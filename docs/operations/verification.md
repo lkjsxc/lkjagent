@@ -59,8 +59,9 @@ for f in $(find docs -name '*.md' ! -name 'README.md'); do
   grep -q "($(basename "$f"))" "$(dirname "$f")/README.md" || echo "unlinked: $f"
 done
 
-# banned tokens (the -ersion family, single-letter release tags, compat framing)
-grep -rniE 'v[0-9]+|[a-z]ersion|legacy|backward|deprecat' docs/ README.md AGENTS.md
+# banned tokens (the -ersion family, single-letter release tags, compat framing);
+# the pattern is split so the scan never matches its own definition here
+grep -rniE "\bv[0-9]+\b|\bvers""ion|\bleg""acy|\bback""ward|\bdeprec""at" docs/ README.md AGENTS.md
 ```
 
 The banned-token scan must print nothing; the others must print nothing.
