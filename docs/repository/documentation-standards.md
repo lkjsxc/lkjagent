@@ -10,7 +10,8 @@ three links and trust what it reads.
 
 - First line: `# Title`. Then a `## Purpose` section stating what the file
   owns. Then the content.
-- ASCII only. Prose lines at most 120 characters. Tables at most 6 columns.
+- ASCII only. Prose lines at most 120 characters; table rows and fenced
+  code blocks are exempt from the width rule. Tables at most 6 columns.
 - Leaf specifications for unbuilt behavior end with a `## Status` section
   holding one of: implemented, design-only, not implemented, out of scope,
   open question.
