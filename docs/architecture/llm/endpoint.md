@@ -1,0 +1,84 @@
+# Endpoint
+
+## Purpose
+
+Specify the wire contract between the harness and the chat-completions route:
+the exact request fields sent, the exact response fields read, the
+non-streaming decision, and the mapping of endpoint failures onto
+[../protocol/recovery.md](../protocol/recovery.md).
+
+## One Crate Touches the Wire
+
+The client lives in the lkjagent-llm crate, and that crate is the only place
+in the workspace where HTTP and serde appear. Every other crate hands it a
+message list and receives a completion or a classified error. The endpoint is
+configured in data/lkjagent.toml by base URL and model name; an optional API
+key is read from an environment variable. The decision to depend on exactly
+one OpenAI-compatible endpoint is
+[../../decisions/openai-endpoint.md](../../decisions/openai-endpoint.md).
+
+## Request Subset
+
+The harness sends exactly these fields and no others:
+
+| Field | Value | Why |
+| --- | --- | --- |
+| model | configured model name | selects the model on a server that may host several |
+| messages | system, user, assistant; plain-string content | frame mapping per [layout.md](../context/layout.md) |
+| max_tokens | 1024 | the generation reserve in [layout.md](../context/layout.md) |
+| temperature | 0.3 | precision over creativity, per [sampling.md](sampling.md) |
+| top_p | 0.9 | per [sampling.md](sampling.md) |
+| stop | `["</act>"]` | every action ends at the act close tag; the server cuts there |
+| stream | false | whole completions only, see below |
+
+No tools field, no response-format field, no logit bias: the action protocol
+lives in the message text, and the parser owns it.
+
+## Non-Streaming, Deliberately
+
+stream is false because nothing consumes partial tokens:
+
+- There is no UI to feed token-by-token; the CLI reads completed events from
+  the store.
+- Whole-completion handling keeps the client and the recovery logic small: a
+  turn either produced a completion or it did not, and a retry re-sends one
+  request instead of resuming a stream.
+
+## Response Subset
+
+The harness reads exactly these fields:
+
+| Field | Feeds |
+| --- | --- |
+| choices[0].message.content | the model turn handed to the parser |
+| choices[0].finish_reason | stop is expected; length triggers the oversize handling |
+| usage.prompt_tokens | the token ledger in [layout.md](../context/layout.md) |
+| usage.completion_tokens | the same ledger |
+| cache metrics, where provided | the transcript, for observability |
+
+A finish_reason of length is the oversize case in
+[../protocol/recovery.md](../protocol/recovery.md). Cache metrics means
+server-side data such as llama.cpp timings and prompt cache hit counts; the
+daemon records them into the transcript so cache health is visible as
+numbers, and their absence is tolerated.
+
+## Error Mapping
+
+Every failure classifies onto the taxonomy in
+[../protocol/recovery.md](../protocol/recovery.md):
+
+| Failure | Recovery class | Response |
+| --- | --- | --- |
+| connection refused or timeout | endpoint error | capped exponential backoff |
+| malformed response body | endpoint error | the same backoff |
+| HTTP 4xx on context overflow | endpoint overflow | error event, forced compaction, incident memory row |
+
+A context overflow surfacing as 4xx is treated as a harness bug, not an
+endpoint fault: the window math failed, and the incident memory row keeps the
+evidence. Retries re-send the identical request bytes, which preserves the
+prefix cache ([caching.md](../context/caching.md)), and nothing is appended
+to the context until a completion arrives.
+
+## Status
+
+design-only.
