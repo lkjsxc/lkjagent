@@ -1,0 +1,71 @@
+# Compose
+
+## Purpose
+
+The docker compose service design: what each service does, what it may
+mount, and the guardrails that keep verification honest. The compose file
+itself lands with [../execution/tasks/compose-final-gate.md](../execution/tasks/compose-final-gate.md).
+
+## Services
+
+| Service | Runs | Mounts |
+| --- | --- | --- |
+| agent | the daemon: lkjagent run | named volume at /data; owner-chosen bind at /workspace |
+| verify | quiet verify inside a fresh image build | none |
+
+The endpoint is not a service this file owns: it is whatever
+OpenAI-compatible server the owner runs, reachable from the agent service
+by URL per [../architecture/llm/endpoint.md](../architecture/llm/endpoint.md).
+A commented example for a llama.cpp-class server container ships in the
+compose file for convenience, disabled by default.
+
+## Shape
+
+```yaml
+services:
+  agent:
+    build: .
+    volumes:
+      - lkjagent-data:/data
+      - ${LKJAGENT_WORKSPACE}:/workspace
+    environment:
+      - LKJAGENT_ENDPOINT_URL
+      - LKJAGENT_API_KEY
+  verify:
+    build: .
+    command: cargo run -p lkjagent-xtask -- quiet verify
+volumes:
+  lkjagent-data:
+```
+
+The committed file is the contract; this sketch shows the intended shape
+and the guardrails below bind it.
+
+## Guardrails
+
+- The verify service never mounts the source tree: it proves the committed
+  repository, per [verification.md](verification.md).
+- The agent service mounts exactly two things: the data volume and one
+  workspace bind. Mounting more enlarges the blast radius described in
+  [../architecture/sandbox/safety.md](../architecture/sandbox/safety.md)
+  and is an owner decision made in an override file, never in the
+  committed compose file.
+- No develop or watch sections, no source bind for hot reload: the harness
+  is rebuilt, not reloaded.
+- Secrets travel as environment variables from the host shell, never as
+  committed values; the compose file references names only.
+- One compose file; environment differences live in the documented
+  variables, not in file forks.
+
+## Daily Commands
+
+```sh
+docker compose up -d agent                          # start the daemon
+docker compose exec agent lkjagent send "..."       # talk to it
+docker compose exec agent lkjagent status           # observe it
+docker compose run --rm verify                      # the final gate
+```
+
+## Status
+
+design-only.

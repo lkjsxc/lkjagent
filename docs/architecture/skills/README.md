@@ -1,0 +1,17 @@
+# Skills
+
+## Purpose
+
+This directory specifies the skill system: markdown capability files in one
+unified format, indexed cheaply in the prefix, loaded whole on demand, and
+refined by the agent itself. Skills are how lkjagent grows capability
+without growing the harness. Decision:
+[../../decisions/unified-skills.md](../../decisions/unified-skills.md).
+Owned by the lkjagent-skills crate.
+
+## Table of Contents
+
+- [format.md](format.md): the canonical skill shape both audiences obey.
+- [loading.md](loading.md): index in the prefix, bodies on demand.
+- [lifecycle.md](lifecycle.md): creation, refinement, and retirement.
+- [library.md](library.md): where skills live and what ships as seed.
