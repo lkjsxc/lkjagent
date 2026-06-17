@@ -9,3 +9,4 @@ Doc contract: [../../docs/architecture/llm/README.md](../../docs/architecture/ll
 
 - [Cargo.toml](Cargo.toml): package manifest.
 - [src/](src/README.md): source map.
+- [tests/](tests/README.md): endpoint client fixtures.

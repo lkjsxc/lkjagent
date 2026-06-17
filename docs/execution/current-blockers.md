@@ -11,7 +11,6 @@ Acceptance section names.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 6 | No endpoint client | [tasks/llm-client.md](tasks/llm-client.md) | open |
 | 7 | No skill validator, index, or loader | [tasks/skill-runtime.md](tasks/skill-runtime.md) | open |
 | 8 | No tool dispatch or adapters | [tasks/tool-runtime.md](tasks/tool-runtime.md) | open |
 | 9 | No agent loop composing the crates | [tasks/agent-loop.md](tasks/agent-loop.md) | open |
@@ -38,3 +37,4 @@ Acceptance section names.
 | 3 | The action grammar has no parser or renderer | [tasks/protocol-parser.md](tasks/protocol-parser.md) | Implement strict action parser and renderer |
 | 4 | No context engine: budgets, admission, compaction decisions | [tasks/context-engine.md](tasks/context-engine.md) | Implement pure context engine decisions |
 | 5 | No store: queue, events, memory, state | [tasks/sqlite-store.md](tasks/sqlite-store.md) | Implement SQLite store boundary |
+| 6 | No endpoint client | [tasks/llm-client.md](tasks/llm-client.md) | Implement LLM endpoint client |

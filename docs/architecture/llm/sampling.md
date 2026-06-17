@@ -39,12 +39,12 @@ cache discipline is specified in [caching.md](../context/caching.md), and a
 config change is a lawful invalidation there precisely because it forces a
 restart.
 
-## Configuration
+## Ownership
 
-All four values live in data/lkjagent.toml beside the endpoint base URL and
-model name. The full table of config keys belongs to
-[../../operations/running.md](../../operations/running.md).
+The lkjagent-llm client owns these four values as request constants. The
+runtime passes the model name and endpoint base URL into the client; config
+file loading belongs to the later runtime and CLI slices.
 
 ## Status
 
-design-only.
+implemented.
