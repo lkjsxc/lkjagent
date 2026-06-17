@@ -10,9 +10,10 @@ design-only, not implemented, out of scope, open question.
 ## Summary
 
 The repository contains the complete documentation contract, a compiling
-Cargo workspace, local verification gates, and the action parser. Runtime
-loop behavior described under [architecture/](architecture/README.md) and
-[product/](product/README.md) is design-only. The implementation queue is
+Cargo workspace, local verification gates, the action parser, and the pure
+context engine. Runtime loop behavior described under
+[architecture/](architecture/README.md) and [product/](product/README.md) is
+design-only. The implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status
@@ -29,7 +30,7 @@ loop behavior described under [architecture/](architecture/README.md) and
 | Docker compose services | design-only | [operations/compose.md](operations/compose.md) |
 | Container image skeleton | implemented | [architecture/sandbox/container.md](architecture/sandbox/container.md) |
 | Daemon and agent loop | design-only | [architecture/runtime/](architecture/runtime/README.md) |
-| Context engine and compaction | design-only | [architecture/context/](architecture/context/README.md) |
+| Context engine and compaction | implemented | [architecture/context/](architecture/context/README.md) |
 | Action protocol and parser | implemented | [architecture/protocol/](architecture/protocol/README.md) |
 | Toolset | design-only | [architecture/tools/](architecture/tools/README.md) |
 | SQLite store and memory | design-only | [architecture/memory/](architecture/memory/README.md) |
@@ -48,7 +49,7 @@ and cron schedules. The boundaries are stated in [vision/scope.md](vision/scope.
 
 Take the first open blocker in
 [execution/current-blockers.md](execution/current-blockers.md): implement the
-context engine per [execution/tasks/context-engine.md](execution/tasks/context-engine.md).
+SQLite store per [execution/tasks/sqlite-store.md](execution/tasks/sqlite-store.md).
 
 ## Honesty Rules
 

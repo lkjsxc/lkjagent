@@ -39,4 +39,4 @@ window.
 
 ## Status
 
-design-only.
+implemented.

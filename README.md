@@ -23,8 +23,8 @@ under [docs/](docs/README.md) is the implementation contract: code follows docs.
 
 ## Status
 
-The Cargo workspace, local verification gates, and action parser are
-implemented. Runtime loop behavior is design-only.
+The Cargo workspace, local verification gates, action parser, and pure
+context engine are implemented. Runtime loop behavior is design-only.
 
 - [docs/current-state.md](docs/current-state.md) is the honest status ledger.
 - [docs/execution/current-blockers.md](docs/execution/current-blockers.md) is the implementation queue.

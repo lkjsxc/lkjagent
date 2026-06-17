@@ -52,4 +52,4 @@ not as vague slowness, per
 
 ## Status
 
-design-only.
+implemented.
