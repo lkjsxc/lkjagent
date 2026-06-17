@@ -104,8 +104,9 @@ fn special_docs_report_skill_task_and_crate_readme_violations() {
     assert_eq!(
         messages(check_special_docs(&files)),
         vec![
+            "docs/agent/skills/foo.md: skill shape: filename must be the kebab-case skill name plus .md",
             "docs/agent/skills/foo.md: skill shape: headings must be Purpose, Trigger, Context, Procedure, Checks, Must Not, optional Handoff",
-            "docs/agent/skills/foo.md: skill shape: filename must be a kebab-case skill name",
+            "docs/agent/skills/foo.md: skill shape: Trigger section must contain one sentence",
             "docs/execution/tasks/foo.md: task shape: headings must match the task template",
             "crates/lkjagent-bad/README.md: crate readme: name the Doc contract",
             "crates/lkjagent-bad/README.md: crate readme: add a Table of Contents",
