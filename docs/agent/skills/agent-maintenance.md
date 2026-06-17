@@ -14,7 +14,8 @@ The manual, AGENTS.md, or this library needs maintenance.
 
 - [../../../AGENTS.md](../../../AGENTS.md): the entry point being maintained.
 - [../README.md](../README.md): the manual's authority table.
-- [../../architecture/runtime/self-maintenance.md](../../architecture/runtime/self-maintenance.md): the directives this skill mirrors.
+- [../../architecture/runtime/self-maintenance.md](../../architecture/runtime/self-maintenance.md):
+  the directives this skill mirrors.
 - [../../architecture/skills/lifecycle.md](../../architecture/skills/lifecycle.md): refinement and retirement bars.
 - Recent session evidence: handoffs, commit history, and any friction the
   requesting user names.

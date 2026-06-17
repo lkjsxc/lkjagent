@@ -9,3 +9,4 @@ Doc contract: [../../docs/operations/verification.md](../../docs/operations/veri
 
 - [Cargo.toml](Cargo.toml): package manifest.
 - [src/](src/README.md): source map.
+- [tests/](tests/README.md): fixture tests.

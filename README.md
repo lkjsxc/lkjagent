@@ -23,7 +23,8 @@ under [docs/](docs/README.md) is the implementation contract: code follows docs.
 
 ## Status
 
-The Cargo workspace skeleton is implemented. Runtime behavior is design-only.
+The Cargo workspace skeleton and local verification gates are implemented.
+Runtime behavior is design-only.
 
 - [docs/current-state.md](docs/current-state.md) is the honest status ledger.
 - [docs/execution/current-blockers.md](docs/execution/current-blockers.md) is the implementation queue.
@@ -60,8 +61,9 @@ The full contract lives in [docs/product/cli.md](docs/product/cli.md) and
 
 ## Verification Design
 
-Gates are designed in [docs/operations/verification.md](docs/operations/verification.md)
-and built by [docs/execution/tasks/xtask-checks.md](docs/execution/tasks/xtask-checks.md):
+Local gates are implemented in
+[docs/operations/verification.md](docs/operations/verification.md) and
+[crates/lkjagent-xtask/](crates/lkjagent-xtask/):
 
 ```sh
 cargo run -p lkjagent-xtask -- check-docs    # doc shape, topology, links, banned tokens

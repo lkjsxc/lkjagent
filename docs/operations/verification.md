@@ -38,39 +38,12 @@ source bind mounts, so the gate proves the repository as committed, not the
 working tree. Service design in [compose.md](compose.md). Any claim that a
 runtime behavior is implemented requires this gate in the same handoff.
 
-## Interim Checks
-
-Until the xtask exists, docs-only changes run these from the repository
-root; together they substitute for check-docs and check-lines:
-
-```sh
-# line cap: no output means pass
-find . -path ./.git -prune -o -type f -name '*.md' -print \
-  | xargs awk 'END{} {c[FILENAME]++} END{for(f in c) if (c[f]>200) print f, c[f]}'
-
-# README topology: every docs dir has README.md and >=2 children
-for d in $(find docs -type d); do
-  [ -f "$d/README.md" ] || echo "missing README: $d"
-  [ "$(ls "$d" | wc -l)" -ge 3 ] || echo "thin directory: $d"
-done
-
-# TOC completeness: every doc is linked from its directory README
-for f in $(find docs -name '*.md' ! -name 'README.md'); do
-  grep -q "($(basename "$f"))" "$(dirname "$f")/README.md" || echo "unlinked: $f"
-done
-
-# banned tokens (the -ersion family, single-letter release tags, compat framing);
-# the pattern is split so the scan never matches its own definition here
-grep -rniE "\bv[0-9]+\b|\bvers""ion|\bleg""acy|\bback""ward|\bdeprec""at" docs/ README.md AGENTS.md
-```
-
-The banned-token scan must print nothing; the others must print nothing.
-
 ## CI
 
 CI runs the final gate and nothing else, so local and CI verdicts cannot
-diverge. The workflow file lands with the xtask task.
+diverge. The workflow file lands with
+[../execution/tasks/compose-final-gate.md](../execution/tasks/compose-final-gate.md).
 
 ## Status
 
-design-only (interim checks excepted: they run today).
+implemented.
