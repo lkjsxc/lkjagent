@@ -19,6 +19,10 @@ by URL per [../architecture/llm/endpoint.md](../architecture/llm/endpoint.md).
 A profiled example for a llama.cpp-class server container ships in the
 compose file for convenience, disabled by default.
 
+Compose reads the repository-root .env file automatically. That file holds
+local deployment values and stays uncommitted; [.env.example](../../.env.example)
+names the expected variables.
+
 ## Shape
 
 ```yaml
@@ -33,6 +37,7 @@ services:
       - ${LKJAGENT_WORKSPACE:-./.lkjagent-workspace}:/workspace
     environment:
       - LKJAGENT_ENDPOINT_URL
+      - LKJAGENT_MODEL
       - LKJAGENT_API_KEY
   verify:
     build:
@@ -57,8 +62,9 @@ and the guardrails below bind it.
   committed compose file.
 - No develop or watch sections, no source bind for hot reload: the harness
   is rebuilt, not reloaded.
-- Secrets travel as environment variables from the host shell, never as
-  committed values; the compose file references names only.
+- Secrets and deployment values travel as environment variables from .env or
+  the host shell, never as committed values; the compose file references
+  names only.
 - One compose file; environment differences live in the documented
   variables, not in file forks.
 

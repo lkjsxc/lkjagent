@@ -32,9 +32,9 @@ mounts below.
 
 | Variable | Meaning |
 | --- | --- |
-| endpoint URL | where the chat-completions endpoint is reached |
-| model | the model name sent on every request |
-| API key | optional; sent to the endpoint when set |
+| LKJAGENT_ENDPOINT_URL | where the chat-completions endpoint is reached |
+| LKJAGENT_MODEL | the model name sent on every request |
+| LKJAGENT_API_KEY | optional; sent to the endpoint when set |
 
 The API key, when needed, arrives by environment variable only: never baked
 into the image and never written to the store, per

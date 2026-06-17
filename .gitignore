@@ -3,6 +3,7 @@
 *.sqlite3
 *.sqlite3-shm
 *.sqlite3-wal
+/.env
 /.lkjagent-models
 /.lkjagent-workspace
 /Cargo.lock

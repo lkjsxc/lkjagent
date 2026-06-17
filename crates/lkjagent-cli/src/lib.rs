@@ -1,5 +1,6 @@
 pub mod args;
 pub mod config;
+pub mod env_file;
 pub mod error;
 pub mod log;
 pub mod memory;
@@ -11,6 +12,7 @@ pub mod store;
 
 use args::{parse_args, Command};
 use error::CliError;
+use std::path::Path;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct CliOutcome {
@@ -30,6 +32,21 @@ where
             stdout,
             stderr: String::new(),
         },
+        Err(error) => CliOutcome {
+            code: error.code(),
+            stdout: String::new(),
+            stderr: error.to_string(),
+        },
+    }
+}
+
+pub fn run_cli_with_dotenv<I, S>(args: I) -> CliOutcome
+where
+    I: IntoIterator<Item = S>,
+    S: Into<String>,
+{
+    match env_file::load(Path::new(".env")) {
+        Ok(()) => run_cli(args),
         Err(error) => CliOutcome {
             code: error.code(),
             stdout: String::new(),
