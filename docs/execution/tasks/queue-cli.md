@@ -7,7 +7,7 @@ the read-only memory and skills commands, all speaking to the store.
 
 ## Status
 
-open
+done
 
 ## Depends On
 

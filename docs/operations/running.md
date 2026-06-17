@@ -58,4 +58,5 @@ the in-flight turn and exits per
 
 ## Status
 
-design-only.
+design-only. First-start config writing is implemented; compose operation
+lands with [../execution/tasks/compose-final-gate.md](../execution/tasks/compose-final-gate.md).

@@ -29,6 +29,11 @@ pub fn set(conn: &Connection, key: &str, value: &str) -> StoreResult<()> {
     Ok(())
 }
 
+pub fn delete(conn: &Connection, key: &str) -> StoreResult<()> {
+    conn.execute("DELETE FROM state WHERE key = ?1", params![key])?;
+    Ok(())
+}
+
 pub fn take_lock(
     conn: &Connection,
     holder: &str,
