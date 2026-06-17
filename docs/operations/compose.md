@@ -10,13 +10,13 @@ itself lands with [../execution/tasks/compose-final-gate.md](../execution/tasks/
 
 | Service | Runs | Mounts |
 | --- | --- | --- |
-| agent | the daemon: lkjagent run | named volume at /data; owner-chosen bind at /workspace |
-| verify | quiet verify inside a fresh image build | none |
+| agent | lkjagent run and the other lkjagent commands | named volume at /data; owner-chosen bind at /workspace |
+| verify | quiet verify inside the build image | none |
 
 The endpoint is not a service this file owns: it is whatever
 OpenAI-compatible server the owner runs, reachable from the agent service
 by URL per [../architecture/llm/endpoint.md](../architecture/llm/endpoint.md).
-A commented example for a llama.cpp-class server container ships in the
+A profiled example for a llama.cpp-class server container ships in the
 compose file for convenience, disabled by default.
 
 ## Shape
@@ -24,15 +24,20 @@ compose file for convenience, disabled by default.
 ```yaml
 services:
   agent:
-    build: .
+    build:
+      context: .
+      target: runtime
+    command: ["run"]
     volumes:
       - lkjagent-data:/data
-      - ${LKJAGENT_WORKSPACE}:/workspace
+      - ${LKJAGENT_WORKSPACE:-./.lkjagent-workspace}:/workspace
     environment:
       - LKJAGENT_ENDPOINT_URL
       - LKJAGENT_API_KEY
   verify:
-    build: .
+    build:
+      context: .
+      target: build
     command: cargo run -p lkjagent-xtask -- quiet verify
 volumes:
   lkjagent-data:
@@ -60,12 +65,12 @@ and the guardrails below bind it.
 ## Daily Commands
 
 ```sh
-docker compose up -d agent                          # start the daemon
-docker compose exec agent lkjagent send "..."       # talk to it
-docker compose exec agent lkjagent status           # observe it
+docker compose run --rm agent                       # first start writes config if missing
+docker compose run --rm agent send "..."            # talk to it
+docker compose run --rm agent status                # observe it
 docker compose run --rm verify                      # the final gate
 ```
 
 ## Status
 
-design-only.
+implemented.

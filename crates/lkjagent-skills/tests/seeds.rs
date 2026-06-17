@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 use std::fs;
-use std::io::{Error, ErrorKind};
+use std::path::Path;
 use std::process::{Command, Stdio};
 
 use lkjagent_skills::model::SkillSource;
@@ -41,17 +41,52 @@ fn seed_procedure_commands_exist_in_container() -> TestResult<()> {
 }
 
 fn repo_paths() -> TestResult<BTreeSet<String>> {
+    if !Path::new(".git").exists() {
+        return walk_paths(Path::new("."));
+    }
     let output = Command::new("git")
         .args(["ls-files", "--cached", "--others", "--exclude-standard"])
         .output()?;
     if !output.status.success() {
-        return Err(Box::new(Error::new(
-            ErrorKind::Other,
-            "git ls-files failed",
-        )));
+        return Err("git ls-files failed".into());
     }
     let text = String::from_utf8(output.stdout)?;
     Ok(text.lines().map(str::to_string).collect())
+}
+
+fn walk_paths(root: &Path) -> TestResult<BTreeSet<String>> {
+    let mut paths = BTreeSet::new();
+    collect_path(root, root, &mut paths)?;
+    Ok(paths)
+}
+
+fn collect_path(root: &Path, path: &Path, paths: &mut BTreeSet<String>) -> TestResult<()> {
+    for entry in fs::read_dir(path)? {
+        let entry = entry?;
+        let path = entry.path();
+        let relative = path
+            .strip_prefix(root)?
+            .to_string_lossy()
+            .replace('\\', "/");
+        if ignored(&relative) {
+            continue;
+        }
+        if path.is_dir() {
+            collect_path(root, &path, paths)?;
+        } else if path.is_file() {
+            paths.insert(relative);
+        }
+    }
+    Ok(())
+}
+
+fn ignored(relative: &str) -> bool {
+    relative.split('/').any(|part| {
+        matches!(
+            part,
+            ".git" | ".lkjagent-models" | ".lkjagent-workspace" | ".omx" | "data" | "target"
+        )
+    })
 }
 
 fn is_skill_path(path: &str) -> bool {

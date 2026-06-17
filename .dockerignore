@@ -1,4 +1,6 @@
 .git
+.lkjagent-models
+.lkjagent-workspace
 .omx
 Cargo.lock
 data
