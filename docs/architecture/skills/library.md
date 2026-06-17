@@ -46,4 +46,4 @@ in [../../execution/tasks/skill-runtime.md](../../execution/tasks/skill-runtime.
 
 ## Status
 
-design-only.
+implemented.

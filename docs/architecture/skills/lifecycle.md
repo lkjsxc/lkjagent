@@ -56,4 +56,5 @@ git history as provenance in both worlds.
 
 ## Status
 
-design-only.
+design-only. The format validator exists; skill.save, refinement, and
+retirement actions land with later tool and maintenance slices.

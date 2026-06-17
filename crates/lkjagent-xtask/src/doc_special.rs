@@ -1,5 +1,8 @@
 use std::collections::BTreeSet;
 
+use lkjagent_skills::model::SkillSource;
+use lkjagent_skills::validate::validate;
+
 use crate::model::{RepoFile, Violation};
 
 pub fn check_special_docs(files: &[RepoFile]) -> Vec<Violation> {
@@ -12,50 +15,23 @@ pub fn check_special_docs(files: &[RepoFile]) -> Vec<Violation> {
 
 fn check_skill_shapes(files: &[RepoFile]) -> Vec<Violation> {
     let mut violations = Vec::new();
+    let known_paths: BTreeSet<String> = files.iter().map(|file| file.path.clone()).collect();
     for file in files.iter().filter(|file| is_skill(file)) {
-        let headings = headings(file);
-        let required = [
-            "Purpose",
-            "Trigger",
-            "Context",
-            "Procedure",
-            "Checks",
-            "Must Not",
-        ];
-        let has_handoff = headings.last().is_some_and(|heading| heading == "Handoff");
-        let body = if has_handoff {
-            headings
-                .iter()
-                .take(headings.len().saturating_sub(1))
-                .cloned()
-                .collect()
-        } else {
-            headings.clone()
+        let source = SkillSource {
+            path: &file.path,
+            text: &file.text,
+            known_paths: &known_paths,
         };
-        if body != required {
-            violations.push(Violation::new(
-                &file.path,
-                "skill shape",
-                "headings must be Purpose, Trigger, Context, Procedure, Checks, Must Not, optional Handoff",
-            ));
-        }
-        if !file
-            .path
-            .trim_start_matches("docs/agent/skills/")
-            .contains('-')
-        {
-            violations.push(Violation::new(
-                &file.path,
-                "skill shape",
-                "filename must be a kebab-case skill name",
-            ));
+        for violation in validate(&source).violations {
+            violations.push(Violation::new(&file.path, "skill shape", violation.message));
         }
     }
     violations
 }
 
 fn is_skill(file: &RepoFile) -> bool {
-    file.path.starts_with("docs/agent/skills/")
+    (file.path.starts_with("docs/agent/skills/")
+        || file.path.starts_with("crates/lkjagent-skills/seeds/"))
         && file.path.ends_with(".md")
         && !file.path.ends_with("/README.md")
 }

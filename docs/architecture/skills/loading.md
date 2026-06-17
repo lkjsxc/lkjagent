@@ -18,8 +18,8 @@ fix-flaky-test: A test passes alone but fails in the suite.
 Name, colon, trigger sentence, within the 512-token index budget from
 [../context/budgets.md](../context/budgets.md). When the library outgrows
 the budget, the entries with the oldest use stamps degrade to name-only
-until usage promotes them again; degradation order is deterministic so the
-prefix stays byte-stable between compactions.
+until usage promotes them again; ties break by skill name. Degradation
+order is deterministic so the prefix stays byte-stable between compactions.
 
 ## Loading a Body
 
@@ -62,4 +62,4 @@ skill.use appends the file verbatim as one immutable skill frame:
 
 ## Status
 
-design-only.
+implemented.
