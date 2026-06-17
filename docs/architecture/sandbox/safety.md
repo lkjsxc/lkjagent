@@ -13,6 +13,8 @@ There are no permission prompts and no approval flows, by design:
 Prompts assume an attending human, which contradicts a continuously
 running, queue-fed agent. Inside the container the agent edits, executes,
 installs, and reaches the network without asking.
+Task turns and maintenance turns have the same authority; maintenance has
+no extra sandbox beyond this boundary.
 
 ## Blast Radius
 

@@ -11,8 +11,10 @@ the thin CLI share it without IPC.
 The store is one SQLite file at data/lkjagent.sqlite3, on the /data volume
 inside the container per [../sandbox/workspace.md](../sandbox/workspace.md).
 It runs in WAL mode so the daemon and the thin CLI share the file safely:
-the CLI writes queue rows and reads transcript rows directly, and no socket
-or IPC protocol exists. sqlite3 on the file is the forensics surface per
+the CLI and tools call lkjagent-store directly, and no socket or IPC
+protocol exists. Queue writes use store APIs only; SQL strings for queue
+mutation do not appear outside this crate. sqlite3 on the file is the
+read-only forensics surface per
 [../../product/observability.md](../../product/observability.md).
 
 ## Tables
@@ -25,8 +27,10 @@ The persistent owner-message queue, drained by the loop at turn boundaries.
 | --- | --- | --- |
 | id | INTEGER PRIMARY KEY | delivery order |
 | created_at | TEXT | enqueue time |
+| updated_at | TEXT | last mutation time |
+| source_queue_id | INTEGER | source row for redelivery; null for original enqueue |
 | content | TEXT | the owner message, verbatim |
-| status | TEXT | pending or delivered |
+| status | TEXT | pending, delivered, or deleted |
 | delivered_turn | INTEGER | the turn that received the row; null while pending |
 
 ### events
@@ -36,8 +40,8 @@ The transcript: append-only, never updated, never deleted.
 | Column | Type | Meaning |
 | --- | --- | --- |
 | id | INTEGER PRIMARY KEY | total order of the transcript |
-| turn | INTEGER | the turn the event belongs to |
-| kind | TEXT | owner, action, observation, notice, compaction, or error |
+| turn | INTEGER | owning turn; null for out-of-turn queue mutation events |
+| kind | TEXT | owner, action, observation, notice, queue_mutation, compaction, or error |
 | content | TEXT | the event payload |
 | tokens | INTEGER | token count of the payload as windowed |
 | created_at | TEXT | write time |
@@ -79,10 +83,20 @@ writes the owner event in the same transaction, so a message is never both
 delivered and missing from the transcript. A SIGKILL loses at most one
 in-flight turn; the queue and the transcript stay consistent.
 
+Queue mutation APIs, including CLI send and the queue tools, enqueue, edit,
+delete, and redeliver rows in the same transaction as their queue_mutation
+event. That event records operation, reason, target id, source_queue_id
+when present, and before and after content where applicable. CLI send uses
+the fixed reason `owner-send`.
+
 ## Mutability
 
 - events rows are append-only: no update, no delete, ever. The transcript
   is the complete truth of agent behavior.
+- queue rows mutate only through lkjagent-store queue APIs. Pending rows
+  can be edited or tombstoned; delivered rows keep their delivered content
+  and turn. Redelivery inserts a new source-linked pending row instead of
+  rewriting delivered history.
 - memory rows may be updated and deleted, but only through memory.save and
   the prune-memory directive per [distillation.md](distillation.md).
 

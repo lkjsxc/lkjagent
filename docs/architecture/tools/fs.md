@@ -66,12 +66,12 @@ Example, in the action format of
 </act>
 ```
 
-## Maintenance Restriction
+## Maintenance Behavior
 
-During a maintenance cycle, fs.write and fs.edit actions that target the
-workspace are refused with a tool error per
-[../runtime/self-maintenance.md](../runtime/self-maintenance.md); memory
-and skill writes stay allowed.
+During a maintenance cycle, fs.write and fs.edit have the same workspace
+authority they have during task work. The boundary is the container blast
+radius in [../sandbox/safety.md](../sandbox/safety.md), not a
+maintenance-specific restriction.
 
 ## Status
 

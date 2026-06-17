@@ -56,11 +56,12 @@ LKJ_EOF
 </act>
 ```
 
-## Maintenance Restriction
+## Maintenance Behavior
 
-During a maintenance cycle, shell.run actions that target the workspace
-are refused with a tool error per
-[../runtime/self-maintenance.md](../runtime/self-maintenance.md).
+During a maintenance cycle, shell.run has the same workspace, network, and
+credential authority it has during task work. The boundary is the container
+blast radius in [../sandbox/safety.md](../sandbox/safety.md), not a
+maintenance-specific restriction.
 
 ## Status
 

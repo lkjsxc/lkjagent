@@ -2,9 +2,9 @@
 
 ## Purpose
 
-Implement lkjagent-store: schema setup, queue operations with exactly-once
-delivery, append-only events, editable memory with FTS retrieval, the state
-table, and the daemon lock row.
+Implement lkjagent-store: schema setup, queue delivery and mutation APIs,
+append-only events, editable memory with FTS retrieval, the state table,
+and the daemon lock row.
 
 ## Status
 
@@ -42,6 +42,13 @@ cargo clippy -p lkjagent-store -- -D warnings
 
 - Queue delivery marks the row and writes the owner event in one
   transaction; the exactly-once test passes under interleaved writers.
+- Queue rows include updated_at, source_queue_id, and status values pending,
+  delivered, and deleted.
+- Queue enqueue, edit, delete, and redeliver APIs write a queue_mutation
+  event in the same transaction, including operation, reason, target id,
+  source link, and before and after content where applicable.
+- queue.delete is a tombstone; queue.redeliver creates a new pending row
+  linked by source_queue_id; delivered owner events are never rewritten.
 - The events API exposes append and read only; no update or delete
   functions exist.
 - memory.find ranking honors bm25 with kind weights and recency tiebreak

@@ -33,8 +33,8 @@ directories with short focused files.
 - `architecture/protocol/README.md` `architecture/protocol/action-format.md` `architecture/protocol/parsing.md`
   `architecture/protocol/system-prompt.md` `architecture/protocol/recovery.md`
 - `architecture/tools/README.md` `architecture/tools/registry.md` `architecture/tools/fs.md`
-  `architecture/tools/shell.md` `architecture/tools/memory-ops.md` `architecture/tools/skill-ops.md`
-  `architecture/tools/control.md`
+  `architecture/tools/shell.md` `architecture/tools/queue-ops.md` `architecture/tools/memory-ops.md`
+  `architecture/tools/skill-ops.md` `architecture/tools/control.md`
 - `architecture/memory/README.md` `architecture/memory/store.md` `architecture/memory/retrieval.md`
   `architecture/memory/transcripts.md` `architecture/memory/distillation.md`
 - `architecture/skills/README.md` `architecture/skills/format.md` `architecture/skills/loading.md`

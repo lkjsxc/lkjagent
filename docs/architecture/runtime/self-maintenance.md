@@ -31,12 +31,14 @@ model never schedules itself.
 
 ## Bounds
 
-- Maintenance uses the same toolset, protocol, and budgets as task work;
-  there is no privileged mode.
-- Maintenance may write memory rows and skill files; it must not touch the
-  workspace or the queue. The restriction is enforced by the harness
-  refusing fs and shell actions targeting the workspace during maintenance,
-  with a tool_error observation.
+- Maintenance uses the same toolset, protocol, budgets, and YOLO authority
+  as task work; it has no special sandbox inside the container blast radius.
+- Maintenance may mutate /workspace and /data: workspace files, git state
+  and remotes, queue rows, memory rows, skills, config, and external
+  services when credentials and network access exist.
+- Maintenance still obeys the integrity invariants: one action per turn,
+  bounded observations, real observations only, append-only transcript
+  events, and queue preemption only at turn boundaries.
 - A maintenance cycle that finds nothing useful ends early with agent.done
   and a one-line summary; an empty cycle is a valid, honest outcome.
 

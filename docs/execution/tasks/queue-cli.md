@@ -38,7 +38,9 @@ cargo run -p lkjagent-xtask -- quiet verify
 
 ## Acceptance
 
-- send appends and prints the queue id; a daemonless send still persists.
+- send appends through lkjagent-store, writes a queue_mutation event with
+  reason owner-send, and prints the queue id; a daemonless send still
+  persists.
 - status prints daemon state, queue depth, open task, turns, context
   ledger numbers, and last compaction, one fact per line.
 - log renders the documented compact form; --follow tails; --full prints

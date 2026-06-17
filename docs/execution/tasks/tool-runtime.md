@@ -3,8 +3,7 @@
 ## Purpose
 
 Implement lkjagent-tools: the dispatcher validating against the shared
-registry table and the ten tool adapters, each returning bounded
-observations.
+registry table and the tool adapters, each returning bounded observations.
 
 ## Status
 
@@ -21,6 +20,7 @@ open
 - [../../architecture/tools/registry.md](../../architecture/tools/registry.md)
 - [../../architecture/tools/fs.md](../../architecture/tools/fs.md)
 - [../../architecture/tools/shell.md](../../architecture/tools/shell.md)
+- [../../architecture/tools/queue-ops.md](../../architecture/tools/queue-ops.md)
 - [../../architecture/tools/memory-ops.md](../../architecture/tools/memory-ops.md)
 - [../../architecture/tools/skill-ops.md](../../architecture/tools/skill-ops.md)
 - [../../architecture/tools/control.md](../../architecture/tools/control.md)
@@ -28,8 +28,8 @@ open
 ## Files To Touch
 
 - crates/lkjagent-tools/src/: dispatch.rs (validation order from the
-  registry contract, maintenance restrictions), fs.rs, shell.rs,
-  memory.rs, skill.rs, control.rs, observe.rs (observation frame
+  registry contract), fs.rs, shell.rs, queue.rs, memory.rs, skill.rs,
+  control.rs, observe.rs (observation frame
   construction and truncation), error.rs.
 - crates/lkjagent-tools/tests/: per-tool tables against tempdir
   filesystems and in-memory stores; shell tests against real /bin/sh.
@@ -49,8 +49,10 @@ cargo clippy -p lkjagent-tools -- -D warnings
   observations carry path and byte count, never content.
 - shell.run captures head and tail within the cap, reports exit codes, and
   enforces the timeout against a real slow command.
-- Maintenance-mode restriction refuses workspace writes with a tool error,
-  tested.
+- Queue tools validate ids, statuses, and reasons; mutation tools call only
+  lkjagent-store and return bounded observations.
+- During maintenance, fs, shell, and queue actions have the same authority
+  as task actions, bounded only by the container blast radius.
 - Duplicate-read refusal and repeat-action detection produce the
   documented notices.
 - Blocker row 8 done; tools area status moves in the ledger.
@@ -59,5 +61,5 @@ cargo clippy -p lkjagent-tools -- -D warnings
 
 - Do not let any adapter decide policy; caps and restrictions arrive from
   the context engine and dispatcher as values.
-- Do not add tools beyond the ten; new capability is a skill.
+- Do not add tools beyond the registry table; new capability is a skill.
 - Do not shell out from non-shell adapters.
