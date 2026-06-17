@@ -40,4 +40,4 @@ the command itself succeeded; it never claims anything about task success.
 
 ## Status
 
-design-only.
+implemented.

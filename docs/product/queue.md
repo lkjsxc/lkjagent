@@ -55,4 +55,4 @@ delivered, per [../architecture/context/budgets.md](../architecture/context/budg
 
 ## Status
 
-design-only.
+implemented.

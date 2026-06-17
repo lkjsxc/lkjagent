@@ -12,9 +12,10 @@ design-only, not implemented, out of scope, open question.
 The repository contains the complete documentation contract, a compiling
 Cargo workspace, local verification gates, the action parser, the pure
 context engine, the SQLite store boundary, the LLM endpoint client, the
-skill validator plus seed library, the tool dispatcher/adapters, and the
-runtime step/daemon core. CLI behavior described under
-[product/](product/README.md) is design-only. The implementation queue is
+skill validator plus seed library, the tool dispatcher/adapters, the
+runtime step/daemon core, and the CLI for send, status, log, memory,
+skills, and startup checks. Self-maintenance and compose wiring are
+design-only. The implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status
@@ -38,7 +39,7 @@ runtime step/daemon core. CLI behavior described under
 | Skill validator, index, loader, and seed library | implemented | [architecture/skills/](architecture/skills/README.md) |
 | LLM endpoint client | implemented | [architecture/llm/](architecture/llm/README.md) |
 | Container and sandbox | design-only | [architecture/sandbox/](architecture/sandbox/README.md) |
-| User message queue and CLI | design-only | [product/](product/README.md) |
+| User message queue and CLI | implemented | [product/](product/README.md) |
 | Self-maintenance loop | design-only | [architecture/runtime/self-maintenance.md](architecture/runtime/self-maintenance.md) |
 
 ## Out of Scope
@@ -50,7 +51,7 @@ and cron schedules. The boundaries are stated in [vision/scope.md](vision/scope.
 
 Take the first open blocker in
 [execution/current-blockers.md](execution/current-blockers.md): implement the
-queue CLI per [execution/tasks/queue-cli.md](execution/tasks/queue-cli.md).
+self-maintenance loop per [execution/tasks/self-maintenance.md](execution/tasks/self-maintenance.md).
 
 ## Honesty Rules
 

@@ -40,4 +40,4 @@ the CLI reads it. Anything fancier is a skill the agent can build on demand.
 
 ## Status
 
-design-only.
+implemented.

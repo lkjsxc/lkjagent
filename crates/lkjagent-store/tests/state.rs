@@ -1,6 +1,6 @@
 mod support;
 
-use lkjagent_store::state::{take_lock, LockDecision};
+use lkjagent_store::state::{delete, get, take_lock, LockDecision};
 use support::{memory_store, TestResult};
 
 #[test]
@@ -33,5 +33,7 @@ fn lock_take_refuse_and_reclaim_behaviors_work() -> TestResult<()> {
         )?,
         LockDecision::Reclaimed { .. }
     ));
+    delete(&conn, "daemon lock")?;
+    assert_eq!(get(&conn, "daemon lock")?, None);
     Ok(())
 }
