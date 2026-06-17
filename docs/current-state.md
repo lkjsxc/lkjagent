@@ -11,8 +11,9 @@ design-only, not implemented, out of scope, open question.
 
 The repository contains the complete documentation contract, a compiling
 Cargo workspace, local verification gates, the action parser, the pure
-context engine, the SQLite store boundary, the LLM endpoint client, and the
-skill validator plus seed library. Runtime loop behavior described under
+context engine, the SQLite store boundary, the LLM endpoint client, the
+skill validator plus seed library, and the tool dispatcher/adapters.
+Runtime loop behavior described under
 [architecture/](architecture/README.md) and [product/](product/README.md) is
 design-only. The implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
@@ -33,7 +34,7 @@ design-only. The implementation queue is
 | Daemon and agent loop | design-only | [architecture/runtime/](architecture/runtime/README.md) |
 | Context engine and compaction | implemented | [architecture/context/](architecture/context/README.md) |
 | Action protocol and parser | implemented | [architecture/protocol/](architecture/protocol/README.md) |
-| Toolset | design-only | [architecture/tools/](architecture/tools/README.md) |
+| Toolset | implemented | [architecture/tools/](architecture/tools/README.md) |
 | SQLite store, transcript, and memory access | implemented | [architecture/memory/](architecture/memory/README.md) |
 | Skill validator, index, loader, and seed library | implemented | [architecture/skills/](architecture/skills/README.md) |
 | LLM endpoint client | implemented | [architecture/llm/](architecture/llm/README.md) |
@@ -50,7 +51,7 @@ and cron schedules. The boundaries are stated in [vision/scope.md](vision/scope.
 
 Take the first open blocker in
 [execution/current-blockers.md](execution/current-blockers.md): implement the
-tool runtime per [execution/tasks/tool-runtime.md](execution/tasks/tool-runtime.md).
+agent loop per [execution/tasks/agent-loop.md](execution/tasks/agent-loop.md).
 
 ## Honesty Rules
 

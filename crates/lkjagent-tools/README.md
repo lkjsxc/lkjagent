@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This crate owns tool execution adapter code.
+This crate owns tool dispatch, adapter code, and bounded observations.
 Doc contract: [../../docs/architecture/tools/README.md](../../docs/architecture/tools/README.md).
 
 ## Table of Contents

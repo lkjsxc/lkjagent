@@ -44,7 +44,6 @@ const FS_EDIT: &[ParamSpec] = &[
 const SHELL_RUN: &[ParamSpec] = &[
     ParamSpec::req("command"),
     ParamSpec::opt("timeout", Some("60")),
-    ParamSpec::opt("max", Some("600")),
 ];
 const QUEUE_LIST: &[ParamSpec] = &[
     ParamSpec::opt("status", Some("all")),

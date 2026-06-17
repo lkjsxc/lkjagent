@@ -11,7 +11,6 @@ Acceptance section names.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 8 | No tool dispatch or adapters | [tasks/tool-runtime.md](tasks/tool-runtime.md) | open |
 | 9 | No agent loop composing the crates | [tasks/agent-loop.md](tasks/agent-loop.md) | open |
 | 10 | No binary: daemon entry, send, status, log | [tasks/queue-cli.md](tasks/queue-cli.md) | open |
 | 11 | Idle time does nothing | [tasks/self-maintenance.md](tasks/self-maintenance.md) | open |
@@ -38,3 +37,4 @@ Acceptance section names.
 | 5 | No store: queue, events, memory, state | [tasks/sqlite-store.md](tasks/sqlite-store.md) | Implement SQLite store boundary |
 | 6 | No endpoint client | [tasks/llm-client.md](tasks/llm-client.md) | Implement LLM endpoint client |
 | 7 | No skill validator, index, or loader | [tasks/skill-runtime.md](tasks/skill-runtime.md) | Implement skill runtime and seeds |
+| 8 | No tool dispatch or adapters | [tasks/tool-runtime.md](tasks/tool-runtime.md) | Implement tool runtime dispatch |

@@ -44,4 +44,4 @@ re-reading files is the cheap path under
 
 ## Status
 
-design-only.
+implemented.
