@@ -77,4 +77,4 @@ Renamed the flag in both call sites; cargo test passes 41/41.
 
 ## Status
 
-design-only.
+implemented.
