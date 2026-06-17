@@ -1,0 +1,13 @@
+# lkjagent-store Tests
+
+## Purpose
+
+This directory holds in-memory SQLite integration tests for the store crate.
+
+## Table of Contents
+
+- [events.rs](events.rs): append/read event ordering fixture.
+- [memory.rs](memory.rs): FTS ranking, digest, update, and delete fixtures.
+- [queue.rs](queue.rs): delivery and mutation fixtures.
+- [state.rs](state.rs): daemon lock fixture.
+- [support/](support/README.md): shared in-memory setup helper.

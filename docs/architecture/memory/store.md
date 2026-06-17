@@ -59,6 +59,7 @@ Distilled durable knowledge, written per [distillation.md](distillation.md).
 | title | TEXT | searchable noun phrase |
 | tags | TEXT | files, tools, and subsystems touched |
 | content | TEXT | the entry body |
+| tokens | INTEGER | budget cost used by digest selection |
 | created_at | TEXT | first write |
 | updated_at | TEXT | last edit; the recency key in [retrieval.md](retrieval.md) |
 
@@ -111,4 +112,4 @@ the fixed reason `owner-send`.
 
 ## Status
 
-design-only.
+implemented.

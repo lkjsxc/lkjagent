@@ -41,9 +41,8 @@ written in the same transaction.
 
 ## Rendering
 
-`lkjagent log` renders events in id order, one line per event with kind,
-turn when present, and a bounded preview; `--full` prints whole payloads.
-The owner surfaces are owned by
+Store readers receive events in id order with kind, turn when present,
+content, tokens, and created_at. The `lkjagent log` CLI surface is owned by
 [../../product/observability.md](../../product/observability.md).
 
 ## Reproducibility
@@ -56,4 +55,4 @@ files.
 
 ## Status
 
-design-only.
+implemented.

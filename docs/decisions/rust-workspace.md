@@ -15,6 +15,9 @@ Dependencies are few and boring: an HTTP client, a SQLite binding, a TOML
 reader, and serde for the endpoint wire format only. Anything a skill can do
 through shell does not become a dependency.
 
+Cargo.lock is local cargo output. The committed source of dependency truth
+is the workspace manifests plus the dependency allowlist gate.
+
 ## Consequences
 
 - Compile-time guarantees carry much of the verification burden; the type

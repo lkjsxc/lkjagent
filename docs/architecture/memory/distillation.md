@@ -53,4 +53,5 @@ distinction is fixed in [store.md](store.md).
 
 ## Status
 
-design-only.
+design-only. Store APIs for memory writes, edits, deletes, and digest
+selection are implemented; runtime distillation turns are not.
