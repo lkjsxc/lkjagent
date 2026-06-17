@@ -25,8 +25,8 @@ fn parses_clean_turns_and_round_trips_rendered_actions() {
             Action::new("fs.read", vec![Param::new("path", " notes.md ")]),
         ),
         (
-            "<act>\n<tool>shell.run</tool>\n<max>20</max>\n<command>cargo test</command>\n</act>",
-            Action::new("shell.run", vec![Param::new("max", "20"), Param::new("command", "cargo test")]),
+            "<act>\n<tool>shell.run</tool>\n<timeout>20</timeout>\n<command>cargo test</command>\n</act>",
+            Action::new("shell.run", vec![Param::new("timeout", "20"), Param::new("command", "cargo test")]),
         ),
     ];
 

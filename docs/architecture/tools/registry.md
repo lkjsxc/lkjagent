@@ -77,4 +77,4 @@ from it; there is no second copy to fall out of step.
 
 ## Status
 
-design-only.
+implemented.

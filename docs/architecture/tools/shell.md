@@ -65,4 +65,4 @@ maintenance-specific restriction.
 
 ## Status
 
-design-only.
+implemented.

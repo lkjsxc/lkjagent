@@ -46,4 +46,4 @@ waits for compaction.
 
 ## Status
 
-design-only.
+implemented.

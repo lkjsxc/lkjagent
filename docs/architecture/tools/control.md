@@ -48,4 +48,4 @@ refuses think as a tool name like any other unknown name.
 
 ## Status
 
-design-only.
+implemented.

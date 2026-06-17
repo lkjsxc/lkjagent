@@ -5,6 +5,8 @@ use crate::error::{StoreError, StoreResult};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct QueueRow {
     pub id: i64,
+    pub created_at: String,
+    pub updated_at: String,
     pub source_queue_id: Option<i64>,
     pub content: String,
     pub status: String,
@@ -14,7 +16,7 @@ pub struct QueueRow {
 pub(super) fn next_pending(tx: &Transaction<'_>) -> StoreResult<Option<QueueRow>> {
     let row = tx
         .query_row(
-            "SELECT id, source_queue_id, content, status, delivered_turn
+            "SELECT id, created_at, updated_at, source_queue_id, content, status, delivered_turn
              FROM queue WHERE status = 'pending' ORDER BY id LIMIT 1",
             [],
             row_from_sql,
@@ -63,9 +65,11 @@ where
 fn row_from_sql(row: &rusqlite::Row<'_>) -> rusqlite::Result<QueueRow> {
     Ok(QueueRow {
         id: row.get(0)?,
-        source_queue_id: row.get(1)?,
-        content: row.get(2)?,
-        status: row.get(3)?,
-        delivered_turn: row.get(4)?,
+        created_at: row.get(1)?,
+        updated_at: row.get(2)?,
+        source_queue_id: row.get(3)?,
+        content: row.get(4)?,
+        status: row.get(5)?,
+        delivered_turn: row.get(6)?,
     })
 }

@@ -127,6 +127,7 @@ pub fn deliver_next(
     append_event_tx(&tx, Some(turn), EventKind::Owner, &row.content, tokens, now)?;
     tx.commit()?;
     Ok(Some(QueueRow {
+        updated_at: now.to_string(),
         status: "delivered".to_string(),
         delivered_turn: Some(turn),
         ..row
@@ -135,7 +136,8 @@ pub fn deliver_next(
 
 pub fn list(conn: &Connection) -> StoreResult<Vec<QueueRow>> {
     let mut statement = conn.prepare(
-        "SELECT id, source_queue_id, content, status, delivered_turn FROM queue ORDER BY id",
+        "SELECT id, created_at, updated_at, source_queue_id, content, status, delivered_turn
+         FROM queue ORDER BY id",
     )?;
     rows_from_statement(&mut statement, [])
 }

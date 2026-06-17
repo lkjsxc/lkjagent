@@ -7,7 +7,7 @@ registry table and the tool adapters, each returning bounded observations.
 
 ## Status
 
-open
+done
 
 ## Depends On
 
