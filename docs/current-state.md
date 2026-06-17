@@ -9,9 +9,10 @@ design-only, not implemented, out of scope, open question.
 
 ## Summary
 
-The repository contains the complete documentation contract and no Rust code.
-Every runtime behavior described under [architecture/](architecture/README.md)
-and [product/](product/README.md) is design-only. The implementation queue is
+The repository contains the complete documentation contract and a compiling
+Cargo workspace skeleton. Every runtime behavior described under
+[architecture/](architecture/README.md) and [product/](product/README.md) is
+design-only. The implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status
@@ -23,9 +24,10 @@ and [product/](product/README.md) is design-only. The implementation queue is
 | Decision records | implemented | [decisions/](decisions/README.md) |
 | Agent manual and skills | implemented | [agent/](agent/README.md) |
 | Execution queue and tasks | implemented | [execution/](execution/README.md) |
-| Cargo workspace and crates | design-only | [repository/layout.md](repository/layout.md) |
+| Cargo workspace and crates | implemented | [repository/layout.md](repository/layout.md) |
 | Verification xtask and quiet gates | design-only | [operations/verification.md](operations/verification.md) |
 | Docker compose services | design-only | [operations/compose.md](operations/compose.md) |
+| Container image skeleton | implemented | [architecture/sandbox/container.md](architecture/sandbox/container.md) |
 | Daemon and agent loop | design-only | [architecture/runtime/](architecture/runtime/README.md) |
 | Context engine and compaction | design-only | [architecture/context/](architecture/context/README.md) |
 | Action protocol and parser | design-only | [architecture/protocol/](architecture/protocol/README.md) |
@@ -45,9 +47,8 @@ and cron schedules. The boundaries are stated in [vision/scope.md](vision/scope.
 ## Next Step
 
 Take the first open blocker in
-[execution/current-blockers.md](execution/current-blockers.md):
-bootstrap the cargo workspace per
-[execution/tasks/bootstrap-workspace.md](execution/tasks/bootstrap-workspace.md).
+[execution/current-blockers.md](execution/current-blockers.md): build the
+repository checks per [execution/tasks/xtask-checks.md](execution/tasks/xtask-checks.md).
 
 ## Honesty Rules
 

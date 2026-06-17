@@ -1,6 +1,8 @@
-/target
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
 /crates/**/target
 /data
-*.sqlite3
-*.sqlite3-wal
-*.sqlite3-shm
+/target
