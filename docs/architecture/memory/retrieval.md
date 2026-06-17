@@ -47,4 +47,4 @@ Whole-entry selection is why entries stay near 200 tokens per
 
 ## Status
 
-design-only.
+implemented.

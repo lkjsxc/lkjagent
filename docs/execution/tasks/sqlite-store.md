@@ -8,7 +8,7 @@ and the daemon lock row.
 
 ## Status
 
-open
+done
 
 ## Depends On
 

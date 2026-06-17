@@ -9,3 +9,4 @@ Doc contract: [../../docs/architecture/memory/README.md](../../docs/architecture
 
 - [Cargo.toml](Cargo.toml): package manifest.
 - [src/](src/README.md): source map.
+- [tests/](tests/README.md): SQLite store integration fixtures.

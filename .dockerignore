@@ -1,5 +1,6 @@
 .git
 .omx
+Cargo.lock
 data
 target
 *.db
