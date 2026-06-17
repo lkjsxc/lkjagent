@@ -8,12 +8,12 @@ the fixture table both are tested against.
 
 ## Status
 
-open
+done with Implement strict action parser and renderer
 
 ## Depends On
 
-[bootstrap-workspace.md](bootstrap-workspace.md); runs under interim checks
-if [xtask-checks.md](xtask-checks.md) is blocked.
+[bootstrap-workspace.md](bootstrap-workspace.md);
+[xtask-checks.md](xtask-checks.md).
 
 ## Files To Read
 

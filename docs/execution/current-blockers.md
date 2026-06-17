@@ -11,7 +11,6 @@ Acceptance section names.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 3 | The action grammar has no parser or renderer | [tasks/protocol-parser.md](tasks/protocol-parser.md) | open |
 | 4 | No context engine: budgets, admission, compaction decisions | [tasks/context-engine.md](tasks/context-engine.md) | open |
 | 5 | No store: queue, events, memory, state | [tasks/sqlite-store.md](tasks/sqlite-store.md) | open |
 | 6 | No endpoint client | [tasks/llm-client.md](tasks/llm-client.md) | open |
@@ -38,3 +37,4 @@ Acceptance section names.
 | --- | --- | --- | --- |
 | 1 | No cargo workspace exists | [tasks/bootstrap-workspace.md](tasks/bootstrap-workspace.md) | Enable concrete Rust workspace bootstrap |
 | 2 | Doc and style rules are not machine-enforced | [tasks/xtask-checks.md](tasks/xtask-checks.md) | Make repository gates enforce their contracts |
+| 3 | The action grammar has no parser or renderer | [tasks/protocol-parser.md](tasks/protocol-parser.md) | Implement strict action parser and renderer |

@@ -55,4 +55,4 @@ shape; transcripts make every failure reproducible.
 
 ## Status
 
-design-only.
+implemented.
