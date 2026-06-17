@@ -48,4 +48,4 @@ and invented observations, per
 
 ## Status
 
-design-only.
+implemented.

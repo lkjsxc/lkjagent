@@ -14,8 +14,8 @@ Cargo workspace, local verification gates, the action parser, the pure
 context engine, the SQLite store boundary, the LLM endpoint client, the
 skill validator plus seed library, the tool dispatcher/adapters, the
 runtime step/daemon core, and the CLI for send, status, log, memory,
-skills, and startup checks. Self-maintenance is implemented in the runtime
-core; compose wiring is design-only. The implementation queue is
+skills, and startup checks. Self-maintenance and compose wiring are
+implemented. The implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status
@@ -29,7 +29,7 @@ core; compose wiring is design-only. The implementation queue is
 | Execution queue and tasks | implemented | [execution/](execution/README.md) |
 | Cargo workspace and crates | implemented | [repository/layout.md](repository/layout.md) |
 | Verification xtask and quiet gates | implemented | [operations/verification.md](operations/verification.md) |
-| Docker compose services | design-only | [operations/compose.md](operations/compose.md) |
+| Docker compose services | implemented | [operations/compose.md](operations/compose.md) |
 | Container image skeleton | implemented | [architecture/sandbox/container.md](architecture/sandbox/container.md) |
 | Daemon and agent loop | implemented | [architecture/runtime/](architecture/runtime/README.md) |
 | Context engine and compaction | implemented | [architecture/context/](architecture/context/README.md) |
@@ -38,7 +38,7 @@ core; compose wiring is design-only. The implementation queue is
 | SQLite store, transcript, and memory access | implemented | [architecture/memory/](architecture/memory/README.md) |
 | Skill validator, index, loader, and seed library | implemented | [architecture/skills/](architecture/skills/README.md) |
 | LLM endpoint client | implemented | [architecture/llm/](architecture/llm/README.md) |
-| Container and sandbox | design-only | [architecture/sandbox/](architecture/sandbox/README.md) |
+| Container and sandbox | implemented | [architecture/sandbox/](architecture/sandbox/README.md) |
 | User message queue and CLI | implemented | [product/](product/README.md) |
 | Self-maintenance loop | implemented | [architecture/runtime/self-maintenance.md](architecture/runtime/self-maintenance.md) |
 
@@ -49,9 +49,9 @@ and cron schedules. The boundaries are stated in [vision/scope.md](vision/scope.
 
 ## Next Step
 
-Take the first open blocker in
-[execution/current-blockers.md](execution/current-blockers.md): implement the
-compose final gate per [execution/tasks/compose-final-gate.md](execution/tasks/compose-final-gate.md).
+No open blocker remains in
+[execution/current-blockers.md](execution/current-blockers.md). Future changes
+use the compose final gate per [operations/verification.md](operations/verification.md).
 
 ## Honesty Rules
 

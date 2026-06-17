@@ -8,7 +8,7 @@ from a clean checkout.
 
 ## Status
 
-open
+done
 
 ## Depends On
 

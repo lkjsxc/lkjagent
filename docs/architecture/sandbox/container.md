@@ -14,7 +14,8 @@ needs:
 
 - the lkjagent binary,
 - busybox-class core utilities,
-- git, curl, and ripgrep.
+- git, curl, and ripgrep,
+- the seed skill files under /usr/local/share/lkjagent/skills.
 
 Nothing else is promised. The agent runs as a non-root user named agent.
 There is no docker socket, and no host filesystem is visible beyond the two
@@ -56,4 +57,4 @@ Compose wiring is owned by
 
 ## Status
 
-design-only.
+implemented.

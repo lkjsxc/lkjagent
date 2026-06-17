@@ -1,0 +1,19 @@
+name: verify
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  final-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare workspace bind
+        run: mkdir -p .lkjagent-workspace
+      - name: Run final gate
+        run: docker compose run --rm verify
+        env:
+          LKJAGENT_WORKSPACE: ./.lkjagent-workspace
