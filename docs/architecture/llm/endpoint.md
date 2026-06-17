@@ -79,6 +79,9 @@ evidence. Retries re-send the identical request bytes, which preserves the
 prefix cache ([caching.md](../context/caching.md)), and nothing is appended
 to the context until a completion arrives.
 
+Backoff is pure and owned by lkjagent-llm: attempt 0 waits 1 second, each
+later attempt doubles the delay, and the cap is 15 minutes.
+
 ## Status
 
-design-only.
+implemented.
