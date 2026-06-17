@@ -53,4 +53,4 @@ the lazy path and the clean path the same path.
 
 ## Status
 
-design-only.
+implemented.

@@ -55,4 +55,4 @@ pressure toward narrow tool use.
 
 ## Status
 
-design-only.
+implemented.

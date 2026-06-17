@@ -8,7 +8,7 @@ as pure functions.
 
 ## Status
 
-open
+done with Implement pure context engine decisions
 
 ## Depends On
 

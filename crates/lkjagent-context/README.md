@@ -9,3 +9,4 @@ Doc contract: [../../docs/architecture/context/README.md](../../docs/architectur
 
 - [Cargo.toml](Cargo.toml): package manifest.
 - [src/](src/README.md): source map.
+- [tests/](tests/README.md): context engine fixtures.

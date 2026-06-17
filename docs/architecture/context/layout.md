@@ -62,4 +62,4 @@ local estimate for unsent frames. The ledger feeds
 
 ## Status
 
-design-only.
+implemented.
