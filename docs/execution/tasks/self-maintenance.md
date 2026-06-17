@@ -8,7 +8,7 @@ moments at task close and compaction.
 
 ## Status
 
-open
+done
 
 ## Depends On
 

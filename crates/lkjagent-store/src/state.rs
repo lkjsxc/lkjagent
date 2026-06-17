@@ -34,6 +34,18 @@ pub fn delete(conn: &Connection, key: &str) -> StoreResult<()> {
     Ok(())
 }
 
+pub fn maintenance_stamp(conn: &Connection, directive: &str) -> StoreResult<Option<String>> {
+    get(conn, &maintenance_stamp_key(directive))
+}
+
+pub fn set_maintenance_stamp(conn: &Connection, directive: &str, value: &str) -> StoreResult<()> {
+    set(conn, &maintenance_stamp_key(directive), value)
+}
+
+pub fn maintenance_stamp_key(directive: &str) -> String {
+    format!("maintenance last-run {directive}")
+}
+
 pub fn take_lock(
     conn: &Connection,
     holder: &str,

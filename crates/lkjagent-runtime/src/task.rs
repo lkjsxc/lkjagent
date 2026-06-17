@@ -1,6 +1,8 @@
 use lkjagent_context::model::ContextState;
 use lkjagent_protocol::Action;
 
+use crate::maintenance::MaintenanceCycle;
+
 pub const DEFAULT_TURN_BUDGET: u16 = 64;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -22,6 +24,7 @@ pub struct PendingAction {
 pub struct RuntimeState {
     pub context: ContextState,
     pub task: TaskState,
+    pub maintenance: Option<MaintenanceCycle>,
     pub pending_action: Option<PendingAction>,
     pub parse_faults: u8,
     pub repeat_faults: u8,
@@ -33,6 +36,7 @@ impl RuntimeState {
         Self {
             context,
             task: TaskState::Idle,
+            maintenance: None,
             pending_action: None,
             parse_faults: 0,
             repeat_faults: 0,
@@ -54,6 +58,7 @@ pub enum StopReason {
     ToolError,
     BudgetNotice,
     Compaction,
+    Maintenance,
 }
 
 pub fn open_task(task: &TaskState) -> TaskState {

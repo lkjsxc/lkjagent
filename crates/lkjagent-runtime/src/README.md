@@ -10,6 +10,8 @@ This directory holds the runtime state machine and thin daemon adapters.
 - [error.rs](error.rs): runtime error type.
 - [intake.rs](intake.rs): queue delivery helpers.
 - [lib.rs](lib.rs): library root.
+- [maintenance.rs](maintenance.rs): idle directive rotation, cycle budgets, and distillation prompts.
+- [maintenance/](maintenance/README.md): store-facing maintenance adapters.
 - [prompt.rs](prompt.rs): deterministic prefix assembly.
 - [recovery.rs](recovery.rs): parse and repeat fault recovery helpers.
 - [step/](step/README.md): step helper modules.

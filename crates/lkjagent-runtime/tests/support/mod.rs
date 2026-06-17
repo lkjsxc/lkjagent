@@ -1,13 +1,16 @@
 #![allow(dead_code)]
 
 use lkjagent_context::model::{ContextState, Frame, FrameKind, PrefixSection};
-use lkjagent_protocol::render_observation;
+use lkjagent_protocol::{render_observation, Action, Param};
 use lkjagent_runtime::prompt::{build_prefix, PromptInputs};
 use lkjagent_runtime::task::RuntimeState;
 use lkjagent_store::schema::setup;
-use lkjagent_tools::dispatch::DispatchOutput;
+use lkjagent_tools::dispatch::{DispatchOutput, DispatchState, ToolRuntime};
 use lkjagent_tools::observe::OutputKind;
 use rusqlite::Connection;
+use std::fs;
+use std::path::PathBuf;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 pub type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
@@ -70,4 +73,42 @@ pub fn store() -> TestResult<Connection> {
     let conn = Connection::open_in_memory()?;
     setup(&conn)?;
     Ok(conn)
+}
+
+pub fn temp_workspace(name: &str) -> TestResult<PathBuf> {
+    let mut path = std::env::temp_dir();
+    let stamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos();
+    path.push(format!(
+        "lkjagent-runtime-{name}-{}-{stamp}",
+        std::process::id()
+    ));
+    if path.exists() {
+        fs::remove_dir_all(&path)?;
+    }
+    fs::create_dir_all(&path)?;
+    Ok(path)
+}
+
+pub fn tool_runtime(workspace: PathBuf) -> TestResult<ToolRuntime> {
+    let skill_library = workspace.join("skills");
+    fs::create_dir_all(&skill_library)?;
+    Ok(ToolRuntime::new(
+        workspace,
+        skill_library,
+        "2026-01-01T00:00:00Z",
+    ))
+}
+
+pub fn dispatch_state() -> DispatchState {
+    DispatchState::default()
+}
+
+pub fn action(tool: &str, params: &[(&str, &str)]) -> Action {
+    Action::new(
+        tool,
+        params
+            .iter()
+            .map(|(name, value)| Param::new(*name, *value))
+            .collect(),
+    )
 }
