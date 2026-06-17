@@ -14,7 +14,8 @@ The skill format, loading, lifecycle, or library is changing.
 
 - [../../architecture/skills/format.md](../../architecture/skills/format.md): the canonical shape; the single owner.
 - [../../architecture/skills/loading.md](../../architecture/skills/loading.md): index, budgets, visibility rules.
-- [../../architecture/skills/lifecycle.md](../../architecture/skills/lifecycle.md): creation bar, refinement, retirement.
+- [../../architecture/skills/lifecycle.md](../../architecture/skills/lifecycle.md):
+  creation bar, refinement, retirement.
 - [../../architecture/skills/library.md](../../architecture/skills/library.md): location and seeds.
 - [README.md](README.md): the builder instances that must keep validating.
 

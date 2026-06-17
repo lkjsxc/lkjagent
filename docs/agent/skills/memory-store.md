@@ -13,9 +13,11 @@ The store schema, transcripts, retrieval, or distillation is changing.
 ## Context
 
 - [../../architecture/memory/store.md](../../architecture/memory/store.md): tables, transaction rules, the lock row.
-- [../../architecture/memory/transcripts.md](../../architecture/memory/transcripts.md): event kinds and ordering guarantees.
+- [../../architecture/memory/transcripts.md](../../architecture/memory/transcripts.md):
+  event kinds and ordering guarantees.
 - [../../architecture/memory/retrieval.md](../../architecture/memory/retrieval.md): ranking and the digest builder.
-- [../../architecture/memory/distillation.md](../../architecture/memory/distillation.md): when rows are written and their quality bar.
+- [../../architecture/memory/distillation.md](../../architecture/memory/distillation.md):
+  row writes and their quality bar.
 - [../../decisions/sqlite-store.md](../../decisions/sqlite-store.md): the settled ground.
 
 ## Procedure

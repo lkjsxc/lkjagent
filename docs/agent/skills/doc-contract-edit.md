@@ -12,7 +12,8 @@ A contract under docs/ needs to change, with no code moving.
 ## Context
 
 - [../../README.md](../../README.md): find the owning file in the All Files manifest; never edit a mirror.
-- [../../repository/documentation-standards.md](../../repository/documentation-standards.md): shape, topology, banned tokens.
+- [../../repository/documentation-standards.md](../../repository/documentation-standards.md):
+  shape, topology, banned tokens.
 - [../../repository/line-limits.md](../../repository/line-limits.md): the cap and the split recipe.
 - [../../current-state.md](../../current-state.md): whether the change moves a status.
 

@@ -12,7 +12,8 @@ A gate is being built or its checks are changing.
 ## Context
 
 - [../../operations/verification.md](../../operations/verification.md): the gate table and the quiet contract.
-- [../../repository/documentation-standards.md](../../repository/documentation-standards.md): what check-docs must enforce.
+- [../../repository/documentation-standards.md](../../repository/documentation-standards.md):
+  what check-docs must enforce.
 - [../../repository/line-limits.md](../../repository/line-limits.md): what check-lines must enforce.
 - [../../repository/functional-style.md](../../repository/functional-style.md): what check-style must scan for.
 - [../../operations/compose.md](../../operations/compose.md): the no-source-mount rule the final gate proves.

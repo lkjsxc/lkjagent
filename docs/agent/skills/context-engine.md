@@ -15,7 +15,8 @@ Window layout, budgets, compaction, or caching rules are changing.
 - [../../architecture/context/layout.md](../../architecture/context/layout.md): regions and message mapping.
 - [../../architecture/context/budgets.md](../../architecture/context/budgets.md): the ledger every number lives in.
 - [../../architecture/context/compaction.md](../../architecture/context/compaction.md): the rebuild procedure.
-- [../../architecture/context/caching.md](../../architecture/context/caching.md): the byte-stability contract and lawful invalidations.
+- [../../architecture/context/caching.md](../../architecture/context/caching.md):
+  byte stability and lawful invalidations.
 - [../../architecture/context/hygiene.md](../../architecture/context/hygiene.md): the admission allowlist.
 
 ## Procedure

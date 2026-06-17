@@ -25,7 +25,7 @@ design-only. The implementation queue is
 | Agent manual and skills | implemented | [agent/](agent/README.md) |
 | Execution queue and tasks | implemented | [execution/](execution/README.md) |
 | Cargo workspace and crates | implemented | [repository/layout.md](repository/layout.md) |
-| Verification xtask and quiet gates | design-only | [operations/verification.md](operations/verification.md) |
+| Verification xtask and quiet gates | implemented | [operations/verification.md](operations/verification.md) |
 | Docker compose services | design-only | [operations/compose.md](operations/compose.md) |
 | Container image skeleton | implemented | [architecture/sandbox/container.md](architecture/sandbox/container.md) |
 | Daemon and agent loop | design-only | [architecture/runtime/](architecture/runtime/README.md) |
@@ -47,8 +47,8 @@ and cron schedules. The boundaries are stated in [vision/scope.md](vision/scope.
 ## Next Step
 
 Take the first open blocker in
-[execution/current-blockers.md](execution/current-blockers.md): build the
-repository checks per [execution/tasks/xtask-checks.md](execution/tasks/xtask-checks.md).
+[execution/current-blockers.md](execution/current-blockers.md): implement the
+protocol parser per [execution/tasks/protocol-parser.md](execution/tasks/protocol-parser.md).
 
 ## Honesty Rules
 

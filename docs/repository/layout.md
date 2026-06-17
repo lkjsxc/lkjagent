@@ -9,6 +9,7 @@ adding a top-level path means adding a row in the same commit.
 
 | Path | Owns | Contract |
 | --- | --- | --- |
+| .cargo/ | local cargo command configuration | [../operations/verification.md](../operations/verification.md) |
 | .dockerignore | image build context exclusions | [../architecture/sandbox/container.md](../architecture/sandbox/container.md) |
 | .gitignore | local build and store ignore rules | this file, below |
 | README.md | project overview and read order | self-contained |
@@ -20,7 +21,7 @@ adding a top-level path means adding a row in the same commit.
 | docker-compose.yml | service wiring | [../operations/compose.md](../operations/compose.md) |
 | Dockerfile | the harness image | [../architecture/sandbox/container.md](../architecture/sandbox/container.md) |
 | .github/ | GitHub metadata, uses _README.md | [../../.github/_README.md](../../.github/_README.md) |
-| LICENSE | Apache License 2.0 | unmodified |
+| LICENSE | Apache License 2.0 text | self-contained |
 | rustfmt.toml | Rust formatting configuration | [functional-style.md](functional-style.md) |
 
 docker-compose.yml is design-only until its task in

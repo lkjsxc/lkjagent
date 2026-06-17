@@ -2,13 +2,13 @@
 
 ## Purpose
 
-Build the verification gates so every rule in this repository becomes
-machine-enforced: check-docs, check-lines, check-style, quiet test, quiet
-verify, and the CI workflow that runs the final gate.
+Build the local verification gates so every repository rule can be checked
+before the compose final gate exists: check-docs, check-lines, check-style,
+quiet test, and quiet verify.
 
 ## Status
 
-open
+done with Make repository gates enforce their contracts
 
 ## Depends On
 
@@ -28,8 +28,6 @@ open
 - crates/lkjagent-xtask/src/: main.rs dispatcher, one module per gate,
   each a pure judgment over collected repository facts; fixtures under
   crates/lkjagent-xtask/tests/.
-- .github/workflows/ (new): one workflow running the final gate.
-- .github/_README.md: extend with the workflow row.
 
 ## Focused Gate
 
@@ -51,6 +49,7 @@ cargo run -p lkjagent-xtask -- quiet verify
   completeness, the All Files manifest, ASCII, prose width, banned tokens,
   skill shape (both libraries), task shape, crate README coverage.
 - Blocker row 2 done; verification.md Status moves to implemented.
+  The compose final gate task owns the CI workflow.
 
 ## Must Not
 

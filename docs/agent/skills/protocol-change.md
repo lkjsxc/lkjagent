@@ -13,9 +13,12 @@ The action grammar, parser, or system prompt is changing.
 
 - [../../architecture/protocol/action-format.md](../../architecture/protocol/action-format.md): the grammar contract.
 - [../../architecture/protocol/parsing.md](../../architecture/protocol/parsing.md): rules and fault variants.
-- [../../architecture/protocol/recovery.md](../../architecture/protocol/recovery.md): every new failure shape needs a taxonomy row.
-- [../../architecture/protocol/system-prompt.md](../../architecture/protocol/system-prompt.md): the budgeted sections teaching the grammar.
-- [../../decisions/xml-action-protocol.md](../../decisions/xml-action-protocol.md): the settled ground; moving it means updating it.
+- [../../architecture/protocol/recovery.md](../../architecture/protocol/recovery.md):
+  every new failure shape needs a taxonomy row.
+- [../../architecture/protocol/system-prompt.md](../../architecture/protocol/system-prompt.md):
+  the budgeted sections teaching the grammar.
+- [../../decisions/xml-action-protocol.md](../../decisions/xml-action-protocol.md):
+  the settled ground; moving it means updating it.
 
 ## Procedure
 
