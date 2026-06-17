@@ -8,7 +8,7 @@ configuration, and the Dockerfile that builds the binary.
 
 ## Status
 
-open
+done with Enable concrete Rust workspace bootstrap
 
 ## Depends On
 

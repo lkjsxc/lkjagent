@@ -11,7 +11,6 @@ Acceptance section names.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | No cargo workspace exists | [tasks/bootstrap-workspace.md](tasks/bootstrap-workspace.md) | open |
 | 2 | Doc and style rules are not machine-enforced | [tasks/xtask-checks.md](tasks/xtask-checks.md) | open |
 | 3 | The action grammar has no parser or renderer | [tasks/protocol-parser.md](tasks/protocol-parser.md) | open |
 | 4 | No context engine: budgets, admission, compaction decisions | [tasks/context-engine.md](tasks/context-engine.md) | open |
@@ -36,4 +35,6 @@ Acceptance section names.
 
 ## Done
 
-Nothing yet. Rows move here with their closing commit named.
+| # | Blocker | Task | Closing commit |
+| --- | --- | --- | --- |
+| 1 | No cargo workspace exists | [tasks/bootstrap-workspace.md](tasks/bootstrap-workspace.md) | Enable concrete Rust workspace bootstrap |

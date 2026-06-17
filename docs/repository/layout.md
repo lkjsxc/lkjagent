@@ -9,17 +9,22 @@ adding a top-level path means adding a row in the same commit.
 
 | Path | Owns | Contract |
 | --- | --- | --- |
+| .dockerignore | image build context exclusions | [../architecture/sandbox/container.md](../architecture/sandbox/container.md) |
+| .gitignore | local build and store ignore rules | this file, below |
 | README.md | project overview and read order | self-contained |
 | AGENTS.md | entry point for coding agents | self-contained |
+| Cargo.lock | resolved Rust dependency graph | [../decisions/rust-workspace.md](../decisions/rust-workspace.md) |
+| Cargo.toml | cargo workspace manifest and shared lints | [../decisions/rust-workspace.md](../decisions/rust-workspace.md) |
 | docs/ | the implementation contract | [../README.md](../README.md) |
 | crates/ | the Rust workspace | this file, below |
 | docker-compose.yml | service wiring | [../operations/compose.md](../operations/compose.md) |
 | Dockerfile | the harness image | [../architecture/sandbox/container.md](../architecture/sandbox/container.md) |
 | .github/ | GitHub metadata, uses _README.md | [../../.github/_README.md](../../.github/_README.md) |
 | LICENSE | Apache License 2.0 | unmodified |
+| rustfmt.toml | Rust formatting configuration | [functional-style.md](functional-style.md) |
 
-crates/, docker-compose.yml, and Dockerfile are design-only until their
-tasks in [../execution/tasks/](../execution/tasks/README.md) land.
+docker-compose.yml is design-only until its task in
+[../execution/tasks/](../execution/tasks/README.md) lands.
 
 ## Crates
 

@@ -23,7 +23,7 @@ under [docs/](docs/README.md) is the implementation contract: code follows docs.
 
 ## Status
 
-Design-only. No Rust code exists yet.
+The Cargo workspace skeleton is implemented. Runtime behavior is design-only.
 
 - [docs/current-state.md](docs/current-state.md) is the honest status ledger.
 - [docs/execution/current-blockers.md](docs/execution/current-blockers.md) is the implementation queue.
@@ -41,7 +41,7 @@ Design-only. No Rust code exists yet.
 | --- | --- |
 | [docs/](docs/README.md) | Implementation contract (canonical) |
 | [AGENTS.md](AGENTS.md) | Entry point for automated coding agents |
-| crates/ | Rust workspace (design-only; see [docs/repository/layout.md](docs/repository/layout.md)) |
+| crates/ | Rust workspace; see [docs/repository/layout.md](docs/repository/layout.md) |
 | [LICENSE](LICENSE) | Apache License 2.0 |
 
 ## Operation Design
