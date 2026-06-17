@@ -1,10 +1,12 @@
 use lkjagent_context::assemble::append_frame;
 use lkjagent_context::model::{ContextState, Frame, FrameKind, NoticeKind};
+use lkjagent_protocol::render_notice;
 use lkjagent_protocol::Action;
 use lkjagent_store::events::EventKind;
 use lkjagent_tools::dispatch::DispatchOutput;
 use lkjagent_tools::observe::OutputKind;
 
+use crate::maintenance::task_distillation_prompt;
 use crate::prompt::token_estimate;
 use crate::step::Effect;
 use crate::task::{PendingAction, RuntimeState, StopReason, TaskState};
@@ -53,10 +55,22 @@ pub(super) fn handle_control_success(
         return None;
     }
     match pending.action.tool.as_str() {
-        "agent.done" => close_task(state, &pending.action, effects),
+        "agent.done" => close_work(state, &pending.action, effects),
         "agent.ask" => wait_for_owner(state, &pending.action),
         _ => None,
     }
+}
+
+fn close_work(
+    state: &mut RuntimeState,
+    action: &Action,
+    effects: &mut Vec<Effect>,
+) -> Option<StopReason> {
+    if state.maintenance.is_some() {
+        state.maintenance = None;
+        return Some(StopReason::Done);
+    }
+    close_task(state, action, effects)
 }
 
 fn close_task(
@@ -68,14 +82,29 @@ fn close_task(
     state.task = TaskState::Closed {
         summary: summary.clone(),
     };
+    let prompt = task_distillation_prompt(&summary);
+    append_distillation_notice(state, &prompt);
     effects.push(Effect::DistillTask {
         summary,
+        prompt,
         max_turns: 2,
     });
     Some(StopReason::Done)
 }
 
+fn append_distillation_notice(state: &mut RuntimeState, prompt: &str) {
+    state.context = append_frame(
+        &state.context,
+        Frame::new(
+            FrameKind::Notice(NoticeKind::Maintenance),
+            render_notice("maintenance", prompt),
+            token_estimate(prompt).saturating_add(8),
+        ),
+    );
+}
+
 fn wait_for_owner(state: &mut RuntimeState, action: &Action) -> Option<StopReason> {
+    state.maintenance = None;
     state.task = TaskState::Waiting {
         question: action_param(action, "question"),
     };

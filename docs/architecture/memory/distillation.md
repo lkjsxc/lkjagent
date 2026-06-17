@@ -53,5 +53,6 @@ distinction is fixed in [store.md](store.md).
 
 ## Status
 
-design-only. Store APIs for memory writes, edits, deletes, and digest
-selection are implemented; runtime distillation turns are not.
+Implemented for memory storage APIs, digest selection, task-close
+distillation prompts, compaction distillation prompts, and the maintenance
+distill directive. The model writes durable rows through memory.save.

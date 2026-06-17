@@ -14,8 +14,8 @@ Cargo workspace, local verification gates, the action parser, the pure
 context engine, the SQLite store boundary, the LLM endpoint client, the
 skill validator plus seed library, the tool dispatcher/adapters, the
 runtime step/daemon core, and the CLI for send, status, log, memory,
-skills, and startup checks. Self-maintenance and compose wiring are
-design-only. The implementation queue is
+skills, and startup checks. Self-maintenance is implemented in the runtime
+core; compose wiring is design-only. The implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status
@@ -40,7 +40,7 @@ design-only. The implementation queue is
 | LLM endpoint client | implemented | [architecture/llm/](architecture/llm/README.md) |
 | Container and sandbox | design-only | [architecture/sandbox/](architecture/sandbox/README.md) |
 | User message queue and CLI | implemented | [product/](product/README.md) |
-| Self-maintenance loop | design-only | [architecture/runtime/self-maintenance.md](architecture/runtime/self-maintenance.md) |
+| Self-maintenance loop | implemented | [architecture/runtime/self-maintenance.md](architecture/runtime/self-maintenance.md) |
 
 ## Out of Scope
 
@@ -51,7 +51,7 @@ and cron schedules. The boundaries are stated in [vision/scope.md](vision/scope.
 
 Take the first open blocker in
 [execution/current-blockers.md](execution/current-blockers.md): implement the
-self-maintenance loop per [execution/tasks/self-maintenance.md](execution/tasks/self-maintenance.md).
+compose final gate per [execution/tasks/compose-final-gate.md](execution/tasks/compose-final-gate.md).
 
 ## Honesty Rules
 

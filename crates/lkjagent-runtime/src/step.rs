@@ -1,20 +1,23 @@
-use lkjagent_context::assemble::append_frame;
-use lkjagent_context::model::{Frame, FrameKind, NoticeKind};
-use lkjagent_protocol::{parse_completion, render_action, render_owner};
+use lkjagent_context::model::{Frame, NoticeKind};
 use lkjagent_store::events::EventKind;
 use lkjagent_tools::dispatch::DispatchOutput;
 
+use crate::maintenance::MaintenanceDirective;
 use crate::prompt::token_estimate;
-use crate::recovery::{parse_notice, should_escalate, stop_reason};
-use crate::task::{open_task, spend_turn, PendingAction, RuntimeState, StopReason, TaskState};
+use crate::recovery::should_escalate;
+use crate::task::{RuntimeState, StopReason, TaskState};
 
 mod compact;
+mod cycle;
 mod frames;
 mod output;
+mod turn;
 
 use compact::compact_step;
+use cycle::maintenance_start_step;
 use frames::{append_notice, result};
 use output::{append_output_frame, event_kind, handle_control_success, stop_for_output};
+use turn::{completion_step, owner_step};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StepInput {
@@ -32,6 +35,10 @@ pub enum StepInput {
         summary: Frame,
         memory_ids: Vec<i64>,
     },
+    StartMaintenance {
+        directive: MaintenanceDirective,
+        budget: u16,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -46,7 +53,13 @@ pub enum Effect {
     },
     DistillTask {
         summary: String,
+        prompt: String,
         max_turns: u8,
+    },
+    DistillCompaction {
+        prompt: String,
+        max_turns: u8,
+        task_summary_required: bool,
     },
     Pause {
         reason: String,
@@ -75,84 +88,10 @@ pub fn step(state: RuntimeState, input: StepInput) -> StepResult {
             summary,
             memory_ids,
         } => compact_step(state, prefix, summary, memory_ids),
-    }
-}
-
-fn owner_step(mut state: RuntimeState, content: String, tokens: usize) -> StepResult {
-    if let TaskState::Waiting { question } = &state.task {
-        let notice = format!("answering outstanding question: {question}");
-        state = append_notice(state, NoticeKind::Delivery, &notice);
-    }
-    state.context = append_frame(
-        &state.context,
-        Frame::new(FrameKind::Owner, render_owner(&content), tokens),
-    );
-    state.task = open_task(&state.task);
-    StepResult {
-        state,
-        effects: vec![Effect::RecordEvent {
-            kind: EventKind::Owner,
-            content,
-            tokens: tokens as i64,
-        }],
-        stop_reason: None,
-    }
-}
-
-fn completion_step(mut state: RuntimeState, content: String, tokens: usize) -> StepResult {
-    state.turn = state.turn.saturating_add(1);
-    let (task, exhausted) = spend_turn(&state.task);
-    state.task = task;
-    state.context = append_frame(
-        &state.context,
-        Frame::new(FrameKind::ModelTurn, content.clone(), tokens),
-    );
-    if exhausted {
-        state = append_notice(state, NoticeKind::Budget, "turn budget exhausted");
-        return result(state, vec![], Some(StopReason::BudgetNotice));
-    }
-    match parse_completion(&content) {
-        Ok(action) => {
-            let action_text = render_action(&action);
-            state.pending_action = Some(PendingAction {
-                action,
-                action_text: action_text.clone(),
-            });
-            state.parse_faults = 0;
-            result(
-                state,
-                vec![
-                    Effect::RecordEvent {
-                        kind: EventKind::Action,
-                        content: action_text.clone(),
-                        tokens: token_estimate(&action_text) as i64,
-                    },
-                    Effect::ExecuteTool { action_text },
-                ],
-                Some(StopReason::Acted),
-            )
+        StepInput::StartMaintenance { directive, budget } => {
+            maintenance_start_step(state, directive, budget)
         }
-        Err(fault) => parse_fault_step(state, &fault),
     }
-}
-
-fn parse_fault_step(mut state: RuntimeState, fault: &lkjagent_protocol::ParseFault) -> StepResult {
-    let notice = parse_notice(fault);
-    state.parse_faults = state.parse_faults.saturating_add(1);
-    state = append_notice(state, NoticeKind::Error, &notice);
-    let mut effects = vec![Effect::RecordEvent {
-        kind: EventKind::Error,
-        content: notice,
-        tokens: 32,
-    }];
-    if should_escalate(state.parse_faults) {
-        let reason = "three consecutive parse-class faults".to_string();
-        state.task = TaskState::Paused {
-            reason: reason.clone(),
-        };
-        effects.push(Effect::Pause { reason });
-    }
-    result(state, effects, Some(stop_reason(fault)))
 }
 
 fn tool_output_step(mut state: RuntimeState, output: DispatchOutput) -> StepResult {
@@ -179,6 +118,7 @@ fn tool_output_step(mut state: RuntimeState, output: DispatchOutput) -> StepResu
             state.task = TaskState::Paused {
                 reason: reason.clone(),
             };
+            state.maintenance = None;
             effects.push(Effect::Pause { reason });
         }
     } else if stop != StopReason::ToolError {

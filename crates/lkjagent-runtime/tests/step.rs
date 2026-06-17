@@ -45,10 +45,17 @@ fn scripted_task_reaches_done_and_distillation_prompt() -> TestResult<()> {
             effect,
             Effect::DistillTask {
                 summary,
+                prompt,
                 max_turns: 2
-            } if summary == "finished"
+            } if summary == "finished" && prompt.contains("distill closed task")
         )
     }));
+    assert!(done
+        .state
+        .context
+        .log
+        .iter()
+        .any(|frame| frame.content.contains("max_turns=2")));
     Ok(())
 }
 
@@ -83,8 +90,10 @@ fn parse_faults_pause_after_three_consecutive_failures() -> TestResult<()> {
 
 #[test]
 fn compaction_rebuilds_window_and_records_event() -> TestResult<()> {
+    let mut state = oversized_state();
+    state.task = TaskState::Open { turns_remaining: 7 };
     let compacted = step(
-        oversized_state(),
+        state,
         StepInput::Compact {
             prefix: prefix()?,
             summary: summary_frame(),
@@ -105,5 +114,21 @@ fn compaction_rebuilds_window_and_records_event() -> TestResult<()> {
             } if memory_ids == &vec![1, 2]
         )
     }));
+    assert!(compacted.effects.iter().any(|effect| {
+        matches!(
+            effect,
+            Effect::DistillCompaction {
+                max_turns: 4,
+                task_summary_required: true,
+                ..
+            }
+        )
+    }));
+    assert!(compacted
+        .state
+        .context
+        .log
+        .iter()
+        .any(|frame| frame.content.contains("task_summary_required=true")));
     Ok(())
 }

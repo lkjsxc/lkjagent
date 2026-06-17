@@ -26,8 +26,8 @@ rotation, weighted by staleness:
 | prune-memory | Merge duplicate memory rows, rewrite vague entries, drop superseded ones |
 | audit-self | Compare recent failures against contracts; record mismatches as memory entries tagged for the owner |
 
-The harness tracks per-directive last-run stamps in the state table; the
-model never schedules itself.
+The harness tracks per-directive last-run stamps in the state table when a
+cycle opens; the model never schedules itself.
 
 ## Bounds
 
@@ -50,4 +50,6 @@ is not using, and stops the moment work arrives.
 
 ## Status
 
-design-only.
+Implemented in lkjagent-runtime as a pure idle-boundary decision, a
+store-backed state-stamp adapter, bounded maintenance cycle state, normal
+tool-dispatch authority, and task-close plus compaction distillation notices.
