@@ -6,16 +6,35 @@ The runtime configuration contract and day-to-day operation of the harness.
 Owner-visible behavior is under [../product/](../product/README.md); this
 file owns the knobs.
 
-## Configuration
+## Environment
 
-One file: /data/lkjagent.toml, read once at daemon startup. Changing it
-requires a restart; the daemon never hot-reloads, per the cache rules in
-[../architecture/context/caching.md](../architecture/context/caching.md).
+Local deployment values live in the repository-root .env file. It is read by
+docker compose before containers start and by the lkjagent binary when run
+directly from the repository root. .env is not committed; copy
+[../../.env.example](../../.env.example) and fill the local values.
+
+| Variable | Meaning |
+| --- | --- |
+| LKJAGENT_ENDPOINT_URL | base URL of the chat-completions server |
+| LKJAGENT_MODEL | model name passed through to the server |
+| LKJAGENT_API_KEY | optional bearer token for the endpoint |
+| LKJAGENT_WORKSPACE | host path bound to /workspace by compose |
+| LKJAGENT_MODEL_DIR | host path for the disabled endpoint example |
+| LKJAGENT_CONTEXT_LENGTH | endpoint example context length |
+
+Host environment variables override values in .env. Changing deployment
+values requires a restart; the daemon never hot-reloads, per the cache rules
+in [../architecture/context/caching.md](../architecture/context/caching.md).
+
+## Runtime Config
+
+The runtime config file is /data/lkjagent.toml, read once at daemon startup.
+It records resolved defaults and non-secret runtime knobs.
 
 | Key | Initial contract | Meaning |
 | --- | --- | --- |
-| endpoint.url | http://endpoint:8080 | base URL of the chat-completions server |
-| endpoint.model | (required) | model name passed through to the server |
+| endpoint.url | http://endpoint:8080 | fallback when LKJAGENT_ENDPOINT_URL is unset |
+| endpoint.model | LKJAGENT_MODEL or required | fallback when LKJAGENT_MODEL is unset |
 | endpoint.api-key-env | LKJAGENT_API_KEY | name of the env var holding the key, when one is needed |
 | context.window | 32768 | total token window the budgets divide |
 | context.reserve | 1024 | generation headroom, also max_tokens |
@@ -26,25 +45,27 @@ requires a restart; the daemon never hot-reloads, per the cache rules in
 | maintenance.cycle-budget | 8 | per [../architecture/runtime/self-maintenance.md](../architecture/runtime/self-maintenance.md) |
 | shell.timeout-seconds | 60 | default for shell.run, max 600 |
 
-Environment variables override nothing except through the api-key-env
-indirection and the compose-level variables in [compose.md](compose.md);
-configuration has one home.
+LKJAGENT_ENDPOINT_URL and LKJAGENT_MODEL override the endpoint table at
+startup. The API key value is never written to /data/lkjagent.toml; only the
+environment variable name is stored.
 
-First start writes a commented default file to /data/lkjagent.toml when
-none exists, then exits asking the owner to fill in endpoint.model; the
-daemon never guesses a model name.
+First start writes /data/lkjagent.toml from .env when LKJAGENT_MODEL is set.
+When no model exists in either .env, the host environment, or the config file,
+startup writes a commented default and exits asking the owner to fill in
+endpoint.model.
 
 ## Day to Day
 
 ```sh
-docker compose up -d agent
-docker compose exec agent lkjagent send "Survey the workspace and report."
-docker compose exec agent lkjagent log --follow
-docker compose exec agent lkjagent status
+docker compose run --rm agent
+docker compose run --rm agent send "Survey the workspace and report."
+docker compose run --rm agent log --follow
+docker compose run --rm agent status
 ```
 
-Stopping: `docker compose stop agent` delivers SIGTERM; the daemon finishes
-the in-flight turn and exits per
+The committed command path performs startup checks and clean shutdown. A
+resident supervisor or override stops with SIGTERM; the daemon finishes the
+in-flight turn and exits per
 [../architecture/runtime/daemon-process.md](../architecture/runtime/daemon-process.md).
 
 ## Backup and Reset

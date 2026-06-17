@@ -11,10 +11,11 @@ non-streaming decision, and the mapping of endpoint failures onto
 
 The client lives in the lkjagent-llm crate, and that crate is the only place
 in the workspace where HTTP and serde appear. Every other crate hands it a
-message list and receives a completion or a classified error. The endpoint is
-configured in data/lkjagent.toml by base URL and model name; an optional API
-key is read from an environment variable. The decision to depend on exactly
-one OpenAI-compatible endpoint is
+message list and receives a completion or a classified error. The endpoint
+base URL and model name come from LKJAGENT_ENDPOINT_URL and LKJAGENT_MODEL,
+falling back to data/lkjagent.toml when those variables are unset. An
+optional API key is read from LKJAGENT_API_KEY. The decision to depend on
+exactly one OpenAI-compatible endpoint is
 [../../decisions/openai-endpoint.md](../../decisions/openai-endpoint.md).
 
 ## Request Subset

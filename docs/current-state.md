@@ -14,8 +14,9 @@ Cargo workspace, local verification gates, the action parser, the pure
 context engine, the SQLite store boundary, the LLM endpoint client, the
 skill validator plus seed library, the tool dispatcher/adapters, the
 runtime step/daemon core, and the CLI for send, status, log, memory,
-skills, and startup checks. Self-maintenance and compose wiring are
-implemented. The implementation queue is
+skills, startup checks, and repository-root .env loading for local
+deployment values. Self-maintenance and compose wiring are implemented. The
+implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status

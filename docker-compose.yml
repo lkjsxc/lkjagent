@@ -7,6 +7,7 @@ services:
     environment:
       LKJAGENT_API_KEY: ${LKJAGENT_API_KEY:-}
       LKJAGENT_ENDPOINT_URL: ${LKJAGENT_ENDPOINT_URL:-}
+      LKJAGENT_MODEL: ${LKJAGENT_MODEL:-}
     volumes:
       - type: volume
         source: lkjagent-data
@@ -32,7 +33,7 @@ services:
       - --model
       - /models/model.gguf
       - -c
-      - "32768"
+      - ${LKJAGENT_CONTEXT_LENGTH:-32768}
     volumes:
       - type: bind
         source: ${LKJAGENT_MODEL_DIR:-./.lkjagent-models}
