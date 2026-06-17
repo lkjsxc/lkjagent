@@ -7,3 +7,12 @@ publish.workspace = true
 
 [lints]
 workspace = true
+
+[dependencies]
+lkjagent-context = { path = "../lkjagent-context" }
+lkjagent-llm = { path = "../lkjagent-llm" }
+lkjagent-protocol = { path = "../lkjagent-protocol" }
+lkjagent-skills = { path = "../lkjagent-skills" }
+lkjagent-store = { path = "../lkjagent-store" }
+lkjagent-tools = { path = "../lkjagent-tools" }
+rusqlite = { version = "0.40.1", features = ["bundled"] }

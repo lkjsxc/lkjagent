@@ -12,10 +12,9 @@ design-only, not implemented, out of scope, open question.
 The repository contains the complete documentation contract, a compiling
 Cargo workspace, local verification gates, the action parser, the pure
 context engine, the SQLite store boundary, the LLM endpoint client, the
-skill validator plus seed library, and the tool dispatcher/adapters.
-Runtime loop behavior described under
-[architecture/](architecture/README.md) and [product/](product/README.md) is
-design-only. The implementation queue is
+skill validator plus seed library, the tool dispatcher/adapters, and the
+runtime step/daemon core. CLI behavior described under
+[product/](product/README.md) is design-only. The implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status
@@ -31,7 +30,7 @@ design-only. The implementation queue is
 | Verification xtask and quiet gates | implemented | [operations/verification.md](operations/verification.md) |
 | Docker compose services | design-only | [operations/compose.md](operations/compose.md) |
 | Container image skeleton | implemented | [architecture/sandbox/container.md](architecture/sandbox/container.md) |
-| Daemon and agent loop | design-only | [architecture/runtime/](architecture/runtime/README.md) |
+| Daemon and agent loop | implemented | [architecture/runtime/](architecture/runtime/README.md) |
 | Context engine and compaction | implemented | [architecture/context/](architecture/context/README.md) |
 | Action protocol and parser | implemented | [architecture/protocol/](architecture/protocol/README.md) |
 | Toolset | implemented | [architecture/tools/](architecture/tools/README.md) |
@@ -51,7 +50,7 @@ and cron schedules. The boundaries are stated in [vision/scope.md](vision/scope.
 
 Take the first open blocker in
 [execution/current-blockers.md](execution/current-blockers.md): implement the
-agent loop per [execution/tasks/agent-loop.md](execution/tasks/agent-loop.md).
+queue CLI per [execution/tasks/queue-cli.md](execution/tasks/queue-cli.md).
 
 ## Honesty Rules
 
