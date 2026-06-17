@@ -15,6 +15,7 @@ the ordering guarantees every reader relies on.
 | action | the model produces a parsed action for a turn |
 | observation | a tool returns its bounded result |
 | notice | the harness injects a frame: delivery, truncation, budget, distillation direction |
+| queue_mutation | a queue row is enqueued, edited, tombstoned, or redelivered |
 | compaction | a compaction completes: before and after token counts, memory row ids written |
 | error | the harness records a fault: parse fault, tool failure, endpoint outage, internal error |
 
@@ -23,16 +24,17 @@ count in tokens, per the schema in [store.md](store.md).
 
 ## Turn Linkage
 
-Every event carries the turn it belongs to. A normal turn produces one
+Events written during a turn carry that turn. A normal turn produces one
 action event and one observation event with the same turn number; owner and
-notice events carry the turn at whose boundary they were injected. The
+notice events carry the turn at whose boundary they were injected. An
+out-of-turn queue_mutation event has no turn. The
 delivered_turn column of a queue row matches the turn of its owner event,
 written in the same transaction.
 
 ## Ordering
 
 - id is the total order of the transcript; readers sort by id alone.
-- turn numbers are nondecreasing along id.
+- non-null turn numbers are nondecreasing along id.
 - Rows are append-only: never updated, never deleted, never compacted.
   Compaction shrinks the window, not the transcript, per
   [../context/compaction.md](../context/compaction.md).
@@ -40,8 +42,8 @@ written in the same transaction.
 ## Rendering
 
 `lkjagent log` renders events in id order, one line per event with kind,
-turn, and a bounded preview; `--full` prints whole payloads. The owner
-surfaces are owned by
+turn when present, and a bounded preview; `--full` prints whole payloads.
+The owner surfaces are owned by
 [../../product/observability.md](../../product/observability.md).
 
 ## Reproducibility

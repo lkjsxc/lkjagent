@@ -17,6 +17,18 @@ system.
 - Consuming a message never deletes it; the queue row is marked delivered and
   the content becomes a transcript event.
 
+## Mutation
+
+Queue rows have status pending, delivered, or deleted. Pending rows may be
+edited or tombstoned before delivery through queue tools; tombstoned rows
+stay in the store and are skipped by delivery. Redelivery always inserts a
+new pending row linked to source_queue_id. It never rewrites the source row
+or delivered owner events. CLI send and queue tools record queue_mutation
+events in the transcript.
+
+Tool contracts live in [../architecture/tools/queue-ops.md](../architecture/tools/queue-ops.md);
+storage rules live in [../architecture/memory/store.md](../architecture/memory/store.md).
+
 ## Delivery Into an Open Task
 
 If a message arrives while a task is open, it is injected at the next turn

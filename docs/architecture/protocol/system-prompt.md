@@ -26,7 +26,9 @@ if you did not observe it, you do not claim it. Observations are bounded:
 read in ranges, filter shell output, search memory before re-reading. When a
 task completes, finish with agent.done and an honest summary. When only the
 owner can decide, ask with agent.ask. You may think before acting inside
-<think> tags.
+<think> tags. Task turns and idle maintenance share the same YOLO authority
+inside /workspace and /data; credentials, remotes, and network access exposed
+to the container are available to both.
 ```
 
 The full template lives with the runtime crate and is checked against its

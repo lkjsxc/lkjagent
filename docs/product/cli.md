@@ -3,15 +3,15 @@
 ## Purpose
 
 Describe the thin command-line client. The CLI is the only user surface of
-lkjagent. It talks to the daemon exclusively through the SQLite store; there
-is no socket, no HTTP, and no IPC protocol.
+lkjagent. It uses lkjagent-store directly; there is no socket, no HTTP, and
+no IPC protocol.
 
 ## Commands
 
 | Command | Behavior |
 | --- | --- |
 | `lkjagent run` | Start the daemon in the foreground. Exactly one per store. |
-| `lkjagent send <text>` | Append a user message to the queue; print its queue id. |
+| `lkjagent send <text>` | Append a user message through lkjagent-store; print its queue id. |
 | `lkjagent status` | Print daemon state, queue depth, open task, context usage. |
 | `lkjagent log` | Print recent transcript events; `--follow` tails new ones. |
 | `lkjagent memory <query>` | Search distilled memory through the full-text index. |

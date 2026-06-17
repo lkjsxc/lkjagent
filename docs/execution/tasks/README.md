@@ -42,7 +42,7 @@ Every task file uses exactly these headings:
 - [sqlite-store.md](sqlite-store.md): queue, events, memory, state, retrieval.
 - [llm-client.md](llm-client.md): the chat-completions client and backoff.
 - [skill-runtime.md](skill-runtime.md): validator, index, loader, seed skills.
-- [tool-runtime.md](tool-runtime.md): dispatch and the ten tool adapters.
+- [tool-runtime.md](tool-runtime.md): dispatch and the registry-backed tool adapters.
 - [agent-loop.md](agent-loop.md): the turn loop composing every crate.
 - [queue-cli.md](queue-cli.md): the lkjagent binary and its commands.
 - [self-maintenance.md](self-maintenance.md): idle directives and their bounds.

@@ -12,9 +12,9 @@ owner --(lkjagent send)--> store.queue
 store.queue --(turn boundary)--> agent loop
 agent loop --(append-only messages)--> endpoint (chat completions, 32k)
 endpoint --(tag-based action, stops at </act>)--> parser
-parser --> toolset (fs, shell, memory ops, skill ops, control)
+parser --> toolset (fs, shell, queue ops, memory ops, skill ops, control)
 toolset --(bounded observation)--> agent loop --> store.events
-idle queue --> self-maintenance (distill memory, refine skills)
+idle queue --> self-maintenance (mutate workspace, queue, memory, skills)
 ```
 
 The loop appends every turn to the transcript; the context engine decides
@@ -49,7 +49,7 @@ The workspace layout is owned by [../repository/layout.md](../repository/layout.
 | queue | persistent owner-message queue in the store |
 | store | the SQLite database: queue, events, memory, state |
 | transcript | the append-only event log in the store |
-| event | one transcript row: owner, action, observation, notice, compaction |
+| event | one transcript row: owner, action, observation, notice, queue mutation, compaction |
 | memory | distilled durable knowledge rows with a full-text index |
 | skill | a markdown capability file in the unified format |
 | prefix | the stable system message: identity, protocol, registry, digest, brief, index |

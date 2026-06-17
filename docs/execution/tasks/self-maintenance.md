@@ -3,7 +3,7 @@
 ## Purpose
 
 Implement the idle loop: directive rotation with staleness weighting,
-cycle budgets, maintenance-mode tool restrictions, and the distillation
+cycle budgets, normal YOLO authority during idle work, and the distillation
 moments at task close and compaction.
 
 ## Status
@@ -21,7 +21,7 @@ daemon to extend).
 - [../../architecture/memory/distillation.md](../../architecture/memory/distillation.md)
 - [../../architecture/skills/lifecycle.md](../../architecture/skills/lifecycle.md)
 - [../../architecture/tools/registry.md](../../architecture/tools/registry.md)
-  (the maintenance restriction)
+  (the shared tool authority)
 
 ## Files To Touch
 
@@ -45,8 +45,12 @@ cargo run -p lkjagent-xtask -- quiet verify
 - An idle daemon opens a maintenance cycle with the stalest directive,
   bounded by the cycle budget, asserted in scripted tests.
 - A queue arrival preempts at the next boundary, never mid-turn.
-- Workspace-targeting fs and shell actions during maintenance return the
-  documented tool error; memory and skill writes succeed.
+- Workspace fs and shell actions during maintenance succeed under the same
+  authority as task work; there is no maintenance-specific block.
+- Maintenance can mutate queue rows through queue tools; each mutation has
+  a queue_mutation transcript event and respects cycle budgets.
+- External write behavior is tested with local fixtures such as a bare git
+  remote, not live production services.
 - Task-close distillation injects the prompt and allows two turns;
   compaction distillation allows four and requires the task summary.
 - Directive stamps update in the state table; the rotation is
@@ -58,5 +62,5 @@ cargo run -p lkjagent-xtask -- quiet verify
 - Do not add timers, heartbeats, or schedules; idleness is the only
   trigger.
 - Do not let maintenance turns bypass any budget or hygiene rule; there is
-  no privileged mode.
+  no budget exemption.
 - Do not fabricate maintenance outcomes; an empty cycle ends honestly.
