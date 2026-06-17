@@ -57,4 +57,4 @@ and surfaces the condition in `lkjagent status`.
 
 ## Status
 
-design-only.
+implemented.

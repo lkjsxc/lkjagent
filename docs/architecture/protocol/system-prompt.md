@@ -53,4 +53,4 @@ sentence either changes behavior or leaves.
 
 ## Status
 
-design-only.
+implemented.

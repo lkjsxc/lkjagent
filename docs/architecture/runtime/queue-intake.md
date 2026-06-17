@@ -50,4 +50,4 @@ hundred queued messages still reach one loop, one at a time, in order.
 
 ## Status
 
-design-only.
+implemented.
