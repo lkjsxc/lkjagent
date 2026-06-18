@@ -12,7 +12,8 @@ design-only, not implemented, out of scope, open question.
 The repository contains the complete documentation contract, a compiling
 Cargo workspace, local verification gates, the action parser, the pure
 context engine, the SQLite store boundary, the LLM endpoint client, the
-skill validator plus seed library, the tool dispatcher/adapters, the
+skill validator plus seed library, recursive structure stewardship, the
+tool dispatcher/adapters, the
 runtime step/daemon core, and the CLI for send, status, log, console,
 memory, skills, startup checks, repository-root .env loading for local
 deployment values, JSON runtime config, a /data/workspace working tree, and a
