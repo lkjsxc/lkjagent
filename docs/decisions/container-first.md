@@ -17,10 +17,12 @@ safety mechanism. The sandbox contract is
 - The toolset needs no permission system, which keeps the loop simple and the
   context free of approval chatter.
 - The blast radius of any action is the container filesystem, the mounted
-  workspace, and the data volume; nothing else exists from the agent's view.
+  workspace, and the data directory; nothing else exists from the agent's
+  view.
 - Compose owns the wiring between the harness container and the endpoint;
   see [../operations/compose.md](../operations/compose.md).
-- Upgrades are image rebuilds; the store and workspace survive on volumes.
+- Upgrades are image rebuilds; the store and workspace survive in the data
+  directory.
 
 ## Rejected Directions
 

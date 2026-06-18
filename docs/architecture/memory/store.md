@@ -8,8 +8,9 @@ the thin CLI share it without IPC.
 
 ## Location and Access
 
-The store is one SQLite file at data/lkjagent.sqlite3, on the /data volume
-inside the container per [../sandbox/workspace.md](../sandbox/workspace.md).
+The store is one SQLite file at /data/lkjagent.sqlite3 inside the
+container, backed by LKJAGENT_DATA_DIR per
+[../sandbox/workspace.md](../sandbox/workspace.md).
 It runs in WAL mode so the daemon and the thin CLI share the file safely:
 the CLI and tools call lkjagent-store directly, and no socket or IPC
 protocol exists. Queue writes use store APIs only; SQL strings for queue

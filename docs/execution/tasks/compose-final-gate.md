@@ -24,8 +24,8 @@ done
 
 ## Files To Touch
 
-- docker-compose.yml (new): the two services and the named volume per the
-  compose contract, including the disabled endpoint example.
+- docker-compose.yml (new): the services and data directory bind mount per
+  the compose contract, including the disabled endpoint example.
 - Dockerfile: finalize runtime stage contents (non-root agent user, core
   utilities, git, curl, ripgrep) and the seed skill copy step.
 - .github/workflows/: point CI at the final gate if not already exact.
@@ -43,7 +43,7 @@ docker compose run --rm verify
 - The final gate passes from a clean checkout: image builds, quiet verify
   prints ok verify inside the container.
 - The verify service has no mounts; the agent service mounts exactly the
-  data volume; asserted by inspecting
+  data directory at /data; asserted by inspecting
   `docker compose config` output in a gate check.
 - The agent service starts, writes the default config on first start, and
   `docker compose exec agent lkjagent status` reports honestly against a

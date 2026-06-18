@@ -40,9 +40,11 @@ services:
       - /tmp:size=64m,mode=1777
       - /home/agent:size=16m,uid=1000,gid=1000,mode=700
     volumes:
-      - type: volume
-        source: lkjagent-data
+      - type: bind
+        source: ${LKJAGENT_DATA_DIR:-./data}
         target: /data
+        bind:
+          create_host_path: true
 
   verify:
     profiles: ["verify"]
@@ -68,6 +70,3 @@ services:
         source: ${LKJAGENT_MODEL_DIR:-./.lkjagent-models}
         target: /models
         read_only: true
-
-volumes:
-  lkjagent-data:
