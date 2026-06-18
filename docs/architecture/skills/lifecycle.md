@@ -42,10 +42,11 @@ replaced it, so the knowledge of why survives the file.
 
 ## Provenance
 
-The library directory is a git repository on the data volume; every
-skill.save commits with the acting context (task or explicit maintenance
-cycle) in the message. Diff history is the agent's own record of how its
-capabilities evolved, inspectable by the owner with ordinary git tools.
+The library directory is a git repository in the mounted data directory;
+every skill.save commits with the acting context (task or explicit
+maintenance cycle) in the message. Diff history is the agent's own record
+of how its capabilities evolved, inspectable by the owner with ordinary git
+tools.
 
 ## The Builder Mirror
 

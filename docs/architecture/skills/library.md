@@ -6,8 +6,8 @@ Specify where skills live and what the library contains on first start.
 
 ## Location
 
-The runtime library is /data/skills on the data volume: flat directory,
-one markdown file per skill, a git repository for provenance per
+The runtime library is /data/skills in the mounted data directory: flat
+directory, one markdown file per skill, a git repository for provenance per
 [lifecycle.md](lifecycle.md). The store keeps only index stamps (name, use
 counts, refinement and outcome stamps) per
 [../memory/store.md](../memory/store.md); the files are the truth.

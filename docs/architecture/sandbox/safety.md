@@ -22,7 +22,7 @@ The blast radius of any agent action is exactly:
 
 - the container filesystem, reset by an image rebuild,
 - /data/workspace, the project directory,
-- /data, the store, workspace, skill library, and config.
+- /data, the mounted store, workspace, skill library, and config.
 
 Nothing outside the mounts exists from the agent's view: no host
 filesystem, no docker socket, no other process namespaces. Other compose
@@ -34,7 +34,7 @@ services exist only as network peers.
   radius.
 - Treat credentials handed to the agent as spendable: an API key in the
   environment, a token in the workspace, a remote the checkout can push to.
-- Snapshot the /data volume for rollback: it contains the state worth
+- Snapshot the host data directory for rollback: it contains the state worth
   keeping, per [workspace.md](workspace.md).
 - Restrict egress in compose when the agent must be airgapped, per
   [container.md](container.md).

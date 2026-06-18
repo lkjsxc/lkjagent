@@ -10,7 +10,7 @@ itself lands with [../execution/tasks/compose-final-gate.md](../execution/tasks/
 
 | Service | Profile | Runs | Mounts |
 | --- | --- | --- | --- |
-| agent | default | lkjagent run and CLI commands | named volume at /data |
+| agent | default | lkjagent run and CLI commands | host data directory at /data |
 | verify | verify | quiet verify inside the build image | none |
 | endpoint-example | endpoint | optional llama.cpp-class endpoint | model bind read-only |
 
@@ -24,13 +24,14 @@ Compose reads the repository-root .env file automatically. That file holds
 local deployment values and stays uncommitted; [.env.example](../../.env.example)
 names the expected variables.
 
-The agent workspace is /data/workspace inside the named data volume. The
-stock image creates it for the non-root agent user.
+The agent workspace is /data/workspace inside the mounted data directory.
+By default the host path is ./data; LKJAGENT_DATA_DIR changes it. The stock
+image creates it for the non-root agent user.
 
 ## Profiles
 
 The default compose profile is production-shaped: it starts only the
-resident agent daemon and the named data volume.
+resident agent daemon with the mounted data directory.
 
 The `verify` profile holds the final gate service. It may be run directly
 with `docker compose run --rm verify`, or explicitly with the profile when
@@ -60,7 +61,11 @@ services:
       - /tmp:size=64m,mode=1777
       - /home/agent:size=16m,uid=1000,gid=1000,mode=700
     volumes:
-      - lkjagent-data:/data
+      - type: bind
+        source: ${LKJAGENT_DATA_DIR:-./data}
+        target: /data
+        bind:
+          create_host_path: true
     environment:
       - LKJAGENT_ENDPOINT_URL
       - LKJAGENT_ENDPOINT_TIMEOUT_SECONDS
@@ -75,8 +80,6 @@ services:
   endpoint-example:
     profiles: ["endpoint"]
     image: ghcr.io/ggerganov/llama.cpp:server
-volumes:
-  lkjagent-data:
 ```
 
 The committed file is the contract; this sketch shows the intended shape
@@ -86,8 +89,9 @@ and the guardrails below bind it.
 
 - The verify service never mounts the source tree: it proves the committed
   repository, per [verification.md](verification.md).
-- The agent service mounts exactly one thing: the data volume. Mounting more
-  enlarges the blast radius described in
+- The agent service mounts exactly one durable host directory:
+  LKJAGENT_DATA_DIR at /data. Mounting more enlarges the blast radius
+  described in
   [../architecture/sandbox/safety.md](../architecture/sandbox/safety.md)
   and is an owner decision made in an override file, never in the committed
   compose file.

@@ -19,7 +19,7 @@ needs:
 
 Nothing else is promised. The entrypoint prepares /data ownership, then runs
 the requested command as the non-root user named agent. There is no docker
-socket, and no host filesystem is visible beyond the mount below.
+socket, and no host filesystem is visible beyond the mounted data directory.
 Compose runs the agent with a read-only root filesystem, tmpfs at /tmp and
 /home/agent, no-new-privileges, and NET_RAW removed.
 
@@ -27,7 +27,7 @@ Compose runs the agent with a read-only root filesystem, tmpfs at /tmp and
 
 | Mount | Kind | Holds |
 | --- | --- | --- |
-| /data | named volume | store file, workspace, skill library, config; layout in [workspace.md](workspace.md) |
+| /data | bind mount | store file, workspace, skill library, config; layout in [workspace.md](workspace.md) |
 
 ## Environment
 
@@ -47,7 +47,7 @@ into the image and never written to the store, per
 The container supervisor restarts the daemon on nonzero exit; startup,
 shutdown, and the lock row are owned by
 [../runtime/daemon-process.md](../runtime/daemon-process.md). Upgrades are
-image rebuilds; the store and the workspace survive in the data volume.
+image rebuilds; the store and workspace survive in LKJAGENT_DATA_DIR.
 Compose declares `restart: unless-stopped`, `init: true`, bounded json-file
 logs, a 45-second stop grace window, and a healthcheck that verifies the
 lkjagent process plus writable /data/workspace ownership.
