@@ -87,11 +87,11 @@ fn console_replaces_invalid_utf8_input_instead_of_failing() -> TestResult<()> {
 }
 
 #[test]
-fn console_uses_answer_prompt_when_daemon_waits() -> TestResult<()> {
+fn console_keeps_send_prompt_when_daemon_waits() -> TestResult<()> {
     let data = temp_data("console-waiting")?;
     let conn = open_store(&data)?;
     lkjagent_store::state::set(&conn, "daemon state", "waiting")?;
-    lkjagent_store::state::set(&conn, "daemon question", "Need an answer?")?;
+    lkjagent_store::state::set(&conn, "daemon question", "Need input?")?;
     let input = b"/quit\n";
     let reader = Cursor::new(input.to_vec());
     let mut output = Vec::new();
@@ -99,8 +99,8 @@ fn console_uses_answer_prompt_when_daemon_waits() -> TestResult<()> {
     run_console(&data, reader, &mut output)?;
     let text = String::from_utf8(output)?;
     assert!(text.contains("WAITING"));
-    assert!(text.contains("question Need an answer?"));
-    assert!(text.contains("answer>"));
+    assert!(text.contains("question Need input?"));
+    assert!(text.contains("send>"));
     Ok(())
 }
 

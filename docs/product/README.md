@@ -12,5 +12,5 @@ Internal mechanics live under [../architecture/](../architecture/README.md).
 
 - [daemon.md](daemon.md): the continuously running process and its lifecycle.
 - [cli.md](cli.md): the thin command-line client and its commands.
-- [queue.md](queue.md): how user messages enter, wait, and get answered.
+- [queue.md](queue.md): how user messages enter, wait, and resume tasks.
 - [observability.md](observability.md): status, transcript, and memory views.

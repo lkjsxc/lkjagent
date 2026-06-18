@@ -37,7 +37,6 @@ pub(super) fn result(
 
 fn notice_name(kind: NoticeKind) -> &'static str {
     match kind {
-        NoticeKind::Delivery => "delivery",
         NoticeKind::Truncation => "truncation",
         NoticeKind::Budget => "budget",
         NoticeKind::Error => "error",

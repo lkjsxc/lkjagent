@@ -37,15 +37,16 @@ amends the current task or is new work; new work is deferred by the agent
 with an explicit acknowledgment in the transcript, and picked up when the
 current task closes.
 
-## Answers and Questions
+## Done and Questions
 
-- The agent closes a task with agent.done; the summary is the answer and is
-  visible in `lkjagent log`.
+- The agent closes a task with agent.done; the summary is visible in
+  `lkjagent log`.
 - The agent may ask the owner a question with agent.ask. The task enters the
-  waiting state. The next queue message is treated as the answer if it
-  arrives while waiting.
+  waiting state. The next queue message is delivered as a normal owner
+  message and resumes the task.
 - Waiting never blocks senders: with an empty queue the daemon remains
-  waiting and returns to work when the answer arrives.
+  waiting and returns to work when another message arrives through
+  `lkjagent send`.
 
 ## Bounds
 

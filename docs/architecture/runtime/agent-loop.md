@@ -29,12 +29,12 @@ Steps are sequential; nothing else touches the context while a turn runs.
 ## The Task
 
 A task is opened when an owner message is delivered with no task open, and
-closed by an agent.done action whose summary becomes the answer.
+closed by an agent.done action whose summary is recorded.
 
 | Task state | Driven by |
 | --- | --- |
 | open | owner message delivered; turns proceed |
-| waiting | agent.ask emitted; loop waits until an answer arrives |
+| waiting | agent.ask emitted; loop waits until another send arrives |
 | closed | agent.done emitted; summary recorded; task-summary memory saved |
 
 A task carries a turn budget (initial contract: 64 turns, config-tunable).

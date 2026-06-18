@@ -26,11 +26,7 @@ pub fn state_badge(state: &str) -> String {
 }
 
 pub fn prompt(state: &str) -> String {
-    let label = if state == "waiting" {
-        "answer>"
-    } else {
-        "send>"
-    };
+    let label = "send>";
     let color = if state == "waiting" { YELLOW } else { CYAN };
     format!("{BOLD}{color}{label}{RESET}")
 }

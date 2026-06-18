@@ -3,8 +3,8 @@
 ## Purpose
 
 Specify how queue rows become context frames: when delivery happens, how
-order is kept, and how answers to agent questions are matched. Owner-visible
-behavior is [../../product/queue.md](../../product/queue.md).
+order is kept, and how waiting tasks resume. Owner-visible behavior is
+[../../product/queue.md](../../product/queue.md).
 
 ## Delivery Rules
 
@@ -34,12 +34,11 @@ message text
   acknowledgment in its next think preamble. Deferred work is the next task
   the moment the current one closes.
 
-## Answer Matching
+## Waiting Tasks
 
-When the task is waiting on agent.ask, the next delivered message is the
-answer: the harness injects it as an owner frame directly after a notice
-naming the question it answers. There is no parallel conversation; one
-question may be outstanding at a time, enforced by
+When the task is waiting on agent.ask, the next delivered message is still
+only an owner frame. The harness does not give it a separate role or inject
+a matching notice. One question may be outstanding at a time, enforced by
 [../tools/control.md](../tools/control.md).
 
 ## Backpressure

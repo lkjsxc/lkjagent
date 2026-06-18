@@ -11,5 +11,5 @@ lkjagent-runtime crate per [../overview.md](../overview.md).
 
 - [agent-loop.md](agent-loop.md): the turn and task lifecycle.
 - [daemon-process.md](daemon-process.md): process model, startup, shutdown, restart.
-- [queue-intake.md](queue-intake.md): turn-boundary delivery and answer matching.
+- [queue-intake.md](queue-intake.md): turn-boundary delivery and waiting-task resume.
 - [self-maintenance.md](self-maintenance.md): idle maintenance boundary and explicit directives.

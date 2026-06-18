@@ -13,9 +13,8 @@ parameter table: [registry.md](registry.md).
 | --- | --- |
 | summary | required |
 
-Closes the open task. The summary is the answer the owner reads, so it
-states what was asked, what was done, and how it was verified. agent.done
-also ends a maintenance cycle per
+Closes the open task. The summary states what was asked, what was done, and
+how it was verified. agent.done also ends a maintenance cycle per
 [../runtime/self-maintenance.md](../runtime/self-maintenance.md); an empty
 cycle ends with a one-line summary.
 
@@ -27,7 +26,7 @@ cycle ends with a one-line summary.
 
 Delivers a question to the owner and moves the task into waiting. At most
 one question may be outstanding; a second agent.ask while one waits is a
-tool error. The next queue message is matched as the answer per
+tool error. The owner responds through the same `lkjagent send` path per
 [../runtime/queue-intake.md](../runtime/queue-intake.md).
 
 ## Budget Interaction
