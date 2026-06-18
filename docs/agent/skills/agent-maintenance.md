@@ -3,8 +3,8 @@
 ## Purpose
 
 Maintain the surfaces that steer agents: AGENTS.md, the manual, and this
-skill library. The mirror of the runtime's self-maintenance, executed
-through commits.
+skill library. This mirrors explicit runtime maintenance directives through
+commits.
 
 ## Trigger
 
@@ -22,7 +22,7 @@ The manual, AGENTS.md, or this library needs maintenance.
 
 ## Procedure
 
-1. Pick one directive for the session, mirroring the runtime rotation:
+1. Pick one explicit directive for the session:
    distill (turn recurring session friction into a skill or a manual fix),
    refine-skills (sharpen the stalest skill here against real session
    evidence), prune (collapse duplicated guidance into its owner), or

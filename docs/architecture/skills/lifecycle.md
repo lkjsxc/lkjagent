@@ -3,7 +3,7 @@
 ## Purpose
 
 Specify how skills are born, sharpened, and retired. The library is a
-living asset: its quality compounds because idle time is spent on it per
+living asset sharpened through explicit maintenance paths per
 [../runtime/self-maintenance.md](../runtime/self-maintenance.md).
 
 ## Creation
@@ -20,9 +20,9 @@ written before the procedure ever worked, violate
 
 ## Refinement
 
-The refine-skills maintenance directive picks the skill with the oldest
-refinement stamp or the worst recent outcome and sharpens it against the
-transcript record of its last uses:
+The explicit refine-skills maintenance directive picks the skill with the
+oldest refinement stamp or the worst recent outcome and sharpens it against
+the transcript record of its last uses:
 
 - tighten Trigger if the skill was loaded and unused, or missed when needed;
 - repair Procedure steps that observations contradicted;
@@ -43,9 +43,9 @@ replaced it, so the knowledge of why survives the file.
 ## Provenance
 
 The library directory is a git repository on the data volume; every
-skill.save commits with the acting context (task or maintenance cycle) in
-the message. Diff history is the agent's own record of how its capabilities
-evolved, inspectable by the owner with ordinary git tools.
+skill.save commits with the acting context (task or explicit maintenance
+cycle) in the message. Diff history is the agent's own record of how its
+capabilities evolved, inspectable by the owner with ordinary git tools.
 
 ## The Builder Mirror
 

@@ -9,17 +9,16 @@ the transcript remembers everything, memory remembers what matters.
 
 ## The Three Moments
 
-Memory rows are written by the model via memory.save at three moments:
+Memory rows are written at three moments:
 
-1. Task close. After agent.done, the harness injects a distillation notice
-   and allows up to 2 turns of memory.save actions: lessons, facts, and
-   incidents worth keeping from the closed task.
+1. Task close. After agent.done, the harness saves the done summary as a
+   task-summary row and records the memory id in the transcript.
 2. Compaction. The compaction notice opens up to 4 turns of memory.save
    per [../context/compaction.md](../context/compaction.md); the final
    save must be a task-summary row when a task is open.
-3. Maintenance. The distill directive of a maintenance cycle
-   ([../runtime/self-maintenance.md](../runtime/self-maintenance.md))
-   reads recent transcript spans and writes durable lessons.
+3. Explicit maintenance. The distill directive
+   ([../runtime/self-maintenance.md](../runtime/self-maintenance.md)) can
+   read recent transcript spans and write durable lessons when invoked.
 
 ## Entry Quality Rules
 
@@ -53,6 +52,7 @@ distinction is fixed in [store.md](store.md).
 
 ## Status
 
-Implemented for memory storage APIs, digest selection, task-close
-distillation prompts, compaction distillation prompts, and the maintenance
-distill directive. The model writes durable rows through memory.save.
+Implemented for memory storage APIs, digest selection, harness-written
+task-summary rows on task close, compaction distillation prompts, and the
+explicit maintenance distill directive. The model can write durable rows
+through memory.save during prompted compaction or explicit maintenance.

@@ -43,7 +43,8 @@ Not-tested: <known gaps and why>
 
 ## The Runtime Mirror
 
-The running agent follows the same protocol when it commits in /workspace
-or in its skill library ([../architecture/skills/lifecycle.md](../architecture/skills/lifecycle.md)):
+The running agent follows the same protocol when it commits in
+/data/workspace or in its skill library
+([../architecture/skills/lifecycle.md](../architecture/skills/lifecycle.md)):
 intent first, honest Tested trailers, small steps. One protocol, both worlds,
 per the unified principle in [../decisions/unified-skills.md](../decisions/unified-skills.md).

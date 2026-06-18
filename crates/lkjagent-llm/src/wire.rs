@@ -9,8 +9,6 @@ use metrics::collect_cache_metrics;
 pub const MAX_TOKENS: u16 = 1024;
 pub const TEMPERATURE: f32 = 0.3;
 pub const TOP_P: f32 = 0.9;
-pub const STOP: &str = "</act>";
-
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct ChatRequest {
     pub model: String,
@@ -18,6 +16,7 @@ pub struct ChatRequest {
     pub max_tokens: u16,
     pub temperature: f32,
     pub top_p: f32,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub stop: Vec<String>,
     pub stream: bool,
 }
@@ -92,7 +91,7 @@ pub fn build_request(model: &str, messages: &[Message]) -> ChatRequest {
         max_tokens: MAX_TOKENS,
         temperature: TEMPERATURE,
         top_p: TOP_P,
-        stop: vec![STOP.to_string()],
+        stop: Vec::new(),
         stream: false,
     }
 }

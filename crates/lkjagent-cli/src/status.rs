@@ -11,10 +11,12 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
     let queue_depth = rows.iter().filter(|row| row.status == "pending").count();
     let daemon_state = state_value(&conn, "daemon state", "stopped")?;
     let open_task = state_value(&conn, "open task", "none")?;
+    let daemon_question = state_value(&conn, "daemon question", "none")?;
+    let daemon_error = state_value(&conn, "daemon error", "none")?;
     let turns = state_value(&conn, "turn", "0")?;
     let last_compaction = last_compaction(&conn)?;
     Ok(format!(
-        "daemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\nturns={turns}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
+        "daemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\ndaemon_question={daemon_question}\ndaemon_error={daemon_error}\nturns={turns}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
         prefix_cap_total(),
         initial_log_space(),
         WHOLE_WINDOW_TRIGGER

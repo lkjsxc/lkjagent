@@ -58,10 +58,10 @@ LKJ_EOF
 
 ## Maintenance Behavior
 
-During a maintenance cycle, shell.run has the same workspace, network, and
-credential authority it has during task work. The boundary is the container
-blast radius in [../sandbox/safety.md](../sandbox/safety.md), not a
-maintenance-specific restriction.
+During an explicit maintenance cycle, shell.run has the same workspace,
+network, and credential authority it has during task work. The boundary is
+the container blast radius in [../sandbox/safety.md](../sandbox/safety.md),
+not a maintenance-specific restriction.
 
 ## Status
 

@@ -34,13 +34,17 @@ closed by an agent.done action whose summary becomes the answer.
 | Task state | Driven by |
 | --- | --- |
 | open | owner message delivered; turns proceed |
-| waiting | agent.ask emitted; loop yields to maintenance until an answer arrives |
-| closed | agent.done emitted; summary recorded; distillation prompt follows |
+| waiting | agent.ask emitted; loop waits until an answer arrives |
+| closed | agent.done emitted; summary recorded; task-summary memory saved |
 
 A task carries a turn budget (initial contract: 64 turns, config-tunable).
 When exhausted, the harness injects a budget notice; the only lawful actions
 after it are agent.ask or agent.done. This converts runaway loops into a
 question for the owner instead of silent burn.
+
+When no task is open and the queue is empty, the daemon sets
+`daemon_state=idle`, refreshes its lock heartbeat, and waits for queue
+arrival. It does not open self-maintenance work while idle.
 
 ## Pure Core
 

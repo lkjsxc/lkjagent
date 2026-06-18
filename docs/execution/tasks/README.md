@@ -45,5 +45,5 @@ Every task file uses exactly these headings:
 - [tool-runtime.md](tool-runtime.md): dispatch and the registry-backed tool adapters.
 - [agent-loop.md](agent-loop.md): the turn loop composing every crate.
 - [queue-cli.md](queue-cli.md): the lkjagent binary and its commands.
-- [self-maintenance.md](self-maintenance.md): idle directives and their bounds.
+- [self-maintenance.md](self-maintenance.md): explicit maintenance directives and their bounds.
 - [compose-final-gate.md](compose-final-gate.md): Dockerfile, compose services, CI.

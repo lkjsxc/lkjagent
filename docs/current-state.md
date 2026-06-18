@@ -13,10 +13,13 @@ The repository contains the complete documentation contract, a compiling
 Cargo workspace, local verification gates, the action parser, the pure
 context engine, the SQLite store boundary, the LLM endpoint client, the
 skill validator plus seed library, the tool dispatcher/adapters, the
-runtime step/daemon core, and the CLI for send, status, log, memory,
-skills, startup checks, and repository-root .env loading for local
-deployment values. Self-maintenance and compose wiring are implemented. The
-implementation queue is
+runtime step/daemon core, and the CLI for send, status, log, console,
+memory, skills, startup checks, repository-root .env loading for local
+deployment values, JSON runtime config, a /data/workspace working tree, and a
+resident daemon that delivers queued owner work to the endpoint and tool
+dispatcher until agent.done. Empty queues leave the daemon idle; automatic
+idle self-maintenance is not active. Compose wiring is
+implemented. The implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status
@@ -41,7 +44,7 @@ implementation queue is
 | LLM endpoint client | implemented | [architecture/llm/](architecture/llm/README.md) |
 | Container and sandbox | implemented | [architecture/sandbox/](architecture/sandbox/README.md) |
 | User message queue and CLI | implemented | [product/](product/README.md) |
-| Self-maintenance loop | implemented | [architecture/runtime/self-maintenance.md](architecture/runtime/self-maintenance.md) |
+| Automatic idle self-maintenance | not implemented | [architecture/runtime/self-maintenance.md](architecture/runtime/self-maintenance.md) |
 
 ## Out of Scope
 

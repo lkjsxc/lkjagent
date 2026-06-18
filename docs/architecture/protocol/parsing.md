@@ -18,9 +18,8 @@ ParseFault variants map one-to-one onto the taxonomy in [recovery.md](recovery.m
    inline tag-like text is content, not structure.
 2. Everything before `<act>` is preamble. A `<think>` pair is allowed there;
    unmatched or repeated think tags are preamble text, not errors.
-3. `<act>` must appear exactly once. Absent: ParseFault::MissingAct. The
-   stop sequence prevents duplicates; a duplicate in test input is
-   ParseFault::MultipleAct.
+3. `<act>` must appear exactly once. Absent: ParseFault::MissingAct. A
+   duplicate is ParseFault::MultipleAct.
 4. The first element inside act must be a tool pair naming a known registry
    entry. Unknown name: ParseFault::UnknownTool. Missing: ParseFault::MissingTool.
 5. Each subsequent opening tag inside act collects raw lines until the first

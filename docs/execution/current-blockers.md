@@ -36,5 +36,5 @@ Acceptance section names.
 | 8 | No tool dispatch or adapters | [tasks/tool-runtime.md](tasks/tool-runtime.md) | Implement tool runtime dispatch |
 | 9 | No agent loop composing the crates | [tasks/agent-loop.md](tasks/agent-loop.md) | Implement runtime step and daemon core |
 | 10 | No binary: daemon entry, send, status, log | [tasks/queue-cli.md](tasks/queue-cli.md) | Implement queue CLI commands |
-| 11 | Idle time does nothing | [tasks/self-maintenance.md](tasks/self-maintenance.md) | Use idle time for bounded self-maintenance |
+| 11 | Idle maintenance helpers missing | [tasks/self-maintenance.md](tasks/self-maintenance.md) | Add explicit maintenance helpers |
 | 12 | No image, compose services, or CI final gate | [tasks/compose-final-gate.md](tasks/compose-final-gate.md) | Use compose as the final verification gate |

@@ -9,14 +9,17 @@ non-streaming decision, and the mapping of endpoint failures onto
 
 ## One Crate Touches the Wire
 
-The client lives in the lkjagent-llm crate, and that crate is the only place
-in the workspace where HTTP and serde appear. Every other crate hands it a
-message list and receives a completion or a classified error. The endpoint
-base URL and model name come from LKJAGENT_ENDPOINT_URL and LKJAGENT_MODEL,
-falling back to data/lkjagent.toml when those variables are unset. An
+The endpoint client lives in the lkjagent-llm crate, and that crate is the
+only place in the workspace that sends HTTP to the model server. Every other
+crate hands it a message list and receives a completion or a classified
+error. The endpoint base URL and model name come from
+LKJAGENT_ENDPOINT_URL and LKJAGENT_MODEL, falling back to
+data/lkjagent.json when those variables are unset. An
 optional API key is read from LKJAGENT_API_KEY. The decision to depend on
 exactly one OpenAI-compatible endpoint is
 [../../decisions/openai-endpoint.md](../../decisions/openai-endpoint.md).
+The request timeout defaults to 180 seconds and is set by
+endpoint.timeout-seconds or LKJAGENT_ENDPOINT_TIMEOUT_SECONDS.
 
 ## Request Subset
 
@@ -29,11 +32,12 @@ The harness sends exactly these fields and no others:
 | max_tokens | 1024 | the generation reserve in [layout.md](../context/layout.md) |
 | temperature | 0.3 | precision over creativity, per [sampling.md](sampling.md) |
 | top_p | 0.9 | per [sampling.md](sampling.md) |
-| stop | `["</act>"]` | every action ends at the act close tag; the server cuts there |
 | stream | false | whole completions only, see below |
 
-No tools field, no response-format field, no logit bias: the action protocol
-lives in the message text, and the parser owns it.
+No tools field, no response-format field, no stop field, no logit bias: the
+action protocol lives in the message text, and the parser owns it. The close
+tag must stay in choices[0].message.content because OpenAI-compatible stop
+sequences are removed from the returned text.
 
 ## Non-Streaming, Deliberately
 

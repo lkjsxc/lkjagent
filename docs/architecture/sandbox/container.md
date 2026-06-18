@@ -17,16 +17,15 @@ needs:
 - git, curl, and ripgrep,
 - the seed skill files under /usr/local/share/lkjagent/skills.
 
-Nothing else is promised. The agent runs as a non-root user named agent.
-There is no docker socket, and no host filesystem is visible beyond the two
-mounts below.
+Nothing else is promised. The entrypoint prepares /data ownership, then runs
+the requested command as the non-root user named agent. There is no docker
+socket, and no host filesystem is visible beyond the mount below.
 
 ## Mounts
 
 | Mount | Kind | Holds |
 | --- | --- | --- |
-| /data | named volume | store file, skill library, config; layout in [workspace.md](workspace.md) |
-| /workspace | bind mount | the owner's chosen project; semantics in [workspace.md](workspace.md) |
+| /data | named volume | store file, workspace, skill library, config; layout in [workspace.md](workspace.md) |
 
 ## Environment
 
@@ -35,6 +34,7 @@ mounts below.
 | LKJAGENT_ENDPOINT_URL | where the chat-completions endpoint is reached |
 | LKJAGENT_MODEL | the model name sent on every request |
 | LKJAGENT_API_KEY | optional; sent to the endpoint when set |
+| LKJAGENT_ENDPOINT_TIMEOUT_SECONDS | optional endpoint request timeout |
 
 The API key, when needed, arrives by environment variable only: never baked
 into the image and never written to the store, per
@@ -45,7 +45,7 @@ into the image and never written to the store, per
 The container supervisor restarts the daemon on nonzero exit; startup,
 shutdown, and the lock row are owned by
 [../runtime/daemon-process.md](../runtime/daemon-process.md). Upgrades are
-image rebuilds; the store and the workspace survive on their mounts.
+image rebuilds; the store and the workspace survive in the data volume.
 
 ## Network
 

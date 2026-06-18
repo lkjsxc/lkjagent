@@ -22,13 +22,25 @@ RUN apt-get update \
         ripgrep \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --create-home --home-dir /home/agent --shell /usr/sbin/nologin agent \
-    && mkdir -p /data /workspace /usr/local/share/lkjagent/skills \
-    && chown agent:agent /data /workspace /usr/local/share/lkjagent/skills
+    && mkdir -p /data/workspace /usr/local/share/lkjagent/skills \
+    && chown -R agent:agent /data /usr/local/share/lkjagent/skills \
+    && printf '%s\n' \
+        '#!/bin/sh' \
+        'set -eu' \
+        'mkdir -p /data/workspace /data/skills' \
+        'chown -R agent:agent /data' \
+        'case "${1:-}" in' \
+        '  ""|run|send|status|log|console|memory|skills)' \
+        '    set -- /usr/local/bin/lkjagent "$@"' \
+        '    ;;' \
+        'esac' \
+        'exec setpriv --reuid=1000 --regid=1000 --init-groups -- "$@"' \
+        > /usr/local/bin/lkjagent-entrypoint \
+    && chmod +x /usr/local/bin/lkjagent-entrypoint
 
 COPY --from=build /src/target/release/lkjagent /usr/local/bin/lkjagent
 COPY --from=build --chown=agent:agent /src/crates/lkjagent-skills/seeds \
     /usr/local/share/lkjagent/skills
 
-USER agent
-WORKDIR /workspace
-ENTRYPOINT ["/usr/local/bin/lkjagent"]
+WORKDIR /data/workspace
+ENTRYPOINT ["/usr/local/bin/lkjagent-entrypoint"]

@@ -1,18 +1,20 @@
 mod support;
 
+use std::fs;
+
 use lkjagent_context::budget::{
     PREFIX_GRAMMAR_REGISTRY, PREFIX_IDENTITY, PREFIX_MEMORY_DIGEST, PREFIX_SKILL_INDEX,
     PREFIX_WORKSPACE_BRIEF,
 };
 use lkjagent_context::model::{FrameKind, PrefixSection};
 use lkjagent_runtime::daemon::{
-    request_shutdown, startup_state, take_daemon_lock, ShutdownDecision, ShutdownState, Signal,
-    StartupLock,
+    request_shutdown, seed_skill_library, startup_state, take_daemon_lock, ShutdownDecision,
+    ShutdownState, Signal, StartupLock,
 };
 use lkjagent_runtime::prompt::{build_prefix, PromptInputs};
 use lkjagent_runtime::task::TaskState;
 use lkjagent_store::events::read_events;
-use support::{prefix, store, TestResult};
+use support::{prefix, store, temp_workspace, TestResult};
 
 #[test]
 fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
@@ -55,21 +57,40 @@ fn startup_resumes_from_summary_without_raw_replay() -> TestResult<()> {
 fn daemon_lock_takes_refuses_and_records_reclaim_notice() -> TestResult<()> {
     let conn = store()?;
     assert_eq!(
-        take_daemon_lock(&conn, "pid1", "2026-01-01T00:00:00Z", "2025")?,
+        take_daemon_lock(&conn, "pid1", "100", "0")?,
         StartupLock::Taken
     );
     assert!(matches!(
-        take_daemon_lock(&conn, "pid2", "2026-01-01T00:00:01Z", "2025")?,
+        take_daemon_lock(&conn, "pid2", "101", "50")?,
         StartupLock::Refused { .. }
     ));
     assert!(matches!(
-        take_daemon_lock(&conn, "pid2", "2026-01-01T00:00:02Z", "2027")?,
+        take_daemon_lock(&conn, "pid2", "400", "300")?,
         StartupLock::Reclaimed { .. }
     ));
     let events = read_events(&conn)?;
     assert!(events
         .iter()
         .any(|event| event.content.contains("reclaimed stale daemon lock")));
+    Ok(())
+}
+
+#[test]
+fn seed_skill_library_copies_empty_dir_without_overwriting() -> TestResult<()> {
+    let root = temp_workspace("seed-copy")?;
+    let source = root.join("source");
+    let target = root.join("target");
+    fs::create_dir_all(&source)?;
+    fs::write(source.join("seed.md"), "seed body")?;
+
+    seed_skill_library(&target, &root.join("missing-image"), &source)?;
+    assert_eq!(fs::read_to_string(target.join("seed.md"))?, "seed body");
+
+    fs::write(target.join("seed.md"), "custom body")?;
+    fs::write(source.join("other.md"), "other body")?;
+    seed_skill_library(&target, &root.join("missing-image"), &source)?;
+    assert_eq!(fs::read_to_string(target.join("seed.md"))?, "custom body");
+    assert!(!target.join("other.md").exists());
     Ok(())
 }
 

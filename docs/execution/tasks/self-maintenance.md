@@ -2,9 +2,9 @@
 
 ## Purpose
 
-Implement the idle loop: directive rotation with staleness weighting,
-cycle budgets, normal YOLO authority during idle work, and the distillation
-moments at task close and compaction.
+Implement explicit maintenance helpers: directive rotation with staleness
+weighting, cycle budgets, normal YOLO authority during maintenance work,
+and the distillation moments at task close and compaction.
 
 ## Status
 
@@ -42,25 +42,25 @@ cargo run -p lkjagent-xtask -- quiet verify
 
 ## Acceptance
 
-- An idle daemon opens a maintenance cycle with the stalest directive,
-  bounded by the cycle budget, asserted in scripted tests.
-- A queue arrival preempts at the next boundary, never mid-turn.
+- The runtime can open an explicit maintenance cycle with the stalest
+  directive, bounded by the cycle budget, asserted in scripted tests.
+- A queue arrival preempts an explicit maintenance cycle at the next
+  boundary, never mid-turn.
 - Workspace fs and shell actions during maintenance succeed under the same
   authority as task work; there is no maintenance-specific block.
 - Maintenance can mutate queue rows through queue tools; each mutation has
   a queue_mutation transcript event and respects cycle budgets.
 - External write behavior is tested with local fixtures such as a bare git
   remote, not live production services.
-- Task-close distillation injects the prompt and allows two turns;
-  compaction distillation allows four and requires the task summary.
+- Task close saves a task-summary row; compaction distillation allows four
+  turns and requires the task summary.
 - Directive stamps update in the state table; the rotation is
   deterministic given the stamps.
 - Blocker row 11 done; self-maintenance status moves in the ledger.
 
 ## Must Not
 
-- Do not add timers, heartbeats, or schedules; idleness is the only
-  trigger.
+- Do not add timers, automatic idle maintenance, or schedules.
 - Do not let maintenance turns bypass any budget or hygiene rule; there is
   no budget exemption.
 - Do not fabricate maintenance outcomes; an empty cycle ends honestly.

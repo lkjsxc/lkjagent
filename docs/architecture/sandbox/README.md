@@ -11,5 +11,5 @@ Decision:
 ## Table of Contents
 
 - [container.md](container.md): the image, the user, the mounts, environment, and network.
-- [workspace.md](workspace.md): /workspace semantics, the workspace brief, and the /data layout.
+- [workspace.md](workspace.md): /data/workspace semantics, the workspace brief, and the /data layout.
 - [safety.md](safety.md): the YOLO posture, the blast radius, and owner responsibilities.

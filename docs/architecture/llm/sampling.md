@@ -12,7 +12,6 @@ rationale for each, and the rule that they stay constant within a session.
 | temperature | 0.3 |
 | top_p | 0.9 |
 | max_tokens | 1024 |
-| stop | `["</act>"]` |
 
 ## Rationale
 
@@ -26,9 +25,9 @@ rationale for each, and the rule that they stay constant within a session.
   [layout.md](../context/layout.md). One think preamble plus one act block
   fits; a completion that hits this limit is the oversize case in
   [../protocol/recovery.md](../protocol/recovery.md).
-- stop `["</act>"]`: the action grammar ends every turn at the act close
-  tag, so the server cuts generation there instead of letting the model run
-  past its own action.
+- no stop field: the action grammar needs the closing act tag in the
+  response body, and OpenAI-compatible stop strings are removed before the
+  client can parse them.
 
 ## Constant Within a Session
 
@@ -41,7 +40,7 @@ restart.
 
 ## Ownership
 
-The lkjagent-llm client owns these four values as request constants. The
+The lkjagent-llm client owns these values as request constants. The
 runtime passes the model name and endpoint base URL into the client; config
 file loading belongs to the later runtime and CLI slices.
 

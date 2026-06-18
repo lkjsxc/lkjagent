@@ -23,7 +23,7 @@ model family, and swapping the model is one config edit per
 | Requirement | Why the harness needs it |
 | --- | --- |
 | the chat-completions route | the only wire format the client speaks ([endpoint.md](endpoint.md)) |
-| honoring the stop array | every turn must end at the act close tag |
+| returning the close tag | the parser must see the complete act block |
 | a context window of at least 32k tokens | the window budgets assume it ([budgets.md](../context/budgets.md)) |
 | prefix caching | acceptable turn latency; the design works without it, just slower |
 | applying its own chat template | the harness sends a message list and never builds template bytes |

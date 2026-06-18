@@ -12,7 +12,7 @@ live in [../decisions/](../decisions/README.md).
 ## Table of Contents
 
 - [overview.md](overview.md): component map, crate ownership, and glossary.
-- [runtime/](runtime/README.md): the agent loop, daemon process, queue intake, self-maintenance.
+- [runtime/](runtime/README.md): the agent loop, daemon process, queue intake, idle boundary.
 - [context/](context/README.md): window layout, budgets, compaction, caching, hygiene.
 - [protocol/](protocol/README.md): action format, parsing, system prompt, recovery.
 - [tools/](tools/README.md): the fixed toolset and its contracts.

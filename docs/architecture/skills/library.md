@@ -40,7 +40,7 @@ in [../../execution/tasks/skill-runtime.md](../../execution/tasks/skill-runtime.
 - Not a package ecosystem: nothing installs skills from anywhere; the agent
   writes its own or the owner drops files into /data/skills.
 - Not configuration: skills teach procedures; values that tune the harness
-  live in lkjagent.toml per [../../operations/running.md](../../operations/running.md).
+  live in lkjagent.json per [../../operations/running.md](../../operations/running.md).
 - Not memory: a skill says how to do something repeatable; memory records
   what happened and what it taught ([../memory/distillation.md](../memory/distillation.md)).
 

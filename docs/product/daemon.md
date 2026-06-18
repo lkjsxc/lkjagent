@@ -11,39 +11,41 @@ The daemon starts with `lkjagent run` inside the container and keeps running
 until stopped. It owns the single agent loop described in
 [../architecture/runtime/agent-loop.md](../architecture/runtime/agent-loop.md).
 
-While running, the daemon cycles through three observable states:
+While running, the daemon cycles through four observable states:
 
 | State | Meaning |
 | --- | --- |
+| idle | No task is open; the queue is empty; the daemon is waiting |
 | working | A task is open; the loop is taking turns toward agent.done |
 | waiting | The agent asked the owner a question and no answer has arrived |
-| maintaining | The queue is empty; the loop distills memory and refines skills |
+| error | The endpoint or loop failed; details are visible in status and log |
 
 State transitions are driven only by the queue and the loop, never by
-timers visible to the owner. A new queue message always pulls the daemon out
-of maintaining at the next turn boundary.
+timers visible to the owner. A new queue message pulls the daemon out of
+idle or waiting at the next turn boundary.
 
 ## Startup
 
 On startup the daemon opens the store, replays nothing, and rebuilds its
 context prefix from durable state: system prompt, memory digest, skill index,
 and the workspace brief. If a task was open when the process stopped, the
-task resumes from its transcript summary, not from a raw replay. Startup is
+task resumes from stored task state and summaries, not from a raw replay. Startup is
 specified in [../architecture/runtime/daemon-process.md](../architecture/runtime/daemon-process.md).
 
 ## Shutdown
 
-Stopping the container or sending SIGTERM ends the daemon between turns. A
-turn in flight finishes its observation write before exit. Nothing is lost:
-queue, transcripts, and memory are durable in the store, and skills are files.
+Stopping the container ends the process. In-flight endpoint calls are not
+drained by a custom signal handler. Queue rows, transcript events, memory,
+and skills are durable, and a restarted daemon reclaims a stale lock after
+the heartbeat exceeds the configured stale window.
 
 ## Failure
 
-If the endpoint is unreachable, the daemon retries with backoff and reports
-the condition through `lkjagent status`; it never fabricates a model reply.
-If the loop itself fails, the daemon records the failure as a transcript
-event and the container supervisor restarts the process.
+If the endpoint is unreachable, the daemon records an error event, sets
+`daemon_state=error`, and tries again on later polls; it never fabricates a
+model reply. If the loop itself fails, stale lock reclaim lets a restarted
+process continue from durable state.
 
 ## Status
 
-design-only.
+implemented.

@@ -23,7 +23,7 @@ done
 ## Files To Touch
 
 - crates/lkjagent-cli/src/: main.rs (argument dispatch, no logic), one
-  module per command, config.rs (lkjagent.toml reading, first-start
+  module per command, config.rs (lkjagent.json reading, first-start
   default writing per the running contract).
 - crates/lkjagent-cli/tests/: command tests against a temp store; config
   first-start behavior.
@@ -41,12 +41,12 @@ cargo run -p lkjagent-xtask -- quiet verify
 - send appends through lkjagent-store, writes a queue_mutation event with
   reason owner-send, and prints the queue id; a daemonless send still
   persists.
-- status prints daemon state, queue depth, open task, turns, context
-  ledger numbers, and last compaction, one fact per line.
+- status prints daemon state, queue depth, open task, question, error,
+  turns, context ledger numbers, and last compaction, one fact per line.
 - log renders the documented compact form; --follow tails; --full prints
   whole payloads.
-- run starts the daemon per the startup order, refuses a second instance,
-  and exits cleanly on SIGTERM mid-task, all integration-tested.
+- run starts the resident daemon per the startup order, refuses a second
+  fresh instance, and relies on heartbeat stale reclaim after process loss.
 - First start without a config writes the commented default and exits
   asking for endpoint.model, exactly as the running contract states.
 - Blocker row 10 done; product area statuses move in the ledger.
