@@ -20,6 +20,8 @@ needs:
 Nothing else is promised. The entrypoint prepares /data ownership, then runs
 the requested command as the non-root user named agent. There is no docker
 socket, and no host filesystem is visible beyond the mount below.
+Compose runs the agent with a read-only root filesystem, tmpfs at /tmp and
+/home/agent, no-new-privileges, and NET_RAW removed.
 
 ## Mounts
 
@@ -46,6 +48,9 @@ The container supervisor restarts the daemon on nonzero exit; startup,
 shutdown, and the lock row are owned by
 [../runtime/daemon-process.md](../runtime/daemon-process.md). Upgrades are
 image rebuilds; the store and the workspace survive in the data volume.
+Compose declares `restart: unless-stopped`, `init: true`, bounded json-file
+logs, a 45-second stop grace window, and a healthcheck that verifies the
+lkjagent process plus writable /data/workspace ownership.
 
 ## Network
 

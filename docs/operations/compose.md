@@ -8,10 +8,11 @@ itself lands with [../execution/tasks/compose-final-gate.md](../execution/tasks/
 
 ## Services
 
-| Service | Runs | Mounts |
-| --- | --- | --- |
-| agent | lkjagent run and the other lkjagent commands | named volume at /data |
-| verify | quiet verify inside the build image | none |
+| Service | Profile | Runs | Mounts |
+| --- | --- | --- | --- |
+| agent | default | lkjagent run and CLI commands | named volume at /data |
+| verify | verify | quiet verify inside the build image | none |
+| endpoint-example | endpoint | optional llama.cpp-class endpoint | model bind read-only |
 
 The endpoint is not a service this file owns: it is whatever
 OpenAI-compatible server the owner runs, reachable from the agent service
@@ -26,6 +27,18 @@ names the expected variables.
 The agent workspace is /data/workspace inside the named data volume. The
 stock image creates it for the non-root agent user.
 
+## Profiles
+
+The default compose profile is production-shaped: it starts only the
+resident agent daemon and the named data volume.
+
+The `verify` profile holds the final gate service. It may be run directly
+with `docker compose run --rm verify`, or explicitly with the profile when
+checking service sets.
+
+The `endpoint` profile holds the local endpoint example. It is disabled
+unless the owner asks for it with `docker compose --profile endpoint`.
+
 ## Shape
 
 ```yaml
@@ -35,6 +48,17 @@ services:
       context: .
       target: runtime
     command: ["run"]
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 45s
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+      - /home/agent:size=16m,uid=1000,gid=1000,mode=700
     volumes:
       - lkjagent-data:/data
     environment:
@@ -43,10 +67,14 @@ services:
       - LKJAGENT_MODEL
       - LKJAGENT_API_KEY
   verify:
+    profiles: ["verify"]
     build:
       context: .
       target: build
     command: cargo run -p lkjagent-xtask -- quiet verify
+  endpoint-example:
+    profiles: ["endpoint"]
+    image: ghcr.io/ggerganov/llama.cpp:server
 volumes:
   lkjagent-data:
 ```
@@ -65,6 +93,16 @@ and the guardrails below bind it.
   compose file.
 - /data/workspace is writable by the container user before real work is
   queued; otherwise fs.write and fs.edit report permission errors.
+- The agent root filesystem is read-only. Ephemeral writes belong in tmpfs
+  at /tmp or /home/agent; durable writes belong under /data.
+- The daemon has a process and workspace healthcheck, bounded json-file
+  logs, `restart: unless-stopped`, `init: true`, and a 45-second stop grace
+  window.
+- The default profile starts only the agent. Verification and local endpoint
+  containers are opt-in services behind their profiles.
+- The agent drops NET_RAW and runs with no-new-privileges. It still starts
+  through the root entrypoint long enough to repair /data ownership before
+  dropping to the agent user.
 - No develop or watch sections, no source bind for hot reload: the harness
   is rebuilt, not reloaded.
 - Secrets and deployment values travel as environment variables from .env or
@@ -82,6 +120,7 @@ docker compose run --rm agent send "..."   # queue owner work
 docker compose run --rm agent log --follow # read transcript events
 docker compose run --rm agent status       # observe daemon and queue state
 docker compose run --rm verify             # final gate
+docker compose --profile endpoint up -d endpoint-example
 ```
 
 ## Status
