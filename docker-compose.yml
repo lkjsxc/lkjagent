@@ -4,24 +4,55 @@ services:
       context: .
       target: runtime
     command: ["run"]
+    init: true
+    restart: unless-stopped
+    stop_signal: SIGTERM
+    stop_grace_period: 45s
+    read_only: true
+    working_dir: /data/workspace
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
     environment:
+      HOME: /home/agent
       LKJAGENT_API_KEY: ${LKJAGENT_API_KEY:-}
       LKJAGENT_ENDPOINT_URL: ${LKJAGENT_ENDPOINT_URL:-}
       LKJAGENT_ENDPOINT_TIMEOUT_SECONDS: ${LKJAGENT_ENDPOINT_TIMEOUT_SECONDS:-}
       LKJAGENT_MODEL: ${LKJAGENT_MODEL:-}
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          pidof lkjagent >/dev/null &&
+          stat -c %u /data/workspace | grep -qx 1000 &&
+          test -w /data/workspace
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+      - /home/agent:size=16m,uid=1000,gid=1000,mode=700
     volumes:
       - type: volume
         source: lkjagent-data
         target: /data
 
   verify:
+    profiles: ["verify"]
     build:
       context: .
       target: build
     command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "quiet", "verify"]
 
   endpoint-example:
-    profiles: ["endpoint-example"]
+    profiles: ["endpoint"]
     image: ghcr.io/ggerganov/llama.cpp:server
     command:
       - --host
