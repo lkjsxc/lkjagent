@@ -23,7 +23,8 @@ ParseFault variants map one-to-one onto the taxonomy in [recovery.md](recovery.m
 4. The first element inside act must be a tool pair naming a known registry
    entry. Unknown name: ParseFault::UnknownTool. Missing: ParseFault::MissingTool.
 5. Each subsequent opening tag inside act collects raw lines until the first
-   line exactly matching its closing tag. Unclosed at end of input:
+   line exactly matching its closing tag. If bytes follow the opening tag on
+   the same line, those bytes are the first value line. Unclosed at end of input:
    ParseFault::UnclosedTag with the tag name.
 6. Single-line form `<path>value</path>` is recognized when open and close
    sit on one line; the value is the inner text, untrimmed.

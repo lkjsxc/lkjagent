@@ -11,6 +11,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [daemon_loop.rs](daemon_loop.rs): resident queue, endpoint, tool, ask, and error fixtures.
 - [prompt_daemon.rs](prompt_daemon.rs): prompt, startup, lock, and shutdown fixtures.
 - [recursive_guard.rs](recursive_guard.rs): guarded recursive-structure daemon fixture.
+- [recursive_scaffold.rs](recursive_scaffold.rs): docs auto-scaffold daemon fixture.
 - [recursive_structure.rs](recursive_structure.rs): recursive structure seed integration fixture.
 - [step.rs](step.rs): task lifecycle, recovery, and compaction fixtures.
 - [support/](support/README.md): shared state and store helpers.

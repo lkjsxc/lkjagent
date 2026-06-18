@@ -18,3 +18,4 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [shell.rs](shell.rs): /bin/sh adapter with timeout handling.
 - [skill.rs](skill.rs): skill library load and save adapters.
 - [structure.rs](structure.rs): recursive tree completion checks.
+- [structure_seed.rs](structure_seed.rs): deterministic recursive docs scaffold.

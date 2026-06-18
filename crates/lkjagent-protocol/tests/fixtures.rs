@@ -28,6 +28,16 @@ fn parses_clean_turns_and_round_trips_rendered_actions() {
             "<act>\n<tool>shell.run</tool>\n<timeout>20</timeout>\n<command>cargo test</command>\n</act>",
             Action::new("shell.run", vec![Param::new("timeout", "20"), Param::new("command", "cargo test")]),
         ),
+        (
+            "<act>\n<tool>fs.write</tool>\n<path>docs/README.md</path>\n<content># Docs\n\n## Purpose\n\nRoot index.\n</content>\n</act>",
+            Action::new(
+                "fs.write",
+                vec![
+                    Param::new("path", "docs/README.md"),
+                    Param::new("content", "# Docs\n\n## Purpose\n\nRoot index."),
+                ],
+            ),
+        ),
     ];
 
     for (text, expected) in fixtures {

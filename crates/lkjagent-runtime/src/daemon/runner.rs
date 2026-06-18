@@ -114,6 +114,9 @@ impl ResidentDaemon {
         } else {
             self.dispatch_state.control.resume_task();
         }
+        let scaffold_docs = starting_task
+            && self.dispatch_state.control.guard == CompletionGuard::RecursiveStructure
+            && recursive_docs_requested(&owner.content);
         let result = step(
             self.state.clone(),
             StepInput::Owner {
@@ -122,6 +125,13 @@ impl ResidentDaemon {
             },
         );
         self.apply_step_result(conn, now, result, true)?;
+        if starting_task && self.dispatch_state.control.guard == CompletionGuard::RecursiveStructure
+        {
+            self.auto_load_recursive_structure(conn, now)?;
+            if scaffold_docs {
+                self.auto_scaffold_recursive_docs(conn, now)?;
+            }
+        }
         Ok(())
     }
 
@@ -178,4 +188,9 @@ fn preview(content: &str) -> String {
         .filter(|line| !line.is_empty())
         .unwrap_or("active");
     first.chars().take(80).collect()
+}
+
+fn recursive_docs_requested(content: &str) -> bool {
+    let lower = content.to_ascii_lowercase();
+    lower.contains("docs") || lower.contains("documentation") || content.contains("ドキュメント")
 }

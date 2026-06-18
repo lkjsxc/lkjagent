@@ -20,14 +20,17 @@ The command runs as /bin/sh -lc with the workspace directory as the
 working directory, inside the container boundary specified by
 [../sandbox/safety.md](../sandbox/safety.md). A command that exceeds its
 timeout is killed, and the observation reports the timeout alongside the
-output captured before the kill.
+output captured before the kill. Because the shell is /bin/sh, commands
+must not depend on Bash-only expansion such as `{a,b}` brace expansion.
 
 ## Observation
 
 The observation opens with an exit code line, then the combined stdout and
 stderr, captured head-and-tail within the 2,048-token observation cap of
-[../context/budgets.md](../context/budgets.md). When the middle is elided,
-the truncation notice names a narrower command as the retrieval path.
+[../context/budgets.md](../context/budgets.md). Exit code 0 returns status
+ok. Non-zero exits, signal exits, and timeouts return status error with the
+same captured content. When the middle is elided, the truncation notice
+names a narrower command as the retrieval path.
 
 ## Narrow Beats Raw
 

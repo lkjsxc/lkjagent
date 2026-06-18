@@ -14,7 +14,15 @@ pub fn dispatch_skill_use(
     runtime: &ToolRuntime,
     state: &mut DispatchState,
 ) -> DispatchOutput {
-    let name = param(params, "name");
+    load_skill_frame(&param(params, "name"), action_text, runtime, state)
+}
+
+pub fn load_skill_frame(
+    name: &str,
+    action_text: &str,
+    runtime: &ToolRuntime,
+    state: &mut DispatchState,
+) -> DispatchOutput {
     if let Some(record) = state
         .loaded_skills
         .iter()
@@ -29,7 +37,7 @@ pub fn dispatch_skill_use(
             ),
         );
     }
-    match skill::use_skill(&runtime.skill_library, &name) {
+    match skill::use_skill(&runtime.skill_library, name) {
         Err(error) => observe_error(error, action_text, runtime, state),
         Ok(loaded) => finish_loaded_skill(loaded, action_text, state),
     }

@@ -14,6 +14,12 @@ pub struct ShellReport {
     pub output: String,
 }
 
+impl ShellReport {
+    pub fn succeeded(&self) -> bool {
+        !self.timed_out && self.exit_code == Some(0)
+    }
+}
+
 pub fn run(workspace: &Path, command: &str, timeout_seconds: u64) -> ToolResult<ShellReport> {
     if command.trim().is_empty() {
         return Err(ToolError::invalid("command must not be empty"));

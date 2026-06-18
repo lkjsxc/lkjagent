@@ -3,9 +3,10 @@ mod support;
 use std::fs;
 use std::path::Path;
 
+use lkjagent_context::model::FrameKind;
 use lkjagent_runtime::daemon::{
-    client_config, restore_completion_guard, take_daemon_lock, DaemonTick, ResidentDaemon,
-    ResidentRuntime,
+    client_config, restore_completion_guard, seed_skill_library, take_daemon_lock, DaemonTick,
+    ResidentDaemon, ResidentRuntime,
 };
 use lkjagent_store::{memory, queue, state};
 use lkjagent_tools::control::CompletionGuard;
@@ -24,20 +25,29 @@ fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestRe
     take_daemon_lock(&conn, "test", "100", "0")?;
     queue::enqueue(
         &mut conn,
-        "高度に再帰的に構造化された docs を作ってください",
+        "高度に再帰的に構造化された workspace を作ってください",
         "owner-send",
         "101",
     )?;
     let workspace = temp_workspace("recursive-guard")?;
+    let seed = Path::new(env!("CARGO_MANIFEST_DIR")).join("../lkjagent-skills/seeds");
+    seed_skill_library(&workspace.join("skills"), &workspace.join("missing"), &seed)?;
     let responses = scripted_responses();
     let server = serve_responses(responses)?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    assert!(daemon
+        .state
+        .context
+        .log
+        .iter()
+        .any(|frame| frame.kind == FrameKind::SkillBody
+            && frame.content.contains("# Skill: Recursive Structure")));
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     assert_eq!(
         state::get(&conn, "open task")?,
-        Some("高度に再帰的に構造化された docs を作ってください".to_string())
+        Some("高度に再帰的に構造化された workspace を作ってください".to_string())
     );
     assert_eq!(
         state::get(&conn, "completion guard")?,

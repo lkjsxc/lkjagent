@@ -8,5 +8,6 @@ This directory holds adapter helpers for the foreground daemon.
 
 - [runner.rs](runner.rs): resident poll loop and effect interpretation.
 - [effects.rs](effects.rs): step effect persistence and tool dispatch.
+- [skills.rs](skills.rs): guarded task skill auto-loading.
 - [status.rs](status.rs): daemon state fields written to the store.
 - [startup.rs](startup.rs): seed copying and prefix input loading.

@@ -22,18 +22,24 @@ A task asks to organize, scaffold, split, or maintain a recursive project file s
 1. Run `pwd`, `find . -maxdepth 3 -type f | sort`, and `git status --short`.
 2. Read applicable `AGENTS.md`, root README, docs README, current-state, and blocker files when present.
 3. Pick the smallest root that owns the request, such as `docs/`, `src/`, or a named product area.
-4. Write or update that root `README.md` as the table of contents before adding child files.
-5. Split by ownership: create a child directory when one file would own multiple peer concepts.
-6. Put a `README.md` in every new directory before adding leaf files under it.
-7. Keep each leaf to one purpose, one status or evidence section, and links to its parent or owner doc.
-8. Record durable work state in current-state, blockers, tasks, or traceability files when those exist.
-9. If no state spine exists, create only the minimal state files needed for the current task.
-10. Build at least six directories, twelve markdown files, and three nested directory levels.
-11. Run the repository gate named by AGENTS or README; if absent, run the checks below.
+4. Keep each action compact. Use shell.run for multi-file scaffolds and fs.write only for one concise file.
+5. Write or update that root `README.md` before adding child files.
+   Every README.md must include the exact heading `## Table of Contents`.
+6. Split by ownership: create a child directory when one file would own multiple peer concepts.
+7. Put a `README.md` in every new directory before adding leaf files under it.
+8. Keep each leaf to one purpose, one status or evidence section, and links to its parent or owner doc.
+9. Record durable work state in current-state, blockers, tasks, or traceability files when those exist.
+10. If no state spine exists, create only the minimal state files needed for the current task.
+11. Build at least six directories, twelve markdown files, and three nested directory levels.
+12. Use explicit paths with `mkdir -p` before writes. shell.run uses /bin/sh,
+    so do not rely on Bash-only `{a,b}` brace expansion.
+13. For bulk creation or repair, use one compact shell.run script with short README bodies.
+14. Run the repository gate named by AGENTS or README; if absent, run the checks below.
 
 ## Checks
 
 - `find <root> -type d ! -exec test -f '{}/README.md' ';' -print` prints no required directory.
+- `grep -R -L '## Table of Contents' <root>/**/README.md <root>/README.md` prints no file.
 - `find <root> -type f -name '*.md' -exec wc -l {} + | sort -n | tail -20` stays under the local cap.
 - `find <root> -type d | wc -l` is at least 6, and markdown file count is at least 12.
 - `git status --short` shows only paths intended for this structural slice.
@@ -42,6 +48,8 @@ A task asks to organize, scaffold, split, or maintain a recursive project file s
 ## Must Not
 
 - Do not create a deep directory without an index at each level.
+- Do not replace `## Table of Contents` with decorative or domain-specific headings.
+- Do not use shell brace expansion; write each directory path explicitly.
 - Do not split by file type when ownership gives a clearer boundary.
 - Do not leave status, tasks, assumptions, or acceptance only in chat.
 - Do not call agent.done after only one file or one directory level.

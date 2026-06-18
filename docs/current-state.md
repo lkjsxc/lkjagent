@@ -18,8 +18,13 @@ for send, status, log, console,
 memory, skills, startup checks, repository-root .env loading for local
 deployment values, JSON runtime config, a /data/workspace working tree, and a
 resident daemon that delivers queued owner work to the endpoint and tool
-dispatcher until agent.done. Empty queues leave the daemon idle; automatic
-idle self-maintenance is not active. Compose wiring is
+dispatcher until agent.done. Recursive structure tasks auto-load their seed
+skill before the first endpoint turn. Recursive docs tasks also create a
+minimal README-indexed scaffold before endpoint work, and no recursive
+structure task can close without a verified README-indexed tree. shell.run
+reports non-zero and signal exits as error observations with captured
+output. Empty queues leave the daemon idle; automatic idle self-maintenance
+is not active. Compose wiring is
 implemented. The implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
 

@@ -95,6 +95,7 @@ fn shell_reports_exit_truncates_and_times_out() -> TestResult<()> {
         &mut conn,
         &mut state,
     );
+    assert!(is_error(&exited));
     assert!(exited.content.contains("exit_code=7"));
     assert!(exited.content.contains("alpha"));
 

@@ -44,7 +44,12 @@ question for the owner instead of silent burn.
 
 Some owner messages activate a completion guard. Recursive structure tasks
 cannot close until the tool layer verifies a README-indexed recursive tree;
-a premature agent.done returns a tool error and the task remains open.
+a premature agent.done returns a tool error and the task remains open. The
+daemon auto-loads the recursive-structure skill body immediately after the
+opening owner frame and before the first endpoint completion for that task.
+When the owner asks for recursive docs or documentation, the daemon also
+creates a minimal README-indexed docs scaffold that already satisfies the
+guard, then records that observation before calling the endpoint.
 
 When no task is open and the queue is empty, the daemon sets
 `daemon_state=idle`, refreshes its lock heartbeat, and waits for queue

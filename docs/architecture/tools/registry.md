@@ -17,7 +17,7 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | fs.read | path req; start opt 1; count opt 200 | ranged raw read, one header line | missing file; duplicate read |
 | fs.write | path req; content req | write file, create parent directories | write failure |
 | fs.edit | path req; find req; replace req | replace exactly one match of find | zero or many matches, count reported |
-| shell.run | command req; timeout opt 60, max 600 | run /bin/sh -lc in the workspace | timeout; spawn failure |
+| shell.run | command req; timeout opt 60, max 600 | run /bin/sh -lc in the workspace | non-zero exit; signal exit; timeout; spawn failure |
 | queue.list | status opt all; limit opt 20 | list queue rows by id, status, source, and preview | unknown status |
 | queue.enqueue | content req; reason req | append a pending queue row | empty content |
 | queue.edit | id req; content req; reason req | replace content of a pending queue row | missing row; non-pending |

@@ -47,8 +47,9 @@ cargo clippy -p lkjagent-tools -- -D warnings
   each has at least one ok-path and one error-path test.
 - fs.edit refuses zero and multiple matches with the match count; fs.write
   observations carry path and byte count, never content.
-- shell.run captures head and tail within the cap, reports exit codes, and
-  enforces the timeout against a real slow command.
+- shell.run captures head and tail within the cap, reports exit codes,
+  returns status error on non-zero exits, and enforces the timeout against a
+  real slow command.
 - Queue tools validate ids, statuses, and reasons; mutation tools call only
   lkjagent-store and return bounded observations.
 - During maintenance, fs, shell, and queue actions have the same authority
