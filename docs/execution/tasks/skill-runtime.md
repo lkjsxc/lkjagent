@@ -3,7 +3,7 @@
 ## Purpose
 
 Implement lkjagent-skills: the format validator, the library index with
-deterministic degradation, the loader, and the five seed skills, written
+deterministic degradation, the loader, and the seed skills, written
 for real and validated by the same rules.
 
 ## Status
@@ -28,7 +28,7 @@ done
 - crates/lkjagent-skills/src/: model.rs, validate.rs (the rule table
   shared with check-docs), index.rs (index lines, budget degradation),
   load.rs (file to skill frame).
-- crates/lkjagent-skills/seeds/: the five seed skill files from the
+- crates/lkjagent-skills/seeds/: the seed skill files from the
   library contract, each a real working procedure.
 - crates/lkjagent-skills/tests/: validation table, degradation
   determinism, seed validation.
@@ -47,7 +47,7 @@ cargo run -p lkjagent-xtask -- check-docs
   class asserts the exact message listing all violations at once.
 - Index generation is deterministic under the 512-token budget, including
   the degradation order.
-- All five seeds validate, name real commands, and contain Checks sections
+- All seeds validate, name real commands, and contain Checks sections
   with evidence that can actually appear.
 - check-docs and the runtime validator consume one shared rule table;
   drift is structurally impossible.
