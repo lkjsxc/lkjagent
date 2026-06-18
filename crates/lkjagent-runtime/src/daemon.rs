@@ -18,7 +18,7 @@ mod runner;
 mod startup;
 mod status;
 
-pub use runner::{DaemonTick, ResidentDaemon, ResidentRuntime};
+pub use runner::{restore_completion_guard, DaemonTick, ResidentDaemon, ResidentRuntime};
 pub use startup::{build_prefix_from_store, seed_skill_library, startup_summary};
 
 pub type EndpointClientConfig = ClientConfig;
