@@ -53,7 +53,7 @@ fn daemon_delivers_queue_writes_file_and_records_done() -> TestResult<()> {
 }
 
 #[test]
-fn daemon_waits_on_ask_and_treats_next_send_as_answer() -> TestResult<()> {
+fn daemon_waits_on_ask_and_resumes_from_next_send() -> TestResult<()> {
     let mut conn = store()?;
     take_lock(&conn)?;
     queue::enqueue(&mut conn, "start", "owner-send", "101")?;
@@ -66,15 +66,22 @@ fn daemon_waits_on_ask_and_treats_next_send_as_answer() -> TestResult<()> {
         state::get(&conn, "daemon question")?,
         Some("Need detail?".to_string())
     );
-    queue::enqueue(&mut conn, "answer", "owner-send", "102")?;
+    queue::enqueue(&mut conn, "guidance", "owner-send", "102")?;
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Done);
     server.join()?;
 
-    let owners = events::read_events(&conn)?
-        .into_iter()
-        .filter(|event| event.kind == "owner")
-        .count();
+    let log = events::read_events(&conn)?;
+    let owners = log.iter().filter(|event| event.kind == "owner").count();
     assert_eq!(owners, 2);
+    assert!(log
+        .iter()
+        .any(|event| event.kind == "owner" && event.content == "guidance"));
+    assert!(!daemon
+        .state
+        .context
+        .log
+        .iter()
+        .any(|frame| frame.content.contains("<kind>delivery</kind>")));
     assert_eq!(state::get(&conn, "daemon state")?, Some("idle".to_string()));
     Ok(())
 }

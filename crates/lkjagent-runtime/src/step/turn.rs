@@ -11,10 +11,6 @@ use crate::step::{Effect, StepResult};
 use crate::task::{open_task, spend_turn, PendingAction, RuntimeState, StopReason, TaskState};
 
 pub(super) fn owner_step(mut state: RuntimeState, content: String, tokens: usize) -> StepResult {
-    if let TaskState::Waiting { question } = &state.task {
-        let notice = format!("answering outstanding question: {question}");
-        state = append_notice(state, NoticeKind::Delivery, &notice);
-    }
     if state.maintenance.is_some() {
         state = append_notice(
             state,

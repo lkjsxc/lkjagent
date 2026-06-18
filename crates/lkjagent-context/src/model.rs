@@ -12,7 +12,6 @@ pub enum PrefixSection {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum NoticeKind {
-    Delivery,
     Truncation,
     Budget,
     Error,

@@ -152,8 +152,8 @@ fn section(label: &str) -> String {
 
 fn hint(state: &str, pending: usize) -> String {
     match (state, pending) {
-        ("waiting", 0) => "reply to answer the question | /refresh /help /quit".to_string(),
-        ("waiting", _) => "answer queued; wait or /refresh | /help /quit".to_string(),
+        ("waiting", 0) => "type a message to send guidance | /refresh /help /quit".to_string(),
+        ("waiting", _) => "sent guidance is pending | /refresh /help /quit".to_string(),
         (_, 0) => "type a message to queue work | /refresh /help /quit".to_string(),
         _ => "queued work is pending | /refresh /help /quit".to_string(),
     }

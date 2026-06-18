@@ -23,16 +23,17 @@ container data directory defined in [../operations/running.md](../operations/run
 
 ## Conversation Shape
 
-The owner sends a message and reads the answer from the transcript:
+The owner sends a message and reads the result from the transcript:
 
 ```sh
 lkjagent send "Profile the parser and remove the hot allocation."
 lkjagent log --follow
 ```
 
-Answers appear as agent.done events; questions from the agent appear as
-agent.ask events and are answered with another `lkjagent send`. Replies join
-the queue like any message; ordering rules live in [queue.md](queue.md).
+Completed work appears as agent.done events. Questions from the agent
+appear as agent.ask events, and the owner responds with another
+`lkjagent send`. Every owner line joins the same queue; ordering rules live
+in [queue.md](queue.md).
 
 ## Owner Console
 
@@ -43,7 +44,7 @@ is open:
 - the last useful agent output,
 - pending queue previews,
 - the recent transcript tail,
-- a `send>` or `answer>` prompt.
+- a `send>` prompt.
 
 Any non-command line typed at the prompt is enqueued with the same durability
 as `lkjagent send`. `/refresh` redraws, `/help` lists commands, and `/quit`

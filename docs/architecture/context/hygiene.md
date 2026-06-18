@@ -23,7 +23,6 @@ Notices are the only free-form harness voice, and even they are enumerated:
 
 | Kind | Carries |
 | --- | --- |
-| delivery | question-answer matching context for an owner frame |
 | truncation | what was cut and the retrieval path for the rest |
 | budget | task turn budget exhausted; lawful next actions |
 | error | parse, tool, or endpoint failure in one bounded line set |

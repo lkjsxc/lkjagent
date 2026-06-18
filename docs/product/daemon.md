@@ -17,7 +17,7 @@ While running, the daemon cycles through four observable states:
 | --- | --- |
 | idle | No task is open; the queue is empty; the daemon is waiting |
 | working | A task is open; the loop is taking turns toward agent.done |
-| waiting | The agent asked the owner a question and no answer has arrived |
+| waiting | The agent asked the owner a question and no later send has arrived |
 | error | The endpoint or loop failed; details are visible in status and log |
 
 State transitions are driven only by the queue and the loop, never by
