@@ -21,10 +21,12 @@ fn env_model_initializes_first_config() -> TestResult<()> {
     };
     assert_eq!(config.endpoint_url, "http://host.docker.internal:8080");
     assert_eq!(config.endpoint_model, "local-model");
+    assert_eq!(config.endpoint_timeout_seconds, 180);
 
-    let text = fs::read_to_string(data.join("lkjagent.toml"))?;
-    assert!(text.contains("model = \"local-model\""));
-    assert!(text.contains("api-key-env = \"LKJAGENT_API_KEY\""));
+    let text = fs::read_to_string(data.join("lkjagent.json"))?;
+    assert!(text.contains("\"model\": \"local-model\""));
+    assert!(text.contains("\"api-key-env\": \"LKJAGENT_API_KEY\""));
+    assert!(text.contains("\"timeout-seconds\": 180"));
     Ok(())
 }
 
@@ -44,6 +46,41 @@ fn env_values_override_existing_endpoint_config() -> TestResult<()> {
     };
     assert_eq!(config.endpoint_url, "http://127.0.0.1:9000");
     assert_eq!(config.endpoint_model, "env-model");
+    assert_eq!(config.endpoint_timeout_seconds, 180);
+    Ok(())
+}
+
+#[test]
+fn endpoint_timeout_uses_env_config_and_default_order() -> TestResult<()> {
+    let data = temp_data("timeout")?;
+    fs::write(
+        data.join("lkjagent.json"),
+        "{\"endpoint\":{\"model\":\"local-test\",\"timeout-seconds\":45}}",
+    )?;
+    let loaded = load_or_initialize_with_env(&data, |key| match key {
+        "LKJAGENT_ENDPOINT_TIMEOUT_SECONDS" => Some("12".to_string()),
+        _ => None,
+    })?;
+    let ConfigLoad::Ready(config) = loaded else {
+        return Err("timeout config did not load".into());
+    };
+    assert_eq!(config.endpoint_timeout_seconds, 12);
+
+    let loaded = load_or_initialize_with_env(&data, |_| None)?;
+    let ConfigLoad::Ready(config) = loaded else {
+        return Err("timeout config did not load".into());
+    };
+    assert_eq!(config.endpoint_timeout_seconds, 45);
+
+    fs::write(
+        data.join("lkjagent.json"),
+        "{\"endpoint\":{\"model\":\"local-test\"}}",
+    )?;
+    let loaded = load_or_initialize_with_env(&data, |_| None)?;
+    let ConfigLoad::Ready(config) = loaded else {
+        return Err("timeout config did not load".into());
+    };
+    assert_eq!(config.endpoint_timeout_seconds, 180);
     Ok(())
 }
 
@@ -78,8 +115,8 @@ fn temp_data(name: &str) -> TestResult<PathBuf> {
 
 fn write_config(data: &PathBuf) -> TestResult<()> {
     fs::write(
-        data.join("lkjagent.toml"),
-        "[endpoint]\nurl = \"http://endpoint:8080\"\nmodel = \"local-test\"\n",
+        data.join("lkjagent.json"),
+        "{\"endpoint\":{\"url\":\"http://endpoint:8080\",\"model\":\"local-test\"}}",
     )?;
     Ok(())
 }

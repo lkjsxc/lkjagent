@@ -12,17 +12,17 @@ There are no permission prompts and no approval flows, by design:
 [../../decisions/container-first.md](../../decisions/container-first.md).
 Prompts assume an attending human, which contradicts a continuously
 running, queue-fed agent. Inside the container the agent edits, executes,
-installs, and reaches the network without asking.
-Task turns and maintenance turns have the same authority; maintenance has
-no extra sandbox beyond this boundary.
+installs, and reaches the network without asking. Task turns and explicit
+maintenance paths have the same authority; maintenance has no extra sandbox
+beyond this boundary.
 
 ## Blast Radius
 
 The blast radius of any agent action is exactly:
 
 - the container filesystem, reset by an image rebuild,
-- /workspace, the mounted project,
-- /data, the store, skill library, and config.
+- /data/workspace, the project directory,
+- /data, the store, workspace, skill library, and config.
 
 Nothing outside the mounts exists from the agent's view: no host
 filesystem, no docker socket, no other process namespaces. Other compose
@@ -34,8 +34,8 @@ services exist only as network peers.
   radius.
 - Treat credentials handed to the agent as spendable: an API key in the
   environment, a token in the workspace, a remote the checkout can push to.
-- Snapshot volumes for rollback: the /data volume and the workspace are
-  the state worth keeping, per [workspace.md](workspace.md).
+- Snapshot the /data volume for rollback: it contains the state worth
+  keeping, per [workspace.md](workspace.md).
 - Restrict egress in compose when the agent must be airgapped, per
   [container.md](container.md).
 

@@ -43,7 +43,7 @@ docker compose run --rm verify
 - The final gate passes from a clean checkout: image builds, quiet verify
   prints ok verify inside the container.
 - The verify service has no mounts; the agent service mounts exactly the
-  data volume and the workspace bind; asserted by inspecting
+  data volume; asserted by inspecting
   `docker compose config` output in a gate check.
 - The agent service starts, writes the default config on first start, and
   `docker compose exec agent lkjagent status` reports honestly against a

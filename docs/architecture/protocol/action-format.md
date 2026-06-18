@@ -3,8 +3,8 @@
 ## Purpose
 
 The grammar of a model turn. The model writes plain text with paired,
-attribute-free tags; the harness stops generation at the closing act tag.
-JSON never appears in either direction.
+attribute-free tags; the completion must include the closing act tag. JSON
+never appears in either direction.
 
 ## A Turn
 
@@ -23,8 +23,7 @@ renderer before changing anything.
 
 - The think preamble is optional, free-form, and unparsed; it exists for the
   model's own chain of thought and stays in the log verbatim.
-- Exactly one act block per turn. The stop sequence `</act>` makes a second
-  block impossible to generate.
+- Exactly one act block per turn. A second act block is a parse fault.
 - The first child of act is always tool, naming an entry in
   [../tools/registry.md](../tools/registry.md). The remaining children are
   that tool's parameters, in any order.

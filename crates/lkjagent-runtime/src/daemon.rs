@@ -7,10 +7,21 @@ use lkjagent_store::events::{append_event, EventKind};
 use lkjagent_store::state::{take_lock, LockDecision};
 use lkjagent_tools::dispatch::{dispatch, DispatchOutput, DispatchState, ToolRuntime};
 use rusqlite::Connection;
+use std::time::Duration;
 
 use crate::error::RuntimeResult;
 use crate::prompt::token_estimate;
 use crate::task::{RuntimeState, TaskState};
+
+mod effects;
+mod runner;
+mod startup;
+mod status;
+
+pub use runner::{DaemonTick, ResidentDaemon, ResidentRuntime};
+pub use startup::{build_prefix_from_store, seed_skill_library, startup_summary};
+
+pub type EndpointClientConfig = ClientConfig;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StartupLock {
@@ -100,6 +111,18 @@ pub fn endpoint_complete(
 ) -> RuntimeResult<Completion> {
     let messages = assemble_messages(context);
     Ok(complete(config, &messages, attempt)?)
+}
+
+pub fn client_config(
+    base_url: &str,
+    model: &str,
+    api_key: Option<String>,
+    timeout_seconds: u64,
+) -> ClientConfig {
+    let mut config = ClientConfig::new(base_url, model);
+    config.api_key = api_key;
+    config.timeout = Duration::from_secs(timeout_seconds);
+    config
 }
 
 pub fn execute_tool(

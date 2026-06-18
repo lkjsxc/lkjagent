@@ -14,6 +14,7 @@ pub enum Command {
     Send { text: String },
     Status,
     Log { follow: bool, full: bool },
+    Console,
     Memory { query: String },
     Skills,
 }
@@ -54,6 +55,7 @@ fn parse_command(command: &str, args: Vec<String>) -> Result<Command, CliError> 
         "send" => parse_send(args),
         "status" => Ok(Command::Status),
         "log" => parse_log(args),
+        "console" => parse_no_args(args, "console").map(|()| Command::Console),
         "memory" => parse_memory(args),
         "skills" => Ok(Command::Skills),
         other => Err(CliError::usage(format!("unknown command: {other}"))),
@@ -80,6 +82,14 @@ fn parse_log(args: Vec<String>) -> Result<Command, CliError> {
         }
     }
     Ok(Command::Log { follow, full })
+}
+
+fn parse_no_args(args: Vec<String>, command: &str) -> Result<(), CliError> {
+    if args.is_empty() {
+        Ok(())
+    } else {
+        Err(CliError::usage(format!("{command} takes no arguments")))
+    }
 }
 
 fn parse_memory(args: Vec<String>) -> Result<Command, CliError> {

@@ -7,14 +7,12 @@ services:
     environment:
       LKJAGENT_API_KEY: ${LKJAGENT_API_KEY:-}
       LKJAGENT_ENDPOINT_URL: ${LKJAGENT_ENDPOINT_URL:-}
+      LKJAGENT_ENDPOINT_TIMEOUT_SECONDS: ${LKJAGENT_ENDPOINT_TIMEOUT_SECONDS:-}
       LKJAGENT_MODEL: ${LKJAGENT_MODEL:-}
     volumes:
       - type: volume
         source: lkjagent-data
         target: /data
-      - type: bind
-        source: ${LKJAGENT_WORKSPACE:-./.lkjagent-workspace}
-        target: /workspace
 
   verify:
     build:

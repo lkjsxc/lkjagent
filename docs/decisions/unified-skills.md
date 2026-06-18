@@ -19,9 +19,8 @@ Both sets obey the same headings, the same line cap, and the same lifecycle.
 - The format gets twice the testing: every friction the builders feel is a
   bug report for the runtime, and the reverse.
 - The harness can maintain its own skills with the same machinery the
-  builders use, which is what the self-maintenance loop in
-  [../architecture/runtime/self-maintenance.md](../architecture/runtime/self-maintenance.md)
-  does during idle time.
+  builders use through explicit maintenance paths described in
+  [../architecture/runtime/self-maintenance.md](../architecture/runtime/self-maintenance.md).
 - A skill written for building lkjagent is loadable by lkjagent once it runs;
   the project bootstraps its own capability library.
 - There is exactly one format document to keep sharp, honoring the one-rule

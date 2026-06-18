@@ -14,7 +14,7 @@ agent loop --(append-only messages)--> endpoint (chat completions, 32k)
 endpoint --(tag-based action, stops at </act>)--> parser
 parser --> toolset (fs, shell, queue ops, memory ops, skill ops, control)
 toolset --(bounded observation)--> agent loop --> store.events
-idle queue --> self-maintenance (mutate workspace, queue, memory, skills)
+idle queue --> wait for owner work
 ```
 
 The loop appends every turn to the transcript; the context engine decides
@@ -31,7 +31,7 @@ the prefix.
 | lkjagent-llm | endpoint HTTP client | [llm/](llm/README.md) |
 | lkjagent-skills | skill parse, index, load | [skills/](skills/README.md) |
 | lkjagent-tools | tool execution adapters | [tools/](tools/README.md) |
-| lkjagent-runtime | daemon, loop composition, intake, maintenance | [runtime/](runtime/README.md) |
+| lkjagent-runtime | daemon, loop composition, intake, maintenance helpers | [runtime/](runtime/README.md) |
 | lkjagent-cli | the lkjagent binary | [../product/cli.md](../product/cli.md) |
 | lkjagent-xtask | repository checks and quiet gates | [../operations/verification.md](../operations/verification.md) |
 

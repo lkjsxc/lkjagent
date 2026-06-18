@@ -2,22 +2,20 @@
 
 ## Purpose
 
-Specify what the loop does when the queue is empty and no task is open: it
-improves the system it runs on. This is the continuous-operation payoff and
-the reason idle time is never wasted.
+State the self-maintenance boundary. The resident daemon does not open
+maintenance work when the queue is empty and no task is open; it waits in
+the idle state.
 
 ## Trigger
 
-At a turn boundary with no open task and no pending queue rows, the harness
-injects a maintenance notice opening a maintenance cycle. A cycle has a turn
-budget (initial contract: 8 turns), after which the harness re-checks the
-queue before opening another cycle. Owner messages always preempt the next
-cycle, never the current turn.
+There is no automatic idle trigger. At a turn boundary with no open task and
+no pending queue rows, the harness records `daemon_state=idle`, refreshes
+the daemon lock heartbeat, and waits for the next queue row.
 
 ## Maintenance Directives
 
-The maintenance notice carries one directive, chosen by the harness in
-rotation, weighted by staleness:
+The pure runtime still defines maintenance directives for explicit future
+use, chosen in rotation and weighted by staleness:
 
 | Directive | Work |
 | --- | --- |
@@ -31,25 +29,24 @@ cycle opens; the model never schedules itself.
 
 ## Bounds
 
-- Maintenance uses the same toolset, protocol, budgets, and YOLO authority
-  as task work; it has no special sandbox inside the container blast radius.
-- Maintenance may mutate /workspace and /data: workspace files, git state
-  and remotes, queue rows, memory rows, skills, config, and external
-  services when credentials and network access exist.
+- Explicit maintenance uses the same toolset, protocol, budgets, and YOLO
+  authority as task work; it has no special sandbox inside the container
+  blast radius.
+- Explicit maintenance may mutate /data/workspace and /data: workspace
+  files, git state and remotes, queue rows, memory rows, skills, config,
+  and external services when credentials and network access exist.
 - Maintenance still obeys the integrity invariants: one action per turn,
   bounded observations, real observations only, append-only transcript
   events, and queue preemption only at turn boundaries.
 - A maintenance cycle that finds nothing useful ends early with agent.done
   and a one-line summary; an empty cycle is a valid, honest outcome.
 
-## Why Not Heartbeats or Cron
+## Heartbeat
 
-Scheduled wakeups are out of scope per [../../vision/scope.md](../../vision/scope.md).
-Maintenance is purely queue-shadowed: it consumes exactly the time the owner
-is not using, and stops the moment work arrives.
+Idle time is used only for the daemon lock heartbeat. Scheduled wakeups and
+cron-style work remain out of scope per [../../vision/scope.md](../../vision/scope.md).
 
 ## Status
 
-Implemented in lkjagent-runtime as a pure idle-boundary decision, a
-store-backed state-stamp adapter, bounded maintenance cycle state, normal
-tool-dispatch authority, and task-close plus compaction distillation notices.
+not implemented as automatic daemon behavior. The runtime crate retains pure
+directive and budget helpers for explicit maintenance paths.

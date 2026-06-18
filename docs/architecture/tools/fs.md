@@ -68,10 +68,10 @@ Example, in the action format of
 
 ## Maintenance Behavior
 
-During a maintenance cycle, fs.write and fs.edit have the same workspace
-authority they have during task work. The boundary is the container blast
-radius in [../sandbox/safety.md](../sandbox/safety.md), not a
-maintenance-specific restriction.
+During an explicit maintenance cycle, fs.write and fs.edit have the same
+workspace authority they have during task work. The boundary is the
+container blast radius in [../sandbox/safety.md](../sandbox/safety.md), not
+a maintenance-specific restriction.
 
 ## Status
 

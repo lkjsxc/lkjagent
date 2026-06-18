@@ -72,9 +72,12 @@ Key-value runtime state: key TEXT PRIMARY KEY, value TEXT.
 
 | Key | Holds |
 | --- | --- |
-| daemon lock | holder pid and start time per [../runtime/daemon-process.md](../runtime/daemon-process.md) |
-| open task | the current task, if any |
-| maintenance stamps | per-directive last-run stamps, [../runtime/self-maintenance.md](../runtime/self-maintenance.md) |
+| daemon lock | holder pid, start time, and heartbeat per [../runtime/daemon-process.md](../runtime/daemon-process.md) |
+| daemon state | idle, working, waiting, or error |
+| daemon question | outstanding agent.ask text, if any |
+| daemon error | latest endpoint or loop error, if any |
+| open task | the current task label, or none |
+| maintenance stamps | per-directive explicit-maintenance stamps, [../runtime/self-maintenance.md](../runtime/self-maintenance.md) |
 | counters | turn counter and similar running totals |
 
 ## Transactions
@@ -105,7 +108,7 @@ the fixed reason `owner-send`.
 
 - Skills: markdown files in the skill library directory at /data/skills.
   The store holds only their index stamps.
-- Config: data/lkjagent.toml on disk, never mirrored into tables.
+- Config: data/lkjagent.json on disk, never mirrored into tables.
 - The endpoint API key: it arrives by environment variable per
   [../sandbox/container.md](../sandbox/container.md) and is never written
   to the store.

@@ -6,8 +6,14 @@ This directory holds CLI argument dispatch and one module per command.
 
 ## Table of Contents
 
-- [args.rs](args.rs): argument parser for the six documented commands.
+- [args.rs](args.rs): argument parser for the documented commands.
 - [config.rs](config.rs): runtime config loading and first-start default writing.
+- [config/json.rs](config/json.rs): JSON config parsing and rendering.
+- [console.rs](console.rs): interactive owner console input loop.
+- [console/input.rs](console/input.rs): line and terminal input adapters.
+- [console/render.rs](console/render.rs): terminal console screen rendering.
+- [console/style.rs](console/style.rs): ANSI terminal styling for the console.
+- [console/terminal_input.rs](console/terminal_input.rs): terminal character input reader.
 - [env_file.rs](env_file.rs): optional .env loading for the binary entrypoint.
 - [error.rs](error.rs): CLI error type and exit-code mapping.
 - [lib.rs](lib.rs): command dispatcher used by tests and main.

@@ -44,8 +44,8 @@ current task closes.
 - The agent may ask the owner a question with agent.ask. The task enters the
   waiting state. The next queue message is treated as the answer if it
   arrives while waiting.
-- Waiting never blocks the daemon: with an empty queue it shifts to
-  self-maintenance and returns the moment an answer arrives.
+- Waiting never blocks senders: with an empty queue the daemon remains
+  waiting and returns to work when the answer arrives.
 
 ## Bounds
 

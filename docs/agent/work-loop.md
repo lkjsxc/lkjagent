@@ -43,7 +43,7 @@ lives there and is not repeated here.
 
 ## Self-Maintenance Sessions
 
-When asked to maintain rather than build, mirror the runtime's directives
+When explicitly asked to maintain rather than build, mirror the runtime's directives
 from [../architecture/runtime/self-maintenance.md](../architecture/runtime/self-maintenance.md):
 sharpen a stale skill against recent session evidence, prune contradictions
 between docs, or distill recurring friction into a skill. The

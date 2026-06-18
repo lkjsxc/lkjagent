@@ -12,6 +12,8 @@ use std::fs;
 use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
+pub mod http;
+
 pub type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 pub fn prefix() -> TestResult<Vec<Frame>> {

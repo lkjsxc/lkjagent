@@ -29,7 +29,7 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     );
     assert_eq!(
         request.body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"stop\":[\"</act>\"],\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"stream\":false}"
     );
     Ok(())
 }

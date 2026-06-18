@@ -22,8 +22,8 @@ pub fn temp_data(name: &str) -> TestResult<PathBuf> {
 
 pub fn write_config(data: &PathBuf) -> TestResult<()> {
     fs::write(
-        data.join("lkjagent.toml"),
-        "[endpoint]\nurl = \"http://endpoint:8080\"\nmodel = \"local-test\"\n",
+        data.join("lkjagent.json"),
+        "{\"endpoint\":{\"url\":\"http://endpoint:8080\",\"model\":\"local-test\"}}",
     )?;
     Ok(())
 }
