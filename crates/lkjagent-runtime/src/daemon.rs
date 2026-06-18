@@ -15,6 +15,7 @@ use crate::task::{RuntimeState, TaskState};
 
 mod effects;
 mod runner;
+mod skills;
 mod startup;
 mod status;
 

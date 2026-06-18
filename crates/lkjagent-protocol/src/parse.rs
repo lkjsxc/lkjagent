@@ -75,11 +75,14 @@ fn parse_pair(lines: &[&str], index: usize) -> ParseResult<(String, String, usiz
     if let Some((name, value)) = inline_pair(line) {
         return Ok((name, value, index + 1));
     }
-    let Some(name) = open_name(line) else {
+    let Some((name, first_value)) = open_name_and_tail(line) else {
         return Err(ParseFault::MissingTool);
     };
     let close = format!("</{name}>");
     let mut value_lines = Vec::new();
+    if !first_value.is_empty() {
+        value_lines.push(first_value);
+    }
     let mut cursor = index + 1;
     while let Some(raw) = lines.get(cursor) {
         if raw.trim_end() == close {
@@ -92,7 +95,7 @@ fn parse_pair(lines: &[&str], index: usize) -> ParseResult<(String, String, usiz
 }
 
 fn starts_pair(line: &str) -> bool {
-    inline_pair(line).is_some() || open_name(line).is_some()
+    inline_pair(line).is_some() || open_name_and_tail(line).is_some()
 }
 
 fn non_pair_fault(needs_tool: bool, line: &str) -> ParseFault {
@@ -142,13 +145,19 @@ fn is_open(line: &str, name: &str) -> bool {
     line.trim_end() == format!("<{name}>")
 }
 
-fn open_name(line: &str) -> Option<String> {
+fn open_name_and_tail(line: &str) -> Option<(String, String)> {
     let trimmed = line.trim_end();
-    if !trimmed.starts_with('<') || !trimmed.ends_with('>') || trimmed.starts_with("</") {
+    if !trimmed.starts_with('<') || trimmed.starts_with("</") {
         return None;
     }
-    let name = &trimmed[1..trimmed.len().saturating_sub(1)];
-    valid_name(name).then(|| name.to_string())
+    let open_end = trimmed.find('>')?;
+    let name = &trimmed[1..open_end];
+    valid_name(name).then(|| {
+        (
+            name.to_string(),
+            trimmed[open_end.saturating_add(1)..].to_string(),
+        )
+    })
 }
 
 fn inline_pair(line: &str) -> Option<(String, String)> {

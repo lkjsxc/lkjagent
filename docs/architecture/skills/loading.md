@@ -23,7 +23,9 @@ order is deterministic so the prefix stays byte-stable between compactions.
 
 ## Loading a Body
 
-skill.use appends the file verbatim as one immutable skill frame:
+skill.use appends the file verbatim as one immutable skill frame. A guarded
+runtime task may also auto-load its matching seed before the first endpoint
+turn; recursive-structure tasks load recursive-structure this way.
 
 ```
 <skill>
@@ -32,8 +34,8 @@ skill.use appends the file verbatim as one immutable skill frame:
 </skill>
 ```
 
-- A body is loaded at most once per window; a second skill.use gets a
-  notice pointing at the existing frame
+- A body is loaded at most once per window; a second skill.use or guard
+  auto-load gets a notice pointing at the existing frame
   ([../context/hygiene.md](../context/hygiene.md)).
 - Concurrent loaded bodies are capped (6,144 tokens total); past the cap,
   skill.use is refused with a notice naming what is loaded, and the model

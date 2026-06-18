@@ -80,7 +80,7 @@ pub fn dispatch_shell(
         Err(error) => return observe_error(error, action_text, runtime, state),
     };
     match shell::run(&runtime.workspace, &param(params, "command"), timeout) {
-        Ok(report) if report.timed_out => finish(
+        Ok(report) if !report.succeeded() => finish(
             state,
             action_text,
             observe::error(shell::observation(&report), runtime.observation_tokens),

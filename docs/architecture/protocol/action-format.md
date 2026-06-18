@@ -45,12 +45,13 @@ The renderer drops trailing newlines on every block write.
 ```
 
 The value of content is everything between its tags, byte-exact including
-inner blank lines. One reserved case exists: a payload that itself contains
-a line consisting exactly of a closing parameter tag cannot be expressed;
-the model routes such payloads through shell.run with a heredoc per
-[../tools/shell.md](../tools/shell.md). The limitation is stated in the
-system prompt rather than papered over with escaping rules small models
-would misapply.
+inner blank lines. If the first payload bytes follow the opening tag on the
+same line, those bytes are the first value line. One reserved case exists:
+a payload that itself contains a line consisting exactly of a closing
+parameter tag cannot be expressed; the model routes such payloads through
+shell.run with a heredoc per [../tools/shell.md](../tools/shell.md). The
+limitation is stated in the system prompt rather than papered over with
+escaping rules small models would misapply.
 
 ## Control Actions
 

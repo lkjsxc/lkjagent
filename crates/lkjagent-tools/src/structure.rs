@@ -48,7 +48,7 @@ pub fn verify_recursive_tree(workspace: &Path) -> ToolResult<()> {
             best = Some((candidate, evidence));
         }
     }
-    Err(ToolError::invalid(report_failure(workspace, best)))
+    Err(ToolError::invalid(report_failure(workspace, best)?))
 }
 
 fn candidate_roots(workspace: &Path) -> ToolResult<Vec<PathBuf>> {
@@ -121,25 +121,79 @@ fn hidden(path: &Path) -> bool {
         .is_some_and(|name| name.starts_with('.'))
 }
 
-fn report_failure(workspace: &Path, best: Option<(PathBuf, Evidence)>) -> String {
+fn report_failure(workspace: &Path, best: Option<(PathBuf, Evidence)>) -> ToolResult<String> {
     let minimum = format!(
-        "recursive structure incomplete: need README-indexed tree with at least {MIN_DIRECTORIES} directories, {MIN_MARKDOWN_FILES} markdown files, depth {MIN_DEPTH}, and no directory without README.md"
+        "recursive structure incomplete: need README-indexed tree with at least {MIN_DIRECTORIES} directories, {MIN_MARKDOWN_FILES} markdown files, depth {MIN_DEPTH}, no directory without README.md, and every README.md containing ## Table of Contents"
     );
     let Some((path, evidence)) = best else {
-        return format!("{minimum}; no README.md candidate found");
+        return Ok(format!("{minimum}; no README.md candidate found"));
     };
-    let shown = path
-        .strip_prefix(workspace)
-        .ok()
-        .filter(|relative| !relative.as_os_str().is_empty())
-        .unwrap_or(path.as_path())
-        .to_string_lossy();
-    format!(
-        "{minimum}; best={shown} directories={} markdown_files={} depth={} missing_readmes={} readmes_without_toc={}",
+    let shown = relative(&path, workspace);
+    let missing = sample_missing_readmes(&path, workspace)?;
+    let without_toc = sample_readmes_without_toc(&path, workspace)?;
+    Ok(format!(
+        "{minimum}; next action should be one compact shell.run repair script with short README bodies; create missing parent directories first, write README.md before leaf files, add ## Table of Contents to every README.md, and avoid shell brace expansion under /bin/sh; best={shown} directories={} markdown_files={} depth={} missing_readmes={} readmes_without_toc={} missing_readme_paths={} readmes_without_toc_paths={}",
         evidence.directories,
         evidence.markdown_files,
         evidence.max_depth,
         evidence.missing_readmes,
-        evidence.readmes_without_toc
-    )
+        evidence.readmes_without_toc,
+        sample_list(&missing),
+        sample_list(&without_toc)
+    ))
+}
+
+fn sample_missing_readmes(root: &Path, workspace: &Path) -> ToolResult<Vec<String>> {
+    let mut samples = Vec::new();
+    collect_samples(root, workspace, &mut samples, |path| {
+        Ok(path.is_dir() && !path.join("README.md").exists())
+    })?;
+    Ok(samples)
+}
+
+fn sample_readmes_without_toc(root: &Path, workspace: &Path) -> ToolResult<Vec<String>> {
+    let mut samples = Vec::new();
+    collect_samples(root, workspace, &mut samples, readme_without_toc)?;
+    Ok(samples)
+}
+
+fn collect_samples<F>(
+    path: &Path,
+    workspace: &Path,
+    samples: &mut Vec<String>,
+    matches: F,
+) -> ToolResult<()>
+where
+    F: Fn(&Path) -> ToolResult<bool> + Copy,
+{
+    if samples.len() >= 6 || hidden(path) {
+        return Ok(());
+    }
+    if matches(path)? {
+        samples.push(relative(path, workspace));
+    }
+    for entry in fs::read_dir(path)? {
+        let child = entry?.path();
+        if child.is_dir() {
+            collect_samples(&child, workspace, samples, matches)?;
+        }
+    }
+    Ok(())
+}
+
+fn sample_list(samples: &[String]) -> String {
+    if samples.is_empty() {
+        "none".to_string()
+    } else {
+        samples.join(",")
+    }
+}
+
+fn relative(path: &Path, workspace: &Path) -> String {
+    path.strip_prefix(workspace)
+        .ok()
+        .filter(|relative| !relative.as_os_str().is_empty())
+        .unwrap_or(path)
+        .to_string_lossy()
+        .to_string()
 }

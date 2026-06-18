@@ -13,6 +13,7 @@ use rusqlite::Connection;
 use crate::error::{ToolError, ToolResult};
 use crate::observe::{self, OutputFrame};
 use routes::route;
+pub use skill_tools::load_skill_frame;
 pub use state::{DispatchOutput, DispatchState, LoadedSkillRecord, ReadRecord, ToolRuntime};
 use validate::validate_action;
 

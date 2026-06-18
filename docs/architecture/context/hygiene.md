@@ -15,7 +15,7 @@ anything not listed here is forbidden by default.
 | model turn | every completion, verbatim | reserve in [budgets.md](budgets.md) |
 | observation | exactly one per executed action | [../tools/registry.md](../tools/registry.md) |
 | notice | enumerated kinds below | harness |
-| skill body | explicit skill.use only | [../skills/loading.md](../skills/loading.md) |
+| skill body | skill.use or guarded task auto-load | [../skills/loading.md](../skills/loading.md) |
 
 ## Notice Kinds
 
