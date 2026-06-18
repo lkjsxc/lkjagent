@@ -3,8 +3,9 @@ use std::fs;
 use std::path::Path;
 use std::process::{Command, Stdio};
 
+use lkjagent_skills::index::{entry_from_skill, render_index_text};
 use lkjagent_skills::model::SkillSource;
-use lkjagent_skills::validate::validate;
+use lkjagent_skills::validate::{parse, validate};
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
@@ -37,6 +38,26 @@ fn seed_procedure_commands_exist_in_container() -> TestResult<()> {
             .status()?;
         assert!(status.success(), "{command} is missing");
     }
+    Ok(())
+}
+
+#[test]
+fn recursive_structure_seed_is_discoverable_by_index() -> TestResult<()> {
+    let path = "crates/lkjagent-skills/seeds/recursive-structure.md";
+    let file = Path::new(env!("CARGO_MANIFEST_DIR")).join("seeds/recursive-structure.md");
+    let text = fs::read_to_string(file)?;
+    let known = BTreeSet::from([path.to_string()]);
+    let source = SkillSource {
+        path,
+        text: &text,
+        known_paths: &known,
+    };
+    let skill = match parse(&source) {
+        Ok(skill) => skill,
+        Err(report) => return Err(report.messages().join("; ").into()),
+    };
+    let line = render_index_text(&[entry_from_skill(&skill, 1)]);
+    assert!(line.contains("recursive project file structure"));
     Ok(())
 }
 

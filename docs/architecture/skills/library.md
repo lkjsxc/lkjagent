@@ -30,6 +30,7 @@ library is meant to be grown by its owner-agent pair, not shipped.
 | git-checkpoint | Work reached a state worth a commit with an honest message |
 | web-research | The answer is outside the container and curl can fetch it |
 | owner-report | A long task needs a compact, honest progress answer |
+| recursive-structure | A task asks for recursive project structure creation or maintenance |
 
 Seed bodies live in the harness repository and are validated by the same
 checks as builder skills; their content is part of the implementation work
