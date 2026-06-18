@@ -28,12 +28,14 @@ A task asks to organize, scaffold, split, or maintain a recursive project file s
 7. Keep each leaf to one purpose, one status or evidence section, and links to its parent or owner doc.
 8. Record durable work state in current-state, blockers, tasks, or traceability files when those exist.
 9. If no state spine exists, create only the minimal state files needed for the current task.
-10. Run the repository gate named by AGENTS or README; if absent, run the checks below.
+10. Build at least six directories, twelve markdown files, and three nested directory levels.
+11. Run the repository gate named by AGENTS or README; if absent, run the checks below.
 
 ## Checks
 
 - `find <root> -type d ! -exec test -f '{}/README.md' ';' -print` prints no required directory.
 - `find <root> -type f -name '*.md' -exec wc -l {} + | sort -n | tail -20` stays under the local cap.
+- `find <root> -type d | wc -l` is at least 6, and markdown file count is at least 12.
 - `git status --short` shows only paths intended for this structural slice.
 - The repository gate exits 0, or the handoff names why no gate exists.
 
@@ -42,5 +44,6 @@ A task asks to organize, scaffold, split, or maintain a recursive project file s
 - Do not create a deep directory without an index at each level.
 - Do not split by file type when ownership gives a clearer boundary.
 - Do not leave status, tasks, assumptions, or acceptance only in chat.
+- Do not call agent.done after only one file or one directory level.
 - Do not delete or overwrite existing source unless the owner explicitly requested it.
 - Do not claim repository-wide structure when checks covered only a subroot.

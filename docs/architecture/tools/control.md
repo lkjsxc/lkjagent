@@ -18,6 +18,11 @@ how it was verified. agent.done also ends a maintenance cycle per
 [../runtime/self-maintenance.md](../runtime/self-maintenance.md); an empty
 cycle ends with a one-line summary.
 
+Recursive structure tasks carry a completion guard. When the owner asks for
+recursive or highly structured organization, agent.done is refused until
+the workspace contains a README-indexed tree with enough depth and breadth
+to prove the request was not satisfied by one file.
+
 ## agent.ask
 
 | Parameter | Rule |

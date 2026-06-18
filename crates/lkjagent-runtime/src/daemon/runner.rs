@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use lkjagent_llm::client::ClientConfig;
 use lkjagent_store::state as store_state;
+use lkjagent_tools::control::CompletionGuard;
 use lkjagent_tools::dispatch::{DispatchState, ToolRuntime};
 use rusqlite::Connection;
 
@@ -104,9 +105,15 @@ impl ResidentDaemon {
         );
         if starting_task {
             store_state::set(conn, "open task", &preview(&owner.content))?;
+            self.dispatch_state.control.start_task(&owner.content);
+            store_state::set(
+                conn,
+                "completion guard",
+                self.dispatch_state.control.guard.as_state_value(),
+            )?;
+        } else {
+            self.dispatch_state.control.resume_task();
         }
-        self.dispatch_state.control.work_open = true;
-        self.dispatch_state.control.question_outstanding = false;
         let result = step(
             self.state.clone(),
             StepInput::Owner {
@@ -142,6 +149,14 @@ impl ResidentDaemon {
             }
         }
     }
+}
+
+pub fn restore_completion_guard(conn: &Connection, state: &mut DispatchState) -> RuntimeResult<()> {
+    let value = store_state::get(conn, "completion guard")?.unwrap_or_else(|| "none".to_string());
+    state
+        .control
+        .set_guard(CompletionGuard::from_state_value(&value));
+    Ok(())
 }
 
 fn next_owner_tokens(conn: &Connection) -> RuntimeResult<usize> {

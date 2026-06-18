@@ -7,3 +7,4 @@ pub mod observe;
 pub mod queue;
 pub mod shell;
 pub mod skill;
+pub mod structure;

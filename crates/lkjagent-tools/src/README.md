@@ -17,3 +17,4 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [queue.rs](queue.rs): queue list and mutation adapters.
 - [shell.rs](shell.rs): /bin/sh adapter with timeout handling.
 - [skill.rs](skill.rs): skill library load and save adapters.
+- [structure.rs](structure.rs): recursive tree completion checks.

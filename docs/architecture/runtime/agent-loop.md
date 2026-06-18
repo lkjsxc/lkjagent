@@ -42,6 +42,10 @@ When exhausted, the harness injects a budget notice; the only lawful actions
 after it are agent.ask or agent.done. This converts runaway loops into a
 question for the owner instead of silent burn.
 
+Some owner messages activate a completion guard. Recursive structure tasks
+cannot close until the tool layer verifies a README-indexed recursive tree;
+a premature agent.done returns a tool error and the task remains open.
+
 When no task is open and the queue is empty, the daemon sets
 `daemon_state=idle`, refreshes its lock heartbeat, and waits for queue
 arrival. It does not open self-maintenance work while idle.

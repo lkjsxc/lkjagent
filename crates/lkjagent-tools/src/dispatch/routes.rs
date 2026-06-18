@@ -42,6 +42,7 @@ pub fn route(
         "agent.done" => observe_result(
             control::done(
                 &mut state.control,
+                &runtime.workspace,
                 &crate::dispatch::params::param(&action.params, "summary"),
             ),
             action_text,

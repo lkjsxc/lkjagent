@@ -48,6 +48,7 @@ pub fn run(data_dir: &Path) -> Result<String, CliError> {
                 &now,
             );
             let mut daemon = lkjagent_runtime::daemon::ResidentDaemon::new(state, runtime);
+            lkjagent_runtime::daemon::restore_completion_guard(&conn, &mut daemon.dispatch_state)?;
             loop {
                 let tick = daemon.poll_once(&mut conn, &now_stamp())?;
                 if should_sleep(tick) {
