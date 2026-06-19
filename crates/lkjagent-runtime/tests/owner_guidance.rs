@@ -50,6 +50,30 @@ fn owner_guidance_during_open_task_persists_count_guard() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn benchmark_docs_task_auto_scaffolds_exact_markdown_count() -> TestResult<()> {
+    let mut conn = store()?;
+    take_daemon_lock(&conn, "test", "100", "0")?;
+    queue::enqueue(
+        &mut conn,
+        "Create a benchmark documentation corpus with exactly 12 markdown files.",
+        "owner-send",
+        "101",
+    )?;
+    let workspace = temp_workspace("benchmark-guidance")?;
+    let server = serve_responses(vec![completion(DONE_ACTION)])?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Done);
+    server.join()?;
+
+    let root = workspace.join("docs/benchmark-corpus");
+    assert_eq!(markdown_count(&root)?, 12);
+    assert_eq!(other_count(&root)?, 0);
+    assert_eq!(state::get(&conn, "completion guard")?, None);
+    Ok(())
+}
+
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
     let runtime = ResidentRuntime::new(
         "test".to_string(),
@@ -59,4 +83,25 @@ fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
         "100",
     );
     Ok(ResidentDaemon::new(runtime_state()?, runtime))
+}
+
+fn markdown_count(path: &Path) -> TestResult<usize> {
+    count_with(path, true)
+}
+
+fn other_count(path: &Path) -> TestResult<usize> {
+    count_with(path, false)
+}
+
+fn count_with(path: &Path, markdown: bool) -> TestResult<usize> {
+    let mut count = 0_usize;
+    for entry in fs::read_dir(path)? {
+        let child = entry?.path();
+        if child.is_dir() {
+            count = count.saturating_add(count_with(&child, markdown)?);
+        } else if child.extension().is_some_and(|extension| extension == "md") == markdown {
+            count = count.saturating_add(1);
+        }
+    }
+    Ok(count)
 }

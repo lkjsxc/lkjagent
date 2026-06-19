@@ -6,6 +6,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 
 ## Table of Contents
 
+- [benchmark_seed.rs](benchmark_seed.rs): deterministic benchmark corpus scaffold.
 - [control.rs](control.rs): agent.done and agent.ask state transitions.
 - [count_guard.rs](count_guard.rs): exact markdown-count completion guard.
 - [dispatch/](dispatch/README.md): dispatch helper modules.
