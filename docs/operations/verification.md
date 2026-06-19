@@ -24,8 +24,9 @@ all run as `cargo run -p lkjagent-xtask -- <gate>`:
 | check-docs | doc shape, topology, TOC completeness, ASCII, prose width, banned tokens, skill format, task format, README coverage |
 | check-lines | the 200-line cap (120 for skills) on every tracked file |
 | check-style | panic-path scan and dependency allowlist on product crates |
+| benchmark check-corpus | deterministic benchmark task, fixture, and judge validity |
 | quiet test | cargo fmt --check, clippy with warnings denied, all workspace tests |
-| quiet verify | check-docs, check-lines, check-style, then quiet test |
+| quiet verify | check-docs, check-lines, check-style, benchmark check-corpus, then quiet test |
 
 ## Final Gate
 
@@ -37,6 +38,9 @@ Builds the image from a clean context and runs quiet verify inside it; no
 source bind mounts, so the gate proves the repository as committed, not the
 working tree. Service design in [compose.md](compose.md). Any claim that a
 runtime behavior is implemented requires this gate in the same handoff.
+
+Real benchmark scoring is not part of CI because it needs an endpoint. The
+operator command is documented in [../evaluation/running.md](../evaluation/running.md).
 
 ## CI
 

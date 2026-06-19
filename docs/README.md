@@ -14,6 +14,7 @@ directories with short focused files.
 - [vision/](vision/README.md): north star, principles, and scope boundaries.
 - [product/](product/README.md): observable behavior of the daemon, CLI, and queue.
 - [architecture/](architecture/README.md): runtime, context, protocol, tools, memory, skills, llm, sandbox.
+- [evaluation/](evaluation/README.md): mechanical benchmark tasks, judges, reports, and improvement loop.
 - [decisions/](decisions/README.md): durable decision records with rejected directions.
 - [repository/](repository/README.md): layout, line limits, doc standards, style, commits, workflow.
 - [operations/](operations/README.md): verification gates, compose design, running the harness.
@@ -43,6 +44,9 @@ directories with short focused files.
   `architecture/llm/sampling.md`
 - `architecture/sandbox/README.md` `architecture/sandbox/container.md` `architecture/sandbox/workspace.md`
   `architecture/sandbox/safety.md`
+- `evaluation/README.md` `evaluation/mechanical-benchmarks.md` `evaluation/task-contract.md`
+  `evaluation/metrics-reports.md` `evaluation/running.md` `evaluation/improvement-loop.md`
+  `evaluation/overfitting.md`
 - `decisions/README.md` `decisions/rust-workspace.md` `decisions/openai-endpoint.md`
   `decisions/xml-action-protocol.md` `decisions/append-only-context.md` `decisions/single-loop.md`
   `decisions/sqlite-store.md` `decisions/no-mcp.md` `decisions/no-subagents.md`
@@ -55,6 +59,7 @@ directories with short focused files.
 - `agent/skills/README.md` `agent/skills/doc-contract-edit.md` `agent/skills/rust-crate-slice.md`
   `agent/skills/protocol-change.md` `agent/skills/context-engine.md` `agent/skills/memory-store.md`
   `agent/skills/skill-system.md` `agent/skills/verification-gate.md` `agent/skills/agent-maintenance.md`
+  `agent/skills/benchmark-driven-improvement.md`
 - `execution/README.md` `execution/operating-rules.md` `execution/current-blockers.md`
 - `execution/tasks/README.md` `execution/tasks/bootstrap-workspace.md` `execution/tasks/xtask-checks.md`
   `execution/tasks/llm-client.md` `execution/tasks/protocol-parser.md` `execution/tasks/context-engine.md`

@@ -23,8 +23,9 @@ under [docs/](docs/README.md) is the implementation contract: code follows docs.
 
 ## Status
 
-The Cargo workspace, local verification gates, action parser, context engine,
-container wiring, resident daemon, tool loop, and queue intake are implemented.
+The Cargo workspace, local verification gates, benchmark corpus, action
+parser, context engine, container wiring, resident daemon, tool loop, and
+queue intake are implemented.
 
 - [docs/current-state.md](docs/current-state.md) is the honest status ledger.
 - [docs/execution/current-blockers.md](docs/execution/current-blockers.md) is the implementation queue.
@@ -82,9 +83,23 @@ Local gates are implemented in
 cargo run -p lkjagent-xtask -- check-docs    # doc shape, topology, links, banned tokens
 cargo run -p lkjagent-xtask -- check-lines   # 200-line cap on every file
 cargo run -p lkjagent-xtask -- check-style   # forbid panic paths in product crates
+cargo run -p lkjagent-xtask -- benchmark check-corpus
 cargo run -p lkjagent-xtask -- quiet verify  # all checks plus tests, prints: ok verify
 docker compose run --rm verify               # final gate, image build, no source mounts
 ```
 
-Until the xtask exists, the shell checks listed in
-[docs/operations/verification.md](docs/operations/verification.md) are the gate.
+## Evaluation Design
+
+The benchmark contract lives in [docs/evaluation/](docs/evaluation/README.md).
+The deterministic corpus runs without an endpoint:
+
+```sh
+cargo run -p lkjagent-xtask -- benchmark list
+cargo run -p lkjagent-xtask -- benchmark check-corpus
+```
+
+Real scoring is explicit and requires endpoint config:
+
+```sh
+cargo run -p lkjagent-xtask -- benchmark run --suite tiny --data data/benchmark
+```

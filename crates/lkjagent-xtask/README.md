@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This crate owns repository checks and quiet gates.
+This crate owns repository checks, benchmark commands, and quiet gates.
 Doc contract: [../../docs/operations/verification.md](../../docs/operations/verification.md).
 
 ## Table of Contents

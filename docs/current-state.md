@@ -47,7 +47,11 @@ so exact-count corrections are not lost when they interrupt maintenance or
 long-running work. Benchmark documentation corpus requests with an exact
 markdown count get a deterministic markdown-only scaffold before endpoint
 work, giving the Docker smoke path a reliable populated workspace on small
-local models.
+local models. A first-class benchmark system is implemented in
+lkjagent-benchmark and xtask. It includes a tiny suite of seven mechanically
+judged math and computer-science tasks, corpus validity checks, deterministic
+judges, Docker real-run orchestration, TSV and markdown reports, report
+comparison, and an agent-builder skill for benchmark-driven improvement.
 Empty queues open bounded self-maintenance cycles in rotation; owner queue
 arrival preempts maintenance at the next turn boundary, and maintenance
 agent.ask attempts close the maintenance cycle instead of putting the daemon
@@ -78,6 +82,7 @@ implemented. The implementation queue is
 | Container and sandbox | implemented | [architecture/sandbox/](architecture/sandbox/README.md) |
 | User message queue and CLI | implemented | [product/](product/README.md) |
 | Automatic idle self-maintenance | implemented | [architecture/runtime/self-maintenance.md](architecture/runtime/self-maintenance.md) |
+| Mechanical benchmark evaluation | implemented | [evaluation/](evaluation/README.md) |
 
 ## Out of Scope
 

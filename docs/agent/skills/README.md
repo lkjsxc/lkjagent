@@ -21,6 +21,8 @@ executed through commits.
 - [skill-system.md](skill-system.md): The skill format, loading, lifecycle, or library is changing.
 - [verification-gate.md](verification-gate.md): A gate is being built or its checks are changing.
 - [agent-maintenance.md](agent-maintenance.md): The manual, AGENTS.md, or this library needs maintenance.
+- [benchmark-driven-improvement.md](benchmark-driven-improvement.md):
+  A benchmark report is being used to choose or verify an agent improvement.
 
 ## Table of Contents
 
