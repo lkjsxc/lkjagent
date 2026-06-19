@@ -104,6 +104,11 @@ fn append_distillation_notice(state: &mut RuntimeState, prompt: &str) {
 }
 
 fn wait_for_owner(state: &mut RuntimeState, action: &Action) -> Option<StopReason> {
+    if state.maintenance.is_some() {
+        state.maintenance = None;
+        state.task = TaskState::Idle;
+        return Some(StopReason::Done);
+    }
     state.maintenance = None;
     state.task = TaskState::Waiting {
         question: action_param(action, "question"),
