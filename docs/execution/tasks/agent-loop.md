@@ -47,8 +47,9 @@ cargo run -p lkjagent-xtask -- quiet verify
 
 - A scripted task runs end to end in tests: owner frame, turns, tool
   effects, agent.done, distillation prompt, all asserted as values.
-- Recovery escalation pauses the task after three consecutive parse-class
-  faults, with the documented events.
+- Recovery escalation records stronger notices after consecutive
+  parse-class faults while keeping the task open, with the documented
+  events.
 - Compaction integrates: a scripted over-budget session distills, rebuilds,
   and resumes, with the transcript event recorded.
 - The prefix assembled by prompt.rs is byte-identical across two builds

@@ -4,30 +4,22 @@ use std::fs;
 
 use lkjagent_context::budget::LOG_LOADED_SKILLS;
 use lkjagent_protocol::{Action, Param};
+use lkjagent_tools::control::{CompletionGuard, ControlState};
 use lkjagent_tools::dispatch::{dispatch, dispatch_with_text};
 use lkjagent_tools::observe::OutputKind;
 use support::{action, runtime, state, store, temp_workspace, valid_skill, TestResult};
 
 #[test]
-fn skill_tools_save_use_and_refuse_documented_faults() -> TestResult<()> {
+fn skill_tools_use_and_refuse_documented_faults() -> TestResult<()> {
     let workspace = temp_workspace("skill")?;
     let runtime = runtime(workspace.clone())?;
     let mut conn = store()?;
     let mut state = state();
 
-    let saved = dispatch(
-        &action(
-            "skill.save",
-            &[
-                ("name", "demo-skill"),
-                ("content", valid_skill("Demo Skill")),
-            ],
-        ),
-        &runtime,
-        &mut conn,
-        &mut state,
-    );
-    assert!(saved.content.contains("validation=ok"));
+    fs::write(
+        runtime.skill_library.join("demo-skill.md"),
+        valid_skill("Demo Skill"),
+    )?;
 
     let used = dispatch(
         &action("skill.use", &[("name", "demo-skill")]),
@@ -48,17 +40,6 @@ fn skill_tools_save_use_and_refuse_documented_faults() -> TestResult<()> {
     assert!(matches!(again.kind, OutputKind::Notice { .. }));
     assert!(again.content.contains("skill already loaded"));
 
-    let bad_save = dispatch(
-        &action(
-            "skill.save",
-            &[("name", "bad-skill"), ("content", "# Skill: Bad\n")],
-        ),
-        &runtime,
-        &mut conn,
-        &mut state,
-    );
-    assert!(is_error(&bad_save));
-
     let unknown = dispatch(
         &action("skill.use", &[("name", "missing-skill")]),
         &runtime,
@@ -68,7 +49,7 @@ fn skill_tools_save_use_and_refuse_documented_faults() -> TestResult<()> {
     assert!(is_error(&unknown));
 
     fs::write(
-        workspace.join("skills/other-skill.md"),
+        runtime.skill_library.join("other-skill.md"),
         valid_skill("Other Skill"),
     )?;
     state.loaded_skill_tokens = LOG_LOADED_SKILLS;
@@ -123,6 +104,15 @@ fn control_tools_close_wait_and_report_errors() -> TestResult<()> {
     assert!(is_error(&second_ask));
     assert!(second_ask.content.contains("already outstanding"));
     Ok(())
+}
+
+#[test]
+fn control_classifies_recursive_knowledge_requests() {
+    let mut state = ControlState::default();
+
+    state.start_task("百科事典を作ってください");
+
+    assert_eq!(state.guard, CompletionGuard::RecursiveKnowledge);
 }
 
 #[test]

@@ -12,19 +12,27 @@ design-only, not implemented, out of scope, open question.
 The repository contains the complete documentation contract, a compiling
 Cargo workspace, local verification gates, the action parser, the pure
 context engine, the SQLite store boundary, the LLM endpoint client, the
-skill validator plus seed library, guarded recursive structure stewardship,
+skill validator plus source-owned seed library, guarded recursive structure stewardship,
 the tool dispatcher/adapters, the runtime step/daemon core, and the CLI
 for send, status, log, console,
 memory, skills, startup checks, repository-root .env loading for local
 deployment values, JSON runtime config, a /data/workspace working tree, and a
 resident daemon that delivers queued owner work to the endpoint and tool
 dispatcher until agent.done. Recursive structure tasks auto-load their seed
-skill before the first endpoint turn. Recursive docs tasks also create a
-minimal README-indexed scaffold before endpoint work, and no recursive
-structure task can close without a verified README-indexed tree. shell.run
+skill before the first endpoint turn. Runtime skills are indexed from
+source or image paths, not copied into data. Recursive docs tasks create a
+README-indexed scaffold before endpoint work; encyclopedia, wiki, and
+knowledge-base creation tasks create a small knowledge nucleus with
+current-state, concept-map, expansion-queue, and rebalance-plan anchors.
+They cannot close without knowledge-nucleus evidence plus contract-shaped
+markdown pages. Generic recursive structure tasks cannot close without a
+verified README-indexed tree. Recursive-knowledge tasks also reject nested
+docs roots and writes outside the seeded top-level docs map. shell.run
 reports non-zero and signal exits as error observations with captured
-output. Empty queues leave the daemon idle; automatic idle self-maintenance
-is not active. Compose wiring is
+output. Recoverable parse, repeat-action, and tool errors add recovery
+notices to the transcript and keep the task moving instead of pausing it.
+Empty queues open bounded self-maintenance cycles in rotation; owner queue
+arrival preempts maintenance at the next turn boundary. Compose wiring is
 implemented. The implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
 
@@ -50,7 +58,7 @@ implemented. The implementation queue is
 | LLM endpoint client | implemented | [architecture/llm/](architecture/llm/README.md) |
 | Container and sandbox | implemented | [architecture/sandbox/](architecture/sandbox/README.md) |
 | User message queue and CLI | implemented | [product/](product/README.md) |
-| Automatic idle self-maintenance | not implemented | [architecture/runtime/self-maintenance.md](architecture/runtime/self-maintenance.md) |
+| Automatic idle self-maintenance | implemented | [architecture/runtime/self-maintenance.md](architecture/runtime/self-maintenance.md) |
 
 ## Out of Scope
 

@@ -40,7 +40,7 @@ pub fn admit(frame: PendingFrame) -> AdmissionDecision {
     match frame.kind {
         FrameKind::Owner | FrameKind::Observation => truncate(frame, cap),
         FrameKind::SkillBody => {
-            refuse("skill body exceeds 2,048 tokens; use skill.save with a smaller body")
+            refuse("skill body exceeds 2,048 tokens; load a smaller source-owned skill")
         }
         _ => refuse("frame exceeds its budget owner cap"),
     }

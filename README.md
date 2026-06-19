@@ -23,8 +23,8 @@ under [docs/](docs/README.md) is the implementation contract: code follows docs.
 
 ## Status
 
-The Cargo workspace, local verification gates, action parser, and pure
-context engine are implemented. Runtime loop behavior is design-only.
+The Cargo workspace, local verification gates, action parser, context engine,
+container wiring, resident daemon, tool loop, and queue intake are implemented.
 
 - [docs/current-state.md](docs/current-state.md) is the honest status ledger.
 - [docs/execution/current-blockers.md](docs/execution/current-blockers.md) is the implementation queue.
@@ -54,6 +54,19 @@ lkjagent run            # start the daemon (single agent loop)
 lkjagent send "text"    # enqueue a user message
 lkjagent status         # daemon state, queue depth, context usage
 lkjagent log            # tail recent transcript events
+```
+
+For a fresh Docker trial, start the daemon and then send work. The workspace is
+empty until the first task writes files.
+
+```sh
+rm -rf data
+mkdir -p data
+docker compose up -d --build agent
+docker compose run --rm agent status
+docker compose run --rm agent send "Create hello.md with a short hello."
+docker compose run --rm agent log
+find data/workspace -maxdepth 2 -type f -print
 ```
 
 The full contract lives in [docs/product/cli.md](docs/product/cli.md) and

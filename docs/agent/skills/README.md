@@ -9,7 +9,7 @@ Purpose, Trigger, Context, Procedure, Checks, Must Not, optional Handoff,
 at most 120 lines. Match by trigger line, load one skill, read its Context
 before editing. Lifecycle (refinement and retirement) follows
 [../../architecture/skills/lifecycle.md](../../architecture/skills/lifecycle.md),
-executed through commits instead of skill.save.
+executed through commits.
 
 ## Index
 

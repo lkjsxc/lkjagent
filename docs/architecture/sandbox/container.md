@@ -27,7 +27,7 @@ Compose runs the agent with a read-only root filesystem, tmpfs at /tmp and
 
 | Mount | Kind | Holds |
 | --- | --- | --- |
-| /data | bind mount | store file, workspace, skill library, config; layout in [workspace.md](workspace.md) |
+| /data | bind mount | store file, workspace, config; layout in [workspace.md](workspace.md) |
 
 ## Environment
 

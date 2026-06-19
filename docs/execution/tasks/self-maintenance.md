@@ -60,7 +60,8 @@ cargo run -p lkjagent-xtask -- quiet verify
 
 ## Must Not
 
-- Do not add timers, automatic idle maintenance, or schedules.
+- Do not add timers or schedules; automatic idle maintenance is driven only
+  by the resident poll loop.
 - Do not let maintenance turns bypass any budget or hygiene rule; there is
   no budget exemption.
 - Do not fabricate maintenance outcomes; an empty cycle ends honestly.

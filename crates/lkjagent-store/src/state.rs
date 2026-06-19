@@ -62,7 +62,10 @@ pub fn take_lock(
             Ok(LockDecision::Taken)
         }
         Some(existing) => {
-            if lock_is_stale(&existing, stale_before) {
+            if lock_matches_holder(&existing, holder) {
+                set(conn, LOCK_KEY, &value)?;
+                Ok(LockDecision::Taken)
+            } else if lock_is_stale(&existing, stale_before) {
                 set(conn, LOCK_KEY, &value)?;
                 Ok(LockDecision::Reclaimed { previous: existing })
             } else {
@@ -92,6 +95,10 @@ pub fn heartbeat_lock(conn: &Connection, holder: &str, heartbeat_at: &str) -> St
 
 fn lock_is_stale(existing: &str, stale_before: &str) -> bool {
     parse_lock(existing).is_some_and(|lock| stamp_lt(lock.heartbeat_at, stale_before))
+}
+
+fn lock_matches_holder(existing: &str, holder: &str) -> bool {
+    parse_lock(existing).is_some_and(|lock| lock.holder == holder)
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

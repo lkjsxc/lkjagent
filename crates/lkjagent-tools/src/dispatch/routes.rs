@@ -9,7 +9,7 @@ use crate::dispatch::queue_tools::{
     dispatch_queue_delete, dispatch_queue_edit, dispatch_queue_enqueue, dispatch_queue_list,
     dispatch_queue_redeliver,
 };
-use crate::dispatch::skill_tools::{dispatch_skill_save, dispatch_skill_use};
+use crate::dispatch::skill_tools::dispatch_skill_use;
 use crate::dispatch::validate::ValidatedAction;
 use crate::dispatch::{finish, observe_result, DispatchOutput, DispatchState, ToolRuntime};
 use crate::observe;
@@ -38,7 +38,6 @@ pub fn route(
         "memory.save" => dispatch_memory_save(&action.params, action_text, runtime, conn, state),
         "memory.find" => dispatch_memory_find(&action.params, action_text, runtime, conn, state),
         "skill.use" => dispatch_skill_use(&action.params, action_text, runtime, state),
-        "skill.save" => dispatch_skill_save(&action.params, action_text, runtime, state),
         "agent.done" => observe_result(
             control::done(
                 &mut state.control,

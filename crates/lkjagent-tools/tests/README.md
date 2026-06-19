@@ -7,6 +7,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 ## Table of Contents
 
 - [fs_shell.rs](fs_shell.rs): filesystem and shell tool fixtures.
+- [knowledge_path_guard.rs](knowledge_path_guard.rs): recursive knowledge write fences.
 - [skill_control_dispatch.rs](skill_control_dispatch.rs): skill, control, and dispatcher notice fixtures.
 - [structure_seed.rs](structure_seed.rs): deterministic recursive docs scaffold fixture.
 - [store_tools.rs](store_tools.rs): queue and memory tool fixtures.

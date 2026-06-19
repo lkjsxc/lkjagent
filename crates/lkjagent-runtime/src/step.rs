@@ -4,8 +4,8 @@ use lkjagent_tools::dispatch::DispatchOutput;
 
 use crate::maintenance::MaintenanceDirective;
 use crate::prompt::token_estimate;
-use crate::recovery::should_escalate;
-use crate::task::{RuntimeState, StopReason, TaskState};
+use crate::recovery::{repeat_recovery_notice, tool_recovery_notice};
+use crate::task::{RuntimeState, StopReason};
 
 mod compact;
 mod cycle;
@@ -113,20 +113,31 @@ fn tool_output_step(mut state: RuntimeState, output: DispatchOutput) -> StepResu
     let mut stop = stop_for_output(&output);
     if stop == StopReason::RepeatAction {
         state.repeat_faults = state.repeat_faults.saturating_add(1);
-        if should_escalate(state.repeat_faults) {
-            let reason = "three consecutive repeat actions".to_string();
-            state.task = TaskState::Paused {
-                reason: reason.clone(),
-            };
-            state.maintenance = None;
-            effects.push(Effect::Pause { reason });
-        }
-    } else if stop != StopReason::ToolError {
+        let recovery = repeat_recovery_notice(state.repeat_faults);
+        state = append_recovery_notice(state, &recovery, &mut effects);
+    } else {
         state.repeat_faults = 0;
+        if stop == StopReason::ToolError {
+            let recovery = tool_recovery_notice(&output.content);
+            state = append_recovery_notice(state, &recovery, &mut effects);
+        }
     }
     if let Some(control_stop) = handle_control_success(&mut state, &pending, &output, &mut effects)
     {
         stop = control_stop;
     }
     result(state, effects, Some(stop))
+}
+
+fn append_recovery_notice(
+    state: RuntimeState,
+    content: &str,
+    effects: &mut Vec<Effect>,
+) -> RuntimeState {
+    effects.push(Effect::RecordEvent {
+        kind: EventKind::Notice,
+        content: content.to_string(),
+        tokens: token_estimate(content) as i64,
+    });
+    append_notice(state, NoticeKind::Error, content)
 }

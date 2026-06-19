@@ -16,6 +16,8 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [observe.rs](observe.rs): bounded frame construction helpers.
 - [queue.rs](queue.rs): queue list and mutation adapters.
 - [shell.rs](shell.rs): /bin/sh adapter with timeout handling.
-- [skill.rs](skill.rs): skill library load and save adapters.
+- [skill.rs](skill.rs): source skill library load adapter.
 - [structure.rs](structure.rs): recursive tree completion checks.
-- [structure_seed.rs](structure_seed.rs): deterministic recursive docs scaffold.
+- [structure_network.rs](structure_network.rs): knowledge network completion checks.
+- [structure_seed/](structure_seed/README.md): deterministic docs scaffold profiles.
+- [structure_seed.rs](structure_seed.rs): scaffold profile entrypoint.

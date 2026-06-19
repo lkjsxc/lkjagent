@@ -2,8 +2,8 @@
 
 ## Purpose
 
-Maintain the surfaces that steer agents: AGENTS.md, the manual, and this
-skill library. This mirrors explicit runtime maintenance directives through
+Maintain the source surfaces that steer agents: AGENTS.md, the manual, and
+this skill library. This mirrors explicit maintenance directives through
 commits.
 
 ## Trigger

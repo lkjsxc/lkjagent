@@ -3,7 +3,10 @@ mod support;
 use lkjagent_context::model::FrameKind;
 use lkjagent_runtime::step::{step, Effect, StepInput};
 use lkjagent_runtime::task::{StopReason, TaskState};
-use support::{ok_output, oversized_state, prefix, runtime_state, summary_frame, TestResult};
+use support::{
+    error_output, ok_output, oversized_state, prefix, repeat_notice, runtime_state, summary_frame,
+    TestResult,
+};
 
 #[test]
 fn scripted_task_reaches_done_and_distillation_prompt() -> TestResult<()> {
@@ -60,7 +63,7 @@ fn scripted_task_reaches_done_and_distillation_prompt() -> TestResult<()> {
 }
 
 #[test]
-fn parse_faults_pause_after_three_consecutive_failures() -> TestResult<()> {
+fn parse_faults_keep_task_open_and_recover_after_three_failures() -> TestResult<()> {
     let mut state = step(
         runtime_state()?,
         StepInput::Owner {
@@ -81,10 +84,68 @@ fn parse_faults_pause_after_three_consecutive_failures() -> TestResult<()> {
         state = result.state;
         last_effects = result.effects;
     }
-    assert!(matches!(state.task, TaskState::Paused { .. }));
+    assert!(matches!(state.task, TaskState::Open { .. }));
     assert!(last_effects
         .iter()
-        .any(|effect| matches!(effect, Effect::Pause { .. })));
+        .any(|effect| matches!(effect, Effect::RecordEvent { content, .. } if content.contains("simplify the next turn"))));
+    let recovered = step(
+        state,
+        StepInput::Completion {
+            content: "<act>\n<tool>agent.done</tool>\n<summary>recovered</summary>\n</act>"
+                .to_string(),
+            tokens: 12,
+        },
+    );
+    assert_eq!(recovered.stop_reason, Some(StopReason::Acted));
+    assert_eq!(recovered.state.parse_faults, 0);
+    Ok(())
+}
+
+#[test]
+fn tool_and_repeat_errors_add_recovery_notices_without_pausing() -> TestResult<()> {
+    let mut state = step(
+        runtime_state()?,
+        StepInput::Owner {
+            content: "recover tool use".to_string(),
+            tokens: 3,
+        },
+    )
+    .state;
+    state = step(
+        state,
+        StepInput::Completion {
+            content: "<act>\n<tool>fs.read</tool>\n<path>missing.md</path>\n</act>".to_string(),
+            tokens: 10,
+        },
+    )
+    .state;
+
+    let tool_error = step(state, StepInput::ToolOutput(error_output("missing file")));
+    assert_eq!(tool_error.stop_reason, Some(StopReason::ToolError));
+    assert!(matches!(tool_error.state.task, TaskState::Open { .. }));
+    assert!(tool_error
+        .state
+        .context
+        .log
+        .iter()
+        .any(|frame| frame.content.contains("tool error recorded")));
+
+    let pending_repeat = step(
+        tool_error.state,
+        StepInput::Completion {
+            content: "<act>\n<tool>fs.read</tool>\n<path>missing.md</path>\n</act>".to_string(),
+            tokens: 10,
+        },
+    );
+    let repeat = step(pending_repeat.state, StepInput::ToolOutput(repeat_notice()));
+    assert_eq!(repeat.stop_reason, Some(StopReason::RepeatAction));
+    assert!(matches!(repeat.state.task, TaskState::Open { .. }));
+    assert!(repeat
+        .state
+        .context
+        .log
+        .iter()
+        .any(|frame| frame.content.contains("repeated action was refused")));
     Ok(())
 }
 

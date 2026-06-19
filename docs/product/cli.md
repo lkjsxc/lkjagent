@@ -16,10 +16,11 @@ no IPC protocol.
 | `lkjagent log` | Print recent transcript events; `--follow` tails new ones. |
 | `lkjagent console` | Open an interactive owner console with status, pending queue, recent log, and send prompt. |
 | `lkjagent memory <query>` | Search distilled memory through the full-text index. |
-| `lkjagent skills` | List the skill library: name, trigger line, last refined. |
+| `lkjagent skills` | List source skills: name, trigger line, file timestamp. |
 
 All commands accept `--data <dir>` to locate the store and default to the
 container data directory defined in [../operations/running.md](../operations/running.md).
+The skills command reads the source or image skill library, not data.
 
 ## Conversation Shape
 

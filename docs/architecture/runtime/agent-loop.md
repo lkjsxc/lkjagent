@@ -25,6 +25,8 @@ A turn is the atomic unit of agent activity:
    [../context/budgets.md](../context/budgets.md).
 
 Steps are sequential; nothing else touches the context while a turn runs.
+Recoverable parser, repeat-action, and tool faults append recovery notices
+to the same transcript and leave the task open for the next endpoint turn.
 
 ## The Task
 
@@ -48,12 +50,18 @@ a premature agent.done returns a tool error and the task remains open. The
 daemon auto-loads the recursive-structure skill body immediately after the
 opening owner frame and before the first endpoint completion for that task.
 When the owner asks for recursive docs or documentation, the daemon also
-creates a minimal README-indexed docs scaffold that already satisfies the
-guard, then records that observation before calling the endpoint.
+creates a README-indexed docs scaffold, then records that observation
+before calling the endpoint. Encyclopedia, wiki, and knowledge-base creation
+requests use the same pre-endpoint path with a stricter recursive-knowledge
+guard and a small nucleus scaffold with maps, a starter domain, reference,
+curation, execution state, an expansion queue, and a rebalance plan. That
+guard requires nucleus, growth-control, and required-file evidence before
+agent.done can close.
 
-When no task is open and the queue is empty, the daemon sets
-`daemon_state=idle`, refreshes its lock heartbeat, and waits for queue
-arrival. It does not open self-maintenance work while idle.
+When no task is open and the queue is empty, the daemon opens a bounded
+self-maintenance cycle, records `daemon_state=working`, and continues toward
+one concrete improvement or an honest empty-cycle agent.done. Queue arrival
+preempts maintenance at the next turn boundary.
 
 ## Pure Core
 

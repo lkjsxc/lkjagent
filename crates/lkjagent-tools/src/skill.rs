@@ -24,30 +24,6 @@ pub fn use_skill(library: &Path, name: &str) -> ToolResult<LoadedSkill> {
     })
 }
 
-pub fn save_skill(library: &Path, name: &str, content: &str) -> ToolResult<String> {
-    let path = skill_path(library, name)?;
-    let mut known_paths = collect_known_paths(library)?;
-    known_paths.insert(path.to_string_lossy().replace('\\', "/"));
-    let path_text = path.to_string_lossy().replace('\\', "/");
-    let source = lkjagent_skills::model::SkillSource {
-        path: &path_text,
-        text: content,
-        known_paths: &known_paths,
-    };
-    let report = lkjagent_skills::validate::validate(&source);
-    if !report.is_valid() {
-        return Err(ToolError::Skill(report.messages().join("; ")));
-    }
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent)?;
-    }
-    fs::write(&path, content)?;
-    Ok(format!(
-        "path={}\nvalidation=ok",
-        path.to_string_lossy().replace('\\', "/")
-    ))
-}
-
 fn skill_path(library: &Path, name: &str) -> ToolResult<PathBuf> {
     if !valid_name(name) {
         return Err(ToolError::invalid(

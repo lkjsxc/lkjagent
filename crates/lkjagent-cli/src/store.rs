@@ -1,5 +1,6 @@
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
+use std::path::PathBuf;
 
 use rusqlite::Connection;
 
@@ -7,10 +8,6 @@ use crate::error::CliError;
 
 pub fn store_path(data_dir: &Path) -> PathBuf {
     data_dir.join("lkjagent.sqlite3")
-}
-
-pub fn skill_dir(data_dir: &Path) -> PathBuf {
-    data_dir.join("skills")
 }
 
 pub fn open_store(data_dir: &Path) -> Result<Connection, CliError> {

@@ -4,7 +4,7 @@ use lkjagent_store::events::{append_event, EventKind};
 use lkjagent_tools::dispatch::load_skill_frame;
 use lkjagent_tools::dispatch::DispatchOutput;
 use lkjagent_tools::observe::{self, OutputKind};
-use lkjagent_tools::structure_seed::scaffold_recursive_docs;
+use lkjagent_tools::structure_seed::{scaffold_profile, ScaffoldProfile};
 use rusqlite::Connection;
 
 use super::runner::ResidentDaemon;
@@ -30,8 +30,9 @@ impl ResidentDaemon {
         &mut self,
         conn: &Connection,
         now: &str,
+        profile: ScaffoldProfile,
     ) -> RuntimeResult<()> {
-        let output = match scaffold_recursive_docs(&self.runtime.tools.workspace) {
+        let output = match scaffold_profile(&self.runtime.tools.workspace, profile) {
             Ok(content) => observe::ok(
                 content,
                 self.runtime.tools.observation_tokens,
@@ -40,6 +41,25 @@ impl ResidentDaemon {
             Err(error) => observe::error(error.to_string(), self.runtime.tools.observation_tokens),
         };
         self.append_output_frame(conn, now, &output.kind, output.rendered)
+    }
+
+    pub(super) fn recursive_docs_requested(content: &str) -> bool {
+        let lower = content.to_ascii_lowercase();
+        lower.contains("docs")
+            || lower.contains("documentation")
+            || lower.contains("encyclopedia")
+            || lower.contains("knowledge base")
+            || lower.contains("wiki")
+            || content.contains("ドキュメント")
+            || content.contains("百科事典")
+    }
+
+    pub(super) fn scaffold_profile(&self) -> ScaffoldProfile {
+        if self.dispatch_state.control.guard.is_knowledge() {
+            ScaffoldProfile::Knowledge
+        } else {
+            ScaffoldProfile::Generic
+        }
     }
 
     fn append_dispatch_output(

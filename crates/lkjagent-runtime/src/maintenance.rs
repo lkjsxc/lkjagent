@@ -36,7 +36,7 @@ impl MaintenanceDirective {
     pub fn work(self) -> &'static str {
         match self {
             Self::Distill => "read recent transcript spans and save durable lessons",
-            Self::RefineSkills => "sharpen the oldest or weakest skill",
+            Self::RefineSkills => "record source skill improvement candidates",
             Self::PruneMemory => "merge, rewrite, or drop stale memory rows",
             Self::AuditSelf => "record contract mismatches from recent failures",
         }

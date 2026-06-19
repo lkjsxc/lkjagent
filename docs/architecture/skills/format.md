@@ -4,7 +4,7 @@
 
 The canonical skill shape. One format serves the running agent and the
 coding agents that build lkjagent; the builders' instances live under
-[../../agent/skills/](../../agent/skills/README.md). skill.save and the
+[../../agent/skills/](../../agent/skills/README.md). Source validation and the
 repository checks enforce the same rules.
 
 ## Shape

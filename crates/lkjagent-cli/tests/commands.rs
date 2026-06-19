@@ -1,13 +1,12 @@
 mod support;
 
-use std::fs;
 use std::io::Cursor;
 
 use lkjagent_cli::console::run_console;
 use lkjagent_cli::run_cli;
 use lkjagent_store::events::read_events;
 use lkjagent_store::memory::{save, MemoryKind};
-use support::{open_store, temp_data, valid_skill, write_config, TestResult};
+use support::{open_store, temp_data, write_config, TestResult};
 
 #[test]
 fn send_persists_and_status_log_render_store_facts() -> TestResult<()> {
@@ -105,7 +104,7 @@ fn console_keeps_send_prompt_when_daemon_waits() -> TestResult<()> {
 }
 
 #[test]
-fn memory_and_skills_commands_read_existing_store_and_library() -> TestResult<()> {
+fn memory_command_reads_store_and_skills_command_reads_source_library() -> TestResult<()> {
     let data = temp_data("read")?;
     let mut conn = open_store(&data)?;
     save(
@@ -126,13 +125,10 @@ fn memory_and_skills_commands_read_existing_store_and_library() -> TestResult<()
     assert!(memory.stdout.contains("kind=fact"));
     assert!(memory.stdout.contains("title=runtime cli"));
 
-    fs::create_dir_all(data.join("skills"))?;
-    fs::write(data.join("skills/demo-skill.md"), valid_skill())?;
     let skills = run_cli(["--data", data.to_string_lossy().as_ref(), "skills"]);
-    assert!(skills.stdout.contains("name=demo-skill"));
-    assert!(skills
-        .stdout
-        .contains("trigger=A CLI test needs a listed skill."));
+    assert!(skills.stdout.contains("name=recursive-structure"));
+    assert!(skills.stdout.contains("trigger=A task asks"));
+    assert!(!data.join("skills").exists());
     Ok(())
 }
 

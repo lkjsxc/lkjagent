@@ -22,7 +22,7 @@ The blast radius of any agent action is exactly:
 
 - the container filesystem, reset by an image rebuild,
 - /data/workspace, the project directory,
-- /data, the mounted store, workspace, skill library, and config.
+- /data, the mounted store, workspace, and config.
 
 Nothing outside the mounts exists from the agent's view: no host
 filesystem, no docker socket, no other process namespaces. Other compose

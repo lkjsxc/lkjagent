@@ -5,14 +5,14 @@ use std::path::Path;
 
 use lkjagent_context::model::FrameKind;
 use lkjagent_runtime::daemon::{
-    client_config, restore_completion_guard, seed_skill_library, take_daemon_lock, DaemonTick,
-    ResidentDaemon, ResidentRuntime,
+    client_config, restore_completion_guard, take_daemon_lock, DaemonTick, ResidentDaemon,
+    ResidentRuntime,
 };
 use lkjagent_store::{memory, queue, state};
 use lkjagent_tools::control::CompletionGuard;
 use lkjagent_tools::dispatch::DispatchState;
 use support::http::{completion, serve_responses};
-use support::{store, temp_workspace, TestResult};
+use support::{seed_skill_path, store, temp_workspace, TestResult};
 
 const DONE: &str = "<act>
 <tool>agent.done</tool>
@@ -30,8 +30,6 @@ fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestRe
         "101",
     )?;
     let workspace = temp_workspace("recursive-guard")?;
-    let seed = Path::new(env!("CARGO_MANIFEST_DIR")).join("../lkjagent-skills/seeds");
-    seed_skill_library(&workspace.join("skills"), &workspace.join("missing"), &seed)?;
     let responses = scripted_responses();
     let server = serve_responses(responses)?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
@@ -102,7 +100,7 @@ fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
         "test".to_string(),
         client_config(base_url, "local-model", None, 180),
         workspace.to_path_buf(),
-        workspace.join("skills"),
+        seed_skill_path(),
         "100",
     );
     Ok(ResidentDaemon::new(support::runtime_state()?, runtime))

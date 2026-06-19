@@ -9,7 +9,7 @@ the coding agents use to build the harness.
 
 One skill format serves both audiences. The canonical shape is owned by
 [../architecture/skills/format.md](../architecture/skills/format.md). The
-runtime loads skills from its library at
+runtime loads source-owned skills from its library at
 [../architecture/skills/library.md](../architecture/skills/library.md); the
 builders load theirs from [../agent/skills/README.md](../agent/skills/README.md).
 Both sets obey the same headings, the same line cap, and the same lifecycle.
@@ -18,9 +18,8 @@ Both sets obey the same headings, the same line cap, and the same lifecycle.
 
 - The format gets twice the testing: every friction the builders feel is a
   bug report for the runtime, and the reverse.
-- The harness can maintain its own skills with the same machinery the
-  builders use through explicit maintenance paths described in
-  [../architecture/runtime/self-maintenance.md](../architecture/runtime/self-maintenance.md).
+- The harness skills change through source edits and commits, using the
+  same validation machinery the builders use.
 - A skill written for building lkjagent is loadable by lkjagent once it runs;
   the project bootstraps its own capability library.
 - There is exactly one format document to keep sharp, honoring the one-rule

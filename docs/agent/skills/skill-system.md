@@ -24,8 +24,8 @@ The skill format, loading, lifecycle, or library is changing.
 1. Change format.md first; it is the only owner of the shape. Loading,
    lifecycle, validation code, and the check-docs skill rules all derive
    from it.
-2. Update the skill.save validator in lkjagent-skills and the check-docs
-   skill-shape rules in lkjagent-xtask to the same new rules; they share a
+2. Update the lkjagent-skills validator and the check-docs skill-shape
+   rules in lkjagent-xtask to the same new rules; they share a
    single rule table by construction, so change that table.
 3. Re-validate every existing skill: all builder skills in this directory
    and all seed skills; bring each into the new shape in this same change.

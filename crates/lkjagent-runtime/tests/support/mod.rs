@@ -39,6 +39,17 @@ pub fn ok_output(content: &str) -> DispatchOutput {
     }
 }
 
+pub fn error_output(content: &str) -> DispatchOutput {
+    DispatchOutput {
+        frame_ref: 1,
+        kind: OutputKind::Observation {
+            status: "error".to_string(),
+        },
+        content: content.to_string(),
+        rendered: render_observation("error", content),
+    }
+}
+
 pub fn repeat_notice() -> DispatchOutput {
     DispatchOutput {
         frame_ref: 1,
@@ -91,12 +102,14 @@ pub fn temp_workspace(name: &str) -> TestResult<PathBuf> {
     Ok(path)
 }
 
+pub fn seed_skill_path() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../lkjagent-skills/seeds")
+}
+
 pub fn tool_runtime(workspace: PathBuf) -> TestResult<ToolRuntime> {
-    let skill_library = workspace.join("skills");
-    fs::create_dir_all(&skill_library)?;
     Ok(ToolRuntime::new(
         workspace,
-        skill_library,
+        seed_skill_path(),
         "2026-01-01T00:00:00Z",
     ))
 }

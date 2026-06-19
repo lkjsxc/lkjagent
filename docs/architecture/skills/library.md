@@ -6,22 +6,25 @@ Specify where skills live and what the library contains on first start.
 
 ## Location
 
-The runtime library is /data/skills in the mounted data directory: flat
-directory, one markdown file per skill, a git repository for provenance per
-[lifecycle.md](lifecycle.md). The store keeps only index stamps (name, use
-counts, refinement and outcome stamps) per
-[../memory/store.md](../memory/store.md); the files are the truth.
+The runtime library is source-owned, not data-owned. In the container image
+the daemon reads flat markdown files from
+`/usr/local/share/lkjagent/skills`; in local development the CLI falls back
+to `crates/lkjagent-skills/seeds`. The data directory does not expose a
+skill library, and the running agent does not edit skills.
+
+The store keeps only index stamps (name, use counts, and outcome stamps)
+per [../memory/store.md](../memory/store.md); the source files are the
+truth.
 
 Flat by design: the index line is the discovery mechanism, so directories
 would only add path noise. If the library ever outgrows flatness, that is a
 budget problem to solve in [loading.md](loading.md), not a taxonomy problem.
 
-## Seeding
+## Seed Set
 
-First start with an empty /data/skills copies the seed set from the image.
-Seeds are written like any other skill and carry no special status; the
-agent refines or retires them like the rest. The seed set stays small: the
-library is meant to be grown by its owner-agent pair, not shipped.
+The image ships the seed set as source content. Startup indexes that
+directory directly; there is no first-start copy step. The seed set stays
+small and changes through repository edits, tests, and commits.
 
 | Seed | Trigger summary |
 | --- | --- |
@@ -38,8 +41,8 @@ in [../../execution/tasks/skill-runtime.md](../../execution/tasks/skill-runtime.
 
 ## What the Library Is Not
 
-- Not a package ecosystem: nothing installs skills from anywhere; the agent
-  writes its own or the owner drops files into /data/skills.
+- Not a package ecosystem: nothing installs skills from runtime data, and
+  the agent does not write skill files.
 - Not configuration: skills teach procedures; values that tune the harness
   live in lkjagent.json per [../../operations/running.md](../../operations/running.md).
 - Not memory: a skill says how to do something repeatable; memory records
