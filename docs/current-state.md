@@ -13,7 +13,7 @@ The repository contains the documentation contract, a compiling Cargo
 workspace, local verification gates, the action parser, the pure state graph,
 the pure context engine, the SQLite store boundary, the LLM endpoint client,
 the tool dispatcher/adapters, the runtime step/daemon core, and the CLI for
-send, status, log, console, memory, startup checks, repository-root .env
+send, status, bounded log, console, memory, startup checks, repository-root .env
 loading, JSON runtime config, a /data/workspace working tree, and a resident
 daemon that delivers queued owner work to the endpoint and tool dispatcher
 until graph-gated agent.done. The console is transcript-first with a bottom

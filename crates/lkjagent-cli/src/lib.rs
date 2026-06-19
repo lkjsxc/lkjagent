@@ -67,7 +67,11 @@ where
         Command::Run => run::run(&invocation.data_dir),
         Command::Send { text } => send::send(&invocation.data_dir, &text),
         Command::Status => status::status(&invocation.data_dir),
-        Command::Log { follow, full } => log::log(&invocation.data_dir, follow, full),
+        Command::Log {
+            follow,
+            full,
+            limit,
+        } => log::log(&invocation.data_dir, follow, full, limit),
         Command::Console => console::console(&invocation.data_dir),
         Command::Memory { query } => memory::memory(&invocation.data_dir, &query),
         Command::Graph => graph::graph(&invocation.data_dir),

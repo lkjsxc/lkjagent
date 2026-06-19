@@ -45,6 +45,30 @@ fn send_persists_and_status_log_render_store_facts() -> TestResult<()> {
 }
 
 #[test]
+fn log_limit_renders_recent_events_only() -> TestResult<()> {
+    let data = temp_data("log-limit")?;
+    let first = run_cli(["--data", data.to_string_lossy().as_ref(), "send", "first"]);
+    let second = run_cli(["--data", data.to_string_lossy().as_ref(), "send", "second"]);
+    assert_eq!(first.code, 0);
+    assert_eq!(second.code, 0);
+
+    let limited = run_cli([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "log",
+        "--limit",
+        "1",
+    ]);
+
+    assert_eq!(limited.code, 0);
+    assert!(limited.stdout.contains("id=2"));
+    assert!(limited.stdout.contains("preview=operation=enqueue"));
+    assert!(!limited.stdout.contains("id=1"));
+    assert_eq!(limited.stdout.lines().count(), 1);
+    Ok(())
+}
+
+#[test]
 fn console_renders_status_and_sends_owner_messages() -> TestResult<()> {
     let data = temp_data("console")?;
     let input = b"hello from console\n/quit\n";

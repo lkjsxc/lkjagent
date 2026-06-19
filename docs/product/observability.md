@@ -27,7 +27,8 @@ Recovery notices are transcript events too, so a rare parse, repeat, or tool
 error leaves visible evidence and the model sees the next-step instruction.
 
 `lkjagent log` renders events compactly: one line per event with kind, turn
-when present, and a bounded preview; `--full` prints whole payloads.
+when present, and a bounded preview. `--limit N` keeps the newest N events,
+and `--full` prints whole payloads.
 
 ## Context Usage
 

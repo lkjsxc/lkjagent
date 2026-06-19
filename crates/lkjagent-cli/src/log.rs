@@ -5,18 +5,31 @@ use std::time::Duration;
 use crate::error::CliError;
 use crate::store::open_store;
 
-pub fn log(data_dir: &Path, follow: bool, full: bool) -> Result<String, CliError> {
+pub fn log(
+    data_dir: &Path,
+    follow: bool,
+    full: bool,
+    limit: Option<usize>,
+) -> Result<String, CliError> {
     let conn = open_store(data_dir)?;
     if follow {
         thread::sleep(Duration::from_millis(250));
     }
-    render_events(&conn, full)
+    render_events(&conn, full, limit)
 }
 
-fn render_events(conn: &rusqlite::Connection, full: bool) -> Result<String, CliError> {
+fn render_events(
+    conn: &rusqlite::Connection,
+    full: bool,
+    limit: Option<usize>,
+) -> Result<String, CliError> {
     let events = lkjagent_store::events::read_events(conn)?;
+    let start = limit
+        .map(|limit| events.len().saturating_sub(limit))
+        .unwrap_or(0);
     let lines = events
         .iter()
+        .skip(start)
         .map(|event| {
             if full {
                 format!(
@@ -47,5 +60,9 @@ fn turn(turn: Option<i64>) -> String {
 }
 
 fn preview(content: &str) -> String {
-    content.chars().take(80).collect()
+    content
+        .chars()
+        .map(|ch| if matches!(ch, '\n' | '\r') { ' ' } else { ch })
+        .take(80)
+        .collect()
 }
