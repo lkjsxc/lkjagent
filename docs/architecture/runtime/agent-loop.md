@@ -72,13 +72,14 @@ a root acceptance-audit section and a per-part role ledger to the main index,
 verifies the requested count, root index, root file budget, count-linked
 acceptance audit, optional directory indexes, docs coverage map, all design
 memo sections, all main-file sections, required content blocks, and part
-ledger, records graph evidence, saves a task summary, and closes the task
-without asking the endpoint to repeat the same bulk generation. The recorded
-evidence includes the `structured-output` path, target file count, index file
-count, design memo count, main file count, file-budget status, acceptance-audit
-status, coverage-map status, `index_scope=all`, `section_scope=all`,
-content-block status, required design-section status, required main-section
-status, first and last main status, part ledger status, and `verification=ok`.
+ledger, records graph evidence, saves the same verification evidence in the
+task summary, and closes the task without asking the endpoint to repeat the
+same bulk generation. The recorded evidence includes the `structured-output`
+path, target file count, index file count, design memo count, main file count,
+file-budget status, acceptance-audit status, coverage-map status,
+`index_scope=all`, `section_scope=all`, content-block status, required
+design-section status, required main-section status, first and last main
+status, part ledger status, and `verification=ok`.
 
 When no task is open and the queue is empty, the daemon opens a bounded
 graph maintenance case only after a directive is due, records

@@ -6,7 +6,7 @@ use std::path::Path;
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
-use lkjagent_store::{queue, state};
+use lkjagent_store::{memory, queue, state};
 use support::http::{completion, serve_responses};
 use support::{store, temp_workspace, TestResult};
 
@@ -77,6 +77,7 @@ fn counted_documentation_task_auto_scaffolds_before_endpoint() -> TestResult<()>
     assert_eq!(state::get(&conn, "completion guard")?, None);
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
     assert_counted_graph_evidence(&conn, 20)?;
+    assert_counted_task_summary(&conn)?;
     Ok(())
 }
 
@@ -171,6 +172,19 @@ fn assert_counted_graph_evidence(conn: &rusqlite::Connection, target: usize) -> 
                 && path.as_deref() == Some("structured-output")
         }),
         "{evidence:?}"
+    );
+    Ok(())
+}
+
+fn assert_counted_task_summary(conn: &rusqlite::Connection) -> TestResult<()> {
+    assert!(
+        memory::find(conn, "file_budget", 5)?.iter().any(|row| {
+            row.kind == "task-summary"
+                && row.content.contains("file_budget=ok")
+                && row.content.contains("acceptance_audit=ok")
+                && row.content.contains("verification=ok")
+        }),
+        "missing counted task-summary evidence"
     );
     Ok(())
 }
