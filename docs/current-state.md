@@ -65,9 +65,9 @@ headings, section roles, objective anchors that preserve model-number decimal
 tokens, main-range coverage, sequence ledgers, anchor-linked body spines,
 per-part content details, draft passage blocks, and continuity handoffs while
 preserving the exact count.
-When the objective includes a design, memo, or viewpoint count inside a larger
-file-count request, the scaffold uses that count for design memos when the
-exact total can still retain main content.
+When the objective includes a design, memo, viewpoint, outline, planning, or
+brief count inside a larger file-count request, the scaffold uses that count
+for design memos when the exact total can still retain main content.
 File-count wording stays stronger than design wording when scoring allocation
 hints, so total-count numbers are not reused as design memo counts.
 Runtime recovery still uses bounded notices for parse errors, repeated

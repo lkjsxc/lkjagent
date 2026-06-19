@@ -90,16 +90,28 @@ fn closest_distance(span: Span, signals: &[Span]) -> Option<usize> {
 fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
     let mut spans = Vec::new();
     for needle in [
+        "brief",
+        "briefs",
+        "blueprint",
+        "blueprints",
         "design",
         "memo",
         "memos",
+        "outline",
+        "outlines",
+        "plan file",
+        "plan files",
+        "planning note",
+        "planning notes",
         "planning",
+        "spec",
+        "specs",
         "viewpoint",
         "viewpoints",
     ] {
         spans.extend(span_matches(lower, needle));
     }
-    for needle in ["設計", "観点", "メモ"] {
+    for needle in ["設計", "観点", "メモ", "構成案", "章立て", "計画"] {
         spans.extend(span_matches(content, needle));
     }
     spans
