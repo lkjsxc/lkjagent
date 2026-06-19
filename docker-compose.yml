@@ -9,7 +9,7 @@ services:
     stop_signal: SIGTERM
     stop_grace_period: 45s
     read_only: true
-    working_dir: /data/workspace
+    working_dir: /
     security_opt:
       - no-new-privileges:true
     cap_drop:
