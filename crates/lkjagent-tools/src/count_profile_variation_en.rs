@@ -8,7 +8,19 @@ pub(crate) fn english_variation(kind: DeliverableKind, index: usize) -> Variatio
         DeliverableKind::Report => EN_REPORT,
         DeliverableKind::General => EN_GENERAL,
     };
+    if matches!(kind, DeliverableKind::Narrative) {
+        return spread_variation(values, index);
+    }
     values[index.saturating_sub(1) % values.len()]
+}
+
+fn spread_variation(values: &[Variation], index: usize) -> Variation {
+    let position = index.saturating_sub(1);
+    let slot = position
+        .saturating_mul(5)
+        .saturating_add(position / values.len())
+        % values.len();
+    values[slot]
 }
 
 const EN_NARRATIVE: &[Variation] = &[

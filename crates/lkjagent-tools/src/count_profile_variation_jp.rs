@@ -8,7 +8,19 @@ pub(crate) fn japanese_variation(kind: DeliverableKind, index: usize) -> Variati
         DeliverableKind::Report => JP_REPORT,
         DeliverableKind::General => JP_GENERAL,
     };
+    if matches!(kind, DeliverableKind::Narrative) {
+        return spread_variation(values, index);
+    }
     values[index.saturating_sub(1) % values.len()]
+}
+
+fn spread_variation(values: &[Variation], index: usize) -> Variation {
+    let position = index.saturating_sub(1);
+    let slot = position
+        .saturating_mul(5)
+        .saturating_add(position / values.len())
+        % values.len();
+    values[slot]
 }
 
 const JP_NARRATIVE: &[Variation] = &[

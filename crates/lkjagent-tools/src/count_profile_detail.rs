@@ -95,7 +95,11 @@ fn pick(values: &[&'static str], index: usize, stride: usize) -> &'static str {
     if values.is_empty() {
         return "";
     }
-    let slot = index.saturating_sub(1).saturating_div(stride.max(1)) % values.len();
+    let position = index.saturating_sub(1).saturating_div(stride.max(1));
+    let slot = position
+        .saturating_mul(5)
+        .saturating_add(position / values.len())
+        % values.len();
     values[slot]
 }
 
