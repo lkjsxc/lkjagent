@@ -55,6 +55,8 @@ pub(crate) fn split_unit_spans(lower: &str, file_signals: &[Span]) -> Vec<Span> 
         "quality criteria",
         "case study",
         "case studies",
+        "risk register",
+        "risk registers",
         "decision record",
         "decision records",
         "decision log",
