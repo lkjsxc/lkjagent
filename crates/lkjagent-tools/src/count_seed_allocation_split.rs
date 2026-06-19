@@ -59,6 +59,8 @@ fn split_signal_spans(lower: &str) -> Vec<Span> {
         "the rest",
         "rest of the files",
         "rest of the documents",
+        "残り",
+        "それ以外",
     ] {
         spans.extend(span_matches(lower, needle));
     }
@@ -122,7 +124,7 @@ fn soft_separator_segment(text: &str, number: Span, split: Span, numbers: &[Numb
     if intervening_number(number, split, numbers) {
         return false;
     }
-    allocation_lead_before(text, number)
+    allocation_lead_before(text, number) || allocation_after_number(text, number, split)
 }
 
 fn sentence_separator_segment(
@@ -140,7 +142,12 @@ fn sentence_separator_segment(
     if intervening_number(number, split, numbers) {
         return false;
     }
-    allocation_lead_before(text, number)
+    allocation_lead_before(text, number) || allocation_after_number(text, number, split)
+}
+
+fn allocation_after_number(text: &str, number: Span, split: Span) -> bool {
+    text.get(number.end..split.start)
+        .is_some_and(|between| between.contains('使') || between.contains("用意"))
 }
 
 fn intervening_number(number: Span, split: Span, numbers: &[NumberSpan]) -> bool {
@@ -176,7 +183,7 @@ fn sentence_separator(ch: char) -> bool {
 }
 
 fn soft_separator(ch: char) -> bool {
-    matches!(ch, ',' | ';' | '；')
+    matches!(ch, ',' | ';' | '、' | '；')
 }
 
 fn clause_break(ch: char) -> bool {
