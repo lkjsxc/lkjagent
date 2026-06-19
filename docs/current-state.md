@@ -76,9 +76,10 @@ deliverable kind, so the root, docs, and main directories are README-indexed
 within the selected count guard, and the root README records the count
 breakdown, machine-readable audit manifest, acceptance audit, and whether the
 guard is exact or approximate.
-Kind profiling recognizes narrative, guide, report, and general deliverables
-with practical synonyms such as manuscript, screenplay, playbook, runbook,
-whitepaper, dossier, and their Japanese task terms.
+Kind profiling recognizes explicit guide and report synonyms before
+narrative terms, ignores negated story-specific constraints, and covers
+manuscript, screenplay, playbook, runbook, whitepaper, dossier, and Japanese
+task terms.
 The graph evidence for that scaffold records `structured-output`, the target
 file count, index file count, design memo count, main file count, root index,
 file-budget status, machine-readable audit-manifest status including
@@ -112,8 +113,8 @@ briefs, sequence ledgers, anchor-linked body spines, per-part content
 details, specific-detail variation blocks, draft passage blocks, and
 continuity handoffs while preserving the exact count. Root indexes keep
 operational clauses and raw counted-create wording for traceability, while
-main-file body anchors skip model-thrift, budget-thrift, and count-only
-structural clauses when content-bearing anchors exist.
+main-file body anchors skip model-thrift, budget-thrift, count-only
+structural clauses, and generic meta constraints when content anchors exist.
 Docs-side scaffolds carry twenty distinct planning focus labels before
 falling back, so common 20-outline requests do not collapse into repeated
 supplemental planning notes.

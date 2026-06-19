@@ -27,6 +27,7 @@ fn content_anchor(anchor: &str) -> Option<String> {
     let cleaned = trim_request_suffix(trim_scaffold_suffix(strip_scaffold_prefix(anchor))).trim();
     let lower = cleaned.to_ascii_lowercase();
     if operational_anchor(cleaned, &lower)
+        || meta_constraint_anchor(&lower)
         || structural_count_anchor(cleaned, &lower)
         || cleaned.chars().count() < 4
     {
@@ -39,7 +40,10 @@ fn content_anchor(anchor: &str) -> Option<String> {
 fn fallback_anchor(anchor: &str) -> Option<String> {
     let cleaned = trim_request_suffix(trim_scaffold_suffix(strip_scaffold_prefix(anchor))).trim();
     let lower = cleaned.to_ascii_lowercase();
-    if operational_anchor(cleaned, &lower) || cleaned.chars().count() < 4 {
+    if operational_anchor(cleaned, &lower)
+        || meta_constraint_anchor(&lower)
+        || cleaned.chars().count() < 4
+    {
         None
     } else {
         Some(truncate_anchor(cleaned))
@@ -107,9 +111,20 @@ fn operational_anchor(cleaned: &str, lower: &str) -> bool {
         || (lower.contains("codex") && (cleaned.contains('枠') || cleaned.contains("節約")))
 }
 
+fn meta_constraint_anchor(lower: &str) -> bool {
+    lower.contains("not story-specific")
+        || lower.contains("not story specific")
+        || lower.starts_with("keep it generic")
+        || lower.starts_with("keep this generic")
+        || lower.starts_with("keep it reusable")
+        || (lower.starts_with("keep ") && lower.contains("reusable"))
+}
+
 fn structural_count_anchor(cleaned: &str, lower: &str) -> bool {
     let has_file_unit = lower.contains("file")
         || lower.contains("document")
+        || lower.contains("docs")
+        || lower.contains("documentation")
         || lower.contains("markdown")
         || cleaned.contains("ファイル")
         || cleaned.contains("ドキュメント")
