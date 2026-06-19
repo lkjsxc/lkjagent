@@ -78,19 +78,53 @@ fn workspace_brief(workspace: &Path) -> RuntimeResult<String> {
 
 fn memory_digest(conn: &Connection) -> RuntimeResult<String> {
     let rows = lkjagent_store::memory::digest(conn, None, PREFIX_MEMORY_DIGEST as i64)?;
+    let budget = PREFIX_MEMORY_DIGEST.saturating_sub(token_estimate("## memory digest\n"));
     if rows.is_empty() {
         return Ok("none".to_string());
     }
-    Ok(rows
-        .iter()
-        .map(|row| {
-            format!(
-                "kind={}\ntitle={}\ntags={}\n{}",
-                row.kind, row.title, row.tags, row.content
-            )
-        })
-        .collect::<Vec<_>>()
-        .join("\n\n"))
+    Ok(render_memory_rows(&rows, budget))
+}
+
+fn render_memory_rows(rows: &[lkjagent_store::memory::MemoryRow], budget: usize) -> String {
+    let mut rendered = String::new();
+    for row in rows {
+        let entry = format!(
+            "kind={}\ntitle={}\ntags={}\n{}",
+            row.kind, row.title, row.tags, row.content
+        );
+        let next = append_memory_entry(&rendered, &entry);
+        if token_estimate(&next) <= budget {
+            rendered = next;
+        } else if rendered.is_empty() {
+            rendered = truncate_memory_entry(&entry, budget);
+        }
+    }
+    if rendered.is_empty() {
+        "none".to_string()
+    } else {
+        rendered
+    }
+}
+
+fn append_memory_entry(rendered: &str, entry: &str) -> String {
+    if rendered.is_empty() {
+        entry.to_string()
+    } else {
+        format!("{rendered}\n\n{entry}")
+    }
+}
+
+fn truncate_memory_entry(entry: &str, budget: usize) -> String {
+    let marker = "\n[truncated to memory digest budget]";
+    let mut text = String::new();
+    for ch in entry.chars() {
+        let candidate = format!("{text}{ch}{marker}");
+        if token_estimate(&candidate) > budget {
+            break;
+        }
+        text.push(ch);
+    }
+    format!("{text}{marker}")
 }
 
 fn io_error(error: std::io::Error) -> RuntimeError {

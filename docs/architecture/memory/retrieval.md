@@ -33,17 +33,20 @@ can explain any result.
 
 The digest builder runs whenever the prefix is rebuilt, which is at
 compaction ([../context/compaction.md](../context/compaction.md)) and at
-daemon startup. It selects top-ranked entries into the 2,048-token memory
-digest budget from [../context/budgets.md](../context/budgets.md):
+daemon startup. It selects top-ranked entries, then validates the rendered
+prefix text against the 2,048-token memory digest budget from
+[../context/budgets.md](../context/budgets.md):
 
 - The open task's task summary is always first.
-- Remaining space fills in rank order; an entry that would overflow the
-  cap is skipped, never truncated.
+- Remaining space fills in rank order; a rendered entry that would overflow
+  the cap is skipped.
+- If the first rendered entry alone exceeds the cap, it is truncated with an
+  explicit marker so daemon startup can continue.
 - The rendered digest lands in the rebuilt prefix and is what the model
   sees without asking.
 
-Whole-entry selection is why entries stay near 200 tokens per
-[distillation.md](distillation.md).
+Whole-entry selection remains the normal path, so entries stay near 200
+tokens per [distillation.md](distillation.md).
 
 ## Status
 

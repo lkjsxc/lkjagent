@@ -6,13 +6,14 @@ use lkjagent_context::budget::{
 };
 use lkjagent_context::model::{FrameKind, PrefixSection};
 use lkjagent_runtime::daemon::{
-    request_shutdown, startup_state, take_daemon_lock, ShutdownDecision, ShutdownState, Signal,
-    StartupLock,
+    build_prefix_from_store, request_shutdown, startup_state, take_daemon_lock, ShutdownDecision,
+    ShutdownState, Signal, StartupLock,
 };
 use lkjagent_runtime::prompt::{build_prefix, PromptInputs};
 use lkjagent_runtime::task::TaskState;
 use lkjagent_store::events::read_events;
-use support::{prefix, store, TestResult};
+use lkjagent_store::memory::{save, MemoryKind};
+use support::{prefix, seed_skill_path, store, temp_workspace, TestResult};
 
 #[test]
 fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
@@ -44,6 +45,32 @@ fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
         };
         assert!(frame.tokens.0 <= cap);
     }
+    Ok(())
+}
+
+#[test]
+fn startup_trims_rendered_memory_digest_to_prefix_budget() -> TestResult<()> {
+    let mut conn = store()?;
+    let content = "x ".repeat(600);
+    for index in 0..40 {
+        save(
+            &mut conn,
+            MemoryKind::Fact,
+            &format!("oversized digest row {index}"),
+            "startup-memory",
+            &content,
+            1,
+            "2026-06-19T00:00:00Z",
+        )?;
+    }
+    let workspace = temp_workspace("digest-budget")?;
+    let prefix = build_prefix_from_store(&conn, &seed_skill_path(), &workspace)?;
+    let memory = prefix
+        .iter()
+        .find(|frame| frame.kind == FrameKind::Prefix(PrefixSection::MemoryDigest))
+        .ok_or("missing memory digest frame")?;
+    assert!(memory.tokens.0 <= PREFIX_MEMORY_DIGEST);
+    assert!(memory.content.contains("kind=fact"));
     Ok(())
 }
 
