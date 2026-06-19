@@ -30,6 +30,10 @@ pub(crate) fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
         "story bible",
         "character profile",
         "character profiles",
+        "character sheet",
+        "character sheets",
+        "cast profile",
+        "cast profiles",
     ] {
         spans.extend(span_matches(lower, needle));
     }
