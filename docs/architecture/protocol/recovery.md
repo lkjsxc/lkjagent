@@ -30,9 +30,11 @@ faults):
 
 - 3 consecutive parse-class faults: the harness keeps the task open and adds
   a stronger recovery notice telling the model to emit one simple valid act
-  block or ask if blocked.
+  block, switch tag-like or large generated payloads to shell.run, or ask if
+  blocked.
 - 3 consecutive repeat actions: same recovery notice pattern; the repeated
-  action is not re-executed.
+  action is not re-executed, and the model is told to inspect state, choose
+  a different tool, or switch repetitive writes to shell.run.
 - Endpoint unreachable beyond the backoff cap (initial contract: 15
   minutes): daemon stays alive, state shows the outage, retries continue at
   the capped interval.
