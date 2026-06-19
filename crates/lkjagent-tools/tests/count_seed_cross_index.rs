@@ -29,6 +29,9 @@ fn count_seed_main_ledger_links_parts_to_design_owners() -> TestResult<()> {
     assert!(main_index
         .contains("main/part-085.md: resolution / public consequence; design: docs/design-012.md"));
     assert!(main_part.contains("- Design owner: docs/design-002.md"));
+    assert!(main_part.contains("- Previous: main/part-007.md"));
+    assert!(main_part.contains("- Current: main/part-008.md"));
+    assert!(main_part.contains("- Next: main/part-009.md"));
     assert!(report.contains("part_ledger=ok"));
     assert!(report.contains("verification=ok"));
     Ok(())

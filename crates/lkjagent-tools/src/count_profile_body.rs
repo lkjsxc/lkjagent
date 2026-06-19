@@ -43,11 +43,11 @@ pub(crate) fn sequence_text(language: Language, index: usize, total: usize) -> S
     let next = next_label(language, index, total);
     match language {
         Language::Japanese => format!(
-            "- 前: {previous}\n- 現在: {index:03}\n- 次: {next}\n- 現在の段階: {}",
+            "- 前: {previous}\n- 現在: main/part-{index:03}.md\n- 次: {next}\n- 現在の段階: {}",
             jp_stage(index, total)
         ),
         Language::English => format!(
-            "- Previous: {previous}\n- Current: {index:03}\n- Next: {next}\n- Current stage: {}",
+            "- Previous: {previous}\n- Current: main/part-{index:03}.md\n- Next: {next}\n- Current stage: {}",
             en_stage(index, total)
         ),
     }
@@ -68,10 +68,10 @@ pub(crate) fn handoff_text(language: Language, index: usize, total: usize) -> St
     let next = index.saturating_add(1);
     match language {
         Language::Japanese => {
-            format!("- 前節までの用語、判断、未解決点を引き継ぎます。\n- 次の接続先: {next:03}")
+            format!("- 前節までの用語、判断、未解決点を引き継ぎます。\n- 次の接続先: main/part-{next:03}.md")
         }
         Language::English => format!(
-            "- Carry forward terms, decisions, and open questions from earlier parts.\n- Next segment: {next:03}"
+            "- Carry forward terms, decisions, and open questions from earlier parts.\n- Next segment: main/part-{next:03}.md"
         ),
     }
 }
@@ -83,7 +83,7 @@ fn previous_label(language: Language, index: usize) -> String {
             Language::English => "none".to_string(),
         };
     }
-    format!("{:03}", index.saturating_sub(1))
+    format!("main/part-{:03}.md", index.saturating_sub(1))
 }
 
 fn next_label(language: Language, index: usize, total: usize) -> String {
@@ -93,7 +93,7 @@ fn next_label(language: Language, index: usize, total: usize) -> String {
             Language::English => "none".to_string(),
         };
     }
-    format!("{:03}", index.saturating_add(1))
+    format!("main/part-{:03}.md", index.saturating_add(1))
 }
 
 fn jp_narrative(index: usize, total: usize) -> String {
