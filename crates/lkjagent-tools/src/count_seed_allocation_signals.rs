@@ -27,6 +27,8 @@ pub(crate) fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
         "specs",
         "timeline",
         "timelines",
+        "lesson plan",
+        "lesson plans",
         "viewpoint",
         "viewpoints",
         "lore",
