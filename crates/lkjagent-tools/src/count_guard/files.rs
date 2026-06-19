@@ -13,9 +13,13 @@ pub struct CandidateCount {
 pub fn candidate_counts(workspace: &Path, kind: CountKind) -> ToolResult<Vec<CandidateCount>> {
     let mut roots = Vec::new();
     collect(workspace, 0, &mut roots)?;
-    if roots.is_empty() {
-        roots = plain_single_root(workspace)?;
+    if !roots.is_empty() {
+        return counts_for_roots(roots, kind);
     }
+    plain_output_counts(workspace, kind)
+}
+
+fn counts_for_roots(roots: Vec<PathBuf>, kind: CountKind) -> ToolResult<Vec<CandidateCount>> {
     let mut counts = Vec::new();
     for path in roots {
         counts.push(CandidateCount {
@@ -84,7 +88,7 @@ fn collect(path: &Path, depth: usize, roots: &mut Vec<PathBuf>) -> ToolResult<()
     Ok(())
 }
 
-fn plain_single_root(workspace: &Path) -> ToolResult<Vec<PathBuf>> {
+fn plain_output_counts(workspace: &Path, kind: CountKind) -> ToolResult<Vec<CandidateCount>> {
     let mut roots = Vec::new();
     let mut visible_files = 0_usize;
     for entry in fs::read_dir(workspace)? {
@@ -98,10 +102,20 @@ fn plain_single_root(workspace: &Path) -> ToolResult<Vec<PathBuf>> {
             visible_files = visible_files.saturating_add(1);
         }
     }
-    if roots.len() == 1 && visible_files == 0 {
-        Ok(roots)
+    if roots.is_empty() || visible_files > 0 {
+        return Ok(Vec::new());
+    }
+    if roots.len() == 1 {
+        counts_for_roots(roots, kind)
     } else {
-        Ok(Vec::new())
+        let mut count = 0_usize;
+        for root in roots {
+            count = count.saturating_add(count_files(&root, kind)?);
+        }
+        Ok(vec![CandidateCount {
+            path: workspace.to_path_buf(),
+            count,
+        }])
     }
 }
 
