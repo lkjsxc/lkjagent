@@ -9,7 +9,8 @@ pub(crate) fn remaining_split_hint(
     file_signals: &[Span],
 ) -> Option<usize> {
     let split_signals = split_signal_spans(lower);
-    if file_signals.is_empty() || split_signals.is_empty() {
+    let unit_signals = split_unit_spans(lower, file_signals);
+    if unit_signals.is_empty() || split_signals.is_empty() {
         return None;
     }
     let numbers = number_spans(objective);
@@ -21,7 +22,7 @@ pub(crate) fn remaining_split_hint(
             split_score(
                 objective,
                 number.span,
-                file_signals,
+                &unit_signals,
                 &split_signals,
                 &numbers,
             )
@@ -47,6 +48,23 @@ fn split_signal_spans(lower: &str) -> Vec<Span> {
         "the rest",
         "rest of the files",
         "rest of the documents",
+    ] {
+        spans.extend(span_matches(lower, needle));
+    }
+    spans
+}
+
+fn split_unit_spans(lower: &str, file_signals: &[Span]) -> Vec<Span> {
+    let mut spans = file_signals.to_vec();
+    for needle in [
+        "source packet",
+        "source packets",
+        "research packet",
+        "research packets",
+        "reference packet",
+        "reference packets",
+        "packet",
+        "packets",
     ] {
         spans.extend(span_matches(lower, needle));
     }
