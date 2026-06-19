@@ -4,6 +4,21 @@ use std::path::Path;
 use crate::count_guard::CountGuard;
 use crate::error::{ToolError, ToolResult};
 
+const DESIGN_FOCUSES: [&str; 12] = [
+    "scope and acceptance criteria",
+    "directory map and reading order",
+    "voice, format, and naming conventions",
+    "continuity ledger",
+    "source assumptions and constraints",
+    "section pacing plan",
+    "quality checklist",
+    "revision workflow",
+    "risk register",
+    "verification plan",
+    "handoff notes",
+    "completion summary",
+];
+
 pub fn scaffold_counted_documents(
     workspace: &Path,
     guard: CountGuard,
@@ -53,19 +68,26 @@ pub fn scaffold_counted_documents(
 
 fn root_readme(docs: usize, main: usize, objective: &str) -> String {
     format!(
-        "# Structured Output\n\n## Purpose\n\nA generated multi-file deliverable for this objective:\n\n{objective}\n\n## Table of Contents\n\n- [docs/](docs/): {docs} design files.\n- [main/](main/): {main} main content files.\n"
+        "# Structured Output\n\n## Purpose\n\nA generated multi-file deliverable for this objective:\n\n{objective}\n\n## Table of Contents\n\n- [docs/](docs/): {docs} design files for planning, continuity, and verification.\n- [main/](main/): {main} ordered main content files.\n\n## Verification\n\nThe scaffold was generated as an exact counted deliverable. Keep the total file count stable unless the owner changes the target.\n"
     )
 }
 
 fn doc_page(index: usize, objective: &str) -> String {
+    let focus = DESIGN_FOCUSES
+        .get(index.saturating_sub(1))
+        .copied()
+        .unwrap_or("supplemental planning notes");
     format!(
-        "# Design Memo {index:03}\n\n## Purpose\n\nPlanning notes, structure, and continuity constraints for output batch {index}.\n\n## Objective Context\n\n{objective}\n"
+        "# Design Memo {index:03}\n\n## Focus\n\n{focus}\n\n## Objective Context\n\n{objective}\n\n## Notes\n\nUse this memo to keep the generated file set coherent, ordered, and verifiable. Record decisions that should shape the corresponding main content files.\n"
     )
 }
 
 fn main_page(index: usize, objective: &str) -> String {
+    let arc = index.saturating_sub(1) / 10 + 1;
+    let slot = index.saturating_sub(1) % 10 + 1;
+    let next = index.saturating_add(1);
     format!(
-        "# Main Content {index:03}\n\n## Purpose\n\nPrimary deliverable segment {index} for the requested structured output.\n\n## Objective Context\n\n{objective}\n\n## Segment\n\nThis file establishes segment {index} as part of the larger deliverable and keeps the scaffold ready for later expansion.\n"
+        "# Main Content {index:03}\n\n## Position\n\n- Arc: {arc}\n- Segment: {slot}\n\n## Objective Context\n\n{objective}\n\n## Draft Content\n\nThis segment turns the objective into concrete material for ordered part {index}. It should read as a complete unit while preserving continuity with the surrounding files.\n\n## Continuity Hand-Off\n\n- Carry forward terms, decisions, and open questions from earlier parts.\n- Leave a clear next-step hook for part {next:03} when another part follows.\n"
     )
 }
 
