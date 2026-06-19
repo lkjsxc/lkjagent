@@ -5,24 +5,6 @@ pub(crate) fn detect_kind(objective: &str) -> DeliverableKind {
     if contains_any(
         &lower,
         &[
-            "story",
-            "novel",
-            "fiction",
-            "narrative",
-            "manuscript",
-            "screenplay",
-            "script",
-            "saga",
-            "tale",
-            "物語",
-            "小説",
-            "脚本",
-        ],
-    ) {
-        DeliverableKind::Narrative
-    } else if contains_any(
-        &lower,
-        &[
             "guide",
             "manual",
             "tutorial",
@@ -53,9 +35,40 @@ pub(crate) fn detect_kind(objective: &str) -> DeliverableKind {
         ],
     ) {
         DeliverableKind::Report
+    } else if narrative_kind(&lower) {
+        DeliverableKind::Narrative
     } else {
         DeliverableKind::General
     }
+}
+
+fn narrative_kind(lower: &str) -> bool {
+    contains_any(
+        lower,
+        &[
+            "story",
+            "novel",
+            "fiction",
+            "narrative",
+            "manuscript",
+            "screenplay",
+            "script",
+            "saga",
+            "tale",
+            "物語",
+            "小説",
+            "脚本",
+        ],
+    ) && !contains_any(
+        lower,
+        &[
+            "not story",
+            "not a story",
+            "not story-specific",
+            "not narrative",
+            "not fiction",
+        ],
+    )
 }
 
 fn contains_any(haystack: &str, needles: &[&str]) -> bool {
