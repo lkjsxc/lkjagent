@@ -144,9 +144,10 @@ Owner task turn budgets load from `task.turn-budget` and apply to new tasks,
 explicit continuations after budget exhaustion, and restart summaries.
 Compaction is graph-aware: it preserves the active case, phase, node, plan,
 evidence, missing evidence, touched paths, selected packages, recovery
-strategy, and completion guard before rebuilding the prefix. The schema has
-graph memory links for retrieval ranking; task-summary saves link the memory
-row to the active or just-closed graph case and node.
+strategy, and completion guard before rebuilding the prefix. Memory retrieval
+uses graph memory links to prefer active-case and active-node rows within the
+same memory kind, and task-summary saves link the memory row to the active or
+just-closed graph case and node.
 
 Memory remains durable retrieval, but graph cases link evidence and memories.
 Empty queues open bounded graph maintenance cycles in rotation when directives
