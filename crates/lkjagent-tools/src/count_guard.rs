@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use crate::error::{ToolError, ToolResult};
 
 mod files;
+mod parse;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CountKind {
@@ -78,21 +79,7 @@ impl CountGuard {
 }
 
 pub fn count_target(lower: &str, content: &str) -> Option<CountGuard> {
-    if !file_signal(lower, content) {
-        return None;
-    }
-    let target = numbers(lower).into_iter().max()?;
-    let kind = if markdown_signal(lower, content) {
-        CountKind::Markdown
-    } else {
-        CountKind::File
-    };
-    let mode = if approximate_signal(lower, content) && !exact_signal(lower, content) {
-        CountMode::Approximate
-    } else {
-        CountMode::Exact
-    };
-    Some(CountGuard { kind, target, mode })
+    parse::count_target(lower, content)
 }
 
 pub fn verify_count(workspace: &Path, guard: CountGuard) -> ToolResult<()> {
@@ -108,84 +95,6 @@ pub fn verify_count(workspace: &Path, guard: CountGuard) -> ToolResult<()> {
         }
     }
     Err(ToolError::invalid(files::report(workspace, guard, best)))
-}
-
-fn file_signal(lower: &str, content: &str) -> bool {
-    lower.contains("file")
-        || lower.contains("document")
-        || lower.contains("docs")
-        || lower.contains(".md")
-        || content.contains("ファイル")
-        || content.contains("文書")
-        || content.contains("ドキュメント")
-}
-
-fn markdown_signal(lower: &str, content: &str) -> bool {
-    lower.contains("markdown")
-        || lower.contains(".md")
-        || content.contains("マークダウン")
-        || content.contains("ドキュメント")
-}
-
-fn approximate_signal(lower: &str, content: &str) -> bool {
-    lower.contains("about")
-        || lower.contains("around")
-        || lower.contains("roughly")
-        || lower.contains("approximately")
-        || lower.contains("approx ")
-        || content.contains("ぐらい")
-        || content.contains("くらい")
-        || content.contains("程度")
-        || content.contains("約")
-}
-
-fn exact_signal(lower: &str, content: &str) -> bool {
-    lower.contains("exact")
-        || lower.contains("exactly")
-        || lower.contains("precisely")
-        || content.contains("ちょうど")
-        || content.contains("ぴったり")
-        || content.contains("正確")
-}
-
-fn numbers(text: &str) -> Vec<usize> {
-    let mut values = Vec::new();
-    let mut current = String::new();
-    for ch in text.chars() {
-        if let Some(digit) = digit_char(ch) {
-            current.push(digit);
-        } else if number_separator(ch) && !current.is_empty() {
-            continue;
-        } else {
-            save_number(&mut values, &mut current);
-        }
-    }
-    save_number(&mut values, &mut current);
-    values
-}
-
-fn digit_char(ch: char) -> Option<char> {
-    if ch.is_ascii_digit() {
-        return Some(ch);
-    }
-    if ('０'..='９').contains(&ch) {
-        return char::from_digit(ch as u32 - '０' as u32, 10);
-    }
-    None
-}
-
-fn number_separator(ch: char) -> bool {
-    matches!(ch, ',' | '_' | '，')
-}
-
-fn save_number(values: &mut Vec<usize>, current: &mut String) {
-    if current.is_empty() {
-        return;
-    }
-    if let Ok(value) = current.parse() {
-        values.push(value);
-    }
-    current.clear();
 }
 
 fn distance(count: usize, target: usize) -> usize {
