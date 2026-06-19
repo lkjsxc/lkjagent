@@ -70,6 +70,7 @@ fn content_signal(lower: &str, content: &str) -> bool {
             "content",
             "corpus",
             "deliverable",
+            "draft",
             "essay",
             "guide",
             "lesson",
@@ -86,6 +87,7 @@ fn content_signal(lower: &str, content: &str) -> bool {
         content,
         &[
             "本文",
+            "本編",
             "章",
             "教材",
             "物語",

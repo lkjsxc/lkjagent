@@ -64,3 +64,29 @@ fn counted_body_files_select_document_construction() {
         .selected_packages
         .contains(&"doc-construction".to_string()));
 }
+
+#[test]
+fn counted_draft_files_select_document_construction() {
+    let state = initial_state(
+        "Create about 100 files total, split between twenty planning notes and draft files.",
+        Some(26),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert!(state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+}
+
+#[test]
+fn counted_japanese_main_files_select_document_construction() {
+    let state = initial_state(
+        "合計百ファイルほどを、二十個の設計メモと本編ファイルに分けて作ってください。",
+        Some(27),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert!(state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+}
