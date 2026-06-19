@@ -49,7 +49,8 @@ fn console_renders_status_and_sends_owner_messages() -> TestResult<()> {
 
     run_console(&data, reader, &mut output)?;
     let text = String::from_utf8(output)?;
-    assert!(text.contains("lkjagent console"));
+    assert!(text.contains("state STOPPED"));
+    assert!(text.contains("send work"));
     assert!(text.contains("queued id=1"));
     assert!(text.contains("console closed"));
 

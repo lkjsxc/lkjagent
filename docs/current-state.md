@@ -18,8 +18,10 @@ for send, status, log, console,
 memory, skills, startup checks, repository-root .env loading for local
 deployment values, JSON runtime config, a /data/workspace working tree, and a
 resident daemon that delivers queued owner work to the endpoint and tool
-dispatcher until agent.done. Recursive structure tasks auto-load their seed
-skill before the first endpoint turn. Runtime skills are indexed from
+dispatcher until agent.done. The console is transcript-first with a bottom
+status/control deck and display-width wrapping for mixed English and Japanese
+terminal text. Recursive structure tasks auto-load their seed skill before the
+first endpoint turn. Runtime skills are indexed from
 source or image paths, not copied into data. Recursive docs tasks create a
 README-indexed scaffold before endpoint work; encyclopedia, wiki, and
 knowledge-base creation tasks create a small knowledge nucleus with
