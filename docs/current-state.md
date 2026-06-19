@@ -42,6 +42,9 @@ Generation reserve and endpoint max_tokens are 2048 tokens, giving compact
 batch scripts enough room while preserving the one-action protocol.
 Owner-stated exact markdown file counts activate a completion guard, so
 agent.done is refused until a README-indexed candidate tree has that count.
+Queued owner guidance can strengthen that guard while a task is already open,
+so exact-count corrections are not lost when they interrupt maintenance or
+long-running work.
 Empty queues open bounded self-maintenance cycles in rotation; owner queue
 arrival preempts maintenance at the next turn boundary. Compose wiring is
 implemented. The implementation queue is

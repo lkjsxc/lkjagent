@@ -10,6 +10,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [maintenance_authority.rs](maintenance_authority.rs): maintenance tool authority and local remote fixtures.
 - [automatic_maintenance.rs](automatic_maintenance.rs): daemon idle maintenance and owner preemption fixtures.
 - [daemon_loop.rs](daemon_loop.rs): resident queue, endpoint, tool, ask, and error fixtures.
+- [owner_guidance.rs](owner_guidance.rs): queued owner guidance guard persistence fixture.
 - [prompt_daemon.rs](prompt_daemon.rs): prompt, startup, lock, and shutdown fixtures.
 - [recursive_guard.rs](recursive_guard.rs): guarded recursive-structure daemon fixture.
 - [recursive_scaffold.rs](recursive_scaffold.rs): docs auto-scaffold daemon fixture.
