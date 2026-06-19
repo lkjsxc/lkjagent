@@ -1,6 +1,7 @@
 use std::fs;
 use std::path::Path;
 
+use crate::count_seed_verify_root::verify_file_budget;
 use crate::count_seed_verify_text::{
     verify_acceptance_audit, verify_coverage_map, verify_design_file_content,
     verify_design_file_sections, verify_main_file_content, verify_main_file_sections,
@@ -14,6 +15,7 @@ pub(crate) struct ScaffoldCheck {
     pub(crate) docs_index: &'static str,
     pub(crate) coverage_map: &'static str,
     pub(crate) main_index: &'static str,
+    pub(crate) file_budget: &'static str,
     pub(crate) acceptance_audit: &'static str,
     pub(crate) part_ledger: &'static str,
     pub(crate) index_scope: &'static str,
@@ -39,6 +41,7 @@ pub(crate) fn verify_scaffold(
     }
     let root_text = require_text(&root.join("README.md"), "root index")?;
     let acceptance_audit = verify_acceptance_audit(&root_text)?;
+    let file_budget = verify_file_budget(&root_text, target, docs, main, index_count(indexes))?;
     let design_sections = verify_design_files(root, docs, main > 0)?;
     let main_sections = verify_main_files(root, main)?;
     let content_blocks = status(docs > 0 || main > 0);
@@ -65,6 +68,7 @@ pub(crate) fn verify_scaffold(
         docs_index,
         coverage_map,
         main_index,
+        file_budget,
         acceptance_audit,
         part_ledger,
         index_scope,
@@ -74,6 +78,14 @@ pub(crate) fn verify_scaffold(
         first_main,
         last_main,
     })
+}
+
+fn index_count(indexes: bool) -> usize {
+    if indexes {
+        2
+    } else {
+        0
+    }
 }
 
 fn verify_design_files(root: &Path, docs: usize, has_main: bool) -> ToolResult<&'static str> {

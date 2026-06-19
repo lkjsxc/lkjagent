@@ -19,6 +19,7 @@ mod count_profile_thread;
 pub mod count_seed;
 mod count_seed_allocation;
 mod count_seed_verify;
+mod count_seed_verify_root;
 mod count_seed_verify_text;
 pub mod dispatch;
 pub mod error;
