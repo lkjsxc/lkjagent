@@ -115,6 +115,27 @@ fn count_seed_honors_research_notes_without_file_noun() -> TestResult<()> {
 }
 
 #[test]
+fn count_seed_honors_evidence_summaries_without_file_noun() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-evidence-summaries-without-file-noun")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        file_guard(),
+        "Create about one hundred files total for a market intelligence dossier. Use \
+         twenty-four evidence summaries. The rest as ordered report sections. Count docs and \
+         main content together. Keep Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert_counts(&root, 24, 73)?;
+    assert!(root.join("docs/design-024.md").exists());
+    assert!(!root.join("docs/design-025.md").exists());
+    assert!(root.join("main/part-073.md").exists());
+    assert!(!root.join("main/part-074.md").exists());
+    Ok(())
+}
+
+#[test]
 fn count_seed_does_not_treat_total_sentence_as_split_allocation() -> TestResult<()> {
     let workspace = temp_workspace("count-seed-sentence-total-rest")?;
 

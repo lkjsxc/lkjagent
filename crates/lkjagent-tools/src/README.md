@@ -40,6 +40,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_seed_allocation_lead.rs](count_seed_allocation_lead.rs): split allocation lead words.
 - [count_seed_allocation_split.rs](count_seed_allocation_split.rs): remaining-file allocation hints.
 - [count_seed_allocation_signals.rs](count_seed_allocation_signals.rs): allocation signal spans.
+- [count_seed_allocation_units.rs](count_seed_allocation_units.rs): split allocation unit words.
 - [count_seed_verify.rs](count_seed_verify.rs): counted scaffold structural verifier.
 - [count_seed_verify_manifest.rs](count_seed_verify_manifest.rs): counted scaffold audit-manifest verifier.
 - [count_seed_verify_main.rs](count_seed_verify_main.rs): counted scaffold main-file verifier.
