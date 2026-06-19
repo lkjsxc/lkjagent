@@ -37,6 +37,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_profile_data.rs](count_profile_data.rs): counted scaffold profile labels.
 - [count_seed.rs](count_seed.rs): counted document scaffold generator.
 - [count_seed_allocation.rs](count_seed_allocation.rs): counted scaffold file allocation.
+- [count_seed_allocation_infer.rs](count_seed_allocation_infer.rs): inferred split units.
 - [count_seed_allocation_lead.rs](count_seed_allocation_lead.rs): split allocation lead words.
 - [count_seed_allocation_split.rs](count_seed_allocation_split.rs): remaining-file allocation hints.
 - [count_seed_allocation_signals.rs](count_seed_allocation_signals.rs): allocation signal spans.

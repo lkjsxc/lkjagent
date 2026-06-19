@@ -70,6 +70,49 @@ fn count_seed_honors_audit_findings_without_file_noun() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn count_seed_infers_ordered_rest_support_split() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-policy-exceptions")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        file_guard(),
+        "Create about one hundred files total for a policy exception dossier. Use \
+         twenty-four policy exceptions. The rest as ordered remediation sections. Count docs \
+         and main content together. Keep Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert_counts(&root, 24, 73, "report")?;
+    assert!(root.join("docs/design-024.md").exists());
+    assert!(!root.join("docs/design-025.md").exists());
+    assert!(root.join("main/part-073.md").exists());
+    assert!(!root.join("main/part-074.md").exists());
+    Ok(())
+}
+
+#[test]
+fn count_seed_does_not_infer_split_when_rest_is_supporting_docs() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-rest-supporting-docs")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        file_guard(),
+        "Create about one hundred files total for a chapter collection. Use twenty-four \
+         chapters. The rest as supporting docs. Count docs and main content together. Keep \
+         Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    assert!(readme.contains("- Design memos: 12"));
+    assert!(readme.contains("- Main files: 85"));
+    assert!(root.join("docs/design-012.md").exists());
+    assert!(!root.join("docs/design-013.md").exists());
+    assert!(root.join("main/part-085.md").exists());
+    Ok(())
+}
+
 fn file_guard() -> CountGuard {
     CountGuard {
         kind: CountKind::File,
