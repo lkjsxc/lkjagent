@@ -78,6 +78,7 @@ fn counted_documentation_task_auto_scaffolds_before_endpoint() -> TestResult<()>
 
     assert_eq!(state::get(&conn, "completion guard")?, None);
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
+    assert_closed_graph_case(&conn)?;
     assert_counted_graph_evidence(&conn, 20)?;
     assert_counted_task_summary(&conn)?;
     Ok(())
@@ -171,5 +172,17 @@ fn assert_counted_task_summary(conn: &rusqlite::Connection) -> TestResult<()> {
         }),
         "missing counted task-summary evidence"
     );
+    Ok(())
+}
+
+fn assert_closed_graph_case(conn: &rusqlite::Connection) -> TestResult<()> {
+    let (phase, active_node, status): (String, String, String) = conn.query_row(
+        "SELECT phase, active_node, status FROM graph_cases ORDER BY id DESC LIMIT 1",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+    )?;
+    assert_eq!(phase, "closed");
+    assert_eq!(active_node, "complete");
+    assert_eq!(status, "closed");
     Ok(())
 }

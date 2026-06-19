@@ -81,7 +81,9 @@ map, all design memo sections, all main-file sections, design-owner links,
 local verification checklists, sequence paths, required content blocks
 including per-part specific detail markers, and part ledger, records graph
 evidence, saves the same verification evidence in the task summary, and closes
-the task without asking the endpoint to repeat the same bulk generation. The
+the task only after the graph completion gate admits that evidence, without
+asking the endpoint to repeat the same bulk generation. If the graph gate is
+not admitted, the daemon waits with the missing gate reason instead. The
 recorded evidence includes the `structured-output`
 path, target file count, index file count, design memo count, main file count,
 file-budget status, audit-manifest status, restart-guide status,

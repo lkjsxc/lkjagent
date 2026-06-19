@@ -11,6 +11,7 @@ This directory holds adapter helpers for the foreground daemon.
 - [compaction_support.rs](compaction_support.rs): compaction prompt helpers.
 - [context_budget.rs](context_budget.rs): turn-boundary pressure checks.
 - [count_scaffold.rs](count_scaffold.rs): counted document auto scaffold.
+- [count_scaffold_gate.rs](count_scaffold_gate.rs): graph gate check for counted scaffold closure.
 - [effects.rs](effects.rs): step effect persistence and tool dispatch.
 - [endpoint.rs](endpoint.rs): endpoint completion and oversize handling.
 - [idle.rs](idle.rs): automatic idle maintenance cycle opening.

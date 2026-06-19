@@ -5,6 +5,7 @@ use lkjagent_tools::count_seed::scaffold_counted_documents;
 use lkjagent_tools::observe;
 use rusqlite::Connection;
 
+use super::count_scaffold_gate::{counted_scaffold_closure, CountedScaffoldClosure};
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
 use crate::graph_state::status_str;
@@ -52,6 +53,12 @@ impl ResidentDaemon {
         let summary = format!(
             "created counted structured-output scaffold with {target} files\n{evidence_summary}"
         );
+        let close_target = match counted_scaffold_closure(self.state.graph.as_ref()) {
+            CountedScaffoldClosure::Admit { target } => target,
+            CountedScaffoldClosure::Wait { question } => {
+                return self.wait_counted_scaffold(conn, now, question);
+            }
+        };
         self.state.task = TaskState::Closed {
             summary: summary.clone(),
         };
@@ -61,7 +68,7 @@ impl ResidentDaemon {
         if let Some(graph) = self.state.graph.as_mut() {
             graph.status = CaseStatus::Closed;
             graph.phase = TaskPhase::Closed;
-            graph.active_node = GraphNodeId("complete");
+            graph.active_node = close_target;
             if let Some(case_id) = graph.case_id {
                 lkjagent_store::graph::update_case(
                     conn,
@@ -74,6 +81,44 @@ impl ResidentDaemon {
             }
         }
         self.save_task_summary(conn, now, &summary)?;
+        self.write_observable(conn)
+    }
+
+    fn wait_counted_scaffold(
+        &mut self,
+        conn: &mut Connection,
+        now: &str,
+        question: String,
+    ) -> RuntimeResult<()> {
+        self.state.task = TaskState::Waiting {
+            question: question.clone(),
+        };
+        self.dispatch_state.control.work_open = true;
+        self.dispatch_state.control.question_outstanding = true;
+        if let Some(graph) = self.state.graph.as_mut() {
+            graph.phase = TaskPhase::Waiting;
+            graph.active_node = GraphNodeId("recover");
+            graph.recovery = Some(question.clone());
+            if let Some(case_id) = graph.case_id {
+                lkjagent_store::graph::update_case(
+                    conn,
+                    case_id,
+                    graph.phase.as_str(),
+                    graph.active_node.0,
+                    status_str(graph.status),
+                    now,
+                )?;
+                lkjagent_store::graph::record_event(
+                    conn,
+                    case_id,
+                    "recovery",
+                    graph.active_node.0,
+                    graph.phase.as_str(),
+                    &question,
+                    now,
+                )?;
+            }
+        }
         self.write_observable(conn)
     }
 }
