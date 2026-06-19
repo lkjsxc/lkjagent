@@ -24,5 +24,11 @@ fn allocation_lead_word(word: &str) -> bool {
             | "allocated"
             | "assign"
             | "assigned"
+            | "use"
+            | "using"
+            | "prepare"
+            | "prepared"
+            | "write"
+            | "written"
     )
 }
