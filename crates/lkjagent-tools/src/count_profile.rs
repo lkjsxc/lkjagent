@@ -1,3 +1,4 @@
+use crate::count_guard::CountMode;
 use crate::count_profile_anchor::{anchor_block, anchor_for_part};
 use crate::count_profile_body::{body_text, handoff_text, main_title, sequence_text};
 use crate::count_profile_data::{EN_DESIGN_FOCUSES, JP_DESIGN_FOCUSES};
@@ -37,16 +38,18 @@ impl DeliverableProfile {
         docs: usize,
         main: usize,
         index_files: usize,
+        mode: CountMode,
         objective: &str,
     ) -> String {
         let anchors = anchor_block(self.language, objective);
         let budget = file_budget(self.language, docs, main, index_files);
+        let verification = self.verification_text(mode);
         match self.language {
             Language::Japanese => format!(
-                "# 構造化成果物\n\n## 目的\n\n次の依頼に対応する複数ファイル成果物です。\n\n{objective}\n\n{anchors}\n## 目次\n\n- [docs/](docs/): 設計、継続性、検証のための設計メモ {docs} 件。\n- [main/](main/): 順序付き本編ファイル {main} 件。\n\n{budget}\n## 検証\n\nこの成果物は指定ファイル数に合わせて生成されています。依頼が変わらない限り、合計ファイル数を保ってください。\n"
+                "# 構造化成果物\n\n## 目的\n\n次の依頼に対応する複数ファイル成果物です。\n\n{objective}\n\n{anchors}\n## 目次\n\n- [docs/](docs/): 設計、継続性、検証のための設計メモ {docs} 件。\n- [main/](main/): 順序付き本編ファイル {main} 件。\n\n{budget}\n## 検証\n\n{verification}\n"
             ),
             Language::English => format!(
-                "# Structured Output\n\n## Purpose\n\nA generated multi-file deliverable for this objective:\n\n{objective}\n\n{anchors}\n## Table of Contents\n\n- [docs/](docs/): {docs} design files for planning, continuity, and verification.\n- [main/](main/): {main} ordered main content files.\n\n{budget}\n## Verification\n\nThe scaffold was generated as an exact counted deliverable. Keep the total file count stable unless the owner changes the target.\n"
+                "# Structured Output\n\n## Purpose\n\nA generated multi-file deliverable for this objective:\n\n{objective}\n\n{anchors}\n## Table of Contents\n\n- [docs/](docs/): {docs} design files for planning, continuity, and verification.\n- [main/](main/): {main} ordered main content files.\n\n{budget}\n## Verification\n\n{verification}\n"
             ),
         }
     }
@@ -128,6 +131,23 @@ impl DeliverableProfile {
         };
         let slot = index.saturating_sub(1).min(focuses.len().saturating_sub(1));
         focuses.get(slot).copied().unwrap_or(fallback)
+    }
+
+    fn verification_text(self, mode: CountMode) -> &'static str {
+        match (self.language, mode) {
+            (Language::Japanese, CountMode::Exact) => {
+                "この成果物は指定ファイル数に合わせて生成されています。依頼が変わらない限り、合計ファイル数を保ってください。"
+            }
+            (Language::Japanese, CountMode::Approximate) => {
+                "この成果物は目標ファイル数を中心に生成されています。依頼が変わらない限り、許容範囲から外れないようにしてください。"
+            }
+            (Language::English, CountMode::Exact) => {
+                "The scaffold was generated as an exact counted deliverable. Keep the total file count stable unless the owner changes the target."
+            }
+            (Language::English, CountMode::Approximate) => {
+                "The scaffold was generated at the requested target within the approximate-count guard. Keep the total inside the accepted range unless the owner changes the target."
+            }
+        }
     }
 }
 

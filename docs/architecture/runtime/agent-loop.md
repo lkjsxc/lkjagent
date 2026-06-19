@@ -55,12 +55,14 @@ recursive tree. Documentation, counted structured content, and knowledge-base
 requests enter document construction nodes that create structure anchors
 before endpoint execution. File and markdown-count requests become completion
 guards and compose with recursive or knowledge-base requirements instead of
-replacing them. Exact wording requires the exact count. Approximate wording
-accepts the documented tolerance. Active count guards are rendered in the
-graph-state prefix with an instruction to use one compact `shell.run` command
-with direct `/bin/sh` loops and `printf` templates for bulk creation and
-count verification, keep the act payload under about 1200 characters, and
-avoid hardcoded `/workspace` paths, brace expansion, cat heredocs, bash
+replacing them. Exact or approximate wording is scored near the chosen count
+target, so direct exact wording is strict while exact wording attached to a
+smaller subcount does not make an approximate total strict. Approximate
+wording accepts the documented tolerance. Active count guards are rendered in
+the graph-state prefix with an instruction to use one compact `shell.run`
+command with direct `/bin/sh` loops and `printf` templates for bulk creation
+and count verification, keep the act payload under about 1200 characters,
+and avoid hardcoded `/workspace` paths, brace expansion, cat heredocs, bash
 scripts, literal bodies, or one `fs.write` per file.
 For counted documentation tasks without recursive or benchmark scaffolds, the
 daemon writes a generic `structured-output/` tree before the first endpoint
