@@ -55,7 +55,7 @@ pub fn scaffold_counted_documents(
     for index in 1..=allocation.main {
         write_file(
             &root.join(format!("main/part-{index:03}.md")),
-            &profile.main_page(index, allocation.main, &objective),
+            &profile.main_page(index, allocation.docs, allocation.main, &objective),
         )?;
     }
     let check = verify_scaffold(

@@ -47,7 +47,7 @@ pub(crate) fn verify_scaffold(
     let audit_manifest =
         verify_audit_manifest(&root_text, target, docs, main, index_count(indexes))?;
     let design_sections = verify_design_files(root, docs, main > 0)?;
-    let main_sections = verify_main_files(root, main)?;
+    let main_sections = verify_main_files(root, docs, main)?;
     let content_blocks = status(docs > 0 || main > 0);
     let first_main = status(main > 0);
     let last_main = status(main > 0);
@@ -106,7 +106,7 @@ fn verify_design_files(root: &Path, docs: usize, has_main: bool) -> ToolResult<&
     Ok("ok")
 }
 
-fn verify_main_files(root: &Path, main: usize) -> ToolResult<&'static str> {
+fn verify_main_files(root: &Path, docs: usize, main: usize) -> ToolResult<&'static str> {
     if main == 0 {
         return Ok("n/a");
     }
@@ -114,7 +114,7 @@ fn verify_main_files(root: &Path, main: usize) -> ToolResult<&'static str> {
         let label = format!("main part {index:03}");
         let text = require_text(&root.join(format!("main/part-{index:03}.md")), &label)?;
         verify_main_file_sections(&text, &label)?;
-        verify_main_file_content(&text, &label)?;
+        verify_main_file_content(&text, &label, index, docs, main)?;
     }
     Ok("ok")
 }

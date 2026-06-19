@@ -21,12 +21,14 @@ fn count_seed_main_ledger_links_parts_to_design_owners() -> TestResult<()> {
     )?;
 
     let main_index = fs::read_to_string(workspace.join("structured-output/main/README.md"))?;
+    let main_part = fs::read_to_string(workspace.join("structured-output/main/part-008.md"))?;
     assert!(main_index
         .contains("main/part-001.md: opening / inciting pressure; design: docs/design-001.md"));
     assert!(main_index
         .contains("main/part-008.md: opening / choice under pressure; design: docs/design-002.md"));
     assert!(main_index
         .contains("main/part-085.md: resolution / public consequence; design: docs/design-012.md"));
+    assert!(main_part.contains("- Design owner: docs/design-002.md"));
     assert!(report.contains("part_ledger=ok"));
     assert!(report.contains("verification=ok"));
     Ok(())
