@@ -2,8 +2,8 @@ use std::fs;
 use std::path::Path;
 
 use crate::count_seed_verify_text::{
-    verify_acceptance_audit, verify_coverage_map, verify_design_sections, verify_main_sections,
-    verify_part_ledger,
+    verify_acceptance_audit, verify_coverage_map, verify_design_file_sections,
+    verify_main_file_sections, verify_part_ledger,
 };
 use crate::error::{ToolError, ToolResult};
 
@@ -36,16 +36,10 @@ pub(crate) fn verify_scaffold(
     }
     let root_text = require_text(&root.join("README.md"), "root index")?;
     let acceptance_audit = verify_acceptance_audit(&root_text)?;
-    let first_design_text = design_file_text(root, docs, 1, "first design memo")?;
-    let last_design_text = design_file_text(root, docs, docs, "last design memo")?;
-    let design_sections =
-        verify_design_sections(first_design_text.as_deref(), last_design_text.as_deref())?;
-    let first_main_text = main_file_text(root, main, 1, "first main part")?;
-    let last_main_text = main_file_text(root, main, main, "last main part")?;
-    let first_main = status(first_main_text.is_some());
-    let last_main = status(last_main_text.is_some());
-    let main_sections =
-        verify_main_sections(first_main_text.as_deref(), last_main_text.as_deref())?;
+    let design_sections = verify_design_files(root, docs)?;
+    let main_sections = verify_main_files(root, main)?;
+    let first_main = status(main > 0);
+    let last_main = status(main > 0);
     let docs_text = if indexes {
         Some(require_text(&root.join("docs/README.md"), "docs index")?)
     } else {
@@ -75,34 +69,28 @@ pub(crate) fn verify_scaffold(
     })
 }
 
-fn design_file_text(
-    root: &Path,
-    docs: usize,
-    index: usize,
-    label: &str,
-) -> ToolResult<Option<String>> {
+fn verify_design_files(root: &Path, docs: usize) -> ToolResult<&'static str> {
     if docs == 0 {
-        return Ok(None);
+        return Ok("n/a");
     }
-    Ok(Some(require_text(
-        &root.join(format!("docs/design-{index:03}.md")),
-        label,
-    )?))
+    for index in 1..=docs {
+        let label = format!("design memo {index:03}");
+        let text = require_text(&root.join(format!("docs/design-{index:03}.md")), &label)?;
+        verify_design_file_sections(&text, &label)?;
+    }
+    Ok("ok")
 }
 
-fn main_file_text(
-    root: &Path,
-    main: usize,
-    index: usize,
-    label: &str,
-) -> ToolResult<Option<String>> {
+fn verify_main_files(root: &Path, main: usize) -> ToolResult<&'static str> {
     if main == 0 {
-        return Ok(None);
+        return Ok("n/a");
     }
-    Ok(Some(require_text(
-        &root.join(format!("main/part-{index:03}.md")),
-        label,
-    )?))
+    for index in 1..=main {
+        let label = format!("main part {index:03}");
+        let text = require_text(&root.join(format!("main/part-{index:03}.md")), &label)?;
+        verify_main_file_sections(&text, &label)?;
+    }
+    Ok("ok")
 }
 
 fn require_file(path: &Path, label: &str) -> ToolResult<()> {

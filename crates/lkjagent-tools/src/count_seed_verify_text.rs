@@ -55,33 +55,7 @@ pub(crate) fn verify_part_ledger(
     Ok("ok")
 }
 
-pub(crate) fn verify_design_sections(
-    first: Option<&str>,
-    last: Option<&str>,
-) -> ToolResult<&'static str> {
-    let Some(first) = first else {
-        return Ok("n/a");
-    };
-    let last = last.unwrap_or(first);
-    require_design_sections(first, "first design memo")?;
-    require_design_sections(last, "last design memo")?;
-    Ok("ok")
-}
-
-pub(crate) fn verify_main_sections(
-    first: Option<&str>,
-    last: Option<&str>,
-) -> ToolResult<&'static str> {
-    let Some(first) = first else {
-        return Ok("n/a");
-    };
-    let last = last.unwrap_or(first);
-    require_main_sections(first, "first main part")?;
-    require_main_sections(last, "last main part")?;
-    Ok("ok")
-}
-
-fn require_design_sections(text: &str, label: &str) -> ToolResult<()> {
+pub(crate) fn verify_design_file_sections(text: &str, label: &str) -> ToolResult<()> {
     require_one(text, &["## Focus", "## 焦点"], label)?;
     require_one(text, &["## Coverage", "## 対象範囲"], label)?;
     require_one(text, &["## Design Task", "## 設計タスク"], label)?;
@@ -89,7 +63,7 @@ fn require_design_sections(text: &str, label: &str) -> ToolResult<()> {
     Ok(())
 }
 
-fn require_main_sections(text: &str, label: &str) -> ToolResult<()> {
+pub(crate) fn verify_main_file_sections(text: &str, label: &str) -> ToolResult<()> {
     require_one(text, &["## Segment Brief", "## セグメント概要"], label)?;
     require_one(text, &["## Sequence Ledger", "## 連続性台帳"], label)?;
     require_one(text, &["## Draft Content", "## 本文"], label)?;
