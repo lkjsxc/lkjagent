@@ -7,6 +7,8 @@ pub(crate) fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
         "briefs",
         "blueprint",
         "blueprints",
+        "checklist",
+        "checklists",
         "design",
         "appendix",
         "appendices",
