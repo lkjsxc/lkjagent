@@ -9,10 +9,14 @@ use lkjagent_runtime::daemon::{
     build_prefix_from_store, request_shutdown, startup_state, take_daemon_lock, ShutdownDecision,
     ShutdownState, Signal, StartupLock,
 };
+use lkjagent_runtime::graph_state::{open_owner_case_with_guard, render_state};
 use lkjagent_runtime::prompt::{build_prefix, PromptInputs};
 use lkjagent_runtime::task::TaskState;
 use lkjagent_store::events::read_events;
 use lkjagent_store::memory::{save, MemoryKind};
+use lkjagent_store::state;
+use lkjagent_tools::control::CompletionGuard;
+use lkjagent_tools::count_guard::CountMode;
 use support::{prefix, store, temp_workspace, TestResult};
 
 #[test]
@@ -34,6 +38,18 @@ fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
     assert!(first
         .iter()
         .any(|frame| frame.content.contains("shell.run heredoc or script")));
+    assert!(first
+        .iter()
+        .any(|frame| frame.content.contains("under about 1200 characters")));
+    assert!(first
+        .iter()
+        .any(|frame| frame.content.contains("do not cd /workspace")));
+    assert!(first
+        .iter()
+        .any(|frame| frame.content.contains("direct /bin/sh loops")));
+    assert!(first
+        .iter()
+        .any(|frame| frame.content.contains("avoid brace expansion")));
     for frame in first {
         let cap = match frame.kind {
             FrameKind::Prefix(PrefixSection::Identity) => PREFIX_IDENTITY,
@@ -71,6 +87,55 @@ fn startup_trims_rendered_memory_digest_to_prefix_budget() -> TestResult<()> {
         .ok_or("missing memory digest frame")?;
     assert!(memory.tokens.0 <= PREFIX_MEMORY_DIGEST);
     assert!(memory.content.contains("kind=fact"));
+    Ok(())
+}
+
+#[test]
+fn startup_prefix_renders_count_guard_batch_instruction() -> TestResult<()> {
+    let conn = store()?;
+    state::set(&conn, "completion guard", "file-count-about:100")?;
+    let workspace = temp_workspace("count-guard-prefix")?;
+
+    let prefix = build_prefix_from_store(&conn, &workspace)?;
+    let graph = prefix
+        .iter()
+        .find(|frame| frame.kind == FrameKind::Prefix(PrefixSection::GraphState))
+        .ok_or("missing graph state frame")?;
+
+    assert!(graph
+        .content
+        .contains("completion_guard=file-count-about:100"));
+    assert!(graph.content.contains("under about 1200 chars"));
+    assert!(graph.content.contains("one compact shell.run command"));
+    assert!(graph.content.contains("direct /bin/sh loops"));
+    assert!(graph.content.contains("printf templates"));
+    assert!(graph.content.contains("no brace expansion"));
+    assert!(graph.content.contains("cat heredocs"));
+    Ok(())
+}
+
+#[test]
+fn owner_graph_notice_renders_count_guard_batch_instruction() -> TestResult<()> {
+    let conn = store()?;
+    let graph = open_owner_case_with_guard(
+        &conn,
+        "Create about 100 files total.",
+        "101",
+        CompletionGuard::FileCount {
+            target: 100,
+            mode: CountMode::Approximate,
+        },
+    )?;
+
+    let rendered = render_state(&graph);
+
+    assert!(rendered.contains("completion_guard=file-count-about:100"));
+    assert!(rendered.contains("under about 1200 chars"));
+    assert!(rendered.contains("one compact shell.run command"));
+    assert!(rendered.contains("direct /bin/sh loops"));
+    assert!(rendered.contains("printf templates"));
+    assert!(rendered.contains("no brace expansion"));
+    assert!(rendered.contains("cat heredocs"));
     Ok(())
 }
 

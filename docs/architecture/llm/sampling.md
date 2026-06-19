@@ -12,6 +12,7 @@ rationale for each, and the rule that they stay constant within a session.
 | temperature | 0.3 |
 | top_p | 0.9 |
 | max_tokens | 2048 |
+| stop | `</act>` |
 
 ## Rationale
 
@@ -25,9 +26,9 @@ rationale for each, and the rule that they stay constant within a session.
   [layout.md](../context/layout.md). One think preamble plus one act block
   fits; a completion that hits this limit is the oversize case in
   [../protocol/recovery.md](../protocol/recovery.md).
-- no stop field: the action grammar needs the closing act tag in the
-  response body, and OpenAI-compatible stop strings are removed before the
-  client can parse them.
+- stop `</act>`: generation ends after one action envelope instead of
+  drifting into prose or another action. The client restores the stripped
+  close tag before parsing.
 
 ## Constant Within a Session
 

@@ -63,10 +63,12 @@ pub fn complete(
     let completion = decode_completion(&text).map_err(|error| {
         endpoint_error(EndpointFailure::Malformed(error.to_string()), retry_after)
     })?;
-    if completion.finish_reason == FinishReason::Length {
+    if completion.finish_reason == FinishReason::Length && !has_closed_act(&completion.content) {
+        let preview = preview(&completion.content);
         return Err(ClientError::Oversize {
             usage: completion.usage,
             cache_metrics: completion.cache_metrics,
+            preview,
         });
     }
     Ok(completion)
@@ -103,6 +105,20 @@ fn send_request(
 
 fn chat_url(base_url: &str) -> String {
     format!("{}/v1/chat/completions", base_url.trim_end_matches('/'))
+}
+
+fn has_closed_act(content: &str) -> bool {
+    content
+        .find("<act>")
+        .is_some_and(|start| content[start..].contains("</act>"))
+}
+
+fn preview(content: &str) -> String {
+    content
+        .chars()
+        .take(240)
+        .collect::<String>()
+        .replace('\n', "\\n")
 }
 
 fn endpoint_error(failure: EndpointFailure, retry_after: Duration) -> ClientError {

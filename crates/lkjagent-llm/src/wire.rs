@@ -9,6 +9,8 @@ use metrics::collect_cache_metrics;
 pub const MAX_TOKENS: u16 = 2048;
 pub const TEMPERATURE: f32 = 0.3;
 pub const TOP_P: f32 = 0.9;
+const ACT_CLOSE: &str = "</act>";
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct ChatRequest {
     pub model: String,
@@ -91,7 +93,7 @@ pub fn build_request(model: &str, messages: &[Message], max_tokens: u16) -> Chat
         max_tokens,
         temperature: TEMPERATURE,
         top_p: TOP_P,
-        stop: Vec::new(),
+        stop: vec![ACT_CLOSE.to_string()],
         stream: false,
     }
 }
@@ -107,9 +109,10 @@ pub fn decode_completion(text: &str) -> Result<Completion, WireError> {
         .into_iter()
         .next()
         .ok_or(WireError::Missing("choices[0]"))?;
+    let finish_reason = finish_reason(choice.finish_reason);
     Ok(Completion {
-        content: choice.message.content,
-        finish_reason: finish_reason(choice.finish_reason),
+        content: restore_stop_suffix(choice.message.content, &finish_reason),
+        finish_reason,
         usage: CompletionUsage {
             prompt_tokens: body.usage.prompt_tokens,
             completion_tokens: body.usage.completion_tokens,
@@ -143,6 +146,17 @@ fn role_name(role: Role) -> &'static str {
         Role::System => "system",
         Role::Assistant => "assistant",
         Role::User => "user",
+    }
+}
+
+fn restore_stop_suffix(content: String, finish_reason: &FinishReason) -> String {
+    if matches!(finish_reason, FinishReason::Stop)
+        && content.contains("<act>")
+        && !content.contains(ACT_CLOSE)
+    {
+        format!("{content}{ACT_CLOSE}")
+    } else {
+        content
     }
 }
 

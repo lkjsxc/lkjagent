@@ -41,6 +41,30 @@ fn graph_tools_report_state_and_record_evidence() -> TestResult<()> {
 }
 
 #[test]
+fn agent_done_refusal_points_to_missing_graph_evidence() -> TestResult<()> {
+    let workspace = temp_workspace("graph-done-refusal")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+    state.graph_state = Some("case=1\nphase=execution".to_string());
+    state.graph_completion_ready = false;
+    state.graph_missing = vec!["document-structure".to_string()];
+
+    let refused = dispatch(
+        &action("agent.done", &[("summary", "finished")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+
+    assert!(is_error(&refused));
+    assert!(refused.content.contains("graph completion refused"));
+    assert!(refused.content.contains("graph.evidence"));
+    assert!(refused.content.contains("kind=document-structure"));
+    Ok(())
+}
+
+#[test]
 fn control_tools_close_wait_and_report_errors() -> TestResult<()> {
     let workspace = temp_workspace("control")?;
     let runtime = runtime(workspace)?;

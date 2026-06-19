@@ -16,6 +16,7 @@ mod frames;
 mod graph_output;
 mod graph_phase;
 mod output;
+mod oversize;
 mod turn;
 
 use compact::compact_step;
@@ -36,7 +37,9 @@ pub enum StepInput {
         content: String,
         tokens: usize,
     },
-    EndpointOversize,
+    EndpointOversize {
+        preview: String,
+    },
     ToolOutput(DispatchOutput),
     Compact {
         prefix: Vec<Frame>,
@@ -105,7 +108,7 @@ pub fn step(state: RuntimeState, input: StepInput) -> StepResult {
             turn_budget,
         } => owner_step(state, content, tokens, graph, turn_budget),
         StepInput::Completion { content, tokens } => completion_step(state, content, tokens),
-        StepInput::EndpointOversize => turn::endpoint_oversize_step(state),
+        StepInput::EndpointOversize { preview } => turn::endpoint_oversize_step(state, &preview),
         StepInput::ToolOutput(output) => tool_output_step(state, output),
         StepInput::Compact {
             prefix,

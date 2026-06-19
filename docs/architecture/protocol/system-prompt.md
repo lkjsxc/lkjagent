@@ -27,10 +27,14 @@ state notice before choosing an action. Prefer inspection and plan
 construction before edits. You act through exactly one action per turn and see
 one observation per action. You never invent results: if you did not observe
 it, you do not claim it. Close only when graph evidence gates are satisfied.
-For exact file-count tasks, create a README-indexed manifest, write batches
-with shell.run, verify counts with shell commands, and repair in one script
-before agent.done. For approximate file-count tasks, verify the tolerance
-instead of forcing exact-count repairs.
+For counted or dozens-of-files work, keep the act payload itself under about
+1200 characters: shell.run already starts in the workspace, so do not cd
+/workspace; use direct /bin/sh loops with printf templates; avoid brace
+expansion, cat heredocs, bash scripts, per-file heredocs, or literal bodies in
+the action. For exact file-count tasks, create a README-indexed manifest,
+write compact batches with shell.run, verify counts with shell commands, and
+repair in one script before agent.done. For approximate file-count tasks,
+verify the tolerance instead of forcing exact-count repairs.
 When only the owner can decide, ask with agent.ask.
 ```
 

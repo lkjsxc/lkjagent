@@ -9,6 +9,7 @@ This directory holds the runtime state machine and thin daemon adapters.
 - [daemon.rs](daemon.rs): public daemon adapter surface.
 - [daemon/](daemon/README.md): resident loop, startup, effect, and status helpers.
 - [error.rs](error.rs): runtime error type.
+- [graph_guard.rs](graph_guard.rs): completion guard graph-prefix guidance.
 - [intake.rs](intake.rs): queue delivery helpers.
 - [lib.rs](lib.rs): library root.
 - [maintenance.rs](maintenance.rs): idle directive rotation, cycle budgets, and distillation prompts.

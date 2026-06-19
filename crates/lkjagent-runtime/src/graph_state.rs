@@ -6,9 +6,11 @@ use lkjagent_graph::{
 };
 use lkjagent_protocol::render_graph;
 use lkjagent_store::graph::{GraphCaseRow, GraphEvidenceRow, OpenCase};
+use lkjagent_tools::control::CompletionGuard;
 use rusqlite::Connection;
 
 use crate::error::RuntimeResult;
+use crate::graph_guard;
 use crate::graph_parse::{evidence_kind, family, node_id, phase, status};
 use crate::prompt::token_estimate;
 
@@ -17,7 +19,17 @@ pub fn open_owner_case(
     content: &str,
     now: &str,
 ) -> RuntimeResult<TaskGraphState> {
+    open_owner_case_with_guard(conn, content, now, CompletionGuard::None)
+}
+
+pub fn open_owner_case_with_guard(
+    conn: &Connection,
+    content: &str,
+    now: &str,
+    guard: CompletionGuard,
+) -> RuntimeResult<TaskGraphState> {
     let mut state = initial_state(content, None);
+    graph_guard::append_plan_guard(&mut state.plan, guard);
     let id = lkjagent_store::graph::open_case(conn, open_case(&state), now)?;
     state.case_id = Some(id);
     let evidence = plan_evidence();
@@ -36,13 +48,14 @@ pub fn open_owner_case(
 }
 
 pub fn prefix_graph_state(conn: &Connection) -> RuntimeResult<String> {
-    match lkjagent_store::graph::active_case(conn)? {
+    let graph = match lkjagent_store::graph::active_case(conn)? {
         Some(row) => {
             let evidence = lkjagent_store::graph::evidence_for_case(conn, row.id)?;
-            Ok(render_state(&state_from_row(row, evidence)))
+            render_state(&state_from_row(row, evidence))
         }
-        None => Ok(render_state(&idle_state())),
-    }
+        None => render_state(&idle_state()),
+    };
+    graph_guard::append_store_guard(conn, graph)
 }
 
 pub fn graph_notice_frame(state: &TaskGraphState) -> Frame {

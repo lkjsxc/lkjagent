@@ -18,7 +18,7 @@ task; the task turn budget remains the hard bound.
 | repeat action | dispatcher: byte-identical act to previous turn | notice pointing at the prior observation plus recovery instruction |
 | tool error | tool adapter | observation with status error plus a recovery instruction |
 | endpoint error | llm client | capped exponential backoff retries; nothing appended until a completion arrives |
-| completion oversize | llm client finish_reason length | error notice plus instruction to emit one short valid action |
+| completion oversize | llm client finish_reason length without a closed act | error notice with preview plus instruction to emit one short valid action |
 | endpoint overflow | llm client | treated as a harness bug: error event, compaction forced, incident memory row |
 | oversize payload | context engine | truncation per [../context/budgets.md](../context/budgets.md) with retrieval path |
 | task budget exhausted | loop | budget notice; only agent.ask or agent.done lawful next |
@@ -54,10 +54,17 @@ fault trail, and the next endpoint turn sees the latest recovery notice.
   [../../agent/honest-state.md](../../agent/honest-state.md).
 - Tool errors are never retried by the harness. The observation and recovery
   notice tell the model to inspect the failure, adjust path, command, or
-  parameters, and continue with a narrower action.
-- Completion oversize is not an endpoint outage. The daemon records it,
-  resets endpoint retry state, and appends a recovery notice telling the
-  model to emit one short act block.
+  parameters, and continue with a narrower action. For shell.run errors, the
+  observation adds targeted hints for common non-portable commands such as
+  hardcoded /workspace paths or /bin/sh brace expansion.
+- Completion oversize is not an endpoint outage. The daemon records it with
+  a bounded preview, resets endpoint retry state, and appends a recovery
+  notice telling the model to emit one short act block under about 1200
+  characters. If the preview shows a bulk write, the notice directs the next
+  action toward direct /bin/sh loops with printf templates instead of cat
+  heredocs, bash scripts, or literal file bodies, and reminds it not to cd to
+  /workspace. A length response that already contains one closed act is
+  accepted and passed to the parser.
 
 ## Status
 

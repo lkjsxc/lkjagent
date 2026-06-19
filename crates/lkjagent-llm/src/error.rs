@@ -24,6 +24,7 @@ pub enum ClientError {
     Oversize {
         usage: CompletionUsage,
         cache_metrics: Vec<CacheMetric>,
+        preview: String,
     },
 }
 
@@ -42,8 +43,14 @@ impl std::fmt::Display for ClientError {
             ClientError::EndpointOverflow { status, .. } => {
                 write!(formatter, "endpoint overflow: HTTP {status}")
             }
-            ClientError::Oversize { .. } => {
+            ClientError::Oversize { preview, .. } if preview.is_empty() => {
                 formatter.write_str("endpoint completion hit max tokens")
+            }
+            ClientError::Oversize { preview, .. } => {
+                write!(
+                    formatter,
+                    "endpoint completion hit max tokens; preview={preview}"
+                )
             }
         }
     }

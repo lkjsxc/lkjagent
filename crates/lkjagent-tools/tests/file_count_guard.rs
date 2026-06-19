@@ -101,6 +101,28 @@ fn approximate_file_count_guard_refuses_outside_tolerance() -> TestResult<()> {
 }
 
 #[test]
+fn shell_errors_hint_against_hardcoded_workspace_path() -> TestResult<()> {
+    let workspace = temp_workspace("shell-workspace-hint")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+
+    let output = dispatch(
+        &action(
+            "shell.run",
+            &[("command", "cd /workspace/definitely-missing-lkjagent")],
+        ),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+
+    assert!(is_error(&output));
+    assert!(output.content.contains("do not cd /workspace"));
+    Ok(())
+}
+
+#[test]
 fn count_guard_accepts_plain_single_root_without_readme() -> TestResult<()> {
     let workspace = temp_workspace("file-count-plain-root")?;
     let runtime = runtime(workspace.clone())?;

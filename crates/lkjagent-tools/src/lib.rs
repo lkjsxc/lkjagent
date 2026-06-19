@@ -1,6 +1,7 @@
 pub mod benchmark_seed;
 pub mod control;
 pub mod count_guard;
+pub mod count_seed;
 pub mod dispatch;
 pub mod error;
 pub mod fs;

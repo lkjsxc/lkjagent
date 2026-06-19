@@ -1,5 +1,6 @@
 pub mod daemon;
 pub mod error;
+mod graph_guard;
 mod graph_parse;
 pub mod graph_state;
 pub mod intake;
