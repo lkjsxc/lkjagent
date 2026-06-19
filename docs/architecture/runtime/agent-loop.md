@@ -74,7 +74,7 @@ turn. The scaffold profiles the owner's objective by detected language and
 broad deliverable kind, gives each main file a kind-aware segment brief, adds
 a root machine-readable audit manifest, a root acceptance-audit section, and
 a root reading path, adds a per-part role ledger to the main index, gives each
-main file a design-owner link, local verification checklist, and sequence path ledger,
+main file a design-owner link, content-bearing objective anchor, local verification checklist, and sequence path ledger,
 verifies the requested count, root index, root file budget, count-linked
 audit manifest, acceptance audit, optional directory indexes, docs coverage
 map, all design memo sections, all main-file sections, design-owner links,

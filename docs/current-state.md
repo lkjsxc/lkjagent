@@ -112,8 +112,8 @@ briefs, sequence ledgers, anchor-linked body spines, per-part content
 details, specific-detail variation blocks, draft passage blocks, and
 continuity handoffs while preserving the exact count. Root indexes keep
 operational clauses and raw counted-create wording for traceability, while
-main-file body anchors skip model-thrift clauses and trim counted-scaffold
-command wording when content-bearing anchors exist.
+main-file body anchors skip model-thrift, budget-thrift, and count-only
+structural clauses when content-bearing anchors exist.
 Docs-side scaffolds carry twenty distinct planning focus labels before
 falling back, so common 20-outline requests do not collapse into repeated
 supplemental planning notes.
