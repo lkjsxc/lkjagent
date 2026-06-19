@@ -26,7 +26,12 @@ pub fn scaffold_counted_documents(
     let profile = DeliverableProfile::from_objective(&objective);
     write_file(
         &root.join("README.md"),
-        &profile.root_readme(allocation.docs, allocation.main, &objective),
+        &profile.root_readme(
+            allocation.docs,
+            allocation.main,
+            allocation.index_files(),
+            &objective,
+        ),
     )?;
     if allocation.indexes {
         write_file(
@@ -66,6 +71,16 @@ struct Allocation {
     docs: usize,
     main: usize,
     indexes: bool,
+}
+
+impl Allocation {
+    fn index_files(&self) -> usize {
+        if self.indexes {
+            2
+        } else {
+            0
+        }
+    }
 }
 
 fn allocation_for(target: usize) -> Allocation {

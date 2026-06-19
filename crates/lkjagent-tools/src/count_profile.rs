@@ -31,14 +31,21 @@ impl DeliverableProfile {
         }
     }
 
-    pub(crate) fn root_readme(self, docs: usize, main: usize, objective: &str) -> String {
+    pub(crate) fn root_readme(
+        self,
+        docs: usize,
+        main: usize,
+        index_files: usize,
+        objective: &str,
+    ) -> String {
         let anchors = anchor_block(self.language, objective);
+        let budget = file_budget(self.language, docs, main, index_files);
         match self.language {
             Language::Japanese => format!(
-                "# 構造化成果物\n\n## 目的\n\n次の依頼に対応する複数ファイル成果物です。\n\n{objective}\n\n{anchors}\n## 目次\n\n- [docs/](docs/): 設計、継続性、検証のための設計メモ {docs} 件。\n- [main/](main/): 順序付き本編ファイル {main} 件。\n\n## 検証\n\nこの成果物は指定ファイル数に合わせて生成されています。依頼が変わらない限り、合計ファイル数を保ってください。\n"
+                "# 構造化成果物\n\n## 目的\n\n次の依頼に対応する複数ファイル成果物です。\n\n{objective}\n\n{anchors}\n## 目次\n\n- [docs/](docs/): 設計、継続性、検証のための設計メモ {docs} 件。\n- [main/](main/): 順序付き本編ファイル {main} 件。\n\n{budget}\n## 検証\n\nこの成果物は指定ファイル数に合わせて生成されています。依頼が変わらない限り、合計ファイル数を保ってください。\n"
             ),
             Language::English => format!(
-                "# Structured Output\n\n## Purpose\n\nA generated multi-file deliverable for this objective:\n\n{objective}\n\n{anchors}\n## Table of Contents\n\n- [docs/](docs/): {docs} design files for planning, continuity, and verification.\n- [main/](main/): {main} ordered main content files.\n\n## Verification\n\nThe scaffold was generated as an exact counted deliverable. Keep the total file count stable unless the owner changes the target.\n"
+                "# Structured Output\n\n## Purpose\n\nA generated multi-file deliverable for this objective:\n\n{objective}\n\n{anchors}\n## Table of Contents\n\n- [docs/](docs/): {docs} design files for planning, continuity, and verification.\n- [main/](main/): {main} ordered main content files.\n\n{budget}\n## Verification\n\nThe scaffold was generated as an exact counted deliverable. Keep the total file count stable unless the owner changes the target.\n"
             ),
         }
     }
@@ -155,4 +162,19 @@ fn detect_kind(objective: &str) -> DeliverableKind {
 
 fn contains_any(haystack: &str, needles: &[&str]) -> bool {
     needles.iter().any(|needle| haystack.contains(needle))
+}
+
+fn file_budget(language: Language, docs: usize, main: usize, index_files: usize) -> String {
+    let total = 1_usize
+        .saturating_add(index_files)
+        .saturating_add(docs)
+        .saturating_add(main);
+    match language {
+        Language::Japanese => format!(
+            "## ファイル内訳\n\n- ルート索引: 1\n- ディレクトリ索引: {index_files}\n- 設計メモ: {docs}\n- 本編ファイル: {main}\n- 合計ファイル数: {total}\n"
+        ),
+        Language::English => format!(
+            "## File Budget\n\n- Root index: 1\n- Directory indexes: {index_files}\n- Design memos: {docs}\n- Main files: {main}\n- Total files: {total}\n"
+        ),
+    }
 }
