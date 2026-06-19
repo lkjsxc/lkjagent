@@ -110,13 +110,22 @@ impl ResidentDaemon {
             self.state.task,
             TaskState::Open { .. } | TaskState::Waiting { .. }
         );
-        if starting_task {
+        let visible_task = store_state::get(conn, "open task")?;
+        let visible_maintenance = visible_task
+            .as_deref()
+            .is_some_and(|task| task.starts_with("maintenance:"));
+        if starting_task || visible_maintenance {
             store_state::set(conn, "open task", &preview(&owner.content))?;
+        }
+        let previous_guard = self.dispatch_state.control.guard;
+        if starting_task {
             self.dispatch_state.control.start_task(&owner.content);
+        } else {
+            self.dispatch_state.control.resume_task_with(&owner.content);
+        }
+        if starting_task || previous_guard != self.dispatch_state.control.guard {
             let guard = self.dispatch_state.control.guard.as_state_value();
             store_state::set(conn, "completion guard", &guard)?;
-        } else {
-            self.dispatch_state.control.resume_task();
         }
         let scaffold_docs = starting_task
             && self.dispatch_state.control.guard.is_recursive()

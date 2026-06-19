@@ -75,6 +75,11 @@ impl ControlState {
         self.question_outstanding = false;
     }
 
+    pub fn resume_task_with(&mut self, content: &str) {
+        self.resume_task();
+        self.guard = merge_guard(self.guard, classify(content));
+    }
+
     pub fn set_guard(&mut self, guard: CompletionGuard) {
         self.guard = guard;
     }
@@ -128,6 +133,25 @@ fn classify(content: &str) -> CompletionGuard {
         CompletionGuard::RecursiveStructure
     } else {
         CompletionGuard::None
+    }
+}
+
+fn merge_guard(current: CompletionGuard, next: CompletionGuard) -> CompletionGuard {
+    match (current, next) {
+        (current, CompletionGuard::None) => current,
+        (CompletionGuard::None, next) => next,
+        (CompletionGuard::MarkdownCount { .. }, CompletionGuard::MarkdownCount { .. }) => next,
+        (current, next) if guard_rank(next) > guard_rank(current) => next,
+        (current, _) => current,
+    }
+}
+
+fn guard_rank(guard: CompletionGuard) -> u8 {
+    match guard {
+        CompletionGuard::None => 0,
+        CompletionGuard::MarkdownCount { .. } => 1,
+        CompletionGuard::RecursiveStructure => 2,
+        CompletionGuard::RecursiveKnowledge => 3,
     }
 }
 
