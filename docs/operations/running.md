@@ -65,7 +65,7 @@ It records resolved defaults and non-secret runtime knobs.
 | context.trigger | 21504 | optional hard trigger; stale or unsafe values are derived from the selected window |
 | sampling.temperature | 0.3 | per [../architecture/llm/sampling.md](../architecture/llm/sampling.md) |
 | sampling.top-p | 0.9 | same |
-| task.turn-budget | 64 | per [../architecture/runtime/agent-loop.md](../architecture/runtime/agent-loop.md) |
+| task.turn-budget | 64 | endpoint turns granted to each owner task or explicit continuation |
 | daemon.lock-stale-seconds | 300 | daemon lock reclaim window; never below endpoint timeout plus 60 |
 | shell.timeout-seconds | 60 | default for shell.run, max 600 |
 
@@ -79,6 +79,10 @@ environment variable name is stored.
 a smaller live log. Values below 16384 fail with a config error. Changing
 any context budget value requires a daemon restart because the prefix cache
 and pressure policy are session state.
+
+`task.turn-budget` is read at daemon startup. Larger values let one owner
+message drive longer structured work before the harness asks for continuation
+guidance; smaller values force earlier owner checkpoints.
 
 First start writes /data/lkjagent.json from .env when LKJAGENT_MODEL is set.
 When no model exists in either .env, the host environment, or the config file,

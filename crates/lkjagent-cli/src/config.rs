@@ -5,11 +5,13 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use lkjagent_context::budget::ContextBudgetPolicy;
+use serde_json::{Map, Value};
 
 use crate::error::CliError;
 
 pub const DEFAULT_ENDPOINT_TIMEOUT_SECONDS: u64 = 180;
 pub const DEFAULT_LOCK_STALE_SECONDS: u64 = 300;
+pub const DEFAULT_TASK_TURN_BUDGET: u16 = lkjagent_runtime::task::DEFAULT_TURN_BUDGET;
 pub const CONFIG_FILE: &str = "lkjagent.json";
 
 pub const DEFAULT_CONFIG: &str = r#"{
@@ -45,6 +47,7 @@ pub struct RuntimeConfig {
     pub api_key_env: String,
     pub endpoint_timeout_seconds: u64,
     pub daemon_lock_stale_seconds: u64,
+    pub task_turn_budget: u16,
     pub context_policy: ContextBudgetPolicy,
 }
 
@@ -77,6 +80,7 @@ where
     let endpoint = json::required_object(&value, "endpoint")?;
     let daemon = json::object(&value, "daemon");
     let context = json::object(&value, "context");
+    let task = json::object(&value, "task");
     let model = env_value(&env, "LKJAGENT_MODEL")
         .or_else(|| json::string(endpoint, "model"))
         .ok_or_else(|| CliError::failure("missing endpoint.model"))?;
@@ -94,6 +98,7 @@ where
         daemon_lock_stale_seconds: daemon
             .and_then(|table| json::u64(table, "lock-stale-seconds"))
             .unwrap_or(DEFAULT_LOCK_STALE_SECONDS),
+        task_turn_budget: task_turn_budget(task)?,
         context_policy: context::policy_from_config_and_env(context, &env)?,
     }))
 }
@@ -124,8 +129,16 @@ where
         endpoint_timeout_seconds: env_u64(env, "LKJAGENT_ENDPOINT_TIMEOUT_SECONDS")?
             .unwrap_or(DEFAULT_ENDPOINT_TIMEOUT_SECONDS),
         daemon_lock_stale_seconds: DEFAULT_LOCK_STALE_SECONDS,
+        task_turn_budget: DEFAULT_TASK_TURN_BUDGET,
         context_policy: context::policy_from_config_and_env(None, env)?,
     }))
+}
+
+fn task_turn_budget(task: Option<&Map<String, Value>>) -> Result<u16, CliError> {
+    let value = task
+        .and_then(|table| json::u64(table, "turn-budget"))
+        .unwrap_or(u64::from(DEFAULT_TASK_TURN_BUDGET));
+    u16::try_from(value).map_err(|_| CliError::failure("task.turn-budget: too large"))
 }
 
 fn policy_error(error: lkjagent_context::budget::ContextBudgetError) -> CliError {

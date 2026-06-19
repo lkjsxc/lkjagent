@@ -3,16 +3,16 @@ use std::path::PathBuf;
 use lkjagent_context::budget::ContextBudgetPolicy;
 use lkjagent_llm::client::ClientConfig;
 use lkjagent_store::state as store_state;
-use lkjagent_tools::control::CompletionGuard;
 use lkjagent_tools::dispatch::{DispatchState, ToolRuntime};
 use rusqlite::Connection;
 
 use crate::error::{RuntimeError, RuntimeResult};
 use crate::graph_state::open_owner_case;
 use crate::intake;
-use crate::prompt::token_estimate;
 use crate::step::{step, StepInput};
-use crate::task::{RuntimeState, TaskState};
+use crate::task::{RuntimeState, TaskState, DEFAULT_TURN_BUDGET};
+
+use super::persisted::{next_owner_tokens, owner_preview};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DaemonTick {
@@ -30,6 +30,7 @@ pub struct ResidentRuntime {
     pub client: ClientConfig,
     pub tools: ToolRuntime,
     pub budget: ContextBudgetPolicy,
+    pub task_turn_budget: u16,
 }
 
 impl ResidentRuntime {
@@ -39,11 +40,17 @@ impl ResidentRuntime {
             client,
             tools: ToolRuntime::new(workspace, now),
             budget: ContextBudgetPolicy::default(),
+            task_turn_budget: DEFAULT_TURN_BUDGET,
         }
     }
 
     pub fn with_budget(mut self, budget: ContextBudgetPolicy) -> Self {
         self.budget = budget;
+        self
+    }
+
+    pub fn with_task_turn_budget(mut self, turn_budget: u16) -> Self {
+        self.task_turn_budget = turn_budget.max(1);
         self
     }
 }
@@ -122,7 +129,7 @@ impl ResidentDaemon {
             .as_deref()
             .is_some_and(|task| task.starts_with("maintenance:"));
         if starting_task || visible_maintenance {
-            store_state::set(conn, "open task", &preview(&owner.content))?;
+            store_state::set(conn, "open task", &owner_preview(&owner.content))?;
         }
         let previous_guard = self.dispatch_state.control.guard;
         if starting_task {
@@ -155,6 +162,7 @@ impl ResidentDaemon {
                 content: owner.content,
                 tokens: owner.tokens,
                 graph,
+                turn_budget: self.runtime.task_turn_budget,
             },
         );
         self.apply_step_result(conn, now, result, true)?;
@@ -166,33 +174,4 @@ impl ResidentDaemon {
         }
         Ok(())
     }
-}
-
-pub fn restore_completion_guard(conn: &Connection, state: &mut DispatchState) -> RuntimeResult<()> {
-    let value = store_state::get(conn, "completion guard")?.unwrap_or_else(|| "none".to_string());
-    state
-        .control
-        .set_guard(CompletionGuard::from_state_value(&value));
-    Ok(())
-}
-
-fn next_owner_tokens(conn: &Connection) -> RuntimeResult<usize> {
-    let rows = lkjagent_store::queue::list(conn)?;
-    let tokens = rows
-        .iter()
-        .find(|row| row.status == "pending")
-        .map_or(0, |row| {
-            token_estimate(&lkjagent_protocol::render_owner(&row.content))
-        });
-    Ok(tokens)
-}
-
-fn preview(content: &str) -> String {
-    let first = content
-        .lines()
-        .next()
-        .map(str::trim)
-        .filter(|line| !line.is_empty())
-        .unwrap_or("active");
-    first.chars().take(80).collect()
 }

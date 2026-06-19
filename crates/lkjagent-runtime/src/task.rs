@@ -76,12 +76,17 @@ pub enum StopReason {
 }
 
 pub fn open_task(task: &TaskState) -> TaskState {
+    open_task_with_budget(task, DEFAULT_TURN_BUDGET)
+}
+
+pub fn open_task_with_budget(task: &TaskState, turn_budget: u16) -> TaskState {
+    let budget = turn_budget.max(1);
     match task {
         TaskState::Idle | TaskState::Closed { .. } | TaskState::Waiting { .. } => TaskState::Open {
-            turns_remaining: DEFAULT_TURN_BUDGET,
+            turns_remaining: budget,
         },
         TaskState::Open { turns_remaining: 0 } => TaskState::Open {
-            turns_remaining: DEFAULT_TURN_BUDGET,
+            turns_remaining: budget,
         },
         current => current.clone(),
     }

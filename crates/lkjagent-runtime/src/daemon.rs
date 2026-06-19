@@ -22,6 +22,7 @@ mod endpoint;
 mod graph_sync;
 mod idle;
 mod maintenance_wait;
+mod persisted;
 mod pressure;
 mod record;
 mod runner;
@@ -30,7 +31,8 @@ mod startup;
 mod status;
 mod task_summary;
 
-pub use runner::{restore_completion_guard, DaemonTick, ResidentDaemon, ResidentRuntime};
+pub use persisted::restore_completion_guard;
+pub use runner::{DaemonTick, ResidentDaemon, ResidentRuntime};
 pub use startup::{build_prefix_from_store, startup_summary};
 
 pub type EndpointClientConfig = ClientConfig;
@@ -85,6 +87,14 @@ pub fn take_daemon_lock(
 }
 
 pub fn startup_state(prefix: Vec<Frame>, task_summary: Option<String>) -> RuntimeState {
+    startup_state_with_budget(prefix, task_summary, crate::task::DEFAULT_TURN_BUDGET)
+}
+
+pub fn startup_state_with_budget(
+    prefix: Vec<Frame>,
+    task_summary: Option<String>,
+    task_turn_budget: u16,
+) -> RuntimeState {
     let mut state = RuntimeState::new(ContextState::new(prefix, Vec::new()));
     if let Some(summary) = task_summary {
         let frame = Frame::new(
@@ -94,7 +104,7 @@ pub fn startup_state(prefix: Vec<Frame>, task_summary: Option<String>) -> Runtim
         );
         state.context.log.push(frame);
         state.task = TaskState::Open {
-            turns_remaining: 64,
+            turns_remaining: task_turn_budget.max(1),
         };
     }
     state

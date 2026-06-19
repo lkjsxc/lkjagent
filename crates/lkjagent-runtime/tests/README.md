@@ -19,3 +19,4 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [recovery_loop.rs](recovery_loop.rs): repeated recoverable-error daemon fixture.
 - [step.rs](step.rs): task lifecycle, recovery, and compaction fixtures.
 - [support/](support/README.md): shared state and store helpers.
+- [task_budget.rs](task_budget.rs): configured task turn budget fixtures.
