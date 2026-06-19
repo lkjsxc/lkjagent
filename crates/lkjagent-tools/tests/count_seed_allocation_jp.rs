@@ -88,3 +88,31 @@ fn count_seed_honors_japanese_character_introductions_without_file_noun() -> Tes
     assert!(readme.contains("この成果物は 物語 として監査します"));
     Ok(())
 }
+
+#[test]
+fn count_seed_honors_japanese_relationship_charts_without_file_noun() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-jp-relationship-charts")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 100,
+            mode: CountMode::Approximate,
+        },
+        "合計で百ファイルぐらいの長編小説を作ってください。二十四個の人物相関図を\
+         使い、残りは順番付きの本編章にしてください。docs と本編を合計して\
+         数えてください。Codex/Spark の使用量は抑えてください。",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert!(root.join("docs/design-024.md").exists());
+    assert!(!root.join("docs/design-025.md").exists());
+    assert!(root.join("main/part-073.md").exists());
+    assert!(!root.join("main/part-074.md").exists());
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    assert!(readme.contains("- 設計メモ: 24"));
+    assert!(readme.contains("- 本編ファイル: 73"));
+    assert!(readme.contains("この成果物は 物語 として監査します"));
+    Ok(())
+}
