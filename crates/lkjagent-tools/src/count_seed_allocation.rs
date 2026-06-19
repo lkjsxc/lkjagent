@@ -1,4 +1,6 @@
 const MAX_DESIGN_SIGNAL_DISTANCE: usize = 72;
+const MAX_LOCAL_DESIGN_DISTANCE: usize = 36;
+const MAX_LOCAL_FILE_DISTANCE: usize = 18;
 
 use crate::count_number::{number_spans, span_distance, span_matches, Span};
 
@@ -63,6 +65,9 @@ fn design_count_hint(objective: &str) -> Option<usize> {
         return None;
     }
     let file_signals = file_signal_spans(&lower, objective);
+    if let Some(hint) = local_design_file_hint(objective, &design_signals, &file_signals) {
+        return Some(hint);
+    }
     number_spans(objective)
         .into_iter()
         .filter(|number| number.value > 0)
@@ -78,6 +83,66 @@ fn design_count_hint(objective: &str) -> Option<usize> {
         })
         .min_by_key(|(score, value)| (*score, *value))
         .map(|(_, value)| value)
+}
+
+fn local_design_file_hint(
+    objective: &str,
+    design_signals: &[Span],
+    file_signals: &[Span],
+) -> Option<usize> {
+    number_spans(objective)
+        .into_iter()
+        .filter(|number| number.value > 0)
+        .filter_map(|number| {
+            local_design_file_score(objective, number.span, design_signals, file_signals)
+                .map(|score| (score, number.value))
+        })
+        .min_by_key(|(score, value)| (*score, *value))
+        .map(|(_, value)| value)
+}
+
+fn local_design_file_score(
+    objective: &str,
+    number: Span,
+    design_signals: &[Span],
+    file_signals: &[Span],
+) -> Option<usize> {
+    let mut best: Option<usize> = None;
+    for design in design_signals
+        .iter()
+        .copied()
+        .filter(|span| span.end <= number.start)
+    {
+        let design_distance = span_distance(number, design);
+        if design_distance > MAX_LOCAL_DESIGN_DISTANCE {
+            continue;
+        }
+        for file in file_signals
+            .iter()
+            .copied()
+            .filter(|span| number.end <= span.start)
+        {
+            let file_distance = span_distance(number, file);
+            if file_distance > MAX_LOCAL_FILE_DISTANCE {
+                continue;
+            }
+            if !same_clause(objective, design.end, file.start) {
+                continue;
+            }
+            let score = design_distance.saturating_add(file_distance);
+            best = Some(best.map_or(score, |current| current.min(score)));
+        }
+    }
+    best
+}
+
+fn same_clause(text: &str, start: usize, end: usize) -> bool {
+    text.get(start..end)
+        .is_some_and(|between| !between.chars().any(clause_break))
+}
+
+fn clause_break(ch: char) -> bool {
+    matches!(ch, '\n' | '\r' | '.' | ',' | ';' | '。' | '、' | '；')
 }
 
 fn closest_distance(span: Span, signals: &[Span]) -> Option<usize> {
