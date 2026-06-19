@@ -44,6 +44,7 @@ fn split_signal_spans(lower: &str) -> Vec<Span> {
         "all other documents",
         "all other docs",
         "everything else",
+        "the rest",
         "rest of the files",
         "rest of the documents",
     ] {
