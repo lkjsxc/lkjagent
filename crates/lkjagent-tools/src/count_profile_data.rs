@@ -1,4 +1,4 @@
-pub(crate) const EN_DESIGN_FOCUSES: [&str; 12] = [
+pub(crate) const EN_DESIGN_FOCUSES: [&str; 20] = [
     "scope and acceptance criteria",
     "directory map and reading order",
     "voice, format, and naming conventions",
@@ -11,9 +11,17 @@ pub(crate) const EN_DESIGN_FOCUSES: [&str; 12] = [
     "verification plan",
     "handoff notes",
     "completion summary",
+    "dependency and reference map",
+    "audience and use-case alignment",
+    "cross-file consistency pass",
+    "edge-case and recovery notes",
+    "terminology index",
+    "expansion backlog",
+    "final integration checklist",
+    "release readiness record",
 ];
 
-pub(crate) const JP_DESIGN_FOCUSES: [&str; 12] = [
+pub(crate) const JP_DESIGN_FOCUSES: [&str; 20] = [
     "範囲と受け入れ条件",
     "ディレクトリ構成と読書順",
     "文体、形式、命名規則",
@@ -26,4 +34,12 @@ pub(crate) const JP_DESIGN_FOCUSES: [&str; 12] = [
     "検証計画",
     "引き継ぎメモ",
     "完了要約",
+    "依存関係と参照地図",
+    "読者と利用場面の整合",
+    "ファイル間一貫性確認",
+    "例外と復旧メモ",
+    "用語索引",
+    "拡張バックログ",
+    "最終統合チェックリスト",
+    "公開準備記録",
 ];
