@@ -14,6 +14,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_number.rs](count_number.rs): counted wording number-span parser.
 - [count_number_kanji.rs](count_number_kanji.rs): Japanese numeric kanji helpers.
 - [count_number_words.rs](count_number_words.rs): English number-word parser.
+- [count_profile_audit.rs](count_profile_audit.rs): counted scaffold acceptance audit text.
 - [count_profile_anchor_content.rs](count_profile_anchor_content.rs): body anchor cleanup.
 - [count_profile_anchor.rs](count_profile_anchor.rs): counted scaffold requirement anchors.
 - [count_profile_body.rs](count_profile_body.rs): counted scaffold body spines.
@@ -26,6 +27,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_profile_data.rs](count_profile_data.rs): counted scaffold profile labels.
 - [count_seed.rs](count_seed.rs): counted document scaffold generator.
 - [count_seed_allocation.rs](count_seed_allocation.rs): counted scaffold file allocation.
+- [count_seed_verify.rs](count_seed_verify.rs): counted scaffold structural verifier.
 - [dispatch/](dispatch/README.md): dispatch helper modules.
 - [dispatch.rs](dispatch.rs): registry validation and tool routing.
 - [error.rs](error.rs): tool error type.

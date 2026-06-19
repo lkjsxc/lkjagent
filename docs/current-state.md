@@ -73,11 +73,12 @@ evidence for the scaffold, then saves the task summary and closes the task.
 That scaffold profiles the owner's objective by detected language and broad
 deliverable kind, so the root, docs, and main directories are README-indexed
 within the selected count guard, and the root README records the count
-breakdown plus whether the guard is exact or approximate.
+breakdown, acceptance audit, and whether the guard is exact or approximate.
 The graph evidence for that scaffold records `structured-output`, the target
 file count, index file count, design memo count, main file count, root index,
-directory index, first and last main, part-ledger status, and
-`verification=ok`, so completion can be audited after the case closes.
+directory index, acceptance-audit status, first and last main, part-ledger
+status, and `verification=ok`, so completion can be audited after the case
+closes.
 The docs index maps design memos to covered main ranges, and the main index
 maps stage ranges plus a per-part role ledger to numbered main files. Design
 and main files carry matching headings, section roles, objective anchors that
