@@ -158,6 +158,7 @@ fn assert_counted_graph_evidence(conn: &rusqlite::Connection, target: usize) -> 
                 && summary.contains("design_memos=")
                 && summary.contains("main_files=")
                 && summary.contains("file_budget=ok")
+                && summary.contains("audit_manifest=ok")
                 && summary.contains("coverage_map=ok")
                 && summary.contains("acceptance_audit=ok")
                 && summary.contains("part_ledger=ok")
@@ -181,6 +182,7 @@ fn assert_counted_task_summary(conn: &rusqlite::Connection) -> TestResult<()> {
         memory::find(conn, "file_budget", 5)?.iter().any(|row| {
             row.kind == "task-summary"
                 && row.content.contains("file_budget=ok")
+                && row.content.contains("audit_manifest=ok")
                 && row.content.contains("acceptance_audit=ok")
                 && row.content.contains("verification=ok")
         }),
