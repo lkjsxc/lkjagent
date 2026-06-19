@@ -2,7 +2,7 @@ use crate::count_profile_anchor::{anchor_block, anchor_for_part};
 use crate::count_profile_body::{body_text, handoff_text, main_title, sequence_text};
 use crate::count_profile_data::{EN_DESIGN_FOCUSES, JP_DESIGN_FOCUSES};
 use crate::count_profile_design::design_text;
-use crate::count_profile_index::{file_budget, main_map};
+use crate::count_profile_index::{docs_map, file_budget, main_map};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct DeliverableProfile {
@@ -53,12 +53,13 @@ impl DeliverableProfile {
 
     pub(crate) fn docs_readme(self, docs: usize, main: usize, objective: &str) -> String {
         let anchors = anchor_block(self.language, objective);
+        let map = docs_map(self.language, docs, main);
         match self.language {
             Language::Japanese => format!(
-                "# docs\n\n## 目的\n\n設計、継続性、検証条件を整理する索引です。\n\n{anchors}\n## 構成\n\n- 設計メモ数: {docs}\n- 対象本編数: {main}\n- 各設計メモは担当範囲、設計タスク、検証観点を持ちます。\n\n## 依頼文\n\n{objective}\n"
+                "# docs\n\n## 目的\n\n設計、継続性、検証条件を整理する索引です。\n\n{anchors}\n## 構成\n\n- 設計メモ数: {docs}\n- 対象本編数: {main}\n- 各設計メモは担当範囲、設計タスク、検証観点を持ちます。\n\n{map}\n## 依頼文\n\n{objective}\n"
             ),
             Language::English => format!(
-                "# docs\n\n## Purpose\n\nIndex for design, continuity, and verification conditions.\n\n{anchors}\n## Structure\n\n- Design memo count: {docs}\n- Covered main files: {main}\n- Each design memo carries coverage, design work, and verification checks.\n\n## Objective Context\n\n{objective}\n"
+                "# docs\n\n## Purpose\n\nIndex for design, continuity, and verification conditions.\n\n{anchors}\n## Structure\n\n- Design memo count: {docs}\n- Covered main files: {main}\n- Each design memo carries coverage, design work, and verification checks.\n\n{map}\n## Objective Context\n\n{objective}\n"
             ),
         }
     }

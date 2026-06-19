@@ -51,10 +51,11 @@ evidence for the scaffold, then saves the task summary and closes the task.
 That scaffold profiles the owner's objective by detected language and broad
 deliverable kind, so the root, docs, and main directories are README-indexed
 within the exact count, and the root README records the count breakdown.
-The main index also maps stage ranges to numbered main files. Design and main
-files carry matching headings, section roles, objective anchors, main-range
-coverage, sequence ledgers, anchor-linked body spines, per-part content
-details, and continuity handoffs while preserving the exact count.
+The docs index maps design memos to covered main ranges, and the main index
+maps stage ranges to numbered main files. Design and main files carry matching
+headings, section roles, objective anchors, main-range coverage, sequence
+ledgers, anchor-linked body spines, per-part content details, and continuity
+handoffs while preserving the exact count.
 Runtime recovery still uses bounded notices for parse errors, repeated
 actions, tool errors, endpoint max-token exits, budget exhaustion, and context
 pressure; graph recovery nodes are present as the structured target for the
