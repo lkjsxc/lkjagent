@@ -42,7 +42,7 @@ pub fn render_config(config: &RuntimeConfig) -> Result<String, CliError> {
         },
         "context": {
             "window": 32768,
-            "reserve": 1024,
+            "reserve": 2048,
             "trigger": 28672
         },
         "sampling": {

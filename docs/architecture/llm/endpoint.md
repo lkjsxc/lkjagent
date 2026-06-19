@@ -29,7 +29,7 @@ The harness sends exactly these fields and no others:
 | --- | --- | --- |
 | model | configured model name | selects the model on a server that may host several |
 | messages | system, user, assistant; plain-string content | frame mapping per [layout.md](../context/layout.md) |
-| max_tokens | 1024 | the generation reserve in [layout.md](../context/layout.md) |
+| max_tokens | 2048 | the generation reserve in [layout.md](../context/layout.md) |
 | temperature | 0.3 | precision over creativity, per [sampling.md](sampling.md) |
 | top_p | 0.9 | per [sampling.md](sampling.md) |
 | stream | false | whole completions only, see below |

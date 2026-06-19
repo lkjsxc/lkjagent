@@ -61,7 +61,7 @@ It records resolved defaults and non-secret runtime knobs.
 | endpoint.api-key-env | LKJAGENT_API_KEY | name of the env var holding the key, when one is needed |
 | endpoint.timeout-seconds | 180 | request timeout; LKJAGENT_ENDPOINT_TIMEOUT_SECONDS overrides |
 | context.window | 32768 | total token window the budgets divide |
-| context.reserve | 1024 | generation headroom, also max_tokens |
+| context.reserve | 2048 | generation headroom, also max_tokens |
 | context.trigger | 28672 | compaction trigger per [../architecture/context/budgets.md](../architecture/context/budgets.md) |
 | sampling.temperature | 0.3 | per [../architecture/llm/sampling.md](../architecture/llm/sampling.md) |
 | sampling.top-p | 0.9 | same |

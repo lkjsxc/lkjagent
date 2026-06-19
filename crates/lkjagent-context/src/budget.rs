@@ -1,5 +1,5 @@
 pub const WINDOW_TOKENS: usize = 32_768;
-pub const GENERATION_RESERVE: usize = 1_024;
+pub const GENERATION_RESERVE: usize = 2_048;
 pub const PREFIX_IDENTITY: usize = 768;
 pub const PREFIX_GRAMMAR_REGISTRY: usize = 1_024;
 pub const PREFIX_SKILL_INDEX: usize = 512;

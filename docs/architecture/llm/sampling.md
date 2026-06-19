@@ -11,7 +11,7 @@ rationale for each, and the rule that they stay constant within a session.
 | --- | --- |
 | temperature | 0.3 |
 | top_p | 0.9 |
-| max_tokens | 1024 |
+| max_tokens | 2048 |
 
 ## Rationale
 
@@ -21,7 +21,7 @@ rationale for each, and the rule that they stay constant within a session.
   text before committing, so low temperature does not starve deliberation.
 - top_p 0.9: trims the improbable tail without narrowing ordinary word
   choice; it backstops the low temperature rather than competing with it.
-- max_tokens 1024: the generation reserve from
+- max_tokens 2048: the generation reserve from
   [layout.md](../context/layout.md). One think preamble plus one act block
   fits; a completion that hits this limit is the oversize case in
   [../protocol/recovery.md](../protocol/recovery.md).

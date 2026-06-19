@@ -17,7 +17,7 @@ fn budget_constants_match_the_doc_table() {
         );
     }
     assert_eq!(budget::prefix_cap_total(), 5_376);
-    assert_eq!(budget::initial_log_space(), 26_368);
+    assert_eq!(budget::initial_log_space(), 25_344);
     assert!(budget::config_preserves_log_floor(
         budget::WINDOW_TOKENS,
         budget::prefix_cap_total(),

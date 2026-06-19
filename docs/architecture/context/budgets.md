@@ -11,7 +11,7 @@ window.
 
 | Region | Cap (tokens) | Owner | On overflow |
 | --- | --- | --- | --- |
-| generation reserve | 1,024 | harness | never occupied; subtracted first |
+| generation reserve | 2,048 | harness | never occupied; subtracted first |
 | prefix: identity and rules | 768 | [../protocol/system-prompt.md](../protocol/system-prompt.md) | build-time check fails |
 | prefix: grammar and tool registry | 1,024 | [../protocol/system-prompt.md](../protocol/system-prompt.md) | build-time check fails |
 | prefix: skill index | 512 | [../skills/loading.md](../skills/loading.md) | oldest-stamped entries drop to name-only |
@@ -31,7 +31,7 @@ window.
 - Truncation is always marked with a notice naming what was cut and how to
   retrieve the rest (a ranged fs.read, a narrower shell command, a
   memory.find query).
-- The prefix total (5,376 max) plus reserve leaves at least 26,368 tokens of
+- The prefix total (5,376 max) plus reserve leaves at least 25,344 tokens of
   log space at the initial values; the context engine asserts this at
   startup and refuses configs that starve the log below 16,384.
 - Budget arithmetic lives in pure functions in lkjagent-context with
