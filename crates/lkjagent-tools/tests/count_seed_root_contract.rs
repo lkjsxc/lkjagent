@@ -31,6 +31,7 @@ fn count_seed_root_audit_matches_generated_counts() -> TestResult<()> {
     assert!(readme.contains("- local_verification: required"));
     assert!(readme.contains("- reading_path: required"));
     assert!(readme.contains("- sequence_paths: required"));
+    assert!(readme.contains("- closure_reason: deterministic_scaffold"));
     assert!(readme.contains("## Reading Path"));
     assert!(readme.contains("- First main: main/part-001.md"));
     assert!(readme.contains("- Last main: main/part-085.md"));
@@ -51,6 +52,7 @@ fn count_seed_root_audit_matches_generated_counts() -> TestResult<()> {
     assert!(report.contains("design_owner_links=ok"));
     assert!(report.contains("local_verification=ok"));
     assert!(report.contains("reading_path=ok"));
+    assert!(report.contains("closure_reason=deterministic_scaffold"));
     Ok(())
 }
 
@@ -80,11 +82,13 @@ fn count_seed_root_manifest_marks_empty_scopes_as_not_applicable() -> TestResult
     assert!(readme.contains("- local_verification: n/a"));
     assert!(readme.contains("- reading_path: n/a"));
     assert!(readme.contains("- sequence_paths: n/a"));
+    assert!(readme.contains("- closure_reason: deterministic_scaffold"));
     assert!(readme.contains("No main files exist"));
     assert!(report.contains("audit_manifest=ok"));
     assert!(report.contains("restart_guide=ok"));
     assert!(report.contains("design_owner_links=n/a"));
     assert!(report.contains("local_verification=n/a"));
     assert!(report.contains("reading_path=n/a"));
+    assert!(report.contains("closure_reason=deterministic_scaffold"));
     Ok(())
 }

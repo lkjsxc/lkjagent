@@ -87,9 +87,10 @@ acceptance-audit status, coverage-map status, first and last main, `index_scope=
 `section_scope=all`, content-block status, required design-section status,
 required main-section status, part-ledger status, explicit design-owner-link
 status, explicit local-verification status, explicit root reading-path status,
-explicit sequence-path status, and `verification=ok`, so completion can be
-audited after the case closes. The same normalized evidence is saved into the
-task-summary memory for startup and compaction recovery.
+explicit sequence-path status, deterministic scaffold closure reason, and
+`verification=ok`, so completion can be audited after the case closes. The
+same normalized evidence is saved into task-summary memory for startup and
+compaction recovery.
 The root index includes a restart guide that names README.md, docs/README.md,
 main/README.md, design-owner links, local verification, sequence ledgers, and
 the stable file-count rule when content exists. It also includes a reading

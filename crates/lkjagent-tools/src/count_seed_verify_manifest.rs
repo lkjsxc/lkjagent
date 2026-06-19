@@ -95,6 +95,11 @@ pub(crate) fn verify_audit_manifest(
     )?;
     require_manifest_line(
         root_index,
+        "- closure_reason: deterministic_scaffold",
+        "audit manifest closure reason",
+    )?;
+    require_manifest_line(
+        root_index,
         "- completion: ready",
         "audit manifest completion",
     )?;

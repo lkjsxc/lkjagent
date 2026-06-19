@@ -30,6 +30,6 @@ pub(crate) fn audit_manifest(
         Language::English => "## Audit Manifest",
     };
     format!(
-        "{heading}\n\n- root: structured-output\n- files: {total}\n- index_files: {index_files}\n- design_memos: {docs}\n- main_files: {main}\n- index_scope: {index_scope}\n- section_scope: all\n- content_blocks: {content_blocks}\n- restart_guide: required\n- design_owner_links: {design_owner_links}\n- local_verification: {local_verification}\n- reading_path: {reading_path}\n- sequence_paths: {sequence_paths}\n- completion: ready\n"
+        "{heading}\n\n- root: structured-output\n- files: {total}\n- index_files: {index_files}\n- design_memos: {docs}\n- main_files: {main}\n- index_scope: {index_scope}\n- section_scope: all\n- content_blocks: {content_blocks}\n- restart_guide: required\n- design_owner_links: {design_owner_links}\n- local_verification: {local_verification}\n- reading_path: {reading_path}\n- sequence_paths: {sequence_paths}\n- closure_reason: deterministic_scaffold\n- completion: ready\n"
     )
 }
