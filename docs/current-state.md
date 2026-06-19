@@ -62,8 +62,8 @@ The docs index maps design memos to covered main ranges, and the main index
 maps stage ranges to numbered main files. Design and main files carry matching
 headings, section roles, objective anchors that preserve model-number decimal
 tokens, main-range coverage, sequence ledgers, anchor-linked body spines,
-per-part content details, and continuity handoffs while preserving the exact
-count.
+per-part content details, draft passage blocks, and continuity handoffs while
+preserving the exact count.
 Runtime recovery still uses bounded notices for parse errors, repeated
 actions, tool errors, endpoint max-token exits, budget exhaustion, and context
 pressure; graph recovery nodes are present as the structured target for the
