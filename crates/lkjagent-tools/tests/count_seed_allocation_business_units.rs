@@ -28,6 +28,27 @@ fn count_seed_honors_risk_registers_without_file_noun() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn count_seed_honors_control_mappings_without_file_noun() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-control-mappings")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        file_guard(),
+        "Create about one hundred files total for a security compliance dossier. Use \
+         twenty-four control mappings. The rest as ordered compliance sections. Count docs and \
+         main content together. Keep Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert_counts(&root, 24, 73, "report")?;
+    assert!(root.join("docs/design-024.md").exists());
+    assert!(!root.join("docs/design-025.md").exists());
+    assert!(root.join("main/part-073.md").exists());
+    assert!(!root.join("main/part-074.md").exists());
+    Ok(())
+}
+
 fn file_guard() -> CountGuard {
     CountGuard {
         kind: CountKind::File,
