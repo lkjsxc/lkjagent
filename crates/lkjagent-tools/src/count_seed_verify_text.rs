@@ -1,16 +1,5 @@
 use crate::error::{ToolError, ToolResult};
 
-pub(crate) fn verify_acceptance_audit(root_index: &str) -> ToolResult<&'static str> {
-    if root_index.contains("## Acceptance Audit") || root_index.contains("## 受入監査") {
-        require_contains(root_index, "README.md", "acceptance audit entry point")?;
-        Ok("ok")
-    } else {
-        Err(ToolError::invalid(
-            "counted document scaffold missing acceptance audit",
-        ))
-    }
-}
-
 pub(crate) fn verify_coverage_map(
     docs_index: Option<&str>,
     docs: usize,

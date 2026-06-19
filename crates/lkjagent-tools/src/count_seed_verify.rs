@@ -1,11 +1,10 @@
 use std::fs;
 use std::path::Path;
 
-use crate::count_seed_verify_root::verify_file_budget;
+use crate::count_seed_verify_root::{verify_acceptance_audit, verify_file_budget};
 use crate::count_seed_verify_text::{
-    verify_acceptance_audit, verify_coverage_map, verify_design_file_content,
-    verify_design_file_sections, verify_main_file_content, verify_main_file_sections,
-    verify_part_ledger,
+    verify_coverage_map, verify_design_file_content, verify_design_file_sections,
+    verify_main_file_content, verify_main_file_sections, verify_part_ledger,
 };
 use crate::error::{ToolError, ToolResult};
 
@@ -40,7 +39,7 @@ pub(crate) fn verify_scaffold(
         )));
     }
     let root_text = require_text(&root.join("README.md"), "root index")?;
-    let acceptance_audit = verify_acceptance_audit(&root_text)?;
+    let acceptance_audit = verify_acceptance_audit(&root_text, docs, main)?;
     let file_budget = verify_file_budget(&root_text, target, docs, main, index_count(indexes))?;
     let design_sections = verify_design_files(root, docs, main > 0)?;
     let main_sections = verify_main_files(root, main)?;
