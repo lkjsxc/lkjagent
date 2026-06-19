@@ -1,6 +1,7 @@
 use std::fs;
 use std::path::Path;
 
+use crate::count_seed_verify_restart::verify_restart_guide;
 use crate::count_seed_verify_root::{
     verify_acceptance_audit, verify_audit_manifest, verify_file_budget,
 };
@@ -19,6 +20,7 @@ pub(crate) struct ScaffoldCheck {
     pub(crate) file_budget: &'static str,
     pub(crate) audit_manifest: &'static str,
     pub(crate) acceptance_audit: &'static str,
+    pub(crate) restart_guide: &'static str,
     pub(crate) part_ledger: &'static str,
     pub(crate) index_scope: &'static str,
     pub(crate) content_blocks: &'static str,
@@ -47,6 +49,7 @@ pub(crate) fn verify_scaffold(
     let file_budget = verify_file_budget(&root_text, target, docs, main, index_count(indexes))?;
     let audit_manifest =
         verify_audit_manifest(&root_text, target, docs, main, index_count(indexes))?;
+    let restart_guide = verify_restart_guide(&root_text, index_count(indexes), main)?;
     let design_sections = verify_design_files(root, docs, main > 0)?;
     let main_sections = verify_main_files(root, docs, main)?;
     let sequence_paths = main_sections;
@@ -77,6 +80,7 @@ pub(crate) fn verify_scaffold(
         file_budget,
         audit_manifest,
         acceptance_audit,
+        restart_guide,
         part_ledger,
         index_scope,
         content_blocks,

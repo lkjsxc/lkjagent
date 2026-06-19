@@ -31,9 +31,15 @@ fn count_seed_root_audit_matches_generated_counts() -> TestResult<()> {
     assert!(readme.contains("Main coverage: 85 main files"));
     assert!(readme.contains("Content contract: every main file carries"));
     assert!(readme.contains("Kind contract: audit this deliverable as a narrative"));
+    assert!(readme.contains("## Restart Guide"));
+    assert!(readme.contains("docs/README.md"));
+    assert!(readme.contains("main/README.md"));
+    assert!(readme.contains("Design owner"));
+    assert!(readme.contains("Sequence Ledger"));
     assert!(report.contains("audit_manifest=ok"));
     assert!(report.contains("acceptance_audit=ok"));
     assert!(report.contains("file_budget=ok"));
+    assert!(report.contains("restart_guide=ok"));
     Ok(())
 }
 
@@ -58,6 +64,8 @@ fn count_seed_root_manifest_marks_empty_scopes_as_not_applicable() -> TestResult
     assert!(readme.contains("- main_files: 0"));
     assert!(readme.contains("- index_scope: n/a"));
     assert!(readme.contains("- content_blocks: n/a"));
+    assert!(readme.contains("No main files exist"));
     assert!(report.contains("audit_manifest=ok"));
+    assert!(report.contains("restart_guide=ok"));
     Ok(())
 }
