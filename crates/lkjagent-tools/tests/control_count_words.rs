@@ -77,6 +77,39 @@ fn not_precisely_file_count_request_stays_approximate() {
 }
 
 #[test]
+fn no_need_to_be_exact_file_count_request_stays_approximate() {
+    let mut state = ControlState::default();
+
+    state
+        .start_task("Create about 100 files total for docs and main content; no need to be exact.");
+
+    assert_eq!(
+        state.guard,
+        CompletionGuard::FileCount {
+            target: 100,
+            mode: CountMode::Approximate
+        }
+    );
+}
+
+#[test]
+fn does_not_have_to_be_exact_file_count_request_stays_approximate() {
+    let mut state = ControlState::default();
+
+    state.start_task(
+        "Create around 100 files total for docs and main content; it doesn't have to be exact.",
+    );
+
+    assert_eq!(
+        state.guard,
+        CompletionGuard::FileCount {
+            target: 100,
+            mode: CountMode::Approximate
+        }
+    );
+}
+
+#[test]
 fn aggregate_total_count_beats_outline_file_subcount() {
     let mut state = ControlState::default();
 
