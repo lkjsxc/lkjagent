@@ -30,6 +30,12 @@ fn parse_from(tokens: &[Token], start: usize) -> Option<(usize, usize)> {
     let mut consumed = false;
     let mut scaled = false;
     while let Some(token) = tokens.get(index) {
+        if article_scale_start(tokens, index) && !consumed {
+            current = 1;
+            consumed = true;
+            index = index.saturating_add(1);
+            continue;
+        }
         if token.word == "and" && consumed && next_is_number(tokens, index.saturating_add(1)) {
             index = index.saturating_add(1);
             continue;
@@ -59,6 +65,15 @@ fn parse_from(tokens: &[Token], start: usize) -> Option<(usize, usize)> {
     let value = total.saturating_add(current);
     let multi_word = end > start;
     (scaled || multi_word || value <= 20 || value.is_multiple_of(10)).then_some((end, value))
+}
+
+fn article_scale_start(tokens: &[Token], index: usize) -> bool {
+    tokens.get(index).is_some_and(|token| {
+        matches!(token.word.as_str(), "a" | "an")
+            && tokens
+                .get(index.saturating_add(1))
+                .is_some_and(|next| matches!(next.word.as_str(), "hundred" | "thousand"))
+    })
 }
 
 fn next_is_number(tokens: &[Token], index: usize) -> bool {
