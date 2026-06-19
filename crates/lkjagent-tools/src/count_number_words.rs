@@ -75,13 +75,16 @@ fn parse_from(tokens: &[Token], start: usize) -> Option<(usize, usize)> {
 }
 
 fn bare_scale_start(token: &Token) -> bool {
-    matches!(token.word.as_str(), "hundred" | "thousand")
+    matches!(
+        token.word.as_str(),
+        "hundred" | "hundreds" | "thousand" | "thousands"
+    )
 }
 
 fn scale_value(word: &str) -> Option<usize> {
     match word {
-        "hundred" => Some(100),
-        "thousand" => Some(1000),
+        "hundred" | "hundreds" => Some(100),
+        "thousand" | "thousands" => Some(1000),
         _ => None,
     }
 }
