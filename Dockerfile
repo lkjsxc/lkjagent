@@ -40,8 +40,6 @@ RUN apt-get update \
     && chmod +x /usr/local/bin/lkjagent-entrypoint
 
 COPY --from=build /src/target/release/lkjagent /usr/local/bin/lkjagent
-COPY --from=build /src/crates/lkjagent-skills/seeds \
-    /usr/local/share/lkjagent/skills
 
 WORKDIR /
 ENTRYPOINT ["/usr/local/bin/lkjagent-entrypoint"]
