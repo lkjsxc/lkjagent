@@ -26,6 +26,8 @@ fn count_seed_root_audit_matches_generated_counts() -> TestResult<()> {
     assert!(readme.contains("- index_files: 2"));
     assert!(readme.contains("- design_memos: 12"));
     assert!(readme.contains("- main_files: 85"));
+    assert!(readme.contains("- restart_guide: required"));
+    assert!(readme.contains("- sequence_paths: required"));
     assert!(readme.contains("- completion: ready"));
     assert!(readme.contains("Design coverage: 12 design memos"));
     assert!(readme.contains("Main coverage: 85 main files"));
@@ -64,6 +66,8 @@ fn count_seed_root_manifest_marks_empty_scopes_as_not_applicable() -> TestResult
     assert!(readme.contains("- main_files: 0"));
     assert!(readme.contains("- index_scope: n/a"));
     assert!(readme.contains("- content_blocks: n/a"));
+    assert!(readme.contains("- restart_guide: required"));
+    assert!(readme.contains("- sequence_paths: n/a"));
     assert!(readme.contains("No main files exist"));
     assert!(report.contains("audit_manifest=ok"));
     assert!(report.contains("restart_guide=ok"));

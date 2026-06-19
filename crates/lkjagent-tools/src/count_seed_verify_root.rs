@@ -108,6 +108,7 @@ pub(crate) fn verify_audit_manifest(
         "n/a"
     };
     let content_blocks = if has_content { "required" } else { "n/a" };
+    let sequence_paths = if main > 0 { "required" } else { "n/a" };
     require_budget_line(
         root_index,
         "- root: structured-output",
@@ -155,6 +156,18 @@ pub(crate) fn verify_audit_manifest(
         &format!("- content_blocks: {content_blocks}"),
         &format!("- content_blocks: {content_blocks}"),
         "audit manifest content blocks",
+    )?;
+    require_budget_line(
+        root_index,
+        "- restart_guide: required",
+        "- restart_guide: required",
+        "audit manifest restart guide",
+    )?;
+    require_budget_line(
+        root_index,
+        &format!("- sequence_paths: {sequence_paths}"),
+        &format!("- sequence_paths: {sequence_paths}"),
+        "audit manifest sequence paths",
     )?;
     require_budget_line(
         root_index,
