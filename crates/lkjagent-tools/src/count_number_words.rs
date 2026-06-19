@@ -30,6 +30,13 @@ fn parse_from(tokens: &[Token], start: usize) -> Option<(usize, usize)> {
     let mut consumed = false;
     let mut scaled = false;
     while let Some(token) = tokens.get(index) {
+        if bare_scale_start(token) && !consumed {
+            current = scale_value(&token.word)?;
+            consumed = true;
+            scaled = true;
+            index = index.saturating_add(1);
+            continue;
+        }
         if article_scale_start(tokens, index) && !consumed {
             current = 1;
             consumed = true;
@@ -65,6 +72,18 @@ fn parse_from(tokens: &[Token], start: usize) -> Option<(usize, usize)> {
     let value = total.saturating_add(current);
     let multi_word = end > start;
     (scaled || multi_word || value <= 20 || value.is_multiple_of(10)).then_some((end, value))
+}
+
+fn bare_scale_start(token: &Token) -> bool {
+    matches!(token.word.as_str(), "hundred" | "thousand")
+}
+
+fn scale_value(word: &str) -> Option<usize> {
+    match word {
+        "hundred" => Some(100),
+        "thousand" => Some(1000),
+        _ => None,
+    }
 }
 
 fn article_scale_start(tokens: &[Token], index: usize) -> bool {
