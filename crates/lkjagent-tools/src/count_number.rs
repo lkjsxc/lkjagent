@@ -44,6 +44,8 @@ pub(crate) fn number_spans(text: &str) -> Vec<NumberSpan> {
     }
     save_digit_number(&mut values, &mut digits, digit_start, digit_end);
     save_kanji_number(&mut values, &mut kanji, kanji_start, kanji_end, None);
+    values.extend(crate::count_number_words::number_spans(text));
+    values.sort_by_key(|number| number.span.start);
     values
 }
 
