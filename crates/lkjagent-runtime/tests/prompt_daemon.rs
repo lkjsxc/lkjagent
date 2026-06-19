@@ -1,20 +1,18 @@
 mod support;
 
-use std::fs;
-
 use lkjagent_context::budget::{
     PREFIX_GRAMMAR_REGISTRY, PREFIX_IDENTITY, PREFIX_MEMORY_DIGEST, PREFIX_SKILL_INDEX,
     PREFIX_WORKSPACE_BRIEF,
 };
 use lkjagent_context::model::{FrameKind, PrefixSection};
 use lkjagent_runtime::daemon::{
-    request_shutdown, seed_skill_library, startup_state, take_daemon_lock, ShutdownDecision,
-    ShutdownState, Signal, StartupLock,
+    request_shutdown, startup_state, take_daemon_lock, ShutdownDecision, ShutdownState, Signal,
+    StartupLock,
 };
 use lkjagent_runtime::prompt::{build_prefix, PromptInputs};
 use lkjagent_runtime::task::TaskState;
 use lkjagent_store::events::read_events;
-use support::{prefix, store, temp_workspace, TestResult};
+use support::{prefix, store, TestResult};
 
 #[test]
 fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
@@ -26,6 +24,12 @@ fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
     let first = build_prefix(&inputs)?;
     let second = build_prefix(&inputs)?;
     assert_eq!(first, second);
+    assert!(first.iter().any(|frame| frame
+        .content
+        .contains("continue with a\nnarrower action instead of agent.done")));
+    assert!(first.iter().any(|frame| frame
+        .content
+        .contains("follow the maintenance notice's bounded work")));
     for frame in first {
         let cap = match frame.kind {
             FrameKind::Prefix(PrefixSection::Identity) => PREFIX_IDENTITY,
@@ -72,25 +76,6 @@ fn daemon_lock_takes_refuses_and_records_reclaim_notice() -> TestResult<()> {
     assert!(events
         .iter()
         .any(|event| event.content.contains("reclaimed stale daemon lock")));
-    Ok(())
-}
-
-#[test]
-fn seed_skill_library_copies_empty_dir_without_overwriting() -> TestResult<()> {
-    let root = temp_workspace("seed-copy")?;
-    let source = root.join("source");
-    let target = root.join("target");
-    fs::create_dir_all(&source)?;
-    fs::write(source.join("seed.md"), "seed body")?;
-
-    seed_skill_library(&target, &root.join("missing-image"), &source)?;
-    assert_eq!(fs::read_to_string(target.join("seed.md"))?, "seed body");
-
-    fs::write(target.join("seed.md"), "custom body")?;
-    fs::write(source.join("other.md"), "other body")?;
-    seed_skill_library(&target, &root.join("missing-image"), &source)?;
-    assert_eq!(fs::read_to_string(target.join("seed.md"))?, "custom body");
-    assert!(!target.join("other.md").exists());
     Ok(())
 }
 

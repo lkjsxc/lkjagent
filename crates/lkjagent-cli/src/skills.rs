@@ -3,10 +3,10 @@ use std::fs;
 use std::path::Path;
 
 use crate::error::CliError;
-use crate::store::skill_dir;
+use crate::paths::skill_library;
 
-pub fn skills(data_dir: &Path) -> Result<String, CliError> {
-    let root = skill_dir(data_dir);
+pub fn skills() -> Result<String, CliError> {
+    let root = skill_library();
     let known = known_paths(&root)?;
     let mut lines = Vec::new();
     for path in &known {
@@ -18,10 +18,10 @@ pub fn skills(data_dir: &Path) -> Result<String, CliError> {
         };
         if let Ok(skill) = lkjagent_skills::validate::parse(&source) {
             lines.push(format!(
-                "name={} trigger={} last_refined={}",
+                "name={} trigger={} modified_at={}",
                 skill.name,
                 skill.trigger,
-                last_refined(Path::new(path))
+                modified_at(Path::new(path))
             ));
         }
     }
@@ -47,7 +47,7 @@ fn known_paths(root: &Path) -> Result<BTreeSet<String>, CliError> {
     Ok(paths)
 }
 
-fn last_refined(path: &Path) -> String {
+fn modified_at(path: &Path) -> String {
     fs::metadata(path)
         .and_then(|metadata| metadata.modified())
         .ok()

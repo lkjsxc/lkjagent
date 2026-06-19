@@ -73,7 +73,7 @@ Key-value runtime state: key TEXT PRIMARY KEY, value TEXT.
 
 | Key | Holds |
 | --- | --- |
-| daemon lock | holder pid, start time, and heartbeat per [../runtime/daemon-process.md](../runtime/daemon-process.md) |
+| daemon lock | holder id, start time, and heartbeat per [../runtime/daemon-process.md](../runtime/daemon-process.md) |
 | daemon state | idle, working, waiting, or error |
 | daemon question | outstanding agent.ask text, if any |
 | daemon error | latest endpoint or loop error, if any |
@@ -107,8 +107,8 @@ the fixed reason `owner-send`.
 
 ## Deliberately Not Stored
 
-- Skills: markdown files in the skill library directory at /data/skills.
-  The store holds only their index stamps.
+- Skills: markdown files in the source-owned skill library. The store holds
+  only their index stamps.
 - Config: data/lkjagent.json on disk, never mirrored into tables.
 - The endpoint API key: it arrives by environment variable per
   [../sandbox/container.md](../sandbox/container.md) and is never written

@@ -30,6 +30,25 @@ The agent workspace is /data/workspace inside the container and
 LKJAGENT_DATA_DIR/workspace on the host. The default host path is
 ./data/workspace.
 
+## Fresh Docker Trial
+
+```sh
+rm -rf data
+mkdir -p data
+docker compose up -d --build agent
+docker compose run --rm agent status
+docker compose run --rm agent skills
+docker compose run --rm agent send "Create hello.md with a short hello."
+docker compose run --rm agent log
+find data/workspace -maxdepth 2 -type f -print
+```
+
+This leaves the host data directory empty before first start. The daemon then
+creates only clean runtime files under /data: config, store, and workspace. A
+fresh workspace is intentionally empty until an owner message is sent and the
+agent writes files for that task. Skills remain image- or source-owned and are
+not copied into /data.
+
 ## Runtime Config
 
 The runtime config file is /data/lkjagent.json, read once at daemon startup.
@@ -72,17 +91,18 @@ docker compose run --rm agent status
 
 The agent service is the resident daemon. Console, send, log, status,
 memory, and skills commands run as short-lived containers that use the same
-/data bind mount. Stopping the service relies on durable store state and
-stale lock reclaim; there is no custom signal-drain path.
+/data bind mount for store, config, and workspace; skills are read from
+image or source paths. Stopping the service relies on durable store state
+and stale lock reclaim; there is no custom signal-drain path.
 
 ## Backup and Reset
 
-- Back up: snapshot LKJAGENT_DATA_DIR (store, skill library, workspace, and
-  config); all are ordinary files.
-- Reset memory but keep skills: delete the store file while stopped; the
-  queue and transcripts go with it, deliberately.
-- Full reset: remove the host data directory; first start reseeds skills per
-  [../architecture/skills/library.md](../architecture/skills/library.md).
+- Back up: snapshot LKJAGENT_DATA_DIR (store, workspace, and config); all
+  are ordinary files.
+- Reset memory: delete the store file while stopped; the queue and
+  transcripts go with it, deliberately.
+- Full reset: remove the host data directory; first start recreates config
+  and workspace while skills still come from source or image paths.
 
 ## Status
 

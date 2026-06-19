@@ -1,9 +1,8 @@
 mod support;
 
 use std::fs;
-use std::path::Path;
 
-use lkjagent_runtime::daemon::{build_prefix_from_store, seed_skill_library};
+use lkjagent_runtime::daemon::build_prefix_from_store;
 use lkjagent_tools::dispatch::dispatch;
 use lkjagent_tools::observe::OutputKind;
 use support::{action, dispatch_state, store, temp_workspace, tool_runtime, TestResult};
@@ -16,8 +15,6 @@ fn recursive_structure_seed_loads_and_drives_indexed_tree() -> TestResult<()> {
         "# AGENTS.md\n\n## Purpose\n\nTest workspace rules.\n",
     )?;
     let runtime = tool_runtime(workspace.clone())?;
-    let seed = Path::new(env!("CARGO_MANIFEST_DIR")).join("../lkjagent-skills/seeds");
-    seed_skill_library(&runtime.skill_library, &workspace.join("missing"), &seed)?;
 
     let mut conn = store()?;
     let prefix = build_prefix_from_store(&conn, &runtime.skill_library, &workspace)?;

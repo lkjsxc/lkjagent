@@ -32,13 +32,13 @@ per [../context/budgets.md](../context/budgets.md).
 | --- | --- |
 | /data/lkjagent.sqlite3 | the store, per [../memory/store.md](../memory/store.md) |
 | /data/workspace | the project directory the agent works in |
-| /data/skills | the skill library: markdown skill files indexed by the store |
 | /data/lkjagent.json | the config file read at daemon startup |
 
 /data is a bind mount from LKJAGENT_DATA_DIR. The default host path is
-./data, so the store, workspace, skill library, and config survive image
-rebuilds and container replacement as ordinary host files. Snapshotting the
-host directory is the owner's rollback mechanism per [safety.md](safety.md).
+./data, so the store, workspace, and config survive image rebuilds and
+container replacement as ordinary host files. Snapshotting the host
+directory is the owner's rollback mechanism per [safety.md](safety.md).
+Runtime skills are image or source content, not mounted data.
 
 ## Status
 

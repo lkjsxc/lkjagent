@@ -53,7 +53,7 @@ The xtask check-docs gate enforces coverage once built.
 
 | Host path | Container path | Owns | Contract |
 | --- | --- | --- | --- |
-| ./data | /data | store, workspace, skill library, config | [../architecture/sandbox/workspace.md](../architecture/sandbox/workspace.md) |
+| ./data | /data | store, workspace, config | [../architecture/sandbox/workspace.md](../architecture/sandbox/workspace.md) |
 | ./data/workspace | /data/workspace | project directory the agent works on | [../architecture/sandbox/workspace.md](../architecture/sandbox/workspace.md) |
 
 Runtime paths are ignored local state. The default compose bind mount maps

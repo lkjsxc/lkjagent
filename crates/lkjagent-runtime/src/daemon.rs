@@ -14,13 +14,14 @@ use crate::prompt::token_estimate;
 use crate::task::{RuntimeState, TaskState};
 
 mod effects;
+mod idle;
 mod runner;
 mod skills;
 mod startup;
 mod status;
 
 pub use runner::{restore_completion_guard, DaemonTick, ResidentDaemon, ResidentRuntime};
-pub use startup::{build_prefix_from_store, seed_skill_library, startup_summary};
+pub use startup::{build_prefix_from_store, startup_summary};
 
 pub type EndpointClientConfig = ClientConfig;
 

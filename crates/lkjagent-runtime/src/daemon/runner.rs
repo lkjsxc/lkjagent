@@ -68,6 +68,11 @@ impl ResidentDaemon {
         self.runtime.tools.now = now.to_string();
         self.heartbeat(conn, now)?;
         self.deliver_owner(conn, now)?;
+        if self.state.maintenance.is_some()
+            && matches!(self.state.task, TaskState::Idle | TaskState::Closed { .. })
+        {
+            return self.endpoint_turn(conn, now);
+        }
         match &self.state.task {
             TaskState::Open { .. } => self.endpoint_turn(conn, now),
             TaskState::Waiting { .. } => {
@@ -79,6 +84,9 @@ impl ResidentDaemon {
                 Ok(DaemonTick::Paused)
             }
             TaskState::Idle | TaskState::Closed { .. } => {
+                if let Some(tick) = self.open_idle_maintenance(conn, now)? {
+                    return Ok(tick);
+                }
                 self.write_observable(conn)?;
                 Ok(DaemonTick::Idle)
             }
@@ -115,8 +123,9 @@ impl ResidentDaemon {
             self.dispatch_state.control.resume_task();
         }
         let scaffold_docs = starting_task
-            && self.dispatch_state.control.guard == CompletionGuard::RecursiveStructure
-            && recursive_docs_requested(&owner.content);
+            && self.dispatch_state.control.guard.is_recursive()
+            && Self::recursive_docs_requested(&owner.content);
+        let scaffold_profile = self.scaffold_profile();
         let result = step(
             self.state.clone(),
             StepInput::Owner {
@@ -125,11 +134,10 @@ impl ResidentDaemon {
             },
         );
         self.apply_step_result(conn, now, result, true)?;
-        if starting_task && self.dispatch_state.control.guard == CompletionGuard::RecursiveStructure
-        {
+        if starting_task && self.dispatch_state.control.guard.is_recursive() {
             self.auto_load_recursive_structure(conn, now)?;
             if scaffold_docs {
-                self.auto_scaffold_recursive_docs(conn, now)?;
+                self.auto_scaffold_recursive_docs(conn, now, scaffold_profile)?;
             }
         }
         Ok(())
@@ -188,9 +196,4 @@ fn preview(content: &str) -> String {
         .filter(|line| !line.is_empty())
         .unwrap_or("active");
     first.chars().take(80).collect()
-}
-
-fn recursive_docs_requested(content: &str) -> bool {
-    let lower = content.to_ascii_lowercase();
-    lower.contains("docs") || lower.contains("documentation") || content.contains("ドキュメント")
 }

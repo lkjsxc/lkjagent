@@ -21,7 +21,14 @@ cycle ends with a one-line summary.
 Recursive structure tasks carry a completion guard. When the owner asks for
 recursive or highly structured organization, agent.done is refused until
 the workspace contains a README-indexed tree with enough depth and breadth
-to prove the request was not satisfied by one file.
+to prove the request was not satisfied by one file. Encyclopedia, wiki, and
+knowledge-base creation requests use a stricter recursive-knowledge guard:
+the docs tree must contain a small nucleus with required map,
+starter-domain, reference, curation, expansion-queue, and rebalance-plan
+files. The guard requires contract-shaped markdown pages, growth-control
+sections, and enough links to behave like a navigable nucleus. It rejects
+nested `docs/` subtrees and top-level directories outside the seeded
+encyclopedia map.
 
 ## agent.ask
 

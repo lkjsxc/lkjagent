@@ -20,6 +20,7 @@ This directory holds CLI argument dispatch and one module per command.
 - [log.rs](log.rs): transcript log rendering.
 - [main.rs](main.rs): binary entrypoint.
 - [memory.rs](memory.rs): memory search command.
+- [paths.rs](paths.rs): workspace and source skill path resolution.
 - [run.rs](run.rs): daemon startup command.
 - [send.rs](send.rs): queue append command.
 - [skills.rs](skills.rs): skill library listing.

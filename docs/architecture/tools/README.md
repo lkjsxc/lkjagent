@@ -17,5 +17,5 @@ prompt and behavior cannot drift.
 - [shell.md](shell.md): shell.run, the general-purpose escape hatch and its capture rules.
 - [queue-ops.md](queue-ops.md): queue.list and queue mutation actions.
 - [memory-ops.md](memory-ops.md): memory.save and memory.find, the durable-knowledge contracts.
-- [skill-ops.md](skill-ops.md): skill.use and skill.save, loading and writing library skills.
+- [skill-ops.md](skill-ops.md): skill.use and source-owned skill loading.
 - [control.md](control.md): agent.done and agent.ask, the actions that close or suspend a task.

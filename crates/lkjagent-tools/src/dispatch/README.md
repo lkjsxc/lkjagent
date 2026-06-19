@@ -7,6 +7,7 @@ This directory splits dispatcher state, validation, and route helpers.
 ## Table of Contents
 
 - [fs_tools.rs](fs_tools.rs): fs and shell dispatch helpers.
+- [guards.rs](guards.rs): task-shape write fences.
 - [memory_tools.rs](memory_tools.rs): memory dispatch helpers.
 - [params.rs](params.rs): validated parameter access and parsing.
 - [queue_tools.rs](queue_tools.rs): queue dispatch helpers.

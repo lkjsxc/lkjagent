@@ -33,32 +33,3 @@ pub fn open_store(data: &PathBuf) -> TestResult<Connection> {
     lkjagent_store::schema::setup(&conn)?;
     Ok(conn)
 }
-
-pub fn valid_skill() -> &'static str {
-    "# Skill: Demo Skill
-
-## Purpose
-
-Exercise CLI skill listing.
-
-## Trigger
-
-A CLI test needs a listed skill.
-
-## Context
-
-- No additional context.
-
-## Procedure
-
-1. Run `pwd`.
-
-## Checks
-
-- `pwd` prints the workspace.
-
-## Must Not
-
-- Do not mutate unrelated files.
-"
-}

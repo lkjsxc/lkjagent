@@ -8,10 +8,9 @@ living asset sharpened through explicit maintenance paths per
 
 ## Creation
 
-A skill is created with skill.save when the agent recognizes a repeatable
-procedure: a task took shell exploration that the next occurrence should
-skip. Validation enforces [format.md](format.md) at save time; an invalid
-skill is refused with every violation listed, so one retry fixes all.
+A skill is created by editing the source library and committing the change.
+Validation enforces [format.md](format.md) in tests and documentation
+gates; an invalid skill fails before it ships.
 
 The bar for creation: the procedure ran successfully at least once, and the
 Checks section quotes evidence that actually appeared. Speculative skills,
@@ -20,18 +19,15 @@ written before the procedure ever worked, violate
 
 ## Refinement
 
-The explicit refine-skills maintenance directive picks the skill with the
-oldest refinement stamp or the worst recent outcome and sharpens it against
-the transcript record of its last uses:
+Skill refinement is a source change driven by transcript evidence:
 
 - tighten Trigger if the skill was loaded and unused, or missed when needed;
 - repair Procedure steps that observations contradicted;
 - extend Must Not with any new failure mode actually observed;
 - shrink everything: shorter skills load cheaper and read truer.
 
-Each use of a skill stamps the state table with outcome evidence (loaded,
-task closed cleanly or not); refinement reads those stamps rather than
-guessing.
+Each use of a skill may stamp outcome evidence (loaded, task closed cleanly
+or not); refinement reads those stamps rather than guessing.
 
 ## Retirement
 
@@ -42,20 +38,16 @@ replaced it, so the knowledge of why survives the file.
 
 ## Provenance
 
-The library directory is a git repository in the mounted data directory;
-every skill.save commits with the acting context (task or explicit
-maintenance cycle) in the message. Diff history is the agent's own record
-of how its capabilities evolved, inspectable by the owner with ordinary git
-tools.
+The repository git history is the provenance for skill changes. Runtime
+data holds task state and memory; it does not hold skill files.
 
 ## The Builder Mirror
 
-The same lifecycle governs [../../agent/skills/](../../agent/skills/README.md),
-executed by the coding agents through the repository workflow instead of
-skill.save: same format, same refinement pressure, same retirement bar, with
-git history as provenance in both worlds.
+The same lifecycle governs [../../agent/skills/](../../agent/skills/README.md):
+same format, same refinement pressure, same retirement bar, with git
+history as provenance.
 
 ## Status
 
-design-only. The format validator exists; skill.save, refinement, and
-retirement actions land with later tool and maintenance slices.
+implemented for source-owned skills. Runtime self-refinement remains out of
+scope.

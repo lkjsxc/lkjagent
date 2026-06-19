@@ -13,7 +13,7 @@ read-only and never perturbs the loop: looking at the agent costs it nothing.
 | `lkjagent log` | Transcript events in order: messages, actions, observations, notices, queue mutations, compactions |
 | `lkjagent console` | Combined owner screen with status, pending queue, recent transcript, and send prompt |
 | `lkjagent memory` | Full-text search over distilled memory entries |
-| `lkjagent skills` | Skill library index with refinement timestamps |
+| `lkjagent skills` | Source skill library index with file timestamps |
 | sqlite3 on the store | Read-only forensics; schema in [../architecture/memory/store.md](../architecture/memory/store.md) |
 
 ## Transcript as Truth
@@ -23,6 +23,8 @@ model took, every observation it saw, every recorded queue mutation, every
 notice the harness injected, and every compaction. If something is not in
 the transcript, it did not happen. Event kinds are defined in
 [../architecture/memory/transcripts.md](../architecture/memory/transcripts.md).
+Recovery notices are transcript events too, so a rare parse, repeat, or tool
+error leaves visible evidence and the model sees the next-step instruction.
 
 `lkjagent log` renders events compactly: one line per event with kind, turn
 when present, and a bounded preview; `--full` prints whole payloads.

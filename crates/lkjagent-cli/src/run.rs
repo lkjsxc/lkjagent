@@ -1,11 +1,11 @@
-use std::fs;
 use std::path::Path;
 use std::time::Duration;
 
 use crate::config::RuntimeConfig;
 use crate::config::{load_or_initialize, ConfigLoad};
 use crate::error::CliError;
-use crate::store::{now_stamp, open_store, skill_dir};
+use crate::paths::{skill_library, workspace};
+use crate::store::{now_stamp, open_store};
 
 pub fn run(data_dir: &Path) -> Result<String, CliError> {
     let workspace = workspace(data_dir)?;
@@ -27,12 +27,7 @@ pub fn run(data_dir: &Path) -> Result<String, CliError> {
         | lkjagent_runtime::daemon::StartupLock::Reclaimed { .. } => {
             lkjagent_store::state::set(&conn, "daemon state", "idle")?;
             lkjagent_store::state::set(&conn, "endpoint model", &config.endpoint_model)?;
-            let skills = skill_dir(data_dir);
-            lkjagent_runtime::daemon::seed_skill_library(
-                &skills,
-                Path::new("/usr/local/share/lkjagent/skills"),
-                &local_seed_path(),
-            )?;
+            let skills = skill_library();
             let prefix =
                 lkjagent_runtime::daemon::build_prefix_from_store(&conn, &skills, &workspace)?;
             let mut state = lkjagent_runtime::daemon::startup_state(
@@ -97,16 +92,6 @@ fn stored_turn(conn: &rusqlite::Connection) -> Result<i64, CliError> {
     Ok(lkjagent_store::state::get(conn, "turn")?
         .and_then(|turn| turn.parse::<i64>().ok())
         .unwrap_or(0))
-}
-
-fn workspace(data_dir: &Path) -> Result<std::path::PathBuf, CliError> {
-    let path = data_dir.join("workspace");
-    fs::create_dir_all(&path)?;
-    Ok(path)
-}
-
-fn local_seed_path() -> std::path::PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../lkjagent-skills/seeds")
 }
 
 fn secret_env(name: &str) -> Option<String> {

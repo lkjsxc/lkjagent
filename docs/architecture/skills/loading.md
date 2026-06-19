@@ -46,20 +46,20 @@ turn; recursive-structure tasks load recursive-structure this way.
 
 ## Visibility Rules
 
-- A skill saved or refined mid-session becomes visible in the index at the
-  next compaction, never immediately: editing the prefix mid-session would
+- A source skill changed by a repository edit becomes visible after restart
+  or after the next prefix rebuild; editing the prefix mid-session would
   invalidate the cache for one line of text.
-- The body the model just wrote with skill.save is already in its window;
-  deferral costs nothing in practice.
-- Startup indexes the whole library fresh; restart is the other lawful
-  index refresh point.
+- Runtime tasks load skills with skill.use only. They do not save or refine
+  skill files.
+- Startup indexes the whole source library fresh; restart is the other
+  lawful index refresh point.
 
 ## Failure Cases
 
 | Case | Response |
 | --- | --- |
 | unknown skill name | tool error listing the index names |
-| oversized skill file | refused at save time per [format.md](format.md), never at load time |
+| oversized skill file | source validation fails before the image or repo gate passes |
 | index over budget | deterministic degradation, notice in transcript |
 
 ## Status

@@ -15,14 +15,15 @@ While running, the daemon cycles through four observable states:
 
 | State | Meaning |
 | --- | --- |
-| idle | No task is open; the queue is empty; the daemon is waiting |
-| working | A task is open; the loop is taking turns toward agent.done |
+| idle | No task or maintenance cycle is open between loop ticks |
+| working | A task or maintenance cycle is open; the loop is taking turns |
 | waiting | The agent asked the owner a question and no later send has arrived |
 | error | The endpoint or loop failed; details are visible in status and log |
 
 State transitions are driven only by the queue and the loop, never by
-timers visible to the owner. A new queue message pulls the daemon out of
-idle or waiting at the next turn boundary.
+timers visible to the owner. With an empty queue, the next idle boundary
+opens bounded self-maintenance. A new queue message preempts maintenance or
+pulls the daemon out of idle or waiting at the next turn boundary.
 
 ## Startup
 
@@ -36,15 +37,20 @@ specified in [../architecture/runtime/daemon-process.md](../architecture/runtime
 
 Stopping the container ends the process. In-flight endpoint calls are not
 drained by a custom signal handler. Queue rows, transcript events, memory,
-and skills are durable, and a restarted daemon reclaims a stale lock after
-the heartbeat exceeds the configured stale window.
+and workspace state are durable in data; skills are durable source or image
+content. A restarted daemon reclaims a stale lock after the heartbeat
+exceeds the configured stale window.
 
 ## Failure
 
 If the endpoint is unreachable, the daemon records an error event, sets
 `daemon_state=error`, and tries again on later polls; it never fabricates a
-model reply. If the loop itself fails, stale lock reclaim lets a restarted
-process continue from durable state.
+model reply. Parser, repeat-action, and tool failures stay inside the task:
+the daemon records the failure, adds a recovery notice for the next model
+turn, and keeps working until agent.done, agent.ask, or the task budget.
+When a user task closes, the daemon returns to maintenance on the next empty
+queue boundary instead of stopping permanently. If the loop itself fails,
+stale lock reclaim lets a restarted process continue from durable state.
 
 ## Status
 

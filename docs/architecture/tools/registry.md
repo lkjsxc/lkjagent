@@ -26,7 +26,6 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | memory.save | kind req; title req; tags opt; content req | insert one memory row, return its id | unknown kind |
 | memory.find | query req; limit opt 5 | ranked full-text search over memory | none; empty results are ok |
 | skill.use | name req | append skill body as immutable frame | unknown name; already loaded; skill budget |
-| skill.save | name req; content req | validate and write skill into library | format validation failure |
 | agent.done | summary req | close the task or maintenance cycle | no open task or cycle |
 | agent.ask | question req | ask the owner; task enters waiting | a question is already outstanding |
 

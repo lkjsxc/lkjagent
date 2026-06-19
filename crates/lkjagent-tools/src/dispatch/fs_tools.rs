@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use crate::dispatch::guards::{guard_shell_command, guard_write_path};
 use crate::dispatch::params::{param, parse_u64, parse_usize};
 use crate::dispatch::{finish, observe_error, observe_result};
 use crate::dispatch::{DispatchOutput, DispatchState, ReadRecord, ToolRuntime};
@@ -33,12 +34,12 @@ pub fn dispatch_fs_write(
     runtime: &ToolRuntime,
     state: &mut DispatchState,
 ) -> DispatchOutput {
+    let path = param(params, "path");
+    if let Err(error) = guard_write_path(state.control.guard, &path) {
+        return observe_error(error, action_text, runtime, state);
+    }
     observe_result(
-        fs::write(
-            &runtime.workspace,
-            &param(params, "path"),
-            &param(params, "content"),
-        ),
+        fs::write(&runtime.workspace, &path, &param(params, "content")),
         action_text,
         runtime,
         state,
@@ -51,9 +52,13 @@ pub fn dispatch_fs_edit(
     runtime: &ToolRuntime,
     state: &mut DispatchState,
 ) -> DispatchOutput {
+    let path = param(params, "path");
+    if let Err(error) = guard_write_path(state.control.guard, &path) {
+        return observe_error(error, action_text, runtime, state);
+    }
     let result = fs::edit(
         &runtime.workspace,
-        &param(params, "path"),
+        &path,
         &param(params, "find"),
         &param(params, "replace"),
     )
@@ -67,6 +72,10 @@ pub fn dispatch_shell(
     runtime: &ToolRuntime,
     state: &mut DispatchState,
 ) -> DispatchOutput {
+    let command = param(params, "command");
+    if let Err(error) = guard_shell_command(state.control.guard, &command) {
+        return observe_error(error, action_text, runtime, state);
+    }
     let timeout = match parse_u64(&param(params, "timeout")) {
         Ok(value) if value <= runtime.shell_timeout_max => value,
         Ok(_) => {
@@ -79,7 +88,7 @@ pub fn dispatch_shell(
         }
         Err(error) => return observe_error(error, action_text, runtime, state),
     };
-    match shell::run(&runtime.workspace, &param(params, "command"), timeout) {
+    match shell::run(&runtime.workspace, &command, timeout) {
         Ok(report) if !report.succeeded() => finish(
             state,
             action_text,

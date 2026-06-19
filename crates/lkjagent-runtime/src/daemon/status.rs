@@ -22,6 +22,17 @@ impl ResidentDaemon {
                 Ok(())
             }
             TaskState::Idle | TaskState::Closed { .. } => {
+                if let Some(cycle) = &self.state.maintenance {
+                    store_state::set(conn, "daemon state", "working")?;
+                    store_state::set(
+                        conn,
+                        "open task",
+                        &format!("maintenance: {}", cycle.directive.as_str()),
+                    )?;
+                    store_state::delete(conn, "daemon question")?;
+                    store_state::delete(conn, "daemon error")?;
+                    return Ok(());
+                }
                 store_state::set(conn, "daemon state", "idle")?;
                 store_state::set(conn, "open task", "none")?;
                 store_state::delete(conn, "daemon question")?;

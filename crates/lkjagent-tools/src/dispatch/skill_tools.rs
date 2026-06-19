@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use lkjagent_context::budget::{LOG_LOADED_SKILLS, LOG_SKILL_BODY};
 
 use crate::dispatch::params::param;
-use crate::dispatch::{finish, observe_error, observe_result};
+use crate::dispatch::{finish, observe_error};
 use crate::dispatch::{DispatchOutput, DispatchState, LoadedSkillRecord, ToolRuntime};
 use crate::observe;
 use crate::skill;
@@ -41,24 +41,6 @@ pub fn load_skill_frame(
         Err(error) => observe_error(error, action_text, runtime, state),
         Ok(loaded) => finish_loaded_skill(loaded, action_text, state),
     }
-}
-
-pub fn dispatch_skill_save(
-    params: &BTreeMap<String, String>,
-    action_text: &str,
-    runtime: &ToolRuntime,
-    state: &mut DispatchState,
-) -> DispatchOutput {
-    observe_result(
-        skill::save_skill(
-            &runtime.skill_library,
-            &param(params, "name"),
-            &param(params, "content"),
-        ),
-        action_text,
-        runtime,
-        state,
-    )
 }
 
 fn finish_loaded_skill(

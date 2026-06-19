@@ -14,7 +14,7 @@ agent loop --(append-only messages)--> endpoint (chat completions, 32k)
 endpoint --(tag-based action, stops at </act>)--> parser
 parser --> toolset (fs, shell, queue ops, memory ops, skill ops, control)
 toolset --(bounded observation)--> agent loop --> store.events
-idle queue --> wait for owner work
+empty queue --> bounded self-maintenance --> agent loop
 ```
 
 The loop appends every turn to the transcript; the context engine decides
@@ -68,4 +68,4 @@ The workspace layout is owned by [../repository/layout.md](../repository/layout.
 - One daemon per store; one loop per daemon; one endpoint per config.
 - The serialized message list is append-only between compactions.
 - Every byte in the window is attributable to a hygiene allowlist entry.
-- Everything observable is reconstructible from the store plus the skill files.
+- Everything observable is reconstructible from the store plus source skill files.

@@ -23,11 +23,11 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --create-home --home-dir /home/agent --shell /usr/sbin/nologin agent \
     && mkdir -p /data/workspace /usr/local/share/lkjagent/skills \
-    && chown -R agent:agent /data /usr/local/share/lkjagent/skills \
+    && chown -R agent:agent /data \
     && printf '%s\n' \
         '#!/bin/sh' \
         'set -eu' \
-        'mkdir -p /data/workspace /data/skills' \
+        'mkdir -p /data/workspace' \
         'chown -R agent:agent /data' \
         'case "${1:-}" in' \
         '  ""|run|send|status|log|console|memory|skills)' \
@@ -39,7 +39,7 @@ RUN apt-get update \
     && chmod +x /usr/local/bin/lkjagent-entrypoint
 
 COPY --from=build /src/target/release/lkjagent /usr/local/bin/lkjagent
-COPY --from=build --chown=agent:agent /src/crates/lkjagent-skills/seeds \
+COPY --from=build /src/crates/lkjagent-skills/seeds \
     /usr/local/share/lkjagent/skills
 
 WORKDIR /data/workspace

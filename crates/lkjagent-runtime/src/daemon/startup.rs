@@ -10,36 +10,6 @@ use rusqlite::Connection;
 use crate::error::{RuntimeError, RuntimeResult};
 use crate::prompt::{build_prefix, token_estimate, PromptInputs};
 
-pub fn seed_skill_library(
-    target: &Path,
-    image_seed: &Path,
-    fallback_seed: &Path,
-) -> RuntimeResult<()> {
-    fs::create_dir_all(target).map_err(io_error)?;
-    if has_markdown(target)? {
-        return Ok(());
-    }
-    let source = if image_seed.exists() {
-        image_seed
-    } else {
-        fallback_seed
-    };
-    if !source.exists() {
-        return Ok(());
-    }
-    for entry in fs::read_dir(source).map_err(io_error)? {
-        let entry = entry.map_err(io_error)?;
-        let path = entry.path();
-        if path.extension().is_some_and(|extension| extension == "md") {
-            let destination = target.join(entry.file_name());
-            if !destination.exists() {
-                fs::copy(&path, destination).map_err(io_error)?;
-            }
-        }
-    }
-    Ok(())
-}
-
 pub fn build_prefix_from_store(
     conn: &Connection,
     skill_library: &Path,
@@ -61,23 +31,6 @@ pub fn startup_summary(conn: &Connection) -> RuntimeResult<Option<String>> {
             Some(format!("open task at restart: {task}"))
         }
     }))
-}
-
-fn has_markdown(path: &Path) -> RuntimeResult<bool> {
-    if !path.exists() {
-        return Ok(false);
-    }
-    for entry in fs::read_dir(path).map_err(io_error)? {
-        let entry = entry.map_err(io_error)?;
-        if entry
-            .path()
-            .extension()
-            .is_some_and(|extension| extension == "md")
-        {
-            return Ok(true);
-        }
-    }
-    Ok(false)
 }
 
 fn skill_index(root: &Path) -> RuntimeResult<String> {

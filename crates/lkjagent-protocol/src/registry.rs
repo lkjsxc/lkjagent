@@ -69,7 +69,6 @@ const MEMORY_SAVE: &[ParamSpec] = &[
 ];
 const MEMORY_FIND: &[ParamSpec] = &[ParamSpec::req("query"), ParamSpec::opt("limit", Some("5"))];
 const SKILL_USE: &[ParamSpec] = &[ParamSpec::req("name")];
-const SKILL_SAVE: &[ParamSpec] = &[ParamSpec::req("name"), ParamSpec::req("content")];
 const AGENT_DONE: &[ParamSpec] = &[ParamSpec::req("summary")];
 const AGENT_ASK: &[ParamSpec] = &[ParamSpec::req("question")];
 
@@ -133,11 +132,6 @@ pub const TOOLS: &[ToolSpec] = &[
         name: "skill.use",
         params: SKILL_USE,
         contract: "append skill body as a frame",
-    },
-    ToolSpec {
-        name: "skill.save",
-        params: SKILL_SAVE,
-        contract: "validate and write a skill",
     },
     ToolSpec {
         name: "agent.done",

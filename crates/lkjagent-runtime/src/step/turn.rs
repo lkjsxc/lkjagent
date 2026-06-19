@@ -5,7 +5,7 @@ use lkjagent_store::events::EventKind;
 
 use crate::maintenance::spend_cycle;
 use crate::prompt::token_estimate;
-use crate::recovery::{parse_notice, should_escalate, stop_reason};
+use crate::recovery::{parse_notice, parse_recovery_notice, stop_reason};
 use crate::step::frames::{append_notice, result};
 use crate::step::{Effect, StepResult};
 use crate::task::{open_task, spend_turn, PendingAction, RuntimeState, StopReason, TaskState};
@@ -115,18 +115,17 @@ fn parse_fault_step(mut state: RuntimeState, fault: &lkjagent_protocol::ParseFau
     let notice = parse_notice(fault);
     state.parse_faults = state.parse_faults.saturating_add(1);
     state = append_notice(state, NoticeKind::Error, &notice);
+    let recovery = parse_recovery_notice(state.parse_faults);
+    state = append_notice(state, NoticeKind::Error, &recovery);
     let mut effects = vec![Effect::RecordEvent {
         kind: EventKind::Error,
         content: notice,
         tokens: 32,
     }];
-    if should_escalate(state.parse_faults) {
-        let reason = "three consecutive parse-class faults".to_string();
-        state.task = TaskState::Paused {
-            reason: reason.clone(),
-        };
-        state.maintenance = None;
-        effects.push(Effect::Pause { reason });
-    }
+    effects.push(Effect::RecordEvent {
+        kind: EventKind::Notice,
+        content: recovery,
+        tokens: 32,
+    });
     result(state, effects, Some(stop_reason(fault)))
 }

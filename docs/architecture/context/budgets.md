@@ -19,7 +19,7 @@ window.
 | prefix: memory digest | 2,048 | [../memory/distillation.md](../memory/distillation.md) | digest builder must rank within cap |
 | log: owner frame | 4,096 each | [../runtime/queue-intake.md](../runtime/queue-intake.md) | head kept, truncation notice |
 | log: observation | 2,048 each | [../tools/registry.md](../tools/registry.md) | head and tail kept, middle elided, truncation notice |
-| log: skill body | 2,048 each | [../skills/format.md](../skills/format.md) | skill.save refuses oversized skills |
+| log: skill body | 2,048 each | [../skills/format.md](../skills/format.md) | source validation rejects oversized skills |
 | log: loaded skills concurrent | 6,144 total | [../skills/loading.md](../skills/loading.md) | skill.use refused with notice |
 | whole window trigger | 28,672 used | [compaction.md](compaction.md) | compaction at next boundary |
 | post-compaction target | 8,192 | [compaction.md](compaction.md) | compaction must reach it or fail loudly |

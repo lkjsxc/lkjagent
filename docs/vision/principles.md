@@ -24,8 +24,8 @@ conflict, the principle wins.
    [../repository/functional-style.md](../repository/functional-style.md).
 6. One rule, one owner. Every contract lives in exactly one file; everything
    else links to it. Duplication is drift waiting to happen.
-7. Self-improvement over feature growth. Idle time goes to distilling memory
-   and refining skills, not to speculative features.
+7. Self-improvement over feature growth. Maintenance work goes to
+   distilling memory and improving source skills, not speculative features.
 8. The agent is the user. Docs, errors, and formats are optimized for LLM
    reading first. Humans arrive through agents.
 
