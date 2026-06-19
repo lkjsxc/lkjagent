@@ -91,6 +91,33 @@ fn architecture_artifact_auto_scaffold_routes_to_document_construction() -> Test
     Ok(())
 }
 
+#[test]
+fn planning_notes_and_body_files_auto_scaffold() -> TestResult<()> {
+    let mut conn = store()?;
+    take_daemon_lock(&conn, "test", "700", "0")?;
+    queue::enqueue(
+        &mut conn,
+        "Create about 100 files total, split between twenty planning notes and body files.",
+        "owner-send",
+        "701",
+    )?;
+    let workspace = temp_workspace("file-count-body-files-auto")?;
+    let server = serve_responses(vec![])?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+
+    assert_eq!(daemon.poll_once(&mut conn, "701")?, DaemonTick::Idle);
+    server.join()?;
+
+    let root = workspace.join("structured-output");
+    assert_eq!(file_count(&root)?, 100);
+    assert!(root.join("docs/design-020.md").exists());
+    assert!(!root.join("docs/design-021.md").exists());
+    assert!(root.join("main/part-077.md").exists());
+    assert_eq!(state::get(&conn, "completion guard")?, None);
+    assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
+    Ok(())
+}
+
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
     let runtime = ResidentRuntime::new(
         "test".to_string(),
