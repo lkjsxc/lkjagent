@@ -122,11 +122,11 @@ impl DeliverableProfile {
     }
 
     fn design_focus(self, index: usize) -> &'static str {
-        let slot = index.saturating_sub(1).min(11);
         let (focuses, fallback) = match self.language {
             Language::Japanese => (&JP_DESIGN_FOCUSES, "補足設計メモ"),
             Language::English => (&EN_DESIGN_FOCUSES, "supplemental planning notes"),
         };
+        let slot = index.saturating_sub(1).min(focuses.len().saturating_sub(1));
         focuses.get(slot).copied().unwrap_or(fallback)
     }
 }

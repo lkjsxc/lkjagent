@@ -65,6 +65,9 @@ headings, section roles, objective anchors that preserve model-number decimal
 tokens, main-range coverage, sequence ledgers, anchor-linked body spines,
 per-part content details, draft passage blocks, and continuity handoffs while
 preserving the exact count.
+Docs-side scaffolds carry twenty distinct planning focus labels before
+falling back, so common 20-outline requests do not collapse into repeated
+supplemental planning notes.
 When the objective includes a design, memo, viewpoint, outline, planning, or
 brief count inside a larger file-count request, the scaffold uses that count
 for design memos when the exact total can still retain main content.

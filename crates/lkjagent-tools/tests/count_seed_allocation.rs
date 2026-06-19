@@ -73,6 +73,8 @@ fn count_seed_honors_english_word_design_count_hint_inside_total() -> TestResult
     assert!(root.join("docs/design-020.md").exists());
     assert!(!root.join("docs/design-021.md").exists());
     assert!(root.join("main/part-077.md").exists());
+    let late_design = fs::read_to_string(root.join("docs/design-020.md"))?;
+    assert!(late_design.contains("release readiness record"));
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- Design memos: 20"));
     assert!(readme.contains("- Main files: 77"));
