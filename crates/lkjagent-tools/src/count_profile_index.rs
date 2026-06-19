@@ -37,6 +37,23 @@ pub(crate) fn main_map(language: Language, total: usize) -> String {
     }
 }
 
+pub(crate) fn docs_map(language: Language, docs: usize, main: usize) -> String {
+    if docs == 0 {
+        return match language {
+            Language::Japanese => "## 設計対応表\n\n設計メモはありません。\n".to_string(),
+            Language::English => "## Coverage Map\n\nNo design memos exist.\n".to_string(),
+        };
+    }
+    let lines = (1..=docs)
+        .map(|index| docs_map_line(language, index, docs, main))
+        .collect::<Vec<_>>()
+        .join("\n");
+    match language {
+        Language::Japanese => format!("## 設計対応表\n\n{lines}\n"),
+        Language::English => format!("## Coverage Map\n\n{lines}\n"),
+    }
+}
+
 fn map_line(language: Language, total: usize, slot: usize) -> Option<String> {
     let (start, end) = stage_range(total, slot)?;
     let label = match language {
@@ -59,10 +76,47 @@ fn map_line(language: Language, total: usize, slot: usize) -> Option<String> {
     })
 }
 
+fn docs_map_line(language: Language, index: usize, docs: usize, main: usize) -> String {
+    let file = format!("design-{index:03}.md");
+    let Some((start, end)) = coverage_range(index, docs, main) else {
+        return match language {
+            Language::Japanese => format!("- {file}: 全体構成のみ"),
+            Language::English => format!("- {file}: overall structure only"),
+        };
+    };
+    match language {
+        Language::Japanese if start == end => {
+            format!("- {file}: main/part-{start:03}.md")
+        }
+        Language::Japanese => {
+            format!("- {file}: main/part-{start:03}.md から main/part-{end:03}.md")
+        }
+        Language::English if start == end => {
+            format!("- {file}: main/part-{start:03}.md")
+        }
+        Language::English => {
+            format!("- {file}: main/part-{start:03}.md through main/part-{end:03}.md")
+        }
+    }
+}
+
 fn stage_range(total: usize, slot: usize) -> Option<(usize, usize)> {
     let start = slot.saturating_mul(total) / 6 + 1;
     let end = (slot.saturating_add(1)).saturating_mul(total) / 6;
     (start <= end).then_some((start, end))
+}
+
+fn coverage_range(index: usize, docs: usize, main: usize) -> Option<(usize, usize)> {
+    if docs == 0 || main == 0 {
+        return None;
+    }
+    let slot = index.saturating_sub(1).min(docs.saturating_sub(1));
+    let start = slot.saturating_mul(main) / docs + 1;
+    let mut end = (slot.saturating_add(1)).saturating_mul(main) / docs;
+    if end < start {
+        end = start;
+    }
+    Some((start.min(main), end.min(main)))
 }
 
 const JP_STAGES: [&str; 6] = ["導入", "探索", "対立拡大", "中盤反転", "危機", "収束"];
