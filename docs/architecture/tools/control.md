@@ -30,6 +30,11 @@ sections, and enough links to behave like a navigable nucleus. It rejects
 nested `docs/` subtrees and top-level directories outside the seeded
 encyclopedia map.
 
+Owner tasks that state an exact markdown file count also carry a completion
+guard. agent.done is refused until one README-indexed candidate tree contains
+exactly that many markdown files; the refusal names the closest candidate
+and tells the model to repair the count with one compact shell.run script.
+
 ## agent.ask
 
 | Parameter | Rule |

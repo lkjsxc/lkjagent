@@ -116,6 +116,43 @@ fn control_classifies_recursive_knowledge_requests() {
 }
 
 #[test]
+fn control_guards_requested_markdown_file_count() -> TestResult<()> {
+    let workspace = temp_workspace("markdown-count")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut state = state();
+    state
+        .control
+        .start_task("create exactly 3 markdown files total");
+    assert_eq!(
+        state.control.guard,
+        CompletionGuard::MarkdownCount { target: 3 }
+    );
+    fs::create_dir_all(workspace.join("docs/count"))?;
+    fs::write(workspace.join("docs/count/README.md"), "# Count\n")?;
+    fs::write(workspace.join("docs/count/one.md"), "# One\n")?;
+
+    let early = dispatch(
+        &action("agent.done", &[("summary", "two files")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+    assert!(is_error(&early));
+    assert!(early.content.contains("need exactly 3 markdown files"));
+    fs::write(workspace.join("docs/count/two.md"), "# Two\n")?;
+
+    let done = dispatch(
+        &action("agent.done", &[("summary", "three files")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+    assert!(done.content.contains("summary=three files"));
+    Ok(())
+}
+
+#[test]
 fn dispatcher_reports_validation_and_repeat_notices() -> TestResult<()> {
     let workspace = temp_workspace("dispatch")?;
     let runtime = runtime(workspace)?;

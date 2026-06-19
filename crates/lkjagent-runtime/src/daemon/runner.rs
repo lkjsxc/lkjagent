@@ -113,11 +113,8 @@ impl ResidentDaemon {
         if starting_task {
             store_state::set(conn, "open task", &preview(&owner.content))?;
             self.dispatch_state.control.start_task(&owner.content);
-            store_state::set(
-                conn,
-                "completion guard",
-                self.dispatch_state.control.guard.as_state_value(),
-            )?;
+            let guard = self.dispatch_state.control.guard.as_state_value();
+            store_state::set(conn, "completion guard", &guard)?;
         } else {
             self.dispatch_state.control.resume_task();
         }

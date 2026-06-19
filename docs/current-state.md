@@ -40,6 +40,8 @@ shell.run scripts instead of repeated fs.write actions. Endpoint completions
 that hit max_tokens become recovery notices instead of endpoint retry loops.
 Generation reserve and endpoint max_tokens are 2048 tokens, giving compact
 batch scripts enough room while preserving the one-action protocol.
+Owner-stated exact markdown file counts activate a completion guard, so
+agent.done is refused until a README-indexed candidate tree has that count.
 Empty queues open bounded self-maintenance cycles in rotation; owner queue
 arrival preempts maintenance at the next turn boundary. Compose wiring is
 implemented. The implementation queue is

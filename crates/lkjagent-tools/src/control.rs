@@ -1,5 +1,6 @@
 use std::path::Path;
 
+use crate::count_guard::{markdown_count_target, verify_markdown_count};
 use crate::error::{ToolError, ToolResult};
 use crate::structure::verify_recursive_tree;
 use crate::structure_network::verify_knowledge_network;
@@ -14,20 +15,28 @@ pub struct ControlState {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompletionGuard {
     None,
+    MarkdownCount { target: usize },
     RecursiveStructure,
     RecursiveKnowledge,
 }
 
 impl CompletionGuard {
-    pub fn as_state_value(self) -> &'static str {
+    pub fn as_state_value(self) -> String {
         match self {
-            Self::None => "none",
-            Self::RecursiveStructure => "recursive-structure",
-            Self::RecursiveKnowledge => "recursive-knowledge",
+            Self::None => "none".to_string(),
+            Self::MarkdownCount { target } => format!("markdown-count:{target}"),
+            Self::RecursiveStructure => "recursive-structure".to_string(),
+            Self::RecursiveKnowledge => "recursive-knowledge".to_string(),
         }
     }
 
     pub fn from_state_value(value: &str) -> Self {
+        if let Some(target) = value
+            .strip_prefix("markdown-count:")
+            .and_then(|raw| raw.parse::<usize>().ok())
+        {
+            return Self::MarkdownCount { target };
+        }
         match value {
             "recursive-structure" => Self::RecursiveStructure,
             "recursive-knowledge" => Self::RecursiveKnowledge,
@@ -80,6 +89,7 @@ pub fn done(state: &mut ControlState, workspace: &Path, summary: &str) -> ToolRe
     }
     match state.guard {
         CompletionGuard::None => {}
+        CompletionGuard::MarkdownCount { target } => verify_markdown_count(workspace, target)?,
         CompletionGuard::RecursiveStructure => verify_recursive_tree(workspace)?,
         CompletionGuard::RecursiveKnowledge => verify_knowledge_network(workspace)?,
     }
@@ -112,6 +122,8 @@ fn classify(content: &str) -> CompletionGuard {
         && (recursive || structure || creation_request(&lower, content))
     {
         CompletionGuard::RecursiveKnowledge
+    } else if let Some(target) = markdown_count_target(&lower) {
+        CompletionGuard::MarkdownCount { target }
     } else if recursive && structure {
         CompletionGuard::RecursiveStructure
     } else {

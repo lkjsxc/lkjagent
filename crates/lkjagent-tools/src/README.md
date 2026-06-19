@@ -7,6 +7,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 ## Table of Contents
 
 - [control.rs](control.rs): agent.done and agent.ask state transitions.
+- [count_guard.rs](count_guard.rs): exact markdown-count completion guard.
 - [dispatch/](dispatch/README.md): dispatch helper modules.
 - [dispatch.rs](dispatch.rs): registry validation and tool routing.
 - [error.rs](error.rs): tool error type.
