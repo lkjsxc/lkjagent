@@ -55,6 +55,19 @@ pub(crate) fn verify_part_ledger(
     Ok("ok")
 }
 
+pub(crate) fn verify_design_sections(
+    first: Option<&str>,
+    last: Option<&str>,
+) -> ToolResult<&'static str> {
+    let Some(first) = first else {
+        return Ok("n/a");
+    };
+    let last = last.unwrap_or(first);
+    require_design_sections(first, "first design memo")?;
+    require_design_sections(last, "last design memo")?;
+    Ok("ok")
+}
+
 pub(crate) fn verify_main_sections(
     first: Option<&str>,
     last: Option<&str>,
@@ -66,6 +79,14 @@ pub(crate) fn verify_main_sections(
     require_main_sections(first, "first main part")?;
     require_main_sections(last, "last main part")?;
     Ok("ok")
+}
+
+fn require_design_sections(text: &str, label: &str) -> ToolResult<()> {
+    require_one(text, &["## Focus", "## 焦点"], label)?;
+    require_one(text, &["## Coverage", "## 対象範囲"], label)?;
+    require_one(text, &["## Design Task", "## 設計タスク"], label)?;
+    require_one(text, &["## Verification Checks", "## 検証観点"], label)?;
+    Ok(())
 }
 
 fn require_main_sections(text: &str, label: &str) -> ToolResult<()> {

@@ -80,8 +80,9 @@ whitepaper, dossier, and their Japanese task terms.
 The graph evidence for that scaffold records `structured-output`, the target
 file count, index file count, design memo count, main file count, root index,
 directory index, coverage-map status, acceptance-audit status, first and
-last main, required main-section status, part-ledger status, and
-`verification=ok`, so completion can be audited after the case closes.
+last main, required design-section status, required main-section status,
+part-ledger status, and `verification=ok`, so completion can be audited after
+the case closes.
 The docs index maps design memos to covered main ranges, and the main index
 maps stage ranges plus a per-part role ledger to numbered main files. Design
 and main files carry matching headings, section roles, objective anchors that
