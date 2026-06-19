@@ -49,6 +49,27 @@ fn count_seed_honors_character_sketches_without_file_noun() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn count_seed_honors_character_bios_without_file_noun() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-character-bios")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        file_guard(),
+        "Create about one hundred files total for a large fantasy novel. Use twenty-four \
+         character bios. The rest as ordered chapter drafts. Count docs and main content \
+         together. Keep Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert_counts(&root, 24, 73, "narrative")?;
+    assert!(root.join("docs/design-024.md").exists());
+    assert!(!root.join("docs/design-025.md").exists());
+    assert!(root.join("main/part-073.md").exists());
+    assert!(!root.join("main/part-074.md").exists());
+    Ok(())
+}
+
 fn file_guard() -> CountGuard {
     CountGuard {
         kind: CountKind::File,
