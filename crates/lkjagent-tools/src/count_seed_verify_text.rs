@@ -56,6 +56,7 @@ pub(crate) fn verify_part_ledger(
             "counted document scaffold missing part ledger",
         ));
     }
+    verify_progress_map(text, main)?;
     for index in 1..=main {
         let part = format!("- main/part-{index:03}.md:");
         let line = require_line(text, &part, "main index part ledger entry")?;
@@ -68,6 +69,36 @@ pub(crate) fn verify_part_ledger(
         }
     }
     Ok("ok")
+}
+
+fn verify_progress_map(text: &str, main: usize) -> ToolResult<()> {
+    for slot in 0..6 {
+        let Some((start, end)) = stage_range(main, slot) else {
+            continue;
+        };
+        require_stage_line(text, slot, start, end)?;
+    }
+    Ok(())
+}
+
+fn require_stage_line(text: &str, slot: usize, start: usize, end: usize) -> ToolResult<()> {
+    let english = stage_line(EN_STAGES[slot], start, end, "through");
+    let japanese = stage_line(JP_STAGES[slot], start, end, "から");
+    if text.contains(&english) || text.contains(&japanese) {
+        Ok(())
+    } else {
+        Err(ToolError::invalid(
+            "counted document scaffold missing progress map range",
+        ))
+    }
+}
+
+fn stage_line(label: &str, start: usize, end: usize, separator: &str) -> String {
+    if start == end {
+        format!("- {label}: main/part-{start:03}.md")
+    } else {
+        format!("- {label}: main/part-{start:03}.md {separator} main/part-{end:03}.md")
+    }
 }
 
 pub(crate) fn verify_design_file_sections(text: &str, label: &str) -> ToolResult<()> {
@@ -134,3 +165,34 @@ fn coverage_range(index: usize, docs: usize, main: usize) -> Option<(usize, usiz
     let end = (slot.saturating_add(1)).saturating_mul(main) / docs;
     Some((start.min(main), end.max(start).min(main)))
 }
+
+fn stage_range(total: usize, slot: usize) -> Option<(usize, usize)> {
+    let mut start = None;
+    let mut end = None;
+    for index in 1..=total {
+        if stage_slot(index, total) == slot {
+            start.get_or_insert(index);
+            end = Some(index);
+        }
+    }
+    start.zip(end)
+}
+
+fn stage_slot(index: usize, total: usize) -> usize {
+    index
+        .saturating_sub(1)
+        .saturating_mul(6)
+        .checked_div(total.max(1))
+        .unwrap_or(0)
+        .min(5)
+}
+
+const JP_STAGES: [&str; 6] = ["導入", "探索", "対立拡大", "中盤反転", "危機", "収束"];
+const EN_STAGES: [&str; 6] = [
+    "opening",
+    "exploration",
+    "rising conflict",
+    "midpoint reversal",
+    "crisis",
+    "resolution",
+];

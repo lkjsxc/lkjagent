@@ -24,6 +24,13 @@ fn count_seed_main_ledger_links_parts_to_design_owners() -> TestResult<()> {
     let main_part = fs::read_to_string(workspace.join("structured-output/main/part-008.md"))?;
     assert!(main_index
         .contains("main/part-001.md: opening / inciting pressure; design: docs/design-001.md"));
+    assert!(main_index.contains("- opening: main/part-001.md through main/part-015.md"));
+    assert!(main_index.contains("- exploration: main/part-016.md through main/part-029.md"));
+    assert!(main_index
+        .contains("main/part-015.md: opening / reversal seed; design: docs/design-003.md"));
+    assert!(main_index.contains(
+        "main/part-016.md: exploration / choice under pressure; design: docs/design-003.md"
+    ));
     assert!(main_index
         .contains("main/part-008.md: opening / choice under pressure; design: docs/design-002.md"));
     assert!(main_index
