@@ -75,6 +75,7 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     assert!(first_part.contains("Continuity Hand-Off"));
     assert!(first_part.contains("Arc: 1"));
     assert!(first_part.contains("### Draft Passage"));
+    assert!(first_part.contains("## Local Verification"));
     Ok(())
 }
 
@@ -120,6 +121,7 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     assert!(first_part.contains("ファイル役割: 導入 / 発端の圧力"));
     assert!(first_part.contains("## 要求アンカー"));
     assert!(first_part.contains("## 本文"));
+    assert!(first_part.contains("## ローカル検証"));
     assert!(first_part.contains("## 連続性台帳"));
     assert!(first_part.contains("- 前: なし"));
     assert!(first_part.contains("- 現在: main/part-001.md"));

@@ -151,6 +151,7 @@ fn count_seed_keeps_file_count_stronger_than_design_wording() -> TestResult<()> 
     assert!(report.contains("design_sections=ok"));
     assert!(report.contains("main_sections=ok"));
     assert!(report.contains("design_owner_links=ok"));
+    assert!(report.contains("local_verification=ok"));
     assert!(report.contains("first_main=ok"));
     assert!(report.contains("last_main=ok"));
     Ok(())

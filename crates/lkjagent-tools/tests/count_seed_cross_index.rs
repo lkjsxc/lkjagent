@@ -32,8 +32,10 @@ fn count_seed_main_ledger_links_parts_to_design_owners() -> TestResult<()> {
     assert!(main_part.contains("- Previous: main/part-007.md"));
     assert!(main_part.contains("- Current: main/part-008.md"));
     assert!(main_part.contains("- Next: main/part-009.md"));
+    assert!(main_part.contains("## Local Verification"));
     assert!(report.contains("part_ledger=ok"));
     assert!(report.contains("design_owner_links=ok"));
+    assert!(report.contains("local_verification=ok"));
     assert!(report.contains("sequence_paths=ok"));
     assert!(report.contains("verification=ok"));
     Ok(())
