@@ -113,6 +113,28 @@ fn count_seed_does_not_infer_split_when_rest_is_supporting_docs() -> TestResult<
     Ok(())
 }
 
+#[test]
+fn count_seed_does_not_infer_main_unit_as_support_split() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-main-unit-rest-sections")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        file_guard(),
+        "Create about one hundred files total for a chapter collection. Use twenty-four \
+         chapters. The rest as ordered sections. Count docs and main content together. Keep \
+         Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    assert!(readme.contains("- Design memos: 12"));
+    assert!(readme.contains("- Main files: 85"));
+    assert!(root.join("docs/design-012.md").exists());
+    assert!(!root.join("docs/design-013.md").exists());
+    assert!(root.join("main/part-085.md").exists());
+    Ok(())
+}
+
 fn file_guard() -> CountGuard {
     CountGuard {
         kind: CountKind::File,

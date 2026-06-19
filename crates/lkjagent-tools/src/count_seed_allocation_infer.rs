@@ -51,9 +51,12 @@ fn inferred_unit_span(text: &str, number: Span, split: Span) -> Option<Span> {
     if start >= end {
         return None;
     }
-    text.get(start..end)
-        .filter(|phrase| phrase.chars().any(|ch| ch.is_alphabetic()))
-        .map(|_| Span { start, end })
+    text.get(start..end).and_then(|phrase| {
+        if !phrase.chars().any(|ch| ch.is_alphabetic()) || phrase_mentions_main_unit(phrase) {
+            return None;
+        }
+        Some(Span { start, end })
+    })
 }
 
 fn trim_end(text: &str, start: usize, mut end: usize) -> usize {
@@ -115,6 +118,13 @@ fn main_unit_word(word: &str) -> bool {
             | "drafts"
             | "content"
     )
+}
+
+fn phrase_mentions_main_unit(phrase: &str) -> bool {
+    let lower = phrase.to_lowercase();
+    lower
+        .split(|ch: char| !ch.is_alphanumeric())
+        .any(main_unit_word)
 }
 
 fn clause_break(ch: char) -> bool {
