@@ -13,7 +13,7 @@ fn request_serializes_exact_documented_fields() -> TestResult<()> {
     let body = serde_json::to_string(&request)?;
     assert_eq!(
         body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system prefix\"},{\"role\":\"user\",\"content\":\"<owner>hello</owner>\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system prefix\"},{\"role\":\"user\",\"content\":\"<owner>hello</owner>\"}],\"max_tokens\":2048,\"temperature\":0.3,\"top_p\":0.9,\"stream\":false}"
     );
     Ok(())
 }

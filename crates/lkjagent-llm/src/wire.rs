@@ -6,7 +6,7 @@ use serde_json::Value;
 
 use metrics::collect_cache_metrics;
 
-pub const MAX_TOKENS: u16 = 1024;
+pub const MAX_TOKENS: u16 = 2048;
 pub const TEMPERATURE: f32 = 0.3;
 pub const TOP_P: f32 = 0.9;
 #[derive(Debug, Clone, PartialEq, Serialize)]

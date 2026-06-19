@@ -48,7 +48,7 @@ pub fn completion(content: &str) -> String {
 
 pub fn length_completion(content: &str) -> String {
     format!(
-        "{{\"choices\":[{{\"message\":{{\"content\":\"{}\"}},\"finish_reason\":\"length\"}}],\"usage\":{{\"prompt_tokens\":5,\"completion_tokens\":1024}}}}",
+        "{{\"choices\":[{{\"message\":{{\"content\":\"{}\"}},\"finish_reason\":\"length\"}}],\"usage\":{{\"prompt_tokens\":5,\"completion_tokens\":2048}}}}",
         json_string(content)
     )
 }

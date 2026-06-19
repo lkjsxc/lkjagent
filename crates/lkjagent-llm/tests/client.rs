@@ -29,14 +29,14 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     );
     assert_eq!(
         request.body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":2048,\"temperature\":0.3,\"top_p\":0.9,\"stream\":false}"
     );
     Ok(())
 }
 
 #[test]
 fn length_finish_reason_maps_to_oversize() -> TestResult<()> {
-    let body = r#"{"choices":[{"message":{"content":"partial"},"finish_reason":"length"}],"usage":{"prompt_tokens":5,"completion_tokens":1024},"prompt_cache_hit_tokens":4}"#;
+    let body = r#"{"choices":[{"message":{"content":"partial"},"finish_reason":"length"}],"usage":{"prompt_tokens":5,"completion_tokens":2048},"prompt_cache_hit_tokens":4}"#;
     let server = serve_once(200, body)?;
     let config = ClientConfig::new(server.base_url.clone(), "local-model");
     let result = complete(&config, &[Message::new(Role::System, "system")], 1);
@@ -47,7 +47,7 @@ fn length_finish_reason_maps_to_oversize() -> TestResult<()> {
         Err(ClientError::Oversize {
             usage,
             cache_metrics
-        }) if usage.completion_tokens == 1024 && cache_metrics.len() == 1
+        }) if usage.completion_tokens == 2048 && cache_metrics.len() == 1
     ));
     Ok(())
 }
