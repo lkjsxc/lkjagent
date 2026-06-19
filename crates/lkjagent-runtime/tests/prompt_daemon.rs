@@ -30,6 +30,9 @@ fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
     assert!(first.iter().any(|frame| frame
         .content
         .contains("follow the maintenance notice's bounded work")));
+    assert!(first.iter().any(|frame| frame
+        .content
+        .contains("prefer a small shell.run heredoc or script")));
     for frame in first {
         let cap = match frame.kind {
             FrameKind::Prefix(PrefixSection::Identity) => PREFIX_IDENTITY,

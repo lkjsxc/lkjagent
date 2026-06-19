@@ -87,7 +87,7 @@ fn parse_faults_keep_task_open_and_recover_after_three_failures() -> TestResult<
     assert!(matches!(state.task, TaskState::Open { .. }));
     assert!(last_effects
         .iter()
-        .any(|effect| matches!(effect, Effect::RecordEvent { content, .. } if content.contains("simplify the next turn"))));
+        .any(|effect| matches!(effect, Effect::RecordEvent { content, .. } if content.contains("shell.run heredoc/script"))));
     let recovered = step(
         state,
         StepInput::Completion {
