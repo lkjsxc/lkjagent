@@ -57,9 +57,11 @@ write is a single transaction.
 
 The container supervisor restarts the daemon on nonzero exit. Endpoint
 outages do not fabricate replies: the daemon appends an error event, stores
-`daemon_state=error`, and tries again on later polls. Internal process loss
-is recovered by stale lock reclaim plus durable queue, graph cases,
-transcript, memory, config, and workspace state.
+`daemon_state=error`, and tries again only after the capped retry deadline.
+Polls before that deadline keep the heartbeat alive without appending more
+endpoint error events. Internal process loss is recovered by stale lock
+reclaim plus durable queue, graph cases, transcript, memory, config, and
+workspace state.
 
 ## Status
 
