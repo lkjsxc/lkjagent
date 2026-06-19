@@ -88,9 +88,10 @@ required main-section status, part-ledger status, and `verification=ok`, so
 completion can be audited after the case closes. The same normalized evidence
 is saved into the task-summary memory for startup and compaction recovery.
 The docs index maps design memos to covered main ranges, and the main index
-maps stage ranges plus a per-part role ledger to numbered main files. Every
-design index entry and every main part ledger entry is verified before
-closure. Every design and main file is section-verified and content-block
+maps stage ranges plus a per-part role ledger that links each main file back
+to its design memo owner. Every design index entry and every main ledger
+entry, including its design-owner link, is verified before closure. Every
+design and main file is section-verified and content-block
 verified before scaffold closure. Design and main files carry matching
 headings, section roles, objective anchors that
 preserve model-number decimal tokens, main-range coverage, kind-aware segment

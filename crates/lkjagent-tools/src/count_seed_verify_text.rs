@@ -1,3 +1,4 @@
+use crate::count_profile_index::design_owner;
 use crate::error::{ToolError, ToolResult};
 
 pub(crate) fn verify_coverage_map(
@@ -41,6 +42,7 @@ pub(crate) fn verify_coverage_map(
 
 pub(crate) fn verify_part_ledger(
     main_index: Option<&str>,
+    docs: usize,
     main: usize,
 ) -> ToolResult<&'static str> {
     let Some(text) = main_index else {
@@ -55,11 +57,15 @@ pub(crate) fn verify_part_ledger(
         ));
     }
     for index in 1..=main {
-        require_contains(
-            text,
-            &format!("main/part-{index:03}.md"),
-            "main index part ledger entry",
-        )?;
+        let part = format!("- main/part-{index:03}.md:");
+        let line = require_line(text, &part, "main index part ledger entry")?;
+        if let Some(owner) = design_owner(index, docs, main) {
+            require_contains(
+                line,
+                &format!("docs/design-{owner:03}.md"),
+                "main index design owner",
+            )?;
+        }
     }
     Ok("ok")
 }
@@ -140,6 +146,12 @@ fn require_contains(text: &str, needle: &str, label: &str) -> ToolResult<()> {
             "counted document scaffold missing {label}"
         )))
     }
+}
+
+fn require_line<'a>(text: &'a str, needle: &str, label: &str) -> ToolResult<&'a str> {
+    text.lines()
+        .find(|line| line.contains(needle))
+        .ok_or_else(|| ToolError::invalid(format!("counted document scaffold missing {label}")))
 }
 
 fn coverage_range(index: usize, docs: usize, main: usize) -> Option<(usize, usize)> {
