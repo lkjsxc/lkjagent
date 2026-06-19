@@ -153,8 +153,12 @@ fn assert_counted_graph_evidence(conn: &rusqlite::Connection, target: usize) -> 
         evidence.iter().any(|(requirement, summary, path)| {
             requirement == "verification"
                 && summary.contains(&format!("files={target}"))
+                && summary.contains("index_files=")
                 && summary.contains("design_memos=")
                 && summary.contains("main_files=")
+                && summary.contains("part_ledger=ok")
+                && summary.contains("first_main=ok")
+                && summary.contains("last_main=ok")
                 && summary.contains("verification=ok")
                 && path.as_deref() == Some("structured-output")
         }),

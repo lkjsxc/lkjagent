@@ -109,7 +109,7 @@ fn count_seed_honors_outline_count_hint_inside_total() -> TestResult<()> {
 fn count_seed_keeps_file_count_stronger_than_design_wording() -> TestResult<()> {
     let workspace = temp_workspace("count-seed-total-file-not-design")?;
 
-    scaffold_counted_documents(
+    let report = scaffold_counted_documents(
         &workspace,
         CountGuard {
             kind: CountKind::File,
@@ -126,6 +126,13 @@ fn count_seed_keeps_file_count_stronger_than_design_wording() -> TestResult<()> 
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- Design memos: 12"));
     assert!(readme.contains("- Main files: 85"));
+    assert!(report.contains("index_files=2"));
+    assert!(report.contains("root_index=ok"));
+    assert!(report.contains("docs_index=ok"));
+    assert!(report.contains("main_index=ok"));
+    assert!(report.contains("part_ledger=ok"));
+    assert!(report.contains("first_main=ok"));
+    assert!(report.contains("last_main=ok"));
     Ok(())
 }
 

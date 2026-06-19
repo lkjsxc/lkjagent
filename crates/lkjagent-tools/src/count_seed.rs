@@ -4,6 +4,7 @@ use std::path::Path;
 use crate::count_guard::CountGuard;
 use crate::count_profile::DeliverableProfile;
 use crate::count_seed_allocation::allocation_for;
+use crate::count_seed_verify::verify_scaffold;
 use crate::error::{ToolError, ToolResult};
 
 pub fn scaffold_counted_documents(
@@ -57,16 +58,24 @@ pub fn scaffold_counted_documents(
             &profile.main_page(index, allocation.main, &objective),
         )?;
     }
-    let count = count_files(&root)?;
-    if count != guard.target {
-        return Err(ToolError::invalid(format!(
-            "counted document scaffold expected {} files, got {count}",
-            guard.target
-        )));
-    }
+    let check = verify_scaffold(
+        &root,
+        guard.target,
+        allocation.docs,
+        allocation.main,
+        allocation.indexes,
+    )?;
     Ok(format!(
-        "counted document scaffold root=structured-output\nfiles={count}\ndesign_memos={}\nmain_files={}\nverification=ok\ncompletion=ready",
-        allocation.docs, allocation.main
+        "counted document scaffold root=structured-output\nfiles={}\nindex_files={}\ndesign_memos={}\nmain_files={}\nroot_index=ok\ndocs_index={}\nmain_index={}\npart_ledger={}\nfirst_main={}\nlast_main={}\nverification=ok\ncompletion=ready",
+        check.files,
+        check.index_files,
+        allocation.docs,
+        allocation.main,
+        check.docs_index,
+        check.main_index,
+        check.part_ledger,
+        check.first_main,
+        check.last_main
     ))
 }
 
@@ -84,17 +93,4 @@ fn write_file(path: &Path, content: &str) -> ToolResult<()> {
     }
     fs::write(path, content)?;
     Ok(())
-}
-
-fn count_files(path: &Path) -> ToolResult<usize> {
-    let mut count = 0_usize;
-    for entry in fs::read_dir(path)? {
-        let child = entry?.path();
-        if child.is_dir() {
-            count = count.saturating_add(count_files(&child)?);
-        } else {
-            count = count.saturating_add(1);
-        }
-    }
-    Ok(count)
 }

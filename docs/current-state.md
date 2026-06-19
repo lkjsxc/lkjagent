@@ -75,8 +75,9 @@ deliverable kind, so the root, docs, and main directories are README-indexed
 within the selected count guard, and the root README records the count
 breakdown plus whether the guard is exact or approximate.
 The graph evidence for that scaffold records `structured-output`, the target
-file count, design memo count, main file count, and `verification=ok`, so
-completion can be audited after the case closes.
+file count, index file count, design memo count, main file count, root index,
+directory index, first and last main, part-ledger status, and
+`verification=ok`, so completion can be audited after the case closes.
 The docs index maps design memos to covered main ranges, and the main index
 maps stage ranges plus a per-part role ledger to numbered main files. Design
 and main files carry matching headings, section roles, objective anchors that
