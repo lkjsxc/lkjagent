@@ -148,12 +148,6 @@ pub fn task_distillation_prompt(summary: &str) -> String {
     )
 }
 
-pub fn compaction_distillation_prompt(task_summary_required: bool) -> String {
-    format!(
-        "distill before compaction\nmax_turns=4\ntask_summary_required={task_summary_required}\nfinal_save=task-summary when required"
-    )
-}
-
 pub fn task_summary_required(task: &TaskState) -> bool {
     matches!(task, TaskState::Open { .. } | TaskState::Waiting { .. })
 }

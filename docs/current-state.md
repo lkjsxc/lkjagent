@@ -38,8 +38,18 @@ notices to the transcript and keep the task moving instead of pausing it;
 consecutive parse/repeat notices steer large or tag-like writes toward
 shell.run scripts instead of repeated fs.write actions. Endpoint completions
 that hit max_tokens become recovery notices instead of endpoint retry loops.
-Generation reserve and endpoint max_tokens are 2048 tokens, giving compact
-batch scripts enough room while preserving the one-action protocol.
+The runtime context window defaults to 24,576 tokens, accepts 16,384 tokens
+as the lower supported value, derives safe soft/hard compaction triggers
+from the configured window, and uses the 2,048-token reserve as endpoint
+max_tokens. The daemon checks pressure before owner delivery, before
+endpoint calls, and after observations; red or orange pressure compacts at
+the safe boundary, and invalid pressure pauses with a diagnostic. Compaction
+rebuilds the prefix from durable state, records a task-summary row when a
+task is open, restarts the live log with one compact resume notice, and
+records before/after tokens, memory ids, and policy values in the transcript.
+Model-assisted compaction distillation gets up to four `memory.save` turns;
+when an open task still lacks a task-summary row, the harness writes a
+compact fallback task-summary before rebuilding.
 Owner-stated exact markdown file counts activate a completion guard, so
 agent.done is refused until a README-indexed candidate tree has that count.
 Queued owner guidance can strengthen that guard while a task is already open,

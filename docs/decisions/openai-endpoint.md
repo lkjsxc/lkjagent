@@ -9,7 +9,7 @@ Fix how the harness reaches its model.
 The harness talks to exactly one OpenAI-compatible chat-completions HTTP
 endpoint, configured by URL and model name. The reference deployment is a
 llama.cpp-class server running a roughly 14B open model at 4-bit on a 16 GB
-budget with a 32k context window. The endpoint contract is
+budget with the configured context window. The endpoint contract is
 [../architecture/llm/endpoint.md](../architecture/llm/endpoint.md).
 
 The harness never loads model weights, never links inference libraries, and

@@ -28,7 +28,7 @@ is owned by [../architecture/skills/README.md](../architecture/skills/README.md)
 ## Rejected Directions
 
 - MCP client support: each connected server injects tool schemas into every
-  prompt, which a 32k window cannot afford, and pulls in a JSON-RPC stack the
+  prompt, which the runtime window cannot afford, and pulls in a JSON-RPC stack the
   rest of the design deliberately avoids.
 - A bespoke plugin API: same costs as MCP without the ecosystem; skills on
   shell already cover the need.

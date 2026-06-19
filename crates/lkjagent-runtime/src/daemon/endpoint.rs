@@ -11,6 +11,9 @@ impl ResidentDaemon {
         conn: &mut Connection,
         now: &str,
     ) -> RuntimeResult<DaemonTick> {
+        if let Some(tick) = self.compact_before_endpoint(conn, now)? {
+            return Ok(tick);
+        }
         match endpoint_complete(
             &self.runtime.client,
             &self.state.context,

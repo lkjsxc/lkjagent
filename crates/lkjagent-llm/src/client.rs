@@ -6,7 +6,7 @@ use reqwest::header::CONTENT_TYPE;
 
 use crate::backoff::delay_for_attempt;
 use crate::error::{ClientError, ClientResult, EndpointFailure};
-use crate::wire::{build_request, decode_completion, Completion, FinishReason};
+use crate::wire::{build_request, decode_completion, Completion, FinishReason, MAX_TOKENS};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ClientConfig {
@@ -14,6 +14,7 @@ pub struct ClientConfig {
     pub model: String,
     pub api_key: Option<String>,
     pub timeout: Duration,
+    pub max_tokens: u16,
 }
 
 impl ClientConfig {
@@ -23,6 +24,7 @@ impl ClientConfig {
             model: model.into(),
             api_key: None,
             timeout: Duration::from_secs(60),
+            max_tokens: MAX_TOKENS,
         }
     }
 }
@@ -39,7 +41,7 @@ pub fn complete(
         .map_err(|error| {
             endpoint_error(EndpointFailure::Connection(error.to_string()), retry_after)
         })?;
-    let body = request_body(&config.model, messages, retry_after)?;
+    let body = request_body(&config.model, messages, retry_after, config.max_tokens)?;
     let response = send_request(&client, config, body, retry_after)?;
     let status = response.status();
     let text = response.text().map_err(|error| {
@@ -70,8 +72,13 @@ pub fn complete(
     Ok(completion)
 }
 
-fn request_body(model: &str, messages: &[Message], retry_after: Duration) -> ClientResult<String> {
-    let request = build_request(model, messages);
+fn request_body(
+    model: &str,
+    messages: &[Message],
+    retry_after: Duration,
+    max_tokens: u16,
+) -> ClientResult<String> {
+    let request = build_request(model, messages, max_tokens);
     serde_json::to_string(&request)
         .map_err(|error| endpoint_error(EndpointFailure::Malformed(error.to_string()), retry_after))
 }

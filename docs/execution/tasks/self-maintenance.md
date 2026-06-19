@@ -52,8 +52,9 @@ cargo run -p lkjagent-xtask -- quiet verify
   a queue_mutation transcript event and respects cycle budgets.
 - External write behavior is tested with local fixtures such as a bare git
   remote, not live production services.
-- Task close saves a task-summary row; compaction distillation allows four
-  turns and requires the task summary.
+- Task close saves a task-summary row; compaction allows up to four
+  `memory.save` turns and falls back to a harness-written task-summary when
+  an open task still needs one.
 - Directive stamps update in the state table; the rotation is
   deterministic given the stamps.
 - Blocker row 11 done; self-maintenance status moves in the ledger.

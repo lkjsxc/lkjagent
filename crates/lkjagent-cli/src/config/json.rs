@@ -32,6 +32,10 @@ pub fn u64(object: &Map<String, Value>, key: &str) -> Option<u64> {
         .filter(|value| *value > 0)
 }
 
+pub fn usize(object: &Map<String, Value>, key: &str) -> Option<usize> {
+    u64(object, key).and_then(|value| usize::try_from(value).ok())
+}
+
 pub fn render_config(config: &RuntimeConfig) -> Result<String, CliError> {
     let value = json!({
         "endpoint": {
@@ -41,9 +45,9 @@ pub fn render_config(config: &RuntimeConfig) -> Result<String, CliError> {
             "timeout-seconds": config.endpoint_timeout_seconds
         },
         "context": {
-            "window": 32768,
-            "reserve": 2048,
-            "trigger": 28672
+            "window": config.context_policy.window,
+            "reserve": config.context_policy.reserve,
+            "trigger": config.context_policy.hard_trigger
         },
         "sampling": {
             "temperature": 0.3,

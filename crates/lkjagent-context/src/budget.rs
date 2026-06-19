@@ -1,5 +1,8 @@
-pub const WINDOW_TOKENS: usize = 32_768;
-pub const GENERATION_RESERVE: usize = 2_048;
+pub const DEFAULT_WINDOW_TOKENS: usize = 24_576;
+pub const MIN_CONTEXT_WINDOW: usize = 16_384;
+pub const DEFAULT_GENERATION_RESERVE: usize = 2_048;
+pub const WINDOW_TOKENS: usize = DEFAULT_WINDOW_TOKENS;
+pub const GENERATION_RESERVE: usize = DEFAULT_GENERATION_RESERVE;
 pub const PREFIX_IDENTITY: usize = 768;
 pub const PREFIX_GRAMMAR_REGISTRY: usize = 1_024;
 pub const PREFIX_SKILL_INDEX: usize = 512;
@@ -9,9 +12,12 @@ pub const LOG_OWNER_FRAME: usize = 4_096;
 pub const LOG_OBSERVATION: usize = 2_048;
 pub const LOG_SKILL_BODY: usize = 2_048;
 pub const LOG_LOADED_SKILLS: usize = 6_144;
-pub const WHOLE_WINDOW_TRIGGER: usize = 28_672;
-pub const POST_COMPACTION_TARGET: usize = 8_192;
-pub const MIN_LOG_SPACE: usize = 16_384;
+pub const DEFAULT_SOFT_TRIGGER: usize = 18_432;
+pub const DEFAULT_HARD_TRIGGER: usize = 21_504;
+pub const DEFAULT_POST_COMPACTION_TARGET: usize = 8_192;
+pub const WHOLE_WINDOW_TRIGGER: usize = DEFAULT_HARD_TRIGGER;
+pub const POST_COMPACTION_TARGET: usize = DEFAULT_POST_COMPACTION_TARGET;
+pub const MIN_LOG_SPACE: usize = 4_096;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct BudgetRow {
@@ -61,7 +67,11 @@ pub const BUDGET_ROWS: &[BudgetRow] = &[
         cap: LOG_LOADED_SKILLS,
     },
     BudgetRow {
-        region: "whole window trigger",
+        region: "soft compaction trigger",
+        cap: DEFAULT_SOFT_TRIGGER,
+    },
+    BudgetRow {
+        region: "hard compaction trigger",
         cap: WHOLE_WINDOW_TRIGGER,
     },
     BudgetRow {
@@ -79,9 +89,13 @@ pub fn prefix_cap_total() -> usize {
 }
 
 pub fn initial_log_space() -> usize {
-    WINDOW_TOKENS - GENERATION_RESERVE - prefix_cap_total()
+    ContextBudgetPolicy::default().available_log_space()
 }
 
 pub fn config_preserves_log_floor(window: usize, prefix_total: usize, reserve: usize) -> bool {
     window.saturating_sub(prefix_total).saturating_sub(reserve) >= MIN_LOG_SPACE
 }
+#[path = "budget_policy.rs"]
+mod policy;
+
+pub use policy::{budget_rows_for, ContextBudgetError, ContextBudgetPolicy, ContextPressure};

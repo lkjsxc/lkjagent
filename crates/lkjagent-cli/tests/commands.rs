@@ -1,12 +1,14 @@
 mod support;
 
+use std::fs;
 use std::io::Cursor;
+use std::path::Path;
 
 use lkjagent_cli::console::run_console;
 use lkjagent_cli::run_cli;
 use lkjagent_store::events::read_events;
 use lkjagent_store::memory::{save, MemoryKind};
-use support::{open_store, temp_data, write_config, TestResult};
+use support::{open_store, temp_data, TestResult};
 
 #[test]
 fn send_persists_and_status_log_render_store_facts() -> TestResult<()> {
@@ -29,7 +31,9 @@ fn send_persists_and_status_log_render_store_facts() -> TestResult<()> {
 
     let status = run_cli(["--data", data.to_string_lossy().as_ref(), "status"]);
     assert!(status.stdout.contains("queue_depth=1"));
-    assert!(status.stdout.contains("context_compaction_trigger=28672"));
+    assert!(status.stdout.contains("context_window=24576"));
+    assert!(status.stdout.contains("context_hard_trigger=21504"));
+    assert!(status.stdout.contains("context_compaction_trigger=21504"));
 
     let log = run_cli(["--data", data.to_string_lossy().as_ref(), "log"]);
     assert!(log.stdout.contains("kind=queue_mutation"));
@@ -150,5 +154,13 @@ fn run_writes_first_config_and_refuses_existing_lock() -> TestResult<()> {
     let refused = run_cli(["--data", locked.to_string_lossy().as_ref(), "run"]);
     assert_eq!(refused.code, 1);
     assert!(refused.stderr.contains("daemon_refused=other"));
+    Ok(())
+}
+
+fn write_config(data: &Path) -> TestResult<()> {
+    fs::write(
+        data.join("lkjagent.json"),
+        "{\"endpoint\":{\"url\":\"http://endpoint:8080\",\"model\":\"local-test\"}}",
+    )?;
     Ok(())
 }

@@ -3,9 +3,9 @@
 ## Purpose
 
 The token ledger: every region of the window has a cap, an owner, and an
-overflow rule. Initial contract values assume a 32,768-token window and are
-config-tunable; the ratios are the contract, the absolute numbers follow the
-window.
+overflow rule. The default runtime window is 24,576 tokens. The supported
+lower bound is 16,384 tokens, which remains usable by compacting earlier
+and leaving a smaller live log.
 
 ## The Ledger
 
@@ -21,7 +21,8 @@ window.
 | log: observation | 2,048 each | [../tools/registry.md](../tools/registry.md) | head and tail kept, middle elided, truncation notice |
 | log: skill body | 2,048 each | [../skills/format.md](../skills/format.md) | source validation rejects oversized skills |
 | log: loaded skills concurrent | 6,144 total | [../skills/loading.md](../skills/loading.md) | skill.use refused with notice |
-| whole window trigger | 28,672 used | [compaction.md](compaction.md) | compaction at next boundary |
+| soft compaction trigger | 18,432 used | [compaction.md](compaction.md) | narrow observations; preemptive compaction may run |
+| hard compaction trigger | 21,504 used | [compaction.md](compaction.md) | compaction before owner delivery or endpoint call |
 | post-compaction target | 8,192 | [compaction.md](compaction.md) | compaction must reach it or fail loudly |
 
 ## Rules
@@ -31,9 +32,17 @@ window.
 - Truncation is always marked with a notice naming what was cut and how to
   retrieve the rest (a ranged fs.read, a narrower shell command, a
   memory.find query).
-- The prefix total (5,376 max) plus reserve leaves at least 25,344 tokens of
-  log space at the initial values; the context engine asserts this at
-  startup and refuses configs that starve the log below 16,384.
+- The prefix total is 5,376 tokens. With the default 24,576-token window and
+  2,048-token reserve, 17,152 tokens remain for the live log.
+- With a 16,384-token window and 2,048-token reserve, 8,960 tokens remain
+  for the live log. The derived policy is soft trigger 12,288, hard trigger
+  13,312, and post-compaction target 7,424.
+- `context.trigger` is accepted only when it is below `window - reserve`
+  and above the post-compaction target. Omitted or stale trigger values are
+  derived from the selected window instead of preserving larger-window
+  numbers.
+- Configs below a 16,384-token window fail loudly. Configs whose prefix plus
+  reserve leave less than 4,096 log tokens also fail.
 - Budget arithmetic lives in pure functions in lkjagent-context with
   table-driven tests; no budget decision happens inside an IO adapter.
 

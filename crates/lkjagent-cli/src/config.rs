@@ -1,7 +1,10 @@
+mod context;
 mod json;
 
 use std::fs;
 use std::path::{Path, PathBuf};
+
+use lkjagent_context::budget::ContextBudgetPolicy;
 
 use crate::error::CliError;
 
@@ -17,9 +20,9 @@ pub const DEFAULT_CONFIG: &str = r#"{
     "timeout-seconds": 180
   },
   "context": {
-    "window": 32768,
+    "window": 24576,
     "reserve": 2048,
-    "trigger": 28672
+    "trigger": 21504
   },
   "sampling": {
     "temperature": 0.3,
@@ -42,6 +45,7 @@ pub struct RuntimeConfig {
     pub api_key_env: String,
     pub endpoint_timeout_seconds: u64,
     pub daemon_lock_stale_seconds: u64,
+    pub context_policy: ContextBudgetPolicy,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -72,6 +76,7 @@ where
     let value = json::parse(&text)?;
     let endpoint = json::required_object(&value, "endpoint")?;
     let daemon = json::object(&value, "daemon");
+    let context = json::object(&value, "context");
     let model = env_value(&env, "LKJAGENT_MODEL")
         .or_else(|| json::string(endpoint, "model"))
         .ok_or_else(|| CliError::failure("missing endpoint.model"))?;
@@ -89,7 +94,18 @@ where
         daemon_lock_stale_seconds: daemon
             .and_then(|table| json::u64(table, "lock-stale-seconds"))
             .unwrap_or(DEFAULT_LOCK_STALE_SECONDS),
+        context_policy: context::policy_from_config_and_env(context, &env)?,
     }))
+}
+
+pub fn load_context_policy_for_status(data_dir: &Path) -> Result<ContextBudgetPolicy, CliError> {
+    let path = data_dir.join(CONFIG_FILE);
+    if !path.exists() {
+        return ContextBudgetPolicy::derive(24_576, 2_048, None).map_err(policy_error);
+    }
+    let text = fs::read_to_string(path)?;
+    let value = json::parse(&text)?;
+    context::policy_from_config_and_env(json::object(&value, "context"), &process_env)
 }
 
 fn config_from_env<F>(path: PathBuf, env: &F) -> Result<Option<RuntimeConfig>, CliError>
@@ -108,7 +124,12 @@ where
         endpoint_timeout_seconds: env_u64(env, "LKJAGENT_ENDPOINT_TIMEOUT_SECONDS")?
             .unwrap_or(DEFAULT_ENDPOINT_TIMEOUT_SECONDS),
         daemon_lock_stale_seconds: DEFAULT_LOCK_STALE_SECONDS,
+        context_policy: context::policy_from_config_and_env(None, env)?,
     }))
+}
+
+fn policy_error(error: lkjagent_context::budget::ContextBudgetError) -> CliError {
+    CliError::failure(error.to_string())
 }
 
 fn process_env(key: &str) -> Option<String> {

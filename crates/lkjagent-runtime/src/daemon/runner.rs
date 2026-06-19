@@ -1,5 +1,6 @@
 use std::path::PathBuf;
 
+use lkjagent_context::budget::ContextBudgetPolicy;
 use lkjagent_llm::client::ClientConfig;
 use lkjagent_store::state as store_state;
 use lkjagent_tools::control::CompletionGuard;
@@ -27,6 +28,7 @@ pub struct ResidentRuntime {
     pub holder: String,
     pub client: ClientConfig,
     pub tools: ToolRuntime,
+    pub budget: ContextBudgetPolicy,
 }
 
 impl ResidentRuntime {
@@ -41,7 +43,13 @@ impl ResidentRuntime {
             holder,
             client,
             tools: ToolRuntime::new(workspace, skill_library, now),
+            budget: ContextBudgetPolicy::default(),
         }
+    }
+
+    pub fn with_budget(mut self, budget: ContextBudgetPolicy) -> Self {
+        self.budget = budget;
+        self
     }
 }
 
@@ -66,6 +74,9 @@ impl ResidentDaemon {
     pub fn poll_once(&mut self, conn: &mut Connection, now: &str) -> RuntimeResult<DaemonTick> {
         self.runtime.tools.now = now.to_string();
         self.heartbeat(conn, now)?;
+        if let Some(tick) = self.compact_before_owner(conn, now)? {
+            return Ok(tick);
+        }
         self.deliver_owner(conn, now)?;
         if self.state.maintenance.is_some()
             && matches!(self.state.task, TaskState::Idle | TaskState::Closed { .. })

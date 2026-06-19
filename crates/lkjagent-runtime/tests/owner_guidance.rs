@@ -77,7 +77,7 @@ fn benchmark_docs_task_auto_scaffolds_exact_markdown_count() -> TestResult<()> {
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
     let runtime = ResidentRuntime::new(
         "test".to_string(),
-        client_config(base_url, "local-model", None, 180),
+        client_config(base_url, "local-model", None, 180, 2_048),
         workspace.to_path_buf(),
         seed_skill_path(),
         "100",

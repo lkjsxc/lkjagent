@@ -27,6 +27,61 @@ fn env_model_initializes_first_config() -> TestResult<()> {
     assert!(text.contains("\"model\": \"local-model\""));
     assert!(text.contains("\"api-key-env\": \"LKJAGENT_API_KEY\""));
     assert!(text.contains("\"timeout-seconds\": 180"));
+    assert!(text.contains("\"window\": 24576"));
+    assert!(text.contains("\"trigger\": 21504"));
+    Ok(())
+}
+
+#[test]
+fn context_length_env_overrides_default_window() -> TestResult<()> {
+    let data = temp_data("context-env")?;
+    let loaded = load_or_initialize_with_env(&data, |key| match key {
+        "LKJAGENT_MODEL" => Some("local-model".to_string()),
+        "LKJAGENT_CONTEXT_LENGTH" => Some("16384".to_string()),
+        _ => None,
+    })?;
+    let ConfigLoad::Ready(config) = loaded else {
+        return Err("env context config did not load".into());
+    };
+    assert_eq!(config.context_policy.window, 16_384);
+    assert_eq!(config.context_policy.hard_trigger, 13_312);
+
+    let text = fs::read_to_string(data.join("lkjagent.json"))?;
+    assert!(text.contains("\"window\": 16384"));
+    assert!(text.contains("\"trigger\": 13312"));
+    Ok(())
+}
+
+#[test]
+fn invalid_context_window_fails_loudly() -> TestResult<()> {
+    let data = temp_data("context-invalid")?;
+    let result = load_or_initialize_with_env(&data, |key| match key {
+        "LKJAGENT_MODEL" => Some("local-model".to_string()),
+        "LKJAGENT_CONTEXT_LENGTH" => Some("12000".to_string()),
+        _ => None,
+    });
+    match result {
+        Ok(_) => Err("invalid context length loaded".into()),
+        Err(error) => {
+            assert!(error.to_string().contains("at least 16384"));
+            Ok(())
+        }
+    }
+}
+
+#[test]
+fn old_explicit_thirty_two_k_config_stays_valid() -> TestResult<()> {
+    let data = temp_data("context-old")?;
+    fs::write(
+        data.join("lkjagent.json"),
+        "{\"endpoint\":{\"model\":\"local-test\"},\"context\":{\"window\":32768,\"reserve\":2048,\"trigger\":28672}}",
+    )?;
+    let loaded = load_or_initialize_with_env(&data, |_| None)?;
+    let ConfigLoad::Ready(config) = loaded else {
+        return Err("old context config did not load".into());
+    };
+    assert_eq!(config.context_policy.window, 32_768);
+    assert_eq!(config.context_policy.hard_trigger, 28_672);
     Ok(())
 }
 
@@ -47,6 +102,7 @@ fn env_values_override_existing_endpoint_config() -> TestResult<()> {
     assert_eq!(config.endpoint_url, "http://127.0.0.1:9000");
     assert_eq!(config.endpoint_model, "env-model");
     assert_eq!(config.endpoint_timeout_seconds, 180);
+    assert_eq!(config.context_policy.window, 24_576);
     Ok(())
 }
 

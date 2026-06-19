@@ -14,6 +14,7 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     let server = serve_once(200, body)?;
     let mut config = ClientConfig::new(server.base_url.clone(), "local-model");
     config.api_key = Some("secret-token".to_string());
+    config.max_tokens = 1_024;
     let messages = vec![Message::new(Role::System, "system")];
 
     let completion = complete(&config, &messages, 0)?;
@@ -29,7 +30,7 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     );
     assert_eq!(
         request.body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":2048,\"temperature\":0.3,\"top_p\":0.9,\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"stream\":false}"
     );
     Ok(())
 }
