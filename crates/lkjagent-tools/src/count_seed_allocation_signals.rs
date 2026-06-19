@@ -25,6 +25,7 @@ pub(crate) fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
         "specs",
         "viewpoint",
         "viewpoints",
+        "lore",
         "worldbuilding",
         "world bible",
         "story bible",

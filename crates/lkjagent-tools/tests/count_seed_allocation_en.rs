@@ -65,6 +65,36 @@ fn count_seed_honors_english_worldbuilding_file_count() -> TestResult<()> {
 }
 
 #[test]
+fn count_seed_honors_english_lore_file_count() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-en-lore-hint")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 100,
+            mode: CountMode::Approximate,
+        },
+        "Create about one hundred files total for a large mythic novel, with twenty-one lore \
+         files and the remaining files as ordered chapter drafts. Count docs and main content \
+         together. Keep Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert!(root.join("docs/design-021.md").exists());
+    assert!(!root.join("docs/design-022.md").exists());
+    assert!(root.join("main/part-076.md").exists());
+    assert!(!root.join("main/part-077.md").exists());
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    assert!(readme.contains("- Design memos: 21"));
+    assert!(readme.contains("- Main files: 76"));
+    assert!(readme.contains("Kind contract: audit this deliverable as a narrative"));
+    assert!(first.contains("### Scene Role"));
+    Ok(())
+}
+
+#[test]
 fn count_seed_honors_english_character_sheet_file_count() -> TestResult<()> {
     let workspace = temp_workspace("count-seed-en-character-sheet-hint")?;
 
