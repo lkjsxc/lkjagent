@@ -33,10 +33,13 @@ and points the next action to `graph.evidence`.
 Recursive docs, counted structured content, and knowledge-base tasks are
 graph task families that select document construction. They create
 README-indexed scaffolds before endpoint work and cannot close without graph
-evidence for the required document structure. File and markdown-count
-requests remain deterministic control guards, including when combined with a
-recursive or knowledge-base task family; English file, document, and docs
-wording plus common Japanese file wording are recognized, ASCII digits,
+evidence for the required document structure. Counted artifact wording,
+including English artifact and Japanese seikabutsu phrasing, selects document
+construction when it is paired with file-count wording. File and
+markdown-count requests remain deterministic control guards, including when
+combined with a recursive or knowledge-base task family; English file,
+document, and docs wording plus common Japanese file wording are recognized,
+ASCII digits,
 full-width digits, common Japanese numeric kanji, common English number
 words including singular and plural scale words such as hundred and hundreds,
 and comma-like digit separators are accepted, the target number is chosen by

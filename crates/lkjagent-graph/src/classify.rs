@@ -82,6 +82,7 @@ fn content_signal(lower: &str, content: &str) -> bool {
         lower,
         &[
             "article",
+            "artifact",
             "book",
             "chapter",
             "collection",
@@ -107,6 +108,7 @@ fn content_signal(lower: &str, content: &str) -> bool {
             "教材",
             "物語",
             "小説",
+            "成果物",
             "手引き",
             "記事",
             "報告書",
