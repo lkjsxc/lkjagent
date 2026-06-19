@@ -1,5 +1,6 @@
 mod support;
 
+use lkjagent_store::graph::{link_memory, open_case, OpenCase};
 use lkjagent_store::memory::{
     delete as delete_memory, digest, find, save, update as update_memory, MemoryKind, MemoryUpdate,
 };
@@ -80,5 +81,58 @@ fn memory_updates_and_deletes_keep_fts_current() -> TestResult<()> {
     delete_memory(&mut conn, id)?;
     let fresh = find(&conn, "fresh", 3)?;
     assert!(fresh.is_empty());
+    Ok(())
+}
+
+#[test]
+fn memory_find_prefers_active_graph_link_within_kind() -> TestResult<()> {
+    let mut conn = memory_store()?;
+    let newer = save(
+        &mut conn,
+        MemoryKind::Lesson,
+        "parser",
+        "protocol",
+        "parser recovery detail",
+        100,
+        "2026-01-01T00:00:02Z",
+    )?;
+    let linked = save(
+        &mut conn,
+        MemoryKind::Lesson,
+        "parser",
+        "protocol",
+        "parser recovery detail",
+        100,
+        "2026-01-01T00:00:01Z",
+    )?;
+    let requirements = vec!["memory".to_string()];
+    let packages = Vec::new();
+    let pending = Vec::new();
+    let case_id = open_case(
+        &conn,
+        OpenCase {
+            objective: "fix parser recovery",
+            family: "bug-fix",
+            phase: "execution",
+            active_node: "execute",
+            plan: "reuse linked parser memory",
+            evidence_requirements: &requirements,
+            selected_packages: &packages,
+            pending_checks: &pending,
+        },
+        "2026-01-01T00:00:03Z",
+    )?;
+    link_memory(
+        &conn,
+        case_id,
+        linked,
+        "execute",
+        "task-context",
+        "2026-01-01T00:00:03Z",
+    )?;
+
+    let found = find(&conn, "parser recovery", 2)?;
+    assert_eq!(found.first().map(|row| row.id), Some(linked));
+    assert!(found.iter().any(|row| row.id == newer));
     Ok(())
 }

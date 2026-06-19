@@ -13,13 +13,13 @@ bounded observation. Matching and ranking:
 
 1. The query runs against memory_fts, the FTS5 mirror over title, tags,
    and content ([store.md](store.md)).
-2. The base score is FTS5 bm25.
-3. The score is weighted by kind: task-summary highest, then incident,
+2. The score is weighted by kind: task-summary highest, then incident,
    then lesson, then fact. Summaries of past work and records of past
    failures outrank general knowledge at equal lexical relevance.
-4. Ties break by recency: latest updated_at first.
-5. When an active graph case exists, linked memory and matching graph node
-   terms are preferred within the same kind and lexical score band.
+3. When an active graph case exists, memory linked to that case is preferred
+   within the same kind, and links for the active node rank first.
+4. The base lexical score is FTS5 bm25.
+5. Ties break by recency: latest updated_at first.
 
 ## Why Lexical
 
