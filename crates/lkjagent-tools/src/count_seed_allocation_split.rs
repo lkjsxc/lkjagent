@@ -1,4 +1,5 @@
 use crate::count_number::{number_spans, span_distance, span_matches, NumberSpan, Span};
+use crate::count_seed_allocation_lead::allocation_lead_before;
 
 const MAX_SPLIT_FILE_DISTANCE: usize = 48;
 const MAX_REMAINING_DISTANCE: usize = 64;
@@ -158,16 +159,6 @@ fn total_count_candidate(text: &str, number: Span, split: Span) -> bool {
         lower
             .split(|ch: char| !ch.is_alphanumeric())
             .any(|word| matches!(word, "total" | "altogether" | "overall"))
-    })
-}
-
-fn allocation_lead_before(text: &str, number: Span) -> bool {
-    let start = number.start.saturating_sub(32);
-    text.get(start..number.start).is_some_and(|prefix| {
-        let lower = prefix.to_lowercase();
-        ["with", "including", "include", "containing", "contains"]
-            .iter()
-            .any(|lead| lower.split_whitespace().any(|word| word == *lead))
     })
 }
 
