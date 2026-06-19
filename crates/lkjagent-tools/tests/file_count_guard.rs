@@ -100,6 +100,52 @@ fn approximate_file_count_guard_refuses_outside_tolerance() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn count_guard_accepts_plain_single_root_without_readme() -> TestResult<()> {
+    let workspace = temp_workspace("file-count-plain-root")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut state = state();
+    state.control.start_task("create exactly 3 files total");
+    fs::create_dir_all(workspace.join("story"))?;
+    for index in 1..=3 {
+        fs::write(workspace.join(format!("story/chapter-{index}.md")), "x\n")?;
+    }
+
+    let done = dispatch(
+        &action("agent.done", &[("summary", "plain story root")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+    assert!(done.content.contains("summary=plain story root"));
+    Ok(())
+}
+
+#[test]
+fn count_guard_refuses_ambiguous_plain_roots_without_readme() -> TestResult<()> {
+    let workspace = temp_workspace("file-count-ambiguous-roots")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut state = state();
+    state.control.start_task("create exactly 3 files total");
+    fs::create_dir_all(workspace.join("docs"))?;
+    fs::create_dir_all(workspace.join("main"))?;
+    fs::write(workspace.join("docs/one.md"), "x\n")?;
+    fs::write(workspace.join("main/two.md"), "x\n")?;
+    fs::write(workspace.join("main/three.md"), "x\n")?;
+
+    let early = dispatch(
+        &action("agent.done", &[("summary", "ambiguous roots")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+    assert!(is_error(&early));
+    assert!(early.content.contains("no README.md candidate found"));
+    Ok(())
+}
+
 fn is_error(output: &lkjagent_tools::dispatch::DispatchOutput) -> bool {
     matches!(
         &output.kind,
