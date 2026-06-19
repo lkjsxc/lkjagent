@@ -123,6 +123,10 @@ fn count_seed_keeps_file_count_stronger_than_design_wording() -> TestResult<()> 
     assert!(root.join("docs/design-012.md").exists());
     assert!(!root.join("docs/design-013.md").exists());
     assert!(root.join("main/part-085.md").exists());
+    let mid_design = fs::read_to_string(root.join("docs/design-006.md"))?;
+    assert!(mid_design.contains("## Verification Checks"));
+    let mid_part = fs::read_to_string(root.join("main/part-042.md"))?;
+    assert!(mid_part.contains("## Continuity Hand-Off"));
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- Design memos: 12"));
     assert!(readme.contains("- Main files: 85"));
@@ -133,6 +137,7 @@ fn count_seed_keeps_file_count_stronger_than_design_wording() -> TestResult<()> 
     assert!(report.contains("main_index=ok"));
     assert!(report.contains("acceptance_audit=ok"));
     assert!(report.contains("part_ledger=ok"));
+    assert!(report.contains("section_scope=all"));
     assert!(report.contains("design_sections=ok"));
     assert!(report.contains("main_sections=ok"));
     assert!(report.contains("first_main=ok"));
