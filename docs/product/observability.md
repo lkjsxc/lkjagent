@@ -11,7 +11,7 @@ read-only and never perturbs the loop: looking at the agent costs it nothing.
 | --- | --- |
 | `lkjagent status` | Daemon state, queue depth, open task, question, error, turns, context usage, last compaction |
 | `lkjagent log` | Transcript events in order: messages, actions, observations, notices, queue mutations, compactions |
-| `lkjagent console` | Combined owner screen with status, pending queue, recent transcript, and send prompt |
+| `lkjagent console` | Owner screen with transcript top, pending preview, bottom status deck, and send prompt |
 | `lkjagent memory` | Full-text search over distilled memory entries |
 | `lkjagent skills` | Source skill library index with file timestamps |
 | sqlite3 on the store | Read-only forensics; schema in [../architecture/memory/store.md](../architecture/memory/store.md) |
@@ -39,7 +39,8 @@ This makes context pollution visible long before it hurts.
 ## Boundaries
 
 No metrics endpoint and no log shipping. The store is local and the CLI
-reads it. The console is an interactive terminal view, not a web service.
+reads it. The console is an interactive terminal view, not a web service,
+and it sizes itself from terminal rows and columns.
 Anything fancier is a skill the agent can build on demand.
 
 ## Status

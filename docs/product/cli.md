@@ -14,7 +14,7 @@ no IPC protocol.
 | `lkjagent send <text>` | Append a user message through lkjagent-store; print its queue id. |
 | `lkjagent status` | Print daemon state, queue depth, open task, question, error, context usage. |
 | `lkjagent log` | Print recent transcript events; `--follow` tails new ones. |
-| `lkjagent console` | Open an interactive owner console with status, pending queue, recent log, and send prompt. |
+| `lkjagent console` | Open an interactive owner console with transcript, bottom status deck, and send prompt. |
 | `lkjagent memory <query>` | Search distilled memory through the full-text index. |
 | `lkjagent skills` | List source skills: name, trigger line, file timestamp. |
 
@@ -39,20 +39,23 @@ in [queue.md](queue.md).
 ## Owner Console
 
 `lkjagent console` renders a compact management screen that redraws while it
-is open:
+is open. It keeps the transcript area at the top and concentrates operational
+controls at the bottom:
 
-- daemon state, pending queue count, open task, question, and error,
-- the last useful agent output,
-- pending queue previews,
-- the recent transcript tail,
-- a `send>` prompt.
+- transcript tail and the last useful agent output,
+- pending queue previews near the transcript,
+- daemon state, pending count, open task, question, error, and notice in the
+  bottom deck,
+- a `send>` prompt under the bottom deck.
 
 Any non-command line typed at the prompt is enqueued with the same durability
 as `lkjagent send`. `/refresh` redraws, `/help` lists commands, and `/quit`
 exits the console without touching the daemon. The screen refreshes every
 second, so daemon state, transcript changes, and queued work appear even when
 the owner is not typing. In an interactive terminal, unfinished input stays
-visible across redraws.
+visible across redraws. The renderer reads terminal columns and rows, caps the
+body to the visible screen, and wraps mixed English, Japanese, and other wide
+characters by display width.
 
 ## Output Style
 

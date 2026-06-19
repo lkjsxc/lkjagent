@@ -1,3 +1,5 @@
+mod display;
+mod event_view;
 mod input;
 mod render;
 mod style;
@@ -11,7 +13,7 @@ use std::time::Duration;
 use crate::error::CliError;
 use crate::store::{now_stamp, open_store};
 use input::{spawn_line_input, InputEvent};
-use render::render_screen;
+use render::{render_screen, render_screen_for_size, ScreenSize};
 use terminal_input::{spawn_terminal_input, TerminalMode};
 
 const REFRESH_INTERVAL: Duration = Duration::from_millis(1000);
@@ -96,6 +98,15 @@ where
     )?;
     writer.flush()?;
     Ok(())
+}
+
+pub fn render_snapshot(
+    data_dir: &Path,
+    notice: &str,
+    columns: usize,
+    rows: usize,
+) -> Result<String, CliError> {
+    Ok(render_screen_for_size(data_dir, notice, ScreenSize { columns, rows })?.body)
 }
 
 fn handle_input(data_dir: &Path, input: &str) -> Result<ConsoleFlow, CliError> {
