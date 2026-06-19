@@ -1,5 +1,5 @@
-use super::{CountGuard, CountKind, CountMode};
-use crate::count_number::{number_spans, span_distance, span_matches, Span};
+use super::{mode::count_mode, CountGuard, CountKind};
+use crate::count_number::{number_spans, span_distance, span_matches, NumberSpan, Span};
 
 const MAX_SIGNAL_DISTANCE: usize = 80;
 const MAX_AGGREGATE_SIGNAL_DISTANCE: usize = 32;
@@ -15,15 +15,15 @@ pub(super) fn count_target(lower: &str, content: &str) -> Option<CountGuard> {
     } else {
         CountKind::File
     };
-    let mode = if approximate_signal(lower, content) && !exact_signal(lower, content) {
-        CountMode::Approximate
-    } else {
-        CountMode::Exact
-    };
-    Some(CountGuard { kind, target, mode })
+    let mode = count_mode(target.span, lower, content);
+    Some(CountGuard {
+        kind,
+        target: target.value,
+        mode,
+    })
 }
 
-fn target_number(lower: &str, content: &str, signals: &[Span]) -> Option<usize> {
+fn target_number(lower: &str, content: &str, signals: &[Span]) -> Option<NumberSpan> {
     let aggregate_signals = aggregate_signal_spans(lower, content);
     let non_file_units = non_file_unit_spans(lower, content);
     number_spans(content)
@@ -41,10 +41,10 @@ fn target_number(lower: &str, content: &str, signals: &[Span]) -> Option<usize> 
                 (None, Some(aggregate)) => aggregate,
                 (None, None) => return None,
             };
-            (score <= MAX_SIGNAL_DISTANCE).then_some((score, number.value))
+            (score <= MAX_SIGNAL_DISTANCE).then_some((score, number))
         })
-        .min_by_key(|(score, value)| (*score, usize::MAX.saturating_sub(*value)))
-        .map(|(_, value)| value)
+        .min_by_key(|(score, number)| (*score, usize::MAX.saturating_sub(number.value)))
+        .map(|(_, number)| number)
 }
 
 fn aggregate_signal_score(
@@ -122,59 +122,4 @@ fn markdown_signal(lower: &str, content: &str) -> bool {
         || lower.contains(".md")
         || content.contains("マークダウン")
         || content.contains("ドキュメント")
-}
-
-fn approximate_signal(lower: &str, content: &str) -> bool {
-    lower.contains("about")
-        || lower.contains("around")
-        || lower.contains("roughly")
-        || lower.contains("approximately")
-        || lower.contains("approx ")
-        || number_ish_signal(lower, content)
-        || lower.contains("or so")
-        || content.contains("ぐらい")
-        || content.contains("くらい")
-        || content.contains("程度")
-        || content.contains("ほど")
-        || content.contains("前後")
-        || content.contains("約")
-}
-
-fn number_ish_signal(lower: &str, content: &str) -> bool {
-    let numbers = number_spans(content);
-    span_matches(lower, "ish").into_iter().any(|ish| {
-        numbers.iter().any(|number| {
-            number.span.end <= ish.start && ish.start.saturating_sub(number.span.end) <= 1
-        })
-    })
-}
-
-fn exact_signal(lower: &str, content: &str) -> bool {
-    !negated_exact_signal(lower)
-        && (lower.contains("exact")
-            || lower.contains("exactly")
-            || lower.contains("precisely")
-            || content.contains("ちょうど")
-            || content.contains("ぴったり")
-            || content.contains("正確"))
-}
-
-fn negated_exact_signal(lower: &str) -> bool {
-    lower.contains("not exact")
-        || lower.contains("not exactly")
-        || lower.contains("not precise")
-        || lower.contains("not precisely")
-        || lower.contains("not an exact")
-        || lower.contains("no need to be exact")
-        || lower.contains("no need to be precise")
-        || lower.contains("need not be exact")
-        || lower.contains("need not be precise")
-        || lower.contains("do not need to be exact")
-        || lower.contains("do not have to be exact")
-        || lower.contains("does not need to be exact")
-        || lower.contains("does not have to be exact")
-        || lower.contains("don't need to be exact")
-        || lower.contains("don't have to be exact")
-        || lower.contains("doesn't need to be exact")
-        || lower.contains("doesn't have to be exact")
 }

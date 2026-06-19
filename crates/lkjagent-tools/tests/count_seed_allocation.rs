@@ -128,3 +128,23 @@ fn count_seed_keeps_file_count_stronger_than_design_wording() -> TestResult<()> 
     assert!(readme.contains("- Main files: 85"));
     Ok(())
 }
+
+#[test]
+fn count_seed_readme_preserves_approximate_count_mode() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-approximate-mode")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 100,
+            mode: CountMode::Approximate,
+        },
+        "Create about 100 files total with twenty design memos and ordered main files.",
+    )?;
+
+    let readme = fs::read_to_string(workspace.join("structured-output/README.md"))?;
+    assert!(readme.contains("within the approximate-count guard"));
+    assert!(!readme.contains("exact counted deliverable"));
+    Ok(())
+}

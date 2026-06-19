@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 use crate::error::{ToolError, ToolResult};
 
 mod files;
+mod mode;
 mod parse;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

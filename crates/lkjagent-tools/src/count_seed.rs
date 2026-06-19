@@ -31,6 +31,7 @@ pub fn scaffold_counted_documents(
             allocation.docs,
             allocation.main,
             allocation.index_files(),
+            guard.mode,
             &objective,
         ),
     )?;

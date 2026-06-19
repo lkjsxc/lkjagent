@@ -48,14 +48,17 @@ are recognized, ASCII digits,
 full-width digits, common Japanese numeric kanji, common English number
 words including singular and plural scale words such as hundred and hundreds,
 and comma-like digit separators are accepted, the target number is chosen by
-proximity to file or document wording, exact wording is exact, and approximate
-wording, including ish, or-so, hodo, and zengo forms, uses a bounded
-tolerance; negated exact wording such as not-exactly, no-need-exact, and
+proximity to file or document wording, and exact or approximate mode wording
+is scored near that chosen target. Direct exact wording is exact, approximate
+wording including ish, or-so, hodo, and zengo forms uses a bounded tolerance,
+and negated exact wording such as not-exactly, no-need-exact, and
 does-not-have-to-be-exact keeps the approximate mode instead of forcing an
-exact count. Aggregate wording such as total, combined, in-all, and gokei can
-carry the overall count when the prompt also contains smaller docs or outline
-file counts, while nearby non-file units such as words or pages keep their
-numbers from becoming file-count targets. Counted completion prefers
+exact count. Exact wording attached to a smaller docs, outline, or design
+subcount does not make an approximate overall count strict. Aggregate wording
+such as total, combined, in-all, and gokei can carry the overall count when
+the prompt also contains smaller docs or outline file counts, while nearby
+non-file units such as words or pages keep their numbers from becoming
+file-count targets. Counted completion prefers
 README-indexed roots and falls back to clean top-level output directories.
 The active graph prefix renders count guards and tells the model to use one
 compact `shell.run` command with direct `/bin/sh` loops and `printf`
@@ -69,7 +72,8 @@ tree with the requested count before the first endpoint turn and records graph
 evidence for the scaffold, then saves the task summary and closes the task.
 That scaffold profiles the owner's objective by detected language and broad
 deliverable kind, so the root, docs, and main directories are README-indexed
-within the exact count, and the root README records the count breakdown.
+within the selected count guard, and the root README records the count
+breakdown plus whether the guard is exact or approximate.
 The graph evidence for that scaffold records `structured-output`, the target
 file count, design memo count, main file count, and `verification=ok`, so
 completion can be audited after the case closes.
