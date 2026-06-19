@@ -54,6 +54,33 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-japanese")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 20,
+            mode: CountMode::Exact,
+        },
+        "100ファイルぐらいの大きな物語を作ってください。",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert_eq!(counts(&root)?.markdown, 20);
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    assert!(readme.contains("# 構造化成果物"));
+    let design = fs::read_to_string(root.join("docs/design-001.md"))?;
+    assert!(design.contains("範囲と受け入れ条件"));
+    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    assert!(first_part.contains("# 本編 001"));
+    assert!(first_part.contains("## 本文"));
+    assert!(first_part.contains("第1節"));
+    Ok(())
+}
+
 fn assert_readmes(root: &Path) -> TestResult<()> {
     for entry in fs::read_dir(root)? {
         let child = entry?.path();
