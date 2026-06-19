@@ -106,6 +106,31 @@ fn count_seed_english_main_anchor_trims_parenthetical_file_total_suffix() -> Tes
 }
 
 #[test]
+fn count_seed_english_main_anchor_trims_markdown_count_suffix() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-english-markdown-count")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 100,
+            mode: CountMode::Approximate,
+        },
+        "Write a large story as about a hundred markdown files, with planning documents and manuscript chapters combined. Keep Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    assert!(readme.contains("about a hundred markdown files"));
+    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    assert!(first_part.contains(
+        "Local objective: Turn \"a large story\" into this file's distinct contribution."
+    ));
+    assert_no_local_objective_starts_with(&root, "a large story as about a hundred markdown")?;
+    Ok(())
+}
+
+#[test]
 fn count_seed_english_report_skips_docs_total_constraint_anchor() -> TestResult<()> {
     let workspace = temp_workspace("count-seed-report-content-anchor")?;
 
