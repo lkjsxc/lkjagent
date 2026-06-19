@@ -65,6 +65,36 @@ fn count_seed_honors_english_checklist_file_count() -> TestResult<()> {
 }
 
 #[test]
+fn count_seed_honors_english_timeline_file_count() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-en-timeline-hint")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 100,
+            mode: CountMode::Approximate,
+        },
+        "Create about one hundred files total for a disaster response playbook, with seventeen \
+         timeline files and the remaining files as ordered exercise modules. Count docs and main \
+         content together. Keep Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert!(root.join("docs/design-017.md").exists());
+    assert!(!root.join("docs/design-018.md").exists());
+    assert!(root.join("main/part-080.md").exists());
+    assert!(!root.join("main/part-081.md").exists());
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    assert!(readme.contains("- Design memos: 17"));
+    assert!(readme.contains("- Main files: 80"));
+    assert!(readme.contains("Kind contract: audit this deliverable as a guide"));
+    assert!(first.contains("### Procedure Role"));
+    Ok(())
+}
+
+#[test]
 fn count_seed_honors_english_worldbuilding_file_count() -> TestResult<()> {
     let workspace = temp_workspace("count-seed-en-worldbuilding-hint")?;
 
