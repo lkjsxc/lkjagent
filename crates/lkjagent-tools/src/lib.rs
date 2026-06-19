@@ -4,6 +4,7 @@ pub mod count_guard;
 mod count_profile;
 mod count_profile_body;
 mod count_profile_data;
+mod count_profile_design;
 pub mod count_seed;
 pub mod dispatch;
 pub mod error;

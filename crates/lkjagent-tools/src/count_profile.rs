@@ -1,5 +1,6 @@
 use crate::count_profile_body::{body_text, handoff_text, main_title, sequence_text};
 use crate::count_profile_data::{EN_DESIGN_FOCUSES, JP_DESIGN_FOCUSES};
+use crate::count_profile_design::design_text;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct DeliverableProfile {
@@ -40,15 +41,22 @@ impl DeliverableProfile {
         }
     }
 
-    pub(crate) fn doc_page(self, index: usize, objective: &str) -> String {
+    pub(crate) fn doc_page(
+        self,
+        index: usize,
+        docs: usize,
+        main: usize,
+        objective: &str,
+    ) -> String {
+        let design = design_text(self.language, self.kind, index, docs, main);
         match self.language {
             Language::Japanese => format!(
-                "# 設計メモ {index:03}\n\n## 焦点\n\n{}\n\n## 依頼文\n\n{objective}\n\n## 設計ノート\n\nこのメモは、成果物全体の順序、継続性、検証可能性を保つために使います。対応する本編ファイルへ反映すべき判断を記録します。\n",
-                self.design_focus(index)
+                "# 設計メモ {index:03}\n\n## 焦点\n\n{}\n\n## 依頼文\n\n{objective}\n\n{design}",
+                self.design_focus(index),
             ),
             Language::English => format!(
-                "# Design Memo {index:03}\n\n## Focus\n\n{}\n\n## Objective Context\n\n{objective}\n\n## Notes\n\nUse this memo to keep the generated file set coherent, ordered, and verifiable. Record decisions that should shape the corresponding main content files.\n",
-                self.design_focus(index)
+                "# Design Memo {index:03}\n\n## Focus\n\n{}\n\n## Objective Context\n\n{objective}\n\n{design}",
+                self.design_focus(index),
             ),
         }
     }

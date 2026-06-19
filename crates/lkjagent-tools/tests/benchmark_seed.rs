@@ -74,6 +74,9 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     assert!(readme.contains("# 構造化成果物"));
     let design = fs::read_to_string(root.join("docs/design-001.md"))?;
     assert!(design.contains("範囲と受け入れ条件"));
+    assert!(design.contains("## 対象範囲"));
+    assert!(design.contains("main/part-001.md"));
+    assert!(design.contains("## 検証観点"));
     let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
     assert!(first_part.contains("# 本編 001"));
     assert!(first_part.contains("## 本文"));

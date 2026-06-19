@@ -32,7 +32,7 @@ pub fn scaffold_counted_documents(
     for index in 1..=docs {
         write_file(
             &root.join(format!("docs/design-{index:03}.md")),
-            &profile.doc_page(index, &objective),
+            &profile.doc_page(index, docs, main, &objective),
         )?;
     }
     for index in 1..=main {
