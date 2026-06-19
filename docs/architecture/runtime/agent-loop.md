@@ -64,9 +64,10 @@ avoid hardcoded `/workspace` paths, brace expansion, cat heredocs, bash
 scripts, literal bodies, or one `fs.write` per file.
 For counted documentation tasks without recursive or benchmark scaffolds, the
 daemon writes a generic `structured-output/` tree before the first endpoint
-turn, verifies the requested count, records graph evidence, saves a task
-summary, and closes the task without asking the endpoint to repeat the same
-bulk generation.
+turn. The scaffold profiles the owner's objective by detected language and
+broad deliverable kind, verifies the requested count, records graph evidence,
+saves a task summary, and closes the task without asking the endpoint to
+repeat the same bulk generation.
 
 When no task is open and the queue is empty, the daemon opens a bounded
 graph maintenance case, records `daemon_state=working`, and continues toward
