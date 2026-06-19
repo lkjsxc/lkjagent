@@ -1,3 +1,4 @@
+pub mod benchmark_seed;
 pub mod control;
 pub mod count_guard;
 pub mod dispatch;

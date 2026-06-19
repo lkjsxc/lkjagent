@@ -130,6 +130,12 @@ impl ResidentDaemon {
         let scaffold_docs = starting_task
             && self.dispatch_state.control.guard.is_recursive()
             && Self::recursive_docs_requested(&owner.content);
+        let benchmark_target = self
+            .dispatch_state
+            .control
+            .guard
+            .markdown_target()
+            .filter(|_| Self::benchmark_docs_requested(&owner.content));
         let scaffold_profile = self.scaffold_profile();
         let result = step(
             self.state.clone(),
@@ -144,6 +150,9 @@ impl ResidentDaemon {
             if scaffold_docs {
                 self.auto_scaffold_recursive_docs(conn, now, scaffold_profile)?;
             }
+        }
+        if let Some(target) = benchmark_target {
+            self.auto_scaffold_markdown_corpus(conn, now, target)?;
         }
         Ok(())
     }

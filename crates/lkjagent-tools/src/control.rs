@@ -51,6 +51,13 @@ impl CompletionGuard {
     pub fn is_knowledge(self) -> bool {
         matches!(self, Self::RecursiveKnowledge)
     }
+
+    pub fn markdown_target(self) -> Option<usize> {
+        match self {
+            Self::MarkdownCount { target } => Some(target),
+            _ => None,
+        }
+    }
 }
 
 impl Default for ControlState {

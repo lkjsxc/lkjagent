@@ -44,7 +44,10 @@ Owner-stated exact markdown file counts activate a completion guard, so
 agent.done is refused until a README-indexed candidate tree has that count.
 Queued owner guidance can strengthen that guard while a task is already open,
 so exact-count corrections are not lost when they interrupt maintenance or
-long-running work.
+long-running work. Benchmark documentation corpus requests with an exact
+markdown count get a deterministic markdown-only scaffold before endpoint
+work, giving the Docker smoke path a reliable populated workspace on small
+local models.
 Empty queues open bounded self-maintenance cycles in rotation; owner queue
 arrival preempts maintenance at the next turn boundary. Compose wiring is
 implemented. The implementation queue is

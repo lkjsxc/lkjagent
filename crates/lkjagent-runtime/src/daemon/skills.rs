@@ -1,6 +1,7 @@
 use lkjagent_context::assemble::append_frame;
 use lkjagent_context::model::{Frame, FrameKind, NoticeKind};
 use lkjagent_store::events::{append_event, EventKind};
+use lkjagent_tools::benchmark_seed::scaffold_markdown_corpus;
 use lkjagent_tools::dispatch::load_skill_frame;
 use lkjagent_tools::dispatch::DispatchOutput;
 use lkjagent_tools::observe::{self, OutputKind};
@@ -43,6 +44,23 @@ impl ResidentDaemon {
         self.append_output_frame(conn, now, &output.kind, output.rendered)
     }
 
+    pub(super) fn auto_scaffold_markdown_corpus(
+        &mut self,
+        conn: &Connection,
+        now: &str,
+        target: usize,
+    ) -> RuntimeResult<()> {
+        let output = match scaffold_markdown_corpus(&self.runtime.tools.workspace, target) {
+            Ok(content) => observe::ok(
+                content,
+                self.runtime.tools.observation_tokens,
+                "finish with agent.done",
+            ),
+            Err(error) => observe::error(error.to_string(), self.runtime.tools.observation_tokens),
+        };
+        self.append_output_frame(conn, now, &output.kind, output.rendered)
+    }
+
     pub(super) fn recursive_docs_requested(content: &str) -> bool {
         let lower = content.to_ascii_lowercase();
         lower.contains("docs")
@@ -52,6 +70,13 @@ impl ResidentDaemon {
             || lower.contains("wiki")
             || content.contains("ドキュメント")
             || content.contains("百科事典")
+    }
+
+    pub(super) fn benchmark_docs_requested(content: &str) -> bool {
+        let lower = content.to_ascii_lowercase();
+        lower.contains("docs/benchmark-corpus")
+            || (lower.contains("benchmark")
+                && (lower.contains("documentation") || lower.contains("corpus")))
     }
 
     pub(super) fn scaffold_profile(&self) -> ScaffoldProfile {
