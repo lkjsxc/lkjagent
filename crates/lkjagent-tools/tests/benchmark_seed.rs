@@ -117,6 +117,26 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn count_seed_keeps_decimal_version_inside_objective_anchor() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-version-anchor")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 8,
+            mode: CountMode::Exact,
+        },
+        "Use GPT-5.3-Codex-Spark thrift. Create about 100 files total.",
+    )?;
+
+    let readme = fs::read_to_string(workspace.join("structured-output/README.md"))?;
+    assert!(readme.contains("- Use GPT-5.3-Codex-Spark thrift"));
+    assert!(!readme.contains("- Use GPT-5\n- 3-Codex-Spark thrift"));
+    Ok(())
+}
+
 fn assert_readmes(root: &Path) -> TestResult<()> {
     for entry in fs::read_dir(root)? {
         let child = entry?.path();

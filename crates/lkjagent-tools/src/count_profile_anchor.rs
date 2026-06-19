@@ -44,12 +44,13 @@ fn objective_anchors(objective: &str) -> Vec<String> {
 fn clause_anchors(objective: &str) -> Vec<String> {
     let mut anchors = Vec::new();
     let mut current = String::new();
-    for ch in objective.chars() {
-        if is_clause_separator(ch) {
+    let chars = objective.chars().collect::<Vec<_>>();
+    for (index, ch) in chars.iter().enumerate() {
+        if is_clause_separator(&chars, index) {
             push_anchor(&mut anchors, &current);
             current.clear();
         } else {
-            current.push(ch);
+            current.push(*ch);
         }
     }
     push_anchor(&mut anchors, &current);
@@ -97,11 +98,22 @@ fn dedupe_limit(values: Vec<String>, limit: usize) -> Vec<String> {
     deduped
 }
 
-fn is_clause_separator(ch: char) -> bool {
+fn is_clause_separator(chars: &[char], index: usize) -> bool {
+    let ch = chars[index];
+    if ch == '.' && decimal_point(chars, index) {
+        return false;
+    }
     matches!(
         ch,
         '\n' | '\r' | ',' | ';' | '.' | '!' | '?' | '、' | '。' | '；' | '！' | '？'
     )
+}
+
+fn decimal_point(chars: &[char], index: usize) -> bool {
+    index > 0
+        && index.saturating_add(1) < chars.len()
+        && chars[index - 1].is_ascii_digit()
+        && chars[index + 1].is_ascii_digit()
 }
 
 fn is_stop_word(word: &str) -> bool {

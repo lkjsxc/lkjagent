@@ -81,6 +81,36 @@ fn english_document_count_request_adds_approximate_file_guard() {
 }
 
 #[test]
+fn file_count_target_uses_number_near_file_signal() {
+    let mut state = ControlState::default();
+
+    state.start_task("Create 20 files total with 100 sections of internal detail.");
+
+    assert_eq!(
+        state.guard,
+        CompletionGuard::FileCount {
+            target: 20,
+            mode: CountMode::Exact
+        }
+    );
+}
+
+#[test]
+fn file_count_target_ignores_model_version_numbers() {
+    let mut state = ControlState::default();
+
+    state.start_task("Use GPT-5.3-Codex-Spark style thrift and create about 100 files total.");
+
+    assert_eq!(
+        state.guard,
+        CompletionGuard::FileCount {
+            target: 100,
+            mode: CountMode::Approximate
+        }
+    );
+}
+
+#[test]
 fn exact_signal_overrides_about_wording() {
     let mut state = ControlState::default();
 
