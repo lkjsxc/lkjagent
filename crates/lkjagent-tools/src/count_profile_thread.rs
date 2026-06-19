@@ -20,6 +20,19 @@ pub(crate) fn segment_brief(
     }
 }
 
+pub(crate) fn segment_role(
+    language: Language,
+    kind: DeliverableKind,
+    index: usize,
+    total: usize,
+) -> String {
+    format!(
+        "{} / {}",
+        stage_name(language, index, total),
+        focus_label(language, kind, index)
+    )
+}
+
 fn focus_label(language: Language, kind: DeliverableKind, index: usize) -> &'static str {
     match (language, kind) {
         (Language::Japanese, DeliverableKind::Narrative) => pick(JP_NARRATIVE, index),

@@ -62,6 +62,9 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     assert!(main_index.contains("Main file count"));
     assert!(main_index.contains("## Progress Map"));
     assert!(main_index.contains("main/part-001.md"));
+    assert!(main_index.contains("## Part Ledger"));
+    assert!(main_index.contains("main/part-001.md: opening / scope unit"));
+    assert!(main_index.contains("main/part-002.md: exploration / premise unit"));
     let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
     let second_part = fs::read_to_string(root.join("main/part-002.md"))?;
     assert!(first_part.contains("## Segment Brief"));

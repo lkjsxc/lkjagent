@@ -1,4 +1,5 @@
-use crate::count_profile::Language;
+use crate::count_profile::{DeliverableKind, Language};
+use crate::count_profile_thread::segment_role;
 
 pub(crate) fn file_budget(
     language: Language,
@@ -20,7 +21,7 @@ pub(crate) fn file_budget(
     }
 }
 
-pub(crate) fn main_map(language: Language, total: usize) -> String {
+pub(crate) fn main_map(language: Language, kind: DeliverableKind, total: usize) -> String {
     if total == 0 {
         return match language {
             Language::Japanese => "## 進行地図\n\n本編ファイルはありません。\n".to_string(),
@@ -31,10 +32,11 @@ pub(crate) fn main_map(language: Language, total: usize) -> String {
         .filter_map(|slot| map_line(language, total, slot))
         .collect::<Vec<_>>()
         .join("\n");
-    match language {
+    let map = match language {
         Language::Japanese => format!("## 進行地図\n\n{lines}\n"),
         Language::English => format!("## Progress Map\n\n{lines}\n"),
-    }
+    };
+    format!("{map}{}", part_ledger(language, kind, total))
 }
 
 pub(crate) fn docs_map(language: Language, docs: usize, main: usize) -> String {
@@ -98,6 +100,27 @@ fn docs_map_line(language: Language, index: usize, docs: usize, main: usize) -> 
             format!("- {file}: main/part-{start:03}.md through main/part-{end:03}.md")
         }
     }
+}
+
+fn part_ledger(language: Language, kind: DeliverableKind, total: usize) -> String {
+    let lines = (1..=total)
+        .map(|index| part_ledger_line(language, kind, index, total))
+        .collect::<Vec<_>>()
+        .join("\n");
+    match language {
+        Language::Japanese => format!("\n## 本編台帳\n\n{lines}\n"),
+        Language::English => format!("\n## Part Ledger\n\n{lines}\n"),
+    }
+}
+
+fn part_ledger_line(
+    language: Language,
+    kind: DeliverableKind,
+    index: usize,
+    total: usize,
+) -> String {
+    let role = segment_role(language, kind, index, total);
+    format!("- main/part-{index:03}.md: {role}")
 }
 
 fn stage_range(total: usize, slot: usize) -> Option<(usize, usize)> {
