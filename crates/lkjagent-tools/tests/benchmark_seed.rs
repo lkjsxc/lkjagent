@@ -48,6 +48,9 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     assert!(root.join("main/part-001.md").exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("northern expedition"));
+    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    assert!(first_part.contains("Continuity Hand-Off"));
+    assert!(first_part.contains("Arc: 1"));
     Ok(())
 }
 
