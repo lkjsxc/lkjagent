@@ -33,6 +33,9 @@ message text
   guidance for the current task, or explicitly defer it with an
   acknowledgment in its next think preamble. Deferred work is the next task
   the moment the current one closes.
+- Delivery into an open task whose turn budget is already exhausted refreshes
+  the task budget before the next endpoint call, because owner input is an
+  explicit continuation signal.
 
 ## Waiting Tasks
 

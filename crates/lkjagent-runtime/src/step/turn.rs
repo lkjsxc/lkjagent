@@ -47,8 +47,7 @@ pub(super) fn completion_step(
         Frame::new(FrameKind::ModelTurn, content.clone(), tokens),
     );
     if let Some(exhausted) = exhausted {
-        state = append_notice(state, NoticeKind::Budget, exhausted.notice());
-        return result(state, vec![], Some(StopReason::BudgetNotice));
+        return budget_exhausted_step(state, exhausted);
     }
     match parse_completion(&content) {
         Ok(action) => action_step(state, action),
@@ -117,6 +116,24 @@ fn spend_active_budget(state: &mut RuntimeState) -> Option<BudgetExhaustion> {
     } else {
         None
     }
+}
+
+fn budget_exhausted_step(mut state: RuntimeState, exhausted: BudgetExhaustion) -> StepResult {
+    let notice = exhausted.notice();
+    state = append_notice(state, NoticeKind::Budget, notice);
+    let effects = vec![Effect::RecordEvent {
+        kind: EventKind::Notice,
+        content: notice.to_string(),
+        tokens: token_estimate(notice) as i64,
+    }];
+    if exhausted == BudgetExhaustion::Task {
+        state.task = TaskState::Waiting {
+            question: "Turn budget exhausted. Send guidance to continue or narrow the task."
+                .to_string(),
+        };
+        return result(state, effects, Some(StopReason::Ask));
+    }
+    result(state, effects, Some(StopReason::BudgetNotice))
 }
 
 fn action_step(mut state: RuntimeState, action: lkjagent_protocol::Action) -> StepResult {
