@@ -115,12 +115,12 @@ operational clauses and raw counted-create wording for traceability, while
 main-file body anchors skip model-thrift, budget-thrift, English count mechanics,
 composition parentheticals, allocation-only clauses, count-only structural
 clauses, and generic meta constraints.
-Docs-side scaffolds carry twenty distinct planning focus labels before
-falling back, so common 20-outline requests do not collapse into repeated
-supplemental planning notes.
+Docs-side scaffolds carry twenty distinct planning focus labels, so common
+20-outline requests do not collapse into repeated supplemental planning notes.
 When the objective includes a design, memo, viewpoint, outline, planning,
-appendix-note, checklist, timeline, lore/story-planning sheets, Japanese design-file, or setting-reference
-count, the scaffold uses it for design memos when the exact total can still retain main content.
+appendix-note, checklist, timeline, lore/story-planning sheets, Japanese design-file,
+setting-reference, or explicit "N files and the remaining files" split count,
+the scaffold uses it for design memos when the exact total can still retain main content.
 File-count wording stays stronger than design wording when scoring allocation
 hints, so total-count numbers are not reused as design memo counts.
 Runtime recovery uses bounded notices for parse errors, repeated actions,
