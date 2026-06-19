@@ -1,6 +1,7 @@
 use crate::count_profile::{DeliverableKind, Language};
 use crate::count_profile_detail::detail_block;
 use crate::count_profile_passage::passage_block;
+use crate::count_profile_stage::stage_name;
 
 pub(crate) fn main_title(language: Language, kind: DeliverableKind, index: usize) -> String {
     match (language, kind) {
@@ -44,11 +45,11 @@ pub(crate) fn sequence_text(language: Language, index: usize, total: usize) -> S
     match language {
         Language::Japanese => format!(
             "- 前: {previous}\n- 現在: main/part-{index:03}.md\n- 次: {next}\n- 現在の段階: {}",
-            jp_stage(index, total)
+            stage_name(language, index, total)
         ),
         Language::English => format!(
             "- Previous: {previous}\n- Current: main/part-{index:03}.md\n- Next: {next}\n- Current stage: {}",
-            en_stage(index, total)
+            stage_name(language, index, total)
         ),
     }
 }
@@ -97,7 +98,7 @@ fn next_label(language: Language, index: usize, total: usize) -> String {
 }
 
 fn jp_narrative(index: usize, total: usize) -> String {
-    let stage = jp_stage(index, total);
+    let stage = stage_name(Language::Japanese, index, total);
     format!(
         "### 場面の役割\n第{index}節は「{stage}」の段階として、状況、願い、障害を一つの場面に集約します。\n\n### 展開\n登場する視点、場所、対立の焦点を明確にし、読者が次の変化を期待できるように小さな決断を置きます。\n\n### 転換点\nこの節の終わりでは、人物の理解か状況の均衡を一つ変え、全{total}本の流れの中で次節へ進む理由を残します。"
     )
@@ -122,7 +123,7 @@ fn jp_general(index: usize, total: usize) -> String {
 }
 
 fn en_narrative(index: usize, total: usize) -> String {
-    let stage = en_stage(index, total);
+    let stage = stage_name(Language::English, index, total);
     format!(
         "### Scene Role\nSegment {index} serves the {stage} stage by concentrating a situation, a desire, and an obstacle into one readable scene.\n\n### Development\nName the viewpoint, place, and conflict pressure clearly enough that the reader can track the next change.\n\n### Turn\nEnd the segment with one changed understanding or unstable condition that justifies the next part in the {total}-file sequence."
     )
@@ -158,30 +159,3 @@ fn anchor_link(language: Language, anchor: &str) -> String {
         }
     }
 }
-
-fn jp_stage(index: usize, total: usize) -> &'static str {
-    JP_STAGES[stage_slot(index, total)]
-}
-
-fn en_stage(index: usize, total: usize) -> &'static str {
-    EN_STAGES[stage_slot(index, total)]
-}
-
-fn stage_slot(index: usize, total: usize) -> usize {
-    index
-        .saturating_sub(1)
-        .saturating_mul(6)
-        .checked_div(total.max(1))
-        .unwrap_or(0)
-        .min(5)
-}
-
-const JP_STAGES: [&str; 6] = ["導入", "探索", "対立拡大", "中盤反転", "危機", "収束"];
-const EN_STAGES: [&str; 6] = [
-    "opening",
-    "exploration",
-    "rising conflict",
-    "midpoint reversal",
-    "crisis",
-    "resolution",
-];

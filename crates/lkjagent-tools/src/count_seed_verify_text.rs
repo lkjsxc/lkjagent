@@ -1,4 +1,6 @@
+use crate::count_profile::Language;
 use crate::count_profile_index::design_owner;
+use crate::count_profile_stage::{stage_label, stage_range};
 use crate::error::{ToolError, ToolResult};
 
 pub(crate) fn verify_coverage_map(
@@ -82,8 +84,8 @@ fn verify_progress_map(text: &str, main: usize) -> ToolResult<()> {
 }
 
 fn require_stage_line(text: &str, slot: usize, start: usize, end: usize) -> ToolResult<()> {
-    let english = stage_line(EN_STAGES[slot], start, end, "through");
-    let japanese = stage_line(JP_STAGES[slot], start, end, "から");
+    let english = stage_line(stage_label(Language::English, slot), start, end, "through");
+    let japanese = stage_line(stage_label(Language::Japanese, slot), start, end, "から");
     if text.contains(&english) || text.contains(&japanese) {
         Ok(())
     } else {
@@ -165,34 +167,3 @@ fn coverage_range(index: usize, docs: usize, main: usize) -> Option<(usize, usiz
     let end = (slot.saturating_add(1)).saturating_mul(main) / docs;
     Some((start.min(main), end.max(start).min(main)))
 }
-
-fn stage_range(total: usize, slot: usize) -> Option<(usize, usize)> {
-    let mut start = None;
-    let mut end = None;
-    for index in 1..=total {
-        if stage_slot(index, total) == slot {
-            start.get_or_insert(index);
-            end = Some(index);
-        }
-    }
-    start.zip(end)
-}
-
-fn stage_slot(index: usize, total: usize) -> usize {
-    index
-        .saturating_sub(1)
-        .saturating_mul(6)
-        .checked_div(total.max(1))
-        .unwrap_or(0)
-        .min(5)
-}
-
-const JP_STAGES: [&str; 6] = ["導入", "探索", "対立拡大", "中盤反転", "危機", "収束"];
-const EN_STAGES: [&str; 6] = [
-    "opening",
-    "exploration",
-    "rising conflict",
-    "midpoint reversal",
-    "crisis",
-    "resolution",
-];

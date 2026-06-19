@@ -1,4 +1,5 @@
 use crate::count_profile::{DeliverableKind, Language};
+use crate::count_profile_stage::stage_name;
 
 pub(crate) fn segment_brief(
     language: Language,
@@ -59,32 +60,9 @@ fn proof_label(language: Language, kind: DeliverableKind, index: usize) -> &'sta
     }
 }
 
-fn stage_name(language: Language, index: usize, total: usize) -> &'static str {
-    let slot = index
-        .saturating_sub(1)
-        .saturating_mul(6)
-        .checked_div(total.max(1))
-        .unwrap_or(0)
-        .min(5);
-    match language {
-        Language::Japanese => JP_STAGES[slot],
-        Language::English => EN_STAGES[slot],
-    }
-}
-
 fn pick(values: &[&'static str], index: usize) -> &'static str {
     values[index.saturating_sub(1) % values.len()]
 }
-
-const EN_STAGES: [&str; 6] = [
-    "opening",
-    "exploration",
-    "rising conflict",
-    "midpoint reversal",
-    "crisis",
-    "resolution",
-];
-const JP_STAGES: [&str; 6] = ["導入", "探索", "対立拡大", "中盤反転", "危機", "収束"];
 
 const EN_NARRATIVE: &[&str] = &[
     "inciting pressure",

@@ -20,6 +20,7 @@ mod count_profile_manifest;
 mod count_profile_passage;
 mod count_profile_reading;
 mod count_profile_restart;
+mod count_profile_stage;
 mod count_profile_thread;
 mod count_profile_variation;
 mod count_profile_variation_en;
