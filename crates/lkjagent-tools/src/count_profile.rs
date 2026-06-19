@@ -72,9 +72,9 @@ impl DeliverableProfile {
         }
     }
 
-    pub(crate) fn main_readme(self, main: usize, objective: &str) -> String {
+    pub(crate) fn main_readme(self, docs: usize, main: usize, objective: &str) -> String {
         let anchors = anchor_block(self.language, objective);
-        let map = main_map(self.language, self.kind, main);
+        let map = main_map(self.language, self.kind, docs, main);
         match self.language {
             Language::Japanese => format!(
                 "# main\n\n## 目的\n\n順序付き本編ファイルの索引です。\n\n{anchors}\n## 構成\n\n- 本編ファイル数: {main}\n- 各本編は位置、連続性台帳、本文、継続メモを持ちます。\n- 読む順序は part-001.md から番号順です。\n\n{map}\n## 依頼文\n\n{objective}\n"

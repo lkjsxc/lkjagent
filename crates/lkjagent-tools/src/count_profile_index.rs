@@ -47,7 +47,12 @@ pub(crate) fn audit_manifest(
     )
 }
 
-pub(crate) fn main_map(language: Language, kind: DeliverableKind, total: usize) -> String {
+pub(crate) fn main_map(
+    language: Language,
+    kind: DeliverableKind,
+    docs: usize,
+    total: usize,
+) -> String {
     if total == 0 {
         return match language {
             Language::Japanese => "## 進行地図\n\n本編ファイルはありません。\n".to_string(),
@@ -62,7 +67,7 @@ pub(crate) fn main_map(language: Language, kind: DeliverableKind, total: usize) 
         Language::Japanese => format!("## 進行地図\n\n{lines}\n"),
         Language::English => format!("## Progress Map\n\n{lines}\n"),
     };
-    format!("{map}{}", part_ledger(language, kind, total))
+    format!("{map}{}", part_ledger(language, kind, docs, total))
 }
 
 pub(crate) fn docs_map(language: Language, docs: usize, main: usize) -> String {
@@ -128,9 +133,9 @@ fn docs_map_line(language: Language, index: usize, docs: usize, main: usize) -> 
     }
 }
 
-fn part_ledger(language: Language, kind: DeliverableKind, total: usize) -> String {
+fn part_ledger(language: Language, kind: DeliverableKind, docs: usize, total: usize) -> String {
     let lines = (1..=total)
-        .map(|index| part_ledger_line(language, kind, index, total))
+        .map(|index| part_ledger_line(language, kind, docs, index, total))
         .collect::<Vec<_>>()
         .join("\n");
     match language {
@@ -142,11 +147,26 @@ fn part_ledger(language: Language, kind: DeliverableKind, total: usize) -> Strin
 fn part_ledger_line(
     language: Language,
     kind: DeliverableKind,
+    docs: usize,
     index: usize,
     total: usize,
 ) -> String {
     let role = segment_role(language, kind, index, total);
-    format!("- main/part-{index:03}.md: {role}")
+    let design = match (language, design_owner(index, docs, total)) {
+        (Language::Japanese, Some(owner)) => format!("設計: docs/design-{owner:03}.md"),
+        (Language::Japanese, None) => "設計: なし".to_string(),
+        (Language::English, Some(owner)) => format!("design: docs/design-{owner:03}.md"),
+        (Language::English, None) => "design: none".to_string(),
+    };
+    format!("- main/part-{index:03}.md: {role}; {design}")
+}
+
+pub(crate) fn design_owner(index: usize, docs: usize, main: usize) -> Option<usize> {
+    (1..=docs).find(|doc| {
+        coverage_range(*doc, docs, main)
+            .map(|(start, end)| index >= start && index <= end)
+            .unwrap_or(false)
+    })
 }
 
 fn stage_range(total: usize, slot: usize) -> Option<(usize, usize)> {

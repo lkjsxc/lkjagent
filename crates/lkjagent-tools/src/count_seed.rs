@@ -43,7 +43,7 @@ pub fn scaffold_counted_documents(
         )?;
         write_file(
             &root.join("main/README.md"),
-            &profile.main_readme(allocation.main, &objective),
+            &profile.main_readme(allocation.docs, allocation.main, &objective),
         )?;
     }
     for index in 1..=allocation.docs {

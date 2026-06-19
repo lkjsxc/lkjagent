@@ -64,7 +64,7 @@ pub(crate) fn verify_scaffold(
         None
     };
     let main_index = status(main_text.is_some());
-    let part_ledger = verify_part_ledger(main_text.as_deref(), main)?;
+    let part_ledger = verify_part_ledger(main_text.as_deref(), docs, main)?;
     let index_scope = scope_status(indexes && (docs > 0 || main > 0));
     Ok(ScaffoldCheck {
         files,
