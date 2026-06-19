@@ -29,3 +29,28 @@ fn count_seed_main_anchor_uses_content_topic_not_count_command() -> TestResult<(
     assert!(!first_part.contains("Local objective: Turn \"Create about 100 files total"));
     Ok(())
 }
+
+#[test]
+fn count_seed_japanese_main_anchor_skips_count_and_budget_clauses() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-japanese-content-anchor")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 100,
+            mode: CountMode::Approximate,
+        },
+        "合計100ファイルぐらいで、15個の設計メモと本編を含む大きな物語成果物を作ってください。ドキュメント群と実際の本編ファイル群を合わせた総数です。Codex/Sparkの枠を節約してください。",
+    )?;
+
+    let readme = fs::read_to_string(workspace.join("structured-output/README.md"))?;
+    assert!(readme.contains("- 合計100ファイルぐらいで"));
+    let first_part = fs::read_to_string(workspace.join("structured-output/main/part-001.md"))?;
+    assert!(first_part.contains(
+        "局所目的: 要求「15個の設計メモと本編を含む大きな物語成果物」をこのファイル固有の成果に変換します。"
+    ));
+    assert!(!first_part.contains("局所目的: 要求「合計100ファイルぐらいで"));
+    assert!(!first_part.contains("局所目的: 要求「Codex/Spark"));
+    Ok(())
+}

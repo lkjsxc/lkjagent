@@ -6,20 +6,40 @@ pub(crate) fn content_anchors(objective: &str) -> Vec<String> {
         .iter()
         .filter_map(|anchor| content_anchor(anchor))
         .collect::<Vec<_>>();
-    if filtered.is_empty() {
+    if !filtered.is_empty() {
+        return filtered;
+    }
+    let fallback = anchors
+        .iter()
+        .filter_map(|anchor| fallback_anchor(anchor))
+        .collect::<Vec<_>>();
+    if fallback.is_empty() {
         anchors
             .iter()
             .map(|anchor| truncate_anchor(anchor))
             .collect()
     } else {
-        filtered
+        fallback
     }
 }
 
 fn content_anchor(anchor: &str) -> Option<String> {
-    let cleaned = trim_scaffold_suffix(strip_scaffold_prefix(anchor)).trim();
+    let cleaned = trim_request_suffix(trim_scaffold_suffix(strip_scaffold_prefix(anchor))).trim();
     let lower = cleaned.to_ascii_lowercase();
-    if operational_anchor(&lower) || cleaned.chars().count() < 4 {
+    if operational_anchor(cleaned, &lower)
+        || structural_count_anchor(cleaned, &lower)
+        || cleaned.chars().count() < 4
+    {
+        None
+    } else {
+        Some(truncate_anchor(cleaned))
+    }
+}
+
+fn fallback_anchor(anchor: &str) -> Option<String> {
+    let cleaned = trim_request_suffix(trim_scaffold_suffix(strip_scaffold_prefix(anchor))).trim();
+    let lower = cleaned.to_ascii_lowercase();
+    if operational_anchor(cleaned, &lower) || cleaned.chars().count() < 4 {
         None
     } else {
         Some(truncate_anchor(cleaned))
@@ -62,11 +82,57 @@ fn trim_scaffold_suffix(anchor: &str) -> &str {
     anchor
 }
 
-fn operational_anchor(lower: &str) -> bool {
+fn trim_request_suffix(anchor: &str) -> &str {
+    for suffix in [
+        "を作ってください",
+        "を作成してください",
+        "を生成してください",
+        "してください",
+        "して下さい",
+    ] {
+        if anchor.ends_with(suffix) {
+            let end = anchor.len().saturating_sub(suffix.len());
+            return anchor[..end].trim();
+        }
+    }
+    anchor
+}
+
+fn operational_anchor(cleaned: &str, lower: &str) -> bool {
     lower.starts_with("use gpt")
         || lower.starts_with("use codex")
         || lower.contains("codex-spark thrift")
         || lower.contains("model thrift")
+        || (lower.contains("codex") && (lower.contains("spark") || lower.contains("thrift")))
+        || (lower.contains("codex") && (cleaned.contains('枠') || cleaned.contains("節約")))
+}
+
+fn structural_count_anchor(cleaned: &str, lower: &str) -> bool {
+    let has_file_unit = lower.contains("file")
+        || lower.contains("document")
+        || lower.contains("markdown")
+        || cleaned.contains("ファイル")
+        || cleaned.contains("ドキュメント")
+        || cleaned.contains("文書");
+    let has_total_word = lower.contains("total")
+        || lower.contains("combined")
+        || lower.contains("in all")
+        || cleaned.contains("合計")
+        || cleaned.contains("総数")
+        || cleaned.contains("合わせた");
+    let has_content_word = lower.contains("story")
+        || lower.contains("narrative")
+        || lower.contains("guide")
+        || lower.contains("report")
+        || cleaned.contains("物語")
+        || cleaned.contains("本文")
+        || cleaned.contains("本編")
+        || cleaned.contains("成果物");
+    has_file_unit && (cleaned.contains("総数") || cleaned.contains("合わせた"))
+        || has_file_unit && has_total_word && !has_content_word
+        || cleaned.ends_with("ファイルぐらいで")
+        || cleaned.ends_with("ファイル程度で")
+        || cleaned.ends_with("ファイルくらいで")
 }
 
 fn starts_with_creation(lower: &str) -> bool {
