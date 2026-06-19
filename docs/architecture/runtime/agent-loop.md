@@ -40,9 +40,10 @@ closed by an agent.done action whose summary is recorded.
 | closed | agent.done emitted; summary recorded; task-summary memory saved |
 
 A task carries a turn budget (initial contract: 64 turns, config-tunable).
-When exhausted, the harness injects a budget notice; the only lawful actions
-after it are agent.ask or agent.done. This converts runaway loops into a
-question for the owner instead of silent burn.
+The final budgeted turn is still admitted. If the daemon reaches another
+endpoint turn after the budget is exhausted, it records a budget notice and
+sets the task to waiting with a concrete owner question instead of silently
+burning turns. The next owner send resumes the task with a fresh turn budget.
 
 Some owner messages activate a completion guard. Recursive structure tasks
 cannot close until the tool layer verifies a README-indexed recursive tree;

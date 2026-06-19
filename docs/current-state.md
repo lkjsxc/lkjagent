@@ -38,6 +38,9 @@ notices to the transcript and keep the task moving instead of pausing it;
 consecutive parse/repeat notices steer large or tag-like writes toward
 shell.run scripts instead of repeated fs.write actions. Endpoint completions
 that hit max_tokens become recovery notices instead of endpoint retry loops.
+Task turn budget exhaustion records a budget notice, moves the daemon to
+waiting with a concrete question, and the next owner send refreshes the task
+turn budget before the endpoint call.
 The runtime context window defaults to 24,576 tokens, accepts 16,384 tokens
 as the lower supported value, derives safe soft/hard compaction triggers
 from the configured window, and uses the 2,048-token reserve as endpoint

@@ -77,6 +77,9 @@ pub fn open_task(task: &TaskState) -> TaskState {
         TaskState::Idle | TaskState::Closed { .. } | TaskState::Waiting { .. } => TaskState::Open {
             turns_remaining: DEFAULT_TURN_BUDGET,
         },
+        TaskState::Open { turns_remaining: 0 } => TaskState::Open {
+            turns_remaining: DEFAULT_TURN_BUDGET,
+        },
         current => current.clone(),
     }
 }
@@ -89,6 +92,7 @@ pub fn spend_turn(task: &TaskState) -> (TaskState, bool) {
             },
             false,
         ),
+        TaskState::Open { turns_remaining: 1 } => (TaskState::Open { turns_remaining: 0 }, false),
         TaskState::Open { .. } => (TaskState::Open { turns_remaining: 0 }, true),
         current => (current.clone(), false),
     }
