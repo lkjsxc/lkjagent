@@ -21,24 +21,33 @@ pub fn scaffold_counted_documents(
     }
     fs::create_dir_all(root.join("docs"))?;
     fs::create_dir_all(root.join("main"))?;
-    let docs = guard.target.saturating_sub(1).min(12);
-    let main = guard.target.saturating_sub(1).saturating_sub(docs);
+    let allocation = allocation_for(guard.target);
     let objective = objective_summary(objective);
     let profile = DeliverableProfile::from_objective(&objective);
     write_file(
         &root.join("README.md"),
-        &profile.root_readme(docs, main, &objective),
+        &profile.root_readme(allocation.docs, allocation.main, &objective),
     )?;
-    for index in 1..=docs {
+    if allocation.indexes {
         write_file(
-            &root.join(format!("docs/design-{index:03}.md")),
-            &profile.doc_page(index, docs, main, &objective),
+            &root.join("docs/README.md"),
+            &profile.docs_readme(allocation.docs, allocation.main, &objective),
+        )?;
+        write_file(
+            &root.join("main/README.md"),
+            &profile.main_readme(allocation.main, &objective),
         )?;
     }
-    for index in 1..=main {
+    for index in 1..=allocation.docs {
+        write_file(
+            &root.join(format!("docs/design-{index:03}.md")),
+            &profile.doc_page(index, allocation.docs, allocation.main, &objective),
+        )?;
+    }
+    for index in 1..=allocation.main {
         write_file(
             &root.join(format!("main/part-{index:03}.md")),
-            &profile.main_page(index, main, &objective),
+            &profile.main_page(index, allocation.main, &objective),
         )?;
     }
     let count = count_files(&root)?;
@@ -51,6 +60,41 @@ pub fn scaffold_counted_documents(
     Ok(format!(
         "counted document scaffold root=structured-output\nfiles={count}\nverification=ok\ncompletion=ready"
     ))
+}
+
+struct Allocation {
+    docs: usize,
+    main: usize,
+    indexes: bool,
+}
+
+fn allocation_for(target: usize) -> Allocation {
+    if target <= 1 {
+        return Allocation {
+            docs: 0,
+            main: 0,
+            indexes: false,
+        };
+    }
+    if target == 2 {
+        return Allocation {
+            docs: 0,
+            main: 1,
+            indexes: false,
+        };
+    }
+    let content = target.saturating_sub(3);
+    let mut docs = content.min(12);
+    let mut main = content.saturating_sub(docs);
+    if content > 0 && main == 0 {
+        docs = docs.saturating_sub(1);
+        main = 1;
+    }
+    Allocation {
+        docs,
+        main,
+        indexes: true,
+    }
 }
 
 fn objective_summary(objective: &str) -> String {
