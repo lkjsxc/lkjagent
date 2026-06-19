@@ -28,14 +28,16 @@ rebalance-plan files. The graph gate requires contract-shaped markdown pages,
 growth-control sections, and enough links to behave like a navigable nucleus.
 
 Owner tasks that state a file or markdown file count also carry completion
-requirements. Exact wording requires one README-indexed candidate tree to
-contain exactly that many files. Approximate wording such as about, around,
-roughly, approximately, or common Japanese equivalents accepts a 10 percent
-tolerance with a minimum tolerance of one file. Markdown-count requests count
-only .md files; general file-count requests count every non-hidden regular
-file. Count guards compose with recursive and knowledge-base guards. The
-refusal names the closest candidate and directs the next action toward one
-compact shell.run repair script.
+requirements. Exact wording requires one candidate tree to contain exactly
+that many files. README-indexed roots are preferred candidates; when none
+exist, one visible top-level directory with no visible sibling files is also
+a candidate. Approximate wording such as about, around, roughly,
+approximately, or common Japanese equivalents accepts a 10 percent tolerance
+with a minimum tolerance of one file. Markdown-count requests count only .md
+files; general file-count requests count every non-hidden regular file. Count
+guards compose with recursive and knowledge-base guards. The refusal names
+the closest candidate and directs the next action toward one compact
+shell.run repair script.
 
 ## agent.ask
 
