@@ -16,8 +16,9 @@ pub(crate) fn body_text(
     kind: DeliverableKind,
     index: usize,
     total: usize,
+    anchor: &str,
 ) -> String {
-    match (language, kind) {
+    let body = match (language, kind) {
         (Language::Japanese, DeliverableKind::Narrative) => jp_narrative(index, total),
         (Language::Japanese, DeliverableKind::Guide) => jp_guide(index, total),
         (Language::Japanese, DeliverableKind::Report) => jp_report(index, total),
@@ -26,7 +27,8 @@ pub(crate) fn body_text(
         (Language::English, DeliverableKind::Guide) => en_guide(index, total),
         (Language::English, DeliverableKind::Report) => en_report(index, total),
         (Language::English, DeliverableKind::General) => en_general(index, total),
-    }
+    };
+    format!("{body}\n\n{}", anchor_link(language, anchor))
 }
 
 pub(crate) fn sequence_text(language: Language, index: usize, total: usize) -> String {
@@ -135,6 +137,19 @@ fn en_general(index: usize, total: usize) -> String {
     format!(
         "### Section Role\nSegment {index} develops one standalone unit inside the {total}-file deliverable.\n\n### Content\nSeparate purpose, premise, and concrete development while avoiding overlap with nearby files.\n\n### Link\nLeave terms, open questions, and next work that connect this segment to the sequence."
     )
+}
+
+fn anchor_link(language: Language, anchor: &str) -> String {
+    match language {
+        Language::Japanese => {
+            format!("### 要求との接続\nこの節では「{anchor}」を具体化する材料を本文内に置きます。")
+        }
+        Language::English => {
+            format!(
+                "### Requirement Link\nThis segment gives concrete form to \"{anchor}\" inside the main content."
+            )
+        }
+    }
 }
 
 fn jp_stage(index: usize, total: usize) -> &'static str {

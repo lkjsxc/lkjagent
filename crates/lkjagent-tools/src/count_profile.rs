@@ -1,4 +1,4 @@
-use crate::count_profile_anchor::anchor_block;
+use crate::count_profile_anchor::{anchor_block, anchor_for_part};
 use crate::count_profile_body::{body_text, handoff_text, main_title, sequence_text};
 use crate::count_profile_data::{EN_DESIGN_FOCUSES, JP_DESIGN_FOCUSES};
 use crate::count_profile_design::design_text;
@@ -68,19 +68,20 @@ impl DeliverableProfile {
         let arc = index.saturating_sub(1) / 10 + 1;
         let slot = index.saturating_sub(1) % 10 + 1;
         let anchors = anchor_block(self.language, objective);
+        let part_anchor = anchor_for_part(self.language, objective, index);
         match self.language {
             Language::Japanese => format!(
                 "# {}\n\n## 位置\n\n- 幕: {arc}\n- 節: {slot}\n\n## 連続性台帳\n\n{}\n\n## 依頼文\n\n{objective}\n\n{anchors}\n## 本文\n\n{}\n\n## 継続メモ\n\n{}\n",
                 main_title(self.language, self.kind, index),
                 sequence_text(self.language, index, total),
-                body_text(self.language, self.kind, index, total),
+                body_text(self.language, self.kind, index, total, &part_anchor),
                 handoff_text(self.language, index, total)
             ),
             Language::English => format!(
                 "# {}\n\n## Position\n\n- Arc: {arc}\n- Segment: {slot}\n\n## Sequence Ledger\n\n{}\n\n## Objective Context\n\n{objective}\n\n{anchors}\n## Draft Content\n\n{}\n\n## Continuity Hand-Off\n\n{}\n",
                 main_title(self.language, self.kind, index),
                 sequence_text(self.language, index, total),
-                body_text(self.language, self.kind, index, total),
+                body_text(self.language, self.kind, index, total, &part_anchor),
                 handoff_text(self.language, index, total)
             ),
         }

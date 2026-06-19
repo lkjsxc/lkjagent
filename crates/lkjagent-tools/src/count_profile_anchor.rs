@@ -20,6 +20,18 @@ pub(crate) fn anchor_block(language: Language, objective: &str) -> String {
     }
 }
 
+pub(crate) fn anchor_for_part(language: Language, objective: &str, index: usize) -> String {
+    let anchors = objective_anchors(objective);
+    if anchors.is_empty() {
+        return match language {
+            Language::Japanese => "明示された依頼文".to_string(),
+            Language::English => "the stated owner objective".to_string(),
+        };
+    }
+    let slot = index.saturating_sub(1) % anchors.len();
+    anchors[slot].clone()
+}
+
 fn objective_anchors(objective: &str) -> Vec<String> {
     let normalized = normalize(objective);
     let mut anchors = clause_anchors(&normalized);
