@@ -93,14 +93,14 @@ fn split_segment_allowed(text: &str, number: Span, split: Span, numbers: &[Numbe
     if same_clause(text, number.end, split.start) {
         return true;
     }
-    soft_comma_segment(text, number, split, numbers)
+    soft_separator_segment(text, number, split, numbers)
 }
 
-fn soft_comma_segment(text: &str, number: Span, split: Span, numbers: &[NumberSpan]) -> bool {
+fn soft_separator_segment(text: &str, number: Span, split: Span, numbers: &[NumberSpan]) -> bool {
     let Some(between) = text.get(number.end..split.start) else {
         return false;
     };
-    if !between.contains(',') || between.chars().any(hard_break) {
+    if !between.chars().any(soft_separator) || between.chars().any(hard_break) {
         return false;
     }
     if numbers
@@ -128,7 +128,11 @@ fn same_clause(text: &str, start: usize, end: usize) -> bool {
 }
 
 fn hard_break(ch: char) -> bool {
-    matches!(ch, '\n' | '\r' | '.' | ';' | '。' | '；')
+    matches!(ch, '\n' | '\r' | '.' | '。')
+}
+
+fn soft_separator(ch: char) -> bool {
+    matches!(ch, ',' | ';' | '；')
 }
 
 fn clause_break(ch: char) -> bool {
