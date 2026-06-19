@@ -10,6 +10,7 @@ mod count_profile_detail;
 mod count_profile_index;
 mod count_profile_passage;
 pub mod count_seed;
+mod count_seed_allocation;
 pub mod dispatch;
 pub mod error;
 pub mod fs;
