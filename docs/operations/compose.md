@@ -52,6 +52,7 @@ services:
     init: true
     restart: unless-stopped
     stop_grace_period: 45s
+    working_dir: /
     read_only: true
     security_opt:
       - no-new-privileges:true

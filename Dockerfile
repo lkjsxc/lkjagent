@@ -29,6 +29,7 @@ RUN apt-get update \
         'set -eu' \
         'mkdir -p /data/workspace' \
         'chown -R agent:agent /data' \
+        'cd /data/workspace' \
         'case "${1:-}" in' \
         '  ""|run|send|status|log|console|memory|skills)' \
         '    set -- /usr/local/bin/lkjagent "$@"' \
@@ -42,5 +43,5 @@ COPY --from=build /src/target/release/lkjagent /usr/local/bin/lkjagent
 COPY --from=build /src/crates/lkjagent-skills/seeds \
     /usr/local/share/lkjagent/skills
 
-WORKDIR /data/workspace
+WORKDIR /
 ENTRYPOINT ["/usr/local/bin/lkjagent-entrypoint"]
