@@ -150,10 +150,18 @@ fn number_ish_signal(lower: &str, content: &str) -> bool {
 }
 
 fn exact_signal(lower: &str, content: &str) -> bool {
-    lower.contains("exact")
-        || lower.contains("exactly")
-        || lower.contains("precisely")
-        || content.contains("ちょうど")
-        || content.contains("ぴったり")
-        || content.contains("正確")
+    !negated_exact_signal(lower)
+        && (lower.contains("exact")
+            || lower.contains("exactly")
+            || lower.contains("precisely")
+            || content.contains("ちょうど")
+            || content.contains("ぴったり")
+            || content.contains("正確"))
+}
+
+fn negated_exact_signal(lower: &str) -> bool {
+    lower.contains("not exact")
+        || lower.contains("not exactly")
+        || lower.contains("not precise")
+        || lower.contains("not precisely")
 }
