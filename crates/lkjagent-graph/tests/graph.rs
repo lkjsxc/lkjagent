@@ -24,6 +24,32 @@ fn classification_opens_planning_case_with_requirements() {
 }
 
 #[test]
+fn counted_content_deliverable_selects_document_construction() {
+    let state = initial_state(
+        "Create about 100 files total for a structured story corpus with chapters.",
+        Some(8),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert!(state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+    assert!(state
+        .evidence_requirements
+        .contains(&"document-structure".to_string()));
+}
+
+#[test]
+fn counted_implementation_request_stays_code_change() {
+    let state = initial_state("Create exactly 3 files implementing a Rust CLI.", Some(9));
+
+    assert_eq!(state.family, TaskFamily::CodeChange);
+    assert!(!state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+}
+
+#[test]
 fn graph_slice_is_deterministic_and_budgeted() {
     let state = initial_state("write docs", None);
     let first = render_graph_slice(source_graph(), &state, 128);

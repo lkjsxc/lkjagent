@@ -28,6 +28,10 @@ Yellow pressure narrows package text. Orange schedules compaction at the next
 safe boundary. Red compacts before endpoint or owner delivery. Black-invalid
 pauses with a diagnostic.
 
+The document-construction package is selected for documentation,
+knowledge-base, and counted structured content tasks so large standalone
+deliverables receive structure guidance before endpoint execution.
+
 ## Status
 
 implemented.

@@ -29,7 +29,8 @@ so restart and compaction reconstruct structured state. Tool observations are
 recorded as graph evidence. Completion is refused until the active graph gate
 has its required evidence.
 
-Recursive docs and knowledge-base tasks are graph task families. They create
+Recursive docs, counted structured content, and knowledge-base tasks are
+graph task families that select document construction. They create
 README-indexed scaffolds before endpoint work and cannot close without graph
 evidence for the required document structure. File and markdown-count
 requests remain deterministic control guards, including when combined with a

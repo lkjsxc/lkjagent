@@ -15,9 +15,9 @@ pub fn classify_intent(content: &str) -> TaskFamily {
         TaskFamily::BugFix
     } else if lower.contains("verify") || lower.contains("test") {
         TaskFamily::Verification
-    } else if knowledge_request(&lower) {
+    } else if knowledge_request(&lower, content) {
         TaskFamily::KnowledgeBase
-    } else if lower.contains("doc") || lower.contains("readme") {
+    } else if documentation_request(&lower, content) {
         TaskFamily::Documentation
     } else if lower.contains("maintain") || lower.contains("cleanup") {
         TaskFamily::Maintenance
@@ -48,8 +48,74 @@ pub fn initial_state(objective: &str, case_id: Option<i64>) -> TaskGraphState {
     }
 }
 
-fn knowledge_request(lower: &str) -> bool {
-    lower.contains("knowledge") || lower.contains("wiki") || lower.contains("encyclopedia")
+fn knowledge_request(lower: &str, content: &str) -> bool {
+    lower.contains("knowledge")
+        || lower.contains("wiki")
+        || lower.contains("encyclopedia")
+        || content.contains("百科事典")
+        || content.contains("知識ベース")
+}
+
+fn documentation_request(lower: &str, content: &str) -> bool {
+    lower.contains("doc")
+        || lower.contains("readme")
+        || lower.contains("markdown")
+        || content.contains("文書")
+        || content.contains("ドキュメント")
+        || counted_content_request(lower, content)
+}
+
+fn counted_content_request(lower: &str, content: &str) -> bool {
+    file_signal(lower, content) && content_signal(lower, content)
+}
+
+fn file_signal(lower: &str, content: &str) -> bool {
+    lower.contains("file")
+        || lower.contains(".md")
+        || content.contains("ファイル")
+        || content.contains("文書")
+        || content.contains("ドキュメント")
+}
+
+fn content_signal(lower: &str, content: &str) -> bool {
+    contains_any(
+        lower,
+        &[
+            "article",
+            "book",
+            "chapter",
+            "collection",
+            "content",
+            "corpus",
+            "deliverable",
+            "essay",
+            "guide",
+            "lesson",
+            "manual",
+            "narrative",
+            "novel",
+            "report",
+            "scene",
+            "story",
+            "tutorial",
+        ],
+    ) || contains_any(
+        content,
+        &[
+            "本文",
+            "章",
+            "教材",
+            "物語",
+            "小説",
+            "手引き",
+            "記事",
+            "報告書",
+        ],
+    )
+}
+
+fn contains_any(text: &str, needles: &[&str]) -> bool {
+    needles.iter().any(|needle| text.contains(needle))
 }
 
 fn confidence_for(family: TaskFamily) -> u8 {

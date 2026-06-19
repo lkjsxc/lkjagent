@@ -51,12 +51,12 @@ configured fresh turn budget.
 
 Some owner messages activate task-family completion requirements. Recursive
 structure tasks cannot close until graph evidence proves a README-indexed
-recursive tree. Documentation and knowledge-base requests enter document
-construction nodes that create nucleus anchors before endpoint execution.
-File and markdown-count requests become completion guards and compose with
-recursive or knowledge-base requirements instead of replacing them. Exact
-wording requires the exact count. Approximate wording accepts the documented
-tolerance.
+recursive tree. Documentation, counted structured content, and knowledge-base
+requests enter document construction nodes that create structure anchors
+before endpoint execution. File and markdown-count requests become completion
+guards and compose with recursive or knowledge-base requirements instead of
+replacing them. Exact wording requires the exact count. Approximate wording
+accepts the documented tolerance.
 
 When no task is open and the queue is empty, the daemon opens a bounded
 graph maintenance case, records `daemon_state=working`, and continues toward
