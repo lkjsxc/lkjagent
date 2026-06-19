@@ -6,7 +6,6 @@ use lkjagent_tools::control::CompletionGuard;
 use lkjagent_tools::dispatch::{DispatchState, ToolRuntime};
 use rusqlite::Connection;
 
-use crate::daemon::endpoint_complete;
 use crate::error::{RuntimeError, RuntimeResult};
 use crate::intake;
 use crate::prompt::token_estimate;
@@ -141,31 +140,6 @@ impl ResidentDaemon {
             }
         }
         Ok(())
-    }
-
-    fn endpoint_turn(&mut self, conn: &mut Connection, now: &str) -> RuntimeResult<DaemonTick> {
-        match endpoint_complete(
-            &self.runtime.client,
-            &self.state.context,
-            self.endpoint_attempt,
-        ) {
-            Ok(completion) => {
-                self.endpoint_attempt = 0;
-                let result = step(
-                    self.state.clone(),
-                    StepInput::Completion {
-                        content: completion.content,
-                        tokens: completion.usage.completion_tokens as usize,
-                    },
-                );
-                self.apply_step_result(conn, now, result, false)
-            }
-            Err(error) => {
-                self.endpoint_attempt = self.endpoint_attempt.saturating_add(1);
-                self.record_endpoint_error(conn, now, &error.to_string())?;
-                Ok(DaemonTick::EndpointError)
-            }
-        }
     }
 }
 

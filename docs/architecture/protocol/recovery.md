@@ -18,6 +18,7 @@ task; the task turn budget remains the hard bound.
 | repeat action | dispatcher: byte-identical act to previous turn | notice pointing at the prior observation plus recovery instruction |
 | tool error | tool adapter | observation with status error plus a recovery instruction |
 | endpoint error | llm client | capped exponential backoff retries; nothing appended until a completion arrives |
+| completion oversize | llm client finish_reason length | error notice plus instruction to emit one short valid action |
 | endpoint overflow | llm client | treated as a harness bug: error event, compaction forced, incident memory row |
 | oversize payload | context engine | truncation per [../context/budgets.md](../context/budgets.md) with retrieval path |
 | task budget exhausted | loop | budget notice; only agent.ask or agent.done lawful next |
@@ -54,6 +55,9 @@ fault trail, and the next endpoint turn sees the latest recovery notice.
 - Tool errors are never retried by the harness. The observation and recovery
   notice tell the model to inspect the failure, adjust path, command, or
   parameters, and continue with a narrower action.
+- Completion oversize is not an endpoint outage. The daemon records it,
+  resets endpoint retry state, and appends a recovery notice telling the
+  model to emit one short act block.
 
 ## Status
 

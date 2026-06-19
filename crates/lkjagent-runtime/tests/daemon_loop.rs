@@ -8,7 +8,7 @@ use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
 use lkjagent_store::{events, memory, queue, state};
-use support::http::{completion, serve_responses};
+use support::http::{completion, length_completion, serve_responses};
 use support::{runtime_state, seed_skill_path, store, temp_workspace, TestResult};
 
 const WRITE_ACTION: &str = "<act>
@@ -111,6 +111,33 @@ fn daemon_records_endpoint_error_without_losing_delivered_queue() -> TestResult<
     assert!(queue::list(&conn)?
         .first()
         .is_some_and(|row| row.status == "delivered"));
+    Ok(())
+}
+
+#[test]
+fn daemon_recovers_from_max_token_completion_without_retry_loop() -> TestResult<()> {
+    let mut conn = store()?;
+    take_lock(&conn)?;
+    queue::enqueue(&mut conn, "write many docs", "owner-send", "101")?;
+    let workspace = temp_workspace("daemon-oversize")?;
+    let server = serve_responses(vec![
+        length_completion("<act>\n<tool>shell.run</tool>\n<command>"),
+        completion(DONE_ACTION),
+    ])?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    assert_eq!(daemon.endpoint_attempt, 0);
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Done);
+    server.join()?;
+
+    let log = events::read_events(&conn)?;
+    assert!(log
+        .iter()
+        .any(|event| event.content.contains("completion hit max tokens")));
+    assert!(log
+        .iter()
+        .any(|event| event.content.contains("short valid act block")));
     Ok(())
 }
 

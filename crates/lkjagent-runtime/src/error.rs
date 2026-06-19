@@ -4,6 +4,7 @@ pub type RuntimeResult<T> = Result<T, RuntimeError>;
 pub enum RuntimeError {
     Store(String),
     Llm(String),
+    CompletionOversize,
     Prompt(String),
 }
 
@@ -12,6 +13,9 @@ impl std::fmt::Display for RuntimeError {
         match self {
             RuntimeError::Store(message) => write!(formatter, "store error: {message}"),
             RuntimeError::Llm(message) => write!(formatter, "llm error: {message}"),
+            RuntimeError::CompletionOversize => {
+                formatter.write_str("llm error: endpoint completion hit max tokens")
+            }
             RuntimeError::Prompt(message) => write!(formatter, "prompt error: {message}"),
         }
     }
@@ -27,6 +31,9 @@ impl From<lkjagent_store::error::StoreError> for RuntimeError {
 
 impl From<lkjagent_llm::error::ClientError> for RuntimeError {
     fn from(error: lkjagent_llm::error::ClientError) -> Self {
-        Self::Llm(error.to_string())
+        match error {
+            lkjagent_llm::error::ClientError::Oversize { .. } => Self::CompletionOversize,
+            other => Self::Llm(other.to_string()),
+        }
     }
 }

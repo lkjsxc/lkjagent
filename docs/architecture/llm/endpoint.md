@@ -61,11 +61,12 @@ The harness reads exactly these fields:
 | usage.completion_tokens | the same ledger |
 | cache metrics, where provided | the transcript, for observability |
 
-A finish_reason of length is the oversize case in
-[../protocol/recovery.md](../protocol/recovery.md). Cache metrics means
-server-side data such as llama.cpp timings and prompt cache hit counts; the
-daemon records them into the transcript so cache health is visible as
-numbers, and their absence is tolerated.
+A finish_reason of length is the completion-oversize case in
+[../protocol/recovery.md](../protocol/recovery.md): it is not retried as an
+endpoint outage. Cache metrics means server-side data such as llama.cpp
+timings and prompt cache hit counts; the daemon records them into the
+transcript so cache health is visible as numbers, and their absence is
+tolerated.
 
 ## Error Mapping
 
@@ -76,6 +77,7 @@ Every failure classifies onto the taxonomy in
 | --- | --- | --- |
 | connection refused or timeout | endpoint error | capped exponential backoff |
 | malformed response body | endpoint error | the same backoff |
+| finish_reason length | completion oversize | error plus recovery notice; next turn asks for one short action |
 | HTTP 4xx on context overflow | endpoint overflow | error event, forced compaction, incident memory row |
 
 A context overflow surfacing as 4xx is treated as a harness bug, not an

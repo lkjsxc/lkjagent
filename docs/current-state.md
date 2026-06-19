@@ -36,7 +36,8 @@ reports non-zero and signal exits as error observations with captured
 output. Recoverable parse, repeat-action, and tool errors add recovery
 notices to the transcript and keep the task moving instead of pausing it;
 consecutive parse/repeat notices steer large or tag-like writes toward
-shell.run scripts instead of repeated fs.write actions.
+shell.run scripts instead of repeated fs.write actions. Endpoint completions
+that hit max_tokens become recovery notices instead of endpoint retry loops.
 Empty queues open bounded self-maintenance cycles in rotation; owner queue
 arrival preempts maintenance at the next turn boundary. Compose wiring is
 implemented. The implementation queue is

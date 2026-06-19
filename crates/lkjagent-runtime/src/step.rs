@@ -29,6 +29,7 @@ pub enum StepInput {
         content: String,
         tokens: usize,
     },
+    EndpointOversize,
     ToolOutput(DispatchOutput),
     Compact {
         prefix: Vec<Frame>,
@@ -82,6 +83,7 @@ pub fn step(state: RuntimeState, input: StepInput) -> StepResult {
     match input {
         StepInput::Owner { content, tokens } => owner_step(state, content, tokens),
         StepInput::Completion { content, tokens } => completion_step(state, content, tokens),
+        StepInput::EndpointOversize => turn::endpoint_oversize_step(state),
         StepInput::ToolOutput(output) => tool_output_step(state, output),
         StepInput::Compact {
             prefix,
