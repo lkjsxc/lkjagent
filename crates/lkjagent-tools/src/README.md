@@ -24,6 +24,9 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_profile_kind.rs](count_profile_kind.rs): counted scaffold kind detection.
 - [count_profile_passage.rs](count_profile_passage.rs): counted scaffold draft passage blocks.
 - [count_profile_thread.rs](count_profile_thread.rs): counted scaffold segment briefs.
+- [count_profile_variation.rs](count_profile_variation.rs): counted scaffold per-part variation data.
+- [count_profile_variation_en.rs](count_profile_variation_en.rs): English per-part variation data.
+- [count_profile_variation_jp.rs](count_profile_variation_jp.rs): Japanese per-part variation data.
 - [count_profile.rs](count_profile.rs): objective profile text for counted scaffolds.
 - [count_profile_data.rs](count_profile_data.rs): counted scaffold profile labels.
 - [count_seed.rs](count_seed.rs): counted document scaffold generator.

@@ -117,6 +117,7 @@ pub(crate) fn verify_main_file_content(text: &str, label: &str) -> ToolResult<()
         label,
     )?;
     require_one(text, &["### Draft Passage", "### 本文断片"], label)?;
+    require_one(text, &["### Specific Detail", "### 固有要素"], label)?;
     require_one(text, &["### Requirement Link", "### 要求との接続"], label)?;
     Ok(())
 }

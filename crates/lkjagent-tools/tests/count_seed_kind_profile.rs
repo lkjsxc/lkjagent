@@ -18,9 +18,12 @@ fn playbook_profiles_as_guide() -> TestResult<()> {
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
     let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let second = fs::read_to_string(root.join("main/part-002.md"))?;
     assert!(readme.contains("audit this deliverable as a guide"));
     assert!(first.contains("### Procedure Role"));
     assert!(first.contains("### Execution Commitments"));
+    assert!(first.contains("workspace boundary"));
+    assert!(second.contains("handoff packet"));
     Ok(())
 }
 
@@ -35,9 +38,13 @@ fn screenplay_profiles_as_narrative() -> TestResult<()> {
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
     let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let second = fs::read_to_string(root.join("main/part-002.md"))?;
     assert!(readme.contains("audit this deliverable as a narrative"));
     assert!(first.contains("### Scene Role"));
     assert!(first.contains("### Concrete Commitments"));
+    assert!(first.contains("### Specific Detail"));
+    assert!(first.contains("archive stair"));
+    assert!(second.contains("flooded platform"));
     Ok(())
 }
 
@@ -52,9 +59,12 @@ fn whitepaper_profiles_as_report() -> TestResult<()> {
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
     let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let second = fs::read_to_string(root.join("main/part-002.md"))?;
     assert!(readme.contains("audit this deliverable as a report"));
     assert!(first.contains("### Analysis Role"));
     assert!(first.contains("### Analysis Commitments"));
+    assert!(first.contains("usage evidence"));
+    assert!(second.contains("risk evidence"));
     Ok(())
 }
 

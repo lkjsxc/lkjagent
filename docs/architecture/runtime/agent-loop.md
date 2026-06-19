@@ -73,7 +73,7 @@ a per-part role ledger to the main index,
 verifies the requested count, root index, root file budget, count-linked
 audit manifest, acceptance audit, optional directory indexes, docs coverage
 map, all design memo sections, all main-file sections, required content
-blocks, and part
+blocks including per-part specific detail markers, and part
 ledger, records graph evidence, saves the same verification evidence in the
 task summary, and closes the task without asking the endpoint to repeat the
 same bulk generation. The recorded evidence includes the `structured-output`
