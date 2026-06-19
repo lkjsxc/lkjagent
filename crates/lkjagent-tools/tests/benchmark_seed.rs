@@ -63,6 +63,10 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     assert!(main_index.contains("## Progress Map"));
     assert!(main_index.contains("main/part-001.md"));
     let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    let second_part = fs::read_to_string(root.join("main/part-002.md"))?;
+    assert!(first_part.contains("## Segment Brief"));
+    assert!(first_part.contains("File role: opening / scope unit"));
+    assert!(second_part.contains("File role: exploration / premise unit"));
     assert!(first_part.contains("Continuity Hand-Off"));
     assert!(first_part.contains("Arc: 1"));
     assert!(first_part.contains("### Draft Passage"));
@@ -106,6 +110,8 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     assert!(design.contains("## 検証観点"));
     let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
     assert!(first_part.contains("# 本編 001"));
+    assert!(first_part.contains("## セグメント概要"));
+    assert!(first_part.contains("ファイル役割: 導入 / 発端の圧力"));
     assert!(first_part.contains("## 要求アンカー"));
     assert!(first_part.contains("## 本文"));
     assert!(first_part.contains("## 連続性台帳"));
@@ -139,6 +145,11 @@ fn count_seed_keeps_decimal_version_inside_objective_anchor() -> TestResult<()> 
     let readme = fs::read_to_string(workspace.join("structured-output/README.md"))?;
     assert!(readme.contains("- Use GPT-5.3-Codex-Spark thrift"));
     assert!(!readme.contains("- Use GPT-5\n- 3-Codex-Spark thrift"));
+    let first_part = fs::read_to_string(workspace.join("structured-output/main/part-001.md"))?;
+    assert!(first_part.contains(
+        "Local objective: Turn \"Create about 100 files total\" into this file's distinct contribution."
+    ));
+    assert!(!first_part.contains("Local objective: Turn \"Use GPT-5.3-Codex-Spark thrift\""));
     Ok(())
 }
 

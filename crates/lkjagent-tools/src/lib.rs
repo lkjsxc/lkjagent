@@ -12,6 +12,7 @@ mod count_profile_design;
 mod count_profile_detail;
 mod count_profile_index;
 mod count_profile_passage;
+mod count_profile_thread;
 pub mod count_seed;
 mod count_seed_allocation;
 pub mod dispatch;

@@ -80,9 +80,11 @@ completion can be audited after the case closes.
 The docs index maps design memos to covered main ranges, and the main index
 maps stage ranges to numbered main files. Design and main files carry matching
 headings, section roles, objective anchors that preserve model-number decimal
-tokens, main-range coverage, sequence ledgers, anchor-linked body spines,
-per-part content details, draft passage blocks, and continuity handoffs while
-preserving the exact count.
+tokens, main-range coverage, kind-aware segment briefs, sequence ledgers,
+anchor-linked body spines, per-part content details, draft passage blocks,
+and continuity handoffs while preserving the exact count. Root indexes keep
+operational clauses such as model-thrift requests for traceability, while
+main-file body anchors skip those clauses when content-bearing anchors exist.
 Docs-side scaffolds carry twenty distinct planning focus labels before
 falling back, so common 20-outline requests do not collapse into repeated
 supplemental planning notes.

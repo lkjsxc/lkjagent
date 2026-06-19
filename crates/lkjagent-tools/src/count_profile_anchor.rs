@@ -21,7 +21,7 @@ pub(crate) fn anchor_block(language: Language, objective: &str) -> String {
 }
 
 pub(crate) fn anchor_for_part(language: Language, objective: &str, index: usize) -> String {
-    let anchors = objective_anchors(objective);
+    let anchors = content_anchors(objective);
     if anchors.is_empty() {
         return match language {
             Language::Japanese => "明示された依頼文".to_string(),
@@ -30,6 +30,20 @@ pub(crate) fn anchor_for_part(language: Language, objective: &str, index: usize)
     }
     let slot = index.saturating_sub(1) % anchors.len();
     anchors[slot].clone()
+}
+
+fn content_anchors(objective: &str) -> Vec<String> {
+    let anchors = objective_anchors(objective);
+    let filtered = anchors
+        .iter()
+        .filter(|anchor| content_anchor(anchor))
+        .cloned()
+        .collect::<Vec<_>>();
+    if filtered.is_empty() {
+        anchors
+    } else {
+        filtered
+    }
 }
 
 fn objective_anchors(objective: &str) -> Vec<String> {
@@ -121,4 +135,12 @@ fn is_stop_word(word: &str) -> bool {
         word.to_ascii_lowercase().as_str(),
         "about" | "after" | "before" | "should" | "the" | "that" | "this" | "with"
     )
+}
+
+fn content_anchor(anchor: &str) -> bool {
+    let lower = anchor.to_ascii_lowercase();
+    !(lower.starts_with("use gpt")
+        || lower.starts_with("use codex")
+        || lower.contains("codex-spark thrift")
+        || lower.contains("model thrift"))
 }
