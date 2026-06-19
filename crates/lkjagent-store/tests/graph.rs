@@ -1,14 +1,15 @@
 mod support;
 
 use lkjagent_store::graph::{
-    active_case, evidence_for_case, open_case, record_event, record_evidence, update_case,
-    GraphEvidenceRow, OpenCase,
+    active_case, evidence_for_case, link_memory, memory_links_for_case, open_case, record_event,
+    record_evidence, update_case, GraphEvidenceRow, OpenCase,
 };
+use lkjagent_store::memory::{self, MemoryKind};
 use support::{memory_store, TestResult};
 
 #[test]
 fn graph_tables_persist_active_cases_and_evidence() -> TestResult<()> {
-    let conn = memory_store()?;
+    let mut conn = memory_store()?;
     let requirements = vec!["plan".to_string(), "observation".to_string()];
     let packages = vec!["planning-checklist".to_string()];
     let pending = vec!["focused verification".to_string()];
@@ -67,5 +68,29 @@ fn graph_tables_persist_active_cases_and_evidence() -> TestResult<()> {
     let evidence = evidence_for_case(&conn, case_id)?;
     assert_eq!(evidence.len(), 1);
     assert_eq!(evidence[0].requirement, "plan");
+
+    let memory_id = memory::save(
+        &mut conn,
+        MemoryKind::TaskSummary,
+        "fixed bug",
+        "task",
+        "summary body",
+        2,
+        "2026-01-01T00:00:02Z",
+    )?;
+    link_memory(
+        &conn,
+        case_id,
+        memory_id,
+        "execute",
+        "task-summary",
+        "2026-01-01T00:00:02Z",
+    )?;
+    let links = memory_links_for_case(&conn, case_id)?;
+    assert_eq!(links.len(), 1);
+    assert_eq!(links[0].case_id, case_id);
+    assert_eq!(links[0].memory_id, memory_id);
+    assert_eq!(links[0].node, "execute");
+    assert_eq!(links[0].reason, "task-summary");
     Ok(())
 }

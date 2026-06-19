@@ -113,7 +113,8 @@ completion proof.
 | event_id | INTEGER | transcript event link when present |
 | created_at | TEXT | write time |
 
-`graph_memory_links` links memory rows to graph cases and nodes.
+`graph_memory_links` links memory rows to graph cases and nodes. Task-summary
+memory rows are linked to the active or just-closed case node when saved.
 `graph_node_stats` stores deterministic counters used for ranking package
 choices.
 

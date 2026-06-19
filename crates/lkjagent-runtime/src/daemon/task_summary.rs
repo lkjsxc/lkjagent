@@ -23,6 +23,7 @@ impl ResidentDaemon {
             token_estimate(summary) as i64,
             now,
         )?;
+        self.link_task_summary_memory(conn, memory_id, now)?;
         store_state::set(conn, "last task summary id", &memory_id.to_string())?;
         store_state::set(conn, "open task", "none")?;
         store_state::delete(conn, "completion guard")?;
@@ -34,6 +35,31 @@ impl ResidentDaemon {
             EventKind::Notice,
             &content,
             token_estimate(&content) as i64,
+            now,
+        )?;
+        Ok(())
+    }
+}
+
+impl ResidentDaemon {
+    fn link_task_summary_memory(
+        &self,
+        conn: &Connection,
+        memory_id: i64,
+        now: &str,
+    ) -> RuntimeResult<()> {
+        let Some(graph) = self.state.graph.as_ref() else {
+            return Ok(());
+        };
+        let Some(case_id) = graph.case_id else {
+            return Ok(());
+        };
+        lkjagent_store::graph::link_memory(
+            conn,
+            case_id,
+            memory_id,
+            graph.active_node.0,
+            "task-summary",
             now,
         )?;
         Ok(())

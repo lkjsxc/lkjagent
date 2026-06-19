@@ -8,6 +8,8 @@ This directory holds schema setup and typed SQLite store APIs.
 
 - [error.rs](error.rs): store error type.
 - [events.rs](events.rs): append-only transcript events.
+- [graph/](graph/README.md): graph table helper modules.
+- [graph.rs](graph.rs): graph case, event, evidence, and memory-link APIs.
 - [lib.rs](lib.rs): library root.
 - [memory.rs](memory.rs): memory write, edit, search, and digest APIs.
 - [memory/](memory/README.md): memory row mapping helpers.
