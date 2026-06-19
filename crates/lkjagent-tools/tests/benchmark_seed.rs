@@ -56,6 +56,8 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     assert!(docs_index.contains("Design memo count"));
     let main_index = fs::read_to_string(root.join("main/README.md"))?;
     assert!(main_index.contains("Main file count"));
+    assert!(main_index.contains("## Progress Map"));
+    assert!(main_index.contains("main/part-001.md"));
     let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
     assert!(first_part.contains("Continuity Hand-Off"));
     assert!(first_part.contains("Arc: 1"));
@@ -88,6 +90,8 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     assert!(docs_index.contains("設計メモ数"));
     let main_index = fs::read_to_string(root.join("main/README.md"))?;
     assert!(main_index.contains("本編ファイル数"));
+    assert!(main_index.contains("## 進行地図"));
+    assert!(main_index.contains("main/part-001.md"));
     let design = fs::read_to_string(root.join("docs/design-001.md"))?;
     assert!(design.contains("範囲と受け入れ条件"));
     assert!(design.contains("## 対象範囲"));
