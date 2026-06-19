@@ -17,7 +17,7 @@ task; the task turn budget remains the hard bound.
 | bad or duplicate params | parser | error notice listing every offender plus recovery instruction |
 | repeat action | dispatcher: byte-identical act to previous turn | notice pointing at the prior observation plus recovery instruction |
 | tool error | tool adapter | observation with status error plus a recovery instruction |
-| endpoint error | llm client | capped exponential backoff retries; nothing appended until a completion arrives |
+| endpoint error | llm client | one error event per failed attempt, then capped exponential backoff before the next endpoint call |
 | completion oversize | llm client finish_reason length without a closed act | error notice with preview plus instruction to emit one short valid action |
 | endpoint overflow | llm client | treated as a harness bug: error event, compaction forced, incident memory row |
 | oversize payload | context engine | truncation per [../context/budgets.md](../context/budgets.md) with retrieval path |
@@ -37,17 +37,18 @@ faults):
   action is not re-executed, and the model is told to inspect state, choose
   a different tool, or switch repetitive writes to shell.run.
 - Endpoint unreachable beyond the backoff cap (initial contract: 15
-  minutes): daemon stays alive, state shows the outage, retries continue at
-  the capped interval.
+  minutes): daemon stays alive, state shows the outage, polls before the
+  retry deadline do not append duplicate error events, and retries continue
+  at the capped interval.
 
 Recovery never discards state: the task stays open, the transcript holds the
 fault trail, and the next endpoint turn sees the latest recovery notice.
 
 ## Retry Discipline
 
-- Endpoint retries are invisible to the context: the request is re-sent
-  unchanged, preserving the cache, and only the final completion is
-  appended.
+- Endpoint retries are invisible to the context until an attempt is made: the
+  request is re-sent unchanged after the retry deadline, preserving the
+  cache, and polls before the deadline do not append transcript noise.
 - Parse retries are visible by design: the faulty completion and the error
   notice both stay in the log, because the model needs to see its own
   mistake to stop making it, and the transcript must stay honest per

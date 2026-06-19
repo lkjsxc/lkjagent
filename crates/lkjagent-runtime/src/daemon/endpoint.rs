@@ -11,6 +11,9 @@ impl ResidentDaemon {
         conn: &mut Connection,
         now: &str,
     ) -> RuntimeResult<DaemonTick> {
+        if self.endpoint_retry_pending(now) {
+            return Ok(DaemonTick::EndpointError);
+        }
         if let Some(tick) = self.compact_before_endpoint(conn, now)? {
             return Ok(tick);
         }
@@ -25,6 +28,7 @@ impl ResidentDaemon {
             }
             Err(error) => {
                 self.endpoint_attempt = self.endpoint_attempt.saturating_add(1);
+                self.endpoint_retry_at = retry_deadline(now, error.retry_after_secs());
                 self.record_endpoint_error(conn, now, &error.to_string())?;
                 Ok(DaemonTick::EndpointError)
             }
@@ -38,6 +42,7 @@ impl ResidentDaemon {
         completion: lkjagent_llm::wire::Completion,
     ) -> RuntimeResult<DaemonTick> {
         self.endpoint_attempt = 0;
+        self.endpoint_retry_at = None;
         let result = step(
             self.state.clone(),
             StepInput::Completion {
@@ -55,7 +60,33 @@ impl ResidentDaemon {
         preview: String,
     ) -> RuntimeResult<DaemonTick> {
         self.endpoint_attempt = 0;
+        self.endpoint_retry_at = None;
         let result = step(self.state.clone(), StepInput::EndpointOversize { preview });
         self.apply_step_result(conn, now, result, false)
+    }
+
+    fn endpoint_retry_pending(&mut self, now: &str) -> bool {
+        let Some(deadline) = &self.endpoint_retry_at else {
+            return false;
+        };
+        if seconds_before(now, deadline) {
+            return true;
+        }
+        self.endpoint_retry_at = None;
+        false
+    }
+}
+
+fn retry_deadline(now: &str, retry_after_secs: Option<u64>) -> Option<String> {
+    let delay = retry_after_secs?;
+    now.parse::<u64>()
+        .ok()
+        .map(|stamp| stamp.saturating_add(delay).to_string())
+}
+
+fn seconds_before(now: &str, deadline: &str) -> bool {
+    match (now.parse::<u64>(), deadline.parse::<u64>()) {
+        (Ok(now), Ok(deadline)) => now < deadline,
+        _ => false,
     }
 }

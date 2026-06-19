@@ -62,6 +62,7 @@ pub struct ResidentDaemon {
     pub runtime: ResidentRuntime,
     pub dispatch_state: DispatchState,
     pub endpoint_attempt: u32,
+    pub endpoint_retry_at: Option<String>,
 }
 
 impl ResidentDaemon {
@@ -71,6 +72,7 @@ impl ResidentDaemon {
             runtime,
             dispatch_state: DispatchState::default(),
             endpoint_attempt: 0,
+            endpoint_retry_at: None,
         }
     }
 
@@ -121,6 +123,7 @@ impl ResidentDaemon {
             return Ok(());
         };
         let owner_content = owner.content.clone();
+        self.endpoint_retry_at = None;
         self.dispatch_state.reset_repeat_tracking();
         let starting_task = !matches!(
             self.state.task,

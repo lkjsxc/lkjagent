@@ -56,10 +56,13 @@ count.
 Runtime recovery still uses bounded notices for parse errors, repeated
 actions, tool errors, endpoint max-token exits, budget exhaustion, and context
 pressure; graph recovery nodes are present as the structured target for the
-next runtime expansion. The LLM client sends `</act>` as a stop sequence and
-restores the stripped close tag before parsing so one endpoint completion
-stays bounded to one action envelope. Length completions with a closed act are
-accepted; true oversize completions record a bounded preview in recovery.
+next runtime expansion. Endpoint outages record failed attempts, set a capped
+retry deadline, and keep later polls from hitting the endpoint or appending
+more error events until that deadline. The LLM client sends `</act>` as a stop
+sequence and restores the stripped close tag before parsing so one endpoint
+completion stays bounded to one action envelope. Length completions with a
+closed act are accepted; true oversize completions record a bounded preview in
+recovery.
 
 The runtime context window defaults to 24,576 tokens, accepts 16,384 tokens as
 the lower supported value, derives safe soft/hard compaction triggers from the
