@@ -14,6 +14,7 @@ use crate::prompt::token_estimate;
 use crate::task::{RuntimeState, TaskState};
 
 mod effects;
+mod endpoint;
 mod idle;
 mod runner;
 mod skills;

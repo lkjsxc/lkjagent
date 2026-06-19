@@ -56,6 +56,35 @@ pub(super) fn completion_step(
     }
 }
 
+pub(super) fn endpoint_oversize_step(mut state: RuntimeState) -> StepResult {
+    state.turn = state.turn.saturating_add(1);
+    let exhausted = spend_active_budget(&mut state);
+    if let Some(exhausted) = exhausted {
+        state = append_notice(state, NoticeKind::Budget, exhausted.notice());
+        return result(state, vec![], Some(StopReason::BudgetNotice));
+    }
+    let error = "endpoint completion hit max tokens";
+    let recovery = "recovery: completion hit max tokens; emit one short valid act block next; use shell.run heredoc/script for large generated output";
+    state = append_notice(state, NoticeKind::Error, error);
+    state = append_notice(state, NoticeKind::Error, recovery);
+    result(
+        state,
+        vec![
+            Effect::RecordEvent {
+                kind: EventKind::Error,
+                content: error.to_string(),
+                tokens: token_estimate(error) as i64,
+            },
+            Effect::RecordEvent {
+                kind: EventKind::Notice,
+                content: recovery.to_string(),
+                tokens: token_estimate(recovery) as i64,
+            },
+        ],
+        Some(StopReason::InvalidAction),
+    )
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum BudgetExhaustion {
     Task,

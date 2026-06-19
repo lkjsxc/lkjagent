@@ -46,6 +46,13 @@ pub fn completion(content: &str) -> String {
     )
 }
 
+pub fn length_completion(content: &str) -> String {
+    format!(
+        "{{\"choices\":[{{\"message\":{{\"content\":\"{}\"}},\"finish_reason\":\"length\"}}],\"usage\":{{\"prompt_tokens\":5,\"completion_tokens\":1024}}}}",
+        json_string(content)
+    )
+}
+
 fn drain_request(stream: &mut std::net::TcpStream) -> std::io::Result<()> {
     let mut buffer = Vec::new();
     let mut chunk = [0_u8; 1024];
