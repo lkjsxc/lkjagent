@@ -67,11 +67,11 @@ scripts, literal bodies, or one `fs.write` per file.
 For counted documentation tasks without recursive or benchmark scaffolds, the
 daemon writes a generic `structured-output/` tree before the first endpoint
 turn. The scaffold profiles the owner's objective by detected language and
-broad deliverable kind, verifies the requested count, records graph evidence,
-saves a task summary, and closes the task without asking the endpoint to
-repeat the same bulk generation. The recorded evidence includes the
-`structured-output` path, target file count, design memo count, main file
-count, and `verification=ok`.
+broad deliverable kind, gives each main file a kind-aware segment brief,
+verifies the requested count, records graph evidence, saves a task summary,
+and closes the task without asking the endpoint to repeat the same bulk
+generation. The recorded evidence includes the `structured-output` path,
+target file count, design memo count, main file count, and `verification=ok`.
 
 When no task is open and the queue is empty, the daemon opens a bounded
 graph maintenance case only after a directive is due, records
