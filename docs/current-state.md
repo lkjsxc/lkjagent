@@ -27,7 +27,8 @@ transitions, then renders a graph state notice into the first endpoint-visible
 context. Runtime state persists graph cases, graph events, and graph evidence
 so restart and compaction reconstruct structured state. Tool observations are
 recorded as graph evidence. Completion is refused until the active graph gate
-has its required evidence.
+has its required evidence; a graph completion refusal names the missing kind
+and points the next action to `graph.evidence`.
 
 Recursive docs, counted structured content, and knowledge-base tasks are
 graph task families that select document construction. They create
@@ -37,10 +38,23 @@ requests remain deterministic control guards, including when combined with a
 recursive or knowledge-base task family; exact wording is exact, while
 approximate wording uses a bounded tolerance. Counted completion prefers
 README-indexed roots and falls back to clean top-level output directories.
+The active graph prefix renders count guards and tells the model to use one
+compact `shell.run` command with direct `/bin/sh` loops and `printf`
+templates for bulk creation and count verification, keep the act payload
+under about 1200 characters, and avoid hardcoded `/workspace` paths, brace
+expansion, cat heredocs, bash scripts, literal bodies, or one `fs.write` per
+file.
+For counted documentation tasks that are not recursive, knowledge-base, or
+benchmark scaffolds, the daemon also writes a generic `structured-output/`
+tree with the requested count before the first endpoint turn and records graph
+evidence for the scaffold, then saves the task summary and closes the task.
 Runtime recovery still uses bounded notices for parse errors, repeated
 actions, tool errors, endpoint max-token exits, budget exhaustion, and context
 pressure; graph recovery nodes are present as the structured target for the
-next runtime expansion.
+next runtime expansion. The LLM client sends `</act>` as a stop sequence and
+restores the stripped close tag before parsing so one endpoint completion
+stays bounded to one action envelope. Length completions with a closed act are
+accepted; true oversize completions record a bounded preview in recovery.
 
 The runtime context window defaults to 24,576 tokens, accepts 16,384 tokens as
 the lower supported value, derives safe soft/hard compaction triggers from the

@@ -157,7 +157,7 @@ fn daemon_recovers_from_max_token_completion_without_retry_loop() -> TestResult<
         .any(|event| event.content.contains("completion hit max tokens")));
     assert!(log
         .iter()
-        .any(|event| event.content.contains("short valid act block")));
+        .any(|event| event.content.contains("under about 1200 chars")));
     Ok(())
 }
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {

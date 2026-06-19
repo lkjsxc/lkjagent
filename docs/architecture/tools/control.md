@@ -26,6 +26,9 @@ recursive-knowledge task family: the docs tree must contain a small nucleus
 with required map, starter-domain, reference, curation, expansion-queue, and
 rebalance-plan files. The graph gate requires contract-shaped markdown pages,
 growth-control sections, and enough links to behave like a navigable nucleus.
+If graph completion is refused because evidence is missing, the observation
+names the missing kinds and points the next action to `graph.evidence` with
+the first missing kind, an observed verification summary, and a path.
 
 Owner tasks that state a file or markdown file count also carry completion
 requirements. Exact wording requires one candidate tree to contain exactly

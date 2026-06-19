@@ -12,4 +12,5 @@ This directory holds helper modules for the pure runtime step transition.
 - [graph_output.rs](graph_output.rs): graph evidence updates after tools.
 - [graph_phase.rs](graph_phase.rs): graph phase and evidence-kind helpers.
 - [output.rs](output.rs): tool-output frame and control-action helpers.
+- [oversize.rs](oversize.rs): endpoint oversize recovery messages.
 - [turn.rs](turn.rs): owner and model completion step helpers.

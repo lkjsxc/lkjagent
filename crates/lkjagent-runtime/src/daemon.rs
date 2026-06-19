@@ -17,6 +17,7 @@ mod compaction;
 mod compaction_gate;
 mod compaction_support;
 mod context_budget;
+mod count_scaffold;
 mod effects;
 mod endpoint;
 mod graph_sync;

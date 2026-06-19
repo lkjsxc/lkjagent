@@ -37,7 +37,7 @@ fn counted_documentation_task_closes_after_batch_shell_write() -> TestResult<()>
     take_daemon_lock(&conn, "test", "100", "0")?;
     queue::enqueue(
         &mut conn,
-        "Create docs and main deliverable with exactly 5 files total.",
+        "Create a code package with exactly 5 files total.",
         "owner-send",
         "101",
     )?;
@@ -52,6 +52,28 @@ fn counted_documentation_task_closes_after_batch_shell_write() -> TestResult<()>
     assert_eq!(file_count(&workspace.join("deliverable"))?, 5);
     assert_eq!(state::get(&conn, "completion guard")?, None);
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
+    Ok(())
+}
+
+#[test]
+fn counted_documentation_task_auto_scaffolds_before_endpoint() -> TestResult<()> {
+    let mut conn = store()?;
+    take_daemon_lock(&conn, "test", "200", "0")?;
+    queue::enqueue(
+        &mut conn,
+        "Create about 20 files total for docs and main content.",
+        "owner-send",
+        "201",
+    )?;
+    let workspace = temp_workspace("file-count-auto")?;
+    let server = serve_responses(vec![])?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+
+    assert_eq!(daemon.poll_once(&mut conn, "201")?, DaemonTick::Working);
+    assert_eq!(file_count(&workspace.join("structured-output"))?, 20);
+    server.join()?;
+
+    assert_eq!(state::get(&conn, "completion guard")?, None);
     Ok(())
 }
 

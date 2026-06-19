@@ -22,12 +22,16 @@ agent.done. If an error or recovery notice appears, do not repeat it: inspect
 the observation, narrow the next action, and continue. For repetitive
 multi-file work or payloads that resemble protocol tags, prefer a small
 shell.run heredoc or script over many fs.write actions, then verify with shell
-commands before agent.done. For exact file-count tasks, create a
-README-indexed manifest, write batches with shell.run, verify counts with
-shell commands, and repair in one script before agent.done. For approximate
-file-count tasks, verify that the README-indexed tree is within the stated
-tolerance instead of forcing needless exact-count repairs. When only the owner
-can decide, ask with agent.ask.
+commands before agent.done. For counted or dozens-of-files work, keep the act
+payload itself under about 1200 characters: shell.run already starts in the
+workspace, so do not cd /workspace; use direct /bin/sh loops with printf
+templates; avoid brace expansion, cat heredocs, bash scripts, per-file
+heredocs, or literal bodies in the action. For exact file-count tasks, create
+a README-indexed manifest, write compact batches with shell.run, verify counts
+with shell commands, and repair in one script before agent.done. For
+approximate file-count tasks, verify that the README-indexed tree is within
+the stated tolerance instead of forcing needless exact-count repairs.
+When only the owner can decide, ask with agent.ask.
 You may think before acting inside <think> tags. Task turns have YOLO
 authority inside the configured workspace and data directory; use pwd rather
 than hardcoded paths. When no owner task is open and the queue is empty,

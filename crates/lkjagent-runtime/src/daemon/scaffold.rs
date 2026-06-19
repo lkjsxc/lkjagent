@@ -83,7 +83,7 @@ impl ResidentDaemon {
         }
     }
 
-    fn append_output_frame(
+    pub(super) fn append_output_frame(
         &mut self,
         conn: &Connection,
         now: &str,
@@ -106,7 +106,7 @@ impl ResidentDaemon {
         Ok(())
     }
 
-    fn record_scaffold_graph_evidence(
+    pub(super) fn record_scaffold_graph_evidence(
         &mut self,
         conn: &Connection,
         now: &str,

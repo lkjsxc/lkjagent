@@ -78,11 +78,31 @@ pub(crate) fn observe_error(
     runtime: &ToolRuntime,
     state: &mut DispatchState,
 ) -> DispatchOutput {
+    let mut message = error.to_string();
+    if let Some(hint) = shell_error_hint(action_text) {
+        message.push_str("; ");
+        message.push_str(hint);
+    }
     finish(
         state,
         action_text,
-        observe::error(error.to_string(), runtime.observation_tokens),
+        observe::error(message, runtime.observation_tokens),
     )
+}
+
+fn shell_error_hint(action_text: &str) -> Option<&'static str> {
+    if !action_text.contains("<tool>shell.run</tool>") {
+        return None;
+    }
+    if action_text.contains("/workspace") {
+        return Some("shell.run already starts in the workspace; do not cd /workspace");
+    }
+    if action_text.contains('{') && action_text.contains('}') {
+        return Some(
+            "/bin/sh does not expand brace lists; spell directories explicitly or loop over words",
+        );
+    }
+    None
 }
 
 pub(crate) fn finish(

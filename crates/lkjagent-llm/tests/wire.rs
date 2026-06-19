@@ -13,7 +13,7 @@ fn request_serializes_exact_documented_fields() -> TestResult<()> {
     let body = serde_json::to_string(&request)?;
     assert_eq!(
         body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system prefix\"},{\"role\":\"user\",\"content\":\"<owner>hello</owner>\"}],\"max_tokens\":2048,\"temperature\":0.3,\"top_p\":0.9,\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system prefix\"},{\"role\":\"user\",\"content\":\"<owner>hello</owner>\"}],\"max_tokens\":2048,\"temperature\":0.3,\"top_p\":0.9,\"stop\":[\"</act>\"],\"stream\":false}"
     );
     Ok(())
 }
@@ -39,5 +39,19 @@ fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
         .cache_metrics
         .iter()
         .any(|metric| metric.name == "timings.prompt_ms" && metric.value == "4.5"));
+    Ok(())
+}
+
+#[test]
+fn stop_stripped_act_close_is_restored() -> TestResult<()> {
+    let response = r#"{
+        "choices":[{"message":{"content":"<act>\n<tool>agent.done</tool>\n<summary>x</summary>\n"},"finish_reason":"stop"}],
+        "usage":{"prompt_tokens":11,"completion_tokens":7}
+    }"#;
+
+    let completion = decode_completion(response)?;
+
+    assert!(completion.content.ends_with("</act>"));
+    assert_eq!(completion.finish_reason, FinishReason::Stop);
     Ok(())
 }

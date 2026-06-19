@@ -11,6 +11,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [control.rs](control.rs): agent.done and agent.ask state transitions.
 - [count_guard.rs](count_guard.rs): exact and approximate file-count guards.
 - [count_guard/](count_guard/README.md): file-count scanning helpers.
+- [count_seed.rs](count_seed.rs): counted document scaffold generator.
 - [dispatch/](dispatch/README.md): dispatch helper modules.
 - [dispatch.rs](dispatch.rs): registry validation and tool routing.
 - [error.rs](error.rs): tool error type.

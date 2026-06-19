@@ -65,9 +65,8 @@ fn dispatch_done(
 ) -> DispatchOutput {
     if state.graph_state.is_some() && !state.graph_completion_ready {
         return observe_result(
-            Err(crate::error::ToolError::invalid(format!(
-                "graph completion refused; missing: {}",
-                state.graph_missing.join(", ")
+            Err(crate::error::ToolError::invalid(done_refusal(
+                &state.graph_missing,
             ))),
             action_text,
             runtime,
@@ -83,5 +82,16 @@ fn dispatch_done(
         action_text,
         runtime,
         state,
+    )
+}
+
+fn done_refusal(missing: &[String]) -> String {
+    let listed = missing.join(", ");
+    let first = missing
+        .first()
+        .cloned()
+        .unwrap_or_else(|| "required-evidence".to_string());
+    format!(
+        "graph completion refused; missing: {listed}; next action: graph.evidence kind={first} summary=observed verification path=."
     )
 }

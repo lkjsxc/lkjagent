@@ -20,7 +20,9 @@ impl ResidentDaemon {
             self.endpoint_attempt,
         ) {
             Ok(completion) => self.apply_completion(conn, now, completion),
-            Err(RuntimeError::CompletionOversize) => self.apply_oversize(conn, now),
+            Err(RuntimeError::CompletionOversize { preview }) => {
+                self.apply_oversize(conn, now, preview)
+            }
             Err(error) => {
                 self.endpoint_attempt = self.endpoint_attempt.saturating_add(1);
                 self.record_endpoint_error(conn, now, &error.to_string())?;
@@ -46,9 +48,14 @@ impl ResidentDaemon {
         self.apply_step_result(conn, now, result, false)
     }
 
-    fn apply_oversize(&mut self, conn: &mut Connection, now: &str) -> RuntimeResult<DaemonTick> {
+    fn apply_oversize(
+        &mut self,
+        conn: &mut Connection,
+        now: &str,
+        preview: String,
+    ) -> RuntimeResult<DaemonTick> {
         self.endpoint_attempt = 0;
-        let result = step(self.state.clone(), StepInput::EndpointOversize);
+        let result = step(self.state.clone(), StepInput::EndpointOversize { preview });
         self.apply_step_result(conn, now, result, false)
     }
 }

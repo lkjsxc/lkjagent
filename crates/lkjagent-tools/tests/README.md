@@ -6,7 +6,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 
 ## Table of Contents
 
-- [benchmark_seed.rs](benchmark_seed.rs): benchmark corpus scaffold fixture.
+- [benchmark_seed.rs](benchmark_seed.rs): benchmark and counted scaffold fixtures.
 - [control_guard.rs](control_guard.rs): resumed owner guidance completion guards.
 - [fs_shell.rs](fs_shell.rs): filesystem and shell tool fixtures.
 - [knowledge_path_guard.rs](knowledge_path_guard.rs): recursive knowledge write fences.

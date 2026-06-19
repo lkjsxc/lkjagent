@@ -1,13 +1,14 @@
 use std::path::PathBuf;
 
 use lkjagent_context::budget::ContextBudgetPolicy;
+use lkjagent_graph::TaskFamily;
 use lkjagent_llm::client::ClientConfig;
 use lkjagent_store::state as store_state;
 use lkjagent_tools::dispatch::{DispatchState, ToolRuntime};
 use rusqlite::Connection;
 
 use crate::error::{RuntimeError, RuntimeResult};
-use crate::graph_state::open_owner_case;
+use crate::graph_state::open_owner_case_with_guard;
 use crate::intake;
 use crate::step::{step, StepInput};
 use crate::task::{RuntimeState, TaskState, DEFAULT_TURN_BUDGET};
@@ -151,10 +152,23 @@ impl ResidentDaemon {
             .markdown_target()
             .filter(|_| Self::benchmark_docs_requested(&owner.content));
         let graph = if starting_task || visible_maintenance {
-            Some(open_owner_case(conn, &owner.content, now)?)
+            Some(open_owner_case_with_guard(
+                conn,
+                &owner.content,
+                now,
+                self.dispatch_state.control.guard,
+            )?)
         } else {
             None
         };
+        let counted_document_guard = graph.as_ref().and_then(|graph| {
+            (starting_task
+                && benchmark_target.is_none()
+                && graph.family == TaskFamily::Documentation
+                && !self.dispatch_state.control.guard.is_recursive())
+            .then(|| self.dispatch_state.control.guard.count_guard())
+            .flatten()
+        });
         let scaffold_profile = self.scaffold_profile();
         let result = step(
             self.state.clone(),
@@ -171,6 +185,9 @@ impl ResidentDaemon {
         }
         if let Some(target) = benchmark_target {
             self.auto_scaffold_markdown_corpus(conn, now, target)?;
+        }
+        if let Some(guard) = counted_document_guard {
+            self.auto_scaffold_counted_documents(conn, now, guard)?;
         }
         Ok(())
     }

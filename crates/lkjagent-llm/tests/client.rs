@@ -30,7 +30,7 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     );
     assert_eq!(
         request.body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"stop\":[\"</act>\"],\"stream\":false}"
     );
     Ok(())
 }
@@ -47,9 +47,28 @@ fn length_finish_reason_maps_to_oversize() -> TestResult<()> {
         result,
         Err(ClientError::Oversize {
             usage,
-            cache_metrics
+            cache_metrics,
+            preview
         }) if usage.completion_tokens == 2048 && cache_metrics.len() == 1
+            && preview == "partial"
     ));
+    Ok(())
+}
+
+#[test]
+fn length_with_closed_action_is_accepted() -> TestResult<()> {
+    let body = r#"{"choices":[{"message":{"content":"<act>\n<tool>agent.done</tool>\n<summary>x</summary>\n</act>\nextra"},"finish_reason":"length"}],"usage":{"prompt_tokens":5,"completion_tokens":2048}}"#;
+    let server = serve_once(200, body)?;
+    let config = ClientConfig::new(server.base_url.clone(), "local-model");
+
+    let completion = complete(&config, &[Message::new(Role::System, "system")], 1)?;
+    let _request = server.recorded()?;
+
+    assert!(completion.content.contains("</act>"));
+    assert_eq!(
+        completion.finish_reason,
+        lkjagent_llm::wire::FinishReason::Length
+    );
     Ok(())
 }
 

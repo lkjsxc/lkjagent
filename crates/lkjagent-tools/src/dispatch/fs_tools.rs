@@ -92,7 +92,10 @@ pub fn dispatch_shell(
         Ok(report) if !report.succeeded() => finish(
             state,
             action_text,
-            observe::error(shell::observation(&report), runtime.observation_tokens),
+            observe::error(
+                shell_observation(&report, &command),
+                runtime.observation_tokens,
+            ),
         ),
         Ok(report) => finish(
             state,
@@ -105,6 +108,18 @@ pub fn dispatch_shell(
         ),
         Err(error) => observe_error(error, action_text, runtime, state),
     }
+}
+
+fn shell_observation(report: &shell::ShellReport, command: &str) -> String {
+    let mut output = shell::observation(report);
+    if command.contains("/workspace") {
+        output.push_str("hint=shell.run already starts in the workspace; do not cd /workspace\n");
+    } else if command.contains('{') && command.contains('}') {
+        output.push_str(
+            "hint=/bin/sh does not expand brace lists; spell directories explicitly or loop over words\n",
+        );
+    }
+    output
 }
 
 fn finish_read(
