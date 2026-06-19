@@ -5,6 +5,7 @@ use crate::count_profile_body::{body_text, handoff_text, main_title, sequence_te
 use crate::count_profile_data::{EN_DESIGN_FOCUSES, JP_DESIGN_FOCUSES};
 use crate::count_profile_design::design_text;
 use crate::count_profile_index::{docs_map, file_budget, main_map};
+use crate::count_profile_kind::detect_kind;
 use crate::count_profile_thread::segment_brief;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -163,30 +164,4 @@ fn detect_language(objective: &str) -> Language {
     } else {
         Language::English
     }
-}
-
-fn detect_kind(objective: &str) -> DeliverableKind {
-    let lower = objective.to_lowercase();
-    if contains_any(
-        &lower,
-        &["story", "novel", "fiction", "narrative", "物語", "小説"],
-    ) {
-        DeliverableKind::Narrative
-    } else if contains_any(
-        &lower,
-        &["guide", "manual", "tutorial", "procedure", "手順", "説明書"],
-    ) {
-        DeliverableKind::Guide
-    } else if contains_any(
-        &lower,
-        &["report", "analysis", "research", "調査", "分析", "報告"],
-    ) {
-        DeliverableKind::Report
-    } else {
-        DeliverableKind::General
-    }
-}
-
-fn contains_any(haystack: &str, needles: &[&str]) -> bool {
-    needles.iter().any(|needle| haystack.contains(needle))
 }
