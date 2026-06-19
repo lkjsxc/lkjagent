@@ -53,6 +53,21 @@ fn counted_architecture_artifact_still_selects_document_construction() {
 }
 
 #[test]
+fn counted_architecture_playbook_with_implementation_chapters_selects_documents() {
+    let state = initial_state(
+        "Create about one hundred files total for a product architecture playbook. Use \
+         twenty-four decision records. The rest as ordered implementation chapters. Count docs \
+         and main content together.",
+        Some(28),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert!(state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+}
+
+#[test]
 fn counted_body_files_select_document_construction() {
     let state = initial_state(
         "Create about 100 files total, split between twenty planning notes and body files.",
