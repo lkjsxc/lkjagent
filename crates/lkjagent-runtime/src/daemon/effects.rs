@@ -99,6 +99,8 @@ impl ResidentDaemon {
         let Some(pending) = self.state.pending_action.clone() else {
             return Ok(None);
         };
+        let maintenance_ask =
+            self.state.maintenance.is_some() && pending.action.tool.as_str() == "agent.ask";
         let output = dispatch_with_text(
             &pending.action,
             action_text,
@@ -108,6 +110,9 @@ impl ResidentDaemon {
         );
         let result = step(self.state.clone(), StepInput::ToolOutput(output));
         let tick = self.apply_step_result(conn, now, result, false)?;
+        if maintenance_ask {
+            self.dispatch_state.control.question_outstanding = false;
+        }
         Ok(Some(tick))
     }
 

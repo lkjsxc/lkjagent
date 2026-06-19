@@ -19,6 +19,10 @@ const WRITE_ACTION: &str = "<act>
 <path>owner.txt</path>
 <content>owner wins</content>
 </act>";
+const MAINT_ASK: &str = "<act>
+<tool>agent.ask</tool>
+<question>Should maintenance wait?</question>
+</act>";
 const DONE_ACTION: &str = "<act>
 <tool>agent.done</tool>
 <summary>owner task complete</summary>
@@ -50,6 +54,25 @@ fn idle_daemon_runs_maintenance_and_restarts_after_empty_cycle() -> TestResult<(
     assert!(events::read_events(&conn)?.iter().any(|event| {
         event.kind == "notice" && event.content.contains("maintenance cycle opened")
     }));
+    Ok(())
+}
+
+#[test]
+fn maintenance_ask_closes_cycle_without_waiting_for_owner() -> TestResult<()> {
+    let mut conn = store()?;
+    take_lock(&conn)?;
+    let workspace = temp_workspace("auto-maintenance-ask")?;
+    let server = serve_responses(vec![completion(MAINT_ASK)])?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Done);
+    server.join()?;
+
+    assert!(daemon.state.maintenance.is_none());
+    assert!(!daemon.dispatch_state.control.question_outstanding);
+    assert_eq!(state::get(&conn, "daemon state")?, Some("idle".to_string()));
+    assert_eq!(state::get(&conn, "daemon question")?, None);
     Ok(())
 }
 

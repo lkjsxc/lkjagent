@@ -49,7 +49,9 @@ markdown count get a deterministic markdown-only scaffold before endpoint
 work, giving the Docker smoke path a reliable populated workspace on small
 local models.
 Empty queues open bounded self-maintenance cycles in rotation; owner queue
-arrival preempts maintenance at the next turn boundary. Compose wiring is
+arrival preempts maintenance at the next turn boundary, and maintenance
+agent.ask attempts close the maintenance cycle instead of putting the daemon
+into owner-waiting state. Compose wiring is
 implemented. The implementation queue is
 [execution/current-blockers.md](execution/current-blockers.md).
 
