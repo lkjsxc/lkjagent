@@ -2,6 +2,7 @@ use crate::count_profile_anchor::{anchor_block, anchor_for_part};
 use crate::count_profile_body::{body_text, handoff_text, main_title, sequence_text};
 use crate::count_profile_data::{EN_DESIGN_FOCUSES, JP_DESIGN_FOCUSES};
 use crate::count_profile_design::design_text;
+use crate::count_profile_index::{file_budget, main_map};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct DeliverableProfile {
@@ -64,12 +65,13 @@ impl DeliverableProfile {
 
     pub(crate) fn main_readme(self, main: usize, objective: &str) -> String {
         let anchors = anchor_block(self.language, objective);
+        let map = main_map(self.language, main);
         match self.language {
             Language::Japanese => format!(
-                "# main\n\n## 目的\n\n順序付き本編ファイルの索引です。\n\n{anchors}\n## 構成\n\n- 本編ファイル数: {main}\n- 各本編は位置、連続性台帳、本文、継続メモを持ちます。\n- 読む順序は part-001.md から番号順です。\n\n## 依頼文\n\n{objective}\n"
+                "# main\n\n## 目的\n\n順序付き本編ファイルの索引です。\n\n{anchors}\n## 構成\n\n- 本編ファイル数: {main}\n- 各本編は位置、連続性台帳、本文、継続メモを持ちます。\n- 読む順序は part-001.md から番号順です。\n\n{map}\n## 依頼文\n\n{objective}\n"
             ),
             Language::English => format!(
-                "# main\n\n## Purpose\n\nIndex for ordered main content files.\n\n{anchors}\n## Structure\n\n- Main file count: {main}\n- Each main file carries position, sequence ledger, body, and handoff notes.\n- Read in numeric order from part-001.md onward.\n\n## Objective Context\n\n{objective}\n"
+                "# main\n\n## Purpose\n\nIndex for ordered main content files.\n\n{anchors}\n## Structure\n\n- Main file count: {main}\n- Each main file carries position, sequence ledger, body, and handoff notes.\n- Read in numeric order from part-001.md onward.\n\n{map}\n## Objective Context\n\n{objective}\n"
             ),
         }
     }
@@ -162,19 +164,4 @@ fn detect_kind(objective: &str) -> DeliverableKind {
 
 fn contains_any(haystack: &str, needles: &[&str]) -> bool {
     needles.iter().any(|needle| haystack.contains(needle))
-}
-
-fn file_budget(language: Language, docs: usize, main: usize, index_files: usize) -> String {
-    let total = 1_usize
-        .saturating_add(index_files)
-        .saturating_add(docs)
-        .saturating_add(main);
-    match language {
-        Language::Japanese => format!(
-            "## ファイル内訳\n\n- ルート索引: 1\n- ディレクトリ索引: {index_files}\n- 設計メモ: {docs}\n- 本編ファイル: {main}\n- 合計ファイル数: {total}\n"
-        ),
-        Language::English => format!(
-            "## File Budget\n\n- Root index: 1\n- Directory indexes: {index_files}\n- Design memos: {docs}\n- Main files: {main}\n- Total files: {total}\n"
-        ),
-    }
 }

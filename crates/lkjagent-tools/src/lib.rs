@@ -7,6 +7,7 @@ mod count_profile_body;
 mod count_profile_data;
 mod count_profile_design;
 mod count_profile_detail;
+mod count_profile_index;
 pub mod count_seed;
 pub mod dispatch;
 pub mod error;
