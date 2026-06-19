@@ -69,14 +69,14 @@ daemon writes a generic `structured-output/` tree before the first endpoint
 turn. The scaffold profiles the owner's objective by detected language and
 broad deliverable kind, gives each main file a kind-aware segment brief, adds
 a root acceptance-audit section and a per-part role ledger to the main index,
-verifies the requested count, root index, root file budget, acceptance audit,
-optional directory indexes, docs coverage map, all design memo sections, all
-main-file sections, required content blocks, and part ledger, records graph
-evidence, saves a task summary, and closes the task without asking the
-endpoint to repeat the same bulk generation. The recorded evidence includes the
-`structured-output` path, target file count, index file count, design memo
-count, main file count, file-budget status, coverage-map status,
-acceptance-audit status, `index_scope=all`, `section_scope=all`,
+verifies the requested count, root index, root file budget, count-linked
+acceptance audit, optional directory indexes, docs coverage map, all design
+memo sections, all main-file sections, required content blocks, and part
+ledger, records graph evidence, saves a task summary, and closes the task
+without asking the endpoint to repeat the same bulk generation. The recorded
+evidence includes the `structured-output` path, target file count, index file
+count, design memo count, main file count, file-budget status, acceptance-audit
+status, coverage-map status, `index_scope=all`, `section_scope=all`,
 content-block status, required design-section status, required main-section
 status, first and last main status, part ledger status, and `verification=ok`.
 
