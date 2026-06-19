@@ -35,9 +35,14 @@ fn trim_english_count_suffix(anchor: &str) -> &str {
         " across around ",
         " over about ",
         " over around ",
+        " as about ",
+        " as around ",
+        " as approximately ",
+        " as approx ",
         " in ",
         " across ",
         " over ",
+        " as ",
     ] {
         if let Some(index) = lower.find(marker) {
             let suffix = &lower[index.saturating_add(marker.len())..];
