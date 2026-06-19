@@ -26,6 +26,7 @@ pub(crate) fn verify_audit_manifest(
         "n/a"
     };
     let local_verification = if main > 0 { "required" } else { "n/a" };
+    let reading_path = if main > 0 { "required" } else { "n/a" };
     let sequence_paths = if main > 0 { "required" } else { "n/a" };
     require_manifest_line(
         root_index,
@@ -81,6 +82,11 @@ pub(crate) fn verify_audit_manifest(
         root_index,
         format!("- local_verification: {local_verification}"),
         "audit manifest local verification",
+    )?;
+    require_manifest_line(
+        root_index,
+        format!("- reading_path: {reading_path}"),
+        "audit manifest reading path",
     )?;
     require_manifest_line(
         root_index,

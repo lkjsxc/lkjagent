@@ -3,6 +3,7 @@ use std::path::Path;
 
 use crate::count_seed_verify_main::{verify_main_file_content, verify_main_file_sections};
 use crate::count_seed_verify_manifest::verify_audit_manifest;
+use crate::count_seed_verify_reading::verify_reading_path;
 use crate::count_seed_verify_restart::verify_restart_guide;
 use crate::count_seed_verify_root::{verify_acceptance_audit, verify_file_budget};
 use crate::count_seed_verify_text::{
@@ -29,6 +30,7 @@ pub(crate) struct ScaffoldCheck {
     pub(crate) sequence_paths: &'static str,
     pub(crate) design_owner_links: &'static str,
     pub(crate) local_verification: &'static str,
+    pub(crate) reading_path: &'static str,
     pub(crate) first_main: &'static str,
     pub(crate) last_main: &'static str,
 }
@@ -52,6 +54,7 @@ pub(crate) fn verify_scaffold(
     let audit_manifest =
         verify_audit_manifest(&root_text, target, docs, main, index_count(indexes))?;
     let restart_guide = verify_restart_guide(&root_text, index_count(indexes), main)?;
+    let reading_path = verify_reading_path(&root_text, main)?;
     let design_sections = verify_design_files(root, docs, main > 0)?;
     let main_sections = verify_main_files(root, docs, main)?;
     let sequence_paths = main_sections;
@@ -93,6 +96,7 @@ pub(crate) fn verify_scaffold(
         sequence_paths,
         design_owner_links,
         local_verification,
+        reading_path,
         first_main,
         last_main,
     })
