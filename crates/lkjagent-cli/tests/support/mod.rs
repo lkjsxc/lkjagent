@@ -20,14 +20,6 @@ pub fn temp_data(name: &str) -> TestResult<PathBuf> {
     Ok(path)
 }
 
-pub fn write_config(data: &PathBuf) -> TestResult<()> {
-    fs::write(
-        data.join("lkjagent.json"),
-        "{\"endpoint\":{\"url\":\"http://endpoint:8080\",\"model\":\"local-test\"}}",
-    )?;
-    Ok(())
-}
-
 pub fn open_store(data: &PathBuf) -> TestResult<Connection> {
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     lkjagent_store::schema::setup(&conn)?;

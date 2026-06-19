@@ -13,9 +13,15 @@ use crate::error::RuntimeResult;
 use crate::prompt::token_estimate;
 use crate::task::{RuntimeState, TaskState};
 
+mod compaction;
+mod compaction_gate;
+mod compaction_support;
+mod context_budget;
 mod effects;
 mod endpoint;
 mod idle;
+mod pressure;
+mod record;
 mod runner;
 mod skills;
 mod startup;
@@ -121,10 +127,12 @@ pub fn client_config(
     model: &str,
     api_key: Option<String>,
     timeout_seconds: u64,
+    max_tokens: u16,
 ) -> ClientConfig {
     let mut config = ClientConfig::new(base_url, model);
     config.api_key = api_key;
     config.timeout = Duration::from_secs(timeout_seconds);
+    config.max_tokens = max_tokens;
     config
 }
 

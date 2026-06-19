@@ -9,7 +9,7 @@ fn request_serializes_exact_documented_fields() -> TestResult<()> {
         Message::new(Role::System, "system prefix"),
         Message::new(Role::User, "<owner>hello</owner>"),
     ];
-    let request = build_request("local-model", &messages);
+    let request = build_request("local-model", &messages, 2_048);
     let body = serde_json::to_string(&request)?;
     assert_eq!(
         body,

@@ -41,7 +41,8 @@ pub fn run(data_dir: &Path) -> Result<String, CliError> {
                 workspace,
                 skills,
                 &now,
-            );
+            )
+            .with_budget(config.context_policy);
             let mut daemon = lkjagent_runtime::daemon::ResidentDaemon::new(state, runtime);
             lkjagent_runtime::daemon::restore_completion_guard(&conn, &mut daemon.dispatch_state)?;
             loop {
@@ -63,6 +64,7 @@ fn client_config(config: &RuntimeConfig) -> lkjagent_runtime::daemon::EndpointCl
         &config.endpoint_model,
         secret_env(&config.api_key_env),
         config.endpoint_timeout_seconds,
+        config.context_policy.reserve as u16,
     )
 }
 

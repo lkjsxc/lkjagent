@@ -84,11 +84,11 @@ struct ResponseUsage {
     completion_tokens: u64,
 }
 
-pub fn build_request(model: &str, messages: &[Message]) -> ChatRequest {
+pub fn build_request(model: &str, messages: &[Message], max_tokens: u16) -> ChatRequest {
     ChatRequest {
         model: model.to_string(),
         messages: messages.iter().map(ChatMessage::from_context).collect(),
-        max_tokens: MAX_TOKENS,
+        max_tokens,
         temperature: TEMPERATURE,
         top_p: TOP_P,
         stop: Vec::new(),

@@ -8,18 +8,35 @@ Compaction is the only moment the window shrinks.
 
 ## Trigger
 
-The engine checks at every turn boundary: when the tracked window usage
-reaches the trigger threshold ([budgets.md](budgets.md)), compaction runs
-before anything else is delivered. The trigger is harness-owned; the model
-neither requests nor refuses compaction.
+The engine checks pressure at safe turn boundaries: before owner delivery,
+before endpoint calls, and after an action/observation pair completes. The
+trigger is harness-owned; the model neither requests nor refuses compaction.
+
+Pressure states:
+
+- green: normal.
+- yellow: projected usage crosses the soft trigger; observations should stay
+  narrow and retrieval-oriented.
+- orange: current usage is above the soft trigger; the harness schedules
+  compaction at the next safe boundary.
+- red: projected usage reaches the hard trigger or reserve limit; the
+  harness compacts before owner delivery or endpoint calls.
+- black-invalid: current usage already violates the policy; the daemon
+  pauses with an explicit diagnostic instead of looping.
+
+Compaction never runs mid-action. If a model action is pending, the harness
+executes the action, appends exactly one observation, and only then compacts
+at the next boundary.
 
 ## Procedure
 
 1. Distillation turns. The harness injects a compaction notice directing the
-   model to record what must survive: task state, open threads, fresh
-   lessons. The model gets up to 4 turns of memory.save actions per
-   [../memory/distillation.md](../memory/distillation.md). The final save
-   must be a task summary entry when a task is open.
+   model to preserve task state, open threads, and fresh lessons through
+   `memory.save`. The model gets up to four turns per
+   [../memory/distillation.md](../memory/distillation.md). When a task is
+   open, the cycle must leave a task-summary row; if pressure or model output
+   prevents that save, the harness writes a compact fallback task-summary
+   before rebuilding.
 2. Digest rebuild. The harness rebuilds the memory digest from the memory
    store within its budget: top entries by rank, task summary first.
 3. Prefix rebuild. A fresh prefix is assembled: identity, grammar and
@@ -28,8 +45,8 @@ neither requests nor refuses compaction.
 4. Log restart. The new log opens with one notice frame holding the task
    summary (or the maintenance state) so the model re-enters mid-stride.
 5. Transcript record. One compaction event stores the before and after token
-   counts and the ids of the memory rows written. The transcript itself is
-   never compacted; only the window is.
+   counts, memory row ids, and the policy values used. The transcript itself
+   is never compacted; only the window is.
 
 The new window must land at or under the post-compaction target; if
 distillation cannot fit the task summary inside the digest budget, the

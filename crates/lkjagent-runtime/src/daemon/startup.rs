@@ -77,12 +77,21 @@ fn workspace_brief(workspace: &Path) -> RuntimeResult<String> {
 }
 
 fn memory_digest(conn: &Connection) -> RuntimeResult<String> {
-    let rows = lkjagent_store::memory::digest(conn, None, PREFIX_MEMORY_DIGEST as i64)?;
+    let rows = lkjagent_store::memory::digest(
+        conn,
+        last_task_summary_id(conn)?,
+        PREFIX_MEMORY_DIGEST as i64,
+    )?;
     let budget = PREFIX_MEMORY_DIGEST.saturating_sub(token_estimate("## memory digest\n"));
     if rows.is_empty() {
         return Ok("none".to_string());
     }
     Ok(render_memory_rows(&rows, budget))
+}
+
+fn last_task_summary_id(conn: &Connection) -> RuntimeResult<Option<i64>> {
+    Ok(lkjagent_store::state::get(conn, "last task summary id")?
+        .and_then(|value| value.parse::<i64>().ok()))
 }
 
 fn render_memory_rows(rows: &[lkjagent_store::memory::MemoryRow], budget: usize) -> String {

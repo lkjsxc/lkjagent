@@ -12,7 +12,7 @@ forks, no parallel explorations, no delegation. The single loop in
 
 ## Consequences
 
-- The 16 GB / 32k budget serves one context well instead of several badly;
+- The local memory and context budget serves one context well instead of several badly;
   a sub-agent would halve the cache and double the prompt processing.
 - No result-merging logic, no orphaned workers, no cross-loop state races.
 - Long tasks decompose in time, not in workers: the loop works sequentially

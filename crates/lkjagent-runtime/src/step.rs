@@ -1,3 +1,4 @@
+use lkjagent_context::budget::ContextBudgetPolicy;
 use lkjagent_context::model::{Frame, NoticeKind};
 use lkjagent_store::events::EventKind;
 use lkjagent_tools::dispatch::DispatchOutput;
@@ -35,6 +36,7 @@ pub enum StepInput {
         prefix: Vec<Frame>,
         summary: Frame,
         memory_ids: Vec<i64>,
+        policy: ContextBudgetPolicy,
     },
     StartMaintenance {
         directive: MaintenanceDirective,
@@ -57,11 +59,6 @@ pub enum Effect {
         prompt: String,
         max_turns: u8,
     },
-    DistillCompaction {
-        prompt: String,
-        max_turns: u8,
-        task_summary_required: bool,
-    },
     Pause {
         reason: String,
     },
@@ -69,6 +66,7 @@ pub enum Effect {
         before_tokens: usize,
         after_tokens: usize,
         memory_ids: Vec<i64>,
+        policy: ContextBudgetPolicy,
     },
 }
 
@@ -89,7 +87,8 @@ pub fn step(state: RuntimeState, input: StepInput) -> StepResult {
             prefix,
             summary,
             memory_ids,
-        } => compact_step(state, prefix, summary, memory_ids),
+            policy,
+        } => compact_step(state, prefix, summary, memory_ids, policy),
         StepInput::StartMaintenance { directive, budget } => {
             maintenance_start_step(state, directive, budget)
         }

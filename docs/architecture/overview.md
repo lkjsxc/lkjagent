@@ -10,7 +10,7 @@ and the words every other document uses.
 ```
 owner --(lkjagent send)--> store.queue
 store.queue --(turn boundary)--> agent loop
-agent loop --(append-only messages)--> endpoint (chat completions, 32k)
+agent loop --(append-only messages)--> endpoint (chat completions, configurable window)
 endpoint --(tag-based action, stops at </act>)--> parser
 parser --> toolset (fs, shell, queue ops, memory ops, skill ops, control)
 toolset --(bounded observation)--> agent loop --> store.events

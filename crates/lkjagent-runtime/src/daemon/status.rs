@@ -8,6 +8,7 @@ use crate::task::TaskState;
 impl ResidentDaemon {
     pub(super) fn write_observable(&self, conn: &Connection) -> RuntimeResult<()> {
         store_state::set(conn, "turn", &self.state.turn.to_string())?;
+        self.write_context_observable(conn)?;
         match &self.state.task {
             TaskState::Open { .. } => self.write_working(conn),
             TaskState::Waiting { question } => {

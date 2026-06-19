@@ -19,8 +19,8 @@ Every byte that enters the window has a budget and an owner per
 
 ## Consequences
 
-- Turn latency is dominated by generation, not prompt re-evaluation; a 32k
-  window on local hardware stays interactive.
+- Turn latency is dominated by generation, not prompt re-evaluation; the
+  configured runtime window on local hardware stays interactive.
 - Skill bodies and observations are immutable once appended; corrections
   append, never rewrite.
 - Compaction is visible in transcripts as a first-class event, so context

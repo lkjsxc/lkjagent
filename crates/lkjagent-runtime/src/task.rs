@@ -21,10 +21,20 @@ pub struct PendingAction {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CompactionCycle {
+    pub before_tokens: usize,
+    pub turns_remaining: u8,
+    pub task_summary_required: bool,
+    pub task_summary_saved: bool,
+    pub memory_ids: Vec<i64>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RuntimeState {
     pub context: ContextState,
     pub task: TaskState,
     pub maintenance: Option<MaintenanceCycle>,
+    pub compaction: Option<CompactionCycle>,
     pub pending_action: Option<PendingAction>,
     pub parse_faults: u8,
     pub repeat_faults: u8,
@@ -37,6 +47,7 @@ impl RuntimeState {
             context,
             task: TaskState::Idle,
             maintenance: None,
+            compaction: None,
             pending_action: None,
             parse_faults: 0,
             repeat_faults: 0,

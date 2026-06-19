@@ -9,7 +9,7 @@ from any endpoint.
 ## Reference Deployment
 
 A roughly 14B-parameter open-weights model at 4-bit quantization on a 16 GB
-memory budget, with a 32,768-token context window, served by a
+memory budget, with at least the configured context window, served by a
 llama.cpp-class server with prefix caching enabled. The budgets in
 [budgets.md](../context/budgets.md) and the latency expectations are
 calibrated against this deployment.
@@ -24,7 +24,7 @@ model family, and swapping the model is one config edit per
 | --- | --- |
 | the chat-completions route | the only wire format the client speaks ([endpoint.md](endpoint.md)) |
 | returning the close tag | the parser must see the complete act block |
-| a context window of at least 32k tokens | the window budgets assume it ([budgets.md](../context/budgets.md)) |
+| a context window of at least 16,384 tokens | the window budgets support that lower bound ([budgets.md](../context/budgets.md)) |
 | prefix caching | acceptable turn latency; the design works without it, just slower |
 | applying its own chat template | the harness sends a message list and never builds template bytes |
 

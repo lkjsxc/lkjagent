@@ -8,7 +8,7 @@ make the repository measurably closer to this state.
 ## The End State
 
 A single container runs forever. Inside it, one small Rust daemon drives one
-agent loop against a local 32k-context model. The owner talks to it by
+agent loop against a local configurable-context model. The owner talks to it by
 dropping messages into a queue from a thin CLI and reading results from the
 transcript. The agent never stops: when the queue is empty it maintains
 its daemon heartbeat and waits for more owner work.

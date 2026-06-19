@@ -88,7 +88,7 @@ fn daemon_recovers_from_repeated_transient_errors_across_tasks() -> TestResult<(
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
     let runtime = ResidentRuntime::new(
         "test".to_string(),
-        client_config(base_url, "local-model", None, 180),
+        client_config(base_url, "local-model", None, 180, 2_048),
         workspace.to_path_buf(),
         seed_skill_path(),
         "100",

@@ -1,5 +1,6 @@
 mod support;
 
+use lkjagent_context::budget::ContextBudgetPolicy;
 use lkjagent_context::model::FrameKind;
 use lkjagent_runtime::step::{step, Effect, StepInput};
 use lkjagent_runtime::task::{StopReason, TaskState};
@@ -159,6 +160,7 @@ fn compaction_rebuilds_window_and_records_event() -> TestResult<()> {
             prefix: prefix()?,
             summary: summary_frame(),
             memory_ids: vec![1, 2],
+            policy: ContextBudgetPolicy::default(),
         },
     );
     assert_eq!(compacted.stop_reason, Some(StopReason::Compaction));
@@ -171,25 +173,16 @@ fn compaction_rebuilds_window_and_records_event() -> TestResult<()> {
             effect,
             Effect::CompactionRecorded {
                 memory_ids,
+                policy,
                 ..
-            } if memory_ids == &vec![1, 2]
-        )
-    }));
-    assert!(compacted.effects.iter().any(|effect| {
-        matches!(
-            effect,
-            Effect::DistillCompaction {
-                max_turns: 4,
-                task_summary_required: true,
-                ..
-            }
+            } if memory_ids == &vec![1, 2] && policy.window == 24_576
         )
     }));
     assert!(compacted
         .state
         .context
         .log
-        .iter()
-        .any(|frame| frame.content.contains("task_summary_required=true")));
+        .first()
+        .is_some_and(|frame| frame.content.contains("task summary")));
     Ok(())
 }

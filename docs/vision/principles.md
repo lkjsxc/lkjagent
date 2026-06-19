@@ -14,7 +14,7 @@ conflict, the principle wins.
 2. Smallness. Fewer features, fewer crates, fewer lines. Every addition must
    pay for itself; removal is always in season. Files stay at or below 200
    lines per [../repository/line-limits.md](../repository/line-limits.md).
-3. Context is sacred. The 32k window is the scarcest resource. Nothing enters
+3. Context is sacred. The runtime window is the scarcest resource. Nothing enters
    it without a budget and an owner.
    Canonical rule: [../architecture/context/hygiene.md](../architecture/context/hygiene.md).
 4. Cache discipline. The prompt prefix is append-only between compactions so

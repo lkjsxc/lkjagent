@@ -3,6 +3,7 @@ use lkjagent_store::state as store_state;
 use lkjagent_tools::dispatch::dispatch_with_text;
 use rusqlite::Connection;
 
+use super::compaction_gate::blocked_compaction_output;
 use super::runner::{DaemonTick, ResidentDaemon};
 use crate::error::RuntimeResult;
 use crate::prompt::token_estimate;
@@ -80,11 +81,8 @@ impl ResidentDaemon {
                 before_tokens,
                 after_tokens,
                 memory_ids,
-            } => self.record_compaction(conn, now, before_tokens, after_tokens, memory_ids),
-            Effect::DistillCompaction { prompt, .. } => {
-                append_event(conn, self.event_turn(), EventKind::Notice, &prompt, 16, now)?;
-                Ok(None)
-            }
+                policy,
+            } => self.record_compaction(conn, now, before_tokens, after_tokens, memory_ids, policy),
         }
     }
 }
@@ -101,17 +99,30 @@ impl ResidentDaemon {
         };
         let maintenance_ask =
             self.state.maintenance.is_some() && pending.action.tool.as_str() == "agent.ask";
-        let output = dispatch_with_text(
-            &pending.action,
-            action_text,
-            &self.runtime.tools,
-            conn,
-            &mut self.dispatch_state,
-        );
+        let output = if self.state.compaction.is_some() && pending.action.tool != "memory.save" {
+            blocked_compaction_output(&mut self.dispatch_state, action_text)
+        } else {
+            dispatch_with_text(
+                &pending.action,
+                action_text,
+                &self.runtime.tools,
+                conn,
+                &mut self.dispatch_state,
+            )
+        };
+        let compaction_output = output.clone();
         let result = step(self.state.clone(), StepInput::ToolOutput(output));
         let tick = self.apply_step_result(conn, now, result, false)?;
         if maintenance_ask {
             self.dispatch_state.control.question_outstanding = false;
+        }
+        if let Some(next) =
+            self.advance_compaction_after_output(conn, now, &pending.action, &compaction_output)?
+        {
+            return Ok(Some(next));
+        }
+        if let Some(next) = self.compact_after_observation(conn, now)? {
+            return Ok(Some(next));
         }
         Ok(Some(tick))
     }
@@ -144,28 +155,6 @@ impl ResidentDaemon {
             now,
         )?;
         Ok(())
-    }
-
-    fn record_compaction(
-        &self,
-        conn: &Connection,
-        now: &str,
-        before_tokens: usize,
-        after_tokens: usize,
-        memory_ids: Vec<i64>,
-    ) -> RuntimeResult<Option<DaemonTick>> {
-        let content = format!(
-            "before_tokens={before_tokens}\nafter_tokens={after_tokens}\nmemory_ids={memory_ids:?}"
-        );
-        append_event(
-            conn,
-            self.event_turn(),
-            EventKind::Compaction,
-            &content,
-            16,
-            now,
-        )?;
-        Ok(None)
     }
 }
 

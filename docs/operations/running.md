@@ -21,7 +21,7 @@ directly from the repository root. .env is not committed; copy
 | LKJAGENT_ENDPOINT_TIMEOUT_SECONDS | endpoint request timeout; default 180 |
 | LKJAGENT_DATA_DIR | host path mounted as /data; default ./data |
 | LKJAGENT_MODEL_DIR | host path for the disabled endpoint example |
-| LKJAGENT_CONTEXT_LENGTH | endpoint example context length |
+| LKJAGENT_CONTEXT_LENGTH | runtime context.window override |
 
 Host environment variables override values in .env. Changing deployment
 values requires a restart; the daemon never hot-reloads, per the cache rules
@@ -60,19 +60,25 @@ It records resolved defaults and non-secret runtime knobs.
 | endpoint.model | LKJAGENT_MODEL or required | fallback when LKJAGENT_MODEL is unset |
 | endpoint.api-key-env | LKJAGENT_API_KEY | name of the env var holding the key, when one is needed |
 | endpoint.timeout-seconds | 180 | request timeout; LKJAGENT_ENDPOINT_TIMEOUT_SECONDS overrides |
-| context.window | 32768 | total token window the budgets divide |
+| context.window | 24576 | total token window the budgets divide; 16384 is the supported lower bound |
 | context.reserve | 2048 | generation headroom, also max_tokens |
-| context.trigger | 28672 | compaction trigger per [../architecture/context/budgets.md](../architecture/context/budgets.md) |
+| context.trigger | 21504 | optional hard trigger; stale or unsafe values are derived from the selected window |
 | sampling.temperature | 0.3 | per [../architecture/llm/sampling.md](../architecture/llm/sampling.md) |
 | sampling.top-p | 0.9 | same |
 | task.turn-budget | 64 | per [../architecture/runtime/agent-loop.md](../architecture/runtime/agent-loop.md) |
 | daemon.lock-stale-seconds | 300 | daemon lock reclaim window; never below endpoint timeout plus 60 |
 | shell.timeout-seconds | 60 | default for shell.run, max 600 |
 
-LKJAGENT_ENDPOINT_URL, LKJAGENT_MODEL, and
-LKJAGENT_ENDPOINT_TIMEOUT_SECONDS override the endpoint table at startup.
+LKJAGENT_ENDPOINT_URL, LKJAGENT_MODEL,
+LKJAGENT_ENDPOINT_TIMEOUT_SECONDS, and LKJAGENT_CONTEXT_LENGTH override the
+runtime table at startup.
 The API key value is never written to /data/lkjagent.json; only the
 environment variable name is stored.
+
+`LKJAGENT_CONTEXT_LENGTH=16384` is valid and causes earlier compaction with
+a smaller live log. Values below 16384 fail with a config error. Changing
+any context budget value requires a daemon restart because the prefix cache
+and pressure policy are session state.
 
 First start writes /data/lkjagent.json from .env when LKJAGENT_MODEL is set.
 When no model exists in either .env, the host environment, or the config file,

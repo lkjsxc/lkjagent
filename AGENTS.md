@@ -9,7 +9,7 @@ routing, verification, and where the deeper contracts live.
 ## What lkjagent Is
 
 A minimal, continuously running agent harness in Rust for a local LLM with a
-32k context window. One daemon, one agent loop, a persistent user message
+configurable context window. One daemon, one agent loop, a persistent user message
 queue, a tag-based action protocol, an append-only cache-friendly context,
 SQLite persistence, a unified markdown skill system, and a container-first
 YOLO posture. The full picture is [docs/architecture/overview.md](docs/architecture/overview.md).
