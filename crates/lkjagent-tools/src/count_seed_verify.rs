@@ -24,6 +24,7 @@ pub(crate) struct ScaffoldCheck {
     pub(crate) content_blocks: &'static str,
     pub(crate) design_sections: &'static str,
     pub(crate) main_sections: &'static str,
+    pub(crate) sequence_paths: &'static str,
     pub(crate) first_main: &'static str,
     pub(crate) last_main: &'static str,
 }
@@ -48,6 +49,7 @@ pub(crate) fn verify_scaffold(
         verify_audit_manifest(&root_text, target, docs, main, index_count(indexes))?;
     let design_sections = verify_design_files(root, docs, main > 0)?;
     let main_sections = verify_main_files(root, docs, main)?;
+    let sequence_paths = main_sections;
     let content_blocks = status(docs > 0 || main > 0);
     let first_main = status(main > 0);
     let last_main = status(main > 0);
@@ -80,6 +82,7 @@ pub(crate) fn verify_scaffold(
         content_blocks,
         design_sections,
         main_sections,
+        sequence_paths,
         first_main,
         last_main,
     })

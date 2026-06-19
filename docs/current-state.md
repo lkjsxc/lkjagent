@@ -84,9 +84,10 @@ file-budget status, machine-readable audit-manifest status, directory index,
 count-linked acceptance-audit status, coverage-map status, first and last
 main, `index_scope=all`,
 `section_scope=all`, content-block status, required design-section status,
-required main-section status, part-ledger status, and `verification=ok`, so
-completion can be audited after the case closes. The same normalized evidence
-is saved into the task-summary memory for startup and compaction recovery.
+required main-section status, part-ledger status, explicit sequence-path
+status, and `verification=ok`, so completion can be audited after the case
+closes. The same normalized evidence is saved into the task-summary memory for
+startup and compaction recovery.
 The docs index maps design memos to covered main ranges, and the main index
 maps stage ranges plus a per-part role ledger that links each main file back
 to its design memo owner. Each main file repeats that owner link in its
