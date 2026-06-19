@@ -94,6 +94,7 @@ fn split_segment_allowed(text: &str, number: Span, split: Span, numbers: &[Numbe
         return true;
     }
     soft_separator_segment(text, number, split, numbers)
+        || sentence_separator_segment(text, number, split, numbers)
 }
 
 fn soft_separator_segment(text: &str, number: Span, split: Span, numbers: &[NumberSpan]) -> bool {
@@ -103,13 +104,43 @@ fn soft_separator_segment(text: &str, number: Span, split: Span, numbers: &[Numb
     if !between.chars().any(soft_separator) || between.chars().any(hard_break) {
         return false;
     }
-    if numbers
-        .iter()
-        .any(|other| number.start < other.span.start && other.span.start < split.start)
-    {
+    if intervening_number(number, split, numbers) {
         return false;
     }
     allocation_lead_before(text, number)
+}
+
+fn sentence_separator_segment(
+    text: &str,
+    number: Span,
+    split: Span,
+    numbers: &[NumberSpan],
+) -> bool {
+    let Some(between) = text.get(number.end..split.start) else {
+        return false;
+    };
+    if !between.chars().any(sentence_separator) || between.chars().any(line_break) {
+        return false;
+    }
+    if intervening_number(number, split, numbers) || total_count_candidate(text, number, split) {
+        return false;
+    }
+    allocation_lead_before(text, number)
+}
+
+fn intervening_number(number: Span, split: Span, numbers: &[NumberSpan]) -> bool {
+    numbers
+        .iter()
+        .any(|other| number.start < other.span.start && other.span.start < split.start)
+}
+
+fn total_count_candidate(text: &str, number: Span, split: Span) -> bool {
+    text.get(number.start..split.start).is_some_and(|segment| {
+        let lower = segment.to_lowercase();
+        lower
+            .split(|ch: char| !ch.is_alphanumeric())
+            .any(|word| matches!(word, "total" | "altogether" | "overall"))
+    })
 }
 
 fn allocation_lead_before(text: &str, number: Span) -> bool {
@@ -129,6 +160,14 @@ fn same_clause(text: &str, start: usize, end: usize) -> bool {
 
 fn hard_break(ch: char) -> bool {
     matches!(ch, '\n' | '\r' | '.' | '。')
+}
+
+fn line_break(ch: char) -> bool {
+    matches!(ch, '\n' | '\r')
+}
+
+fn sentence_separator(ch: char) -> bool {
+    matches!(ch, '.' | '。')
 }
 
 fn soft_separator(ch: char) -> bool {
