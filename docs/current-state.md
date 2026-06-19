@@ -78,11 +78,12 @@ The graph evidence for that scaffold records `structured-output`, the target
 file count, design memo count, main file count, and `verification=ok`, so
 completion can be audited after the case closes.
 The docs index maps design memos to covered main ranges, and the main index
-maps stage ranges to numbered main files. Design and main files carry matching
-headings, section roles, objective anchors that preserve model-number decimal
-tokens, main-range coverage, kind-aware segment briefs, sequence ledgers,
-anchor-linked body spines, per-part content details, draft passage blocks,
-and continuity handoffs while preserving the exact count. Root indexes keep
+maps stage ranges plus a per-part role ledger to numbered main files. Design
+and main files carry matching headings, section roles, objective anchors that
+preserve model-number decimal tokens, main-range coverage, kind-aware segment
+briefs, sequence ledgers, anchor-linked body spines, per-part content
+details, draft passage blocks, and continuity handoffs while preserving the
+exact count. Root indexes keep
 operational clauses and raw counted-create wording for traceability, while
 main-file body anchors skip model-thrift clauses and trim counted-scaffold
 command wording when content-bearing anchors exist.
