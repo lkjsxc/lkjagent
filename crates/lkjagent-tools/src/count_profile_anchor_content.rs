@@ -1,4 +1,5 @@
 use crate::count_profile_anchor::{raw_objective_anchors, truncate_anchor};
+use crate::count_profile_anchor_cleanup::trim_count_mechanics;
 
 pub(crate) fn content_anchors(objective: &str) -> Vec<String> {
     let anchors = raw_objective_anchors(objective);
@@ -24,7 +25,7 @@ pub(crate) fn content_anchors(objective: &str) -> Vec<String> {
 }
 
 fn content_anchor(anchor: &str) -> Option<String> {
-    let cleaned = trim_count_prefix(trim_request_suffix(trim_scaffold_suffix(
+    let cleaned = trim_count_mechanics(trim_request_suffix(trim_scaffold_suffix(
         strip_scaffold_prefix(anchor),
     )))
     .trim();
@@ -41,7 +42,7 @@ fn content_anchor(anchor: &str) -> Option<String> {
 }
 
 fn fallback_anchor(anchor: &str) -> Option<String> {
-    let cleaned = trim_count_prefix(trim_request_suffix(trim_scaffold_suffix(
+    let cleaned = trim_count_mechanics(trim_request_suffix(trim_scaffold_suffix(
         strip_scaffold_prefix(anchor),
     )))
     .trim();
@@ -103,20 +104,6 @@ fn trim_request_suffix(anchor: &str) -> &str {
         if anchor.ends_with(suffix) {
             let end = anchor.len().saturating_sub(suffix.len());
             return anchor[..end].trim();
-        }
-    }
-    anchor
-}
-
-fn trim_count_prefix(anchor: &str) -> &str {
-    for marker in ["ぐらいの", "くらいの", "程度の", "ほどの"] {
-        let Some(index) = anchor.find(marker) else {
-            continue;
-        };
-        let prefix = &anchor[..index];
-        if prefix.contains("ファイル") || prefix.contains("ドキュメント") || prefix.contains("文書")
-        {
-            return anchor[index.saturating_add(marker.len())..].trim();
         }
     }
     anchor

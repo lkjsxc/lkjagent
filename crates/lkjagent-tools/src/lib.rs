@@ -6,6 +6,7 @@ mod count_number_kanji;
 mod count_number_words;
 mod count_profile;
 mod count_profile_anchor;
+mod count_profile_anchor_cleanup;
 mod count_profile_anchor_content;
 mod count_profile_audit;
 mod count_profile_body;
