@@ -16,6 +16,46 @@ pub mod http;
 
 pub type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
+pub fn contains_all(text: &str, needles: &[&str]) -> bool {
+    needles.iter().all(|needle| text.contains(needle))
+}
+
+pub const COUNTED_EVIDENCE_TERMS: &[&str] = &[
+    "index_files=",
+    "design_memos=",
+    "main_files=",
+    "file_budget=ok",
+    "audit_manifest=ok",
+    "coverage_map=ok",
+    "acceptance_audit=ok",
+    "restart_guide=ok",
+    "part_ledger=ok",
+    "index_scope=all",
+    "section_scope=all",
+    "content_blocks=ok",
+    "design_sections=ok",
+    "main_sections=ok",
+    "design_owner_links=ok",
+    "local_verification=ok",
+    "reading_path=ok",
+    "sequence_paths=ok",
+    "first_main=ok",
+    "last_main=ok",
+    "verification=ok",
+];
+
+pub const COUNTED_SUMMARY_TERMS: &[&str] = &[
+    "file_budget=ok",
+    "audit_manifest=ok",
+    "acceptance_audit=ok",
+    "restart_guide=ok",
+    "design_owner_links=ok",
+    "local_verification=ok",
+    "reading_path=ok",
+    "sequence_paths=ok",
+    "verification=ok",
+];
+
 pub fn prefix() -> TestResult<Vec<Frame>> {
     Ok(build_prefix(&PromptInputs {
         graph_state: "case=none\nphase=waiting\nnode=classify".to_string(),

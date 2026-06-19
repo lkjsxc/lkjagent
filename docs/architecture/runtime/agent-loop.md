@@ -73,8 +73,8 @@ daemon writes a generic `structured-output/` tree before the first endpoint
 turn. The scaffold profiles the owner's objective by detected language and
 broad deliverable kind, gives each main file a kind-aware segment brief, adds
 a root machine-readable audit manifest, a root acceptance-audit section, and
-a per-part role ledger to the main index, gives each main file a design-owner
-link, local verification checklist, and sequence path ledger,
+a root reading path, adds a per-part role ledger to the main index, gives each
+main file a design-owner link, local verification checklist, and sequence path ledger,
 verifies the requested count, root index, root file budget, count-linked
 audit manifest, acceptance audit, optional directory indexes, docs coverage
 map, all design memo sections, all main-file sections, design-owner links,
@@ -89,7 +89,7 @@ acceptance-audit status, coverage-map status,
 `index_scope=all`, `section_scope=all`, content-block status, required
 design-section status, required main-section status, first and last main
 status, part ledger status, design-owner-link status, local-verification
-status, sequence-path status, and `verification=ok`.
+status, root reading-path status, sequence-path status, and `verification=ok`.
 
 When no task is open and the queue is empty, the daemon opens a bounded
 graph maintenance case only after a directive is due, records

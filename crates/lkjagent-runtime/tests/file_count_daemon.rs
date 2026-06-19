@@ -8,7 +8,9 @@ use lkjagent_runtime::daemon::{
 };
 use lkjagent_store::{memory, queue, state};
 use support::http::{completion, serve_responses};
-use support::{store, temp_workspace, TestResult};
+use support::{
+    contains_all, store, temp_workspace, TestResult, COUNTED_EVIDENCE_TERMS, COUNTED_SUMMARY_TERMS,
+};
 
 const BATCH_WRITE: &str = "<act>
 <tool>shell.run</tool>
@@ -154,26 +156,7 @@ fn assert_counted_graph_evidence(conn: &rusqlite::Connection, target: usize) -> 
         evidence.iter().any(|(requirement, summary, path)| {
             requirement == "verification"
                 && summary.contains(&format!("files={target}"))
-                && summary.contains("index_files=")
-                && summary.contains("design_memos=")
-                && summary.contains("main_files=")
-                && summary.contains("file_budget=ok")
-                && summary.contains("audit_manifest=ok")
-                && summary.contains("coverage_map=ok")
-                && summary.contains("acceptance_audit=ok")
-                && summary.contains("restart_guide=ok")
-                && summary.contains("part_ledger=ok")
-                && summary.contains("index_scope=all")
-                && summary.contains("section_scope=all")
-                && summary.contains("content_blocks=ok")
-                && summary.contains("design_sections=ok")
-                && summary.contains("main_sections=ok")
-                && summary.contains("design_owner_links=ok")
-                && summary.contains("local_verification=ok")
-                && summary.contains("sequence_paths=ok")
-                && summary.contains("first_main=ok")
-                && summary.contains("last_main=ok")
-                && summary.contains("verification=ok")
+                && contains_all(summary, COUNTED_EVIDENCE_TERMS)
                 && path.as_deref() == Some("structured-output")
         }),
         "{evidence:?}"
@@ -184,15 +167,7 @@ fn assert_counted_graph_evidence(conn: &rusqlite::Connection, target: usize) -> 
 fn assert_counted_task_summary(conn: &rusqlite::Connection) -> TestResult<()> {
     assert!(
         memory::find(conn, "file_budget", 5)?.iter().any(|row| {
-            row.kind == "task-summary"
-                && row.content.contains("file_budget=ok")
-                && row.content.contains("audit_manifest=ok")
-                && row.content.contains("acceptance_audit=ok")
-                && row.content.contains("restart_guide=ok")
-                && row.content.contains("design_owner_links=ok")
-                && row.content.contains("local_verification=ok")
-                && row.content.contains("sequence_paths=ok")
-                && row.content.contains("verification=ok")
+            row.kind == "task-summary" && contains_all(&row.content, COUNTED_SUMMARY_TERMS)
         }),
         "missing counted task-summary evidence"
     );

@@ -66,7 +66,7 @@ pub fn scaffold_counted_documents(
         allocation.indexes,
     )?;
     Ok(format!(
-        "counted document scaffold root=structured-output\nfiles={}\nindex_files={}\ndesign_memos={}\nmain_files={}\nroot_index=ok\nfile_budget={}\naudit_manifest={}\ndocs_index={}\ncoverage_map={}\nmain_index={}\nacceptance_audit={}\nrestart_guide={}\npart_ledger={}\nindex_scope={}\nsection_scope=all\ncontent_blocks={}\ndesign_sections={}\nmain_sections={}\ndesign_owner_links={}\nlocal_verification={}\nsequence_paths={}\nfirst_main={}\nlast_main={}\nverification=ok\ncompletion=ready",
+        "counted document scaffold root=structured-output\nfiles={}\nindex_files={}\ndesign_memos={}\nmain_files={}\nroot_index=ok\nfile_budget={}\naudit_manifest={}\ndocs_index={}\ncoverage_map={}\nmain_index={}\nacceptance_audit={}\nrestart_guide={}\npart_ledger={}\nindex_scope={}\nsection_scope=all\ncontent_blocks={}\ndesign_sections={}\nmain_sections={}\ndesign_owner_links={}\nlocal_verification={}\nreading_path={}\nsequence_paths={}\nfirst_main={}\nlast_main={}\nverification=ok\ncompletion=ready",
         check.files,
         check.index_files,
         allocation.docs,
@@ -85,6 +85,7 @@ pub fn scaffold_counted_documents(
         check.main_sections,
         check.design_owner_links,
         check.local_verification,
+        check.reading_path,
         check.sequence_paths,
         check.first_main,
         check.last_main
