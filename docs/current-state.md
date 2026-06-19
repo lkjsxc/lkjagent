@@ -39,8 +39,8 @@ honpen phrasing select document construction when paired with file-count
 wording, and counted creation deliverables preempt incidental architecture or
 test wording before endpoint work starts. Implementation, fix, debug, patch,
 and refactor action wording plus Japanese shusei, jisso, debug, and refactor
-wording veto that preemption so code-change tasks keep their specialized
-graph family. Japanese bug and shusei wording also select bug-fix routing.
+wording veto that preemption, while implementation-chapter wording stays a counted
+deliverable. Japanese bug and shusei wording also select bug-fix routing.
 File and markdown-count requests remain deterministic control guards,
 including when combined with a recursive or knowledge-base task family;
 English file, document, and docs wording plus common Japanese file wording
@@ -118,7 +118,7 @@ clauses, and generic meta constraints.
 Docs-side scaffolds carry twenty distinct planning focus labels, so common
 20-outline requests do not collapse into repeated supplemental planning notes.
 When the objective includes a design, memo, viewpoint, outline, planning,
-appendix-note, checklist, timeline, lesson-plan, lore/story-planning sheets, Japanese design-file,
+appendix-note, checklist, timeline, decision-record, lesson-plan, lore/story-planning sheets, Japanese design-file,
 setting-reference, qualified character/cast/persona bio, or explicit packet/note/summary/exhibit/sketch split count,
 the scaffold uses it for design memos when the exact total can still retain main content.
 File-count wording stays stronger than design wording when scoring allocation

@@ -33,20 +33,26 @@ fn creation_request(lower: &str, content: &str) -> bool {
 }
 
 fn code_change_action(lower: &str, content: &str) -> bool {
-    contains_any(
-        lower,
-        &[
-            "debug",
-            "debugging",
-            "fix",
-            "fixing",
-            "implement",
-            "implementation",
-            "patch",
-            "refactor",
-            "refactoring",
-        ],
-    ) || contains_any(content, &["修正", "実装", "デバッグ", "リファクタ"])
+    lower
+        .split(|ch: char| !ch.is_ascii_alphanumeric())
+        .any(code_change_word)
+        || contains_any(content, &["修正", "実装", "デバッグ", "リファクタ"])
+}
+
+fn code_change_word(word: &str) -> bool {
+    matches!(
+        word,
+        "debug"
+            | "debugging"
+            | "fix"
+            | "fixing"
+            | "implement"
+            | "implementing"
+            | "patch"
+            | "patching"
+            | "refactor"
+            | "refactoring"
+    )
 }
 
 fn file_signal(lower: &str, content: &str) -> bool {
