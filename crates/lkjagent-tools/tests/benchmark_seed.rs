@@ -88,6 +88,8 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     assert!(first_part.contains("- 次: 002"));
     assert!(first_part.contains("### 場面の役割"));
     assert!(first_part.contains("### 転換点"));
+    assert!(first_part.contains("### 具体化メモ"));
+    assert!(first_part.contains("記録係の視点"));
     assert!(first_part.contains("### 要求との接続"));
     assert!(first_part.contains("この節では「100ファイルぐらいの大きな物語を作ってください」"));
     Ok(())

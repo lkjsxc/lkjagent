@@ -1,4 +1,5 @@
 use crate::count_profile::{DeliverableKind, Language};
+use crate::count_profile_detail::detail_block;
 
 pub(crate) fn main_title(language: Language, kind: DeliverableKind, index: usize) -> String {
     match (language, kind) {
@@ -28,7 +29,8 @@ pub(crate) fn body_text(
         (Language::English, DeliverableKind::Report) => en_report(index, total),
         (Language::English, DeliverableKind::General) => en_general(index, total),
     };
-    format!("{body}\n\n{}", anchor_link(language, anchor))
+    let detail = detail_block(language, kind, index, total, anchor);
+    format!("{body}\n\n{detail}\n\n{}", anchor_link(language, anchor))
 }
 
 pub(crate) fn sequence_text(language: Language, index: usize, total: usize) -> String {
