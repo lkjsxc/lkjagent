@@ -97,8 +97,7 @@ impl ResidentDaemon {
         let Some(pending) = self.state.pending_action.clone() else {
             return Ok(None);
         };
-        let maintenance_ask =
-            self.state.maintenance.is_some() && pending.action.tool.as_str() == "agent.ask";
+        let maintenance_ask = self.maintenance_ask_pending(conn, pending.action.tool.as_str())?;
         let output = if self.state.compaction.is_some() && pending.action.tool != "memory.save" {
             blocked_compaction_output(&mut self.dispatch_state, action_text)
         } else {
@@ -114,7 +113,8 @@ impl ResidentDaemon {
         let result = step(self.state.clone(), StepInput::ToolOutput(output));
         let tick = self.apply_step_result(conn, now, result, false)?;
         if maintenance_ask {
-            self.dispatch_state.control.question_outstanding = false;
+            self.close_maintenance_ask(conn)?;
+            return Ok(Some(DaemonTick::Done));
         }
         if let Some(next) =
             self.advance_compaction_after_output(conn, now, &pending.action, &compaction_output)?

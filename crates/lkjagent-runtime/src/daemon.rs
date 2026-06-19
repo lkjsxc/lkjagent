@@ -20,6 +20,7 @@ mod context_budget;
 mod effects;
 mod endpoint;
 mod idle;
+mod maintenance_wait;
 mod pressure;
 mod record;
 mod runner;
