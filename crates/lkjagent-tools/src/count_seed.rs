@@ -64,7 +64,8 @@ pub fn scaffold_counted_documents(
         )));
     }
     Ok(format!(
-        "counted document scaffold root=structured-output\nfiles={count}\nverification=ok\ncompletion=ready"
+        "counted document scaffold root=structured-output\nfiles={count}\ndesign_memos={}\nmain_files={}\nverification=ok\ncompletion=ready",
+        allocation.docs, allocation.main
     ))
 }
 

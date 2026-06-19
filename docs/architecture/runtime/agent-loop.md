@@ -68,7 +68,8 @@ turn. The scaffold profiles the owner's objective by detected language and
 broad deliverable kind, verifies the requested count, records graph evidence,
 saves a task summary, and closes the task without asking the endpoint to
 repeat the same bulk generation. The recorded evidence includes the
-`structured-output` path, target file count, and `verification=ok`.
+`structured-output` path, target file count, design memo count, main file
+count, and `verification=ok`.
 
 When no task is open and the queue is empty, the daemon opens a bounded
 graph maintenance case only after a directive is due, records
