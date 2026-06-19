@@ -1,4 +1,5 @@
 use crate::count_number::{number_spans, span_distance, span_matches, NumberSpan, Span};
+use crate::count_seed_allocation_infer::inferred_split_unit_spans;
 use crate::count_seed_allocation_lead::allocation_lead_before;
 use crate::count_seed_allocation_units::split_unit_spans;
 
@@ -11,11 +12,19 @@ pub(crate) fn remaining_split_hint(
     file_signals: &[Span],
 ) -> Option<usize> {
     let split_signals = split_signal_spans(lower);
-    let unit_signals = split_unit_spans(lower, file_signals);
-    if unit_signals.is_empty() || split_signals.is_empty() {
+    if split_signals.is_empty() {
         return None;
     }
     let numbers = number_spans(objective);
+    let mut unit_signals = split_unit_spans(lower, file_signals);
+    unit_signals.extend(inferred_split_unit_spans(
+        objective,
+        &numbers,
+        &split_signals,
+    ));
+    if unit_signals.is_empty() {
+        return None;
+    }
     numbers
         .iter()
         .copied()

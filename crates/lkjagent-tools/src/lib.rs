@@ -27,6 +27,7 @@ mod count_profile_variation_en;
 mod count_profile_variation_jp;
 pub mod count_seed;
 mod count_seed_allocation;
+mod count_seed_allocation_infer;
 mod count_seed_allocation_lead;
 mod count_seed_allocation_signals;
 mod count_seed_allocation_split;
