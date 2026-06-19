@@ -144,9 +144,24 @@ pub(crate) fn design_owner(index: usize, docs: usize, main: usize) -> Option<usi
 }
 
 fn stage_range(total: usize, slot: usize) -> Option<(usize, usize)> {
-    let start = slot.saturating_mul(total) / 6 + 1;
-    let end = (slot.saturating_add(1)).saturating_mul(total) / 6;
-    (start <= end).then_some((start, end))
+    let mut start = None;
+    let mut end = None;
+    for index in 1..=total {
+        if stage_slot(index, total) == slot {
+            start.get_or_insert(index);
+            end = Some(index);
+        }
+    }
+    start.zip(end)
+}
+
+fn stage_slot(index: usize, total: usize) -> usize {
+    index
+        .saturating_sub(1)
+        .saturating_mul(6)
+        .checked_div(total.max(1))
+        .unwrap_or(0)
+        .min(5)
 }
 
 fn coverage_range(index: usize, docs: usize, main: usize) -> Option<(usize, usize)> {

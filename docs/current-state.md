@@ -97,14 +97,13 @@ The root index includes a restart guide that names README.md, docs/README.md,
 main/README.md, design-owner links, local verification, sequence ledgers, and
 the stable file-count rule when content exists. It also includes a reading
 path that names the first main file, last main file, and numeric read order.
-The docs index maps design memos to covered main ranges, and the main index
-maps stage ranges plus a per-part role ledger that links each main file back
-to its design memo owner. Each main file repeats that owner link in its
-position section for direct restart from a single part file.
-Every design index entry, main ledger entry, main-file design-owner link, and
-explicit main-file previous/current/next path is verified before closure. Every
-main file also carries a local verification checklist covering design-owner
-status, sequence paths, draft content blocks, and continuity handoff. Every
+The docs index maps design memos to covered main ranges. The main index maps
+stage ranges from the same per-part stage assignment plus a role ledger that
+links each main file back to its design memo owner for direct part-file restart.
+Every design index entry, progress-map line, main ledger entry, main-file
+design-owner link, and explicit main-file previous/current/next path is verified
+before closure. Every main file also carries a local verification checklist
+covering design-owner status, sequence paths, draft content blocks, and continuity handoff. Every
 design and main file is section-verified and content-block
 verified before scaffold closure. Design and main files carry matching
 headings, section roles, objective anchors that
