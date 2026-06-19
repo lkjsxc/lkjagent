@@ -39,6 +39,8 @@ pub(crate) fn split_unit_spans(lower: &str, file_signals: &[Span]) -> Vec<Span> 
         "reference exhibits",
         "background exhibit",
         "background exhibits",
+        "lesson plan",
+        "lesson plans",
         "character sketch",
         "character sketches",
         "character bio",

@@ -29,6 +29,27 @@ fn count_seed_honors_supporting_exhibits_without_file_noun() -> TestResult<()> {
 }
 
 #[test]
+fn count_seed_honors_lesson_plans_without_file_noun() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-lesson-plans")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        file_guard(),
+        "Create about one hundred files total for a training course. Use twenty-four \
+         lesson plans. The rest as ordered training modules. Count docs and main content \
+         together. Keep Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert_counts(&root, 24, 73, "guide")?;
+    assert!(root.join("docs/design-024.md").exists());
+    assert!(!root.join("docs/design-025.md").exists());
+    assert!(root.join("main/part-073.md").exists());
+    assert!(!root.join("main/part-074.md").exists());
+    Ok(())
+}
+
+#[test]
 fn count_seed_honors_character_sketches_without_file_noun() -> TestResult<()> {
     let workspace = temp_workspace("count-seed-character-sketches")?;
 
