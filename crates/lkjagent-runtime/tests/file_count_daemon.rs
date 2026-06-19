@@ -76,6 +76,7 @@ fn counted_documentation_task_auto_scaffolds_before_endpoint() -> TestResult<()>
 
     assert_eq!(state::get(&conn, "completion guard")?, None);
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
+    assert_counted_graph_evidence(&conn, 20)?;
     Ok(())
 }
 
@@ -124,4 +125,38 @@ fn file_count(path: &Path) -> TestResult<usize> {
         }
     }
     Ok(count)
+}
+
+fn assert_counted_graph_evidence(conn: &rusqlite::Connection, target: usize) -> TestResult<()> {
+    let mut statement = conn.prepare(
+        "SELECT requirement, summary, path
+         FROM graph_evidence
+         WHERE summary LIKE 'counted document scaffold%'
+         ORDER BY id",
+    )?;
+    let rows = statement.query_map([], |row| {
+        Ok((
+            row.get::<_, String>(0)?,
+            row.get::<_, String>(1)?,
+            row.get::<_, Option<String>>(2)?,
+        ))
+    })?;
+    let evidence = rows.collect::<Result<Vec<_>, _>>()?;
+    assert!(evidence.len() >= 2, "{evidence:?}");
+    assert!(
+        evidence.iter().any(|(requirement, _, path)| {
+            requirement == "document-structure" && path.as_deref() == Some("structured-output")
+        }),
+        "{evidence:?}"
+    );
+    assert!(
+        evidence.iter().any(|(requirement, summary, path)| {
+            requirement == "verification"
+                && summary.contains(&format!("files={target}"))
+                && summary.contains("verification=ok")
+                && path.as_deref() == Some("structured-output")
+        }),
+        "{evidence:?}"
+    );
+    Ok(())
 }
