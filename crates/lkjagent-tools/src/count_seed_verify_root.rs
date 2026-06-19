@@ -108,70 +108,69 @@ pub(crate) fn verify_audit_manifest(
         "n/a"
     };
     let content_blocks = if has_content { "required" } else { "n/a" };
+    let design_owner_links = if docs > 0 && main > 0 {
+        "required"
+    } else {
+        "n/a"
+    };
     let sequence_paths = if main > 0 { "required" } else { "n/a" };
-    require_budget_line(
+    require_manifest_line(
         root_index,
-        "- root: structured-output",
         "- root: structured-output",
         "audit manifest root",
     )?;
-    require_budget_line(
+    require_manifest_line(
         root_index,
-        &format!("- files: {target}"),
-        &format!("- files: {target}"),
+        format!("- files: {target}"),
         "audit manifest file count",
     )?;
-    require_budget_line(
+    require_manifest_line(
         root_index,
-        &format!("- index_files: {index_files}"),
-        &format!("- index_files: {index_files}"),
+        format!("- index_files: {index_files}"),
         "audit manifest index count",
     )?;
-    require_budget_line(
+    require_manifest_line(
         root_index,
-        &format!("- design_memos: {docs}"),
-        &format!("- design_memos: {docs}"),
+        format!("- design_memos: {docs}"),
         "audit manifest design count",
     )?;
-    require_budget_line(
+    require_manifest_line(
         root_index,
-        &format!("- main_files: {main}"),
-        &format!("- main_files: {main}"),
+        format!("- main_files: {main}"),
         "audit manifest main count",
     )?;
-    require_budget_line(
+    require_manifest_line(
         root_index,
-        &format!("- index_scope: {index_scope}"),
-        &format!("- index_scope: {index_scope}"),
+        format!("- index_scope: {index_scope}"),
         "audit manifest index scope",
     )?;
-    require_budget_line(
+    require_manifest_line(
         root_index,
-        "- section_scope: all",
         "- section_scope: all",
         "audit manifest section scope",
     )?;
-    require_budget_line(
+    require_manifest_line(
         root_index,
-        &format!("- content_blocks: {content_blocks}"),
-        &format!("- content_blocks: {content_blocks}"),
+        format!("- content_blocks: {content_blocks}"),
         "audit manifest content blocks",
     )?;
-    require_budget_line(
+    require_manifest_line(
         root_index,
-        "- restart_guide: required",
         "- restart_guide: required",
         "audit manifest restart guide",
     )?;
-    require_budget_line(
+    require_manifest_line(
         root_index,
-        &format!("- sequence_paths: {sequence_paths}"),
-        &format!("- sequence_paths: {sequence_paths}"),
+        format!("- design_owner_links: {design_owner_links}"),
+        "audit manifest design owner links",
+    )?;
+    require_manifest_line(
+        root_index,
+        format!("- sequence_paths: {sequence_paths}"),
         "audit manifest sequence paths",
     )?;
-    require_budget_line(
+    require_manifest_line(
         root_index,
-        "- completion: ready",
         "- completion: ready",
         "audit manifest completion",
     )?;
@@ -186,4 +185,9 @@ fn require_budget_line(text: &str, english: &str, japanese: &str, label: &str) -
             "counted document scaffold missing {label}"
         )))
     }
+}
+
+fn require_manifest_line(text: &str, line: impl AsRef<str>, label: &str) -> ToolResult<()> {
+    let line = line.as_ref();
+    require_budget_line(text, line, line, label)
 }

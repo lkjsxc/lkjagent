@@ -24,6 +24,7 @@ mod count_profile_variation_jp;
 pub mod count_seed;
 mod count_seed_allocation;
 mod count_seed_verify;
+mod count_seed_verify_main;
 mod count_seed_verify_restart;
 mod count_seed_verify_root;
 mod count_seed_verify_text;
