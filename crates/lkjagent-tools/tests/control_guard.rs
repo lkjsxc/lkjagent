@@ -66,6 +66,30 @@ fn japanese_full_width_file_count_request_adds_approximate_file_guard() {
 }
 
 #[test]
+fn japanese_kanji_file_count_request_adds_approximate_file_guard() {
+    let mut state = ControlState::default();
+
+    state.start_task("合計百ファイル程度の大きな成果物を作ってください。");
+
+    assert_eq!(
+        state.guard,
+        CompletionGuard::FileCount {
+            target: 100,
+            mode: CountMode::Approximate
+        }
+    );
+}
+
+#[test]
+fn japanese_encyclopedia_word_does_not_add_file_count_guard() {
+    let mut state = ControlState::default();
+
+    state.start_task("百科事典を高度に再帰的な構造でdocsに作ってください");
+
+    assert_eq!(state.guard, CompletionGuard::RecursiveKnowledge);
+}
+
+#[test]
 fn english_document_count_request_adds_approximate_file_guard() {
     let mut state = ControlState::default();
 

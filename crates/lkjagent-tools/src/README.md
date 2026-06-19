@@ -11,6 +11,8 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [control.rs](control.rs): agent.done and agent.ask state transitions.
 - [count_guard.rs](count_guard.rs): exact and approximate file-count guards.
 - [count_guard/](count_guard/README.md): file-count scanning helpers.
+- [count_number.rs](count_number.rs): counted wording number-span parser.
+- [count_number_kanji.rs](count_number_kanji.rs): Japanese numeric kanji helpers.
 - [count_profile_anchor.rs](count_profile_anchor.rs): counted scaffold requirement anchors.
 - [count_profile_body.rs](count_profile_body.rs): counted scaffold body spines.
 - [count_profile_design.rs](count_profile_design.rs): counted scaffold design memo bodies.

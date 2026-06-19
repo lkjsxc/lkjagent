@@ -37,11 +37,11 @@ evidence for the required document structure. File and markdown-count
 requests remain deterministic control guards, including when combined with a
 recursive or knowledge-base task family; English file, document, and docs
 wording plus common Japanese file wording are recognized, ASCII digits,
-full-width digits, and comma-like digit separators are accepted, the target
-number is chosen by proximity to file or document wording, exact wording is
-exact, and approximate wording uses a bounded tolerance. Counted completion
-prefers README-indexed roots and falls back to clean top-level output
-directories.
+full-width digits, common Japanese numeric kanji, and comma-like digit
+separators are accepted, the target number is chosen by proximity to file or
+document wording, exact wording is exact, and approximate wording uses a
+bounded tolerance. Counted completion prefers README-indexed roots and falls
+back to clean top-level output directories.
 The active graph prefix renders count guards and tells the model to use one
 compact `shell.run` command with direct `/bin/sh` loops and `printf`
 templates for bulk creation and count verification, keep the act payload
