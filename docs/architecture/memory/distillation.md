@@ -35,7 +35,8 @@ The memory digest in the prefix renders selected entries in rank order,
 task summary always first, within the 2,048-token budget from
 [../context/budgets.md](../context/budgets.md). Selection rules are owned
 by [retrieval.md](retrieval.md); the builder must fit whole entries inside
-the cap.
+the cap during normal operation and only truncates a first oversized entry
+so daemon startup remains recoverable.
 
 ## Pruning
 

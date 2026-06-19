@@ -29,7 +29,9 @@ current-state, concept-map, expansion-queue, and rebalance-plan anchors.
 They cannot close without knowledge-nucleus evidence plus contract-shaped
 markdown pages. Generic recursive structure tasks cannot close without a
 verified README-indexed tree. Recursive-knowledge tasks also reject nested
-docs roots and writes outside the seeded top-level docs map. shell.run
+docs roots and writes outside the seeded top-level docs map. Startup trims
+rendered memory digest rows to the prefix budget instead of failing when
+stored token estimates are stale. shell.run
 reports non-zero and signal exits as error observations with captured
 output. Recoverable parse, repeat-action, and tool errors add recovery
 notices to the transcript and keep the task moving instead of pausing it;
