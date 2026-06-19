@@ -16,6 +16,7 @@ pub(crate) struct ScaffoldCheck {
     pub(crate) main_index: &'static str,
     pub(crate) acceptance_audit: &'static str,
     pub(crate) part_ledger: &'static str,
+    pub(crate) index_scope: &'static str,
     pub(crate) content_blocks: &'static str,
     pub(crate) design_sections: &'static str,
     pub(crate) main_sections: &'static str,
@@ -49,7 +50,7 @@ pub(crate) fn verify_scaffold(
         None
     };
     let docs_index = status(docs_text.is_some());
-    let coverage_map = verify_coverage_map(docs_text.as_deref(), main)?;
+    let coverage_map = verify_coverage_map(docs_text.as_deref(), docs, main)?;
     let main_text = if indexes {
         Some(require_text(&root.join("main/README.md"), "main index")?)
     } else {
@@ -57,6 +58,7 @@ pub(crate) fn verify_scaffold(
     };
     let main_index = status(main_text.is_some());
     let part_ledger = verify_part_ledger(main_text.as_deref(), main)?;
+    let index_scope = scope_status(indexes && (docs > 0 || main > 0));
     Ok(ScaffoldCheck {
         files,
         index_files: if indexes { 2 } else { 0 },
@@ -65,6 +67,7 @@ pub(crate) fn verify_scaffold(
         main_index,
         acceptance_audit,
         part_ledger,
+        index_scope,
         content_blocks,
         design_sections,
         main_sections,
@@ -117,6 +120,14 @@ fn require_text(path: &Path, label: &str) -> ToolResult<String> {
 fn status(ok: bool) -> &'static str {
     if ok {
         "ok"
+    } else {
+        "n/a"
+    }
+}
+
+fn scope_status(all: bool) -> &'static str {
+    if all {
+        "all"
     } else {
         "n/a"
     }

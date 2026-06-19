@@ -129,6 +129,10 @@ fn count_seed_keeps_file_count_stronger_than_design_wording() -> TestResult<()> 
     let mid_part = fs::read_to_string(root.join("main/part-042.md"))?;
     assert!(mid_part.contains("## Continuity Hand-Off"));
     assert!(mid_part.contains("### Draft Passage"));
+    let docs_index = fs::read_to_string(root.join("docs/README.md"))?;
+    assert!(docs_index.contains("design-012.md"));
+    let main_index = fs::read_to_string(root.join("main/README.md"))?;
+    assert!(main_index.contains("main/part-042.md"));
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- Design memos: 12"));
     assert!(readme.contains("- Main files: 85"));
@@ -139,6 +143,7 @@ fn count_seed_keeps_file_count_stronger_than_design_wording() -> TestResult<()> 
     assert!(report.contains("main_index=ok"));
     assert!(report.contains("acceptance_audit=ok"));
     assert!(report.contains("part_ledger=ok"));
+    assert!(report.contains("index_scope=all"));
     assert!(report.contains("section_scope=all"));
     assert!(report.contains("content_blocks=ok"));
     assert!(report.contains("design_sections=ok"));

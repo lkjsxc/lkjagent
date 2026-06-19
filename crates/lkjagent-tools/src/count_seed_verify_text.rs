@@ -13,12 +13,13 @@ pub(crate) fn verify_acceptance_audit(root_index: &str) -> ToolResult<&'static s
 
 pub(crate) fn verify_coverage_map(
     docs_index: Option<&str>,
+    docs: usize,
     main: usize,
 ) -> ToolResult<&'static str> {
     let Some(text) = docs_index else {
         return Ok("n/a");
     };
-    if main == 0 {
+    if docs == 0 || main == 0 {
         return Ok("n/a");
     }
     if !text.contains("## Coverage Map") && !text.contains("## 設計対応表") {
@@ -26,12 +27,26 @@ pub(crate) fn verify_coverage_map(
             "counted document scaffold missing coverage map",
         ));
     }
-    require_contains(text, "part-001.md", "coverage map first main")?;
-    require_contains(
-        text,
-        &format!("part-{main:03}.md"),
-        "coverage map last main",
-    )?;
+    for index in 1..=docs {
+        let Some((start, end)) = coverage_range(index, docs, main) else {
+            continue;
+        };
+        require_contains(
+            text,
+            &format!("design-{index:03}.md"),
+            "coverage map design entry",
+        )?;
+        require_contains(
+            text,
+            &format!("main/part-{start:03}.md"),
+            "coverage map range start",
+        )?;
+        require_contains(
+            text,
+            &format!("main/part-{end:03}.md"),
+            "coverage map range end",
+        )?;
+    }
     Ok("ok")
 }
 
@@ -45,12 +60,17 @@ pub(crate) fn verify_part_ledger(
     if main == 0 {
         return Ok("n/a");
     }
-    require_contains(text, "part-001.md", "main index first part")?;
-    require_contains(text, &format!("part-{main:03}.md"), "main index last part")?;
     if !text.contains("## Part Ledger") && !text.contains("## 本編台帳") {
         return Err(ToolError::invalid(
             "counted document scaffold missing part ledger",
         ));
+    }
+    for index in 1..=main {
+        require_contains(
+            text,
+            &format!("main/part-{index:03}.md"),
+            "main index part ledger entry",
+        )?;
     }
     Ok("ok")
 }
@@ -130,4 +150,14 @@ fn require_contains(text: &str, needle: &str, label: &str) -> ToolResult<()> {
             "counted document scaffold missing {label}"
         )))
     }
+}
+
+fn coverage_range(index: usize, docs: usize, main: usize) -> Option<(usize, usize)> {
+    if docs == 0 || main == 0 {
+        return None;
+    }
+    let slot = index.saturating_sub(1).min(docs.saturating_sub(1));
+    let start = slot.saturating_mul(main) / docs + 1;
+    let end = (slot.saturating_add(1)).saturating_mul(main) / docs;
+    Some((start.min(main), end.max(start).min(main)))
 }
