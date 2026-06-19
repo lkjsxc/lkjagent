@@ -66,7 +66,7 @@ fn scripted_task_reaches_done_and_distillation_prompt() -> TestResult<()> {
 }
 
 #[test]
-fn parse_faults_keep_task_open_and_recover_after_three_failures() -> TestResult<()> {
+fn parse_faults_keep_task_open_and_recover_before_wait_threshold() -> TestResult<()> {
     let mut state = step(
         runtime_state()?,
         StepInput::Owner {
@@ -78,7 +78,7 @@ fn parse_faults_keep_task_open_and_recover_after_three_failures() -> TestResult<
     )
     .state;
     let mut last_effects = Vec::new();
-    for _ in 0..3 {
+    for _ in 0..2 {
         let result = step(
             state,
             StepInput::Completion {
@@ -92,7 +92,7 @@ fn parse_faults_keep_task_open_and_recover_after_three_failures() -> TestResult<
     assert!(matches!(state.task, TaskState::Open { .. }));
     assert!(last_effects
         .iter()
-        .any(|effect| matches!(effect, Effect::RecordEvent { content, .. } if content.contains("shell.run heredoc/script"))));
+        .any(|effect| matches!(effect, Effect::RecordEvent { content, .. } if content.contains("one valid act block"))));
     let recovered = step(
         state,
         StepInput::Completion {

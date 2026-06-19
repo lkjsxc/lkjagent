@@ -48,9 +48,10 @@ If the endpoint is unreachable, the daemon records an error event, sets
 `daemon_state=error`, and tries again only after the capped retry deadline;
 polls before that deadline do not hit the endpoint or add more error events.
 It never fabricates a model reply. Parser, repeat-action, and tool failures
-stay inside the task: the daemon records the failure, adds a recovery notice
-for the next model turn, and keeps working until agent.done, agent.ask, or the
-task budget.
+stay inside the task: the daemon records the failure and adds a recovery
+notice for the next model turn. Three consecutive failures of the same class
+move the task to waiting with a concrete recovery handoff instead of spending
+the remaining turn budget on the same loop.
 Task budget exhaustion becomes an observable waiting state with a concrete
 question, and the next owner send resumes the task with a fresh budget.
 When a user task closes, the task summary stamps maintenance directives so

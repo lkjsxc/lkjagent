@@ -7,7 +7,8 @@ use lkjagent_store::events::EventKind;
 use crate::graph_state::graph_notice_frame;
 use crate::maintenance::spend_cycle;
 use crate::prompt::token_estimate;
-use crate::recovery::{parse_notice, parse_recovery_notice, stop_reason};
+use crate::recovery::{parse_notice, parse_recovery_notice, should_escalate, stop_reason};
+use crate::step::fault_wait::{enter_recovery_wait, RecoveryFault};
 use crate::step::frames::{append_notice, result};
 use crate::step::oversize::{oversize_error, oversize_recovery};
 use crate::step::{Effect, StepResult};
@@ -38,6 +39,9 @@ pub(super) fn owner_step(
         state.context = append_frame(&state.context, graph_notice_frame(&graph));
         state.graph = Some(graph);
     }
+    state.parse_faults = 0;
+    state.repeat_faults = 0;
+    state.tool_faults = 0;
     state.task = open_task_with_budget(&state.task, turn_budget);
     StepResult {
         state,
@@ -143,8 +147,7 @@ fn budget_exhausted_step(mut state: RuntimeState, exhausted: BudgetExhaustion) -
     }];
     if exhausted == BudgetExhaustion::Task {
         state.task = TaskState::Waiting {
-            question: "Turn budget exhausted. Send guidance to continue or narrow the task."
-                .to_string(),
+            question: "Turn budget exhausted. Send guidance to continue.".to_string(),
         };
         return result(state, effects, Some(StopReason::Ask));
     }
@@ -185,8 +188,13 @@ fn parse_fault_step(mut state: RuntimeState, fault: &lkjagent_protocol::ParseFau
     }];
     effects.push(Effect::RecordEvent {
         kind: EventKind::Notice,
-        content: recovery,
+        content: recovery.clone(),
         tokens: 32,
     });
+    if should_escalate(state.parse_faults) {
+        let count = state.parse_faults;
+        state = enter_recovery_wait(state, RecoveryFault::Parse, count, &mut effects);
+        return result(state, effects, Some(StopReason::Ask));
+    }
     result(state, effects, Some(stop_reason(fault)))
 }

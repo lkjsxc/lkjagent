@@ -6,12 +6,13 @@ use lkjagent_tools::dispatch::DispatchOutput;
 
 use crate::maintenance::MaintenanceDirective;
 use crate::prompt::token_estimate;
-use crate::recovery::{repeat_recovery_notice, tool_recovery_notice};
+use crate::recovery::{repeat_recovery_notice, should_escalate, tool_recovery_notice};
 use crate::task::{RuntimeState, StopReason};
 
 mod action_params;
 mod compact;
 mod cycle;
+mod fault_wait;
 mod frames;
 mod graph_output;
 mod graph_phase;
@@ -21,6 +22,7 @@ mod turn;
 
 use compact::compact_step;
 use cycle::maintenance_start_step;
+use fault_wait::{enter_recovery_wait, RecoveryFault};
 use frames::{append_notice, result};
 use output::{append_output_frame, event_kind, handle_control_success, stop_for_output};
 use turn::{completion_step, owner_step};
@@ -142,13 +144,27 @@ fn tool_output_step(mut state: RuntimeState, output: DispatchOutput) -> StepResu
     let mut stop = stop_for_output(&output);
     if stop == StopReason::RepeatAction {
         state.repeat_faults = state.repeat_faults.saturating_add(1);
+        state.tool_faults = 0;
         let recovery = repeat_recovery_notice(state.repeat_faults);
         state = append_recovery_notice(state, &recovery, &mut effects);
+        if should_escalate(state.repeat_faults) {
+            let count = state.repeat_faults;
+            state = enter_recovery_wait(state, RecoveryFault::Repeat, count, &mut effects);
+            stop = StopReason::Ask;
+        }
     } else {
         state.repeat_faults = 0;
         if stop == StopReason::ToolError {
+            state.tool_faults = state.tool_faults.saturating_add(1);
             let recovery = tool_recovery_notice(&output.content);
             state = append_recovery_notice(state, &recovery, &mut effects);
+            if should_escalate(state.tool_faults) {
+                let count = state.tool_faults;
+                state = enter_recovery_wait(state, RecoveryFault::Tool, count, &mut effects);
+                stop = StopReason::Ask;
+            }
+        } else {
+            state.tool_faults = 0;
         }
     }
     if let Some(control_stop) = handle_control_success(&mut state, &pending, &output, &mut effects)
