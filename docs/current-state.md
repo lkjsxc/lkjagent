@@ -120,7 +120,7 @@ The scaffold uses design-memo allocation, when the exact total can retain main c
 for a design, memo, viewpoint, outline, planning, appendix-note, checklist,
 assessment-rubric, review-criteria, case-study, risk-register, control-mapping,
 audit-finding, timeline, decision-record, lesson-plan, story-planning sheets,
-Japanese character/design references, qualified bio/sketch, support split count, or ordered-rest split phrasing.
+Japanese character/design/relationship refs, qualified bio/sketch, support split count, or ordered-rest split phrasing.
 File-count wording stays stronger than design wording when scoring allocation
 hints, so total-count numbers are not reused as design memo counts.
 Runtime recovery uses bounded notices for parse errors, repeated actions,
