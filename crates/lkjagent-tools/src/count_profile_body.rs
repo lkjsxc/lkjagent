@@ -99,8 +99,15 @@ fn next_label(language: Language, index: usize, total: usize) -> String {
 
 fn jp_narrative(index: usize, total: usize) -> String {
     let stage = stage_name(Language::Japanese, index, total);
+    let turn = if index >= total {
+        "最終節では、残された対立を整理し、完了後に残る余韻を明確にします。".to_string()
+    } else {
+        format!(
+            "この節の終わりでは、人物の理解か状況の均衡を一つ変え、全{total}本の流れの中で次節へ進む理由を残します。"
+        )
+    };
     format!(
-        "### 場面の役割\n第{index}節は「{stage}」の段階として、状況、願い、障害を一つの場面に集約します。\n\n### 展開\n登場する視点、場所、対立の焦点を明確にし、読者が次の変化を期待できるように小さな決断を置きます。\n\n### 転換点\nこの節の終わりでは、人物の理解か状況の均衡を一つ変え、全{total}本の流れの中で次節へ進む理由を残します。"
+        "### 場面の役割\n第{index}節は「{stage}」の段階として、状況、願い、障害を一つの場面に集約します。\n\n### 展開\n登場する視点、場所、対立の焦点を明確にし、読者が次の変化を期待できるように小さな決断を置きます。\n\n### 転換点\n{turn}"
     )
 }
 
@@ -124,8 +131,16 @@ fn jp_general(index: usize, total: usize) -> String {
 
 fn en_narrative(index: usize, total: usize) -> String {
     let stage = stage_name(Language::English, index, total);
+    let turn = if index >= total {
+        "Close the final segment with the public consequence, remaining cost, and completion state."
+            .to_string()
+    } else {
+        format!(
+            "End the segment with one changed understanding or unstable condition that justifies the next part in the {total}-file sequence."
+        )
+    };
     format!(
-        "### Scene Role\nSegment {index} serves the {stage} stage by concentrating a situation, a desire, and an obstacle into one readable scene.\n\n### Development\nName the viewpoint, place, and conflict pressure clearly enough that the reader can track the next change.\n\n### Turn\nEnd the segment with one changed understanding or unstable condition that justifies the next part in the {total}-file sequence."
+        "### Scene Role\nSegment {index} serves the {stage} stage by concentrating a situation, a desire, and an obstacle into one readable scene.\n\n### Development\nName the viewpoint, place, and conflict pressure clearly enough that the reader can track the next change.\n\n### Turn\n{turn}"
     )
 }
 

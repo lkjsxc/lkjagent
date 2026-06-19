@@ -44,7 +44,32 @@ fn screenplay_profiles_as_narrative() -> TestResult<()> {
     assert!(first.contains("### Concrete Commitments"));
     assert!(first.contains("### Specific Detail"));
     assert!(first.contains("archive stair"));
-    assert!(second.contains("flooded platform"));
+    assert!(second.contains("cold signal tower"));
+    Ok(())
+}
+
+#[test]
+fn large_novel_varies_first_and_final_segments() -> TestResult<()> {
+    let workspace = temp_workspace("count-kind-large-novel-variation")?;
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 100,
+            mode: CountMode::Approximate,
+        },
+        "Create about one hundred files total for a large fantasy novel. Count docs and main \
+         chapters together. Keep Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let last = fs::read_to_string(root.join("main/part-085.md"))?;
+    assert!(first.contains("archive stair"));
+    assert!(!last.contains("archive stair"));
+    assert!(!last.contains("justifies the next part"));
+    assert!(!last.contains("pressure for the next segment"));
+    assert!(last.contains("completed state rather than a next-step hook"));
     Ok(())
 }
 

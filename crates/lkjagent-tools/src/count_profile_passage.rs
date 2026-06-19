@@ -26,8 +26,15 @@ fn jp_narrative(index: usize, total: usize, anchor: &str) -> String {
         DeliverableKind::Narrative,
         index,
     ));
+    let close = if index >= total {
+        "最終節では、続きへの圧力ではなく、選択の代償と完了後に残る状態を明示します。".to_string()
+    } else {
+        format!(
+            "場面の終わりでは、解決ではなく次へ進む理由を残します。全{total}本の流れの中で、この節は小さな判断を確定し、その判断が次の節の圧力になるように結びます。"
+        )
+    };
     format!(
-        "{detail}\n\n### 本文断片\n第{index}節では、要求「{anchor}」を、人物が選び直しを迫られる場面として描きます。{detail_sentence}。\n\n場面の終わりでは、解決ではなく次へ進む理由を残します。全{total}本の流れの中で、この節は小さな判断を確定し、その判断が次の節の圧力になるように結びます。",
+        "{detail}\n\n### 本文断片\n第{index}節では、要求「{anchor}」を、人物が選び直しを迫られる場面として描きます。{detail_sentence}。\n\n{close}",
         detail_sentence = jp_sentence(variation(Language::Japanese, DeliverableKind::Narrative, index))
     )
 }
@@ -70,8 +77,15 @@ fn en_narrative(index: usize, total: usize, anchor: &str) -> String {
         DeliverableKind::Narrative,
         index,
     ));
+    let close = if index >= total {
+        "The final segment resolves the immediate choice, names the remaining cost, and leaves a completed state rather than a next-step hook.".to_string()
+    } else {
+        format!(
+            "The segment closes with a reason to continue rather than a full resolution. Inside the {total}-file sequence, this part fixes one decision and lets that decision become pressure for the next segment."
+        )
+    };
     format!(
-        "{detail}\n\n### Draft Passage\nSegment {index} turns \"{anchor}\" into a scene where someone must choose again. {detail_sentence}.\n\nThe segment closes with a reason to continue rather than a full resolution. Inside the {total}-file sequence, this part fixes one decision and lets that decision become pressure for the next segment.",
+        "{detail}\n\n### Draft Passage\nSegment {index} turns \"{anchor}\" into a scene where someone must choose again. {detail_sentence}.\n\n{close}",
         detail_sentence = en_sentence(variation(Language::English, DeliverableKind::Narrative, index))
     )
 }
