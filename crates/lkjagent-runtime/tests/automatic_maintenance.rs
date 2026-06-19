@@ -77,6 +77,31 @@ fn maintenance_ask_closes_cycle_without_waiting_for_owner() -> TestResult<()> {
 }
 
 #[test]
+fn maintenance_labeled_queue_ask_does_not_wait_for_owner() -> TestResult<()> {
+    let mut conn = store()?;
+    take_lock(&conn)?;
+    queue::enqueue(
+        &mut conn,
+        "maintenance: resume distillation after compaction",
+        "maintenance-resume",
+        "101",
+    )?;
+    let workspace = temp_workspace("auto-maintenance-labeled-ask")?;
+    let server = serve_responses(vec![completion(MAINT_ASK)])?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Done);
+    server.join()?;
+
+    assert!(daemon.state.maintenance.is_none());
+    assert!(!daemon.dispatch_state.control.question_outstanding);
+    assert_eq!(state::get(&conn, "daemon state")?, Some("idle".to_string()));
+    assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
+    assert_eq!(state::get(&conn, "daemon question")?, None);
+    Ok(())
+}
+
+#[test]
 fn owner_queue_preempts_idle_maintenance_at_turn_boundary() -> TestResult<()> {
     let mut conn = store()?;
     take_lock(&conn)?;
