@@ -1,3 +1,4 @@
+pub mod benchmark;
 pub mod doc_common;
 pub mod doc_special;
 pub mod doc_topology;
@@ -13,6 +14,7 @@ use std::path::Path;
 use docs::check_docs;
 use facts::collect_files;
 use lines::check_lines;
+use lkjagent_benchmark::check_corpus;
 use runner::run_quiet_test;
 use style::check_style;
 
@@ -23,6 +25,7 @@ pub fn run(args: &[String], root: &Path) -> i32 {
         Ok(Gate::CheckStyle) => run_static_gate(root, "check-style", check_style),
         Ok(Gate::QuietTest) => run_command_gate(root, "test"),
         Ok(Gate::QuietVerify) => run_verify(root),
+        Ok(Gate::Benchmark(rest)) => benchmark::run(&rest, root),
         Err(lines) => {
             print_failure(&lines);
             2
@@ -86,6 +89,14 @@ fn run_verify(root: &Path) -> i32 {
             return report_static(name, violations);
         }
     }
+    if let Err(error) = check_corpus() {
+        print_failure(&[
+            "benchmark check-corpus failed".to_string(),
+            "exit status: 1".to_string(),
+            error.to_string(),
+        ]);
+        return 1;
+    }
     run_command_gate(root, "verify")
 }
 
@@ -112,6 +123,7 @@ enum Gate {
     CheckStyle,
     QuietTest,
     QuietVerify,
+    Benchmark(Vec<String>),
 }
 
 fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
@@ -121,10 +133,12 @@ fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
         [one] if one == "check-style" => Ok(Gate::CheckStyle),
         [first, second] if first == "quiet" && second == "test" => Ok(Gate::QuietTest),
         [first, second] if first == "quiet" && second == "verify" => Ok(Gate::QuietVerify),
+        [first, rest @ ..] if first == "benchmark" => Ok(Gate::Benchmark(rest.to_vec())),
         _ => Err(vec![
             "xtask failed".to_string(),
             "exit status: 2".to_string(),
-            "use: check-docs | check-lines | check-style | quiet test | quiet verify".to_string(),
+            "use: check-docs | check-lines | check-style | quiet test | quiet verify | benchmark ..."
+                .to_string(),
         ]),
     }
 }

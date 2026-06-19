@@ -36,6 +36,7 @@ adding a top-level path means adding a row in the same commit.
 | crates/lkjagent-tools | tool execution adapters | [../architecture/tools/](../architecture/tools/README.md) |
 | crates/lkjagent-runtime | daemon, loop, intake, maintenance | [../architecture/runtime/](../architecture/runtime/README.md) |
 | crates/lkjagent-cli | the lkjagent binary | [../product/cli.md](../product/cli.md) |
+| crates/lkjagent-benchmark | benchmark tasks, judges, corpus checks, reports | [../evaluation/](../evaluation/README.md) |
 | crates/lkjagent-xtask | repository checks and quiet gates | [../operations/verification.md](../operations/verification.md) |
 
 Dependency direction flows toward purity: cli and runtime depend on the
@@ -55,6 +56,7 @@ The xtask check-docs gate enforces coverage once built.
 | --- | --- | --- | --- |
 | ./data | /data | store, workspace, config | [../architecture/sandbox/workspace.md](../architecture/sandbox/workspace.md) |
 | ./data/workspace | /data/workspace | project directory the agent works on | [../architecture/sandbox/workspace.md](../architecture/sandbox/workspace.md) |
+| ./data/benchmark | not mounted by default | generated benchmark reports and task data | [../evaluation/](../evaluation/README.md) |
 
 Runtime paths are ignored local state. The default compose bind mount maps
 repository ./data to container /data. .gitignore and .dockerignore exclude
