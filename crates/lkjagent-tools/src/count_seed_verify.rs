@@ -2,7 +2,8 @@ use std::fs;
 use std::path::Path;
 
 use crate::count_seed_verify_text::{
-    verify_acceptance_audit, verify_coverage_map, verify_main_sections, verify_part_ledger,
+    verify_acceptance_audit, verify_coverage_map, verify_design_sections, verify_main_sections,
+    verify_part_ledger,
 };
 use crate::error::{ToolError, ToolResult};
 
@@ -14,6 +15,7 @@ pub(crate) struct ScaffoldCheck {
     pub(crate) main_index: &'static str,
     pub(crate) acceptance_audit: &'static str,
     pub(crate) part_ledger: &'static str,
+    pub(crate) design_sections: &'static str,
     pub(crate) main_sections: &'static str,
     pub(crate) first_main: &'static str,
     pub(crate) last_main: &'static str,
@@ -34,12 +36,10 @@ pub(crate) fn verify_scaffold(
     }
     let root_text = require_text(&root.join("README.md"), "root index")?;
     let acceptance_audit = verify_acceptance_audit(&root_text)?;
-    if docs > 0 {
-        require_file(
-            &root.join(format!("docs/design-{docs:03}.md")),
-            "last design memo",
-        )?;
-    }
+    let first_design_text = design_file_text(root, docs, 1, "first design memo")?;
+    let last_design_text = design_file_text(root, docs, docs, "last design memo")?;
+    let design_sections =
+        verify_design_sections(first_design_text.as_deref(), last_design_text.as_deref())?;
     let first_main_text = main_file_text(root, main, 1, "first main part")?;
     let last_main_text = main_file_text(root, main, main, "last main part")?;
     let first_main = status(first_main_text.is_some());
@@ -68,10 +68,26 @@ pub(crate) fn verify_scaffold(
         main_index,
         acceptance_audit,
         part_ledger,
+        design_sections,
         main_sections,
         first_main,
         last_main,
     })
+}
+
+fn design_file_text(
+    root: &Path,
+    docs: usize,
+    index: usize,
+    label: &str,
+) -> ToolResult<Option<String>> {
+    if docs == 0 {
+        return Ok(None);
+    }
+    Ok(Some(require_text(
+        &root.join(format!("docs/design-{index:03}.md")),
+        label,
+    )?))
 }
 
 fn main_file_text(

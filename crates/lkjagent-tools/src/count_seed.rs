@@ -66,7 +66,7 @@ pub fn scaffold_counted_documents(
         allocation.indexes,
     )?;
     Ok(format!(
-        "counted document scaffold root=structured-output\nfiles={}\nindex_files={}\ndesign_memos={}\nmain_files={}\nroot_index=ok\ndocs_index={}\ncoverage_map={}\nmain_index={}\nacceptance_audit={}\npart_ledger={}\nmain_sections={}\nfirst_main={}\nlast_main={}\nverification=ok\ncompletion=ready",
+        "counted document scaffold root=structured-output\nfiles={}\nindex_files={}\ndesign_memos={}\nmain_files={}\nroot_index=ok\ndocs_index={}\ncoverage_map={}\nmain_index={}\nacceptance_audit={}\npart_ledger={}\ndesign_sections={}\nmain_sections={}\nfirst_main={}\nlast_main={}\nverification=ok\ncompletion=ready",
         check.files,
         check.index_files,
         allocation.docs,
@@ -76,6 +76,7 @@ pub fn scaffold_counted_documents(
         check.main_index,
         check.acceptance_audit,
         check.part_ledger,
+        check.design_sections,
         check.main_sections,
         check.first_main,
         check.last_main
