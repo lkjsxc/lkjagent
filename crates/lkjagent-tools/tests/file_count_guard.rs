@@ -123,8 +123,8 @@ fn count_guard_accepts_plain_single_root_without_readme() -> TestResult<()> {
 }
 
 #[test]
-fn count_guard_refuses_ambiguous_plain_roots_without_readme() -> TestResult<()> {
-    let workspace = temp_workspace("file-count-ambiguous-roots")?;
+fn count_guard_accepts_clean_sibling_roots_without_readme() -> TestResult<()> {
+    let workspace = temp_workspace("file-count-sibling-roots")?;
     let runtime = runtime(workspace.clone())?;
     let mut conn = store()?;
     let mut state = state();
@@ -135,8 +135,30 @@ fn count_guard_refuses_ambiguous_plain_roots_without_readme() -> TestResult<()> 
     fs::write(workspace.join("main/two.md"), "x\n")?;
     fs::write(workspace.join("main/three.md"), "x\n")?;
 
+    let done = dispatch(
+        &action("agent.done", &[("summary", "docs plus main roots")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+    assert!(done.content.contains("summary=docs plus main roots"));
+    Ok(())
+}
+
+#[test]
+fn count_guard_refuses_plain_roots_mixed_with_top_level_files() -> TestResult<()> {
+    let workspace = temp_workspace("file-count-mixed-root")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut state = state();
+    state.control.start_task("create exactly 3 files total");
+    fs::create_dir_all(workspace.join("docs"))?;
+    fs::write(workspace.join("docs/one.md"), "x\n")?;
+    fs::write(workspace.join("docs/two.md"), "x\n")?;
+    fs::write(workspace.join("loose.md"), "x\n")?;
+
     let early = dispatch(
-        &action("agent.done", &[("summary", "ambiguous roots")]),
+        &action("agent.done", &[("summary", "mixed root")]),
         &runtime,
         &mut conn,
         &mut state,

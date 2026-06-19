@@ -35,7 +35,7 @@ evidence for the required document structure. File and markdown-count
 requests remain deterministic control guards, including when combined with a
 recursive or knowledge-base task family; exact wording is exact, while
 approximate wording uses a bounded tolerance. Counted completion prefers
-README-indexed roots and falls back to a single clear top-level output root.
+README-indexed roots and falls back to clean top-level output directories.
 Runtime recovery still uses bounded notices for parse errors, repeated
 actions, tool errors, endpoint max-token exits, budget exhaustion, and context
 pressure; graph recovery nodes are present as the structured target for the
