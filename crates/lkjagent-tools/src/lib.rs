@@ -2,6 +2,7 @@ pub mod benchmark_seed;
 pub mod control;
 pub mod count_guard;
 mod count_profile;
+mod count_profile_anchor;
 mod count_profile_body;
 mod count_profile_data;
 mod count_profile_design;
