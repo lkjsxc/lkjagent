@@ -40,6 +40,8 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     )?;
 
     assert!(report.contains("files=20"));
+    assert!(report.contains("design_memos=12"));
+    assert!(report.contains("main_files=5"));
     let root = workspace.join("structured-output");
     assert_eq!(counts(&root)?.markdown, 20);
     assert_eq!(counts(&root)?.other, 0);

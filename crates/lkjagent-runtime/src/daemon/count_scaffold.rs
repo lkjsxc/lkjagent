@@ -2,7 +2,7 @@ use lkjagent_graph::{CaseStatus, GraphNodeId, TaskPhase};
 use lkjagent_tools::control::CompletionGuard;
 use lkjagent_tools::count_guard::CountGuard;
 use lkjagent_tools::count_seed::scaffold_counted_documents;
-use lkjagent_tools::observe::{self, OutputKind};
+use lkjagent_tools::observe;
 use rusqlite::Connection;
 
 use super::runner::ResidentDaemon;
@@ -18,23 +18,24 @@ impl ResidentDaemon {
         guard: CountGuard,
         objective: &str,
     ) -> RuntimeResult<()> {
-        let output =
+        let (output, evidence_summary) =
             match scaffold_counted_documents(&self.runtime.tools.workspace, guard, objective) {
-                Ok(content) => observe::ok(
-                    content,
-                    self.runtime.tools.observation_tokens,
-                    "finish with agent.done",
-                ),
-                Err(error) => {
-                    observe::error(error.to_string(), self.runtime.tools.observation_tokens)
+                Ok(content) => {
+                    let summary = normalize_scaffold_summary(&content);
+                    let output = observe::ok(
+                        content,
+                        self.runtime.tools.observation_tokens,
+                        "finish with agent.done",
+                    );
+                    (output, Some(summary))
                 }
+                Err(error) => (
+                    observe::error(error.to_string(), self.runtime.tools.observation_tokens),
+                    None,
+                ),
             };
         self.append_output_frame(conn, now, &output.kind, output.rendered)?;
-        if matches!(output.kind, OutputKind::Observation { .. }) {
-            let summary = format!(
-                "counted document scaffold root=structured-output files={} verification=ok",
-                guard.target
-            );
+        if let Some(summary) = evidence_summary {
             self.record_scaffold_graph_evidence(conn, now, &summary, Some("structured-output"))?;
             self.close_counted_scaffold(conn, now, guard.target)?;
         }
@@ -72,4 +73,8 @@ impl ResidentDaemon {
         self.save_task_summary(conn, now, &summary)?;
         self.write_observable(conn)
     }
+}
+
+fn normalize_scaffold_summary(content: &str) -> String {
+    content.split_whitespace().collect::<Vec<_>>().join(" ")
 }
