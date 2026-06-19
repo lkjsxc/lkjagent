@@ -56,6 +56,30 @@ fn count_seed_honors_kanji_design_count_hint_inside_total() -> TestResult<()> {
 }
 
 #[test]
+fn count_seed_honors_english_word_design_count_hint_inside_total() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-english-word-design-hint")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 100,
+            mode: CountMode::Exact,
+        },
+        "Create about one hundred files total with twenty design memos and ordered main files.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert!(root.join("docs/design-020.md").exists());
+    assert!(!root.join("docs/design-021.md").exists());
+    assert!(root.join("main/part-077.md").exists());
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    assert!(readme.contains("- Design memos: 20"));
+    assert!(readme.contains("- Main files: 77"));
+    Ok(())
+}
+
+#[test]
 fn count_seed_keeps_file_count_stronger_than_design_wording() -> TestResult<()> {
     let workspace = temp_workspace("count-seed-total-file-not-design")?;
 

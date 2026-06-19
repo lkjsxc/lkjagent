@@ -3,6 +3,7 @@ pub mod control;
 pub mod count_guard;
 mod count_number;
 mod count_number_kanji;
+mod count_number_words;
 mod count_profile;
 mod count_profile_anchor;
 mod count_profile_body;

@@ -120,6 +120,21 @@ fn file_count_target_uses_number_near_file_signal() {
 }
 
 #[test]
+fn english_word_file_count_request_adds_approximate_file_guard() {
+    let mut state = ControlState::default();
+
+    state.start_task("Create about one hundred files total for docs and main content.");
+
+    assert_eq!(
+        state.guard,
+        CompletionGuard::FileCount {
+            target: 100,
+            mode: CountMode::Approximate
+        }
+    );
+}
+
+#[test]
 fn file_count_target_ignores_model_version_numbers() {
     let mut state = ControlState::default();
 
