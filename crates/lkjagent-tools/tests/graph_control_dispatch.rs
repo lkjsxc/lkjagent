@@ -4,6 +4,7 @@ use std::fs;
 
 use lkjagent_protocol::{Action, Param};
 use lkjagent_tools::control::{CompletionGuard, ControlState};
+use lkjagent_tools::count_guard::CountMode;
 use lkjagent_tools::dispatch::{dispatch, dispatch_with_text};
 use lkjagent_tools::observe::OutputKind;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
@@ -101,7 +102,10 @@ fn control_guards_requested_markdown_file_count() -> TestResult<()> {
         .start_task("create exactly 3 markdown files total");
     assert_eq!(
         state.control.guard,
-        CompletionGuard::MarkdownCount { target: 3 }
+        CompletionGuard::MarkdownCount {
+            target: 3,
+            mode: CountMode::Exact
+        }
     );
     fs::create_dir_all(workspace.join("docs/count"))?;
     fs::write(workspace.join("docs/count/README.md"), "# Count\n")?;

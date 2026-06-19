@@ -31,9 +31,10 @@ has its required evidence.
 
 Recursive docs and knowledge-base tasks are graph task families. They create
 README-indexed scaffolds before endpoint work and cannot close without graph
-evidence for the required document structure. Exact file and markdown-count
+evidence for the required document structure. File and markdown-count
 requests remain deterministic control guards, including when combined with a
-recursive or knowledge-base task family.
+recursive or knowledge-base task family; exact wording is exact, while
+approximate wording uses a bounded tolerance.
 Runtime recovery still uses bounded notices for parse errors, repeated
 actions, tool errors, endpoint max-token exits, budget exhaustion, and context
 pressure; graph recovery nodes are present as the structured target for the

@@ -12,8 +12,8 @@ is satisfied. The gate checks:
 - required evidence records for the task family and active phase.
 - pending checks are empty or explicitly marked not run with a reason.
 - completion summary is nonempty and matches observed evidence.
-- task-specific guards, such as recursive document structure or exact file
-  counts, are satisfied.
+- task-specific guards, such as recursive document structure or file-count
+  requirements, are satisfied.
 
 Missing evidence routes to a completion recovery notice. The model receives
 the missing requirements and the next legal transitions. It does not close the
