@@ -30,6 +30,7 @@ mod count_seed_allocation;
 mod count_seed_allocation_lead;
 mod count_seed_allocation_signals;
 mod count_seed_allocation_split;
+mod count_seed_allocation_units;
 mod count_seed_verify;
 mod count_seed_verify_main;
 mod count_seed_verify_manifest;

@@ -1,5 +1,6 @@
 use crate::count_number::{number_spans, span_distance, span_matches, NumberSpan, Span};
 use crate::count_seed_allocation_lead::allocation_lead_before;
+use crate::count_seed_allocation_units::split_unit_spans;
 
 const MAX_SPLIT_FILE_DISTANCE: usize = 48;
 const MAX_REMAINING_DISTANCE: usize = 64;
@@ -49,31 +50,6 @@ fn split_signal_spans(lower: &str) -> Vec<Span> {
         "the rest",
         "rest of the files",
         "rest of the documents",
-    ] {
-        spans.extend(span_matches(lower, needle));
-    }
-    spans
-}
-
-fn split_unit_spans(lower: &str, file_signals: &[Span]) -> Vec<Span> {
-    let mut spans = file_signals.to_vec();
-    for needle in [
-        "source packet",
-        "source packets",
-        "research packet",
-        "research packets",
-        "reference packet",
-        "reference packets",
-        "research note",
-        "research notes",
-        "source note",
-        "source notes",
-        "reference note",
-        "reference notes",
-        "background note",
-        "background notes",
-        "packet",
-        "packets",
     ] {
         spans.extend(span_matches(lower, needle));
     }
