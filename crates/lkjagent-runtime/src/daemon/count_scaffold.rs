@@ -37,7 +37,7 @@ impl ResidentDaemon {
         self.append_output_frame(conn, now, &output.kind, output.rendered)?;
         if let Some(summary) = evidence_summary {
             self.record_scaffold_graph_evidence(conn, now, &summary, Some("structured-output"))?;
-            self.close_counted_scaffold(conn, now, guard.target)?;
+            self.close_counted_scaffold(conn, now, guard.target, &summary)?;
         }
         Ok(())
     }
@@ -47,8 +47,11 @@ impl ResidentDaemon {
         conn: &mut Connection,
         now: &str,
         target: usize,
+        evidence_summary: &str,
     ) -> RuntimeResult<()> {
-        let summary = format!("created counted structured-output scaffold with {target} files");
+        let summary = format!(
+            "created counted structured-output scaffold with {target} files\n{evidence_summary}"
+        );
         self.state.task = TaskState::Closed {
             summary: summary.clone(),
         };
