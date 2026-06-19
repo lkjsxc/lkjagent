@@ -4,8 +4,9 @@ use crate::count_profile_audit::acceptance_audit;
 use crate::count_profile_body::{body_text, handoff_text, main_title, sequence_text};
 use crate::count_profile_data::{EN_DESIGN_FOCUSES, JP_DESIGN_FOCUSES};
 use crate::count_profile_design::design_text;
-use crate::count_profile_index::{audit_manifest, design_owner, docs_map, file_budget, main_map};
+use crate::count_profile_index::{design_owner, docs_map, file_budget, main_map};
 use crate::count_profile_kind::detect_kind;
+use crate::count_profile_manifest::audit_manifest;
 use crate::count_profile_restart::restart_guide;
 use crate::count_profile_thread::segment_brief;
 

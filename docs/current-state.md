@@ -80,9 +80,10 @@ with practical synonyms such as manuscript, screenplay, playbook, runbook,
 whitepaper, dossier, and their Japanese task terms.
 The graph evidence for that scaffold records `structured-output`, the target
 file count, index file count, design memo count, main file count, root index,
-file-budget status, machine-readable audit-manifest status, restart-guide
-status, directory index, count-linked acceptance-audit status, coverage-map
-status, first and last main, `index_scope=all`,
+file-budget status, machine-readable audit-manifest status including
+restart-guide and sequence-path requirements, restart-guide status, directory
+index, count-linked acceptance-audit status, coverage-map status, first and
+last main, `index_scope=all`,
 `section_scope=all`, content-block status, required design-section status,
 required main-section status, part-ledger status, explicit sequence-path
 status, and `verification=ok`, so completion can be audited after the case

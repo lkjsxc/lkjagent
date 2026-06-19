@@ -22,6 +22,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_profile_detail.rs](count_profile_detail.rs): counted scaffold per-part content details.
 - [count_profile_index.rs](count_profile_index.rs): counted scaffold index sections.
 - [count_profile_kind.rs](count_profile_kind.rs): counted scaffold kind detection.
+- [count_profile_manifest.rs](count_profile_manifest.rs): counted scaffold audit manifest text.
 - [count_profile_passage.rs](count_profile_passage.rs): counted scaffold draft passage blocks.
 - [count_profile_restart.rs](count_profile_restart.rs): counted scaffold restart guide text.
 - [count_profile_thread.rs](count_profile_thread.rs): counted scaffold segment briefs.
