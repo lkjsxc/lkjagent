@@ -42,6 +42,7 @@ pub const COUNTED_EVIDENCE_TERMS: &[&str] = &[
     "first_main=ok",
     "last_main=ok",
     "verification=ok",
+    "closure_reason=deterministic_scaffold",
 ];
 
 pub const COUNTED_SUMMARY_TERMS: &[&str] = &[
@@ -54,6 +55,7 @@ pub const COUNTED_SUMMARY_TERMS: &[&str] = &[
     "reading_path=ok",
     "sequence_paths=ok",
     "verification=ok",
+    "closure_reason=deterministic_scaffold",
 ];
 
 pub fn prefix() -> TestResult<Vec<Frame>> {
