@@ -28,9 +28,10 @@ pub fn run(data_dir: &Path) -> Result<String, CliError> {
             lkjagent_store::state::set(&conn, "daemon state", "idle")?;
             lkjagent_store::state::set(&conn, "endpoint model", &config.endpoint_model)?;
             let prefix = lkjagent_runtime::daemon::build_prefix_from_store(&conn, &workspace)?;
-            let mut state = lkjagent_runtime::daemon::startup_state(
+            let mut state = lkjagent_runtime::daemon::startup_state_with_budget(
                 prefix,
                 lkjagent_runtime::daemon::startup_summary(&conn)?,
+                config.task_turn_budget,
             );
             state.turn = stored_turn(&conn)?;
             let runtime = lkjagent_runtime::daemon::ResidentRuntime::new(
@@ -39,7 +40,8 @@ pub fn run(data_dir: &Path) -> Result<String, CliError> {
                 workspace,
                 &now,
             )
-            .with_budget(config.context_policy);
+            .with_budget(config.context_policy)
+            .with_task_turn_budget(config.task_turn_budget);
             let mut daemon = lkjagent_runtime::daemon::ResidentDaemon::new(state, runtime);
             lkjagent_runtime::daemon::restore_completion_guard(&conn, &mut daemon.dispatch_state)?;
             loop {

@@ -54,7 +54,7 @@ pub fn render_config(config: &RuntimeConfig) -> Result<String, CliError> {
             "top-p": 0.9
         },
         "task": {
-            "turn-budget": 64
+            "turn-budget": config.task_turn_budget
         },
         "daemon": {
             "lock-stale-seconds": config.daemon_lock_stale_seconds

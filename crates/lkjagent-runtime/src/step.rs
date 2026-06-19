@@ -30,6 +30,7 @@ pub enum StepInput {
         content: String,
         tokens: usize,
         graph: Option<TaskGraphState>,
+        turn_budget: u16,
     },
     Completion {
         content: String,
@@ -101,7 +102,8 @@ pub fn step(state: RuntimeState, input: StepInput) -> StepResult {
             content,
             tokens,
             graph,
-        } => owner_step(state, content, tokens, graph),
+            turn_budget,
+        } => owner_step(state, content, tokens, graph, turn_budget),
         StepInput::Completion { content, tokens } => completion_step(state, content, tokens),
         StepInput::EndpointOversize => turn::endpoint_oversize_step(state),
         StepInput::ToolOutput(output) => tool_output_step(state, output),

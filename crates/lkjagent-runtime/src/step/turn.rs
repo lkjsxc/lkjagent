@@ -10,13 +10,16 @@ use crate::prompt::token_estimate;
 use crate::recovery::{parse_notice, parse_recovery_notice, stop_reason};
 use crate::step::frames::{append_notice, result};
 use crate::step::{Effect, StepResult};
-use crate::task::{open_task, spend_turn, PendingAction, RuntimeState, StopReason, TaskState};
+use crate::task::{
+    open_task_with_budget, spend_turn, PendingAction, RuntimeState, StopReason, TaskState,
+};
 
 pub(super) fn owner_step(
     mut state: RuntimeState,
     content: String,
     tokens: usize,
     graph: Option<TaskGraphState>,
+    turn_budget: u16,
 ) -> StepResult {
     if state.maintenance.is_some() {
         state = append_notice(
@@ -34,7 +37,7 @@ pub(super) fn owner_step(
         state.context = append_frame(&state.context, graph_notice_frame(&graph));
         state.graph = Some(graph);
     }
-    state.task = open_task(&state.task);
+    state.task = open_task_with_budget(&state.task, turn_budget);
     StepResult {
         state,
         effects: vec![Effect::RecordEvent {

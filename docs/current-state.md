@@ -42,6 +42,8 @@ next runtime expansion.
 The runtime context window defaults to 24,576 tokens, accepts 16,384 tokens as
 the lower supported value, derives safe soft/hard compaction triggers from the
 configured window, and uses the 2,048-token reserve as endpoint max_tokens.
+Owner task turn budgets load from `task.turn-budget` and apply to new tasks,
+explicit continuations after budget exhaustion, and restart summaries.
 Compaction is graph-aware: it preserves the active case, phase, node, plan,
 evidence, missing evidence, touched paths, selected packages, recovery
 strategy, and completion guard before rebuilding the prefix. The schema has

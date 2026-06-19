@@ -17,6 +17,7 @@ fn scripted_task_reaches_done_and_distillation_prompt() -> TestResult<()> {
             content: "ship the task".to_string(),
             tokens: 4,
             graph: None,
+            turn_budget: 64,
         },
     );
     assert!(matches!(owner.state.task, TaskState::Open { .. }));
@@ -72,6 +73,7 @@ fn parse_faults_keep_task_open_and_recover_after_three_failures() -> TestResult<
             content: "break parser".to_string(),
             tokens: 3,
             graph: None,
+            turn_budget: 64,
         },
     )
     .state;
@@ -112,6 +114,7 @@ fn tool_and_repeat_errors_add_recovery_notices_without_pausing() -> TestResult<(
             content: "recover tool use".to_string(),
             tokens: 3,
             graph: None,
+            turn_budget: 64,
         },
     )
     .state;

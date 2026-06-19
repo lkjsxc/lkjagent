@@ -42,11 +42,12 @@ and closed by an agent.done action admitted by the graph completion gate.
 | waiting | agent.ask emitted; loop waits until another send arrives |
 | closed | agent.done admitted; summary, evidence, and memory links recorded |
 
-A task carries a turn budget (initial contract: 64 turns, config-tunable).
-The final budgeted turn is still admitted. If the daemon reaches another
-endpoint turn after the budget is exhausted, it records a budget notice and
-sets the task to waiting with a concrete owner question instead of silently
-burning turns. The next owner send resumes the task with a fresh turn budget.
+A task carries a turn budget loaded from `task.turn-budget`, defaulting to
+64 turns. The final budgeted turn is still admitted. If the daemon reaches
+another endpoint turn after the budget is exhausted, it records a budget
+notice and sets the task to waiting with a concrete owner question instead
+of silently burning turns. The next owner send resumes the task with the
+configured fresh turn budget.
 
 Some owner messages activate task-family completion requirements. Recursive
 structure tasks cannot close until graph evidence proves a README-indexed
