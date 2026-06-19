@@ -28,6 +28,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_profile_passage.rs](count_profile_passage.rs): counted scaffold draft passage blocks.
 - [count_profile_reading.rs](count_profile_reading.rs): counted scaffold root reading path text.
 - [count_profile_restart.rs](count_profile_restart.rs): counted scaffold restart guide text.
+- [count_profile_stage.rs](count_profile_stage.rs): counted scaffold stage labels and ranges.
 - [count_profile_thread.rs](count_profile_thread.rs): counted scaffold segment briefs.
 - [count_profile_variation.rs](count_profile_variation.rs): counted scaffold per-part variation data.
 - [count_profile_variation_en.rs](count_profile_variation_en.rs): English per-part variation data.
