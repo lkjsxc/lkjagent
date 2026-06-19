@@ -16,6 +16,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [count_seed_allocation_jp.rs](count_seed_allocation_jp.rs): Japanese allocation fixtures.
 - [count_seed_allocation_sentence_split.rs](count_seed_allocation_sentence_split.rs): sentence split fixtures.
 - [count_seed_allocation_split.rs](count_seed_allocation_split.rs): explicit split allocation fixtures.
+- [count_seed_allocation_support_units.rs](count_seed_allocation_support_units.rs): support unit fixtures.
 - [count_seed_anchor.rs](count_seed_anchor.rs): counted scaffold objective-anchor fixtures.
 - [count_seed_cross_index.rs](count_seed_cross_index.rs): counted scaffold cross-index fixtures.
 - [count_seed_anchor_parenthetical.rs](count_seed_anchor_parenthetical.rs): parenthetical anchor fixtures.
