@@ -25,6 +25,11 @@ pub(crate) fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
         "specs",
         "viewpoint",
         "viewpoints",
+        "worldbuilding",
+        "world bible",
+        "story bible",
+        "character profile",
+        "character profiles",
     ] {
         spans.extend(span_matches(lower, needle));
     }
