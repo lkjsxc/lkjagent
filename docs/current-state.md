@@ -69,7 +69,8 @@ file.
 For counted documentation tasks that are not recursive, knowledge-base, or
 benchmark scaffolds, the daemon also writes a generic `structured-output/`
 tree with the requested count before the first endpoint turn and records graph
-evidence for the scaffold, then saves the task summary and closes the task.
+evidence for the scaffold, then closes only when the graph completion gate
+admits that evidence; otherwise it waits with the missing gate reason.
 That scaffold profiles the owner's objective by detected language and broad
 deliverable kind, so the root, docs, and main directories are README-indexed
 within the selected count guard, and the root README records the count
