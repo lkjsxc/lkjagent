@@ -32,7 +32,7 @@ Acceptance section names.
 | 4 | No context engine: budgets, admission, compaction decisions | [tasks/context-engine.md](tasks/context-engine.md) | Implement pure context engine decisions |
 | 5 | No store: queue, events, memory, state | [tasks/sqlite-store.md](tasks/sqlite-store.md) | Implement SQLite store boundary |
 | 6 | No endpoint client | [tasks/llm-client.md](tasks/llm-client.md) | Implement LLM endpoint client |
-| 7 | No skill validator, index, or loader | [tasks/skill-runtime.md](tasks/skill-runtime.md) | Implement skill runtime and seeds |
+| 7 | No state graph core exists | [tasks/state-graph-runtime.md](tasks/state-graph-runtime.md) | Implement graph runtime core |
 | 8 | No tool dispatch or adapters | [tasks/tool-runtime.md](tasks/tool-runtime.md) | Implement tool runtime dispatch |
 | 9 | No agent loop composing the crates | [tasks/agent-loop.md](tasks/agent-loop.md) | Implement runtime step and daemon core |
 | 10 | No binary: daemon entry, send, status, log | [tasks/queue-cli.md](tasks/queue-cli.md) | Implement queue CLI commands |

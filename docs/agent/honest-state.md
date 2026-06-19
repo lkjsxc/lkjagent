@@ -32,8 +32,7 @@ Nothing in this project may present a state that did not actually happen.
   per [../architecture/protocol/recovery.md](../architecture/protocol/recovery.md).
 - Memory rows record what happened, not what should have happened; a
   distillation that smooths over a failure poisons every future retrieval.
-- Skills claim procedures that ran at least once, per
-  [../architecture/skills/lifecycle.md](../architecture/skills/lifecycle.md).
+- Graph policy changes name the observed evidence that justified them.
 - Truncation, budget exhaustion, and compaction are announced in notices,
   never silent, per [../architecture/context/hygiene.md](../architecture/context/hygiene.md).
 

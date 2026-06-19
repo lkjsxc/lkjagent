@@ -3,8 +3,8 @@
 ## Purpose
 
 How distilled memory comes back: the memory.find action the model calls
-mid-task, and the digest builder that fills the prefix region. Both read
-the same memory table with the same ranking.
+mid-task, graph-linked retrieval, and the digest builder that fills the
+prefix region. Both read the same memory table with the same ranking.
 
 ## memory.find
 
@@ -18,6 +18,8 @@ bounded observation. Matching and ranking:
    then lesson, then fact. Summaries of past work and records of past
    failures outrank general knowledge at equal lexical relevance.
 4. Ties break by recency: latest updated_at first.
+5. When an active graph case exists, linked memory and matching graph node
+   terms are preferred within the same kind and lexical score band.
 
 ## Why Lexical
 

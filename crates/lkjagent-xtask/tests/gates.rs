@@ -83,12 +83,8 @@ fn doc_topology_reports_missing_readme_thin_toc_and_manifest() {
 }
 
 #[test]
-fn special_docs_report_skill_task_and_crate_readme_violations() {
+fn special_docs_report_task_and_crate_readme_violations() {
     let files = vec![
-        RepoFile::new(
-            "docs/agent/skills/foo.md",
-            "# Skill: Foo\n\n## Purpose\n\nx\n",
-        ),
         RepoFile::new("docs/execution/tasks/foo.md", "# Foo\n\n## Purpose\n\nx\n"),
         RepoFile::new("crates/lkjagent-demo/src/lib.rs", "//! demo\n"),
         RepoFile::new(
@@ -104,9 +100,6 @@ fn special_docs_report_skill_task_and_crate_readme_violations() {
     assert_eq!(
         messages(check_special_docs(&files)),
         vec![
-            "docs/agent/skills/foo.md: skill shape: filename must be the kebab-case skill name plus .md",
-            "docs/agent/skills/foo.md: skill shape: headings must be Purpose, Trigger, Context, Procedure, Checks, Must Not, optional Handoff",
-            "docs/agent/skills/foo.md: skill shape: Trigger section must contain one sentence",
             "docs/execution/tasks/foo.md: task shape: headings must match the task template",
             "crates/lkjagent-bad/README.md: crate readme: name the Doc contract",
             "crates/lkjagent-bad/README.md: crate readme: add a Table of Contents",
@@ -118,21 +111,12 @@ fn special_docs_report_skill_task_and_crate_readme_violations() {
 }
 
 #[test]
-fn line_check_reports_normal_and_skill_limits() {
-    let files = vec![
-        RepoFile::new("README.md", "x\n".repeat(201)),
-        RepoFile::new(
-            "docs/agent/skills/demo.md",
-            format!("# Skill: Demo\n{}", "x\n".repeat(120)),
-        ),
-    ];
+fn line_check_reports_normal_limits() {
+    let files = vec![RepoFile::new("README.md", "x\n".repeat(201))];
 
     assert_eq!(
         messages(check_lines(&files)),
-        vec![
-            "README.md: line limit: has 201 lines, limit is 200; split by ownership",
-            "docs/agent/skills/demo.md: line limit: has 121 lines, limit is 120; split by ownership",
-        ]
+        vec!["README.md: line limit: has 201 lines, limit is 200; split by ownership"]
     );
 }
 

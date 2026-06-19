@@ -14,13 +14,12 @@ and leaving a smaller live log.
 | generation reserve | 2,048 | harness | never occupied; subtracted first |
 | prefix: identity and rules | 768 | [../protocol/system-prompt.md](../protocol/system-prompt.md) | build-time check fails |
 | prefix: grammar and tool registry | 1,024 | [../protocol/system-prompt.md](../protocol/system-prompt.md) | build-time check fails |
-| prefix: skill index | 512 | [../skills/loading.md](../skills/loading.md) | oldest-stamped entries drop to name-only |
+| prefix: graph state | 512 | [../state-graph/context-packages.md](../state-graph/context-packages.md) | package text narrows |
 | prefix: workspace brief | 1,024 | [../sandbox/workspace.md](../sandbox/workspace.md) | head kept, truncation notice |
 | prefix: memory digest | 2,048 | [../memory/distillation.md](../memory/distillation.md) | digest builder must rank within cap |
 | log: owner frame | 4,096 each | [../runtime/queue-intake.md](../runtime/queue-intake.md) | head kept, truncation notice |
 | log: observation | 2,048 each | [../tools/registry.md](../tools/registry.md) | head and tail kept, middle elided, truncation notice |
-| log: skill body | 2,048 each | [../skills/format.md](../skills/format.md) | source validation rejects oversized skills |
-| log: loaded skills concurrent | 6,144 total | [../skills/loading.md](../skills/loading.md) | skill.use refused with notice |
+| log: graph notice | 2,048 each | [../state-graph/task-state.md](../state-graph/task-state.md) | graph notice narrows |
 | soft compaction trigger | 18,432 used | [compaction.md](compaction.md) | narrow observations; preemptive compaction may run |
 | hard compaction trigger | 21,504 used | [compaction.md](compaction.md) | compaction before owner delivery or endpoint call |
 | post-compaction target | 8,192 | [compaction.md](compaction.md) | compaction must reach it or fail loudly |

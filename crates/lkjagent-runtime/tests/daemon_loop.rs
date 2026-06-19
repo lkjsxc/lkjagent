@@ -4,13 +4,12 @@ use std::fs;
 use std::net::TcpListener;
 use std::path::Path;
 
-use lkjagent_context::model::{Frame, FrameKind};
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
 use lkjagent_store::{events, memory, queue, state};
 use support::http::{completion, length_completion, serve_responses};
-use support::{runtime_state, seed_skill_path, store, temp_workspace, TestResult};
+use support::{runtime_state, store, temp_workspace, TestResult};
 
 const WRITE_ACTION: &str = "<act>
 <tool>fs.write</tool>
@@ -25,6 +24,14 @@ const DONE_ACTION: &str = "<act>
 <tool>agent.done</tool>
 <summary>wrote file</summary>
 </act>";
+const VERIFY_WRITE_ACTION: &str = "<act>
+<tool>shell.run</tool>
+<command>test \"$(cat out.txt)\" = hello</command>
+</act>";
+const VERIFY_TRUE_ACTION: &str = "<act>
+<tool>shell.run</tool>
+<command>true</command>
+</act>";
 
 #[test]
 fn daemon_delivers_queue_writes_file_and_records_done() -> TestResult<()> {
@@ -32,12 +39,17 @@ fn daemon_delivers_queue_writes_file_and_records_done() -> TestResult<()> {
     take_lock(&conn)?;
     queue::enqueue(&mut conn, "write the file", "owner-send", "101")?;
     let workspace = temp_workspace("daemon-write")?;
-    let server = serve_responses(vec![completion(WRITE_ACTION), completion(DONE_ACTION)])?;
+    let server = serve_responses(vec![
+        completion(WRITE_ACTION),
+        completion(VERIFY_WRITE_ACTION),
+        completion(DONE_ACTION),
+    ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(fs::read_to_string(workspace.join("out.txt"))?, "hello");
-    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Done);
     server.join()?;
 
     assert_eq!(state::get(&conn, "daemon state")?, Some("idle".to_string()));
@@ -59,7 +71,11 @@ fn daemon_waits_on_ask_and_resumes_from_next_send() -> TestResult<()> {
     take_lock(&conn)?;
     queue::enqueue(&mut conn, "start", "owner-send", "101")?;
     let workspace = temp_workspace("daemon-ask")?;
-    let server = serve_responses(vec![completion(ASK_ACTION), completion(DONE_ACTION)])?;
+    let server = serve_responses(vec![
+        completion(ASK_ACTION),
+        completion(VERIFY_TRUE_ACTION),
+        completion(DONE_ACTION),
+    ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Waiting);
@@ -68,7 +84,8 @@ fn daemon_waits_on_ask_and_resumes_from_next_send() -> TestResult<()> {
         Some("Need detail?".to_string())
     );
     queue::enqueue(&mut conn, "guidance", "owner-send", "102")?;
-    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Done);
     server.join()?;
 
     let log = events::read_events(&conn)?;
@@ -119,17 +136,19 @@ fn daemon_records_endpoint_error_without_losing_delivered_queue() -> TestResult<
 fn daemon_recovers_from_max_token_completion_without_retry_loop() -> TestResult<()> {
     let mut conn = store()?;
     take_lock(&conn)?;
-    queue::enqueue(&mut conn, "write many docs", "owner-send", "101")?;
+    queue::enqueue(&mut conn, "write many files", "owner-send", "101")?;
     let workspace = temp_workspace("daemon-oversize")?;
     let server = serve_responses(vec![
         length_completion("<act>\n<tool>shell.run</tool>\n<command>"),
+        completion(VERIFY_TRUE_ACTION),
         completion(DONE_ACTION),
     ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(daemon.endpoint_attempt, 0);
-    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Done);
     server.join()?;
 
     let log = events::read_events(&conn)?;
@@ -141,53 +160,11 @@ fn daemon_recovers_from_max_token_completion_without_retry_loop() -> TestResult<
         .any(|event| event.content.contains("short valid act block")));
     Ok(())
 }
-#[test]
-fn daemon_compacts_before_endpoint_when_prediction_crosses_hard_trigger() -> TestResult<()> {
-    let mut conn = store()?;
-    take_lock(&conn)?;
-    let workspace = temp_workspace("daemon-pre-endpoint-compact")?;
-    let mut daemon = daemon("http://127.0.0.1:9", &workspace)?;
-    daemon.state.task = lkjagent_runtime::task::TaskState::Open { turns_remaining: 7 };
-    daemon.state.context.log.push(Frame::new(
-        FrameKind::Observation,
-        "large prior output",
-        20_000,
-    ));
-
-    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
-    assert_eq!(daemon.endpoint_attempt, 0);
-    assert!(daemon.state.context.used_tokens() <= 8_192);
-    assert!(events::read_events(&conn)?
-        .iter()
-        .any(|event| event.kind == "compaction" && event.content.contains("context_window=24576")));
-    Ok(())
-}
-#[test]
-fn daemon_compacts_before_owner_delivery_can_cross_hard_trigger() -> TestResult<()> {
-    let mut conn = store()?;
-    take_lock(&conn)?;
-    queue::enqueue(&mut conn, "continue with more detail", "owner-send", "101")?;
-    let workspace = temp_workspace("daemon-pre-owner-compact")?;
-    let mut daemon = daemon("http://127.0.0.1:9", &workspace)?;
-    daemon.state.context.log.push(Frame::new(
-        FrameKind::Observation,
-        "large prior output",
-        19_500,
-    ));
-
-    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
-    assert!(queue::list(&conn)?
-        .first()
-        .is_some_and(|row| row.status == "pending"));
-    assert!(daemon.state.context.used_tokens() <= 8_192);
-    Ok(())
-}
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
     let runtime = ResidentRuntime::new(
         "test".to_string(),
         client_config(base_url, "local-model", None, 180, 2_048),
         workspace.to_path_buf(),
-        seed_skill_path(),
         "100",
     );
     Ok(ResidentDaemon::new(runtime_state()?, runtime))

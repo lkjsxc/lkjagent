@@ -8,6 +8,7 @@ use lkjagent_tools::dispatch::{DispatchState, ToolRuntime};
 use rusqlite::Connection;
 
 use crate::error::{RuntimeError, RuntimeResult};
+use crate::graph_state::open_owner_case;
 use crate::intake;
 use crate::prompt::token_estimate;
 use crate::step::{step, StepInput};
@@ -32,17 +33,11 @@ pub struct ResidentRuntime {
 }
 
 impl ResidentRuntime {
-    pub fn new(
-        holder: String,
-        client: ClientConfig,
-        workspace: PathBuf,
-        skill_library: PathBuf,
-        now: &str,
-    ) -> Self {
+    pub fn new(holder: String, client: ClientConfig, workspace: PathBuf, now: &str) -> Self {
         Self {
             holder,
             client,
-            tools: ToolRuntime::new(workspace, skill_library, now),
+            tools: ToolRuntime::new(workspace, now),
             budget: ContextBudgetPolicy::default(),
         }
     }
@@ -147,20 +142,23 @@ impl ResidentDaemon {
             .guard
             .markdown_target()
             .filter(|_| Self::benchmark_docs_requested(&owner.content));
+        let graph = if starting_task || visible_maintenance {
+            Some(open_owner_case(conn, &owner.content, now)?)
+        } else {
+            None
+        };
         let scaffold_profile = self.scaffold_profile();
         let result = step(
             self.state.clone(),
             StepInput::Owner {
                 content: owner.content,
                 tokens: owner.tokens,
+                graph,
             },
         );
         self.apply_step_result(conn, now, result, true)?;
-        if starting_task && self.dispatch_state.control.guard.is_recursive() {
-            self.auto_load_recursive_structure(conn, now)?;
-            if scaffold_docs {
-                self.auto_scaffold_recursive_docs(conn, now, scaffold_profile)?;
-            }
+        if starting_task && self.dispatch_state.control.guard.is_recursive() && scaffold_docs {
+            self.auto_scaffold_recursive_docs(conn, now, scaffold_profile)?;
         }
         if let Some(target) = benchmark_target {
             self.auto_scaffold_markdown_corpus(conn, now, target)?;

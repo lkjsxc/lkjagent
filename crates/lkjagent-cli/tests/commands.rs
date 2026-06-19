@@ -109,7 +109,7 @@ fn console_keeps_send_prompt_when_daemon_waits() -> TestResult<()> {
 }
 
 #[test]
-fn memory_command_reads_store_and_skills_command_reads_source_library() -> TestResult<()> {
+fn memory_command_reads_store_and_graph_command_reports_source_graph() -> TestResult<()> {
     let data = temp_data("read")?;
     let mut conn = open_store(&data)?;
     save(
@@ -130,10 +130,10 @@ fn memory_command_reads_store_and_skills_command_reads_source_library() -> TestR
     assert!(memory.stdout.contains("kind=fact"));
     assert!(memory.stdout.contains("title=runtime cli"));
 
-    let skills = run_cli(["--data", data.to_string_lossy().as_ref(), "skills"]);
-    assert!(skills.stdout.contains("name=recursive-structure"));
-    assert!(skills.stdout.contains("trigger=A task asks"));
-    assert!(!data.join("skills").exists());
+    let graph = run_cli(["--data", data.to_string_lossy().as_ref(), "graph"]);
+    assert!(graph.stdout.contains("source_nodes="));
+    assert!(graph.stdout.contains("source_valid=true"));
+    assert!(graph.stdout.contains("active_case=none"));
     Ok(())
 }
 

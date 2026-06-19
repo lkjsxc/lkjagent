@@ -12,8 +12,8 @@ exposes a pure core with effectful adapters at its edge. The crate map is
 owned by [../repository/layout.md](../repository/layout.md).
 
 Dependencies are few and boring: an HTTP client, a SQLite binding, a TOML
-reader, and serde for the endpoint wire format only. Anything a skill can do
-through shell does not become a dependency.
+reader, and serde for the endpoint wire format only. Anything graph guidance
+can do through shell does not become a dependency.
 
 Cargo.lock is local cargo output. The committed source of dependency truth
 is the workspace manifests plus the dependency allowlist gate.

@@ -6,4 +6,4 @@ pub mod render;
 
 pub use model::{Action, Param, ParseFault};
 pub use parse::parse_completion;
-pub use render::{render_action, render_notice, render_observation, render_owner, render_skill};
+pub use render::{render_action, render_graph, render_notice, render_observation, render_owner};

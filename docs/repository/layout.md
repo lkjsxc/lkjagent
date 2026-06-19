@@ -32,7 +32,7 @@ adding a top-level path means adding a row in the same commit.
 | crates/lkjagent-context | window layout, budgets, compaction | [../architecture/context/](../architecture/context/README.md) |
 | crates/lkjagent-store | SQLite queue, events, memory, state | [../architecture/memory/](../architecture/memory/README.md) |
 | crates/lkjagent-llm | endpoint HTTP client | [../architecture/llm/](../architecture/llm/README.md) |
-| crates/lkjagent-skills | skill parse, index, load | [../architecture/skills/](../architecture/skills/README.md) |
+| crates/lkjagent-graph | state graph, task cases, transitions, evidence gates | [../architecture/state-graph/](../architecture/state-graph/README.md) |
 | crates/lkjagent-tools | tool execution adapters | [../architecture/tools/](../architecture/tools/README.md) |
 | crates/lkjagent-runtime | daemon, loop, intake, maintenance | [../architecture/runtime/](../architecture/runtime/README.md) |
 | crates/lkjagent-cli | the lkjagent binary | [../product/cli.md](../product/cli.md) |
@@ -40,7 +40,7 @@ adding a top-level path means adding a row in the same commit.
 | crates/lkjagent-xtask | repository checks and quiet gates | [../operations/verification.md](../operations/verification.md) |
 
 Dependency direction flows toward purity: cli and runtime depend on the
-others; protocol, context, and skills depend on nothing in the workspace;
+others; protocol, context, and graph depend on nothing in the workspace;
 nothing depends on cli or xtask.
 
 ## README Coverage

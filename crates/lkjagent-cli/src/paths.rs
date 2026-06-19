@@ -8,11 +8,3 @@ pub fn workspace(data_dir: &Path) -> Result<PathBuf, CliError> {
     fs::create_dir_all(&path)?;
     Ok(path)
 }
-
-pub fn skill_library() -> PathBuf {
-    let image = Path::new("/usr/local/share/lkjagent/skills");
-    if image.exists() {
-        return image.to_path_buf();
-    }
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../lkjagent-skills/seeds")
-}

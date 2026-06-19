@@ -37,7 +37,7 @@ rm -rf data
 mkdir -p data
 docker compose up -d --build agent
 docker compose run --rm agent status
-docker compose run --rm agent skills
+docker compose run --rm agent graph
 docker compose run --rm agent send "Create hello.md with a short hello."
 docker compose run --rm agent log
 find data/workspace -maxdepth 2 -type f -print
@@ -46,8 +46,8 @@ find data/workspace -maxdepth 2 -type f -print
 This leaves the host data directory empty before first start. The daemon then
 creates only clean runtime files under /data: config, store, and workspace. A
 fresh workspace is intentionally empty until an owner message is sent and the
-agent writes files for that task. Skills remain image- or source-owned and are
-not copied into /data.
+agent writes files for that task. Source graph definitions live in the image
+or local build, while runtime graph cases live in /data.
 
 ## Runtime Config
 
@@ -96,9 +96,8 @@ docker compose run --rm agent status
 ```
 
 The agent service is the resident daemon. Console, send, log, status,
-memory, and skills commands run as short-lived containers that use the same
-/data bind mount for store, config, and workspace; skills are read from
-image or source paths. Stopping the service relies on durable store state
+memory, and graph commands run as short-lived containers that use the same
+/data bind mount for store, config, and workspace. Stopping the service relies on durable store state
 and stale lock reclaim; there is no custom signal-drain path.
 
 ## Backup and Reset
@@ -107,8 +106,8 @@ and stale lock reclaim; there is no custom signal-drain path.
   are ordinary files.
 - Reset memory: delete the store file while stopped; the queue and
   transcripts go with it, deliberately.
-- Full reset: remove the host data directory; first start recreates config
-  and workspace while skills still come from source or image paths.
+- Full reset: remove the host data directory; first start recreates config,
+  workspace, and runtime graph state from source graph definitions.
 
 ## Status
 

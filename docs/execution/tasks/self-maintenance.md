@@ -19,7 +19,7 @@ daemon to extend).
 
 - [../../architecture/runtime/self-maintenance.md](../../architecture/runtime/self-maintenance.md)
 - [../../architecture/memory/distillation.md](../../architecture/memory/distillation.md)
-- [../../architecture/skills/lifecycle.md](../../architecture/skills/lifecycle.md)
+- [../../architecture/state-graph/maintenance.md](../../architecture/state-graph/maintenance.md)
 - [../../architecture/tools/registry.md](../../architecture/tools/registry.md)
   (the shared tool authority)
 

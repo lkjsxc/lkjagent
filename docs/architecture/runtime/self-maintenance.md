@@ -3,8 +3,8 @@
 ## Purpose
 
 State the self-maintenance boundary. The resident daemon opens bounded
-maintenance work when the queue is empty and no user task is open, so it
-keeps improving state instead of stopping at a quiet idle loop.
+graph maintenance work when the queue is empty and no user task is open, so
+it keeps improving state instead of stopping at a quiet idle loop.
 
 ## Trigger
 
@@ -22,7 +22,7 @@ Maintenance directives are chosen in rotation and weighted by staleness:
 | Directive | Work |
 | --- | --- |
 | distill | Read recent transcript spans; write durable lessons via memory.save per [../memory/distillation.md](../memory/distillation.md) |
-| refine-skills | Record concrete skill improvement candidates or perform safe workspace edits |
+| improve-graph | Improve graph patterns, context packages, evidence policy, or tests |
 | prune-memory | Merge duplicate memory rows, rewrite vague entries, drop superseded ones |
 | audit-self | Compare recent failures against contracts; record mismatches as memory entries tagged for the owner |
 

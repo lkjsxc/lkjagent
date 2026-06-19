@@ -7,7 +7,7 @@ Set rules that keep benchmark-driven work aimed at general capability.
 ## Rules
 
 Do not put oracle answers, fixture text, hidden generated cases, judge code,
-or report-specific fixes into prompts, skills, memory, or runtime branches.
+or report-specific fixes into prompts, graph policy, memory, or runtime branches.
 The agent sees public prompts and starter files only.
 
 Use failure clusters instead of single task answers. A graph failure can

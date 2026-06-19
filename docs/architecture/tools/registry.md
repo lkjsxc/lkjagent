@@ -25,13 +25,14 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | queue.redeliver | id req; reason req; content opt | create a pending row linked to a source row | missing row |
 | memory.save | kind req; title req; tags opt; content req | insert one memory row, return its id | unknown kind |
 | memory.find | query req; limit opt 5 | ranked full-text search over memory | none; empty results are ok |
-| skill.use | name req | append skill body as immutable frame | unknown name; already loaded; skill budget |
+| graph.state | none | show active graph case, phase, node, evidence, and transitions | no active case |
+| graph.evidence | kind req; summary req; path opt | record explicit evidence on active case | no active case; empty summary |
 | agent.done | summary req | close the task or maintenance cycle | no open task or cycle |
 | agent.ask | question req | ask the owner; task enters waiting | a question is already outstanding |
 
 Detailed contracts: [fs.md](fs.md), [shell.md](shell.md),
 [queue-ops.md](queue-ops.md), [memory-ops.md](memory-ops.md),
-[skill-ops.md](skill-ops.md), [control.md](control.md).
+[graph-ops.md](graph-ops.md), [control.md](control.md).
 
 ## Dispatch
 

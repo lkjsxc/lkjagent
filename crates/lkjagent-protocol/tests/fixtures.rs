@@ -1,5 +1,5 @@
 use lkjagent_protocol::{
-    parse_completion, render_action, render_notice, render_observation, render_owner, render_skill,
+    parse_completion, render_action, render_graph, render_notice, render_observation, render_owner,
     Action, Param, ParseFault,
 };
 
@@ -99,7 +99,7 @@ fn renders_context_frames() {
     );
     assert_eq!(render_owner("hello"), "<owner>\nhello\n</owner>");
     assert_eq!(
-        render_skill("# Skill: demo"),
-        "<skill>\n# Skill: demo\n</skill>"
+        render_graph("case=new\nphase=planning"),
+        "<graph>\ncase=new\nphase=planning\n</graph>"
     );
 }

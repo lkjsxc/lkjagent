@@ -3,8 +3,8 @@
 ## Purpose
 
 The contract for shell.run, the one general-purpose tool. Everything the
-fixed toolset does not cover, listing, searching, building, testing,
-fetching, runs through it, and skills are instructions for driving it.
+fixed toolset does not cover, listing, searching, building, testing, and
+fetching runs through it, guided by active graph state.
 Canonical parameter table: [registry.md](registry.md).
 
 ## Parameters

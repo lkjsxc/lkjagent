@@ -4,7 +4,6 @@ use lkjagent_protocol::{render_notice, render_observation};
 pub enum OutputKind {
     Observation { status: String },
     Notice { kind: String },
-    Skill { name: String },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -34,17 +33,6 @@ pub fn notice(kind: &str, content: impl Into<String>) -> OutputFrame {
             kind: kind.to_string(),
         },
         rendered: render_notice(kind, &content),
-        content,
-    }
-}
-
-pub fn skill(name: &str, rendered: impl Into<String>) -> OutputFrame {
-    let content = rendered.into();
-    OutputFrame {
-        kind: OutputKind::Skill {
-            name: name.to_string(),
-        },
-        rendered: content.clone(),
         content,
     }
 }

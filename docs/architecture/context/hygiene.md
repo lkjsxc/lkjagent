@@ -15,7 +15,7 @@ anything not listed here is forbidden by default.
 | model turn | every completion, verbatim | reserve in [budgets.md](budgets.md) |
 | observation | exactly one per executed action | [../tools/registry.md](../tools/registry.md) |
 | notice | enumerated kinds below | harness |
-| skill body | skill.use or guarded task auto-load | [../skills/loading.md](../skills/loading.md) |
+| graph notice | case intake, phase change, recovery, or compaction | [../state-graph/](../state-graph/README.md) |
 
 ## Notice Kinds
 
@@ -28,6 +28,7 @@ Notices are the only free-form harness voice, and even they are enumerated:
 | error | parse, tool, or endpoint failure in one bounded line set |
 | compaction | the log-head task summary after a rebuild |
 | maintenance | cycle directive per [../runtime/self-maintenance.md](../runtime/self-maintenance.md) |
+| graph | active case state, missing evidence, and legal transitions |
 
 ## Explicitly Forbidden
 

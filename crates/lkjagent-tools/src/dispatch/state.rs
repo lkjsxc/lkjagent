@@ -8,17 +8,15 @@ use crate::observe::OutputKind;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ToolRuntime {
     pub workspace: PathBuf,
-    pub skill_library: PathBuf,
     pub now: String,
     pub observation_tokens: usize,
     pub shell_timeout_max: u64,
 }
 
 impl ToolRuntime {
-    pub fn new(workspace: PathBuf, skill_library: PathBuf, now: impl Into<String>) -> Self {
+    pub fn new(workspace: PathBuf, now: impl Into<String>) -> Self {
         Self {
             workspace,
-            skill_library,
             now: now.into(),
             observation_tokens: LOG_OBSERVATION,
             shell_timeout_max: 600,
@@ -33,8 +31,10 @@ pub struct DispatchState {
     pub next_frame_ref: usize,
     pub repeat_count: usize,
     pub reads: Vec<ReadRecord>,
-    pub loaded_skills: Vec<LoadedSkillRecord>,
-    pub loaded_skill_tokens: usize,
+    pub graph_state: Option<String>,
+    pub graph_evidence: Vec<GraphEvidenceRecord>,
+    pub graph_completion_ready: bool,
+    pub graph_missing: Vec<String>,
     pub control: ControlState,
 }
 
@@ -46,8 +46,10 @@ impl Default for DispatchState {
             next_frame_ref: 1,
             repeat_count: 0,
             reads: Vec::new(),
-            loaded_skills: Vec::new(),
-            loaded_skill_tokens: 0,
+            graph_state: None,
+            graph_evidence: Vec::new(),
+            graph_completion_ready: true,
+            graph_missing: Vec::new(),
             control: ControlState::default(),
         }
     }
@@ -64,10 +66,11 @@ pub struct ReadRecord {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct LoadedSkillRecord {
-    pub name: String,
+pub struct GraphEvidenceRecord {
+    pub kind: String,
+    pub summary: String,
+    pub path: Option<String>,
     pub frame_ref: usize,
-    pub tokens: usize,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -12,11 +12,15 @@ use lkjagent_store::{memory, queue, state};
 use lkjagent_tools::control::CompletionGuard;
 use lkjagent_tools::dispatch::DispatchState;
 use support::http::{completion, serve_responses};
-use support::{seed_skill_path, store, temp_workspace, TestResult};
+use support::{store, temp_workspace, TestResult};
 
 const DONE: &str = "<act>
 <tool>agent.done</tool>
 <summary>recursive structure complete</summary>
+</act>";
+const VERIFY_TREE: &str = "<act>
+<tool>shell.run</tool>
+<command>test -f docs/product/contracts/domain/model.md</command>
 </act>";
 
 #[test]
@@ -40,8 +44,8 @@ fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestRe
         .context
         .log
         .iter()
-        .any(|frame| frame.kind == FrameKind::SkillBody
-            && frame.content.contains("# Skill: Recursive Structure")));
+        .any(|frame| frame.kind == FrameKind::GraphNotice
+            && frame.content.contains("phase=planning")));
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     assert_eq!(
         state::get(&conn, "open task")?,
@@ -56,13 +60,13 @@ fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestRe
     assert_eq!(restored.control.guard, CompletionGuard::RecursiveStructure);
     assert!(memory::find(&conn, "recursive structure complete", 5)?.is_empty());
 
-    for stamp in 103..115 {
+    for stamp in 103..116 {
         assert_eq!(
             daemon.poll_once(&mut conn, &stamp.to_string())?,
             DaemonTick::Working
         );
     }
-    assert_eq!(daemon.poll_once(&mut conn, "115")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "116")?, DaemonTick::Done);
     server.join()?;
 
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
@@ -85,6 +89,7 @@ fn scripted_responses() -> Vec<String> {
     for (path, content) in TREE_FILES {
         responses.push(completion(&write_action(path, content)));
     }
+    responses.push(completion(VERIFY_TREE));
     responses.push(completion(DONE));
     responses
 }
@@ -100,7 +105,6 @@ fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
         "test".to_string(),
         client_config(base_url, "local-model", None, 180, 2_048),
         workspace.to_path_buf(),
-        seed_skill_path(),
         "100",
     );
     Ok(ResidentDaemon::new(support::runtime_state()?, runtime))

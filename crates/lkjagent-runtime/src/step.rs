@@ -1,5 +1,6 @@
 use lkjagent_context::budget::ContextBudgetPolicy;
 use lkjagent_context::model::{Frame, NoticeKind};
+use lkjagent_graph::TaskGraphState;
 use lkjagent_store::events::EventKind;
 use lkjagent_tools::dispatch::DispatchOutput;
 
@@ -8,9 +9,11 @@ use crate::prompt::token_estimate;
 use crate::recovery::{repeat_recovery_notice, tool_recovery_notice};
 use crate::task::{RuntimeState, StopReason};
 
+mod action_params;
 mod compact;
 mod cycle;
 mod frames;
+mod graph_output;
 mod output;
 mod turn;
 
@@ -25,6 +28,7 @@ pub enum StepInput {
     Owner {
         content: String,
         tokens: usize,
+        graph: Option<TaskGraphState>,
     },
     Completion {
         content: String,
@@ -59,6 +63,19 @@ pub enum Effect {
         prompt: String,
         max_turns: u8,
     },
+    RecordGraphEvidence {
+        case_id: i64,
+        requirement: String,
+        kind: String,
+        summary: String,
+        path: Option<String>,
+    },
+    UpdateGraphCase {
+        case_id: i64,
+        phase: String,
+        active_node: String,
+        status: String,
+    },
     Pause {
         reason: String,
     },
@@ -79,7 +96,11 @@ pub struct StepResult {
 
 pub fn step(state: RuntimeState, input: StepInput) -> StepResult {
     match input {
-        StepInput::Owner { content, tokens } => owner_step(state, content, tokens),
+        StepInput::Owner {
+            content,
+            tokens,
+            graph,
+        } => owner_step(state, content, tokens, graph),
         StepInput::Completion { content, tokens } => completion_step(state, content, tokens),
         StepInput::EndpointOversize => turn::endpoint_oversize_step(state),
         StepInput::ToolOutput(output) => tool_output_step(state, output),
@@ -111,6 +132,7 @@ fn tool_output_step(mut state: RuntimeState, output: DispatchOutput) -> StepResu
         content: output.rendered.clone(),
         tokens: token_estimate(&output.rendered) as i64,
     }];
+    graph_output::update_graph_after_output(&mut state, &pending, &output, &mut effects);
     let mut stop = stop_for_output(&output);
     if stop == StopReason::RepeatAction {
         state.repeat_faults = state.repeat_faults.saturating_add(1);

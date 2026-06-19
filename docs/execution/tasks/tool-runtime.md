@@ -12,7 +12,7 @@ done
 ## Depends On
 
 [protocol-parser.md](protocol-parser.md), [sqlite-store.md](sqlite-store.md),
-[skill-runtime.md](skill-runtime.md), [context-engine.md](context-engine.md)
+[state-graph-runtime.md](state-graph-runtime.md), [context-engine.md](context-engine.md)
 (observation caps).
 
 ## Files To Read
@@ -22,13 +22,13 @@ done
 - [../../architecture/tools/shell.md](../../architecture/tools/shell.md)
 - [../../architecture/tools/queue-ops.md](../../architecture/tools/queue-ops.md)
 - [../../architecture/tools/memory-ops.md](../../architecture/tools/memory-ops.md)
-- [../../architecture/tools/skill-ops.md](../../architecture/tools/skill-ops.md)
+- [../../architecture/tools/graph-ops.md](../../architecture/tools/graph-ops.md)
 - [../../architecture/tools/control.md](../../architecture/tools/control.md)
 
 ## Files To Touch
 
 - crates/lkjagent-tools/src/: dispatch.rs (validation order from the
-  registry contract), fs.rs, shell.rs, queue.rs, memory.rs, skill.rs,
+  registry contract), fs.rs, shell.rs, queue.rs, memory.rs, graph.rs,
   control.rs, observe.rs (observation frame
   construction and truncation), error.rs.
 - crates/lkjagent-tools/tests/: per-tool tables against tempdir
@@ -62,5 +62,5 @@ cargo clippy -p lkjagent-tools -- -D warnings
 
 - Do not let any adapter decide policy; caps and restrictions arrive from
   the context engine and dispatcher as values.
-- Do not add tools beyond the registry table; new capability is a skill.
+- Do not add tools beyond the registry table; new capability is graph policy.
 - Do not shell out from non-shell adapters.

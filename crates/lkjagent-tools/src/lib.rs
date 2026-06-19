@@ -8,7 +8,6 @@ pub mod memory;
 pub mod observe;
 pub mod queue;
 pub mod shell;
-pub mod skill;
 pub mod structure;
 pub mod structure_network;
 pub mod structure_seed;

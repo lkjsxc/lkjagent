@@ -34,16 +34,15 @@ seconds.
 1. Open the store; run schema setup if tables are missing.
 2. Load config from data/lkjagent.json per
    [../../operations/running.md](../../operations/running.md).
-3. Resolve the source-owned skill library from the image path or local seed
-   path.
-4. Index the source skill library ([../skills/loading.md](../skills/loading.md)).
-5. Build the prefix: system prompt, workspace brief, memory digest, skill
-   index ([../protocol/system-prompt.md](../protocol/system-prompt.md)).
-6. If the state table records an open task, append its latest task summary
-   as the first log frame; otherwise start at the queue.
+3. Load source graph definitions from lkjagent-graph.
+4. Reconstruct the active graph case from graph tables when one exists.
+5. Build the prefix: system prompt, registry, graph state, workspace brief,
+   and memory digest ([../protocol/system-prompt.md](../protocol/system-prompt.md)).
+6. If a graph case is active, append its graph resume notice as the first log
+   frame; otherwise start at the queue.
 
-Startup never replays raw transcript history into the context; summaries
-carry state across restarts, which keeps restart cost flat over time.
+Startup never replays raw transcript history into the context; graph state and
+evidence carry state across restarts, which keeps restart cost flat over time.
 
 ## Shutdown
 
@@ -59,8 +58,8 @@ write is a single transaction.
 The container supervisor restarts the daemon on nonzero exit. Endpoint
 outages do not fabricate replies: the daemon appends an error event, stores
 `daemon_state=error`, and tries again on later polls. Internal process loss
-is recovered by stale lock reclaim plus durable queue, transcript, memory,
-config, and workspace state.
+is recovered by stale lock reclaim plus durable queue, graph cases,
+transcript, memory, config, and workspace state.
 
 ## Status
 

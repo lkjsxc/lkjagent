@@ -2,10 +2,12 @@
 
 ## Purpose
 
-lkjagent is a minimal, continuously running agent harness for a local LLM.
-One daemon owns one agent loop. A persistent queue feeds it user messages.
-It talks to an OpenAI-compatible endpoint, acts through a small fixed
-toolset, and refines its own skills and memory while idle.
+lkjagent is a graph-governed, continuously running agent operating system
+for a weak local LLM. One daemon owns one agent loop. A persistent queue
+feeds it user messages. The runtime creates durable task cases, routes them
+through a typed state-transition graph, renders graph-selected context, acts
+through a small fixed toolset, and improves graph policy plus memory while
+idle.
 
 This repository is read and written by LLM agents. The documentation tree
 under [docs/](docs/README.md) is the implementation contract: code follows docs.
@@ -16,16 +18,16 @@ under [docs/](docs/README.md) is the implementation contract: code follows docs.
 - Runs entirely inside a container; the host only runs docker compose.
 - YOLO only: no permission prompts; the sandbox boundary is the safety model.
 - Local model budget: about 16 GB of memory and a 32k token context window.
-- Append-only context with explicit compaction keeps the endpoint prefix cache hot.
+- Append-only context with graph-aware compaction keeps the endpoint prefix cache hot.
 - The model speaks a tag-based action protocol, never JSON.
-- Skills are markdown capability files; one format serves the harness and its builders.
+- A typed state graph governs planning, context, evidence, recovery, and completion.
 - No MCP, no sub-agents, no plan mode, no web UI.
 
 ## Status
 
 The Cargo workspace, local verification gates, benchmark corpus, action
-parser, context engine, container wiring, resident daemon, tool loop, and
-queue intake are implemented.
+parser, graph core, context engine, container wiring, resident daemon, tool
+loop, and queue intake are implemented.
 
 - [docs/current-state.md](docs/current-state.md) is the honest status ledger.
 - [docs/execution/current-blockers.md](docs/execution/current-blockers.md) is the implementation queue.

@@ -10,7 +10,7 @@ workspace = true
 
 [dependencies]
 lkjagent-context = { path = "../lkjagent-context" }
+lkjagent-graph = { path = "../lkjagent-graph" }
 lkjagent-protocol = { path = "../lkjagent-protocol" }
-lkjagent-skills = { path = "../lkjagent-skills" }
 lkjagent-store = { path = "../lkjagent-store" }
 rusqlite = { version = "0.40.1", features = ["bundled"] }

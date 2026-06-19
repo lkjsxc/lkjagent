@@ -2,26 +2,26 @@
 
 ## Purpose
 
-Specify the single continuous loop: how a turn runs, how a task opens and
-closes, and which budgets bound it. Decision:
+Specify the single continuous loop: how a graph case opens, how a turn runs,
+how completion closes, and which budgets bound it. Decision:
 [../../decisions/single-loop.md](../../decisions/single-loop.md).
 
 ## The Turn
 
 A turn is the atomic unit of agent activity:
 
-1. Boundary work: deliver due queue messages as owner frames
+1. Boundary work: deliver due queue messages, create or resume graph cases
    ([queue-intake.md](queue-intake.md)), check the compaction trigger
    ([../context/compaction.md](../context/compaction.md)).
-2. Call the endpoint with the current message list and the stop sequence
+2. Render graph state and call the endpoint with the current message list and the stop sequence
    `</act>`; sampling per [../llm/sampling.md](../llm/sampling.md).
 3. Parse the completion into one action per
    [../protocol/parsing.md](../protocol/parsing.md). On failure, follow
    [../protocol/recovery.md](../protocol/recovery.md).
 4. Execute the action through the toolset
    ([../tools/registry.md](../tools/registry.md)).
-5. Append the action and its bounded observation to the transcript and to
-   the context log. Token caps per
+5. Append the action and its bounded observation to the transcript, graph
+   evidence, and the context log. Token caps per
    [../context/budgets.md](../context/budgets.md).
 
 Steps are sequential; nothing else touches the context while a turn runs.
@@ -30,14 +30,17 @@ to the same transcript and leave the task open for the next endpoint turn.
 
 ## The Task
 
-A task is opened when an owner message is delivered with no task open, and
-closed by an agent.done action whose summary is recorded.
+A task case is opened when an owner message is delivered with no active case,
+and closed by an agent.done action admitted by the graph completion gate.
 
-| Task state | Driven by |
+| Case phase | Driven by |
 | --- | --- |
-| open | owner message delivered; turns proceed |
+| planning | owner message delivered; graph classifier and planner run |
+| execution | plan and context package selection complete |
+| verification | checks or observed evidence are required |
+| recovery | parse, tool, endpoint, budget, pressure, or completion gate failure |
 | waiting | agent.ask emitted; loop waits until another send arrives |
-| closed | agent.done emitted; summary recorded; task-summary memory saved |
+| closed | agent.done admitted; summary, evidence, and memory links recorded |
 
 A task carries a turn budget (initial contract: 64 turns, config-tunable).
 The final budgeted turn is still admitted. If the daemon reaches another
@@ -45,24 +48,14 @@ endpoint turn after the budget is exhausted, it records a budget notice and
 sets the task to waiting with a concrete owner question instead of silently
 burning turns. The next owner send resumes the task with a fresh turn budget.
 
-Some owner messages activate a completion guard. Recursive structure tasks
-cannot close until the tool layer verifies a README-indexed recursive tree;
-a premature agent.done returns a tool error and the task remains open. The
-daemon auto-loads the recursive-structure skill body immediately after the
-opening owner frame and before the first endpoint completion for that task.
-When the owner asks for recursive docs or documentation, the daemon also
-creates a README-indexed docs scaffold, then records that observation
-before calling the endpoint. Encyclopedia, wiki, and knowledge-base creation
-requests use the same pre-endpoint path with a stricter recursive-knowledge
-guard and a small nucleus scaffold with maps, a starter domain, reference,
-curation, execution state, an expansion queue, and a rebalance plan. That
-guard requires nucleus, growth-control, and required-file evidence before
-agent.done can close.
-Tasks that state an exact markdown file count carry a count guard; done is
-refused until a README-indexed candidate tree has exactly that count.
+Some owner messages activate task-family completion requirements. Recursive
+structure tasks cannot close until graph evidence proves a README-indexed
+recursive tree. Documentation and knowledge-base requests enter document
+construction nodes that create nucleus anchors before endpoint execution.
+Exact markdown file counts become graph evidence requirements.
 
 When no task is open and the queue is empty, the daemon opens a bounded
-self-maintenance cycle, records `daemon_state=working`, and continues toward
+graph maintenance case, records `daemon_state=working`, and continues toward
 one concrete improvement or an honest empty-cycle agent.done. Queue arrival
 preempts maintenance at the next turn boundary.
 
@@ -72,7 +65,7 @@ The loop body is a pure transition function in lkjagent-runtime composed
 from lkjagent-context and lkjagent-protocol:
 
 ```
-step : (State, Completion) -> (State, Effects)
+step : (State, GraphState, Completion) -> (State, GraphState, Effects)
 ```
 
 Effects (tool execution, store writes, endpoint calls) are interpreted by
@@ -84,7 +77,7 @@ states and effects without any IO, per
 
 Every turn records why it ended: acted, done, ask, invalid_action,
 unknown_tool, bad_params, repeat_action, endpoint_error, tool_error,
-budget_notice. The taxonomy is owned by
+budget_notice, compaction, maintenance. The taxonomy is owned by
 [../protocol/recovery.md](../protocol/recovery.md).
 
 ## Status

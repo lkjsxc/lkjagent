@@ -5,7 +5,6 @@ pub enum ToolError {
     InvalidParam(String),
     Io(String),
     Store(String),
-    Skill(String),
     MissingStore,
 }
 
@@ -21,7 +20,6 @@ impl std::fmt::Display for ToolError {
             ToolError::InvalidParam(message) => write!(formatter, "invalid parameter: {message}"),
             ToolError::Io(message) => write!(formatter, "io error: {message}"),
             ToolError::Store(message) => write!(formatter, "store error: {message}"),
-            ToolError::Skill(message) => write!(formatter, "skill error: {message}"),
             ToolError::MissingStore => write!(formatter, "store connection required"),
         }
     }

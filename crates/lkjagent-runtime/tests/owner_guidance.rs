@@ -8,7 +8,7 @@ use lkjagent_runtime::daemon::{
 };
 use lkjagent_store::{events, queue, state};
 use support::http::{completion, serve_responses};
-use support::{runtime_state, seed_skill_path, store, temp_workspace, TestResult};
+use support::{runtime_state, store, temp_workspace, TestResult};
 
 const WRITE_ACTION: &str = "<act>
 <tool>fs.write</tool>
@@ -19,6 +19,10 @@ const DONE_ACTION: &str = "<act>
 <tool>agent.done</tool>
 <summary>three markdown files complete</summary>
 </act>";
+const VERIFY_ACTION: &str = "<act>
+<tool>shell.run</tool>
+<command>test -f notes.md</command>
+</act>";
 
 #[test]
 fn owner_guidance_during_open_task_persists_count_guard() -> TestResult<()> {
@@ -26,7 +30,11 @@ fn owner_guidance_during_open_task_persists_count_guard() -> TestResult<()> {
     take_daemon_lock(&conn, "test", "100", "0")?;
     queue::enqueue(&mut conn, "start long work", "owner-send", "101")?;
     let workspace = temp_workspace("owner-guidance")?;
-    let server = serve_responses(vec![completion(WRITE_ACTION), completion(DONE_ACTION)])?;
+    let server = serve_responses(vec![
+        completion(WRITE_ACTION),
+        completion(VERIFY_ACTION),
+        completion(DONE_ACTION),
+    ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
@@ -38,6 +46,7 @@ fn owner_guidance_during_open_task_persists_count_guard() -> TestResult<()> {
         "102",
     )?;
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
     server.join()?;
 
     assert_eq!(
@@ -79,7 +88,6 @@ fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
         "test".to_string(),
         client_config(base_url, "local-model", None, 180, 2_048),
         workspace.to_path_buf(),
-        seed_skill_path(),
         "100",
     );
     Ok(ResidentDaemon::new(runtime_state()?, runtime))

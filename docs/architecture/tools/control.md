@@ -13,27 +13,24 @@ parameter table: [registry.md](registry.md).
 | --- | --- |
 | summary | required |
 
-Closes the open task. The summary states what was asked, what was done, and
-how it was verified. agent.done also ends a maintenance cycle per
+Closes the active graph case. The summary states what was asked, what was
+done, and how it was verified. agent.done also ends a maintenance case per
 [../runtime/self-maintenance.md](../runtime/self-maintenance.md); an empty
-cycle ends with a one-line summary.
+case ends with a one-line summary.
 
-Recursive structure tasks carry a completion guard. When the owner asks for
-recursive or highly structured organization, agent.done is refused until
-the workspace contains a README-indexed tree with enough depth and breadth
-to prove the request was not satisfied by one file. Encyclopedia, wiki, and
-knowledge-base creation requests use a stricter recursive-knowledge guard:
-the docs tree must contain a small nucleus with required map,
-starter-domain, reference, curation, expansion-queue, and rebalance-plan
-files. The guard requires contract-shaped markdown pages, growth-control
-sections, and enough links to behave like a navigable nucleus. It rejects
-nested `docs/` subtrees and top-level directories outside the seeded
-encyclopedia map.
+Recursive structure tasks carry graph evidence requirements. When the owner
+asks for recursive or highly structured organization, agent.done is refused
+until graph evidence proves a README-indexed tree with enough depth and
+breadth. Encyclopedia, wiki, and knowledge-base creation requests use a
+recursive-knowledge task family: the docs tree must contain a small nucleus
+with required map, starter-domain, reference, curation, expansion-queue, and
+rebalance-plan files. The graph gate requires contract-shaped markdown pages,
+growth-control sections, and enough links to behave like a navigable nucleus.
 
-Owner tasks that state an exact markdown file count also carry a completion
-guard. agent.done is refused until one README-indexed candidate tree contains
-exactly that many markdown files; the refusal names the closest candidate
-and tells the model to repair the count with one compact shell.run script.
+Owner tasks that state an exact markdown file count also carry graph
+completion requirements. agent.done is refused until one README-indexed
+candidate tree contains exactly that many markdown files; the refusal names
+the missing graph evidence and legal next transitions.
 
 ## agent.ask
 
@@ -49,10 +46,9 @@ tool error. The owner responds through the same `lkjagent send` path per
 ## Budget Interaction
 
 When the task turn budget is exhausted, the harness appends a budget
-notice, and only agent.ask or agent.done are lawful next actions, per
+notice and moves the case into a graph recovery or waiting phase per
 [../runtime/agent-loop.md](../runtime/agent-loop.md) and the taxonomy in
-[../protocol/recovery.md](../protocol/recovery.md). Asking buys owner
-guidance; done closes honestly with what was achieved.
+[../protocol/recovery.md](../protocol/recovery.md).
 
 ## Think Is Not a Tool
 

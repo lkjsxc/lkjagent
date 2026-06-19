@@ -1,8 +1,10 @@
 use lkjagent_context::assemble::append_frame;
 use lkjagent_context::model::{Frame, FrameKind, NoticeKind};
+use lkjagent_graph::TaskGraphState;
 use lkjagent_protocol::{parse_completion, render_action, render_owner};
 use lkjagent_store::events::EventKind;
 
+use crate::graph_state::graph_notice_frame;
 use crate::maintenance::spend_cycle;
 use crate::prompt::token_estimate;
 use crate::recovery::{parse_notice, parse_recovery_notice, stop_reason};
@@ -10,7 +12,12 @@ use crate::step::frames::{append_notice, result};
 use crate::step::{Effect, StepResult};
 use crate::task::{open_task, spend_turn, PendingAction, RuntimeState, StopReason, TaskState};
 
-pub(super) fn owner_step(mut state: RuntimeState, content: String, tokens: usize) -> StepResult {
+pub(super) fn owner_step(
+    mut state: RuntimeState,
+    content: String,
+    tokens: usize,
+    graph: Option<TaskGraphState>,
+) -> StepResult {
     if state.maintenance.is_some() {
         state = append_notice(
             state,
@@ -23,6 +30,10 @@ pub(super) fn owner_step(mut state: RuntimeState, content: String, tokens: usize
         &state.context,
         Frame::new(FrameKind::Owner, render_owner(&content), tokens),
     );
+    if let Some(graph) = graph {
+        state.context = append_frame(&state.context, graph_notice_frame(&graph));
+        state.graph = Some(graph);
+    }
     state.task = open_task(&state.task);
     StepResult {
         state,

@@ -1,4 +1,5 @@
 use lkjagent_context::model::ContextState;
+use lkjagent_graph::TaskGraphState;
 use lkjagent_protocol::Action;
 
 use crate::maintenance::MaintenanceCycle;
@@ -33,6 +34,7 @@ pub struct CompactionCycle {
 pub struct RuntimeState {
     pub context: ContextState,
     pub task: TaskState,
+    pub graph: Option<TaskGraphState>,
     pub maintenance: Option<MaintenanceCycle>,
     pub compaction: Option<CompactionCycle>,
     pub pending_action: Option<PendingAction>,
@@ -46,6 +48,7 @@ impl RuntimeState {
         Self {
             context,
             task: TaskState::Idle,
+            graph: None,
             maintenance: None,
             compaction: None,
             pending_action: None,

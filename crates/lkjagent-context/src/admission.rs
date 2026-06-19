@@ -1,4 +1,4 @@
-use crate::budget::{LOG_LOADED_SKILLS, LOG_OBSERVATION, LOG_OWNER_FRAME, LOG_SKILL_BODY};
+use crate::budget::{LOG_GRAPH_NOTICE, LOG_OBSERVATION, LOG_OWNER_FRAME};
 use crate::model::{Frame, FrameKind, NoticeKind};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -39,18 +39,8 @@ pub fn admit(frame: PendingFrame) -> AdmissionDecision {
     }
     match frame.kind {
         FrameKind::Owner | FrameKind::Observation => truncate(frame, cap),
-        FrameKind::SkillBody => {
-            refuse("skill body exceeds 2,048 tokens; load a smaller source-owned skill")
-        }
+        FrameKind::GraphNotice => refuse("graph notice exceeds 2,048 tokens; narrow graph slice"),
         _ => refuse("frame exceeds its budget owner cap"),
-    }
-}
-
-pub fn admit_loaded_skill(current_tokens: usize, frame: PendingFrame) -> AdmissionDecision {
-    if current_tokens.saturating_add(frame.tokens) > LOG_LOADED_SKILLS {
-        refuse("loaded skills exceed 6,144 tokens; reload after compaction")
-    } else {
-        admit(frame)
     }
 }
 
@@ -79,7 +69,7 @@ fn cap_for(kind: &FrameKind) -> usize {
     match kind {
         FrameKind::Owner => LOG_OWNER_FRAME,
         FrameKind::Observation => LOG_OBSERVATION,
-        FrameKind::SkillBody => LOG_SKILL_BODY,
+        FrameKind::GraphNotice => LOG_GRAPH_NOTICE,
         _ => usize::MAX,
     }
 }

@@ -13,7 +13,7 @@ fragmentation.
 | every Markdown file, including README.md and AGENTS.md | 200 lines |
 | every Rust source file | 200 lines |
 | every script, config, compose, and workflow file | 200 lines |
-| skill files | 120 lines per [../architecture/skills/format.md](../architecture/skills/format.md) |
+| graph context package docs | 200 lines |
 
 There are no exemptions and no generated-file escape hatch: generated
 content that cannot meet the cap does not get committed.
