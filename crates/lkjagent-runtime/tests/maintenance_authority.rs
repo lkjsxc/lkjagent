@@ -12,7 +12,7 @@ use support::TestResult;
 use support::{action, dispatch_state, runtime_state, store, temp_workspace, tool_runtime};
 
 #[test]
-fn maintenance_uses_normal_tool_authority_and_budget() -> TestResult<()> {
+fn maintenance_state_tools_keep_normal_authority_and_budget() -> TestResult<()> {
     let workspace = temp_workspace("authority")?;
     let runtime = tool_runtime(workspace.clone())?;
     let mut conn = store()?;
@@ -21,7 +21,7 @@ fn maintenance_uses_normal_tool_authority_and_budget() -> TestResult<()> {
 
     state = run_action(
         state,
-        action("fs.write", &[("path", "note.md"), ("content", "hi")]),
+        action("queue.list", &[("status", "pending"), ("limit", "5")]),
         &runtime,
         &mut conn,
         &mut dispatch_state,
@@ -29,21 +29,12 @@ fn maintenance_uses_normal_tool_authority_and_budget() -> TestResult<()> {
     state = run_action(
         state,
         action(
-            "queue.enqueue",
-            &[("content", "follow up"), ("reason", "maintenance")],
-        ),
-        &runtime,
-        &mut conn,
-        &mut dispatch_state,
-    )?;
-    state = run_action(
-        state,
-        action(
-            "queue.edit",
+            "memory.save",
             &[
-                ("id", "1"),
-                ("content", "edited"),
-                ("reason", "maintenance"),
+                ("kind", "lesson"),
+                ("title", "maintenance note"),
+                ("tags", "maintenance"),
+                ("content", "write durable lessons only"),
             ],
         ),
         &runtime,
@@ -52,25 +43,18 @@ fn maintenance_uses_normal_tool_authority_and_budget() -> TestResult<()> {
     )?;
     state = run_action(
         state,
-        action("shell.run", &[("command", git_remote_command())]),
+        action("memory.find", &[("query", "durable"), ("limit", "5")]),
         &runtime,
         &mut conn,
         &mut dispatch_state,
     )?;
 
-    assert_eq!(std::fs::read_to_string(workspace.join("note.md"))?, "hi");
-    assert!(workspace.join("remote.git/refs/heads/main").exists());
     assert!(matches!(
         state.maintenance.map(|cycle| cycle.turns_remaining),
-        Some(1)
+        Some(2)
     ));
-    let events = read_events(&conn)?;
-    assert!(events.iter().any(|event| {
-        event.kind == "queue_mutation" && event.content.contains("operation=enqueue")
-    }));
-    assert!(events.iter().any(|event| {
-        event.kind == "queue_mutation" && event.content.contains("operation=edit")
-    }));
+    assert!(!workspace.join("remote.git").exists());
+    assert!(read_events(&conn)?.is_empty());
     Ok(())
 }
 
@@ -106,8 +90,4 @@ fn run_action(
         OutputKind::Observation { ref status } if status == "ok"
     ));
     Ok(step(completion.state, StepInput::ToolOutput(output)).state)
-}
-
-fn git_remote_command() -> &'static str {
-    "git init --bare remote.git && git init work && git -C work config user.email test@example.com && git -C work config user.name Test && printf hi > work/README.md && git -C work add README.md && git -C work commit -m init && git -C work remote add origin ../remote.git && git -C work push origin HEAD:main"
 }

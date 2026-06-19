@@ -22,6 +22,7 @@ mod effects;
 mod endpoint;
 mod graph_sync;
 mod idle;
+mod maintenance_gate;
 mod maintenance_wait;
 mod persisted;
 mod pressure;
