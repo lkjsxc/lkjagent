@@ -1,10 +1,10 @@
-use crate::count_guard::{CountGuard, CountKind};
+use crate::count_guard::{CountGuard, CountKind, CountMode};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CompletionGuard {
     None,
-    FileCount { target: usize },
-    MarkdownCount { target: usize },
+    FileCount { target: usize, mode: CountMode },
+    MarkdownCount { target: usize, mode: CountMode },
     RecursiveStructure,
     RecursiveKnowledge,
     RecursiveStructureCount { count: CountGuard },
@@ -15,8 +15,18 @@ impl CompletionGuard {
     pub fn as_state_value(self) -> String {
         match self {
             Self::None => "none".to_string(),
-            Self::FileCount { target } => format!("file-count:{target}"),
-            Self::MarkdownCount { target } => format!("markdown-count:{target}"),
+            Self::FileCount { target, mode } => CountGuard {
+                kind: CountKind::File,
+                target,
+                mode,
+            }
+            .as_state_value(),
+            Self::MarkdownCount { target, mode } => CountGuard {
+                kind: CountKind::Markdown,
+                target,
+                mode,
+            }
+            .as_state_value(),
             Self::RecursiveStructure => "recursive-structure".to_string(),
             Self::RecursiveKnowledge => "recursive-knowledge".to_string(),
             Self::RecursiveStructureCount { count } => {
@@ -76,13 +86,15 @@ impl CompletionGuard {
 
     pub fn count_guard(self) -> Option<CountGuard> {
         match self {
-            Self::FileCount { target } => Some(CountGuard {
+            Self::FileCount { target, mode } => Some(CountGuard {
                 kind: CountKind::File,
                 target,
+                mode,
             }),
-            Self::MarkdownCount { target } => Some(CountGuard {
+            Self::MarkdownCount { target, mode } => Some(CountGuard {
                 kind: CountKind::Markdown,
                 target,
+                mode,
             }),
             Self::RecursiveStructureCount { count } | Self::RecursiveKnowledgeCount { count } => {
                 Some(count)
@@ -115,9 +127,11 @@ impl CompletionGuard {
         match count.kind {
             CountKind::File => Self::FileCount {
                 target: count.target,
+                mode: count.mode,
             },
             CountKind::Markdown => Self::MarkdownCount {
                 target: count.target,
+                mode: count.mode,
             },
         }
     }

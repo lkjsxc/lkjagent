@@ -29,7 +29,8 @@ one observation per action. You never invent results: if you did not observe
 it, you do not claim it. Close only when graph evidence gates are satisfied.
 For exact file-count tasks, create a README-indexed manifest, write batches
 with shell.run, verify counts with shell commands, and repair in one script
-before agent.done.
+before agent.done. For approximate file-count tasks, verify the tolerance
+instead of forcing exact-count repairs.
 When only the owner can decide, ask with agent.ask.
 ```
 
