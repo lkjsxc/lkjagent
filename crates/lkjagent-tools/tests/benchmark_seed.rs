@@ -36,6 +36,7 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
             target: 20,
             mode: CountMode::Exact,
         },
+        "Create a structured archive for the northern expedition.",
     )?;
 
     assert!(report.contains("files=20"));
@@ -45,6 +46,8 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     assert!(root.join("README.md").exists());
     assert!(root.join("docs/design-001.md").exists());
     assert!(root.join("main/part-001.md").exists());
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    assert!(readme.contains("northern expedition"));
     Ok(())
 }
 

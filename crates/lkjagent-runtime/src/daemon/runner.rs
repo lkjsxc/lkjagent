@@ -120,6 +120,7 @@ impl ResidentDaemon {
         let Some(owner) = intake::deliver_next(conn, turn, tokens as i64, now)? else {
             return Ok(());
         };
+        let owner_content = owner.content.clone();
         self.dispatch_state.reset_repeat_tracking();
         let starting_task = !matches!(
             self.state.task,
@@ -187,7 +188,7 @@ impl ResidentDaemon {
             self.auto_scaffold_markdown_corpus(conn, now, target)?;
         }
         if let Some(guard) = counted_document_guard {
-            self.auto_scaffold_counted_documents(conn, now, guard)?;
+            self.auto_scaffold_counted_documents(conn, now, guard, &owner_content)?;
         }
         Ok(())
     }

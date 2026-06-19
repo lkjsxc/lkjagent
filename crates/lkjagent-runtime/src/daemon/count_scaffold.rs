@@ -16,15 +16,19 @@ impl ResidentDaemon {
         conn: &mut Connection,
         now: &str,
         guard: CountGuard,
+        objective: &str,
     ) -> RuntimeResult<()> {
-        let output = match scaffold_counted_documents(&self.runtime.tools.workspace, guard) {
-            Ok(content) => observe::ok(
-                content,
-                self.runtime.tools.observation_tokens,
-                "finish with agent.done",
-            ),
-            Err(error) => observe::error(error.to_string(), self.runtime.tools.observation_tokens),
-        };
+        let output =
+            match scaffold_counted_documents(&self.runtime.tools.workspace, guard, objective) {
+                Ok(content) => observe::ok(
+                    content,
+                    self.runtime.tools.observation_tokens,
+                    "finish with agent.done",
+                ),
+                Err(error) => {
+                    observe::error(error.to_string(), self.runtime.tools.observation_tokens)
+                }
+            };
         self.append_output_frame(conn, now, &output.kind, output.rendered)?;
         if matches!(output.kind, OutputKind::Observation { .. }) {
             self.record_scaffold_graph_evidence(conn, now, "counted document scaffold")?;
