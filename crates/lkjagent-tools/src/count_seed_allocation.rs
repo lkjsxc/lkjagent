@@ -1,5 +1,7 @@
 const MAX_DESIGN_SIGNAL_DISTANCE: usize = 72;
 
+use crate::count_number::{number_spans, span_distance, span_matches, Span};
+
 pub(crate) struct Allocation {
     pub(crate) docs: usize,
     pub(crate) main: usize,
@@ -95,10 +97,10 @@ fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
         "viewpoint",
         "viewpoints",
     ] {
-        spans.extend(matches(lower, needle));
+        spans.extend(span_matches(lower, needle));
     }
     for needle in ["設計", "観点", "メモ"] {
-        spans.extend(matches(content, needle));
+        spans.extend(span_matches(content, needle));
     }
     spans
 }
@@ -106,90 +108,10 @@ fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
 fn file_signal_spans(lower: &str, content: &str) -> Vec<Span> {
     let mut spans = Vec::new();
     for needle in ["file", "files", "document", "documents", "docs", ".md"] {
-        spans.extend(matches(lower, needle));
+        spans.extend(span_matches(lower, needle));
     }
     for needle in ["ファイル", "文書", "ドキュメント", "マークダウン"] {
-        spans.extend(matches(content, needle));
+        spans.extend(span_matches(content, needle));
     }
     spans
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct NumberSpan {
-    value: usize,
-    span: Span,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct Span {
-    start: usize,
-    end: usize,
-}
-
-fn number_spans(text: &str) -> Vec<NumberSpan> {
-    let mut values = Vec::new();
-    let mut current = String::new();
-    let mut start = 0_usize;
-    let mut end = 0_usize;
-    for (index, ch) in text.char_indices() {
-        if let Some(digit) = digit_char(ch) {
-            if current.is_empty() {
-                start = index;
-            }
-            current.push(digit);
-            end = index.saturating_add(ch.len_utf8());
-        } else if number_separator(ch) && !current.is_empty() {
-            continue;
-        } else {
-            save_number(&mut values, &mut current, start, end);
-        }
-    }
-    save_number(&mut values, &mut current, start, end);
-    values
-}
-
-fn digit_char(ch: char) -> Option<char> {
-    if ch.is_ascii_digit() {
-        return Some(ch);
-    }
-    if ('０'..='９').contains(&ch) {
-        return char::from_digit(ch as u32 - '０' as u32, 10);
-    }
-    None
-}
-
-fn number_separator(ch: char) -> bool {
-    matches!(ch, ',' | '_' | '，')
-}
-
-fn save_number(values: &mut Vec<NumberSpan>, current: &mut String, start: usize, end: usize) {
-    if current.is_empty() {
-        return;
-    }
-    if let Ok(value) = current.parse() {
-        values.push(NumberSpan {
-            value,
-            span: Span { start, end },
-        });
-    }
-    current.clear();
-}
-
-fn matches(text: &str, needle: &str) -> Vec<Span> {
-    text.match_indices(needle)
-        .map(|(start, found)| Span {
-            start,
-            end: start.saturating_add(found.len()),
-        })
-        .collect()
-}
-
-fn span_distance(left: Span, right: Span) -> usize {
-    if left.end <= right.start {
-        right.start.saturating_sub(left.end)
-    } else if right.end <= left.start {
-        left.start.saturating_sub(right.end)
-    } else {
-        0
-    }
 }
