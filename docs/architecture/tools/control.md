@@ -31,14 +31,18 @@ names the missing kinds and points the next action to `graph.evidence` with
 the first missing kind, an observed verification summary, and a path.
 
 Owner tasks that state a file or markdown file count also carry completion
-requirements. Exact wording requires one candidate tree to contain exactly
-that many files. README-indexed roots are preferred candidates; when none
-exist, a clean set of visible top-level output directories with no visible
-top-level files is also a candidate. Approximate wording such as about,
-around, roughly, approximately, or common Japanese equivalents accepts a 10
-percent tolerance with a minimum tolerance of one file. Markdown-count
-requests count only .md files; general file-count requests count every
-non-hidden regular file. Count guards compose with recursive and
+requirements. English file, document, and docs wording plus common Japanese
+file wording activate general file-count guards; markdown and .md wording
+activate markdown-count guards. ASCII digits, full-width digits, and
+comma-like digit separators are accepted. Exact wording requires one
+candidate tree to contain exactly that many files. README-indexed roots are
+preferred candidates; when none exist, a clean set of visible top-level output
+directories with no visible top-level files is also a candidate. Approximate
+wording such as about, around, roughly, approximately, or common Japanese
+equivalents accepts a 10 percent tolerance with a minimum tolerance of one
+file. Markdown-count requests count only .md files; general file-count
+requests count every non-hidden regular file. Count guards compose with
+recursive and
 knowledge-base guards. The refusal names the closest candidate and directs
 the next action toward one compact shell.run repair script.
 
