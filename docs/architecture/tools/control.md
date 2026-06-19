@@ -27,10 +27,13 @@ with required map, starter-domain, reference, curation, expansion-queue, and
 rebalance-plan files. The graph gate requires contract-shaped markdown pages,
 growth-control sections, and enough links to behave like a navigable nucleus.
 
-Owner tasks that state an exact markdown file count also carry graph
+Owner tasks that state an exact file or markdown file count also carry
 completion requirements. agent.done is refused until one README-indexed
-candidate tree contains exactly that many markdown files; the refusal names
-the missing graph evidence and legal next transitions.
+candidate tree contains exactly that many files. Markdown-count requests count
+only .md files; general file-count requests count every non-hidden regular
+file. Count guards compose with recursive and knowledge-base guards. The
+refusal names the closest candidate and directs the next action toward one
+compact shell.run repair script.
 
 ## agent.ask
 

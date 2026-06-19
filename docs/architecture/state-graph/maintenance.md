@@ -10,8 +10,8 @@ quality work.
 Idle maintenance rotates through:
 
 - distill: save reusable lessons, facts, task summaries, and incidents.
-- improve-graph: update graph patterns, context packages, or evidence rules
-  from observed failures.
+- refine-skills: record source skill improvement candidates from observed
+  failures and gaps.
 - prune-memory: merge, correct, or delete stale durable memory.
 - audit-self: record mismatches between docs, code, graph state, and tests.
 

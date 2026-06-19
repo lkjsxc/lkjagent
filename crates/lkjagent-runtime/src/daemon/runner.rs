@@ -112,6 +112,7 @@ impl ResidentDaemon {
         let Some(owner) = intake::deliver_next(conn, turn, tokens as i64, now)? else {
             return Ok(());
         };
+        self.dispatch_state.reset_repeat_tracking();
         let starting_task = !matches!(
             self.state.task,
             TaskState::Open { .. } | TaskState::Waiting { .. }

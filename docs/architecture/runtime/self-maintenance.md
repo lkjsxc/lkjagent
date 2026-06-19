@@ -9,11 +9,13 @@ it keeps improving state instead of stopping at a quiet idle loop.
 ## Trigger
 
 At a turn boundary with no open task and no pending queue rows, the harness
-opens the stalest maintenance directive and records `daemon_state=working`.
-The next endpoint turn receives the maintenance notice and must choose one
-bounded improvement action or close the cycle honestly with agent.done. A
-new queue row preempts maintenance at the next turn boundary before another
-maintenance endpoint turn is sent.
+opens the stalest due maintenance directive and records
+`daemon_state=working`. Recent last-run stamps keep the daemon idle until a
+directive is due again or owner work arrives. The next endpoint turn receives
+the maintenance notice and must choose one bounded improvement action or
+close the cycle honestly with agent.done. A new queue row preempts
+maintenance at the next turn boundary before another maintenance endpoint
+turn is sent.
 
 ## Maintenance Directives
 
@@ -22,12 +24,13 @@ Maintenance directives are chosen in rotation and weighted by staleness:
 | Directive | Work |
 | --- | --- |
 | distill | Read recent transcript spans; write durable lessons via memory.save per [../memory/distillation.md](../memory/distillation.md) |
-| improve-graph | Improve graph patterns, context packages, evidence policy, or tests |
+| refine-skills | Record source skill improvement candidates from observed gaps |
 | prune-memory | Merge duplicate memory rows, rewrite vague entries, drop superseded ones |
 | audit-self | Compare recent failures against contracts; record mismatches as memory entries tagged for the owner |
 
 The harness tracks per-directive last-run stamps in the state table when a
-cycle opens. The daemon, not the model, decides when the next cycle starts.
+cycle opens. A directive is due after its cooldown interval passes. The
+daemon, not the model, decides when the next cycle starts.
 
 ## Bounds
 
@@ -41,7 +44,8 @@ cycle opens. The daemon, not the model, decides when the next cycle starts.
   bounded observations, real observations only, append-only transcript
   events, and queue preemption only at turn boundaries.
 - A maintenance cycle that finds nothing useful ends early with agent.done
-  and a one-line summary. The next idle boundary opens the next directive.
+  and a one-line summary. Recent stamps delay the next idle restart so
+  maintenance cannot spin in a tight endpoint loop.
 
 ## Heartbeat
 

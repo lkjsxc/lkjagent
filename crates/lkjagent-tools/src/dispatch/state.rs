@@ -55,6 +55,14 @@ impl Default for DispatchState {
     }
 }
 
+impl DispatchState {
+    pub fn reset_repeat_tracking(&mut self) {
+        self.last_action_text = None;
+        self.last_frame_ref = None;
+        self.repeat_count = 0;
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReadRecord {
     pub path: String,

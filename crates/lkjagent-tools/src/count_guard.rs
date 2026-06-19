@@ -3,28 +3,86 @@ use std::path::{Path, PathBuf};
 
 use crate::error::{ToolError, ToolResult};
 
-pub fn markdown_count_target(lower: &str) -> Option<usize> {
-    if !(lower.contains("markdown") || lower.contains(".md")) || !lower.contains("file") {
-        return None;
-    }
-    numbers(lower).into_iter().max()
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CountKind {
+    File,
+    Markdown,
 }
 
-pub fn verify_markdown_count(workspace: &Path, target: usize) -> ToolResult<()> {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct CountGuard {
+    pub kind: CountKind,
+    pub target: usize,
+}
+
+impl CountGuard {
+    pub fn as_state_value(self) -> String {
+        match self.kind {
+            CountKind::File => format!("file-count:{}", self.target),
+            CountKind::Markdown => format!("markdown-count:{}", self.target),
+        }
+    }
+
+    pub fn from_state_value(value: &str) -> Option<Self> {
+        let (kind, raw) = if let Some(raw) = value.strip_prefix("file-count:") {
+            (CountKind::File, raw)
+        } else if let Some(raw) = value.strip_prefix("markdown-count:") {
+            (CountKind::Markdown, raw)
+        } else {
+            return None;
+        };
+        raw.parse::<usize>()
+            .ok()
+            .map(|target| Self { kind, target })
+    }
+
+    pub fn markdown_target(self) -> Option<usize> {
+        (self.kind == CountKind::Markdown).then_some(self.target)
+    }
+}
+
+pub fn count_target(lower: &str, content: &str) -> Option<CountGuard> {
+    if !file_signal(lower, content) {
+        return None;
+    }
+    let target = numbers(lower).into_iter().max()?;
+    let kind = if markdown_signal(lower, content) {
+        CountKind::Markdown
+    } else {
+        CountKind::File
+    };
+    Some(CountGuard { kind, target })
+}
+
+pub fn verify_count(workspace: &Path, guard: CountGuard) -> ToolResult<()> {
     let mut best: Option<(PathBuf, usize)> = None;
     for candidate in candidates(workspace)? {
-        let count = markdown_count(&candidate)?;
-        if count == target {
+        let count = count_files(&candidate, guard.kind)?;
+        if count == guard.target {
             return Ok(());
         }
-        if best
-            .as_ref()
-            .is_none_or(|(_, current)| distance(count, target) < distance(*current, target))
-        {
+        if best.as_ref().is_none_or(|(_, current)| {
+            distance(count, guard.target) < distance(*current, guard.target)
+        }) {
             best = Some((candidate, count));
         }
     }
-    Err(ToolError::invalid(report(workspace, target, best)))
+    Err(ToolError::invalid(report(workspace, guard, best)))
+}
+
+fn file_signal(lower: &str, content: &str) -> bool {
+    lower.contains("file")
+        || lower.contains(".md")
+        || content.contains("ファイル")
+        || content.contains("文書")
+        || content.contains("ドキュメント")
+}
+
+fn markdown_signal(lower: &str, content: &str) -> bool {
+    lower.contains("markdown")
+        || lower.contains(".md")
+        || content.contains("マークダウン")
+        || content.contains("ドキュメント")
 }
 
 fn numbers(text: &str) -> Vec<usize> {
@@ -73,17 +131,24 @@ fn collect(path: &Path, depth: usize, roots: &mut Vec<PathBuf>) -> ToolResult<()
     Ok(())
 }
 
-fn markdown_count(path: &Path) -> ToolResult<usize> {
+fn count_files(path: &Path, kind: CountKind) -> ToolResult<usize> {
     let mut count = 0_usize;
     for entry in fs::read_dir(path)? {
         let child = entry?.path();
         if child.is_dir() && !hidden(&child) {
-            count = count.saturating_add(markdown_count(&child)?);
-        } else if child.extension().is_some_and(|extension| extension == "md") {
+            count = count.saturating_add(count_files(&child, kind)?);
+        } else if counted_file(&child, kind) {
             count = count.saturating_add(1);
         }
     }
     Ok(count)
+}
+
+fn counted_file(path: &Path, kind: CountKind) -> bool {
+    match kind {
+        CountKind::File => path.is_file(),
+        CountKind::Markdown => path.extension().is_some_and(|extension| extension == "md"),
+    }
 }
 
 fn hidden(path: &Path) -> bool {
@@ -96,14 +161,23 @@ fn distance(count: usize, target: usize) -> usize {
     count.max(target).saturating_sub(count.min(target))
 }
 
-fn report(workspace: &Path, target: usize, best: Option<(PathBuf, usize)>) -> String {
-    let base = format!("markdown count incomplete: need exactly {target} markdown files");
+fn report(workspace: &Path, guard: CountGuard, best: Option<(PathBuf, usize)>) -> String {
+    let label = match guard.kind {
+        CountKind::File => "files",
+        CountKind::Markdown => "markdown files",
+    };
+    let base = format!(
+        "{} count incomplete: need exactly {} {label}",
+        label.trim_end_matches('s'),
+        guard.target
+    );
     match best {
         Some((path, count)) => format!(
-            "{base}; next action should repair the count with one compact shell.run script; best={} markdown_files={count}",
-            relative(&path, workspace)
+            "{base}; next action should repair the count with one compact shell.run script; best={} {}={count}",
+            relative(&path, workspace),
+            label.replace(' ', "_")
         ),
-        None => format!("{base}; no README.md candidate found"),
+        None => format!("{base}; no README.md candidate found; create a README-indexed root first"),
     }
 }
 

@@ -31,8 +31,9 @@ has its required evidence.
 
 Recursive docs and knowledge-base tasks are graph task families. They create
 README-indexed scaffolds before endpoint work and cannot close without graph
-evidence for the required document structure. Exact markdown file counts
-remain deterministic control guards that run after the graph completion gate.
+evidence for the required document structure. Exact file and markdown-count
+requests remain deterministic control guards, including when combined with a
+recursive or knowledge-base task family.
 Runtime recovery still uses bounded notices for parse errors, repeated
 actions, tool errors, endpoint max-token exits, budget exhaustion, and context
 pressure; graph recovery nodes are present as the structured target for the
@@ -48,8 +49,9 @@ graph memory links for later retrieval ranking, but current compaction does
 not yet populate those links.
 
 Memory remains durable retrieval, but graph cases link evidence and memories.
-Empty queues open bounded graph maintenance cycles in rotation: distill,
-improve-graph, prune-memory, and audit-self. Compose wiring is implemented.
+Empty queues open bounded graph maintenance cycles in rotation when directives
+are due: distill, refine-skills, prune-memory, and audit-self. Compose wiring
+is implemented.
 The implementation queue is [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status
