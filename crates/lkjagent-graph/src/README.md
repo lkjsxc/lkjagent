@@ -13,6 +13,7 @@ workspace dependencies.
 - [source.rs](source.rs): deterministic source graph definitions.
 - [validate.rs](validate.rs): source graph validation.
 - [classify.rs](classify.rs): intent routing and initial case construction.
+- [classify_signals.rs](classify_signals.rs): pure lexical routing signals.
 - [render.rs](render.rs): compact graph slice rendering.
 - [transition.rs](transition.rs): legal transition admission.
 - [completion.rs](completion.rs): evidence-gated completion checks.

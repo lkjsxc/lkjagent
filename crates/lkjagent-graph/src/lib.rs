@@ -1,4 +1,5 @@
 pub mod classify;
+mod classify_signals;
 pub mod compaction;
 pub mod completion;
 pub mod maintenance;
