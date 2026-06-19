@@ -27,6 +27,7 @@ mod count_profile_variation_en;
 mod count_profile_variation_jp;
 pub mod count_seed;
 mod count_seed_allocation;
+mod count_seed_allocation_signals;
 mod count_seed_verify;
 mod count_seed_verify_main;
 mod count_seed_verify_manifest;

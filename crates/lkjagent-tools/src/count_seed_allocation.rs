@@ -2,7 +2,8 @@ const MAX_DESIGN_SIGNAL_DISTANCE: usize = 72;
 const MAX_LOCAL_DESIGN_DISTANCE: usize = 36;
 const MAX_LOCAL_FILE_DISTANCE: usize = 18;
 
-use crate::count_number::{number_spans, span_distance, span_matches, Span};
+use crate::count_number::{number_spans, span_distance, Span};
+use crate::count_seed_allocation_signals::{design_signal_spans, file_signal_spans};
 
 pub(crate) struct Allocation {
     pub(crate) docs: usize,
@@ -120,13 +121,10 @@ fn local_design_file_score(
         for file in file_signals
             .iter()
             .copied()
-            .filter(|span| number.end <= span.start)
+            .filter(|span| same_local_phrase(objective, design, *span, number))
         {
             let file_distance = span_distance(number, file);
             if file_distance > MAX_LOCAL_FILE_DISTANCE {
-                continue;
-            }
-            if !same_clause(objective, design.end, file.start) {
                 continue;
             }
             let score = design_distance.saturating_add(file_distance);
@@ -134,6 +132,16 @@ fn local_design_file_score(
         }
     }
     best
+}
+
+fn same_local_phrase(text: &str, design: Span, file: Span, number: Span) -> bool {
+    if design.end <= number.start && number.end <= file.start {
+        return same_clause(text, design.end, file.start);
+    }
+    if design.end <= file.start && file.end <= number.start {
+        return same_clause(text, design.end, number.start);
+    }
+    false
 }
 
 fn same_clause(text: &str, start: usize, end: usize) -> bool {
@@ -150,49 +158,4 @@ fn closest_distance(span: Span, signals: &[Span]) -> Option<usize> {
         .iter()
         .map(|signal| span_distance(span, *signal))
         .min()
-}
-
-fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
-    let mut spans = Vec::new();
-    for needle in [
-        "brief",
-        "briefs",
-        "blueprint",
-        "blueprints",
-        "design",
-        "appendix",
-        "appendices",
-        "appendix note",
-        "appendix notes",
-        "memo",
-        "memos",
-        "outline",
-        "outlines",
-        "plan file",
-        "plan files",
-        "planning note",
-        "planning notes",
-        "planning",
-        "spec",
-        "specs",
-        "viewpoint",
-        "viewpoints",
-    ] {
-        spans.extend(span_matches(lower, needle));
-    }
-    for needle in ["設計", "観点", "メモ", "構成案", "章立て", "計画"] {
-        spans.extend(span_matches(content, needle));
-    }
-    spans
-}
-
-fn file_signal_spans(lower: &str, content: &str) -> Vec<Span> {
-    let mut spans = Vec::new();
-    for needle in ["file", "files", "document", "documents", "docs", ".md"] {
-        spans.extend(span_matches(lower, needle));
-    }
-    for needle in ["ファイル", "文書", "ドキュメント", "マークダウン"] {
-        spans.extend(span_matches(content, needle));
-    }
-    spans
 }
