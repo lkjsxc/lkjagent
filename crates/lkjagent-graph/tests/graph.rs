@@ -40,6 +40,19 @@ fn counted_content_deliverable_selects_document_construction() {
 }
 
 #[test]
+fn counted_japanese_story_request_selects_document_construction() {
+    let state = initial_state(
+        "100ファイルぐらいの大きな物語を、設計メモと本文に分けて作って。",
+        Some(10),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert!(state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+}
+
+#[test]
 fn counted_implementation_request_stays_code_change() {
     let state = initial_state("Create exactly 3 files implementing a Rust CLI.", Some(9));
 
