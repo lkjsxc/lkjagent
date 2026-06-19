@@ -68,6 +68,23 @@ fn whitepaper_profiles_as_report() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn training_course_profiles_as_guide() -> TestResult<()> {
+    let workspace = temp_workspace("count-kind-training-course")?;
+    scaffold(
+        &workspace,
+        "Create about 20 files total for a training course pack with lesson plan files.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    assert!(readme.contains("audit this deliverable as a guide"));
+    assert!(first.contains("### Procedure Role"));
+    assert!(first.contains("### Execution Commitments"));
+    Ok(())
+}
+
 fn scaffold(workspace: &Path, objective: &str) -> TestResult<()> {
     scaffold_counted_documents(
         workspace,

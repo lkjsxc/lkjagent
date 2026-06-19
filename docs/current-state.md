@@ -78,8 +78,8 @@ breakdown, machine-readable audit manifest, acceptance audit, and whether the
 guard is exact or approximate.
 Kind profiling recognizes explicit guide and report synonyms before
 narrative terms, ignores negated story-specific constraints, and covers
-manuscript, screenplay, playbook, runbook, whitepaper, dossier, and Japanese
-task terms.
+manuscript, screenplay, playbook, runbook, course, training, whitepaper,
+dossier, and Japanese task terms.
 The graph evidence for that scaffold records `structured-output`, the target
 file count, index file count, design memo count, main file count, root index,
 file-budget status, machine-readable audit-manifest status including
