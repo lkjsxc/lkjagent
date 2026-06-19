@@ -13,7 +13,7 @@ no IPC protocol.
 | `lkjagent run` | Start the daemon in the foreground. Exactly one per store. |
 | `lkjagent send <text>` | Append a user message through lkjagent-store; print its queue id. |
 | `lkjagent status` | Print daemon state, queue depth, open task, question, error, context usage. |
-| `lkjagent log` | Print recent transcript events; `--follow` tails new ones. |
+| `lkjagent log` | Print transcript events; `--limit N` keeps the newest N and `--follow` tails new ones. |
 | `lkjagent console` | Open an interactive owner console with transcript, bottom status deck, and send prompt. |
 | `lkjagent memory <query>` | Search distilled memory through the full-text index. |
 | `lkjagent graph` | Print the active graph case and source graph summary. |
@@ -28,7 +28,7 @@ The owner sends a message and reads the result from the transcript:
 
 ```sh
 lkjagent send "Profile the parser and remove the hot allocation."
-lkjagent log --follow
+lkjagent log --limit 20 --follow
 ```
 
 Completed work appears as agent.done events. Questions from the agent
