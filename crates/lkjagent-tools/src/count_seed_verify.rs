@@ -8,6 +8,7 @@ pub(crate) struct ScaffoldCheck {
     pub(crate) index_files: usize,
     pub(crate) docs_index: &'static str,
     pub(crate) main_index: &'static str,
+    pub(crate) acceptance_audit: &'static str,
     pub(crate) part_ledger: &'static str,
     pub(crate) first_main: &'static str,
     pub(crate) last_main: &'static str,
@@ -26,7 +27,8 @@ pub(crate) fn verify_scaffold(
             "counted document scaffold expected {target} files, got {files}"
         )));
     }
-    require_file(&root.join("README.md"), "root index")?;
+    let root_text = require_text(&root.join("README.md"), "root index")?;
+    let acceptance_audit = verify_acceptance_audit(&root_text)?;
     if docs > 0 {
         require_file(
             &root.join(format!("docs/design-{docs:03}.md")),
@@ -48,6 +50,7 @@ pub(crate) fn verify_scaffold(
         index_files: if indexes { 2 } else { 0 },
         docs_index,
         main_index,
+        acceptance_audit,
         part_ledger,
         first_main,
         last_main,
@@ -91,6 +94,17 @@ fn verify_part_ledger(main_index: Option<&str>, main: usize) -> ToolResult<&'sta
         ));
     }
     Ok("ok")
+}
+
+fn verify_acceptance_audit(root_index: &str) -> ToolResult<&'static str> {
+    if root_index.contains("## Acceptance Audit") || root_index.contains("## 受入監査") {
+        require_contains(root_index, "README.md", "acceptance audit entry point")?;
+        Ok("ok")
+    } else {
+        Err(ToolError::invalid(
+            "counted document scaffold missing acceptance audit",
+        ))
+    }
 }
 
 fn require_file(path: &Path, label: &str) -> ToolResult<()> {
