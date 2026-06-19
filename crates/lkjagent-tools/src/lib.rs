@@ -13,6 +13,7 @@ mod count_profile_data;
 mod count_profile_design;
 mod count_profile_detail;
 mod count_profile_index;
+mod count_profile_kind;
 mod count_profile_passage;
 mod count_profile_thread;
 pub mod count_seed;

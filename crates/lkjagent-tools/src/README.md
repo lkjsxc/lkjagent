@@ -21,6 +21,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_profile_design.rs](count_profile_design.rs): counted scaffold design memo bodies.
 - [count_profile_detail.rs](count_profile_detail.rs): counted scaffold per-part content details.
 - [count_profile_index.rs](count_profile_index.rs): counted scaffold index sections.
+- [count_profile_kind.rs](count_profile_kind.rs): counted scaffold kind detection.
 - [count_profile_passage.rs](count_profile_passage.rs): counted scaffold draft passage blocks.
 - [count_profile_thread.rs](count_profile_thread.rs): counted scaffold segment briefs.
 - [count_profile.rs](count_profile.rs): objective profile text for counted scaffolds.

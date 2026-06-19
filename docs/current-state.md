@@ -74,6 +74,9 @@ That scaffold profiles the owner's objective by detected language and broad
 deliverable kind, so the root, docs, and main directories are README-indexed
 within the selected count guard, and the root README records the count
 breakdown, acceptance audit, and whether the guard is exact or approximate.
+Kind profiling recognizes narrative, guide, report, and general deliverables
+with practical synonyms such as manuscript, screenplay, playbook, runbook,
+whitepaper, dossier, and their Japanese task terms.
 The graph evidence for that scaffold records `structured-output`, the target
 file count, index file count, design memo count, main file count, root index,
 directory index, acceptance-audit status, first and last main, part-ledger
