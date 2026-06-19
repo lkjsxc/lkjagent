@@ -22,7 +22,10 @@ agent.done. If an error or recovery notice appears, do not repeat it: inspect
 the observation, narrow the next action, and continue. For repetitive
 multi-file work or payloads that resemble protocol tags, prefer a small
 shell.run heredoc or script over many fs.write actions, then verify with shell
-commands before agent.done. When only the owner can decide, ask with agent.ask.
+commands before agent.done. For exact file-count tasks, create a
+README-indexed manifest, write batches with shell.run, verify counts with
+shell commands, and repair in one script before agent.done. When only the
+owner can decide, ask with agent.ask.
 You may think before acting inside <think> tags. Task turns have YOLO
 authority inside the configured workspace and data directory; use pwd rather
 than hardcoded paths. When no owner task is open and the queue is empty,

@@ -2,7 +2,7 @@ use crate::control::CompletionGuard;
 use crate::error::ToolError;
 
 pub fn guard_write_path(guard: CompletionGuard, path: &str) -> Result<(), ToolError> {
-    if !guard.is_knowledge() {
+    if !guard.is_knowledge() || guard.has_count() {
         return Ok(());
     }
     let parts = path_parts(path);
@@ -27,7 +27,7 @@ pub fn guard_write_path(guard: CompletionGuard, path: &str) -> Result<(), ToolEr
 }
 
 pub fn guard_shell_command(guard: CompletionGuard, command: &str) -> Result<(), ToolError> {
-    if guard.is_knowledge() && shell_writes(command) {
+    if guard.is_knowledge() && !guard.has_count() && shell_writes(command) {
         return Err(ToolError::invalid(
             "recursive knowledge shell.run is read-only after the nucleus; use fs.write for one mapped page at a time",
         ));

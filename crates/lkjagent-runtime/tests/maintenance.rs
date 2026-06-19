@@ -59,6 +59,21 @@ fn directive_rotation_uses_stalest_state_stamp() -> TestResult<()> {
 }
 
 #[test]
+fn recent_maintenance_stamps_delay_empty_queue_cycles() -> TestResult<()> {
+    let conn = store()?;
+    for directive in Directive::all() {
+        stamp_directive(&conn, *directive, "100")?;
+    }
+
+    let delayed = prepare_idle_cycle(&conn, &runtime_state()?, "120")?;
+    assert!(matches!(delayed, BoundaryDecision::NotIdle));
+
+    let ready = prepare_idle_cycle(&conn, &runtime_state()?, "160")?;
+    assert!(matches!(ready, BoundaryDecision::StartCycle { .. }));
+    Ok(())
+}
+
+#[test]
 fn queue_preempts_at_boundary_not_mid_turn() -> TestResult<()> {
     let started = start_cycle(Directive::Distill, 3)?;
     let acting = step(

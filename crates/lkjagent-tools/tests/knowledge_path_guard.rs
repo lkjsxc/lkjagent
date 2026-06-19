@@ -49,6 +49,37 @@ fn recursive_knowledge_refuses_duplicate_docs_roots() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn counted_recursive_knowledge_allows_batch_writes() -> TestResult<()> {
+    let workspace = temp_workspace("knowledge-count-guard")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+    state
+        .control
+        .start_task("百科事典を再帰的な構造で合計100ファイル作ってください");
+
+    let mkdir = dispatch(
+        &action("shell.run", &[("command", "mkdir -p docs/ontology")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+    assert!(!is_error(&mkdir));
+
+    let write = dispatch(
+        &action(
+            "fs.write",
+            &[("path", "docs/ontology/README.md"), ("content", "# Ok\n")],
+        ),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+    assert!(!is_error(&write));
+    Ok(())
+}
+
 fn git_probe() -> &'static str {
     "git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git status --short || printf 'git=absent\\n'"
 }

@@ -14,6 +14,7 @@ mod compact;
 mod cycle;
 mod frames;
 mod graph_output;
+mod graph_phase;
 mod output;
 mod turn;
 

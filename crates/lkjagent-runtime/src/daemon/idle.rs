@@ -14,6 +14,7 @@ impl ResidentDaemon {
     ) -> RuntimeResult<Option<DaemonTick>> {
         match prepare_idle_cycle(conn, &self.state, now)? {
             BoundaryDecision::StartCycle { directive, budget } => {
+                self.dispatch_state.reset_repeat_tracking();
                 self.dispatch_state.control.resume_task();
                 let result = step(
                     self.state.clone(),

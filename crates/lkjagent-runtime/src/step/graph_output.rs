@@ -1,13 +1,12 @@
 use lkjagent_context::assemble::append_frame;
-use lkjagent_graph::{
-    completion_decision, EvidenceKind, GraphNodeId, TaskGraphState, TaskPhase, TransitionDecision,
-};
+use lkjagent_graph::{EvidenceKind, TaskGraphState};
 use lkjagent_protocol::Action;
 use lkjagent_tools::dispatch::DispatchOutput;
 use lkjagent_tools::observe::OutputKind;
 
 use crate::graph_state::{evidence_record, graph_notice_frame, status_str};
 use crate::step::action_params::action_param;
+use crate::step::graph_phase::{evidence_kind_for, refresh_graph_phase};
 use crate::step::Effect;
 use crate::task::{PendingAction, RuntimeState};
 
@@ -55,7 +54,19 @@ fn add_tool_evidence(
                 None,
                 effects,
             );
-            observed || verified
+            let structured = if shell_document_structure(&pending.action, output) {
+                ensure_evidence(
+                    graph,
+                    "document-structure",
+                    EvidenceKind::File,
+                    output,
+                    None,
+                    effects,
+                )
+            } else {
+                false
+            };
+            observed || verified || structured
         }
         "fs.read" | "fs.write" | "fs.edit" | "memory.find" | "memory.save" => {
             let path = action_param(&pending.action, "path");
@@ -71,6 +82,14 @@ fn add_tool_evidence(
         }
         _ => false,
     }
+}
+
+fn shell_document_structure(action: &Action, output: &DispatchOutput) -> bool {
+    let command = action_param(action, "command").to_ascii_lowercase();
+    let content = output.content.to_ascii_lowercase();
+    command.contains("readme.md")
+        || content.contains("files=")
+        || content.contains("markdown_files=")
 }
 
 fn add_explicit_graph_evidence(
@@ -158,43 +177,5 @@ fn push_case_update(graph: &TaskGraphState, effects: &mut Vec<Effect>) {
             active_node: graph.active_node.0.to_string(),
             status: status_str(graph.status).to_string(),
         });
-    }
-}
-
-fn refresh_graph_phase(graph: &mut TaskGraphState) {
-    match completion_decision(graph) {
-        TransitionDecision::Admit { .. } => {
-            graph.phase = TaskPhase::Completion;
-            graph.active_node = GraphNodeId("complete");
-        }
-        TransitionDecision::Defer { .. } => {
-            if has_evidence(graph, "verification") {
-                graph.phase = TaskPhase::Verification;
-                graph.active_node = GraphNodeId("verify");
-            } else {
-                graph.phase = TaskPhase::Execution;
-                graph.active_node = GraphNodeId("execute");
-            }
-        }
-        TransitionDecision::Recover { .. } | TransitionDecision::Refuse { .. } => {
-            graph.phase = TaskPhase::Recovery;
-            graph.active_node = GraphNodeId("recover");
-        }
-    }
-}
-
-fn has_evidence(graph: &TaskGraphState, requirement: &str) -> bool {
-    graph
-        .evidence
-        .iter()
-        .any(|evidence| evidence.requirement == requirement)
-}
-
-fn evidence_kind_for(requirement: &str) -> EvidenceKind {
-    match requirement {
-        "verification" => EvidenceKind::Verification,
-        "document-structure" => EvidenceKind::File,
-        "plan" => EvidenceKind::Note,
-        _ => EvidenceKind::Observation,
     }
 }
