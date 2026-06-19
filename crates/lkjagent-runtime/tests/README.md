@@ -12,6 +12,8 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [budget_recovery.rs](budget_recovery.rs): exhausted task budget waiting and owner-send resume fixtures.
 - [daemon_loop.rs](daemon_loop.rs): resident queue, endpoint, tool, ask, and error fixtures.
 - [endpoint_retry.rs](endpoint_retry.rs): endpoint backoff deadline fixture.
+- [file_count_aggregate_daemon.rs](file_count_aggregate_daemon.rs): aggregate count auto-scaffold fixture.
+- [file_count_daemon.rs](file_count_daemon.rs): counted file daemon fixtures.
 - [owner_guidance.rs](owner_guidance.rs): queued owner guidance guard persistence fixture.
 - [prompt_daemon.rs](prompt_daemon.rs): prompt, startup, lock, and shutdown fixtures.
 - [recursive_guard.rs](recursive_guard.rs): guarded recursive-structure daemon fixture.
