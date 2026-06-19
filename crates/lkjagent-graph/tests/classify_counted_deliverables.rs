@@ -51,3 +51,16 @@ fn counted_architecture_artifact_still_selects_document_construction() {
         .selected_packages
         .contains(&"doc-construction".to_string()));
 }
+
+#[test]
+fn counted_body_files_select_document_construction() {
+    let state = initial_state(
+        "Create about 100 files total, split between twenty planning notes and body files.",
+        Some(25),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert!(state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+}
