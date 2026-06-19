@@ -53,9 +53,11 @@ for the next model turn, and keeps working until agent.done, agent.ask, or the
 task budget.
 Task budget exhaustion becomes an observable waiting state with a concrete
 question, and the next owner send resumes the task with a fresh budget.
-When a user task closes, the daemon returns to maintenance on the next empty
-queue boundary instead of stopping permanently. If the loop itself fails,
-stale lock reclaim lets a restarted process continue from durable state.
+When a user task closes, the task summary stamps maintenance directives so
+the daemon shows idle until the maintenance cooldown passes or owner work
+arrives. It then returns to due maintenance instead of stopping permanently.
+If the loop itself fails, stale lock reclaim lets a restarted process continue
+from durable state.
 
 ## Status
 

@@ -83,8 +83,10 @@ not yet populate those links.
 
 Memory remains durable retrieval, but graph cases link evidence and memories.
 Empty queues open bounded graph maintenance cycles in rotation when directives
-are due: distill, refine-skills, prune-memory, and audit-self. Compose wiring
-is implemented.
+are due: distill, refine-skills, prune-memory, and audit-self. Saving a user
+task summary stamps all maintenance directives, so the daemon shows idle after
+task completion until the cooldown passes or owner work arrives. Compose
+wiring is implemented.
 The implementation queue is [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status

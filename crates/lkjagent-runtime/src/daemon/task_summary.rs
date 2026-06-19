@@ -4,6 +4,7 @@ use rusqlite::Connection;
 
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
+use crate::maintenance::defer_all_directives;
 use crate::prompt::token_estimate;
 
 impl ResidentDaemon {
@@ -25,6 +26,7 @@ impl ResidentDaemon {
         store_state::set(conn, "last task summary id", &memory_id.to_string())?;
         store_state::set(conn, "open task", "none")?;
         store_state::delete(conn, "completion guard")?;
+        defer_all_directives(conn, now)?;
         let content = format!("task-summary memory_id={memory_id}\nsummary={summary}");
         append_event(
             conn,

@@ -134,7 +134,7 @@ fn owner_queue_preempts_idle_maintenance_at_turn_boundary() -> TestResult<()> {
 }
 
 #[test]
-fn closed_owner_task_returns_to_maintenance_on_next_empty_boundary() -> TestResult<()> {
+fn closed_owner_task_delays_maintenance_until_cooldown_passes() -> TestResult<()> {
     let mut conn = store()?;
     take_lock(&conn)?;
     queue::enqueue(&mut conn, "write owner file", "owner-send", "101")?;
@@ -153,7 +153,11 @@ fn closed_owner_task_returns_to_maintenance_on_next_empty_boundary() -> TestResu
     assert!(daemon.state.maintenance.is_none());
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
 
-    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Idle);
+    assert!(daemon.state.maintenance.is_none());
+    assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
+
+    assert_eq!(daemon.poll_once(&mut conn, "164")?, DaemonTick::Working);
     assert!(daemon.state.maintenance.is_some());
     assert!(state::get(&conn, "open task")?.is_some_and(|task| task.starts_with("maintenance:")));
     Ok(())

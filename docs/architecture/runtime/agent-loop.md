@@ -70,9 +70,12 @@ saves a task summary, and closes the task without asking the endpoint to
 repeat the same bulk generation.
 
 When no task is open and the queue is empty, the daemon opens a bounded
-graph maintenance case, records `daemon_state=working`, and continues toward
-one concrete improvement or an honest empty-cycle agent.done. Queue arrival
-preempts maintenance at the next turn boundary.
+graph maintenance case only after a directive is due, records
+`daemon_state=working`, and continues toward one concrete improvement or an
+honest empty-cycle agent.done. Task-summary saves defer all directives for
+the maintenance cooldown so a completed owner task returns to visible idle
+before maintenance resumes. Queue arrival preempts maintenance at the next
+turn boundary.
 
 ## Pure Core
 

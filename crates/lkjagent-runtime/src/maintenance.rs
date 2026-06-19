@@ -2,7 +2,7 @@ use crate::task::{RuntimeState, TaskState};
 
 mod store;
 
-pub use store::{load_directive_stamps, prepare_idle_cycle, stamp_directive};
+pub use store::{defer_all_directives, load_directive_stamps, prepare_idle_cycle, stamp_directive};
 
 pub const DEFAULT_MAINTENANCE_TURN_BUDGET: u16 = 8;
 

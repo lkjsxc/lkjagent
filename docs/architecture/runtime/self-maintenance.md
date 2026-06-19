@@ -16,6 +16,9 @@ the maintenance notice and must choose one bounded improvement action or
 close the cycle honestly with agent.done. A new queue row preempts
 maintenance at the next turn boundary before another maintenance endpoint
 turn is sent.
+Saving a user task summary stamps all maintenance directives with the close
+time, so the daemon does not immediately start idle maintenance after a
+successful owner task.
 
 ## Maintenance Directives
 
