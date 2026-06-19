@@ -147,13 +147,24 @@ fn structural_count_anchor(cleaned: &str, lower: &str) -> bool {
     let has_content_word = lower.contains("story")
         || lower.contains("narrative")
         || lower.contains("guide")
+        || lower.contains("manual")
         || lower.contains("report")
+        || lower.contains("procedure")
         || cleaned.contains("物語")
         || cleaned.contains("本文")
         || cleaned.contains("本編")
         || cleaned.contains("成果物");
+    let allocation_only = (lower.starts_with("with ") || lower.starts_with("including "))
+        && has_file_unit
+        && (lower.contains("remaining files")
+            || lower.contains("ordered main")
+            || lower.contains("planning note")
+            || lower.contains("planning notes")
+            || lower.contains("design memo")
+            || lower.contains("design memos"));
     has_file_unit && (cleaned.contains("総数") || cleaned.contains("合わせた"))
         || has_file_unit && has_total_word && !has_content_word
+        || allocation_only
         || cleaned.ends_with("ファイルぐらいで")
         || cleaned.ends_with("ファイル程度で")
         || cleaned.ends_with("ファイルくらいで")

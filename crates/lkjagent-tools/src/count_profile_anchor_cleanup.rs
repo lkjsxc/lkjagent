@@ -1,7 +1,8 @@
 pub(crate) fn trim_count_mechanics(anchor: &str) -> &str {
     let without_create = strip_content_creation_prefix(anchor).trim();
     let without_hyphen = trim_english_count_prefix(without_create).trim();
-    let without_english = trim_english_count_suffix(without_hyphen).trim();
+    let without_parenthetical = trim_english_file_composition_parenthetical(without_hyphen).trim();
+    let without_english = trim_english_count_suffix(without_parenthetical).trim();
     trim_japanese_count_prefix(without_english).trim()
 }
 
@@ -75,6 +76,42 @@ fn trim_english_count_prefix(anchor: &str) -> &str {
         }
     }
     anchor
+}
+
+fn trim_english_file_composition_parenthetical(anchor: &str) -> &str {
+    let trimmed = anchor.trim();
+    if !trimmed.ends_with(')') {
+        return anchor;
+    }
+    let Some(open) = trimmed.rfind('(') else {
+        return anchor;
+    };
+    let inner = &trimmed[open.saturating_add(1)..trimmed.len().saturating_sub(1)];
+    if file_composition_parenthetical(&inner.to_ascii_lowercase()) {
+        trimmed[..open].trim()
+    } else {
+        anchor
+    }
+}
+
+fn file_composition_parenthetical(lower: &str) -> bool {
+    let has_file_unit = lower.contains("file")
+        || lower.contains("document")
+        || lower.contains("docs")
+        || lower.contains("manuscript");
+    let joins_groups = lower.contains("combined")
+        || lower.contains(" plus ")
+        || lower.contains(" and ")
+        || lower.contains('+');
+    let names_main = lower.contains("main")
+        || lower.contains("manuscript")
+        || lower.contains("procedure")
+        || lower.contains("body");
+    let names_support = lower.contains("documentation")
+        || lower.contains("document")
+        || lower.contains("docs")
+        || lower.contains("planning");
+    has_file_unit && joins_groups && names_main && names_support
 }
 
 fn trim_japanese_count_prefix(anchor: &str) -> &str {
