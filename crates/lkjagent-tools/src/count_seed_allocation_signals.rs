@@ -29,6 +29,8 @@ pub(crate) fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
         "risk registers",
         "control mapping",
         "control mappings",
+        "audit finding",
+        "audit findings",
         "design",
         "decision record",
         "decision records",
