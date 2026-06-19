@@ -67,6 +67,8 @@ preserving the exact count.
 When the objective includes a design, memo, or viewpoint count inside a larger
 file-count request, the scaffold uses that count for design memos when the
 exact total can still retain main content.
+File-count wording stays stronger than design wording when scoring allocation
+hints, so total-count numbers are not reused as design memo counts.
 Runtime recovery still uses bounded notices for parse errors, repeated
 actions, tool errors, endpoint max-token exits, budget exhaustion, and context
 pressure; graph recovery nodes are present as the structured target for the

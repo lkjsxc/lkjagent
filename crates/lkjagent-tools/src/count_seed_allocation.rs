@@ -56,22 +56,33 @@ fn bounded_design_count(hint: usize, content: usize) -> Option<usize> {
 
 fn design_count_hint(objective: &str) -> Option<usize> {
     let lower = objective.to_lowercase();
-    let signals = design_signal_spans(&lower, objective);
-    if signals.is_empty() {
+    let design_signals = design_signal_spans(&lower, objective);
+    if design_signals.is_empty() {
         return None;
     }
+    let file_signals = file_signal_spans(&lower, objective);
     number_spans(objective)
         .into_iter()
         .filter(|number| number.value > 0)
         .filter_map(|number| {
-            let score = signals
-                .iter()
-                .map(|signal| span_distance(number.span, *signal))
-                .min()?;
-            (score <= MAX_DESIGN_SIGNAL_DISTANCE).then_some((score, number.value))
+            let score = closest_distance(number.span, &design_signals)?;
+            if score > MAX_DESIGN_SIGNAL_DISTANCE {
+                return None;
+            }
+            if closest_distance(number.span, &file_signals).is_some_and(|file| file < score) {
+                return None;
+            }
+            Some((score, number.value))
         })
         .min_by_key(|(score, value)| (*score, *value))
         .map(|(_, value)| value)
+}
+
+fn closest_distance(span: Span, signals: &[Span]) -> Option<usize> {
+    signals
+        .iter()
+        .map(|signal| span_distance(span, *signal))
+        .min()
 }
 
 fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
@@ -87,6 +98,17 @@ fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
         spans.extend(matches(lower, needle));
     }
     for needle in ["設計", "観点", "メモ"] {
+        spans.extend(matches(content, needle));
+    }
+    spans
+}
+
+fn file_signal_spans(lower: &str, content: &str) -> Vec<Span> {
+    let mut spans = Vec::new();
+    for needle in ["file", "files", "document", "documents", "docs", ".md"] {
+        spans.extend(matches(lower, needle));
+    }
+    for needle in ["ファイル", "文書", "ドキュメント", "マークダウン"] {
         spans.extend(matches(content, needle));
     }
     spans
