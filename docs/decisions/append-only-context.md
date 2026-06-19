@@ -21,7 +21,7 @@ Every byte that enters the window has a budget and an owner per
 
 - Turn latency is dominated by generation, not prompt re-evaluation; the
   configured runtime window on local hardware stays interactive.
-- Skill bodies and observations are immutable once appended; corrections
+- Graph notices and observations are immutable once appended; corrections
   append, never rewrite.
 - Compaction is visible in transcripts as a first-class event, so context
   state is always reconstructible from the store.

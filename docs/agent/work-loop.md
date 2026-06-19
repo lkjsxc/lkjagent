@@ -13,9 +13,8 @@ lives there and is not repeated here.
 2. Take the work: the user-named task, or the first open blocker in
    [../execution/current-blockers.md](../execution/current-blockers.md),
    then open its task file under [../execution/tasks/](../execution/tasks/README.md).
-3. Match a skill in [skills/README.md](skills/README.md) by trigger line;
-   load it and read every file its Context section names before editing
-   anything.
+3. Build the case state: objective, constraints, assumptions, risks, evidence
+   requirements, candidate files, and next action before editing anything.
 4. Write the contract change first: the architecture or product doc, the
    decision record when a settled decision moves, and
    [../current-state.md](../current-state.md) in the same change.
@@ -43,9 +42,8 @@ lives there and is not repeated here.
 
 ## Self-Maintenance Sessions
 
-When explicitly asked to maintain rather than build, mirror the runtime's directives
-from [../architecture/runtime/self-maintenance.md](../architecture/runtime/self-maintenance.md):
-sharpen a stale skill against recent session evidence, prune contradictions
-between docs, or distill recurring friction into a skill. The
-[skills/agent-maintenance.md](skills/agent-maintenance.md) skill owns the
-procedure.
+When explicitly asked to maintain rather than build, mirror the runtime's
+directives from
+[../architecture/runtime/self-maintenance.md](../architecture/runtime/self-maintenance.md):
+improve graph policy against recent evidence, prune contradictions between
+docs, or distill recurring friction into reusable memory.

@@ -38,7 +38,7 @@ per [../context/budgets.md](../context/budgets.md).
 ./data, so the store, workspace, and config survive image rebuilds and
 container replacement as ordinary host files. Snapshotting the host
 directory is the owner's rollback mechanism per [safety.md](safety.md).
-Runtime skills are image or source content, not mounted data.
+Source graph definitions are image or source content, not mounted data.
 
 ## Status
 

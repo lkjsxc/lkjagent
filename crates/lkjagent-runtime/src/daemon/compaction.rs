@@ -126,11 +126,7 @@ impl ResidentDaemon {
             |cycle| cycle.before_tokens,
         );
         let (summary, memory_ids) = self.compaction_summary_rows(conn, now, reason, before)?;
-        let prefix = super::startup::build_prefix_from_store(
-            conn,
-            &self.runtime.tools.skill_library,
-            &self.runtime.tools.workspace,
-        )?;
+        let prefix = super::startup::build_prefix_from_store(conn, &self.runtime.tools.workspace)?;
         let rendered = render_notice("compaction", &summary);
         let frame = Frame::new(
             FrameKind::Notice(NoticeKind::Compaction),

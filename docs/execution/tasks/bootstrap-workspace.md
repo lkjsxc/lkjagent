@@ -26,7 +26,7 @@ Nothing. First blocker.
 - Cargo.toml (new): workspace members, shared lints (clippy unwrap_used,
   expect_used, panic, todo, unimplemented denied for product crates),
   shared profile.
-- crates/lkjagent-{protocol,context,store,llm,skills,tools,runtime,cli,xtask}/
+- crates/lkjagent-{protocol,graph,context,store,llm,tools,runtime,cli,xtask}/
   (new): each with Cargo.toml, src/lib.rs or src/main.rs containing only
   what compiles honestly (type and module declarations belong to later
   tasks; an empty lib is honest, a stubbed function is not), and README.md

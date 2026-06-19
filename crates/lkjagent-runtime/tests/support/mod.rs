@@ -18,7 +18,7 @@ pub type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 pub fn prefix() -> TestResult<Vec<Frame>> {
     Ok(build_prefix(&PromptInputs {
-        skill_index: "demo-skill: test trigger.".to_string(),
+        graph_state: "case=none\nphase=waiting\nnode=classify".to_string(),
         workspace_brief: "workspace brief".to_string(),
         memory_digest: "memory digest".to_string(),
     })?)
@@ -102,16 +102,8 @@ pub fn temp_workspace(name: &str) -> TestResult<PathBuf> {
     Ok(path)
 }
 
-pub fn seed_skill_path() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../lkjagent-skills/seeds")
-}
-
 pub fn tool_runtime(workspace: PathBuf) -> TestResult<ToolRuntime> {
-    Ok(ToolRuntime::new(
-        workspace,
-        seed_skill_path(),
-        "2026-01-01T00:00:00Z",
-    ))
+    Ok(ToolRuntime::new(workspace, "2026-01-01T00:00:00Z"))
 }
 
 pub fn dispatch_state() -> DispatchState {

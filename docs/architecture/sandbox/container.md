@@ -15,7 +15,7 @@ needs:
 - the lkjagent binary,
 - busybox-class core utilities,
 - git, curl, and ripgrep,
-- the seed skill files under /usr/local/share/lkjagent/skills.
+- source graph definitions compiled into lkjagent-graph.
 
 Nothing else is promised. The entrypoint prepares /data ownership, then runs
 the requested command as the non-root user named agent. There is no docker

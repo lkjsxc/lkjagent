@@ -19,9 +19,7 @@ done with Make repository gates enforce their contracts
 - [../../operations/verification.md](../../operations/verification.md)
 - [../../repository/documentation-standards.md](../../repository/documentation-standards.md)
 - [../../repository/line-limits.md](../../repository/line-limits.md)
-- [../../architecture/skills/format.md](../../architecture/skills/format.md)
 - [README.md](README.md) (the task template check-docs must enforce)
-- [../../agent/skills/verification-gate.md](../../agent/skills/verification-gate.md)
 
 ## Files To Touch
 
@@ -47,7 +45,7 @@ cargo run -p lkjagent-xtask -- quiet verify
 - Fixture tests cover every violation class with exact-message assertions.
 - check-docs enforces: H1-Purpose shape, README topology and TOC
   completeness, the All Files manifest, ASCII, prose width, banned tokens,
-  skill shape (both libraries), task shape, crate README coverage.
+  task shape and crate README coverage.
 - Blocker row 2 done; verification.md Status moves to implemented.
   The compose final gate task owns the CI workflow.
 

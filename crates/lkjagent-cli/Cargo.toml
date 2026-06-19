@@ -14,8 +14,8 @@ workspace = true
 
 [dependencies]
 lkjagent-context = { path = "../lkjagent-context" }
+lkjagent-graph = { path = "../lkjagent-graph" }
 lkjagent-runtime = { path = "../lkjagent-runtime" }
-lkjagent-skills = { path = "../lkjagent-skills" }
 lkjagent-store = { path = "../lkjagent-store" }
 rusqlite = { version = "0.40.1", features = ["bundled"] }
 serde_json = "1"

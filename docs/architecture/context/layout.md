@@ -12,13 +12,13 @@ chat-completions message list.
 | prefix   (one system message, stable)             |
 |   identity and rules                              |
 |   protocol grammar and tool registry              |
-|   skill index (name + trigger per skill)          |
+|   graph state (case, phase, packages, evidence)   |
 |   workspace brief (the workspace's AGENTS.md)     |
 |   memory digest (rebuilt only at compaction)      |
 +--------------------------------------------------+
 | log      (appended messages, never edited)        |
 |   owner frames, action turns, observations,       |
-|   notices, loaded skill bodies                    |
+|   notices, graph evidence updates                 |
 +--------------------------------------------------+
 | reserve  (generation headroom, never occupied)    |
 +--------------------------------------------------+
@@ -36,7 +36,7 @@ The reserve is subtracted before any budget math.
 | observation | user | `<observation>` block per [../tools/registry.md](../tools/registry.md) |
 | owner message | user | `<owner>` block per [../runtime/queue-intake.md](../runtime/queue-intake.md) |
 | notice | user | `<notice>` block, kinds in [hygiene.md](hygiene.md) |
-| skill body | user | `<skill>` block per [../skills/loading.md](../skills/loading.md) |
+| graph notice | user | `<notice>` block derived from [../state-graph/task-state.md](../state-graph/task-state.md) |
 
 Consecutive harness frames between two model turns are concatenated into one
 user message in arrival order, so the list strictly alternates assistant and

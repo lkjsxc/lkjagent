@@ -5,13 +5,12 @@ pub const WINDOW_TOKENS: usize = DEFAULT_WINDOW_TOKENS;
 pub const GENERATION_RESERVE: usize = DEFAULT_GENERATION_RESERVE;
 pub const PREFIX_IDENTITY: usize = 768;
 pub const PREFIX_GRAMMAR_REGISTRY: usize = 1_024;
-pub const PREFIX_SKILL_INDEX: usize = 512;
+pub const PREFIX_GRAPH_STATE: usize = 512;
 pub const PREFIX_WORKSPACE_BRIEF: usize = 1_024;
 pub const PREFIX_MEMORY_DIGEST: usize = 2_048;
 pub const LOG_OWNER_FRAME: usize = 4_096;
 pub const LOG_OBSERVATION: usize = 2_048;
-pub const LOG_SKILL_BODY: usize = 2_048;
-pub const LOG_LOADED_SKILLS: usize = 6_144;
+pub const LOG_GRAPH_NOTICE: usize = 2_048;
 pub const DEFAULT_SOFT_TRIGGER: usize = 18_432;
 pub const DEFAULT_HARD_TRIGGER: usize = 21_504;
 pub const DEFAULT_POST_COMPACTION_TARGET: usize = 8_192;
@@ -39,8 +38,8 @@ pub const BUDGET_ROWS: &[BudgetRow] = &[
         cap: PREFIX_GRAMMAR_REGISTRY,
     },
     BudgetRow {
-        region: "prefix: skill index",
-        cap: PREFIX_SKILL_INDEX,
+        region: "prefix: graph state",
+        cap: PREFIX_GRAPH_STATE,
     },
     BudgetRow {
         region: "prefix: workspace brief",
@@ -59,12 +58,8 @@ pub const BUDGET_ROWS: &[BudgetRow] = &[
         cap: LOG_OBSERVATION,
     },
     BudgetRow {
-        region: "log: skill body",
-        cap: LOG_SKILL_BODY,
-    },
-    BudgetRow {
-        region: "log: loaded skills concurrent",
-        cap: LOG_LOADED_SKILLS,
+        region: "log: graph notice",
+        cap: LOG_GRAPH_NOTICE,
     },
     BudgetRow {
         region: "soft compaction trigger",
@@ -83,7 +78,7 @@ pub const BUDGET_ROWS: &[BudgetRow] = &[
 pub fn prefix_cap_total() -> usize {
     PREFIX_IDENTITY
         + PREFIX_GRAMMAR_REGISTRY
-        + PREFIX_SKILL_INDEX
+        + PREFIX_GRAPH_STATE
         + PREFIX_WORKSPACE_BRIEF
         + PREFIX_MEMORY_DIGEST
 }

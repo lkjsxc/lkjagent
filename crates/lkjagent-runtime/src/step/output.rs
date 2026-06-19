@@ -1,13 +1,15 @@
 use lkjagent_context::assemble::append_frame;
 use lkjagent_context::model::{ContextState, Frame, FrameKind, NoticeKind};
-use lkjagent_protocol::render_notice;
-use lkjagent_protocol::Action;
+use lkjagent_graph::{CaseStatus, GraphNodeId, TaskPhase};
+use lkjagent_protocol::{render_notice, Action};
 use lkjagent_store::events::EventKind;
 use lkjagent_tools::dispatch::DispatchOutput;
 use lkjagent_tools::observe::OutputKind;
 
+use crate::graph_state::status_str;
 use crate::maintenance::task_distillation_prompt;
 use crate::prompt::token_estimate;
+use crate::step::action_params::action_param;
 use crate::step::Effect;
 use crate::task::{PendingAction, RuntimeState, StopReason, TaskState};
 
@@ -15,7 +17,6 @@ pub(super) fn append_output_frame(context: &ContextState, output: &DispatchOutpu
     let kind = match output.kind {
         OutputKind::Observation { .. } => FrameKind::Observation,
         OutputKind::Notice { .. } => FrameKind::Notice(NoticeKind::Error),
-        OutputKind::Skill { .. } => FrameKind::SkillBody,
     };
     append_frame(
         context,
@@ -31,7 +32,6 @@ pub(super) fn event_kind(kind: &OutputKind) -> EventKind {
     match kind {
         OutputKind::Observation { .. } => EventKind::Observation,
         OutputKind::Notice { .. } => EventKind::Notice,
-        OutputKind::Skill { .. } => EventKind::Observation,
     }
 }
 
@@ -89,6 +89,19 @@ fn close_task(
         prompt,
         max_turns: 2,
     });
+    if let Some(graph) = state.graph.as_mut() {
+        graph.status = CaseStatus::Closed;
+        graph.phase = TaskPhase::Closed;
+        graph.active_node = GraphNodeId("complete");
+        if let Some(case_id) = graph.case_id {
+            effects.push(Effect::UpdateGraphCase {
+                case_id,
+                phase: graph.phase.as_str().to_string(),
+                active_node: graph.active_node.0.to_string(),
+                status: status_str(graph.status).to_string(),
+            });
+        }
+    }
     Some(StopReason::Done)
 }
 
@@ -114,12 +127,4 @@ fn wait_for_owner(state: &mut RuntimeState, action: &Action) -> Option<StopReaso
         question: action_param(action, "question"),
     };
     Some(StopReason::Ask)
-}
-
-fn action_param(action: &Action, name: &str) -> String {
-    action
-        .params
-        .iter()
-        .find(|param| param.name == name)
-        .map_or_else(String::new, |param| param.value.clone())
 }

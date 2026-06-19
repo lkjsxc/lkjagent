@@ -154,7 +154,7 @@ fn over_budget_state_rebuilds_under_target_with_summary_at_log_head() {
             "grammar",
             1_024,
         ),
-        Frame::new(FrameKind::Prefix(PrefixSection::SkillIndex), "skills", 512),
+        Frame::new(FrameKind::Prefix(PrefixSection::GraphState), "graph", 512),
         Frame::new(
             FrameKind::Prefix(PrefixSection::WorkspaceBrief),
             "workspace",

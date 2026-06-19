@@ -26,13 +26,7 @@ pub fn temp_workspace(name: &str) -> TestResult<PathBuf> {
 }
 
 pub fn runtime(workspace: PathBuf) -> TestResult<ToolRuntime> {
-    let skill_library = workspace.join("skills");
-    fs::create_dir_all(&skill_library)?;
-    Ok(ToolRuntime::new(
-        workspace,
-        skill_library,
-        "2026-01-01T00:00:00Z",
-    ))
+    Ok(ToolRuntime::new(workspace, "2026-01-01T00:00:00Z"))
 }
 
 pub fn store() -> TestResult<Connection> {
@@ -54,64 +48,3 @@ pub fn action(tool: &str, params: &[(&str, &str)]) -> Action {
             .collect(),
     )
 }
-
-pub fn valid_skill(name: &str) -> &'static str {
-    match name {
-        "Demo Skill" => DEMO_SKILL,
-        _ => OTHER_SKILL,
-    }
-}
-
-const DEMO_SKILL: &str = "# Skill: Demo Skill
-
-## Purpose
-
-Exercise the skill runtime.
-
-## Trigger
-
-A test needs a valid demo skill.
-
-## Context
-
-- No additional context.
-
-## Procedure
-
-1. Run `pwd`.
-
-## Checks
-
-- `pwd` prints the workspace.
-
-## Must Not
-
-- Do not mutate unrelated files.
-";
-
-const OTHER_SKILL: &str = "# Skill: Other Skill
-
-## Purpose
-
-Exercise the skill budget path.
-
-## Trigger
-
-A test needs a second valid skill.
-
-## Context
-
-- No additional context.
-
-## Procedure
-
-1. Run `pwd`.
-
-## Checks
-
-- `pwd` prints the workspace.
-
-## Must Not
-
-- Do not mutate unrelated files.
-";

@@ -1,7 +1,7 @@
 mod support;
 
 use lkjagent_context::budget::{
-    PREFIX_GRAMMAR_REGISTRY, PREFIX_IDENTITY, PREFIX_MEMORY_DIGEST, PREFIX_SKILL_INDEX,
+    PREFIX_GRAMMAR_REGISTRY, PREFIX_GRAPH_STATE, PREFIX_IDENTITY, PREFIX_MEMORY_DIGEST,
     PREFIX_WORKSPACE_BRIEF,
 };
 use lkjagent_context::model::{FrameKind, PrefixSection};
@@ -13,12 +13,12 @@ use lkjagent_runtime::prompt::{build_prefix, PromptInputs};
 use lkjagent_runtime::task::TaskState;
 use lkjagent_store::events::read_events;
 use lkjagent_store::memory::{save, MemoryKind};
-use support::{prefix, seed_skill_path, store, temp_workspace, TestResult};
+use support::{prefix, store, temp_workspace, TestResult};
 
 #[test]
 fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
     let inputs = PromptInputs {
-        skill_index: "demo-skill: test trigger.".to_string(),
+        graph_state: "case=1\nphase=planning\nnode=plan".to_string(),
         workspace_brief: "workspace brief".to_string(),
         memory_digest: "memory digest".to_string(),
     };
@@ -27,18 +27,18 @@ fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
     assert_eq!(first, second);
     assert!(first.iter().any(|frame| frame
         .content
-        .contains("continue with a\nnarrower action instead of agent.done")));
-    assert!(first.iter().any(|frame| frame
-        .content
-        .contains("follow the maintenance notice's bounded work")));
-    assert!(first.iter().any(|frame| frame
-        .content
-        .contains("prefer a small shell.run heredoc or script")));
+        .contains("Do not\nact directly from the first owner message")));
+    assert!(first
+        .iter()
+        .any(|frame| frame.content.contains("bounded graph-maintenance work")));
+    assert!(first
+        .iter()
+        .any(|frame| frame.content.contains("shell.run heredoc or script")));
     for frame in first {
         let cap = match frame.kind {
             FrameKind::Prefix(PrefixSection::Identity) => PREFIX_IDENTITY,
             FrameKind::Prefix(PrefixSection::GrammarRegistry) => PREFIX_GRAMMAR_REGISTRY,
-            FrameKind::Prefix(PrefixSection::SkillIndex) => PREFIX_SKILL_INDEX,
+            FrameKind::Prefix(PrefixSection::GraphState) => PREFIX_GRAPH_STATE,
             FrameKind::Prefix(PrefixSection::WorkspaceBrief) => PREFIX_WORKSPACE_BRIEF,
             FrameKind::Prefix(PrefixSection::MemoryDigest) => PREFIX_MEMORY_DIGEST,
             _ => 0,
@@ -64,7 +64,7 @@ fn startup_trims_rendered_memory_digest_to_prefix_budget() -> TestResult<()> {
         )?;
     }
     let workspace = temp_workspace("digest-budget")?;
-    let prefix = build_prefix_from_store(&conn, &seed_skill_path(), &workspace)?;
+    let prefix = build_prefix_from_store(&conn, &workspace)?;
     let memory = prefix
         .iter()
         .find(|frame| frame.kind == FrameKind::Prefix(PrefixSection::MemoryDigest))

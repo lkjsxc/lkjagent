@@ -36,7 +36,7 @@ Everything else follows from that rule.
 | compaction | the prefix is rebuilt by design | per [compaction.md](compaction.md) trigger |
 | daemon restart | prefix rebuilt from durable state | rare |
 | config change | model, sampling, or budget change | requires restart, owner-driven |
-| source skill changed | index changes arrive with restart or prefix rebuild | never mid-session |
+| source graph changed | graph slice changes arrive with restart or prefix rebuild | never mid-session |
 
 Anything else that would invalidate the cache is a bug. The context engine
 asserts append-only serialization in tests by diffing consecutive request

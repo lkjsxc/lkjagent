@@ -28,17 +28,18 @@ pulls the daemon out of idle or waiting at the next turn boundary.
 ## Startup
 
 On startup the daemon opens the store, replays nothing, and rebuilds its
-context prefix from durable state: system prompt, memory digest, skill index,
+context prefix from durable state: system prompt, graph state, memory digest,
 and the workspace brief. If a task was open when the process stopped, the
-task resumes from stored task state and summaries, not from a raw replay. Startup is
-specified in [../architecture/runtime/daemon-process.md](../architecture/runtime/daemon-process.md).
+task resumes from graph case state and evidence, not from a raw replay.
+Startup is specified in
+[../architecture/runtime/daemon-process.md](../architecture/runtime/daemon-process.md).
 
 ## Shutdown
 
 Stopping the container ends the process. In-flight endpoint calls are not
 drained by a custom signal handler. Queue rows, transcript events, memory,
-and workspace state are durable in data; skills are durable source or image
-content. A restarted daemon reclaims a stale lock after the heartbeat
+graph cases, evidence, memory, and workspace state are durable in data. A
+restarted daemon reclaims a stale lock after the heartbeat
 exceeds the configured stale window.
 
 ## Failure

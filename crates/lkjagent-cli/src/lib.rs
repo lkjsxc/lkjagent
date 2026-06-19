@@ -3,12 +3,12 @@ pub mod config;
 pub mod console;
 pub mod env_file;
 pub mod error;
+pub mod graph;
 pub mod log;
 pub mod memory;
 pub mod paths;
 pub mod run;
 pub mod send;
-pub mod skills;
 pub mod status;
 pub mod store;
 
@@ -70,6 +70,6 @@ where
         Command::Log { follow, full } => log::log(&invocation.data_dir, follow, full),
         Command::Console => console::console(&invocation.data_dir),
         Command::Memory { query } => memory::memory(&invocation.data_dir, &query),
-        Command::Skills => skills::skills(),
+        Command::Graph => graph::graph(&invocation.data_dir),
     }
 }

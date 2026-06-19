@@ -1,39 +1,12 @@
 use std::collections::BTreeSet;
 
-use lkjagent_skills::model::SkillSource;
-use lkjagent_skills::validate::validate;
-
 use crate::model::{RepoFile, Violation};
 
 pub fn check_special_docs(files: &[RepoFile]) -> Vec<Violation> {
     let mut violations = Vec::new();
-    violations.extend(check_skill_shapes(files));
     violations.extend(check_task_shapes(files));
     violations.extend(check_crate_readmes(files));
     violations
-}
-
-fn check_skill_shapes(files: &[RepoFile]) -> Vec<Violation> {
-    let mut violations = Vec::new();
-    let known_paths: BTreeSet<String> = files.iter().map(|file| file.path.clone()).collect();
-    for file in files.iter().filter(|file| is_skill(file)) {
-        let source = SkillSource {
-            path: &file.path,
-            text: &file.text,
-            known_paths: &known_paths,
-        };
-        for violation in validate(&source).violations {
-            violations.push(Violation::new(&file.path, "skill shape", violation.message));
-        }
-    }
-    violations
-}
-
-fn is_skill(file: &RepoFile) -> bool {
-    (file.path.starts_with("docs/agent/skills/")
-        || file.path.starts_with("crates/lkjagent-skills/seeds/"))
-        && file.path.ends_with(".md")
-        && !file.path.ends_with("/README.md")
 }
 
 fn headings(file: &RepoFile) -> Vec<String> {

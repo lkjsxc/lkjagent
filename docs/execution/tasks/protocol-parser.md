@@ -3,7 +3,7 @@
 ## Purpose
 
 Implement lkjagent-protocol: the pure parser from completion text to one
-action, the renderer for observation, notice, owner, and skill frames, and
+action, the renderer for observation, notice, owner, and graph frames, and
 the fixture table both are tested against.
 
 ## Status
@@ -21,7 +21,6 @@ done with Implement strict action parser and renderer
 - [../../architecture/protocol/parsing.md](../../architecture/protocol/parsing.md)
 - [../../architecture/protocol/recovery.md](../../architecture/protocol/recovery.md)
 - [../../architecture/tools/registry.md](../../architecture/tools/registry.md)
-- [../../agent/skills/protocol-change.md](../../agent/skills/protocol-change.md)
 
 ## Files To Touch
 

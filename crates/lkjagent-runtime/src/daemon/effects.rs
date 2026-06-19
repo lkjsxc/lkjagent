@@ -73,6 +73,38 @@ impl ResidentDaemon {
                 self.save_task_summary(conn, now, &summary)?;
                 Ok(None)
             }
+            Effect::RecordGraphEvidence {
+                case_id,
+                requirement,
+                kind,
+                summary,
+                path,
+            } => {
+                let evidence = lkjagent_store::graph::GraphEvidenceRow {
+                    requirement,
+                    kind,
+                    summary,
+                    path,
+                };
+                lkjagent_store::graph::record_evidence(conn, case_id, &evidence, now)?;
+                Ok(None)
+            }
+            Effect::UpdateGraphCase {
+                case_id,
+                phase,
+                active_node,
+                status,
+            } => {
+                lkjagent_store::graph::update_case(
+                    conn,
+                    case_id,
+                    &phase,
+                    &active_node,
+                    &status,
+                    now,
+                )?;
+                Ok(None)
+            }
             Effect::Pause { reason } => {
                 store_state::set(conn, "daemon error", &reason)?;
                 Ok(Some(DaemonTick::Paused))
@@ -101,6 +133,7 @@ impl ResidentDaemon {
         let output = if self.state.compaction.is_some() && pending.action.tool != "memory.save" {
             blocked_compaction_output(&mut self.dispatch_state, action_text)
         } else {
+            self.sync_graph_dispatch_state();
             dispatch_with_text(
                 &pending.action,
                 action_text,
@@ -126,36 +159,6 @@ impl ResidentDaemon {
         }
         Ok(Some(tick))
     }
-
-    fn save_task_summary(
-        &mut self,
-        conn: &mut Connection,
-        now: &str,
-        summary: &str,
-    ) -> RuntimeResult<()> {
-        let memory_id = lkjagent_store::memory::save(
-            conn,
-            lkjagent_store::memory::MemoryKind::TaskSummary,
-            &summary_title(summary),
-            "task",
-            summary,
-            token_estimate(summary) as i64,
-            now,
-        )?;
-        store_state::set(conn, "last task summary id", &memory_id.to_string())?;
-        store_state::set(conn, "open task", "none")?;
-        store_state::delete(conn, "completion guard")?;
-        let content = format!("task-summary memory_id={memory_id}\nsummary={summary}");
-        append_event(
-            conn,
-            self.event_turn(),
-            EventKind::Notice,
-            &content,
-            token_estimate(&content) as i64,
-            now,
-        )?;
-        Ok(())
-    }
 }
 
 fn tick_for_stop(stop: Option<StopReason>) -> DaemonTick {
@@ -171,14 +174,4 @@ fn tick_for_stop(stop: Option<StopReason>) -> DaemonTick {
         Some(StopReason::ToolError | StopReason::RepeatAction) => DaemonTick::Working,
         None => DaemonTick::Working,
     }
-}
-
-fn summary_title(summary: &str) -> String {
-    let first = summary
-        .lines()
-        .next()
-        .map(str::trim)
-        .filter(|line| !line.is_empty())
-        .unwrap_or("closed task");
-    first.chars().take(80).collect()
 }

@@ -4,7 +4,7 @@ use std::time::Duration;
 use crate::config::RuntimeConfig;
 use crate::config::{load_or_initialize, ConfigLoad};
 use crate::error::CliError;
-use crate::paths::{skill_library, workspace};
+use crate::paths::workspace;
 use crate::store::{now_stamp, open_store};
 
 pub fn run(data_dir: &Path) -> Result<String, CliError> {
@@ -27,9 +27,7 @@ pub fn run(data_dir: &Path) -> Result<String, CliError> {
         | lkjagent_runtime::daemon::StartupLock::Reclaimed { .. } => {
             lkjagent_store::state::set(&conn, "daemon state", "idle")?;
             lkjagent_store::state::set(&conn, "endpoint model", &config.endpoint_model)?;
-            let skills = skill_library();
-            let prefix =
-                lkjagent_runtime::daemon::build_prefix_from_store(&conn, &skills, &workspace)?;
+            let prefix = lkjagent_runtime::daemon::build_prefix_from_store(&conn, &workspace)?;
             let mut state = lkjagent_runtime::daemon::startup_state(
                 prefix,
                 lkjagent_runtime::daemon::startup_summary(&conn)?,
@@ -39,7 +37,6 @@ pub fn run(data_dir: &Path) -> Result<String, CliError> {
                 holder,
                 client_config(&config),
                 workspace,
-                skills,
                 &now,
             )
             .with_budget(config.context_policy);

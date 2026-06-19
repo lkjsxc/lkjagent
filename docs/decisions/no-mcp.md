@@ -7,17 +7,16 @@ ecosystems in general.
 
 ## Decision
 
-lkjagent never implements MCP, neither as client nor as server. Every
-capability beyond the fixed toolset arrives as a skill: a markdown file that
-teaches the model to use shell commands, scripts, or files. The skill system
-is owned by [../architecture/skills/README.md](../architecture/skills/README.md).
+lkjagent never implements MCP, neither as client nor as server. Capability
+beyond the fixed toolset arrives as graph guidance that teaches the model to
+use shell commands, scripts, or files through the fixed action protocol.
 
 ## Consequences
 
 - Zero protocol surface to track, no server lifecycle management, no
   capability negotiation, no per-server context tax.
-- Tool descriptions never flood the window; a skill index line costs a few
-  tokens and the body loads only on demand, which preserves both the budget
+- Tool descriptions never flood the window; graph-selected context packages
+  render only the phase-relevant instruction slice, preserving both the budget
   in [../architecture/context/budgets.md](../architecture/context/budgets.md)
   and the prefix cache.
 - Integrations are owned and refined by the agent itself during
@@ -30,5 +29,5 @@ is owned by [../architecture/skills/README.md](../architecture/skills/README.md)
 - MCP client support: each connected server injects tool schemas into every
   prompt, which the runtime window cannot afford, and pulls in a JSON-RPC stack the
   rest of the design deliberately avoids.
-- A bespoke plugin API: same costs as MCP without the ecosystem; skills on
-  shell already cover the need.
+- A bespoke plugin API: same costs as MCP without the ecosystem; graph
+  guidance on shell already covers the need.

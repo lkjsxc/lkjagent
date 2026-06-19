@@ -21,7 +21,6 @@ done with Implement pure context engine decisions
 - [../../architecture/context/compaction.md](../../architecture/context/compaction.md)
 - [../../architecture/context/caching.md](../../architecture/context/caching.md)
 - [../../architecture/context/hygiene.md](../../architecture/context/hygiene.md)
-- [../../agent/skills/context-engine.md](../../agent/skills/context-engine.md)
 
 ## Files To Touch
 

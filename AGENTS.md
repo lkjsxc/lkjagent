@@ -8,11 +8,12 @@ routing, verification, and where the deeper contracts live.
 
 ## What lkjagent Is
 
-A minimal, continuously running agent harness in Rust for a local LLM with a
-configurable context window. One daemon, one agent loop, a persistent user message
-queue, a tag-based action protocol, an append-only cache-friendly context,
-SQLite persistence, a unified markdown skill system, and a container-first
-YOLO posture. The full picture is [docs/architecture/overview.md](docs/architecture/overview.md).
+A graph-governed, continuously running agent operating system in Rust for a
+local LLM with a configurable context window. One daemon, one agent loop, a
+persistent user message queue, a tag-based action protocol, an append-only
+cache-friendly context, SQLite persistence, typed graph cases, graph-selected
+context packages, evidence-gated completion, and a container-first YOLO
+posture. The full picture is [docs/architecture/overview.md](docs/architecture/overview.md).
 
 ## Non-Negotiable Rules
 
@@ -41,17 +42,18 @@ YOLO posture. The full picture is [docs/architecture/overview.md](docs/architect
 1. [docs/current-state.md](docs/current-state.md)
 2. [docs/agent/README.md](docs/agent/README.md)
 3. [docs/execution/current-blockers.md](docs/execution/current-blockers.md)
-4. The contracts linked from the chosen task or skill
+4. The contracts linked from the chosen task or graph node
 
 ## Task Routing
 
-When the user names a task, do that task and load the matching skill from
-[docs/agent/skills/README.md](docs/agent/skills/README.md). Otherwise take the
-first open blocker in [docs/execution/current-blockers.md](docs/execution/current-blockers.md)
-and follow its task file under [docs/execution/tasks/](docs/execution/tasks/README.md).
+When the user names a task, do that task and first construct the case state:
+objective, constraints, assumptions, risks, evidence requirements, candidate
+files, and next action. Otherwise take the first open blocker in
+[docs/execution/current-blockers.md](docs/execution/current-blockers.md) and
+follow its task file under [docs/execution/tasks/](docs/execution/tasks/README.md).
 
-Skills here use the same format the harness itself runs on:
-[docs/architecture/skills/format.md](docs/architecture/skills/format.md).
+The runtime graph contract is
+[docs/architecture/state-graph/README.md](docs/architecture/state-graph/README.md).
 
 ## Verification
 

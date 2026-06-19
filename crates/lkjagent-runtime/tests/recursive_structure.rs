@@ -3,12 +3,12 @@ mod support;
 use std::fs;
 
 use lkjagent_runtime::daemon::build_prefix_from_store;
+use lkjagent_runtime::graph_state::{open_owner_case, render_state};
 use lkjagent_tools::dispatch::dispatch;
-use lkjagent_tools::observe::OutputKind;
 use support::{action, dispatch_state, store, temp_workspace, tool_runtime, TestResult};
 
 #[test]
-fn recursive_structure_seed_loads_and_drives_indexed_tree() -> TestResult<()> {
+fn graph_case_drives_indexed_tree_workflow() -> TestResult<()> {
     let workspace = temp_workspace("recursive-structure")?;
     fs::write(
         workspace.join("AGENTS.md"),
@@ -17,22 +17,16 @@ fn recursive_structure_seed_loads_and_drives_indexed_tree() -> TestResult<()> {
     let runtime = tool_runtime(workspace.clone())?;
 
     let mut conn = store()?;
-    let prefix = build_prefix_from_store(&conn, &runtime.skill_library, &workspace)?;
+    let graph = open_owner_case(&conn, "build a recursive docs structure", "101")?;
+    let prefix = build_prefix_from_store(&conn, &workspace)?;
     assert!(prefix
         .iter()
-        .any(|frame| frame.content.contains("recursive-structure: A task asks")));
+        .any(|frame| frame.content.contains("phase=planning")));
 
     let mut state = dispatch_state();
-    let skill = dispatch(
-        &action("skill.use", &[("name", "recursive-structure")]),
-        &runtime,
-        &mut conn,
-        &mut state,
-    );
-    assert!(matches!(skill.kind, OutputKind::Skill { .. }));
-    assert!(skill
-        .content
-        .contains("Put a `README.md` in every new directory"));
+    state.graph_state = Some(render_state(&graph));
+    let graph_state = dispatch(&action("graph.state", &[]), &runtime, &mut conn, &mut state);
+    assert!(graph_state.content.contains("missing_evidence=observation"));
 
     write_file(
         &runtime,

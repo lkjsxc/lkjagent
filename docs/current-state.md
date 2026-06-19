@@ -9,68 +9,48 @@ design-only, not implemented, out of scope, open question.
 
 ## Summary
 
-The repository contains the complete documentation contract, a compiling
-Cargo workspace, local verification gates, the action parser, the pure
-context engine, the SQLite store boundary, the LLM endpoint client, the
-skill validator plus source-owned seed library, guarded recursive structure stewardship,
-the tool dispatcher/adapters, the runtime step/daemon core, and the CLI
-for send, status, log, console,
-memory, skills, startup checks, repository-root .env loading for local
-deployment values, JSON runtime config, a /data/workspace working tree, and a
-resident daemon that delivers queued owner work to the endpoint and tool
-dispatcher until agent.done. The console is transcript-first with a bottom
+The repository contains the documentation contract, a compiling Cargo
+workspace, local verification gates, the action parser, the pure state graph,
+the pure context engine, the SQLite store boundary, the LLM endpoint client,
+the tool dispatcher/adapters, the runtime step/daemon core, and the CLI for
+send, status, log, console, memory, startup checks, repository-root .env
+loading, JSON runtime config, a /data/workspace working tree, and a resident
+daemon that delivers queued owner work to the endpoint and tool dispatcher
+until graph-gated agent.done. The console is transcript-first with a bottom
 status/control deck and display-width wrapping for mixed English and Japanese
-terminal text. Recursive structure tasks auto-load their seed skill before the
-first endpoint turn. Runtime skills are indexed from
-source or image paths, not copied into data. Recursive docs tasks create a
-README-indexed scaffold before endpoint work; encyclopedia, wiki, and
-knowledge-base creation tasks create a small knowledge nucleus with
-current-state, concept-map, expansion-queue, and rebalance-plan anchors.
-They cannot close without knowledge-nucleus evidence plus contract-shaped
-markdown pages. Generic recursive structure tasks cannot close without a
-verified README-indexed tree. Recursive-knowledge tasks also reject nested
-docs roots and writes outside the seeded top-level docs map. Startup trims
-rendered memory digest rows to the prefix budget instead of failing when
-stored token estimates are stale. shell.run
-reports non-zero and signal exits as error observations with captured
-output. Recoverable parse, repeat-action, and tool errors add recovery
-notices to the transcript and keep the task moving instead of pausing it;
-consecutive parse/repeat notices steer large or tag-like writes toward
-shell.run scripts instead of repeated fs.write actions. Endpoint completions
-that hit max_tokens become recovery notices instead of endpoint retry loops.
-Task turn budget exhaustion records a budget notice, moves the daemon to
-waiting with a concrete question, and the next owner send refreshes the task
-turn budget before the endpoint call.
-The runtime context window defaults to 24,576 tokens, accepts 16,384 tokens
-as the lower supported value, derives safe soft/hard compaction triggers
-from the configured window, and uses the 2,048-token reserve as endpoint
-max_tokens. The daemon checks pressure before owner delivery, before
-endpoint calls, and after observations; red or orange pressure compacts at
-the safe boundary, and invalid pressure pauses with a diagnostic. Compaction
-rebuilds the prefix from durable state, records a task-summary row when a
-task is open, restarts the live log with one compact resume notice, and
-records before/after tokens, memory ids, and policy values in the transcript.
-Model-assisted compaction distillation gets up to four `memory.save` turns;
-when an open task still lacks a task-summary row, the harness writes a
-compact fallback task-summary before rebuilding.
-Owner-stated exact markdown file counts activate a completion guard, so
-agent.done is refused until a README-indexed candidate tree has that count.
-Queued owner guidance can strengthen that guard while a task is already open,
-so exact-count corrections are not lost when they interrupt maintenance or
-long-running work. Benchmark documentation corpus requests with an exact
-markdown count get a deterministic markdown-only scaffold before endpoint
-work, giving the Docker smoke path a reliable populated workspace on small
-local models. A first-class benchmark system is implemented in
-lkjagent-benchmark and xtask. It includes a tiny suite of seven mechanically
-judged math and computer-science tasks, corpus validity checks, deterministic
-judges, Docker real-run orchestration, TSV and markdown reports, report
-comparison, and an agent-builder skill for benchmark-driven improvement.
-Empty queues open bounded self-maintenance cycles in rotation; owner queue
-arrival preempts maintenance at the next turn boundary, and maintenance
-agent.ask attempts close the maintenance cycle instead of putting the daemon
-into owner-waiting state. Compose wiring is
-implemented. The implementation queue is
-[execution/current-blockers.md](execution/current-blockers.md).
+terminal text.
+
+Owner messages create or resume a graph case before endpoint execution. The
+graph classifies the task family, enters planning, records constraints,
+risks, evidence requirements, selected context packages, and legal next
+transitions, then renders a graph state notice into the first endpoint-visible
+context. Runtime state persists graph cases, graph events, and graph evidence
+so restart and compaction reconstruct structured state. Tool observations are
+recorded as graph evidence. Completion is refused until the active graph gate
+has its required evidence.
+
+Recursive docs and knowledge-base tasks are graph task families. They create
+README-indexed scaffolds before endpoint work and cannot close without graph
+evidence for the required document structure. Exact markdown file counts
+remain deterministic control guards that run after the graph completion gate.
+Runtime recovery still uses bounded notices for parse errors, repeated
+actions, tool errors, endpoint max-token exits, budget exhaustion, and context
+pressure; graph recovery nodes are present as the structured target for the
+next runtime expansion.
+
+The runtime context window defaults to 24,576 tokens, accepts 16,384 tokens as
+the lower supported value, derives safe soft/hard compaction triggers from the
+configured window, and uses the 2,048-token reserve as endpoint max_tokens.
+Compaction is graph-aware: it preserves the active case, phase, node, plan,
+evidence, missing evidence, touched paths, selected packages, recovery
+strategy, and completion guard before rebuilding the prefix. The schema has
+graph memory links for later retrieval ranking, but current compaction does
+not yet populate those links.
+
+Memory remains durable retrieval, but graph cases link evidence and memories.
+Empty queues open bounded graph maintenance cycles in rotation: distill,
+improve-graph, prune-memory, and audit-self. Compose wiring is implemented.
+The implementation queue is [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status
 
@@ -79,18 +59,18 @@ implemented. The implementation queue is
 | Documentation tree and policies | implemented | [repository/](repository/README.md) |
 | Vision and scope | implemented | [vision/](vision/README.md) |
 | Decision records | implemented | [decisions/](decisions/README.md) |
-| Agent manual and skills | implemented | [agent/](agent/README.md) |
+| Agent manual | implemented | [agent/](agent/README.md) |
 | Execution queue and tasks | implemented | [execution/](execution/README.md) |
 | Cargo workspace and crates | implemented | [repository/layout.md](repository/layout.md) |
 | Verification xtask and quiet gates | implemented | [operations/verification.md](operations/verification.md) |
 | Docker compose services | implemented | [operations/compose.md](operations/compose.md) |
 | Container image skeleton | implemented | [architecture/sandbox/container.md](architecture/sandbox/container.md) |
 | Daemon and agent loop | implemented | [architecture/runtime/](architecture/runtime/README.md) |
-| Context engine and compaction | implemented | [architecture/context/](architecture/context/README.md) |
+| State graph and task cases | implemented | [architecture/state-graph/](architecture/state-graph/README.md) |
+| Context engine and graph-aware compaction | implemented | [architecture/context/](architecture/context/README.md) |
 | Action protocol and parser | implemented | [architecture/protocol/](architecture/protocol/README.md) |
 | Toolset | implemented | [architecture/tools/](architecture/tools/README.md) |
 | SQLite store, transcript, and memory access | implemented | [architecture/memory/](architecture/memory/README.md) |
-| Skill validator, index, loader, and seed library | implemented | [architecture/skills/](architecture/skills/README.md) |
 | LLM endpoint client | implemented | [architecture/llm/](architecture/llm/README.md) |
 | Container and sandbox | implemented | [architecture/sandbox/](architecture/sandbox/README.md) |
 | User message queue and CLI | implemented | [product/](product/README.md) |

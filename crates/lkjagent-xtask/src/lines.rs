@@ -19,10 +19,6 @@ pub fn check_lines(files: &[RepoFile]) -> Vec<Violation> {
         .collect()
 }
 
-fn limit_for(file: &RepoFile) -> usize {
-    if file.path.ends_with(".md") && file.text.starts_with("# Skill:") {
-        120
-    } else {
-        200
-    }
+fn limit_for(_file: &RepoFile) -> usize {
+    200
 }

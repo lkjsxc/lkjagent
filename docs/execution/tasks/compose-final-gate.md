@@ -27,7 +27,7 @@ done
 - docker-compose.yml (new): the services and data directory bind mount per
   the compose contract, including the disabled endpoint example.
 - Dockerfile: finalize runtime stage contents (non-root agent user, core
-  utilities, git, curl, ripgrep) and the seed skill copy step.
+  utilities, git, curl, ripgrep) and source graph availability.
 - .github/workflows/: point CI at the final gate if not already exact.
 
 ## Focused Gate

@@ -13,15 +13,17 @@ welcome; work outside it is rejected regardless of quality.
 - The tag-based action protocol and its strict parser.
 - The append-only context engine with explicit compaction.
 - A SQLite store for queue, transcripts, memory, and runtime state.
-- A markdown skill system shared by the harness and its builders.
-- The fixed toolset: file read, write, edit, shell, memory ops, skill ops,
-  and control actions. Everything else is a skill built on shell.
+- A typed state graph shared by runtime, context, memory, compaction, and
+  completion.
+- The fixed toolset: file read, write, edit, shell, queue ops, memory ops,
+  graph ops, and control actions. Everything else is graph guidance built on
+  shell and files.
 - Container-first operation via docker compose.
 - The xtask verification gates that keep this repository lawful.
 
 ## Out of Scope
 
-- MCP in any form. Capabilities arrive as skills, not servers.
+- MCP in any form. Capabilities arrive as graph policy, not servers.
   Decision: [../decisions/no-mcp.md](../decisions/no-mcp.md).
 - Sub-agents, worker forks, parallel sessions.
   Decision: [../decisions/no-subagents.md](../decisions/no-subagents.md).

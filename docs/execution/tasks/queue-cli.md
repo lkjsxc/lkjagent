@@ -3,7 +3,7 @@
 ## Purpose
 
 Implement lkjagent-cli: the single binary with run, send, status, log, and
-the read-only memory and skills commands, all speaking to the store.
+the read-only memory and graph commands, all speaking to the store.
 
 ## Status
 
@@ -53,7 +53,7 @@ cargo run -p lkjagent-xtask -- quiet verify
 
 ## Must Not
 
-- Do not add commands beyond the documented six.
+- Do not add commands beyond the documented set.
 - Do not open any network connection from CLI commands; the store is the
   only interface.
 - Do not decorate output; plain text, one fact per line, exit codes per

@@ -2,9 +2,9 @@
 
 ## Purpose
 
-Specify the explicit event that keeps the single session alive forever:
-distill the log into durable memory, rebuild the prefix, restart the log.
-Compaction is the only moment the window shrinks.
+Specify the explicit graph transition that keeps the single session alive:
+preserve structured case state, distill reusable memory, rebuild the prefix,
+and restart the log. Compaction is the only moment the window shrinks.
 
 ## Trigger
 
@@ -31,16 +31,12 @@ at the next boundary.
 ## Procedure
 
 1. Distillation turns. The harness injects a compaction notice directing the
-   model to preserve task state, open threads, and fresh lessons through
-   `memory.save`. The model gets up to four turns per
-   [../memory/distillation.md](../memory/distillation.md). When a task is
-   open, the cycle must leave a task-summary row; if pressure or model output
-   prevents that save, the harness writes a compact fallback task-summary
-   before rebuilding.
+  model to preserve reusable lessons through `memory.save`. The graph state
+  itself is preserved by the harness through a typed `CompactionPlan`.
 2. Digest rebuild. The harness rebuilds the memory digest from the memory
    store within its budget: top entries by rank, task summary first.
 3. Prefix rebuild. A fresh prefix is assembled: identity, grammar and
-   registry, skill index, workspace brief, new digest, per
+   registry, graph state, workspace brief, new digest, per
    [../protocol/system-prompt.md](../protocol/system-prompt.md).
 4. Log restart. The new log opens with one notice frame holding the task
    summary (or the maintenance state) so the model re-enters mid-stride.
@@ -58,9 +54,9 @@ for owner attention. Silent loss is forbidden by
 
 | Content | Survives as |
 | --- | --- |
-| task state and open threads | task summary in digest plus log-head notice |
+| task state and open threads | graph case, graph evidence, and log-head notice |
 | lessons and discoveries | memory rows, retrievable by memory.find |
-| loaded skill bodies | dropped; reload via skill.use if still needed |
+| selected context packages | package identities in graph state; text reselected after rebuild |
 | raw turn history | transcript only, never back into the window |
 
 ## Cost Model

@@ -9,9 +9,9 @@ Fix where queue, transcripts, memory, and runtime state persist.
 One SQLite database file holds the user message queue, the transcript event
 log, distilled memory with a full-text index, and runtime state. The schema
 is owned by [../architecture/memory/store.md](../architecture/memory/store.md).
-Skills are the exception: they live as source-owned markdown files per
-[../decisions/unified-skills.md](unified-skills.md), and the store only
-indexes usage state.
+Source graph definitions are the exception: they live in lkjagent-graph, and
+the store records runtime graph cases, graph events, graph evidence, and
+ranking signals.
 
 WAL mode lets the daemon and the thin CLI share the file safely; the CLI
 writes queue rows and reads transcript rows without any IPC protocol.

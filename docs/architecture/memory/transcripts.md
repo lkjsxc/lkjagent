@@ -50,8 +50,8 @@ content, tokens, and created_at. The `lkjagent log` CLI surface is owned by
 Recorded completions from action events become parser test fixtures: every
 shape the endpoint ever produced can be replayed against the rules in
 [../protocol/parsing.md](../protocol/parsing.md) as a table-driven test.
-Everything observable is reconstructible from the store plus source skill
-files.
+Everything observable is reconstructible from the store plus source graph
+definitions.
 
 ## Status
 

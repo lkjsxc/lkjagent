@@ -9,7 +9,7 @@ use lkjagent_runtime::daemon::{
 use lkjagent_runtime::task::TaskState;
 use lkjagent_store::{events, memory, state};
 use support::http::{completion, serve_responses};
-use support::{runtime_state, seed_skill_path, store, temp_workspace, TestResult};
+use support::{runtime_state, store, temp_workspace, TestResult};
 
 const SAVE_TASK_SUMMARY: &str = "<act>
 <tool>memory.save</tool>
@@ -111,7 +111,6 @@ fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
         "test".to_string(),
         client_config(base_url, "local-model", None, 180, 2_048),
         workspace.to_path_buf(),
-        seed_skill_path(),
         "100",
     );
     Ok(ResidentDaemon::new(runtime_state()?, runtime))

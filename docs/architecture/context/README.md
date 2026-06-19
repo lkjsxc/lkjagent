@@ -2,8 +2,9 @@
 
 ## Purpose
 
-This directory specifies the context engine: how the runtime window is laid
-out, budgeted, compacted, kept cache-hot, and kept clean. The window is the
+This directory specifies the context engine: how graph-selected packages,
+runtime observations, memory digest, and workspace brief are laid out,
+budgeted, compacted, kept cache-hot, and kept clean. The window is the
 scarcest resource in the system; every other subsystem bends to the rules
 here. Decision:
 [../../decisions/append-only-context.md](../../decisions/append-only-context.md).

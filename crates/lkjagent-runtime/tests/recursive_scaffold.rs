@@ -11,7 +11,7 @@ use lkjagent_store::{memory, queue, state};
 use lkjagent_tools::structure::verify_recursive_tree;
 use lkjagent_tools::structure_network::verify_knowledge_network;
 use support::http::{completion, serve_responses};
-use support::{seed_skill_path, store, temp_workspace, TestResult};
+use support::{store, temp_workspace, TestResult};
 
 const DONE: &str = "<act>
 <tool>agent.done</tool>
@@ -38,7 +38,7 @@ fn recursive_docs_task_auto_scaffolds_before_done() -> TestResult<()> {
         .context
         .log
         .iter()
-        .any(|frame| frame.kind == FrameKind::SkillBody));
+        .any(|frame| frame.kind == FrameKind::GraphNotice));
     assert!(daemon.state.context.log.iter().any(|frame| {
         frame.content.contains("profile=generic") && frame.content.contains("verification=ok")
     }));
@@ -88,7 +88,6 @@ fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
         "test".to_string(),
         client_config(base_url, "local-model", None, 180, 2_048),
         workspace.to_path_buf(),
-        seed_skill_path(),
         "100",
     );
     Ok(ResidentDaemon::new(support::runtime_state()?, runtime))

@@ -13,10 +13,9 @@ Memory rows are written at three moments:
 
 1. Task close. After agent.done, the harness saves the done summary as a
    task-summary row and records the memory id in the transcript.
-2. Compaction. The compaction notice opens up to four `memory.save` turns
-   per [../context/compaction.md](../context/compaction.md). When a task is
-   open, the cycle must leave a task-summary row; if it does not, the
-   harness writes a compact fallback task-summary before rebuilding.
+2. Compaction. The graph-aware compaction plan preserves structured case
+   state. The model may save reusable lessons or incidents through
+   `memory.save` per [../context/compaction.md](../context/compaction.md).
 3. Explicit maintenance. The distill directive
    ([../runtime/self-maintenance.md](../runtime/self-maintenance.md)) can
    read recent transcript spans and write durable lessons when invoked.

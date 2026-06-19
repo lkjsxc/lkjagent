@@ -3,9 +3,8 @@
 ## Purpose
 
 Implement lkjagent-runtime: the pure step function composing protocol,
-context, store, llm, skills, and tools into the turn lifecycle, plus the
-daemon shell around it: startup, lock, signals, intake, recovery
-escalation.
+graph, context, store, llm, and tools into the turn lifecycle, plus the
+daemon shell around it: startup, lock, signals, intake, recovery escalation.
 
 ## Status
 

@@ -2,9 +2,9 @@
 
 ## Purpose
 
-The schema and access rules of the SQLite store: one file, four tables, one
-full-text mirror, and the transaction discipline that lets the daemon and
-the thin CLI share it without IPC.
+The schema and access rules of the SQLite store: one file, queue tables,
+graph tables, transcript tables, memory tables, and the transaction
+discipline that lets the daemon and the thin CLI share it without IPC.
 
 ## Location and Access
 
@@ -67,6 +67,56 @@ Distilled durable knowledge, written per [distillation.md](distillation.md).
 memory_fts is an FTS5 mirror over title, tags, and content. It is kept in
 sync with memory inside the same transaction as every memory write.
 
+### graph_cases
+
+One row per active or closed task case.
+
+| Column | Type | Meaning |
+| --- | --- | --- |
+| id | INTEGER PRIMARY KEY | case id |
+| status | TEXT | active, waiting, closed, or paused |
+| objective | TEXT | owner objective or maintenance directive |
+| task_family | TEXT | classified graph task family |
+| phase | TEXT | active task phase |
+| node_id | TEXT | active graph node |
+| plan | TEXT | structured plan and current next actions |
+| created_at | TEXT | first write |
+| updated_at | TEXT | last graph state write |
+| closed_at | TEXT | close time, null while open |
+
+### graph_events
+
+Transition events, selected packages, phase changes, and recovery routing.
+
+| Column | Type | Meaning |
+| --- | --- | --- |
+| id | INTEGER PRIMARY KEY | graph event id |
+| case_id | INTEGER | owning graph case |
+| kind | TEXT | transition, context, recovery, completion, or maintenance |
+| node_id | TEXT | graph node related to the event |
+| content | TEXT | compact event payload |
+| created_at | TEXT | write time |
+
+### graph_evidence
+
+Observed files, command results, verification outputs, read facts, and
+completion proof.
+
+| Column | Type | Meaning |
+| --- | --- | --- |
+| id | INTEGER PRIMARY KEY | evidence id |
+| case_id | INTEGER | owning graph case |
+| requirement | TEXT | evidence requirement or inferred category |
+| kind | TEXT | owner, action, observation, verification, file, memory, or note |
+| summary | TEXT | bounded evidence summary |
+| path | TEXT | optional workspace path |
+| event_id | INTEGER | transcript event link when present |
+| created_at | TEXT | write time |
+
+`graph_memory_links` links memory rows to graph cases and nodes.
+`graph_node_stats` stores deterministic counters used for ranking package
+choices.
+
 ### state
 
 Key-value runtime state: key TEXT PRIMARY KEY, value TEXT.
@@ -77,7 +127,6 @@ Key-value runtime state: key TEXT PRIMARY KEY, value TEXT.
 | daemon state | idle, working, waiting, or error |
 | daemon question | outstanding agent.ask text, if any |
 | daemon error | latest endpoint or loop error, if any |
-| open task | the current task label, or none |
 | maintenance stamps | per-directive explicit-maintenance stamps, [../runtime/self-maintenance.md](../runtime/self-maintenance.md) |
 | counters | turn counter and similar running totals |
 
@@ -107,8 +156,8 @@ the fixed reason `owner-send`.
 
 ## Deliberately Not Stored
 
-- Skills: markdown files in the source-owned skill library. The store holds
-  only their index stamps.
+- Source graph definitions: the store holds runtime cases, events, evidence,
+  and ranking stats, not the source graph itself.
 - Config: data/lkjagent.json on disk, never mirrored into tables.
 - The endpoint API key: it arrives by environment variable per
   [../sandbox/container.md](../sandbox/container.md) and is never written

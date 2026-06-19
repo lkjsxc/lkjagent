@@ -11,8 +11,8 @@ follows, and the gate each change class must pass before handoff.
    of the affected area.
 2. Choose work: the user-named task, or the first open blocker in
    [../execution/current-blockers.md](../execution/current-blockers.md).
-3. Load the matching skill from [../agent/skills/](../agent/skills/README.md)
-   and read its Context entries.
+3. Build the case state: objective, constraints, assumptions, risks, evidence
+   requirements, candidate files, and next action.
 4. Update docs first: change the contract, the decision record if a
    decision moves, and [../current-state.md](../current-state.md).
 5. Implement the narrowest change that satisfies the new contract.

@@ -28,8 +28,8 @@ pub fn render_owner(content: &str) -> String {
     render_raw_frame("owner", content)
 }
 
-pub fn render_skill(content: &str) -> String {
-    render_raw_frame("skill", content)
+pub fn render_graph(content: &str) -> String {
+    render_raw_frame("graph", content)
 }
 
 fn render_fields(tag: &str, fields: &[Param]) -> String {

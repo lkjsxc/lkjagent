@@ -14,7 +14,7 @@ tree. The judge recomputes the answer or checks the artifact independently.
 
 Mechanical benchmarks are not a replacement for owner judgment. They are the
 repeatable loop that shows whether changes to tools, prompts, memory,
-context, skills, or runtime behavior make general task completion more
+context, graph policy, or runtime behavior make general task completion more
 reliable.
 
 The tiny suite is small enough for repeated local runs on the target local

@@ -5,7 +5,7 @@ pub struct TokenCount(pub usize);
 pub enum PrefixSection {
     Identity,
     GrammarRegistry,
-    SkillIndex,
+    GraphState,
     WorkspaceBrief,
     MemoryDigest,
 }
@@ -26,7 +26,7 @@ pub enum FrameKind {
     Observation,
     Owner,
     Notice(NoticeKind),
-    SkillBody,
+    GraphNotice,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

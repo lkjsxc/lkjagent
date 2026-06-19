@@ -24,7 +24,7 @@ and the stop sequence guarantees one action per turn.
 - Every recovery case has a taxonomy entry in
   [../architecture/protocol/recovery.md](../architecture/protocol/recovery.md);
   invalid output costs one bounded notice, never a crash.
-- Skill bodies teach by example because the format reads as plain text.
+- Graph notices teach by example because the format reads as plain text.
 
 ## Rejected Directions
 

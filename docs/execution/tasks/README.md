@@ -41,7 +41,7 @@ Every task file uses exactly these headings:
 - [context-engine.md](context-engine.md): budgets, admission, accounting, compaction decisions.
 - [sqlite-store.md](sqlite-store.md): queue, events, memory, state, retrieval.
 - [llm-client.md](llm-client.md): the chat-completions client and backoff.
-- [skill-runtime.md](skill-runtime.md): validator, index, loader, seed skills.
+- [state-graph-runtime.md](state-graph-runtime.md): graph model, routing, evidence gates.
 - [tool-runtime.md](tool-runtime.md): dispatch and the registry-backed tool adapters.
 - [agent-loop.md](agent-loop.md): the turn loop composing every crate.
 - [queue-cli.md](queue-cli.md): the lkjagent binary and its commands.

@@ -21,7 +21,6 @@ done
 - [../../architecture/memory/transcripts.md](../../architecture/memory/transcripts.md)
 - [../../architecture/memory/retrieval.md](../../architecture/memory/retrieval.md)
 - [../../architecture/memory/distillation.md](../../architecture/memory/distillation.md)
-- [../../agent/skills/memory-store.md](../../agent/skills/memory-store.md)
 
 ## Files To Touch
 
@@ -62,4 +61,4 @@ cargo clippy -p lkjagent-store -- -D warnings
 - Do not let SQL strings appear outside this crate.
 - Do not write migration logic; setup creates the current schema, reset
   semantics apply, and the handoff says so.
-- Do not store skill bodies or secrets.
+- Do not store source graph definitions or secrets.

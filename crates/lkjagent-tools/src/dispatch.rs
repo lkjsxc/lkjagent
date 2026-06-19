@@ -1,10 +1,10 @@
 mod fs_tools;
+mod graph_tools;
 mod guards;
 mod memory_tools;
 mod params;
 mod queue_tools;
 mod routes;
-mod skill_tools;
 mod state;
 mod validate;
 
@@ -14,8 +14,7 @@ use rusqlite::Connection;
 use crate::error::{ToolError, ToolResult};
 use crate::observe::{self, OutputFrame};
 use routes::route;
-pub use skill_tools::load_skill_frame;
-pub use state::{DispatchOutput, DispatchState, LoadedSkillRecord, ReadRecord, ToolRuntime};
+pub use state::{DispatchOutput, DispatchState, GraphEvidenceRecord, ReadRecord, ToolRuntime};
 use validate::validate_action;
 
 pub fn dispatch(

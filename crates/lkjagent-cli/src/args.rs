@@ -16,7 +16,7 @@ pub enum Command {
     Log { follow: bool, full: bool },
     Console,
     Memory { query: String },
-    Skills,
+    Graph,
 }
 
 pub fn parse_args<I, S>(args: I) -> Result<Invocation, CliError>
@@ -57,7 +57,7 @@ fn parse_command(command: &str, args: Vec<String>) -> Result<Command, CliError> 
         "log" => parse_log(args),
         "console" => parse_no_args(args, "console").map(|()| Command::Console),
         "memory" => parse_memory(args),
-        "skills" => Ok(Command::Skills),
+        "graph" => parse_no_args(args, "graph").map(|()| Command::Graph),
         other => Err(CliError::usage(format!("unknown command: {other}"))),
     }
 }

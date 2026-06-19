@@ -10,4 +10,3 @@ workspace = true
 
 [dependencies]
 lkjagent-benchmark = { path = "../lkjagent-benchmark" }
-lkjagent-skills = { path = "../lkjagent-skills" }

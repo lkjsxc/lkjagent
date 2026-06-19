@@ -18,10 +18,10 @@ historical evolution.
 - [rust-workspace.md](rust-workspace.md): Rust cargo workspace of small focused crates.
 - [openai-endpoint.md](openai-endpoint.md): one OpenAI-compatible HTTP endpoint, no embedded inference.
 - [xml-action-protocol.md](xml-action-protocol.md): tag-based action output, never JSON.
-- [append-only-context.md](append-only-context.md): append-only context with explicit compaction.
+- [append-only-context.md](append-only-context.md): append-only context with graph-aware compaction.
 - [single-loop.md](single-loop.md): one continuous agent loop, no sessions.
 - [sqlite-store.md](sqlite-store.md): one SQLite file for queue, transcripts, memory, state.
-- [no-mcp.md](no-mcp.md): no MCP; skills and shell carry every capability.
+- [state-graph-runtime.md](state-graph-runtime.md): typed graph cases govern planning and completion.
+- [no-mcp.md](no-mcp.md): no MCP; graph-selected tools and shell carry capability.
 - [no-subagents.md](no-subagents.md): no sub-agents or worker forks.
 - [container-first.md](container-first.md): the harness lives inside the container.
-- [unified-skills.md](unified-skills.md): one skill format for the harness and its builders.

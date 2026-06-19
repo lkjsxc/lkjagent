@@ -68,7 +68,12 @@ const MEMORY_SAVE: &[ParamSpec] = &[
     ParamSpec::req("content"),
 ];
 const MEMORY_FIND: &[ParamSpec] = &[ParamSpec::req("query"), ParamSpec::opt("limit", Some("5"))];
-const SKILL_USE: &[ParamSpec] = &[ParamSpec::req("name")];
+const GRAPH_STATE: &[ParamSpec] = &[];
+const GRAPH_EVIDENCE: &[ParamSpec] = &[
+    ParamSpec::req("kind"),
+    ParamSpec::req("summary"),
+    ParamSpec::opt("path", None),
+];
 const AGENT_DONE: &[ParamSpec] = &[ParamSpec::req("summary")];
 const AGENT_ASK: &[ParamSpec] = &[ParamSpec::req("question")];
 
@@ -129,9 +134,14 @@ pub const TOOLS: &[ToolSpec] = &[
         contract: "ranked memory search",
     },
     ToolSpec {
-        name: "skill.use",
-        params: SKILL_USE,
-        contract: "append skill body as a frame",
+        name: "graph.state",
+        params: GRAPH_STATE,
+        contract: "show active graph case state",
+    },
+    ToolSpec {
+        name: "graph.evidence",
+        params: GRAPH_EVIDENCE,
+        contract: "record explicit graph evidence",
     },
     ToolSpec {
         name: "agent.done",
