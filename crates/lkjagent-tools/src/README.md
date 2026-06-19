@@ -23,6 +23,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_profile_index.rs](count_profile_index.rs): counted scaffold index sections.
 - [count_profile_kind.rs](count_profile_kind.rs): counted scaffold kind detection.
 - [count_profile_passage.rs](count_profile_passage.rs): counted scaffold draft passage blocks.
+- [count_profile_restart.rs](count_profile_restart.rs): counted scaffold restart guide text.
 - [count_profile_thread.rs](count_profile_thread.rs): counted scaffold segment briefs.
 - [count_profile_variation.rs](count_profile_variation.rs): counted scaffold per-part variation data.
 - [count_profile_variation_en.rs](count_profile_variation_en.rs): English per-part variation data.
@@ -33,6 +34,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_seed_allocation.rs](count_seed_allocation.rs): counted scaffold file allocation.
 - [count_seed_verify.rs](count_seed_verify.rs): counted scaffold structural verifier.
 - [count_seed_verify_root.rs](count_seed_verify_root.rs): counted scaffold root budget verifier.
+- [count_seed_verify_restart.rs](count_seed_verify_restart.rs): counted scaffold restart guide verifier.
 - [count_seed_verify_text.rs](count_seed_verify_text.rs): counted scaffold text-section verifier.
 - [dispatch/](dispatch/README.md): dispatch helper modules.
 - [dispatch.rs](dispatch.rs): registry validation and tool routing.

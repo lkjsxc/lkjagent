@@ -80,21 +80,23 @@ with practical synonyms such as manuscript, screenplay, playbook, runbook,
 whitepaper, dossier, and their Japanese task terms.
 The graph evidence for that scaffold records `structured-output`, the target
 file count, index file count, design memo count, main file count, root index,
-file-budget status, machine-readable audit-manifest status, directory index,
-count-linked acceptance-audit status, coverage-map status, first and last
-main, `index_scope=all`,
+file-budget status, machine-readable audit-manifest status, restart-guide
+status, directory index, count-linked acceptance-audit status, coverage-map
+status, first and last main, `index_scope=all`,
 `section_scope=all`, content-block status, required design-section status,
 required main-section status, part-ledger status, explicit sequence-path
 status, and `verification=ok`, so completion can be audited after the case
 closes. The same normalized evidence is saved into the task-summary memory for
 startup and compaction recovery.
-The docs index maps design memos to covered main ranges, and the main index
-maps stage ranges plus a per-part role ledger that links each main file back
-to its design memo owner. Each main file repeats that owner link in its
-position section for direct restart from a single part file. Every design
-index entry, main ledger entry, main-file design-owner link, and explicit
-main-file previous/current/next path is verified before closure. Every design
-and main file is section-verified and content-block
+The root index includes a restart guide that names README.md, docs/README.md,
+main/README.md, design-owner links, sequence ledgers, and the stable file-count
+rule when content exists. The docs index maps design memos to covered main
+ranges, and the main index maps stage ranges plus a per-part role ledger that
+links each main file back to its design memo owner. Each main file repeats that
+owner link in its position section for direct restart from a single part file.
+Every design index entry, main ledger entry, main-file design-owner link, and
+explicit main-file previous/current/next path is verified before closure. Every
+design and main file is section-verified and content-block
 verified before scaffold closure. Design and main files carry matching
 headings, section roles, objective anchors that
 preserve model-number decimal tokens, main-range coverage, kind-aware segment

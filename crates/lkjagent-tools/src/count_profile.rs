@@ -6,6 +6,7 @@ use crate::count_profile_data::{EN_DESIGN_FOCUSES, JP_DESIGN_FOCUSES};
 use crate::count_profile_design::design_text;
 use crate::count_profile_index::{audit_manifest, design_owner, docs_map, file_budget, main_map};
 use crate::count_profile_kind::detect_kind;
+use crate::count_profile_restart::restart_guide;
 use crate::count_profile_thread::segment_brief;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -48,13 +49,14 @@ impl DeliverableProfile {
         let budget = file_budget(self.language, docs, main, index_files);
         let manifest = audit_manifest(self.language, docs, main, index_files);
         let audit = acceptance_audit(self.language, self.kind, docs, main);
+        let restart = restart_guide(self.language, docs, main, index_files);
         let verification = self.verification_text(mode);
         match self.language {
             Language::Japanese => format!(
-                "# 構造化成果物\n\n## 目的\n\n次の依頼に対応する複数ファイル成果物です。\n\n{objective}\n\n{anchors}\n## 目次\n\n- [docs/](docs/): 設計、継続性、検証のための設計メモ {docs} 件。\n- [main/](main/): 順序付き本編ファイル {main} 件。\n\n{budget}\n{manifest}\n{audit}\n## 検証\n\n{verification}\n"
+                "# 構造化成果物\n\n## 目的\n\n次の依頼に対応する複数ファイル成果物です。\n\n{objective}\n\n{anchors}\n## 目次\n\n- [docs/](docs/): 設計、継続性、検証のための設計メモ {docs} 件。\n- [main/](main/): 順序付き本編ファイル {main} 件。\n\n{budget}\n{manifest}\n{audit}\n{restart}\n## 検証\n\n{verification}\n"
             ),
             Language::English => format!(
-                "# Structured Output\n\n## Purpose\n\nA generated multi-file deliverable for this objective:\n\n{objective}\n\n{anchors}\n## Table of Contents\n\n- [docs/](docs/): {docs} design files for planning, continuity, and verification.\n- [main/](main/): {main} ordered main content files.\n\n{budget}\n{manifest}\n{audit}\n## Verification\n\n{verification}\n"
+                "# Structured Output\n\n## Purpose\n\nA generated multi-file deliverable for this objective:\n\n{objective}\n\n{anchors}\n## Table of Contents\n\n- [docs/](docs/): {docs} design files for planning, continuity, and verification.\n- [main/](main/): {main} ordered main content files.\n\n{budget}\n{manifest}\n{audit}\n{restart}\n## Verification\n\n{verification}\n"
             ),
         }
     }
