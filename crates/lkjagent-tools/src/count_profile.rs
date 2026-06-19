@@ -43,6 +43,30 @@ impl DeliverableProfile {
         }
     }
 
+    pub(crate) fn docs_readme(self, docs: usize, main: usize, objective: &str) -> String {
+        let anchors = anchor_block(self.language, objective);
+        match self.language {
+            Language::Japanese => format!(
+                "# docs\n\n## 目的\n\n設計、継続性、検証条件を整理する索引です。\n\n{anchors}\n## 構成\n\n- 設計メモ数: {docs}\n- 対象本編数: {main}\n- 各設計メモは担当範囲、設計タスク、検証観点を持ちます。\n\n## 依頼文\n\n{objective}\n"
+            ),
+            Language::English => format!(
+                "# docs\n\n## Purpose\n\nIndex for design, continuity, and verification conditions.\n\n{anchors}\n## Structure\n\n- Design memo count: {docs}\n- Covered main files: {main}\n- Each design memo carries coverage, design work, and verification checks.\n\n## Objective Context\n\n{objective}\n"
+            ),
+        }
+    }
+
+    pub(crate) fn main_readme(self, main: usize, objective: &str) -> String {
+        let anchors = anchor_block(self.language, objective);
+        match self.language {
+            Language::Japanese => format!(
+                "# main\n\n## 目的\n\n順序付き本編ファイルの索引です。\n\n{anchors}\n## 構成\n\n- 本編ファイル数: {main}\n- 各本編は位置、連続性台帳、本文、継続メモを持ちます。\n- 読む順序は part-001.md から番号順です。\n\n## 依頼文\n\n{objective}\n"
+            ),
+            Language::English => format!(
+                "# main\n\n## Purpose\n\nIndex for ordered main content files.\n\n{anchors}\n## Structure\n\n- Main file count: {main}\n- Each main file carries position, sequence ledger, body, and handoff notes.\n- Read in numeric order from part-001.md onward.\n\n## Objective Context\n\n{objective}\n"
+            ),
+        }
+    }
+
     pub(crate) fn doc_page(
         self,
         index: usize,

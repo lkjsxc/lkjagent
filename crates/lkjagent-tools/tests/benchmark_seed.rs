@@ -44,10 +44,16 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     assert_eq!(counts(&root)?.markdown, 20);
     assert_eq!(counts(&root)?.other, 0);
     assert!(root.join("README.md").exists());
+    assert!(root.join("docs/README.md").exists());
+    assert!(root.join("main/README.md").exists());
     assert!(root.join("docs/design-001.md").exists());
     assert!(root.join("main/part-001.md").exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("northern expedition"));
+    let docs_index = fs::read_to_string(root.join("docs/README.md"))?;
+    assert!(docs_index.contains("Design memo count"));
+    let main_index = fs::read_to_string(root.join("main/README.md"))?;
+    assert!(main_index.contains("Main file count"));
     let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
     assert!(first_part.contains("Continuity Hand-Off"));
     assert!(first_part.contains("Arc: 1"));
@@ -74,6 +80,10 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     assert!(readme.contains("# 構造化成果物"));
     assert!(readme.contains("## 要求アンカー"));
     assert!(readme.contains("大きな物語"));
+    let docs_index = fs::read_to_string(root.join("docs/README.md"))?;
+    assert!(docs_index.contains("設計メモ数"));
+    let main_index = fs::read_to_string(root.join("main/README.md"))?;
+    assert!(main_index.contains("本編ファイル数"));
     let design = fs::read_to_string(root.join("docs/design-001.md"))?;
     assert!(design.contains("範囲と受け入れ条件"));
     assert!(design.contains("## 対象範囲"));
