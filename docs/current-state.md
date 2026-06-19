@@ -95,8 +95,8 @@ verified before scaffold closure. Design and main files carry matching
 headings, section roles, objective anchors that
 preserve model-number decimal tokens, main-range coverage, kind-aware segment
 briefs, sequence ledgers, anchor-linked body spines, per-part content
-details, draft passage blocks, and continuity handoffs while preserving the
-exact count. Root indexes keep
+details, specific-detail variation blocks, draft passage blocks, and
+continuity handoffs while preserving the exact count. Root indexes keep
 operational clauses and raw counted-create wording for traceability, while
 main-file body anchors skip model-thrift clauses and trim counted-scaffold
 command wording when content-bearing anchors exist.
