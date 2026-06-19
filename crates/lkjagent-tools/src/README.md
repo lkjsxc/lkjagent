@@ -29,6 +29,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_seed.rs](count_seed.rs): counted document scaffold generator.
 - [count_seed_allocation.rs](count_seed_allocation.rs): counted scaffold file allocation.
 - [count_seed_verify.rs](count_seed_verify.rs): counted scaffold structural verifier.
+- [count_seed_verify_text.rs](count_seed_verify_text.rs): counted scaffold text-section verifier.
 - [dispatch/](dispatch/README.md): dispatch helper modules.
 - [dispatch.rs](dispatch.rs): registry validation and tool routing.
 - [error.rs](error.rs): tool error type.

@@ -133,6 +133,7 @@ fn count_seed_keeps_file_count_stronger_than_design_wording() -> TestResult<()> 
     assert!(report.contains("main_index=ok"));
     assert!(report.contains("acceptance_audit=ok"));
     assert!(report.contains("part_ledger=ok"));
+    assert!(report.contains("main_sections=ok"));
     assert!(report.contains("first_main=ok"));
     assert!(report.contains("last_main=ok"));
     Ok(())
