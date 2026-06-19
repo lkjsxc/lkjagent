@@ -50,6 +50,8 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     assert!(root.join("main/part-001.md").exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("northern expedition"));
+    assert!(readme.contains("## File Budget"));
+    assert!(readme.contains("- Total files: 20"));
     let docs_index = fs::read_to_string(root.join("docs/README.md"))?;
     assert!(docs_index.contains("Design memo count"));
     let main_index = fs::read_to_string(root.join("main/README.md"))?;
@@ -80,6 +82,8 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     assert!(readme.contains("# 構造化成果物"));
     assert!(readme.contains("## 要求アンカー"));
     assert!(readme.contains("大きな物語"));
+    assert!(readme.contains("## ファイル内訳"));
+    assert!(readme.contains("- 合計ファイル数: 20"));
     let docs_index = fs::read_to_string(root.join("docs/README.md"))?;
     assert!(docs_index.contains("設計メモ数"));
     let main_index = fs::read_to_string(root.join("main/README.md"))?;
