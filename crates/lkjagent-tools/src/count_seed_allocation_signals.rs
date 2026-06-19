@@ -25,6 +25,8 @@ pub(crate) fn design_signal_spans(lower: &str, content: &str) -> Vec<Span> {
         "quality criteria",
         "case study",
         "case studies",
+        "risk register",
+        "risk registers",
         "design",
         "decision record",
         "decision records",
