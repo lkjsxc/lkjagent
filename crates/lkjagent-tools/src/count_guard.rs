@@ -112,6 +112,8 @@ pub fn verify_count(workspace: &Path, guard: CountGuard) -> ToolResult<()> {
 
 fn file_signal(lower: &str, content: &str) -> bool {
     lower.contains("file")
+        || lower.contains("document")
+        || lower.contains("docs")
         || lower.contains(".md")
         || content.contains("ファイル")
         || content.contains("文書")
@@ -150,14 +152,30 @@ fn numbers(text: &str) -> Vec<usize> {
     let mut values = Vec::new();
     let mut current = String::new();
     for ch in text.chars() {
-        if ch.is_ascii_digit() {
-            current.push(ch);
+        if let Some(digit) = digit_char(ch) {
+            current.push(digit);
+        } else if number_separator(ch) && !current.is_empty() {
+            continue;
         } else {
             save_number(&mut values, &mut current);
         }
     }
     save_number(&mut values, &mut current);
     values
+}
+
+fn digit_char(ch: char) -> Option<char> {
+    if ch.is_ascii_digit() {
+        return Some(ch);
+    }
+    if ('０'..='９').contains(&ch) {
+        return char::from_digit(ch as u32 - '０' as u32, 10);
+    }
+    None
+}
+
+fn number_separator(ch: char) -> bool {
+    matches!(ch, ',' | '_' | '，')
 }
 
 fn save_number(values: &mut Vec<usize>, current: &mut String) {
