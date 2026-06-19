@@ -22,6 +22,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_profile_detail.rs](count_profile_detail.rs): counted scaffold per-part content details.
 - [count_profile_index.rs](count_profile_index.rs): counted scaffold index sections.
 - [count_profile_kind.rs](count_profile_kind.rs): counted scaffold kind detection.
+- [count_profile_local.rs](count_profile_local.rs): counted scaffold per-file verification text.
 - [count_profile_manifest.rs](count_profile_manifest.rs): counted scaffold audit manifest text.
 - [count_profile_passage.rs](count_profile_passage.rs): counted scaffold draft passage blocks.
 - [count_profile_restart.rs](count_profile_restart.rs): counted scaffold restart guide text.
@@ -34,6 +35,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_seed.rs](count_seed.rs): counted document scaffold generator.
 - [count_seed_allocation.rs](count_seed_allocation.rs): counted scaffold file allocation.
 - [count_seed_verify.rs](count_seed_verify.rs): counted scaffold structural verifier.
+- [count_seed_verify_manifest.rs](count_seed_verify_manifest.rs): counted scaffold audit-manifest verifier.
 - [count_seed_verify_main.rs](count_seed_verify_main.rs): counted scaffold main-file verifier.
 - [count_seed_verify_root.rs](count_seed_verify_root.rs): counted scaffold root budget verifier.
 - [count_seed_verify_restart.rs](count_seed_verify_restart.rs): counted scaffold restart guide verifier.

@@ -6,6 +6,7 @@ use crate::count_profile_data::{EN_DESIGN_FOCUSES, JP_DESIGN_FOCUSES};
 use crate::count_profile_design::design_text;
 use crate::count_profile_index::{design_owner, docs_map, file_budget, main_map};
 use crate::count_profile_kind::detect_kind;
+use crate::count_profile_local::local_verification;
 use crate::count_profile_manifest::audit_manifest;
 use crate::count_profile_restart::restart_guide;
 use crate::count_profile_thread::segment_brief;
@@ -121,17 +122,18 @@ impl DeliverableProfile {
         let anchors = anchor_block(self.language, objective);
         let part_anchor = anchor_for_part(self.language, objective, index);
         let brief = segment_brief(self.language, self.kind, index, total, &part_anchor);
+        let local = local_verification(self.language);
         let owner = self.design_owner_line(index, docs, total);
         match self.language {
             Language::Japanese => format!(
-                "# {}\n\n{brief}## 位置\n\n- 幕: {arc}\n- 節: {slot}\n{owner}\n\n## 連続性台帳\n\n{}\n\n## 依頼文\n\n{objective}\n\n{anchors}\n## 本文\n\n{}\n\n## 継続メモ\n\n{}\n",
+                "# {}\n\n{brief}## 位置\n\n- 幕: {arc}\n- 節: {slot}\n{owner}\n\n## 連続性台帳\n\n{}\n\n## 依頼文\n\n{objective}\n\n{anchors}\n## 本文\n\n{}\n\n{local}## 継続メモ\n\n{}\n",
                 main_title(self.language, self.kind, index),
                 sequence_text(self.language, index, total),
                 body_text(self.language, self.kind, index, total, &part_anchor),
                 handoff_text(self.language, index, total)
             ),
             Language::English => format!(
-                "# {}\n\n{brief}## Position\n\n- Arc: {arc}\n- Segment: {slot}\n{owner}\n\n## Sequence Ledger\n\n{}\n\n## Objective Context\n\n{objective}\n\n{anchors}\n## Draft Content\n\n{}\n\n## Continuity Hand-Off\n\n{}\n",
+                "# {}\n\n{brief}## Position\n\n- Arc: {arc}\n- Segment: {slot}\n{owner}\n\n## Sequence Ledger\n\n{}\n\n## Objective Context\n\n{objective}\n\n{anchors}\n## Draft Content\n\n{}\n\n{local}## Continuity Hand-Off\n\n{}\n",
                 main_title(self.language, self.kind, index),
                 sequence_text(self.language, index, total),
                 body_text(self.language, self.kind, index, total, &part_anchor),

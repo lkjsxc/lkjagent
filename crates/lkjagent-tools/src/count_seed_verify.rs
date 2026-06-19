@@ -2,10 +2,9 @@ use std::fs;
 use std::path::Path;
 
 use crate::count_seed_verify_main::{verify_main_file_content, verify_main_file_sections};
+use crate::count_seed_verify_manifest::verify_audit_manifest;
 use crate::count_seed_verify_restart::verify_restart_guide;
-use crate::count_seed_verify_root::{
-    verify_acceptance_audit, verify_audit_manifest, verify_file_budget,
-};
+use crate::count_seed_verify_root::{verify_acceptance_audit, verify_file_budget};
 use crate::count_seed_verify_text::{
     verify_coverage_map, verify_design_file_content, verify_design_file_sections,
     verify_part_ledger,
@@ -29,6 +28,7 @@ pub(crate) struct ScaffoldCheck {
     pub(crate) main_sections: &'static str,
     pub(crate) sequence_paths: &'static str,
     pub(crate) design_owner_links: &'static str,
+    pub(crate) local_verification: &'static str,
     pub(crate) first_main: &'static str,
     pub(crate) last_main: &'static str,
 }
@@ -73,6 +73,7 @@ pub(crate) fn verify_scaffold(
     let main_index = status(main_text.is_some());
     let part_ledger = verify_part_ledger(main_text.as_deref(), docs, main)?;
     let design_owner_links = status(docs > 0 && main > 0);
+    let local_verification = main_sections;
     let index_scope = scope_status(indexes && (docs > 0 || main > 0));
     Ok(ScaffoldCheck {
         files,
@@ -91,6 +92,7 @@ pub(crate) fn verify_scaffold(
         main_sections,
         sequence_paths,
         design_owner_links,
+        local_verification,
         first_main,
         last_main,
     })

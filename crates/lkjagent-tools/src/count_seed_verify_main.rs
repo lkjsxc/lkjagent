@@ -5,6 +5,7 @@ pub(crate) fn verify_main_file_sections(text: &str, label: &str) -> ToolResult<(
     require_one(text, &["## Segment Brief", "## セグメント概要"], label)?;
     require_one(text, &["## Sequence Ledger", "## 連続性台帳"], label)?;
     require_one(text, &["## Draft Content", "## 本文"], label)?;
+    require_one(text, &["## Local Verification", "## ローカル検証"], label)?;
     require_one(text, &["## Continuity Hand-Off", "## 継続メモ"], label)?;
     Ok(())
 }
@@ -33,6 +34,38 @@ pub(crate) fn verify_main_file_content(
     require_one(text, &["### Draft Passage", "### 本文断片"], label)?;
     require_one(text, &["### Specific Detail", "### 固有要素"], label)?;
     require_one(text, &["### Requirement Link", "### 要求との接続"], label)?;
+    require_one(
+        text,
+        &[
+            "Design-owner status is recorded and checked before edits.",
+            "設計担当の状態を記録し、編集前に確認します。",
+        ],
+        label,
+    )?;
+    require_one(
+        text,
+        &[
+            "Sequence ledger names previous, current, and next paths.",
+            "連続性台帳は前・現在・次のパスを示します。",
+        ],
+        label,
+    )?;
+    require_one(
+        text,
+        &[
+            "Draft content includes concrete detail, passage, and requirement link.",
+            "本文は固有要素、本文断片、要求との接続を含みます。",
+        ],
+        label,
+    )?;
+    require_one(
+        text,
+        &[
+            "Handoff names the state later files can continue from.",
+            "継続メモは後続ファイルが続けられる状態を示します。",
+        ],
+        label,
+    )?;
     if let Some(owner) = design_owner(index, docs, main) {
         require_contains(
             text,
