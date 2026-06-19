@@ -1,3 +1,4 @@
+use crate::count_profile_body::{body_text, handoff_text, main_title};
 use crate::count_profile_data::{EN_DESIGN_FOCUSES, JP_DESIGN_FOCUSES};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -7,13 +8,13 @@ pub(crate) struct DeliverableProfile {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Language {
+pub(crate) enum Language {
     English,
     Japanese,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum DeliverableKind {
+pub(crate) enum DeliverableKind {
     Narrative,
     Guide,
     Report,
@@ -58,27 +59,16 @@ impl DeliverableProfile {
         match self.language {
             Language::Japanese => format!(
                 "# {}\n\n## 位置\n\n- 幕: {arc}\n- 節: {slot}\n\n## 依頼文\n\n{objective}\n\n## 本文\n\n{}\n\n## 継続メモ\n\n{}\n",
-                self.main_title(index),
-                self.body_text(index, total),
-                self.handoff_text(index, total)
+                main_title(self.language, self.kind, index),
+                body_text(self.language, self.kind, index, total),
+                handoff_text(self.language, index, total)
             ),
             Language::English => format!(
                 "# {}\n\n## Position\n\n- Arc: {arc}\n- Segment: {slot}\n\n## Objective Context\n\n{objective}\n\n## Draft Content\n\n{}\n\n## Continuity Hand-Off\n\n{}\n",
-                self.main_title(index),
-                self.body_text(index, total),
-                self.handoff_text(index, total)
+                main_title(self.language, self.kind, index),
+                body_text(self.language, self.kind, index, total),
+                handoff_text(self.language, index, total)
             ),
-        }
-    }
-
-    fn main_title(self, index: usize) -> String {
-        match (self.language, self.kind) {
-            (Language::Japanese, DeliverableKind::Narrative) => format!("本編 {index:03}"),
-            (Language::Japanese, _) => format!("本文 {index:03}"),
-            (Language::English, DeliverableKind::Narrative) => {
-                format!("Narrative Segment {index:03}")
-            }
-            (Language::English, _) => format!("Main Content {index:03}"),
         }
     }
 
@@ -89,58 +79,6 @@ impl DeliverableProfile {
             Language::English => (&EN_DESIGN_FOCUSES, "supplemental planning notes"),
         };
         focuses.get(slot).copied().unwrap_or(fallback)
-    }
-
-    fn body_text(self, index: usize, total: usize) -> String {
-        match (self.language, self.kind) {
-            (Language::Japanese, DeliverableKind::Narrative) => format!(
-                "第{index}節は、依頼された大きな物語を一つの場面として進めます。状況、選択、変化を明確に置き、全{total}本の流れの中で次の節へ進む理由を残します。"
-            ),
-            (Language::Japanese, DeliverableKind::Guide) => format!(
-                "この節では、依頼内容を実行可能な手順へ分解します。前提、操作、確認結果を明確にし、全{total}本の手順が重複せず積み上がるようにします。"
-            ),
-            (Language::Japanese, DeliverableKind::Report) => format!(
-                "この節では、依頼内容に関する観点、根拠、示唆を整理します。全{total}本の報告が同じ論点を繰り返さず、次の分析へつながる形でまとめます。"
-            ),
-            (Language::Japanese, DeliverableKind::General) => format!(
-                "この節では、依頼内容を独立して読める単位へ展開します。全{total}本の成果物が順序、目的、継続性を持つように、具体的な内容と次の接続点を残します。"
-            ),
-            (Language::English, DeliverableKind::Narrative) => format!(
-                "Segment {index} advances the requested narrative as one concrete scene. It establishes a situation, a choice, and a visible change while leaving a reason for the next segment in the {total}-file sequence."
-            ),
-            (Language::English, DeliverableKind::Guide) => format!(
-                "Segment {index} turns the objective into an actionable procedure. It states the premise, the operation, and the expected check so the {total}-file guide accumulates without repeating itself."
-            ),
-            (Language::English, DeliverableKind::Report) => format!(
-                "Segment {index} records one perspective, its supporting basis, and its implication. It keeps the {total}-file report ordered and prepares the next analysis point."
-            ),
-            (Language::English, DeliverableKind::General) => format!(
-                "Segment {index} develops the objective as a standalone unit. It keeps the {total}-file deliverable ordered, purposeful, and ready for later expansion."
-            ),
-        }
-    }
-
-    fn handoff_text(self, index: usize, total: usize) -> String {
-        if index >= total {
-            return match self.language {
-                Language::Japanese => {
-                    "- 最終節として、未解決の論点と完成条件を明確にします。".to_string()
-                }
-                Language::English => {
-                    "- Close the sequence by naming unresolved points and completion checks."
-                        .to_string()
-                }
-            };
-        }
-        let next = index.saturating_add(1);
-        match self.language {
-            Language::Japanese => {
-                format!("- 前節までの用語、判断、未解決点を引き継ぎます。\n- 次の接続先: {next:03}")
-            }
-            Language::English => format!(
-                "- Carry forward terms, decisions, and open questions from earlier parts.\n- Next segment: {next:03}"
-            ),
-        }
     }
 }
 
