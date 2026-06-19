@@ -8,6 +8,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 
 - [benchmark_seed.rs](benchmark_seed.rs): benchmark and counted scaffold fixtures.
 - [control_count_mode_scope.rs](control_count_mode_scope.rs): scoped count-mode wording fixtures.
+- [control_count_hyphen_words.rs](control_count_hyphen_words.rs): hyphenated number-word fixtures.
 - [control_count_words.rs](control_count_words.rs): count guard number-word fixtures.
 - [control_guard.rs](control_guard.rs): resumed owner guidance completion guards.
 - [count_seed_allocation.rs](count_seed_allocation.rs): counted scaffold allocation fixtures.

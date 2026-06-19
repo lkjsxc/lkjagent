@@ -109,11 +109,7 @@ fn local_design_file_score(
     file_signals: &[Span],
 ) -> Option<usize> {
     let mut best: Option<usize> = None;
-    for design in design_signals
-        .iter()
-        .copied()
-        .filter(|span| span.end <= number.start)
-    {
+    for design in design_signals.iter().copied() {
         let design_distance = span_distance(number, design);
         if design_distance > MAX_LOCAL_DESIGN_DISTANCE {
             continue;
@@ -140,6 +136,9 @@ fn same_local_phrase(text: &str, design: Span, file: Span, number: Span) -> bool
     }
     if design.end <= file.start && file.end <= number.start {
         return same_clause(text, design.end, number.start);
+    }
+    if number.end <= design.start && design.end <= file.start {
+        return same_clause(text, number.end, file.start);
     }
     false
 }

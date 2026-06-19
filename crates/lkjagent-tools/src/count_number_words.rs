@@ -9,7 +9,8 @@ struct Token {
 pub(crate) fn number_spans(text: &str) -> Vec<NumberSpan> {
     let tokens = word_tokens(text);
     let mut spans = Vec::new();
-    for index in 0..tokens.len() {
+    let mut index = 0_usize;
+    while index < tokens.len() {
         if let Some((end, value)) = parse_from(&tokens, index) {
             spans.push(NumberSpan {
                 value,
@@ -18,6 +19,9 @@ pub(crate) fn number_spans(text: &str) -> Vec<NumberSpan> {
                     end: tokens[end].end,
                 },
             });
+            index = end.saturating_add(1);
+        } else {
+            index = index.saturating_add(1);
         }
     }
     spans
