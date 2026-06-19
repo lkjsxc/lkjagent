@@ -14,6 +14,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_number.rs](count_number.rs): counted wording number-span parser.
 - [count_number_kanji.rs](count_number_kanji.rs): Japanese numeric kanji helpers.
 - [count_number_words.rs](count_number_words.rs): English number-word parser.
+- [count_profile_anchor_content.rs](count_profile_anchor_content.rs): body anchor cleanup.
 - [count_profile_anchor.rs](count_profile_anchor.rs): counted scaffold requirement anchors.
 - [count_profile_body.rs](count_profile_body.rs): counted scaffold body spines.
 - [count_profile_design.rs](count_profile_design.rs): counted scaffold design memo bodies.
