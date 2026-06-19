@@ -34,12 +34,12 @@ daemon, not the model, decides when the next cycle starts.
 
 ## Bounds
 
-- Maintenance uses the same toolset, protocol, budgets, and YOLO
-  authority as task work; it has no special sandbox inside the container
-  blast radius.
-- Maintenance may mutate /data/workspace and /data: workspace files, git
-  state and remotes, queue rows, memory rows, config, and external services
-  when credentials and network access exist.
+- Maintenance uses the same protocol and turn budget as task work, but the
+  daemon limits idle maintenance tools to state-only actions.
+- Maintenance may use `memory.find`, `memory.save`, `queue.list`,
+  `agent.done`, and `agent.ask`.
+- Maintenance may not write workspace files, run shell commands, mutate queue
+  rows, edit graph cases, change git state, or call external services.
 - Maintenance still obeys the integrity invariants: one action per turn,
   bounded observations, real observations only, append-only transcript
   events, and queue preemption only at turn boundaries.

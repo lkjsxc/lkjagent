@@ -10,6 +10,8 @@ use crate::prompt::token_estimate;
 use crate::step::{step, Effect, StepInput, StepResult};
 use crate::task::StopReason;
 
+use super::maintenance_gate::{blocked_maintenance_output, maintenance_allows};
+
 impl ResidentDaemon {
     pub(super) fn apply_step_result(
         &mut self,
@@ -132,6 +134,8 @@ impl ResidentDaemon {
         let maintenance_ask = self.maintenance_ask_pending(conn, pending.action.tool.as_str())?;
         let output = if self.state.compaction.is_some() && pending.action.tool != "memory.save" {
             blocked_compaction_output(&mut self.dispatch_state, action_text)
+        } else if self.state.maintenance.is_some() && !maintenance_allows(&pending.action.tool) {
+            blocked_maintenance_output(&mut self.dispatch_state, action_text)
         } else {
             self.sync_graph_dispatch_state();
             dispatch_with_text(
