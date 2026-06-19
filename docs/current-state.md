@@ -42,8 +42,11 @@ words including singular and plural scale words such as hundred and hundreds,
 and comma-like digit separators are accepted, the target number is chosen by
 proximity to file or document wording, exact wording is exact, and approximate
 wording, including ish, or-so, hodo, and zengo forms, uses a bounded
-tolerance. Counted completion prefers README-indexed roots and falls back to
-clean top-level output directories.
+tolerance. Aggregate wording such as total, combined, in-all, and gokei can
+carry the overall count when the prompt also contains smaller docs or outline
+file counts, while nearby non-file units such as words or pages keep their
+numbers from becoming file-count targets. Counted completion prefers
+README-indexed roots and falls back to clean top-level output directories.
 The active graph prefix renders count guards and tells the model to use one
 compact `shell.run` command with direct `/bin/sh` loops and `printf`
 templates for bulk creation and count verification, keep the act payload
