@@ -34,12 +34,12 @@ fn segment_allowed(text: &str, number: Span, split: Span, numbers: &[NumberSpan]
     if intervening_number(number, split, numbers) {
         return false;
     }
-    allocation_lead_before(text, number)
+    allocation_lead_before(text, number) || allocation_after_number(text, number, split)
 }
 
 fn inferred_unit_span(text: &str, number: Span, split: Span) -> Option<Span> {
     let between = text.get(number.end..split.start)?;
-    let start_offset = between.find(|ch: char| ch.is_alphabetic())?;
+    let start_offset = between.find(unit_content_char)?;
     let start = number.end.saturating_add(start_offset);
     let tail = text.get(start..split.start)?;
     let stop_offset = tail
@@ -52,7 +52,7 @@ fn inferred_unit_span(text: &str, number: Span, split: Span) -> Option<Span> {
         return None;
     }
     text.get(start..end).and_then(|phrase| {
-        if !phrase.chars().any(|ch| ch.is_alphabetic()) || phrase_mentions_main_unit(phrase) {
+        if !phrase.chars().any(unit_content_char) || phrase_mentions_main_unit(phrase) {
             return None;
         }
         Some(Span { start, end })
@@ -76,11 +76,13 @@ fn trim_end(text: &str, start: usize, mut end: usize) -> usize {
 }
 
 fn rest_segment_mentions_main(text: &str, split: Span) -> bool {
-    let end = split.end.saturating_add(96).min(text.len());
-    text.get(split.end..end).is_some_and(|tail| {
+    text.get(split.end..).is_some_and(|tail| {
         let sentence = tail.split(['\n', '\r', '.', '。']).next().unwrap_or(tail);
-        let lower = sentence.to_lowercase();
+        let window = sentence.chars().take(96).collect::<String>();
+        let lower = window.to_lowercase();
         lower.contains("main content")
+            || lower.contains("本編")
+            || lower.contains("本文")
             || (lower.contains("ordered")
                 && lower
                     .split(|ch: char| !ch.is_alphanumeric())
@@ -122,9 +124,29 @@ fn main_unit_word(word: &str) -> bool {
 
 fn phrase_mentions_main_unit(phrase: &str) -> bool {
     let lower = phrase.to_lowercase();
+    if jp_main_unit_marker(&lower) {
+        return true;
+    }
     lower
         .split(|ch: char| !ch.is_alphanumeric())
         .any(main_unit_word)
+}
+
+fn allocation_after_number(text: &str, number: Span, split: Span) -> bool {
+    text.get(number.end..split.start)
+        .is_some_and(|between| between.contains('使') || between.contains("用意"))
+}
+
+fn jp_main_unit_marker(phrase: &str) -> bool {
+    ["本編", "本文", "章を", "章に", "節を", "節に"]
+        .iter()
+        .any(|marker| phrase.contains(marker))
+}
+
+fn unit_content_char(ch: char) -> bool {
+    ch.is_alphanumeric()
+        || ('\u{3040}'..='\u{30ff}').contains(&ch)
+        || ('\u{4e00}'..='\u{9fff}').contains(&ch)
 }
 
 fn clause_break(ch: char) -> bool {
