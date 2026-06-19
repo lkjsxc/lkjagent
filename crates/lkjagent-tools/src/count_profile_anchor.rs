@@ -1,4 +1,5 @@
 use crate::count_profile::Language;
+use crate::count_profile_anchor_content::content_anchors;
 
 pub(crate) fn anchor_block(language: Language, objective: &str) -> String {
     let anchors = objective_anchors(objective);
@@ -32,21 +33,14 @@ pub(crate) fn anchor_for_part(language: Language, objective: &str, index: usize)
     anchors[slot].clone()
 }
 
-fn content_anchors(objective: &str) -> Vec<String> {
-    let anchors = objective_anchors(objective);
-    let filtered = anchors
-        .iter()
-        .filter(|anchor| content_anchor(anchor))
-        .cloned()
-        .collect::<Vec<_>>();
-    if filtered.is_empty() {
-        anchors
-    } else {
-        filtered
-    }
+fn objective_anchors(objective: &str) -> Vec<String> {
+    raw_objective_anchors(objective)
+        .into_iter()
+        .map(|value| truncate_anchor(&value))
+        .collect()
 }
 
-fn objective_anchors(objective: &str) -> Vec<String> {
+pub(crate) fn raw_objective_anchors(objective: &str) -> Vec<String> {
     let normalized = normalize(objective);
     let mut anchors = clause_anchors(&normalized);
     if anchors.len() < 2 {
@@ -76,14 +70,14 @@ fn word_anchors(objective: &str) -> Vec<String> {
         .split(|ch: char| !ch.is_alphanumeric())
         .filter(|word| word.chars().count() >= 4)
         .filter(|word| !is_stop_word(word))
-        .map(truncate_anchor)
+        .map(str::to_string)
         .collect()
 }
 
 fn push_anchor(anchors: &mut Vec<String>, text: &str) {
     let trimmed = text.trim();
     if trimmed.chars().count() >= 4 {
-        anchors.push(truncate_anchor(trimmed));
+        anchors.push(trimmed.to_string());
     }
 }
 
@@ -91,7 +85,7 @@ fn normalize(text: &str) -> String {
     text.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
-fn truncate_anchor(text: &str) -> String {
+pub(crate) fn truncate_anchor(text: &str) -> String {
     let mut value: String = text.chars().take(72).collect();
     if text.chars().count() > 72 {
         value.push('…');
@@ -135,12 +129,4 @@ fn is_stop_word(word: &str) -> bool {
         word.to_ascii_lowercase().as_str(),
         "about" | "after" | "before" | "should" | "the" | "that" | "this" | "with"
     )
-}
-
-fn content_anchor(anchor: &str) -> bool {
-    let lower = anchor.to_ascii_lowercase();
-    !(lower.starts_with("use gpt")
-        || lower.starts_with("use codex")
-        || lower.contains("codex-spark thrift")
-        || lower.contains("model thrift"))
 }
