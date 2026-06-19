@@ -3,6 +3,7 @@ use std::path::Path;
 
 use crate::count_guard::CountGuard;
 use crate::count_profile::DeliverableProfile;
+use crate::count_seed_allocation::allocation_for;
 use crate::error::{ToolError, ToolResult};
 
 pub fn scaffold_counted_documents(
@@ -21,8 +22,8 @@ pub fn scaffold_counted_documents(
     }
     fs::create_dir_all(root.join("docs"))?;
     fs::create_dir_all(root.join("main"))?;
-    let allocation = allocation_for(guard.target);
     let objective = objective_summary(objective);
+    let allocation = allocation_for(guard.target, &objective);
     let profile = DeliverableProfile::from_objective(&objective);
     write_file(
         &root.join("README.md"),
@@ -65,51 +66,6 @@ pub fn scaffold_counted_documents(
     Ok(format!(
         "counted document scaffold root=structured-output\nfiles={count}\nverification=ok\ncompletion=ready"
     ))
-}
-
-struct Allocation {
-    docs: usize,
-    main: usize,
-    indexes: bool,
-}
-
-impl Allocation {
-    fn index_files(&self) -> usize {
-        if self.indexes {
-            2
-        } else {
-            0
-        }
-    }
-}
-
-fn allocation_for(target: usize) -> Allocation {
-    if target <= 1 {
-        return Allocation {
-            docs: 0,
-            main: 0,
-            indexes: false,
-        };
-    }
-    if target == 2 {
-        return Allocation {
-            docs: 0,
-            main: 1,
-            indexes: false,
-        };
-    }
-    let content = target.saturating_sub(3);
-    let mut docs = content.min(12);
-    let mut main = content.saturating_sub(docs);
-    if content > 0 && main == 0 {
-        docs = docs.saturating_sub(1);
-        main = 1;
-    }
-    Allocation {
-        docs,
-        main,
-        indexes: true,
-    }
 }
 
 fn objective_summary(objective: &str) -> String {

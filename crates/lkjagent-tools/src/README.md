@@ -20,6 +20,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_profile.rs](count_profile.rs): objective profile text for counted scaffolds.
 - [count_profile_data.rs](count_profile_data.rs): counted scaffold profile labels.
 - [count_seed.rs](count_seed.rs): counted document scaffold generator.
+- [count_seed_allocation.rs](count_seed_allocation.rs): counted scaffold file allocation.
 - [dispatch/](dispatch/README.md): dispatch helper modules.
 - [dispatch.rs](dispatch.rs): registry validation and tool routing.
 - [error.rs](error.rs): tool error type.
