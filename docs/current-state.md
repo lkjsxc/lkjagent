@@ -119,7 +119,7 @@ Docs-side scaffolds carry twenty distinct planning focus labels, so common
 20-outline requests do not collapse into repeated supplemental planning notes.
 When the objective includes a design, memo, viewpoint, outline, planning,
 appendix-note, checklist, assessment-rubric, timeline, decision-record, lesson-plan,
-story-planning sheets, Japanese design-file, setting-reference, qualified bio/sketch, or explicit support split count,
+story-planning sheets, Japanese character/design references, qualified bio/sketch, or support split count,
 the scaffold uses it for design memos when the exact total can still retain main content.
 File-count wording stays stronger than design wording when scoring allocation
 hints, so total-count numbers are not reused as design memo counts.
