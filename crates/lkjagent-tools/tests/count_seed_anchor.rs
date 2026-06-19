@@ -81,6 +81,31 @@ fn count_seed_japanese_main_anchor_trims_parenthetical_file_total_prefix() -> Te
 }
 
 #[test]
+fn count_seed_english_main_anchor_trims_parenthetical_file_total_suffix() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-english-parenthetical-count")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 100,
+            mode: CountMode::Approximate,
+        },
+        "Create a large story in about 100 files (documentation files plus actual manuscript files combined). Save Codex/Spark budget.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    assert!(readme.contains("Create a large story in about 100 files"));
+    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    assert!(first_part.contains(
+        "Local objective: Turn \"a large story\" into this file's distinct contribution."
+    ));
+    assert_no_local_objective_starts_with(&root, "Create a large story in about 100 files")?;
+    Ok(())
+}
+
+#[test]
 fn count_seed_english_report_skips_docs_total_constraint_anchor() -> TestResult<()> {
     let workspace = temp_workspace("count-seed-report-content-anchor")?;
 
