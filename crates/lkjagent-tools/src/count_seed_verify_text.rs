@@ -63,11 +63,52 @@ pub(crate) fn verify_design_file_sections(text: &str, label: &str) -> ToolResult
     Ok(())
 }
 
+pub(crate) fn verify_design_file_content(
+    text: &str,
+    label: &str,
+    has_main: bool,
+) -> ToolResult<()> {
+    require_one(text, &["## Objective Context", "## 依頼文"], label)?;
+    require_one(text, &["## Requirement Anchors", "## 要求アンカー"], label)?;
+    if has_main {
+        require_contains(text, "main/part-", "design memo main coverage")?;
+    }
+    require_one(
+        text,
+        &[
+            "The covered range preserves sequence continuity.",
+            "担当範囲の前後関係が連続していること。",
+        ],
+        label,
+    )?;
+    Ok(())
+}
+
 pub(crate) fn verify_main_file_sections(text: &str, label: &str) -> ToolResult<()> {
     require_one(text, &["## Segment Brief", "## セグメント概要"], label)?;
     require_one(text, &["## Sequence Ledger", "## 連続性台帳"], label)?;
     require_one(text, &["## Draft Content", "## 本文"], label)?;
     require_one(text, &["## Continuity Hand-Off", "## 継続メモ"], label)?;
+    Ok(())
+}
+
+pub(crate) fn verify_main_file_content(text: &str, label: &str) -> ToolResult<()> {
+    require_one(
+        text,
+        &[
+            "### Concrete Commitments",
+            "### Execution Commitments",
+            "### Analysis Commitments",
+            "### Deliverable Commitments",
+            "### 具体化メモ",
+            "### 実行メモ",
+            "### 分析メモ",
+            "### 成果物メモ",
+        ],
+        label,
+    )?;
+    require_one(text, &["### Draft Passage", "### 本文断片"], label)?;
+    require_one(text, &["### Requirement Link", "### 要求との接続"], label)?;
     Ok(())
 }
 

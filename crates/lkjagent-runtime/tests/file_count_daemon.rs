@@ -160,6 +160,7 @@ fn assert_counted_graph_evidence(conn: &rusqlite::Connection, target: usize) -> 
                 && summary.contains("acceptance_audit=ok")
                 && summary.contains("part_ledger=ok")
                 && summary.contains("section_scope=all")
+                && summary.contains("content_blocks=ok")
                 && summary.contains("design_sections=ok")
                 && summary.contains("main_sections=ok")
                 && summary.contains("first_main=ok")
