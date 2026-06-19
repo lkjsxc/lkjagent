@@ -1,4 +1,4 @@
-use crate::count_number::{number_spans, span_distance, span_matches, Span};
+use crate::count_number::{number_spans, span_distance, span_matches, NumberSpan, Span};
 
 const MAX_SPLIT_FILE_DISTANCE: usize = 48;
 const MAX_REMAINING_DISTANCE: usize = 64;
@@ -12,12 +12,20 @@ pub(crate) fn remaining_split_hint(
     if file_signals.is_empty() || split_signals.is_empty() {
         return None;
     }
-    number_spans(objective)
-        .into_iter()
+    let numbers = number_spans(objective);
+    numbers
+        .iter()
+        .copied()
         .filter(|number| number.value > 0)
         .filter_map(|number| {
-            split_score(objective, number.span, file_signals, &split_signals)
-                .map(|score| (score, number.value))
+            split_score(
+                objective,
+                number.span,
+                file_signals,
+                &split_signals,
+                &numbers,
+            )
+            .map(|score| (score, number.value))
         })
         .min_by_key(|(score, value)| (*score, *value))
         .map(|(_, value)| value)
@@ -49,6 +57,7 @@ fn split_score(
     number: Span,
     file_signals: &[Span],
     split_signals: &[Span],
+    numbers: &[NumberSpan],
 ) -> Option<usize> {
     let mut best: Option<usize> = None;
     for file in file_signals
@@ -69,7 +78,7 @@ fn split_score(
             if split_distance > MAX_REMAINING_DISTANCE {
                 continue;
             }
-            if !same_clause(text, number.end, split.start) {
+            if !split_segment_allowed(text, number, split, numbers) {
                 continue;
             }
             let score = file_distance.saturating_add(split_distance);
@@ -79,9 +88,46 @@ fn split_score(
     best
 }
 
+fn split_segment_allowed(text: &str, number: Span, split: Span, numbers: &[NumberSpan]) -> bool {
+    if same_clause(text, number.end, split.start) {
+        return true;
+    }
+    soft_comma_segment(text, number, split, numbers)
+}
+
+fn soft_comma_segment(text: &str, number: Span, split: Span, numbers: &[NumberSpan]) -> bool {
+    let Some(between) = text.get(number.end..split.start) else {
+        return false;
+    };
+    if !between.contains(',') || between.chars().any(hard_break) {
+        return false;
+    }
+    if numbers
+        .iter()
+        .any(|other| number.start < other.span.start && other.span.start < split.start)
+    {
+        return false;
+    }
+    allocation_lead_before(text, number)
+}
+
+fn allocation_lead_before(text: &str, number: Span) -> bool {
+    let start = number.start.saturating_sub(32);
+    text.get(start..number.start).is_some_and(|prefix| {
+        let lower = prefix.to_lowercase();
+        ["with", "including", "include", "containing", "contains"]
+            .iter()
+            .any(|lead| lower.split_whitespace().any(|word| word == *lead))
+    })
+}
+
 fn same_clause(text: &str, start: usize, end: usize) -> bool {
     text.get(start..end)
         .is_some_and(|between| !between.chars().any(clause_break))
+}
+
+fn hard_break(ch: char) -> bool {
+    matches!(ch, '\n' | '\r' | '.' | ';' | '。' | '；')
 }
 
 fn clause_break(ch: char) -> bool {
