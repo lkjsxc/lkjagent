@@ -63,6 +63,7 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
     assert!(first_part.contains("Continuity Hand-Off"));
     assert!(first_part.contains("Arc: 1"));
+    assert!(first_part.contains("### Draft Passage"));
     Ok(())
 }
 
@@ -112,6 +113,8 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     assert!(first_part.contains("### 転換点"));
     assert!(first_part.contains("### 具体化メモ"));
     assert!(first_part.contains("記録係の視点"));
+    assert!(first_part.contains("### 本文断片"));
+    assert!(first_part.contains("次へ進む理由"));
     assert!(first_part.contains("### 要求との接続"));
     assert!(first_part.contains("この節では「100ファイルぐらいの大きな物語を作ってください」"));
     Ok(())
