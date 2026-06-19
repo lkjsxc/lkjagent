@@ -4,6 +4,7 @@ const MAX_LOCAL_FILE_DISTANCE: usize = 18;
 
 use crate::count_number::{number_spans, span_distance, Span};
 use crate::count_seed_allocation_signals::{design_signal_spans, file_signal_spans};
+use crate::count_seed_allocation_split::remaining_split_hint;
 
 pub(crate) struct Allocation {
     pub(crate) docs: usize,
@@ -61,11 +62,14 @@ fn bounded_design_count(hint: usize, content: usize) -> Option<usize> {
 
 fn design_count_hint(objective: &str) -> Option<usize> {
     let lower = objective.to_lowercase();
+    let file_signals = file_signal_spans(&lower, objective);
+    if let Some(hint) = remaining_split_hint(objective, &lower, &file_signals) {
+        return Some(hint);
+    }
     let design_signals = design_signal_spans(&lower, objective);
     if design_signals.is_empty() {
         return None;
     }
-    let file_signals = file_signal_spans(&lower, objective);
     if let Some(hint) = local_design_file_hint(objective, &design_signals, &file_signals) {
         return Some(hint);
     }
