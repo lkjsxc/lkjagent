@@ -134,7 +134,7 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     assert!(first_part.contains("### 本文断片"));
     assert!(first_part.contains("次へ進む理由"));
     assert!(first_part.contains("### 要求との接続"));
-    assert!(first_part.contains("この節では「100ファイルぐらいの大きな物語」"));
+    assert!(first_part.contains("この節では「大きな物語」"));
     Ok(())
 }
 
