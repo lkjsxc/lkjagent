@@ -16,6 +16,7 @@ mod count_profile_passage;
 mod count_profile_thread;
 pub mod count_seed;
 mod count_seed_allocation;
+mod count_seed_verify;
 pub mod dispatch;
 pub mod error;
 pub mod fs;
