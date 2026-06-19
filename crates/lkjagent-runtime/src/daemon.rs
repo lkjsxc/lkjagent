@@ -29,6 +29,7 @@ mod pressure;
 mod record;
 mod runner;
 mod scaffold;
+mod scaffold_evidence;
 mod startup;
 mod status;
 mod task_summary;

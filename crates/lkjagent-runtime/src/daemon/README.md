@@ -20,6 +20,7 @@ This directory holds adapter helpers for the foreground daemon.
 - [record.rs](record.rs): compaction transcript recording.
 - [runner.rs](runner.rs): resident poll loop and effect interpretation.
 - [scaffold.rs](scaffold.rs): graph evidence and scaffold recording helpers.
+- [scaffold_evidence.rs](scaffold_evidence.rs): scaffold graph evidence persistence.
 - [skills.rs](skills.rs): guarded task skill auto-loading and scaffolding.
 - [status.rs](status.rs): daemon state fields written to the store.
 - [startup.rs](startup.rs): seed copying and prefix input loading.

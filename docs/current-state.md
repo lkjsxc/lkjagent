@@ -55,6 +55,9 @@ evidence for the scaffold, then saves the task summary and closes the task.
 That scaffold profiles the owner's objective by detected language and broad
 deliverable kind, so the root, docs, and main directories are README-indexed
 within the exact count, and the root README records the count breakdown.
+The graph evidence for that scaffold records `structured-output`, the target
+file count, and `verification=ok`, so completion can be audited after the
+case closes.
 The docs index maps design memos to covered main ranges, and the main index
 maps stage ranges to numbered main files. Design and main files carry matching
 headings, section roles, objective anchors that preserve model-number decimal

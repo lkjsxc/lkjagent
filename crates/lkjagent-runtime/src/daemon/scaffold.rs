@@ -1,8 +1,5 @@
 use lkjagent_context::assemble::append_frame;
 use lkjagent_context::model::{Frame, FrameKind, NoticeKind};
-use lkjagent_graph::{
-    completion_decision, EvidenceKind, GraphNodeId, TaskPhase, TransitionDecision,
-};
 use lkjagent_store::events::{append_event, EventKind};
 use lkjagent_tools::benchmark_seed::scaffold_markdown_corpus;
 use lkjagent_tools::observe::{self, OutputKind};
@@ -11,7 +8,6 @@ use rusqlite::Connection;
 
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
-use crate::graph_state::{evidence_record, graph_notice_frame, row_from_evidence, status_str};
 use crate::prompt::token_estimate;
 
 impl ResidentDaemon {
@@ -31,7 +27,12 @@ impl ResidentDaemon {
         };
         self.append_output_frame(conn, now, &output.kind, output.rendered)?;
         if matches!(output.kind, OutputKind::Observation { .. }) {
-            self.record_scaffold_graph_evidence(conn, now, "recursive docs scaffold")?;
+            self.record_scaffold_graph_evidence(
+                conn,
+                now,
+                "recursive docs scaffold",
+                Some("docs"),
+            )?;
         }
         Ok(())
     }
@@ -52,7 +53,12 @@ impl ResidentDaemon {
         };
         self.append_output_frame(conn, now, &output.kind, output.rendered)?;
         if matches!(output.kind, OutputKind::Observation { .. }) {
-            self.record_scaffold_graph_evidence(conn, now, "markdown corpus scaffold")?;
+            self.record_scaffold_graph_evidence(
+                conn,
+                now,
+                "markdown corpus scaffold",
+                Some("docs/benchmark-corpus"),
+            )?;
         }
         Ok(())
     }
@@ -105,60 +111,6 @@ impl ResidentDaemon {
         )?;
         Ok(())
     }
-
-    pub(super) fn record_scaffold_graph_evidence(
-        &mut self,
-        conn: &Connection,
-        now: &str,
-        summary: &str,
-    ) -> RuntimeResult<()> {
-        let Some(graph) = self.state.graph.as_mut() else {
-            return Ok(());
-        };
-        for (requirement, kind) in [
-            ("observation", EvidenceKind::Observation),
-            ("document-structure", EvidenceKind::File),
-            ("verification", EvidenceKind::Verification),
-        ] {
-            if missing_required_evidence(graph, requirement) {
-                let evidence = evidence_record(requirement, kind, summary.to_string(), None);
-                if let Some(case_id) = graph.case_id {
-                    lkjagent_store::graph::record_evidence(
-                        conn,
-                        case_id,
-                        &row_from_evidence(&evidence),
-                        now,
-                    )?;
-                }
-                graph.evidence.push(evidence);
-            }
-        }
-        graph.pending_checks.clear();
-        refresh_graph_case(graph);
-        if let Some(case_id) = graph.case_id {
-            lkjagent_store::graph::update_case(
-                conn,
-                case_id,
-                graph.phase.as_str(),
-                graph.active_node.0,
-                status_str(graph.status),
-                now,
-            )?;
-        }
-        self.state.context = append_frame(&self.state.context, graph_notice_frame(graph));
-        Ok(())
-    }
-}
-
-fn missing_required_evidence(graph: &lkjagent_graph::TaskGraphState, requirement: &str) -> bool {
-    graph
-        .evidence_requirements
-        .iter()
-        .any(|item| item == requirement)
-        && !graph
-            .evidence
-            .iter()
-            .any(|item| item.requirement == requirement)
 }
 
 fn frame_kind(kind: &OutputKind) -> FrameKind {
@@ -172,22 +124,5 @@ fn event_kind(kind: &OutputKind) -> EventKind {
     match kind {
         OutputKind::Notice { .. } => EventKind::Notice,
         OutputKind::Observation { .. } => EventKind::Observation,
-    }
-}
-
-fn refresh_graph_case(graph: &mut lkjagent_graph::TaskGraphState) {
-    match completion_decision(graph) {
-        TransitionDecision::Admit { .. } => {
-            graph.phase = TaskPhase::Completion;
-            graph.active_node = GraphNodeId("complete");
-        }
-        TransitionDecision::Defer { .. } => {
-            graph.phase = TaskPhase::Execution;
-            graph.active_node = GraphNodeId("execute");
-        }
-        TransitionDecision::Recover { .. } | TransitionDecision::Refuse { .. } => {
-            graph.phase = TaskPhase::Recovery;
-            graph.active_node = GraphNodeId("recover");
-        }
     }
 }

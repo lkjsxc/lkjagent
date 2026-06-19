@@ -31,7 +31,11 @@ impl ResidentDaemon {
             };
         self.append_output_frame(conn, now, &output.kind, output.rendered)?;
         if matches!(output.kind, OutputKind::Observation { .. }) {
-            self.record_scaffold_graph_evidence(conn, now, "counted document scaffold")?;
+            let summary = format!(
+                "counted document scaffold root=structured-output files={} verification=ok",
+                guard.target
+            );
+            self.record_scaffold_graph_evidence(conn, now, &summary, Some("structured-output"))?;
             self.close_counted_scaffold(conn, now, guard.target)?;
         }
         Ok(())
