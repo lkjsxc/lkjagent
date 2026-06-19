@@ -107,7 +107,13 @@ pub(crate) fn verify_main_file_sections(text: &str, label: &str) -> ToolResult<(
     Ok(())
 }
 
-pub(crate) fn verify_main_file_content(text: &str, label: &str) -> ToolResult<()> {
+pub(crate) fn verify_main_file_content(
+    text: &str,
+    label: &str,
+    index: usize,
+    docs: usize,
+    main: usize,
+) -> ToolResult<()> {
     require_one(
         text,
         &[
@@ -125,6 +131,13 @@ pub(crate) fn verify_main_file_content(text: &str, label: &str) -> ToolResult<()
     require_one(text, &["### Draft Passage", "### 本文断片"], label)?;
     require_one(text, &["### Specific Detail", "### 固有要素"], label)?;
     require_one(text, &["### Requirement Link", "### 要求との接続"], label)?;
+    if let Some(owner) = design_owner(index, docs, main) {
+        require_contains(
+            text,
+            &format!("docs/design-{owner:03}.md"),
+            "main file design owner",
+        )?;
+    }
     Ok(())
 }
 
