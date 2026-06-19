@@ -48,6 +48,10 @@ another endpoint turn after the budget is exhausted, it records a budget
 notice and sets the task to waiting with a concrete owner question instead
 of silently burning turns. The next owner send resumes the task with the
 configured fresh turn budget.
+Three consecutive parse faults, repeated actions, or tool errors also move
+the task to waiting with a recovery handoff, so the loop stops before spending
+the remaining task budget on the same failure pattern. The next owner send
+clears those recovery counters and resumes with a fresh turn budget.
 
 Some owner messages activate task-family completion requirements. Recursive
 structure tasks cannot close until graph evidence proves a README-indexed

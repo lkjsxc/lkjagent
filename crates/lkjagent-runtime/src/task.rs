@@ -40,6 +40,7 @@ pub struct RuntimeState {
     pub pending_action: Option<PendingAction>,
     pub parse_faults: u8,
     pub repeat_faults: u8,
+    pub tool_faults: u8,
     pub turn: i64,
 }
 
@@ -54,6 +55,7 @@ impl RuntimeState {
             pending_action: None,
             parse_faults: 0,
             repeat_faults: 0,
+            tool_faults: 0,
             turn: 0,
         }
     }

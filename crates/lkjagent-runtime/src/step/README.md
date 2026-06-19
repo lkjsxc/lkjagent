@@ -8,6 +8,7 @@ This directory holds helper modules for the pure runtime step transition.
 
 - [compact.rs](compact.rs): compaction rebuild step helper.
 - [cycle.rs](cycle.rs): maintenance cycle start helper.
+- [fault_wait.rs](fault_wait.rs): recovery fault waiting handoff helper.
 - [frames.rs](frames.rs): notice and result construction helpers.
 - [graph_output.rs](graph_output.rs): graph evidence updates after tools.
 - [graph_phase.rs](graph_phase.rs): graph phase and evidence-kind helpers.

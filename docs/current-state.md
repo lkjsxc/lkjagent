@@ -108,10 +108,13 @@ brief count inside a larger file-count request, the scaffold uses that count
 for design memos when the exact total can still retain main content.
 File-count wording stays stronger than design wording when scoring allocation
 hints, so total-count numbers are not reused as design memo counts.
-Runtime recovery still uses bounded notices for parse errors, repeated
-actions, tool errors, endpoint max-token exits, budget exhaustion, and context
-pressure; graph recovery nodes are present as the structured target for the
-next runtime expansion. Endpoint outages record failed attempts, set a capped
+Runtime recovery uses bounded notices for parse errors, repeated actions,
+tool errors, endpoint max-token exits, budget exhaustion, and context
+pressure. Three consecutive parse faults, repeated actions, or tool errors
+move the task to waiting with a concrete owner handoff instead of spending the
+remaining turn budget on the same recovery loop. Graph recovery nodes are
+present as the structured target for the next runtime expansion. Endpoint
+outages record failed attempts, set a capped
 retry deadline, and keep later polls from hitting the endpoint or appending
 more error events until that deadline. The LLM client sends `</act>` as a stop
 sequence and restores the stripped close tag before parsing so one endpoint
