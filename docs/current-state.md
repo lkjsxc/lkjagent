@@ -119,8 +119,8 @@ Docs-side scaffolds carry twenty distinct planning focus labels before
 falling back, so common 20-outline requests do not collapse into repeated
 supplemental planning notes.
 When the objective includes a design, memo, viewpoint, outline, planning, or
-brief count inside a larger file-count request, including appendix-note and
-Japanese design-file phrases, the scaffold uses it for design memos when the exact total can still retain main content.
+brief count inside a larger file-count request, including appendix-note, Japanese design-file, and
+setting-reference phrases, the scaffold uses it for design memos when the exact total can still retain main content.
 File-count wording stays stronger than design wording when scoring allocation
 hints, so total-count numbers are not reused as design memo counts.
 Runtime recovery uses bounded notices for parse errors, repeated actions,

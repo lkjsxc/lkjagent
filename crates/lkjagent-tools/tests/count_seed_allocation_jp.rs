@@ -32,3 +32,31 @@ fn count_seed_honors_japanese_design_file_count_phrase() -> TestResult<()> {
     assert!(readme.contains("- 本編ファイル: 81"));
     Ok(())
 }
+
+#[test]
+fn count_seed_honors_japanese_setting_reference_file_count_phrase() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-jp-setting-reference-hint")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 100,
+            mode: CountMode::Approximate,
+        },
+        "ドキュメント用ファイルと本編ファイルを合計して百ファイルくらいの長編物語を\
+         作ってください。設定資料ファイルを十八個、残りは章ごとの本編ファイルに\
+         してください。Codex/Spark の消費は抑えてください。",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert!(root.join("docs/design-018.md").exists());
+    assert!(!root.join("docs/design-019.md").exists());
+    assert!(root.join("main/part-079.md").exists());
+    assert!(!root.join("main/part-080.md").exists());
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    assert!(readme.contains("- 設計メモ: 18"));
+    assert!(readme.contains("- 本編ファイル: 79"));
+    assert!(readme.contains("この成果物は 物語 として監査します"));
+    Ok(())
+}
