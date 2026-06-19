@@ -52,6 +52,27 @@ fn count_seed_honors_source_packets_without_file_noun() -> TestResult<()> {
 }
 
 #[test]
+fn count_seed_honors_split_into_source_packets() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-split-into-source-packets")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        file_guard(),
+        "Create about one hundred files total for a market intelligence dossier. Split into \
+         twenty-eight source packets. The rest as ordered report sections. Count docs and main \
+         content together. Keep Codex/Spark budget low.",
+    )?;
+
+    let root = workspace.join("structured-output");
+    assert_counts(&root, 28, 69)?;
+    assert!(root.join("docs/design-028.md").exists());
+    assert!(!root.join("docs/design-029.md").exists());
+    assert!(root.join("main/part-069.md").exists());
+    assert!(!root.join("main/part-070.md").exists());
+    Ok(())
+}
+
+#[test]
 fn count_seed_does_not_treat_total_sentence_as_split_allocation() -> TestResult<()> {
     let workspace = temp_workspace("count-seed-sentence-total-rest")?;
 
