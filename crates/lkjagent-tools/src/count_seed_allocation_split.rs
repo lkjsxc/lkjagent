@@ -109,6 +109,9 @@ fn split_score(
 }
 
 fn split_segment_allowed(text: &str, number: Span, split: Span, numbers: &[NumberSpan]) -> bool {
+    if total_count_candidate(text, number, split) {
+        return false;
+    }
     if same_clause(text, number.end, split.start) {
         return true;
     }
@@ -141,7 +144,7 @@ fn sentence_separator_segment(
     if !between.chars().any(sentence_separator) || between.chars().any(line_break) {
         return false;
     }
-    if intervening_number(number, split, numbers) || total_count_candidate(text, number, split) {
+    if intervening_number(number, split, numbers) {
         return false;
     }
     allocation_lead_before(text, number)
