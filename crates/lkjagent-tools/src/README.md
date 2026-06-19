@@ -12,6 +12,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_guard.rs](count_guard.rs): exact and approximate file-count guards.
 - [count_guard/](count_guard/README.md): file-count scanning helpers.
 - [count_profile_body.rs](count_profile_body.rs): counted scaffold body spines.
+- [count_profile_design.rs](count_profile_design.rs): counted scaffold design memo bodies.
 - [count_profile.rs](count_profile.rs): objective profile text for counted scaffolds.
 - [count_profile_data.rs](count_profile_data.rs): counted scaffold profile labels.
 - [count_seed.rs](count_seed.rs): counted document scaffold generator.
