@@ -1,7 +1,9 @@
 use std::fs;
 use std::path::Path;
 
-use crate::count_seed_verify_root::{verify_acceptance_audit, verify_file_budget};
+use crate::count_seed_verify_root::{
+    verify_acceptance_audit, verify_audit_manifest, verify_file_budget,
+};
 use crate::count_seed_verify_text::{
     verify_coverage_map, verify_design_file_content, verify_design_file_sections,
     verify_main_file_content, verify_main_file_sections, verify_part_ledger,
@@ -15,6 +17,7 @@ pub(crate) struct ScaffoldCheck {
     pub(crate) coverage_map: &'static str,
     pub(crate) main_index: &'static str,
     pub(crate) file_budget: &'static str,
+    pub(crate) audit_manifest: &'static str,
     pub(crate) acceptance_audit: &'static str,
     pub(crate) part_ledger: &'static str,
     pub(crate) index_scope: &'static str,
@@ -41,6 +44,8 @@ pub(crate) fn verify_scaffold(
     let root_text = require_text(&root.join("README.md"), "root index")?;
     let acceptance_audit = verify_acceptance_audit(&root_text, docs, main)?;
     let file_budget = verify_file_budget(&root_text, target, docs, main, index_count(indexes))?;
+    let audit_manifest =
+        verify_audit_manifest(&root_text, target, docs, main, index_count(indexes))?;
     let design_sections = verify_design_files(root, docs, main > 0)?;
     let main_sections = verify_main_files(root, main)?;
     let content_blocks = status(docs > 0 || main > 0);
@@ -68,6 +73,7 @@ pub(crate) fn verify_scaffold(
         coverage_map,
         main_index,
         file_budget,
+        audit_manifest,
         acceptance_audit,
         part_ledger,
         index_scope,

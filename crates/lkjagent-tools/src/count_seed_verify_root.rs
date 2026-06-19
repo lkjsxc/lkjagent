@@ -88,6 +88,83 @@ pub(crate) fn verify_file_budget(
     Ok("ok")
 }
 
+pub(crate) fn verify_audit_manifest(
+    root_index: &str,
+    target: usize,
+    docs: usize,
+    main: usize,
+    index_files: usize,
+) -> ToolResult<&'static str> {
+    if !root_index.contains("## Audit Manifest") && !root_index.contains("## 監査マニフェスト")
+    {
+        return Err(ToolError::invalid(
+            "counted document scaffold missing audit manifest",
+        ));
+    }
+    let has_content = docs > 0 || main > 0;
+    let index_scope = if index_files > 0 && has_content {
+        "all"
+    } else {
+        "n/a"
+    };
+    let content_blocks = if has_content { "required" } else { "n/a" };
+    require_budget_line(
+        root_index,
+        "- root: structured-output",
+        "- root: structured-output",
+        "audit manifest root",
+    )?;
+    require_budget_line(
+        root_index,
+        &format!("- files: {target}"),
+        &format!("- files: {target}"),
+        "audit manifest file count",
+    )?;
+    require_budget_line(
+        root_index,
+        &format!("- index_files: {index_files}"),
+        &format!("- index_files: {index_files}"),
+        "audit manifest index count",
+    )?;
+    require_budget_line(
+        root_index,
+        &format!("- design_memos: {docs}"),
+        &format!("- design_memos: {docs}"),
+        "audit manifest design count",
+    )?;
+    require_budget_line(
+        root_index,
+        &format!("- main_files: {main}"),
+        &format!("- main_files: {main}"),
+        "audit manifest main count",
+    )?;
+    require_budget_line(
+        root_index,
+        &format!("- index_scope: {index_scope}"),
+        &format!("- index_scope: {index_scope}"),
+        "audit manifest index scope",
+    )?;
+    require_budget_line(
+        root_index,
+        "- section_scope: all",
+        "- section_scope: all",
+        "audit manifest section scope",
+    )?;
+    require_budget_line(
+        root_index,
+        &format!("- content_blocks: {content_blocks}"),
+        &format!("- content_blocks: {content_blocks}"),
+        "audit manifest content blocks",
+    )?;
+    require_budget_line(
+        root_index,
+        "- completion: ready",
+        "- completion: ready",
+        "audit manifest completion",
+    )?;
+    Ok("ok")
+}
+
 fn require_budget_line(text: &str, english: &str, japanese: &str, label: &str) -> ToolResult<()> {
     if text.contains(english) || text.contains(japanese) {
         Ok(())

@@ -73,14 +73,16 @@ evidence for the scaffold, then saves the task summary and closes the task.
 That scaffold profiles the owner's objective by detected language and broad
 deliverable kind, so the root, docs, and main directories are README-indexed
 within the selected count guard, and the root README records the count
-breakdown, acceptance audit, and whether the guard is exact or approximate.
+breakdown, machine-readable audit manifest, acceptance audit, and whether the
+guard is exact or approximate.
 Kind profiling recognizes narrative, guide, report, and general deliverables
 with practical synonyms such as manuscript, screenplay, playbook, runbook,
 whitepaper, dossier, and their Japanese task terms.
 The graph evidence for that scaffold records `structured-output`, the target
 file count, index file count, design memo count, main file count, root index,
-file-budget status, directory index, count-linked acceptance-audit status,
-coverage-map status, first and last main, `index_scope=all`,
+file-budget status, machine-readable audit-manifest status, directory index,
+count-linked acceptance-audit status, coverage-map status, first and last
+main, `index_scope=all`,
 `section_scope=all`, content-block status, required design-section status,
 required main-section status, part-ledger status, and `verification=ok`, so
 completion can be audited after the case closes. The same normalized evidence
