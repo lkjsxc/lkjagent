@@ -64,6 +64,33 @@ fn japanese_artifact_auto_scaffold_routes_to_document_construction() -> TestResu
     Ok(())
 }
 
+#[test]
+fn architecture_artifact_auto_scaffold_routes_to_document_construction() -> TestResult<()> {
+    let mut conn = store()?;
+    take_daemon_lock(&conn, "test", "600", "0")?;
+    queue::enqueue(
+        &mut conn,
+        "Create about 100 files total for a structured architecture artifact, including twenty outline files and ordered main files.",
+        "owner-send",
+        "601",
+    )?;
+    let workspace = temp_workspace("file-count-architecture-artifact-auto")?;
+    let server = serve_responses(vec![])?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+
+    assert_eq!(daemon.poll_once(&mut conn, "601")?, DaemonTick::Idle);
+    server.join()?;
+
+    let root = workspace.join("structured-output");
+    assert_eq!(file_count(&root)?, 100);
+    assert!(root.join("docs/design-020.md").exists());
+    assert!(!root.join("docs/design-021.md").exists());
+    assert!(root.join("main/part-077.md").exists());
+    assert_eq!(state::get(&conn, "completion guard")?, None);
+    assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
+    Ok(())
+}
+
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
     let runtime = ResidentRuntime::new(
         "test".to_string(),

@@ -9,6 +9,8 @@ pub fn classify_intent(content: &str) -> TaskFamily {
         TaskFamily::Recovery
     } else if lower.contains("benchmark") {
         TaskFamily::Benchmark
+    } else if priority_counted_content_request(&lower, content) {
+        TaskFamily::Documentation
     } else if lower.contains("architecture") || lower.contains("redesign") {
         TaskFamily::Architecture
     } else if lower.contains("bug") || lower.contains("fix") {
@@ -67,6 +69,17 @@ fn documentation_request(lower: &str, content: &str) -> bool {
 
 fn counted_content_request(lower: &str, content: &str) -> bool {
     file_signal(lower, content) && content_signal(lower, content)
+}
+
+fn priority_counted_content_request(lower: &str, content: &str) -> bool {
+    counted_content_request(lower, content) && creation_request(lower, content)
+}
+
+fn creation_request(lower: &str, content: &str) -> bool {
+    contains_any(
+        lower,
+        &["build", "create", "generate", "make", "produce", "write"],
+    ) || contains_any(content, &["作", "生成", "構築"])
 }
 
 fn file_signal(lower: &str, content: &str) -> bool {

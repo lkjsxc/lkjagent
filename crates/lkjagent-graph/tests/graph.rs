@@ -79,10 +79,49 @@ fn counted_japanese_artifact_request_selects_document_construction() {
 }
 
 #[test]
+fn counted_architecture_artifact_request_selects_document_construction() {
+    let state = initial_state(
+        "Create about 100 files total for a structured architecture artifact with docs and main content.",
+        Some(13),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert!(state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+}
+
+#[test]
+fn counted_test_corpus_request_selects_document_construction() {
+    let state = initial_state(
+        "Create about 100 files total for a test corpus with docs and main content.",
+        Some(14),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert!(state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+}
+
+#[test]
 fn counted_implementation_request_stays_code_change() {
     let state = initial_state("Create exactly 3 files implementing a Rust CLI.", Some(9));
 
     assert_eq!(state.family, TaskFamily::CodeChange);
+    assert!(!state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+}
+
+#[test]
+fn counted_implementation_with_tests_stays_verification() {
+    let state = initial_state(
+        "Create exactly 3 files implementing tests for a Rust CLI.",
+        Some(15),
+    );
+
+    assert_eq!(state.family, TaskFamily::Verification);
     assert!(!state
         .selected_packages
         .contains(&"doc-construction".to_string()));
