@@ -60,10 +60,23 @@ fn approximate_signal(lower: &str, content: &str) -> bool {
         || lower.contains("roughly")
         || lower.contains("approximately")
         || lower.contains("approx ")
+        || number_ish_signal(lower, content)
+        || lower.contains("or so")
         || content.contains("ぐらい")
         || content.contains("くらい")
         || content.contains("程度")
+        || content.contains("ほど")
+        || content.contains("前後")
         || content.contains("約")
+}
+
+fn number_ish_signal(lower: &str, content: &str) -> bool {
+    let numbers = number_spans(content);
+    span_matches(lower, "ish").into_iter().any(|ish| {
+        numbers.iter().any(|number| {
+            number.span.end <= ish.start && ish.start.saturating_sub(number.span.end) <= 1
+        })
+    })
 }
 
 fn exact_signal(lower: &str, content: &str) -> bool {
