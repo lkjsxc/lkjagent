@@ -27,6 +27,7 @@ fn count_seed_root_audit_matches_generated_counts() -> TestResult<()> {
     assert!(readme.contains("- design_memos: 12"));
     assert!(readme.contains("- main_files: 85"));
     assert!(readme.contains("- restart_guide: required"));
+    assert!(readme.contains("- design_owner_links: required"));
     assert!(readme.contains("- sequence_paths: required"));
     assert!(readme.contains("- completion: ready"));
     assert!(readme.contains("Design coverage: 12 design memos"));
@@ -42,6 +43,7 @@ fn count_seed_root_audit_matches_generated_counts() -> TestResult<()> {
     assert!(report.contains("acceptance_audit=ok"));
     assert!(report.contains("file_budget=ok"));
     assert!(report.contains("restart_guide=ok"));
+    assert!(report.contains("design_owner_links=ok"));
     Ok(())
 }
 
@@ -67,9 +69,11 @@ fn count_seed_root_manifest_marks_empty_scopes_as_not_applicable() -> TestResult
     assert!(readme.contains("- index_scope: n/a"));
     assert!(readme.contains("- content_blocks: n/a"));
     assert!(readme.contains("- restart_guide: required"));
+    assert!(readme.contains("- design_owner_links: n/a"));
     assert!(readme.contains("- sequence_paths: n/a"));
     assert!(readme.contains("No main files exist"));
     assert!(report.contains("audit_manifest=ok"));
     assert!(report.contains("restart_guide=ok"));
+    assert!(report.contains("design_owner_links=n/a"));
     Ok(())
 }

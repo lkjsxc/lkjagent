@@ -34,6 +34,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_seed.rs](count_seed.rs): counted document scaffold generator.
 - [count_seed_allocation.rs](count_seed_allocation.rs): counted scaffold file allocation.
 - [count_seed_verify.rs](count_seed_verify.rs): counted scaffold structural verifier.
+- [count_seed_verify_main.rs](count_seed_verify_main.rs): counted scaffold main-file verifier.
 - [count_seed_verify_root.rs](count_seed_verify_root.rs): counted scaffold root budget verifier.
 - [count_seed_verify_restart.rs](count_seed_verify_restart.rs): counted scaffold restart guide verifier.
 - [count_seed_verify_text.rs](count_seed_verify_text.rs): counted scaffold text-section verifier.

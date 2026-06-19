@@ -73,20 +73,22 @@ daemon writes a generic `structured-output/` tree before the first endpoint
 turn. The scaffold profiles the owner's objective by detected language and
 broad deliverable kind, gives each main file a kind-aware segment brief, adds
 a root machine-readable audit manifest, a root acceptance-audit section, and
-a per-part role ledger to the main index,
+a per-part role ledger to the main index, gives each main file a design-owner
+link and sequence path ledger,
 verifies the requested count, root index, root file budget, count-linked
 audit manifest, acceptance audit, optional directory indexes, docs coverage
-map, all design memo sections, all main-file sections, required content
-blocks including per-part specific detail markers, and part
-ledger, records graph evidence, saves the same verification evidence in the
-task summary, and closes the task without asking the endpoint to repeat the
-same bulk generation. The recorded evidence includes the `structured-output`
+map, all design memo sections, all main-file sections, design-owner links,
+sequence paths, required content blocks including per-part specific detail
+markers, and part ledger, records graph evidence, saves the same verification
+evidence in the task summary, and closes the task without asking the endpoint
+to repeat the same bulk generation. The recorded evidence includes the `structured-output`
 path, target file count, index file count, design memo count, main file count,
-file-budget status, audit-manifest status, acceptance-audit status,
-coverage-map status,
+file-budget status, audit-manifest status, restart-guide status,
+acceptance-audit status, coverage-map status,
 `index_scope=all`, `section_scope=all`, content-block status, required
 design-section status, required main-section status, first and last main
-status, part ledger status, and `verification=ok`.
+status, part ledger status, design-owner-link status, sequence-path status,
+and `verification=ok`.
 
 When no task is open and the queue is empty, the daemon opens a bounded
 graph maintenance case only after a directive is due, records

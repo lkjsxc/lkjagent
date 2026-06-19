@@ -168,6 +168,7 @@ fn assert_counted_graph_evidence(conn: &rusqlite::Connection, target: usize) -> 
                 && summary.contains("content_blocks=ok")
                 && summary.contains("design_sections=ok")
                 && summary.contains("main_sections=ok")
+                && summary.contains("design_owner_links=ok")
                 && summary.contains("sequence_paths=ok")
                 && summary.contains("first_main=ok")
                 && summary.contains("last_main=ok")
@@ -187,6 +188,7 @@ fn assert_counted_task_summary(conn: &rusqlite::Connection) -> TestResult<()> {
                 && row.content.contains("audit_manifest=ok")
                 && row.content.contains("acceptance_audit=ok")
                 && row.content.contains("restart_guide=ok")
+                && row.content.contains("design_owner_links=ok")
                 && row.content.contains("sequence_paths=ok")
                 && row.content.contains("verification=ok")
         }),
