@@ -1,4 +1,5 @@
 pub mod control;
+pub mod count_guard;
 pub mod dispatch;
 pub mod error;
 pub mod fs;

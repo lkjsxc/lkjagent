@@ -57,6 +57,8 @@ guard and a small nucleus scaffold with maps, a starter domain, reference,
 curation, execution state, an expansion queue, and a rebalance plan. That
 guard requires nucleus, growth-control, and required-file evidence before
 agent.done can close.
+Tasks that state an exact markdown file count carry a count guard; done is
+refused until a README-indexed candidate tree has exactly that count.
 
 When no task is open and the queue is empty, the daemon opens a bounded
 self-maintenance cycle, records `daemon_state=working`, and continues toward
