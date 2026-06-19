@@ -77,6 +77,9 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
     assert!(first_part.contains("# 本編 001"));
     assert!(first_part.contains("## 本文"));
+    assert!(first_part.contains("## 連続性台帳"));
+    assert!(first_part.contains("- 前: なし"));
+    assert!(first_part.contains("- 次: 002"));
     assert!(first_part.contains("### 場面の役割"));
     assert!(first_part.contains("### 転換点"));
     Ok(())

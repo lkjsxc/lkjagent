@@ -29,6 +29,21 @@ pub(crate) fn body_text(
     }
 }
 
+pub(crate) fn sequence_text(language: Language, index: usize, total: usize) -> String {
+    let previous = previous_label(language, index);
+    let next = next_label(language, index, total);
+    match language {
+        Language::Japanese => format!(
+            "- 前: {previous}\n- 現在: {index:03}\n- 次: {next}\n- 現在の段階: {}",
+            jp_stage(index, total)
+        ),
+        Language::English => format!(
+            "- Previous: {previous}\n- Current: {index:03}\n- Next: {next}\n- Current stage: {}",
+            en_stage(index, total)
+        ),
+    }
+}
+
 pub(crate) fn handoff_text(language: Language, index: usize, total: usize) -> String {
     if index >= total {
         return match language {
@@ -50,6 +65,26 @@ pub(crate) fn handoff_text(language: Language, index: usize, total: usize) -> St
             "- Carry forward terms, decisions, and open questions from earlier parts.\n- Next segment: {next:03}"
         ),
     }
+}
+
+fn previous_label(language: Language, index: usize) -> String {
+    if index <= 1 {
+        return match language {
+            Language::Japanese => "なし".to_string(),
+            Language::English => "none".to_string(),
+        };
+    }
+    format!("{:03}", index.saturating_sub(1))
+}
+
+fn next_label(language: Language, index: usize, total: usize) -> String {
+    if index >= total {
+        return match language {
+            Language::Japanese => "なし".to_string(),
+            Language::English => "none".to_string(),
+        };
+    }
+    format!("{:03}", index.saturating_add(1))
 }
 
 fn jp_narrative(index: usize, total: usize) -> String {
