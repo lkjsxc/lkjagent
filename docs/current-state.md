@@ -145,8 +145,8 @@ explicit continuations after budget exhaustion, and restart summaries.
 Compaction is graph-aware: it preserves the active case, phase, node, plan,
 evidence, missing evidence, touched paths, selected packages, recovery
 strategy, and completion guard before rebuilding the prefix. The schema has
-graph memory links for later retrieval ranking, but current compaction does
-not yet populate those links.
+graph memory links for retrieval ranking; task-summary saves link the memory
+row to the active or just-closed graph case and node.
 
 Memory remains durable retrieval, but graph cases link evidence and memories.
 Empty queues open bounded graph maintenance cycles in rotation when directives

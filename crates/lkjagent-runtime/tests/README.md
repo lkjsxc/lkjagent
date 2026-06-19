@@ -15,6 +15,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [fault_wait.rs](fault_wait.rs): repeated recovery fault waiting fixtures.
 - [file_count_aggregate_daemon.rs](file_count_aggregate_daemon.rs): aggregate count auto-scaffold fixture.
 - [file_count_daemon.rs](file_count_daemon.rs): counted file daemon fixtures.
+- [graph_memory_links.rs](graph_memory_links.rs): graph case to task-summary memory links.
 - [owner_guidance.rs](owner_guidance.rs): queued owner guidance guard persistence fixture.
 - [prompt_daemon.rs](prompt_daemon.rs): prompt, startup, lock, and shutdown fixtures.
 - [recursive_guard.rs](recursive_guard.rs): guarded recursive-structure daemon fixture.

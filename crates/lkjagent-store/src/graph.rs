@@ -1,3 +1,7 @@
+mod links;
+
+pub use links::{link_memory, memory_links_for_case, GraphMemoryLinkRow};
+
 use rusqlite::{params, Connection, OptionalExtension};
 
 use crate::error::StoreResult;
