@@ -1,6 +1,7 @@
 pub(crate) fn trim_count_mechanics(anchor: &str) -> &str {
     let without_create = strip_content_creation_prefix(anchor).trim();
-    let without_english = trim_english_count_suffix(without_create).trim();
+    let without_hyphen = trim_english_count_prefix(without_create).trim();
+    let without_english = trim_english_count_suffix(without_hyphen).trim();
     trim_japanese_count_prefix(without_english).trim()
 }
 
@@ -49,6 +50,28 @@ fn trim_english_count_suffix(anchor: &str) -> &str {
             if counted_file_suffix(suffix) {
                 return anchor[..index].trim();
             }
+        }
+    }
+    anchor
+}
+
+fn trim_english_count_prefix(anchor: &str) -> &str {
+    for prefix in [
+        "a one-hundred-file ",
+        "a one hundred file ",
+        "a hundred-file ",
+        "a hundred file ",
+        "a 100-file ",
+        "a 100 file ",
+        "one-hundred-file ",
+        "one hundred file ",
+        "hundred-file ",
+        "hundred file ",
+        "100-file ",
+        "100 file ",
+    ] {
+        if anchor.to_ascii_lowercase().starts_with(prefix) {
+            return anchor[prefix.len()..].trim();
         }
     }
     anchor

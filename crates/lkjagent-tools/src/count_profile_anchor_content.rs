@@ -84,6 +84,8 @@ fn trim_scaffold_suffix(anchor: &str) -> &str {
         " with ordered main files",
         " including docs and main content",
         " including documentation and main content",
+        " with documentation and manuscript files combined",
+        " with documentation and manuscript combined",
     ] {
         if lower.ends_with(suffix) {
             let end = anchor.len().saturating_sub(suffix.len());
