@@ -7,6 +7,7 @@ pub(crate) struct ScaffoldCheck {
     pub(crate) files: usize,
     pub(crate) index_files: usize,
     pub(crate) docs_index: &'static str,
+    pub(crate) coverage_map: &'static str,
     pub(crate) main_index: &'static str,
     pub(crate) acceptance_audit: &'static str,
     pub(crate) part_ledger: &'static str,
@@ -37,7 +38,13 @@ pub(crate) fn verify_scaffold(
     }
     let first_main = verify_main_file(root, main, 1, "first main part")?;
     let last_main = verify_main_file(root, main, main, "last main part")?;
-    let docs_index = require_optional_index(root, indexes, "docs/README.md")?;
+    let docs_text = if indexes {
+        Some(require_text(&root.join("docs/README.md"), "docs index")?)
+    } else {
+        None
+    };
+    let docs_index = status(docs_text.is_some());
+    let coverage_map = verify_coverage_map(docs_text.as_deref(), main)?;
     let main_text = if indexes {
         Some(require_text(&root.join("main/README.md"), "main index")?)
     } else {
@@ -49,6 +56,7 @@ pub(crate) fn verify_scaffold(
         files,
         index_files: if indexes { 2 } else { 0 },
         docs_index,
+        coverage_map,
         main_index,
         acceptance_audit,
         part_ledger,
@@ -70,15 +78,6 @@ fn verify_main_file(
     Ok("ok")
 }
 
-fn require_optional_index(root: &Path, indexes: bool, relative: &str) -> ToolResult<&'static str> {
-    if indexes {
-        require_file(&root.join(relative), relative)?;
-        Ok("ok")
-    } else {
-        Ok("n/a")
-    }
-}
-
 fn verify_part_ledger(main_index: Option<&str>, main: usize) -> ToolResult<&'static str> {
     let Some(text) = main_index else {
         return Ok("n/a");
@@ -93,6 +92,27 @@ fn verify_part_ledger(main_index: Option<&str>, main: usize) -> ToolResult<&'sta
             "counted document scaffold missing part ledger",
         ));
     }
+    Ok("ok")
+}
+
+fn verify_coverage_map(docs_index: Option<&str>, main: usize) -> ToolResult<&'static str> {
+    let Some(text) = docs_index else {
+        return Ok("n/a");
+    };
+    if main == 0 {
+        return Ok("n/a");
+    }
+    if !text.contains("## Coverage Map") && !text.contains("## 設計対応表") {
+        return Err(ToolError::invalid(
+            "counted document scaffold missing coverage map",
+        ));
+    }
+    require_contains(text, "part-001.md", "coverage map first main")?;
+    require_contains(
+        text,
+        &format!("part-{main:03}.md"),
+        "coverage map last main",
+    )?;
     Ok("ok")
 }
 
