@@ -69,11 +69,13 @@ fn counted_documentation_task_auto_scaffolds_before_endpoint() -> TestResult<()>
     let server = serve_responses(vec![])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
-    assert_eq!(daemon.poll_once(&mut conn, "201")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "201")?, DaemonTick::Idle);
     assert_eq!(file_count(&workspace.join("structured-output"))?, 20);
+    assert_eq!(daemon.poll_once(&mut conn, "202")?, DaemonTick::Idle);
     server.join()?;
 
     assert_eq!(state::get(&conn, "completion guard")?, None);
+    assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
     Ok(())
 }
 
@@ -91,11 +93,13 @@ fn counted_documentation_task_auto_scaffolds_full_width_japanese_count() -> Test
     let server = serve_responses(vec![])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
-    assert_eq!(daemon.poll_once(&mut conn, "301")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "301")?, DaemonTick::Idle);
     assert_eq!(file_count(&workspace.join("structured-output"))?, 20);
+    assert_eq!(daemon.poll_once(&mut conn, "302")?, DaemonTick::Idle);
     server.join()?;
 
     assert_eq!(state::get(&conn, "completion guard")?, None);
+    assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
     Ok(())
 }
 

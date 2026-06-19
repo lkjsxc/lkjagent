@@ -48,10 +48,11 @@ fn repeat_tracking_resets_between_maintenance_cycles() -> TestResult<()> {
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Done);
-    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Done);
-    assert_eq!(daemon.poll_once(&mut conn, "106")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "107")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Idle);
+    assert_eq!(daemon.poll_once(&mut conn, "164")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "165")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "166")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "167")?, DaemonTick::Done);
     server.join()?;
 
     let repeat_notices = events::read_events(&conn)?

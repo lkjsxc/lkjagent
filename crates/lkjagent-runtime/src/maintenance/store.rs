@@ -46,6 +46,13 @@ pub fn stamp_directive(
     )?)
 }
 
+pub fn defer_all_directives(conn: &Connection, now: &str) -> RuntimeResult<()> {
+    for directive in MaintenanceDirective::all() {
+        stamp_directive(conn, *directive, now)?;
+    }
+    Ok(())
+}
+
 fn pending_queue_count(conn: &Connection) -> RuntimeResult<usize> {
     let rows = lkjagent_store::queue::list(conn)?;
     Ok(rows
