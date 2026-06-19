@@ -53,6 +53,32 @@ fn counted_japanese_story_request_selects_document_construction() {
 }
 
 #[test]
+fn counted_english_artifact_request_selects_document_construction() {
+    let state = initial_state(
+        "Create about 100 files total for a structured artifact with docs and main content.",
+        Some(11),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert!(state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+}
+
+#[test]
+fn counted_japanese_artifact_request_selects_document_construction() {
+    let state = initial_state(
+        "合計百ファイルほどの大きな成果物を、設計メモと本文に分けて作ってください。",
+        Some(12),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert!(state
+        .selected_packages
+        .contains(&"doc-construction".to_string()));
+}
+
+#[test]
 fn counted_implementation_request_stays_code_change() {
     let state = initial_state("Create exactly 3 files implementing a Rust CLI.", Some(9));
 

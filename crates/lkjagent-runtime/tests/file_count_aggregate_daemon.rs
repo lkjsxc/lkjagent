@@ -37,6 +37,33 @@ fn aggregate_total_auto_scaffold_keeps_hundred_target() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn japanese_artifact_auto_scaffold_routes_to_document_construction() -> TestResult<()> {
+    let mut conn = store()?;
+    take_daemon_lock(&conn, "test", "500", "0")?;
+    queue::enqueue(
+        &mut conn,
+        "合計百ファイルほどの大きな成果物を、二十個の設計メモと本文に分けて作ってください。",
+        "owner-send",
+        "501",
+    )?;
+    let workspace = temp_workspace("file-count-japanese-artifact-auto")?;
+    let server = serve_responses(vec![])?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+
+    assert_eq!(daemon.poll_once(&mut conn, "501")?, DaemonTick::Idle);
+    server.join()?;
+
+    let root = workspace.join("structured-output");
+    assert_eq!(file_count(&root)?, 100);
+    assert!(root.join("docs/design-020.md").exists());
+    assert!(!root.join("docs/design-021.md").exists());
+    assert!(root.join("main/part-077.md").exists());
+    assert_eq!(state::get(&conn, "completion guard")?, None);
+    assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
+    Ok(())
+}
+
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
     let runtime = ResidentRuntime::new(
         "test".to_string(),
