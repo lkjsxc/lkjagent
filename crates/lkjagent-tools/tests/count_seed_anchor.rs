@@ -56,6 +56,31 @@ fn count_seed_japanese_main_anchor_skips_count_and_budget_clauses() -> TestResul
 }
 
 #[test]
+fn count_seed_japanese_main_anchor_trims_parenthetical_file_total_prefix() -> TestResult<()> {
+    let workspace = temp_workspace("count-seed-japanese-parenthetical-count")?;
+
+    scaffold_counted_documents(
+        &workspace,
+        CountGuard {
+            kind: CountKind::File,
+            target: 100,
+            mode: CountMode::Approximate,
+        },
+        "プロンプト一発で100ファイル（そのドキュメントのファイルたちと実際の本編のファイルたちを合計して）ぐらいの大きな物語を作ってください。Codexの枠を節約してください。",
+    )?;
+
+    let root = workspace.join("structured-output");
+    let readme = fs::read_to_string(root.join("README.md"))?;
+    assert!(readme.contains("100ファイル（そのドキュメント"));
+    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    assert!(
+        first_part.contains("局所目的: 要求「大きな物語」をこのファイル固有の成果に変換します。")
+    );
+    assert_no_local_objective_starts_with(&root, "プロンプト一発で100ファイル")?;
+    Ok(())
+}
+
+#[test]
 fn count_seed_english_report_skips_docs_total_constraint_anchor() -> TestResult<()> {
     let workspace = temp_workspace("count-seed-report-content-anchor")?;
 
