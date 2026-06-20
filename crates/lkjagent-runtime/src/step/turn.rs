@@ -126,7 +126,7 @@ fn parse_fault_step(mut state: RuntimeState, fault: &lkjagent_protocol::ParseFau
     let notice = parse_notice(fault);
     state.parse_faults = state.parse_faults.saturating_add(1);
     state = append_notice(state, NoticeKind::Error, &notice);
-    let recovery = parse_recovery_notice(state.parse_faults);
+    let recovery = parse_recovery_notice(fault, state.parse_faults);
     state = append_notice(state, NoticeKind::Error, &recovery);
     let mut effects = vec![Effect::RecordEvent {
         kind: EventKind::Error,
@@ -141,7 +141,7 @@ fn parse_fault_step(mut state: RuntimeState, fault: &lkjagent_protocol::ParseFau
     let count = state.parse_faults;
     record_recoverable_fault(
         &mut state,
-        RecoveryFault::Parse,
+        recovery_fault(fault),
         count,
         None,
         &recovery,
@@ -149,7 +149,15 @@ fn parse_fault_step(mut state: RuntimeState, fault: &lkjagent_protocol::ParseFau
     );
     if should_escalate(state.parse_faults) {
         let count = state.parse_faults;
-        state = enter_recovery_route(state, RecoveryFault::Parse, count, None, &mut effects);
+        state = enter_recovery_route(state, recovery_fault(fault), count, None, &mut effects);
     }
     result(state, effects, Some(stop_reason(fault)))
+}
+
+fn recovery_fault(fault: &lkjagent_protocol::ParseFault) -> RecoveryFault {
+    match fault {
+        lkjagent_protocol::ParseFault::BadParams { .. }
+        | lkjagent_protocol::ParseFault::DuplicateParam { .. } => RecoveryFault::Params,
+        _ => RecoveryFault::Parse,
+    }
 }

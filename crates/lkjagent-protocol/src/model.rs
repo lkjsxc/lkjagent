@@ -43,6 +43,7 @@ pub enum ParseFault {
         name: String,
     },
     BadParams {
+        tool: String,
         missing: Vec<String>,
         unknown: Vec<String>,
     },

@@ -19,8 +19,9 @@ semantically poor documentation files such as part-001.md and could loop on
 action parameter faults such as unknown params [path]. The generic document
 scaffold now has focused tests for semantic names, README indexes, exact-count
 semantic files, graph manifests, and audit rejection of sequence-only names.
-Safe action parameter drift now normalizes documented aliases and prints exact
-valid examples for refusals.
+Safe action parameter drift now normalizes documented aliases, prints exact
+valid examples for refusals, and routes repeated parser-level parameter faults
+through a dedicated `recover-params` node.
 
 The graph now has neutral ranked state tracks, an objective envelope that does
 not copy raw owner text, SQLite track snapshots, graph notice rendering, and
@@ -37,13 +38,13 @@ console, and `lkjagent gpt-log`.
 | Cargo workspace and gates | implemented | `Cargo.toml`; `crates/lkjagent-xtask` |
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol` |
-| Tool dispatcher | partially implemented | safe parameter normalization exists; runtime recovery is still shallow |
+| Tool dispatcher | partially implemented | safe parameter normalization and focused parameter recovery exist; broader transition scoring is not fully wired |
 | Document scaffold tool | partially implemented | semantic scaffold tests pass; final gate not yet run |
 | Document audit tool | partially implemented | topology and graph checks exist; final gate not yet run |
 | Recursive document seed | partially implemented | deterministic tree uses semantic contract paths |
 | State graph cases | partially implemented | ranked neutral tracks exist; controller integration remains shallow |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
-| Runtime recovery | partially implemented | parse/tool recovery exists, parameter recovery is shallow |
+| Runtime recovery | partially implemented | parse/tool/repeat recovery and `recover-params` exist; broader transition controller remains shallow |
 | Context budgets | partially implemented | budget model and compact context display exist; compaction control still needs broader gates |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |

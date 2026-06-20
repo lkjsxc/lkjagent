@@ -47,7 +47,7 @@ fn parse_act(lines: &[&str], mut index: usize) -> ParseResult<(Action, usize)> {
             continue;
         }
         if !starts_pair(line) {
-            return Err(non_pair_fault(tool.is_none(), line));
+            return Err(non_pair_fault(tool.as_deref(), line));
         }
 
         let (name, value, next) = parse_pair(lines, index)?;
@@ -98,11 +98,12 @@ fn starts_pair(line: &str) -> bool {
     inline_pair(line).is_some() || open_name_and_tail(line).is_some()
 }
 
-fn non_pair_fault(needs_tool: bool, line: &str) -> ParseFault {
-    if needs_tool {
+fn non_pair_fault(tool: Option<&str>, line: &str) -> ParseFault {
+    if tool.is_none() {
         ParseFault::MissingTool
     } else {
         ParseFault::BadParams {
+            tool: tool.unwrap_or_default().to_string(),
             missing: Vec::new(),
             unknown: vec![line.to_string()],
         }
@@ -120,7 +121,11 @@ fn validate_params(tool_name: &str, params: &[Param]) -> ParseResult<()> {
     if missing.is_empty() && unknown.is_empty() {
         Ok(())
     } else {
-        Err(ParseFault::BadParams { missing, unknown })
+        Err(ParseFault::BadParams {
+            tool: tool_name.to_string(),
+            missing,
+            unknown,
+        })
     }
 }
 

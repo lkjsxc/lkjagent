@@ -130,6 +130,8 @@ pub(crate) const RECOVERY_TOOLS: &[&str] = &[
     "verify.xtask",
     "agent.ask",
 ];
+pub(crate) const PARAM_RECOVERY_TOOLS: &[&str] =
+    &["graph.state", "fs.list", "workspace.summary", "agent.ask"];
 pub(crate) const SHELL_ESCAPE_TOOLS: &[&str] = &[
     "graph.state",
     "graph.next",

@@ -37,6 +37,52 @@ fn third_parse_fault_routes_to_graph_recovery() -> TestResult<()> {
 }
 
 #[test]
+fn param_fault_routes_to_recover_params() -> TestResult<()> {
+    let mut state = open("parameter loop")?;
+    for _ in 0..2 {
+        state = param_fault(state).state;
+    }
+
+    let routed = param_fault(state);
+
+    assert_eq!(routed.stop_reason, Some(StopReason::BadParams));
+    assert_eq!(
+        routed.state.graph.as_ref().map(|graph| graph.active_node.0),
+        Some("recover-params")
+    );
+    assert!(routed.effects.iter().any(|effect| {
+        matches!(
+            effect,
+            lkjagent_runtime::step::Effect::RecordGraphFault { kind, count, .. }
+                if kind == "params" && *count == 3
+        )
+    }));
+    Ok(())
+}
+
+#[test]
+fn recover_params_renders_valid_example() -> TestResult<()> {
+    let state = open("parameter fault")?;
+    let result = param_fault(state);
+    let joined = result
+        .effects
+        .iter()
+        .filter_map(|effect| match effect {
+            lkjagent_runtime::step::Effect::RecordEvent { content, .. } => Some(content.as_str()),
+            _ => None,
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    assert!(joined.contains("action params refused"));
+    assert!(joined.contains("tool=graph.state"));
+    assert!(joined.contains("expected=no parameters"));
+    assert!(joined.contains("<tool>graph.state</tool>\n</act>"));
+    assert!(joined.contains("fs.list/workspace.summary"));
+    Ok(())
+}
+
+#[test]
 fn third_repeat_action_routes_to_graph_recovery() -> TestResult<()> {
     let mut state = open("repeat loop")?;
     for _ in 0..3 {
@@ -117,6 +163,16 @@ fn parse_fault(state: lkjagent_runtime::task::RuntimeState) -> lkjagent_runtime:
         StepInput::Completion {
             content: "no act block".to_string(),
             tokens: 3,
+        },
+    )
+}
+
+fn param_fault(state: lkjagent_runtime::task::RuntimeState) -> lkjagent_runtime::step::StepResult {
+    step(
+        state,
+        StepInput::Completion {
+            content: "<act>\n<tool>graph.state</tool>\n<path>.</path>\n</act>".to_string(),
+            tokens: 5,
         },
     )
 }

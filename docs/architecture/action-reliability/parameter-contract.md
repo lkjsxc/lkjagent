@@ -11,10 +11,17 @@ This file defines the typed parameter boundary for model actions.
 - Required semantic fields are never invented by recovery.
 - Optional defaults come only from the registry.
 - Safe location aliases are normalized before refusal.
+- Parser-level parameter faults preserve the tool name so runtime recovery can
+  render the exact valid example for that tool.
 
 ## Implementation Hooks
 
+- Source: `crates/lkjagent-protocol/src/parse.rs`
+- Source: `crates/lkjagent-protocol/src/model.rs`
 - Source: `crates/lkjagent-tools/src/dispatch/validate.rs`
+- Source: `crates/lkjagent-runtime/src/recovery.rs`
+- Tests: `crates/lkjagent-protocol/tests/fixtures.rs`
+- Tests: `crates/lkjagent-runtime/tests/fault_wait.rs`
 - Tests: `crates/lkjagent-tools/tests/graph_control_dispatch.rs`
 - Verification: `docker compose run --rm verify`
 

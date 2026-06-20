@@ -138,8 +138,9 @@ fn legal_transition_line(graph: &GraphDefinition, state: &TaskGraphState) -> Str
 fn recovery_line(state: &TaskGraphState) -> String {
     state.recovery.strategy.clone().unwrap_or_else(|| {
         format!(
-            "parse={} tool={} repeat={}",
+            "parse={} params={} tool={} repeat={}",
             state.recovery.parse_failures,
+            state.recovery.param_failures,
             state.recovery.tool_failures,
             state.recovery.repeat_failures
         )
