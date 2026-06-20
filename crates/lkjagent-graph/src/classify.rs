@@ -1,11 +1,11 @@
 use crate::case_completion::CompletionState;
 use crate::case_context::{CaseBudgetState, GraphContextState, WorkspaceState};
-use crate::case_document::DocumentState;
 use crate::case_evidence::EvidenceState;
 use crate::case_fields::{ConstraintRecord, FieldStatus, RiskRecord};
 use crate::case_objective::ObjectiveState;
 use crate::case_plan::PlanState;
 use crate::case_recovery::RecoveryState;
+use crate::classify_artifact::route_spec;
 use crate::classify_signals::{
     documentation_request, knowledge_request, priority_counted_content_request,
     priority_long_content_request,
@@ -51,6 +51,7 @@ pub fn initial_state(objective: &str, case_id: Option<i64>) -> TaskGraphState {
     let family = classify_intent(objective);
     let confidence = confidence_for(family);
     let mut objective_state = ObjectiveState::new(objective);
+    let route = route_spec(family, objective);
     let requirements = requirements_for(family);
     let pending_checks = checks_for(family);
     let active_node = GraphNodeId("plan");
@@ -60,8 +61,8 @@ pub fn initial_state(objective: &str, case_id: Option<i64>) -> TaskGraphState {
         case_id,
         objective: objective_state.clone(),
         family,
-        subroute: subroute_for(family).to_string(),
-        route_reason: route_reason_for(family).to_string(),
+        subroute: route.subroute,
+        route_reason: route.route_reason,
         phase: TaskPhase::Planning,
         status: CaseStatus::Active,
         active_node,
@@ -79,21 +80,13 @@ pub fn initial_state(objective: &str, case_id: Option<i64>) -> TaskGraphState {
         evidence: EvidenceState::new(requirements.clone(), pending_checks.clone()),
         completion: CompletionState::new(requirements, pending_checks),
         recovery: RecoveryState::default(),
-        document: document_state_for(family),
+        document: route.document,
         state_tracks,
         transitions: Vec::new(),
         budgets: CaseBudgetState::default(),
         next_action_class: "survey-plan-context".to_string(),
         health: crate::case_context::CaseHealthState::default(),
     }
-}
-
-fn document_state_for(family: TaskFamily) -> Option<DocumentState> {
-    matches!(
-        family,
-        TaskFamily::Documentation | TaskFamily::KnowledgeBase
-    )
-    .then(|| DocumentState::planned("structured-output", "document"))
 }
 
 fn confidence_for(family: TaskFamily) -> u8 {
@@ -103,36 +96,6 @@ fn confidence_for(family: TaskFamily) -> u8 {
         TaskFamily::Verification => 65,
         TaskFamily::CodeChange => 55,
         _ => 60,
-    }
-}
-
-fn subroute_for(family: TaskFamily) -> &'static str {
-    match family {
-        TaskFamily::Documentation | TaskFamily::KnowledgeBase => "document-construction",
-        TaskFamily::CodeChange | TaskFamily::BugFix => "code-change",
-        TaskFamily::Architecture => "architecture-change",
-        TaskFamily::Verification => "verification",
-        TaskFamily::Compaction => "compaction",
-        TaskFamily::Recovery => "recovery",
-        TaskFamily::Benchmark => "benchmark",
-        TaskFamily::IdleMaintenance => "idle-maintenance",
-        TaskFamily::Maintenance => "maintenance",
-    }
-}
-
-fn route_reason_for(family: TaskFamily) -> &'static str {
-    match family {
-        TaskFamily::Documentation | TaskFamily::KnowledgeBase => {
-            "counted or document-shaped deliverable"
-        }
-        TaskFamily::CodeChange | TaskFamily::BugFix => "implementation/fix wording preempts docs",
-        TaskFamily::Architecture => "architecture wording with code/doc drift risk",
-        TaskFamily::Verification => "verification or test wording",
-        TaskFamily::Compaction => "context pressure or compaction wording",
-        TaskFamily::Recovery => "recovery/failure wording",
-        TaskFamily::Benchmark => "benchmark wording",
-        TaskFamily::IdleMaintenance => "empty-queue maintenance",
-        TaskFamily::Maintenance => "maintenance or cleanup wording",
     }
 }
 

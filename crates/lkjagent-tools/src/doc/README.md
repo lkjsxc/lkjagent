@@ -14,5 +14,6 @@ This directory holds the semantic document scaffold and audit implementation.
 - [names.rs](names.rs): semantic names, joins, and forbidden-name checks.
 - [profile.rs](profile.rs): pure profile selection and plan generation.
 - [roles.rs](roles.rs): semantic fallback role names for requested counts.
-- [shapes.rs](shapes.rs): built-in semantic scaffold shapes.
+- [shape_profiles.rs](shape_profiles.rs): built-in semantic scaffold shapes.
+- [shapes.rs](shapes.rs): scaffold profile selection.
 - [write.rs](write.rs): filesystem effect boundary for scaffold plans.

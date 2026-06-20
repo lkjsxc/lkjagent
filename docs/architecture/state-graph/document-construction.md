@@ -41,5 +41,6 @@ completion gate requires deterministic audit evidence.
 
 ## Status
 
-partially implemented; semantic artifact planning, manifest adoption, and
-content-bearing completion gates remain open.
+partially implemented; long story and bread cookbook classification now route
+to `content-artifact`, and scaffold profiles produce semantic story/cookbook
+paths. Manifest adoption and content-bearing completion gates remain open.

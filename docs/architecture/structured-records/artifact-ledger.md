@@ -25,4 +25,6 @@ section roles, paths, required flags, content policy, and last audit result.
 
 ## Status
 
-design, implementation pending
+partially implemented; graph classification assigns content-artifact roots for
+long stories and cookbooks, and `.lkj-doc-graph.md` records scaffold paths.
+Stable `.lkj-artifact.md` identity, adoption, and repair decisions remain open.

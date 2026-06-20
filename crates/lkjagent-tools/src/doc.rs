@@ -6,6 +6,7 @@ mod model;
 mod names;
 mod profile;
 mod roles;
+mod shape_profiles;
 mod shapes;
 mod write;
 

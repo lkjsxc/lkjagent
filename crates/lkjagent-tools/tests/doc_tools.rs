@@ -1,9 +1,8 @@
 mod support;
 
+use lkjagent_tools::dispatch::dispatch;
 use std::fs;
 use std::path::Path;
-
-use lkjagent_tools::dispatch::dispatch;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
 #[test]
@@ -56,11 +55,35 @@ fn doc_scaffold_story_title_uses_manuscript_paths() -> TestResult<()> {
 
     assert!(output.contains("profile=NarrativeManuscript"));
     assert!(workspace.join("stories/planning/premise.md").is_file());
-    assert!(workspace
-        .join("stories/manuscript/chapter-arc-setup.md")
-        .is_file());
+    assert!(workspace.join("stories/chapters/waking-pod.md").is_file());
     assert!(!workspace.join("stories/part-001.md").exists());
     assert_no_serial_files(&workspace.join("stories"))?;
+    Ok(())
+}
+
+#[test]
+fn doc_scaffold_bread_cookbook_uses_recipe_paths() -> TestResult<()> {
+    let workspace = temp_workspace("doc-cookbook")?;
+    let output = scaffold(
+        &workspace,
+        &[
+            ("root", "cookbooks/bread-cookbook"),
+            ("title", "Bread Cookbook"),
+            ("kind", "content-artifact"),
+        ],
+    )?;
+
+    assert!(output.contains("profile=Cookbook"));
+    assert!(workspace
+        .join("cookbooks/bread-cookbook/foundations/flour-water-salt-yeast.md")
+        .is_file());
+    assert!(workspace
+        .join("cookbooks/bread-cookbook/recipes/sourdough-country-loaf.md")
+        .is_file());
+    assert!(!workspace
+        .join("cookbooks/bread-cookbook/part-001.md")
+        .exists());
+    assert_no_serial_files(&workspace.join("cookbooks/bread-cookbook"))?;
     Ok(())
 }
 
@@ -139,8 +162,7 @@ fn assert_readmes(root: &Path) -> TestResult<()> {
         if path.is_dir() {
             assert!(
                 path.join("README.md").is_file(),
-                "missing README in {:?}",
-                path
+                "missing README in {path:?}"
             );
             assert_readmes(&path)?;
         }
