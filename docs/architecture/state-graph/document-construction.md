@@ -43,5 +43,6 @@ completion gate requires deterministic audit evidence.
 
 partially implemented; long story and bread cookbook classification now route
 to `content-artifact`, scaffold profiles produce semantic story/cookbook paths,
-and scaffold-only output cannot satisfy document-structure evidence. Manifest
-adoption and content-bearing completion gates remain open.
+scaffold-only output cannot satisfy document-structure evidence, and
+`doc.audit` rejects scaffold-only story and cookbook leaves. Manifest adoption
+and broader artifact repair remain open.

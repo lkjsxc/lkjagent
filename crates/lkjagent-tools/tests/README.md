@@ -24,6 +24,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [count_seed_anchor_parenthetical.rs](count_seed_anchor_parenthetical.rs): parenthetical anchor fixtures.
 - [count_seed_kind_profile.rs](count_seed_kind_profile.rs): counted scaffold kind-profile fixtures.
 - [count_seed_root_contract.rs](count_seed_root_contract.rs): counted scaffold root contract fixtures.
+- [doc_content_audit.rs](doc_content_audit.rs): content-artifact scaffold-only audit fixtures.
 - [doc_tools.rs](doc_tools.rs): document scaffold and audit fixtures.
 - [fs_shell.rs](fs_shell.rs): filesystem and shell tool fixtures.
 - [knowledge_path_guard.rs](knowledge_path_guard.rs): recursive knowledge write fences.
