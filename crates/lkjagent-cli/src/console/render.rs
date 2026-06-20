@@ -2,6 +2,7 @@ use std::path::Path;
 
 pub use super::size::ScreenSize;
 use super::{display, event_view, style};
+use crate::accounting;
 use crate::error::CliError;
 use crate::store::open_store;
 
@@ -29,7 +30,7 @@ pub fn render_screen_for_size(
         .collect::<Vec<_>>();
     let events = lkjagent_store::events::read_events(&conn)?;
     let state = state_value(&conn, "daemon state", "stopped")?;
-    let bottom = bottom_deck(&conn, &state, notice, pending.len(), size.columns)?;
+    let bottom = bottom_deck(data_dir, &conn, &state, notice, pending.len(), size.columns)?;
     let body_limit = size.rows.saturating_sub(1);
     let body_budget = body_limit.saturating_sub(bottom.len());
     let mut lines = top_pane(&events, &pending, body_budget, size.columns);
@@ -66,6 +67,7 @@ fn top_pane(
 }
 
 fn bottom_deck(
+    data_dir: &Path,
     conn: &rusqlite::Connection,
     state: &str,
     notice: &str,
@@ -83,7 +85,11 @@ fn bottom_deck(
     if states != "none" {
         state_line.push_str(&format!(" | states {states}"));
     }
+    let accounting = accounting::deck_for_data(data_dir, conn)?;
     lines.extend(wrap_limited(&state_line, width, 2));
+    lines.extend(wrap_limited(&accounting.context_line, width, 1));
+    lines.extend(wrap_limited(&accounting.token_line, width, 1));
+    lines.extend(wrap_limited(&accounting.prefix_line, width, 1));
     lines.extend(optional_row(conn, "question", "daemon question", width, 2)?);
     lines.extend(optional_row(conn, "error", "daemon error", width, 1)?);
     lines.extend(wrap_limited(&format!("notice {notice}"), width, 1));

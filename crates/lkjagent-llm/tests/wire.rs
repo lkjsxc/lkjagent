@@ -22,15 +22,22 @@ fn request_serializes_exact_documented_fields() -> TestResult<()> {
 fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
     let response = r#"{
         "choices":[{"message":{"content":"<act></act>"},"finish_reason":"stop"}],
-        "usage":{"prompt_tokens":11,"completion_tokens":7},
+        "usage":{
+          "prompt_tokens":11,
+          "completion_tokens":7,
+          "total_tokens":18,
+          "prompt_tokens_details":{"cached_tokens":5}
+        },
         "prompt_cache_hit_tokens":9,
         "timings":{"prompt_ms":4.5}
     }"#;
     let completion = decode_completion(response)?;
     assert_eq!(completion.content, "<act></act>");
     assert_eq!(completion.finish_reason, FinishReason::Stop);
-    assert_eq!(completion.usage.prompt_tokens, 11);
-    assert_eq!(completion.usage.completion_tokens, 7);
+    assert_eq!(completion.usage.prompt_tokens, Some(11));
+    assert_eq!(completion.usage.completion_tokens, Some(7));
+    assert_eq!(completion.usage.cached_prompt_tokens, Some(5));
+    assert_eq!(completion.usage.total_tokens, Some(18));
     assert!(completion
         .cache_metrics
         .iter()
@@ -39,6 +46,21 @@ fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
         .cache_metrics
         .iter()
         .any(|metric| metric.name == "timings.prompt_ms" && metric.value == "4.5"));
+    Ok(())
+}
+
+#[test]
+fn response_preserves_missing_usage_as_unknown() -> TestResult<()> {
+    let response = r#"{
+        "choices":[{"message":{"content":"<act></act>"},"finish_reason":"stop"}]
+    }"#;
+
+    let completion = decode_completion(response)?;
+
+    assert_eq!(completion.usage.prompt_tokens, None);
+    assert_eq!(completion.usage.completion_tokens, None);
+    assert_eq!(completion.usage.cached_prompt_tokens, None);
+    assert_eq!(completion.usage.total_tokens, None);
     Ok(())
 }
 

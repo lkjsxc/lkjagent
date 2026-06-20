@@ -2,6 +2,7 @@ mod support;
 
 use lkjagent_cli::console::render_snapshot;
 use lkjagent_store::events::{append_event, EventKind};
+use lkjagent_store::token_usage::{record, TokenUsageEvent};
 use support::{open_store, temp_data, TestResult};
 
 #[test]
@@ -13,7 +14,7 @@ fn console_pads_sparse_transcript_above_bottom_deck() -> TestResult<()> {
     let rule = bottom_rule_index(&lines);
 
     assert_eq!(lines.len(), 15);
-    assert_eq!(rule, 11);
+    assert_eq!(rule, 8);
     assert!(lines[2..rule]
         .iter()
         .all(|line| strip_ansi(line).is_empty()));
@@ -28,6 +29,22 @@ fn console_puts_operational_state_in_bottom_deck() -> TestResult<()> {
     lkjagent_store::state::set(&conn, "daemon state", "waiting")?;
     lkjagent_store::state::set(&conn, "daemon question", "Need owner guidance?")?;
     lkjagent_store::state::set(&conn, "open task", "write docs")?;
+    lkjagent_store::state::set(&conn, "context used tokens", "1234")?;
+    record(
+        &conn,
+        &TokenUsageEvent {
+            task_id: None,
+            turn: 1,
+            input_tokens: Some(8_120),
+            output_tokens: Some(1_040),
+            cached_input_tokens: Some(6_880),
+            total_tokens: Some(9_160),
+            context_window: Some(24_576),
+            context_used_estimate: Some(1_234),
+            source: "endpoint".to_string(),
+        },
+        "2026-06-20T00:00:00Z",
+    )?;
 
     let screen = render_snapshot(&data, "ready", 56, 16)?;
     let lines = screen.lines().collect::<Vec<_>>();
@@ -36,7 +53,9 @@ fn console_puts_operational_state_in_bottom_deck() -> TestResult<()> {
         .iter()
         .position(|line| strip_ansi(line).contains("state WAITING"))
         .unwrap_or(0);
-    assert!(state_line >= lines.len().saturating_sub(6));
+    assert!(state_line >= lines.len().saturating_sub(9));
+    assert!(screen.contains("ctx=1.23K/24.58K 5.02%"));
+    assert!(screen.contains("in=8.12K out=1.04K cache=6.88K total=9.16K"));
     assert!(screen.contains("question Need owner guidance?"));
     Ok(())
 }
@@ -62,7 +81,7 @@ fn console_keeps_bottom_deck_visible_on_minimum_screen() -> TestResult<()> {
     let rule = bottom_rule_index(&lines);
 
     assert_eq!(lines.len(), 11);
-    assert_eq!(rule, 6);
+    assert_eq!(rule, 3);
     assert!(screen.contains("WAITING"));
     for line in lines {
         assert!(visible_width(&strip_ansi(line)) <= 40);

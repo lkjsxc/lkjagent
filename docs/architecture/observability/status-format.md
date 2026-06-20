@@ -14,8 +14,9 @@ This file defines plain text `lkjagent status` output.
 
 ## Implementation Hooks
 
+- Source: `crates/lkjagent-cli/src/accounting.rs`
 - Source: `crates/lkjagent-cli/src/status.rs`
-- Tests: `crates/lkjagent-cli/tests/commands.rs`
+- Tests: `crates/lkjagent-cli/tests/status.rs`
 - Verification: `docker compose run --rm verify`
 
 ## Failure Modes

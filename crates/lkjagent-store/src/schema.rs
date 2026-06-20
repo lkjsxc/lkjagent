@@ -46,6 +46,20 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             value TEXT NOT NULL
         );
 
+        CREATE TABLE IF NOT EXISTS token_usage_events (
+            id INTEGER PRIMARY KEY,
+            task_id INTEGER,
+            turn INTEGER NOT NULL,
+            created_at TEXT NOT NULL,
+            input_tokens INTEGER,
+            output_tokens INTEGER,
+            cached_input_tokens INTEGER,
+            total_tokens INTEGER,
+            context_window INTEGER,
+            context_used_estimate INTEGER,
+            source TEXT NOT NULL
+        );
+
         CREATE TABLE IF NOT EXISTS graph_cases (
             id INTEGER PRIMARY KEY,
             objective TEXT NOT NULL,

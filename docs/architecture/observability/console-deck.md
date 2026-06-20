@@ -24,6 +24,7 @@ This file defines the compact bottom deck in the interactive console.
 - Deck text overlaps the prompt.
 - Token usage disappears when cached input is unknown.
 - State tracks are hidden behind one phase label.
+- GPT handoff path is absent until the GPT-log command is implemented.
 
 ## Status
 

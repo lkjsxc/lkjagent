@@ -2,6 +2,7 @@ use std::path::Path;
 
 use lkjagent_context::budget::{prefix_cap_total, ContextPressure};
 
+use crate::accounting;
 use crate::config::load_context_policy_for_status;
 use crate::error::CliError;
 use crate::store::open_store;
@@ -18,6 +19,7 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
     let last_compaction = last_compaction(&conn)?;
     let active_states = active_states(&conn)?;
     let policy = load_context_policy_for_status(data_dir)?;
+    let accounting = accounting::deck(&conn, policy)?;
     let used = state_value(&conn, "context used tokens", "0")?;
     let used_tokens: usize = used.parse::<usize>().unwrap_or_default();
     let pressure = state_value(
@@ -26,7 +28,10 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
         pressure_name(policy.pressure(used_tokens, 0)),
     )?;
     Ok(format!(
-        "daemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\ndaemon_question={daemon_question}\ndaemon_error={daemon_error}\nturns={turns}\nactive_states={active_states}\ncontext_window={}\ncontext_reserve={}\ncontext_used_tokens={used}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_soft_trigger={}\ncontext_hard_trigger={}\ncontext_post_compaction_target={}\ncontext_pressure={pressure}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
+        "{}\n{}\n{}\ndaemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\ndaemon_question={daemon_question}\ndaemon_error={daemon_error}\nturns={turns}\nactive_states={active_states}\ncontext_window={}\ncontext_reserve={}\ncontext_used_tokens={used}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_soft_trigger={}\ncontext_hard_trigger={}\ncontext_post_compaction_target={}\ncontext_pressure={pressure}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
+        accounting.context_line,
+        accounting.token_line,
+        accounting.prefix_line,
         policy.window,
         policy.reserve,
         prefix_cap_total(),

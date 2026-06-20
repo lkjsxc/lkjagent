@@ -18,3 +18,4 @@ This directory holds schema setup and typed SQLite store APIs.
 - [schema.rs](schema.rs): current SQLite schema setup.
 - [schema_graph.rs](schema_graph.rs): graph-specific SQLite schema setup.
 - [state.rs](state.rs): key-value state and daemon lock decisions.
+- [token_usage.rs](token_usage.rs): normalized token usage event ledger.
