@@ -153,8 +153,12 @@ pub fn dispatch_graph_note(
         "path",
     ];
     if !allowed.contains(&kind.as_str()) {
+        let example = "<act>\n<tool>graph.note</tool>\n<kind>decision</kind>\n<summary>Chose smaller recovery action</summary>\n</act>";
         return observe_error(
-            ToolError::invalid("unknown graph.note kind"),
+            ToolError::invalid(format!(
+                "unknown graph.note kind; allowed: {}; valid_example:\n{example}",
+                allowed.join(", ")
+            )),
             action_text,
             runtime,
             state,

@@ -1,3 +1,4 @@
+mod examples;
 mod fs_extra_tools;
 mod fs_more_tools;
 mod fs_tools;
@@ -21,13 +22,14 @@ use rusqlite::Connection;
 
 use crate::error::{ToolError, ToolResult};
 use crate::observe::{self, OutputFrame};
+pub use examples::registry_valid_example;
 use normalize::{normalize_action, NormalizationDecision, NormalizationNote};
 use routes::route;
 pub use state::{
     DispatchOutput, DispatchState, GraphDispatchPolicy, GraphEvidenceRecord, ReadRecord,
     ToolRuntime,
 };
-use validate::validate_action;
+pub use validate::validate_action;
 
 pub fn dispatch(
     action: &Action,

@@ -7,6 +7,7 @@ This directory splits dispatcher state, validation, and route helpers.
 ## Table of Contents
 
 - [fs_tools.rs](fs_tools.rs): fs and shell dispatch helpers.
+- [examples.rs](examples.rs): generated copyable valid action examples.
 - [fs_extra_tools.rs](fs_extra_tools.rs): list, search, stat, mkdir, and batch-write routing.
 - [fs_more_tools.rs](fs_more_tools.rs): multi-read, patch, and tree routing.
 - [graph_inspect_tools.rs](graph_inspect_tools.rs): graph next, audit, and recovery routing.
