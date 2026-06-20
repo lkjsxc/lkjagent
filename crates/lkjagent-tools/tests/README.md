@@ -12,6 +12,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [control_count_words.rs](control_count_words.rs): count guard number-word fixtures.
 - [control_dispatch.rs](control_dispatch.rs): control tool close, wait, and count guard fixtures.
 - [control_guard.rs](control_guard.rs): resumed owner guidance completion guards.
+- [control_owner_question.rs](control_owner_question.rs): owner-question admission guard fixtures.
 - [count_seed_allocation.rs](count_seed_allocation.rs): counted scaffold allocation fixtures.
 - [count_seed_allocation_en.rs](count_seed_allocation_en.rs): English allocation fixtures.
 - [count_seed_allocation_jp.rs](count_seed_allocation_jp.rs): Japanese allocation fixtures.

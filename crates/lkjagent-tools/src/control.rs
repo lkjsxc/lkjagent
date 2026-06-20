@@ -2,12 +2,15 @@ use std::path::Path;
 
 mod classify;
 mod guard;
+mod owner_question;
 
 use crate::count_guard::verify_count;
+use crate::dispatch::ActionExample;
 use crate::error::{ToolError, ToolResult};
 use crate::structure::verify_recursive_tree;
 use crate::structure_network::verify_knowledge_network;
 pub use guard::CompletionGuard;
+pub use owner_question::{decide_owner_question, OwnerQuestionDecision};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ControlState {
@@ -81,6 +84,20 @@ pub fn ask(state: &mut ControlState, question: &str) -> ToolResult<String> {
     if question.trim().is_empty() {
         return Err(ToolError::invalid("question must not be empty"));
     }
+    let question = match decide_owner_question(question) {
+        OwnerQuestionDecision::Admit { question } => question,
+        OwnerQuestionDecision::Refuse {
+            reason,
+            internal_next_action,
+        } => return Err(ToolError::invalid(refusal(reason, internal_next_action))),
+    };
     state.question_outstanding = true;
     Ok(format!("waiting\nquestion={question}"))
+}
+
+fn refusal(reason: String, internal_next_action: ActionExample) -> String {
+    format!(
+        "owner question refused\nreason={reason}\ninternal_next_action:\n{}",
+        internal_next_action.render()
+    )
 }
