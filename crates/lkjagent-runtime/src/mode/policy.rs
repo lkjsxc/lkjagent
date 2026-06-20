@@ -51,6 +51,7 @@ fn maintenance_policy(mode: ActiveMode) -> ActiveModePolicy {
         mode,
         allowed_tools: vec![
             "memory.find",
+            "memory.prune",
             "memory.save",
             "queue.list",
             "agent.done",

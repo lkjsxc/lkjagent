@@ -59,7 +59,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [fs_batch.rs](fs_batch.rs): directory creation and batched file writes.
 - [fs_tree.rs](fs_tree.rs): bounded deterministic workspace tree output.
 - [lib.rs](lib.rs): library root.
-- [memory.rs](memory.rs): memory save and find adapters.
+- [memory.rs](memory.rs): memory save, find, and prune adapters.
 - [observe.rs](observe.rs): bounded frame construction helpers.
 - [queue.rs](queue.rs): queue list and mutation adapters.
 - [shell.rs](shell.rs): /bin/sh adapter with timeout handling.

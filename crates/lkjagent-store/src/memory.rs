@@ -1,17 +1,19 @@
 mod identity;
+mod prune;
 mod row;
 mod search;
 
 use rusqlite::{params, Connection, Transaction};
 
 pub use identity::{MemoryIdentity, MemoryWriteDecision};
+pub use prune::{prune_exact_duplicates, MemoryPruneReport};
 pub use row::MemoryRow;
 pub use search::{find, normalize_fts_query};
 
 use crate::error::StoreResult;
 use row::{get_required, rows_from_statement};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum MemoryKind {
     Lesson,
     Fact,
@@ -26,6 +28,16 @@ impl MemoryKind {
             MemoryKind::Fact => "fact",
             MemoryKind::TaskSummary => "task-summary",
             MemoryKind::Incident => "incident",
+        }
+    }
+
+    pub fn parse(value: &str) -> Option<Self> {
+        match value {
+            "lesson" => Some(Self::Lesson),
+            "fact" => Some(Self::Fact),
+            "task-summary" => Some(Self::TaskSummary),
+            "incident" => Some(Self::Incident),
+            _ => None,
         }
     }
 }
@@ -172,7 +184,7 @@ fn insert_fts(
     Ok(())
 }
 
-fn delete_fts(tx: &Transaction<'_>, row: &MemoryRow) -> StoreResult<()> {
+pub(super) fn delete_fts(tx: &Transaction<'_>, row: &MemoryRow) -> StoreResult<()> {
     tx.execute(
         "INSERT INTO memory_fts (memory_fts, rowid, title, tags, content)
          VALUES ('delete', ?1, ?2, ?3, ?4)",

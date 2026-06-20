@@ -55,7 +55,7 @@ and Docker Compose verification have not been rerun for this broader redesign.
 | Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; quiet verify from prior controller work |
 | Document audit tool | implemented | topology checks pass local gates; content artifacts reject scaffold-only leaves; runtime records document-structure only for passed audits |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
-| Memory save and find | partially implemented | accepted kinds, duplicate skip, and punctuation-safe FTS queries have focused tests; maintenance pruning remains open |
+| Memory save and find | partially implemented | accepted kinds, duplicate skip, punctuation-safe FTS queries, and exact duplicate prune have focused tests; semantic merge/rewrite pruning remains open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
 | Runtime recovery | partially implemented | pure active-mode selection exists, maintenance/compaction modes do not render graph-policy refusals, internal `agent.ask` questions are refused, runtime close rechecks graph completion, and no-op maintenance defers restart; repeated invalid actions still need full deterministic recovery control |
@@ -70,7 +70,7 @@ and Docker Compose verification have not been rerun for this broader redesign.
 The dependency queue is
 [execution/current-blockers.md](execution/current-blockers.md). The open work is
 structural, not only endpoint quality: endpoint-turn mode selection,
-maintenance pruning, compaction snapshots, semantic artifact adoption/repair,
+semantic maintenance pruning, compaction snapshots, artifact adoption/repair,
 blocked handoffs, and final verification must move before the ledger can call
 the loop redesign implemented.
 

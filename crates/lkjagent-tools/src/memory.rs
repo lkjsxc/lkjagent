@@ -67,6 +67,14 @@ pub fn find(conn: &Connection, query: &str, limit: usize) -> ToolResult<String> 
     }
 }
 
+pub fn prune(conn: &mut Connection) -> ToolResult<String> {
+    let report = lkjagent_store::memory::prune_exact_duplicates(conn)?;
+    Ok(format!(
+        "memory prune completed\nkept_duplicate_groups={}\ndeleted_rows={}",
+        report.kept, report.deleted
+    ))
+}
+
 fn parse_kind(kind: &str) -> ToolResult<lkjagent_store::memory::MemoryKind> {
     match kind {
         "lesson" => Ok(lkjagent_store::memory::MemoryKind::Lesson),

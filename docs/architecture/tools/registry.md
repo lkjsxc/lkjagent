@@ -32,6 +32,7 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | queue.redeliver | id req; reason req; content opt | create a pending row linked to a source row | missing row |
 | memory.save | kind req; title req; tags opt; content req | insert one memory row, return its id | unknown kind |
 | memory.find | query req; limit opt 5 | ranked full-text search over memory | none; empty results are ok |
+| memory.prune | none | delete exact duplicate memory rows | store delete failure |
 | graph.state | none | show active graph case, phase, node, evidence, and transitions | no active case |
 | graph.next | none | show legal transitions, missing guards, and preferred next action | no active case |
 | graph.audit | none | audit active graph case, policy, completion, and shell admission | no active case |

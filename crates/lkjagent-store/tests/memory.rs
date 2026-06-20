@@ -2,7 +2,8 @@ mod support;
 
 use lkjagent_store::graph::{link_memory, open_case, OpenCase};
 use lkjagent_store::memory::{
-    delete as delete_memory, digest, find, save, update as update_memory, MemoryKind, MemoryUpdate,
+    delete as delete_memory, digest, find, prune_exact_duplicates, save, update as update_memory,
+    MemoryKind, MemoryUpdate,
 };
 use support::{memory_store, TestResult};
 
@@ -81,6 +82,45 @@ fn memory_updates_and_deletes_keep_fts_current() -> TestResult<()> {
     delete_memory(&mut conn, id)?;
     let fresh = find(&conn, "fresh", 3)?;
     assert!(fresh.is_empty());
+    Ok(())
+}
+
+#[test]
+fn memory_prune_deletes_exact_duplicates() -> TestResult<()> {
+    let mut conn = memory_store()?;
+    let kept = save(
+        &mut conn,
+        MemoryKind::Lesson,
+        "graph note recovery",
+        "graph,recovery",
+        "normalize graph note aliases",
+        100,
+        "2026-01-01T00:00:00Z",
+    )?;
+    conn.execute(
+        "INSERT INTO memory (kind, title, tags, content, tokens, created_at, updated_at)
+         VALUES ('lesson', 'graph note recovery', 'recovery,graph',
+                 'normalize graph note aliases', 100, '2026', '2026')",
+        [],
+    )?;
+    let duplicate = conn.last_insert_rowid();
+    conn.execute(
+        "INSERT INTO memory_fts (rowid, title, tags, content) VALUES (?1, ?2, ?3, ?4)",
+        (
+            duplicate,
+            "graph note recovery",
+            "recovery,graph",
+            "normalize graph note aliases",
+        ),
+    )?;
+
+    let report = prune_exact_duplicates(&mut conn)?;
+
+    assert_eq!(report.kept, 1);
+    assert_eq!(report.deleted, 1);
+    let found = find(&conn, "graph note recovery", 5)?;
+    assert_eq!(found.len(), 1);
+    assert_eq!(found[0].id, kept);
     Ok(())
 }
 

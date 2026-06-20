@@ -20,7 +20,7 @@ prompt and behavior cannot drift.
 - [doc-tools.md](doc-tools.md): doc.scaffold and doc.audit document topology tools.
 - [shell.md](shell.md): shell.run, the escape hatch and its capture rules.
 - [queue-ops.md](queue-ops.md): queue.list and queue mutation actions.
-- [memory-ops.md](memory-ops.md): memory.save and memory.find, the durable-knowledge contracts.
+- [memory-ops.md](memory-ops.md): memory.save, memory.find, and memory.prune contracts.
 - [graph-ops.md](graph-ops.md): graph.state, graph.plan,
   graph.transition, graph.context, graph.note, graph.evidence, and graph.compact.
 - [control.md](control.md): agent.done and agent.ask, the actions that close or suspend a task.

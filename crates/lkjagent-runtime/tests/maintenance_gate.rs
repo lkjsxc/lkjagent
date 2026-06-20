@@ -22,6 +22,9 @@ const MEMORY_SAVE: &str = "<act>
 <tags>maintenance</tags>
 <content>idle cycle recorded a durable note</content>
 </act>";
+const MEMORY_PRUNE: &str = "<act>
+<tool>memory.prune</tool>
+</act>";
 
 #[test]
 fn maintenance_blocks_workspace_write_tools() -> TestResult<()> {
@@ -70,6 +73,24 @@ fn maintenance_memory_save_ignores_stale_graph_policy() -> TestResult<()> {
         !event
             .content
             .contains("graph policy refused tool=memory.save")
+    }));
+    Ok(())
+}
+
+#[test]
+fn maintenance_memory_prune_is_allowed() -> TestResult<()> {
+    let mut conn = store()?;
+    take_daemon_lock(&conn, "test", "100", "0")?;
+    let workspace = temp_workspace("maintenance-prune")?;
+    let server = serve_responses(vec![completion(MEMORY_PRUNE)])?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    server.join()?;
+
+    assert!(events::read_events(&conn)?.iter().any(|event| {
+        event.kind == "observation" && event.content.contains("memory prune completed")
     }));
     Ok(())
 }
