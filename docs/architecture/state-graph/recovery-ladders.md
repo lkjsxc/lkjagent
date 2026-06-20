@@ -28,6 +28,11 @@ Recovery follows this deterministic order:
 5. use shell only from a shell-admitted recovery node.
 6. mark the specific plan step blocked and continue an independent step.
 
+Parameter faults have their own route. Three consecutive parser-level
+parameter faults move the graph to `recover-params`, render the valid action
+example for the rejected tool, and expose only `graph.state`, `fs.list`,
+`workspace.summary`, and `agent.ask` as next actions.
+
 Waiting is valid only for a concrete owner decision, context invalidity,
 endpoint outage policy, or sandbox boundary.
 

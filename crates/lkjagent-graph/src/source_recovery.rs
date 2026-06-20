@@ -1,6 +1,7 @@
 use crate::model::{GraphNode, NodeKind};
 use crate::source_nodes::{
-    node, COMPACT_PACKAGES, NO_EVIDENCE, PLAN_TOOLS, RECOVERY_PACKAGES, RECOVERY_TOOLS,
+    node, COMPACT_PACKAGES, NO_EVIDENCE, PARAM_RECOVERY_TOOLS, PLAN_TOOLS, RECOVERY_PACKAGES,
+    RECOVERY_TOOLS,
 };
 
 pub(crate) const NODES: &[GraphNode] = &[
@@ -11,6 +12,14 @@ pub(crate) const NODES: &[GraphNode] = &[
         NO_EVIDENCE,
         RECOVERY_PACKAGES,
         RECOVERY_TOOLS,
+    ),
+    node(
+        "recover-params",
+        NodeKind::Recovery,
+        "recover from action parameter mismatch with exact schema",
+        NO_EVIDENCE,
+        RECOVERY_PACKAGES,
+        PARAM_RECOVERY_TOOLS,
     ),
     node(
         "recover-tool",

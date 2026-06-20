@@ -16,6 +16,10 @@ const TOOL_FAULT: &[Guard] = &[Guard::FaultCountAtLeast(
     crate::case_recovery::FaultKind::Tool,
     1,
 )];
+const PARAM_FAULT: &[Guard] = &[Guard::FaultCountAtLeast(
+    crate::case_recovery::FaultKind::Params,
+    1,
+)];
 const REPEAT_FAULT: &[Guard] = &[Guard::FaultCountAtLeast(
     crate::case_recovery::FaultKind::Repeat,
     1,
@@ -96,6 +100,7 @@ pub(crate) const EDGES: &[GraphEdge] = &[
     edge("execute-recover", EdgeKind::Recover, "execute", "recover-tool", TOOL_FAULT),
     edge("recover-inspect", EdgeKind::Recover, "recover", "recover-by-state-inspection", ALWAYS),
     edge("recover-parse", EdgeKind::Recover, "recover", "recover-parse", ALWAYS),
+    edge("recover-params", EdgeKind::Recover, "recover", "recover-params", ALWAYS),
     edge("recover-endpoint", EdgeKind::Recover, "recover", "recover-endpoint", ALWAYS),
     edge("recover-budget", EdgeKind::Recover, "recover", "recover-budget", ALWAYS),
     edge("recover-verification", EdgeKind::Recover, "recover", "recover-verification", ALWAYS),
@@ -104,6 +109,8 @@ pub(crate) const EDGES: &[GraphEdge] = &[
     edge("recover-repeat-plan", EdgeKind::Plan, "recover-repeat", "plan", ALWAYS),
     edge("recover-repeat-alt", EdgeKind::Recover, "recover-repeat", "recover-by-alternate-tool", ALWAYS),
     edge("recover-parse-inspect", EdgeKind::Recover, "recover-parse", "recover-by-state-inspection", ALWAYS),
+    edge("recover-params-inspect", EdgeKind::Recover, "recover-params", "recover-by-state-inspection", ALWAYS),
+    edge("recover-params-plan", EdgeKind::Plan, "recover-params", "plan", ALWAYS),
     edge("recover-endpoint-context", EdgeKind::Recover, "recover-endpoint", "recover-context", ALWAYS),
     edge("recover-context-refresh", EdgeKind::SelectContext, "recover-context", "context-refresh", ALWAYS),
     edge("recover-budget-smaller", EdgeKind::Recover, "recover-budget", "recover-by-smaller-scope", ALWAYS),
@@ -115,6 +122,7 @@ pub(crate) const EDGES: &[GraphEdge] = &[
     edge("shell-escape-plan", EdgeKind::Plan, "recover-by-shell-escape", "plan", ALWAYS),
     edge("recover-owner-question", EdgeKind::Recover, "recover", "owner-question", OWNER_QUESTION),
     edge("execute-repeat", EdgeKind::Recover, "execute", "recover-repeat", REPEAT_FAULT),
+    edge("execute-params", EdgeKind::Recover, "execute", "recover-params", PARAM_FAULT),
     edge("execute-soft-compact", EdgeKind::Compact, "execute", "compact-soft", SOFT_PRESSURE),
     edge("verify-hard-compact", EdgeKind::Compact, "verify", "compact-hard", HARD_PRESSURE),
     edge("verify-escape", EdgeKind::Recover, "verify", "escape", TOOL_FAULT),

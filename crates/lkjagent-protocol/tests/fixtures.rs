@@ -76,6 +76,7 @@ fn produces_each_parse_fault_variant() {
         (
             "<act>\n<tool>fs.read</tool>\n<bogus>x</bogus>\n<extra>y</extra>\n</act>",
             ParseFault::BadParams {
+                tool: "fs.read".to_string(),
                 missing: vec!["path".to_string()],
                 unknown: vec!["bogus".to_string(), "extra".to_string()],
             },

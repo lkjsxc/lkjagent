@@ -13,6 +13,7 @@ use crate::task::RuntimeState;
 #[derive(Clone, Copy)]
 pub(super) enum RecoveryFault {
     Parse,
+    Params,
     Repeat,
     Tool,
 }
@@ -76,6 +77,7 @@ pub(super) fn enter_recovery_route(
 fn route_notice(fault: RecoveryFault, count: u8) -> String {
     let prefix = match fault {
         RecoveryFault::Parse => "Consecutive parse faults",
+        RecoveryFault::Params => "Consecutive parameter faults",
         RecoveryFault::Repeat => "Consecutive repeated actions",
         RecoveryFault::Tool => "Consecutive tool errors",
     };
@@ -157,6 +159,7 @@ fn push_graph_effects(
 fn set_graph_fault_count(graph: &mut lkjagent_graph::TaskGraphState, kind: FaultKind, count: u8) {
     match kind {
         FaultKind::Parse => graph.recovery.parse_failures = count,
+        FaultKind::Params => graph.recovery.param_failures = count,
         FaultKind::Tool => graph.recovery.tool_failures = count,
         FaultKind::Repeat => graph.recovery.repeat_failures = count,
         FaultKind::Endpoint => graph.recovery.endpoint_failures = count,
@@ -165,10 +168,10 @@ fn set_graph_fault_count(graph: &mut lkjagent_graph::TaskGraphState, kind: Fault
         FaultKind::Verification => graph.recovery.verification_failures = count,
     }
 }
-
 fn fault_kind(fault: RecoveryFault) -> FaultKind {
     match fault {
         RecoveryFault::Parse => FaultKind::Parse,
+        RecoveryFault::Params => FaultKind::Params,
         RecoveryFault::Repeat => FaultKind::Repeat,
         RecoveryFault::Tool => FaultKind::Tool,
     }
@@ -177,6 +180,7 @@ fn fault_kind(fault: RecoveryFault) -> FaultKind {
 fn target_node(fault: RecoveryFault) -> GraphNodeId {
     match fault {
         RecoveryFault::Parse => GraphNodeId("recover-parse"),
+        RecoveryFault::Params => GraphNodeId("recover-params"),
         RecoveryFault::Repeat => GraphNodeId("recover-repeat"),
         RecoveryFault::Tool => GraphNodeId("recover-tool"),
     }
@@ -185,6 +189,7 @@ fn target_node(fault: RecoveryFault) -> GraphNodeId {
 fn fault_name(kind: FaultKind) -> &'static str {
     match kind {
         FaultKind::Parse => "parse",
+        FaultKind::Params => "params",
         FaultKind::Tool => "tool",
         FaultKind::Repeat => "repeat",
         FaultKind::Endpoint => "endpoint",

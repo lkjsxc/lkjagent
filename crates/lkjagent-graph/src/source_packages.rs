@@ -58,6 +58,7 @@ const DOC_NODES: &[GraphNodeId] = &[
 const RECOVERY_NODES: &[GraphNodeId] = &[
     GraphNodeId("recover"),
     GraphNodeId("recover-parse"),
+    GraphNodeId("recover-params"),
     GraphNodeId("recover-tool"),
     GraphNodeId("recover-repeat"),
     GraphNodeId("recover-context"),
