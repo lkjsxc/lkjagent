@@ -103,6 +103,11 @@ const BREAD_BAD_SCAFFOLD: &[FileSpec] = &[FileSpec {
     content: "profile=GenericProjectDocs\ndoc.scaffold root=docs/bread\ndocument=root=structured-output audit=Missing\nagent.done scaffold only\n",
 }];
 
+const BREAD_BAD_EMPTY_ROOT: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content: "root=cookbooks/cookbook-about-bread\nempty artifact root after many turns\nrecover-by-smaller-scope blocked doc.scaffold\nagent.done claimed progress\n",
+}];
+
 pub const BREAD_TASK: BenchmarkTask = BenchmarkTask {
     id: "owner-loop-bread-cookbook-001",
     suite: "tiny",
@@ -124,6 +129,10 @@ pub const BREAD_TASK: BenchmarkTask = BenchmarkTask {
         Fixture {
             name: "bread-cookbook-scaffold-only-complete",
             files: BREAD_BAD_SCAFFOLD,
+        },
+        Fixture {
+            name: "recovery-big-bread-cookbook-empty-root",
+            files: BREAD_BAD_EMPTY_ROOT,
         },
     ],
     judge: JudgeKind::BreadCookbookArtifact,

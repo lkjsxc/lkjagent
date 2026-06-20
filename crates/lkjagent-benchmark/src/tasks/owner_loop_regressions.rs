@@ -44,6 +44,50 @@ pub const GRAPH_PLAN_TASK: BenchmarkTask = BenchmarkTask {
     timeout_seconds: 120,
 };
 
+const TRANSITION_GOOD: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content: "legal_transitions=document-audit,document-repair\nvalid_example:\n<act>\n<tool>graph.transition</tool>\n<target>document-audit</target>\n<reason>audit document artifact before completion</reason>\n</act>\n",
+}];
+
+const TRANSITION_BAD_LABEL: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content: "valid_example:\n<act>\n<tool>graph.transition</tool>\n<target>plan:admitted</target>\n</act>\n",
+}];
+
+const TRANSITION_BAD_ALIAS: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content: "graph policy refused graph.transition\nvalid_example target=audit\nlegal target is document-audit\n",
+}];
+
+pub const TRANSITION_TASK: BenchmarkTask = BenchmarkTask {
+    id: "owner-loop-graph-transition-target-001",
+    suite: "tiny",
+    family: TaskFamily::OwnerReliability,
+    difficulty: Difficulty::Tiny,
+    tags: &["owner-failure", "graph-transition", "example"],
+    prompt: "Render graph.transition examples with legal node ids only.",
+    follow_up: None,
+    starter_files: &[],
+    good: &[Fixture {
+        name: "graph-transition-legal-target-example",
+        files: TRANSITION_GOOD,
+    }],
+    bad: &[
+        Fixture {
+            name: "graph-transition-illegal-admitted-label",
+            files: TRANSITION_BAD_LABEL,
+        },
+        Fixture {
+            name: "graph-transition-illegal-target-example",
+            files: TRANSITION_BAD_ALIAS,
+        },
+    ],
+    judge: JudgeKind::GraphTransitionTarget,
+    seed: 8117,
+    points: 1,
+    timeout_seconds: 120,
+};
+
 const FTS_GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
     content: "memory.find query=graph.note query_normalized=graph note\nmemory.find query=parameter-fault query_normalized=parameter fault\n",

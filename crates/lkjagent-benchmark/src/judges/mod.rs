@@ -29,6 +29,7 @@ pub fn judge_task(task: &BenchmarkTask, workspace: &Path) -> BenchResult<JudgeOu
         JudgeKind::DocScaffoldParamRecovery => owner_ops::doc_scaffold_recovery(workspace),
         JudgeKind::RecoveryLoopLongStory => owner_ops::recovery_loop_long_story(workspace),
         JudgeKind::GraphPlanExample => owner_loop_ops::graph_plan_example(workspace),
+        JudgeKind::GraphTransitionTarget => owner_loop_ops::graph_transition_target(workspace),
         JudgeKind::MemoryFtsQuery => owner_loop_ops::memory_fts_query(workspace),
         JudgeKind::MaintenanceMemoryDuplicate => {
             owner_loop_ops::maintenance_memory_duplicate(workspace)

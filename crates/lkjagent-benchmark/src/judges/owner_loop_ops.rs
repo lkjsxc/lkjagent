@@ -13,6 +13,28 @@ pub fn graph_plan_example(workspace: &Path) -> Result<(), String> {
     )
 }
 
+pub fn graph_transition_target(workspace: &Path) -> Result<(), String> {
+    let text = read_any(workspace)?;
+    require_all(
+        &text,
+        &[
+            "<tool>graph.transition</tool>",
+            "<target>document-audit</target>",
+            "legal_transitions=",
+        ],
+    )?;
+    forbid_any(
+        &text,
+        &[
+            "target=plan:admitted",
+            "<target>plan:admitted</target>",
+            "valid_example target=audit",
+            "<target>audit</target>",
+            "graph policy refused graph.transition",
+        ],
+    )
+}
+
 pub fn memory_fts_query(workspace: &Path) -> Result<(), String> {
     let text = read_any(workspace)?;
     require_all(&text, &["memory.find", "query_normalized=graph note"])?;
@@ -113,6 +135,8 @@ pub fn bread_cookbook_artifact(workspace: &Path) -> Result<(), String> {
             "agent.done all evidence requirements met",
             "agent.done scaffold only",
             "audit=Missing",
+            "empty artifact root",
+            "claimed progress",
         ],
     )
 }
