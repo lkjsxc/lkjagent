@@ -37,7 +37,7 @@ fn token_usage_ledger_preserves_known_and_unknown_values() -> TestResult<()> {
         "2026-06-20T00:00:01Z",
     )?;
 
-    let row = latest(&conn)?.expect("latest token usage row");
+    let row = latest(&conn)?.ok_or("latest token usage row")?;
 
     assert_eq!(row.turn, 8);
     assert_eq!(row.input_tokens, None);

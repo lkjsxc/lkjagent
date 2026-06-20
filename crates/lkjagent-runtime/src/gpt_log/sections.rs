@@ -6,6 +6,17 @@ use super::text::{bullets, cell, context_line, line, section, state_u64, state_v
 use crate::error::RuntimeResult;
 
 type CaseRow = lkjagent_store::graph::GraphCaseRow;
+type UsageRow = lkjagent_store::token_usage::TokenUsageEvent;
+
+struct SnapshotContext<'a> {
+    conn: &'a Connection,
+    now: &'a str,
+    queue_depth: usize,
+    used: u64,
+    budget: ContextBudgetPolicy,
+    usage: Option<&'a UsageRow>,
+    case: Option<&'a CaseRow>,
+}
 
 pub fn render(conn: &Connection, now: &str, budget: ContextBudgetPolicy) -> RuntimeResult<String> {
     let case = lkjagent_store::graph::active_case(conn)?;
@@ -16,13 +27,15 @@ pub fn render(conn: &Connection, now: &str, budget: ContextBudgetPolicy) -> Runt
     let mut out = String::from("# lkjagent GPT-5.5-Pro Run Log\n\n");
     snapshot(
         &mut out,
-        conn,
-        now,
-        queue_depth,
-        used,
-        budget,
-        usage.as_ref(),
-        case.as_ref(),
+        SnapshotContext {
+            conn,
+            now,
+            queue_depth,
+            used,
+            budget,
+            usage: usage.as_ref(),
+            case: case.as_ref(),
+        },
     )?;
     owner_objective(&mut out, case.as_ref());
     constraints(&mut out, case.as_ref());
@@ -36,37 +49,33 @@ pub fn render(conn: &Connection, now: &str, budget: ContextBudgetPolicy) -> Runt
     Ok(out)
 }
 
-fn snapshot(
-    out: &mut String,
-    conn: &Connection,
-    now: &str,
-    queue_depth: usize,
-    used: u64,
-    budget: ContextBudgetPolicy,
-    usage: Option<&lkjagent_store::token_usage::TokenUsageEvent>,
-    case: Option<&CaseRow>,
-) -> RuntimeResult<()> {
+fn snapshot(out: &mut String, ctx: SnapshotContext<'_>) -> RuntimeResult<()> {
     section(out, "Snapshot");
-    line(out, "created_at", now);
+    line(out, "created_at", ctx.now);
     line(
         out,
         "daemon_state",
-        &state_value(conn, "daemon state", "stopped")?,
+        &state_value(ctx.conn, "daemon state", "stopped")?,
     );
-    line(out, "queue_depth", &queue_depth.to_string());
+    line(out, "queue_depth", &ctx.queue_depth.to_string());
     line(
         out,
         "active_case",
-        &case.map_or("none".to_string(), |case| case.id.to_string()),
+        &ctx.case
+            .map_or("none".to_string(), |case| case.id.to_string()),
     );
     line(
         out,
         "active_node",
-        case.map_or("none", |case| &case.active_node),
+        ctx.case.map_or("none", |case| &case.active_node),
     );
-    line(out, "active_phase", case.map_or("none", |case| &case.phase));
-    line(out, "context", &context_line(used, budget));
-    line(out, "token_usage", &token_line(usage));
+    line(
+        out,
+        "active_phase",
+        ctx.case.map_or("none", |case| &case.phase),
+    );
+    line(out, "context", &context_line(ctx.used, ctx.budget));
+    line(out, "token_usage", &token_line(ctx.usage));
     out.push('\n');
     Ok(())
 }

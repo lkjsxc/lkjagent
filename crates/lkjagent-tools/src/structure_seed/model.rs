@@ -75,6 +75,13 @@ pub fn write_leaves(workspace: &Path, seeds: &[LeafSeed], counts: &mut Counts) -
     Ok(())
 }
 
+pub fn write_doc_graph(workspace: &Path, profile: &str, counts: &mut Counts) -> ToolResult<()> {
+    let content = format!(
+        "# Document Graph\n\n## Purpose\n\nCompact graph ledger for the `{profile}` structure seed.\n\n## Nodes\n\n| id | path | role | status |\n| --- | --- | --- | --- |\n| root | README.md | root index | scaffolded |\n| architecture | architecture/README.md | architecture index | scaffolded |\n| guides | guides/README.md | guides index | scaffolded |\n| operations | operations/README.md | operations index | scaffolded |\n\n## Edges\n\n| from | to | kind | reason |\n| --- | --- | --- | --- |\n| root | architecture | indexes | local table of contents |\n| root | guides | indexes | local table of contents |\n| root | operations | indexes | verification path |\n\n## Coverage\n\n| owner requirement | covered by | status |\n| --- | --- | --- |\n| recursive structure | README.md and child README indexes | satisfied |\n| no part files | all generated paths | satisfied |\n| graph manifest | .lkj-doc-graph.md | satisfied |\n"
+    );
+    write_missing(workspace, "docs/.lkj-doc-graph.md", &content, counts)
+}
+
 fn readme_content(seed: &ReadmeSeed) -> String {
     format!(
         "# {}\n\n## Purpose\n\n{}\n\n## Table of Contents\n\n{}\n",

@@ -14,7 +14,9 @@ fn scaffold_recursive_docs_satisfies_completion_guard() -> TestResult<()> {
     let report = scaffold_recursive_docs(&workspace)?;
 
     assert!(report.contains("verification=ok"));
+    assert!(report.contains("graph=docs/.lkj-doc-graph.md"));
     verify_recursive_tree(&workspace)?;
+    assert!(workspace.join("docs/.lkj-doc-graph.md").exists());
     Ok(())
 }
 
@@ -25,8 +27,10 @@ fn knowledge_scaffold_satisfies_network_guard() -> TestResult<()> {
     let report = scaffold_profile(&workspace, ScaffoldProfile::Knowledge)?;
 
     assert!(report.contains("profile=knowledge"));
+    assert!(report.contains("graph=docs/.lkj-doc-graph.md"));
     assert!(report.contains("growth=incremental"));
     verify_knowledge_network(&workspace)?;
+    assert!(workspace.join("docs/.lkj-doc-graph.md").exists());
     assert!(workspace.join("docs/maps/concept-network.md").exists());
     assert!(workspace.join("docs/current-state.md").exists());
     assert!(workspace.join("docs/execution/expansion-queue.md").exists());
@@ -34,7 +38,7 @@ fn knowledge_scaffold_satisfies_network_guard() -> TestResult<()> {
     assert!(workspace.join("docs/reference/ontology.md").exists());
     assert!(!workspace.join("docs/timelines").exists());
     assert!(!workspace.join("docs/questions").exists());
-    assert!(markdown_count(&workspace.join("docs"))? <= 24);
+    assert!(markdown_count(&workspace.join("docs"))? <= 25);
     Ok(())
 }
 

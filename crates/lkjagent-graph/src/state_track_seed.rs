@@ -1,6 +1,47 @@
 use crate::model::{GraphNodeId, TaskFamily, TaskPhase};
-use crate::state_track::{StatePosture, StateTrack};
+use crate::state_track::{StatePosture, StateTrack, StateTrackInput};
 
+struct TrackSeed<'a> {
+    id: &'a str,
+    label: &'a str,
+    posture: StatePosture,
+    intensity: u8,
+    confidence: u8,
+    phase: TaskPhase,
+    active_node: GraphNodeId,
+    gaps: &'a [&'a str],
+}
+
+impl TrackSeed<'_> {
+    fn into_track(self) -> StateTrack {
+        StateTrack::new(StateTrackInput {
+            id: self.id,
+            label: self.label,
+            posture: self.posture,
+            intensity: self.intensity,
+            confidence: self.confidence,
+            phase: self.phase,
+            active_node: self.active_node,
+            gaps: self.gaps,
+        })
+    }
+}
+
+macro_rules! seed {
+    ($id:expr, $label:expr, $posture:expr, $intensity:expr, $confidence:expr, $phase:expr, $node:expr, $gaps:expr $(,)?) => {
+        TrackSeed {
+            id: $id,
+            label: $label,
+            posture: $posture,
+            intensity: $intensity,
+            confidence: $confidence,
+            phase: $phase,
+            active_node: $node,
+            gaps: $gaps,
+        }
+        .into_track()
+    };
+}
 pub fn initial_state_tracks(
     family: TaskFamily,
     active_node: GraphNodeId,
@@ -10,7 +51,7 @@ pub fn initial_state_tracks(
         TaskFamily::Documentation | TaskFamily::KnowledgeBase => docs(active_node, confidence),
         TaskFamily::Architecture => architecture(active_node, confidence),
         TaskFamily::Recovery => vec![
-            track(
+            seed!(
                 "recovery",
                 "fault-recovery",
                 StatePosture::Recovering,
@@ -20,7 +61,7 @@ pub fn initial_state_tracks(
                 GraphNodeId("recover"),
                 &["recovery evidence"],
             ),
-            track(
+            seed!(
                 "inspection",
                 "state-inspection",
                 StatePosture::Exploring,
@@ -32,7 +73,7 @@ pub fn initial_state_tracks(
             ),
         ],
         TaskFamily::IdleMaintenance | TaskFamily::Maintenance => vec![
-            track(
+            seed!(
                 "maintenance",
                 "maintenance",
                 StatePosture::Maintaining,
@@ -42,7 +83,7 @@ pub fn initial_state_tracks(
                 active_node,
                 &["maintenance evidence"],
             ),
-            track(
+            seed!(
                 "verification",
                 "verification-gates",
                 StatePosture::Verifying,
@@ -54,7 +95,7 @@ pub fn initial_state_tracks(
             ),
         ],
         _ => vec![
-            track(
+            seed!(
                 "implementation",
                 "implementation",
                 StatePosture::Implementing,
@@ -64,7 +105,7 @@ pub fn initial_state_tracks(
                 active_node,
                 &["plan evidence"],
             ),
-            track(
+            seed!(
                 "verification",
                 "verification-gates",
                 StatePosture::Verifying,
@@ -74,7 +115,7 @@ pub fn initial_state_tracks(
                 GraphNodeId("verify"),
                 &["test evidence"],
             ),
-            track(
+            seed!(
                 "recovery",
                 "action-recovery",
                 StatePosture::Recovering,
@@ -90,7 +131,7 @@ pub fn initial_state_tracks(
 
 fn docs(active_node: GraphNodeId, confidence: u8) -> Vec<StateTrack> {
     vec![
-        track(
+        seed!(
             "document-structure",
             "document-structure",
             StatePosture::Structuring,
@@ -100,7 +141,7 @@ fn docs(active_node: GraphNodeId, confidence: u8) -> Vec<StateTrack> {
             active_node,
             &["document audit"],
         ),
-        track(
+        seed!(
             "action-recovery",
             "action-param-reliability",
             StatePosture::Recovering,
@@ -110,7 +151,7 @@ fn docs(active_node: GraphNodeId, confidence: u8) -> Vec<StateTrack> {
             GraphNodeId("recover"),
             &["normalizer tests"],
         ),
-        track(
+        seed!(
             "observability",
             "observability-ledger",
             StatePosture::Exploring,
@@ -125,7 +166,7 @@ fn docs(active_node: GraphNodeId, confidence: u8) -> Vec<StateTrack> {
 
 fn architecture(active_node: GraphNodeId, confidence: u8) -> Vec<StateTrack> {
     vec![
-        track(
+        seed!(
             "architecture",
             "target-architecture",
             StatePosture::Structuring,
@@ -135,7 +176,7 @@ fn architecture(active_node: GraphNodeId, confidence: u8) -> Vec<StateTrack> {
             active_node,
             &["design evidence"],
         ),
-        track(
+        seed!(
             "implementation",
             "implementation-alignment",
             StatePosture::Implementing,
@@ -145,7 +186,7 @@ fn architecture(active_node: GraphNodeId, confidence: u8) -> Vec<StateTrack> {
             GraphNodeId("execute"),
             &["code evidence"],
         ),
-        track(
+        seed!(
             "verification",
             "verification-gates",
             StatePosture::Verifying,
@@ -156,26 +197,4 @@ fn architecture(active_node: GraphNodeId, confidence: u8) -> Vec<StateTrack> {
             &["test evidence"],
         ),
     ]
-}
-
-fn track(
-    id: &str,
-    label: &str,
-    posture: StatePosture,
-    intensity: u8,
-    confidence: u8,
-    phase: TaskPhase,
-    active_node: GraphNodeId,
-    gaps: &[&str],
-) -> StateTrack {
-    StateTrack::new(
-        id,
-        label,
-        posture,
-        intensity,
-        confidence,
-        phase,
-        active_node,
-        gaps,
-    )
 }

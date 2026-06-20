@@ -30,6 +30,18 @@ pub struct StateTrack {
     pub last_update_turn: Option<u64>,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct StateTrackInput<'a> {
+    pub id: &'a str,
+    pub label: &'a str,
+    pub posture: StatePosture,
+    pub intensity: u8,
+    pub confidence: u8,
+    pub phase: TaskPhase,
+    pub active_node: GraphNodeId,
+    pub gaps: &'a [&'a str],
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RankedStateTrack {
     pub rank_score: u8,
@@ -52,25 +64,16 @@ impl StatePosture {
 }
 
 impl StateTrack {
-    pub fn new(
-        id: &str,
-        label: &str,
-        posture: StatePosture,
-        intensity: u8,
-        confidence: u8,
-        phase: TaskPhase,
-        active_node: GraphNodeId,
-        gaps: &[&str],
-    ) -> Self {
+    pub fn new(input: StateTrackInput<'_>) -> Self {
         Self {
-            id: StateTrackId(id.to_string()),
-            label: label.to_string(),
-            posture,
-            intensity,
-            confidence,
-            phase,
-            active_node,
-            evidence_gap: gaps.iter().map(|gap| (*gap).to_string()).collect(),
+            id: StateTrackId(input.id.to_string()),
+            label: input.label.to_string(),
+            posture: input.posture,
+            intensity: input.intensity,
+            confidence: input.confidence,
+            phase: input.phase,
+            active_node: input.active_node,
+            evidence_gap: input.gaps.iter().map(|gap| (*gap).to_string()).collect(),
             next_affordances: Vec::new(),
             risk: Vec::new(),
             last_update_turn: None,
@@ -135,16 +138,16 @@ pub fn promote_recovery_track(
         ];
         return;
     }
-    tracks.push(StateTrack::new(
-        "recovery",
+    tracks.push(StateTrack::new(StateTrackInput {
+        id: "recovery",
         label,
-        StatePosture::Recovering,
-        90,
-        70,
+        posture: StatePosture::Recovering,
+        intensity: 90,
+        confidence: 70,
         phase,
         active_node,
-        &["recovery evidence"],
-    ));
+        gaps: &["recovery evidence"],
+    }));
 }
 
 pub fn render_ranked_tracks(tracks: &[StateTrack], limit: usize) -> String {
