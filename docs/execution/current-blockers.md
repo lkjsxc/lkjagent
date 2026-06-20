@@ -18,7 +18,7 @@ evidence named by the task contract and the actual gates that ran.
 | 7 | Transition recommendations can point to illegal or impossible targets | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
 | 8 | Structured record identity and deduplication are missing | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
 | 9 | The runtime lacks a deterministic active-mode controller | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 10 | Uploaded-failure benchmark coverage still needs final verification | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 10 | Uploaded-failure benchmark coverage needed final verification | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | done |
 | 11 | Status and console omit compact context and token accounting | [current-work/context-accounting.md](current-work/context-accounting.md) | done |
 | 12 | No single current GPT handoff log exists | [current-work/gpt-log.md](current-work/gpt-log.md) | done |
 
@@ -31,8 +31,10 @@ maintenance restarts after no useful work.
 
 ## Ordering Notes
 
-- Rows 1 through 10 remain open until focused tests and Docker Compose
+- Rows 1 through 9 remain open until focused tests and Docker Compose
   verification prove the uploaded failure patterns cannot recur.
+- Row 10 is done for this slice: uploaded-loop fixtures exist and final quiet
+  plus Docker Compose verification passed on 2026-06-20.
 - Documentation moves first, then code. Do not mark prompt-only guidance done.
 - Docker Compose verification is required for any implemented claim.
 

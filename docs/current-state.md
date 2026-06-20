@@ -42,7 +42,7 @@ owner-reported documentation, action recovery, recovery-loop, graph-plan
 example, FTS punctuation, duplicate-memory, active-policy contradiction,
 invalid-note-kind, bread-cookbook false-completion, accounting, and GPT log
 failure cases with known-good and known-bad fixtures. Final quiet verification
-and Docker Compose verification have not been rerun for this broader redesign.
+and Docker Compose verification passed for this redesign slice on 2026-06-20.
 
 ## Area Status
 
@@ -63,7 +63,7 @@ and Docker Compose verification have not been rerun for this broader redesign.
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
 | GPT handoff log | implemented | runtime and CLI write one current Markdown snapshot |
-| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist and corpus passes; final Docker gate remains open |
+| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist; corpus, quiet verify, and Docker Compose verify pass for this slice |
 
 ## Open Work
 
