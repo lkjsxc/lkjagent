@@ -8,6 +8,7 @@ mod graph_state_row;
 pub mod graph_state_tracks;
 pub mod intake;
 pub mod maintenance;
+pub mod mode;
 pub mod prompt;
 pub mod recovery;
 pub mod step;

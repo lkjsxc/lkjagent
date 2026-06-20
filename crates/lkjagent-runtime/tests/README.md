@@ -8,6 +8,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 
 - [maintenance.rs](maintenance.rs): idle cycle rotation, preemption, and early-close fixtures.
 - [maintenance_authority.rs](maintenance_authority.rs): maintenance tool authority and local remote fixtures.
+- [active_mode.rs](active_mode.rs): active-mode selection and policy rendering fixtures.
 - [automatic_maintenance.rs](automatic_maintenance.rs): daemon idle maintenance and owner preemption fixtures.
 - [budget_recovery.rs](budget_recovery.rs): exhausted task budget waiting and owner-send resume fixtures.
 - [daemon_loop.rs](daemon_loop.rs): resident queue, endpoint, tool, ask, and error fixtures.

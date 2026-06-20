@@ -111,3 +111,9 @@ until `cargo run -p lkjagent-xtask -- quiet verify` and
 ## Status
 
 open
+
+Implemented so far: pure active-mode selection and policy rendering exist, and
+maintenance/compaction modes do not render graph-policy refusals. Remaining
+work: full loop selection before endpoint turns, idempotent maintenance,
+runtime-owned compaction snapshots, transition repair, artifact planning,
+completion gates, owner-question guards, and benchmark fixtures.

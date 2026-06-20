@@ -2,10 +2,11 @@ mod support;
 
 use std::path::Path;
 
+use lkjagent_graph::{initial_state, GraphNodeId};
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
-use lkjagent_store::{events, state};
+use lkjagent_store::{events, memory, state};
 use support::http::{completion, serve_responses};
 use support::{runtime_state, store, temp_workspace, TestResult};
 
@@ -45,6 +46,31 @@ fn maintenance_blocks_workspace_write_tools() -> TestResult<()> {
         state::get(&conn, "daemon state")?,
         Some("working".to_string())
     );
+    Ok(())
+}
+
+#[test]
+fn maintenance_memory_save_ignores_stale_graph_policy() -> TestResult<()> {
+    let mut conn = store()?;
+    take_daemon_lock(&conn, "test", "100", "0")?;
+    let workspace = temp_workspace("maintenance-graph-clear")?;
+    let server = serve_responses(vec![completion(MEMORY_SAVE)])?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+    let mut graph = initial_state("closed stale owner graph", None);
+    graph.active_node = GraphNodeId("complete");
+    daemon.state.graph = Some(graph);
+
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    server.join()?;
+
+    let rows = memory::find(&conn, "maintenance note", 10)?;
+    assert_eq!(rows.len(), 1);
+    assert!(events::read_events(&conn)?.iter().all(|event| {
+        !event
+            .content
+            .contains("graph policy refused tool=memory.save")
+    }));
     Ok(())
 }
 

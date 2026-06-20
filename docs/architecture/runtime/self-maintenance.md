@@ -62,4 +62,6 @@ continues polling.
 
 ## Status
 
-partially implemented; active-mode control and idempotent pruning remain open.
+partially implemented; pure active-mode selection exists and maintenance
+actions no longer inherit stale graph-policy refusals. Queue preemption,
+idempotent pruning, early no-op closure, and owner-question guards remain open.
