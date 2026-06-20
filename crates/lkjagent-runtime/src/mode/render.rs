@@ -1,4 +1,9 @@
+use super::authority::TurnAuthority;
 use super::model::ActiveModePolicy;
+
+pub fn render_turn_authority(authority: &TurnAuthority) -> String {
+    authority.prompt_card.clone()
+}
 
 pub fn render_mode_policy(policy: &ActiveModePolicy) -> String {
     format!(

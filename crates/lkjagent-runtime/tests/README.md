@@ -29,3 +29,4 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [step.rs](step.rs): task lifecycle, recovery, and compaction fixtures.
 - [support/](support/README.md): shared state and store helpers.
 - [task_budget.rs](task_budget.rs): configured task turn budget fixtures.
+- [turn_authority.rs](turn_authority.rs): pure active-mode authority matrix.

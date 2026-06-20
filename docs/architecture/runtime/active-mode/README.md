@@ -26,5 +26,6 @@ authority; it does not create it.
 
 ## Status
 
-partially implemented. Pure selection and policy rendering exist. Full
-endpoint-turn authority and shared dispatch authority remain open.
+partially implemented. Pure turn authority selection, endpoint decision,
+completion policy, and policy rendering exist. Full endpoint-turn authority
+and shared dispatch authority remain open.
