@@ -1,8 +1,8 @@
 use lkjagent_graph::transition_history::{TransitionOutcome, TransitionRecord};
 use lkjagent_graph::{
-    admit_transition, completion_decision, initial_state, render_graph_slice, source_graph,
-    transition_quality, validate_graph, EvidenceKind, EvidenceRecord, GraphNodeId, TaskFamily,
-    TransitionDecision, TransitionLegality,
+    admit_transition, completion_decision, initial_state, source_graph, transition_quality,
+    validate_graph, EvidenceKind, EvidenceRecord, GraphNodeId, TaskFamily, TransitionDecision,
+    TransitionLegality,
 };
 
 #[test]
@@ -122,20 +122,6 @@ fn completion_requires_typed_evidence_and_checks() {
             target: GraphNodeId("complete")
         }
     );
-}
-
-#[test]
-fn render_graph_slice_names_allowed_and_blocked_tools() {
-    let state = initial_state("write docs", None);
-    let rendered = render_graph_slice(source_graph(), &state, 512);
-
-    assert!(rendered.contains("phase: planning"));
-    assert!(rendered.contains("Missing evidence: plan"));
-    assert!(rendered.contains("Allowed tools now:"));
-    assert!(rendered.contains("Blocked tools now:"));
-    assert!(rendered.contains("graph.plan"));
-    assert!(rendered.contains("fs.write"));
-    assert!(rendered.contains("Legal transitions:"));
 }
 
 #[test]

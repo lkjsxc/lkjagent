@@ -79,7 +79,7 @@ One row per active or closed task case.
 | status | TEXT | active, waiting, closed, or paused |
 | objective | TEXT | owner objective or maintenance directive |
 | raw_owner_text | TEXT | original owner text used for reconstruction |
-| objective revision | INTEGER | objective revision counter |
+| objective_counter | INTEGER | internal objective counter, never rendered as a visible label |
 | task_family | TEXT | classified graph task family |
 | subroute | TEXT | narrower task route |
 | route_reason | TEXT | classifier reason for the route |

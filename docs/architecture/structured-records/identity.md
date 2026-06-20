@@ -19,7 +19,7 @@ failure_key = fault kind + tool + normalized message + active node
 
 Normalization lowercases, trims, collapses punctuation to one separator,
 removes empty tokens, and keeps owner-visible names separate from internal
-keys. The rendered objective must not show revision-style prefixes.
+keys. The rendered objective must not show visible counter prefixes.
 
 ## Adoption
 

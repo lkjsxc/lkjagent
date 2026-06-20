@@ -26,7 +26,7 @@ identity, adoption, repair, and content-bearing completion need deeper
 runtime enforcement. Recovery can still block the tools required to escape a
 fault. Completion can still be too close to planning or scaffold evidence
 unless artifact audit gates are enforced at every close path. Visible
-objective rendering must not show revision-style prefixes.
+objective rendering must not show visible counter prefixes.
 
 Owner-reported failures remain active evidence: repeated parse faults,
 invalid `graph.plan`, blocked `doc.scaffold`, blocked `fs.write`, empty
