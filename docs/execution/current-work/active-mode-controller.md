@@ -94,5 +94,6 @@ quiet verify`, then `docker compose run --rm verify`.
 
 ## Status
 
-open; pure mode selection exists, but one effective policy and endpoint-turn
-ownership still need deeper integration.
+open; pure mode selection and dispatch-level effective policy exist. Full
+endpoint-turn ownership, maintenance due selection, and compaction snapshot
+integration remain open.

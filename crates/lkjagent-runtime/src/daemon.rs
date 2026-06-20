@@ -24,7 +24,6 @@ mod endpoint;
 mod execute_pending;
 mod graph_sync;
 mod idle;
-mod maintenance_gate;
 mod maintenance_wait;
 mod owner_delivery;
 mod persisted;

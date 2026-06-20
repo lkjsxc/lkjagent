@@ -17,7 +17,14 @@ pub fn repeat_refusal(action_text: &str, state: &mut DispatchState) -> Option<St
     Some(format!("repeat action refused; see {prior}"))
 }
 
-pub fn graph_policy_refusal(tool: &str, state: &DispatchState) -> Option<String> {
+pub fn policy_refusal(tool: &str, state: &DispatchState) -> Option<String> {
+    if let Some(policy) = state.effective_policy.as_ref() {
+        return super::effective_refusal::effective_policy_refusal(tool, policy, state);
+    }
+    graph_policy_refusal(tool, state)
+}
+
+fn graph_policy_refusal(tool: &str, state: &DispatchState) -> Option<String> {
     if tool == "agent.done" {
         return None;
     }
@@ -66,7 +73,10 @@ fn graph_next_repeat_refusal(prior: &str, state: &DispatchState) -> String {
     )
 }
 
-fn preferred_action(policy: &super::state::GraphDispatchPolicy, blocked: Option<&str>) -> String {
+pub(super) fn preferred_action(
+    policy: &super::state::GraphDispatchPolicy,
+    blocked: Option<&str>,
+) -> String {
     let priority = [
         "graph.recover",
         "graph.transition",
@@ -104,7 +114,10 @@ fn allowed(policy: &super::state::GraphDispatchPolicy, blocked: Option<&str>, to
     blocked != Some(tool) && policy.allowed_tools.iter().any(|allowed| allowed == tool)
 }
 
-fn example_for(policy: &super::state::GraphDispatchPolicy, blocked: Option<&str>) -> String {
+pub(super) fn example_for(
+    policy: &super::state::GraphDispatchPolicy,
+    blocked: Option<&str>,
+) -> String {
     let preferred = preferred_action(policy, blocked);
     if preferred == "graph.transition" {
         return transition_example(policy);
@@ -125,7 +138,7 @@ fn transition_example(policy: &super::state::GraphDispatchPolicy) -> String {
     ))
 }
 
-fn join_or_none(values: &[String]) -> String {
+pub(super) fn join_or_none(values: &[String]) -> String {
     if values.is_empty() {
         "none".to_string()
     } else {

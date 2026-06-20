@@ -36,6 +36,7 @@ pub struct DispatchState {
     pub graph_completion_ready: bool,
     pub graph_missing: Vec<String>,
     pub graph_policy: Option<GraphDispatchPolicy>,
+    pub effective_policy: Option<EffectivePolicy>,
     pub control: ControlState,
 }
 
@@ -52,9 +53,21 @@ impl Default for DispatchState {
             graph_completion_ready: true,
             graph_missing: Vec::new(),
             graph_policy: None,
+            effective_policy: None,
             control: ControlState::default(),
         }
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EffectivePolicy {
+    pub mode: String,
+    pub allowed_tools: Vec<String>,
+    pub blocked_tools: Vec<String>,
+    pub shell_allowed: bool,
+    pub completion_allowed: bool,
+    pub reason: String,
+    pub preferred_next_action: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

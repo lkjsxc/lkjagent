@@ -1,7 +1,6 @@
 use lkjagent_tools::dispatch::dispatch_with_text;
 use rusqlite::Connection;
 
-use super::maintenance_gate::{blocked_maintenance_output, maintenance_allows};
 use super::runner::{DaemonTick, ResidentDaemon};
 use crate::error::RuntimeResult;
 use crate::mode::{policy_for_mode, select_active_mode, ActiveModeInput};
@@ -21,16 +20,8 @@ impl ResidentDaemon {
         let mode = select_active_mode(self.mode_input_for_pending());
         let mode_policy = policy_for_mode(mode);
         let maintenance_ask = self.maintenance_ask_pending(conn, pending.action.tool.as_str())?;
-        let output = if mode_policy.maintenance_policy_applies
-            && !maintenance_allows(&pending.action.tool)
-        {
-            blocked_maintenance_output(&mut self.dispatch_state, action_text)
-        } else {
-            if mode_policy.graph_policy_applies {
-                self.sync_graph_dispatch_state();
-            } else {
-                self.clear_graph_dispatch_state();
-            }
+        self.sync_effective_dispatch_policy(&mode_policy);
+        let output = {
             dispatch_with_text(
                 &pending.action,
                 action_text,

@@ -7,6 +7,12 @@ pub enum ActiveMode {
     ClosedIdle,
 }
 
+impl ActiveMode {
+    pub fn allows_completion(self) -> bool {
+        matches!(self, Self::OwnerTask | Self::Recovery | Self::Maintenance)
+    }
+}
+
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct ActiveModeInput {
     pub pending_owner_rows: usize,
