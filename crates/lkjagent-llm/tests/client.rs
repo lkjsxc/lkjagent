@@ -21,7 +21,7 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     let request = server.recorded()?;
 
     assert_eq!(completion.content, "<act></act>");
-    assert_eq!(completion.usage.prompt_tokens, 5);
+    assert_eq!(completion.usage.prompt_tokens, Some(5));
     assert_eq!(request.method, "POST");
     assert_eq!(request.path, "/v1/chat/completions");
     assert_eq!(
@@ -49,7 +49,7 @@ fn length_finish_reason_maps_to_oversize() -> TestResult<()> {
             usage,
             cache_metrics,
             preview
-        }) if usage.completion_tokens == 2048 && cache_metrics.len() == 1
+        }) if usage.completion_tokens == Some(2048) && cache_metrics.len() == 1
             && preview == "partial"
     ));
     Ok(())

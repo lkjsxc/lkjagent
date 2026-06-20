@@ -11,5 +11,6 @@ compaction decisions.
 - [assemble.rs](assemble.rs): deterministic message serialization.
 - [budget.rs](budget.rs): token ledger constants and arithmetic.
 - [compaction.rs](compaction.rs): compaction trigger and rebuild planning.
+- [format.rs](format.rs): compact token and percentage display helpers.
 - [lib.rs](lib.rs): library root.
 - [model.rs](model.rs): frame, message, and ledger data.

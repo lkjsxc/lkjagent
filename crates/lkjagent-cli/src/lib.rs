@@ -1,3 +1,4 @@
+pub mod accounting;
 pub mod args;
 pub mod config;
 pub mod console;

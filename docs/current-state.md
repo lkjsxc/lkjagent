@@ -26,7 +26,8 @@ The graph now has neutral ranked state tracks, an objective envelope that does
 not copy raw owner text, SQLite track snapshots, graph notice rendering, and
 status/console display tests. The transition-quality scoring exists as pure
 code, but the runtime transition controller still does not consume it. Compact
-token accounting and a single synthesized GPT handoff log remain open.
+token accounting is implemented for endpoint usage, status, and console. A
+single synthesized GPT handoff log remains open.
 
 ## Area Status
 
@@ -42,9 +43,9 @@ token accounting and a single synthesized GPT handoff log remain open.
 | State graph cases | partially implemented | ranked neutral tracks exist; controller integration remains shallow |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
 | Runtime recovery | partially implemented | parse/tool recovery exists, parameter recovery is shallow |
-| Context budgets | partially implemented | budget model exists, compact usage display is missing |
-| Token usage ledger | not implemented | endpoint usage is not persisted as a ledger |
-| Console/status accounting | partially implemented | ranked states display; token deck is incomplete |
+| Context budgets | partially implemented | budget model and compact context display exist; compaction control still needs broader gates |
+| Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
+| Console/status accounting | partially implemented | ranked states plus compact context/token deck display; GPT log path is missing |
 | GPT handoff log | not implemented | no single current Markdown handoff file |
 | Mechanical benchmarks | partially implemented | owner failure cases are not fully covered |
 

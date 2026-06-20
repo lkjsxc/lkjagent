@@ -14,8 +14,12 @@ This file defines compact token usage accounting.
 
 ## Implementation Hooks
 
-- Source: `crates/lkjagent-llm/src`
-- Tests: `crates/lkjagent-cli/tests/console_render.rs`
+- Source: `crates/lkjagent-llm/src/wire.rs`
+- Source: `crates/lkjagent-store/src/token_usage.rs`
+- Source: `crates/lkjagent-runtime/src/token_usage.rs`
+- Tests: `crates/lkjagent-llm/tests/wire.rs`
+- Tests: `crates/lkjagent-store/tests/token_usage.rs`
+- Tests: `crates/lkjagent-runtime/tests/daemon_loop.rs`
 - Verification: `docker compose run --rm verify`
 
 ## Failure Modes
@@ -26,4 +30,4 @@ This file defines compact token usage accounting.
 
 ## Status
 
-not implemented
+implemented

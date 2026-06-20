@@ -14,8 +14,12 @@ runtime persistence.
 
 ## Implementation Hooks
 
+- Source: `crates/lkjagent-cli/src/accounting.rs`
 - Source: `crates/lkjagent-cli/src/status.rs`
+- Source: `crates/lkjagent-cli/src/console/render.rs`
+- Source: `crates/lkjagent-store/src/token_usage.rs`
 - Tests: `crates/lkjagent-cli/tests/console_render.rs`
+- Tests: `crates/lkjagent-cli/tests/status.rs`
 - Verification: `docker compose run --rm verify`
 
 ## Failure Modes
@@ -26,4 +30,4 @@ runtime persistence.
 
 ## Status
 
-not implemented
+implemented

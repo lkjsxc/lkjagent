@@ -11,4 +11,5 @@ This directory holds in-memory SQLite integration tests for the store crate.
 - [memory.rs](memory.rs): FTS ranking, digest, update, and delete fixtures.
 - [queue.rs](queue.rs): delivery and mutation fixtures.
 - [state.rs](state.rs): daemon lock fixture.
+- [token_usage.rs](token_usage.rs): token usage ledger fixtures.
 - [support/](support/README.md): shared in-memory setup helper.

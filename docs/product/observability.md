@@ -34,10 +34,11 @@ and `--full` prints whole payloads.
 
 `lkjagent status` reports prefix size, log size, remaining headroom, and the
 compaction threshold from [../architecture/context/budgets.md](../architecture/context/budgets.md).
-The desired display also includes endpoint input, output, cached input, total
-tokens, context fraction, pressure, and the current GPT handoff path. That
-expanded accounting is tracked in
-[../architecture/observability/](../architecture/observability/README.md).
+`lkjagent status` and `lkjagent console` now also render the compact accounting
+deck: `ctx=used/window percent pressure=color`, endpoint `in/out/cache/total`,
+and `prefix/log/reserve/headroom`. Missing endpoint usage fields render as
+`unknown`, not zero. The GPT handoff path remains tracked in
+[../architecture/observability/gpt-log.md](../architecture/observability/gpt-log.md).
 
 ## Boundaries
 

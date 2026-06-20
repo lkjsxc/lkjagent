@@ -9,7 +9,7 @@ use daemon_loop_actions::*;
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
-use lkjagent_store::{events, memory, queue, state};
+use lkjagent_store::{events, memory, queue, state, token_usage};
 use support::http::{completion, length_completion, serve_responses};
 use support::{runtime_state, store, temp_workspace, TestResult};
 
@@ -46,6 +46,10 @@ fn daemon_delivers_queue_writes_file_and_records_done() -> TestResult<()> {
     assert!(log
         .iter()
         .any(|event| event.content.contains("task-summary")));
+    let usage = token_usage::latest(&conn)?.expect("endpoint token usage");
+    assert_eq!(usage.input_tokens, Some(5));
+    assert_eq!(usage.output_tokens, Some(3));
+    assert_eq!(usage.source, "endpoint");
     Ok(())
 }
 

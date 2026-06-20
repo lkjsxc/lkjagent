@@ -3,6 +3,7 @@ use rusqlite::Connection;
 use super::runner::{DaemonTick, ResidentDaemon};
 use crate::daemon::endpoint_complete;
 use crate::error::{RuntimeError, RuntimeResult};
+use crate::prompt::token_estimate;
 use crate::step::{step, StepInput};
 
 impl ResidentDaemon {
@@ -43,11 +44,22 @@ impl ResidentDaemon {
     ) -> RuntimeResult<DaemonTick> {
         self.endpoint_attempt = 0;
         self.endpoint_retry_at = None;
+        crate::token_usage::record_completion_usage(
+            conn,
+            now,
+            &self.state,
+            self.runtime.budget,
+            &completion.usage,
+        )?;
+        let tokens = completion
+            .usage
+            .completion_tokens
+            .unwrap_or_else(|| token_estimate(&completion.content) as u64);
         let result = step(
             self.state.clone(),
             StepInput::Completion {
                 content: completion.content,
-                tokens: completion.usage.completion_tokens as usize,
+                tokens: tokens as usize,
             },
         );
         self.apply_step_result(conn, now, result, false)

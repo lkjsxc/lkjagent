@@ -39,8 +39,10 @@ pub struct Completion {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct CompletionUsage {
-    pub prompt_tokens: u64,
-    pub completion_tokens: u64,
+    pub prompt_tokens: Option<u64>,
+    pub completion_tokens: Option<u64>,
+    pub cached_prompt_tokens: Option<u64>,
+    pub total_tokens: Option<u64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -66,7 +68,7 @@ pub enum WireError {
 #[derive(Debug, Deserialize)]
 struct ResponseBody {
     choices: Vec<ResponseChoice>,
-    usage: ResponseUsage,
+    usage: Option<ResponseUsage>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -82,8 +84,15 @@ struct ResponseMessage {
 
 #[derive(Debug, Deserialize)]
 struct ResponseUsage {
-    prompt_tokens: u64,
-    completion_tokens: u64,
+    prompt_tokens: Option<u64>,
+    completion_tokens: Option<u64>,
+    total_tokens: Option<u64>,
+    prompt_tokens_details: Option<PromptTokensDetails>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PromptTokensDetails {
+    cached_tokens: Option<u64>,
 }
 
 pub fn build_request(model: &str, messages: &[Message], max_tokens: u16) -> ChatRequest {
@@ -113,12 +122,33 @@ pub fn decode_completion(text: &str) -> Result<Completion, WireError> {
     Ok(Completion {
         content: restore_stop_suffix(choice.message.content, &finish_reason),
         finish_reason,
-        usage: CompletionUsage {
-            prompt_tokens: body.usage.prompt_tokens,
-            completion_tokens: body.usage.completion_tokens,
-        },
+        usage: usage_from_response(body.usage, &cache_metrics),
         cache_metrics,
     })
+}
+
+fn usage_from_response(
+    usage: Option<ResponseUsage>,
+    cache_metrics: &[CacheMetric],
+) -> CompletionUsage {
+    let cached = usage
+        .as_ref()
+        .and_then(|usage| usage.prompt_tokens_details.as_ref())
+        .and_then(|details| details.cached_tokens)
+        .or_else(|| cache_metric_u64(cache_metrics, "prompt_cache_hit_tokens"));
+    CompletionUsage {
+        prompt_tokens: usage.as_ref().and_then(|usage| usage.prompt_tokens),
+        completion_tokens: usage.as_ref().and_then(|usage| usage.completion_tokens),
+        cached_prompt_tokens: cached,
+        total_tokens: usage.and_then(|usage| usage.total_tokens),
+    }
+}
+
+fn cache_metric_u64(metrics: &[CacheMetric], name: &str) -> Option<u64> {
+    metrics
+        .iter()
+        .find(|metric| metric.name == name)
+        .and_then(|metric| metric.value.parse::<u64>().ok())
 }
 
 impl ChatMessage {
