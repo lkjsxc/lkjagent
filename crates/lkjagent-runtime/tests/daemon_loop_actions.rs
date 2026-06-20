@@ -27,6 +27,12 @@ pub const ASK_ACTION: &str = "<act>
 <question>Need detail?</question>
 </act>";
 
+pub const OWNER_QUESTION_NOTE_ACTION: &str = "<act>
+<tool>graph.note</tool>
+<kind>question</kind>
+<summary>Need detail?</summary>
+</act>";
+
 pub const DONE_WRITE_ACTION: &str = "<act>
 <tool>agent.done</tool>
 <summary>wrote file</summary>

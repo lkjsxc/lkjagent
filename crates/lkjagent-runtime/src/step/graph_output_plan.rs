@@ -1,5 +1,7 @@
 use lkjagent_graph::case_context::PackageCompression;
-use lkjagent_graph::case_fields::{ConstraintRecord, FieldStatus, SuccessCriterion};
+use lkjagent_graph::case_fields::{
+    ConstraintRecord, FieldStatus, QuestionRecord, SuccessCriterion,
+};
 use lkjagent_graph::{admit_transition, source_graph, EvidenceKind, TaskGraphState};
 use lkjagent_protocol::Action;
 use lkjagent_tools::dispatch::DispatchOutput;
@@ -108,6 +110,11 @@ pub(super) fn apply_note(
             summary,
             mitigation: "track during plan review".to_string(),
             status: FieldStatus::Open,
+        }),
+        "question" => graph.open_questions.push(QuestionRecord {
+            question: summary,
+            status: FieldStatus::Open,
+            owner_required: true,
         }),
         "success" => graph.success_criteria.push(SuccessCriterion {
             summary,

@@ -53,6 +53,9 @@ decision, question, invariant, success, or path. It never satisfies
 completion evidence by itself. Generated examples must use one of those kinds,
 such as decision.
 
+A question note opens an owner-required question. `agent.ask` is admitted only
+after such a question exists and remains open.
+
 ## graph.evidence
 
 Records explicit evidence against a known requirement when the harness cannot

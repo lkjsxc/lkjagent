@@ -63,6 +63,7 @@ fn daemon_waits_on_ask_and_resumes_from_next_send() -> TestResult<()> {
     queue::enqueue(&mut conn, "start", "owner-send", "101")?;
     let workspace = temp_workspace("daemon-ask")?;
     let server = serve_responses(vec![
+        completion(OWNER_QUESTION_NOTE_ACTION),
         completion(ASK_ACTION),
         completion(PLAN_RESUME_ACTION),
         completion(WORKSPACE_ACTION),
@@ -71,16 +72,17 @@ fn daemon_waits_on_ask_and_resumes_from_next_send() -> TestResult<()> {
     ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
-    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Waiting);
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Waiting);
     assert_eq!(
         state::get(&conn, "daemon question")?,
         Some("Need detail?".to_string())
     );
-    queue::enqueue(&mut conn, "guidance", "owner-send", "102")?;
-    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    queue::enqueue(&mut conn, "guidance", "owner-send", "103")?;
     assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "106")?, DaemonTick::Done);
     server.join()?;
 
     let log = events::read_events(&conn)?;

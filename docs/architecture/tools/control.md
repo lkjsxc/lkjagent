@@ -59,7 +59,8 @@ doc.scaffold repair before shell is considered.
 
 Delivers a question to the owner and moves the task into waiting. At most
 one question may be outstanding; a second agent.ask while one waits is a
-tool error. The owner responds through the same `lkjagent send` path per
+tool error. Graph policy admits this action only after an open owner-required
+question exists. The owner responds through the same `lkjagent send` path per
 [../runtime/queue-intake.md](../runtime/queue-intake.md).
 
 ## Budget Interaction
