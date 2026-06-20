@@ -53,6 +53,11 @@ fn maintenance_mode_does_not_render_graph_policy_refusals() {
     let rendered = render_mode_policy(&policy_for_mode(ActiveMode::Maintenance));
 
     assert!(rendered.contains("policy_layers=maintenance"));
+    assert!(!rendered.contains(
+        "allowed_tools=memory.find,memory.prune,memory.save,queue.list,agent.done,agent.ask"
+    ));
+    assert!(rendered.contains("blocked_tools="));
+    assert!(rendered.contains("agent.ask"));
     assert!(!rendered.contains("graph policy refused"));
     assert!(!rendered.contains("policy_layers=graph,maintenance"));
 }

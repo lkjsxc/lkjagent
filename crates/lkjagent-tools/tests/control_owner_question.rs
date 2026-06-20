@@ -25,12 +25,44 @@ fn agent_ask_refuses_maintenance_transcript_question() -> TestResult<()> {
 }
 
 #[test]
+fn agent_ask_refuses_stale_memory_row_question() -> TestResult<()> {
+    let output = ask("Which memory rows are stale and should be pruned?")?;
+
+    assert!(is_error(&output));
+    assert!(output.content.contains("maintenance must inspect records"));
+    assert!(output.content.contains("<tool>memory.find</tool>"));
+    Ok(())
+}
+
+#[test]
 fn agent_ask_refuses_recovery_how_to_use_tool_question() -> TestResult<()> {
     let output = ask("How should I create the story file given fs.write is blocked?")?;
 
     assert!(is_error(&output));
     assert!(output.content.contains("tool recovery must choose"));
     assert!(output.content.contains("<tool>doc.scaffold</tool>"));
+    Ok(())
+}
+
+#[test]
+fn agent_ask_refuses_doc_scaffold_usage_question() -> TestResult<()> {
+    let output = ask("How do I use doc.scaffold when the recovery node blocks writes?")?;
+
+    assert!(is_error(&output));
+    assert!(output.content.contains("tool recovery must choose"));
+    assert!(output.content.contains("<tool>doc.scaffold</tool>"));
+    Ok(())
+}
+
+#[test]
+fn agent_ask_refuses_internal_graph_recovery_question() -> TestResult<()> {
+    let output = ask("Which internal graph recovery strategy should the tool use?")?;
+
+    assert!(is_error(&output));
+    assert!(output
+        .content
+        .contains("graph recovery strategy is runtime-owned"));
+    assert!(output.content.contains("<tool>graph.recover</tool>"));
     Ok(())
 }
 
