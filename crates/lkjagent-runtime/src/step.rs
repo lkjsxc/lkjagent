@@ -23,6 +23,7 @@ mod graph_output_plan_helpers;
 mod graph_phase;
 mod output;
 mod oversize;
+mod recovery_select;
 mod turn;
 
 use compact::compact_step;
