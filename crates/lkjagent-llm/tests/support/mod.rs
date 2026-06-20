@@ -40,7 +40,7 @@ impl StubServer {
     pub fn recorded(self) -> TestResult<RecordedRequest> {
         self.handle
             .join()
-            .map_err(|_| Error::new(ErrorKind::Other, "stub server thread failed"))?
+            .map_err(|_| Error::other("stub server thread failed"))?
             .map_err(Box::<dyn std::error::Error>::from)
     }
 }

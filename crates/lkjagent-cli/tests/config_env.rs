@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use lkjagent_cli::config::{load_or_initialize_with_env, ConfigLoad};
@@ -169,7 +169,7 @@ fn temp_data(name: &str) -> TestResult<PathBuf> {
     Ok(path)
 }
 
-fn write_config(data: &PathBuf) -> TestResult<()> {
+fn write_config(data: &Path) -> TestResult<()> {
     fs::write(
         data.join("lkjagent.json"),
         "{\"endpoint\":{\"url\":\"http://endpoint:8080\",\"model\":\"local-test\"}}",
