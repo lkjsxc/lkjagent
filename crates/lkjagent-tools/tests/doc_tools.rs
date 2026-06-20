@@ -1,0 +1,156 @@
+mod support;
+
+use std::fs;
+use std::path::Path;
+
+use lkjagent_tools::dispatch::dispatch;
+use support::{action, runtime, state, store, temp_workspace, TestResult};
+
+#[test]
+fn doc_scaffold_project_docs_uses_semantic_paths() -> TestResult<()> {
+    let workspace = temp_workspace("doc-semantic")?;
+    let output = scaffold(&workspace, &[("root", "docs"), ("title", "Project Docs")])?;
+
+    assert!(output.contains("profile=ProjectDocs"));
+    assert!(workspace.join("docs/README.md").is_file());
+    assert!(workspace.join("docs/.lkj-doc-graph.md").is_file());
+    assert!(workspace.join("docs/architecture/runtime.md").is_file());
+    assert!(workspace.join("docs/operations/verification.md").is_file());
+    assert_no_serial_files(&workspace.join("docs"))?;
+    assert_readmes(&workspace.join("docs"))?;
+    Ok(())
+}
+
+#[test]
+fn doc_scaffold_exact_count_uses_semantic_roles() -> TestResult<()> {
+    let workspace = temp_workspace("doc-count")?;
+    let output = scaffold(
+        &workspace,
+        &[
+            ("root", "docs"),
+            ("title", "Thirty Docs"),
+            ("count", "30"),
+            ("mode", "exact"),
+        ],
+    )?;
+
+    assert!(output.contains("files=30"));
+    assert_eq!(markdown_count(&workspace.join("docs"))?, 30);
+    assert!(workspace.join("docs/token-ledger.md").is_file());
+    assert!(!workspace.join("docs/part-001.md").exists());
+    assert_no_serial_files(&workspace.join("docs"))?;
+    Ok(())
+}
+
+#[test]
+fn doc_audit_rejects_part_files_and_missing_links() -> TestResult<()> {
+    let workspace = temp_workspace("doc-audit")?;
+    fs::create_dir_all(workspace.join("docs"))?;
+    fs::write(
+        workspace.join("docs/README.md"),
+        "# Docs\n\n## Purpose\n\nBroken docs.\n\n## Table of Contents\n\n",
+    )?;
+    fs::write(
+        workspace.join("docs/part-001.md"),
+        "# Bad\n\n## Purpose\n\nBad.\n",
+    )?;
+
+    let audit = audit(&workspace, &[("root", "docs")])?;
+    assert!(audit.contains("document audit failed"));
+    assert!(audit.contains("serial_filename: part-001.md"));
+    assert!(audit.contains("missing_readme_link: part-001.md"));
+    assert!(audit.contains("missing_doc_graph"));
+    Ok(())
+}
+
+#[test]
+fn doc_audit_passes_generated_scaffold() -> TestResult<()> {
+    let workspace = temp_workspace("doc-audit-pass")?;
+    scaffold(
+        &workspace,
+        &[
+            ("root", "guide"),
+            ("title", "Guide"),
+            ("count", "3"),
+            ("mode", "exact"),
+        ],
+    )?;
+
+    let audit = audit(
+        &workspace,
+        &[("root", "guide"), ("count", "3"), ("mode", "exact")],
+    )?;
+    assert!(audit.contains("document audit passed"));
+    assert!(audit.contains("checks=15"));
+    Ok(())
+}
+
+fn scaffold(workspace: &Path, params: &[(&str, &str)]) -> TestResult<String> {
+    let runtime = runtime(workspace.to_path_buf())?;
+    let mut conn = store()?;
+    let mut state = state();
+    Ok(dispatch(
+        &action("doc.scaffold", params),
+        &runtime,
+        &mut conn,
+        &mut state,
+    )
+    .content)
+}
+
+fn audit(workspace: &Path, params: &[(&str, &str)]) -> TestResult<String> {
+    let runtime = runtime(workspace.to_path_buf())?;
+    let mut conn = store()?;
+    let mut state = state();
+    Ok(dispatch(
+        &action("doc.audit", params),
+        &runtime,
+        &mut conn,
+        &mut state,
+    )
+    .content)
+}
+
+fn assert_readmes(root: &Path) -> TestResult<()> {
+    for entry in fs::read_dir(root)? {
+        let path = entry?.path();
+        if path.is_dir() {
+            assert!(
+                path.join("README.md").is_file(),
+                "missing README in {:?}",
+                path
+            );
+            assert_readmes(&path)?;
+        }
+    }
+    Ok(())
+}
+
+fn assert_no_serial_files(root: &Path) -> TestResult<()> {
+    for entry in fs::read_dir(root)? {
+        let path = entry?.path();
+        if path.is_dir() {
+            assert_no_serial_files(&path)?;
+        } else {
+            let name = path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .unwrap_or("");
+            assert!(!name.starts_with("part-"), "serial file {name}");
+        }
+    }
+    Ok(())
+}
+
+fn markdown_count(root: &Path) -> TestResult<usize> {
+    let mut count: usize = 0;
+    for entry in fs::read_dir(root)? {
+        let path = entry?.path();
+        if path.is_dir() {
+            count = count.saturating_add(markdown_count(&path)?);
+        } else if path.extension().is_some_and(|ext| ext == "md") {
+            count = count.saturating_add(1);
+        }
+    }
+    Ok(count)
+}

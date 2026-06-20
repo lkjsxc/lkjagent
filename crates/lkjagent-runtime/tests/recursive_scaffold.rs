@@ -49,7 +49,9 @@ fn recursive_docs_task_auto_scaffolds_before_done() -> TestResult<()> {
     assert!(memory::find(&conn, "recursive docs scaffold complete", 5)?
         .iter()
         .any(|row| row.kind == "task-summary"));
-    assert!(workspace.join("docs/api/v1/users/README.md").exists());
+    assert!(workspace
+        .join("docs/contracts/actions/graph/README.md")
+        .exists());
     assert_no_unindexed_directory(&workspace.join("docs"))?;
     Ok(())
 }

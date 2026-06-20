@@ -30,4 +30,4 @@ This file owns the deterministic document topology audit.
 
 ## Status
 
-design-only
+partially implemented

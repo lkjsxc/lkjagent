@@ -1,0 +1,18 @@
+# Document Tool Source
+
+## Purpose
+
+This directory holds the semantic document scaffold and audit implementation.
+
+## Table of Contents
+
+- [audit.rs](audit.rs): deterministic document topology audit.
+- [body.rs](body.rs): generated README and leaf Markdown templates.
+- [fit.rs](fit.rs): exact-count group fitting helpers.
+- [graph.rs](graph.rs): graph manifest rendering and validation helpers.
+- [model.rs](model.rs): scaffold input, plan, files, and profiles.
+- [names.rs](names.rs): semantic names, joins, and forbidden-name checks.
+- [profile.rs](profile.rs): pure profile selection and plan generation.
+- [roles.rs](roles.rs): semantic fallback role names for requested counts.
+- [shapes.rs](shapes.rs): built-in semantic scaffold shapes.
+- [write.rs](write.rs): filesystem effect boundary for scaffold plans.

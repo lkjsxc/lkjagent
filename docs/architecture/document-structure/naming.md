@@ -26,4 +26,4 @@ This file owns semantic names for generated documentation paths.
 
 ## Status
 
-design-only
+partially implemented
