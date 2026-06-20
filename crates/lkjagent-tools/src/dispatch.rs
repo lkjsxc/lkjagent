@@ -6,6 +6,7 @@ mod graph_inspect_tools;
 mod graph_tools;
 mod guards;
 mod memory_tools;
+mod normalize;
 mod params;
 mod queue_tools;
 mod routes;
@@ -15,11 +16,12 @@ mod routes_workspace;
 mod state;
 mod validate;
 
-use lkjagent_protocol::{render_action, Action};
+use lkjagent_protocol::{render_action, render_notice, render_observation, Action};
 use rusqlite::Connection;
 
 use crate::error::{ToolError, ToolResult};
 use crate::observe::{self, OutputFrame};
+use normalize::{normalize_action, NormalizationDecision, NormalizationNote};
 use routes::route;
 pub use state::{
     DispatchOutput, DispatchState, GraphDispatchPolicy, GraphEvidenceRecord, ReadRecord,
@@ -55,14 +57,46 @@ pub fn dispatch_with_text(
         );
     }
     state.repeat_count = 0;
-    let validated = match validate_action(action) {
+    let (normalized, notes) = match normalize_action(action) {
+        NormalizationDecision::Unchanged(action) => (action, Vec::new()),
+        NormalizationDecision::Normalized { action, notes } => (action, notes),
+    };
+    let validated = match validate_action(&normalized) {
         Ok(validated) => validated,
         Err(message) => return finish(state, action_text, observe::notice("error", message)),
     };
     if let Some(message) = graph_policy_refusal(&validated.tool, state) {
         return finish(state, action_text, observe::notice("error", message));
     }
-    route(validated, action_text, runtime, conn, state)
+    let output = route(validated, action_text, runtime, conn, state);
+    with_normalization(output, notes, state)
+}
+
+fn with_normalization(
+    mut output: DispatchOutput,
+    notes: Vec<NormalizationNote>,
+    state: &mut DispatchState,
+) -> DispatchOutput {
+    if notes.is_empty() {
+        return output;
+    }
+    let note_text = notes
+        .iter()
+        .map(NormalizationNote::render)
+        .collect::<Vec<_>>()
+        .join("\n-- normalization --\n");
+    state.graph_evidence.push(GraphEvidenceRecord {
+        kind: "action-normalization".to_string(),
+        summary: note_text.clone(),
+        path: None,
+        frame_ref: output.frame_ref,
+    });
+    output.content = format!("{note_text}\n\n{}", output.content);
+    output.rendered = match &output.kind {
+        observe::OutputKind::Observation { status } => render_observation(status, &output.content),
+        observe::OutputKind::Notice { kind } => render_notice(kind, &output.content),
+    };
+    output
 }
 
 fn graph_policy_refusal(tool: &str, state: &DispatchState) -> Option<String> {

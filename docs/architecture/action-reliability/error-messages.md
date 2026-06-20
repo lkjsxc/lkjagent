@@ -26,4 +26,4 @@ This file defines model-visible parameter refusal text.
 
 ## Status
 
-partially implemented
+implemented

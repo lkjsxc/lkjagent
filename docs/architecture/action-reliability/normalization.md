@@ -27,4 +27,4 @@ This file defines deterministic action parameter normalization.
 
 ## Status
 
-not implemented
+partially implemented

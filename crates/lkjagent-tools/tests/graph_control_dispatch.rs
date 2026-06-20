@@ -167,9 +167,11 @@ fn dispatcher_reports_validation_and_repeat_notices() -> TestResult<()> {
     );
     let validation = dispatch(&bad, &runtime, &mut conn, &mut state);
     assert!(matches!(validation.kind, OutputKind::Notice { .. }));
-    assert!(validation.content.contains("duplicate params: bogus"));
-    assert!(validation.content.contains("missing params: path"));
-    assert!(validation.content.contains("unknown params: bogus"));
+    assert!(validation.content.contains("action params refused"));
+    assert!(validation.content.contains("duplicate=bogus"));
+    assert!(validation.content.contains("missing=path"));
+    assert!(validation.content.contains("unknown=bogus"));
+    assert!(validation.content.contains("valid_example:"));
 
     let unknown = dispatch(
         &Action::new("think", Vec::new()),

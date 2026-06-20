@@ -32,7 +32,7 @@ implementation and tests prove them.
 | Cargo workspace and gates | implemented | `Cargo.toml`; `crates/lkjagent-xtask` |
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol` |
-| Tool dispatcher | partially implemented | strict parameter errors still lack robust recovery |
+| Tool dispatcher | partially implemented | safe parameter normalization exists; runtime recovery is still shallow |
 | Document scaffold tool | partially implemented | semantic scaffold tests pass; final gate not yet run |
 | Document audit tool | partially implemented | topology and graph checks exist; final gate not yet run |
 | Recursive document seed | partially implemented | deterministic tree uses semantic contract paths |

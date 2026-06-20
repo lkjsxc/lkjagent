@@ -1,0 +1,85 @@
+mod support;
+
+use lkjagent_protocol::{Action, Param};
+use lkjagent_tools::dispatch::dispatch;
+use lkjagent_tools::observe::OutputKind;
+use support::{action, runtime, state, store, temp_workspace, TestResult};
+
+#[test]
+fn graph_state_with_safe_path_is_normalized() -> TestResult<()> {
+    let workspace = temp_workspace("normalize-graph")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+    state.graph_state = Some("case=1\nphase=planning".to_string());
+
+    let output = dispatch(
+        &action("graph.state", &[("path", ".")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+
+    assert!(output.content.contains("action params normalized"));
+    assert!(output.content.contains("dropped=path"));
+    assert!(output.content.contains("phase=planning"));
+    assert_eq!(state.graph_evidence[0].kind, "action-normalization");
+    Ok(())
+}
+
+#[test]
+fn doc_scaffold_path_is_renamed_to_root() -> TestResult<()> {
+    let workspace = temp_workspace("normalize-scaffold")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut state = state();
+
+    let output = dispatch(
+        &action("doc.scaffold", &[("path", "docs"), ("title", "Docs")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+
+    assert!(output.content.contains("renamed=path->root"));
+    assert!(output.content.contains("root=docs"));
+    assert!(workspace.join("docs/.lkj-doc-graph.md").is_file());
+    Ok(())
+}
+
+#[test]
+fn doc_audit_path_is_renamed_to_root() -> TestResult<()> {
+    let workspace = temp_workspace("normalize-audit")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+
+    let output = dispatch(
+        &action("doc.audit", &[("path", "docs")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+
+    assert!(output.content.contains("renamed=path->root"));
+    assert!(output.content.contains("missing_root: docs"));
+    Ok(())
+}
+
+#[test]
+fn unknown_param_error_prints_valid_example() -> TestResult<()> {
+    let workspace = temp_workspace("normalize-refusal")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+    let bad = Action::new("graph.state", vec![Param::new("path", "docs")]);
+
+    let output = dispatch(&bad, &runtime, &mut conn, &mut state);
+
+    assert!(matches!(output.kind, OutputKind::Notice { .. }));
+    assert!(output.content.contains("action params refused"));
+    assert!(output.content.contains("expected=no parameters"));
+    assert!(output.content.contains("received=path"));
+    assert!(output.content.contains("<tool>graph.state</tool>"));
+    Ok(())
+}

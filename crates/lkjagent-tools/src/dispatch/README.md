@@ -13,6 +13,7 @@ This directory splits dispatcher state, validation, and route helpers.
 - [graph_tools.rs](graph_tools.rs): graph plan, transition, note, context, and evidence routing.
 - [guards.rs](guards.rs): task-shape write fences.
 - [memory_tools.rs](memory_tools.rs): memory dispatch helpers.
+- [normalize.rs](normalize.rs): safe parameter drift normalization before validation.
 - [params.rs](params.rs): validated parameter access and parsing.
 - [queue_tools.rs](queue_tools.rs): queue dispatch helpers.
 - [routes.rs](routes.rs): tool-name routing table.
