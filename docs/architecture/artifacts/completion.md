@@ -20,6 +20,9 @@ exists. For content artifacts, completion requires:
 - verification or audit evidence exists.
 - no active unrecovered fault exceeds threshold.
 
+The deterministic gate list is [completion-gates.md](completion-gates.md).
+Scaffold, content pass, audit pass, and completion are separate states.
+
 ## Refusals
 
 Planning alone is never completion. Generic scaffold alone is never

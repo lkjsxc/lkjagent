@@ -44,6 +44,10 @@ manifest, semantic children, content-bearing files, plan evidence, observation
 evidence, and verification or audit evidence. Planning alone and generic
 scaffold alone are never completion.
 
+The artifact lifecycle and completion gates are defined in
+[../artifacts/lifecycle.md](../artifacts/lifecycle.md) and
+[../artifacts/completion-gates.md](../artifacts/completion-gates.md).
+
 ## Status
 
 partially implemented; long story and bread cookbook classification now route

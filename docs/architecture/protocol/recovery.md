@@ -75,7 +75,11 @@ an unused native inspection tool, or a smaller plan step.
 - Payload-risk recovery blocks repeated giant writes. Large story, guide,
   book, corpus, and structured content requests route to document construction
   with bounded semantic files.
+- Payload and completion-oversize faults route to artifact planning first,
+  then bounded writes. Recovery must not render repeated raw `fs.write` as the
+  valid example after the same payload risk.
 
 ## Status
 
-implemented.
+partially implemented; recovery topology exists, but full active-mode
+authority and artifact-plan admission remain open.

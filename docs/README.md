@@ -31,10 +31,13 @@ directories with short focused files.
   `architecture/document-structure/network-contract.md` `architecture/document-structure/naming.md`
   `architecture/document-structure/scaffold-profiles.md` `architecture/document-structure/audit.md`
   `architecture/document-structure/completion-gates.md`
-- `architecture/artifacts/README.md` `architecture/artifacts/content-artifacts.md`
+- `architecture/artifacts/README.md` `architecture/artifacts/lifecycle.md`
+  `architecture/artifacts/content-artifacts.md` `architecture/artifacts/content-readiness.md`
   `architecture/artifacts/cookbook-profile.md` `architecture/artifacts/story-profile.md`
   `architecture/artifacts/manifest.md` `architecture/artifacts/scaffold.md`
   `architecture/artifacts/audit.md` `architecture/artifacts/completion.md`
+  `architecture/artifacts/completion-gates.md` `architecture/artifacts/adoption.md`
+  `architecture/artifacts/repair.md` `architecture/artifacts/write-batches.md`
 - `architecture/structured-records/README.md` `architecture/structured-records/record-model.md`
   `architecture/structured-records/identity.md`
   `architecture/structured-records/topic-map.md` `architecture/structured-records/artifact-ledger.md`
@@ -52,6 +55,14 @@ directories with short focused files.
   `architecture/observability/status-format.md`
 - `architecture/runtime/README.md` `architecture/runtime/agent-loop.md` `architecture/runtime/daemon-process.md`
   `architecture/runtime/queue-intake.md` `architecture/runtime/self-maintenance.md`
+- `architecture/runtime/active-mode/README.md` `architecture/runtime/active-mode/selection.md`
+  `architecture/runtime/active-mode/turn-authority.md`
+  `architecture/runtime/active-mode/prompt-rendering.md`
+  `architecture/runtime/active-mode/dispatch-policy.md`
+  `architecture/runtime/active-mode/completion-policy.md`
+  `architecture/runtime/active-mode/preemption.md`
+  `architecture/runtime/active-mode/compaction.md`
+  `architecture/runtime/active-mode/maintenance.md`
 - `architecture/state-graph/README.md` `architecture/state-graph/model.md`
   `architecture/state-graph/transitions.md` `architecture/state-graph/context-packages.md`
   `architecture/state-graph/task-state.md` `architecture/state-graph/compaction.md`
@@ -70,6 +81,7 @@ directories with short focused files.
   `architecture/tools/control.md`
 - `architecture/memory/README.md` `architecture/memory/store.md` `architecture/memory/retrieval.md`
   `architecture/memory/transcripts.md` `architecture/memory/distillation.md`
+  `architecture/memory/maintenance-pruning.md` `architecture/memory/semantic-merge.md`
 - `architecture/llm/README.md` `architecture/llm/endpoint.md` `architecture/llm/model-target.md`
   `architecture/llm/sampling.md`
 - `architecture/sandbox/README.md` `architecture/sandbox/container.md` `architecture/sandbox/workspace.md`

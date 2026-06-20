@@ -78,6 +78,18 @@ productive tool class, the controller transitions to a node that admits that
 tool or produces a blocked handoff. `agent.ask` is forbidden for internal tool
 uncertainty.
 
+## Routes
+
+- Parse faults route to `recover-parse`.
+- Parameter faults route to `recover-params`.
+- Repeat faults route to `recover-repeat`.
+- Tool faults route to `recover-tool`.
+- Payload and completion-oversize faults route to
+  `recover-by-artifact-plan`, then `recover-by-bounded-write`.
+
+After payload risk, repeated raw `fs.write` is blocked. The prompt must show
+artifact planning, document scaffold, or bounded batch writes instead.
+
 ## Status
 
 partially implemented; active-mode integration and semantic examples remain

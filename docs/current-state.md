@@ -13,20 +13,24 @@ scoring, context budgeting, SQLite storage, endpoint client, daemon loop,
 queue intake, status, log, console, and memory CLI surfaces exist.
 
 The implementation is not yet fully safe for the uploaded run logs. Runtime
-transition control remains insufficient. Active mode selection is not
-authoritative enough across owner work, recovery, maintenance, compaction, and
-closed idle. Maintenance and graph policy can still contradict each other in
-some paths. Compaction and graph policy must stay runtime-owned so hard
-pressure never requires a blocked model `memory.save`.
+transition control remains insufficient. Active mode selection is documented
+in [architecture/runtime/active-mode/](architecture/runtime/active-mode/README.md)
+but is not yet authoritative enough across owner work, recovery, maintenance,
+compaction, and closed idle. Maintenance and graph policy can still contradict
+each other in some paths. Compaction and graph policy must stay runtime-owned
+so hard pressure never requires a blocked model `memory.save`.
 
 Memory writes now skip exact equivalents, update same-title high-overlap rows,
 and use punctuation-safe search, but semantic maintenance merge and rewrite
-pruning remain incomplete. Long content tasks route toward story and cookbook scaffolds, but semantic artifact
-identity, adoption, repair, and content-bearing completion need deeper
-runtime enforcement. Recovery can still block the tools required to escape a
-fault. Completion can still be too close to planning or scaffold evidence
-unless artifact audit gates are enforced at every close path. Visible
-objective rendering must not show visible counter prefixes.
+pruning remain incomplete. Long content tasks route toward story and cookbook
+scaffolds, but semantic artifact identity, adoption, repair, and
+content-bearing completion need deeper runtime enforcement. The artifact
+lifecycle contract is
+[architecture/artifacts/lifecycle.md](architecture/artifacts/lifecycle.md).
+Recovery can still block the tools required to escape a fault. Completion can
+still be too close to planning or scaffold evidence unless artifact audit
+gates are enforced at every close path. Visible objective rendering must not
+show visible counter prefixes.
 
 Owner-reported failures remain active evidence: repeated parse faults,
 invalid `graph.plan`, blocked `doc.scaffold`, blocked `fs.write`, empty

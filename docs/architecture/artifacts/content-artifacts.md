@@ -11,6 +11,11 @@ large deliverables route to semantic artifact roots. The root contains a
 README, manifest, semantic child files, audit evidence, and completion
 evidence.
 
+Artifact states are defined in [lifecycle.md](lifecycle.md). Scaffold creates
+topology only. Content pass writes meaningful leaves. Audit proves topology
+and content readiness. Completion requires graph evidence plus artifact
+readiness.
+
 ## Payload Safety
 
 After a max-token write fault, unclosed content tag, or raw large-write retry,
@@ -27,4 +32,4 @@ for project documentation.
 ## Status
 
 partially implemented; classification and scaffold profiles exist. Explicit
-artifact planning and root adoption remain open.
+artifact planning, bounded write batches, and root adoption remain open.

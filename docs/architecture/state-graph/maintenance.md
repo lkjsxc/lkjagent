@@ -19,6 +19,12 @@ Maintenance follows the same graph state machinery as owner tasks but is
 limited to memory and graph-note style actions by the maintenance gate. It
 records policy candidates; it does not edit source while idle.
 
+Maintenance runs only after active-mode selection proves no owner work is
+pending, active, or recoverable. No-op maintenance sets cooldown and writes no
+memory row. Pruning and merge claims must name the row IDs changed by the
+store operation.
+
 ## Status
 
-implemented.
+partially implemented. Exact duplicate pruning exists; semantic merge and
+rewrite pruning remain open.

@@ -24,6 +24,9 @@ Every artifact root carries `.lkj-artifact.md` or an equivalent extension of
 owner objective hash, node roles, required files, content minimums, audit
 state, and completion state.
 
+Adoption and repair record the source root, changed paths, source row or
+manifest IDs when available, readiness gaps, and next executable action.
+
 ## Status
 
 partially implemented; graph classification assigns content-artifact roots for
