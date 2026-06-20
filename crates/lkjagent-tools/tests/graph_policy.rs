@@ -109,6 +109,53 @@ fn graph_recover_guidance_does_not_recommend_graph_next_loop() -> TestResult<()>
     Ok(())
 }
 
+#[test]
+fn policy_refusal_example_target_is_legal() -> TestResult<()> {
+    let workspace = temp_workspace("graph-refusal-legal-transition")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+    state.graph_policy = Some(transition_policy(vec!["document-audit"]));
+
+    let refused = dispatch(
+        &action("fs.write", &[("path", "x.md"), ("content", "x")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+
+    assert!(matches!(refused.kind, OutputKind::Notice { .. }));
+    assert!(refused
+        .content
+        .contains("preferred_next_action=graph.transition"));
+    assert!(refused.content.contains("<target>document-audit</target>"));
+    assert!(!refused.content.contains("<target>plan</target>"));
+    Ok(())
+}
+
+#[test]
+fn policy_refusal_skips_transition_without_legal_targets() -> TestResult<()> {
+    let workspace = temp_workspace("graph-refusal-no-legal-transition")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+    state.graph_policy = Some(transition_policy(Vec::new()));
+
+    let refused = dispatch(
+        &action("fs.write", &[("path", "x.md"), ("content", "x")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+
+    assert!(matches!(refused.kind, OutputKind::Notice { .. }));
+    assert!(refused
+        .content
+        .contains("preferred_next_action=graph.state"));
+    assert!(!refused.content.contains("<tool>graph.transition</tool>"));
+    Ok(())
+}
+
 fn recovery_policy() -> GraphDispatchPolicy {
     GraphDispatchPolicy {
         active_node: "recover-repeat".to_string(),
@@ -123,6 +170,22 @@ fn recovery_policy() -> GraphDispatchPolicy {
         legal_transitions: vec!["recover-by-alternate-tool".to_string()],
         evidence_requirements: Vec::new(),
         blocked_reason: Some("mutation blocked until recovery route changes".to_string()),
+        plan_ready: true,
+        completion_ready: false,
+        shell_allowed: false,
+    }
+}
+
+fn transition_policy(legal_transitions: Vec<&str>) -> GraphDispatchPolicy {
+    GraphDispatchPolicy {
+        active_node: "document".to_string(),
+        phase: "execution".to_string(),
+        allowed_tools: vec!["graph.transition".to_string(), "graph.state".to_string()],
+        blocked_tools: vec!["fs.write".to_string()],
+        allowed_packages: Vec::new(),
+        legal_transitions: legal_transitions.into_iter().map(str::to_string).collect(),
+        evidence_requirements: Vec::new(),
+        blocked_reason: Some("move through admitted document transition".to_string()),
         plan_ready: true,
         completion_ready: false,
         shell_allowed: false,

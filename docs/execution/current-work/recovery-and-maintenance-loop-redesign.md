@@ -114,7 +114,9 @@ open
 
 Implemented so far: pure active-mode selection and policy rendering exist,
 maintenance/compaction modes do not render graph-policy refusals, and internal
-owner questions are refused with valid next-action examples. Remaining work:
-full loop selection before endpoint turns, idempotent maintenance,
-richer structured compaction snapshots, transition repair, artifact planning,
-completion gates, and benchmark fixtures.
+owner questions are refused with valid next-action examples. Graph-policy
+refusals now render `graph.transition` examples only with admitted targets.
+Remaining work: full loop selection before endpoint turns, idempotent
+maintenance, richer structured compaction snapshots, transition selector
+runtime integration, artifact planning, completion gates, and benchmark
+fixtures.
