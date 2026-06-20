@@ -62,6 +62,7 @@ continues polling.
 
 ## Status
 
-partially implemented; pure active-mode selection exists and maintenance
-actions no longer inherit stale graph-policy refusals. Queue preemption,
-idempotent pruning, early no-op closure, and owner-question guards remain open.
+partially implemented; pure active-mode selection exists, maintenance actions
+no longer inherit stale graph-policy refusals, and internal `agent.ask`
+questions are refused. Queue preemption, idempotent pruning, and early no-op
+closure remain open.
