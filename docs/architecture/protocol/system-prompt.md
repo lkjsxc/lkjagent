@@ -12,7 +12,7 @@ the budgets in [../context/budgets.md](../context/budgets.md).
 | --- | --- | --- |
 | identity and rules | who the agent is, graph posture, YOLO posture, honesty rules | static template in lkjagent-runtime |
 | grammar | the action format plus minimal fs.write and agent.done examples | static, from [action-format.md](action-format.md) |
-| registry | one line per tool: name, parameters, one-clause contract | generated from [../tools/registry.md](../tools/registry.md) |
+| registry | tool schemas, no-param markers, and examples for fragile actions | generated from [../tools/registry.md](../tools/registry.md) |
 | graph state | active case, phase, node, legal transitions, context packages, missing evidence | graph slice |
 | workspace brief | the workspace's own AGENTS.md, verbatim | /data/workspace per [../sandbox/workspace.md](../sandbox/workspace.md) |
 | memory digest | ranked rendering of durable memory, task summary first | built per [../memory/distillation.md](../memory/distillation.md) |
@@ -58,7 +58,8 @@ chat models must see the exact action envelope before graph-specific guidance.
 - No dates, no model names, no environment trivia: nothing the model does
   not act on.
 - The registry section is derived from the same table the dispatcher uses,
-  so prompt and behavior cannot drift apart.
+  marks no-param tools explicitly, and gives exact examples for fragile root
+  or path tools.
 - The graph state section is derived from the active `TaskGraphState` and
   source graph definitions.
 - Each section is delimited by a single h2-style line (for example
@@ -71,4 +72,4 @@ and apology templates. Every sentence either changes behavior or leaves.
 
 ## Status
 
-implemented.
+partially implemented.
