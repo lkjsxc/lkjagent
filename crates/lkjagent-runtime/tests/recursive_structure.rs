@@ -21,12 +21,12 @@ fn graph_case_drives_indexed_tree_workflow() -> TestResult<()> {
     let prefix = build_prefix_from_store(&conn, &workspace)?;
     assert!(prefix
         .iter()
-        .any(|frame| frame.content.contains("phase=planning")));
+        .any(|frame| frame.content.contains("phase: planning")));
 
     let mut state = dispatch_state();
     state.graph_state = Some(render_state(&graph));
     let graph_state = dispatch(&action("graph.state", &[]), &runtime, &mut conn, &mut state);
-    assert!(graph_state.content.contains("missing_evidence=plan"));
+    assert!(graph_state.content.contains("Required evidence: plan"));
 
     write_file(
         &runtime,

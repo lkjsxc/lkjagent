@@ -59,7 +59,7 @@ fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestRe
         .log
         .iter()
         .any(|frame| frame.kind == FrameKind::GraphNotice
-            && frame.content.contains("phase=planning")));
+            && frame.content.contains("phase: planning")));
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
     assert_eq!(

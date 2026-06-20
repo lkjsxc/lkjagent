@@ -3,6 +3,7 @@ pub mod model;
 pub mod parse;
 pub mod registry;
 pub mod registry_render;
+mod registry_spec;
 pub mod render;
 
 pub use model::{Action, Param, ParseFault};

@@ -49,11 +49,11 @@ If the endpoint is unreachable, the daemon records an error event, sets
 polls before that deadline do not hit the endpoint or add more error events.
 It never fabricates a model reply. Parser, repeat-action, and tool failures
 stay inside the task: the daemon records the failure and adds a recovery
-notice for the next model turn. Three consecutive failures of the same class
-move the task to waiting with a concrete recovery handoff instead of spending
-the remaining turn budget on the same loop.
-Task budget exhaustion becomes an observable waiting state with a concrete
-question, and the next owner send resumes the task with a fresh budget.
+notice for the next model turn. Consecutive failures of the same class route
+to graph recovery nodes that inspect state, narrow scope, use alternate
+native tools, replan, or use shell only when graph policy admits it.
+Task budget exhaustion records a budget fault and asks the owner only when no
+legal recovery path remains.
 When a user task closes, the task summary stamps maintenance directives so
 the daemon shows idle until the maintenance cooldown passes or owner work
 arrives. It then returns to due maintenance instead of stopping permanently.

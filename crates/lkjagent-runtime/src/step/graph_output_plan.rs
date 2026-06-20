@@ -1,3 +1,4 @@
+use lkjagent_graph::case_context::PackageCompression;
 use lkjagent_graph::case_fields::{ConstraintRecord, FieldStatus, SuccessCriterion};
 use lkjagent_graph::{admit_transition, source_graph, EvidenceKind, TaskGraphState};
 use lkjagent_protocol::Action;
@@ -41,6 +42,15 @@ pub(super) fn apply_context(
 ) -> bool {
     graph.context.selected_packages = lines(&action_param(action, "packages"));
     graph.context.loaded_packages = graph.context.selected_packages.clone();
+    graph.context.compression = graph
+        .context
+        .selected_packages
+        .iter()
+        .map(|package| PackageCompression {
+            package: package.clone(),
+            level: graph.context.pressure,
+        })
+        .collect();
     if let Some(case_id) = graph.case_id {
         effects.push(Effect::RecordGraphContext {
             case_id,

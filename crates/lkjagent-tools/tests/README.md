@@ -25,6 +25,8 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [fs_shell.rs](fs_shell.rs): filesystem and shell tool fixtures.
 - [knowledge_path_guard.rs](knowledge_path_guard.rs): recursive knowledge write fences.
 - [graph_control_dispatch.rs](graph_control_dispatch.rs): graph, control, and dispatcher notice fixtures.
+- [graph_policy.rs](graph_policy.rs): graph dispatch policy refusal fixtures.
+- [native_tools.rs](native_tools.rs): native multi-read, patch, tree, and index fixtures.
 - [structure_seed.rs](structure_seed.rs): deterministic recursive docs scaffold fixture.
 - [store_tools.rs](store_tools.rs): queue and memory tool fixtures.
 - [support/](support/README.md): shared temp workspace and store helpers.

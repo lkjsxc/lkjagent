@@ -4,13 +4,70 @@ const PLAN_NODES: &[GraphNodeId] = &[
     GraphNodeId("intake"),
     GraphNodeId("normalize-objective"),
     GraphNodeId("extract-constraints"),
+    GraphNodeId("extract-non-goals"),
+    GraphNodeId("extract-risks"),
+    GraphNodeId("extract-success-criteria"),
+    GraphNodeId("route-family"),
+    GraphNodeId("detect-blockers"),
+    GraphNodeId("decompose-task"),
+    GraphNodeId("draft-plan"),
     GraphNodeId("plan"),
     GraphNodeId("review-plan"),
+    GraphNodeId("risk-review"),
+    GraphNodeId("evidence-plan"),
+    GraphNodeId("verification-plan"),
+    GraphNodeId("choose-active-step"),
 ];
-const EXEC_NODES: &[GraphNodeId] = &[GraphNodeId("execute"), GraphNodeId("observe")];
-const VERIFY_NODES: &[GraphNodeId] = &[GraphNodeId("verify"), GraphNodeId("complete")];
-const DOC_NODES: &[GraphNodeId] = &[GraphNodeId("document"), GraphNodeId("document-audit")];
-const RECOVERY_NODES: &[GraphNodeId] = &[GraphNodeId("recover"), GraphNodeId("recover-tool")];
+const EXEC_NODES: &[GraphNodeId] = &[
+    GraphNodeId("execute"),
+    GraphNodeId("execute-step"),
+    GraphNodeId("observe"),
+    GraphNodeId("observe-result"),
+    GraphNodeId("integrate-evidence"),
+    GraphNodeId("repair-step"),
+    GraphNodeId("advance-plan"),
+    GraphNodeId("code-survey"),
+    GraphNodeId("code-design"),
+    GraphNodeId("code-edit"),
+    GraphNodeId("code-review"),
+    GraphNodeId("code-verify"),
+    GraphNodeId("code-repair"),
+];
+const VERIFY_NODES: &[GraphNodeId] = &[
+    GraphNodeId("verify"),
+    GraphNodeId("verify-focused"),
+    GraphNodeId("verify-style"),
+    GraphNodeId("verify-docs"),
+    GraphNodeId("verify-integration"),
+    GraphNodeId("verify-final"),
+    GraphNodeId("completion-audit"),
+    GraphNodeId("completion-evidence"),
+    GraphNodeId("complete"),
+];
+const DOC_NODES: &[GraphNodeId] = &[
+    GraphNodeId("document"),
+    GraphNodeId("document-profile"),
+    GraphNodeId("document-topology"),
+    GraphNodeId("document-scaffold"),
+    GraphNodeId("document-section-plan"),
+    GraphNodeId("document-write"),
+    GraphNodeId("document-audit"),
+    GraphNodeId("document-repair"),
+    GraphNodeId("document-completion-check"),
+];
+const RECOVERY_NODES: &[GraphNodeId] = &[
+    GraphNodeId("recover"),
+    GraphNodeId("recover-parse"),
+    GraphNodeId("recover-tool"),
+    GraphNodeId("recover-repeat"),
+    GraphNodeId("recover-context"),
+    GraphNodeId("recover-budget"),
+    GraphNodeId("recover-verification"),
+    GraphNodeId("recover-by-state-inspection"),
+    GraphNodeId("recover-by-alternate-tool"),
+    GraphNodeId("recover-by-smaller-scope"),
+    GraphNodeId("recover-by-shell-escape"),
+];
 const MAINT_NODES: &[GraphNodeId] = &[GraphNodeId("maintain"), GraphNodeId("refine-graph-policy")];
 const ALL_FAMILIES: &[TaskFamily] = &[
     TaskFamily::CodeChange,

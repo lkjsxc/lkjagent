@@ -11,6 +11,24 @@ Shows active case id, objective, family, phase, node, selected context
 packages, evidence, missing requirements, allowed tools, and legal next
 transitions. The harness also injects graph state notices automatically.
 
+## graph.next
+
+Shows legal next transitions, missing guards, allowed tools, blocked tools,
+and the preferred next action class. It is the normal first recovery action
+after repeated parse, repeat, or tool faults.
+
+## graph.audit
+
+Reports whether the active graph case is internally consistent, whether plan
+and completion gates are ready, what evidence is missing, and whether shell is
+currently admitted.
+
+## graph.recover
+
+Reports the recovery ladder for the active fault state. It favors state
+inspection, smaller scope, alternate native tools, replanning, and only then a
+shell-admitted escape.
+
 ## graph.plan
 
 Records objective, optional constraints, assumptions, risks, steps, checks,

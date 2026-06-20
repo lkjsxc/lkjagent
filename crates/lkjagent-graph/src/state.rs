@@ -1,5 +1,5 @@
 use crate::case_completion::CompletionState;
-use crate::case_context::{CaseBudgetState, GraphContextState, WorkspaceState};
+use crate::case_context::{CaseBudgetState, CaseHealthState, GraphContextState, WorkspaceState};
 use crate::case_document::DocumentState;
 use crate::case_evidence::EvidenceState;
 use crate::case_fields::{
@@ -17,6 +17,8 @@ pub struct TaskGraphState {
     pub case_id: Option<i64>,
     pub objective: ObjectiveState,
     pub family: TaskFamily,
+    pub subroute: String,
+    pub route_reason: String,
     pub phase: TaskPhase,
     pub status: CaseStatus,
     pub active_node: GraphNodeId,
@@ -37,6 +39,8 @@ pub struct TaskGraphState {
     pub document: Option<DocumentState>,
     pub transitions: Vec<TransitionRecord>,
     pub budgets: CaseBudgetState,
+    pub next_action_class: String,
+    pub health: CaseHealthState,
 }
 
 impl TaskGraphState {
@@ -50,6 +54,15 @@ impl TaskGraphState {
 
     pub fn selected_packages(&self) -> &[String] {
         &self.context.selected_packages
+    }
+
+    pub fn status_text(&self) -> &'static str {
+        match self.status {
+            CaseStatus::Active => "active",
+            CaseStatus::Waiting => "waiting",
+            CaseStatus::Closed => "closed",
+            CaseStatus::Paused => "paused",
+        }
     }
 }
 
@@ -67,12 +80,17 @@ pub struct CompactionPlan {
     pub phase: TaskPhase,
     pub active_node: GraphNodeId,
     pub objective: String,
+    pub non_goals: Vec<String>,
     pub plan_steps: Vec<String>,
     pub constraints: Vec<String>,
+    pub risks: Vec<String>,
+    pub success_criteria: Vec<String>,
     pub evidence: Vec<EvidenceRecord>,
     pub missing_evidence: Vec<String>,
     pub touched_paths: Vec<String>,
     pub selected_packages: Vec<String>,
+    pub package_compression: Vec<String>,
     pub recovery: RecoveryState,
     pub completion_ready: bool,
+    pub legal_next_transitions: Vec<String>,
 }

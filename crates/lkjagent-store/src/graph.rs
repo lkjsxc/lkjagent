@@ -1,31 +1,20 @@
 pub mod artifacts;
+pub mod cases;
 pub mod context;
 pub mod documents;
 pub mod faults;
 mod links;
 pub mod notes;
 pub mod plan;
+pub mod snapshots;
 pub mod transitions;
 
+pub use cases::{active_case, open_case, update_case, GraphCaseRow, OpenCase};
 pub use links::{link_memory, memory_links_for_case, GraphMemoryLinkRow};
 
-use rusqlite::{params, Connection, OptionalExtension};
+use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GraphCaseRow {
-    pub id: i64,
-    pub objective: String,
-    pub family: String,
-    pub phase: String,
-    pub active_node: String,
-    pub status: String,
-    pub plan: String,
-    pub evidence_requirements: Vec<String>,
-    pub selected_packages: Vec<String>,
-    pub pending_checks: Vec<String>,
-}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GraphEvidenceRow {
@@ -33,72 +22,6 @@ pub struct GraphEvidenceRow {
     pub kind: String,
     pub summary: String,
     pub path: Option<String>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct OpenCase {
-    pub objective: String,
-    pub family: String,
-    pub phase: String,
-    pub active_node: String,
-    pub plan: String,
-    pub evidence_requirements: Vec<String>,
-    pub selected_packages: Vec<String>,
-    pub pending_checks: Vec<String>,
-}
-
-pub fn open_case(conn: &Connection, case: OpenCase, now: &str) -> StoreResult<i64> {
-    conn.execute(
-        "INSERT INTO graph_cases
-         (objective, family, phase, active_node, status, plan,
-          evidence_requirements, selected_packages, pending_checks, created_at, updated_at)
-         VALUES (?1, ?2, ?3, ?4, 'active', ?5, ?6, ?7, ?8, ?9, ?9)",
-        params![
-            case.objective,
-            case.family,
-            case.phase,
-            case.active_node,
-            case.plan,
-            join(&case.evidence_requirements),
-            join(&case.selected_packages),
-            join(&case.pending_checks),
-            now
-        ],
-    )?;
-    Ok(conn.last_insert_rowid())
-}
-
-pub fn active_case(conn: &Connection) -> StoreResult<Option<GraphCaseRow>> {
-    let row = conn
-        .query_row(
-            "SELECT id, objective, family, phase, active_node, status, plan,
-                    evidence_requirements, selected_packages, pending_checks
-             FROM graph_cases
-             WHERE status = 'active'
-             ORDER BY id DESC
-             LIMIT 1",
-            [],
-            read_case_row,
-        )
-        .optional()?;
-    Ok(row)
-}
-
-pub fn update_case(
-    conn: &Connection,
-    id: i64,
-    phase: &str,
-    active_node: &str,
-    status: &str,
-    now: &str,
-) -> StoreResult<()> {
-    conn.execute(
-        "UPDATE graph_cases
-         SET phase = ?2, active_node = ?3, status = ?4, updated_at = ?5
-         WHERE id = ?1",
-        params![id, phase, active_node, status, now],
-    )?;
-    Ok(())
 }
 
 pub fn record_event(
@@ -155,33 +78,6 @@ pub fn evidence_for_case(conn: &Connection, case_id: i64) -> StoreResult<Vec<Gra
         })
     })?;
     collect_rows(rows)
-}
-
-fn read_case_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<GraphCaseRow> {
-    Ok(GraphCaseRow {
-        id: row.get(0)?,
-        objective: row.get(1)?,
-        family: row.get(2)?,
-        phase: row.get(3)?,
-        active_node: row.get(4)?,
-        status: row.get(5)?,
-        plan: row.get(6)?,
-        evidence_requirements: split(&row.get::<_, String>(7)?),
-        selected_packages: split(&row.get::<_, String>(8)?),
-        pending_checks: split(&row.get::<_, String>(9)?),
-    })
-}
-
-fn join(values: &[String]) -> String {
-    values.join("\n")
-}
-
-fn split(value: &str) -> Vec<String> {
-    value
-        .lines()
-        .filter(|line| !line.is_empty())
-        .map(str::to_string)
-        .collect()
 }
 
 fn collect_rows<T>(

@@ -9,10 +9,11 @@ only a token-pressure event.
 
 A `CompactionPlan` preserves:
 
-- active case id, objective, active node, phase, and plan steps.
-- constraints, evidence gathered, missing evidence, and touched paths.
-- recent failures, recovery strategy, selected packages, and completion
-  readiness.
+- active case id, objective, non-goals, active node, phase, and plan steps.
+- constraints, risks, success criteria, evidence gathered, missing evidence,
+  and touched paths.
+- selected packages, package compression, legal next transitions, recent
+  failures, recovery strategy, and completion readiness.
 
 The restart notice is rendered from this structured state. A task summary row
 may exist for memory retrieval, but it is not the source of truth.
@@ -25,6 +26,11 @@ selection, schedule compaction, compact immediately, or pause.
 
 Phase-boundary compaction is allowed when the graph policy says the next phase
 needs a clean window.
+
+Yellow narrows optional package text. Orange schedules a checkpoint at the
+next safe phase boundary. Red compacts before the next endpoint call or owner
+handoff. Black-invalid pauses only when structured state cannot produce a
+valid context window.
 
 ## Status
 

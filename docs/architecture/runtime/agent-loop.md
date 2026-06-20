@@ -45,13 +45,13 @@ and closed by an agent.done action admitted by the graph completion gate.
 A task carries a turn budget loaded from `task.turn-budget`, defaulting to
 64 turns. The final budgeted turn is still admitted. If the daemon reaches
 another endpoint turn after the budget is exhausted, it records a budget
-notice and sets the task to waiting with a concrete owner question instead
-of silently burning turns. The next owner send resumes the task with the
-configured fresh turn budget.
-Three consecutive parse faults, repeated actions, or tool errors also move
-the task to waiting with a recovery handoff, so the loop stops before spending
-the remaining task budget on the same failure pattern. The next owner send
-clears those recovery counters and resumes with a fresh turn budget.
+fault and routes to recovery or a concrete owner question when no legal graph
+path remains.
+Repeated parse faults, repeated actions, or tool errors record typed faults
+and route to recovery nodes such as recover-parse, recover-repeat, or
+recover-tool. Recovery changes the next action class: inspect graph state,
+choose a smaller scope, use an alternate native tool, replan around a blocked
+step, and use shell only from a shell-admitted node.
 
 Some owner messages activate task-family completion requirements. Recursive
 structure tasks cannot close until graph evidence proves a README-indexed
@@ -64,11 +64,10 @@ target, so direct exact wording is strict while exact wording attached to a
 smaller subcount does not make an approximate total strict. Approximate
 wording is a scale hint and accepts the documented tolerance. Active count
 guards are rendered in the graph-state prefix with an instruction to use
-recursive directories for large outputs, one compact `shell.run` command with
-direct `/bin/sh` loops and `printf` templates for bulk creation and
-verification, keep the act payload under about 1200 characters, and avoid
-hardcoded `/workspace` paths, brace expansion, cat heredocs, bash scripts,
-literal bodies, or one `fs.write` per file.
+recursive directories for large outputs, prefer `doc.scaffold`, `doc.audit`,
+`fs.read_many`, `fs.tree`, `workspace.index`, `fs.batch_write`, and `fs.patch`,
+keep the act payload bounded, and avoid shell unless graph policy admits a
+shell escape after native tools are insufficient.
 For counted documentation tasks without recursive or benchmark scaffolds, the
 daemon writes a generic `structured-output/` tree before the first endpoint
 turn. The scaffold profiles the owner's objective by detected language and

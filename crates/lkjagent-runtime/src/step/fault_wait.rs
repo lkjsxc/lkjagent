@@ -1,10 +1,14 @@
+use lkjagent_context::assemble::append_frame;
 use lkjagent_context::model::NoticeKind;
+use lkjagent_graph::case_recovery::{FaultKind, RecoveryRecord};
+use lkjagent_graph::{CaseStatus, GraphNodeId, TaskPhase};
 use lkjagent_store::events::EventKind;
 
+use crate::graph_state::graph_notice_frame;
 use crate::prompt::token_estimate;
 use crate::step::frames::append_notice;
 use crate::step::Effect;
-use crate::task::{RuntimeState, TaskState};
+use crate::task::RuntimeState;
 
 #[derive(Clone, Copy)]
 pub(super) enum RecoveryFault {
@@ -13,30 +17,167 @@ pub(super) enum RecoveryFault {
     Tool,
 }
 
-pub(super) fn enter_recovery_wait(
+pub(super) fn record_recoverable_fault(
+    state: &mut RuntimeState,
+    fault: RecoveryFault,
+    count: u8,
+    action_fingerprint: Option<String>,
+    summary: &str,
+    effects: &mut Vec<Effect>,
+) {
+    let Some(graph) = state.graph.as_mut() else {
+        return;
+    };
+    let kind = fault_kind(fault);
+    set_graph_fault_count(graph, kind, count);
+    graph.recovery.history.push(RecoveryRecord {
+        kind,
+        summary: summary.to_string(),
+        action_fingerprint: action_fingerprint.clone(),
+    });
+    graph.health.recent_faults = graph.health.recent_faults.saturating_add(1);
+    let Some(case_id) = graph.case_id else {
+        return;
+    };
+    effects.push(Effect::RecordGraphFault {
+        case_id,
+        kind: fault_name(kind).to_string(),
+        action_fingerprint,
+        summary: summary.to_string(),
+        count,
+    });
+}
+
+pub(super) fn enter_recovery_route(
     mut state: RuntimeState,
     fault: RecoveryFault,
     count: u8,
+    action_fingerprint: Option<String>,
     effects: &mut Vec<Effect>,
 ) -> RuntimeState {
-    let question = wait_question(fault, count);
-    state = append_notice(state, NoticeKind::Error, &question);
+    let notice = route_notice(fault, count);
+    state = append_notice(state, NoticeKind::Error, &notice);
     effects.push(Effect::RecordEvent {
         kind: EventKind::Notice,
-        content: question.clone(),
-        tokens: token_estimate(&question) as i64,
+        content: notice.clone(),
+        tokens: token_estimate(&notice) as i64,
     });
-    state.task = TaskState::Waiting { question };
+    route_graph(
+        &mut state,
+        fault,
+        count,
+        action_fingerprint,
+        &notice,
+        effects,
+    );
     state
 }
 
-fn wait_question(fault: RecoveryFault, count: u8) -> String {
+fn route_notice(fault: RecoveryFault, count: u8) -> String {
     let prefix = match fault {
         RecoveryFault::Parse => "Consecutive parse faults",
         RecoveryFault::Repeat => "Consecutive repeated actions",
         RecoveryFault::Tool => "Consecutive tool errors",
     };
     format!(
-        "{prefix} reached count={count}. Send guidance to continue, narrow the task, or provide corrected state before more turns are spent."
+        "{prefix} reached count={count}; graph recovery is active. Inspect graph.next, reduce scope, choose an alternate native tool, or replan around the blocked step."
     )
+}
+
+fn route_graph(
+    state: &mut RuntimeState,
+    fault: RecoveryFault,
+    count: u8,
+    action_fingerprint: Option<String>,
+    notice: &str,
+    effects: &mut Vec<Effect>,
+) {
+    let Some(graph) = state.graph.as_mut() else {
+        return;
+    };
+    let from = graph.active_node;
+    let kind = fault_kind(fault);
+    graph.phase = TaskPhase::Recovery;
+    graph.status = CaseStatus::Active;
+    graph.active_node = target_node(fault);
+    graph.recovery.ladder_position = count.min(5);
+    graph.recovery.strategy = Some(notice.to_string());
+    graph.recovery.last_failed_action_fingerprint = action_fingerprint.clone();
+    graph.recovery.history.push(RecoveryRecord {
+        kind,
+        summary: notice.to_string(),
+        action_fingerprint: action_fingerprint.clone(),
+    });
+    graph.health.recent_faults = graph.health.recent_faults.saturating_add(1);
+    push_graph_effects(graph, from, notice, effects);
+    state.context = append_frame(&state.context, graph_notice_frame(graph));
+}
+
+fn push_graph_effects(
+    graph: &lkjagent_graph::TaskGraphState,
+    from: GraphNodeId,
+    notice: &str,
+    effects: &mut Vec<Effect>,
+) {
+    let Some(case_id) = graph.case_id else {
+        return;
+    };
+    effects.push(Effect::UpdateGraphRecovery {
+        case_id,
+        ladder_position: graph.recovery.ladder_position,
+        strategy: notice.to_string(),
+    });
+    effects.push(Effect::RecordGraphTransition {
+        case_id,
+        from_node: from.0.to_string(),
+        to_node: graph.active_node.0.to_string(),
+        decision: "recovery-route".to_string(),
+        reason: notice.to_string(),
+    });
+    effects.push(Effect::UpdateGraphCase {
+        case_id,
+        phase: graph.phase.as_str().to_string(),
+        active_node: graph.active_node.0.to_string(),
+        status: graph.status_text().to_string(),
+    });
+}
+
+fn set_graph_fault_count(graph: &mut lkjagent_graph::TaskGraphState, kind: FaultKind, count: u8) {
+    match kind {
+        FaultKind::Parse => graph.recovery.parse_failures = count,
+        FaultKind::Tool => graph.recovery.tool_failures = count,
+        FaultKind::Repeat => graph.recovery.repeat_failures = count,
+        FaultKind::Endpoint => graph.recovery.endpoint_failures = count,
+        FaultKind::Context => graph.recovery.context_failures = count,
+        FaultKind::Budget => graph.recovery.budget_failures = count,
+        FaultKind::Verification => graph.recovery.verification_failures = count,
+    }
+}
+
+fn fault_kind(fault: RecoveryFault) -> FaultKind {
+    match fault {
+        RecoveryFault::Parse => FaultKind::Parse,
+        RecoveryFault::Repeat => FaultKind::Repeat,
+        RecoveryFault::Tool => FaultKind::Tool,
+    }
+}
+
+fn target_node(fault: RecoveryFault) -> GraphNodeId {
+    match fault {
+        RecoveryFault::Parse => GraphNodeId("recover-parse"),
+        RecoveryFault::Repeat => GraphNodeId("recover-repeat"),
+        RecoveryFault::Tool => GraphNodeId("recover-tool"),
+    }
+}
+
+fn fault_name(kind: FaultKind) -> &'static str {
+    match kind {
+        FaultKind::Parse => "parse",
+        FaultKind::Tool => "tool",
+        FaultKind::Repeat => "repeat",
+        FaultKind::Endpoint => "endpoint",
+        FaultKind::Context => "context",
+        FaultKind::Budget => "budget",
+        FaultKind::Verification => "verification",
+    }
 }

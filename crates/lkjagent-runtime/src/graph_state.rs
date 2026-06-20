@@ -1,5 +1,6 @@
 use lkjagent_context::budget::PREFIX_GRAPH_STATE;
 use lkjagent_context::model::{Frame, FrameKind};
+use lkjagent_graph::policy::ContextPressureLevel;
 use lkjagent_graph::{
     initial_state, render_graph_slice, source_graph, CaseStatus, EvidenceKind, EvidenceRecord,
     GraphNodeId, TaskGraphState, TaskPhase,
@@ -107,24 +108,41 @@ pub fn status_str(status: CaseStatus) -> &'static str {
 fn open_case(state: &TaskGraphState) -> OpenCase {
     OpenCase {
         objective: state.objective_text().to_string(),
+        raw_owner_text: state.objective.raw_owner_message.clone(),
+        objective_version: state.objective.version,
         family: state.family.as_str().to_string(),
+        subroute: state.subroute.clone(),
+        route_reason: state.route_reason.clone(),
         phase: state.phase.as_str().to_string(),
         active_node: state.active_node.0.to_string(),
         plan: state.plan.summary_text(),
         evidence_requirements: state.evidence.requirement_ids(),
         selected_packages: state.context.selected_packages.clone(),
         pending_checks: state.evidence.pending_checks.clone(),
+        next_action_class: state.next_action_class.clone(),
+        context_pressure: pressure_str(state.context.pressure).to_string(),
     }
 }
 
 fn state_from_row(row: GraphCaseRow, evidence: Vec<GraphEvidenceRow>) -> TaskGraphState {
-    let mut state = initial_state(&row.objective, Some(row.id));
+    let raw = if row.raw_owner_text.trim().is_empty() {
+        row.objective.clone()
+    } else {
+        row.raw_owner_text.clone()
+    };
+    let mut state = initial_state(&raw, Some(row.id));
+    state.objective.normalized = row.objective;
+    state.objective.version = row.objective_version;
     state.family = family(&row.family);
+    state.subroute = row.subroute;
+    state.route_reason = row.route_reason;
     state.phase = phase(&row.phase);
     state.status = status(&row.status);
     state.active_node = node_id(&row.active_node);
     state.plan.reason = row.plan;
     state.context.selected_packages = row.selected_packages;
+    state.context.pressure = pressure(&row.context_pressure);
+    state.next_action_class = row.next_action_class;
     state.evidence = lkjagent_graph::case_evidence::EvidenceState::new(
         row.evidence_requirements,
         row.pending_checks,
@@ -138,6 +156,26 @@ fn state_from_row(row: GraphCaseRow, evidence: Vec<GraphEvidenceRow>) -> TaskGra
         .collect();
     lkjagent_graph::completion::refresh_completion_state(&mut state);
     state
+}
+
+fn pressure(value: &str) -> ContextPressureLevel {
+    match value {
+        "yellow" => ContextPressureLevel::Yellow,
+        "orange" => ContextPressureLevel::Orange,
+        "red" => ContextPressureLevel::Red,
+        "black-invalid" => ContextPressureLevel::BlackInvalid,
+        _ => ContextPressureLevel::Green,
+    }
+}
+
+fn pressure_str(value: ContextPressureLevel) -> &'static str {
+    match value {
+        ContextPressureLevel::Green => "green",
+        ContextPressureLevel::Yellow => "yellow",
+        ContextPressureLevel::Orange => "orange",
+        ContextPressureLevel::Red => "red",
+        ContextPressureLevel::BlackInvalid => "black-invalid",
+    }
 }
 
 fn evidence_from_row(row: GraphEvidenceRow) -> EvidenceRecord {

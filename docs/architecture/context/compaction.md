@@ -31,8 +31,8 @@ at the next boundary.
 ## Procedure
 
 1. Distillation turns. The harness injects a compaction notice directing the
-  model to preserve reusable lessons through `memory.save`. The graph state
-  itself is preserved by the harness through a typed `CompactionPlan`.
+   model to preserve reusable lessons through `memory.save`. The graph state
+   itself is preserved by the harness through a typed `CompactionPlan`.
 2. Digest rebuild. The harness rebuilds the memory digest from the memory
    store within its budget: top entries by rank, task summary first.
 3. Prefix rebuild. A fresh prefix is assembled: identity, grammar and
@@ -57,6 +57,8 @@ for owner attention. Silent loss is forbidden by
 | task state and open threads | graph case, graph evidence, and log-head notice |
 | lessons and discoveries | memory rows, retrievable by memory.find |
 | selected context packages | package identities in graph state; text reselected after rebuild |
+| legal next transitions | graph case plus compaction snapshot |
+| recovery ladder | fault rows and graph recovery state |
 | raw turn history | transcript only, never back into the window |
 
 ## Cost Model

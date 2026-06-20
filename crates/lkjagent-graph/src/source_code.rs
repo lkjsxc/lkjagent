@@ -1,10 +1,58 @@
 use crate::model::{GraphNode, NodeKind};
 use crate::source_nodes::{
-    node, EXEC_PACKAGES, EXEC_TOOLS, NO_EVIDENCE, OBSERVE_EVIDENCE, VERIFY_EVIDENCE,
-    VERIFY_PACKAGES, VERIFY_TOOLS,
+    node, EXEC_PACKAGES, EXEC_TOOLS, NO_EVIDENCE, OBSERVE_EVIDENCE, SHELL_ESCAPE_TOOLS,
+    VERIFY_EVIDENCE, VERIFY_PACKAGES, VERIFY_TOOLS,
 };
 
 pub(crate) const NODES: &[GraphNode] = &[
+    node(
+        "code-survey",
+        NodeKind::Context,
+        "inspect existing code and tests before edits",
+        OBSERVE_EVIDENCE,
+        EXEC_PACKAGES,
+        EXEC_TOOLS,
+    ),
+    node(
+        "code-design",
+        NodeKind::Planning,
+        "choose minimal code design and verification shape",
+        OBSERVE_EVIDENCE,
+        EXEC_PACKAGES,
+        EXEC_TOOLS,
+    ),
+    node(
+        "code-edit",
+        NodeKind::Execution,
+        "apply native exact edits or bounded patches",
+        OBSERVE_EVIDENCE,
+        EXEC_PACKAGES,
+        EXEC_TOOLS,
+    ),
+    node(
+        "code-review",
+        NodeKind::Verification,
+        "review changed code against objective and invariants",
+        VERIFY_EVIDENCE,
+        VERIFY_PACKAGES,
+        VERIFY_TOOLS,
+    ),
+    node(
+        "code-verify",
+        NodeKind::Execution,
+        "run focused direct verification tools",
+        VERIFY_EVIDENCE,
+        VERIFY_PACKAGES,
+        VERIFY_TOOLS,
+    ),
+    node(
+        "code-repair",
+        NodeKind::Execution,
+        "repair failed code checks with smaller scope",
+        OBSERVE_EVIDENCE,
+        EXEC_PACKAGES,
+        EXEC_TOOLS,
+    ),
     node(
         "execute",
         NodeKind::Execution,
@@ -43,6 +91,6 @@ pub(crate) const NODES: &[GraphNode] = &[
         "escape hatch for unsupported operations after graph admission",
         NO_EVIDENCE,
         VERIFY_PACKAGES,
-        VERIFY_TOOLS,
+        SHELL_ESCAPE_TOOLS,
     ),
 ];

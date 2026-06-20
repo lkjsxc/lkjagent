@@ -70,5 +70,9 @@ fn policy_for(graph: &lkjagent_graph::TaskGraphState) -> GraphDispatchPolicy {
         blocked_reason: graph.completion.refusal_reason.clone(),
         plan_ready: graph.plan.ready,
         completion_ready: graph.completion.ready,
+        shell_allowed: source
+            .policy
+            .shell_allowed_nodes
+            .contains(&graph.active_node.0),
     }
 }
