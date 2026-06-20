@@ -6,8 +6,8 @@ use lkjagent_tools::observe::OutputKind;
 use crate::graph_state::graph_notice_frame;
 use crate::step::action_params::action_param;
 use crate::step::graph_output_evidence::{
-    add_document_evidence, add_explicit_graph_evidence, add_shell_evidence, ensure_evidence,
-    push_case_update,
+    add_document_evidence, add_document_scaffold_observation, add_explicit_graph_evidence,
+    add_shell_evidence, ensure_evidence, push_case_update,
 };
 use crate::step::graph_output_plan::{apply_context, apply_note, apply_plan, apply_transition};
 use crate::step::graph_output_plan_helpers::advance_active_step;
@@ -71,8 +71,9 @@ fn add_graph_update(
                 effects,
             ) || advance_active_step(graph)
         }
-        "doc.audit" | "doc.scaffold" => {
-            add_document_evidence(graph, output, effects) || advance_active_step(graph)
+        "doc.audit" => add_document_evidence(graph, output, effects) || advance_active_step(graph),
+        "doc.scaffold" => {
+            add_document_scaffold_observation(graph, output, effects) || advance_active_step(graph)
         }
         "fs.batch_write"
             if graph.active_node == GraphNodeId("document")
