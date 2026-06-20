@@ -3,6 +3,7 @@ use rusqlite::Connection;
 use super::runner::{DaemonTick, ResidentDaemon};
 use crate::daemon::endpoint_complete;
 use crate::error::{RuntimeError, RuntimeResult};
+use crate::mode::EndpointDecision;
 use crate::prompt::token_estimate;
 use crate::step::{step, StepInput};
 
@@ -12,12 +13,33 @@ impl ResidentDaemon {
         conn: &mut Connection,
         now: &str,
     ) -> RuntimeResult<DaemonTick> {
-        if self.endpoint_retry_pending(now) {
-            return Ok(DaemonTick::EndpointError);
+        let retry_pending = self.endpoint_retry_pending(now);
+        let authority = self.decide_authority(conn, now, retry_pending)?;
+        self.turn_authority = Some(authority.clone());
+        match authority.endpoint_decision {
+            EndpointDecision::WaitForRetry => return Ok(DaemonTick::EndpointError),
+            EndpointDecision::RuntimeCompact => {
+                if let Some(tick) = self.compact_before_endpoint(conn, now)? {
+                    return Ok(tick);
+                }
+                self.write_observable(conn)?;
+                return Ok(DaemonTick::Working);
+            }
+            EndpointDecision::DeliverOwner => {
+                self.deliver_owner(conn, now)?;
+                return Ok(DaemonTick::Working);
+            }
+            EndpointDecision::DeferMaintenance => {
+                self.state.maintenance = None;
+                return Ok(DaemonTick::Working);
+            }
+            EndpointDecision::ClosedIdle => {
+                self.write_observable(conn)?;
+                return Ok(DaemonTick::Idle);
+            }
+            EndpointDecision::CallModel => {}
         }
-        if let Some(tick) = self.compact_before_endpoint(conn, now)? {
-            return Ok(tick);
-        }
+        self.refresh_authority_card(&authority);
         match endpoint_complete(
             &self.runtime.client,
             &self.state.context,

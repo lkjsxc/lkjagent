@@ -1,7 +1,7 @@
 mod support;
 
 use lkjagent_store::events::read_events;
-use lkjagent_store::queue::{delete, deliver_next, edit, enqueue, list, redeliver};
+use lkjagent_store::queue::{delete, deliver_next, edit, enqueue, list, pending_count, redeliver};
 use support::{memory_store, TestResult};
 
 #[test]
@@ -24,6 +24,21 @@ fn queue_delivery_is_exactly_once_and_writes_owner_event() -> TestResult<()> {
         events.iter().filter(|event| event.kind == "owner").count(),
         2
     );
+    Ok(())
+}
+
+#[test]
+fn pending_count_tracks_only_pending_rows() -> TestResult<()> {
+    let mut conn = memory_store()?;
+    let first = enqueue(&mut conn, "first", "owner-send", "2026-01-01T00:00:00Z")?;
+    enqueue(&mut conn, "second", "owner-send", "2026-01-01T00:00:01Z")?;
+
+    assert_eq!(pending_count(&conn)?, 2);
+    delete(&mut conn, first, "cancel", "2026-01-01T00:00:02Z")?;
+    assert_eq!(pending_count(&conn)?, 1);
+    let delivered = deliver_next(&mut conn, 7, 3, "2026-01-01T00:00:03Z")?;
+    assert!(delivered.is_some());
+    assert_eq!(pending_count(&conn)?, 0);
     Ok(())
 }
 

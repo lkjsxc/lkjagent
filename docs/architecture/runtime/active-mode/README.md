@@ -26,6 +26,7 @@ authority; it does not create it.
 
 ## Status
 
-partially implemented. Pure turn authority selection, endpoint decision,
-completion policy, and policy rendering exist. Full endpoint-turn authority
-and shared dispatch authority remain open.
+partially implemented. Pure turn authority selection, store-backed runtime
+snapshots, endpoint decision, endpoint card refresh, dispatch authority reuse,
+completion policy, and policy rendering exist. Completion unification and
+artifact-aware gates remain open.

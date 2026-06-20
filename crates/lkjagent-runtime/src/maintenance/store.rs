@@ -11,7 +11,7 @@ pub fn prepare_idle_cycle(
     state: &RuntimeState,
     now: &str,
 ) -> RuntimeResult<BoundaryDecision> {
-    let pending_queue = pending_queue_count(conn)?;
+    let pending_queue = lkjagent_store::queue::pending_count(conn)?;
     let stamps = load_directive_stamps(conn)?;
     let decision = idle_boundary(state, pending_queue, &stamps);
     if let BoundaryDecision::StartCycle { directive, .. } = &decision {
@@ -21,6 +21,16 @@ pub fn prepare_idle_cycle(
         stamp_directive(conn, *directive, now)?;
     }
     Ok(decision)
+}
+
+pub fn maintenance_due(conn: &Connection, state: &RuntimeState, now: &str) -> RuntimeResult<bool> {
+    let pending_queue = lkjagent_store::queue::pending_count(conn)?;
+    let stamps = load_directive_stamps(conn)?;
+    Ok(match idle_boundary(state, pending_queue, &stamps) {
+        BoundaryDecision::StartCycle { directive, .. } => cycle_due(directive, &stamps, now),
+        BoundaryDecision::ContinueCycle { .. } => true,
+        BoundaryDecision::PreemptForQueue { .. } | BoundaryDecision::NotIdle => false,
+    })
 }
 
 pub fn load_directive_stamps(conn: &Connection) -> RuntimeResult<Vec<DirectiveStamp>> {
@@ -51,14 +61,6 @@ pub fn defer_all_directives(conn: &Connection, now: &str) -> RuntimeResult<()> {
         stamp_directive(conn, *directive, now)?;
     }
     Ok(())
-}
-
-fn pending_queue_count(conn: &Connection) -> RuntimeResult<usize> {
-    let rows = lkjagent_store::queue::list(conn)?;
-    Ok(rows
-        .iter()
-        .filter(|row| row.status.as_str() == "pending")
-        .count())
 }
 
 fn cycle_due(directive: MaintenanceDirective, stamps: &[DirectiveStamp], now: &str) -> bool {

@@ -7,6 +7,7 @@ use lkjagent_tools::dispatch::{DispatchState, ToolRuntime};
 use rusqlite::Connection;
 
 use crate::error::{RuntimeError, RuntimeResult};
+use crate::mode::TurnAuthority;
 use crate::task::{RuntimeState, TaskState, DEFAULT_TURN_BUDGET};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -64,6 +65,7 @@ pub struct ResidentDaemon {
     pub dispatch_state: DispatchState,
     pub endpoint_attempt: u32,
     pub endpoint_retry_at: Option<String>,
+    pub turn_authority: Option<TurnAuthority>,
 }
 
 impl ResidentDaemon {
@@ -74,6 +76,7 @@ impl ResidentDaemon {
             dispatch_state: DispatchState::default(),
             endpoint_attempt: 0,
             endpoint_retry_at: None,
+            turn_authority: None,
         }
     }
 

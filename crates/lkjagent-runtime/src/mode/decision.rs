@@ -20,6 +20,9 @@ pub fn endpoint_decision_for(
     if input.pending_owner_rows > 0 {
         return EndpointDecision::DeliverOwner;
     }
+    if input.compaction_required {
+        return EndpointDecision::RuntimeCompact;
+    }
     if mode == ActiveMode::Compaction {
         return EndpointDecision::RuntimeCompact;
     }

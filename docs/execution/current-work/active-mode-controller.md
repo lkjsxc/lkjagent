@@ -100,7 +100,8 @@ quiet verify`, then `docker compose run --rm verify`.
 
 ## Status
 
-open; pure turn authority selection, endpoint decisions, completion policy,
-mode rendering, and dispatch-level effective policy exist. Store-backed
-runtime snapshots, endpoint-turn ownership, maintenance due selection, and
-compaction snapshot integration remain open.
+open; pure turn authority selection, store-backed runtime snapshots, endpoint
+decisions, one-card endpoint rendering, cached dispatch authority, completion
+policy, mode rendering, and dispatch-level effective policy exist. Completion
+unification, artifact-aware close gates, and richer compaction snapshots remain
+open.
