@@ -1,7 +1,8 @@
 use super::runner::ResidentDaemon;
 use crate::graph_state::render_state;
 use lkjagent_graph::{admitted_targets, source_graph};
-use lkjagent_tools::dispatch::GraphDispatchPolicy;
+use crate::mode::ActiveModePolicy;
+use lkjagent_tools::dispatch::{EffectivePolicy, GraphDispatchPolicy};
 
 impl ResidentDaemon {
     pub(super) fn clear_graph_dispatch_state(&mut self) {
@@ -9,6 +10,7 @@ impl ResidentDaemon {
         self.dispatch_state.graph_completion_ready = true;
         self.dispatch_state.graph_missing.clear();
         self.dispatch_state.graph_policy = None;
+        self.dispatch_state.effective_policy = None;
     }
 
     pub(super) fn sync_graph_dispatch_state(&mut self) {
@@ -33,6 +35,56 @@ impl ResidentDaemon {
                 self.dispatch_state.graph_missing = vec![reason];
             }
         }
+    }
+
+    pub(super) fn sync_effective_dispatch_policy(&mut self, mode_policy: &ActiveModePolicy) {
+        if mode_policy.graph_policy_applies {
+            self.sync_graph_dispatch_state();
+        } else {
+            self.clear_graph_dispatch_state();
+        }
+        self.dispatch_state.effective_policy = Some(effective_policy(
+            mode_policy,
+            self.dispatch_state.graph_policy.as_ref(),
+        ));
+    }
+}
+
+fn effective_policy(
+    mode_policy: &ActiveModePolicy,
+    graph_policy: Option<&GraphDispatchPolicy>,
+) -> EffectivePolicy {
+    if mode_policy.graph_policy_applies {
+        if let Some(graph) = graph_policy {
+            return EffectivePolicy {
+                mode: format!("{:?}", mode_policy.mode),
+                allowed_tools: graph.allowed_tools.clone(),
+                blocked_tools: graph.blocked_tools.clone(),
+                shell_allowed: graph.shell_allowed,
+                completion_allowed: graph.completion_ready,
+                reason: graph.blocked_reason.clone().unwrap_or_else(|| {
+                    "tool is not admitted by the active graph node".to_string()
+                }),
+                preferred_next_action: mode_policy.preferred_next_action.to_string(),
+            };
+        }
+    }
+    EffectivePolicy {
+        mode: format!("{:?}", mode_policy.mode),
+        allowed_tools: mode_policy
+            .allowed_tools
+            .iter()
+            .map(|tool| (*tool).to_string())
+            .collect(),
+        blocked_tools: mode_policy
+            .blocked_tools
+            .iter()
+            .map(|tool| (*tool).to_string())
+            .collect(),
+        shell_allowed: mode_policy.allowed_tools.iter().any(|tool| *tool == "shell.run"),
+        completion_allowed: mode_policy.mode.allows_completion(),
+        reason: format!("tool is not admitted by {:?} active mode", mode_policy.mode),
+        preferred_next_action: mode_policy.preferred_next_action.to_string(),
     }
 }
 

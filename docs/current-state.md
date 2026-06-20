@@ -56,14 +56,14 @@ and Docker Compose verification passed for this redesign slice on 2026-06-20.
 | Cargo workspace and gates | implemented | `Cargo.toml`; `crates/lkjagent-xtask` |
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol` |
-| Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; single effective-policy enforcement remains open |
+| Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; dispatch now checks one effective policy object before routing |
 | Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; quiet verify from prior controller work |
 | Document audit tool | implemented | topology checks pass local gates; content artifacts reject scaffold-only leaves; runtime records document-structure only for passed audits |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, punctuation-safe FTS queries, and exact duplicate prune have focused tests; semantic merge and rewrite pruning remain open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
-| Runtime recovery | partially implemented | pure active-mode selection exists, maintenance and compaction modes reduce graph-policy contradictions, internal `agent.ask` questions are refused, runtime close rechecks graph completion, and no-op maintenance defers restart; repeated invalid actions still need deterministic recovery control |
+| Runtime recovery | partially implemented | pure active-mode selection exists, dispatch uses one effective policy per turn, internal `agent.ask` questions are refused, runtime close rechecks graph completion, and no-op maintenance defers restart; repeated invalid actions still need deterministic recovery control |
 | Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned and preserves active graph and fault state; richer structured snapshots remain open |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |

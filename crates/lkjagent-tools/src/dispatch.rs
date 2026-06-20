@@ -1,4 +1,5 @@
 mod examples;
+mod effective_refusal;
 mod fs_extra_tools;
 mod fs_more_tools;
 mod fs_tools;
@@ -26,11 +27,11 @@ use crate::error::{ToolError, ToolResult};
 use crate::observe::{self, OutputFrame};
 pub use examples::{registry_valid_example, valid_example_for, ActionExample, ExampleContext};
 use normalize::{normalize_action, NormalizationDecision, NormalizationNote};
-use refusal::{graph_policy_refusal, repeat_refusal};
+use refusal::{policy_refusal, repeat_refusal};
 use routes::route;
 pub use state::{
-    DispatchOutput, DispatchState, GraphDispatchPolicy, GraphEvidenceRecord, ReadRecord,
-    ToolRuntime,
+    DispatchOutput, DispatchState, EffectivePolicy, GraphDispatchPolicy, GraphEvidenceRecord,
+    ReadRecord, ToolRuntime,
 };
 pub use validate::validate_action;
 
@@ -61,7 +62,7 @@ pub fn dispatch_with_text(
         Ok(validated) => validated,
         Err(message) => return finish(state, action_text, observe::notice("error", message)),
     };
-    if let Some(message) = graph_policy_refusal(&validated.tool, state) {
+    if let Some(message) = policy_refusal(&validated.tool, state) {
         return finish(state, action_text, observe::notice("error", message));
     }
     let output = route(validated, action_text, runtime, conn, state);
