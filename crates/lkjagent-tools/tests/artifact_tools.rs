@@ -58,6 +58,43 @@ fn artifact_apply_writes_manifest_and_readmes() -> TestResult<()> {
 }
 
 #[test]
+fn artifact_apply_reuses_existing_root_without_duplicate_sections() -> TestResult<()> {
+    let workspace = temp_workspace("artifact-apply-reuse")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut dispatch_state = state();
+    let params = [
+        ("root", "stories/memory-market"),
+        ("title", "Memory Market"),
+        ("kind", "story"),
+    ];
+
+    let first = dispatch(
+        &action("artifact.apply", &params),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    );
+    let initial_count = markdown_count(&workspace.join("stories/memory-market"))?;
+    dispatch_state.reset_repeat_tracking();
+    let second = dispatch(
+        &action("artifact.apply", &params),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    );
+    let repaired_count = markdown_count(&workspace.join("stories/memory-market"))?;
+
+    assert!(first.content.contains("document scaffold created"));
+    assert!(second.content.contains("document scaffold created"));
+    assert_eq!(initial_count, repaired_count);
+    assert!(!workspace
+        .join("stories/memory-market/chapters/part-001.md")
+        .exists());
+    Ok(())
+}
+
+#[test]
 fn artifact_audit_rejects_empty_root() -> TestResult<()> {
     let workspace = temp_workspace("artifact-audit-empty")?;
     let runtime = runtime(workspace)?;
@@ -74,6 +111,41 @@ fn artifact_audit_rejects_empty_root() -> TestResult<()> {
 
     assert!(output.content.contains("document audit failed"));
     assert!(output.content.contains("missing_root: cookbooks/bread"));
+    Ok(())
+}
+
+#[test]
+fn artifact_audit_rejects_cookbook_scaffold_without_recipe_content() -> TestResult<()> {
+    let workspace = temp_workspace("artifact-audit-cookbook-content")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut dispatch_state = state();
+    dispatch(
+        &action(
+            "artifact.apply",
+            &[
+                ("root", "cookbooks/bread-cookbook"),
+                ("title", "Bread Cookbook"),
+                ("kind", "cookbook"),
+            ],
+        ),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    );
+
+    let output = dispatch(
+        &action(
+            "artifact.audit",
+            &[("root", "cookbooks/bread-cookbook"), ("kind", "cookbook")],
+        ),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    );
+
+    assert!(output.content.contains("document audit failed"));
+    assert!(output.content.contains("scaffold_only_content: recipes/"));
     Ok(())
 }
 
@@ -111,4 +183,17 @@ fn artifact_audit_rejects_generic_project_docs_for_story() -> TestResult<()> {
     let manifest = fs::read_to_string(workspace.join("stories/not-a-story/.lkj-doc-graph.md"))?;
     assert!(manifest.contains("ProjectDocs"));
     Ok(())
+}
+
+fn markdown_count(root: &std::path::Path) -> TestResult<usize> {
+    let mut count: usize = 0;
+    for entry in fs::read_dir(root)? {
+        let path = entry?.path();
+        if path.is_dir() {
+            count = count.saturating_add(markdown_count(&path)?);
+        } else if path.extension().is_some_and(|ext| ext == "md") {
+            count = count.saturating_add(1);
+        }
+    }
+    Ok(count)
 }
