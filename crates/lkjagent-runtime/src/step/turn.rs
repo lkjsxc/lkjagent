@@ -5,16 +5,14 @@ use lkjagent_protocol::{parse_completion, render_action, render_owner};
 use lkjagent_store::events::EventKind;
 
 use crate::graph_state::graph_notice_frame;
-use crate::maintenance::spend_cycle;
 use crate::prompt::token_estimate;
 use crate::recovery::{parse_notice, parse_recovery_notice, should_escalate, stop_reason};
-use crate::step::fault_wait::{enter_recovery_wait, RecoveryFault};
+use crate::step::budget::{budget_exhausted_step, spend_active_budget};
+use crate::step::fault_wait::{enter_recovery_route, record_recoverable_fault, RecoveryFault};
 use crate::step::frames::{append_notice, result};
 use crate::step::oversize::{oversize_error, oversize_recovery};
 use crate::step::{Effect, StepResult};
-use crate::task::{
-    open_task_with_budget, spend_turn, PendingAction, RuntimeState, StopReason, TaskState,
-};
+use crate::task::{open_task_with_budget, PendingAction, RuntimeState, StopReason};
 
 pub(super) fn owner_step(
     mut state: RuntimeState,
@@ -103,57 +101,6 @@ pub(super) fn endpoint_oversize_step(mut state: RuntimeState, preview: &str) -> 
     )
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum BudgetExhaustion {
-    Task,
-    Maintenance,
-}
-
-impl BudgetExhaustion {
-    fn notice(self) -> &'static str {
-        match self {
-            Self::Task => "turn budget exhausted",
-            Self::Maintenance => "maintenance cycle turn budget exhausted",
-        }
-    }
-}
-
-fn spend_active_budget(state: &mut RuntimeState) -> Option<BudgetExhaustion> {
-    if matches!(state.task, TaskState::Open { .. }) {
-        let (task, task_exhausted) = spend_turn(&state.task);
-        state.task = task;
-        if task_exhausted {
-            state.maintenance = None;
-            return Some(BudgetExhaustion::Task);
-        }
-        return None;
-    }
-    let (maintenance, maintenance_exhausted) = spend_cycle(&state.maintenance);
-    state.maintenance = maintenance;
-    if maintenance_exhausted {
-        Some(BudgetExhaustion::Maintenance)
-    } else {
-        None
-    }
-}
-
-fn budget_exhausted_step(mut state: RuntimeState, exhausted: BudgetExhaustion) -> StepResult {
-    let notice = exhausted.notice();
-    state = append_notice(state, NoticeKind::Budget, notice);
-    let effects = vec![Effect::RecordEvent {
-        kind: EventKind::Notice,
-        content: notice.to_string(),
-        tokens: token_estimate(notice) as i64,
-    }];
-    if exhausted == BudgetExhaustion::Task {
-        state.task = TaskState::Waiting {
-            question: "Turn budget exhausted. Send guidance to continue.".to_string(),
-        };
-        return result(state, effects, Some(StopReason::Ask));
-    }
-    result(state, effects, Some(StopReason::BudgetNotice))
-}
-
 fn action_step(mut state: RuntimeState, action: lkjagent_protocol::Action) -> StepResult {
     let action_text = render_action(&action);
     state.pending_action = Some(PendingAction {
@@ -191,10 +138,18 @@ fn parse_fault_step(mut state: RuntimeState, fault: &lkjagent_protocol::ParseFau
         content: recovery.clone(),
         tokens: 32,
     });
+    let count = state.parse_faults;
+    record_recoverable_fault(
+        &mut state,
+        RecoveryFault::Parse,
+        count,
+        None,
+        &recovery,
+        &mut effects,
+    );
     if should_escalate(state.parse_faults) {
         let count = state.parse_faults;
-        state = enter_recovery_wait(state, RecoveryFault::Parse, count, &mut effects);
-        return result(state, effects, Some(StopReason::Ask));
+        state = enter_recovery_route(state, RecoveryFault::Parse, count, None, &mut effects);
     }
     result(state, effects, Some(stop_reason(fault)))
 }

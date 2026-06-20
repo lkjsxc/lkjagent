@@ -23,6 +23,11 @@ verification evidence. Documentation and knowledge-base families require
 document-structure evidence from doc.audit, doc.scaffold, or a deterministic
 harness scaffold.
 
+Architecture changes require matching code and docs evidence. Recovery tasks
+require a fault record, a non-repeating alternate action, and improved state
+or a specific blocker. Compaction tasks require a structured snapshot and a
+rebuilt context notice before they can close.
+
 ## Status
 
 implemented.

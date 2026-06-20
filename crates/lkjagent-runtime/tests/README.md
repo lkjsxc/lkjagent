@@ -12,7 +12,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [budget_recovery.rs](budget_recovery.rs): exhausted task budget waiting and owner-send resume fixtures.
 - [daemon_loop.rs](daemon_loop.rs): resident queue, endpoint, tool, ask, and error fixtures.
 - [endpoint_retry.rs](endpoint_retry.rs): endpoint backoff deadline fixture.
-- [fault_wait.rs](fault_wait.rs): repeated recovery fault waiting fixtures.
+- [fault_wait.rs](fault_wait.rs): repeated fault graph recovery routing fixtures.
 - [file_count_aggregate_daemon.rs](file_count_aggregate_daemon.rs): aggregate count auto-scaffold fixture.
 - [file_count_daemon.rs](file_count_daemon.rs): counted file daemon fixtures.
 - [graph_memory_links.rs](graph_memory_links.rs): graph case to task-summary memory links.

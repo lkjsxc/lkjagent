@@ -49,7 +49,11 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
         CREATE TABLE IF NOT EXISTS graph_cases (
             id INTEGER PRIMARY KEY,
             objective TEXT NOT NULL,
+            raw_owner_text TEXT NOT NULL DEFAULT '',
+            objective_version INTEGER NOT NULL DEFAULT 1,
             family TEXT NOT NULL,
+            subroute TEXT NOT NULL DEFAULT '',
+            route_reason TEXT NOT NULL DEFAULT '',
             phase TEXT NOT NULL,
             active_node TEXT NOT NULL,
             status TEXT NOT NULL,
@@ -57,6 +61,8 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             evidence_requirements TEXT NOT NULL,
             selected_packages TEXT NOT NULL,
             pending_checks TEXT NOT NULL,
+            next_action_class TEXT NOT NULL DEFAULT '',
+            context_pressure TEXT NOT NULL DEFAULT 'green',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         );
@@ -95,6 +101,38 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
         );
         ",
     )?;
+    ensure_graph_case_columns(conn)?;
     crate::schema_graph::setup(conn)?;
     Ok(())
+}
+
+fn ensure_graph_case_columns(conn: &Connection) -> StoreResult<()> {
+    let columns = [
+        ("raw_owner_text", "TEXT NOT NULL DEFAULT ''"),
+        ("objective_version", "INTEGER NOT NULL DEFAULT 1"),
+        ("subroute", "TEXT NOT NULL DEFAULT ''"),
+        ("route_reason", "TEXT NOT NULL DEFAULT ''"),
+        ("next_action_class", "TEXT NOT NULL DEFAULT ''"),
+        ("context_pressure", "TEXT NOT NULL DEFAULT 'green'"),
+    ];
+    for (name, definition) in columns {
+        if !column_exists(conn, "graph_cases", name)? {
+            conn.execute(
+                &format!("ALTER TABLE graph_cases ADD COLUMN {name} {definition}"),
+                [],
+            )?;
+        }
+    }
+    Ok(())
+}
+
+fn column_exists(conn: &Connection, table: &str, column: &str) -> StoreResult<bool> {
+    let mut statement = conn.prepare(&format!("PRAGMA table_info({table})"))?;
+    let rows = statement.query_map([], |row| row.get::<_, String>(1))?;
+    for row in rows {
+        if row? == column {
+            return Ok(true);
+        }
+    }
+    Ok(false)
 }

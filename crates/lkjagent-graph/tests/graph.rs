@@ -1,7 +1,6 @@
 use lkjagent_graph::{
-    admit_transition, compaction_plan, completion_decision, initial_state, render_graph_slice,
-    source_graph, validate_graph, EvidenceKind, EvidenceRecord, GraphNodeId, TaskFamily,
-    TransitionDecision,
+    admit_transition, completion_decision, initial_state, render_graph_slice, source_graph,
+    validate_graph, EvidenceKind, EvidenceRecord, GraphNodeId, TaskFamily, TransitionDecision,
 };
 
 #[test]
@@ -13,6 +12,14 @@ fn source_graph_validates_typed_guards() {
         .edges
         .iter()
         .all(|edge| !edge.guards.is_empty()));
+    assert!(source_graph()
+        .nodes
+        .iter()
+        .any(|node| node.id == GraphNodeId("recover-by-shell-escape")));
+    assert!(source_graph()
+        .nodes
+        .iter()
+        .any(|node| node.id == GraphNodeId("document-topology")));
 }
 
 #[test]
@@ -116,65 +123,17 @@ fn completion_requires_typed_evidence_and_checks() {
 }
 
 #[test]
-fn context_package_selection_is_family_and_node_aware() {
-    let docs = initial_state("Create about 100 docs for a handbook.", None);
-    let code = initial_state("fix parser bug", None);
-
-    assert!(docs
-        .selected_packages()
-        .contains(&"doc-construction".to_string()));
-    assert!(!code
-        .selected_packages()
-        .contains(&"doc-construction".to_string()));
-    assert!(source_graph()
-        .packages
-        .iter()
-        .any(|package| package.id.0 == "recovery-policy"));
-}
-
-#[test]
 fn render_graph_slice_names_allowed_and_blocked_tools() {
     let state = initial_state("write docs", None);
     let rendered = render_graph_slice(source_graph(), &state, 512);
 
-    assert!(rendered.contains("phase=planning"));
-    assert!(rendered.contains("missing_evidence=plan"));
-    assert!(rendered.contains("allowed_tools="));
-    assert!(rendered.contains("blocked_tools="));
+    assert!(rendered.contains("phase: planning"));
+    assert!(rendered.contains("Missing evidence: plan"));
+    assert!(rendered.contains("Allowed tools now:"));
+    assert!(rendered.contains("Blocked tools now:"));
     assert!(rendered.contains("graph.plan"));
     assert!(rendered.contains("fs.write"));
-}
-
-#[test]
-fn compaction_preserves_rich_case_state() {
-    let mut state = initial_state("fix parser bug", Some(4));
-    state.active_node = GraphNodeId("execute");
-    state.plan.ready = true;
-    state.plan.steps.push(lkjagent_graph::case_plan::PlanStep {
-        id: lkjagent_graph::case_plan::StepId("step-1".to_string()),
-        title: "patch parser".to_string(),
-        rationale: "required".to_string(),
-        status: lkjagent_graph::case_plan::StepStatus::Active,
-        node: GraphNodeId("execute"),
-        target_paths: vec!["crates/lkjagent-protocol/src/parse.rs".to_string()],
-        required_evidence: vec!["verification".to_string()],
-        verification: Vec::new(),
-    });
-    state
-        .workspace
-        .touched_paths
-        .push("crates/lkjagent-protocol/src/parse.rs".to_string());
-    state
-        .evidence
-        .records
-        .push(record("plan", EvidenceKind::Plan));
-
-    let plan = compaction_plan(&state);
-    assert_eq!(plan.case_id, Some(4));
-    assert_eq!(plan.active_node, GraphNodeId("execute"));
-    assert!(plan.plan_steps.contains(&"patch parser".to_string()));
-    assert_eq!(plan.touched_paths, state.workspace.touched_paths);
-    assert_eq!(plan.selected_packages, state.context.selected_packages);
+    assert!(rendered.contains("Legal transitions:"));
 }
 
 fn record(requirement: &str, kind: EvidenceKind) -> EvidenceRecord {

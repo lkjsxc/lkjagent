@@ -44,6 +44,18 @@ pub enum Effect {
         decision: String,
         reason: String,
     },
+    RecordGraphFault {
+        case_id: i64,
+        kind: String,
+        action_fingerprint: Option<String>,
+        summary: String,
+        count: u8,
+    },
+    UpdateGraphRecovery {
+        case_id: i64,
+        ladder_position: u8,
+        strategy: String,
+    },
     UpdateGraphCase {
         case_id: i64,
         phase: String,

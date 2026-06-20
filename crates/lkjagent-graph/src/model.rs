@@ -11,6 +11,7 @@ pub enum NodeKind {
     State,
     Context,
     Execution,
+    Verification,
     Document,
     Memory,
     Compaction,
@@ -18,7 +19,6 @@ pub enum NodeKind {
     Completion,
     Maintenance,
 }
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum EdgeKind {
     Start,
@@ -31,7 +31,6 @@ pub enum EdgeKind {
     Complete,
     Maintain,
 }
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaskFamily {
     CodeChange,
@@ -46,7 +45,6 @@ pub enum TaskFamily {
     Compaction,
     IdleMaintenance,
 }
-
 impl TaskFamily {
     pub fn as_str(self) -> &'static str {
         match self {
@@ -64,7 +62,6 @@ impl TaskFamily {
         }
     }
 }
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TaskPhase {
     Intake,
@@ -179,6 +176,7 @@ pub struct GraphNode {
     pub evidence: &'static [EvidenceRequirement],
     pub packages: &'static [&'static str],
     pub allowed_actions: &'static [&'static str],
+    pub policy: crate::node_policy::NodePolicy,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -189,6 +187,7 @@ pub struct GraphEdge {
     pub to: GraphNodeId,
     pub guards: &'static [crate::guards::Guard],
     pub rationale: &'static str,
+    pub policy: crate::node_policy::EdgePolicy,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

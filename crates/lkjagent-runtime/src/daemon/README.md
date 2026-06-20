@@ -13,6 +13,7 @@ This directory holds adapter helpers for the foreground daemon.
 - [count_scaffold.rs](count_scaffold.rs): counted document auto scaffold.
 - [count_scaffold_gate.rs](count_scaffold_gate.rs): graph gate check for counted scaffold closure.
 - [effects.rs](effects.rs): step effect persistence.
+- [effects_graph.rs](effects_graph.rs): graph effect persistence helpers.
 - [execute_pending.rs](execute_pending.rs): tool dispatch after runtime gates.
 - [endpoint.rs](endpoint.rs): endpoint completion and oversize handling.
 - [idle.rs](idle.rs): automatic idle maintenance cycle opening.

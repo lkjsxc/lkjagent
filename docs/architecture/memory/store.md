@@ -76,10 +76,19 @@ One row per active or closed task case.
 | id | INTEGER PRIMARY KEY | case id |
 | status | TEXT | active, waiting, closed, or paused |
 | objective | TEXT | owner objective or maintenance directive |
+| raw_owner_text | TEXT | original owner text used for reconstruction |
+| objective revision | INTEGER | objective revision counter |
 | task_family | TEXT | classified graph task family |
+| subroute | TEXT | narrower task route |
+| route_reason | TEXT | classifier reason for the route |
 | phase | TEXT | active task phase |
 | node_id | TEXT | active graph node |
 | plan | TEXT | structured plan and current next actions |
+| evidence_requirements | TEXT | bounded line list of missing proof |
+| selected_packages | TEXT | bounded line list of package ids |
+| pending_checks | TEXT | bounded line list of checks still due |
+| next_action_class | TEXT | preferred next action class |
+| context_pressure | TEXT | green, yellow, orange, red, or black-invalid |
 | created_at | TEXT | first write |
 | updated_at | TEXT | last graph state write |
 | closed_at | TEXT | close time, null while open |
@@ -112,6 +121,12 @@ completion proof.
 | path | TEXT | optional workspace path |
 | event_id | INTEGER | transcript event link when present |
 | created_at | TEXT | write time |
+
+`graph_plan_steps`, `graph_context_bindings`, `graph_artifacts`,
+`graph_document_state`, `graph_faults`, `graph_recovery_state`,
+`graph_compaction_snapshots`, and `graph_transitions` store the normalized
+ledger around the header. Context bindings include compression level so
+restart can rebuild the same pressure-aware graph card.
 
 `graph_memory_links` links memory rows to graph cases and nodes. Task-summary
 memory rows are linked to the active or just-closed case node when saved.

@@ -5,10 +5,14 @@ use crate::dispatch::fs_extra_tools::{
     dispatch_fs_batch_write, dispatch_fs_list, dispatch_fs_mkdir, dispatch_fs_search,
     dispatch_fs_stat,
 };
+use crate::dispatch::fs_more_tools::{dispatch_fs_patch, dispatch_fs_read_many, dispatch_fs_tree};
 use crate::dispatch::fs_tools::{
     dispatch_fs_edit, dispatch_fs_read, dispatch_fs_write, dispatch_shell,
 };
 use crate::dispatch::graph_evidence_tools::{dispatch_graph_compact, dispatch_graph_evidence};
+use crate::dispatch::graph_inspect_tools::{
+    dispatch_graph_audit, dispatch_graph_next, dispatch_graph_recover,
+};
 use crate::dispatch::graph_tools::{
     dispatch_graph_context, dispatch_graph_note, dispatch_graph_plan, dispatch_graph_state,
     dispatch_graph_transition,
@@ -20,7 +24,7 @@ use crate::dispatch::queue_tools::{
 };
 use crate::dispatch::routes_doc::{dispatch_doc_audit, dispatch_doc_scaffold};
 use crate::dispatch::routes_verify::{dispatch_verify_cargo, dispatch_verify_xtask};
-use crate::dispatch::routes_workspace::dispatch_workspace_summary;
+use crate::dispatch::routes_workspace::{dispatch_workspace_index, dispatch_workspace_summary};
 use crate::dispatch::validate::ValidatedAction;
 use crate::dispatch::{finish, observe_result, DispatchOutput, DispatchState, ToolRuntime};
 use crate::observe;
@@ -34,9 +38,12 @@ pub fn route(
 ) -> DispatchOutput {
     match action.tool.as_str() {
         "fs.read" => dispatch_fs_read(&action.params, action_text, runtime, state),
+        "fs.read_many" => dispatch_fs_read_many(&action.params, action_text, runtime, state),
         "fs.write" => dispatch_fs_write(&action.params, action_text, runtime, state),
         "fs.edit" => dispatch_fs_edit(&action.params, action_text, runtime, state),
+        "fs.patch" => dispatch_fs_patch(&action.params, action_text, runtime, state),
         "fs.list" => dispatch_fs_list(&action.params, action_text, runtime, state),
+        "fs.tree" => dispatch_fs_tree(&action.params, action_text, runtime, state),
         "fs.search" => dispatch_fs_search(&action.params, action_text, runtime, state),
         "fs.stat" => dispatch_fs_stat(&action.params, action_text, runtime, state),
         "fs.mkdir" => dispatch_fs_mkdir(&action.params, action_text, runtime, state),
@@ -54,6 +61,9 @@ pub fn route(
         "memory.save" => dispatch_memory_save(&action.params, action_text, runtime, conn, state),
         "memory.find" => dispatch_memory_find(&action.params, action_text, runtime, conn, state),
         "graph.state" => dispatch_graph_state(action_text, runtime, state),
+        "graph.next" => dispatch_graph_next(action_text, runtime, state),
+        "graph.audit" => dispatch_graph_audit(action_text, runtime, state),
+        "graph.recover" => dispatch_graph_recover(action_text, runtime, state),
         "graph.plan" => dispatch_graph_plan(&action.params, action_text, runtime, state),
         "graph.transition" => {
             dispatch_graph_transition(&action.params, action_text, runtime, state)
@@ -65,6 +75,7 @@ pub fn route(
         "workspace.summary" => {
             dispatch_workspace_summary(&action.params, action_text, runtime, state)
         }
+        "workspace.index" => dispatch_workspace_index(&action.params, action_text, runtime, state),
         "verify.cargo" => dispatch_verify_cargo(&action.params, action_text, runtime, state),
         "verify.xtask" => dispatch_verify_xtask(&action.params, action_text, runtime, state),
         "doc.scaffold" => dispatch_doc_scaffold(&action.params, action_text, runtime, state),

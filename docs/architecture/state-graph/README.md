@@ -19,3 +19,6 @@ context engine, and tools.
 - [policy.md](policy.md): graph policy fields and enforcement boundary.
 - [tool-affordances.md](tool-affordances.md): allowed tools by phase and node.
 - [maintenance.md](maintenance.md): idle graph evolution and policy cleanup.
+- [recovery-ladders.md](recovery-ladders.md): fault routing and alternate actions.
+- [graph-guidance.md](graph-guidance.md): endpoint-visible graph state card.
+- [document-construction.md](document-construction.md): document topology nodes and gates.

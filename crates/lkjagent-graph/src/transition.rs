@@ -3,16 +3,17 @@ use crate::model::{GraphDefinition, GraphNodeId};
 use crate::state::{TaskGraphState, TransitionDecision};
 
 pub fn legal_targets(graph: GraphDefinition, from: GraphNodeId) -> Vec<GraphNodeId> {
-    graph
+    let mut edges = graph
         .edges
         .iter()
         .filter(|edge| edge.from == from)
-        .map(|edge| edge.to)
-        .collect()
+        .collect::<Vec<_>>();
+    edges.sort_by_key(|edge| (edge.policy.priority, edge.id));
+    edges.into_iter().map(|edge| edge.to).collect()
 }
 
 pub fn admitted_targets(graph: &GraphDefinition, state: &TaskGraphState) -> Vec<GraphNodeId> {
-    graph
+    let mut edges = graph
         .edges
         .iter()
         .filter(|edge| edge.from == state.active_node)
@@ -21,8 +22,9 @@ pub fn admitted_targets(graph: &GraphDefinition, state: &TaskGraphState) -> Vec<
                 .iter()
                 .all(|guard| evaluate_guard(*guard, graph, state).is_ok())
         })
-        .map(|edge| edge.to)
-        .collect()
+        .collect::<Vec<_>>();
+    edges.sort_by_key(|edge| (edge.policy.priority, edge.id));
+    edges.into_iter().map(|edge| edge.to).collect()
 }
 
 pub fn admit_transition(

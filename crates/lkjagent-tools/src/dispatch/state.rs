@@ -69,6 +69,7 @@ pub struct GraphDispatchPolicy {
     pub blocked_reason: Option<String>,
     pub plan_ready: bool,
     pub completion_ready: bool,
+    pub shell_allowed: bool,
 }
 
 impl DispatchState {

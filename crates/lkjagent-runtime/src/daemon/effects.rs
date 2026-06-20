@@ -71,91 +71,15 @@ impl ResidentDaemon {
                 self.save_task_summary(conn, now, &summary)?;
                 Ok(None)
             }
-            Effect::RecordGraphEvidence {
-                case_id,
-                requirement,
-                kind,
-                summary,
-                path,
-            } => {
-                let evidence = lkjagent_store::graph::GraphEvidenceRow {
-                    requirement,
-                    kind,
-                    summary,
-                    path,
-                };
-                lkjagent_store::graph::record_evidence(conn, case_id, &evidence, now)?;
-                Ok(None)
-            }
-            Effect::RecordGraphPlan { case_id, steps } => {
-                let rows = steps
-                    .into_iter()
-                    .enumerate()
-                    .map(
-                        |(index, step)| lkjagent_store::graph::plan::GraphPlanStepRow {
-                            case_id,
-                            step_id: step.step_id,
-                            title: step.title,
-                            rationale: step.rationale,
-                            status: step.status,
-                            node: step.node,
-                            target_paths: step.target_paths,
-                            checks: step.checks,
-                            sort_order: index as i64,
-                        },
-                    )
-                    .collect::<Vec<_>>();
-                lkjagent_store::graph::plan::replace_plan_steps(conn, case_id, &rows, now)?;
-                Ok(None)
-            }
-            Effect::RecordGraphContext {
-                case_id,
-                packages,
-                reason,
-            } => {
-                for package in packages {
-                    lkjagent_store::graph::context::record_context_binding(
-                        conn, case_id, &package, &reason, "selected", now,
-                    )?;
-                }
-                Ok(None)
-            }
-            Effect::RecordGraphNote {
-                case_id,
-                kind,
-                summary,
-            } => {
-                lkjagent_store::graph::notes::record_note(
-                    conn, case_id, &kind, &summary, "runtime", now,
-                )?;
-                Ok(None)
-            }
-            Effect::RecordGraphTransition {
-                case_id,
-                from_node,
-                to_node,
-                decision,
-                reason,
-            } => {
-                lkjagent_store::graph::transitions::record_transition(
-                    conn, case_id, &from_node, &to_node, &decision, &reason, now,
-                )?;
-                Ok(None)
-            }
-            Effect::UpdateGraphCase {
-                case_id,
-                phase,
-                active_node,
-                status,
-            } => {
-                lkjagent_store::graph::update_case(
-                    conn,
-                    case_id,
-                    &phase,
-                    &active_node,
-                    &status,
-                    now,
-                )?;
+            effect @ (Effect::RecordGraphEvidence { .. }
+            | Effect::RecordGraphPlan { .. }
+            | Effect::RecordGraphContext { .. }
+            | Effect::RecordGraphNote { .. }
+            | Effect::RecordGraphTransition { .. }
+            | Effect::RecordGraphFault { .. }
+            | Effect::UpdateGraphRecovery { .. }
+            | Effect::UpdateGraphCase { .. }) => {
+                self.apply_graph_effect(conn, now, effect)?;
                 Ok(None)
             }
             Effect::Pause { reason } => {

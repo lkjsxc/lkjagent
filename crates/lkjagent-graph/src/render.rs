@@ -1,37 +1,41 @@
 use crate::completion::missing_requirements;
+use crate::guards::evaluate_guard;
 use crate::model::GraphDefinition;
+use crate::render_guidance::{compaction_instruction, completion_line, recovery_instruction};
 use crate::state::TaskGraphState;
 
 pub fn render_graph_slice(graph: GraphDefinition, state: &TaskGraphState, budget: usize) -> String {
     let allowed = active_allowed(&graph, state);
     let blocked = blocked_tools(&graph, &allowed);
-    let transitions = graph
-        .edges
-        .iter()
-        .filter(|edge| edge.from == state.active_node)
-        .map(|edge| edge.to.0)
-        .collect::<Vec<_>>()
-        .join(", ");
     let text = format!(
-        "case={} family={} phase={} node={} confidence={}\nobjective={}\nconstraints={}\nassumptions={}\nactive_step={}\nmissing_evidence={}\nallowed_tools={}\nblocked_tools={}\nlegal_transitions={}\npackages={}\ntouched_paths={}\nrecovery={}\ncompletion_ready={}\nnext={}",
+        "Graph state:\ncase: {}\nfamily: {}/{}\nphase: {}\nnode: {}\nconfidence: {}\nCurrent state: {}\nObjective: v{} {}\nDo not do: {}\nConstraints: {}\nAssumptions: {}\nRisks: {}\nSuccess criteria: {}\nActive plan step: {}\nRequired evidence: {}\nMissing evidence: {}\nAllowed tools now: {}\nBlocked tools now: {}\nPreferred next action: {}\nLegal transitions: {}\nContext packages: {}\nTouched paths: {}\nRecent faults: {}\nRecovery instruction if next action fails: {}\nCompaction instruction if context pressure rises: {}\nCompletion: {}",
         state.case_id.map_or_else(|| "new".to_string(), |id| id.to_string()),
         state.family.as_str(),
+        state.subroute,
         state.phase.as_str(),
         state.active_node.0,
         state.confidence,
+        state.status_text(),
+        state.objective.version,
         state.objective.normalized,
+        bounded(&state.objective.non_goals),
         join_constraints(state),
         join_assumptions(state),
+        bounded_risks(state),
+        bounded_success(state),
         state.plan.active_step_title(),
+        state.evidence.requirement_ids().join(", "),
         missing_requirements(state).join(", "),
         allowed.join(", "),
         blocked.join(", "),
-        transitions,
+        next_action(state),
+        legal_transition_line(&graph, state),
         state.context.selected_packages.join(", "),
         state.workspace.touched_paths.join(", "),
         recovery_line(state),
-        state.completion.ready,
-        next_action(state)
+        recovery_instruction(state),
+        compaction_instruction(state),
+        completion_line(state)
     );
     fit_budget(&with_document_line(text, state), budget)
 }
@@ -75,6 +79,58 @@ fn join_assumptions(state: &TaskGraphState) -> String {
         .map(|item| item.summary.as_str())
         .collect::<Vec<_>>()
         .join("; ")
+}
+
+fn bounded(values: &[String]) -> String {
+    if values.is_empty() {
+        return "none".to_string();
+    }
+    values
+        .iter()
+        .take(4)
+        .cloned()
+        .collect::<Vec<_>>()
+        .join("; ")
+}
+
+fn bounded_risks(state: &TaskGraphState) -> String {
+    let values = state
+        .risks
+        .iter()
+        .map(|item| format!("{} -> {}", item.summary, item.mitigation))
+        .collect::<Vec<_>>();
+    bounded(&values)
+}
+
+fn bounded_success(state: &TaskGraphState) -> String {
+    let values = state
+        .success_criteria
+        .iter()
+        .map(|item| item.summary.clone())
+        .collect::<Vec<_>>();
+    bounded(&values)
+}
+
+fn legal_transition_line(graph: &GraphDefinition, state: &TaskGraphState) -> String {
+    let rows = graph
+        .edges
+        .iter()
+        .filter(|edge| edge.from == state.active_node)
+        .map(|edge| {
+            let missing = edge
+                .guards
+                .iter()
+                .filter_map(|guard| evaluate_guard(*guard, graph, state).err())
+                .collect::<Vec<_>>();
+            if missing.is_empty() {
+                format!("{}:admitted", edge.to.0)
+            } else {
+                format!("{}:blocked({})", edge.to.0, missing.join("+"))
+            }
+        })
+        .take(8)
+        .collect::<Vec<_>>();
+    bounded(&rows)
 }
 
 fn recovery_line(state: &TaskGraphState) -> String {

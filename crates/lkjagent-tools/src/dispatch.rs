@@ -1,6 +1,8 @@
 mod fs_extra_tools;
+mod fs_more_tools;
 mod fs_tools;
 mod graph_evidence_tools;
+mod graph_inspect_tools;
 mod graph_tools;
 mod guards;
 mod memory_tools;
@@ -69,6 +71,12 @@ fn graph_policy_refusal(tool: &str, state: &DispatchState) -> Option<String> {
     }
     let policy = state.graph_policy.as_ref()?;
     if policy.allowed_tools.iter().any(|allowed| allowed == tool) {
+        if tool == "shell.run" && !policy.shell_allowed {
+            return Some(format!(
+                "graph policy refused shell.run; node={} is not a shell-admitted node",
+                policy.active_node
+            ));
+        }
         return None;
     }
     let allowed = policy

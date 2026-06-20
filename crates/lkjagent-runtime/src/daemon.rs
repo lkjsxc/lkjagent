@@ -20,6 +20,7 @@ mod context_budget;
 mod count_scaffold;
 mod count_scaffold_gate;
 mod effects;
+mod effects_graph;
 mod endpoint;
 mod execute_pending;
 mod graph_sync;

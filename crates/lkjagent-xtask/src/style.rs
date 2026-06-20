@@ -2,6 +2,13 @@ use crate::model::{RepoFile, Violation};
 
 const ALLOWED_EXTERNAL: &[&str] = &["reqwest", "rusqlite", "serde", "serde_json", "toml"];
 const FORBIDDEN_RUST: &[&str] = &[".unwrap(", ".expect(", "panic!", "todo!", "unimplemented!"];
+const FORBIDDEN_SKILL_RUST: &[&str] = &[
+    "SkillRegistry",
+    "struct Skill",
+    "enum Skill",
+    "trait Skill",
+    "skills::",
+];
 
 pub fn check_style(files: &[RepoFile]) -> Vec<Violation> {
     let mut violations = Vec::new();
@@ -10,6 +17,9 @@ pub fn check_style(files: &[RepoFile]) -> Vec<Violation> {
     }
     for file in files.iter().filter(|file| is_product_manifest(&file.path)) {
         violations.extend(check_manifest(file));
+    }
+    for file in files {
+        violations.extend(check_skill_surface(file));
     }
     violations
 }
@@ -39,8 +49,31 @@ fn check_rust_file(file: &RepoFile) -> Vec<Violation> {
                 ));
             }
         }
+        for token in FORBIDDEN_SKILL_RUST {
+            if line.contains(token) {
+                violations.push(Violation::new(
+                    &file.path,
+                    "skill surface",
+                    format!(
+                        "line {line_number} contains '{token}'; model guidance belongs in the graph"
+                    ),
+                ));
+                break;
+            }
+        }
     }
     violations
+}
+
+fn check_skill_surface(file: &RepoFile) -> Vec<Violation> {
+    if file.path.split('/').any(|segment| segment == "skills") {
+        return vec![Violation::new(
+            &file.path,
+            "skill surface",
+            "remove product-level skills directories; use graph nodes and context packages",
+        )];
+    }
+    Vec::new()
 }
 
 fn check_manifest(file: &RepoFile) -> Vec<Violation> {

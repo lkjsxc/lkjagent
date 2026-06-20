@@ -48,6 +48,7 @@ pub mod fs_batch;
 pub mod fs_list;
 pub mod fs_search;
 pub mod fs_stat;
+pub mod fs_tree;
 pub mod memory;
 pub mod observe;
 pub mod queue;

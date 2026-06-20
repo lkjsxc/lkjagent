@@ -63,8 +63,9 @@ fn add_graph_update(
             add_document_evidence(graph, output, effects) || advance_active_step(graph)
         }
         "shell.run" => add_shell_evidence(graph, output, effects) || advance_active_step(graph),
-        "fs.read" | "fs.write" | "fs.edit" | "fs.list" | "fs.search" | "fs.stat" | "fs.mkdir"
-        | "fs.batch_write" | "workspace.summary" | "memory.find" | "memory.save" => {
+        "fs.read" | "fs.read_many" | "fs.write" | "fs.edit" | "fs.patch" | "fs.list"
+        | "fs.tree" | "fs.search" | "fs.stat" | "fs.mkdir" | "fs.batch_write"
+        | "workspace.summary" | "workspace.index" | "memory.find" | "memory.save" => {
             let path = action_param(&pending.action, "path");
             let observed = ensure_evidence(
                 graph,

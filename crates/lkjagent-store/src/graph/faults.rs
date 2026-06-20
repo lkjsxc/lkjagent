@@ -26,3 +26,23 @@ pub fn record_fault(
     )?;
     Ok(())
 }
+
+pub fn upsert_recovery_state(
+    conn: &Connection,
+    case_id: i64,
+    ladder_position: u8,
+    strategy: &str,
+    now: &str,
+) -> StoreResult<()> {
+    conn.execute(
+        "INSERT INTO graph_recovery_state
+         (case_id, ladder_position, strategy, updated_at)
+         VALUES (?1, ?2, ?3, ?4)
+         ON CONFLICT(case_id) DO UPDATE SET
+         ladder_position = excluded.ladder_position,
+         strategy = excluded.strategy,
+         updated_at = excluded.updated_at",
+        params![case_id, i64::from(ladder_position), strategy, now],
+    )?;
+    Ok(())
+}

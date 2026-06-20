@@ -57,12 +57,13 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [fs_search.rs](fs_search.rs): bounded substring search.
 - [fs_stat.rs](fs_stat.rs): deterministic file metadata.
 - [fs_batch.rs](fs_batch.rs): directory creation and batched file writes.
+- [fs_tree.rs](fs_tree.rs): bounded deterministic workspace tree output.
 - [lib.rs](lib.rs): library root.
 - [memory.rs](memory.rs): memory save and find adapters.
 - [observe.rs](observe.rs): bounded frame construction helpers.
 - [queue.rs](queue.rs): queue list and mutation adapters.
 - [shell.rs](shell.rs): /bin/sh adapter with timeout handling.
-- [workspace.rs](workspace.rs): repository shape summaries.
+- [workspace.rs](workspace.rs): repository shape summaries and compact index.
 - [verify.rs](verify.rs): direct cargo and xtask verification runners.
 - [doc.rs](doc.rs): document scaffold and audit tools.
 - [structure.rs](structure.rs): recursive tree completion checks.

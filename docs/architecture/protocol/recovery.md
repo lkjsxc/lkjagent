@@ -21,7 +21,7 @@ task; the task turn budget remains the hard bound.
 | completion oversize | llm client finish_reason length without a closed act | error notice with preview plus instruction to emit one short valid action |
 | endpoint overflow | llm client | treated as a harness bug: error event, compaction forced, incident memory row |
 | oversize payload | context engine | truncation per [../context/budgets.md](../context/budgets.md) with retrieval path |
-| task budget exhausted | loop | budget notice; only agent.ask or agent.done lawful next |
+| task budget exhausted | loop | budget fault, recovery route, or concrete owner question |
 
 ## Repeated Faults
 
@@ -29,13 +29,15 @@ Consecutive faults on one task are counted (resets on any successful
 valid parsed action for parse faults and on non-repeat output for repeat
 faults):
 
-- 3 consecutive parse-class faults: the harness keeps the task open and adds
-  a stronger recovery notice telling the model to emit one simple valid act
-  block, switch large generated payloads to `fs.batch_write` or
-  `doc.scaffold`, or ask if blocked.
-- 3 consecutive repeat actions: same recovery notice pattern; the repeated
-  action is not re-executed, and the model is told to inspect state, choose
-  a different tool, or switch repetitive writes to `fs.batch_write`.
+- 3 consecutive parse-class faults: the harness records a parse fault and
+  routes the case to recover-parse. The next graph card asks for one simple
+  valid act block, smaller payloads, and graph inspection before retry.
+- 3 consecutive repeat actions: the repeated action is not re-executed. The
+  case routes to recover-repeat and the next action must inspect state,
+  choose a different tool, or replan a smaller step.
+- 3 consecutive tool errors: the case routes to recover-tool and the ladder
+  favors graph.next, graph.audit, smaller scope, or an alternate native tool
+  before any shell-admitted escape.
 - Endpoint unreachable beyond the backoff cap (initial contract: 15
   minutes): daemon stays alive, state shows the outage, polls before the
   retry deadline do not append duplicate error events, and retries continue

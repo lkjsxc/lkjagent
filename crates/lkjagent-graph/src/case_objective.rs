@@ -2,6 +2,7 @@
 pub struct ObjectiveState {
     pub raw_owner_message: String,
     pub normalized: String,
+    pub version: u32,
     pub non_goals: Vec<String>,
     pub owner_constraints: Vec<String>,
 }
@@ -11,6 +12,7 @@ impl ObjectiveState {
         Self {
             raw_owner_message: raw.to_string(),
             normalized: normalize_objective(raw),
+            version: 1,
             non_goals: extract_lines(raw, &["do not", "no ", "out of scope"]),
             owner_constraints: extract_lines(raw, &["must", "keep", "avoid", "required"]),
         }

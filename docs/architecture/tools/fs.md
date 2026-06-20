@@ -12,6 +12,12 @@ Reads a ranged file span. Parameters are required `path`, optional `start`
 default `1`, and optional `count` default `200`. The observation includes one
 header line and exact file bytes for the selected range.
 
+## fs.read_many
+
+Reads several ranged file spans in one bounded observation. Parameters are
+required `paths`, optional `start` default `1`, optional `count` default `80`,
+and optional `total` default `400`. The paths value is newline-separated.
+
 ## fs.write
 
 Writes one file, creating parent directories. The observation confirms path
@@ -22,10 +28,29 @@ and byte count and does not echo the content.
 Replaces exactly one `find` string with `replace` in `path`. Zero or multiple
 matches are errors and leave the file unchanged.
 
+## fs.patch
+
+Applies one or more exact find/replace blocks to one file. Each block uses:
+
+```
+find:
+old text
+replace:
+new text
+```
+
+Blocks are separated with `-- lkjagent-next-edit --`. Every find string must
+match exactly once before the file is written.
+
 ## fs.list
 
 Lists sorted relative paths under `path`, bounded by `depth`, `kind`, and
 `limit`. Rows include kind, bytes, and cheap line counts for text files.
+
+## fs.tree
+
+Renders a deterministic bounded tree for quick workspace survey. It is the
+normal replacement for simple recursive `find` or `tree` shell commands.
 
 ## fs.search
 

@@ -4,6 +4,7 @@ pub enum ContextPressureLevel {
     Yellow,
     Orange,
     Red,
+    BlackInvalid,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -59,7 +60,7 @@ pub const DEFAULT_POLICY: GraphPolicy = GraphPolicy {
         requires_verification_for_code: true,
         requires_document_audit: true,
     },
-    shell_allowed_nodes: &["verify", "escape", "recover-tool"],
+    shell_allowed_nodes: &["verify", "escape", "recover-by-shell-escape"],
     max_batch_files: 20,
     compaction_soft: ContextPressureLevel::Orange,
     compaction_hard: ContextPressureLevel::Red,

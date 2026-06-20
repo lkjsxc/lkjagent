@@ -27,10 +27,12 @@ graph classifies the task family, enters planning, records constraints,
 risks, evidence requirements, selected context packages, and legal next
 transitions, then renders a graph state notice into the first endpoint-visible
 context. Runtime state persists graph cases, graph events, and graph evidence
-so restart and compaction reconstruct structured state. Tool observations are
-recorded as graph evidence. Completion is refused until the active graph gate
-has its required evidence; a graph completion refusal names the missing kind
-and points the next action to `graph.evidence`.
+so restart and compaction reconstruct structured state. Case headers now also
+retain raw owner text, objective revision, subroute, route reason, next action
+class, and context pressure. Tool observations are recorded as graph evidence
+or typed faults. Completion is refused until the active graph gate has its
+required evidence; a graph completion refusal names the missing kind and
+points the next action to `graph.evidence`.
 
 Recursive docs, counted structured content, and knowledge-base tasks are
 graph task families that select document construction. They create
@@ -64,9 +66,10 @@ file-count targets. Counted completion prefers README-indexed roots and
 falls back to clean top-level output directories.
 The active graph prefix renders exact count guards as count requirements and
 approximate count guards as scale hints. It tells the model to prefer
-`doc.scaffold`, `doc.audit`, `fs.list`, `fs.stat`, and `fs.batch_write` for
-bulk document construction and verification, keep the act payload bounded,
-and treat `shell.run` as an escape hatch only when graph policy admits it.
+`doc.scaffold`, `doc.audit`, `fs.read_many`, `fs.tree`, `workspace.index`,
+`fs.list`, `fs.stat`, `fs.batch_write`, and `fs.patch` for bulk document
+construction and verification, keep the act payload bounded, and treat
+`shell.run` as an escape hatch only when graph policy admits it.
 For counted documentation tasks that are not recursive, knowledge-base, or
 benchmark scaffolds, the daemon also writes a generic `structured-output/`
 tree at the requested exact count or approximate scale before the first
@@ -122,11 +125,12 @@ File-count wording stays stronger than design wording when scoring allocation
 hints, so total-count numbers are not reused as design memo counts.
 Runtime recovery uses bounded notices for parse errors, repeated actions,
 tool errors, endpoint max-token exits, budget exhaustion, and context
-pressure. Three consecutive parse faults, repeated actions, or tool errors
-move the task to waiting with a concrete owner handoff instead of spending the
-remaining turn budget on the same recovery loop. Graph recovery nodes are
-present as the structured target for the next runtime expansion. Endpoint
-outages record failed attempts, set a capped
+pressure. Consecutive parse faults, repeated actions, or tool errors now
+record typed graph faults and route the open case to recovery nodes such as
+recover-parse, recover-repeat, or recover-tool. The recovery ladder changes
+the next action class toward graph inspection, smaller scope, alternate native
+tools, replanning around a blocked step, and finally shell only from a
+shell-admitted node. Endpoint outages record failed attempts, set a capped
 retry deadline, and keep later polls from hitting the endpoint or appending
 more error events until that deadline. The LLM client sends `</act>` as a stop
 sequence and restores the stripped close tag before parsing so one endpoint
@@ -140,7 +144,8 @@ configured window, and uses the 2,048-token reserve as endpoint max_tokens.
 Owner task turn budgets load from `task.turn-budget` and apply to new tasks,
 explicit continuations after budget exhaustion, and restart summaries.
 Compaction is graph-aware: it preserves the active case, phase, node, plan,
-evidence, missing evidence, touched paths, selected packages, recovery
+non-goals, risks, success criteria, evidence, missing evidence, touched paths,
+selected packages, package compression, legal next transitions, recovery
 strategy, and completion guard before rebuilding the prefix. Memory retrieval
 uses graph memory links to prefer active-case and active-node rows within the
 same memory kind, and task-summary saves link the memory row to the active or
@@ -151,8 +156,8 @@ Empty queues open bounded graph maintenance cycles in rotation when directives
 are due: distill, refine-graph-policy, prune-memory, and audit-self. Saving a
 user task summary stamps all maintenance directives, so the daemon shows idle
 after task completion until the cooldown passes or owner work arrives.
-Compose wiring is implemented.
-The implementation queue is [execution/current-blockers.md](execution/current-blockers.md).
+Compose wiring is implemented; the implementation queue is
+[execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status
 
@@ -181,14 +186,12 @@ The implementation queue is [execution/current-blockers.md](execution/current-bl
 
 ## Out of Scope
 
-Messaging channels, web UI, MCP, sub-agents, plan mode, heartbeat schedules,
-and cron schedules. The boundaries are stated in [vision/scope.md](vision/scope.md).
+Messaging channels, web UI, MCP, sub-agents, plan mode, heartbeat schedules, and cron schedules.
+The boundaries are stated in [vision/scope.md](vision/scope.md).
 
 ## Next Step
-
-No open blocker remains in
-[execution/current-blockers.md](execution/current-blockers.md). Future changes
-use the compose final gate per [operations/verification.md](operations/verification.md).
+No open blocker remains. Future changes use the compose final gate per
+[operations/verification.md](operations/verification.md).
 
 ## Honesty Rules
 

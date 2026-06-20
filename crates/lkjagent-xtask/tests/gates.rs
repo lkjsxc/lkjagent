@@ -145,3 +145,22 @@ fn style_check_reports_panic_paths_and_unapproved_dependencies() {
         ]
     );
 }
+
+#[test]
+fn style_check_blocks_old_skill_runtime_surface() {
+    let files = vec![
+        RepoFile::new(
+            "crates/lkjagent-runtime/src/old.rs",
+            "pub struct SkillRegistry;\n",
+        ),
+        RepoFile::new("crates/lkjagent-runtime/skills/demo.md", "# Demo\n"),
+    ];
+
+    assert_eq!(
+        messages(check_style(&files)),
+        vec![
+            "crates/lkjagent-runtime/src/old.rs: skill surface: line 1 contains 'SkillRegistry'; model guidance belongs in the graph",
+            "crates/lkjagent-runtime/skills/demo.md: skill surface: remove product-level skills directories; use graph nodes and context packages",
+        ]
+    );
+}

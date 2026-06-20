@@ -1,8 +1,8 @@
 mod support;
 
 use lkjagent_store::graph::{
-    active_case, evidence_for_case, link_memory, memory_links_for_case, open_case, record_event,
-    record_evidence, update_case, GraphEvidenceRow, OpenCase,
+    active_case, evidence_for_case, faults, link_memory, memory_links_for_case, open_case,
+    record_event, record_evidence, snapshots, update_case, GraphEvidenceRow, OpenCase,
 };
 use lkjagent_store::memory::{self, MemoryKind};
 use support::{memory_store, TestResult};
@@ -17,13 +17,19 @@ fn graph_tables_persist_active_cases_and_evidence() -> TestResult<()> {
         &conn,
         OpenCase {
             objective: "fix bug".to_string(),
+            raw_owner_text: "please fix bug".to_string(),
+            objective_version: 1,
             family: "bug-fix".to_string(),
+            subroute: "code-change".to_string(),
+            route_reason: "fix wording".to_string(),
             phase: "planning".to_string(),
             active_node: "plan".to_string(),
             plan: "inspect before editing".to_string(),
             evidence_requirements: requirements.clone(),
             selected_packages: packages.clone(),
             pending_checks: pending.clone(),
+            next_action_class: "survey-plan-context".to_string(),
+            context_pressure: "green".to_string(),
         },
         "2026-01-01T00:00:00Z",
     )?;
@@ -59,6 +65,9 @@ fn graph_tables_persist_active_cases_and_evidence() -> TestResult<()> {
 
     let active = active_case(&conn)?.ok_or("missing active graph case")?;
     assert_eq!(active.id, case_id);
+    assert_eq!(active.raw_owner_text, "please fix bug");
+    assert_eq!(active.subroute, "code-change");
+    assert_eq!(active.context_pressure, "green");
     assert_eq!(active.phase, "execution");
     assert_eq!(active.active_node, "execute");
     assert_eq!(active.evidence_requirements, requirements);
@@ -92,5 +101,75 @@ fn graph_tables_persist_active_cases_and_evidence() -> TestResult<()> {
     assert_eq!(links[0].memory_id, memory_id);
     assert_eq!(links[0].node, "execute");
     assert_eq!(links[0].reason, "task-summary");
+    Ok(())
+}
+
+#[test]
+fn graph_tables_persist_recovery_and_compaction_state() -> TestResult<()> {
+    let conn = memory_store()?;
+    let case_id = open_case(
+        &conn,
+        OpenCase {
+            objective: "recover tool failure".to_string(),
+            raw_owner_text: "recover tool failure".to_string(),
+            objective_version: 1,
+            family: "recovery".to_string(),
+            subroute: "recovery".to_string(),
+            route_reason: "failure wording".to_string(),
+            phase: "recovery".to_string(),
+            active_node: "recover-tool".to_string(),
+            plan: "inspect graph and choose alternate tool".to_string(),
+            evidence_requirements: vec!["fault-recorded".to_string()],
+            selected_packages: vec!["recovery-policy".to_string()],
+            pending_checks: Vec::new(),
+            next_action_class: "alternate-native-tool".to_string(),
+            context_pressure: "yellow".to_string(),
+        },
+        "2026-01-01T00:00:00Z",
+    )?;
+
+    faults::record_fault(
+        &conn,
+        case_id,
+        "tool",
+        Some("fs.patch:a.md"),
+        "patch matched twice",
+        3,
+        "2026-01-01T00:00:01Z",
+    )?;
+    faults::upsert_recovery_state(
+        &conn,
+        case_id,
+        3,
+        "inspect graph.next and choose alternate native tool",
+        "2026-01-01T00:00:02Z",
+    )?;
+    let snapshot = snapshots::record_compaction_snapshot(
+        &conn,
+        case_id,
+        "recovery",
+        "recover-tool",
+        "recover tool failure",
+        &[
+            "objective".to_string(),
+            "plan".to_string(),
+            "evidence".to_string(),
+        ],
+        "2026-01-01T00:00:03Z",
+    )?;
+
+    let ladder: i64 = conn.query_row(
+        "SELECT ladder_position FROM graph_recovery_state WHERE case_id = ?1",
+        [case_id],
+        |row| row.get(0),
+    )?;
+    let preserved: String = conn.query_row(
+        "SELECT preserved_fields FROM graph_compaction_snapshots WHERE id = ?1",
+        [snapshot],
+        |row| row.get(0),
+    )?;
+    assert_eq!(ladder, 3);
+    assert!(preserved.contains("objective"));
+    assert!(preserved.contains("evidence"));
     Ok(())
 }

@@ -2,11 +2,10 @@
 
 ## Purpose
 
-The canonical table of every tool: parameters, contracts, and primary error
-cases. The dispatcher validates incoming actions against this table, and
-the prompt builder renders the registry section of the system prompt from
-the same table, so prompt and behavior cannot drift. Other tool documents
-link here; this file is the single source.
+The documented table of every tool: parameters, contracts, and primary error
+cases. The executable registry in `lkjagent-protocol` validates incoming
+actions and renders the system prompt from the same Rust table, so prompt and
+behavior cannot drift. Other tool documents link here.
 
 ## The Table
 
@@ -15,9 +14,12 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | Tool | Parameters | Contract | Primary errors |
 | --- | --- | --- | --- |
 | fs.read | path req; start opt 1; count opt 200 | ranged raw read, one header line | missing file; duplicate read |
+| fs.read_many | paths req; start opt 1; count opt 80; total opt 400 | bounded multi-file ranged read | empty paths; workspace escape; total cap |
 | fs.write | path req; content req | write file, create parent directories | write failure |
 | fs.edit | path req; find req; replace req | replace exactly one match of find | zero or many matches, count reported |
+| fs.patch | path req; patch req | apply exact find/replace edit blocks | zero or many matches; too many edits |
 | fs.list | path opt .; depth opt 2; kind opt all; limit opt 200 | sorted bounded workspace listing | workspace escape; invalid depth or limit |
+| fs.tree | path opt .; depth opt 3; limit opt 200 | sorted bounded tree output | workspace escape; invalid depth or limit |
 | fs.search | query req; path opt .; include opt; case opt insensitive; context opt 1; limit opt 50 | bounded substring search | workspace escape; invalid limit |
 | fs.stat | path req | kind, bytes, lines, stable checksum | missing path; workspace escape |
 | fs.mkdir | path req | create a workspace directory | workspace escape; create failure |
@@ -31,6 +33,9 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | memory.save | kind req; title req; tags opt; content req | insert one memory row, return its id | unknown kind |
 | memory.find | query req; limit opt 5 | ranked full-text search over memory | none; empty results are ok |
 | graph.state | none | show active graph case, phase, node, evidence, and transitions | no active case |
+| graph.next | none | show legal transitions, missing guards, and preferred next action | no active case |
+| graph.audit | none | audit active graph case, policy, completion, and shell admission | no active case |
+| graph.recover | none | inspect recovery ladder and alternate action guidance | no active case |
 | graph.plan | objective req; constraints opt; assumptions opt; risks opt; steps req; checks opt; paths opt; reason req | record structured plan | empty objective; no steps; no checks or paths |
 | graph.transition | target req; reason req | request guarded transition | illegal target; missing guard |
 | graph.context | packages req; reason req | select context packages | unknown or empty package list |
@@ -38,6 +43,7 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | graph.evidence | kind req; summary req; path opt | record explicit evidence on active case | no active case; empty summary |
 | graph.compact | reason req | request graph compaction checkpoint | policy refusal |
 | workspace.summary | path opt .; depth opt 3; limit opt 200 | bounded repository shape map | workspace escape; invalid limit |
+| workspace.index | path opt .; depth opt 3; limit opt 200 | compact repository index with readmes and manifests | workspace escape; invalid limit |
 | verify.cargo | gate req; package opt; timeout opt 120 | run direct cargo gate | unknown gate; timeout; command failure |
 | verify.xtask | gate req; timeout opt 120 | run direct xtask gate | unknown gate; timeout; command failure |
 | doc.scaffold | root req; kind opt documentation; count opt; mode opt approx; title req; sections opt | create compact README-indexed document tree | workspace escape; invalid root |
