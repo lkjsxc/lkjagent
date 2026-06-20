@@ -135,46 +135,6 @@ pub fn dispatch_graph_context(
     )
 }
 
-pub fn dispatch_graph_note(
-    params: &BTreeMap<String, String>,
-    action_text: &str,
-    runtime: &ToolRuntime,
-    state: &mut DispatchState,
-) -> DispatchOutput {
-    let kind = param(params, "kind");
-    let allowed = [
-        "constraint",
-        "assumption",
-        "risk",
-        "decision",
-        "question",
-        "invariant",
-        "success",
-        "path",
-    ];
-    if !allowed.contains(&kind.as_str()) {
-        let example = "<act>\n<tool>graph.note</tool>\n<kind>decision</kind>\n<summary>Chose smaller recovery action</summary>\n</act>";
-        return observe_error(
-            ToolError::invalid(format!(
-                "unknown graph.note kind; allowed: {}; valid_example:\n{example}",
-                allowed.join(", ")
-            )),
-            action_text,
-            runtime,
-            state,
-        );
-    }
-    finish(
-        state,
-        action_text,
-        observe::ok(
-            format!("graph note recorded\nkind={kind}"),
-            runtime.observation_tokens,
-            "inspect graph.state",
-        ),
-    )
-}
-
 fn useful_lines(value: &str) -> usize {
     value.lines().filter(|line| !line.trim().is_empty()).count()
 }

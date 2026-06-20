@@ -11,7 +11,9 @@ This directory splits dispatcher state, validation, and route helpers.
 - [fs_extra_tools.rs](fs_extra_tools.rs): list, search, stat, mkdir, and batch-write routing.
 - [fs_more_tools.rs](fs_more_tools.rs): multi-read, patch, and tree routing.
 - [graph_inspect_tools.rs](graph_inspect_tools.rs): graph next, audit, and recovery routing.
-- [graph_tools.rs](graph_tools.rs): graph plan, transition, note, context, and evidence routing.
+- [graph_note_tools.rs](graph_note_tools.rs): graph note kind validation and alias normalization.
+- [graph_tools.rs](graph_tools.rs): graph plan, transition, state, and context routing.
+- [graph_evidence_tools.rs](graph_evidence_tools.rs): graph evidence and compaction routing.
 - [guards.rs](guards.rs): task-shape write fences.
 - [memory_tools.rs](memory_tools.rs): memory dispatch helpers.
 - [normalize.rs](normalize.rs): safe parameter drift normalization before validation.

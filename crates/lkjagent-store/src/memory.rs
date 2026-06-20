@@ -1,8 +1,12 @@
+mod identity;
 mod row;
+mod search;
 
 use rusqlite::{params, Connection, Transaction};
 
+pub use identity::{MemoryIdentity, MemoryWriteDecision};
 pub use row::MemoryRow;
+pub use search::{find, normalize_fts_query};
 
 use crate::error::StoreResult;
 use row::{get_required, rows_from_statement};
@@ -44,7 +48,24 @@ pub fn save(
     tokens: i64,
     now: &str,
 ) -> StoreResult<i64> {
+    Ok(save_decision(conn, kind, title, tags, content, tokens, now)?.id())
+}
+
+pub fn save_decision(
+    conn: &mut Connection,
+    kind: MemoryKind,
+    title: &str,
+    tags: &str,
+    content: &str,
+    tokens: i64,
+    now: &str,
+) -> StoreResult<MemoryWriteDecision> {
+    let identity = identity::memory_identity(kind, title, tags, content);
     let tx = conn.transaction()?;
+    if let Some(existing_id) = identity::find_duplicate(&tx, &identity)? {
+        tx.commit()?;
+        return Ok(MemoryWriteDecision::SkipDuplicate { existing_id });
+    }
     tx.execute(
         "INSERT INTO memory (kind, title, tags, content, tokens, created_at, updated_at)
          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?6)",
@@ -53,7 +74,7 @@ pub fn save(
     let id = tx.last_insert_rowid();
     insert_fts(&tx, id, title, tags, content)?;
     tx.commit()?;
-    Ok(id)
+    Ok(MemoryWriteDecision::Insert { memory_id: id })
 }
 
 pub fn update(conn: &mut Connection, id: i64, row: MemoryUpdate<'_>, now: &str) -> StoreResult<()> {
@@ -86,44 +107,6 @@ pub fn delete(conn: &mut Connection, id: i64) -> StoreResult<()> {
     tx.execute("DELETE FROM memory WHERE id = ?1", params![id])?;
     tx.commit()?;
     Ok(())
-}
-
-pub fn find(conn: &Connection, query: &str, limit: i64) -> StoreResult<Vec<MemoryRow>> {
-    let mut statement = conn.prepare(
-        "SELECT m.id, m.kind, m.title, m.tags, m.content, m.tokens, m.updated_at
-         FROM memory_fts
-         JOIN memory m ON m.id = memory_fts.rowid
-         LEFT JOIN (
-           SELECT
-             links.memory_id,
-             MAX(CASE WHEN cases.status = 'active' THEN 1 ELSE 0 END) AS active_link,
-             MAX(
-               CASE
-                 WHEN cases.status = 'active'
-                  AND lower(links.node) = lower(cases.active_node)
-                 THEN 1
-                 ELSE 0
-               END
-             ) AS active_node_link
-           FROM graph_memory_links links
-           JOIN graph_cases cases ON cases.id = links.case_id
-           GROUP BY links.memory_id
-         ) graph_rank ON graph_rank.memory_id = m.id
-         WHERE memory_fts MATCH ?1
-         ORDER BY
-           CASE m.kind
-             WHEN 'task-summary' THEN 4
-             WHEN 'incident' THEN 3
-             WHEN 'lesson' THEN 2
-             ELSE 1
-           END DESC,
-           COALESCE(graph_rank.active_link, 0) DESC,
-           COALESCE(graph_rank.active_node_link, 0) DESC,
-           bm25(memory_fts) ASC,
-           m.updated_at DESC
-         LIMIT ?2",
-    )?;
-    rows_from_statement(&mut statement, params![query, limit])
 }
 
 pub fn digest(

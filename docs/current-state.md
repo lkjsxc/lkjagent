@@ -51,10 +51,11 @@ changes.
 | Cargo workspace and gates | implemented | `Cargo.toml`; `crates/lkjagent-xtask` |
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol` |
-| Tool dispatcher | partially implemented | registry validation exists; generated examples and semantic constraints need dispatcher proof |
+| Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for graph plan/note/evidence, memory save, fs.stat, and doc.scaffold; active-mode policy remains open |
 | Document scaffold tool | implemented | semantic scaffold tests, quiet verify, compose smoke |
 | Document audit tool | implemented | topology and graph checks pass local gates |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md` |
+| Memory save and find | partially implemented | accepted kinds, duplicate skip, and punctuation-safe FTS queries have focused tests; maintenance pruning remains open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
 | Runtime recovery | partially implemented | fault routes exist, but policy contradictions and repeated invalid actions still need deterministic active-mode control |

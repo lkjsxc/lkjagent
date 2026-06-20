@@ -18,7 +18,8 @@ Canonical parameter table: [registry.md](registry.md).
 | tags | optional, space-separated |
 | content | required |
 
-The observation is the new memory row id.
+The observation is the memory row id. Equivalent rows return the existing id
+with `duplicate=skipped` instead of inserting another row.
 
 ## Kinds
 
@@ -33,7 +34,7 @@ The observation is the new memory row id.
 
 | Parameter | Rule |
 | --- | --- |
-| query | required, full-text query |
+| query | required, normalized before FTS lookup |
 | limit | optional, default 5 |
 
 The observation lists ranked entries, each as id, kind, title, and a
@@ -42,6 +43,10 @@ bounded snippet. Ranking is owned by
 re-reading files is the cheap path under
 [../context/hygiene.md](../context/hygiene.md).
 
+Punctuation that FTS5 treats as syntax is split into searchable tokens. When
+normalization changes a query, the observation includes `query_normalized`.
+
 ## Status
 
-implemented.
+implemented for accepted kinds, idempotent duplicate skips, and punctuation
+safe FTS queries.

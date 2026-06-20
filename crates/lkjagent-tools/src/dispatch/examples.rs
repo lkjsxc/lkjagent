@@ -1,20 +1,79 @@
 use lkjagent_protocol::registry::{find_tool, ParamSpec};
 use lkjagent_protocol::{render_action, Action, Param};
+use std::fmt;
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ExampleContext {
+    pub evidence_requirement: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ActionExample {
+    pub action: Action,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ExampleError {
+    UnknownTool(String),
+}
+
+impl fmt::Display for ExampleError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ExampleError::UnknownTool(tool) => write!(formatter, "unknown tool: {tool}"),
+        }
+    }
+}
+
+impl std::error::Error for ExampleError {}
 
 pub fn registry_valid_example(tool: &str) -> Option<String> {
-    find_tool(tool).map(|spec| valid_example(tool, spec.params))
+    valid_example_for(tool, ExampleContext::default())
+        .ok()
+        .map(|example| example.render())
 }
 
 pub fn valid_example(tool: &str, specs: &[ParamSpec]) -> String {
-    let params = specs
-        .iter()
-        .filter(|spec| spec.required)
-        .map(|spec| Param::new(spec.name, example_value(tool, spec.name)))
-        .collect::<Vec<_>>();
+    let params = example_params(tool, specs, &ExampleContext::default());
     render_action(&Action::new(tool, params))
 }
 
-fn example_value(tool: &str, name: &str) -> &'static str {
+pub fn valid_example_for(
+    tool: &str,
+    context: ExampleContext,
+) -> Result<ActionExample, ExampleError> {
+    let spec = find_tool(tool).ok_or_else(|| ExampleError::UnknownTool(tool.to_string()))?;
+    Ok(ActionExample {
+        action: Action::new(tool, example_params(tool, spec.params, &context)),
+    })
+}
+
+impl ActionExample {
+    pub fn render(&self) -> String {
+        render_action(&self.action)
+    }
+}
+
+fn example_params(tool: &str, specs: &[ParamSpec], context: &ExampleContext) -> Vec<Param> {
+    let mut params = specs
+        .iter()
+        .filter(|spec| spec.required)
+        .map(|spec| Param::new(spec.name, example_value(tool, spec.name, context)))
+        .collect::<Vec<_>>();
+    if tool == "graph.plan" {
+        params.push(Param::new("checks", "dispatch accepts semantic plan"));
+        params.push(Param::new("paths", "."));
+    }
+    params
+}
+
+fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
+    if (tool, name) == ("graph.evidence", "kind") {
+        return context
+            .evidence_requirement
+            .clone()
+            .unwrap_or_else(|| "observation".to_string());
+    }
     match (tool, name) {
         ("doc.scaffold", "root") | ("doc.audit", "root") => "docs",
         ("doc.scaffold", "title") => "Project Documentation",
@@ -27,7 +86,6 @@ fn example_value(tool: &str, name: &str) -> &'static str {
         ("fs.patch", "patch") => "*** Begin Patch\n*** End Patch",
         ("fs.batch_write", "files") => "docs/example.md|# Example",
         ("fs.search", "query") | ("memory.find", "query") => "README",
-        ("graph.evidence", "kind") => "observation",
         ("graph.note", "kind") => "decision",
         ("graph.evidence", "summary") => "Read README.md",
         ("graph.note", "summary") => "Chose smaller recovery action",
@@ -39,7 +97,7 @@ fn example_value(tool: &str, name: &str) -> &'static str {
         ("graph.context", "packages") => "planning-checklist",
         ("graph.context", "reason") => "Need planning context",
         ("graph.compact", "reason") => "Context pressure",
-        ("memory.save", "kind") => "note",
+        ("memory.save", "kind") => "lesson",
         ("memory.save", "title") => "Useful lesson",
         ("memory.save", "content") => "Record only observed durable facts.",
         ("agent.done", "summary") => "Completed with evidence",
@@ -53,4 +111,5 @@ fn example_value(tool: &str, name: &str) -> &'static str {
         ("verify.xtask", "gate") => "check-docs",
         _ => "value",
     }
+    .to_string()
 }

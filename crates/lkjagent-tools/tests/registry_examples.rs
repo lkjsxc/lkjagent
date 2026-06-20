@@ -1,5 +1,7 @@
 mod support;
 
+use std::fs;
+
 use lkjagent_protocol::registry::TOOLS;
 use lkjagent_protocol::{parse_completion, Action};
 use lkjagent_tools::dispatch::{dispatch, registry_valid_example, validate_action, DispatchOutput};
@@ -51,6 +53,40 @@ fn graph_evidence_valid_example_uses_observation_kind() -> TestResult<()> {
 }
 
 #[test]
+fn memory_save_valid_example_uses_allowed_kind() -> TestResult<()> {
+    let example = example_for("memory.save")?;
+    assert!(example.contains("<kind>lesson</kind>"));
+
+    let output = dispatch_example(parse_example(&example)?)?;
+    assert!(output.content.contains("memory_id=1"));
+    Ok(())
+}
+
+#[test]
+fn fs_stat_example_dispatches() -> TestResult<()> {
+    let output = dispatch_example(parse_example(&example_for("fs.stat")?)?)?;
+    assert!(output.content.contains("path=README.md"));
+    assert!(output.content.contains("kind=file"));
+    Ok(())
+}
+
+#[test]
+fn doc_scaffold_example_dispatches() -> TestResult<()> {
+    let output = dispatch_example(parse_example(&example_for("doc.scaffold")?)?)?;
+    assert!(output.content.contains("document scaffold created"));
+    assert!(output.content.contains("root=docs"));
+    Ok(())
+}
+
+#[test]
+fn all_rendered_examples_parse() -> TestResult<()> {
+    for spec in TOOLS {
+        parse_example(&example_for(spec.name)?)?;
+    }
+    Ok(())
+}
+
+#[test]
 fn all_registry_examples_validate() -> TestResult<()> {
     for spec in TOOLS {
         let example = example_for(spec.name)?;
@@ -75,10 +111,17 @@ fn parse_example(example: &str) -> TestResult<Action> {
 }
 
 fn dispatch_example(action: Action) -> TestResult<DispatchOutput> {
+    dispatch_example_with_state(action, state())
+}
+
+fn dispatch_example_with_state(
+    action: Action,
+    mut state: lkjagent_tools::dispatch::DispatchState,
+) -> TestResult<DispatchOutput> {
     let workspace = temp_workspace("registry-example")?;
+    fs::write(workspace.join("README.md"), "# Example\n")?;
     let runtime = runtime(workspace)?;
     let mut conn = store()?;
-    let mut state = state();
     Ok(dispatch(&action, &runtime, &mut conn, &mut state))
 }
 

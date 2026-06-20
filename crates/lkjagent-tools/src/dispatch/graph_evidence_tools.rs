@@ -1,5 +1,6 @@
 use std::collections::BTreeMap;
 
+use crate::dispatch::examples::{valid_example_for, ExampleContext};
 use crate::dispatch::params::param;
 use crate::dispatch::{
     finish, observe_error, DispatchOutput, DispatchState, GraphEvidenceRecord, ToolRuntime,
@@ -20,8 +21,17 @@ pub fn dispatch_graph_evidence(
             .iter()
             .any(|item| item == &kind)
         {
+            let known = policy.evidence_requirements.join(", ");
+            let example_kind = policy
+                .evidence_requirements
+                .first()
+                .cloned()
+                .unwrap_or_else(|| "observation".to_string());
+            let example = evidence_example(example_kind);
             return observe_error(
-                ToolError::invalid(format!("unknown graph evidence requirement: {kind}")),
+                ToolError::invalid(format!(
+                    "unknown graph evidence requirement: {kind}\nknown requirements now: {known}\nvalid examples:\n{example}"
+                )),
                 action_text,
                 runtime,
                 state,
@@ -51,6 +61,19 @@ pub fn dispatch_graph_evidence(
         frame_ref: output.frame_ref,
     });
     output
+}
+
+fn evidence_example(kind: String) -> String {
+    valid_example_for(
+        "graph.evidence",
+        ExampleContext {
+            evidence_requirement: Some(kind),
+        },
+    )
+    .map(|example| example.render())
+    .unwrap_or_else(|_| {
+        "<act>\n<tool>graph.evidence</tool>\n<kind>plan</kind>\n<summary>Recorded structured plan with checks.</summary>\n</act>".to_string()
+    })
 }
 
 pub fn dispatch_graph_compact(
