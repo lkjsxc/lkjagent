@@ -51,9 +51,10 @@ fn knowledge_guard_rejects_non_contract_state_anchor() -> TestResult<()> {
         "# Broken - State\n\nNo purpose section.\n",
     )?;
 
-    let error = verify_knowledge_network(&workspace)
-        .unwrap_err()
-        .to_string();
+    let error = match verify_knowledge_network(&workspace) {
+        Ok(()) => return Err("knowledge guard accepted broken current-state".into()),
+        Err(error) => error.to_string(),
+    };
 
     assert!(error.contains("docs_contract="));
     assert!(error.contains("docs/current-state.md is missing ## Purpose"));

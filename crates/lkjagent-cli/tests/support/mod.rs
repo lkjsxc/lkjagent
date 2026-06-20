@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use rusqlite::Connection;
@@ -22,7 +22,7 @@ pub fn temp_data(name: &str) -> TestResult<PathBuf> {
     Ok(path)
 }
 
-pub fn open_store(data: &PathBuf) -> TestResult<Connection> {
+pub fn open_store(data: &Path) -> TestResult<Connection> {
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     lkjagent_store::schema::setup(&conn)?;
     Ok(conn)
