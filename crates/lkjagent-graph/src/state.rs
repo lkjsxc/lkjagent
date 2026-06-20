@@ -10,6 +10,7 @@ use crate::case_objective::ObjectiveState;
 use crate::case_plan::PlanState;
 use crate::case_recovery::RecoveryState;
 use crate::model::{CaseStatus, EvidenceRecord, GraphNodeId, TaskFamily, TaskPhase};
+use crate::state_track::StateTrack;
 use crate::transition_history::TransitionRecord;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -37,6 +38,7 @@ pub struct TaskGraphState {
     pub completion: CompletionState,
     pub recovery: RecoveryState,
     pub document: Option<DocumentState>,
+    pub state_tracks: Vec<StateTrack>,
     pub transitions: Vec<TransitionRecord>,
     pub budgets: CaseBudgetState,
     pub next_action_class: String,

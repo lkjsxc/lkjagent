@@ -3,6 +3,8 @@ pub mod error;
 mod graph_guard;
 mod graph_parse;
 pub mod graph_state;
+mod graph_state_row;
+pub mod graph_state_tracks;
 pub mod intake;
 pub mod maintenance;
 pub mod prompt;

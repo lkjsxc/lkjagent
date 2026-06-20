@@ -1,6 +1,8 @@
+use lkjagent_graph::transition_history::{TransitionOutcome, TransitionRecord};
 use lkjagent_graph::{
     admit_transition, completion_decision, initial_state, render_graph_slice, source_graph,
-    validate_graph, EvidenceKind, EvidenceRecord, GraphNodeId, TaskFamily, TransitionDecision,
+    transition_quality, validate_graph, EvidenceKind, EvidenceRecord, GraphNodeId, TaskFamily,
+    TransitionDecision, TransitionLegality,
 };
 
 #[test]
@@ -134,6 +136,51 @@ fn render_graph_slice_names_allowed_and_blocked_tools() {
     assert!(rendered.contains("graph.plan"));
     assert!(rendered.contains("fs.write"));
     assert!(rendered.contains("Legal transitions:"));
+}
+
+#[test]
+fn transition_quality_scores_legal_and_blocked_candidates() {
+    let graph = source_graph();
+    let mut state = initial_state("fix parser bug", Some(4));
+
+    let blocked = transition_quality(&graph, &state, GraphNodeId("review-plan"));
+    assert_eq!(blocked.legality, TransitionLegality::Blocked);
+    assert!(blocked.reason.contains("plan"));
+
+    state.plan.ready = true;
+    let legal = transition_quality(&graph, &state, GraphNodeId("review-plan"));
+    assert_eq!(legal.legality, TransitionLegality::Legal);
+    assert!(legal.evidence_delta > 0);
+    assert!(legal.expected_next_observation.is_some());
+}
+
+#[test]
+fn transition_quality_penalizes_repeated_targets() {
+    let graph = source_graph();
+    let mut state = initial_state("fix parser bug", Some(5));
+    state.active_node = GraphNodeId("recover-tool");
+    state.transitions.push(TransitionRecord {
+        from: GraphNodeId("execute"),
+        to: GraphNodeId("plan"),
+        decision: TransitionOutcome::Recovered,
+        reason: "retry".to_string(),
+    });
+
+    let quality = transition_quality(&graph, &state, GraphNodeId("plan"));
+
+    assert_eq!(quality.legality, TransitionLegality::Legal);
+    assert!(quality.repetition_penalty > 0);
+}
+
+#[test]
+fn transition_quality_rejects_non_edges() {
+    let graph = source_graph();
+    let state = initial_state("fix parser bug", Some(6));
+
+    let quality = transition_quality(&graph, &state, GraphNodeId("complete"));
+
+    assert_eq!(quality.legality, TransitionLegality::Illegal);
+    assert!(quality.risk_delta > 0);
 }
 
 fn record(requirement: &str, kind: EvidenceKind) -> EvidenceRecord {

@@ -37,6 +37,8 @@ mod source_recovery;
 mod source_recovery_extra;
 mod source_verification;
 pub mod state;
+pub mod state_track;
+mod state_track_seed;
 pub mod transition;
 pub mod transition_history;
 pub mod validate;
@@ -53,5 +55,13 @@ pub use policy::*;
 pub use render::render_graph_slice;
 pub use source::source_graph;
 pub use state::*;
-pub use transition::{admit_transition, admitted_targets, legal_targets};
+pub use state_track::{
+    promote_recovery_track, ranked_state_tracks, render_ranked_tracks, score_decimal,
+    RankedStateTrack, StatePosture, StateTrack, StateTrackId,
+};
+pub use state_track_seed::initial_state_tracks;
+pub use transition::{
+    admit_transition, admitted_targets, legal_targets, transition_quality, TransitionLegality,
+    TransitionQuality,
+};
 pub use validate::{validate_graph, ValidationReport};

@@ -67,6 +67,14 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             case_id INTEGER PRIMARY KEY, ladder_position INTEGER NOT NULL,
             strategy TEXT NOT NULL, updated_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS graph_state_tracks (
+            case_id INTEGER NOT NULL, track_id TEXT NOT NULL, label TEXT NOT NULL,
+            posture TEXT NOT NULL, intensity INTEGER NOT NULL, confidence INTEGER NOT NULL,
+            phase TEXT NOT NULL, active_node TEXT NOT NULL, evidence_gap TEXT NOT NULL,
+            next_affordances TEXT NOT NULL, risk TEXT NOT NULL, last_update_turn INTEGER,
+            rank_score INTEGER NOT NULL, updated_at TEXT NOT NULL,
+            PRIMARY KEY(case_id, track_id)
+        );
         ",
     )?;
     ensure_column(

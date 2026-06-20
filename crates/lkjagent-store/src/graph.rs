@@ -7,6 +7,7 @@ mod links;
 pub mod notes;
 pub mod plan;
 pub mod snapshots;
+pub mod state_tracks;
 pub mod transitions;
 
 pub use cases::{active_case, open_case, update_case, GraphCaseRow, OpenCase};

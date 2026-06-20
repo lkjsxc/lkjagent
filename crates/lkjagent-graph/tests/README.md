@@ -10,3 +10,4 @@ rendering, completion gates, and compaction plans.
 - [classify_counted_deliverables.rs](classify_counted_deliverables.rs): counted deliverable routing fixtures.
 - [graph.rs](graph.rs): validation, routing, rendering, and completion fixtures.
 - [graph_context.rs](graph_context.rs): context package pressure and compaction fixtures.
+- [state_tracks.rs](state_tracks.rs): neutral multi-state ranking and rendering fixtures.

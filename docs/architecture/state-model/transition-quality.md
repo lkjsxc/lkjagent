@@ -15,7 +15,7 @@ This file defines scoring and records for task-state transitions.
 ## Implementation Hooks
 
 - Source: `crates/lkjagent-graph/src/transition.rs`
-- Tests: `crates/lkjagent-graph/src/transition.rs`
+- Tests: `crates/lkjagent-graph/tests/graph.rs`
 - Verification: `docker compose run --rm verify`
 
 ## Failure Modes
@@ -26,4 +26,4 @@ This file defines scoring and records for task-state transitions.
 
 ## Status
 
-not implemented
+partially implemented

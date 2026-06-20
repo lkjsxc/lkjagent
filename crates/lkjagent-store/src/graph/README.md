@@ -16,4 +16,5 @@ public graph store API when a table needs focused ownership.
 - [notes.rs](notes.rs): non-evidence note persistence helpers.
 - [plan.rs](plan.rs): structured plan step persistence helpers.
 - [snapshots.rs](snapshots.rs): compaction snapshot persistence helpers.
+- [state_tracks.rs](state_tracks.rs): neutral multi-state progress persistence.
 - [transitions.rs](transitions.rs): graph transition event helpers.

@@ -78,6 +78,7 @@ impl ResidentDaemon {
             | Effect::RecordGraphTransition { .. }
             | Effect::RecordGraphFault { .. }
             | Effect::UpdateGraphRecovery { .. }
+            | Effect::ReplaceGraphStateTracks { .. }
             | Effect::UpdateGraphCase { .. }) => {
                 self.apply_graph_effect(conn, now, effect)?;
                 Ok(None)

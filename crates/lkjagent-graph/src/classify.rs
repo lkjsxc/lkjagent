@@ -8,6 +8,7 @@ use crate::case_recovery::RecoveryState;
 use crate::classify_signals::{
     documentation_request, knowledge_request, priority_counted_content_request,
 };
+use crate::initial_state_tracks;
 use crate::model::{CaseStatus, GraphNodeId, TaskFamily, TaskPhase};
 use crate::state::TaskGraphState;
 
@@ -44,9 +45,13 @@ pub fn classify_intent(content: &str) -> TaskFamily {
 
 pub fn initial_state(objective: &str, case_id: Option<i64>) -> TaskGraphState {
     let family = classify_intent(objective);
-    let objective_state = ObjectiveState::new(objective);
+    let confidence = confidence_for(family);
+    let mut objective_state = ObjectiveState::new(objective);
     let requirements = requirements_for(family);
     let pending_checks = checks_for(family);
+    let active_node = GraphNodeId("plan");
+    let state_tracks = initial_state_tracks(family, active_node, confidence);
+    objective_state.attach_tracks(&state_tracks);
     TaskGraphState {
         case_id,
         objective: objective_state.clone(),
@@ -55,8 +60,8 @@ pub fn initial_state(objective: &str, case_id: Option<i64>) -> TaskGraphState {
         route_reason: route_reason_for(family).to_string(),
         phase: TaskPhase::Planning,
         status: CaseStatus::Active,
-        active_node: GraphNodeId("plan"),
-        confidence: confidence_for(family),
+        active_node,
+        confidence,
         constraints: constraints_from_objective(&objective_state),
         assumptions: Vec::new(),
         open_questions: Vec::new(),
@@ -71,6 +76,7 @@ pub fn initial_state(objective: &str, case_id: Option<i64>) -> TaskGraphState {
         completion: CompletionState::new(requirements, pending_checks),
         recovery: RecoveryState::default(),
         document: None,
+        state_tracks,
         transitions: Vec::new(),
         budgets: CaseBudgetState::default(),
         next_action_class: "survey-plan-context".to_string(),

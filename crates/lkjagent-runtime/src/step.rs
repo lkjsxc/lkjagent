@@ -27,7 +27,7 @@ mod turn;
 
 use compact::compact_step;
 use cycle::maintenance_start_step;
-pub use effects_model::{Effect, GraphPlanStepEffect};
+pub use effects_model::{Effect, GraphPlanStepEffect, GraphStateTrackEffect};
 use fault_wait::{enter_recovery_route, record_recoverable_fault, RecoveryFault};
 use frames::{append_notice, result};
 use output::{append_output_frame, event_kind, handle_control_success, stop_for_output};
