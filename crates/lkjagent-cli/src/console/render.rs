@@ -1,27 +1,18 @@
 use std::path::Path;
 
+pub use super::size::ScreenSize;
 use super::{display, event_view, style};
 use crate::error::CliError;
 use crate::store::open_store;
 
-const DEFAULT_COLUMNS: usize = 80;
-const DEFAULT_ROWS: usize = 24;
-const MIN_COLUMNS: usize = 40;
-const MIN_ROWS: usize = 12;
-
 pub struct ConsoleScreen {
     pub body: String,
     pub prompt: String,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ScreenSize {
     pub columns: usize,
-    pub rows: usize,
 }
 
 pub fn render_screen(data_dir: &Path, notice: &str) -> Result<ConsoleScreen, CliError> {
-    render_screen_for_size(data_dir, notice, ScreenSize::from_env())
+    render_screen_for_size(data_dir, notice, ScreenSize::current())
 }
 
 pub fn render_screen_for_size(
@@ -42,27 +33,18 @@ pub fn render_screen_for_size(
     let body_limit = size.rows.saturating_sub(1);
     let body_budget = body_limit.saturating_sub(bottom.len());
     let mut lines = top_pane(&events, &pending, body_budget, size.columns);
+    pad_to(&mut lines, body_budget);
     lines.extend(bottom);
+    if lines.len() > body_limit {
+        lines = tail(lines, body_limit);
+    } else {
+        pad_to(&mut lines, body_limit);
+    }
     Ok(ConsoleScreen {
         body: lines.join("\n"),
         prompt: style::prompt(&state),
+        columns: size.columns,
     })
-}
-
-impl ScreenSize {
-    fn from_env() -> Self {
-        Self {
-            columns: env_usize("COLUMNS", DEFAULT_COLUMNS),
-            rows: env_usize("LINES", DEFAULT_ROWS),
-        }
-    }
-
-    fn clamp(self) -> Self {
-        Self {
-            columns: self.columns.max(MIN_COLUMNS),
-            rows: self.rows.max(MIN_ROWS),
-        }
-    }
 }
 
 fn top_pane(
@@ -137,6 +119,12 @@ fn tail(lines: Vec<String>, budget: usize) -> Vec<String> {
     lines.into_iter().skip(skip).collect()
 }
 
+fn pad_to(lines: &mut Vec<String>, target: usize) {
+    while lines.len() < target {
+        lines.push(String::new());
+    }
+}
+
 fn rule(width: usize) -> String {
     "-".repeat(width)
 }
@@ -159,11 +147,4 @@ fn state_label(state: &str) -> String {
         _ => "STOPPED",
     }
     .to_string()
-}
-
-fn env_usize(name: &str, default: usize) -> usize {
-    std::env::var(name)
-        .ok()
-        .and_then(|value| value.parse().ok())
-        .unwrap_or(default)
 }

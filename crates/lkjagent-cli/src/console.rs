@@ -2,6 +2,7 @@ mod display;
 mod event_view;
 mod input;
 mod render;
+mod size;
 mod style;
 mod terminal_input;
 
@@ -18,6 +19,7 @@ use terminal_input::{spawn_terminal_input, TerminalMode};
 
 const REFRESH_INTERVAL: Duration = Duration::from_millis(1000);
 const CLEAR_SCREEN: &str = "\x1b[2J\x1b[H";
+const PROMPT_INPUT_COLUMNS: usize = 6;
 
 pub fn console(data_dir: &Path) -> Result<String, CliError> {
     let mut stdout = io::stdout();
@@ -91,10 +93,11 @@ where
     W: Write,
 {
     let screen = render_screen(data_dir, notice)?;
+    let input = prompt_input(typed, screen.columns);
     write!(
         writer,
         "{CLEAR_SCREEN}{}\n{} {}",
-        screen.body, screen.prompt, typed
+        screen.body, screen.prompt, input
     )?;
     writer.flush()?;
     Ok(())
@@ -135,4 +138,22 @@ fn enqueue(data_dir: &Path, text: &str) -> Result<String, CliError> {
 
 fn state_value(conn: &rusqlite::Connection, key: &str, default: &str) -> Result<String, CliError> {
     Ok(lkjagent_store::state::get(conn, key)?.unwrap_or_else(|| default.to_string()))
+}
+
+fn prompt_input(typed: &str, columns: usize) -> String {
+    display::truncate(typed, columns.saturating_sub(PROMPT_INPUT_COLUMNS))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{display, prompt_input};
+
+    #[test]
+    fn typed_prompt_input_is_truncated_to_terminal_width() {
+        let typed = "abcdefghijklmnopqrstuvwxyz日本語入力の長い下書き";
+        let fitted = prompt_input(typed, 40);
+
+        assert!(display::visible_width(&fitted) <= 34);
+        assert!(fitted.ends_with(".."));
+    }
 }

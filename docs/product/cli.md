@@ -53,9 +53,11 @@ as `lkjagent send`. `/refresh` redraws, `/help` lists commands, and `/quit`
 exits the console without touching the daemon. The screen refreshes every
 second, so daemon state, transcript changes, and queued work appear even when
 the owner is not typing. In an interactive terminal, unfinished input stays
-visible across redraws. The renderer reads terminal columns and rows, caps the
-body to the visible screen, and wraps mixed English, Japanese, and other wide
-characters by display width.
+visible across redraws. Each redraw reads live terminal columns and rows,
+falls back to `COLUMNS` and `LINES`, caps the body to one line above the
+prompt, pads short transcripts, and anchors the bottom deck directly above
+`send>`. Mixed English, Japanese, and other wide characters wrap by display
+width, and long unfinished input is truncated to the prompt row.
 
 ## Output Style
 

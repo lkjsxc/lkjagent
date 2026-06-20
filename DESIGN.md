@@ -8,7 +8,7 @@ console and snapshot CLI surfaces.
 ## Source of truth
 
 - Status: Active
-- Last refreshed: 2026-06-19
+- Last refreshed: 2026-06-20
 - Primary product surfaces: `lkjagent console`, snapshot CLI commands
 - Evidence reviewed: `docs/product/cli.md`, `docs/product/observability.md`,
   `crates/lkjagent-cli/src/console/`
@@ -70,7 +70,8 @@ console and snapshot CLI surfaces.
 ## Responsive behavior
 
 - Supported breakpoints/devices: 40-column narrow to 160-column wide terminals
-- Layout adaptations: transcript line count and wrapping follow terminal size
+- Layout adaptations: transcript line count, deck position, and prompt fitting
+  follow live terminal rows and columns
 - Touch/hover differences: none
 
 ## Interaction states
@@ -94,7 +95,8 @@ console and snapshot CLI surfaces.
 - Design-token constraints: no new TUI framework unless unavoidable
 - Performance constraints: one store read per redraw, bounded transcript rows
 - Compatibility constraints: no reliance on terminal pixel metrics
-- Test/screenshot expectations: render tests for width, bottom deck, CJK text
+- Test/screenshot expectations: render tests for width, anchored bottom deck,
+  prompt fitting, CJK text, and body row count
 
 ## Open questions
 

@@ -18,7 +18,9 @@ loading, JSON runtime config, a /data/workspace working tree, and a resident
 daemon that delivers queued owner work to the endpoint and tool dispatcher
 until graph-gated agent.done. The console is transcript-first with a bottom
 status/control deck and display-width wrapping for mixed English and Japanese
-terminal text.
+terminal text. The console reads live terminal size on every redraw, keeps
+the body one row above the prompt, anchors the bottom deck above `send>`, and
+truncates unfinished prompt input to the current prompt row.
 
 Owner messages create or resume a graph case before endpoint execution. The
 graph classifies the task family, enters planning, records constraints,
