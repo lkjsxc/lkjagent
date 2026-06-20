@@ -5,6 +5,23 @@ use lkjagent_store::events::{append_event, EventKind};
 use support::{open_store, temp_data, TestResult};
 
 #[test]
+fn console_pads_sparse_transcript_above_bottom_deck() -> TestResult<()> {
+    let data = temp_data("console-sparse")?;
+
+    let screen = render_snapshot(&data, "ready", 56, 16)?;
+    let lines = screen.lines().collect::<Vec<_>>();
+    let rule = bottom_rule_index(&lines);
+
+    assert_eq!(lines.len(), 15);
+    assert_eq!(rule, 11);
+    assert!(lines[2..rule]
+        .iter()
+        .all(|line| strip_ansi(line).is_empty()));
+    assert!(strip_ansi(lines[14]).contains("/refresh"));
+    Ok(())
+}
+
+#[test]
 fn console_puts_operational_state_in_bottom_deck() -> TestResult<()> {
     let data = temp_data("console-bottom")?;
     let conn = open_store(&data)?;
@@ -14,12 +31,42 @@ fn console_puts_operational_state_in_bottom_deck() -> TestResult<()> {
 
     let screen = render_snapshot(&data, "ready", 56, 16)?;
     let lines = screen.lines().collect::<Vec<_>>();
+    assert_eq!(lines.len(), 15);
     let state_line = lines
         .iter()
         .position(|line| strip_ansi(line).contains("state WAITING"))
         .unwrap_or(0);
     assert!(state_line >= lines.len().saturating_sub(6));
     assert!(screen.contains("question Need owner guidance?"));
+    Ok(())
+}
+
+#[test]
+fn console_uses_one_less_body_line_than_terminal_rows() -> TestResult<()> {
+    let data = temp_data("console-body-lines")?;
+
+    let screen = render_snapshot(&data, "ready", 80, 24)?;
+
+    assert_eq!(screen.lines().count(), 23);
+    Ok(())
+}
+
+#[test]
+fn console_keeps_bottom_deck_visible_on_minimum_screen() -> TestResult<()> {
+    let data = temp_data("console-narrow")?;
+    let conn = open_store(&data)?;
+    lkjagent_store::state::set(&conn, "daemon state", "waiting")?;
+
+    let screen = render_snapshot(&data, "ready", 40, 12)?;
+    let lines = screen.lines().collect::<Vec<_>>();
+    let rule = bottom_rule_index(&lines);
+
+    assert_eq!(lines.len(), 11);
+    assert_eq!(rule, 6);
+    assert!(screen.contains("WAITING"));
+    for line in lines {
+        assert!(visible_width(&strip_ansi(line)) <= 40);
+    }
     Ok(())
 }
 
@@ -42,7 +89,7 @@ fn console_wraps_wide_text_to_terminal_width() -> TestResult<()> {
     )?;
 
     let screen = render_snapshot(&data, "日本語の通知も崩さない", 44, 14)?;
-    assert!(screen.lines().count() <= 13);
+    assert_eq!(screen.lines().count(), 13);
     for line in screen.lines() {
         assert!(
             visible_width(&strip_ansi(line)) <= 44,
@@ -51,6 +98,13 @@ fn console_wraps_wide_text_to_terminal_width() -> TestResult<()> {
     }
     assert!(screen.contains("WORKING"));
     Ok(())
+}
+
+fn bottom_rule_index(lines: &[&str]) -> usize {
+    lines
+        .iter()
+        .position(|line| strip_ansi(line).starts_with("---"))
+        .unwrap_or(usize::MAX)
 }
 
 fn strip_ansi(text: &str) -> String {

@@ -8,6 +8,7 @@ This directory holds the terminal console rendering code used by
 ## Table of Contents
 
 - [render.rs](render.rs): transcript-first screen with bottom status deck.
+- [size.rs](size.rs): live terminal size resolution and minimum clamps.
 - [display.rs](display.rs): terminal display-width wrapping and truncation.
 - [event_view.rs](event_view.rs): transcript and last-output formatting.
 - [input.rs](input.rs): line and terminal input adapters for the console loop.
