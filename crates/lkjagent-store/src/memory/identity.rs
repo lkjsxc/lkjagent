@@ -4,7 +4,7 @@ use crate::error::StoreResult;
 
 use super::MemoryKind;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MemoryIdentity {
     pub kind: MemoryKind,
     pub title_slug: String,

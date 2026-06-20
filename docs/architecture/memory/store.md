@@ -167,8 +167,9 @@ the fixed reason `owner-send`.
   can be edited or tombstoned; delivered rows keep their delivered content
   and turn. Redelivery inserts a new source-linked pending row instead of
   rewriting delivered history.
-- memory rows may be updated and deleted, but only through memory.save and
-  the prune-memory directive per [distillation.md](distillation.md).
+- memory rows may be updated and deleted, but only through memory.save,
+  memory.prune, and the prune-memory directive per
+  [distillation.md](distillation.md).
 
 ## Deliberately Not Stored
 

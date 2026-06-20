@@ -65,5 +65,5 @@ continues polling.
 partially implemented; pure active-mode selection exists, maintenance actions
 no longer inherit stale graph-policy refusals, and internal `agent.ask`
 questions are refused. Empty cycles now defer all directives before the next
-idle poll. Idempotent pruning and real merge/rewrite/delete operations remain
-open.
+idle poll. `memory.prune` performs real exact-duplicate deletes. Semantic
+merge/rewrite pruning remains open.

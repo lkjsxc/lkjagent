@@ -46,3 +46,12 @@ pub fn dispatch_memory_find(
         state,
     )
 }
+
+pub fn dispatch_memory_prune(
+    action_text: &str,
+    runtime: &ToolRuntime,
+    conn: &mut Connection,
+    state: &mut DispatchState,
+) -> DispatchOutput {
+    observe_result(memory::prune(conn), action_text, runtime, state)
+}

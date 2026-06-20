@@ -140,6 +140,7 @@ pub const TOOLS: &[ToolSpec] = &[
     tool("queue.redeliver", QUEUE_REDELIVER, "create a linked pending row"),
     tool("memory.save", MEMORY_SAVE, "insert one memory row"),
     tool("memory.find", MEMORY_FIND, "ranked memory search"),
+    tool("memory.prune", &[], "delete exact duplicate memory rows"),
     tool("graph.state", &[], "show active graph case state"),
     tool("graph.next", &[], "show legal graph transitions and missing guards"),
     tool("graph.audit", &[], "audit active graph case consistency"),

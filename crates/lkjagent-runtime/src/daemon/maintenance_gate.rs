@@ -4,7 +4,7 @@ use lkjagent_tools::observe;
 pub(super) fn maintenance_allows(tool: &str) -> bool {
     matches!(
         tool,
-        "agent.ask" | "agent.done" | "memory.find" | "memory.save" | "queue.list"
+        "agent.ask" | "agent.done" | "memory.find" | "memory.prune" | "memory.save" | "queue.list"
     )
 }
 
@@ -14,7 +14,7 @@ pub(super) fn blocked_maintenance_output(
 ) -> DispatchOutput {
     let frame = observe::notice(
         "error",
-        "maintenance only allows memory.find, memory.save, queue.list, agent.done, or agent.ask",
+        "maintenance only allows memory.find, memory.prune, memory.save, queue.list, agent.done, or agent.ask",
     );
     let frame_ref = state.next_frame_ref;
     state.next_frame_ref = state.next_frame_ref.saturating_add(1);

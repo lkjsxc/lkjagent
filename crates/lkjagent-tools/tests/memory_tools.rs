@@ -62,6 +62,43 @@ fn memory_save_duplicate_returns_existing_id_or_skip_notice() -> TestResult<()> 
 }
 
 #[test]
+fn memory_prune_deletes_exact_duplicate_rows() -> TestResult<()> {
+    let workspace = temp_workspace("memory-prune")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+    conn.execute(
+        "INSERT INTO memory (kind, title, tags, content, tokens, created_at, updated_at)
+         VALUES ('lesson', 'duplicate lesson', 'a,b', 'same content', 10, '2026', '2026')",
+        [],
+    )?;
+    let first = conn.last_insert_rowid();
+    conn.execute(
+        "INSERT INTO memory (kind, title, tags, content, tokens, created_at, updated_at)
+         VALUES ('lesson', 'duplicate lesson', 'b,a', 'same content', 10, '2026', '2026')",
+        [],
+    )?;
+    let second = conn.last_insert_rowid();
+    for id in [first, second] {
+        conn.execute(
+            "INSERT INTO memory_fts (rowid, title, tags, content) VALUES (?1, ?2, ?3, ?4)",
+            (id, "duplicate lesson", "a,b", "same content"),
+        )?;
+    }
+
+    let output = dispatch(
+        &action("memory.prune", &[]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+
+    assert!(output.content.contains("memory prune completed"));
+    assert!(output.content.contains("deleted_rows=1"));
+    Ok(())
+}
+
+#[test]
 fn memory_find_rejects_empty_after_normalization() -> TestResult<()> {
     let workspace = temp_workspace("memory-empty-normalized")?;
     let runtime = runtime(workspace)?;

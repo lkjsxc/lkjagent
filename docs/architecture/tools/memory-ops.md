@@ -2,8 +2,9 @@
 
 ## Purpose
 
-The contracts for memory.save and memory.find: how the model writes
-durable knowledge into the store and queries it back. The row schema is
+The contracts for memory.save, memory.find, and memory.prune: how the model
+writes durable knowledge into the store, queries it back, and deletes exact
+duplicates during maintenance. The row schema is
 owned by [../memory/store.md](../memory/store.md), ranking by
 [../memory/retrieval.md](../memory/retrieval.md), and the judgment of when
 to save by [../memory/distillation.md](../memory/distillation.md).
@@ -46,7 +47,14 @@ re-reading files is the cheap path under
 Punctuation that FTS5 treats as syntax is split into searchable tokens. When
 normalization changes a query, the observation includes `query_normalized`.
 
+## memory.prune
+
+`memory.prune` takes no parameters. It deletes exact duplicate memory rows
+using the store identity key and reports kept duplicate groups plus deleted
+rows. It is admitted only in maintenance mode.
+
 ## Status
 
 implemented for accepted kinds, idempotent duplicate skips, and punctuation
-safe FTS queries.
+safe FTS queries. Exact duplicate pruning is implemented; semantic merge and
+rewrite pruning remain open.
