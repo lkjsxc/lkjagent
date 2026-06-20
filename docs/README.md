@@ -64,6 +64,10 @@ directories with short focused files.
 - `operations/README.md` `operations/verification.md` `operations/compose.md` `operations/running.md`
 - `agent/README.md` `agent/work-loop.md` `agent/handoff.md` `agent/honest-state.md`
 - `execution/README.md` `execution/operating-rules.md` `execution/current-blockers.md`
+- `execution/current-work/README.md` `execution/current-work/owner-reported-failures.md`
+  `execution/current-work/action-fault-recovery.md` `execution/current-work/document-structure-redesign.md`
+  `execution/current-work/context-accounting.md` `execution/current-work/multi-state-runtime.md`
+  `execution/current-work/gpt-log.md` `execution/current-work/verification-plan.md`
 - `execution/tasks/README.md` `execution/tasks/bootstrap-workspace.md` `execution/tasks/xtask-checks.md`
   `execution/tasks/llm-client.md` `execution/tasks/protocol-parser.md` `execution/tasks/context-engine.md`
   `execution/tasks/sqlite-store.md` `execution/tasks/state-graph-runtime.md` `execution/tasks/tool-runtime.md`

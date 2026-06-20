@@ -3,195 +3,60 @@
 ## Purpose
 
 This file is the honest ledger of lkjagent. It states what exists, what is
-design-only, and what comes next. Every change that moves behavior updates
-this file in the same commit. Statuses used across docs: implemented,
-design-only, not implemented, out of scope, open question.
+broken, and what remains open. A behavior is implemented only when code,
+focused tests, and gates prove it.
 
 ## Summary
 
-The repository contains the documentation contract, a compiling Cargo
-workspace, local verification gates, the action parser, the pure state graph,
-the pure context engine, the SQLite store boundary, the LLM endpoint client,
-the tool dispatcher/adapters, the runtime step/daemon core, and the CLI for
-send, status, bounded log, console, memory, startup checks, repository-root .env
-loading, JSON runtime config, a /data/workspace working tree, and a resident
-daemon that delivers queued owner work to the endpoint and tool dispatcher
-until graph-gated agent.done. The console is transcript-first with a bottom
-status/control deck and display-width wrapping for mixed English and Japanese
-terminal text. The console reads live terminal size on every redraw, keeps
-the body one row above the prompt, anchors the bottom deck above `send>`, and
-truncates unfinished prompt input to the current prompt row.
+The repository contains a Rust workspace, documentation contracts, local gates,
+a tag-based action parser, graph case state, context budgeting, SQLite storage,
+an endpoint client, tool dispatch, a daemon loop, and CLI surfaces for queue,
+status, log, console, and memory. Those pieces exist, but owner-visible task
+completion remains unreliable.
 
-Owner messages create or resume a graph case before endpoint execution. The
-graph classifies the task family, enters planning, records constraints,
-risks, evidence requirements, selected context packages, and legal next
-transitions, then renders a graph state notice into the first endpoint-visible
-context. Runtime state persists graph cases, graph events, and graph evidence
-so restart and compaction reconstruct structured state. Case headers now also
-retain raw owner text, objective revision, subroute, route reason, next action
-class, and context pressure. Tool observations are recorded as graph evidence
-or typed faults. Completion is refused until the active graph gate has its
-required evidence; a graph completion refusal names the missing kind and
-points the next action to `graph.evidence`.
+Owner-reported failures are current evidence. The harness can generate
+semantically poor documentation files such as part-001.md and can loop on
+action parameter faults such as unknown params [path]. The code confirms the
+generic document scaffold still creates sequence-named child files, and the
+generic recursive seed still contains release-shaped API paths that violate the
+documentation standards.
 
-Recursive docs, counted structured content, and knowledge-base tasks are
-graph task families that select document construction. They create
-README-indexed scaffolds before endpoint work and cannot close without graph
-evidence for the required document structure. Counted artifact wording,
-English body, draft, and manuscript wording, and Japanese seikabutsu and
-honpen phrasing select document construction when paired with file-count
-wording, and counted creation deliverables preempt incidental architecture or
-test wording before endpoint work starts. Implementation, fix, debug, patch,
-and refactor action wording plus Japanese shusei, jisso, debug, and refactor
-wording veto that preemption, while implementation-chapter wording stays a counted
-deliverable. Japanese bug and shusei wording also select bug-fix routing.
-File and markdown-count requests remain deterministic control guards,
-including when combined with a recursive or knowledge-base task family;
-English file, document, and docs wording plus common Japanese file wording
-are recognized, ASCII digits,
-full-width digits, common Japanese numeric kanji, common English number
-words including hyphenated compounds and scale words such as hundred and hundreds,
-and comma-like digit separators are accepted, the target number is chosen by
-proximity to file or document wording, and exact or approximate mode wording
-is scored near that chosen target. Direct exact wording is exact, approximate
-wording including ish, or-so, hodo, and zengo forms uses a bounded tolerance,
-and negated exact wording such as not-exactly, no-need-exact, and
-does-not-have-to-be-exact keeps the approximate mode instead of forcing an
-exact count. Exact wording attached to a smaller docs, outline, or design
-subcount does not make an approximate overall count strict. Aggregate wording
-such as total, combined, in-all, and gokei can carry the overall count when
-the prompt also contains smaller docs or outline file counts, while nearby
-non-file units such as words or pages keep their numbers from becoming
-file-count targets. Counted completion prefers README-indexed roots and
-falls back to clean top-level output directories.
-The active graph prefix renders exact count guards as count requirements and
-approximate count guards as scale hints. It tells the model to prefer
-`doc.scaffold`, `doc.audit`, `fs.read_many`, `fs.tree`, `workspace.index`,
-`fs.list`, `fs.stat`, `fs.batch_write`, and `fs.patch` for bulk document
-construction and verification, keep the act payload bounded, and treat
-`shell.run` as an escape hatch only when graph policy admits it.
-For counted documentation tasks that are not recursive, knowledge-base, or
-benchmark scaffolds, the daemon also writes a generic `structured-output/`
-tree at the requested exact count or approximate scale before the first
-endpoint turn and records graph evidence for the scaffold, then closes only
-when the graph completion gate admits that evidence; otherwise it waits with
-the missing gate reason.
-That scaffold profiles the owner's objective by detected language and broad
-deliverable kind, so the root, docs, and main directories are README-indexed
-within the selected guard. Design files live under `docs/designs/set-*`,
-main files live under `main/arcs/arc-*`, and the root README records an exact
-file budget for exact guards or a scale plan for approximate guards.
-Kind profiling recognizes explicit guide and report synonyms before
-narrative terms, ignores negated story-specific constraints, and covers
-manuscript, screenplay, playbook, runbook, course, training, whitepaper,
-dossier, and Japanese task terms.
-The graph evidence for that scaffold records `structured-output`, target or
-scale file count, index/design/main counts, root index, file-budget or
-scale-plan status, audit-manifest requirements, restart-guide status,
-directory index, acceptance audit, coverage map, first and last main,
-`index_scope=all`, `section_scope=all`, section/content status, part-ledger
-status, link and sequence verification, deterministic scaffold closure, and
-`verification=ok`. The same normalized evidence is saved into task-summary
-memory for startup and compaction recovery.
-The root index includes a restart guide that names README.md, docs/README.md,
-main/README.md, design-owner links, local verification, sequence ledgers, and
-the stable count or scale rule when content exists. It also includes a reading
-path that names the first main file, last main file, and numeric read order.
-The docs index maps nested design memos to covered main ranges. The main
-index maps nested arc ranges from the same per-part stage assignment plus a
-role ledger that links each main file back to its design memo owner.
-Every design index entry, progress-map line, main ledger entry, main-file
-design-owner link, and explicit main-file previous/current/next path is verified
-before closure. Every main file also carries a local verification checklist
-covering design-owner status, sequence paths, draft content blocks, and continuity handoff. Every
-design and main file is section-verified and content-block
-verified before scaffold closure. Design and main files carry matching
-headings, section roles, objective anchors that
-preserve model-number decimal tokens, main-range coverage, kind-aware segment
-briefs, sequence ledgers, anchor-linked body spines, per-part content
-details, specific-detail variation blocks, final-aware draft passage blocks, and
-continuity handoffs while preserving the scale contract. Root indexes keep
-operational clauses and raw counted-create wording for traceability, while
-main-file body anchors skip model-thrift, budget-thrift, English count mechanics,
-composition parentheticals, allocation-only clauses, count-only structural
-clauses, and generic meta constraints.
-Docs-side scaffolds use twenty planning focus labels, avoiding repeated supplemental notes.
-The scaffold uses design-memo allocation, when the exact total can retain main content,
-for a design, memo, viewpoint, outline, planning, appendix-note, checklist,
-assessment-rubric, review-criteria, case-study, risk-register, control-mapping,
-audit-finding, timeline, decision-record, lesson-plan, story-planning sheets,
-JP character/design/relationship/plot refs, qualified bio/sketch, support split count, or EN/JP ordered-rest split.
-File-count wording stays stronger than design wording when scoring allocation
-hints, so total-count numbers are not reused as design memo counts.
-Runtime recovery uses bounded notices for parse errors, repeated actions,
-tool errors, endpoint max-token exits, budget exhaustion, and context
-pressure. Consecutive parse faults, repeated actions, or tool errors now
-record typed graph faults and route the open case to recovery nodes such as
-recover-parse, recover-repeat, or recover-tool. The recovery ladder changes
-the next action class toward graph inspection, smaller scope, alternate native
-tools, replanning around a blocked step, and finally shell only from a
-shell-admitted node. Endpoint outages record failed attempts, set a capped
-retry deadline, and keep later polls from hitting the endpoint or appending
-more error events until that deadline. The LLM client sends `</act>` as a stop
-sequence and restores the stripped close tag before parsing so one endpoint
-completion stays bounded to one action envelope. Length completions with a
-closed act are accepted; true oversize completions record a bounded preview in
-recovery.
-
-The runtime context window defaults to 24,576 tokens, accepts 16,384 tokens as
-the lower supported value, derives safe soft/hard compaction triggers from the
-configured window, and uses the 2,048-token reserve as endpoint max_tokens.
-Owner task turn budgets load from `task.turn-budget` and apply to new tasks,
-explicit continuations after budget exhaustion, and restart summaries.
-Compaction is graph-aware: it preserves the active case, phase, node, plan,
-non-goals, risks, success criteria, evidence, missing evidence, touched paths,
-selected packages, package compression, legal next transitions, recovery
-strategy, and completion guard before rebuilding the prefix. Memory retrieval
-uses graph memory links to prefer active-case and active-node rows within the
-same memory kind, and task-summary saves link the memory row to the active or
-just-closed graph case and node.
-
-Memory remains durable retrieval, but graph cases link evidence and memories.
-Empty queues open bounded graph maintenance cycles in rotation when directives
-are due: distill, refine-graph-policy, prune-memory, and audit-self. Saving a
-user task summary stamps all maintenance directives, so the daemon shows idle
-after task completion until the cooldown passes or owner work arrives.
-Compose wiring is implemented; the implementation queue is
-[execution/current-blockers.md](execution/current-blockers.md).
+The daemon also lacks enough neutral multi-state progress, compact token
+accounting, and a single synthesized GPT handoff log for a stronger external
+model. Current docs that imply these features are complete are stale until the
+implementation and tests prove them.
 
 ## Area Status
 
-| Area | Status | Contract |
+| Area | Status | Evidence |
 | --- | --- | --- |
-| Documentation tree and policies | implemented | [repository/](repository/README.md) |
-| Vision and scope | implemented | [vision/](vision/README.md) |
-| Decision records | implemented | [decisions/](decisions/README.md) |
-| Agent manual | implemented | [agent/](agent/README.md) |
-| Execution queue and tasks | implemented | [execution/](execution/README.md) |
-| Cargo workspace and crates | implemented | [repository/layout.md](repository/layout.md) |
-| Verification xtask and quiet gates | implemented | [operations/verification.md](operations/verification.md) |
-| Docker compose services | implemented | [operations/compose.md](operations/compose.md) |
-| Container image skeleton | implemented | [architecture/sandbox/container.md](architecture/sandbox/container.md) |
-| Daemon and agent loop | implemented | [architecture/runtime/](architecture/runtime/README.md) |
-| State graph and task cases | implemented | [architecture/state-graph/](architecture/state-graph/README.md) |
-| Context engine and graph-aware compaction | implemented | [architecture/context/](architecture/context/README.md) |
-| Action protocol and parser | implemented | [architecture/protocol/](architecture/protocol/README.md) |
-| Toolset | implemented | [architecture/tools/](architecture/tools/README.md) |
-| SQLite store, transcript, and memory access | implemented | [architecture/memory/](architecture/memory/README.md) |
-| LLM endpoint client | implemented | [architecture/llm/](architecture/llm/README.md) |
-| Container and sandbox | implemented | [architecture/sandbox/](architecture/sandbox/README.md) |
-| User message queue and CLI | implemented | [product/](product/README.md) |
-| Automatic idle self-maintenance | implemented | [architecture/runtime/self-maintenance.md](architecture/runtime/self-maintenance.md) |
-| Mechanical benchmark evaluation | implemented | [evaluation/](evaluation/README.md) |
+| Cargo workspace and gates | implemented | `Cargo.toml`; `crates/lkjagent-xtask` |
+| Docker compose services | implemented | `docker-compose.yml` |
+| Action parser | implemented | `crates/lkjagent-protocol` |
+| Tool dispatcher | partially implemented | strict parameter errors still lack robust recovery |
+| Document scaffold tool | broken | `doc.scaffold` emits sequence-named child files |
+| Document audit tool | partially implemented | checks README and counts, not full topology graph |
+| Recursive document seed | partially implemented | deterministic tree exists with stale API-shaped paths |
+| State graph cases | partially implemented | one case exists, but ranked neutral tracks are missing |
+| Owner objective normalization | partially implemented | raw owner text can dominate task framing |
+| Runtime recovery | partially implemented | parse/tool recovery exists, parameter recovery is shallow |
+| Context budgets | partially implemented | budget model exists, compact usage display is missing |
+| Token usage ledger | not implemented | endpoint usage is not persisted as a ledger |
+| Console/status accounting | partially implemented | status exists, token deck is incomplete |
+| GPT handoff log | not implemented | no single current Markdown handoff file |
+| Mechanical benchmarks | partially implemented | owner failure cases are not fully covered |
+
+## Open Work
+
+The dependency queue is
+[execution/current-blockers.md](execution/current-blockers.md). The first
+active slice is to make the documentation contract honest, then replace the
+semantic document scaffold and audit behavior.
 
 ## Out of Scope
 
-Messaging channels, web UI, MCP, sub-agents, plan mode, heartbeat schedules, and cron schedules.
-The boundaries are stated in [vision/scope.md](vision/scope.md).
-
-## Next Step
-No open blocker remains. Future changes use the compose final gate per
-[operations/verification.md](operations/verification.md).
+Messaging channels, web UI, MCP, runtime sub-agents, heartbeat schedules, and
+cron schedules remain outside this product.
 
 ## Honesty Rules
 
