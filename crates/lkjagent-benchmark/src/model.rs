@@ -56,6 +56,7 @@ pub enum JudgeKind {
     DocScaffoldParamRecovery,
     RecoveryLoopLongStory,
     GraphPlanExample,
+    GraphTransitionTarget,
     MemoryFtsQuery,
     MaintenanceMemoryDuplicate,
     PolicyContradiction,

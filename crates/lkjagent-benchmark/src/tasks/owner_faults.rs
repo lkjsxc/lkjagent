@@ -116,7 +116,7 @@ not allowed big file. structured please.
 
 const STORY_GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "owner_input=Create long SF story.\nfollowup_input=not allowed big file. structured please.\nfamily=documentation\nsubroute=content-artifact\nroot=stories/long-sf-story\npayload_risk=raw fs.write retry is blocked\nnext_action=doc.scaffold\n<tool>doc.scaffold</tool>\nprofile=NarrativeManuscript\nsemantic_paths=stories/README.md,stories/planning/premise.md,stories/chapters/waking-pod.md\ngraph.note kind=decision\ndocument audit passed\nfinal_status=evidence-backed partial handoff\n",
+    content: "owner_input=Create long SF story.\nfollowup_input=not allowed big file. structured please.\nfamily=documentation\nsubroute=content-artifact\nroot=stories/long-sf-story\npayload_risk=raw fs.write retry is blocked\nnext_action=artifact.plan\n<tool>artifact.plan</tool>\nprofile=Story\nsemantic_paths=stories/README.md,stories/premise.md,stories/chapters/waking-pod.md\ngraph.note kind=decision\nartifact.audit passed\nfinal_status=evidence-backed partial handoff\n",
 }];
 
 const STORY_BAD_NOTE_LOOP: &[FileSpec] = &[FileSpec {
@@ -127,6 +127,11 @@ const STORY_BAD_NOTE_LOOP: &[FileSpec] = &[FileSpec {
 const STORY_BAD_COMPACTION: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
     content: "owner_input=Create long SF story.\n<tool>fs.write</tool>\n<path>story.md</path>\ncompletion hit max tokens\ncompaction only allows memory.save actions\ngraph policy refused memory.save\n",
+}];
+
+const STORY_BAD_FALSE_COMPLETE: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content: "owner_input=Create a very long story.\ngraph.plan recorded\nagent.done planning phase only\nartifact root missing\naudit=Missing\n",
 }];
 
 const STORY_GOOD_FIXTURES: &[Fixture] = &[Fixture {
@@ -142,6 +147,10 @@ const STORY_BAD_FIXTURES: &[Fixture] = &[
     Fixture {
         name: "compaction-graph-policy-contradiction",
         files: STORY_BAD_COMPACTION,
+    },
+    Fixture {
+        name: "recovery-very-long-story-false-complete",
+        files: STORY_BAD_FALSE_COMPLETE,
     },
 ];
 
