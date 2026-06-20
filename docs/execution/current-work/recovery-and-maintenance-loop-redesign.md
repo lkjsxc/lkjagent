@@ -118,10 +118,12 @@ owner questions are refused with valid next-action examples. Graph-policy
 refusals now render `graph.transition` examples only with admitted targets.
 Long stories and bread cookbooks now route to `content-artifact` roots and
 semantic scaffold profiles. Scaffold-only output and failed document audits no
-longer satisfy document-structure evidence. The benchmark corpus now covers the
-uploaded graph-plan, FTS punctuation, duplicate-memory, active-policy,
-invalid-note-kind, long-story, and bread-cookbook false-completion patterns.
-Remaining work: full loop selection before endpoint turns, idempotent
-maintenance pruning, richer structured compaction snapshots, transition
-selector runtime integration, artifact adoption/repair, content-bearing
-completion gates, quiet verification, and Docker Compose verification.
+longer satisfy document-structure evidence, and runtime close refuses stale
+`agent.done` success when graph completion is still missing. The benchmark
+corpus now covers the uploaded graph-plan, FTS punctuation, duplicate-memory,
+active-policy, invalid-note-kind, long-story, and bread-cookbook
+false-completion patterns. Remaining work: full loop selection before endpoint
+turns, idempotent maintenance pruning, richer structured compaction snapshots,
+transition selector runtime integration, artifact adoption/repair,
+content-bearing completion gates, quiet verification, and Docker Compose
+verification.

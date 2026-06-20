@@ -58,7 +58,7 @@ and Docker Compose verification have not been rerun for this broader redesign.
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, and punctuation-safe FTS queries have focused tests; maintenance pruning remains open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
-| Runtime recovery | partially implemented | pure active-mode selection exists, maintenance/compaction modes do not render graph-policy refusals, and internal `agent.ask` questions are refused; repeated invalid actions still need full deterministic recovery control |
+| Runtime recovery | partially implemented | pure active-mode selection exists, maintenance/compaction modes do not render graph-policy refusals, internal `agent.ask` questions are refused, and runtime close rechecks graph completion; repeated invalid actions still need full deterministic recovery control |
 | Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned and preserves active graph/fault state; richer structured snapshots remain open |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
