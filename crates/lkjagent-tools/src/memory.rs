@@ -19,8 +19,22 @@ pub fn save(
         return Err(ToolError::invalid("content must not be empty"));
     }
     let tokens = estimate_tokens(content) as i64;
-    let id = lkjagent_store::memory::save(conn, kind, title, tags, content, tokens, now)?;
-    Ok(format!("memory_id={id}"))
+    let decision =
+        lkjagent_store::memory::save_decision(conn, kind, title, tags, content, tokens, now)?;
+    Ok(match decision {
+        lkjagent_store::memory::MemoryWriteDecision::Insert { memory_id } => {
+            format!("memory_id={memory_id}")
+        }
+        lkjagent_store::memory::MemoryWriteDecision::SkipDuplicate { existing_id } => {
+            format!("memory_id={existing_id}\nduplicate=skipped")
+        }
+        lkjagent_store::memory::MemoryWriteDecision::UpdateExisting { existing_id } => {
+            format!("memory_id={existing_id}\nduplicate=updated")
+        }
+        lkjagent_store::memory::MemoryWriteDecision::MergeWith { ids } => {
+            format!("memory_id={}\nduplicate=merged", ids.first().unwrap_or(&0))
+        }
+    })
 }
 
 pub fn find(conn: &Connection, query: &str, limit: usize) -> ToolResult<String> {
@@ -30,8 +44,13 @@ pub fn find(conn: &Connection, query: &str, limit: usize) -> ToolResult<String> 
     if limit == 0 {
         return Err(ToolError::invalid("limit must be positive"));
     }
-    let rows = lkjagent_store::memory::find(conn, query, limit as i64)?;
+    let normalized = lkjagent_store::memory::normalize_fts_query(query)
+        .ok_or_else(|| ToolError::invalid("query has no searchable tokens"))?;
+    let rows = lkjagent_store::memory::find(conn, &normalized, limit as i64)?;
     let mut lines = Vec::new();
+    if normalized != query.trim() {
+        lines.push(format!("query_normalized={normalized}"));
+    }
     for row in rows {
         lines.push(format!(
             "id={} kind={} title={} snippet={}",

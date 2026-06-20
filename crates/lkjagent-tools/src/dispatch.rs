@@ -4,6 +4,7 @@ mod fs_more_tools;
 mod fs_tools;
 mod graph_evidence_tools;
 mod graph_inspect_tools;
+mod graph_note_tools;
 mod graph_tools;
 mod guards;
 mod memory_tools;
@@ -23,7 +24,7 @@ use rusqlite::Connection;
 
 use crate::error::{ToolError, ToolResult};
 use crate::observe::{self, OutputFrame};
-pub use examples::registry_valid_example;
+pub use examples::{registry_valid_example, valid_example_for, ActionExample, ExampleContext};
 use normalize::{normalize_action, NormalizationDecision, NormalizationNote};
 use refusal::{graph_policy_refusal, repeat_refusal};
 use routes::route;

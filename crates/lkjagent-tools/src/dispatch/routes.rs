@@ -13,9 +13,9 @@ use crate::dispatch::graph_evidence_tools::{dispatch_graph_compact, dispatch_gra
 use crate::dispatch::graph_inspect_tools::{
     dispatch_graph_audit, dispatch_graph_next, dispatch_graph_recover,
 };
+use crate::dispatch::graph_note_tools::dispatch_graph_note;
 use crate::dispatch::graph_tools::{
-    dispatch_graph_context, dispatch_graph_note, dispatch_graph_plan, dispatch_graph_state,
-    dispatch_graph_transition,
+    dispatch_graph_context, dispatch_graph_plan, dispatch_graph_state, dispatch_graph_transition,
 };
 use crate::dispatch::memory_tools::{dispatch_memory_find, dispatch_memory_save};
 use crate::dispatch::queue_tools::{

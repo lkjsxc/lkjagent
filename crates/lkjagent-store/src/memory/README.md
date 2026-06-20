@@ -2,8 +2,10 @@
 
 ## Purpose
 
-This directory holds private row mapping helpers for the memory store API.
+This directory holds private helpers for the memory store API.
 
 ## Table of Contents
 
+- [identity.rs](identity.rs): stable memory identity and duplicate decisions.
 - [row.rs](row.rs): memory row struct, required-row lookup, and query mapping.
+- [search.rs](search.rs): FTS query normalization and ranked search.
