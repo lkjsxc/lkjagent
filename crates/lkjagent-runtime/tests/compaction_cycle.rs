@@ -110,6 +110,52 @@ fn compaction_preserves_recovery_fault_state() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn compaction_summary_preserves_missing_evidence() -> TestResult<()> {
+    let mut conn = store()?;
+    take_lock(&conn)?;
+    state::set(&conn, "open task", "continue the active task")?;
+    let workspace = temp_workspace("daemon-compaction-missing-evidence")?;
+    let server = serve_responses(Vec::new())?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+    daemon.state.task = TaskState::Open { turns_remaining: 7 };
+    daemon.state.graph = Some(initial_state("Create a big bread cookbook.", Some(4)));
+    push_orange_pressure(&mut daemon);
+
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    server.join()?;
+
+    let summary = compaction_notice(&daemon)?;
+    assert!(summary.contains("missing_evidence=plan"));
+    assert!(summary.contains("completion_ready=false"));
+    Ok(())
+}
+
+#[test]
+fn compaction_summary_preserves_artifact_root() -> TestResult<()> {
+    let mut conn = store()?;
+    take_lock(&conn)?;
+    state::set(&conn, "open task", "continue the active task")?;
+    let workspace = temp_workspace("daemon-compaction-artifact-root")?;
+    let server = serve_responses(Vec::new())?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+    daemon.state.task = TaskState::Open { turns_remaining: 7 };
+    let mut graph = initial_state("Create a big bread cookbook with recipes.", Some(5));
+    graph.active_node = GraphNodeId("document");
+    graph.recovery.parse_failures = 2;
+    daemon.state.graph = Some(graph);
+    push_orange_pressure(&mut daemon);
+
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    server.join()?;
+
+    let summary = compaction_notice(&daemon)?;
+    assert!(summary.contains("document_root=cookbooks/"));
+    assert!(summary.contains("document_kind=content-artifact"));
+    assert!(summary.contains("recovery=parse:2"));
+    Ok(())
+}
+
 fn push_orange_pressure(daemon: &mut ResidentDaemon) {
     let used = daemon.state.context.used_tokens();
     let tokens = daemon
@@ -123,6 +169,17 @@ fn push_orange_pressure(daemon: &mut ResidentDaemon) {
         "large prior output",
         tokens,
     ));
+}
+
+fn compaction_notice(daemon: &ResidentDaemon) -> TestResult<&str> {
+    daemon
+        .state
+        .context
+        .log
+        .iter()
+        .find(|frame| frame.content.contains("compaction resume"))
+        .map(|frame| frame.content.as_str())
+        .ok_or_else(|| "missing compaction notice".into())
 }
 
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
