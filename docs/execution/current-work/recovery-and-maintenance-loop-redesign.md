@@ -122,8 +122,9 @@ longer satisfy document-structure evidence, and runtime close refuses stale
 `agent.done` success when graph completion is still missing. The benchmark
 corpus now covers the uploaded graph-plan, FTS punctuation, duplicate-memory,
 active-policy, invalid-note-kind, long-story, and bread-cookbook
-false-completion patterns. Remaining work: full loop selection before endpoint
-turns, idempotent maintenance pruning, richer structured compaction snapshots,
-transition selector runtime integration, artifact adoption/repair,
-content-bearing completion gates, quiet verification, and Docker Compose
-verification.
+false-completion patterns. Empty maintenance closes now defer all directives
+before the next idle poll, preventing immediate no-op restarts. Remaining work:
+full loop selection before endpoint turns, idempotent maintenance pruning,
+richer structured compaction snapshots, transition selector runtime
+integration, artifact adoption/repair, content-bearing completion gates, quiet
+verification, and Docker Compose verification.

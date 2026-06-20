@@ -93,6 +93,10 @@ impl ResidentDaemon {
                 memory_ids,
                 policy,
             } => self.record_compaction(conn, now, before_tokens, after_tokens, memory_ids, policy),
+            Effect::DeferMaintenance => {
+                crate::maintenance::defer_all_directives(conn, now)?;
+                Ok(None)
+            }
         }
     }
 }

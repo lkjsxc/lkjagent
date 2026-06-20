@@ -64,5 +64,6 @@ continues polling.
 
 partially implemented; pure active-mode selection exists, maintenance actions
 no longer inherit stale graph-policy refusals, and internal `agent.ask`
-questions are refused. Queue preemption, idempotent pruning, and early no-op
-closure remain open.
+questions are refused. Empty cycles now defer all directives before the next
+idle poll. Idempotent pruning and real merge/rewrite/delete operations remain
+open.

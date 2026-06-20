@@ -14,12 +14,12 @@ an endpoint client, tool dispatch, a daemon loop, and CLI surfaces for queue,
 status, log, console, and memory.
 
 The parser, dispatcher, graph, context engine, store, endpoint client, and
-queue exist. The implementation is not yet safe for the uploaded GPT-5.5-Pro
-failure logs. Runtime completion remains unsafe for long content tasks,
-maintenance can loop and duplicate records, recovery can suggest or allow
-actions that active policy refuses, and compaction can contradict graph policy.
-Structured record identity is not yet sufficient to prevent duplicate
-knowledge artifacts.
+queue exist. The implementation is not yet fully safe for the uploaded
+GPT-5.5-Pro failure logs. Runtime completion is safer but still lacks
+content-bearing artifact audits, maintenance pruning remains incomplete,
+recovery can still need fuller deterministic repeat control, and compaction
+snapshots remain shallow. Structured record identity is not yet sufficient to
+prevent every duplicate knowledge artifact.
 
 Owner-reported failures are current evidence. The harness previously generated
 semantically poor documentation files such as part-001.md and could loop on
@@ -58,7 +58,7 @@ and Docker Compose verification have not been rerun for this broader redesign.
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, and punctuation-safe FTS queries have focused tests; maintenance pruning remains open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
-| Runtime recovery | partially implemented | pure active-mode selection exists, maintenance/compaction modes do not render graph-policy refusals, internal `agent.ask` questions are refused, and runtime close rechecks graph completion; repeated invalid actions still need full deterministic recovery control |
+| Runtime recovery | partially implemented | pure active-mode selection exists, maintenance/compaction modes do not render graph-policy refusals, internal `agent.ask` questions are refused, runtime close rechecks graph completion, and no-op maintenance defers restart; repeated invalid actions still need full deterministic recovery control |
 | Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned and preserves active graph/fault state; richer structured snapshots remain open |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
@@ -69,10 +69,10 @@ and Docker Compose verification have not been rerun for this broader redesign.
 
 The dependency queue is
 [execution/current-blockers.md](execution/current-blockers.md). The open work is
-structural, not only endpoint quality: active-mode selection, maintenance
-idempotency, compaction ownership, semantic artifact planning, completion
-readiness, and benchmark coverage must move before the ledger can call the
-loop redesign implemented.
+structural, not only endpoint quality: endpoint-turn mode selection,
+maintenance pruning, compaction snapshots, semantic artifact planning,
+completion readiness, and final verification must move before the ledger can
+call the loop redesign implemented.
 
 ## Out of Scope
 
