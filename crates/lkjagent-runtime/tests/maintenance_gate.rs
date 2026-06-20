@@ -37,9 +37,13 @@ fn maintenance_blocks_workspace_write_tools() -> TestResult<()> {
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     assert!(!workspace.join("owner.txt").exists());
-    assert!(events::read_events(&conn)?.iter().any(|event| {
-        event.kind == "notice" && event.content.contains("maintenance only allows")
-    }));
+    let event_text = events::read_events(&conn)?
+        .iter()
+        .map(|event| event.content.as_str())
+        .collect::<Vec<_>>()
+        .join("\n");
+    assert!(event_text.contains("effective policy refused fs.write"));
+    assert!(event_text.contains("active_mode=Maintenance"));
 
     assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
     server.join()?;
