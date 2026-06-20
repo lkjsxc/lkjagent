@@ -26,6 +26,12 @@ public-test-only or hard-coded-style behavior. `benchmark check-corpus`
 materializes these fixtures, runs the hidden judge, and fails unless every
 good workspace passes and every bad workspace fails.
 
+Owner-reliability tasks are valid benchmark tasks. Their fixtures model
+observable harness artifacts: generated documentation files, transcript
+notices, status output, and the current GPT handoff log. A bad fixture should
+reproduce a reported failure such as `part-001.md`, weak `unknown params
+[path]` recovery, missing token accounting, or fragmented handoff logs.
+
 ## Status
 
 implemented.

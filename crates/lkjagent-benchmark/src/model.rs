@@ -7,6 +7,7 @@ pub enum TaskFamily {
     ProgramRepair,
     MultiFile,
     StatefulCorrection,
+    OwnerReliability,
 }
 
 impl TaskFamily {
@@ -19,6 +20,7 @@ impl TaskFamily {
             Self::ProgramRepair => "program-repair",
             Self::MultiFile => "multi-file",
             Self::StatefulCorrection => "stateful-correction",
+            Self::OwnerReliability => "owner-reliability",
         }
     }
 }
@@ -47,6 +49,13 @@ pub enum JudgeKind {
     RepairRankShell,
     ReadmeBundle,
     CorrectedComposites,
+    SemanticProjectDocs,
+    RecursiveDocTree,
+    ThirtySemanticDocs,
+    GraphStateParamRecovery,
+    DocScaffoldParamRecovery,
+    StatusAccounting,
+    GptHandoffLog,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

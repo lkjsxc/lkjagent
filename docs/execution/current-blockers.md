@@ -18,7 +18,7 @@ evidence named by the task contract and the actual gates that ran.
 | 7 | Status and console omit compact context and token accounting | [current-work/context-accounting.md](current-work/context-accounting.md) | focused tests pass |
 | 8 | No single current GPT handoff log exists | [current-work/gpt-log.md](current-work/gpt-log.md) | focused tests pass |
 | 9 | Recovery nodes are not specific enough for parameter faults | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | focused tests pass |
-| 10 | Benchmarks do not cover the owner-reported failures | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
+| 10 | Benchmarks do not cover the owner-reported failures | [current-work/verification-plan.md](current-work/verification-plan.md) | focused tests pass |
 | 11 | Compose smoke evidence is missing after the reliability redesign | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
 
 ## Owner Failure

@@ -16,6 +16,7 @@ required before the reliability redesign can close.
 
 - Source: `crates/lkjagent-benchmark/src`
 - Tests: `crates/lkjagent-benchmark`
+- Tests: `cargo run -p lkjagent-xtask -- benchmark check-corpus`
 - Verification: `docker compose run --rm verify`
 
 ## Failure Modes

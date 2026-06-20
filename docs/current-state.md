@@ -29,7 +29,9 @@ status/console display tests. The transition-quality scoring exists as pure
 code, but the runtime transition controller still does not consume it. Compact
 token accounting is implemented for endpoint usage, status, and console. A
 single synthesized GPT handoff log is implemented and exposed through status,
-console, and `lkjagent gpt-log`.
+console, and `lkjagent gpt-log`. The benchmark corpus now includes the
+owner-reported documentation, action recovery, accounting, and GPT log failure
+cases with known-good and known-bad fixtures.
 
 ## Area Status
 
@@ -49,7 +51,7 @@ console, and `lkjagent gpt-log`.
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
 | GPT handoff log | implemented | runtime and CLI write one current Markdown snapshot |
-| Mechanical benchmarks | partially implemented | owner failure cases are not fully covered |
+| Mechanical benchmarks | partially implemented | owner failure cases are covered by corpus fixtures; compose smoke is still pending |
 
 ## Open Work
 

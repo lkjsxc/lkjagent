@@ -14,4 +14,6 @@ this crate.
 - [correction.rs](correction.rs): latest-instruction answer judge.
 - [graph.rs](graph.rs): shortest-path certificate judge.
 - [mod.rs](mod.rs): judge dispatcher.
+- [owner-docs.rs](owner_docs.rs): semantic documentation topology judges.
+- [owner-ops.rs](owner_ops.rs): action recovery, status, and GPT log judges.
 - [program.rs](program.rs): bounded shell program judges.
