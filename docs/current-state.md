@@ -56,7 +56,7 @@ changes.
 | Document audit tool | implemented | topology and graph checks pass local gates |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md` |
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, and punctuation-safe FTS queries have focused tests; maintenance pruning remains open |
-| State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh |
+| State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
 | Runtime recovery | partially implemented | pure active-mode selection exists, maintenance/compaction modes do not render graph-policy refusals, and internal `agent.ask` questions are refused; repeated invalid actions still need full deterministic recovery control |
 | Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned and preserves active graph/fault state; richer structured snapshots remain open |

@@ -1,5 +1,6 @@
 use super::examples::registry_valid_example;
 use super::state::DispatchState;
+use lkjagent_protocol::{render_action, Action, Param};
 
 pub fn repeat_refusal(action_text: &str, state: &mut DispatchState) -> Option<String> {
     if state.last_action_text.as_deref() != Some(action_text) {
@@ -97,12 +98,31 @@ fn preferred_action(policy: &super::state::GraphDispatchPolicy, blocked: Option<
 }
 
 fn allowed(policy: &super::state::GraphDispatchPolicy, blocked: Option<&str>, tool: &str) -> bool {
+    if tool == "graph.transition" && policy.legal_transitions.is_empty() {
+        return false;
+    }
     blocked != Some(tool) && policy.allowed_tools.iter().any(|allowed| allowed == tool)
 }
 
 fn example_for(policy: &super::state::GraphDispatchPolicy, blocked: Option<&str>) -> String {
     let preferred = preferred_action(policy, blocked);
+    if preferred == "graph.transition" {
+        return transition_example(policy);
+    }
     registry_valid_example(&preferred).unwrap_or_else(|| "none".to_string())
+}
+
+fn transition_example(policy: &super::state::GraphDispatchPolicy) -> String {
+    let Some(target) = policy.legal_transitions.first() else {
+        return "No legal transition is currently admitted.".to_string();
+    };
+    render_action(&Action::new(
+        "graph.transition",
+        vec![
+            Param::new("target", target),
+            Param::new("reason", "Use an admitted graph transition"),
+        ],
+    ))
 }
 
 fn join_or_none(values: &[String]) -> String {
