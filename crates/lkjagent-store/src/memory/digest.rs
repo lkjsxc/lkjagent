@@ -12,7 +12,10 @@ pub fn digest(
 ) -> StoreResult<Vec<MemoryRow>> {
     let mut selected = Vec::new();
     let mut remaining = budget;
-    if let Some(row) = task_summary_id.and_then(|id| get(conn, id).transpose()).transpose()? {
+    if let Some(row) = task_summary_id
+        .and_then(|id| get(conn, id).transpose())
+        .transpose()?
+    {
         if row.tokens <= remaining {
             remaining -= row.tokens;
             selected.push(row);

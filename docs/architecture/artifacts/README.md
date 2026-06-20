@@ -23,5 +23,5 @@ completion evidence.
 
 ## Status
 
-partially implemented through document scaffold profiles and audit checks;
-explicit artifact tools, manifest adoption, and repair remain open.
+partially implemented through document scaffold profiles, artifact tool
+wrappers, and audit checks. Manifest adoption and repair remain open.

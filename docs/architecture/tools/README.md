@@ -17,7 +17,7 @@ prompt and behavior cannot drift.
 - [fs.md](fs.md): fs.read, fs.write, fs.edit, fs.list, fs.search, fs.stat, fs.mkdir, and fs.batch_write.
 - [workspace.md](workspace.md): workspace.summary and repository-shape output.
 - [verification-tools.md](verification-tools.md): verify.cargo and verify.xtask direct gates.
-- [doc-tools.md](doc-tools.md): doc.scaffold and doc.audit document topology tools.
+- [doc-tools.md](doc-tools.md): doc and artifact topology tools.
 - [shell.md](shell.md): shell.run, the escape hatch and its capture rules.
 - [queue-ops.md](queue-ops.md): queue.list and queue mutation actions.
 - [memory-ops.md](memory-ops.md): memory.save, memory.find, and memory.prune contracts.

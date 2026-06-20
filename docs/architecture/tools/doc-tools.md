@@ -20,6 +20,25 @@ sequence-only names, graph manifest presence, graph references, line caps, and
 optional file-count target. Passing audits can satisfy document-structure
 evidence when the active graph gate accepts that evidence.
 
+## artifact.plan
+
+Plans a semantic content artifact without writing files. Parameters are
+`root`, `title`, `kind`, optional `scale`, and optional `sections`.
+
+## artifact.apply
+
+Writes a semantic artifact scaffold by reusing the document planner and writer.
+Parameters are `root`, optional `title`, optional `kind`, optional `mode`, and
+optional `sections`. The output includes README files and `.lkj-doc-graph.md`
+as the current manifest.
+
+## artifact.audit
+
+Audits a semantic artifact root. Parameters are `root`, optional `kind`,
+optional `count`, and optional `mode`. When `kind` is story or cookbook, audit
+rejects a generic project-doc manifest for that artifact request.
+
 ## Status
 
-partially implemented.
+partially implemented; doc tools and artifact wrappers exist. Root adoption and
+repair planning remain open.

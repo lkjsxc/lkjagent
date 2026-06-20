@@ -1,7 +1,7 @@
 use super::runner::ResidentDaemon;
 use crate::graph_state::render_state;
-use lkjagent_graph::{admitted_targets, source_graph};
 use crate::mode::ActiveModePolicy;
+use lkjagent_graph::{admitted_targets, source_graph};
 use lkjagent_tools::dispatch::{EffectivePolicy, GraphDispatchPolicy};
 
 impl ResidentDaemon {
@@ -62,9 +62,10 @@ fn effective_policy(
                 blocked_tools: graph.blocked_tools.clone(),
                 shell_allowed: graph.shell_allowed,
                 completion_allowed: graph.completion_ready,
-                reason: graph.blocked_reason.clone().unwrap_or_else(|| {
-                    "tool is not admitted by the active graph node".to_string()
-                }),
+                reason: graph
+                    .blocked_reason
+                    .clone()
+                    .unwrap_or_else(|| "tool is not admitted by the active graph node".to_string()),
                 preferred_next_action: mode_policy.preferred_next_action.to_string(),
             };
         }
@@ -81,7 +82,10 @@ fn effective_policy(
             .iter()
             .map(|tool| (*tool).to_string())
             .collect(),
-        shell_allowed: mode_policy.allowed_tools.iter().any(|tool| *tool == "shell.run"),
+        shell_allowed: mode_policy
+            .allowed_tools
+            .iter()
+            .any(|tool| *tool == "shell.run"),
         completion_allowed: mode_policy.mode.allows_completion(),
         reason: format!("tool is not admitted by {:?} active mode", mode_policy.mode),
         preferred_next_action: mode_policy.preferred_next_action.to_string(),

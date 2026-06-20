@@ -17,6 +17,26 @@ use crate::error::{ToolError, ToolResult};
 pub use model::ScaffoldProfile;
 use model::{ScaffoldInput, ScaffoldMode};
 
+pub fn plan(
+    root: &str,
+    kind: &str,
+    count: &str,
+    mode: &str,
+    title: &str,
+    sections: &str,
+) -> ToolResult<String> {
+    let input = scaffold_input(root, kind, count, mode, title, sections)?;
+    let plan = profile::semantic_doc_plan(&input)?;
+    Ok(format!(
+        "document plan created\nroot={}\nkind={}\nprofile={:?}\nmode={}\nfiles={}\nmanifest=.lkj-doc-graph.md\nwrites=0",
+        input.root,
+        input.kind,
+        plan.profile,
+        input.mode.as_str(),
+        plan.files.len()
+    ))
+}
+
 pub fn scaffold(
     workspace: &Path,
     root: &str,
@@ -26,6 +46,27 @@ pub fn scaffold(
     title: &str,
     sections: &str,
 ) -> ToolResult<String> {
+    let input = scaffold_input(root, kind, count, mode, title, sections)?;
+    let plan = profile::semantic_doc_plan(&input)?;
+    let files = plan.markdown_count();
+    write::write_plan(workspace, &plan)?;
+    Ok(format!(
+        "document scaffold created\nroot={}\nkind={}\nprofile={:?}\nmode={}\nfiles={files}\nreadme=present\ngraph=.lkj-doc-graph.md",
+        input.root,
+        input.kind,
+        plan.profile,
+        input.mode.as_str()
+    ))
+}
+
+fn scaffold_input(
+    root: &str,
+    kind: &str,
+    count: &str,
+    mode: &str,
+    title: &str,
+    sections: &str,
+) -> ToolResult<ScaffoldInput> {
     let input = ScaffoldInput {
         root: root.trim().to_string(),
         kind: value_or(kind, "documentation"),
@@ -40,16 +81,7 @@ pub fn scaffold(
     if input.title.is_empty() {
         return Err(ToolError::invalid("doc.scaffold title must not be empty"));
     }
-    let plan = profile::semantic_doc_plan(&input)?;
-    let files = plan.markdown_count();
-    write::write_plan(workspace, &plan)?;
-    Ok(format!(
-        "document scaffold created\nroot={}\nkind={}\nprofile={:?}\nmode={}\nfiles={files}\nreadme=present\ngraph=.lkj-doc-graph.md",
-        input.root,
-        input.kind,
-        plan.profile,
-        input.mode.as_str()
-    ))
+    Ok(input)
 }
 
 pub fn audit(workspace: &Path, root: &str, count: &str, mode: &str) -> ToolResult<String> {

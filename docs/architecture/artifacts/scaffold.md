@@ -23,5 +23,5 @@ hash, root role, README title, manifest artifact key, and section role.
 
 ## Status
 
-partially implemented for story and cookbook profile paths. Root adoption and
-repair planning remain open.
+partially implemented for story and cookbook profile paths and `artifact.apply`.
+Root adoption and repair planning remain open.

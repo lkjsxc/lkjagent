@@ -76,7 +76,12 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
     }
     match (tool, name) {
         ("doc.scaffold", "root") | ("doc.audit", "root") => "docs",
+        ("artifact.plan", "root") | ("artifact.apply", "root") | ("artifact.audit", "root") => {
+            "stories/example-story"
+        }
         ("doc.scaffold", "title") => "Project Documentation",
+        ("artifact.plan", "title") => "Example Story",
+        ("artifact.plan", "kind") => "story",
         ("fs.read", "path") | ("fs.stat", "path") | ("fs.mkdir", "path") => "README.md",
         ("fs.write", "path") | ("fs.edit", "path") | ("fs.patch", "path") => "README.md",
         ("fs.read_many", "paths") => "README.md",
