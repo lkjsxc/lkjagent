@@ -55,6 +55,12 @@ pub enum JudgeKind {
     GraphStateParamRecovery,
     DocScaffoldParamRecovery,
     RecoveryLoopLongStory,
+    GraphPlanExample,
+    MemoryFtsQuery,
+    MaintenanceMemoryDuplicate,
+    PolicyContradiction,
+    GraphNoteKindRecovery,
+    BreadCookbookArtifact,
     StatusAccounting,
     GptHandoffLog,
 }

@@ -4,6 +4,7 @@ pub mod bundle;
 pub mod correction;
 pub mod graph;
 pub mod owner_docs;
+pub mod owner_loop_ops;
 pub mod owner_ops;
 pub mod program;
 
@@ -27,6 +28,14 @@ pub fn judge_task(task: &BenchmarkTask, workspace: &Path) -> BenchResult<JudgeOu
         JudgeKind::GraphStateParamRecovery => owner_ops::graph_state_recovery(workspace),
         JudgeKind::DocScaffoldParamRecovery => owner_ops::doc_scaffold_recovery(workspace),
         JudgeKind::RecoveryLoopLongStory => owner_ops::recovery_loop_long_story(workspace),
+        JudgeKind::GraphPlanExample => owner_loop_ops::graph_plan_example(workspace),
+        JudgeKind::MemoryFtsQuery => owner_loop_ops::memory_fts_query(workspace),
+        JudgeKind::MaintenanceMemoryDuplicate => {
+            owner_loop_ops::maintenance_memory_duplicate(workspace)
+        }
+        JudgeKind::PolicyContradiction => owner_loop_ops::policy_contradiction(workspace),
+        JudgeKind::GraphNoteKindRecovery => owner_loop_ops::graph_note_kind_recovery(workspace),
+        JudgeKind::BreadCookbookArtifact => owner_loop_ops::bread_cookbook_artifact(workspace),
         JudgeKind::StatusAccounting => owner_ops::status_accounting(workspace),
         JudgeKind::GptHandoffLog => owner_ops::gpt_handoff_log(workspace),
     };
