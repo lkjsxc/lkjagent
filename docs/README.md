@@ -27,6 +27,19 @@ directories with short focused files.
 - `vision/README.md` `vision/north-star.md` `vision/principles.md` `vision/scope.md`
 - `product/README.md` `product/daemon.md` `product/cli.md` `product/queue.md` `product/observability.md`
 - `architecture/README.md` `architecture/overview.md`
+- `architecture/document-structure/README.md` `architecture/document-structure/tree-contract.md`
+  `architecture/document-structure/network-contract.md` `architecture/document-structure/naming.md`
+  `architecture/document-structure/scaffold-profiles.md` `architecture/document-structure/audit.md`
+  `architecture/document-structure/completion-gates.md`
+- `architecture/action-reliability/README.md` `architecture/action-reliability/parameter-contract.md`
+  `architecture/action-reliability/recovery.md` `architecture/action-reliability/normalization.md`
+  `architecture/action-reliability/error-messages.md`
+- `architecture/state-model/README.md` `architecture/state-model/multi-state.md`
+  `architecture/state-model/state-intensity.md` `architecture/state-model/transition-quality.md`
+  `architecture/state-model/owner-input.md`
+- `architecture/observability/README.md` `architecture/observability/token-ledger.md`
+  `architecture/observability/console-deck.md` `architecture/observability/gpt-log.md`
+  `architecture/observability/status-format.md`
 - `architecture/runtime/README.md` `architecture/runtime/agent-loop.md` `architecture/runtime/daemon-process.md`
   `architecture/runtime/queue-intake.md` `architecture/runtime/self-maintenance.md`
 - `architecture/state-graph/README.md` `architecture/state-graph/model.md`

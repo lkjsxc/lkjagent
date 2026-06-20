@@ -9,7 +9,7 @@ read-only and never perturbs the loop: looking at the agent costs it nothing.
 
 | Surface | Content |
 | --- | --- |
-| `lkjagent status` | Daemon state, queue depth, open task, question, error, turns, context usage, last compaction |
+| `lkjagent status` | Daemon state, queue depth, open task, question, error, turns, context usage, token usage, GPT log |
 | `lkjagent log` | Transcript events in order: messages, actions, observations, notices, queue mutations, compactions |
 | `lkjagent console` | Owner screen with transcript top, pending preview, bottom status deck, and send prompt |
 | `lkjagent memory` | Full-text search over distilled memory entries |
@@ -32,10 +32,12 @@ and `--full` prints whole payloads.
 
 ## Context Usage
 
-`lkjagent status` reports the live token ledger: prefix size, log size,
-remaining headroom, and the compaction threshold from
-[../architecture/context/budgets.md](../architecture/context/budgets.md).
-This makes context pollution visible long before it hurts.
+`lkjagent status` reports prefix size, log size, remaining headroom, and the
+compaction threshold from [../architecture/context/budgets.md](../architecture/context/budgets.md).
+The desired display also includes endpoint input, output, cached input, total
+tokens, context fraction, pressure, and the current GPT handoff path. That
+expanded accounting is tracked in
+[../architecture/observability/](../architecture/observability/README.md).
 
 ## Boundaries
 
@@ -46,4 +48,4 @@ Anything fancier is graph-guided shell work the agent can build on demand.
 
 ## Status
 
-implemented.
+partially implemented.
