@@ -10,6 +10,7 @@ mod memory_tools;
 mod normalize;
 mod params;
 mod queue_tools;
+mod refusal;
 mod routes;
 mod routes_doc;
 mod routes_verify;
@@ -24,6 +25,7 @@ use crate::error::{ToolError, ToolResult};
 use crate::observe::{self, OutputFrame};
 pub use examples::registry_valid_example;
 use normalize::{normalize_action, NormalizationDecision, NormalizationNote};
+use refusal::{graph_policy_refusal, repeat_refusal};
 use routes::route;
 pub use state::{
     DispatchOutput, DispatchState, GraphDispatchPolicy, GraphEvidenceRecord, ReadRecord,
@@ -47,18 +49,9 @@ pub fn dispatch_with_text(
     conn: &mut Connection,
     state: &mut DispatchState,
 ) -> DispatchOutput {
-    if state.last_action_text.as_deref() == Some(action_text) {
-        state.repeat_count = state.repeat_count.saturating_add(1);
-        let prior = state
-            .last_frame_ref
-            .map_or_else(|| "previous frame".to_string(), |id| format!("frame {id}"));
-        return finish(
-            state,
-            action_text,
-            observe::notice("error", format!("repeat action refused; see {prior}")),
-        );
+    if let Some(message) = repeat_refusal(action_text, state) {
+        return finish(state, action_text, observe::notice("error", message));
     }
-    state.repeat_count = 0;
     let (normalized, notes) = match normalize_action(action) {
         NormalizationDecision::Unchanged(action) => (action, Vec::new()),
         NormalizationDecision::Normalized { action, notes } => (action, notes),
@@ -99,33 +92,6 @@ fn with_normalization(
         observe::OutputKind::Notice { kind } => render_notice(kind, &output.content),
     };
     output
-}
-
-fn graph_policy_refusal(tool: &str, state: &DispatchState) -> Option<String> {
-    if tool == "agent.done" {
-        return None;
-    }
-    let policy = state.graph_policy.as_ref()?;
-    if policy.allowed_tools.iter().any(|allowed| allowed == tool) {
-        if tool == "shell.run" && !policy.shell_allowed {
-            return Some(format!(
-                "graph policy refused shell.run; node={} is not a shell-admitted node",
-                policy.active_node
-            ));
-        }
-        return None;
-    }
-    let allowed = policy
-        .allowed_tools
-        .iter()
-        .take(4)
-        .cloned()
-        .collect::<Vec<_>>()
-        .join(", ");
-    Some(format!(
-        "graph policy refused {tool}; node={} phase={}; allowed next tools: {allowed}",
-        policy.active_node, policy.phase
-    ))
 }
 
 pub(crate) fn observe_result(
