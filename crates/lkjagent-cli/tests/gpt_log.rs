@@ -59,3 +59,48 @@ fn gpt_log_command_writes_and_prints_single_current_markdown_file() -> TestResul
     assert_eq!(fs::read_to_string(path)?, printed.stdout);
     Ok(())
 }
+
+#[test]
+fn gpt_log_uses_large_manual_handoff_budget() -> TestResult<()> {
+    let data = temp_data("gpt-log-budget")?;
+    let conn = open_store(&data)?;
+    lkjagent_runtime::graph_state::open_owner_case(
+        &conn,
+        "Prepare a manual ChatGPT handoff.",
+        "2026-06-20T00:00:00Z",
+    )?;
+    for index in 0..30 {
+        append_event(
+            &conn,
+            Some(1),
+            EventKind::Observation,
+            &format!("event-{index:03} {}", "context ".repeat(40)),
+            index + 1,
+            "2026-06-20T00:00:00Z",
+        )?;
+    }
+    for index in 30..90 {
+        append_event(
+            &conn,
+            Some(1),
+            EventKind::Observation,
+            &format!("event-{index:03} {}", "large-context ".repeat(200)),
+            index + 1,
+            "2026-06-20T00:00:00Z",
+        )?;
+    }
+
+    let printed = run_cli([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "gpt-log",
+        "--print",
+    ]);
+
+    assert_eq!(printed.code, 0);
+    assert!(printed.stdout.chars().count() <= 100_000);
+    assert!(printed.stdout.contains("event-078"));
+    assert!(printed.stdout.contains("event-089"));
+    assert!(!printed.stdout.contains("event-000"));
+    Ok(())
+}
