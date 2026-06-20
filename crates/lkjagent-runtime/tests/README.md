@@ -12,6 +12,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [automatic_maintenance.rs](automatic_maintenance.rs): daemon idle maintenance and owner preemption fixtures.
 - [budget_recovery.rs](budget_recovery.rs): exhausted task budget waiting and owner-send resume fixtures.
 - [daemon_loop.rs](daemon_loop.rs): resident queue, endpoint, tool, ask, and error fixtures.
+- [document_completion.rs](document_completion.rs): document audit evidence completion fixtures.
 - [endpoint_retry.rs](endpoint_retry.rs): endpoint backoff deadline fixture.
 - [fault_wait.rs](fault_wait.rs): repeated fault graph recovery routing fixtures.
 - [file_count_aggregate_daemon.rs](file_count_aggregate_daemon.rs): aggregate count auto-scaffold fixture.

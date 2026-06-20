@@ -22,4 +22,6 @@ action. It does not claim the requested artifact is done.
 
 ## Status
 
-design, implementation pending
+partially implemented; `doc.scaffold` no longer satisfies document-structure
+evidence and failed `doc.audit` output does not satisfy it. Content-bearing
+artifact audits and blocked handoff states remain open.

@@ -20,15 +20,34 @@ pub(super) fn add_document_evidence(
         None,
         effects,
     );
-    let structured = ensure_evidence(
+    let structured = if output.content.contains("document audit passed") {
+        ensure_evidence(
+            graph,
+            "document-structure",
+            EvidenceKind::File,
+            output,
+            None,
+            effects,
+        )
+    } else {
+        false
+    };
+    observed || structured
+}
+
+pub(super) fn add_document_scaffold_observation(
+    graph: &mut TaskGraphState,
+    output: &DispatchOutput,
+    effects: &mut Vec<Effect>,
+) -> bool {
+    ensure_evidence(
         graph,
-        "document-structure",
-        EvidenceKind::File,
+        "observation",
+        EvidenceKind::Observation,
         output,
         None,
         effects,
-    );
-    observed || structured
+    )
 }
 
 pub(super) fn add_shell_evidence(
