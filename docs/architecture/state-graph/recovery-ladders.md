@@ -36,6 +36,22 @@ example for the rejected tool, and expose only `graph.state`, `fs.list`,
 Waiting is valid only for a concrete owner decision, context invalidity,
 endpoint outage policy, or sandbox boundary.
 
+`graph.next` is diagnostic. It may inspect one fault route, but repeating it
+in the same recovery state records diagnostic exhaustion and forces a
+different action class: `graph.recover`, a legal transition, an unused
+non-mutating native tool, or a smaller plan step.
+
+Recovery nodes never allow endless inspection. Every inspection route has a
+state-changing consequence: alternate tool, smaller scope, shell-admitted
+escape, blocked step, or owner-required question.
+
+`graph.note` accepts only constraint, assumption, risk, decision, question,
+invariant, success, and path. Registry examples and refusal text must render
+only those accepted kinds.
+
+Waiting is forbidden when an internal transition, alternate native tool, or
+smaller independent step can continue.
+
 ## Status
 
 implemented.

@@ -16,6 +16,16 @@ target, count mode, root README status, docs/main split, section map, coverage
 map, first and last main path, sequence status, audit status, and repair
 needs.
 
+Long-form content requests are document deliverables when the owner asks for a
+long story, novel, book, large guide, corpus, many files, structured output, or
+when a write attempt hits max tokens or an unclosed content tag. These tasks
+must not use one giant `fs.write`.
+
+The route creates a semantic document root, a root README table of contents,
+semantic child directories or files, bounded sections, and an audit report.
+Names such as part-001.md are valid only when the owner asks for numbered
+parts.
+
 ## Completion
 
 Document completion requires README or index evidence, topology evidence,

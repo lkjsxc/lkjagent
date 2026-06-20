@@ -30,25 +30,26 @@ at the next boundary.
 
 ## Procedure
 
-1. Distillation turns. The harness injects a compaction notice directing the
-   model to preserve reusable lessons through `memory.save`. The graph state
-   itself is preserved by the harness through a typed `CompactionPlan`.
-2. Digest rebuild. The harness rebuilds the memory digest from the memory
+1. Runtime snapshot. The harness writes a typed `CompactionPlan` that
+   preserves graph state, recovery state, and the active task summary.
+2. Optional maintenance distillation. Reusable lessons may be written through
+   `memory.save` only during maintenance or a node whose graph policy admits
+   memory tools. Forced compaction never waits for a model action.
+3. Digest rebuild. The harness rebuilds the memory digest from the memory
    store within its budget: top entries by rank, task summary first.
-3. Prefix rebuild. A fresh prefix is assembled: identity, grammar and
+4. Prefix rebuild. A fresh prefix is assembled: identity, grammar and
    registry, graph state, workspace brief, new digest, per
    [../protocol/system-prompt.md](../protocol/system-prompt.md).
-4. Log restart. The new log opens with one notice frame holding the task
+5. Log restart. The new log opens with one notice frame holding the task
    summary (or the maintenance state) so the model re-enters mid-stride.
-5. Transcript record. One compaction event stores the before and after token
+6. Transcript record. One compaction event stores the before and after token
    counts, memory row ids, and the policy values used. The transcript itself
    is never compacted; only the window is.
 
-The new window must land at or under the post-compaction target; if
-distillation cannot fit the task summary inside the digest budget, the
-compaction fails loudly as an error notice and the daemon pauses the task
-for owner attention. Silent loss is forbidden by
-[../../agent/honest-state.md](../../agent/honest-state.md).
+The new window must land at or under the post-compaction target. If structured
+state cannot fit inside the digest budget, compaction fails loudly as an error
+notice and the daemon pauses the task for owner attention. Silent loss is
+forbidden by [../../agent/honest-state.md](../../agent/honest-state.md).
 
 ## What Survives Where
 

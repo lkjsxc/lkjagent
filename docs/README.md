@@ -80,6 +80,7 @@ directories with short focused files.
 - `execution/current-work/README.md` `execution/current-work/owner-reported-failures.md`
   `execution/current-work/action-fault-recovery.md` `execution/current-work/document-structure-redesign.md`
   `execution/current-work/context-accounting.md` `execution/current-work/multi-state-runtime.md`
+  `execution/current-work/runtime-recovery-controller.md`
   `execution/current-work/gpt-log.md` `execution/current-work/verification-plan.md`
 - `execution/tasks/README.md` `execution/tasks/bootstrap-workspace.md` `execution/tasks/xtask-checks.md`
   `execution/tasks/llm-client.md` `execution/tasks/protocol-parser.md` `execution/tasks/context-engine.md`

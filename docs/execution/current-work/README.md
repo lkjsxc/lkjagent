@@ -13,13 +13,16 @@ observability, GPT handoff logging, and final verification.
 - [document-structure-redesign.md](document-structure-redesign.md): scaffold and audit redesign.
 - [context-accounting.md](context-accounting.md): context and token display work.
 - [multi-state-runtime.md](multi-state-runtime.md): neutral task-track modeling work.
+- [runtime-recovery-controller.md](runtime-recovery-controller.md): deterministic recovery controller work.
 - [gpt-log.md](gpt-log.md): single handoff-log work.
 - [verification-plan.md](verification-plan.md): focused tests, benchmarks, and compose gates.
 
 ## Reading Paths
 
-- Implementation path: document-structure-redesign, action-fault-recovery, then context-accounting.
-- Diagnosis path: owner-reported-failures, multi-state-runtime, then gpt-log.
+- Implementation path: document-structure-redesign, action-fault-recovery,
+  runtime-recovery-controller, then context-accounting.
+- Diagnosis path: owner-reported-failures, multi-state-runtime,
+  runtime-recovery-controller, then gpt-log.
 - Verification path: verification-plan, then the gate commands it names.
 
 ## Cross-Links
