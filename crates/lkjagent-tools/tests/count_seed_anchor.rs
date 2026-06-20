@@ -22,7 +22,8 @@ fn count_seed_main_anchor_uses_content_topic_not_count_command() -> TestResult<(
 
     let readme = fs::read_to_string(workspace.join("structured-output/README.md"))?;
     assert!(readme.contains("- Use GPT-5.3-Codex-Spark thrift"));
-    let first_part = fs::read_to_string(workspace.join("structured-output/main/part-001.md"))?;
+    let first_part =
+        fs::read_to_string(workspace.join(format!("structured-output/{}", support::main_path(1))))?;
     assert!(first_part.contains(
         "Local objective: Turn \"a large structured story deliverable\" into this file's distinct contribution."
     ));
@@ -46,7 +47,8 @@ fn count_seed_japanese_main_anchor_skips_count_and_budget_clauses() -> TestResul
 
     let readme = fs::read_to_string(workspace.join("structured-output/README.md"))?;
     assert!(readme.contains("- 合計100ファイルぐらいで"));
-    let first_part = fs::read_to_string(workspace.join("structured-output/main/part-001.md"))?;
+    let first_part =
+        fs::read_to_string(workspace.join(format!("structured-output/{}", support::main_path(1))))?;
     assert!(first_part.contains(
         "局所目的: 要求「15個の設計メモと本編を含む大きな物語成果物」をこのファイル固有の成果に変換します。"
     ));
@@ -72,7 +74,7 @@ fn count_seed_japanese_main_anchor_trims_parenthetical_file_total_prefix() -> Te
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("100ファイル（そのドキュメント"));
-    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first_part = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(
         first_part.contains("局所目的: 要求「大きな物語」をこのファイル固有の成果に変換します。")
     );
@@ -97,7 +99,7 @@ fn count_seed_english_main_anchor_trims_parenthetical_file_total_suffix() -> Tes
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("Create a large story in about 100 files"));
-    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first_part = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(first_part.contains(
         "Local objective: Turn \"a large story\" into this file's distinct contribution."
     ));
@@ -122,7 +124,7 @@ fn count_seed_english_main_anchor_trims_markdown_count_suffix() -> TestResult<()
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("about a hundred markdown files"));
-    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first_part = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(first_part.contains(
         "Local objective: Turn \"a large story\" into this file's distinct contribution."
     ));
@@ -147,7 +149,7 @@ fn count_seed_english_report_skips_docs_total_constraint_anchor() -> TestResult<
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("Kind contract: audit this deliverable as a report"));
-    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first_part = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(first_part.contains("### Analysis Role"));
     assert!(first_part.contains(
         "Local objective: Turn \"a market research dossier with 18 analysis memos and ordered main report…\""
@@ -173,7 +175,7 @@ fn count_seed_english_runbook_not_story_specific_stays_guide() -> TestResult<()>
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("Kind contract: audit this deliverable as a guide"));
-    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first_part = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(first_part.contains("### Procedure Role"));
     assert!(!first_part.contains("### Scene Role"));
     assert!(first_part.contains(

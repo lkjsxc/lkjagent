@@ -93,6 +93,9 @@ fn rest_segment_mentions_main(text: &str, split: Span) -> bool {
 fn total_count_candidate(text: &str, number: Span, split: Span) -> bool {
     text.get(number.start..split.start).is_some_and(|segment| {
         let lower = segment.to_lowercase();
+        if lower.contains("合計") || lower.contains("総計") || lower.contains("合わせて") {
+            return true;
+        }
         lower
             .split(|ch: char| !ch.is_alphanumeric())
             .any(|word| matches!(word, "total" | "altogether" | "overall"))
@@ -133,8 +136,12 @@ fn phrase_mentions_main_unit(phrase: &str) -> bool {
 }
 
 fn allocation_after_number(text: &str, number: Span, split: Span) -> bool {
-    text.get(number.end..split.start)
-        .is_some_and(|between| between.contains('使') || between.contains("用意"))
+    text.get(number.end..split.start).is_some_and(|between| {
+        between.contains('使')
+            || between.contains("用意")
+            || between.contains("作り")
+            || between.contains("作成")
+    })
 }
 
 fn jp_main_unit_marker(phrase: &str) -> bool {

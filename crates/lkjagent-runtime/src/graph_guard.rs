@@ -47,7 +47,7 @@ fn count_instruction(kind: CountKind, mode: CountMode) -> &'static str {
             "exact file count active; keep the act payload under about 1200 chars; shell.run starts in workspace, so do not cd /workspace; use one compact shell.run command with direct /bin/sh loops and printf templates for bulk creation and count verification; no brace expansion, cat heredocs, bash scripts, literal bodies, or one fs.write per file"
         }
         (CountKind::File, CountMode::Approximate) => {
-            "approximate file count active; keep the act payload under about 1200 chars; shell.run starts in workspace, so do not cd /workspace; use one compact shell.run command with direct /bin/sh loops and printf templates for bulk creation and count verification; no brace expansion, cat heredocs, bash scripts, literal bodies, or one fs.write per file"
+            "approximate file scale active; treat the number as a size hint, use recursive directories for large outputs, keep the act payload under about 1200 chars; shell.run starts in workspace, so do not cd /workspace; use one compact shell.run command with direct /bin/sh loops and printf templates for bulk creation and tolerance verification; no brace expansion, cat heredocs, bash scripts, literal bodies, or one fs.write per file"
         }
         (CountKind::Markdown, CountMode::Exact) => {
             "exact markdown count active; keep the act payload under about 1200 chars; shell.run starts in workspace, so do not cd /workspace; use one compact shell.run command with direct /bin/sh loops and printf templates for bulk markdown creation and count verification; no brace expansion, cat heredocs, bash scripts, literal bodies, or one fs.write per file"

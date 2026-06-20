@@ -21,11 +21,11 @@ fn count_seed_honors_sentence_split_allocation() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     assert_counts(&root, 28, 69)?;
-    assert!(root.join("docs/design-028.md").exists());
-    assert!(!root.join("docs/design-029.md").exists());
-    assert!(root.join("main/part-069.md").exists());
-    assert!(!root.join("main/part-070.md").exists());
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    assert!(root.join(support::design_path(28)).exists());
+    assert!(!root.join(support::design_path(29)).exists());
+    assert!(root.join(support::main_path(69)).exists());
+    assert!(!root.join(support::main_path(70)).exists());
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(first.contains("### Analysis Role"));
     Ok(())
 }
@@ -44,10 +44,10 @@ fn count_seed_honors_source_packets_without_file_noun() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     assert_counts(&root, 28, 69)?;
-    assert!(root.join("docs/design-028.md").exists());
-    assert!(!root.join("docs/design-029.md").exists());
-    assert!(root.join("main/part-069.md").exists());
-    assert!(!root.join("main/part-070.md").exists());
+    assert!(root.join(support::design_path(28)).exists());
+    assert!(!root.join(support::design_path(29)).exists());
+    assert!(root.join(support::main_path(69)).exists());
+    assert!(!root.join(support::main_path(70)).exists());
     Ok(())
 }
 
@@ -65,10 +65,10 @@ fn count_seed_honors_split_into_source_packets() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     assert_counts(&root, 28, 69)?;
-    assert!(root.join("docs/design-028.md").exists());
-    assert!(!root.join("docs/design-029.md").exists());
-    assert!(root.join("main/part-069.md").exists());
-    assert!(!root.join("main/part-070.md").exists());
+    assert!(root.join(support::design_path(28)).exists());
+    assert!(!root.join(support::design_path(29)).exists());
+    assert!(root.join(support::main_path(69)).exists());
+    assert!(!root.join(support::main_path(70)).exists());
     Ok(())
 }
 
@@ -86,10 +86,10 @@ fn count_seed_honors_use_source_packets() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     assert_counts(&root, 28, 69)?;
-    assert!(root.join("docs/design-028.md").exists());
-    assert!(!root.join("docs/design-029.md").exists());
-    assert!(root.join("main/part-069.md").exists());
-    assert!(!root.join("main/part-070.md").exists());
+    assert!(root.join(support::design_path(28)).exists());
+    assert!(!root.join(support::design_path(29)).exists());
+    assert!(root.join(support::main_path(69)).exists());
+    assert!(!root.join(support::main_path(70)).exists());
     Ok(())
 }
 
@@ -107,10 +107,10 @@ fn count_seed_honors_research_notes_without_file_noun() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     assert_counts(&root, 24, 73)?;
-    assert!(root.join("docs/design-024.md").exists());
-    assert!(!root.join("docs/design-025.md").exists());
-    assert!(root.join("main/part-073.md").exists());
-    assert!(!root.join("main/part-074.md").exists());
+    assert!(root.join(support::design_path(24)).exists());
+    assert!(!root.join(support::design_path(25)).exists());
+    assert!(root.join(support::main_path(73)).exists());
+    assert!(!root.join(support::main_path(74)).exists());
     Ok(())
 }
 
@@ -128,10 +128,10 @@ fn count_seed_honors_evidence_summaries_without_file_noun() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     assert_counts(&root, 24, 73)?;
-    assert!(root.join("docs/design-024.md").exists());
-    assert!(!root.join("docs/design-025.md").exists());
-    assert!(root.join("main/part-073.md").exists());
-    assert!(!root.join("main/part-074.md").exists());
+    assert!(root.join(support::design_path(24)).exists());
+    assert!(!root.join(support::design_path(25)).exists());
+    assert!(root.join(support::main_path(73)).exists());
+    assert!(!root.join(support::main_path(74)).exists());
     Ok(())
 }
 
@@ -148,9 +148,9 @@ fn count_seed_does_not_treat_total_sentence_as_split_allocation() -> TestResult<
 
     let root = workspace.join("structured-output");
     assert_counts(&root, 12, 85)?;
-    assert!(root.join("docs/design-012.md").exists());
-    assert!(!root.join("docs/design-013.md").exists());
-    assert!(root.join("main/part-085.md").exists());
+    assert!(root.join(support::design_path(12)).exists());
+    assert!(!root.join(support::design_path(13)).exists());
+    assert!(root.join(support::main_path(85)).exists());
     Ok(())
 }
 
@@ -168,9 +168,9 @@ fn count_seed_does_not_treat_same_clause_total_as_split_allocation() -> TestResu
 
     let root = workspace.join("structured-output");
     assert_counts(&root, 12, 85)?;
-    assert!(root.join("docs/design-012.md").exists());
-    assert!(!root.join("docs/design-013.md").exists());
-    assert!(root.join("main/part-085.md").exists());
+    assert!(root.join(support::design_path(12)).exists());
+    assert!(!root.join(support::design_path(13)).exists());
+    assert!(root.join(support::main_path(85)).exists());
     Ok(())
 }
 

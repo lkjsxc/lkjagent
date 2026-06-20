@@ -1,6 +1,6 @@
 use lkjagent_graph::{CaseStatus, GraphNodeId, TaskPhase};
 use lkjagent_tools::control::CompletionGuard;
-use lkjagent_tools::count_guard::CountGuard;
+use lkjagent_tools::count_guard::{CountGuard, CountMode};
 use lkjagent_tools::count_seed::scaffold_counted_documents;
 use lkjagent_tools::observe;
 use rusqlite::Connection;
@@ -38,7 +38,7 @@ impl ResidentDaemon {
         self.append_output_frame(conn, now, &output.kind, output.rendered)?;
         if let Some(summary) = evidence_summary {
             self.record_scaffold_graph_evidence(conn, now, &summary, Some("structured-output"))?;
-            self.close_counted_scaffold(conn, now, guard.target, &summary)?;
+            self.close_counted_scaffold(conn, now, guard, &summary)?;
         }
         Ok(())
     }
@@ -47,12 +47,10 @@ impl ResidentDaemon {
         &mut self,
         conn: &mut Connection,
         now: &str,
-        target: usize,
+        guard: CountGuard,
         evidence_summary: &str,
     ) -> RuntimeResult<()> {
-        let summary = format!(
-            "created counted structured-output scaffold with {target} files\n{evidence_summary}"
-        );
+        let summary = close_summary(guard, evidence_summary);
         let close_target = match counted_scaffold_closure(self.state.graph.as_ref()) {
             CountedScaffoldClosure::Admit { target } => target,
             CountedScaffoldClosure::Wait { question } => {
@@ -120,6 +118,19 @@ impl ResidentDaemon {
             }
         }
         self.write_observable(conn)
+    }
+}
+
+fn close_summary(guard: CountGuard, evidence_summary: &str) -> String {
+    match guard.mode {
+        CountMode::Exact => format!(
+            "created counted structured-output scaffold with {} files\n{evidence_summary}",
+            guard.target
+        ),
+        CountMode::Approximate => format!(
+            "created structured-output scaffold at about {}-file scale\n{evidence_summary}",
+            guard.target
+        ),
     }
 }
 

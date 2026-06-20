@@ -29,9 +29,9 @@ fn aggregate_total_auto_scaffold_keeps_hundred_target() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     assert_eq!(file_count(&root)?, 100);
-    assert!(root.join("docs/design-020.md").exists());
-    assert!(!root.join("docs/design-021.md").exists());
-    assert!(root.join("main/part-077.md").exists());
+    assert!(root.join(support::design_path(20)).exists());
+    assert!(!root.join(support::design_path(21)).exists());
+    assert!(root.join(support::main_path(77)).exists());
     assert_eq!(state::get(&conn, "completion guard")?, None);
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
     Ok(())
@@ -56,9 +56,9 @@ fn japanese_artifact_auto_scaffold_routes_to_document_construction() -> TestResu
 
     let root = workspace.join("structured-output");
     assert_eq!(file_count(&root)?, 100);
-    assert!(root.join("docs/design-020.md").exists());
-    assert!(!root.join("docs/design-021.md").exists());
-    assert!(root.join("main/part-077.md").exists());
+    assert!(root.join(support::design_path(20)).exists());
+    assert!(!root.join(support::design_path(21)).exists());
+    assert!(root.join(support::main_path(77)).exists());
     assert_eq!(state::get(&conn, "completion guard")?, None);
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
     Ok(())
@@ -83,9 +83,9 @@ fn architecture_artifact_auto_scaffold_routes_to_document_construction() -> Test
 
     let root = workspace.join("structured-output");
     assert_eq!(file_count(&root)?, 100);
-    assert!(root.join("docs/design-020.md").exists());
-    assert!(!root.join("docs/design-021.md").exists());
-    assert!(root.join("main/part-077.md").exists());
+    assert!(root.join(support::design_path(20)).exists());
+    assert!(!root.join(support::design_path(21)).exists());
+    assert!(root.join(support::main_path(77)).exists());
     assert_eq!(state::get(&conn, "completion guard")?, None);
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
     Ok(())
@@ -110,9 +110,9 @@ fn planning_notes_and_body_files_auto_scaffold() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     assert_eq!(file_count(&root)?, 100);
-    assert!(root.join("docs/design-020.md").exists());
-    assert!(!root.join("docs/design-021.md").exists());
-    assert!(root.join("main/part-077.md").exists());
+    assert!(root.join(support::design_path(20)).exists());
+    assert!(!root.join(support::design_path(21)).exists());
+    assert!(root.join(support::main_path(77)).exists());
     assert_eq!(state::get(&conn, "completion guard")?, None);
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
     Ok(())
@@ -137,9 +137,9 @@ fn japanese_design_and_main_files_auto_scaffold() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     assert_eq!(file_count(&root)?, 100);
-    assert!(root.join("docs/design-020.md").exists());
-    assert!(!root.join("docs/design-021.md").exists());
-    assert!(root.join("main/part-077.md").exists());
+    assert!(root.join(support::design_path(20)).exists());
+    assert!(!root.join(support::design_path(21)).exists());
+    assert!(root.join(support::main_path(77)).exists());
     assert_eq!(state::get(&conn, "completion guard")?, None);
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
     Ok(())

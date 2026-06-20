@@ -60,7 +60,7 @@ impl CountGuard {
         (self.kind == CountKind::Markdown).then_some(self.target)
     }
 
-    fn accepts(self, count: usize) -> bool {
+    pub fn accepts(self, count: usize) -> bool {
         let (lower, upper) = self.bounds();
         (lower..=upper).contains(&count)
     }

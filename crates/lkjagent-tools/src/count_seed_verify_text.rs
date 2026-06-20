@@ -1,5 +1,6 @@
 use crate::count_profile::Language;
 use crate::count_profile_index::design_owner;
+use crate::count_profile_paths::{design_path, main_path};
 use crate::count_profile_stage::{stage_label, stage_range};
 use crate::error::{ToolError, ToolResult};
 
@@ -23,21 +24,9 @@ pub(crate) fn verify_coverage_map(
         let Some((start, end)) = coverage_range(index, docs, main) else {
             continue;
         };
-        require_contains(
-            text,
-            &format!("design-{index:03}.md"),
-            "coverage map design entry",
-        )?;
-        require_contains(
-            text,
-            &format!("main/part-{start:03}.md"),
-            "coverage map range start",
-        )?;
-        require_contains(
-            text,
-            &format!("main/part-{end:03}.md"),
-            "coverage map range end",
-        )?;
+        require_contains(text, &design_path(index), "coverage map design entry")?;
+        require_contains(text, &main_path(start), "coverage map range start")?;
+        require_contains(text, &main_path(end), "coverage map range end")?;
     }
     Ok("ok")
 }
@@ -60,14 +49,10 @@ pub(crate) fn verify_part_ledger(
     }
     verify_progress_map(text, main)?;
     for index in 1..=main {
-        let part = format!("- main/part-{index:03}.md:");
+        let part = format!("- {}:", main_path(index));
         let line = require_line(text, &part, "main index part ledger entry")?;
         if let Some(owner) = design_owner(index, docs, main) {
-            require_contains(
-                line,
-                &format!("docs/design-{owner:03}.md"),
-                "main index design owner",
-            )?;
+            require_contains(line, &design_path(owner), "main index design owner")?;
         }
     }
     Ok("ok")
@@ -97,9 +82,13 @@ fn require_stage_line(text: &str, slot: usize, start: usize, end: usize) -> Tool
 
 fn stage_line(label: &str, start: usize, end: usize, separator: &str) -> String {
     if start == end {
-        format!("- {label}: main/part-{start:03}.md")
+        format!("- {label}: {}", main_path(start))
     } else {
-        format!("- {label}: main/part-{start:03}.md {separator} main/part-{end:03}.md")
+        format!(
+            "- {label}: {} {separator} {}",
+            main_path(start),
+            main_path(end)
+        )
     }
 }
 
@@ -119,13 +108,14 @@ pub(crate) fn verify_design_file_content(
     require_one(text, &["## Objective Context", "## 依頼文"], label)?;
     require_one(text, &["## Requirement Anchors", "## 要求アンカー"], label)?;
     if has_main {
-        require_contains(text, "main/part-", "design memo main coverage")?;
+        require_contains(text, "main/arcs/", "design memo main coverage")?;
     }
     require_one(
         text,
         &[
             "The covered range preserves sequence continuity.",
             "担当範囲の前後関係が連続していること。",
+            "追加や削除で規模目安を崩さないこと。",
         ],
         label,
     )?;

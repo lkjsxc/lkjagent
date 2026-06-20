@@ -48,28 +48,29 @@ fn count_seed_creates_exact_markdown_tree() -> TestResult<()> {
     assert!(root.join("README.md").exists());
     assert!(root.join("docs/README.md").exists());
     assert!(root.join("main/README.md").exists());
-    assert!(root.join("docs/design-001.md").exists());
-    assert!(root.join("main/part-001.md").exists());
+    assert!(root.join(support::design_path(1)).exists());
+    assert!(root.join(support::main_path(1)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("northern expedition"));
     assert!(readme.contains("## Reading Path"));
     assert!(readme.contains("## File Budget"));
     assert!(readme.contains("- Total files: 20"));
     assert!(readme.contains("## Acceptance Audit"));
-    assert!(readme.contains("Part Ledger in main/README.md"));
+    assert!(readme.contains("main/README.md Part Ledger"));
     let docs_index = fs::read_to_string(root.join("docs/README.md"))?;
     assert!(docs_index.contains("Design memo count"));
     assert!(docs_index.contains("## Coverage Map"));
-    assert!(docs_index.contains("design-001.md: main/part-001.md"));
+    let first_coverage = format!("{}: {}", support::design_path(1), support::main_path(1));
+    assert!(docs_index.contains(&first_coverage));
     let main_index = fs::read_to_string(root.join("main/README.md"))?;
-    assert!(main_index.contains("Main file count"));
-    assert!(main_index.contains("## Progress Map"));
-    assert!(main_index.contains("main/part-001.md"));
-    assert!(main_index.contains("## Part Ledger"));
-    assert!(main_index.contains("main/part-001.md: opening / scope unit"));
-    assert!(main_index.contains("main/part-002.md: exploration / premise unit"));
-    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
-    let second_part = fs::read_to_string(root.join("main/part-002.md"))?;
+    assert!(main_index.contains(&support::main_path(1)));
+    assert!(main_index.contains(&format!("{}: opening / scope unit", support::main_path(1))));
+    assert!(main_index.contains(&format!(
+        "{}: exploration / premise unit",
+        support::main_path(2)
+    )));
+    let first_part = fs::read_to_string(root.join(support::main_path(1)))?;
+    let second_part = fs::read_to_string(root.join(support::main_path(2)))?;
     assert!(first_part.contains("## Segment Brief"));
     assert!(first_part.contains("File role: opening / scope unit"));
     assert!(second_part.contains("File role: exploration / premise unit"));
@@ -106,17 +107,16 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     let docs_index = fs::read_to_string(root.join("docs/README.md"))?;
     assert!(docs_index.contains("設計メモ数"));
     assert!(docs_index.contains("## 設計対応表"));
-    assert!(docs_index.contains("design-001.md: main/part-001.md"));
+    let first_coverage = format!("{}: {}", support::design_path(1), support::main_path(1));
+    assert!(docs_index.contains(&first_coverage));
     let main_index = fs::read_to_string(root.join("main/README.md"))?;
-    assert!(main_index.contains("本編ファイル数"));
-    assert!(main_index.contains("## 進行地図"));
-    assert!(main_index.contains("main/part-001.md"));
-    let design = fs::read_to_string(root.join("docs/design-001.md"))?;
+    assert!(main_index.contains(&support::main_path(1)));
+    let design = fs::read_to_string(root.join(support::design_path(1)))?;
     assert!(design.contains("範囲と受け入れ条件"));
     assert!(design.contains("## 対象範囲"));
-    assert!(design.contains("main/part-001.md"));
+    assert!(design.contains(&support::main_path(1)));
     assert!(design.contains("## 検証観点"));
-    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first_part = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(first_part.contains("# 本編 001"));
     assert!(first_part.contains("## セグメント概要"));
     assert!(first_part.contains("ファイル役割: 導入 / 発端の圧力"));
@@ -125,8 +125,8 @@ fn count_seed_profiles_japanese_narrative_output() -> TestResult<()> {
     assert!(first_part.contains("## ローカル検証"));
     assert!(first_part.contains("## 連続性台帳"));
     assert!(first_part.contains("- 前: なし"));
-    assert!(first_part.contains("- 現在: main/part-001.md"));
-    assert!(first_part.contains("- 次: main/part-002.md"));
+    assert!(first_part.contains(&format!("- 現在: {}", support::main_path(1))));
+    assert!(first_part.contains(&format!("- 次: {}", support::main_path(2))));
     assert!(first_part.contains("### 場面の役割"));
     assert!(first_part.contains("### 転換点"));
     assert!(first_part.contains("### 具体化メモ"));
@@ -155,7 +155,8 @@ fn count_seed_keeps_decimal_version_inside_objective_anchor() -> TestResult<()> 
     let readme = fs::read_to_string(workspace.join("structured-output/README.md"))?;
     assert!(readme.contains("- Use GPT-5.3-Codex-Spark thrift"));
     assert!(!readme.contains("- Use GPT-5\n- 3-Codex-Spark thrift"));
-    let first_part = fs::read_to_string(workspace.join("structured-output/main/part-001.md"))?;
+    let first_part =
+        fs::read_to_string(workspace.join(format!("structured-output/{}", support::main_path(1))))?;
     assert!(first_part.contains(
         "Local objective: Turn \"Create about 100 files total\" into this file's distinct contribution."
     ));

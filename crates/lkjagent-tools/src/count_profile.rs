@@ -8,6 +8,7 @@ use crate::count_profile_index::{design_owner, docs_map, file_budget, main_map};
 use crate::count_profile_kind::detect_kind;
 use crate::count_profile_local::local_verification;
 use crate::count_profile_manifest::audit_manifest;
+use crate::count_profile_paths::design_path;
 use crate::count_profile_reading::reading_path;
 use crate::count_profile_restart::restart_guide;
 use crate::count_profile_thread::segment_brief;
@@ -49,9 +50,9 @@ impl DeliverableProfile {
         objective: &str,
     ) -> String {
         let anchors = anchor_block(self.language, objective);
-        let budget = file_budget(self.language, docs, main, index_files);
+        let budget = file_budget(self.language, docs, main, index_files, mode);
         let reading = reading_path(self.language, main);
-        let manifest = audit_manifest(self.language, docs, main, index_files);
+        let manifest = audit_manifest(self.language, docs, main, index_files, mode);
         let audit = acceptance_audit(self.language, self.kind, docs, main);
         let restart = restart_guide(self.language, docs, main, index_files);
         let verification = self.verification_text(mode);
@@ -83,10 +84,10 @@ impl DeliverableProfile {
         let map = main_map(self.language, self.kind, docs, main);
         match self.language {
             Language::Japanese => format!(
-                "# main\n\n## 目的\n\n順序付き本編ファイルの索引です。\n\n{anchors}\n## 構成\n\n- 本編ファイル数: {main}\n- 各本編は位置、連続性台帳、本文、継続メモを持ちます。\n- 読む順序は part-001.md から番号順です。\n\n{map}\n## 依頼文\n\n{objective}\n"
+                "# main\n\n## 目的\n\n順序付き本編ファイルの索引です。\n\n{anchors}\n## 構成\n\n- 本編ファイル数: {main}\n- 各本編は位置、連続性台帳、本文、継続メモを持ちます。\n- 読む順序は再帰的な arc ディレクトリを番号順に進みます。\n\n{map}\n## 依頼文\n\n{objective}\n"
             ),
             Language::English => format!(
-                "# main\n\n## Purpose\n\nIndex for ordered main content files.\n\n{anchors}\n## Structure\n\n- Main file count: {main}\n- Each main file carries position, sequence ledger, body, and handoff notes.\n- Read in numeric order from part-001.md onward.\n\n{map}\n## Objective Context\n\n{objective}\n"
+                "# main\n\n## Purpose\n\nIndex for ordered main content files.\n\n{anchors}\n## Structure\n\n- Main file count: {main}\n- Each main file carries position, sequence ledger, body, and handoff notes.\n- Read in numeric order through the recursive arc directories.\n\n{map}\n## Objective Context\n\n{objective}\n"
             ),
         }
     }
@@ -146,7 +147,7 @@ impl DeliverableProfile {
 
     fn design_owner_line(self, index: usize, docs: usize, main: usize) -> String {
         let value = design_owner(index, docs, main)
-            .map(|owner| format!("docs/design-{owner:03}.md"))
+            .map(design_path)
             .unwrap_or_else(|| match self.language {
                 Language::Japanese => "なし".to_string(),
                 Language::English => "none".to_string(),
@@ -172,13 +173,13 @@ impl DeliverableProfile {
                 "この成果物は指定ファイル数に合わせて生成されています。依頼が変わらない限り、合計ファイル数を保ってください。"
             }
             (Language::Japanese, CountMode::Approximate) => {
-                "この成果物は目標ファイル数を中心に生成されています。依頼が変わらない限り、許容範囲から外れないようにしてください。"
+                "この成果物は長編の規模感に合わせて生成されています。厳密な合計よりも、再帰構造、読む順序、継続しやすさを保ってください。"
             }
             (Language::English, CountMode::Exact) => {
                 "The scaffold was generated as an exact counted deliverable. Keep the total file count stable unless the owner changes the target."
             }
             (Language::English, CountMode::Approximate) => {
-                "The scaffold was generated at the requested target within the approximate-count guard. Keep the total inside the accepted range unless the owner changes the target."
+                "The scaffold was generated from a long-form scale hint. Preserve recursive structure, reading order, and continuity before exact file arithmetic."
             }
         }
     }

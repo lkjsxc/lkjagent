@@ -58,48 +58,45 @@ subcount does not make an approximate overall count strict. Aggregate wording
 such as total, combined, in-all, and gokei can carry the overall count when
 the prompt also contains smaller docs or outline file counts, while nearby
 non-file units such as words or pages keep their numbers from becoming
-file-count targets. Counted completion prefers
-README-indexed roots and falls back to clean top-level output directories.
-The active graph prefix renders count guards and tells the model to use one
-compact `shell.run` command with direct `/bin/sh` loops and `printf`
-templates for bulk creation and count verification, keep the act payload
-under about 1200 characters, and avoid hardcoded `/workspace` paths, brace
-expansion, cat heredocs, bash scripts, literal bodies, or one `fs.write` per
-file.
+file-count targets. Counted completion prefers README-indexed roots and
+falls back to clean top-level output directories.
+The active graph prefix renders exact count guards as count requirements and
+approximate count guards as scale hints. It tells the model to use recursive
+directories for large outputs, one compact `shell.run` command with direct
+`/bin/sh` loops and `printf` templates for bulk creation and verification,
+keep the act payload under about 1200 characters, and avoid hardcoded
+`/workspace` paths, brace expansion, cat heredocs, bash scripts, literal
+bodies, or one `fs.write` per file.
 For counted documentation tasks that are not recursive, knowledge-base, or
 benchmark scaffolds, the daemon also writes a generic `structured-output/`
-tree with the requested count before the first endpoint turn and records graph
-evidence for the scaffold, then closes only when the graph completion gate
-admits that evidence; otherwise it waits with the missing gate reason.
+tree at the requested exact count or approximate scale before the first
+endpoint turn and records graph evidence for the scaffold, then closes only
+when the graph completion gate admits that evidence; otherwise it waits with
+the missing gate reason.
 That scaffold profiles the owner's objective by detected language and broad
 deliverable kind, so the root, docs, and main directories are README-indexed
-within the selected count guard, and the root README records the count
-breakdown, machine-readable audit manifest, acceptance audit, and whether the
-guard is exact or approximate.
+within the selected guard. Design files live under `docs/designs/set-*`,
+main files live under `main/arcs/arc-*`, and the root README records an exact
+file budget for exact guards or a scale plan for approximate guards.
 Kind profiling recognizes explicit guide and report synonyms before
 narrative terms, ignores negated story-specific constraints, and covers
 manuscript, screenplay, playbook, runbook, course, training, whitepaper,
 dossier, and Japanese task terms.
-The graph evidence for that scaffold records `structured-output`, the target
-file count, index file count, design memo count, main file count, root index,
-file-budget status, machine-readable audit-manifest status including
-restart-guide, design-owner-link, local-verification, reading-path, and sequence-path
-requirements, restart-guide status, directory index, count-linked
-acceptance-audit status, coverage-map status, first and last main, `index_scope=all`,
-`section_scope=all`, content-block status, required design-section status,
-required main-section status, part-ledger status, explicit design-owner-link
-status, explicit local-verification status, explicit root reading-path status,
-explicit sequence-path status, deterministic scaffold closure reason, and
-`verification=ok`, so completion can be audited after the case closes. The
-same normalized evidence is saved into task-summary memory for startup and
-compaction recovery.
+The graph evidence for that scaffold records `structured-output`, target or
+scale file count, index/design/main counts, root index, file-budget or
+scale-plan status, audit-manifest requirements, restart-guide status,
+directory index, acceptance audit, coverage map, first and last main,
+`index_scope=all`, `section_scope=all`, section/content status, part-ledger
+status, link and sequence verification, deterministic scaffold closure, and
+`verification=ok`. The same normalized evidence is saved into task-summary
+memory for startup and compaction recovery.
 The root index includes a restart guide that names README.md, docs/README.md,
 main/README.md, design-owner links, local verification, sequence ledgers, and
-the stable file-count rule when content exists. It also includes a reading
+the stable count or scale rule when content exists. It also includes a reading
 path that names the first main file, last main file, and numeric read order.
-The docs index maps design memos to covered main ranges. The main index maps
-stage ranges from the same per-part stage assignment plus a role ledger that
-links each main file back to its design memo owner for direct part-file restart.
+The docs index maps nested design memos to covered main ranges. The main
+index maps nested arc ranges from the same per-part stage assignment plus a
+role ledger that links each main file back to its design memo owner.
 Every design index entry, progress-map line, main ledger entry, main-file
 design-owner link, and explicit main-file previous/current/next path is verified
 before closure. Every main file also carries a local verification checklist
@@ -110,7 +107,7 @@ headings, section roles, objective anchors that
 preserve model-number decimal tokens, main-range coverage, kind-aware segment
 briefs, sequence ledgers, anchor-linked body spines, per-part content
 details, specific-detail variation blocks, final-aware draft passage blocks, and
-continuity handoffs while preserving the exact count. Root indexes keep
+continuity handoffs while preserving the scale contract. Root indexes keep
 operational clauses and raw counted-create wording for traceability, while
 main-file body anchors skip model-thrift, budget-thrift, English count mechanics,
 composition parentheticals, allocation-only clauses, count-only structural

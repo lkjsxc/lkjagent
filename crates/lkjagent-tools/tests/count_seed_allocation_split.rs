@@ -23,12 +23,12 @@ fn count_seed_honors_unknown_support_files_in_remaining_split() -> TestResult<()
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-023.md").exists());
-    assert!(!root.join("docs/design-024.md").exists());
-    assert!(root.join("main/part-074.md").exists());
-    assert!(!root.join("main/part-075.md").exists());
+    assert!(root.join(support::design_path(23)).exists());
+    assert!(!root.join(support::design_path(24)).exists());
+    assert!(root.join(support::main_path(74)).exists());
+    assert!(!root.join(support::main_path(75)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(readme.contains("- Design memos: 23"));
     assert!(readme.contains("- Main files: 74"));
     assert!(readme.contains("Kind contract: audit this deliverable as a report"));
@@ -53,12 +53,12 @@ fn count_seed_honors_unknown_support_files_in_all_other_split() -> TestResult<()
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-024.md").exists());
-    assert!(!root.join("docs/design-025.md").exists());
-    assert!(root.join("main/part-073.md").exists());
-    assert!(!root.join("main/part-074.md").exists());
+    assert!(root.join(support::design_path(24)).exists());
+    assert!(!root.join(support::design_path(25)).exists());
+    assert!(root.join(support::main_path(73)).exists());
+    assert!(!root.join(support::main_path(74)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(readme.contains("- Design memos: 24"));
     assert!(readme.contains("- Main files: 73"));
     assert!(readme.contains("Kind contract: audit this deliverable as a report"));
@@ -83,12 +83,12 @@ fn count_seed_honors_unknown_support_files_before_comma_split() -> TestResult<()
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-026.md").exists());
-    assert!(!root.join("docs/design-027.md").exists());
-    assert!(root.join("main/part-071.md").exists());
-    assert!(!root.join("main/part-072.md").exists());
+    assert!(root.join(support::design_path(26)).exists());
+    assert!(!root.join(support::design_path(27)).exists());
+    assert!(root.join(support::main_path(71)).exists());
+    assert!(!root.join(support::main_path(72)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(readme.contains("- Design memos: 26"));
     assert!(readme.contains("- Main files: 71"));
     assert!(readme.contains("Kind contract: audit this deliverable as a report"));
@@ -113,12 +113,12 @@ fn count_seed_honors_unknown_support_files_in_plus_rest_split() -> TestResult<()
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-025.md").exists());
-    assert!(!root.join("docs/design-026.md").exists());
-    assert!(root.join("main/part-072.md").exists());
-    assert!(!root.join("main/part-073.md").exists());
+    assert!(root.join(support::design_path(25)).exists());
+    assert!(!root.join(support::design_path(26)).exists());
+    assert!(root.join(support::main_path(72)).exists());
+    assert!(!root.join(support::main_path(73)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(readme.contains("- Design memos: 25"));
     assert!(readme.contains("- Main files: 72"));
     assert!(readme.contains("Kind contract: audit this deliverable as a report"));
@@ -143,12 +143,12 @@ fn count_seed_honors_unknown_support_files_before_semicolon_split() -> TestResul
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-027.md").exists());
-    assert!(!root.join("docs/design-028.md").exists());
-    assert!(root.join("main/part-070.md").exists());
-    assert!(!root.join("main/part-071.md").exists());
+    assert!(root.join(support::design_path(27)).exists());
+    assert!(!root.join(support::design_path(28)).exists());
+    assert!(root.join(support::main_path(70)).exists());
+    assert!(!root.join(support::main_path(71)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(readme.contains("- Design memos: 27"));
     assert!(readme.contains("- Main files: 70"));
     assert!(readme.contains("Kind contract: audit this deliverable as a report"));
@@ -173,9 +173,9 @@ fn count_seed_does_not_reuse_total_count_before_rest_split() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-012.md").exists());
-    assert!(!root.join("docs/design-013.md").exists());
-    assert!(root.join("main/part-085.md").exists());
+    assert!(root.join(support::design_path(12)).exists());
+    assert!(!root.join(support::design_path(13)).exists());
+    assert!(root.join(support::main_path(85)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- Design memos: 12"));
     assert!(readme.contains("- Main files: 85"));

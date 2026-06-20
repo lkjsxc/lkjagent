@@ -1,3 +1,4 @@
+use crate::count_guard::{CountGuard, CountMode};
 use crate::error::{ToolError, ToolResult};
 
 pub(crate) fn verify_acceptance_audit(
@@ -45,14 +46,19 @@ pub(crate) fn verify_acceptance_audit(
 
 pub(crate) fn verify_file_budget(
     root_index: &str,
-    target: usize,
+    guard: CountGuard,
+    files: usize,
     docs: usize,
     main: usize,
     index_files: usize,
 ) -> ToolResult<&'static str> {
-    if !root_index.contains("## File Budget") && !root_index.contains("## ファイル内訳") {
+    if !root_index.contains("## File Budget")
+        && !root_index.contains("## ファイル内訳")
+        && !root_index.contains("## Scale Plan")
+        && !root_index.contains("## 規模目安")
+    {
         return Err(ToolError::invalid(
-            "counted document scaffold missing file budget",
+            "counted document scaffold missing scale plan",
         ));
     }
     require_budget_line(
@@ -79,12 +85,20 @@ pub(crate) fn verify_file_budget(
         &format!("- 本編ファイル: {main}"),
         "main file count",
     )?;
-    require_budget_line(
-        root_index,
-        &format!("- Total files: {target}"),
-        &format!("- 合計ファイル数: {target}"),
-        "total file count",
-    )?;
+    match guard.mode {
+        CountMode::Exact => require_budget_line(
+            root_index,
+            &format!("- Total files: {}", guard.target),
+            &format!("- 合計ファイル数: {}", guard.target),
+            "total file count",
+        )?,
+        CountMode::Approximate => require_budget_line(
+            root_index,
+            &format!("- Approximate scale: about {files} files"),
+            &format!("- 目安規模: 約 {files} ファイル"),
+            "approximate scale",
+        )?,
+    }
     Ok("ok")
 }
 

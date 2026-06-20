@@ -1,4 +1,6 @@
+use crate::count_guard::CountMode;
 use crate::count_profile::{DeliverableKind, Language};
+use crate::count_profile_paths::{design_path, main_path};
 use crate::count_profile_stage::{stage_label, stage_range};
 use crate::count_profile_thread::segment_role;
 
@@ -7,16 +9,23 @@ pub(crate) fn file_budget(
     docs: usize,
     main: usize,
     index_files: usize,
+    mode: CountMode,
 ) -> String {
     let total = 1_usize
         .saturating_add(index_files)
         .saturating_add(docs)
         .saturating_add(main);
-    match language {
-        Language::Japanese => format!(
+    match (language, mode) {
+        (Language::Japanese, CountMode::Approximate) => format!(
+            "## 規模目安\n\n- ルート索引: 1\n- ディレクトリ索引: {index_files}\n- 設計メモ: {docs}\n- 本編ファイル: {main}\n- 目安規模: 約 {total} ファイル\n"
+        ),
+        (Language::English, CountMode::Approximate) => format!(
+            "## Scale Plan\n\n- Root index: 1\n- Directory indexes: {index_files}\n- Design memos: {docs}\n- Main files: {main}\n- Approximate scale: about {total} files\n"
+        ),
+        (Language::Japanese, CountMode::Exact) => format!(
             "## ファイル内訳\n\n- ルート索引: 1\n- ディレクトリ索引: {index_files}\n- 設計メモ: {docs}\n- 本編ファイル: {main}\n- 合計ファイル数: {total}\n"
         ),
-        Language::English => format!(
+        (Language::English, CountMode::Exact) => format!(
             "## File Budget\n\n- Root index: 1\n- Directory indexes: {index_files}\n- Design memos: {docs}\n- Main files: {main}\n- Total files: {total}\n"
         ),
     }
@@ -67,22 +76,22 @@ fn map_line(language: Language, total: usize, slot: usize) -> Option<String> {
     let label = stage_label(language, slot);
     Some(match language {
         Language::Japanese if start == end => {
-            format!("- {label}: main/part-{start:03}.md")
+            format!("- {label}: {}", main_path(start))
         }
         Language::Japanese => {
-            format!("- {label}: main/part-{start:03}.md から main/part-{end:03}.md")
+            format!("- {label}: {} から {}", main_path(start), main_path(end))
         }
         Language::English if start == end => {
-            format!("- {label}: main/part-{start:03}.md")
+            format!("- {label}: {}", main_path(start))
         }
         Language::English => {
-            format!("- {label}: main/part-{start:03}.md through main/part-{end:03}.md")
+            format!("- {label}: {} through {}", main_path(start), main_path(end))
         }
     })
 }
 
 fn docs_map_line(language: Language, index: usize, docs: usize, main: usize) -> String {
-    let file = format!("design-{index:03}.md");
+    let file = design_path(index);
     let Some((start, end)) = coverage_range(index, docs, main) else {
         return match language {
             Language::Japanese => format!("- {file}: 全体構成のみ"),
@@ -91,16 +100,16 @@ fn docs_map_line(language: Language, index: usize, docs: usize, main: usize) -> 
     };
     match language {
         Language::Japanese if start == end => {
-            format!("- {file}: main/part-{start:03}.md")
+            format!("- {file}: {}", main_path(start))
         }
         Language::Japanese => {
-            format!("- {file}: main/part-{start:03}.md から main/part-{end:03}.md")
+            format!("- {file}: {} から {}", main_path(start), main_path(end))
         }
         Language::English if start == end => {
-            format!("- {file}: main/part-{start:03}.md")
+            format!("- {file}: {}", main_path(start))
         }
         Language::English => {
-            format!("- {file}: main/part-{start:03}.md through main/part-{end:03}.md")
+            format!("- {file}: {} through {}", main_path(start), main_path(end))
         }
     }
 }
@@ -125,12 +134,12 @@ fn part_ledger_line(
 ) -> String {
     let role = segment_role(language, kind, index, total);
     let design = match (language, design_owner(index, docs, total)) {
-        (Language::Japanese, Some(owner)) => format!("設計: docs/design-{owner:03}.md"),
+        (Language::Japanese, Some(owner)) => format!("設計: {}", design_path(owner)),
         (Language::Japanese, None) => "設計: なし".to_string(),
-        (Language::English, Some(owner)) => format!("design: docs/design-{owner:03}.md"),
+        (Language::English, Some(owner)) => format!("design: {}", design_path(owner)),
         (Language::English, None) => "design: none".to_string(),
     };
-    format!("- main/part-{index:03}.md: {role}; {design}")
+    format!("- {}: {role}; {design}", main_path(index))
 }
 
 pub(crate) fn design_owner(index: usize, docs: usize, main: usize) -> Option<usize> {
