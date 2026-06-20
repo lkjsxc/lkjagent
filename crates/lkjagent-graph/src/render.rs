@@ -10,7 +10,7 @@ pub fn render_graph_slice(graph: GraphDefinition, state: &TaskGraphState, budget
     let allowed = active_allowed(&graph, state);
     let blocked = blocked_tools(&graph, &allowed);
     let text = format!(
-        "Graph state:\ncase: {}\nfamily: {}/{}\nphase: {}\nnode: {}\nconfidence: {}\nCurrent state: {}\nActive states: {}\nObjective: v{} {}\nDo not do: {}\nConstraints: {}\nAssumptions: {}\nRisks: {}\nSuccess criteria: {}\nActive plan step: {}\nRequired evidence: {}\nMissing evidence: {}\nAllowed tools now: {}\nBlocked tools now: {}\nPreferred next action: {}\nLegal transitions: {}\nContext packages: {}\nTouched paths: {}\nRecent faults: {}\nRecovery instruction if next action fails: {}\nCompaction instruction if context pressure rises: {}\nCompletion: {}",
+        "Graph state:\ncase: {}\nfamily: {}/{}\nphase: {}\nnode: {}\nconfidence: {}\nCurrent state: {}\nActive states: {}\nObjective: {}\nDo not do: {}\nConstraints: {}\nAssumptions: {}\nRisks: {}\nSuccess criteria: {}\nActive plan step: {}\nRequired evidence: {}\nMissing evidence: {}\nAllowed tools now: {}\nBlocked tools now: {}\nPreferred next action: {}\nLegal transitions: {}\nContext packages: {}\nTouched paths: {}\nRecent faults: {}\nRecovery instruction if next action fails: {}\nCompaction instruction if context pressure rises: {}\nCompletion: {}",
         state.case_id.map_or_else(|| "new".to_string(), |id| id.to_string()),
         state.family.as_str(),
         state.subroute,
@@ -19,7 +19,6 @@ pub fn render_graph_slice(graph: GraphDefinition, state: &TaskGraphState, budget
         state.confidence,
         state.status_text(),
         render_ranked_tracks(&state.state_tracks, 3),
-        state.objective.version,
         state.objective.normalized,
         bounded(&state.objective.non_goals),
         join_constraints(state),

@@ -35,7 +35,7 @@ recovery ladder, completion contribution, and maintenance contribution.
 The runtime creates or resumes a `TaskGraphState` for each owner task. The
 state records:
 
-- objective state with raw and normalized owner text, objective revision, and
+- objective state with raw and normalized owner text, an internal counter, and
   non-goals.
 - task family, active phase, active node, status, confidence, and budgets.
 - constraints, assumptions, open questions, risks, invariants, success

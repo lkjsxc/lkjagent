@@ -8,7 +8,7 @@ Specify the durable case state that replaces a bare open-or-closed task flag.
 
 Each active case stores structured state:
 
-- raw owner text, normalized objective, objective revision, family, subroute,
+- raw owner text, normalized objective, internal objective counter, family, subroute,
   route reason, phase, status, active node, confidence, and budgets.
 - constraints, assumptions, questions, risks, invariants, success criteria,
   and decisions.
