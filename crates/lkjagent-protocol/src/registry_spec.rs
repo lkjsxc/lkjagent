@@ -116,6 +116,26 @@ const DOC_AUDIT: &[ParamSpec] = &[
     ParamSpec::opt("count", None),
     ParamSpec::opt("mode", Some("approx")),
 ];
+const ARTIFACT_PLAN: &[ParamSpec] = &[
+    ParamSpec::req("root"),
+    ParamSpec::req("title"),
+    ParamSpec::req("kind"),
+    ParamSpec::opt("scale", None),
+    ParamSpec::opt("sections", None),
+];
+const ARTIFACT_APPLY: &[ParamSpec] = &[
+    ParamSpec::req("root"),
+    ParamSpec::opt("title", None),
+    ParamSpec::opt("kind", Some("artifact")),
+    ParamSpec::opt("mode", Some("approx")),
+    ParamSpec::opt("sections", None),
+];
+const ARTIFACT_AUDIT: &[ParamSpec] = &[
+    ParamSpec::req("root"),
+    ParamSpec::opt("kind", None),
+    ParamSpec::opt("count", None),
+    ParamSpec::opt("mode", Some("approx")),
+];
 const AGENT_DONE: &[ParamSpec] = &[ParamSpec::req("summary")];
 const AGENT_ASK: &[ParamSpec] = &[ParamSpec::req("question")];
 
@@ -157,6 +177,9 @@ pub const TOOLS: &[ToolSpec] = &[
     tool("verify.xtask", VERIFY_XTASK, "run a direct xtask gate"),
     tool("doc.scaffold", DOC_SCAFFOLD, "create compact README-indexed document tree"),
     tool("doc.audit", DOC_AUDIT, "audit document topology"),
+    tool("artifact.plan", ARTIFACT_PLAN, "plan semantic content artifact without writes"),
+    tool("artifact.apply", ARTIFACT_APPLY, "write semantic artifact scaffold"),
+    tool("artifact.audit", ARTIFACT_AUDIT, "audit semantic artifact readiness"),
     tool("agent.done", AGENT_DONE, "close the task or cycle"),
     tool("agent.ask", AGENT_ASK, "ask the owner"),
 ];

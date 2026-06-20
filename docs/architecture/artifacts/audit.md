@@ -29,4 +29,5 @@ A failed audit names exact missing files or roles.
 
 ## Status
 
-partially implemented through `doc.audit` and content audit checks.
+partially implemented through `doc.audit`, `artifact.audit`, kind mismatch
+checks, and content audit checks.

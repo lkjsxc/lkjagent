@@ -43,15 +43,12 @@ fn maintenance_graph_state_blocked_by_maintenance_policy_only() -> TestResult<()
     state.graph_policy = Some(owner_graph_policy(vec!["graph.state"]));
     state.effective_policy = Some(maintenance_policy());
 
-    let refused = dispatch(
-        &action("graph.state", &[]),
-        &runtime,
-        &mut conn,
-        &mut state,
-    );
+    let refused = dispatch(&action("graph.state", &[]), &runtime, &mut conn, &mut state);
 
     assert!(matches!(refused.kind, OutputKind::Notice { .. }));
-    assert!(refused.content.contains("effective policy refused graph.state"));
+    assert!(refused
+        .content
+        .contains("effective policy refused graph.state"));
     assert!(refused.content.contains("active_mode=Maintenance"));
     assert!(!refused.content.contains("graph policy refused"));
     Ok(())
@@ -82,7 +79,9 @@ fn owner_task_memory_save_blocked_when_graph_disallows() -> TestResult<()> {
 
     assert!(matches!(refused.kind, OutputKind::Notice { .. }));
     assert!(refused.content.contains("active_mode=OwnerTask"));
-    assert!(refused.content.contains("effective policy refused memory.save"));
+    assert!(refused
+        .content
+        .contains("effective policy refused memory.save"));
     Ok(())
 }
 

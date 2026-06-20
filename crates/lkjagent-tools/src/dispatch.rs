@@ -1,5 +1,5 @@
-mod examples;
 mod effective_refusal;
+mod examples;
 mod fs_extra_tools;
 mod fs_more_tools;
 mod fs_tools;
@@ -14,6 +14,7 @@ mod params;
 mod queue_tools;
 mod refusal;
 mod routes;
+mod routes_artifact;
 mod routes_doc;
 mod routes_verify;
 mod routes_workspace;
