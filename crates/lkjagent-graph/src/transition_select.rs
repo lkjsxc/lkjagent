@@ -110,6 +110,7 @@ fn intent_bonus(
         TransitionIntent::AfterToolFault if target == GraphNodeId("recover-tool") => 500,
         TransitionIntent::AfterRepeatFault if target == GraphNodeId("recover-repeat") => 500,
         TransitionIntent::AfterObservation if target == GraphNodeId("verify") => 140,
+        TransitionIntent::AfterPlan if target == GraphNodeId("document") => 160,
         TransitionIntent::AfterPlan if target == GraphNodeId("execute") => 140,
         TransitionIntent::AfterPlan if target == GraphNodeId("review-plan") => 120,
         TransitionIntent::AfterVerification if target == GraphNodeId("complete") => 180,

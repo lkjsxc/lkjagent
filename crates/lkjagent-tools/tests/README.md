@@ -10,6 +10,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [control_count_mode_scope.rs](control_count_mode_scope.rs): scoped count-mode wording fixtures.
 - [control_count_hyphen_words.rs](control_count_hyphen_words.rs): hyphenated number-word fixtures.
 - [control_count_words.rs](control_count_words.rs): count guard number-word fixtures.
+- [control_dispatch.rs](control_dispatch.rs): control tool close, wait, and count guard fixtures.
 - [control_guard.rs](control_guard.rs): resumed owner guidance completion guards.
 - [count_seed_allocation.rs](count_seed_allocation.rs): counted scaffold allocation fixtures.
 - [count_seed_allocation_en.rs](count_seed_allocation_en.rs): English allocation fixtures.

@@ -16,6 +16,10 @@ Verification nodes allow verify.cargo, verify.xtask, doc.audit, bounded read,
 multi-file read, search tools, graph evidence, and shell.run only as an
 escape hatch.
 
+Document construction nodes allow scaffold, audit, mkdir, batch writes, and
+bounded single-file writes for semantic indexes or sections. Payload-risk
+recovery still redirects large raw writes to scaffold or smaller sections.
+
 Completion nodes allow agent.done only after `CompletionState` is ready.
 Recovery nodes expose the smallest useful action surface for the active fault.
 `recover-parse` favors `graph.recover` and exact copyable action examples.

@@ -18,6 +18,10 @@ Missing evidence routes to a completion recovery notice. The model receives
 the missing requirements and the next legal transitions. It does not close the
 case by assertion.
 
+When `agent.done` is attempted early, the refusal is a partial handoff, not a
+success. It names the failed completion gate, missing evidence, current graph
+state, and one copyable next executable action.
+
 Code, bug, architecture, benchmark, and verification families require typed
 verification evidence. Documentation and knowledge-base families require
 document-structure evidence from doc.audit, doc.scaffold, or a deterministic

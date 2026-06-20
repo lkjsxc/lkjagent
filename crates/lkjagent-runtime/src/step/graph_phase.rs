@@ -1,16 +1,22 @@
 use lkjagent_graph::{
-    completion::refresh_completion_state, completion_decision, EvidenceKind, GraphNodeId,
-    TaskGraphState, TaskPhase, TransitionDecision,
+    best_next_transition, completion::refresh_completion_state, completion_decision, source_graph,
+    EvidenceKind, GraphNodeId, NodeKind, TaskGraphState, TaskPhase, TransitionDecision,
+    TransitionIntent, TransitionLegality,
 };
 
-pub(super) fn refresh_graph_phase(graph: &mut TaskGraphState) {
+pub(super) fn refresh_graph_phase(graph: &mut TaskGraphState, intent: TransitionIntent) {
     refresh_completion_state(graph);
     match completion_decision(graph) {
         TransitionDecision::Admit { .. } => {
             graph.phase = TaskPhase::Completion;
             graph.active_node = GraphNodeId("complete");
         }
-        TransitionDecision::Defer { .. } => refresh_incomplete_phase(graph),
+        TransitionDecision::Defer { .. } => {
+            if route_document_structure_gap(graph) {
+            } else if !apply_selected_transition(graph, intent) {
+                refresh_incomplete_phase(graph);
+            }
+        }
         TransitionDecision::Recover { .. } | TransitionDecision::Refuse { .. } => {
             graph.phase = TaskPhase::Recovery;
             graph.active_node = GraphNodeId("recover");
@@ -76,4 +82,83 @@ fn needs_verification(graph: &TaskGraphState) -> bool {
         .requirements
         .iter()
         .any(|requirement| requirement.id == "verification" && !graph.evidence.has("verification"))
+}
+
+fn route_document_structure_gap(graph: &mut TaskGraphState) -> bool {
+    if !matches!(
+        graph.family,
+        lkjagent_graph::TaskFamily::Documentation | lkjagent_graph::TaskFamily::KnowledgeBase
+    ) || graph.evidence.has("document-structure")
+        || !graph.evidence.has("observation")
+    {
+        return false;
+    }
+    graph.phase = TaskPhase::Execution;
+    graph.active_node = GraphNodeId("document");
+    graph.next_action_class = "document-structure".to_string();
+    true
+}
+
+fn apply_selected_transition(graph: &mut TaskGraphState, intent: TransitionIntent) -> bool {
+    let source = source_graph();
+    let mut moved = false;
+    let mut current_intent = intent;
+    for _ in 0..8 {
+        let selected = best_next_transition(&source, graph, current_intent);
+        if selected.legality != TransitionLegality::Legal {
+            break;
+        }
+        let Some(target) = selected.target else {
+            break;
+        };
+        graph.active_node = target;
+        graph.phase = phase_for_node(&source, target);
+        graph.next_action_class = selected
+            .forced_action_class
+            .unwrap_or_else(|| format!("graph-node:{}", target.0));
+        moved = true;
+        if !should_auto_continue(&source, graph, target, intent) {
+            break;
+        }
+        current_intent = TransitionIntent::Continue;
+    }
+    moved
+}
+
+fn should_auto_continue(
+    source: &lkjagent_graph::GraphDefinition,
+    graph: &TaskGraphState,
+    target: GraphNodeId,
+    intent: TransitionIntent,
+) -> bool {
+    let Some(node) = source.nodes.iter().find(|node| node.id == target) else {
+        return false;
+    };
+    match intent {
+        TransitionIntent::AfterPlan => matches!(node.kind, NodeKind::Planning | NodeKind::State),
+        TransitionIntent::AfterObservation => {
+            node.kind == NodeKind::State
+                && !(target == GraphNodeId("advance-plan") && has_unfinished_step(graph))
+        }
+        _ => false,
+    }
+}
+
+fn phase_for_node(source: &lkjagent_graph::GraphDefinition, target: GraphNodeId) -> TaskPhase {
+    let kind = source
+        .nodes
+        .iter()
+        .find(|node| node.id == target)
+        .map(|node| node.kind)
+        .unwrap_or(NodeKind::Planning);
+    match kind {
+        NodeKind::Intent | NodeKind::Planning => TaskPhase::Planning,
+        NodeKind::Context => TaskPhase::Context,
+        NodeKind::State | NodeKind::Execution | NodeKind::Document => TaskPhase::Execution,
+        NodeKind::Verification => TaskPhase::Verification,
+        NodeKind::Recovery => TaskPhase::Recovery,
+        NodeKind::Compaction => TaskPhase::Compaction,
+        NodeKind::Completion => TaskPhase::Completion,
+        NodeKind::Memory | NodeKind::Maintenance => TaskPhase::Maintenance,
+    }
 }

@@ -1,5 +1,5 @@
 use lkjagent_context::assemble::append_frame;
-use lkjagent_graph::{EvidenceKind, TaskGraphState};
+use lkjagent_graph::{EvidenceKind, GraphNodeId, TaskFamily, TaskGraphState, TransitionIntent};
 use lkjagent_tools::dispatch::DispatchOutput;
 use lkjagent_tools::observe::OutputKind;
 
@@ -28,9 +28,21 @@ pub(super) fn update_graph_after_output(
         return;
     };
     if add_graph_update(graph, pending, output, effects) {
-        refresh_graph_phase(graph);
+        refresh_graph_phase(graph, transition_intent(&pending.action));
         push_case_update(graph, effects);
         state.context = append_frame(&state.context, graph_notice_frame(graph));
+    }
+}
+
+fn transition_intent(action: &lkjagent_protocol::Action) -> TransitionIntent {
+    match action.tool.as_str() {
+        "graph.plan" | "graph.context" => TransitionIntent::AfterPlan,
+        "graph.evidence" if action_param(action, "kind") == "verification" => {
+            TransitionIntent::AfterVerification
+        }
+        "verify.cargo" | "verify.xtask" | "doc.audit" => TransitionIntent::AfterVerification,
+        "agent.done" => TransitionIntent::AttemptCompletion,
+        _ => TransitionIntent::AfterObservation,
     }
 }
 
@@ -60,6 +72,15 @@ fn add_graph_update(
             ) || advance_active_step(graph)
         }
         "doc.audit" | "doc.scaffold" => {
+            add_document_evidence(graph, output, effects) || advance_active_step(graph)
+        }
+        "fs.batch_write"
+            if graph.active_node == GraphNodeId("document")
+                || matches!(
+                    graph.family,
+                    TaskFamily::Documentation | TaskFamily::KnowledgeBase
+                ) =>
+        {
             add_document_evidence(graph, output, effects) || advance_active_step(graph)
         }
         "shell.run" => add_shell_evidence(graph, output, effects) || advance_active_step(graph),

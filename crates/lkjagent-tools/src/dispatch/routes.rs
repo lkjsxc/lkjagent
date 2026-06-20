@@ -106,9 +106,7 @@ fn dispatch_done(
 ) -> DispatchOutput {
     if state.graph_state.is_some() && !state.graph_completion_ready {
         return observe_result(
-            Err(crate::error::ToolError::invalid(done_refusal(
-                &state.graph_missing,
-            ))),
+            Err(crate::error::ToolError::invalid(done_refusal(state))),
             action_text,
             runtime,
             state,
@@ -126,18 +124,41 @@ fn dispatch_done(
     )
 }
 
-fn done_refusal(missing: &[String]) -> String {
-    let listed = missing.join(", ");
-    let first = missing
+fn done_refusal(state: &DispatchState) -> String {
+    let listed = state.graph_missing.join(", ");
+    let first = state
+        .graph_missing
         .first()
         .cloned()
         .unwrap_or_else(|| "required-evidence".to_string());
-    if first == "plan" {
-        return format!(
-            "graph completion refused; missing: {listed}; next action: graph.plan with steps, checks, paths, and reason"
-        );
-    }
+    let next = next_completion_action(&first);
+    let graph_line = state
+        .graph_state
+        .as_deref()
+        .and_then(|text| text.lines().find(|line| !line.trim().is_empty()))
+        .unwrap_or("graph_state=unavailable");
     format!(
-        "graph completion refused; missing: {listed}; next action: graph.evidence kind={first} summary=observed verification path=."
+        "graph completion refused\npartial_handoff=blocked-with-evidence\nattempted=agent.done\nfailed_gate=completion\nmissing={listed}\nexisting_graph={graph_line}\nnext_executable_action={}\nvalid_example:\n{}",
+        next.label, next.example
     )
+}
+
+struct CompletionNextAction {
+    label: &'static str,
+    example: String,
+}
+
+fn next_completion_action(first: &str) -> CompletionNextAction {
+    if first == "plan" {
+        return CompletionNextAction {
+            label: "record graph.plan with steps, checks, paths, and reason",
+            example: "<act>\n<tool>graph.plan</tool>\n<objective>Finish the owner task</objective>\n<steps>inspect current state; run verification; record evidence</steps>\n<checks>verification evidence exists before completion</checks>\n<paths>.</paths>\n<reason>completion gate is missing plan evidence</reason>\n</act>".to_string(),
+        };
+    }
+    CompletionNextAction {
+        label: "record missing graph.evidence before retrying agent.done",
+        example: format!(
+            "<act>\n<tool>graph.evidence</tool>\n<kind>{first}</kind>\n<summary>Observed required completion evidence</summary>\n<path>.</path>\n</act>"
+        ),
+    }
 }
