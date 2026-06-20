@@ -1,8 +1,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 
+use super::examples::valid_example;
 use lkjagent_protocol::registry::{find_tool, TOOLS};
 use lkjagent_protocol::Action;
-use lkjagent_protocol::{render_action, Param};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ValidatedAction {
@@ -150,31 +150,4 @@ fn hint(tool: &str, specs: &[lkjagent_protocol::registry::ParamSpec], unknown: &
     }
     "emit the valid_example exactly, or choose a tool whose schema names the received parameter"
         .to_string()
-}
-
-fn valid_example(tool: &str, specs: &[lkjagent_protocol::registry::ParamSpec]) -> String {
-    let params = specs
-        .iter()
-        .filter(|spec| spec.required)
-        .map(|spec| Param::new(spec.name, example_value(tool, spec.name)))
-        .collect::<Vec<_>>();
-    render_action(&Action::new(tool, params))
-}
-
-fn example_value(tool: &str, name: &str) -> &'static str {
-    match (tool, name) {
-        ("doc.scaffold", "root") | ("doc.audit", "root") => "docs",
-        ("doc.scaffold", "title") => "Project Documentation",
-        ("fs.read", "path") | ("fs.stat", "path") | ("fs.mkdir", "path") => "README.md",
-        ("graph.evidence", "kind") | ("graph.note", "kind") => "observation",
-        ("graph.evidence", "summary") | ("graph.note", "summary") => "Read README.md",
-        ("agent.done", "summary") => "Completed with evidence",
-        ("agent.ask", "question") => "What specific target should I use?",
-        ("queue.enqueue", "content") | ("queue.edit", "content") => "Owner task",
-        ("queue.enqueue", "reason") | ("queue.edit", "reason") => "owner request",
-        ("shell.run", "command") => "pwd",
-        ("verify.cargo", "gate") => "test",
-        ("verify.xtask", "gate") => "check-docs",
-        _ => "value",
-    }
 }
