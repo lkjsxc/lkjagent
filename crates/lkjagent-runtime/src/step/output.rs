@@ -1,6 +1,6 @@
 use lkjagent_context::assemble::append_frame;
 use lkjagent_context::model::{ContextState, Frame, FrameKind, NoticeKind};
-use lkjagent_graph::{CaseStatus, GraphNodeId, TaskPhase};
+use lkjagent_graph::{completion_decision, CaseStatus, GraphNodeId, TaskPhase, TransitionDecision};
 use lkjagent_protocol::{render_notice, Action};
 use lkjagent_store::events::EventKind;
 use lkjagent_tools::dispatch::DispatchOutput;
@@ -78,6 +78,15 @@ fn close_task(
     action: &Action,
     effects: &mut Vec<Effect>,
 ) -> Option<StopReason> {
+    if let Some(refusal) = completion_refusal(state.graph.as_ref()) {
+        append_completion_refusal(state, &refusal);
+        effects.push(Effect::RecordEvent {
+            kind: EventKind::Notice,
+            content: refusal,
+            tokens: 48,
+        });
+        return Some(StopReason::ToolError);
+    }
     let summary = action_param(action, "summary");
     state.task = TaskState::Closed {
         summary: summary.clone(),
@@ -103,6 +112,31 @@ fn close_task(
         }
     }
     Some(StopReason::Done)
+}
+
+fn completion_refusal(graph: Option<&lkjagent_graph::TaskGraphState>) -> Option<String> {
+    let graph = graph?;
+    match completion_decision(graph) {
+        TransitionDecision::Admit { .. } => None,
+        TransitionDecision::Defer { missing } => Some(format!(
+            "agent.done refused by runtime completion gate\nmissing={}",
+            missing.join(", ")
+        )),
+        TransitionDecision::Recover { reason, .. } | TransitionDecision::Refuse { reason } => Some(
+            format!("agent.done refused by runtime completion gate\nreason={reason}"),
+        ),
+    }
+}
+
+fn append_completion_refusal(state: &mut RuntimeState, notice: &str) {
+    state.context = append_frame(
+        &state.context,
+        Frame::new(
+            FrameKind::Notice(NoticeKind::Error),
+            render_notice("error", notice),
+            token_estimate(notice).saturating_add(8),
+        ),
+    );
 }
 
 fn append_distillation_notice(state: &mut RuntimeState, prompt: &str) {
