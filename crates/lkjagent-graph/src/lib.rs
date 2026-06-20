@@ -18,6 +18,7 @@ pub mod node_policy;
 pub mod policy;
 pub mod render;
 mod render_guidance;
+mod render_tools;
 pub mod source;
 mod source_code;
 mod source_compaction;

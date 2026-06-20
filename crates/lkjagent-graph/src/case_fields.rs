@@ -35,6 +35,7 @@ pub struct AssumptionRecord {
 pub struct QuestionRecord {
     pub question: String,
     pub status: FieldStatus,
+    pub owner_required: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -26,6 +26,7 @@ workspace dependencies.
 - [node_policy.rs](node_policy.rs): node and edge affordance policy data.
 - [render.rs](render.rs): compact graph slice rendering.
 - [render_guidance.rs](render_guidance.rs): bounded guidance line helpers.
+- [render_tools.rs](render_tools.rs): rendered allowed and blocked tool helpers.
 - [state.rs](state.rs): task graph state, transitions, and compaction plan data.
 - [source.rs](source.rs): deterministic source graph definitions.
 - [source_code.rs](source_code.rs): code-change node definitions.

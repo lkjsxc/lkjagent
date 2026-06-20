@@ -2,6 +2,7 @@ use crate::completion::missing_requirements;
 use crate::guards::evaluate_guard;
 use crate::model::GraphDefinition;
 use crate::render_guidance::{compaction_instruction, completion_line, recovery_instruction};
+use crate::render_tools::{active_allowed, blocked_tools};
 use crate::state::TaskGraphState;
 use crate::state_track::render_ranked_tracks;
 
@@ -40,29 +41,6 @@ pub fn render_graph_slice(graph: GraphDefinition, state: &TaskGraphState, budget
         completion_line(state)
     );
     fit_budget(&with_document_line(text, state), budget)
-}
-
-fn active_allowed(graph: &GraphDefinition, state: &TaskGraphState) -> Vec<&'static str> {
-    graph
-        .nodes
-        .iter()
-        .find(|node| node.id == state.active_node)
-        .map_or_else(Vec::new, |node| node.allowed_actions.to_vec())
-}
-
-fn blocked_tools(graph: &GraphDefinition, allowed: &[&str]) -> Vec<&'static str> {
-    let mut tools = graph
-        .nodes
-        .iter()
-        .flat_map(|node| node.allowed_actions.iter().copied())
-        .collect::<Vec<_>>();
-    tools.sort_unstable();
-    tools.dedup();
-    tools
-        .into_iter()
-        .filter(|tool| !allowed.contains(tool))
-        .take(12)
-        .collect()
 }
 
 fn join_constraints(state: &TaskGraphState) -> String {
