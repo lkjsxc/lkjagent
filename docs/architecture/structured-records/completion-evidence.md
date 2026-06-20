@@ -23,5 +23,6 @@ action. It does not claim the requested artifact is done.
 ## Status
 
 partially implemented; `doc.scaffold` no longer satisfies document-structure
-evidence and failed `doc.audit` output does not satisfy it. Content-bearing
-artifact audits and blocked handoff states remain open.
+evidence and failed `doc.audit` output does not satisfy it. `doc.audit` rejects
+scaffold-only content artifacts for story and cookbook profiles. Blocked
+handoff states and richer artifact manifests remain open.

@@ -1,5 +1,6 @@
 mod audit;
 mod body;
+mod content_audit;
 mod fit;
 mod graph;
 mod model;

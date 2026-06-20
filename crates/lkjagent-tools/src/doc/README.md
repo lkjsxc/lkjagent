@@ -8,6 +8,7 @@ This directory holds the semantic document scaffold and audit implementation.
 
 - [audit.rs](audit.rs): deterministic document topology audit.
 - [body.rs](body.rs): generated README and leaf Markdown templates.
+- [content_audit.rs](content_audit.rs): content-artifact scaffold-only checks.
 - [fit.rs](fit.rs): exact-count group fitting helpers.
 - [graph.rs](graph.rs): graph manifest rendering and validation helpers.
 - [model.rs](model.rs): scaffold input, plan, files, and profiles.

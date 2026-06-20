@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 use crate::error::ToolResult;
 use crate::fs::workspace_path;
 
+use super::content_audit::content_checks;
 use super::graph::parse_graph;
 use super::model::ScaffoldMode;
 use super::names::{banned_release_wording, forbidden_serial_name, link_target};
@@ -22,6 +23,7 @@ pub fn audit_root(
     }
     collect_dir_checks(&full, &full, &mut failures)?;
     graph_checks(&full, &mut failures);
+    content_checks(&full, &mut failures)?;
     count_check(&full, count, mode, &mut failures)?;
     Ok(report(root, failures))
 }
