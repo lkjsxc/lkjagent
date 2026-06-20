@@ -56,6 +56,6 @@ or delete effect.
 ## Status
 
 Partially implemented. Storage APIs, digest selection, task-summary rows,
-idempotent `memory.save`, punctuation-safe `memory.find`, and maintenance
-distillation exist. Runtime-owned compaction and prune operations that prove
-real effects remain open.
+idempotent `memory.save`, punctuation-safe `memory.find`, maintenance
+distillation, and runtime-owned hard compaction exist. Richer structured
+compaction snapshots and prune operations that prove real effects remain open.

@@ -3,6 +3,7 @@ mod support;
 use std::path::Path;
 
 use lkjagent_context::model::{Frame, FrameKind};
+use lkjagent_graph::{initial_state, GraphNodeId};
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
@@ -58,6 +59,54 @@ fn forced_compaction_never_requires_graph_blocked_tool() -> TestResult<()> {
     assert!(!events::read_events(&conn)?
         .iter()
         .any(|event| { event.content.contains("memory.save actions") }));
+    Ok(())
+}
+
+#[test]
+fn compaction_preserves_active_owner_case() -> TestResult<()> {
+    let mut conn = store()?;
+    take_lock(&conn)?;
+    state::set(&conn, "open task", "continue the active task")?;
+    let workspace = temp_workspace("daemon-compaction-preserve-graph")?;
+    let server = serve_responses(Vec::new())?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+    daemon.state.task = TaskState::Open { turns_remaining: 7 };
+    let mut graph = initial_state("recover the owner task", None);
+    graph.active_node = GraphNodeId("recover-parse");
+    daemon.state.graph = Some(graph);
+    push_orange_pressure(&mut daemon);
+
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    server.join()?;
+
+    assert_eq!(daemon.state.task, TaskState::Open { turns_remaining: 7 });
+    assert_eq!(
+        daemon.state.graph.as_ref().map(|graph| graph.active_node),
+        Some(GraphNodeId("recover-parse"))
+    );
+    Ok(())
+}
+
+#[test]
+fn compaction_preserves_recovery_fault_state() -> TestResult<()> {
+    let mut conn = store()?;
+    take_lock(&conn)?;
+    state::set(&conn, "open task", "continue the active task")?;
+    let workspace = temp_workspace("daemon-compaction-preserve-faults")?;
+    let server = serve_responses(Vec::new())?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+    daemon.state.task = TaskState::Open { turns_remaining: 7 };
+    daemon.state.parse_faults = 3;
+    daemon.state.repeat_faults = 2;
+    daemon.state.tool_faults = 1;
+    push_orange_pressure(&mut daemon);
+
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    server.join()?;
+
+    assert_eq!(daemon.state.parse_faults, 3);
+    assert_eq!(daemon.state.repeat_faults, 2);
+    assert_eq!(daemon.state.tool_faults, 1);
     Ok(())
 }
 
