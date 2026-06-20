@@ -8,7 +8,7 @@ pub fn effective_policy_refusal(
     state: &DispatchState,
 ) -> Option<String> {
     if tool == "agent.done" {
-        return None;
+        return completion_refusal(policy, state);
     }
     if policy.allowed_tools.iter().any(|allowed| allowed == tool) {
         if tool == "shell.run" && !policy.shell_allowed {
@@ -22,6 +22,39 @@ pub fn effective_policy_refusal(
         return None;
     }
     Some(render(tool, policy.reason.as_str(), policy, state))
+}
+
+fn completion_refusal(policy: &EffectivePolicy, state: &DispatchState) -> Option<String> {
+    if policy.completion_allowed {
+        return None;
+    }
+    let missing = if state.graph_missing.is_empty() {
+        policy.reason.clone()
+    } else {
+        state.graph_missing.join(", ")
+    };
+    let graph_line = state
+        .graph_state
+        .as_deref()
+        .and_then(|text| text.lines().find(|line| !line.trim().is_empty()))
+        .unwrap_or("graph_state=unavailable");
+    Some(format!(
+        "completion refused\npartial_handoff=blocked-with-evidence\nattempted=agent.done\nactive_mode={}\nfailed_gate={}\nmissing={missing}\nexisting_graph={graph_line}\nnext_executable_action={}\nvalid_example:\n{}",
+        policy.mode,
+        completion_gate(policy),
+        effective_preferred_action(policy, state, Some("agent.done")),
+        effective_example(policy, state, Some("agent.done"))
+    ))
+}
+
+fn completion_gate(policy: &EffectivePolicy) -> &'static str {
+    match policy.mode.as_str() {
+        "Compaction" => "runtime-compaction",
+        "ClosedIdle" => "closed-idle",
+        "Maintenance" => "maintenance-completion",
+        "Recovery" => "recovery-completion",
+        _ => "completion",
+    }
 }
 
 fn render(tool: &str, reason: &str, policy: &EffectivePolicy, state: &DispatchState) -> String {

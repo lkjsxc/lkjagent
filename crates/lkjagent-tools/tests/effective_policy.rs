@@ -85,6 +85,64 @@ fn owner_task_memory_save_blocked_when_graph_disallows() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn compaction_refuses_agent_done_through_completion_policy() -> TestResult<()> {
+    let workspace = temp_workspace("effective-compaction-done")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+    state.effective_policy = Some(EffectivePolicy {
+        mode: "Compaction".to_string(),
+        allowed_tools: Vec::new(),
+        blocked_tools: vec!["agent.done".to_string(), "memory.save".to_string()],
+        shell_allowed: false,
+        completion_allowed: false,
+        reason: "runtime compaction cannot be completed by model action".to_string(),
+        preferred_next_action: "runtime-owned compaction snapshot".to_string(),
+    });
+
+    let refused = dispatch(
+        &action("agent.done", &[("summary", "finished")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+
+    assert!(matches!(refused.kind, OutputKind::Notice { .. }));
+    assert!(refused.content.contains("completion refused"));
+    assert!(refused.content.contains("active_mode=Compaction"));
+    assert!(refused.content.contains("failed_gate=runtime-compaction"));
+    assert!(state.control.work_open);
+    Ok(())
+}
+
+#[test]
+fn owner_done_refusal_uses_effective_completion_policy() -> TestResult<()> {
+    let workspace = temp_workspace("effective-owner-done")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+    state.graph_state = Some("case=1\nphase=execution".to_string());
+    state.graph_missing = vec!["document-structure".to_string()];
+    state.effective_policy = Some(owner_policy(vec!["agent.done", "graph.evidence"]));
+
+    let refused = dispatch(
+        &action("agent.done", &[("summary", "finished")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+
+    assert!(matches!(refused.kind, OutputKind::Notice { .. }));
+    assert!(refused.content.contains("active_mode=OwnerTask"));
+    assert!(refused
+        .content
+        .contains("partial_handoff=blocked-with-evidence"));
+    assert!(refused.content.contains("missing=document-structure"));
+    assert!(state.control.work_open);
+    Ok(())
+}
+
 fn maintenance_policy() -> EffectivePolicy {
     EffectivePolicy {
         mode: "Maintenance".to_string(),

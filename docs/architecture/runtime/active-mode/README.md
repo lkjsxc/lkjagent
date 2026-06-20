@@ -28,5 +28,5 @@ authority; it does not create it.
 
 partially implemented. Pure turn authority selection, store-backed runtime
 snapshots, endpoint decision, endpoint card refresh, dispatch authority reuse,
-completion policy, and policy rendering exist. Completion unification and
-artifact-aware gates remain open.
+completion policy, effective `agent.done` refusal, and policy rendering exist.
+Artifact-aware gates remain open.
