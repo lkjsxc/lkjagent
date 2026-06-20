@@ -25,7 +25,8 @@ evidence named by the task contract and the actual gates that ran.
 
 ## Owner Failure
 
-The main remaining risk is final Docker Compose verification after the latest
+The main remaining risk is live endpoint quality under real model output.
+Repository gates and Docker Compose verification pass for the deterministic
 controller changes. Earlier failures also include semantically poor files such
 as part-001.md and parameter faults such as unknown params [path].
 
@@ -36,16 +37,16 @@ as part-001.md and parameter faults such as unknown params [path].
   confirmed code cause.
 - Rows 5 through 11 may proceed after the document scaffold tests establish the
   shape contract.
-- Docker Compose verification remains the final integration gate.
+- Docker Compose verification passed after the controller integration.
 
 ## Done
 
 | # | Blocker | Task | Closing commit |
 | --- | --- | --- | --- |
 | 0 | Initial bootstrap queue | [tasks/](tasks/README.md) | completed before this reliability queue |
-| 6 | Transition selector integration | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | current change |
+| 6 | Transition selector integration | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | `a544a1c` |
 | 7 | Repeated inspection loops | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | `701a0bd` |
 | 8 | `graph.note` examples | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | `35a422d` |
 | 9 | Compaction policy contradiction | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | `a73e162` |
 | 10 | Large content unsafe writes | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | `39bed37`, `a9764de` |
-| 11 | Completion and waiting progress proof | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | current change |
+| 11 | Completion and waiting progress proof | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | `a544a1c` |

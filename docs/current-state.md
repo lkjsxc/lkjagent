@@ -39,11 +39,10 @@ Compact token accounting is implemented for endpoint usage, status, and console.
 single synthesized GPT handoff log is implemented and exposed through status,
 console, and `lkjagent gpt-log`. The benchmark corpus now includes the
 owner-reported documentation, action recovery, recovery-loop, accounting, and
-GPT log failure cases with known-good and known-bad fixtures.
-Docker Compose verification and a live smoke run previously passed for
-semantic recursive documentation generation, graph manifest creation, compact
-context/token status, and the single GPT handoff log. They do not prove the
-newer runtime recovery controller behavior.
+GPT log failure cases with known-good and known-bad fixtures. Quiet verification
+and Docker Compose verification pass after the runtime recovery controller
+changes. The optional live smoke run has not been rerun for those controller
+changes.
 
 ## Area Status
 
@@ -68,9 +67,9 @@ newer runtime recovery controller behavior.
 ## Open Work
 
 The dependency queue is
-[execution/current-blockers.md](execution/current-blockers.md). The main open
-risk is proving the integrated repository with final Docker Compose
-verification after the latest controller changes.
+[execution/current-blockers.md](execution/current-blockers.md). The remaining
+open risk is live endpoint quality under real model output; repository gates and
+Docker Compose verification pass for the deterministic controller changes.
 
 ## Out of Scope
 

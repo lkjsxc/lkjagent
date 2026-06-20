@@ -103,5 +103,6 @@ docker compose run --rm verify
 
 ## Status
 
-open until docs, code, focused tests, corpus checks, quiet verify, and Docker
-Compose verification prove the controller behavior.
+done for the deterministic controller scope. Focused tests, corpus checks,
+quiet verify, and Docker Compose verification pass. Live endpoint quality
+remains tracked in the current-state ledger.
