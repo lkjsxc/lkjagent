@@ -12,8 +12,10 @@ pending, no owner case is active, and no owner case is recoverable.
 ## Operations
 
 Exact duplicate pruning deletes real rows and their search rows. Same-title
-high-overlap rows update an existing row. Semantic merge and rewrite pruning
-must name changed row IDs and source row IDs.
+high-overlap pruning merges source rows into the oldest matching row, records
+source row IDs, updates the search row, and deletes superseded rows. Rewrite
+pruning remains open and must name changed row IDs and source row IDs when it
+is implemented.
 
 ## No-Op
 

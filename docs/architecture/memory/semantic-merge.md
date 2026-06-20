@@ -12,9 +12,11 @@ FTS search does not fail before candidate ranking.
 
 ## Merge Rules
 
-Semantic merge preserves real facts and source row IDs. It may rewrite a vague
-row into a clearer row only when the source rows contain those facts. It may
-delete superseded rows only through a real store operation.
+Semantic merge preserves real facts and source row IDs. The implemented prune
+path merges same-kind, same-title, high-overlap rows into the oldest row,
+appends source row IDs, refreshes FTS, and deletes superseded rows. Rewriting
+a vague row into a clearer row remains open and may only use facts present in
+the source rows.
 
 ## Evidence
 
