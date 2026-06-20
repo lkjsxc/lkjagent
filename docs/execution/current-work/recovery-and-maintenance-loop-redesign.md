@@ -126,7 +126,8 @@ false-completion patterns. Empty maintenance closes now defer all directives
 before the next idle poll, preventing immediate no-op restarts. `doc.audit`
 now rejects scaffold-only story and cookbook leaves before document-structure
 evidence can pass. `memory.prune` now performs real exact-duplicate deletes.
+Quiet verification and Docker Compose verification pass for this slice.
 Remaining work: full loop selection before endpoint turns, semantic
 maintenance merge/rewrite pruning, richer structured compaction snapshots,
-transition selector runtime integration, artifact adoption/repair, blocked
-handoff states, quiet verification, and Docker Compose verification.
+transition selector runtime integration, artifact adoption/repair, and blocked
+handoff states.
