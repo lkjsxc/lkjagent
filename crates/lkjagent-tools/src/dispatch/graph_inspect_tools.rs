@@ -67,7 +67,7 @@ pub fn dispatch_graph_recover(
         |policy| format!("node={}\nphase={}", policy.active_node, policy.phase),
     );
     let content = format!(
-        "{policy_line}\nrecovery_ladder=inspect-state,smaller-scope,alternate-native-tool,replan,admitted-shell-escape,block-step-and-continue\nrepeat_count={}\nnext=use graph.next or a non-repeating native tool",
+        "{policy_line}\nrecovery_ladder=inspect-state,smaller-scope,alternate-native-tool,replan,admitted-shell-escape,block-step-and-continue\nrepeat_count={}\nnext=use graph.transition, graph.plan when admitted, or a non-repeating native tool",
         state.repeat_count
     );
     finish(

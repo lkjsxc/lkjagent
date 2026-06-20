@@ -1,0 +1,127 @@
+use super::examples::registry_valid_example;
+use super::state::DispatchState;
+
+pub fn repeat_refusal(action_text: &str, state: &mut DispatchState) -> Option<String> {
+    if state.last_action_text.as_deref() != Some(action_text) {
+        state.repeat_count = 0;
+        return None;
+    }
+    state.repeat_count = state.repeat_count.saturating_add(1);
+    let prior = state
+        .last_frame_ref
+        .map_or_else(|| "previous frame".to_string(), |id| format!("frame {id}"));
+    if action_text.contains("<tool>graph.next</tool>") {
+        return Some(graph_next_repeat_refusal(&prior, state));
+    }
+    Some(format!("repeat action refused; see {prior}"))
+}
+
+pub fn graph_policy_refusal(tool: &str, state: &DispatchState) -> Option<String> {
+    if tool == "agent.done" {
+        return None;
+    }
+    let policy = state.graph_policy.as_ref()?;
+    if policy.allowed_tools.iter().any(|allowed| allowed == tool) {
+        if tool == "shell.run" && !policy.shell_allowed {
+            return Some(format!(
+                "graph policy refused shell.run\nnode={}\nphase={}\nreason=shell is not admitted by this node\nallowed_tools={}\npreferred_next_action={}\nvalid_example:\n{}",
+                policy.active_node,
+                policy.phase,
+                join_or_none(&policy.allowed_tools),
+                preferred_action(policy, Some(tool)),
+                example_for(policy, Some(tool))
+            ));
+        }
+        return None;
+    }
+    Some(format!(
+        "graph policy refused {tool}\nnode={}\nphase={}\nreason={}\nallowed_tools={}\npreferred_next_action={}\nvalid_example:\n{}",
+        policy.active_node,
+        policy.phase,
+        policy
+            .blocked_reason
+            .as_deref()
+            .unwrap_or("tool is not admitted by the active graph node"),
+        join_or_none(&policy.allowed_tools),
+        preferred_action(policy, Some(tool)),
+        example_for(policy, Some(tool))
+    ))
+}
+
+fn graph_next_repeat_refusal(prior: &str, state: &DispatchState) -> String {
+    let Some(policy) = state.graph_policy.as_ref() else {
+        return format!("repeat action refused; graph.next already inspected; see {prior}");
+    };
+    if !policy.active_node.starts_with("recover") {
+        return format!("repeat action refused; graph.next already inspected; see {prior}");
+    }
+    format!(
+        "repeat action refused; graph.next already inspected for this fault; see {prior}\nnode={}\nphase={}\nnext_action_must_be=graph.recover, graph.transition to {}, unused non-mutating inspection, smaller graph.plan when admitted, or agent.ask only with owner_required question\npreferred_next_action={}\nvalid_example:\n{}",
+        policy.active_node,
+        policy.phase,
+        first_or(&policy.legal_transitions, "a legal target"),
+        preferred_action(policy, Some("graph.next")),
+        example_for(policy, Some("graph.next"))
+    )
+}
+
+fn preferred_action(policy: &super::state::GraphDispatchPolicy, blocked: Option<&str>) -> String {
+    let priority = [
+        "graph.recover",
+        "graph.transition",
+        "doc.scaffold",
+        "graph.plan",
+        "fs.list",
+        "fs.tree",
+        "fs.search",
+        "verify.xtask",
+        "graph.state",
+        "graph.next",
+    ];
+    if let Some(tool) = priority.iter().find(|tool| allowed(policy, blocked, tool)) {
+        return (*tool).to_string();
+    }
+    policy
+        .allowed_tools
+        .iter()
+        .find(|tool| blocked != Some(tool.as_str()) && tool.as_str() != "graph.next")
+        .cloned()
+        .or_else(|| {
+            policy
+                .allowed_tools
+                .iter()
+                .find(|tool| blocked != Some(tool.as_str()))
+                .cloned()
+        })
+        .unwrap_or_else(|| "none".to_string())
+}
+
+fn allowed(policy: &super::state::GraphDispatchPolicy, blocked: Option<&str>, tool: &str) -> bool {
+    blocked != Some(tool) && policy.allowed_tools.iter().any(|allowed| allowed == tool)
+}
+
+fn example_for(policy: &super::state::GraphDispatchPolicy, blocked: Option<&str>) -> String {
+    let preferred = preferred_action(policy, blocked);
+    registry_valid_example(&preferred).unwrap_or_else(|| "none".to_string())
+}
+
+fn join_or_none(values: &[String]) -> String {
+    if values.is_empty() {
+        "none".to_string()
+    } else {
+        values
+            .iter()
+            .take(16)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join(", ")
+    }
+}
+
+fn first_or(values: &[String], fallback: &str) -> String {
+    values
+        .iter()
+        .find(|value| !value.is_empty())
+        .cloned()
+        .unwrap_or_else(|| fallback.to_string())
+}
