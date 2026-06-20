@@ -38,7 +38,15 @@ Audits a semantic artifact root. Parameters are `root`, optional `kind`,
 optional `count`, and optional `mode`. When `kind` is story or cookbook, audit
 rejects a generic project-doc manifest for that artifact request.
 
+## artifact.next
+
+Plans the next bounded artifact write batch from readiness gaps. Parameters
+are `root` and optional `kind`. It returns exact weak paths, required sections,
+and a copyable `fs.batch_write` skeleton for the model to fill with real
+content before dispatch.
+
 ## Status
 
-partially implemented; doc tools and artifact wrappers exist. Root adoption and
-repair planning remain open.
+partially implemented; doc tools, artifact wrappers, bounded next-batch
+planning, and scaffold-only rejection exist. Root adoption and repair planning
+remain open.

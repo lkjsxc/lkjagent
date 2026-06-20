@@ -63,3 +63,21 @@ pub fn dispatch_artifact_audit(
         state,
     )
 }
+
+pub fn dispatch_artifact_next(
+    params: &BTreeMap<String, String>,
+    action_text: &str,
+    runtime: &ToolRuntime,
+    state: &mut DispatchState,
+) -> DispatchOutput {
+    observe_result(
+        crate::artifact::next(
+            &runtime.workspace,
+            &param(params, "root"),
+            &param(params, "kind"),
+        ),
+        action_text,
+        runtime,
+        state,
+    )
+}

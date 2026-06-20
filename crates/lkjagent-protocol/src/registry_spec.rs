@@ -136,6 +136,7 @@ const ARTIFACT_AUDIT: &[ParamSpec] = &[
     ParamSpec::opt("count", None),
     ParamSpec::opt("mode", Some("approx")),
 ];
+const ARTIFACT_NEXT: &[ParamSpec] = &[ParamSpec::req("root"), ParamSpec::opt("kind", None)];
 const AGENT_DONE: &[ParamSpec] = &[ParamSpec::req("summary")];
 const AGENT_ASK: &[ParamSpec] = &[ParamSpec::req("question")];
 
@@ -180,6 +181,7 @@ pub const TOOLS: &[ToolSpec] = &[
     tool("artifact.plan", ARTIFACT_PLAN, "plan semantic content artifact without writes"),
     tool("artifact.apply", ARTIFACT_APPLY, "write semantic artifact scaffold"),
     tool("artifact.audit", ARTIFACT_AUDIT, "audit semantic artifact readiness"),
+    tool("artifact.next", ARTIFACT_NEXT, "plan next bounded artifact write batch"),
     tool("agent.done", AGENT_DONE, "close the task or cycle"),
     tool("agent.ask", AGENT_ASK, "ask the owner"),
 ];

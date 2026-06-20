@@ -1,4 +1,5 @@
 pub mod artifact;
+mod artifact_next;
 pub mod benchmark_seed;
 pub mod control;
 pub mod count_guard;

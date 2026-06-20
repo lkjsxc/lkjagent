@@ -13,8 +13,8 @@ This file owns bounded recovery after action parameter faults.
 - The same action text is never executed twice.
 - The same failing tool class cannot loop without a strategy change.
 - Recovery prefers graph inspection or bounded read-only tools before waiting.
-- Payload faults prefer artifact planning or bounded writes before another raw
-  write.
+- Payload faults prefer artifact planning, `artifact.next`, or bounded writes
+  before another raw write.
 - Rendered recovery examples must be admitted by the active mode and
   dispatcher.
 
@@ -36,5 +36,5 @@ This file owns bounded recovery after action parameter faults.
 
 ## Status
 
-partially implemented. Parameter recovery exists; full productive artifact
-escape coverage remains open.
+partially implemented. Parameter recovery and bounded artifact next-batch
+planning exist; full productive artifact escape coverage remains open.

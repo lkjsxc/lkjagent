@@ -30,14 +30,15 @@ only from `recover-by-shell-escape`.
 
 `recover-by-smaller-scope` must admit `graph.plan` or transition to a
 planning node that admits it. `recover-by-artifact-plan` admits artifact
-planning or document scaffold for content tasks. `recover-by-bounded-write`
-admits batch writes or section-limited writes and blocks another raw large
-write after payload risk.
+planning, next-batch planning, or document scaffold for content tasks.
+`recover-by-bounded-write` admits batch writes or next-batch planning and
+blocks another raw large write after payload risk.
 
 `recover-by-artifact-plan` admits `artifact.plan`, `artifact.apply`,
-`artifact.audit`, `doc.scaffold`, `doc.audit`, `fs.batch_write`, `fs.mkdir`,
-`fs.list`, `fs.tree`, and `fs.stat`. `recover-by-bounded-write` admits
-bounded `fs.batch_write`, section-limited `fs.write`, and audit tools.
+`artifact.audit`, `artifact.next`, `doc.scaffold`, `doc.audit`,
+`fs.batch_write`, `fs.mkdir`, `fs.list`, `fs.tree`, and `fs.stat`.
+`recover-by-bounded-write` admits `artifact.next`, bounded `fs.batch_write`,
+and audit tools.
 `recover-by-alternate-tool` must not leave an owner task with only diagnostic
 tools when artifact repair or bounded writing is required.
 

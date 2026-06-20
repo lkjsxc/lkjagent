@@ -47,6 +47,7 @@ const KNOWN_TOOLS: &[&str] = &[
     "artifact.plan",
     "artifact.apply",
     "artifact.audit",
+    "artifact.next",
     "doc.scaffold",
     "doc.audit",
     "agent.done",

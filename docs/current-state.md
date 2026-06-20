@@ -23,7 +23,8 @@ so hard pressure never requires a blocked model `memory.save`.
 Memory writes now skip exact equivalents, update same-title high-overlap rows,
 and use punctuation-safe search, but semantic maintenance merge and rewrite
 pruning remain incomplete. Long content tasks route toward story and cookbook
-scaffolds, but semantic artifact identity, adoption, repair, and
+scaffolds, and `artifact.next` can plan bounded write batches from weak
+content paths, but semantic artifact identity, adoption, repair, and
 content-bearing completion need deeper runtime enforcement. The artifact
 lifecycle contract is
 [architecture/artifacts/lifecycle.md](architecture/artifacts/lifecycle.md).
@@ -62,7 +63,8 @@ and Docker Compose verification passed for this redesign slice on 2026-06-20.
 | Action parser | implemented | `crates/lkjagent-protocol` |
 | Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; dispatch now checks one effective policy object before routing, including `agent.done` completion refusal |
 | Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; artifact.apply reuses the planner and writer |
-| Document audit tool | implemented | topology checks pass local gates; artifact.audit checks kind mismatch; content artifacts reject scaffold-only leaves |
+| Document audit tool | implemented | topology checks pass local gates; artifact.audit checks kind mismatch; content artifacts reject scaffold-only and weak cookbook/story leaves |
+| Artifact next batch | implemented | `artifact.next` returns exact weak paths and an admitted `fs.batch_write` skeleton; scaffold-only cookbook and meaningful cookbook tests pass |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, same-title overlap update, punctuation-safe FTS queries, and exact duplicate prune have focused tests; semantic merge and rewrite pruning remain open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |

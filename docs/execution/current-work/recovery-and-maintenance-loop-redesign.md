@@ -129,15 +129,21 @@ refusals now render `graph.transition` examples only with admitted targets.
 Long stories and bread cookbooks now route to `content-artifact` roots and
 semantic scaffold profiles. Scaffold-only output and failed document audits no
 longer satisfy document-structure evidence, and runtime close refuses stale
-`agent.done` success when graph completion is still missing. The benchmark
-corpus now covers the uploaded graph-plan, FTS punctuation, duplicate-memory,
-active-policy, invalid-note-kind, long-story, and bread-cookbook
-false-completion patterns. Empty maintenance closes now defer all directives
-before the next idle poll, preventing immediate no-op restarts. `doc.audit`
-now rejects scaffold-only story and cookbook leaves before document-structure
-evidence can pass. `memory.prune` now performs real exact-duplicate deletes.
-Quiet verification and Docker Compose verification pass for this slice.
-Remaining work: full loop selection before endpoint turns, semantic
-maintenance merge/rewrite pruning, richer structured compaction snapshots,
-transition selector runtime integration, artifact adoption/repair, and blocked
-handoff states.
+`agent.done` success when graph completion is still missing. `artifact.next`
+now returns exact weak content paths and an admitted `fs.batch_write` skeleton
+for bounded artifact repair. The benchmark corpus now covers the uploaded
+graph-plan, FTS punctuation, duplicate-memory, active-policy,
+invalid-note-kind, long-story, and bread-cookbook false-completion patterns.
+Empty maintenance closes now defer all directives before the next idle poll,
+preventing immediate no-op restarts. `doc.audit` now rejects scaffold-only and
+weak story or cookbook leaves before document-structure evidence can pass.
+`memory.prune` now performs real exact-duplicate deletes. Current artifact
+next-batch evidence: `cargo test -p lkjagent-tools`, `cargo test -p
+lkjagent-graph`, `cargo test -p lkjagent-protocol`, `check-docs`, and
+`check-lines` pass; `benchmark check-corpus` also passes. Final quiet
+verification and Docker Compose verification were not rerun for this
+artifact-next slice. Remaining work: full loop selection before endpoint
+turns, semantic maintenance merge/rewrite pruning, richer structured
+compaction snapshots, transition selector runtime integration, artifact
+adoption/repair, completion wiring, benchmark fixtures for `artifact.next`,
+and blocked handoff states.
