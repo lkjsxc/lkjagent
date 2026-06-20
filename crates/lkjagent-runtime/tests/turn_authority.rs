@@ -70,6 +70,7 @@ fn compaction_waits_for_owner_work_to_clear() {
     });
 
     assert_eq!(owner.mode, ActiveMode::OwnerTask);
+    assert_eq!(owner.endpoint_decision, EndpointDecision::RuntimeCompact);
     assert_eq!(compaction.mode, ActiveMode::Compaction);
     assert_eq!(
         compaction.endpoint_decision,

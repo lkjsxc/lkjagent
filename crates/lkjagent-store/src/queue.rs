@@ -142,6 +142,15 @@ pub fn list(conn: &Connection) -> StoreResult<Vec<QueueRow>> {
     rows_from_statement(&mut statement, [])
 }
 
+pub fn pending_count(conn: &Connection) -> StoreResult<usize> {
+    let count: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM queue WHERE status = 'pending'",
+        [],
+        |row| row.get(0),
+    )?;
+    Ok(count.max(0) as usize)
+}
+
 fn mutation_content(
     operation: &str,
     reason: &str,

@@ -13,6 +13,7 @@ use crate::error::RuntimeResult;
 use crate::prompt::token_estimate;
 use crate::task::{RuntimeState, TaskState};
 
+mod authority;
 mod compaction;
 mod compaction_support;
 mod context_budget;

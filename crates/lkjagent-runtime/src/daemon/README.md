@@ -8,6 +8,7 @@ This directory holds adapter helpers for the foreground daemon.
 
 - [compaction.rs](compaction.rs): runtime-owned compaction and rebuild handoff.
 - [compaction_support.rs](compaction_support.rs): compaction summary helpers.
+- [authority.rs](authority.rs): store-backed turn authority snapshots.
 - [context_budget.rs](context_budget.rs): turn-boundary pressure checks.
 - [count_scaffold.rs](count_scaffold.rs): counted document auto scaffold.
 - [count_scaffold_gate.rs](count_scaffold_gate.rs): graph gate check for counted scaffold closure.

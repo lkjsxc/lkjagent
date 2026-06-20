@@ -30,3 +30,4 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [support/](support/README.md): shared state and store helpers.
 - [task_budget.rs](task_budget.rs): configured task turn budget fixtures.
 - [turn_authority.rs](turn_authority.rs): pure active-mode authority matrix.
+- [turn_authority_runtime.rs](turn_authority_runtime.rs): endpoint card and closed-idle authority fixtures.
