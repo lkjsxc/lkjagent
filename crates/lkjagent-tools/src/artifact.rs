@@ -47,10 +47,7 @@ pub fn audit(
         return Ok(report);
     }
     let full = workspace_path(workspace, root)?;
-    let manifest = match fs::read_to_string(full.join(".lkj-doc-graph.md")) {
-        Ok(text) => text,
-        Err(_) => String::new(),
-    };
+    let manifest = optional_manifest(&full);
     if kind_mismatch(kind, &manifest) {
         return Ok(format!(
             "document audit failed\nroot={root}\nchecks=15\npassed=14\nfailed=1\nfailures:\n- artifact_kind_mismatch: expected={kind}\nnext_action=artifact.apply matching artifact kind"
@@ -86,11 +83,10 @@ fn title_or_root(title: &str, root: &str) -> String {
     if !trimmed.is_empty() {
         return trimmed.to_string();
     }
-    match root.rsplit('/').next() {
-        Some(name) => name,
-        None => "Artifact",
-    }
-    .replace('-', " ")
+    root.rsplit('/')
+        .next()
+        .map_or("Artifact", |name| name)
+        .replace('-', " ")
 }
 
 fn kind_mismatch(kind: &str, manifest: &str) -> bool {
@@ -98,6 +94,14 @@ fn kind_mismatch(kind: &str, manifest: &str) -> bool {
         "story" => !manifest.contains("NarrativeManuscript"),
         "cookbook" => !manifest.contains("Cookbook"),
         _ => false,
+    }
+}
+
+#[allow(clippy::manual_unwrap_or_default)]
+fn optional_manifest(root: &Path) -> String {
+    match fs::read_to_string(root.join(".lkj-doc-graph.md")) {
+        Ok(text) => text,
+        Err(_) => String::new(),
     }
 }
 

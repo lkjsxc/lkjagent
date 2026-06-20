@@ -40,10 +40,7 @@ fn resolved_kind(kind: &str, root: &Path) -> String {
     if !trimmed.is_empty() {
         return trimmed.to_string();
     }
-    let text = match fs::read_to_string(root.join(".lkj-doc-graph.md")) {
-        Ok(text) => text,
-        Err(_) => String::new(),
-    };
+    let text = optional_manifest(root);
     if text.contains("Cookbook") {
         "cookbook".to_string()
     } else if text.contains("NarrativeManuscript") {
@@ -58,6 +55,14 @@ fn required_sections(kind: &str) -> &'static str {
         "cookbook" => "- title\n- purpose\n- ingredients or concept\n- method or procedure\n- timing, signals, and fixes\n- verification notes",
         "story" => "- title\n- purpose\n- scene content or reference detail\n- continuity notes\n- verification notes",
         _ => "- title\n- purpose\n- concrete content\n- verification notes",
+    }
+}
+
+#[allow(clippy::manual_unwrap_or_default)]
+fn optional_manifest(root: &Path) -> String {
+    match fs::read_to_string(root.join(".lkj-doc-graph.md")) {
+        Ok(text) => text,
+        Err(_) => String::new(),
     }
 }
 
