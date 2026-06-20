@@ -36,6 +36,10 @@ const GRAPH_VERIFY: &str = "<act>
 <summary>fs.read observed the deep recursive model file</summary>
 <path>docs/product/contracts/domain/model.md</path>
 </act>";
+const DOC_AUDIT: &str = "<act>
+<tool>doc.audit</tool>
+<root>docs</root>
+</act>";
 
 #[test]
 fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestResult<()> {
@@ -75,13 +79,13 @@ fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestRe
     assert_eq!(restored.control.guard, CompletionGuard::RecursiveStructure);
     assert!(memory::find(&conn, "recursive structure complete", 5)?.is_empty());
 
-    for stamp in 104..107 {
+    for stamp in 104..108 {
         assert_eq!(
             daemon.poll_once(&mut conn, &stamp.to_string())?,
             DaemonTick::Working
         );
     }
-    assert_eq!(daemon.poll_once(&mut conn, "107")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "108")?, DaemonTick::Done);
     server.join()?;
 
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
@@ -104,6 +108,7 @@ fn scripted_responses() -> Vec<String> {
         completion(&batch_tree_action()),
         completion(READ_DEEP_FILE),
         completion(GRAPH_VERIFY),
+        completion(DOC_AUDIT),
         completion(DONE),
     ]
 }
@@ -145,7 +150,15 @@ fn assert_no_unindexed_directory(root: &Path) -> TestResult<()> {
     Ok(())
 }
 
-const DOCS_README: &str = "# Docs\n\n## Purpose\n\nRoot docs index.\n\n## Table of Contents\n\n- [product/](product/README.md): product contracts.\n- [architecture/](architecture/README.md): architecture contracts.\n";
+const DOCS_README: &str = "# Docs\n\n## Purpose\n\nRoot docs index.\n\n## Table of Contents\n\n- [product/](product/README.md): product contracts.\n- [architecture/](architecture/README.md): architecture contracts.\n- [.lkj-doc-graph.md](.lkj-doc-graph.md): graph manifest.\n";
+const DOC_GRAPH: &str = concat!(
+    "# Document Graph\n\n## Purpose\n\nGraph ledger for the recursive docs tree.\n\n",
+    "## Nodes\n\n| id | path | role | status |\n| --- | --- | --- | --- |\n",
+    "| root | README.md | root index | complete |\n\n",
+    "## Edges\n\n| from | to | kind | reason |\n| --- | --- | --- | --- |\n\n",
+    "## Coverage\n\n| owner requirement | covered by | status |\n| --- | --- | --- |\n",
+    "| recursive structure | README.md and local README indexes | satisfied |\n"
+);
 
 const PRODUCT_README: &str = "# Product\n\n## Purpose\n\nProduct index.\n\n## Table of Contents\n\n- [contracts/](contracts/README.md): product contracts.\n- [surfaces.md](surfaces.md): product surfaces.\n";
 
@@ -153,13 +166,14 @@ const CONTRACTS_README: &str = "# Contracts\n\n## Purpose\n\nContract index.\n\n
 
 const DOMAIN_README: &str = "# Domain\n\n## Purpose\n\nDomain index.\n\n## Table of Contents\n\n- [model.md](model.md): domain model.\n- [glossary.md](glossary.md): domain terms.\n";
 
-const ARCHITECTURE_README: &str = "# Architecture\n\n## Purpose\n\nArchitecture index.\n\n## Table of Contents\n\n- [runtime/](runtime/README.md): runtime contracts.\n";
+const ARCHITECTURE_README: &str = "# Architecture\n\n## Purpose\n\nArchitecture index.\n\n## Table of Contents\n\n- [runtime/](runtime/README.md): runtime contracts.\n- [overview.md](overview.md): architecture overview.\n";
 
-const RUNTIME_README: &str = "# Runtime\n\n## Purpose\n\nRuntime index.\n\n## Table of Contents\n\n- [loop.md](loop.md): loop contract.\n- [tools.md](tools.md): tool contract.\n";
+const RUNTIME_README: &str = "# Runtime\n\n## Purpose\n\nRuntime index.\n\n## Table of Contents\n\n- [loop.md](loop.md): loop contract.\n- [tools.md](tools.md): tool contract.\n- [operations.md](operations.md): runtime operations.\n";
 
 const LEAF: &str = "# Leaf\n\n## Purpose\n\nLeaf contract.\n\n## Status\n\nimplemented.\n";
 
 const TREE_FILES: &[(&str, &str)] = &[
+    ("docs/.lkj-doc-graph.md", DOC_GRAPH),
     ("docs/product/README.md", PRODUCT_README),
     ("docs/product/contracts/README.md", CONTRACTS_README),
     ("docs/product/contracts/domain/README.md", DOMAIN_README),
@@ -169,6 +183,7 @@ const TREE_FILES: &[(&str, &str)] = &[
     ("docs/product/contracts/acceptance.md", LEAF),
     ("docs/product/contracts/domain/model.md", LEAF),
     ("docs/product/contracts/domain/glossary.md", LEAF),
+    ("docs/architecture/overview.md", LEAF),
     ("docs/architecture/runtime/loop.md", LEAF),
     ("docs/architecture/runtime/tools.md", LEAF),
     ("docs/architecture/runtime/operations.md", LEAF),
