@@ -33,6 +33,43 @@ pub fn doc_scaffold_recovery(workspace: &Path) -> Result<(), String> {
     forbid(&text, "<path>docs</path>\n</act>")
 }
 
+pub fn recovery_loop_long_story(workspace: &Path) -> Result<(), String> {
+    let text = read_any(workspace, &["transcript.md", "run.log"])?;
+    require_all(
+        &text,
+        &[
+            "Create long SF story",
+            "document-construction",
+            "raw fs.write retry is blocked",
+            "doc.scaffold",
+            "NarrativeManuscript",
+            "stories/README.md",
+            "planning/premise.md",
+            "manuscript/chapter-arc-setup.md",
+            "graph.note kind=decision",
+            "document audit",
+        ],
+    )?;
+    forbid_any(
+        &text,
+        &[
+            "graph.note kind=planning",
+            "graph.note kind=progress",
+            "graph.note kind=note",
+            "graph.note kind=evidence",
+            "graph.note kind=recovery",
+            "graph policy refused memory.save",
+            "compaction only allows memory.save actions",
+            "agent.ask how should I proceed",
+            "<path>story.md</path>",
+        ],
+    )?;
+    if text.matches("<tool>graph.next</tool>").count() > 1 {
+        return Err("repeated graph.next diagnostic".to_string());
+    }
+    Ok(())
+}
+
 pub fn status_accounting(workspace: &Path) -> Result<(), String> {
     let text = read_file(&workspace.join("status.txt"))?;
     require_all(
@@ -100,4 +137,11 @@ fn forbid(text: &str, needle: &str) -> Result<(), String> {
     } else {
         Ok(())
     }
+}
+
+fn forbid_any(text: &str, needles: &[&str]) -> Result<(), String> {
+    for needle in needles {
+        forbid(text, needle)?;
+    }
+    Ok(())
 }

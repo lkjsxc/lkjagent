@@ -14,7 +14,7 @@ files, and good and bad fixtures.
 - [graph.rs](graph.rs): shortest-path certificate task.
 - [mod.rs](mod.rs): task list assembly.
 - [owner-docs.rs](owner_docs.rs): owner-reported project and recursive docs tasks.
-- [owner-faults.rs](owner_faults.rs): owner-reported action parameter recovery tasks.
+- [owner-faults.rs](owner_faults.rs): owner-reported parameter and recovery-loop tasks.
 - [owner-observability.rs](owner_observability.rs): owner-reported status and GPT log tasks.
 - [owner-thirty.rs](owner_thirty.rs): counted semantic documentation task.
 - [repair.rs](repair.rs): shell program repair task.
