@@ -48,6 +48,8 @@ The dispatcher sees one effective policy, so a closed graph case cannot reject
 - Maintenance must not save a memory row when an equivalent row exists.
 - Pruning must not claim rows were deleted, merged, or rewritten unless a real
   delete, merge, or rewrite operation ran.
+- Semantic merge and rewrite pruning must name changed row IDs and source row
+  IDs. See [../memory/semantic-merge.md](../memory/semantic-merge.md).
 - Maintenance may not write workspace files, run shell commands, mutate queue
   rows, edit graph cases, change git state, or call external services.
 - Maintenance still obeys the integrity invariants: one action per turn,

@@ -28,6 +28,12 @@ The only active modes are `OwnerTask`, `Recovery`, `Maintenance`,
 owns allowed tools, blocked tools, preferred action, valid examples, and
 completion semantics.
 
+## Stable Contract
+
+The stable architecture contract is
+[../../architecture/runtime/active-mode/](../../architecture/runtime/active-mode/README.md).
+This current-work file tracks the implementation gap against that contract.
+
 ## Selection Rules
 
 If a pending owner queue row exists, select `OwnerTask`. Else, if an active

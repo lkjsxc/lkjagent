@@ -9,6 +9,7 @@ lkjagent-runtime crate per [../overview.md](../overview.md).
 
 ## Table of Contents
 
+- [active-mode/](active-mode/README.md): turn authority, policy, completion, and preemption.
 - [agent-loop.md](agent-loop.md): the graph case, turn, and task lifecycle.
 - [daemon-process.md](daemon-process.md): process model, startup, shutdown, restart.
 - [queue-intake.md](queue-intake.md): turn-boundary delivery and waiting-task resume.

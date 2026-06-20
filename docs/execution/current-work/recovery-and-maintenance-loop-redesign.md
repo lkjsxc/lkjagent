@@ -44,6 +44,16 @@ tasks that did not create the requested long story or cookbook.
 - Repeated invalid actions force a different action class.
 - Recovery never suggests a tool that active policy rejects.
 
+## Stable Contracts
+
+The stable contracts are:
+
+- [runtime active mode](../../architecture/runtime/active-mode/README.md).
+- [artifact lifecycle](../../architecture/artifacts/lifecycle.md).
+- [artifact completion gates](../../architecture/artifacts/completion-gates.md).
+- [maintenance pruning](../../architecture/memory/maintenance-pruning.md).
+- [recovery ladders](../../architecture/state-graph/recovery-ladders.md).
+
 ## Active Mode Contract
 
 `OwnerTask`, `Recovery`, `Maintenance`, `Compaction`, and `ClosedIdle` are the

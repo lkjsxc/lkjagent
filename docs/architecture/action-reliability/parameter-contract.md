@@ -13,6 +13,8 @@ This file defines the typed parameter boundary for model actions.
 - Safe location aliases are normalized before refusal.
 - Parser-level parameter faults preserve the tool name so runtime recovery can
   render the exact valid example for that tool.
+- Recovery examples are generated from the registry and must remain valid
+  after safe alias normalization.
 
 ## Implementation Hooks
 

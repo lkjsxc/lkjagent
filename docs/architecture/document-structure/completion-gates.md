@@ -14,6 +14,8 @@ This file defines the evidence required before documentation work can close.
 - Content artifacts require README, manifest, semantic children,
   content-bearing files, and a passing audit.
 - Planning-only or scaffold-only output cannot close an artifact task.
+- Artifact completion also obeys
+  [../artifacts/completion-gates.md](../artifacts/completion-gates.md).
 
 ## Implementation Hooks
 

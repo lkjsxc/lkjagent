@@ -22,6 +22,9 @@ The manifest records:
 
 The manifest stores identity and audit metadata, not huge raw content.
 
+Adoption uses this identity to continue an existing equivalent root instead
+of creating duplicates. See [adoption.md](adoption.md).
+
 ## Location
 
 Use `.lkj-artifact.md` or an artifact-specific extension of

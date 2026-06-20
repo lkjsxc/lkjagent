@@ -34,6 +34,8 @@ maintenance restarts after no useful work.
 - Rows stay open until focused tests and Docker Compose verification prove the
   uploaded failure patterns cannot recur.
 - Documentation moves first, then code. Do not mark prompt-only guidance done.
+- Stable active-mode and artifact docs are contracts, not proof that the
+  blockers are closed.
 - Docker Compose verification is required for any implemented claim.
 - Historical fixes may exist, but this queue tracks the current controller and
   artifact hardening work until it passes the current final gate.

@@ -12,6 +12,11 @@ The runtime records each fault as typed graph state, then asks the graph
 controller for the next node, action class, and missing evidence. Prompt text
 may explain the route, but it is not the source of policy.
 
+The stable recovery route contract is
+[../../architecture/state-graph/recovery-ladders.md](../../architecture/state-graph/recovery-ladders.md).
+Active-mode admission is specified in
+[../../architecture/runtime/active-mode/dispatch-policy.md](../../architecture/runtime/active-mode/dispatch-policy.md).
+
 Fault classification separates parse, parameter, tool, repeat, endpoint,
 budget, context, verification, compaction, payload, and completion faults.
 Each class has a forced route and a bounded retry count.

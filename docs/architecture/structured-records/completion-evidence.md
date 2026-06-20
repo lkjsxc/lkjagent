@@ -13,6 +13,8 @@ threshold, and no pending owner followup.
 Artifact tasks also require artifact evidence: root exists, README exists,
 manifest exists, semantic children exist, content-bearing section files exist,
 and audit passed. A generic scaffold cannot satisfy a content artifact.
+The artifact gate list is
+[../artifacts/completion-gates.md](../artifacts/completion-gates.md).
 
 ## Blocked Handoff
 

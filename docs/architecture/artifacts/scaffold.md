@@ -16,6 +16,10 @@ Scaffold writes directories, README files, manifest files, semantic section
 files, and audit placeholders only when the profile requires them. It does not
 count empty placeholders as completed content.
 
+For content artifacts, scaffold output must be followed by bounded content
+write batches and a new audit before completion. See
+[write-batches.md](write-batches.md) and [repair.md](repair.md).
+
 ## Duplicate Prevention
 
 Duplicate detection uses artifact kind, normalized title, owner objective
