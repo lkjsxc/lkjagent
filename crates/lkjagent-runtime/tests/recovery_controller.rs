@@ -2,7 +2,72 @@ mod support;
 
 use lkjagent_runtime::step::{step, StepInput};
 use lkjagent_runtime::task::StopReason;
-use support::{repeat_notice, runtime_state, TestResult};
+use support::{ok_output, repeat_notice, runtime_state, TestResult};
+
+#[test]
+fn runtime_updates_active_node_after_graph_plan() -> TestResult<()> {
+    let state = open("fix parser bug")?;
+    let pending = step(
+        state,
+        StepInput::Completion {
+            content: plan_action("fix parser bug"),
+            tokens: 20,
+        },
+    )
+    .state;
+
+    let planned = step(
+        pending,
+        StepInput::ToolOutput(ok_output("graph plan recorded")),
+    );
+
+    assert_eq!(
+        planned
+            .state
+            .graph
+            .as_ref()
+            .map(|graph| graph.active_node.0),
+        Some("execute")
+    );
+    Ok(())
+}
+
+#[test]
+fn runtime_updates_active_node_after_observation() -> TestResult<()> {
+    let state = open("fix parser bug")?;
+    let planned = step(
+        step(
+            state,
+            StepInput::Completion {
+                content: plan_action("fix parser bug"),
+                tokens: 20,
+            },
+        )
+        .state,
+        StepInput::ToolOutput(ok_output("graph plan recorded")),
+    )
+    .state;
+    let pending = step(
+        planned,
+        StepInput::Completion {
+            content: "<act>\n<tool>fs.read</tool>\n<path>README.md</path>\n</act>".to_string(),
+            tokens: 10,
+        },
+    )
+    .state;
+
+    let observed = step(pending, StepInput::ToolOutput(ok_output("read README.md")));
+
+    assert_eq!(
+        observed
+            .state
+            .graph
+            .as_ref()
+            .map(|graph| graph.active_node.0),
+        Some("verify")
+    );
+    Ok(())
+}
 
 #[test]
 fn runtime_routes_param_fault_to_schema_action_class() -> TestResult<()> {
@@ -81,5 +146,11 @@ fn pending_read(state: lkjagent_runtime::task::RuntimeState) -> lkjagent_runtime
             content: "<act>\n<tool>fs.read</tool>\n<path>missing.md</path>\n</act>".to_string(),
             tokens: 10,
         },
+    )
+}
+
+fn plan_action(objective: &str) -> String {
+    format!(
+        "<act>\n<tool>graph.plan</tool>\n<objective>{objective}</objective>\n<steps>read README.md</steps>\n<checks>README.md is readable</checks>\n<paths>README.md</paths>\n<reason>establish controlled action</reason>\n</act>"
     )
 }

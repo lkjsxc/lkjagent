@@ -69,6 +69,7 @@ after native inspection, alternate native tools, and smaller scope have failed.
 ## Implementation Hooks
 
 - `crates/lkjagent-runtime/src/step/fault_wait.rs`
+- `crates/lkjagent-runtime/src/step/graph_phase.rs`
 - `crates/lkjagent-runtime/src/graph_state.rs`
 - `crates/lkjagent-runtime/src/task.rs`
 - `crates/lkjagent-tools/src/dispatch.rs`
@@ -84,6 +85,7 @@ after native inspection, alternate native tools, and smaller scope have failed.
 
 - `crates/lkjagent-runtime/tests/recovery_controller.rs`
 - `crates/lkjagent-tools/tests/graph_control_dispatch.rs`
+- `crates/lkjagent-graph/tests/best_next_transition.rs`
 - `crates/lkjagent-graph/tests/graph.rs`
 - `crates/lkjagent-benchmark` recovery-loop long-story corpus fixture.
 

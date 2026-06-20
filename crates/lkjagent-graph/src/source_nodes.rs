@@ -108,6 +108,7 @@ pub(crate) const DOC_TOOLS: &[&str] = &[
     "fs.list",
     "fs.tree",
     "fs.stat",
+    "fs.write",
     "doc.scaffold",
     "doc.audit",
     "fs.batch_write",

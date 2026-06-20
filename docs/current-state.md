@@ -32,8 +32,9 @@ the long-story recovery loop.
 
 The graph now has neutral ranked state tracks, an objective envelope that does
 not copy raw owner text, SQLite track snapshots, graph notice rendering,
-transition selection, and status/console display tests. Runtime recovery
-routes consume the selector; broader post-event controller use is still open.
+transition selection, and status/console display tests. Runtime recovery and
+normal post-event graph refresh routes consume the selector. Completion
+refusals now produce structured partial handoffs instead of vague denials.
 Compact token accounting is implemented for endpoint usage, status, and console. A
 single synthesized GPT handoff log is implemented and exposed through status,
 console, and `lkjagent gpt-log`. The benchmark corpus now includes the
@@ -55,9 +56,9 @@ newer runtime recovery controller behavior.
 | Document scaffold tool | implemented | semantic scaffold tests, quiet verify, compose smoke |
 | Document audit tool | implemented | topology and graph checks pass local gates |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md` |
-| State graph cases | partially implemented | ranked neutral tracks and pure transition selection exist; only recovery paths consume selection |
+| State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
-| Runtime recovery | partially implemented | parse/tool/repeat recovery, `recover-params`, selector routing, payload-risk recovery, and repeated-diagnostic refusal exist; full post-event controller integration remains open |
+| Runtime recovery | implemented | parse/tool/repeat recovery, `recover-params`, selector routing, payload-risk recovery, repeated-diagnostic refusal, selector-driven post-event refresh, and partial completion handoff proof exist |
 | Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
@@ -68,10 +69,8 @@ newer runtime recovery controller behavior.
 
 The dependency queue is
 [execution/current-blockers.md](execution/current-blockers.md). The main open
-risk is runtime recovery controller integration beyond recovery faults:
-transition quality must drive every state-changing event, completion must
-produce stronger evidence-backed partial handoffs, and final Docker Compose
-verification must prove the integrated repository.
+risk is proving the integrated repository with final Docker Compose
+verification after the latest controller changes.
 
 ## Out of Scope
 

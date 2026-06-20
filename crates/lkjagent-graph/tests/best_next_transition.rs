@@ -32,6 +32,18 @@ fn best_transition_prefers_execute_after_plan_and_context() {
 }
 
 #[test]
+fn best_transition_prefers_document_after_long_content_plan() {
+    let graph = source_graph();
+    let mut state = initial_state("Create long SF story.", Some(21));
+    state.plan.ready = true;
+
+    let selected = best_next_transition(&graph, &state, TransitionIntent::AfterPlan);
+
+    assert_eq!(selected.target, Some(GraphNodeId("document")));
+    assert_eq!(selected.legality, TransitionLegality::Legal);
+}
+
+#[test]
 fn best_transition_prefers_verify_after_observation() {
     let graph = source_graph();
     let mut state = initial_state("fix parser bug", Some(3));
