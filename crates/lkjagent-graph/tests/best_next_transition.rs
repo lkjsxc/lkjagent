@@ -118,6 +118,25 @@ fn best_transition_for_faults_choose_specific_recovery_nodes() {
 }
 
 #[test]
+fn payload_fault_routes_to_artifact_plan() {
+    let graph = source_graph();
+    let mut state = initial_state("Create a very long SF story.", Some(22));
+    state.active_node = GraphNodeId("recover");
+
+    let selected = best_next_transition(&graph, &state, TransitionIntent::AfterPayloadFault);
+
+    assert_eq!(
+        selected.target,
+        Some(GraphNodeId("recover-by-artifact-plan"))
+    );
+    assert_eq!(selected.legality, TransitionLegality::Legal);
+    assert_eq!(
+        selected.forced_action_class.as_deref(),
+        Some("artifact-plan-or-bounded-write")
+    );
+}
+
+#[test]
 fn best_transition_under_pressure_rejects_blocked_compaction() {
     let graph = source_graph();
     let mut state = initial_state("fix parser bug", Some(6));

@@ -14,6 +14,7 @@ mod budget;
 mod compact;
 mod cycle;
 mod effects_model;
+mod fault_meta;
 mod fault_wait;
 mod frames;
 mod graph_output;
