@@ -41,11 +41,20 @@ pub fn find(conn: &Connection, query: &str, limit: i64) -> StoreResult<Vec<Memor
 }
 
 pub fn normalize_fts_query(raw: &str) -> Option<String> {
+    let mut seen = Vec::new();
     let tokens = raw
         .split(|ch: char| !ch.is_alphanumeric())
         .map(str::trim)
         .filter(|token| !token.is_empty())
         .map(str::to_ascii_lowercase)
+        .filter(|token| {
+            if seen.iter().any(|seen_token| seen_token == token) {
+                false
+            } else {
+                seen.push(token.clone());
+                true
+            }
+        })
         .collect::<Vec<_>>();
     (!tokens.is_empty()).then(|| tokens.join(" "))
 }

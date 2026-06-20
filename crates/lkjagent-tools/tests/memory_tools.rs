@@ -29,6 +29,14 @@ fn memory_find_accepts_brackets_in_tags() -> TestResult<()> {
 }
 
 #[test]
+fn memory_find_deduplicates_normalized_terms() -> TestResult<()> {
+    let found = save_and_find("graph.note graph-note", "graph note recovery detail")?;
+    assert!(found.content.contains("query_normalized=graph note"));
+    assert!(found.content.contains("graph note recovery"));
+    Ok(())
+}
+
+#[test]
 fn memory_save_duplicate_returns_existing_id_or_skip_notice() -> TestResult<()> {
     let workspace = temp_workspace("memory-duplicate")?;
     let runtime = runtime(workspace)?;
