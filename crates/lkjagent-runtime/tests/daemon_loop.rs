@@ -49,7 +49,7 @@ fn daemon_delivers_queue_writes_file_and_records_done() -> TestResult<()> {
     assert!(log
         .iter()
         .any(|event| event.content.contains("task-summary")));
-    let usage = token_usage::latest(&conn)?.expect("endpoint token usage");
+    let usage = token_usage::latest(&conn)?.ok_or("endpoint token usage")?;
     assert_eq!(usage.input_tokens, Some(5));
     assert_eq!(usage.output_tokens, Some(3));
     assert_eq!(usage.source, "endpoint");

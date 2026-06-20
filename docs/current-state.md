@@ -12,7 +12,7 @@ The repository contains a Rust workspace, documentation contracts, local gates,
 a tag-based action parser, graph case state, context budgeting, SQLite storage,
 an endpoint client, tool dispatch, a daemon loop, and CLI surfaces for queue,
 status, log, console, and memory. Those pieces exist, but owner-visible task
-completion remains unreliable.
+completion still depends on endpoint quality and graph-controller depth.
 
 Owner-reported failures are current evidence. The harness previously generated
 semantically poor documentation files such as part-001.md and could loop on
@@ -32,6 +32,9 @@ single synthesized GPT handoff log is implemented and exposed through status,
 console, and `lkjagent gpt-log`. The benchmark corpus now includes the
 owner-reported documentation, action recovery, accounting, and GPT log failure
 cases with known-good and known-bad fixtures.
+Docker Compose verification and a live smoke run now pass for semantic
+recursive documentation generation, graph manifest creation, compact
+context/token status, and the single GPT handoff log.
 
 ## Area Status
 
@@ -41,9 +44,9 @@ cases with known-good and known-bad fixtures.
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol` |
 | Tool dispatcher | partially implemented | safe parameter normalization and focused parameter recovery exist; broader transition scoring is not fully wired |
-| Document scaffold tool | partially implemented | semantic scaffold tests pass; final gate not yet run |
-| Document audit tool | partially implemented | topology and graph checks exist; final gate not yet run |
-| Recursive document seed | partially implemented | deterministic tree uses semantic contract paths |
+| Document scaffold tool | implemented | semantic scaffold tests, quiet verify, compose smoke |
+| Document audit tool | implemented | topology and graph checks pass local gates |
+| Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md` |
 | State graph cases | partially implemented | ranked neutral tracks exist; controller integration remains shallow |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
 | Runtime recovery | partially implemented | parse/tool/repeat recovery and `recover-params` exist; broader transition controller remains shallow |
@@ -51,14 +54,14 @@ cases with known-good and known-bad fixtures.
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
 | GPT handoff log | implemented | runtime and CLI write one current Markdown snapshot |
-| Mechanical benchmarks | partially implemented | owner failure cases are covered by corpus fixtures; compose smoke is still pending |
+| Mechanical benchmarks | implemented | owner failure cases are covered by corpus fixtures and `benchmark check-corpus` passes |
 
 ## Open Work
 
 The dependency queue is
-[execution/current-blockers.md](execution/current-blockers.md). The first
-active slice is to make the documentation contract honest, then replace the
-semantic document scaffold and audit behavior.
+[execution/current-blockers.md](execution/current-blockers.md). The reliability
+redesign has local and compose evidence; remaining open risk is deeper
+transition-controller integration beyond the focused recovery paths.
 
 ## Out of Scope
 

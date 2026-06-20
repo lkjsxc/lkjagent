@@ -1,6 +1,6 @@
 use lkjagent_graph::{
     initial_state, promote_recovery_track, ranked_state_tracks, render_graph_slice, source_graph,
-    GraphNodeId, StatePosture, StateTrack, TaskPhase,
+    GraphNodeId, StatePosture, StateTrack, StateTrackInput, TaskPhase,
 };
 
 #[test]
@@ -57,16 +57,16 @@ fn recovery_track_rises_after_parse_fault() {
 }
 
 fn track(label: &str, intensity: u8, phase: TaskPhase, turn: u64, gaps: &[&str]) -> StateTrack {
-    let mut track = StateTrack::new(
+    let mut track = StateTrack::new(StateTrackInput {
+        id: label,
         label,
-        label,
-        StatePosture::Implementing,
+        posture: StatePosture::Implementing,
         intensity,
-        70,
+        confidence: 70,
         phase,
-        GraphNodeId("execute"),
+        active_node: GraphNodeId("execute"),
         gaps,
-    );
+    });
     track.last_update_turn = Some(turn);
     track
 }

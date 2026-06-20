@@ -57,7 +57,7 @@ pub use source::source_graph;
 pub use state::*;
 pub use state_track::{
     promote_recovery_track, ranked_state_tracks, render_ranked_tracks, score_decimal,
-    RankedStateTrack, StatePosture, StateTrack, StateTrackId,
+    RankedStateTrack, StatePosture, StateTrack, StateTrackId, StateTrackInput,
 };
 pub use state_track_seed::initial_state_tracks;
 pub use transition::{

@@ -11,15 +11,15 @@ evidence named by the task contract and the actual gates that ran.
 | --- | --- | --- | --- |
 | 1 | Owner-reported reliability failures are not recorded as active work | [current-work/owner-reported-failures.md](current-work/owner-reported-failures.md) | done |
 | 2 | Documentation lacks a semantic tree and graph contract | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | done |
-| 3 | `doc.scaffold` can emit sequence-named child files | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | focused tests pass |
-| 4 | `doc.audit` does not enforce the desired topology contract | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | focused tests pass |
-| 5 | Action parameter drift can produce weak unknown-param loops | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | focused tests pass |
+| 3 | `doc.scaffold` can emit sequence-named child files | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | done |
+| 4 | `doc.audit` does not enforce the desired topology contract | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | done |
+| 5 | Action parameter drift can produce weak unknown-param loops | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | done |
 | 6 | Owner messages need stronger objective envelopes and candidate tracks | [current-work/multi-state-runtime.md](current-work/multi-state-runtime.md) | focused tests pass; controller use pending |
-| 7 | Status and console omit compact context and token accounting | [current-work/context-accounting.md](current-work/context-accounting.md) | focused tests pass |
-| 8 | No single current GPT handoff log exists | [current-work/gpt-log.md](current-work/gpt-log.md) | focused tests pass |
-| 9 | Recovery nodes are not specific enough for parameter faults | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | focused tests pass |
-| 10 | Benchmarks do not cover the owner-reported failures | [current-work/verification-plan.md](current-work/verification-plan.md) | focused tests pass |
-| 11 | Compose smoke evidence is missing after the reliability redesign | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
+| 7 | Status and console omit compact context and token accounting | [current-work/context-accounting.md](current-work/context-accounting.md) | done |
+| 8 | No single current GPT handoff log exists | [current-work/gpt-log.md](current-work/gpt-log.md) | done |
+| 9 | Recovery nodes are not specific enough for parameter faults | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | done |
+| 10 | Benchmarks do not cover the owner-reported failures | [current-work/verification-plan.md](current-work/verification-plan.md) | done |
+| 11 | Compose smoke evidence is missing after the reliability redesign | [current-work/verification-plan.md](current-work/verification-plan.md) | done |
 
 ## Owner Failure
 

@@ -1,6 +1,8 @@
 use std::path::Path;
 
-use super::model::{leaf, readme, write_leaves, write_readmes, Counts, LeafSeed, ReadmeSeed};
+use super::model::{
+    leaf, readme, write_doc_graph, write_leaves, write_readmes, Counts, LeafSeed, ReadmeSeed,
+};
 use crate::error::ToolResult;
 
 const ROOT_LINKS: &str = "- [docs/README.md](README.md): docs root.";
@@ -143,9 +145,10 @@ pub fn scaffold(workspace: &Path) -> ToolResult<String> {
     let mut counts = Counts::default();
     write_readmes(workspace, README_SEEDS, &mut counts)?;
     write_leaves(workspace, LEAF_SEEDS, &mut counts)?;
+    write_doc_graph(workspace, "generic", &mut counts)?;
     crate::structure::verify_recursive_tree(workspace)?;
     Ok(format!(
-        "recursive docs scaffold profile=generic root=docs\ncreated_files={}\nskipped_existing={}\nverification=ok",
+        "recursive docs scaffold profile=generic root=docs\ngraph=docs/.lkj-doc-graph.md\ncreated_files={}\nskipped_existing={}\nverification=ok",
         counts.created, counts.skipped
     ))
 }

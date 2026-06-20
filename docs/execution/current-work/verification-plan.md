@@ -11,6 +11,8 @@ required before the reliability redesign can close.
 - Add benchmark cases for semantic docs, parameter recovery, accounting, and the GPT log.
 - Run focused crate tests before workspace and compose gates.
 - Report only gates that actually ran.
+- The compose smoke must show `.lkj-doc-graph.md`, no part files, compact
+  context/token accounting, and printable `gpt-log` output.
 
 ## Implementation Hooks
 
@@ -18,6 +20,7 @@ required before the reliability redesign can close.
 - Tests: `crates/lkjagent-benchmark`
 - Tests: `cargo run -p lkjagent-xtask -- benchmark check-corpus`
 - Verification: `docker compose run --rm verify`
+- Verification: `docker compose up -d --build agent`
 
 ## Failure Modes
 
@@ -27,4 +30,4 @@ required before the reliability redesign can close.
 
 ## Status
 
-partially implemented
+implemented
