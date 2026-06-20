@@ -28,4 +28,4 @@ This file defines the recursive filesystem shape for generated documentation.
 
 ## Status
 
-design-only
+partially implemented

@@ -27,4 +27,4 @@ This file defines deterministic semantic shapes for `doc.scaffold`.
 
 ## Status
 
-design-only
+partially implemented

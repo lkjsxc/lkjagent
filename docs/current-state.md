@@ -14,12 +14,11 @@ an endpoint client, tool dispatch, a daemon loop, and CLI surfaces for queue,
 status, log, console, and memory. Those pieces exist, but owner-visible task
 completion remains unreliable.
 
-Owner-reported failures are current evidence. The harness can generate
-semantically poor documentation files such as part-001.md and can loop on
-action parameter faults such as unknown params [path]. The code confirms the
-generic document scaffold still creates sequence-named child files, and the
-generic recursive seed still contains release-shaped API paths that violate the
-documentation standards.
+Owner-reported failures are current evidence. The harness previously generated
+semantically poor documentation files such as part-001.md and can still loop on
+action parameter faults such as unknown params [path]. The generic document
+scaffold now has focused tests for semantic names, README indexes, exact-count
+semantic files, graph manifests, and audit rejection of sequence-only names.
 
 The daemon also lacks enough neutral multi-state progress, compact token
 accounting, and a single synthesized GPT handoff log for a stronger external
@@ -34,9 +33,9 @@ implementation and tests prove them.
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol` |
 | Tool dispatcher | partially implemented | strict parameter errors still lack robust recovery |
-| Document scaffold tool | broken | `doc.scaffold` emits sequence-named child files |
-| Document audit tool | partially implemented | checks README and counts, not full topology graph |
-| Recursive document seed | partially implemented | deterministic tree exists with stale API-shaped paths |
+| Document scaffold tool | partially implemented | semantic scaffold tests pass; final gate not yet run |
+| Document audit tool | partially implemented | topology and graph checks exist; final gate not yet run |
+| Recursive document seed | partially implemented | deterministic tree uses semantic contract paths |
 | State graph cases | partially implemented | one case exists, but ranked neutral tracks are missing |
 | Owner objective normalization | partially implemented | raw owner text can dominate task framing |
 | Runtime recovery | partially implemented | parse/tool recovery exists, parameter recovery is shallow |

@@ -27,4 +27,4 @@ This file defines the graph layer generated beside a documentation tree.
 
 ## Status
 
-design-only
+partially implemented
