@@ -14,6 +14,8 @@ A `CompactionPlan` preserves:
   and touched paths.
 - selected packages, package compression, legal next transitions, recent
   failures, recovery strategy, and completion readiness.
+- artifact ledger, fault state, last successful action, and blocked next
+  action.
 
 The restart notice is rendered from this structured state. A task summary row
 may exist for memory retrieval, but it is not the source of truth.
@@ -39,4 +41,5 @@ the runtime snapshots state and rebuilds the prefix without model action.
 
 ## Status
 
-implemented.
+partially implemented; forced compaction is runtime-owned. Rich artifact and
+blocked-action preservation remain open.

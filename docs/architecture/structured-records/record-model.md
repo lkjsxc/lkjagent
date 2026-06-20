@@ -7,9 +7,21 @@ pile of repeated Markdown stubs.
 
 ## Kinds
 
-The structured record graph contains Topic, Subtopic, Artifact, Section,
-Claim, Evidence, Decision, Task, Failure, Recovery, MemoryEntry, DocumentNode,
-WriteBatch, VerificationCheck, and CompletionGate records.
+The structured record graph contains:
+
+- `TopicRecord`
+- `SubtopicRecord`
+- `ArtifactRecord`
+- `ArtifactNode`
+- `SectionRecord`
+- `ClaimRecord`
+- `EvidenceRecord`
+- `DecisionRecord`
+- `FailureRecord`
+- `RecoveryRecord`
+- `MemoryRecord`
+- `VerificationRecord`
+- `CompletionRecord`
 
 Each record stores kind, title, scope path, owning task id, source event id,
 tags, content hash, status, and links to parent, child, prerequisite, evidence,
@@ -21,7 +33,7 @@ record may pretend a file or memory row exists before the effect succeeds.
 The default identity is:
 
 ```text
-record_id = kind + normalized_title_slug + scope_path + content_hash_prefix
+record_key = kind + normalized_title_slug + scope_path + content_hash_prefix
 ```
 
 The slug is normalized ASCII, lower case, punctuation-collapsed, and stable
@@ -36,4 +48,5 @@ does not decide identity by free-form file name alone.
 
 ## Status
 
-design, implementation pending
+partially implemented; graph cases, document state, memory rows, evidence,
+faults, and transitions exist. A unified structured-record API remains open.

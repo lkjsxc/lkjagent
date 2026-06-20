@@ -8,27 +8,32 @@ focused tests, and gates prove it.
 
 ## Summary
 
-The repository contains a Rust workspace, documentation contracts, local gates,
-a tag-based action parser, graph case state, context budgeting, SQLite storage,
-an endpoint client, tool dispatch, a daemon loop, and CLI surfaces for queue,
-status, log, console, and memory.
+The core crates, local gates, parser, dispatcher, graph model, transition
+scoring, context budgeting, SQLite storage, endpoint client, daemon loop,
+queue intake, status, log, console, and memory CLI surfaces exist.
 
-The parser, dispatcher, graph, context engine, store, endpoint client, and
-queue exist. The implementation is not yet fully safe for the uploaded
-GPT-5.5-Pro failure logs. Runtime completion is safer but still lacks richer
-blocked handoff states, maintenance pruning remains incomplete, recovery can
-still need fuller deterministic repeat control, and compaction snapshots remain
-shallow. Structured record identity is not yet sufficient to prevent every
-duplicate knowledge artifact.
+The implementation is not yet fully safe for the uploaded run logs. Runtime
+transition control remains insufficient. Active mode selection is not
+authoritative enough across owner work, recovery, maintenance, compaction, and
+closed idle. Maintenance and graph policy can still contradict each other in
+some paths. Compaction and graph policy must stay runtime-owned so hard
+pressure never requires a blocked model `memory.save`.
 
-Owner-reported failures are current evidence. The harness previously generated
-semantically poor documentation files such as part-001.md and could loop on
-action parameter faults such as unknown params [path]. Newer logs show broader
-system failure: repeated parse faults, invalid parameter loops, invalid
-`graph.note` kinds, invalid `memory.save` kinds, duplicate memory entries,
-blocked `memory.save` during maintenance, blocked `doc.scaffold` during
-recovery, repeated `graph.next`, premature `agent.done`, and content tasks that
-completed without the requested story or cookbook artifact.
+Memory writes now have exact duplicate protection and punctuation-safe search,
+but semantic maintenance merge and rewrite pruning remain incomplete. Long
+content tasks route toward story and cookbook scaffolds, but semantic artifact
+identity, adoption, repair, and content-bearing completion need deeper
+runtime enforcement. Recovery can still block the tools required to escape a
+fault. Completion can still be too close to planning or scaffold evidence
+unless artifact audit gates are enforced at every close path. Visible
+objective rendering must not show revision-style prefixes.
+
+Owner-reported failures remain active evidence: repeated parse faults,
+invalid `graph.plan`, blocked `doc.scaffold`, blocked `fs.write`, empty
+cookbook roots, duplicate memory rows, FTS punctuation failures, policy
+contradictions, false completion after scaffold-only output, repeated
+`graph.next`, invalid note and memory kinds, compaction deadlocks, and owner
+questions about internal tool uncertainty.
 
 The graph now has neutral ranked state tracks, an objective envelope that does
 not copy raw owner text, SQLite track snapshots, graph notice rendering,
@@ -51,19 +56,19 @@ and Docker Compose verification passed for this redesign slice on 2026-06-20.
 | Cargo workspace and gates | implemented | `Cargo.toml`; `crates/lkjagent-xtask` |
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol` |
-| Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for graph plan/note/evidence, memory save, fs.stat, and doc.scaffold; maintenance dispatch now suppresses graph policy, broader active-mode loop integration remains open |
+| Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; single effective-policy enforcement remains open |
 | Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; quiet verify from prior controller work |
 | Document audit tool | implemented | topology checks pass local gates; content artifacts reject scaffold-only leaves; runtime records document-structure only for passed audits |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
-| Memory save and find | partially implemented | accepted kinds, duplicate skip, punctuation-safe FTS queries, and exact duplicate prune have focused tests; semantic merge/rewrite pruning remains open |
+| Memory save and find | partially implemented | accepted kinds, duplicate skip, punctuation-safe FTS queries, and exact duplicate prune have focused tests; semantic merge and rewrite pruning remain open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
-| Runtime recovery | partially implemented | pure active-mode selection exists, maintenance/compaction modes do not render graph-policy refusals, internal `agent.ask` questions are refused, runtime close rechecks graph completion, and no-op maintenance defers restart; repeated invalid actions still need full deterministic recovery control |
-| Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned and preserves active graph/fault state; richer structured snapshots remain open |
+| Runtime recovery | partially implemented | pure active-mode selection exists, maintenance and compaction modes reduce graph-policy contradictions, internal `agent.ask` questions are refused, runtime close rechecks graph completion, and no-op maintenance defers restart; repeated invalid actions still need deterministic recovery control |
+| Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned and preserves active graph and fault state; richer structured snapshots remain open |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
 | GPT handoff log | implemented | runtime and CLI write one current Markdown snapshot |
-| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist; corpus, quiet verify, and Docker Compose verify pass for this slice |
+| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist; corpus check passes; final quiet and Docker Compose verification must run for the current change |
 
 ## Open Work
 

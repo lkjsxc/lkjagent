@@ -66,6 +66,8 @@ Distilled durable knowledge, written per [distillation.md](distillation.md).
 
 memory_fts is an FTS5 mirror over title, tags, and content. It is kept in
 sync with memory inside the same transaction as every memory write.
+`memory.find` normalizes raw search text before MATCH so punctuation such as
+tool names, brackets, and hyphens cannot create an FTS syntax loop.
 
 ### graph_cases
 
@@ -170,6 +172,8 @@ the fixed reason `owner-send`.
 - memory rows may be updated and deleted, but only through memory.save,
   memory.prune, and the prune-memory directive per
   [distillation.md](distillation.md).
+- memory.save is idempotent by default; equivalent rows return or update the
+  existing row rather than inserting a duplicate.
 
 ## Deliberately Not Stored
 

@@ -13,6 +13,8 @@ Duplicate detection uses these checks before writes:
 - near-duplicate title plus high content overlap.
 - same tags plus same owning task.
 - same artifact root plus same section role.
+- same artifact kind plus same normalized title.
+- same owner objective hash.
 
 ## Decisions
 
@@ -24,8 +26,10 @@ as a bounded observation. Silent duplicate writes are forbidden.
 
 Memory identity uses kind, title slug, sorted tags key, and content hash. A
 duplicate memory save returns the existing id or a skip notice; it does not
-create another equivalent row.
+create another equivalent row. Maintenance-generated rows dedupe aggressively.
 
 ## Status
 
-design, implementation pending
+partially implemented; exact memory duplicate skips and exact duplicate prune
+exist. Near-duplicate merge, artifact adoption, and repair decisions remain
+open.

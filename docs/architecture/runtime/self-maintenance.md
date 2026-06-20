@@ -32,6 +32,10 @@ The harness tracks per-directive last-run stamps in the state table when a
 cycle opens. A directive is due after its cooldown interval passes. The
 daemon, not the model, decides when the next cycle starts.
 
+Maintenance runs under `Maintenance` active mode, not under graph task policy.
+The dispatcher sees one effective policy, so a closed graph case cannot reject
+`memory.save` while maintenance mode admits it.
+
 ## Bounds
 
 - Maintenance uses the same protocol and turn budget as task work, but the
@@ -52,6 +56,8 @@ daemon, not the model, decides when the next cycle starts.
 - A maintenance cycle that finds nothing useful ends early with agent.done
   and a one-line summary. Recent stamps delay the next idle restart so
   maintenance cannot spin in a tight endpoint loop.
+- Maintenance does not write a memory row merely to say there was nothing to
+  do.
 
 ## Heartbeat
 
