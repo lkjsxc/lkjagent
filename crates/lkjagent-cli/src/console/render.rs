@@ -73,21 +73,41 @@ fn bottom_deck(
     width: usize,
 ) -> Result<Vec<String>, CliError> {
     let mut lines = vec![style::muted(&rule(width))];
-    lines.extend(wrap_limited(
-        &format!(
-            "state {} | pending {pending} | task {} | turns {}",
-            state_label(state),
-            state_value(conn, "open task", "none")?,
-            state_value(conn, "turn", "0")?
-        ),
-        width,
-        2,
-    ));
+    let states = active_states(conn)?;
+    let mut state_line = format!(
+        "state {} | pending {pending} | task {} | turns {}",
+        state_label(state),
+        state_value(conn, "open task", "none")?,
+        state_value(conn, "turn", "0")?
+    );
+    if states != "none" {
+        state_line.push_str(&format!(" | states {states}"));
+    }
+    lines.extend(wrap_limited(&state_line, width, 2));
     lines.extend(optional_row(conn, "question", "daemon question", width, 2)?);
     lines.extend(optional_row(conn, "error", "daemon error", width, 1)?);
     lines.extend(wrap_limited(&format!("notice {notice}"), width, 1));
     lines.extend(wrap_limited(&hint(state, pending), width, 1));
     Ok(lines)
+}
+
+fn active_states(conn: &rusqlite::Connection) -> Result<String, CliError> {
+    let Some(case) = lkjagent_store::graph::active_case(conn)? else {
+        return Ok("none".to_string());
+    };
+    let rows = lkjagent_store::graph::state_tracks::state_tracks_for_case(conn, case.id)?;
+    if rows.is_empty() {
+        return Ok("none".to_string());
+    }
+    Ok(rows
+        .iter()
+        .take(3)
+        .enumerate()
+        .map(|(index, row)| {
+            lkjagent_runtime::graph_state_tracks::format_state_track_row(index + 1, row)
+        })
+        .collect::<Vec<_>>()
+        .join("; "))
 }
 
 fn optional_row(

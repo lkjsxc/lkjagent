@@ -56,6 +56,10 @@ pub enum Effect {
         ladder_position: u8,
         strategy: String,
     },
+    ReplaceGraphStateTracks {
+        case_id: i64,
+        tracks: Vec<GraphStateTrackEffect>,
+    },
     UpdateGraphCase {
         case_id: i64,
         phase: String,
@@ -82,4 +86,20 @@ pub struct GraphPlanStepEffect {
     pub node: String,
     pub target_paths: Vec<String>,
     pub checks: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GraphStateTrackEffect {
+    pub track_id: String,
+    pub label: String,
+    pub posture: String,
+    pub intensity: u8,
+    pub confidence: u8,
+    pub phase: String,
+    pub active_node: String,
+    pub evidence_gap: Vec<String>,
+    pub next_affordances: Vec<String>,
+    pub risk: Vec<String>,
+    pub last_update_turn: Option<u64>,
+    pub rank_score: u8,
 }

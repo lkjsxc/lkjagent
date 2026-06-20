@@ -9,12 +9,12 @@ evidence named by the task contract and the actual gates that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Owner-reported reliability failures are not recorded as active work | [current-work/owner-reported-failures.md](current-work/owner-reported-failures.md) | open |
-| 2 | Documentation lacks a semantic tree and graph contract | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | open |
-| 3 | `doc.scaffold` can emit sequence-named child files | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | open |
-| 4 | `doc.audit` does not enforce the desired topology contract | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | open |
-| 5 | Action parameter drift can produce weak unknown-param loops | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | open |
-| 6 | Owner messages need stronger objective envelopes and candidate tracks | [current-work/multi-state-runtime.md](current-work/multi-state-runtime.md) | open |
+| 1 | Owner-reported reliability failures are not recorded as active work | [current-work/owner-reported-failures.md](current-work/owner-reported-failures.md) | done |
+| 2 | Documentation lacks a semantic tree and graph contract | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | done |
+| 3 | `doc.scaffold` can emit sequence-named child files | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | focused tests pass |
+| 4 | `doc.audit` does not enforce the desired topology contract | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | focused tests pass |
+| 5 | Action parameter drift can produce weak unknown-param loops | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | focused tests pass |
+| 6 | Owner messages need stronger objective envelopes and candidate tracks | [current-work/multi-state-runtime.md](current-work/multi-state-runtime.md) | focused tests pass; controller use pending |
 | 7 | Status and console omit compact context and token accounting | [current-work/context-accounting.md](current-work/context-accounting.md) | open |
 | 8 | No single current GPT handoff log exists | [current-work/gpt-log.md](current-work/gpt-log.md) | open |
 | 9 | Recovery nodes are not specific enough for parameter faults | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | open |

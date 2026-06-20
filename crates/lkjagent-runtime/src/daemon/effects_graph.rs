@@ -2,6 +2,7 @@ use rusqlite::Connection;
 
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
+use crate::graph_state_tracks::store_track_rows;
 use crate::step::Effect;
 
 impl ResidentDaemon {
@@ -112,6 +113,11 @@ impl ResidentDaemon {
                 now,
             )
             .map_err(Into::into),
+            Effect::ReplaceGraphStateTracks { case_id, tracks } => {
+                let rows = store_track_rows(tracks);
+                lkjagent_store::graph::state_tracks::replace_state_tracks(conn, case_id, &rows, now)
+                    .map_err(Into::into)
+            }
             _ => Ok(()),
         }
     }

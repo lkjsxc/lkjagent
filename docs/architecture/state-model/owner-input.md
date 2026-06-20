@@ -15,7 +15,7 @@ This file defines owner messages as evidence for a task case.
 ## Implementation Hooks
 
 - Source: `crates/lkjagent-graph/src/case_objective.rs`
-- Tests: `crates/lkjagent-runtime/tests/prompt_daemon.rs`
+- Tests: `crates/lkjagent-graph/tests/state_tracks.rs`
 - Verification: `docker compose run --rm verify`
 
 ## Failure Modes

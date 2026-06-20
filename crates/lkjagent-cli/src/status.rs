@@ -16,6 +16,7 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
     let daemon_error = state_value(&conn, "daemon error", "none")?;
     let turns = state_value(&conn, "turn", "0")?;
     let last_compaction = last_compaction(&conn)?;
+    let active_states = active_states(&conn)?;
     let policy = load_context_policy_for_status(data_dir)?;
     let used = state_value(&conn, "context used tokens", "0")?;
     let used_tokens: usize = used.parse::<usize>().unwrap_or_default();
@@ -25,7 +26,7 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
         pressure_name(policy.pressure(used_tokens, 0)),
     )?;
     Ok(format!(
-        "daemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\ndaemon_question={daemon_question}\ndaemon_error={daemon_error}\nturns={turns}\ncontext_window={}\ncontext_reserve={}\ncontext_used_tokens={used}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_soft_trigger={}\ncontext_hard_trigger={}\ncontext_post_compaction_target={}\ncontext_pressure={pressure}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
+        "daemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\ndaemon_question={daemon_question}\ndaemon_error={daemon_error}\nturns={turns}\nactive_states={active_states}\ncontext_window={}\ncontext_reserve={}\ncontext_used_tokens={used}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_soft_trigger={}\ncontext_hard_trigger={}\ncontext_post_compaction_target={}\ncontext_pressure={pressure}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
         policy.window,
         policy.reserve,
         prefix_cap_total(),
@@ -35,6 +36,25 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
         policy.post_compaction_target,
         policy.hard_trigger
     ))
+}
+
+fn active_states(conn: &rusqlite::Connection) -> Result<String, CliError> {
+    let Some(case) = lkjagent_store::graph::active_case(conn)? else {
+        return Ok("none".to_string());
+    };
+    let rows = lkjagent_store::graph::state_tracks::state_tracks_for_case(conn, case.id)?;
+    if rows.is_empty() {
+        return Ok("none".to_string());
+    }
+    Ok(rows
+        .iter()
+        .take(3)
+        .enumerate()
+        .map(|(index, row)| {
+            lkjagent_runtime::graph_state_tracks::format_state_track_row(index + 1, row)
+        })
+        .collect::<Vec<_>>()
+        .join("; "))
 }
 
 fn state_value(conn: &rusqlite::Connection, key: &str, default: &str) -> Result<String, CliError> {

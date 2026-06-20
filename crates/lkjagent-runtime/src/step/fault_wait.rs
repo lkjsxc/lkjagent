@@ -1,7 +1,7 @@
 use lkjagent_context::assemble::append_frame;
 use lkjagent_context::model::NoticeKind;
 use lkjagent_graph::case_recovery::{FaultKind, RecoveryRecord};
-use lkjagent_graph::{CaseStatus, GraphNodeId, TaskPhase};
+use lkjagent_graph::{promote_recovery_track, CaseStatus, GraphNodeId, TaskPhase};
 use lkjagent_store::events::EventKind;
 
 use crate::graph_state::graph_notice_frame;
@@ -103,6 +103,14 @@ fn route_graph(
     graph.recovery.ladder_position = count.min(5);
     graph.recovery.strategy = Some(notice.to_string());
     graph.recovery.last_failed_action_fingerprint = action_fingerprint.clone();
+    let label = format!("{}-recovery", fault_name(kind));
+    promote_recovery_track(
+        &mut graph.state_tracks,
+        &label,
+        graph.active_node,
+        graph.phase,
+    );
+    graph.objective.attach_tracks(&graph.state_tracks);
     graph.recovery.history.push(RecoveryRecord {
         kind,
         summary: notice.to_string(),
@@ -139,6 +147,10 @@ fn push_graph_effects(
         phase: graph.phase.as_str().to_string(),
         active_node: graph.active_node.0.to_string(),
         status: graph.status_text().to_string(),
+    });
+    effects.push(Effect::ReplaceGraphStateTracks {
+        case_id,
+        tracks: crate::graph_state_tracks::graph_track_effects(graph),
     });
 }
 

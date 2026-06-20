@@ -7,6 +7,18 @@ pub struct ConstraintRecord {
     pub strength: ConstraintStrength,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct IntentHypothesis {
+    pub label: String,
+    pub confidence: u8,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PreferenceRecord {
+    pub summary: String,
+    pub source: String,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ConstraintStrength {
     Hard,

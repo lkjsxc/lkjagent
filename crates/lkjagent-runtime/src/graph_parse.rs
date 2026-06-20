@@ -69,6 +69,7 @@ pub(crate) fn node_id(value: &str) -> GraphNodeId {
         "verify" => GraphNodeId("verify"),
         "escape" => GraphNodeId("escape"),
         "recover" => GraphNodeId("recover"),
+        "recover-parse" => GraphNodeId("recover-parse"),
         "recover-tool" => GraphNodeId("recover-tool"),
         "recover-repeat" => GraphNodeId("recover-repeat"),
         "compact-soft" => GraphNodeId("compact-soft"),

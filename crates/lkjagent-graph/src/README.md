@@ -45,5 +45,7 @@ workspace dependencies.
 - [source_verification.rs](source_verification.rs): verification node definitions.
 - [source_docs.rs](source_docs.rs): document family helpers.
 - [transition.rs](transition.rs): legal transition admission.
+- [state_track.rs](state_track.rs): neutral active-state track model and ranking.
+- [state_track_seed.rs](state_track_seed.rs): initial track seeds by task family.
 - [validate.rs](validate.rs): source graph validation.
 - [validate_tools.rs](validate_tools.rs): validation allowlist for registry tool ids.

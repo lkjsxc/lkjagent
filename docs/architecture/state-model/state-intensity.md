@@ -16,8 +16,8 @@ This file owns ranked active-state scoring.
 
 ## Implementation Hooks
 
-- Source: `crates/lkjagent-graph/src/state.rs`
-- Tests: `crates/lkjagent-graph/src/state.rs`
+- Source: `crates/lkjagent-graph/src/state_track.rs`
+- Tests: `crates/lkjagent-graph/tests/state_tracks.rs`
 - Verification: `docker compose run --rm verify`
 
 ## Failure Modes
@@ -28,4 +28,4 @@ This file owns ranked active-state scoring.
 
 ## Status
 
-not implemented
+implemented
