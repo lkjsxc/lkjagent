@@ -7,6 +7,8 @@ This directory holds integration tests for dispatch and every tool adapter.
 ## Table of Contents
 
 - [benchmark_seed.rs](benchmark_seed.rs): benchmark and counted scaffold fixtures.
+- [artifact_next.rs](artifact_next.rs): next bounded artifact batch fixtures.
+- [artifact_tools.rs](artifact_tools.rs): artifact plan, apply, and audit fixtures.
 - [control_count_mode_scope.rs](control_count_mode_scope.rs): scoped count-mode wording fixtures.
 - [control_count_hyphen_words.rs](control_count_hyphen_words.rs): hyphenated number-word fixtures.
 - [control_count_words.rs](control_count_words.rs): count guard number-word fixtures.

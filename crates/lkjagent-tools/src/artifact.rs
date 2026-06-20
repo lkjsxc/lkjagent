@@ -47,13 +47,20 @@ pub fn audit(
         return Ok(report);
     }
     let full = workspace_path(workspace, root)?;
-    let manifest = fs::read_to_string(full.join(".lkj-doc-graph.md")).unwrap_or_default();
+    let manifest = match fs::read_to_string(full.join(".lkj-doc-graph.md")) {
+        Ok(text) => text,
+        Err(_) => String::new(),
+    };
     if kind_mismatch(kind, &manifest) {
         return Ok(format!(
             "document audit failed\nroot={root}\nchecks=15\npassed=14\nfailed=1\nfailures:\n- artifact_kind_mismatch: expected={kind}\nnext_action=artifact.apply matching artifact kind"
         ));
     }
     Ok(report.replace("document audit", "artifact audit"))
+}
+
+pub fn next(workspace: &Path, root: &str, kind: &str) -> ToolResult<String> {
+    crate::artifact_next::next(workspace, root, kind)
 }
 
 fn scale_count(scale: &str) -> &str {
@@ -79,10 +86,11 @@ fn title_or_root(title: &str, root: &str) -> String {
     if !trimmed.is_empty() {
         return trimmed.to_string();
     }
-    root.rsplit('/')
-        .next()
-        .unwrap_or("Artifact")
-        .replace('-', " ")
+    match root.rsplit('/').next() {
+        Some(name) => name,
+        None => "Artifact",
+    }
+    .replace('-', " ")
 }
 
 fn kind_mismatch(kind: &str, manifest: &str) -> bool {

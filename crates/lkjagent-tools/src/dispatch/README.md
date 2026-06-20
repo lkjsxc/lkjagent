@@ -21,6 +21,7 @@ This directory splits dispatcher state, validation, and route helpers.
 - [queue_tools.rs](queue_tools.rs): queue dispatch helpers.
 - [refusal.rs](refusal.rs): graph policy and repeat refusal guidance.
 - [routes.rs](routes.rs): tool-name routing table.
+- [routes_artifact.rs](routes_artifact.rs): artifact tool routing.
 - [routes_doc.rs](routes_doc.rs): document scaffold and audit routing.
 - [routes_verify.rs](routes_verify.rs): direct verification gate routing.
 - [routes_workspace.rs](routes_workspace.rs): workspace summary routing.

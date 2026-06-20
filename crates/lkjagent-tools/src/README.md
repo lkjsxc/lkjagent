@@ -65,6 +65,8 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [shell.rs](shell.rs): /bin/sh adapter with timeout handling.
 - [workspace.rs](workspace.rs): repository shape summaries and compact index.
 - [verify.rs](verify.rs): direct cargo and xtask verification runners.
+- [artifact.rs](artifact.rs): artifact plan, apply, audit, and next entrypoints.
+- [artifact_next.rs](artifact_next.rs): bounded artifact write-batch planner.
 - [doc/](doc/README.md): semantic scaffold and audit helper modules.
 - [doc.rs](doc.rs): document scaffold and audit entrypoints.
 - [structure.rs](structure.rs): recursive tree completion checks.

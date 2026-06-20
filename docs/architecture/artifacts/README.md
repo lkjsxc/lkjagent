@@ -31,4 +31,5 @@ separate states.
 ## Status
 
 partially implemented through document scaffold profiles, artifact tool
-wrappers, and audit checks. Manifest adoption and repair remain open.
+wrappers, bounded next-batch planning, and audit checks. Manifest adoption and
+repair remain open.

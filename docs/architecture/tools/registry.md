@@ -49,6 +49,10 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | verify.xtask | gate req; timeout opt 120 | run direct xtask gate | unknown gate; timeout; command failure |
 | doc.scaffold | root req; kind opt documentation; count opt; mode opt approx; title req; sections opt | create compact README-indexed document tree | workspace escape; invalid root |
 | doc.audit | root req; count opt; mode opt approx | audit README and document topology | missing README; count mismatch |
+| artifact.plan | root req; title req; kind req; scale opt; sections opt | plan semantic content artifact without writes | invalid root |
+| artifact.apply | root req; title opt; kind opt artifact; mode opt approx; sections opt | write semantic artifact scaffold | workspace escape; invalid root |
+| artifact.audit | root req; kind opt; count opt; mode opt approx | audit semantic artifact readiness | missing root; scaffold-only content |
+| artifact.next | root req; kind opt | plan next bounded artifact write batch | missing root; no weak content paths |
 | agent.done | summary req | close the task or maintenance cycle | no open task or cycle |
 | agent.ask | question req | ask the owner; task enters waiting | a question is already outstanding |
 

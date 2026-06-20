@@ -93,6 +93,10 @@ pub fn audit(workspace: &Path, root: &str, count: &str, mode: &str) -> ToolResul
     )
 }
 
+pub fn weak_content_paths(root: &Path) -> ToolResult<Vec<String>> {
+    content_audit::weak_content_paths(root)
+}
+
 fn parse_count(value: &str) -> ToolResult<Option<usize>> {
     let trimmed = value.trim();
     if trimmed.is_empty() {

@@ -96,6 +96,7 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
     if (tool, name) == ("artifact.plan", "root")
         || (tool, name) == ("artifact.apply", "root")
         || (tool, name) == ("artifact.audit", "root")
+        || (tool, name) == ("artifact.next", "root")
     {
         return context
             .artifact_root

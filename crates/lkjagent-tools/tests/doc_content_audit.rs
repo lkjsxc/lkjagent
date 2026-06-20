@@ -71,7 +71,9 @@ fn replace_leaves(root: &Path) -> TestResult<()> {
                 .unwrap_or("section");
             fs::write(
                 &path,
-                format!("# {title}\n\n## Content\n\nConcrete section content replaces the generated scaffold marker.\n"),
+                format!(
+                    "# {title}\n\n## Content\n\nThis section contains concrete scene material, named continuity details, sensory description, causal decisions, and verification notes. It names character intent, conflict, setting texture, consequence, and revision evidence so the manuscript can be audited as an actual content artifact instead of a generated scaffold marker.\n"
+                ),
             )?;
         }
     }

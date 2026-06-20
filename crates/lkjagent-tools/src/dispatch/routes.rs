@@ -25,7 +25,8 @@ use crate::dispatch::queue_tools::{
     dispatch_queue_redeliver,
 };
 use crate::dispatch::routes_artifact::{
-    dispatch_artifact_apply, dispatch_artifact_audit, dispatch_artifact_plan,
+    dispatch_artifact_apply, dispatch_artifact_audit, dispatch_artifact_next,
+    dispatch_artifact_plan,
 };
 use crate::dispatch::routes_doc::{dispatch_doc_audit, dispatch_doc_scaffold};
 use crate::dispatch::routes_verify::{dispatch_verify_cargo, dispatch_verify_xtask};
@@ -89,6 +90,7 @@ pub fn route(
         "artifact.plan" => dispatch_artifact_plan(&action.params, action_text, runtime, state),
         "artifact.apply" => dispatch_artifact_apply(&action.params, action_text, runtime, state),
         "artifact.audit" => dispatch_artifact_audit(&action.params, action_text, runtime, state),
+        "artifact.next" => dispatch_artifact_next(&action.params, action_text, runtime, state),
         "agent.done" => dispatch_done(&action.params, action_text, runtime, state),
         "agent.ask" => observe_result(
             control::ask(

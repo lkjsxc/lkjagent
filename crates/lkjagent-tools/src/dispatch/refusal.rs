@@ -80,7 +80,11 @@ pub(super) fn preferred_action(
     let priority = [
         "graph.recover",
         "graph.transition",
+        "artifact.next",
+        "artifact.plan",
+        "artifact.apply",
         "doc.scaffold",
+        "fs.batch_write",
         "graph.plan",
         "fs.list",
         "fs.tree",

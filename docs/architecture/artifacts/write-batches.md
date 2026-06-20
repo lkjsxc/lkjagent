@@ -13,9 +13,12 @@ the harness decides whether the batch is admissible and complete.
 
 ## Next Batch
 
-`artifact.next` or an equivalent planner returns the next bounded batch from
-audit gaps. It should prefer missing or weakest semantic leaves and produce an
-admitted `fs.batch_write` skeleton for the model to fill.
+`artifact.next` returns the next bounded batch from audit gaps. It prefers the
+weakest semantic leaves, names exact paths, and produces an admitted
+`fs.batch_write` skeleton for the model to fill.
+
+The skeleton is not completion evidence. Completion still requires real content
+and a passing artifact audit.
 
 ## Payload Faults
 

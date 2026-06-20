@@ -111,6 +111,7 @@ pub(crate) const DOC_TOOLS: &[&str] = &[
     "artifact.plan",
     "artifact.apply",
     "artifact.audit",
+    "artifact.next",
     "fs.write",
     "doc.scaffold",
     "doc.audit",

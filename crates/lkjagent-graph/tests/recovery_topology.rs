@@ -113,6 +113,7 @@ fn artifact_recovery_admits_bounded_artifact_tools() {
         for tool in [
             "artifact.plan",
             "artifact.apply",
+            "artifact.next",
             "doc.scaffold",
             "fs.batch_write",
         ] {

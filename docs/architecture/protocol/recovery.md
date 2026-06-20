@@ -54,7 +54,7 @@ an unused native inspection tool, or a smaller plan step.
 ## Retry Discipline
 
 - Endpoint retries are invisible to the context until an attempt is made: the
-  request is re-sent unchanged after the retry deadline, preserving the
+  request is resent unchanged after the retry deadline, preserving the
   cache, and polls before the deadline do not append transcript noise.
 - Parse retries are visible by design: the faulty completion and the error
   notice both stay in the log, because the model needs to see its own
@@ -69,15 +69,15 @@ an unused native inspection tool, or a smaller plan step.
   a bounded preview, resets endpoint retry state, and appends a recovery
   notice telling the model to emit one short act block under about 1200
   characters. If the preview shows a bulk write, the notice directs the next
-  action toward `fs.batch_write`, `doc.scaffold`, or a smaller `fs.write`,
+  action toward `artifact.next`, `fs.batch_write`, or `doc.scaffold`,
   and reminds it not to bypass graph policy. A length response that already
   contains one closed act is accepted and passed to the parser.
 - Payload-risk recovery blocks repeated giant writes. Large story, guide,
   book, corpus, and structured content requests route to document construction
   with bounded semantic files.
 - Payload and completion-oversize faults route to artifact planning first,
-  then bounded writes. Recovery must not render repeated raw `fs.write` as the
-  valid example after the same payload risk.
+  then `artifact.next` and bounded writes. Recovery must not render repeated
+  raw `fs.write` as the valid example after the same payload risk.
 
 ## Status
 
