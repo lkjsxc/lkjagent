@@ -7,6 +7,7 @@ pub mod case_objective;
 pub mod case_plan;
 pub mod case_recovery;
 pub mod classify;
+mod classify_artifact;
 mod classify_signals;
 pub mod compaction;
 pub mod completion;

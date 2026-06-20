@@ -24,4 +24,6 @@ not scaffold-only files.
 
 ## Status
 
-design, implementation pending
+partially implemented; story and cookbook scaffold profiles generate semantic
+paths and avoid sequence-only names. Existing-root adoption, repair planning,
+bounded section writing, and content-bearing completion remain open.

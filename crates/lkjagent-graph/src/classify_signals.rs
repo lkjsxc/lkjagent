@@ -21,6 +21,10 @@ pub(crate) fn priority_counted_content_request(lower: &str, content: &str) -> bo
 }
 
 pub(crate) fn priority_long_content_request(lower: &str, content: &str) -> bool {
+    content_artifact_request(lower, content)
+}
+
+pub(crate) fn content_artifact_request(lower: &str, content: &str) -> bool {
     long_content_request(lower, content) && creation_request(lower, content)
 }
 

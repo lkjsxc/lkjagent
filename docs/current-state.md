@@ -52,9 +52,9 @@ changes.
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol` |
 | Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for graph plan/note/evidence, memory save, fs.stat, and doc.scaffold; maintenance dispatch now suppresses graph policy, broader active-mode loop integration remains open |
-| Document scaffold tool | implemented | semantic scaffold tests, quiet verify, compose smoke |
+| Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; quiet verify from prior controller work |
 | Document audit tool | implemented | topology and graph checks pass local gates |
-| Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md` |
+| Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, and punctuation-safe FTS queries have focused tests; maintenance pruning remains open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |

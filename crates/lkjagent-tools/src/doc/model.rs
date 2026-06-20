@@ -10,6 +10,7 @@ pub enum ScaffoldProfile {
     OperationsRunbook,
     EvaluationSuite,
     NarrativeManuscript,
+    Cookbook,
     GenericStructuredDocs,
 }
 
