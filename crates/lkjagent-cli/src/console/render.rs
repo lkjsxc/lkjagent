@@ -90,6 +90,14 @@ fn bottom_deck(
     lines.extend(wrap_limited(&accounting.context_line, width, 1));
     lines.extend(wrap_limited(&accounting.token_line, width, 1));
     lines.extend(wrap_limited(&accounting.prefix_line, width, 1));
+    lines.extend(wrap_limited(
+        &format!(
+            "gpt_log {}",
+            lkjagent_runtime::gpt_log::current_log_path(data_dir).to_string_lossy()
+        ),
+        width,
+        1,
+    ));
     lines.extend(optional_row(conn, "question", "daemon question", width, 2)?);
     lines.extend(optional_row(conn, "error", "daemon error", width, 1)?);
     lines.extend(wrap_limited(&format!("notice {notice}"), width, 1));

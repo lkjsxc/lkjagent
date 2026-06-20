@@ -15,8 +15,10 @@ external model to inspect the active run.
 
 ## Implementation Hooks
 
-- Source: `crates/lkjagent-runtime/src`
-- Tests: `crates/lkjagent-cli/tests/commands.rs`
+- Source: `crates/lkjagent-runtime/src/gpt_log.rs`
+- Source: `crates/lkjagent-cli/src/gpt_log.rs`
+- Tests: `crates/lkjagent-cli/tests/gpt_log.rs`
+- Tests: `crates/lkjagent-runtime/tests/daemon_loop.rs`
 - Verification: `docker compose run --rm verify`
 
 ## Failure Modes
@@ -27,4 +29,4 @@ external model to inspect the active run.
 
 ## Status
 
-not implemented
+implemented

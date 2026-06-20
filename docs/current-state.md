@@ -27,7 +27,8 @@ not copy raw owner text, SQLite track snapshots, graph notice rendering, and
 status/console display tests. The transition-quality scoring exists as pure
 code, but the runtime transition controller still does not consume it. Compact
 token accounting is implemented for endpoint usage, status, and console. A
-single synthesized GPT handoff log remains open.
+single synthesized GPT handoff log is implemented and exposed through status,
+console, and `lkjagent gpt-log`.
 
 ## Area Status
 
@@ -45,8 +46,8 @@ single synthesized GPT handoff log remains open.
 | Runtime recovery | partially implemented | parse/tool recovery exists, parameter recovery is shallow |
 | Context budgets | partially implemented | budget model and compact context display exist; compaction control still needs broader gates |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
-| Console/status accounting | partially implemented | ranked states plus compact context/token deck display; GPT log path is missing |
-| GPT handoff log | not implemented | no single current Markdown handoff file |
+| Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
+| GPT handoff log | implemented | runtime and CLI write one current Markdown snapshot |
 | Mechanical benchmarks | partially implemented | owner failure cases are not fully covered |
 
 ## Open Work

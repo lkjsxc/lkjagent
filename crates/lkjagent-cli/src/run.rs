@@ -41,7 +41,8 @@ pub fn run(data_dir: &Path) -> Result<String, CliError> {
                 &now,
             )
             .with_budget(config.context_policy)
-            .with_task_turn_budget(config.task_turn_budget);
+            .with_task_turn_budget(config.task_turn_budget)
+            .with_gpt_log_path(lkjagent_runtime::gpt_log::current_log_path(data_dir));
             let mut daemon = lkjagent_runtime::daemon::ResidentDaemon::new(state, runtime);
             lkjagent_runtime::daemon::restore_completion_guard(&conn, &mut daemon.dispatch_state)?;
             loop {

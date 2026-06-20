@@ -18,6 +18,7 @@ This directory holds adapter helpers for the foreground daemon.
 - [endpoint.rs](endpoint.rs): endpoint completion and oversize handling.
 - [idle.rs](idle.rs): automatic idle maintenance cycle opening.
 - [maintenance_wait.rs](maintenance_wait.rs): maintenance ask auto-close guard.
+- [owner_delivery.rs](owner_delivery.rs): queue delivery and owner step opening.
 - [persisted.rs](persisted.rs): store-backed guard restoration and owner previews.
 - [pressure.rs](pressure.rs): pressure state names.
 - [record.rs](record.rs): compaction transcript recording.

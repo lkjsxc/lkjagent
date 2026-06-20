@@ -12,11 +12,12 @@ no IPC protocol.
 | --- | --- |
 | `lkjagent run` | Start the daemon in the foreground. Exactly one per store. |
 | `lkjagent send <text>` | Append a user message through lkjagent-store; print its queue id. |
-| `lkjagent status` | Print daemon state, queue depth, open task, question, error, context usage. |
+| `lkjagent status` | Print daemon state, queue depth, open task, question, error, context usage, token usage, and GPT log path. |
 | `lkjagent log` | Print transcript events; `--limit N` keeps the newest N and `--follow` tails new ones. |
 | `lkjagent console` | Open an interactive owner console with transcript, bottom status deck, and send prompt. |
 | `lkjagent memory <query>` | Search distilled memory through the full-text index. |
 | `lkjagent graph` | Print the active graph case and source graph summary. |
+| `lkjagent gpt-log [--print]` | Write the current GPT-5.5-Pro Markdown handoff log and print its path or content. |
 
 All commands accept `--data <dir>` to locate the store and default to the
 container data directory defined in [../operations/running.md](../operations/running.md).
@@ -44,8 +45,8 @@ controls at the bottom:
 
 - transcript tail and the last useful agent output,
 - pending queue previews near the transcript,
-- daemon state, pending count, open task, question, error, and notice in the
-  bottom deck,
+- daemon state, pending count, open task, context/token usage, GPT log path,
+  question, error, and notice in the bottom deck,
 - a `send>` prompt under the bottom deck.
 
 Any non-command line typed at the prompt is enqueued with the same durability

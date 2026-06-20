@@ -27,8 +27,11 @@ fn daemon_delivers_queue_writes_file_and_records_done() -> TestResult<()> {
         completion(DONE_WRITE_ACTION),
     ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
+    let gpt_log_path = workspace.join("current-gpt-5.5-pro.md");
+    daemon.runtime.gpt_log_path = Some(gpt_log_path.clone());
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    assert!(fs::read_to_string(&gpt_log_path)?.contains("GPT-5.5-Pro Run Log"));
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     assert_eq!(fs::read_to_string(workspace.join("out.txt"))?, "hello");
     assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);

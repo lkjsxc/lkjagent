@@ -18,6 +18,7 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
     let turns = state_value(&conn, "turn", "0")?;
     let last_compaction = last_compaction(&conn)?;
     let active_states = active_states(&conn)?;
+    let gpt_log = lkjagent_runtime::gpt_log::current_log_path(data_dir);
     let policy = load_context_policy_for_status(data_dir)?;
     let accounting = accounting::deck(&conn, policy)?;
     let used = state_value(&conn, "context used tokens", "0")?;
@@ -28,10 +29,11 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
         pressure_name(policy.pressure(used_tokens, 0)),
     )?;
     Ok(format!(
-        "{}\n{}\n{}\ndaemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\ndaemon_question={daemon_question}\ndaemon_error={daemon_error}\nturns={turns}\nactive_states={active_states}\ncontext_window={}\ncontext_reserve={}\ncontext_used_tokens={used}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_soft_trigger={}\ncontext_hard_trigger={}\ncontext_post_compaction_target={}\ncontext_pressure={pressure}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
+        "{}\n{}\n{}\ndaemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\ndaemon_question={daemon_question}\ndaemon_error={daemon_error}\nturns={turns}\nactive_states={active_states}\ngpt_log={}\ncontext_window={}\ncontext_reserve={}\ncontext_used_tokens={used}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_soft_trigger={}\ncontext_hard_trigger={}\ncontext_post_compaction_target={}\ncontext_pressure={pressure}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
         accounting.context_line,
         accounting.token_line,
         accounting.prefix_line,
+        gpt_log.to_string_lossy(),
         policy.window,
         policy.reserve,
         prefix_cap_total(),

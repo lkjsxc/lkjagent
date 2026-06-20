@@ -4,6 +4,7 @@ pub mod config;
 pub mod console;
 pub mod env_file;
 pub mod error;
+pub mod gpt_log;
 pub mod graph;
 pub mod log;
 pub mod memory;
@@ -76,5 +77,6 @@ where
         Command::Console => console::console(&invocation.data_dir),
         Command::Memory { query } => memory::memory(&invocation.data_dir, &query),
         Command::Graph => graph::graph(&invocation.data_dir),
+        Command::GptLog { print } => gpt_log::gpt_log(&invocation.data_dir, print),
     }
 }

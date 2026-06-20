@@ -37,8 +37,10 @@ compaction threshold from [../architecture/context/budgets.md](../architecture/c
 `lkjagent status` and `lkjagent console` now also render the compact accounting
 deck: `ctx=used/window percent pressure=color`, endpoint `in/out/cache/total`,
 and `prefix/log/reserve/headroom`. Missing endpoint usage fields render as
-`unknown`, not zero. The GPT handoff path remains tracked in
-[../architecture/observability/gpt-log.md](../architecture/observability/gpt-log.md).
+`unknown`, not zero. Status and console also expose the current GPT handoff
+path tracked in
+[../architecture/observability/gpt-log.md](../architecture/observability/gpt-log.md),
+and `lkjagent gpt-log --print` prints the synthesized Markdown snapshot.
 
 ## Boundaries
 
