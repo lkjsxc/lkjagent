@@ -11,6 +11,8 @@ This file defines model-visible parameter refusal text.
 - Examples are copyable action XML with only valid fields.
 - Normalization notices start with `action params normalized`.
 - Messages name a different tool when the emitted parameter belongs elsewhere.
+- The registry prompt shows no-param tools as `no params` and gives examples
+  for graph inspection and document tools.
 
 ## Implementation Hooks
 
