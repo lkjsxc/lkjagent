@@ -19,9 +19,9 @@ closed idle. Maintenance and graph policy can still contradict each other in
 some paths. Compaction and graph policy must stay runtime-owned so hard
 pressure never requires a blocked model `memory.save`.
 
-Memory writes now have exact duplicate protection and punctuation-safe search,
-but semantic maintenance merge and rewrite pruning remain incomplete. Long
-content tasks route toward story and cookbook scaffolds, but semantic artifact
+Memory writes now skip exact equivalents, update same-title high-overlap rows,
+and use punctuation-safe search, but semantic maintenance merge and rewrite
+pruning remain incomplete. Long content tasks route toward story and cookbook scaffolds, but semantic artifact
 identity, adoption, repair, and content-bearing completion need deeper
 runtime enforcement. Recovery can still block the tools required to escape a
 fault. Completion can still be too close to planning or scaffold evidence
@@ -60,7 +60,7 @@ and Docker Compose verification passed for this redesign slice on 2026-06-20.
 | Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; quiet verify from prior controller work |
 | Document audit tool | implemented | topology checks pass local gates; content artifacts reject scaffold-only leaves; runtime records document-structure only for passed audits |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
-| Memory save and find | partially implemented | accepted kinds, duplicate skip, punctuation-safe FTS queries, and exact duplicate prune have focused tests; semantic merge and rewrite pruning remain open |
+| Memory save and find | partially implemented | accepted kinds, duplicate skip, same-title overlap update, punctuation-safe FTS queries, and exact duplicate prune have focused tests; semantic merge and rewrite pruning remain open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
 | Runtime recovery | partially implemented | pure active-mode selection exists, dispatch uses one effective policy per turn, internal `agent.ask` questions are refused, runtime close rechecks graph completion, and no-op maintenance defers restart; repeated invalid actions still need deterministic recovery control |

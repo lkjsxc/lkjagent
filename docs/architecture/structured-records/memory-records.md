@@ -28,5 +28,5 @@ delete, or merge, or return a no-op outcome with cooldown.
 
 ## Status
 
-partially implemented; accepted kinds, exact duplicate skip, and exact
-duplicate prune exist. Overlap-based updates and semantic merges remain open.
+partially implemented; accepted kinds, exact duplicate skip, same-title
+overlap update, and exact duplicate prune exist. Semantic merges remain open.

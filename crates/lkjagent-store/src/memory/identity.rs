@@ -20,6 +20,12 @@ pub enum MemoryWriteDecision {
     MergeWith { ids: Vec<i64> },
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) enum DuplicateMatch {
+    Exact { existing_id: i64 },
+    Similar { existing_id: i64 },
+}
+
 impl MemoryWriteDecision {
     pub fn id(&self) -> i64 {
         match self {
@@ -48,7 +54,8 @@ pub(super) fn memory_identity(
 pub(super) fn find_duplicate(
     tx: &Transaction<'_>,
     candidate: &MemoryIdentity,
-) -> StoreResult<Option<i64>> {
+    candidate_content: &str,
+) -> StoreResult<Option<DuplicateMatch>> {
     let mut statement =
         tx.prepare("SELECT id, title, tags, content FROM memory WHERE kind = ?1 ORDER BY id")?;
     let mut rows = statement.query(params![candidate.kind.as_str()])?;
@@ -57,11 +64,49 @@ pub(super) fn find_duplicate(
         let title: String = row.get(1)?;
         let tags: String = row.get(2)?;
         let content: String = row.get(3)?;
-        if memory_identity(candidate.kind, &title, &tags, &content) == *candidate {
-            return Ok(Some(id));
+        let existing = memory_identity(candidate.kind, &title, &tags, &content);
+        if exact_match(candidate, &existing) {
+            return Ok(Some(DuplicateMatch::Exact { existing_id: id }));
+        }
+        if title_match(candidate, &existing) && high_overlap(&content, candidate_content) {
+            return Ok(Some(DuplicateMatch::Similar { existing_id: id }));
         }
     }
     Ok(None)
+}
+
+fn exact_match(candidate: &MemoryIdentity, existing: &MemoryIdentity) -> bool {
+    candidate == existing
+        || (candidate.title_slug == existing.title_slug
+            && candidate.content_hash == existing.content_hash)
+        || (!candidate.tags_key.is_empty()
+            && candidate.tags_key == existing.tags_key
+            && candidate.content_hash == existing.content_hash)
+}
+
+fn title_match(candidate: &MemoryIdentity, existing: &MemoryIdentity) -> bool {
+    !candidate.title_slug.is_empty() && candidate.title_slug == existing.title_slug
+}
+
+fn high_overlap(existing_content: &str, candidate_content: &str) -> bool {
+    let existing = words(existing_content);
+    let candidate = words(candidate_content);
+    if existing.len() < 6 || candidate.len() < 6 {
+        return false;
+    }
+    let shared = candidate
+        .iter()
+        .filter(|word| existing.iter().any(|existing| existing == *word))
+        .count();
+    shared.saturating_mul(100) / candidate.len().min(existing.len()) >= 85
+}
+
+fn words(value: &str) -> Vec<String> {
+    value
+        .split(|ch: char| !ch.is_alphanumeric())
+        .filter(|part| !part.is_empty())
+        .map(str::to_ascii_lowercase)
+        .collect()
 }
 
 fn tags_key(tags: &str) -> String {
