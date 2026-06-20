@@ -61,6 +61,7 @@ const RECOVERY_NODES: &[GraphNodeId] = &[
     GraphNodeId("recover-params"),
     GraphNodeId("recover-tool"),
     GraphNodeId("recover-repeat"),
+    GraphNodeId("recover-endpoint"),
     GraphNodeId("recover-context"),
     GraphNodeId("recover-budget"),
     GraphNodeId("recover-verification"),
@@ -68,6 +69,14 @@ const RECOVERY_NODES: &[GraphNodeId] = &[
     GraphNodeId("recover-by-alternate-tool"),
     GraphNodeId("recover-by-smaller-scope"),
     GraphNodeId("recover-by-shell-escape"),
+    GraphNodeId("owner-question"),
+];
+const COMPACT_NODES: &[GraphNodeId] = &[
+    GraphNodeId("compact-soft"),
+    GraphNodeId("compact-hard"),
+    GraphNodeId("compact-boundary"),
+    GraphNodeId("rebuild-context"),
+    GraphNodeId("resume-after-compact"),
 ];
 const MAINT_NODES: &[GraphNodeId] = &[GraphNodeId("maintain"), GraphNodeId("refine-graph-policy")];
 const ALL_FAMILIES: &[TaskFamily] = &[
@@ -138,7 +147,7 @@ pub(crate) const PACKAGES: &[ContextPackage] = &[
         "compaction-preserve",
         "Compaction preservation",
         "Preserve objective, constraints, plan steps, selected packages, evidence, touched paths, recovery, and completion guard.",
-        RECOVERY_NODES,
+        COMPACT_NODES,
         ALL_FAMILIES,
         PackagePriority::Recovery,
     ),
