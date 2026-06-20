@@ -43,6 +43,28 @@ fn doc_scaffold_exact_count_uses_semantic_roles() -> TestResult<()> {
 }
 
 #[test]
+fn doc_scaffold_story_title_uses_manuscript_paths() -> TestResult<()> {
+    let workspace = temp_workspace("doc-story")?;
+    let output = scaffold(
+        &workspace,
+        &[
+            ("root", "stories"),
+            ("title", "Long SF Story"),
+            ("kind", "documentation"),
+        ],
+    )?;
+
+    assert!(output.contains("profile=NarrativeManuscript"));
+    assert!(workspace.join("stories/planning/premise.md").is_file());
+    assert!(workspace
+        .join("stories/manuscript/chapter-arc-setup.md")
+        .is_file());
+    assert!(!workspace.join("stories/part-001.md").exists());
+    assert_no_serial_files(&workspace.join("stories"))?;
+    Ok(())
+}
+
+#[test]
 fn doc_audit_rejects_part_files_and_missing_links() -> TestResult<()> {
     let workspace = temp_workspace("doc-audit")?;
     fs::create_dir_all(workspace.join("docs"))?;

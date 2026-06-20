@@ -142,7 +142,13 @@ pub const MANUSCRIPT: &[ShapeGroup] = &[
 ];
 
 pub fn select_profile(input: &ScaffoldInput) -> ScaffoldProfile {
-    let text = format!("{} {}", input.kind, input.sections.join(" ")).to_ascii_lowercase();
+    let text = format!(
+        "{} {} {}",
+        input.kind,
+        input.title,
+        input.sections.join(" ")
+    )
+    .to_ascii_lowercase();
     if text.contains("knowledge") || text.contains("encyclopedia") {
         ScaffoldProfile::KnowledgeBase
     } else if text.contains("plan") || text.contains("implementation") {
