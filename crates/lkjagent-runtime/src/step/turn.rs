@@ -83,22 +83,36 @@ pub(super) fn endpoint_oversize_step(mut state: RuntimeState, preview: &str) -> 
     let recovery = oversize_recovery(preview);
     state = append_notice(state, NoticeKind::Error, &error);
     state = append_notice(state, NoticeKind::Error, &recovery);
-    result(
-        state,
-        vec![
-            Effect::RecordEvent {
-                kind: EventKind::Error,
-                content: error.clone(),
-                tokens: token_estimate(&error) as i64,
-            },
-            Effect::RecordEvent {
-                kind: EventKind::Notice,
-                content: recovery.clone(),
-                tokens: token_estimate(&recovery) as i64,
-            },
-        ],
-        Some(StopReason::InvalidAction),
-    )
+    let mut effects = vec![
+        Effect::RecordEvent {
+            kind: EventKind::Error,
+            content: error.clone(),
+            tokens: token_estimate(&error) as i64,
+        },
+        Effect::RecordEvent {
+            kind: EventKind::Notice,
+            content: recovery.clone(),
+            tokens: token_estimate(&recovery) as i64,
+        },
+    ];
+    if payload_risk(preview) {
+        state.parse_faults = state.parse_faults.saturating_add(1);
+        let count = state.parse_faults;
+        record_recoverable_fault(
+            &mut state,
+            RecoveryFault::Parse,
+            count,
+            None,
+            &recovery,
+            &mut effects,
+        );
+        state = enter_recovery_route(state, RecoveryFault::Parse, count, None, &mut effects);
+    }
+    result(state, effects, Some(StopReason::InvalidAction))
+}
+
+fn payload_risk(preview: &str) -> bool {
+    preview.contains("<tool>fs.write</tool>") || preview.contains("<content>")
 }
 
 fn action_step(mut state: RuntimeState, action: lkjagent_protocol::Action) -> StepResult {
