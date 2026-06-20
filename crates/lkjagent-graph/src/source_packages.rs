@@ -68,6 +68,8 @@ const RECOVERY_NODES: &[GraphNodeId] = &[
     GraphNodeId("recover-by-state-inspection"),
     GraphNodeId("recover-by-alternate-tool"),
     GraphNodeId("recover-by-smaller-scope"),
+    GraphNodeId("recover-by-artifact-plan"),
+    GraphNodeId("recover-by-bounded-write"),
     GraphNodeId("recover-by-shell-escape"),
     GraphNodeId("owner-question"),
 ];

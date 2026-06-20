@@ -9,6 +9,7 @@ pub enum TransitionIntent {
     AfterPlan,
     AfterVerification,
     AfterParseFault,
+    AfterPayloadFault,
     AfterParamFault,
     AfterToolFault,
     AfterRepeatFault,
@@ -106,6 +107,16 @@ fn intent_bonus(
 ) -> i32 {
     match intent {
         TransitionIntent::AfterParseFault if target == GraphNodeId("recover-parse") => 500,
+        TransitionIntent::AfterPayloadFault
+            if target == GraphNodeId("recover-by-artifact-plan") =>
+        {
+            700
+        }
+        TransitionIntent::AfterPayloadFault
+            if target == GraphNodeId("recover-by-bounded-write") =>
+        {
+            650
+        }
         TransitionIntent::AfterParamFault if target == GraphNodeId("recover-params") => 500,
         TransitionIntent::AfterToolFault if target == GraphNodeId("recover-tool") => 500,
         TransitionIntent::AfterRepeatFault if target == GraphNodeId("recover-repeat") => 500,
@@ -155,6 +166,7 @@ fn missing(quality: &TransitionQuality) -> Vec<String> {
 fn forced_action_class(intent: TransitionIntent) -> Option<String> {
     match intent {
         TransitionIntent::AfterParseFault => Some("valid-act".to_string()),
+        TransitionIntent::AfterPayloadFault => Some("artifact-plan-or-bounded-write".to_string()),
         TransitionIntent::AfterParamFault => Some("exact-schema-example".to_string()),
         TransitionIntent::AfterToolFault => Some("alternate-native-tool".to_string()),
         TransitionIntent::AfterRepeatFault => Some("different-action-class".to_string()),

@@ -15,6 +15,8 @@ const REQUIRED_RECOVERY_NODES: &[GraphNodeId] = &[
     GraphNodeId("recover-by-state-inspection"),
     GraphNodeId("recover-by-alternate-tool"),
     GraphNodeId("recover-by-smaller-scope"),
+    GraphNodeId("recover-by-artifact-plan"),
+    GraphNodeId("recover-by-bounded-write"),
     GraphNodeId("recover-by-shell-escape"),
     GraphNodeId("repair-step"),
     GraphNodeId("owner-question"),
@@ -97,6 +99,27 @@ fn recovery_packages_apply_to_owner_question() {
     assert!(
         package.is_some_and(|item| { item.applies_to.contains(&GraphNodeId("owner-question")) })
     );
+}
+
+#[test]
+fn artifact_recovery_admits_bounded_artifact_tools() {
+    let graph = source_graph();
+    let node = graph
+        .nodes
+        .iter()
+        .find(|node| node.id == GraphNodeId("recover-by-artifact-plan"));
+    assert!(node.is_some(), "missing artifact recovery node");
+    if let Some(node) = node {
+        for tool in [
+            "artifact.plan",
+            "artifact.apply",
+            "doc.scaffold",
+            "fs.batch_write",
+        ] {
+            assert!(node.allowed_actions.contains(&tool), "missing {tool}");
+        }
+        assert!(!node.allowed_actions.contains(&"fs.write"));
+    }
 }
 
 fn node_ids() -> BTreeSet<GraphNodeId> {

@@ -98,15 +98,9 @@ pub(super) fn endpoint_oversize_step(mut state: RuntimeState, preview: &str) -> 
     if payload_risk(preview) {
         state.parse_faults = state.parse_faults.saturating_add(1);
         let count = state.parse_faults;
-        record_recoverable_fault(
-            &mut state,
-            RecoveryFault::Parse,
-            count,
-            None,
-            &recovery,
-            &mut effects,
-        );
-        state = enter_recovery_route(state, RecoveryFault::Parse, count, None, &mut effects);
+        let fault = RecoveryFault::Payload;
+        record_recoverable_fault(&mut state, fault, count, None, &recovery, &mut effects);
+        state = enter_recovery_route(state, fault, count, None, &mut effects);
     }
     result(state, effects, Some(StopReason::InvalidAction))
 }

@@ -24,11 +24,13 @@ fn max_token_inside_write_routes_to_payload_recovery() -> TestResult<()> {
     server.join()?;
 
     assert!(daemon.state.graph.as_ref().is_some_and(|graph| {
-        graph.active_node.0 == "recover-parse" && graph.next_action_class == "valid-act"
+        graph.active_node.0 == "recover-by-artifact-plan"
+            && graph.next_action_class == "artifact-plan-or-bounded-write"
     }));
     assert!(events::read_events(&conn)?.iter().any(|event| {
         event.content.contains("raw fs.write retry is blocked")
-            && event.content.contains("doc.scaffold")
+            && event.content.contains("artifact.plan")
+            && event.content.contains("fs.batch_write")
     }));
     Ok(())
 }

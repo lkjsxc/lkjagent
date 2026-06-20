@@ -1,11 +1,12 @@
 use lkjagent_context::assemble::append_frame;
 use lkjagent_context::model::NoticeKind;
-use lkjagent_graph::case_recovery::{FaultKind, RecoveryRecord};
+use lkjagent_graph::case_recovery::RecoveryRecord;
 use lkjagent_graph::{promote_recovery_track, CaseStatus, GraphNodeId, TaskPhase};
 use lkjagent_store::events::EventKind;
 
 use crate::graph_state::graph_notice_frame;
 use crate::prompt::token_estimate;
+use crate::step::fault_meta::{fault_kind, fault_name, set_graph_fault_count};
 use crate::step::frames::append_notice;
 use crate::step::recovery_select::recovery_transition;
 use crate::step::Effect;
@@ -14,6 +15,7 @@ use crate::task::RuntimeState;
 #[derive(Clone, Copy)]
 pub(crate) enum RecoveryFault {
     Parse,
+    Payload,
     Params,
     Repeat,
     Tool,
@@ -78,10 +80,16 @@ pub(super) fn enter_recovery_route(
 fn route_notice(fault: RecoveryFault, count: u8) -> String {
     let prefix = match fault {
         RecoveryFault::Parse => "Consecutive parse faults",
+        RecoveryFault::Payload => "Consecutive large-payload parse faults",
         RecoveryFault::Params => "Consecutive parameter faults",
         RecoveryFault::Repeat => "Consecutive repeated actions",
         RecoveryFault::Tool => "Consecutive tool errors",
     };
+    if matches!(fault, RecoveryFault::Payload) {
+        return format!(
+            "{prefix} reached count={count}; graph recovery is active. Use artifact.plan, artifact.apply, doc.scaffold, or fs.batch_write. Raw fs.write remains blocked while payload risk is active."
+        );
+    }
     format!(
         "{prefix} reached count={count}; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step."
     )
@@ -159,38 +167,4 @@ fn push_graph_effects(
         case_id,
         tracks: crate::graph_state_tracks::graph_track_effects(graph),
     });
-}
-
-fn set_graph_fault_count(graph: &mut lkjagent_graph::TaskGraphState, kind: FaultKind, count: u8) {
-    match kind {
-        FaultKind::Parse => graph.recovery.parse_failures = count,
-        FaultKind::Params => graph.recovery.param_failures = count,
-        FaultKind::Tool => graph.recovery.tool_failures = count,
-        FaultKind::Repeat => graph.recovery.repeat_failures = count,
-        FaultKind::Endpoint => graph.recovery.endpoint_failures = count,
-        FaultKind::Context => graph.recovery.context_failures = count,
-        FaultKind::Budget => graph.recovery.budget_failures = count,
-        FaultKind::Verification => graph.recovery.verification_failures = count,
-    }
-}
-fn fault_kind(fault: RecoveryFault) -> FaultKind {
-    match fault {
-        RecoveryFault::Parse => FaultKind::Parse,
-        RecoveryFault::Params => FaultKind::Params,
-        RecoveryFault::Repeat => FaultKind::Repeat,
-        RecoveryFault::Tool => FaultKind::Tool,
-    }
-}
-
-fn fault_name(kind: FaultKind) -> &'static str {
-    match kind {
-        FaultKind::Parse => "parse",
-        FaultKind::Params => "params",
-        FaultKind::Tool => "tool",
-        FaultKind::Repeat => "repeat",
-        FaultKind::Endpoint => "endpoint",
-        FaultKind::Context => "context",
-        FaultKind::Budget => "budget",
-        FaultKind::Verification => "verification",
-    }
 }

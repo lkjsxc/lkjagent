@@ -26,6 +26,7 @@ pub(super) fn recovery_transition(
 fn intent(fault: RecoveryFault) -> TransitionIntent {
     match fault {
         RecoveryFault::Parse => TransitionIntent::AfterParseFault,
+        RecoveryFault::Payload => TransitionIntent::AfterPayloadFault,
         RecoveryFault::Params => TransitionIntent::AfterParamFault,
         RecoveryFault::Repeat => TransitionIntent::AfterRepeatFault,
         RecoveryFault::Tool => TransitionIntent::AfterToolFault,
@@ -46,6 +47,7 @@ fn fallback_selection(fault: RecoveryFault) -> TransitionSelection {
 fn fallback_target(fault: RecoveryFault) -> GraphNodeId {
     match fault {
         RecoveryFault::Parse => GraphNodeId("recover-parse"),
+        RecoveryFault::Payload => GraphNodeId("recover-by-artifact-plan"),
         RecoveryFault::Params => GraphNodeId("recover-params"),
         RecoveryFault::Repeat => GraphNodeId("recover-repeat"),
         RecoveryFault::Tool => GraphNodeId("recover-tool"),
