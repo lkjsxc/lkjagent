@@ -9,6 +9,10 @@ compaction, or closed idle.
 ## Table of Contents
 
 - [mod.rs](mod.rs): module exports.
+- [authority.rs](authority.rs): pure turn authority assembly.
+- [completion.rs](completion.rs): mode-specific completion policies.
+- [decision.rs](decision.rs): endpoint decisions for runtime actions.
+- [input.rs](input.rs): turn authority snapshot input.
 - [model.rs](model.rs): active-mode input, mode, and policy records.
 - [policy.rs](policy.rs): allowed tools and policy-layer flags per mode.
 - [render.rs](render.rs): compact active-mode notice rendering.
