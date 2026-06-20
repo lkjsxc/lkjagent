@@ -16,6 +16,7 @@ and rejected directions live in [../decisions/](../decisions/README.md).
 - [context/](context/README.md): window layout, budgets, compaction, caching, hygiene.
 - [protocol/](protocol/README.md): action format, parsing, system prompt, recovery.
 - [document-structure/](document-structure/README.md): semantic document trees and graph manifests.
+- [structured-records/](structured-records/README.md): semantic records, identity, ledgers, and deduplication.
 - [action-reliability/](action-reliability/README.md): parameter normalization and recovery.
 - [state-model/](state-model/README.md): objective envelopes and ranked neutral tracks.
 - [observability/](observability/README.md): token accounting, status, console, and GPT log.

@@ -2,9 +2,10 @@
 
 ## Purpose
 
-This directory owns the reliability redesign work opened by the owner report:
+This directory owns reliability redesign work opened by owner reports:
 semantic documentation generation, action recovery, state modeling,
-observability, GPT handoff logging, and final verification.
+observability, GPT handoff logging, loop recovery, maintenance, and final
+verification.
 
 ## Table of Contents
 
@@ -14,6 +15,7 @@ observability, GPT handoff logging, and final verification.
 - [context-accounting.md](context-accounting.md): context and token display work.
 - [multi-state-runtime.md](multi-state-runtime.md): neutral task-track modeling work.
 - [runtime-recovery-controller.md](runtime-recovery-controller.md): deterministic recovery controller work.
+- [recovery-and-maintenance-loop-redesign.md](recovery-and-maintenance-loop-redesign.md): active-mode loop redesign.
 - [gpt-log.md](gpt-log.md): single handoff-log work.
 - [verification-plan.md](verification-plan.md): focused tests, benchmarks, and compose gates.
 

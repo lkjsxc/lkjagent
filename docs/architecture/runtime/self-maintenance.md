@@ -3,19 +3,16 @@
 ## Purpose
 
 State the self-maintenance boundary. The resident daemon opens bounded
-graph maintenance work when the queue is empty and no user task is open, so
-it keeps improving state instead of stopping at a quiet idle loop.
+maintenance only when no owner task is queued, active, or recoverable.
 
 ## Trigger
 
-At a turn boundary with no open task and no pending queue rows, the harness
-opens the stalest due maintenance directive and records
-`daemon_state=working`. Recent last-run stamps keep the daemon idle until a
-directive is due again or owner work arrives. The next endpoint turn receives
-the maintenance notice and must choose one bounded improvement action or
-close the cycle honestly with agent.done. A new queue row preempts
-maintenance at the next turn boundary before another maintenance endpoint
-turn is sent.
+At a turn boundary with no open task, no recoverable owner case, and no
+pending queue rows, the harness may open the stalest due maintenance directive
+and record `daemon_state=working`. Recent last-run stamps keep the daemon idle
+until a directive is due again or owner work arrives. A new queue row preempts
+maintenance at the next turn boundary before another maintenance endpoint turn
+is sent.
 Saving a user task summary stamps all maintenance directives with the close
 time, so the daemon does not immediately start idle maintenance after a
 successful owner task.
@@ -26,9 +23,9 @@ Maintenance directives are chosen in rotation and weighted by staleness:
 
 | Directive | Work |
 | --- | --- |
-| distill | Read recent transcript spans; write durable lessons via memory.save per [../memory/distillation.md](../memory/distillation.md) |
+| distill | Read recent transcript spans; write deduplicated lessons per [../memory/distillation.md](../memory/distillation.md) |
 | refine-graph-policy | Record graph policy and context package improvement candidates from observed gaps |
-| prune-memory | Merge duplicate memory rows, rewrite vague entries, drop superseded ones |
+| prune-memory | Merge duplicate memory rows, rewrite vague entries, drop superseded ones through real operations |
 | audit-self | Compare recent failures against contracts; record mismatches as memory entries tagged for the owner |
 
 The harness tracks per-directive last-run stamps in the state table when a
@@ -39,8 +36,14 @@ daemon, not the model, decides when the next cycle starts.
 
 - Maintenance uses the same protocol and turn budget as task work, but the
   daemon limits idle maintenance tools to state-only actions.
-- Maintenance may use `memory.find`, `memory.save`, `queue.list`,
-  `agent.done`, and `agent.ask`.
+- Maintenance may use only tools admitted by Maintenance active mode.
+- Maintenance may not ask the owner about transcript spans, stale rows,
+  duplicate memory, tool schemas, or policy mismatches.
+- `agent.ask` is admitted only when a stored owner preference is required and
+  no documented safe default or internal inspection can proceed.
+- Maintenance must not save a memory row when an equivalent row exists.
+- Pruning must not claim rows were deleted, merged, or rewritten unless a real
+  delete, merge, or rewrite operation ran.
 - Maintenance may not write workspace files, run shell commands, mutate queue
   rows, edit graph cases, change git state, or call external services.
 - Maintenance still obeys the integrity invariants: one action per turn,
@@ -59,4 +62,4 @@ continues polling.
 
 ## Status
 
-implemented as automatic daemon behavior.
+partially implemented; active-mode control and idempotent pruning remain open.

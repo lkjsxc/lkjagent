@@ -31,6 +31,11 @@ directories with short focused files.
   `architecture/document-structure/network-contract.md` `architecture/document-structure/naming.md`
   `architecture/document-structure/scaffold-profiles.md` `architecture/document-structure/audit.md`
   `architecture/document-structure/completion-gates.md`
+- `architecture/structured-records/README.md` `architecture/structured-records/record-model.md`
+  `architecture/structured-records/topic-map.md` `architecture/structured-records/artifact-ledger.md`
+  `architecture/structured-records/deduplication.md` `architecture/structured-records/write-planning.md`
+  `architecture/structured-records/maintenance-records.md`
+  `architecture/structured-records/completion-evidence.md`
 - `architecture/action-reliability/README.md` `architecture/action-reliability/parameter-contract.md`
   `architecture/action-reliability/recovery.md` `architecture/action-reliability/normalization.md`
   `architecture/action-reliability/error-messages.md`
@@ -81,6 +86,7 @@ directories with short focused files.
   `execution/current-work/action-fault-recovery.md` `execution/current-work/document-structure-redesign.md`
   `execution/current-work/context-accounting.md` `execution/current-work/multi-state-runtime.md`
   `execution/current-work/runtime-recovery-controller.md`
+  `execution/current-work/recovery-and-maintenance-loop-redesign.md`
   `execution/current-work/gpt-log.md` `execution/current-work/verification-plan.md`
 - `execution/tasks/README.md` `execution/tasks/bootstrap-workspace.md` `execution/tasks/xtask-checks.md`
   `execution/tasks/llm-client.md` `execution/tasks/protocol-parser.md` `execution/tasks/context-engine.md`
