@@ -5,6 +5,10 @@ use std::fmt;
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ExampleContext {
     pub evidence_requirement: Option<String>,
+    pub missing_evidence: Vec<String>,
+    pub allowed_packages: Vec<String>,
+    pub legal_transitions: Vec<String>,
+    pub artifact_root: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -72,13 +76,34 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
         return context
             .evidence_requirement
             .clone()
+            .or_else(|| context.missing_evidence.first().cloned())
             .unwrap_or_else(|| "observation".to_string());
+    }
+    if (tool, name) == ("graph.transition", "target") {
+        return context
+            .legal_transitions
+            .first()
+            .cloned()
+            .unwrap_or_else(|| "plan".to_string());
+    }
+    if (tool, name) == ("graph.context", "packages") {
+        return context
+            .allowed_packages
+            .first()
+            .cloned()
+            .unwrap_or_else(|| "planning-checklist".to_string());
+    }
+    if (tool, name) == ("artifact.plan", "root")
+        || (tool, name) == ("artifact.apply", "root")
+        || (tool, name) == ("artifact.audit", "root")
+    {
+        return context
+            .artifact_root
+            .clone()
+            .unwrap_or_else(|| "stories/example-story".to_string());
     }
     match (tool, name) {
         ("doc.scaffold", "root") | ("doc.audit", "root") => "docs",
-        ("artifact.plan", "root") | ("artifact.apply", "root") | ("artifact.audit", "root") => {
-            "stories/example-story"
-        }
         ("doc.scaffold", "title") => "Project Documentation",
         ("artifact.plan", "title") => "Example Story",
         ("artifact.plan", "kind") => "story",
@@ -97,9 +122,7 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
         ("graph.plan", "objective") => "Complete the owner task",
         ("graph.plan", "steps") => "Inspect state\nAct in one bounded step",
         ("graph.plan", "reason") => "Graph planning requirement",
-        ("graph.transition", "target") => "plan",
         ("graph.transition", "reason") => "Best legal next node",
-        ("graph.context", "packages") => "planning-checklist",
         ("graph.context", "reason") => "Need planning context",
         ("graph.compact", "reason") => "Context pressure",
         ("memory.save", "kind") => "lesson",
