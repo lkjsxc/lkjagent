@@ -121,10 +121,12 @@ pub fn bread_cookbook_artifact(workspace: &Path) -> Result<(), String> {
             "subroute=content-artifact",
             "root=cookbooks/bread-cookbook",
             "profile=Cookbook",
+            "artifact.next",
+            "next_action=fs.batch_write",
             "foundations/flour-water-salt-yeast.md",
             "recipes/sourdough-country-loaf.md",
             "content-bearing files verified",
-            "doc.audit passed",
+            "artifact.audit passed",
         ],
     )?;
     forbid_any(
@@ -136,6 +138,7 @@ pub fn bread_cookbook_artifact(workspace: &Path) -> Result<(), String> {
             "agent.done scaffold only",
             "audit=Missing",
             "empty artifact root",
+            "artifact.next blocked",
             "claimed progress",
         ],
     )
