@@ -66,6 +66,22 @@ fn passed_document_audit_satisfies_structure() -> TestResult<()> {
 }
 
 #[test]
+fn passed_artifact_audit_satisfies_structure() -> TestResult<()> {
+    let state = apply_tool(
+        open_doc_task()?,
+        "artifact.audit",
+        &[("root", "stories/long-sf-story"), ("kind", "story")],
+        "artifact audit passed\nroot=stories/long-sf-story\nfailed=0",
+    );
+
+    assert!(state
+        .graph
+        .as_ref()
+        .is_some_and(|graph| graph.evidence.has("document-structure")));
+    Ok(())
+}
+
+#[test]
 fn agent_done_refuses_scaffold_only_artifact() -> TestResult<()> {
     let state = apply_tool(
         open_doc_task()?,

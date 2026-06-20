@@ -40,7 +40,9 @@ fn transition_intent(action: &lkjagent_protocol::Action) -> TransitionIntent {
         "graph.evidence" if action_param(action, "kind") == "verification" => {
             TransitionIntent::AfterVerification
         }
-        "verify.cargo" | "verify.xtask" | "doc.audit" => TransitionIntent::AfterVerification,
+        "verify.cargo" | "verify.xtask" | "doc.audit" | "artifact.audit" => {
+            TransitionIntent::AfterVerification
+        }
         "agent.done" => TransitionIntent::AttemptCompletion,
         _ => TransitionIntent::AfterObservation,
     }
@@ -71,9 +73,21 @@ fn add_graph_update(
                 effects,
             ) || advance_active_step(graph)
         }
-        "doc.audit" => add_document_evidence(graph, output, effects) || advance_active_step(graph),
-        "doc.scaffold" => {
+        "doc.audit" | "artifact.audit" => {
+            add_document_evidence(graph, output, effects) || advance_active_step(graph)
+        }
+        "doc.scaffold" | "artifact.apply" => {
             add_document_scaffold_observation(graph, output, effects) || advance_active_step(graph)
+        }
+        "artifact.plan" => {
+            ensure_evidence(
+                graph,
+                "observation",
+                EvidenceKind::Observation,
+                output,
+                None,
+                effects,
+            ) || advance_active_step(graph)
         }
         "fs.batch_write"
             if graph.active_node == GraphNodeId("document")

@@ -20,7 +20,9 @@ pub(super) fn add_document_evidence(
         None,
         effects,
     );
-    let structured = if output.content.contains("document audit passed") {
+    let structured = if output.content.contains("document audit passed")
+        || output.content.contains("artifact audit passed")
+    {
         ensure_evidence(
             graph,
             "document-structure",
