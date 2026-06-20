@@ -4,8 +4,8 @@ use rusqlite::Connection;
 
 use crate::error::RuntimeResult;
 
-pub const MAX_LOG_CHARS: usize = 100_000;
-pub const LOG_TAIL_RESERVE_CHARS: usize = 4_000;
+pub const MAX_LOG_CHARS: usize = 1_000_000;
+pub const LOG_TAIL_RESERVE_CHARS: usize = 20_000;
 pub const MAX_TABLE_CELL_CHARS: usize = 512;
 pub const MAX_TRANSCRIPT_CELL_CHARS: usize = 4_000;
 

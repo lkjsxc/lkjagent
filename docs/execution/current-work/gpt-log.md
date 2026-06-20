@@ -11,7 +11,7 @@ send to ChatGPT or another stronger external model.
 - Rewrite the file as a bounded current snapshot, not an append-only transcript.
 - Do not imply that ChatGPT monitors the file; it is printed or opened and sent
   manually by the owner.
-- Allow roughly 100,000 characters so the file carries enough transcript
+- Allow roughly 1,000,000 characters so the file carries enough transcript
   evidence for a manual ChatGPT handoff.
 - Include objective, constraints, ranked tracks, plan, evidence, faults,
   recent transcript, touched paths, token usage, and verification.
