@@ -55,7 +55,6 @@ fn maintenance_policy(mode: ActiveMode) -> ActiveModePolicy {
             "memory.save",
             "queue.list",
             "agent.done",
-            "agent.ask",
         ],
         blocked_tools: vec![
             "graph.state",
@@ -65,8 +64,9 @@ fn maintenance_policy(mode: ActiveMode) -> ActiveModePolicy {
             "doc.scaffold",
             "fs.write",
             "shell.run",
+            "agent.ask",
         ],
-        preferred_next_action: "bounded maintenance bookkeeping or agent.done",
+        preferred_next_action: "bounded maintenance bookkeeping or no-op agent.done",
         completion_condition: "one real maintenance effect or no-op close",
         graph_policy_applies: false,
         maintenance_policy_applies: true,

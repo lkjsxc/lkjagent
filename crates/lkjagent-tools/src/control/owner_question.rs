@@ -39,6 +39,9 @@ fn internal_question(lower: &str) -> Option<(&'static str, &'static str)> {
             "doc.scaffold",
         ));
     }
+    if mentions_internal_recovery(lower) {
+        return Some(("graph recovery strategy is runtime-owned", "graph.recover"));
+    }
     None
 }
 
@@ -54,16 +57,28 @@ fn mentions_maintenance_scan(lower: &str) -> bool {
     lower.contains("transcript span")
         || lower.contains("stale memory")
         || lower.contains("stale rows")
+        || (lower.contains("memory row") && lower.contains("stale"))
+        || (lower.contains("memory rows") && lower.contains("prune"))
         || lower.contains("rows need pruning")
         || lower.contains("what should be distilled")
 }
 
 fn mentions_recovery_how_to(lower: &str) -> bool {
-    (lower.contains("how should i") || lower.contains("what should i do"))
+    (lower.contains("how should i")
+        || lower.contains("what should i do")
+        || lower.contains("how do i")
+        || lower.contains("how to use")
+        || lower.contains("how to proceed"))
         && (lower.contains("fs.write")
+            || lower.contains("doc.scaffold")
             || lower.contains("blocked")
             || lower.contains("unclosed")
             || lower.contains("parse fault"))
+}
+
+fn mentions_internal_recovery(lower: &str) -> bool {
+    (lower.contains("recovery strategy") || lower.contains("graph recovery"))
+        && (lower.contains("internal") || lower.contains("runtime") || lower.contains("tool"))
 }
 
 fn example(tool: &str) -> ActionExample {
