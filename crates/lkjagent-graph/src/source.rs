@@ -1,12 +1,28 @@
-use crate::model::GraphDefinition;
-use crate::source_edges::EDGES;
-use crate::source_nodes::NODES;
-use crate::source_packages::PACKAGES;
+use crate::model::{ContextPackage, GraphDefinition, GraphEdge, GraphNode};
+use crate::policy::DEFAULT_POLICY;
 
 pub fn source_graph() -> GraphDefinition {
     GraphDefinition {
-        nodes: NODES,
-        edges: EDGES,
-        packages: PACKAGES,
+        nodes: all_nodes(),
+        edges: crate::source_edges::EDGES.to_vec(),
+        packages: crate::source_packages::PACKAGES.to_vec(),
+        policy: DEFAULT_POLICY,
     }
 }
+
+fn all_nodes() -> Vec<GraphNode> {
+    let mut nodes = Vec::new();
+    extend(&mut nodes, crate::source_core::NODES);
+    extend(&mut nodes, crate::source_code::NODES);
+    extend(&mut nodes, crate::source_docs::NODES);
+    extend(&mut nodes, crate::source_recovery::NODES);
+    extend(&mut nodes, crate::source_maintenance::NODES);
+    nodes
+}
+
+fn extend<T: Copy>(out: &mut Vec<T>, values: &[T]) {
+    out.extend_from_slice(values);
+}
+
+#[allow(dead_code)]
+fn _type_checks(_: GraphEdge, _: ContextPackage) {}

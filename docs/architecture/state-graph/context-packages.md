@@ -8,13 +8,12 @@ the endpoint window.
 ## Package Shape
 
 A context package is a source-owned, bounded instruction fragment selected by
-the active graph node and phase. Each package has:
+the active graph node and phase. It is not a reusable command bundle. Each package has:
 
-- name and token budget.
-- node kinds and task families where it applies.
-- stable instructions or checklist items.
-- related docs or memory queries.
-- compression rules for pressure states.
+- id, title, purpose, body, default budget, and priority.
+- node ids and task families where it applies.
+- stable directive instructions or checklist items.
+- compression behavior through graph policy pressure states.
 
 The prefix carries a graph slice listing selected package names and compact
 instructions. Runtime log frames may contain package refresh notices when the
@@ -30,7 +29,7 @@ pauses with a diagnostic.
 
 The document-construction package is selected for documentation,
 knowledge-base, and counted structured content tasks so large standalone
-deliverables receive structure guidance before endpoint execution.
+deliverables receive topology guidance before endpoint execution.
 
 ## Status
 

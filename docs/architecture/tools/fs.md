@@ -2,76 +2,67 @@
 
 ## Purpose
 
-The contracts for fs.read, fs.write, and fs.edit: direct file access inside
-the workspace. The three tools cover ranged reading, whole-file writing,
-and single-match editing; listing, searching, and bulk transforms run
-through [shell.md](shell.md). Canonical parameter table:
-[registry.md](registry.md).
+Define direct file and directory tools inside the workspace. These tools
+replace ordinary ls, find, grep, wc, mkdir, and heredoc shell usage. Canonical
+parameter table: [registry.md](registry.md).
 
 ## fs.read
 
-| Parameter | Rule |
-| --- | --- |
-| path | required |
-| start | optional line number, default 1 |
-| count | optional line count, default 200 |
-
-Returns raw file content for the range, prefaced by one header line
-stating the path, the range returned, and the total line count. Content
-lines carry no line-number prefixes: the bytes are exact, so a span can be
-pasted into an fs.edit find string without cleanup.
-
-Reading an unchanged file region already in the window is refused with a
-notice pointing at the earlier observation, per the duplicate rule in
-[../context/hygiene.md](../context/hygiene.md).
+Reads a ranged file span. Parameters are required `path`, optional `start`
+default `1`, and optional `count` default `200`. The observation includes one
+header line and exact file bytes for the selected range.
 
 ## fs.write
 
-| Parameter | Rule |
-| --- | --- |
-| path | required |
-| content | required |
-
-Writes the file, creating parent directories as needed. The observation
-confirms the path and byte count only; it never echoes content, because
-the model already holds the bytes it just wrote
-([../context/hygiene.md](../context/hygiene.md)).
+Writes one file, creating parent directories. The observation confirms path
+and byte count and does not echo the content.
 
 ## fs.edit
 
-| Parameter | Rule |
-| --- | --- |
-| path | required |
-| find | required, must match exactly once |
-| replace | required |
+Replaces exactly one `find` string with `replace` in `path`. Zero or multiple
+matches are errors and leave the file unchanged.
 
-If find matches zero times or more than once, the tool errors and reports
-the match count; nothing is written. On success the observation states the
-path and the line number of the replacement.
+## fs.list
 
-Example, in the action format of
-[../protocol/action-format.md](../protocol/action-format.md):
+Lists sorted relative paths under `path`, bounded by `depth`, `kind`, and
+`limit`. Rows include kind, bytes, and cheap line counts for text files.
+
+## fs.search
+
+Performs bounded substring search. `include` is a simple suffix or substring
+filter; `case` defaults to `insensitive`. Output is `path:line: snippet` with
+bounded context.
+
+## fs.stat
+
+Reports kind, bytes, line count for text files, and a stable checksum. It is
+the normal replacement for simple wc and existence checks.
+
+## fs.mkdir
+
+Creates one directory inside the workspace, including parents.
+
+## fs.batch_write
+
+Writes several files from a simple line protocol:
 
 ```
-<act>
-<tool>fs.edit</tool>
-<path>crates/lkjagent-protocol/src/render.rs</path>
-<find>
-    out.push_str(block);
-</find>
-<replace>
-    out.push_str(block);
-    out.push('\n');
-</replace>
-</act>
+path: docs/a.md
+content:
+# A
+-- lkjagent-next-file --
+path: docs/b.md
+content:
+# B
 ```
 
-## Maintenance Behavior
+The dispatcher rejects empty paths, duplicate paths, and workspace escapes.
 
-During an explicit maintenance cycle, fs.write and fs.edit have the same
-workspace authority they have during task work. The boundary is the
-container blast radius in [../sandbox/safety.md](../sandbox/safety.md), not
-a maintenance-specific restriction.
+## Graph Policy
+
+During maintenance, mutating file tools are blocked by the maintenance gate.
+During owner work, graph policy blocks mutating file tools until a valid plan
+and executable graph node are active.
 
 ## Status
 

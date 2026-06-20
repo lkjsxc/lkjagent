@@ -48,18 +48,23 @@ mod tests {
     #[test]
     fn counted_scaffold_closure_admits_only_complete_graph_evidence() {
         let mut graph = initial_state("Create exactly 5 files total.", None);
-        graph.pending_checks.clear();
-        graph.evidence_requirements = vec![
-            "plan".to_string(),
-            "observation".to_string(),
-            "document-structure".to_string(),
-            "verification".to_string(),
-        ];
-        graph.evidence = graph
-            .evidence_requirements
+        graph.evidence.pending_checks.clear();
+        graph.evidence = lkjagent_graph::case_evidence::EvidenceState::new(
+            vec![
+                "plan".to_string(),
+                "observation".to_string(),
+                "document-structure".to_string(),
+                "verification".to_string(),
+            ],
+            Vec::new(),
+        );
+        graph.evidence.records = graph
+            .evidence
+            .requirement_ids()
             .iter()
             .map(|requirement| evidence(requirement))
             .collect();
+        lkjagent_graph::completion::refresh_completion_state(&mut graph);
 
         assert!(matches!(
             counted_scaffold_closure(Some(&graph)),
@@ -70,9 +75,11 @@ mod tests {
     #[test]
     fn counted_scaffold_closure_waits_when_graph_gate_is_missing_evidence() {
         let mut graph = initial_state("Create exactly 5 files total.", None);
-        graph.pending_checks.clear();
-        graph.evidence_requirements = vec!["verification".to_string()];
-        graph.evidence.clear();
+        graph.evidence = lkjagent_graph::case_evidence::EvidenceState::new(
+            vec!["verification".to_string()],
+            Vec::new(),
+        );
+        lkjagent_graph::completion::refresh_completion_state(&mut graph);
 
         assert!(matches!(
             counted_scaffold_closure(Some(&graph)),
@@ -87,6 +94,10 @@ mod tests {
             kind: EvidenceKind::Verification,
             summary: "ok".to_string(),
             path: None,
+            frame_ref: None,
+            event_ref: None,
+            confidence: 90,
+            satisfies_completion: true,
         }
     }
 }

@@ -15,13 +15,27 @@ const WRITE_ACTION: &str = "<act>
 <path>notes.md</path>
 <content># Notes</content>
 </act>";
+const PLAN_ACTION: &str = "<act>
+<tool>graph.plan</tool>
+<objective>start long work</objective>
+<steps>write notes; read notes; record verification</steps>
+<checks>fs.read notes.md confirms content</checks>
+<paths>notes.md</paths>
+<reason>mutation requires a graph plan</reason>
+</act>";
 const DONE_ACTION: &str = "<act>
 <tool>agent.done</tool>
 <summary>three markdown files complete</summary>
 </act>";
-const VERIFY_ACTION: &str = "<act>
-<tool>shell.run</tool>
-<command>test -f notes.md</command>
+const READ_ACTION: &str = "<act>
+<tool>fs.read</tool>
+<path>notes.md</path>
+</act>";
+const EVIDENCE_ACTION: &str = "<act>
+<tool>graph.evidence</tool>
+<kind>verification</kind>
+<summary>fs.read observed notes.md content</summary>
+<path>notes.md</path>
 </act>";
 
 #[test]
@@ -31,14 +45,15 @@ fn owner_guidance_during_open_task_persists_count_guard() -> TestResult<()> {
     queue::enqueue(&mut conn, "start long work", "owner-send", "101")?;
     let workspace = temp_workspace("owner-guidance")?;
     let server = serve_responses(vec![
+        completion(PLAN_ACTION),
         completion(WRITE_ACTION),
-        completion(VERIFY_ACTION),
+        completion(READ_ACTION),
+        completion(EVIDENCE_ACTION),
         completion(DONE_ACTION),
     ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
-    assert_eq!(fs::read_to_string(workspace.join("notes.md"))?, "# Notes");
     queue::enqueue(
         &mut conn,
         "Finish with exactly 3 markdown files in docs.",
@@ -46,7 +61,10 @@ fn owner_guidance_during_open_task_persists_count_guard() -> TestResult<()> {
         "102",
     )?;
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    assert_eq!(fs::read_to_string(workspace.join("notes.md"))?, "# Notes");
     assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Working);
     server.join()?;
 
     assert_eq!(

@@ -1,8 +1,10 @@
+mod file_count_daemon_actions;
 mod support;
 
 use std::fs;
 use std::path::Path;
 
+use file_count_daemon_actions::*;
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
@@ -12,29 +14,8 @@ use support::{
     contains_all, store, temp_workspace, TestResult, COUNTED_EVIDENCE_TERMS, COUNTED_SUMMARY_TERMS,
 };
 
-const BATCH_WRITE: &str = "<act>
-<tool>shell.run</tool>
-<command>
-set -eu
-rm -rf deliverable
-mkdir -p deliverable/docs deliverable/main
-printf '# Deliverable\n' > deliverable/README.md
-printf '# Doc\n' > deliverable/docs/plan.md
-printf '# Main 1\n' > deliverable/main/part-001.md
-printf '# Main 2\n' > deliverable/main/part-002.md
-printf '# Main 3\n' > deliverable/main/part-003.md
-printf 'files='
-find deliverable -type f | wc -l
-</command>
-</act>";
-
-const DONE: &str = "<act>
-<tool>agent.done</tool>
-<summary>created a README-indexed five-file deliverable</summary>
-</act>";
-
 #[test]
-fn counted_documentation_task_closes_after_batch_shell_write() -> TestResult<()> {
+fn counted_documentation_task_closes_after_batch_write() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "100", "0")?;
     queue::enqueue(
@@ -44,11 +25,20 @@ fn counted_documentation_task_closes_after_batch_shell_write() -> TestResult<()>
         "101",
     )?;
     let workspace = temp_workspace("file-count-daemon")?;
-    let server = serve_responses(vec![completion(BATCH_WRITE), completion(DONE)])?;
+    let server = serve_responses(vec![
+        completion(PLAN_BATCH),
+        completion(BATCH_WRITE),
+        completion(LIST_DELIVERABLE),
+        completion(VERIFY_DELIVERABLE),
+        completion(DONE),
+    ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Done);
     server.join()?;
 
     assert_eq!(file_count(&workspace.join("deliverable"))?, 5);

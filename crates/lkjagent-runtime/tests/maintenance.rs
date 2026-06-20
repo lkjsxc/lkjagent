@@ -32,7 +32,7 @@ fn maintenance_starts_scripted_cycle_for_each_directive() -> TestResult<()> {
 fn directive_rotation_uses_stalest_state_stamp() -> TestResult<()> {
     let stamps = vec![
         stamp(Directive::Distill, Some("2026-01-03T00:00:00Z")),
-        stamp(Directive::RefineSkills, Some("2026-01-01T00:00:00Z")),
+        stamp(Directive::RefineGraphPolicy, Some("2026-01-01T00:00:00Z")),
         stamp(Directive::PruneMemory, None),
         stamp(Directive::AuditSelf, Some("2026-01-02T00:00:00Z")),
     ];
@@ -40,7 +40,7 @@ fn directive_rotation_uses_stalest_state_stamp() -> TestResult<()> {
 
     let conn = store()?;
     stamp_directive(&conn, Directive::Distill, "2026-01-03T00:00:00Z")?;
-    stamp_directive(&conn, Directive::RefineSkills, "2026-01-01T00:00:00Z")?;
+    stamp_directive(&conn, Directive::RefineGraphPolicy, "2026-01-01T00:00:00Z")?;
     stamp_directive(&conn, Directive::AuditSelf, "2026-01-02T00:00:00Z")?;
     let decision = prepare_idle_cycle(&conn, &runtime_state()?, "2026-01-04T00:00:00Z")?;
     assert!(matches!(

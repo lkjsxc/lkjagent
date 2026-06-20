@@ -9,7 +9,7 @@ pub const DEFAULT_MAINTENANCE_TURN_BUDGET: u16 = 8;
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum MaintenanceDirective {
     Distill,
-    RefineSkills,
+    RefineGraphPolicy,
     PruneMemory,
     AuditSelf,
 }
@@ -18,7 +18,7 @@ impl MaintenanceDirective {
     pub fn all() -> &'static [Self] {
         &[
             Self::Distill,
-            Self::RefineSkills,
+            Self::RefineGraphPolicy,
             Self::PruneMemory,
             Self::AuditSelf,
         ]
@@ -27,7 +27,7 @@ impl MaintenanceDirective {
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Distill => "distill",
-            Self::RefineSkills => "refine-skills",
+            Self::RefineGraphPolicy => "refine-graph-policy",
             Self::PruneMemory => "prune-memory",
             Self::AuditSelf => "audit-self",
         }
@@ -36,7 +36,9 @@ impl MaintenanceDirective {
     pub fn work(self) -> &'static str {
         match self {
             Self::Distill => "read recent transcript spans and save durable lessons",
-            Self::RefineSkills => "record source skill improvement candidates",
+            Self::RefineGraphPolicy => {
+                "record graph policy and context package improvement candidates"
+            }
             Self::PruneMemory => "merge, rewrite, or drop stale memory rows",
             Self::AuditSelf => "record contract mismatches from recent failures",
         }

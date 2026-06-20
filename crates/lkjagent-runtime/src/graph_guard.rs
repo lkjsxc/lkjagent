@@ -1,5 +1,7 @@
 use rusqlite::Connection;
 
+use lkjagent_graph::case_fields::ConstraintRecord;
+use lkjagent_graph::TaskGraphState;
 use lkjagent_store::state as store_state;
 use lkjagent_tools::control::CompletionGuard;
 use lkjagent_tools::count_guard::{CountKind, CountMode};
@@ -14,10 +16,11 @@ pub fn append_store_guard(conn: &Connection, graph: String) -> RuntimeResult<Str
     ))
 }
 
-pub fn append_plan_guard(plan: &mut String, guard: CompletionGuard) {
+pub fn append_case_guard(state: &mut TaskGraphState, guard: CompletionGuard) {
     if let Some(text) = guard_text(guard) {
-        plan.push('\n');
-        plan.push_str(&text);
+        state
+            .constraints
+            .push(ConstraintRecord::hard(text, "completion guard"));
     }
 }
 
@@ -44,16 +47,16 @@ fn guard_text(guard: CompletionGuard) -> Option<String> {
 fn count_instruction(kind: CountKind, mode: CountMode) -> &'static str {
     match (kind, mode) {
         (CountKind::File, CountMode::Exact) => {
-            "exact file count active; keep the act payload under about 1200 chars; shell.run starts in workspace, so do not cd /workspace; use one compact shell.run command with direct /bin/sh loops and printf templates for bulk creation and count verification; no brace expansion, cat heredocs, bash scripts, literal bodies, or one fs.write per file"
+            "exact file count active; prefer doc.scaffold, fs.list, fs.stat, doc.audit, or fs.batch_write; shell.run is an escape hatch only when graph policy admits it"
         }
         (CountKind::File, CountMode::Approximate) => {
-            "approximate file scale active; treat the number as a size hint, use recursive directories for large outputs, keep the act payload under about 1200 chars; shell.run starts in workspace, so do not cd /workspace; use one compact shell.run command with direct /bin/sh loops and printf templates for bulk creation and tolerance verification; no brace expansion, cat heredocs, bash scripts, literal bodies, or one fs.write per file"
+            "approximate file scale active; treat the number as a size hint and prefer doc.scaffold plus doc.audit; shell.run is an escape hatch only when graph policy admits it"
         }
         (CountKind::Markdown, CountMode::Exact) => {
-            "exact markdown count active; keep the act payload under about 1200 chars; shell.run starts in workspace, so do not cd /workspace; use one compact shell.run command with direct /bin/sh loops and printf templates for bulk markdown creation and count verification; no brace expansion, cat heredocs, bash scripts, literal bodies, or one fs.write per file"
+            "exact markdown count active; prefer doc.scaffold, fs.list, fs.stat, doc.audit, or fs.batch_write; shell.run is an escape hatch only when graph policy admits it"
         }
         (CountKind::Markdown, CountMode::Approximate) => {
-            "approximate markdown count active; keep the act payload under about 1200 chars; shell.run starts in workspace, so do not cd /workspace; use one compact shell.run command with direct /bin/sh loops and printf templates for bulk markdown creation and count verification; no brace expansion, cat heredocs, bash scripts, literal bodies, or one fs.write per file"
+            "approximate markdown count active; prefer doc.scaffold plus doc.audit within tolerance; shell.run is an escape hatch only when graph policy admits it"
         }
     }
 }

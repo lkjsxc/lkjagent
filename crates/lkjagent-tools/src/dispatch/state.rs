@@ -35,6 +35,7 @@ pub struct DispatchState {
     pub graph_evidence: Vec<GraphEvidenceRecord>,
     pub graph_completion_ready: bool,
     pub graph_missing: Vec<String>,
+    pub graph_policy: Option<GraphDispatchPolicy>,
     pub control: ControlState,
 }
 
@@ -50,9 +51,24 @@ impl Default for DispatchState {
             graph_evidence: Vec::new(),
             graph_completion_ready: true,
             graph_missing: Vec::new(),
+            graph_policy: None,
             control: ControlState::default(),
         }
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GraphDispatchPolicy {
+    pub active_node: String,
+    pub phase: String,
+    pub allowed_tools: Vec<String>,
+    pub blocked_tools: Vec<String>,
+    pub allowed_packages: Vec<String>,
+    pub legal_transitions: Vec<String>,
+    pub evidence_requirements: Vec<String>,
+    pub blocked_reason: Option<String>,
+    pub plan_ready: bool,
+    pub completion_ready: bool,
 }
 
 impl DispatchState {

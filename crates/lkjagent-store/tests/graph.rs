@@ -16,14 +16,14 @@ fn graph_tables_persist_active_cases_and_evidence() -> TestResult<()> {
     let case_id = open_case(
         &conn,
         OpenCase {
-            objective: "fix bug",
-            family: "bug-fix",
-            phase: "planning",
-            active_node: "plan",
-            plan: "inspect before editing",
-            evidence_requirements: &requirements,
-            selected_packages: &packages,
-            pending_checks: &pending,
+            objective: "fix bug".to_string(),
+            family: "bug-fix".to_string(),
+            phase: "planning".to_string(),
+            active_node: "plan".to_string(),
+            plan: "inspect before editing".to_string(),
+            evidence_requirements: requirements.clone(),
+            selected_packages: packages.clone(),
+            pending_checks: pending.clone(),
         },
         "2026-01-01T00:00:00Z",
     )?;

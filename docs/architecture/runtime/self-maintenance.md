@@ -27,7 +27,7 @@ Maintenance directives are chosen in rotation and weighted by staleness:
 | Directive | Work |
 | --- | --- |
 | distill | Read recent transcript spans; write durable lessons via memory.save per [../memory/distillation.md](../memory/distillation.md) |
-| refine-skills | Record source skill improvement candidates from observed gaps |
+| refine-graph-policy | Record graph policy and context package improvement candidates from observed gaps |
 | prune-memory | Merge duplicate memory rows, rewrite vague entries, drop superseded ones |
 | audit-self | Compare recent failures against contracts; record mismatches as memory entries tagged for the owner |
 

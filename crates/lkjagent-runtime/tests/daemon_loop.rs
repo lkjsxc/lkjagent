@@ -1,37 +1,17 @@
+mod daemon_loop_actions;
 mod support;
 
 use std::fs;
 use std::net::TcpListener;
 use std::path::Path;
 
+use daemon_loop_actions::*;
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
 use lkjagent_store::{events, memory, queue, state};
 use support::http::{completion, length_completion, serve_responses};
 use support::{runtime_state, store, temp_workspace, TestResult};
-
-const WRITE_ACTION: &str = "<act>
-<tool>fs.write</tool>
-<path>out.txt</path>
-<content>hello</content>
-</act>";
-const ASK_ACTION: &str = "<act>
-<tool>agent.ask</tool>
-<question>Need detail?</question>
-</act>";
-const DONE_ACTION: &str = "<act>
-<tool>agent.done</tool>
-<summary>wrote file</summary>
-</act>";
-const VERIFY_WRITE_ACTION: &str = "<act>
-<tool>shell.run</tool>
-<command>test \"$(cat out.txt)\" = hello</command>
-</act>";
-const VERIFY_TRUE_ACTION: &str = "<act>
-<tool>shell.run</tool>
-<command>true</command>
-</act>";
 
 #[test]
 fn daemon_delivers_queue_writes_file_and_records_done() -> TestResult<()> {
@@ -40,16 +20,20 @@ fn daemon_delivers_queue_writes_file_and_records_done() -> TestResult<()> {
     queue::enqueue(&mut conn, "write the file", "owner-send", "101")?;
     let workspace = temp_workspace("daemon-write")?;
     let server = serve_responses(vec![
+        completion(PLAN_WRITE_ACTION),
         completion(WRITE_ACTION),
-        completion(VERIFY_WRITE_ACTION),
-        completion(DONE_ACTION),
+        completion(READ_OUT_ACTION),
+        completion(EVIDENCE_WRITE_ACTION),
+        completion(DONE_WRITE_ACTION),
     ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
-    assert_eq!(fs::read_to_string(workspace.join("out.txt"))?, "hello");
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Done);
+    assert_eq!(fs::read_to_string(workspace.join("out.txt"))?, "hello");
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Done);
     server.join()?;
 
     assert_eq!(state::get(&conn, "daemon state")?, Some("idle".to_string()));
@@ -73,8 +57,10 @@ fn daemon_waits_on_ask_and_resumes_from_next_send() -> TestResult<()> {
     let workspace = temp_workspace("daemon-ask")?;
     let server = serve_responses(vec![
         completion(ASK_ACTION),
-        completion(VERIFY_TRUE_ACTION),
-        completion(DONE_ACTION),
+        completion(PLAN_RESUME_ACTION),
+        completion(WORKSPACE_ACTION),
+        completion(EVIDENCE_GENERIC_ACTION),
+        completion(DONE_GENERIC_ACTION),
     ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
@@ -85,7 +71,9 @@ fn daemon_waits_on_ask_and_resumes_from_next_send() -> TestResult<()> {
     );
     queue::enqueue(&mut conn, "guidance", "owner-send", "102")?;
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Done);
     server.join()?;
 
     let log = events::read_events(&conn)?;
@@ -140,15 +128,19 @@ fn daemon_recovers_from_max_token_completion_without_retry_loop() -> TestResult<
     let workspace = temp_workspace("daemon-oversize")?;
     let server = serve_responses(vec![
         length_completion("<act>\n<tool>shell.run</tool>\n<command>"),
-        completion(VERIFY_TRUE_ACTION),
-        completion(DONE_ACTION),
+        completion(PLAN_RESUME_ACTION),
+        completion(WORKSPACE_ACTION),
+        completion(EVIDENCE_GENERIC_ACTION),
+        completion(DONE_GENERIC_ACTION),
     ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(daemon.endpoint_attempt, 0);
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Done);
     server.join()?;
 
     let log = events::read_events(&conn)?;
@@ -157,7 +149,7 @@ fn daemon_recovers_from_max_token_completion_without_retry_loop() -> TestResult<
         .any(|event| event.content.contains("completion hit max tokens")));
     assert!(log
         .iter()
-        .any(|event| event.content.contains("under about 1200 chars")));
+        .any(|event| event.content.contains("next act must stay bounded")));
     Ok(())
 }
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {

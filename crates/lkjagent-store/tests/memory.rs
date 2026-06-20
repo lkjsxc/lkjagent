@@ -111,14 +111,14 @@ fn memory_find_prefers_active_graph_link_within_kind() -> TestResult<()> {
     let case_id = open_case(
         &conn,
         OpenCase {
-            objective: "fix parser recovery",
-            family: "bug-fix",
-            phase: "execution",
-            active_node: "execute",
-            plan: "reuse linked parser memory",
-            evidence_requirements: &requirements,
-            selected_packages: &packages,
-            pending_checks: &pending,
+            objective: "fix parser recovery".to_string(),
+            family: "bug-fix".to_string(),
+            phase: "execution".to_string(),
+            active_node: "execute".to_string(),
+            plan: "reuse linked parser memory".to_string(),
+            evidence_requirements: requirements,
+            selected_packages: packages,
+            pending_checks: pending,
         },
         "2026-01-01T00:00:03Z",
     )?;

@@ -88,7 +88,7 @@ pub fn edit_observation(report: &EditReport) -> String {
     format!("path={}\nline={}", report.path, report.line)
 }
 
-fn workspace_path(workspace: &Path, path: &str) -> ToolResult<PathBuf> {
+pub(crate) fn workspace_path(workspace: &Path, path: &str) -> ToolResult<PathBuf> {
     if path.trim().is_empty() {
         return Err(ToolError::invalid("path must not be empty"));
     }

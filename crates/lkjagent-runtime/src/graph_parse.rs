@@ -44,6 +44,7 @@ pub(crate) fn status(value: &str) -> CaseStatus {
 pub(crate) fn evidence_kind(value: &str) -> EvidenceKind {
     match value {
         "owner" => EvidenceKind::Owner,
+        "plan" => EvidenceKind::Plan,
         "action" => EvidenceKind::Action,
         "verification" => EvidenceKind::Verification,
         "file" => EvidenceKind::File,
@@ -55,16 +56,34 @@ pub(crate) fn evidence_kind(value: &str) -> EvidenceKind {
 
 pub(crate) fn node_id(value: &str) -> GraphNodeId {
     match value {
-        "classify" => GraphNodeId("classify"),
+        "intake" => GraphNodeId("intake"),
+        "normalize-objective" => GraphNodeId("normalize-objective"),
+        "extract-constraints" => GraphNodeId("extract-constraints"),
+        "route" => GraphNodeId("route"),
+        "survey" => GraphNodeId("survey"),
         "context" => GraphNodeId("context"),
+        "review-plan" => GraphNodeId("review-plan"),
         "execute" => GraphNodeId("execute"),
+        "observe" => GraphNodeId("observe"),
+        "integrate-evidence" => GraphNodeId("integrate-evidence"),
         "verify" => GraphNodeId("verify"),
+        "escape" => GraphNodeId("escape"),
         "recover" => GraphNodeId("recover"),
-        "compact" => GraphNodeId("compact"),
+        "recover-tool" => GraphNodeId("recover-tool"),
+        "recover-repeat" => GraphNodeId("recover-repeat"),
+        "compact-soft" => GraphNodeId("compact-soft"),
+        "compact-hard" => GraphNodeId("compact-hard"),
+        "rebuild-context" => GraphNodeId("rebuild-context"),
         "complete" => GraphNodeId("complete"),
         "document" => GraphNodeId("document"),
+        "document-audit" => GraphNodeId("document-audit"),
+        "benchmark" => GraphNodeId("benchmark"),
+        "docs-code-consistency" => GraphNodeId("docs-code-consistency"),
         "memory" => GraphNodeId("memory"),
         "maintain" => GraphNodeId("maintain"),
+        "refine-graph-policy" => GraphNodeId("refine-graph-policy"),
+        "prune-memory" => GraphNodeId("prune-memory"),
+        "audit-self" => GraphNodeId("audit-self"),
         _ => GraphNodeId("plan"),
     }
 }

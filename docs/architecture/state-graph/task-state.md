@@ -6,18 +6,21 @@ Specify the durable case state that replaces a bare open-or-closed task flag.
 
 ## Fields
 
-Each active case stores:
+Each active case stores structured state:
 
-- case id, status, objective, task family, active node, phase, and confidence.
-- plan text with constraints, assumptions, candidate files, risks, evidence
-  requirements, and next actions.
-- touched paths, pending checks, open questions, selected context packages,
-  recovery strategy, and completion guard.
-- created, updated, and closed timestamps.
+- objective, family, phase, status, active node, confidence, and budgets.
+- constraints, assumptions, questions, risks, invariants, success criteria,
+  and decisions.
+- plan steps with status, node, target paths, evidence requirements, and
+  verification checks.
+- context bindings, workspace paths, evidence requirements, evidence records,
+  completion state, recovery history, document state, and transition history.
 
-The store records every phase change and evidence addition in `graph_events`
-and `graph_evidence`. Restart and compaction reconstruct the case from these
-tables instead of a lossy prose summary.
+The store keeps `graph_cases` as the header and normalized child tables for
+constraints, assumptions, questions, risks, success criteria, plan steps,
+decisions, context bindings, transitions, faults, artifacts, and document
+state. Restart and compaction reconstruct from structured rows instead of a
+lossy prose summary.
 
 ## Phases
 

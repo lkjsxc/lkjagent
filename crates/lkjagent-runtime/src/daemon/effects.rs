@@ -1,16 +1,12 @@
 use lkjagent_store::events::{append_event, EventKind};
 use lkjagent_store::state as store_state;
-use lkjagent_tools::dispatch::dispatch_with_text;
 use rusqlite::Connection;
 
-use super::compaction_gate::blocked_compaction_output;
 use super::runner::{DaemonTick, ResidentDaemon};
 use crate::error::RuntimeResult;
 use crate::prompt::token_estimate;
-use crate::step::{step, Effect, StepInput, StepResult};
+use crate::step::{Effect, StepResult};
 use crate::task::StopReason;
-
-use super::maintenance_gate::{blocked_maintenance_output, maintenance_allows};
 
 impl ResidentDaemon {
     pub(super) fn apply_step_result(
@@ -91,6 +87,61 @@ impl ResidentDaemon {
                 lkjagent_store::graph::record_evidence(conn, case_id, &evidence, now)?;
                 Ok(None)
             }
+            Effect::RecordGraphPlan { case_id, steps } => {
+                let rows = steps
+                    .into_iter()
+                    .enumerate()
+                    .map(
+                        |(index, step)| lkjagent_store::graph::plan::GraphPlanStepRow {
+                            case_id,
+                            step_id: step.step_id,
+                            title: step.title,
+                            rationale: step.rationale,
+                            status: step.status,
+                            node: step.node,
+                            target_paths: step.target_paths,
+                            checks: step.checks,
+                            sort_order: index as i64,
+                        },
+                    )
+                    .collect::<Vec<_>>();
+                lkjagent_store::graph::plan::replace_plan_steps(conn, case_id, &rows, now)?;
+                Ok(None)
+            }
+            Effect::RecordGraphContext {
+                case_id,
+                packages,
+                reason,
+            } => {
+                for package in packages {
+                    lkjagent_store::graph::context::record_context_binding(
+                        conn, case_id, &package, &reason, "selected", now,
+                    )?;
+                }
+                Ok(None)
+            }
+            Effect::RecordGraphNote {
+                case_id,
+                kind,
+                summary,
+            } => {
+                lkjagent_store::graph::notes::record_note(
+                    conn, case_id, &kind, &summary, "runtime", now,
+                )?;
+                Ok(None)
+            }
+            Effect::RecordGraphTransition {
+                case_id,
+                from_node,
+                to_node,
+                decision,
+                reason,
+            } => {
+                lkjagent_store::graph::transitions::record_transition(
+                    conn, case_id, &from_node, &to_node, &decision, &reason, now,
+                )?;
+                Ok(None)
+            }
             Effect::UpdateGraphCase {
                 case_id,
                 phase,
@@ -118,50 +169,6 @@ impl ResidentDaemon {
                 policy,
             } => self.record_compaction(conn, now, before_tokens, after_tokens, memory_ids, policy),
         }
-    }
-}
-
-impl ResidentDaemon {
-    fn execute_pending(
-        &mut self,
-        conn: &mut Connection,
-        now: &str,
-        action_text: &str,
-    ) -> RuntimeResult<Option<DaemonTick>> {
-        let Some(pending) = self.state.pending_action.clone() else {
-            return Ok(None);
-        };
-        let maintenance_ask = self.maintenance_ask_pending(conn, pending.action.tool.as_str())?;
-        let output = if self.state.compaction.is_some() && pending.action.tool != "memory.save" {
-            blocked_compaction_output(&mut self.dispatch_state, action_text)
-        } else if self.state.maintenance.is_some() && !maintenance_allows(&pending.action.tool) {
-            blocked_maintenance_output(&mut self.dispatch_state, action_text)
-        } else {
-            self.sync_graph_dispatch_state();
-            dispatch_with_text(
-                &pending.action,
-                action_text,
-                &self.runtime.tools,
-                conn,
-                &mut self.dispatch_state,
-            )
-        };
-        let compaction_output = output.clone();
-        let result = step(self.state.clone(), StepInput::ToolOutput(output));
-        let tick = self.apply_step_result(conn, now, result, false)?;
-        if maintenance_ask {
-            self.close_maintenance_ask(conn)?;
-            return Ok(Some(DaemonTick::Done));
-        }
-        if let Some(next) =
-            self.advance_compaction_after_output(conn, now, &pending.action, &compaction_output)?
-        {
-            return Ok(Some(next));
-        }
-        if let Some(next) = self.compact_after_observation(conn, now)? {
-            return Ok(Some(next));
-        }
-        Ok(Some(tick))
     }
 }
 

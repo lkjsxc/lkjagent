@@ -31,11 +31,11 @@ faults):
 
 - 3 consecutive parse-class faults: the harness keeps the task open and adds
   a stronger recovery notice telling the model to emit one simple valid act
-  block, switch tag-like or large generated payloads to shell.run, or ask if
-  blocked.
+  block, switch large generated payloads to `fs.batch_write` or
+  `doc.scaffold`, or ask if blocked.
 - 3 consecutive repeat actions: same recovery notice pattern; the repeated
   action is not re-executed, and the model is told to inspect state, choose
-  a different tool, or switch repetitive writes to shell.run.
+  a different tool, or switch repetitive writes to `fs.batch_write`.
 - Endpoint unreachable beyond the backoff cap (initial contract: 15
   minutes): daemon stays alive, state shows the outage, polls before the
   retry deadline do not append duplicate error events, and retries continue
@@ -62,10 +62,9 @@ fault trail, and the next endpoint turn sees the latest recovery notice.
   a bounded preview, resets endpoint retry state, and appends a recovery
   notice telling the model to emit one short act block under about 1200
   characters. If the preview shows a bulk write, the notice directs the next
-  action toward direct /bin/sh loops with printf templates instead of cat
-  heredocs, bash scripts, or literal file bodies, and reminds it not to cd to
-  /workspace. A length response that already contains one closed act is
-  accepted and passed to the parser.
+  action toward `fs.batch_write`, `doc.scaffold`, or a smaller `fs.write`,
+  and reminds it not to bypass graph policy. A length response that already
+  contains one closed act is accepted and passed to the parser.
 
 ## Status
 

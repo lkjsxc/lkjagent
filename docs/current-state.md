@@ -61,12 +61,10 @@ non-file units such as words or pages keep their numbers from becoming
 file-count targets. Counted completion prefers README-indexed roots and
 falls back to clean top-level output directories.
 The active graph prefix renders exact count guards as count requirements and
-approximate count guards as scale hints. It tells the model to use recursive
-directories for large outputs, one compact `shell.run` command with direct
-`/bin/sh` loops and `printf` templates for bulk creation and verification,
-keep the act payload under about 1200 characters, and avoid hardcoded
-`/workspace` paths, brace expansion, cat heredocs, bash scripts, literal
-bodies, or one `fs.write` per file.
+approximate count guards as scale hints. It tells the model to prefer
+`doc.scaffold`, `doc.audit`, `fs.list`, `fs.stat`, and `fs.batch_write` for
+bulk document construction and verification, keep the act payload bounded,
+and treat `shell.run` as an escape hatch only when graph policy admits it.
 For counted documentation tasks that are not recursive, knowledge-base, or
 benchmark scaffolds, the daemon also writes a generic `structured-output/`
 tree at the requested exact count or approximate scale before the first
@@ -148,10 +146,10 @@ just-closed graph case and node.
 
 Memory remains durable retrieval, but graph cases link evidence and memories.
 Empty queues open bounded graph maintenance cycles in rotation when directives
-are due: distill, refine-skills, prune-memory, and audit-self. Saving a user
-task summary stamps all maintenance directives, so the daemon shows idle after
-task completion until the cooldown passes or owner work arrives. Compose
-wiring is implemented.
+are due: distill, refine-graph-policy, prune-memory, and audit-self. Saving a
+user task summary stamps all maintenance directives, so the daemon shows idle
+after task completion until the cooldown passes or owner work arrives.
+Compose wiring is implemented.
 The implementation queue is [execution/current-blockers.md](execution/current-blockers.md).
 
 ## Area Status

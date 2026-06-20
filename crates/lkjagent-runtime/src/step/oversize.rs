@@ -8,7 +8,7 @@ pub(super) fn oversize_error(preview: &str) -> String {
 
 pub(super) fn oversize_recovery(preview: &str) -> String {
     if preview.contains("<act>") {
-        return "recovery: completion hit max tokens after starting an action; next act must stay under about 1200 chars; shell.run starts in workspace, so do not cd /workspace; use direct /bin/sh loops with printf templates; no brace expansion, cat heredocs, bash scripts, or literal file bodies".to_string();
+        return "recovery: completion hit max tokens after starting an action; next act must stay bounded; use fs.batch_write or doc.scaffold for large file payloads".to_string();
     }
-    "recovery: completion hit max tokens; next act must stay under about 1200 chars; use direct /bin/sh loops with printf templates for large generated output; do not cd /workspace".to_string()
+    "recovery: completion hit max tokens; next act must stay bounded; prefer typed fs/doc tools and narrow observations".to_string()
 }

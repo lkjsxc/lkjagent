@@ -12,9 +12,13 @@ use crate::task::{RuntimeState, StopReason};
 mod action_params;
 mod compact;
 mod cycle;
+mod effects_model;
 mod fault_wait;
 mod frames;
 mod graph_output;
+mod graph_output_evidence;
+mod graph_output_plan;
+mod graph_output_plan_helpers;
 mod graph_phase;
 mod output;
 mod oversize;
@@ -22,6 +26,7 @@ mod turn;
 
 use compact::compact_step;
 use cycle::maintenance_start_step;
+pub use effects_model::{Effect, GraphPlanStepEffect};
 use fault_wait::{enter_recovery_wait, RecoveryFault};
 use frames::{append_notice, result};
 use output::{append_output_frame, event_kind, handle_control_success, stop_for_output};
@@ -32,7 +37,7 @@ pub enum StepInput {
     Owner {
         content: String,
         tokens: usize,
-        graph: Option<TaskGraphState>,
+        graph: Option<Box<TaskGraphState>>,
         turn_budget: u16,
     },
     Completion {
@@ -56,45 +61,6 @@ pub enum StepInput {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Effect {
-    RecordEvent {
-        kind: EventKind,
-        content: String,
-        tokens: i64,
-    },
-    ExecuteTool {
-        action_text: String,
-    },
-    DistillTask {
-        summary: String,
-        prompt: String,
-        max_turns: u8,
-    },
-    RecordGraphEvidence {
-        case_id: i64,
-        requirement: String,
-        kind: String,
-        summary: String,
-        path: Option<String>,
-    },
-    UpdateGraphCase {
-        case_id: i64,
-        phase: String,
-        active_node: String,
-        status: String,
-    },
-    Pause {
-        reason: String,
-    },
-    CompactionRecorded {
-        before_tokens: usize,
-        after_tokens: usize,
-        memory_ids: Vec<i64>,
-        policy: ContextBudgetPolicy,
-    },
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StepResult {
     pub state: RuntimeState,
     pub effects: Vec<Effect>,
@@ -108,7 +74,13 @@ pub fn step(state: RuntimeState, input: StepInput) -> StepResult {
             tokens,
             graph,
             turn_budget,
-        } => owner_step(state, content, tokens, graph, turn_budget),
+        } => owner_step(
+            state,
+            content,
+            tokens,
+            graph.map(|boxed| *boxed),
+            turn_budget,
+        ),
         StepInput::Completion { content, tokens } => completion_step(state, content, tokens),
         StepInput::EndpointOversize { preview } => turn::endpoint_oversize_step(state, &preview),
         StepInput::ToolOutput(output) => tool_output_step(state, output),

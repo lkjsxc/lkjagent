@@ -15,14 +15,30 @@ const WRITE: &str = "<act>
 <content>done</content>
 </act>";
 
+const PLAN: &str = "<act>
+<tool>graph.plan</tool>
+<objective>write done file</objective>
+<steps>write done.txt; read done.txt; record verification</steps>
+<checks>fs.read done.txt confirms content</checks>
+<paths>done.txt</paths>
+<reason>owner mutation needs graph plan</reason>
+</act>";
+
 const DONE: &str = "<act>
 <tool>agent.done</tool>
 <summary>wrote done.txt</summary>
 </act>";
 
-const VERIFY: &str = "<act>
-<tool>shell.run</tool>
-<command>test -f done.txt</command>
+const READ: &str = "<act>
+<tool>fs.read</tool>
+<path>done.txt</path>
+</act>";
+
+const EVIDENCE: &str = "<act>
+<tool>graph.evidence</tool>
+<kind>verification</kind>
+<summary>fs.read observed done.txt content</summary>
+<path>done.txt</path>
 </act>";
 
 const ASK: &str = "<act>
@@ -37,8 +53,10 @@ fn repeat_tracking_resets_between_maintenance_cycles() -> TestResult<()> {
     queue::enqueue(&mut conn, "write done file", "owner-send", "101")?;
     let workspace = temp_workspace("repeat-scope")?;
     let server = serve_responses(vec![
+        completion(PLAN),
         completion(WRITE),
-        completion(VERIFY),
+        completion(READ),
+        completion(EVIDENCE),
         completion(DONE),
         completion(ASK),
         completion(ASK),
@@ -47,12 +65,14 @@ fn repeat_tracking_resets_between_maintenance_cycles() -> TestResult<()> {
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Done);
-    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Idle);
-    assert_eq!(daemon.poll_once(&mut conn, "164")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "165")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "106")?, DaemonTick::Idle);
     assert_eq!(daemon.poll_once(&mut conn, "166")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "167")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "168")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "169")?, DaemonTick::Done);
     server.join()?;
 
     let repeat_notices = events::read_events(&conn)?
