@@ -41,6 +41,7 @@ pub mod state_track;
 mod state_track_seed;
 pub mod transition;
 pub mod transition_history;
+pub mod transition_select;
 pub mod validate;
 mod validate_tools;
 
@@ -64,4 +65,5 @@ pub use transition::{
     admit_transition, admitted_targets, legal_targets, transition_quality, TransitionLegality,
     TransitionQuality,
 };
+pub use transition_select::{best_next_transition, TransitionIntent, TransitionSelection};
 pub use validate::{validate_graph, ValidationReport};
