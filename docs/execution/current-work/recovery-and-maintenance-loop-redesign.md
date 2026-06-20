@@ -116,5 +116,5 @@ Implemented so far: pure active-mode selection and policy rendering exist,
 maintenance/compaction modes do not render graph-policy refusals, and internal
 owner questions are refused with valid next-action examples. Remaining work:
 full loop selection before endpoint turns, idempotent maintenance,
-runtime-owned compaction snapshots, transition repair, artifact planning,
+richer structured compaction snapshots, transition repair, artifact planning,
 completion gates, and benchmark fixtures.
