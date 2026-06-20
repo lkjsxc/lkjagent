@@ -2,7 +2,10 @@ use lkjagent_context::budget::ContextBudgetPolicy;
 use rusqlite::Connection;
 
 use super::ledger;
-use super::text::{bullets, cell, context_line, line, section, state_u64, state_value, token_line};
+use super::text::{
+    bullets, cell, context_line, line, section, state_u64, state_value, token_line,
+    trim_to_char_budget, LOG_TAIL_RESERVE_CHARS, MAX_LOG_CHARS,
+};
 use crate::error::RuntimeResult;
 
 type CaseRow = lkjagent_store::graph::GraphCaseRow;
@@ -44,8 +47,12 @@ pub fn render(conn: &Connection, now: &str, budget: ContextBudgetPolicy) -> Runt
     ledger::touched_paths(&mut out, conn, case.as_ref())?;
     ledger::evidence(&mut out, conn, case.as_ref())?;
     ledger::faults(&mut out, case.as_ref(), &events);
-    ledger::transcript(&mut out, &events);
+    let transcript_budget = MAX_LOG_CHARS
+        .saturating_sub(out.chars().count())
+        .saturating_sub(LOG_TAIL_RESERVE_CHARS);
+    ledger::transcript(&mut out, &events, transcript_budget);
     ledger::verification(&mut out, case.as_ref());
+    trim_to_char_budget(&mut out, MAX_LOG_CHARS);
     Ok(out)
 }
 

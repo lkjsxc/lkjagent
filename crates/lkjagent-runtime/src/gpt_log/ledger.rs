@@ -2,7 +2,7 @@ use std::collections::BTreeSet;
 
 use rusqlite::Connection;
 
-use super::text::{cell, section};
+use super::text::{cell, cell_limited, section, MAX_TRANSCRIPT_CELL_CHARS};
 use crate::error::RuntimeResult;
 
 type CaseRow = lkjagent_store::graph::GraphCaseRow;
@@ -95,30 +95,43 @@ pub fn faults(out: &mut String, case: Option<&CaseRow>, events: &[EventRow]) {
     out.push('\n');
 }
 
-pub fn transcript(out: &mut String, events: &[EventRow]) {
+pub fn transcript(out: &mut String, events: &[EventRow], budget_chars: usize) {
     section(out, "Recent Transcript");
     out.push_str("| id | turn | kind | preview |\n");
     out.push_str("| --- | --- | --- | --- |\n");
-    for event in events
-        .iter()
-        .rev()
-        .take(12)
-        .collect::<Vec<_>>()
-        .into_iter()
-        .rev()
-    {
-        out.push_str(&format!(
+    if events.is_empty() {
+        out.push_str("| 0 | none | none | none |\n\n");
+        return;
+    }
+    let mut rows = Vec::new();
+    let mut used = 0usize;
+    for event in events.iter().rev() {
+        let remaining = budget_chars.saturating_sub(used);
+        if remaining < 160 {
+            break;
+        }
+        let content_limit = remaining.min(MAX_TRANSCRIPT_CELL_CHARS);
+        let row = format!(
             "| {} | {} | {} | {} |\n",
             event.id,
             event
                 .turn
                 .map_or_else(|| "none".to_string(), |turn| turn.to_string()),
             cell(&event.kind),
-            cell(&event.content)
-        ));
+            cell_limited(&event.content, content_limit)
+        );
+        used += row.chars().count();
+        rows.push(row);
+        if used >= budget_chars {
+            break;
+        }
     }
-    if events.is_empty() {
-        out.push_str("| 0 | none | none | none |\n");
+    if rows.is_empty() {
+        out.push_str("| 0 | none | none | transcript budget exhausted |\n");
+    } else {
+        for row in rows.into_iter().rev() {
+            out.push_str(&row);
+        }
     }
     out.push('\n');
 }
