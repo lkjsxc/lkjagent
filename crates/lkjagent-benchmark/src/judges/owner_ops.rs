@@ -39,13 +39,14 @@ pub fn recovery_loop_long_story(workspace: &Path) -> Result<(), String> {
         &text,
         &[
             "Create long SF story",
-            "document-construction",
+            "content-artifact",
+            "stories/long-sf-story",
             "raw fs.write retry is blocked",
             "doc.scaffold",
             "NarrativeManuscript",
             "stories/README.md",
             "planning/premise.md",
-            "manuscript/chapter-arc-setup.md",
+            "chapters/waking-pod.md",
             "graph.note kind=decision",
             "document audit",
         ],
@@ -62,6 +63,7 @@ pub fn recovery_loop_long_story(workspace: &Path) -> Result<(), String> {
             "compaction only allows memory.save actions",
             "agent.ask how should I proceed",
             "<path>story.md</path>",
+            "manuscript/chapter-arc-setup.md",
         ],
     )?;
     if text.matches("<tool>graph.next</tool>").count() > 1 {

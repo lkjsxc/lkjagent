@@ -5,6 +5,8 @@ pub mod correction;
 pub mod graph;
 pub mod owner_docs;
 pub mod owner_faults;
+pub mod owner_loop_content;
+pub mod owner_loop_regressions;
 pub mod owner_observability;
 pub mod owner_thirty;
 pub mod repair;
@@ -26,6 +28,12 @@ pub const TINY: &[BenchmarkTask] = &[
     owner_faults::GRAPH_TASK,
     owner_faults::SCAFFOLD_TASK,
     owner_faults::STORY_TASK,
+    owner_loop_regressions::GRAPH_PLAN_TASK,
+    owner_loop_regressions::FTS_TASK,
+    owner_loop_regressions::MEMORY_TASK,
+    owner_loop_content::POLICY_TASK,
+    owner_loop_content::NOTE_TASK,
+    owner_loop_content::BREAD_TASK,
     owner_observability::STATUS_TASK,
     owner_observability::LOG_TASK,
 ];

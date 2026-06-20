@@ -18,7 +18,7 @@ evidence named by the task contract and the actual gates that ran.
 | 7 | Transition recommendations can point to illegal or impossible targets | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
 | 8 | Structured record identity and deduplication are missing | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
 | 9 | The runtime lacks a deterministic active-mode controller | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 10 | The benchmark corpus does not fully cover the uploaded failure logs | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 10 | Uploaded-failure benchmark coverage still needs final verification | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
 | 11 | Status and console omit compact context and token accounting | [current-work/context-accounting.md](current-work/context-accounting.md) | done |
 | 12 | No single current GPT handoff log exists | [current-work/gpt-log.md](current-work/gpt-log.md) | done |
 

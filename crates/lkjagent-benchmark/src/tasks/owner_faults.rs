@@ -116,7 +116,7 @@ not allowed big file. structured please.
 
 const STORY_GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "owner_input=Create long SF story.\nfollowup_input=not allowed big file. structured please.\nfamily=documentation\nsubroute=document-construction\npayload_risk=raw fs.write retry is blocked\nnext_action=doc.scaffold\n<tool>doc.scaffold</tool>\nroot=stories\nprofile=NarrativeManuscript\nsemantic_paths=stories/README.md,stories/planning/premise.md,stories/manuscript/chapter-arc-setup.md\ngraph.note kind=decision\ndocument audit passed\nfinal_status=evidence-backed partial handoff\n",
+    content: "owner_input=Create long SF story.\nfollowup_input=not allowed big file. structured please.\nfamily=documentation\nsubroute=content-artifact\nroot=stories/long-sf-story\npayload_risk=raw fs.write retry is blocked\nnext_action=doc.scaffold\n<tool>doc.scaffold</tool>\nprofile=NarrativeManuscript\nsemantic_paths=stories/README.md,stories/planning/premise.md,stories/chapters/waking-pod.md\ngraph.note kind=decision\ndocument audit passed\nfinal_status=evidence-backed partial handoff\n",
 }];
 
 const STORY_BAD_NOTE_LOOP: &[FileSpec] = &[FileSpec {
@@ -130,17 +130,17 @@ const STORY_BAD_COMPACTION: &[FileSpec] = &[FileSpec {
 }];
 
 const STORY_GOOD_FIXTURES: &[Fixture] = &[Fixture {
-    name: "structured-recovery",
+    name: "recovery-loop-very-long-story-structured-followup",
     files: STORY_GOOD,
 }];
 
 const STORY_BAD_FIXTURES: &[Fixture] = &[
     Fixture {
-        name: "invalid-note-loop",
+        name: "recovery-loop-long-sf-story",
         files: STORY_BAD_NOTE_LOOP,
     },
     Fixture {
-        name: "compaction-contradiction",
+        name: "compaction-graph-policy-contradiction",
         files: STORY_BAD_COMPACTION,
     },
 ];
@@ -150,7 +150,7 @@ pub const STORY_TASK: BenchmarkTask = BenchmarkTask {
     suite: "tiny",
     family: TaskFamily::OwnerReliability,
     difficulty: Difficulty::Tiny,
-    tags: &["owner-failure", "recovery-loop", "document-construction"],
+    tags: &["owner-failure", "recovery-loop", "content-artifact"],
     prompt: STORY_PROMPT,
     follow_up: Some(STORY_FOLLOW_UP),
     starter_files: &[],
