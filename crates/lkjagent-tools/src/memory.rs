@@ -31,9 +31,6 @@ pub fn save(
         lkjagent_store::memory::MemoryWriteDecision::UpdateExisting { existing_id } => {
             format!("memory_id={existing_id}\nduplicate=updated")
         }
-        lkjagent_store::memory::MemoryWriteDecision::MergeWith { ids } => {
-            format!("memory_id={}\nduplicate=merged", ids.first().unwrap_or(&0))
-        }
     })
 }
 

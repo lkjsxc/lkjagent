@@ -17,7 +17,6 @@ pub enum MemoryWriteDecision {
     Insert { memory_id: i64 },
     SkipDuplicate { existing_id: i64 },
     UpdateExisting { existing_id: i64 },
-    MergeWith { ids: Vec<i64> },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -32,7 +31,6 @@ impl MemoryWriteDecision {
             MemoryWriteDecision::Insert { memory_id } => *memory_id,
             MemoryWriteDecision::SkipDuplicate { existing_id }
             | MemoryWriteDecision::UpdateExisting { existing_id } => *existing_id,
-            MemoryWriteDecision::MergeWith { ids } => ids.first().copied().unwrap_or_default(),
         }
     }
 }
