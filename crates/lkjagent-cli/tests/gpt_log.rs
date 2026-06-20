@@ -98,9 +98,8 @@ fn gpt_log_uses_large_manual_handoff_budget() -> TestResult<()> {
     ]);
 
     assert_eq!(printed.code, 0);
-    assert!(printed.stdout.chars().count() <= 100_000);
-    assert!(printed.stdout.contains("event-078"));
+    assert!(printed.stdout.chars().count() <= 1_000_000);
+    assert!(printed.stdout.contains("event-000"));
     assert!(printed.stdout.contains("event-089"));
-    assert!(!printed.stdout.contains("event-000"));
     Ok(())
 }

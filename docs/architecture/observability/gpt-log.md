@@ -11,7 +11,7 @@ print and send to ChatGPT or another external model.
 - Rewrite the file after significant transcript events as a synthesized snapshot.
 - Treat the file as a manual export artifact, not as a monitored channel; no
   external model is expected to watch it automatically.
-- Keep the current file near or below 100,000 characters, using the budget for
+- Keep the current file near or below 1,000,000 characters, using the budget for
   useful transcript context before deterministic truncation.
 - Include owner objective, constraints, state tracks, plan, touched paths,
   evidence, faults, recent transcript, and verification.
