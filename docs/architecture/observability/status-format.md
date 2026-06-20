@@ -23,7 +23,7 @@ This file defines plain text `lkjagent status` output.
 
 - Status reports context size without total window or percentage.
 - Token fields are absent from a running task.
-- GPT log path is unavailable to the owner.
+- GPT log path points to a stale or competing current file.
 
 ## Status
 

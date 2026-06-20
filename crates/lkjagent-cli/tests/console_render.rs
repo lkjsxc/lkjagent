@@ -14,7 +14,7 @@ fn console_pads_sparse_transcript_above_bottom_deck() -> TestResult<()> {
     let rule = bottom_rule_index(&lines);
 
     assert_eq!(lines.len(), 15);
-    assert_eq!(rule, 8);
+    assert_eq!(rule, 7);
     assert!(lines[2..rule]
         .iter()
         .all(|line| strip_ansi(line).is_empty()));
@@ -53,9 +53,10 @@ fn console_puts_operational_state_in_bottom_deck() -> TestResult<()> {
         .iter()
         .position(|line| strip_ansi(line).contains("state WAITING"))
         .unwrap_or(0);
-    assert!(state_line >= lines.len().saturating_sub(9));
+    assert!(state_line >= lines.len().saturating_sub(10));
     assert!(screen.contains("ctx=1.23K/24.58K 5.02%"));
     assert!(screen.contains("in=8.12K out=1.04K cache=6.88K total=9.16K"));
+    assert!(screen.contains("gpt_log"));
     assert!(screen.contains("question Need owner guidance?"));
     Ok(())
 }
@@ -81,7 +82,7 @@ fn console_keeps_bottom_deck_visible_on_minimum_screen() -> TestResult<()> {
     let rule = bottom_rule_index(&lines);
 
     assert_eq!(lines.len(), 11);
-    assert_eq!(rule, 3);
+    assert_eq!(rule, 2);
     assert!(screen.contains("WAITING"));
     for line in lines {
         assert!(visible_width(&strip_ansi(line)) <= 40);
