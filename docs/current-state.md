@@ -74,7 +74,7 @@ and Docker Compose verification passed for this redesign slice on 2026-06-20.
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
 | GPT handoff log | implemented | runtime and CLI write one current Markdown snapshot |
-| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist, including bread `artifact.next` recovery; corpus check passes; final quiet and Docker Compose verification must run for the current change |
+| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist, including bread `artifact.next` recovery; corpus, quiet verify, and Docker Compose verify passed for this slice |
 
 ## Open Work
 
@@ -82,8 +82,8 @@ The dependency queue is
 [execution/current-blockers.md](execution/current-blockers.md). The open work is
 structural, not only endpoint quality: endpoint-turn mode selection,
 semantic maintenance pruning, compaction snapshots, artifact adoption/repair,
-blocked handoffs, and final verification must move before the ledger can call
-the loop redesign implemented.
+and blocked handoffs need deeper coverage before the ledger can call the loop
+redesign implemented. Final verification must be rerun after each later slice.
 
 ## Out of Scope
 

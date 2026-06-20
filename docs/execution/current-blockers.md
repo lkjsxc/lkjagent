@@ -40,9 +40,10 @@ maintenance restarts after no useful work.
 - Historical fixes may exist, but this queue tracks the current controller and
   artifact hardening work until it passes the current final gate.
 - Current code admits `artifact.next` and stricter content audit for bounded
-  cookbook/story recovery, but rows 7 to 10 stay open until completion wiring,
-  benchmark corpus, quiet verify, and Docker Compose verify prove the uploaded
-  failure pattern cannot recur.
+  cookbook/story recovery, and quiet plus Docker Compose verification passed
+  for this slice on 2026-06-20. Rows 7 to 10 stay open until completion wiring
+  and broader regression coverage prove the uploaded failure pattern cannot
+  recur across every close path.
 - Current memory pruning deletes exact duplicates and merges same-title
-  high-overlap rows with source IDs, but rewrite pruning and final gates remain
-  open under row 5.
+  high-overlap rows with source IDs, but rewrite pruning remains open under
+  row 5.
