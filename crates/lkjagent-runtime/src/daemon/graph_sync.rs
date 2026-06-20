@@ -82,10 +82,7 @@ fn effective_policy(
             .iter()
             .map(|tool| (*tool).to_string())
             .collect(),
-        shell_allowed: mode_policy
-            .allowed_tools
-            .iter()
-            .any(|tool| *tool == "shell.run"),
+        shell_allowed: mode_policy.allowed_tools.contains(&"shell.run"),
         completion_allowed: mode_policy.mode.allows_completion(),
         reason: format!("tool is not admitted by {:?} active mode", mode_policy.mode),
         preferred_next_action: mode_policy.preferred_next_action.to_string(),
