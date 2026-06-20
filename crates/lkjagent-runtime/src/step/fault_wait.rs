@@ -7,11 +7,12 @@ use lkjagent_store::events::EventKind;
 use crate::graph_state::graph_notice_frame;
 use crate::prompt::token_estimate;
 use crate::step::frames::append_notice;
+use crate::step::recovery_select::recovery_transition;
 use crate::step::Effect;
 use crate::task::RuntimeState;
 
 #[derive(Clone, Copy)]
-pub(super) enum RecoveryFault {
+pub(crate) enum RecoveryFault {
     Parse,
     Params,
     Repeat,
@@ -82,7 +83,7 @@ fn route_notice(fault: RecoveryFault, count: u8) -> String {
         RecoveryFault::Tool => "Consecutive tool errors",
     };
     format!(
-        "{prefix} reached count={count}; graph recovery is active. Inspect graph.next, reduce scope, choose an alternate native tool, or replan around the blocked step."
+        "{prefix} reached count={count}; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step."
     )
 }
 
@@ -99,9 +100,13 @@ fn route_graph(
     };
     let from = graph.active_node;
     let kind = fault_kind(fault);
+    let selection = recovery_transition(graph, fault);
     graph.phase = TaskPhase::Recovery;
     graph.status = CaseStatus::Active;
-    graph.active_node = target_node(fault);
+    graph.active_node = selection.target.unwrap_or(GraphNodeId("recover"));
+    if let Some(action_class) = selection.forced_action_class {
+        graph.next_action_class = action_class;
+    }
     graph.recovery.ladder_position = count.min(5);
     graph.recovery.strategy = Some(notice.to_string());
     graph.recovery.last_failed_action_fingerprint = action_fingerprint.clone();
@@ -174,15 +179,6 @@ fn fault_kind(fault: RecoveryFault) -> FaultKind {
         RecoveryFault::Params => FaultKind::Params,
         RecoveryFault::Repeat => FaultKind::Repeat,
         RecoveryFault::Tool => FaultKind::Tool,
-    }
-}
-
-fn target_node(fault: RecoveryFault) -> GraphNodeId {
-    match fault {
-        RecoveryFault::Parse => GraphNodeId("recover-parse"),
-        RecoveryFault::Params => GraphNodeId("recover-params"),
-        RecoveryFault::Repeat => GraphNodeId("recover-repeat"),
-        RecoveryFault::Tool => GraphNodeId("recover-tool"),
     }
 }
 

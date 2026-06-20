@@ -21,6 +21,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [recursive_guard.rs](recursive_guard.rs): guarded recursive-structure daemon fixture.
 - [recursive_scaffold.rs](recursive_scaffold.rs): docs auto-scaffold daemon fixture.
 - [recursive_structure.rs](recursive_structure.rs): recursive structure seed integration fixture.
+- [recovery_controller.rs](recovery_controller.rs): graph selector recovery routing fixtures.
 - [recovery_loop.rs](recovery_loop.rs): repeated recoverable-error daemon fixture.
 - [step.rs](step.rs): task lifecycle, recovery, and compaction fixtures.
 - [support/](support/README.md): shared state and store helpers.

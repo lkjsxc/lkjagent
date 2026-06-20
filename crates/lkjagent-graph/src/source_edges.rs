@@ -104,6 +104,8 @@ pub(crate) const EDGES: &[GraphEdge] = &[
     edge("recover-endpoint", EdgeKind::Recover, "recover", "recover-endpoint", ALWAYS),
     edge("recover-budget", EdgeKind::Recover, "recover", "recover-budget", ALWAYS),
     edge("recover-verification", EdgeKind::Recover, "recover", "recover-verification", ALWAYS),
+    edge("recover-tool", EdgeKind::Recover, "recover", "recover-tool", ALWAYS),
+    edge("recover-repeat", EdgeKind::Recover, "recover", "recover-repeat", ALWAYS),
     edge("recover-tool-plan", EdgeKind::Plan, "recover-tool", "plan", ALWAYS),
     edge("recover-tool-inspect", EdgeKind::Recover, "recover-tool", "recover-by-state-inspection", ALWAYS),
     edge("recover-repeat-plan", EdgeKind::Plan, "recover-repeat", "plan", ALWAYS),
