@@ -18,9 +18,23 @@ const DONE: &str = "<act>
 <tool>agent.done</tool>
 <summary>recursive structure complete</summary>
 </act>";
-const VERIFY_TREE: &str = "<act>
-<tool>shell.run</tool>
-<command>test -f docs/product/contracts/domain/model.md</command>
+const PLAN: &str = "<act>
+<tool>graph.plan</tool>
+<objective>build a recursive workspace documentation tree</objective>
+<steps>write root index; write recursive tree; read deep model file; record verification</steps>
+<checks>fs.read docs/product/contracts/domain/model.md confirms tree</checks>
+<paths>docs</paths>
+<reason>recursive structure requires planned indexed files</reason>
+</act>";
+const READ_DEEP_FILE: &str = "<act>
+<tool>fs.read</tool>
+<path>docs/product/contracts/domain/model.md</path>
+</act>";
+const GRAPH_VERIFY: &str = "<act>
+<tool>graph.evidence</tool>
+<kind>verification</kind>
+<summary>fs.read observed the deep recursive model file</summary>
+<path>docs/product/contracts/domain/model.md</path>
 </act>";
 
 #[test]
@@ -47,6 +61,7 @@ fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestRe
         .any(|frame| frame.kind == FrameKind::GraphNotice
             && frame.content.contains("phase=planning")));
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
     assert_eq!(
         state::get(&conn, "open task")?,
         Some("高度に再帰的に構造化された workspace を作ってください".to_string())
@@ -60,13 +75,13 @@ fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestRe
     assert_eq!(restored.control.guard, CompletionGuard::RecursiveStructure);
     assert!(memory::find(&conn, "recursive structure complete", 5)?.is_empty());
 
-    for stamp in 103..116 {
+    for stamp in 104..107 {
         assert_eq!(
             daemon.poll_once(&mut conn, &stamp.to_string())?,
             DaemonTick::Working
         );
     }
-    assert_eq!(daemon.poll_once(&mut conn, "116")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "107")?, DaemonTick::Done);
     server.join()?;
 
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
@@ -82,22 +97,30 @@ fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestRe
 }
 
 fn scripted_responses() -> Vec<String> {
-    let mut responses = vec![
+    vec![
+        completion(PLAN),
         completion(&write_action("docs/README.md", DOCS_README)),
         completion(DONE),
-    ];
-    for (path, content) in TREE_FILES {
-        responses.push(completion(&write_action(path, content)));
-    }
-    responses.push(completion(VERIFY_TREE));
-    responses.push(completion(DONE));
-    responses
+        completion(&batch_tree_action()),
+        completion(READ_DEEP_FILE),
+        completion(GRAPH_VERIFY),
+        completion(DONE),
+    ]
 }
 
 fn write_action(path: &str, content: &str) -> String {
     format!(
         "<act>\n<tool>fs.write</tool>\n<path>{path}</path>\n<content>\n{content}</content>\n</act>"
     )
+}
+
+fn batch_tree_action() -> String {
+    let files = TREE_FILES
+        .iter()
+        .map(|(path, content)| format!("path: {path}\ncontent:\n{content}"))
+        .collect::<Vec<_>>()
+        .join("\n-- lkjagent-next-file --\n");
+    format!("<act>\n<tool>fs.batch_write</tool>\n<files>\n{files}</files>\n</act>")
 }
 
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {

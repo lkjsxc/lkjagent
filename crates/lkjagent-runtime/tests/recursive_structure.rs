@@ -26,7 +26,7 @@ fn graph_case_drives_indexed_tree_workflow() -> TestResult<()> {
     let mut state = dispatch_state();
     state.graph_state = Some(render_state(&graph));
     let graph_state = dispatch(&action("graph.state", &[]), &runtime, &mut conn, &mut state);
-    assert!(graph_state.content.contains("missing_evidence=observation"));
+    assert!(graph_state.content.contains("missing_evidence=plan"));
 
     write_file(
         &runtime,
@@ -52,17 +52,14 @@ fn graph_case_drives_indexed_tree_workflow() -> TestResult<()> {
 
     let check = dispatch(
         &action(
-            "shell.run",
-            &[(
-                "command",
-                "find docs -type d ! -exec test -f '{}/README.md' ';' -print",
-            )],
+            "fs.list",
+            &[("path", "docs"), ("depth", "3"), ("kind", "dir")],
         ),
         &runtime,
         &mut conn,
         &mut state,
     );
-    assert!(check.content.trim().ends_with("exit_code=0"));
+    assert!(check.content.contains("dir docs/system"));
     Ok(())
 }
 

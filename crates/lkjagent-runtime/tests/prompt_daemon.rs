@@ -37,19 +37,16 @@ fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
         .any(|frame| frame.content.contains("bounded graph-maintenance work")));
     assert!(first
         .iter()
-        .any(|frame| frame.content.contains("shell.run heredoc or script")));
+        .any(|frame| frame.content.contains("fs.list, fs.search, fs.stat")));
     assert!(first
         .iter()
-        .any(|frame| frame.content.contains("under about 1200 characters")));
+        .any(|frame| frame.content.contains("doc tools, not shell loops")));
     assert!(first
         .iter()
-        .any(|frame| frame.content.contains("do not cd /workspace")));
+        .any(|frame| frame.content.contains("shell.run is an")));
     assert!(first
         .iter()
-        .any(|frame| frame.content.contains("direct /bin/sh loops")));
-    assert!(first
-        .iter()
-        .any(|frame| frame.content.contains("avoid brace expansion")));
+        .any(|frame| frame.content.contains("doc.audit")));
     for frame in first {
         let cap = match frame.kind {
             FrameKind::Prefix(PrefixSection::Identity) => PREFIX_IDENTITY,
@@ -105,12 +102,12 @@ fn startup_prefix_renders_count_guard_batch_instruction() -> TestResult<()> {
     assert!(graph
         .content
         .contains("completion_guard=file-count-about:100"));
-    assert!(graph.content.contains("under about 1200 chars"));
-    assert!(graph.content.contains("one compact shell.run command"));
-    assert!(graph.content.contains("direct /bin/sh loops"));
-    assert!(graph.content.contains("printf templates"));
-    assert!(graph.content.contains("no brace expansion"));
-    assert!(graph.content.contains("cat heredocs"));
+    assert!(graph.content.contains("shell.run is an escape hatch"));
+    assert!(graph.content.contains("doc.scaffold"));
+    assert!(graph.content.contains("fs.list"));
+    assert!(graph.content.contains("fs.stat"));
+    assert!(graph.content.contains("doc.audit"));
+    assert!(graph.content.contains("fs.batch_write"));
     Ok(())
 }
 
@@ -130,12 +127,12 @@ fn owner_graph_notice_renders_count_guard_batch_instruction() -> TestResult<()> 
     let rendered = render_state(&graph);
 
     assert!(rendered.contains("completion_guard=file-count-about:100"));
-    assert!(rendered.contains("under about 1200 chars"));
-    assert!(rendered.contains("one compact shell.run command"));
-    assert!(rendered.contains("direct /bin/sh loops"));
-    assert!(rendered.contains("printf templates"));
-    assert!(rendered.contains("no brace expansion"));
-    assert!(rendered.contains("cat heredocs"));
+    assert!(rendered.contains("shell.run is an escape hatch"));
+    assert!(rendered.contains("doc.scaffold"));
+    assert!(rendered.contains("fs.list"));
+    assert!(rendered.contains("fs.stat"));
+    assert!(rendered.contains("doc.audit"));
+    assert!(rendered.contains("fs.batch_write"));
     Ok(())
 }
 

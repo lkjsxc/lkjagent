@@ -29,11 +29,9 @@ pub fn open_owner_case_with_guard(
     guard: CompletionGuard,
 ) -> RuntimeResult<TaskGraphState> {
     let mut state = initial_state(content, None);
-    graph_guard::append_plan_guard(&mut state.plan, guard);
+    graph_guard::append_case_guard(&mut state, guard);
     let id = lkjagent_store::graph::open_case(conn, open_case(&state), now)?;
     state.case_id = Some(id);
-    let evidence = plan_evidence();
-    lkjagent_store::graph::record_evidence(conn, id, &row_from_evidence(&evidence), now)?;
     lkjagent_store::graph::record_event(
         conn,
         id,
@@ -43,7 +41,6 @@ pub fn open_owner_case_with_guard(
         "owner message opened graph case",
         now,
     )?;
-    state.evidence.push(evidence);
     Ok(state)
 }
 
@@ -82,6 +79,10 @@ pub fn evidence_record(
         kind,
         summary,
         path,
+        frame_ref: None,
+        event_ref: None,
+        confidence: 80,
+        satisfies_completion: true,
     }
 }
 
@@ -103,38 +104,40 @@ pub fn status_str(status: CaseStatus) -> &'static str {
     }
 }
 
-fn open_case(state: &TaskGraphState) -> OpenCase<'_> {
+fn open_case(state: &TaskGraphState) -> OpenCase {
     OpenCase {
-        objective: &state.objective,
-        family: state.family.as_str(),
-        phase: state.phase.as_str(),
-        active_node: state.active_node.0,
-        plan: &state.plan,
-        evidence_requirements: &state.evidence_requirements,
-        selected_packages: &state.selected_packages,
-        pending_checks: &state.pending_checks,
+        objective: state.objective_text().to_string(),
+        family: state.family.as_str().to_string(),
+        phase: state.phase.as_str().to_string(),
+        active_node: state.active_node.0.to_string(),
+        plan: state.plan.summary_text(),
+        evidence_requirements: state.evidence.requirement_ids(),
+        selected_packages: state.context.selected_packages.clone(),
+        pending_checks: state.evidence.pending_checks.clone(),
     }
 }
 
 fn state_from_row(row: GraphCaseRow, evidence: Vec<GraphEvidenceRow>) -> TaskGraphState {
-    TaskGraphState {
-        case_id: Some(row.id),
-        objective: row.objective,
-        family: family(&row.family),
-        phase: phase(&row.phase),
-        status: status(&row.status),
-        active_node: node_id(&row.active_node),
-        confidence: 60,
-        plan: row.plan,
-        risks: Vec::new(),
-        candidate_paths: Vec::new(),
-        touched_paths: evidence.iter().filter_map(|row| row.path.clone()).collect(),
-        selected_packages: row.selected_packages,
-        evidence_requirements: row.evidence_requirements,
-        evidence: evidence.into_iter().map(evidence_from_row).collect(),
-        pending_checks: row.pending_checks,
-        recovery: None,
-    }
+    let mut state = initial_state(&row.objective, Some(row.id));
+    state.family = family(&row.family);
+    state.phase = phase(&row.phase);
+    state.status = status(&row.status);
+    state.active_node = node_id(&row.active_node);
+    state.plan.reason = row.plan;
+    state.context.selected_packages = row.selected_packages;
+    state.evidence = lkjagent_graph::case_evidence::EvidenceState::new(
+        row.evidence_requirements,
+        row.pending_checks,
+    );
+    state.evidence.records = evidence.into_iter().map(evidence_from_row).collect();
+    state.workspace.touched_paths = state
+        .evidence
+        .records
+        .iter()
+        .filter_map(|row| row.path.clone())
+        .collect();
+    lkjagent_graph::completion::refresh_completion_state(&mut state);
+    state
 }
 
 fn evidence_from_row(row: GraphEvidenceRow) -> EvidenceRecord {
@@ -146,22 +149,14 @@ fn evidence_from_row(row: GraphEvidenceRow) -> EvidenceRecord {
     )
 }
 
-fn plan_evidence() -> EvidenceRecord {
-    evidence_record(
-        "plan",
-        EvidenceKind::Note,
-        "harness created initial graph plan".to_string(),
-        None,
-    )
-}
-
 fn idle_state() -> TaskGraphState {
     let mut state = initial_state("no active task", None);
     state.phase = TaskPhase::Waiting;
     state.status = CaseStatus::Waiting;
-    state.active_node = GraphNodeId("classify");
-    state.plan = "no active graph case".to_string();
-    state.evidence.clear();
-    state.pending_checks.clear();
+    state.active_node = GraphNodeId("intake");
+    state.plan.reason = "no active graph case".to_string();
+    state.evidence.records.clear();
+    state.evidence.pending_checks.clear();
+    state.completion.pending_checks.clear();
     state
 }

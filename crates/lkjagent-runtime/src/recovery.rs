@@ -37,7 +37,7 @@ pub fn should_escalate(count: u8) -> bool {
 pub fn parse_recovery_notice(count: u8) -> String {
     if should_escalate(count) {
         return format!(
-            "recovery: parse faults are consecutive count={count}; simplify to one valid act block; use shell.run heredoc/script for tag-like or large file payloads; ask only if blocked"
+            "recovery: parse faults are consecutive count={count}; simplify to one valid act block; prefer typed file/doc tools for large payloads; ask only if blocked"
         );
     }
     "recovery: the previous completion was not executed; emit exactly one valid act block next"
@@ -47,7 +47,7 @@ pub fn parse_recovery_notice(count: u8) -> String {
 pub fn repeat_recovery_notice(count: u8) -> String {
     if should_escalate(count) {
         return format!(
-            "recovery: repeat actions are consecutive count={count}; choose a different tool action, inspect state, or switch repetitive writes to shell.run"
+            "recovery: repeat actions are consecutive count={count}; choose a different tool action, inspect state, or switch to typed batch/doc tools"
         );
     }
     "recovery: repeated action was refused; change the next action instead of resending it"

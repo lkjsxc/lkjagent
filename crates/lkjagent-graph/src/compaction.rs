@@ -6,11 +6,23 @@ pub fn compaction_plan(state: &TaskGraphState) -> CompactionPlan {
         case_id: state.case_id,
         phase: state.phase,
         active_node: state.active_node,
-        plan: state.plan.clone(),
-        evidence: state.evidence.clone(),
+        objective: state.objective.normalized.clone(),
+        plan_steps: state
+            .plan
+            .steps
+            .iter()
+            .map(|step| step.title.clone())
+            .collect(),
+        constraints: state
+            .constraints
+            .iter()
+            .map(|constraint| constraint.summary.clone())
+            .collect(),
+        evidence: state.evidence.records.clone(),
         missing_evidence: missing_requirements(state),
-        touched_paths: state.touched_paths.clone(),
-        selected_packages: state.selected_packages.clone(),
+        touched_paths: state.workspace.touched_paths.clone(),
+        selected_packages: state.context.selected_packages.clone(),
         recovery: state.recovery.clone(),
+        completion_ready: state.completion.ready,
     }
 }

@@ -95,5 +95,6 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
         );
         ",
     )?;
+    crate::schema_graph::setup(conn)?;
     Ok(())
 }

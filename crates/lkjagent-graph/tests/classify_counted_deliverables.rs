@@ -9,7 +9,7 @@ fn counted_story_bug_fix_stays_bug_fix() {
 
     assert_eq!(state.family, TaskFamily::BugFix);
     assert!(!state
-        .selected_packages
+        .selected_packages()
         .contains(&"doc-construction".to_string()));
 }
 
@@ -22,7 +22,7 @@ fn counted_story_refactor_stays_code_change() {
 
     assert_eq!(state.family, TaskFamily::CodeChange);
     assert!(!state
-        .selected_packages
+        .selected_packages()
         .contains(&"doc-construction".to_string()));
 }
 
@@ -35,7 +35,7 @@ fn counted_japanese_story_fix_stays_bug_fix() {
 
     assert_eq!(state.family, TaskFamily::BugFix);
     assert!(!state
-        .selected_packages
+        .selected_packages()
         .contains(&"doc-construction".to_string()));
 }
 
@@ -48,7 +48,7 @@ fn counted_architecture_artifact_still_selects_document_construction() {
 
     assert_eq!(state.family, TaskFamily::Documentation);
     assert!(state
-        .selected_packages
+        .selected_packages()
         .contains(&"doc-construction".to_string()));
 }
 
@@ -63,7 +63,7 @@ fn counted_architecture_playbook_with_implementation_chapters_selects_documents(
 
     assert_eq!(state.family, TaskFamily::Documentation);
     assert!(state
-        .selected_packages
+        .selected_packages()
         .contains(&"doc-construction".to_string()));
 }
 
@@ -76,7 +76,7 @@ fn counted_body_files_select_document_construction() {
 
     assert_eq!(state.family, TaskFamily::Documentation);
     assert!(state
-        .selected_packages
+        .selected_packages()
         .contains(&"doc-construction".to_string()));
 }
 
@@ -89,7 +89,7 @@ fn counted_draft_files_select_document_construction() {
 
     assert_eq!(state.family, TaskFamily::Documentation);
     assert!(state
-        .selected_packages
+        .selected_packages()
         .contains(&"doc-construction".to_string()));
 }
 
@@ -102,6 +102,6 @@ fn counted_japanese_main_files_select_document_construction() {
 
     assert_eq!(state.family, TaskFamily::Documentation);
     assert!(state
-        .selected_packages
+        .selected_packages()
         .contains(&"doc-construction".to_string()));
 }

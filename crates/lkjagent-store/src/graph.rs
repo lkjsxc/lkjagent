@@ -1,4 +1,11 @@
+pub mod artifacts;
+pub mod context;
+pub mod documents;
+pub mod faults;
 mod links;
+pub mod notes;
+pub mod plan;
+pub mod transitions;
 
 pub use links::{link_memory, memory_links_for_case, GraphMemoryLinkRow};
 
@@ -29,18 +36,18 @@ pub struct GraphEvidenceRow {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct OpenCase<'a> {
-    pub objective: &'a str,
-    pub family: &'a str,
-    pub phase: &'a str,
-    pub active_node: &'a str,
-    pub plan: &'a str,
-    pub evidence_requirements: &'a [String],
-    pub selected_packages: &'a [String],
-    pub pending_checks: &'a [String],
+pub struct OpenCase {
+    pub objective: String,
+    pub family: String,
+    pub phase: String,
+    pub active_node: String,
+    pub plan: String,
+    pub evidence_requirements: Vec<String>,
+    pub selected_packages: Vec<String>,
+    pub pending_checks: Vec<String>,
 }
 
-pub fn open_case(conn: &Connection, case: OpenCase<'_>, now: &str) -> StoreResult<i64> {
+pub fn open_case(conn: &Connection, case: OpenCase, now: &str) -> StoreResult<i64> {
     conn.execute(
         "INSERT INTO graph_cases
          (objective, family, phase, active_node, status, plan,
@@ -52,9 +59,9 @@ pub fn open_case(conn: &Connection, case: OpenCase<'_>, now: &str) -> StoreResul
             case.phase,
             case.active_node,
             case.plan,
-            join(case.evidence_requirements),
-            join(case.selected_packages),
-            join(case.pending_checks),
+            join(&case.evidence_requirements),
+            join(&case.selected_packages),
+            join(&case.pending_checks),
             now
         ],
     )?;

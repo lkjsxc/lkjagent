@@ -1,10 +1,15 @@
+mod fs_extra_tools;
 mod fs_tools;
+mod graph_evidence_tools;
 mod graph_tools;
 mod guards;
 mod memory_tools;
 mod params;
 mod queue_tools;
 mod routes;
+mod routes_doc;
+mod routes_verify;
+mod routes_workspace;
 mod state;
 mod validate;
 
@@ -14,7 +19,10 @@ use rusqlite::Connection;
 use crate::error::{ToolError, ToolResult};
 use crate::observe::{self, OutputFrame};
 use routes::route;
-pub use state::{DispatchOutput, DispatchState, GraphEvidenceRecord, ReadRecord, ToolRuntime};
+pub use state::{
+    DispatchOutput, DispatchState, GraphDispatchPolicy, GraphEvidenceRecord, ReadRecord,
+    ToolRuntime,
+};
 use validate::validate_action;
 
 pub fn dispatch(
@@ -49,7 +57,31 @@ pub fn dispatch_with_text(
         Ok(validated) => validated,
         Err(message) => return finish(state, action_text, observe::notice("error", message)),
     };
+    if let Some(message) = graph_policy_refusal(&validated.tool, state) {
+        return finish(state, action_text, observe::notice("error", message));
+    }
     route(validated, action_text, runtime, conn, state)
+}
+
+fn graph_policy_refusal(tool: &str, state: &DispatchState) -> Option<String> {
+    if tool == "agent.done" {
+        return None;
+    }
+    let policy = state.graph_policy.as_ref()?;
+    if policy.allowed_tools.iter().any(|allowed| allowed == tool) {
+        return None;
+    }
+    let allowed = policy
+        .allowed_tools
+        .iter()
+        .take(4)
+        .cloned()
+        .collect::<Vec<_>>()
+        .join(", ");
+    Some(format!(
+        "graph policy refused {tool}; node={} phase={}; allowed next tools: {allowed}",
+        policy.active_node, policy.phase
+    ))
 }
 
 pub(crate) fn observe_result(

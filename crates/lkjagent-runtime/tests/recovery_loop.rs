@@ -19,6 +19,24 @@ const WRITE_ONE: &str = "<act>
 <path>one.txt</path>
 <content>one</content>
 </act>";
+const PLAN_ONE: &str = "<act>
+<tool>graph.plan</tool>
+<objective>recover first</objective>
+<steps>write one.txt; read one.txt; record verification</steps>
+<checks>fs.read one.txt confirms one</checks>
+<paths>one.txt</paths>
+<reason>recovery task still needs a graph plan before mutation</reason>
+</act>";
+const READ_ONE: &str = "<act>
+<tool>fs.read</tool>
+<path>one.txt</path>
+</act>";
+const EVIDENCE_ONE: &str = "<act>
+<tool>graph.evidence</tool>
+<kind>verification</kind>
+<summary>fs.read observed one.txt content</summary>
+<path>one.txt</path>
+</act>";
 const DONE_ONE: &str = "<act>
 <tool>agent.done</tool>
 <summary>first task recovered</summary>
@@ -26,12 +44,25 @@ const DONE_ONE: &str = "<act>
 const WRITE_TWO: &str = "<act>
 <tool>fs.write</tool>
 <path>two.txt</path>
-<content>draft</content>
-</act>";
-const WRITE_TWO_FIXED: &str = "<act>
-<tool>fs.write</tool>
-<path>two.txt</path>
 <content>final</content>
+</act>";
+const PLAN_TWO: &str = "<act>
+<tool>graph.plan</tool>
+<objective>recover second</objective>
+<steps>write two.txt; read two.txt; record verification</steps>
+<checks>fs.read two.txt confirms final</checks>
+<paths>two.txt</paths>
+<reason>second recovery task needs a graph plan before mutation</reason>
+</act>";
+const READ_TWO: &str = "<act>
+<tool>fs.read</tool>
+<path>two.txt</path>
+</act>";
+const EVIDENCE_TWO: &str = "<act>
+<tool>graph.evidence</tool>
+<kind>verification</kind>
+<summary>fs.read observed final in two.txt</summary>
+<path>two.txt</path>
 </act>";
 const DONE_TWO: &str = "<act>
 <tool>agent.done</tool>
@@ -47,11 +78,16 @@ fn daemon_recovers_from_repeated_transient_errors_across_tasks() -> TestResult<(
     let server = serve_responses(vec![
         completion("not an act"),
         completion(READ_MISSING),
+        completion(PLAN_ONE),
         completion(WRITE_ONE),
+        completion(READ_ONE),
+        completion(EVIDENCE_ONE),
         completion(DONE_ONE),
+        completion(PLAN_TWO),
         completion(WRITE_TWO),
         completion(WRITE_TWO),
-        completion(WRITE_TWO_FIXED),
+        completion(READ_TWO),
+        completion(EVIDENCE_TWO),
         completion(DONE_TWO),
     ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
@@ -59,12 +95,17 @@ fn daemon_recovers_from_repeated_transient_errors_across_tasks() -> TestResult<(
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Done);
-    queue::enqueue(&mut conn, "recover second", "owner-send", "105")?;
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "106")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "107")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "108")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "107")?, DaemonTick::Done);
+    queue::enqueue(&mut conn, "recover second", "owner-send", "108")?;
+    assert_eq!(daemon.poll_once(&mut conn, "108")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "109")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "110")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "111")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "112")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "113")?, DaemonTick::Done);
     server.join()?;
 
     assert_eq!(fs::read_to_string(workspace.join("one.txt"))?, "one");

@@ -48,7 +48,8 @@ a 10 percent tolerance with a minimum tolerance of one file. Markdown-count
 requests count only .md files; general file-count requests count every
 non-hidden regular file. Count guards compose with recursive and
 knowledge-base guards. The refusal names the closest candidate and directs
-the next action toward one compact shell.run repair script.
+the next action toward doc.audit, fs.list, fs.stat, fs.batch_write, or
+doc.scaffold repair before shell is considered.
 
 ## agent.ask
 

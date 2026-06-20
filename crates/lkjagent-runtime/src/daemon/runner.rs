@@ -179,7 +179,7 @@ impl ResidentDaemon {
             StepInput::Owner {
                 content: owner.content,
                 tokens: owner.tokens,
-                graph,
+                graph: graph.map(Box::new),
                 turn_budget: self.runtime.task_turn_budget,
             },
         );

@@ -33,13 +33,16 @@ directories with short focused files.
   `architecture/state-graph/transitions.md` `architecture/state-graph/context-packages.md`
   `architecture/state-graph/task-state.md` `architecture/state-graph/compaction.md`
   `architecture/state-graph/completion.md` `architecture/state-graph/maintenance.md`
+  `architecture/state-graph/policy.md` `architecture/state-graph/tool-affordances.md`
 - `architecture/context/README.md` `architecture/context/layout.md` `architecture/context/budgets.md`
   `architecture/context/compaction.md` `architecture/context/caching.md` `architecture/context/hygiene.md`
 - `architecture/protocol/README.md` `architecture/protocol/action-format.md` `architecture/protocol/parsing.md`
   `architecture/protocol/system-prompt.md` `architecture/protocol/recovery.md`
 - `architecture/tools/README.md` `architecture/tools/registry.md` `architecture/tools/fs.md`
   `architecture/tools/shell.md` `architecture/tools/queue-ops.md` `architecture/tools/memory-ops.md`
-  `architecture/tools/graph-ops.md` `architecture/tools/control.md`
+  `architecture/tools/graph-ops.md` `architecture/tools/workspace.md`
+  `architecture/tools/verification-tools.md` `architecture/tools/doc-tools.md`
+  `architecture/tools/control.md`
 - `architecture/memory/README.md` `architecture/memory/store.md` `architecture/memory/retrieval.md`
   `architecture/memory/transcripts.md` `architecture/memory/distillation.md`
 - `architecture/llm/README.md` `architecture/llm/endpoint.md` `architecture/llm/model-target.md`

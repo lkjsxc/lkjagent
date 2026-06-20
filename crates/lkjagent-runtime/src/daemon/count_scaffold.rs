@@ -1,3 +1,4 @@
+use lkjagent_graph::case_recovery::{FaultKind, RecoveryRecord};
 use lkjagent_graph::{CaseStatus, GraphNodeId, TaskPhase};
 use lkjagent_tools::control::CompletionGuard;
 use lkjagent_tools::count_guard::{CountGuard, CountMode};
@@ -96,7 +97,12 @@ impl ResidentDaemon {
         if let Some(graph) = self.state.graph.as_mut() {
             graph.phase = TaskPhase::Waiting;
             graph.active_node = GraphNodeId("recover");
-            graph.recovery = Some(question.clone());
+            graph.recovery.strategy = Some(question.clone());
+            graph.recovery.history.push(RecoveryRecord {
+                kind: FaultKind::Verification,
+                summary: question.clone(),
+                action_fingerprint: None,
+            });
             if let Some(case_id) = graph.case_id {
                 lkjagent_store::graph::update_case(
                     conn,

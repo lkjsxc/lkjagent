@@ -1,12 +1,17 @@
 use lkjagent_context::assemble::append_frame;
 use lkjagent_graph::{EvidenceKind, TaskGraphState};
-use lkjagent_protocol::Action;
 use lkjagent_tools::dispatch::DispatchOutput;
 use lkjagent_tools::observe::OutputKind;
 
-use crate::graph_state::{evidence_record, graph_notice_frame, status_str};
+use crate::graph_state::graph_notice_frame;
 use crate::step::action_params::action_param;
-use crate::step::graph_phase::{evidence_kind_for, refresh_graph_phase};
+use crate::step::graph_output_evidence::{
+    add_document_evidence, add_explicit_graph_evidence, add_shell_evidence, ensure_evidence,
+    push_case_update,
+};
+use crate::step::graph_output_plan::{apply_context, apply_note, apply_plan, apply_transition};
+use crate::step::graph_output_plan_helpers::advance_active_step;
+use crate::step::graph_phase::refresh_graph_phase;
 use crate::step::Effect;
 use crate::task::{PendingAction, RuntimeState};
 
@@ -22,160 +27,55 @@ pub(super) fn update_graph_after_output(
     let Some(graph) = state.graph.as_mut() else {
         return;
     };
-    if add_tool_evidence(graph, pending, output, effects) {
+    if add_graph_update(graph, pending, output, effects) {
         refresh_graph_phase(graph);
         push_case_update(graph, effects);
         state.context = append_frame(&state.context, graph_notice_frame(graph));
     }
 }
 
-fn add_tool_evidence(
+fn add_graph_update(
     graph: &mut TaskGraphState,
     pending: &PendingAction,
     output: &DispatchOutput,
     effects: &mut Vec<Effect>,
 ) -> bool {
     match pending.action.tool.as_str() {
-        "graph.evidence" => add_explicit_graph_evidence(graph, &pending.action, effects),
-        "shell.run" => {
-            let observed = ensure_evidence(
-                graph,
-                "observation",
-                EvidenceKind::Observation,
-                output,
-                None,
-                effects,
-            );
-            let verified = ensure_evidence(
+        "graph.plan" => apply_plan(graph, &pending.action, output, effects),
+        "graph.context" => apply_context(graph, &pending.action, effects),
+        "graph.transition" => apply_transition(graph, &pending.action, effects),
+        "graph.note" => apply_note(graph, &pending.action, effects),
+        "graph.evidence" => {
+            let evidenced = add_explicit_graph_evidence(graph, &pending.action, effects);
+            evidenced || advance_active_step(graph)
+        }
+        "verify.cargo" | "verify.xtask" => {
+            ensure_evidence(
                 graph,
                 "verification",
                 EvidenceKind::Verification,
                 output,
                 None,
                 effects,
-            );
-            let structured = if shell_document_structure(&pending.action, output) {
-                ensure_evidence(
-                    graph,
-                    "document-structure",
-                    EvidenceKind::File,
-                    output,
-                    None,
-                    effects,
-                )
-            } else {
-                false
-            };
-            observed || verified || structured
+            ) || advance_active_step(graph)
         }
-        "fs.read" | "fs.write" | "fs.edit" | "memory.find" | "memory.save" => {
+        "doc.audit" | "doc.scaffold" => {
+            add_document_evidence(graph, output, effects) || advance_active_step(graph)
+        }
+        "shell.run" => add_shell_evidence(graph, output, effects) || advance_active_step(graph),
+        "fs.read" | "fs.write" | "fs.edit" | "fs.list" | "fs.search" | "fs.stat" | "fs.mkdir"
+        | "fs.batch_write" | "workspace.summary" | "memory.find" | "memory.save" => {
             let path = action_param(&pending.action, "path");
-            let path = (!path.is_empty()).then_some(path);
-            ensure_evidence(
+            let observed = ensure_evidence(
                 graph,
                 "observation",
                 EvidenceKind::Observation,
                 output,
-                path,
+                (!path.is_empty()).then_some(path),
                 effects,
-            )
+            );
+            observed || advance_active_step(graph)
         }
         _ => false,
-    }
-}
-
-fn shell_document_structure(action: &Action, output: &DispatchOutput) -> bool {
-    let command = action_param(action, "command").to_ascii_lowercase();
-    let content = output.content.to_ascii_lowercase();
-    command.contains("readme.md")
-        || content.contains("files=")
-        || content.contains("markdown_files=")
-}
-
-fn add_explicit_graph_evidence(
-    graph: &mut TaskGraphState,
-    action: &Action,
-    effects: &mut Vec<Effect>,
-) -> bool {
-    let requirement = action_param(action, "kind");
-    let summary = action_param(action, "summary");
-    let path = action_param(action, "path");
-    let path = (!path.is_empty()).then_some(path);
-    let kind = evidence_kind_for(&requirement);
-    add_evidence(graph, &requirement, kind, summary, path, effects)
-}
-
-fn ensure_evidence(
-    graph: &mut TaskGraphState,
-    requirement: &str,
-    kind: EvidenceKind,
-    output: &DispatchOutput,
-    path: Option<String>,
-    effects: &mut Vec<Effect>,
-) -> bool {
-    if !graph
-        .evidence_requirements
-        .iter()
-        .any(|item| item == requirement)
-    {
-        return false;
-    }
-    let summary = output
-        .content
-        .lines()
-        .next()
-        .unwrap_or("tool output")
-        .to_string();
-    add_evidence(graph, requirement, kind, summary, path, effects)
-}
-
-fn add_evidence(
-    graph: &mut TaskGraphState,
-    requirement: &str,
-    kind: EvidenceKind,
-    summary: String,
-    path: Option<String>,
-    effects: &mut Vec<Effect>,
-) -> bool {
-    if graph
-        .evidence
-        .iter()
-        .any(|row| row.requirement == requirement)
-    {
-        return false;
-    }
-    let evidence = evidence_record(requirement, kind, summary, path);
-    push_evidence_record(graph, &evidence, effects);
-    graph.evidence.push(evidence);
-    graph
-        .pending_checks
-        .retain(|check| check != "focused verification");
-    true
-}
-
-fn push_evidence_record(
-    graph: &TaskGraphState,
-    evidence: &lkjagent_graph::EvidenceRecord,
-    effects: &mut Vec<Effect>,
-) {
-    if let Some(case_id) = graph.case_id {
-        effects.push(Effect::RecordGraphEvidence {
-            case_id,
-            requirement: evidence.requirement.clone(),
-            kind: evidence.kind.as_str().to_string(),
-            summary: evidence.summary.clone(),
-            path: evidence.path.clone(),
-        });
-    }
-}
-
-fn push_case_update(graph: &TaskGraphState, effects: &mut Vec<Effect>) {
-    if let Some(case_id) = graph.case_id {
-        effects.push(Effect::UpdateGraphCase {
-            case_id,
-            phase: graph.phase.as_str().to_string(),
-            active_node: graph.active_node.0.to_string(),
-            status: status_str(graph.status).to_string(),
-        });
     }
 }

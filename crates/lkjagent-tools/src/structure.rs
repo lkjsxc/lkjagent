@@ -132,7 +132,7 @@ fn report_failure(workspace: &Path, best: Option<(PathBuf, Evidence)>) -> ToolRe
     let missing = sample_missing_readmes(&path, workspace)?;
     let without_toc = sample_readmes_without_toc(&path, workspace)?;
     Ok(format!(
-        "{minimum}; next action should be one compact shell.run repair script with short README bodies; create missing parent directories first, write README.md before leaf files, add ## Table of Contents to every README.md, and avoid shell brace expansion under /bin/sh; best={shown} directories={} markdown_files={} depth={} missing_readmes={} readmes_without_toc={} missing_readme_paths={} readmes_without_toc_paths={}",
+        "{minimum}; next action should use doc.scaffold, doc.audit, fs.mkdir, or fs.batch_write to repair README-indexed structure; best={shown} directories={} markdown_files={} depth={} missing_readmes={} readmes_without_toc={} missing_readme_paths={} readmes_without_toc_paths={}",
         evidence.directories,
         evidence.markdown_files,
         evidence.max_depth,

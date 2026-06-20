@@ -16,4 +16,6 @@ context engine, and tools.
 - [task-state.md](task-state.md): active case state, planning fields, and progress ledger.
 - [compaction.md](compaction.md): graph-aware pressure and preservation rules.
 - [completion.md](completion.md): evidence-gated closure.
-- [maintenance.md](maintenance.md): idle graph evolution and source-owned improvements.
+- [policy.md](policy.md): graph policy fields and enforcement boundary.
+- [tool-affordances.md](tool-affordances.md): allowed tools by phase and node.
+- [maintenance.md](maintenance.md): idle graph evolution and policy cleanup.

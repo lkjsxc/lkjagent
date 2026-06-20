@@ -53,12 +53,18 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [dispatch.rs](dispatch.rs): registry validation and tool routing.
 - [error.rs](error.rs): tool error type.
 - [fs.rs](fs.rs): filesystem read, write, and edit adapters.
+- [fs_list.rs](fs_list.rs): bounded deterministic file listing.
+- [fs_search.rs](fs_search.rs): bounded substring search.
+- [fs_stat.rs](fs_stat.rs): deterministic file metadata.
+- [fs_batch.rs](fs_batch.rs): directory creation and batched file writes.
 - [lib.rs](lib.rs): library root.
 - [memory.rs](memory.rs): memory save and find adapters.
 - [observe.rs](observe.rs): bounded frame construction helpers.
 - [queue.rs](queue.rs): queue list and mutation adapters.
 - [shell.rs](shell.rs): /bin/sh adapter with timeout handling.
-- [skill.rs](skill.rs): source skill library load adapter.
+- [workspace.rs](workspace.rs): repository shape summaries.
+- [verify.rs](verify.rs): direct cargo and xtask verification runners.
+- [doc.rs](doc.rs): document scaffold and audit tools.
 - [structure.rs](structure.rs): recursive tree completion checks.
 - [structure_network.rs](structure_network.rs): knowledge network completion checks.
 - [structure_seed/](structure_seed/README.md): deterministic docs scaffold profiles.

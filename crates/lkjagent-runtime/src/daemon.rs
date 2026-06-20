@@ -21,6 +21,7 @@ mod count_scaffold;
 mod count_scaffold_gate;
 mod effects;
 mod endpoint;
+mod execute_pending;
 mod graph_sync;
 mod idle;
 mod maintenance_gate;

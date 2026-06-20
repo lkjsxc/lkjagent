@@ -1,7 +1,6 @@
 mod support;
 
-use std::fs;
-use std::path::Path;
+use std::{fs, path::Path};
 
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
@@ -23,13 +22,27 @@ const MAINT_ASK: &str = "<act>
 <tool>agent.ask</tool>
 <question>Should maintenance wait?</question>
 </act>";
+const PLAN_ACTION: &str = "<act>
+<tool>graph.plan</tool>
+<objective>write owner file</objective>
+<steps>Write owner file; read owner file; record verification evidence</steps>
+<checks>fs.read owner.txt confirms content</checks>
+<paths>owner.txt</paths>
+<reason>owner request needs planned mutation</reason>
+</act>";
 const DONE_ACTION: &str = "<act>
 <tool>agent.done</tool>
 <summary>owner task complete</summary>
 </act>";
-const VERIFY_ACTION: &str = "<act>
-<tool>shell.run</tool>
-<command>test \"$(cat owner.txt)\" = \"owner wins\"</command>
+const READ_ACTION: &str = "<act>
+<tool>fs.read</tool>
+<path>owner.txt</path>
+</act>";
+const EVIDENCE_ACTION: &str = "<act>
+<tool>graph.evidence</tool>
+<kind>verification</kind>
+<summary>fs.read observed owner wins in owner.txt</summary>
+<path>owner.txt</path>
 </act>";
 
 #[test]
@@ -111,8 +124,10 @@ fn owner_queue_preempts_idle_maintenance_at_turn_boundary() -> TestResult<()> {
     take_lock(&conn)?;
     let workspace = temp_workspace("auto-maintenance-preempt")?;
     let server = serve_responses(vec![
+        completion(PLAN_ACTION),
         completion(WRITE_ACTION),
-        completion(VERIFY_ACTION),
+        completion(READ_ACTION),
+        completion(EVIDENCE_ACTION),
         completion(DONE_ACTION),
     ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
@@ -121,13 +136,15 @@ fn owner_queue_preempts_idle_maintenance_at_turn_boundary() -> TestResult<()> {
     queue::enqueue(&mut conn, "write owner file", "owner-send", "102")?;
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     assert!(daemon.state.maintenance.is_none());
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
     assert_eq!(
         fs::read_to_string(workspace.join("owner.txt"))?,
         "owner wins"
     );
 
-    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "106")?, DaemonTick::Done);
     server.join()?;
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
     Ok(())
@@ -140,24 +157,28 @@ fn closed_owner_task_delays_maintenance_until_cooldown_passes() -> TestResult<()
     queue::enqueue(&mut conn, "write owner file", "owner-send", "101")?;
     let workspace = temp_workspace("auto-maintenance-after-task")?;
     let server = serve_responses(vec![
+        completion(PLAN_ACTION),
         completion(WRITE_ACTION),
-        completion(VERIFY_ACTION),
+        completion(READ_ACTION),
+        completion(EVIDENCE_ACTION),
         completion(DONE_ACTION),
     ])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Done);
     server.join()?;
     assert!(daemon.state.maintenance.is_none());
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
 
-    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Idle);
+    assert_eq!(daemon.poll_once(&mut conn, "106")?, DaemonTick::Idle);
     assert!(daemon.state.maintenance.is_none());
     assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
 
-    assert_eq!(daemon.poll_once(&mut conn, "164")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "166")?, DaemonTick::Working);
     assert!(daemon.state.maintenance.is_some());
     assert!(state::get(&conn, "open task")?.is_some_and(|task| task.starts_with("maintenance:")));
     Ok(())

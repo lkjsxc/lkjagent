@@ -9,10 +9,10 @@ only a token-pressure event.
 
 A `CompactionPlan` preserves:
 
-- active case id, objective, task family, active node, phase, and plan.
-- evidence gathered, missing evidence, touched paths, and pending checks.
-- open questions, recent failures, recovery strategy, and selected packages.
-- relevant memory links and completion guard state.
+- active case id, objective, active node, phase, and plan steps.
+- constraints, evidence gathered, missing evidence, and touched paths.
+- recent failures, recovery strategy, selected packages, and completion
+  readiness.
 
 The restart notice is rendered from this structured state. A task summary row
 may exist for memory retrieval, but it is not the source of truth.
