@@ -46,6 +46,11 @@ faults):
 Recovery never discards state: the task stays open, the transcript holds the
 fault trail, and the next endpoint turn sees the latest recovery notice.
 
+After `graph.next` has inspected the same fault once, later identical
+diagnostics do not count as progress. The controller records diagnostic
+exhaustion and renders a forced route to `graph.recover`, a legal transition,
+an unused native inspection tool, or a smaller plan step.
+
 ## Retry Discipline
 
 - Endpoint retries are invisible to the context until an attempt is made: the
@@ -67,6 +72,9 @@ fault trail, and the next endpoint turn sees the latest recovery notice.
   action toward `fs.batch_write`, `doc.scaffold`, or a smaller `fs.write`,
   and reminds it not to bypass graph policy. A length response that already
   contains one closed act is accepted and passed to the parser.
+- Payload-risk recovery blocks repeated giant writes. Large story, guide,
+  book, corpus, and structured content requests route to document construction
+  with bounded semantic files.
 
 ## Status
 

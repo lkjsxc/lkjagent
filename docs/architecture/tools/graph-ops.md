@@ -14,8 +14,9 @@ transitions. The harness also injects graph state notices automatically.
 ## graph.next
 
 Shows legal next transitions, missing guards, allowed tools, blocked tools,
-and the preferred next action class. It is the normal first recovery action
-after repeated parse, repeat, or tool faults.
+and the preferred next action class. It is diagnostic, not a recovery strategy
+by itself. After one `graph.next` for the same fault, the controller forces a
+different action class.
 
 ## graph.audit
 
@@ -49,7 +50,8 @@ against the source graph and active family.
 
 Records structured non-evidence state: constraint, assumption, risk,
 decision, question, invariant, success, or path. It never satisfies
-completion evidence by itself.
+completion evidence by itself. Generated examples must use one of those kinds,
+such as decision.
 
 ## graph.evidence
 
@@ -58,8 +60,9 @@ infer it from a tool output. The runtime links evidence to the active case.
 
 ## graph.compact
 
-Requests a graph compaction checkpoint. Automatic compaction remains owned by
-the runtime and is admitted only when graph policy allows it.
+Requests a graph compaction checkpoint when policy admits it. Forced
+compaction is runtime-owned and never requires a model-authored `memory.save`
+action that graph policy blocks.
 
 ## Status
 

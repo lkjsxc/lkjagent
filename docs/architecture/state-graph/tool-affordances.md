@@ -17,11 +17,17 @@ multi-file read, search tools, graph evidence, and shell.run only as an
 escape hatch.
 
 Completion nodes allow agent.done only after `CompletionState` is ready.
-Recovery nodes allow inspection, graph notes, transitions, and narrower
-verification or shell escape actions when policy admits them.
+Recovery nodes expose the smallest useful action surface for the active fault.
+`recover-parse` favors `graph.recover` and exact copyable action examples.
+`recover-params` blocks `graph.next` loops and mutation. `recover-tool`
+allows one state inspection, then alternate native tools or smaller scope.
+`recover-repeat` requires a different action fingerprint. Shell is allowed
+only from `recover-by-shell-escape`.
 
 The dispatcher uses the same registry as the prompt. If graph policy refuses
-a tool, the observation names the active node and gives allowed alternatives.
+a tool, the observation names the active node, phase, reason, preferred next
+action, and one copyable allowed example. No rendered valid example may be
+rejected by the same registry or dispatcher.
 
 ## Status
 

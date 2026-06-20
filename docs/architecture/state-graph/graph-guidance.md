@@ -20,6 +20,14 @@ includes:
 Lists are bounded and stable. The card is a graph slice, not a dump of the
 source graph.
 
+Allowed tools, blocked tools, preferred next action, and legal transitions
+come from one graph policy source. The card must never recommend a tool that
+the dispatcher will refuse for the active node.
+
+Repeated recovery diagnostics render explicit exhaustion:
+`graph.next already inspected for this fault`. The next action list must then
+exclude the repeated diagnostic and name productive alternatives.
+
 ## Weak Model Rules
 
 The prefix reminds the model that the owner message is raw input, not the
