@@ -1,3 +1,5 @@
+mod digest;
+mod duplicate;
 mod identity;
 mod prune;
 mod row;
@@ -5,13 +7,14 @@ mod search;
 
 use rusqlite::{params, Connection, Transaction};
 
+pub use digest::digest;
 pub use identity::{MemoryIdentity, MemoryWriteDecision};
 pub use prune::{prune_exact_duplicates, MemoryPruneReport};
 pub use row::MemoryRow;
 pub use search::{find, normalize_fts_query};
 
 use crate::error::StoreResult;
-use row::{get_required, rows_from_statement};
+use row::get_required;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum MemoryKind {
@@ -74,9 +77,29 @@ pub fn save_decision(
 ) -> StoreResult<MemoryWriteDecision> {
     let identity = identity::memory_identity(kind, title, tags, content);
     let tx = conn.transaction()?;
-    if let Some(existing_id) = identity::find_duplicate(&tx, &identity)? {
-        tx.commit()?;
-        return Ok(MemoryWriteDecision::SkipDuplicate { existing_id });
+    if let Some(duplicate) = identity::find_duplicate(&tx, &identity, content)? {
+        match duplicate {
+            identity::DuplicateMatch::Exact { existing_id } => {
+                tx.commit()?;
+                return Ok(MemoryWriteDecision::SkipDuplicate { existing_id });
+            }
+            identity::DuplicateMatch::Similar { existing_id } => {
+                duplicate::update_similar(
+                    &tx,
+                    existing_id,
+                    MemoryUpdate {
+                        kind,
+                        title,
+                        tags,
+                        content,
+                        tokens,
+                    },
+                    now,
+                )?;
+                tx.commit()?;
+                return Ok(MemoryWriteDecision::UpdateExisting { existing_id });
+            }
+        }
     }
     tx.execute(
         "INSERT INTO memory (kind, title, tags, content, tokens, created_at, updated_at)
@@ -121,56 +144,7 @@ pub fn delete(conn: &mut Connection, id: i64) -> StoreResult<()> {
     Ok(())
 }
 
-pub fn digest(
-    conn: &Connection,
-    task_summary_id: Option<i64>,
-    budget: i64,
-) -> StoreResult<Vec<MemoryRow>> {
-    let mut selected = Vec::new();
-    let mut remaining = budget;
-    if let Some(id) = task_summary_id {
-        if let Some(row) = get(conn, id)? {
-            if row.tokens <= remaining {
-                remaining -= row.tokens;
-                selected.push(row);
-            }
-        }
-    }
-
-    let mut statement = conn.prepare(
-        "SELECT id, kind, title, tags, content, tokens, updated_at
-         FROM memory
-         ORDER BY
-           CASE kind
-             WHEN 'task-summary' THEN 4
-             WHEN 'incident' THEN 3
-             WHEN 'lesson' THEN 2
-             ELSE 1
-           END DESC,
-           updated_at DESC",
-    )?;
-    let rows = rows_from_statement(&mut statement, [])?;
-    for row in rows {
-        if Some(row.id) == task_summary_id {
-            continue;
-        }
-        if row.tokens <= remaining {
-            remaining -= row.tokens;
-            selected.push(row);
-        }
-    }
-    Ok(selected)
-}
-
-fn get(conn: &Connection, id: i64) -> StoreResult<Option<MemoryRow>> {
-    let mut statement = conn.prepare(
-        "SELECT id, kind, title, tags, content, tokens, updated_at FROM memory WHERE id = ?1",
-    )?;
-    let mut rows = rows_from_statement(&mut statement, params![id])?;
-    Ok(rows.pop())
-}
-
-fn insert_fts(
+pub(super) fn insert_fts(
     tx: &Transaction<'_>,
     id: i64,
     title: &str,
