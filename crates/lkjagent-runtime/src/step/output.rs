@@ -68,6 +68,7 @@ fn close_work(
 ) -> Option<StopReason> {
     if state.maintenance.is_some() {
         state.maintenance = None;
+        effects.push(Effect::DeferMaintenance);
         return Some(StopReason::Done);
     }
     close_task(state, action, effects)

@@ -46,13 +46,12 @@ const EVIDENCE_ACTION: &str = "<act>
 </act>";
 
 #[test]
-fn idle_daemon_runs_maintenance_and_restarts_after_empty_cycle() -> TestResult<()> {
+fn idle_daemon_runs_maintenance_and_delays_after_empty_cycle() -> TestResult<()> {
     let mut conn = store()?;
     take_lock(&conn)?;
     let workspace = temp_workspace("auto-maintenance")?;
     let server = serve_responses(vec![completion(MAINT_DONE)])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
-
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert!(daemon.state.maintenance.is_some());
     assert_eq!(
@@ -60,13 +59,13 @@ fn idle_daemon_runs_maintenance_and_restarts_after_empty_cycle() -> TestResult<(
         Some("working".to_string())
     );
     assert!(state::get(&conn, "open task")?.is_some_and(|task| task.starts_with("maintenance:")));
-
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Done);
     server.join()?;
     assert!(daemon.state.maintenance.is_none());
     assert_eq!(state::get(&conn, "daemon state")?, Some("idle".to_string()));
-
-    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Idle);
+    assert!(daemon.state.maintenance.is_none());
+    assert_eq!(daemon.poll_once(&mut conn, "162")?, DaemonTick::Working);
     assert!(daemon.state.maintenance.is_some());
     assert!(events::read_events(&conn)?.iter().any(|event| {
         event.kind == "notice" && event.content.contains("maintenance cycle opened")

@@ -75,6 +75,7 @@ pub enum Effect {
         memory_ids: Vec<i64>,
         policy: ContextBudgetPolicy,
     },
+    DeferMaintenance,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

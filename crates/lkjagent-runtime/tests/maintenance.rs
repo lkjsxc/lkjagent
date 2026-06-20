@@ -113,6 +113,10 @@ fn empty_maintenance_cycle_closes_without_task_distillation() -> TestResult<()> 
     assert!(done
         .effects
         .iter()
+        .any(|effect| matches!(effect, lkjagent_runtime::step::Effect::DeferMaintenance)));
+    assert!(done
+        .effects
+        .iter()
         .all(|effect| !matches!(effect, lkjagent_runtime::step::Effect::DistillTask { .. })));
     Ok(())
 }
