@@ -16,25 +16,30 @@ target, count mode, root README status, docs/main split, section map, coverage
 map, first and last main path, sequence status, audit status, and repair
 needs.
 
-Long-form content requests are document deliverables when the owner asks for a
-long story, novel, book, large guide, corpus, many files, structured output, or
-when a write attempt hits max tokens or an unclosed content tag. These tasks
-must not use one giant `fs.write`.
+Long-form content requests are content artifacts when the owner asks for a long
+story, very long story, novel, book, big cookbook, encyclopedia, large guide,
+corpus, many files, structured output, or when a write attempt hits max tokens
+or an unclosed content tag. These tasks must not use one giant `fs.write`.
 
-The route creates a semantic document root, a root README table of contents,
-semantic child directories or files, bounded sections, and an audit report.
-Names such as part-001.md are valid only when the owner asks for numbered
-parts.
+The route creates a semantic artifact root, a root README table of contents,
+manifest, semantic child directories or files, bounded content-bearing
+sections, and an audit report. Names such as part-001.md are valid only when
+the owner asks for numbered parts.
+
+Story and cookbook profiles are examples, not hard-coded universal output. The
+planner chooses semantic roles for the owner objective and repairs or adopts
+an existing equivalent root before creating new files.
 
 ## Completion
 
 Document completion requires README or index evidence, topology evidence,
-count or scale evidence, link audit evidence, content presence evidence, and a
-restart or read-order signal when relevant.
+count or scale evidence, link audit evidence, manifest evidence, content
+presence evidence, and a restart or read-order signal when relevant.
 
 The model cannot complete a large document task by saying it is done; the
 completion gate requires deterministic audit evidence.
 
 ## Status
 
-implemented.
+partially implemented; semantic artifact planning, manifest adoption, and
+content-bearing completion gates remain open.

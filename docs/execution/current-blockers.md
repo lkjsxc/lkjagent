@@ -9,35 +9,32 @@ evidence named by the task contract and the actual gates that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Owner-reported reliability failures are not recorded as active work | [current-work/owner-reported-failures.md](current-work/owner-reported-failures.md) | done |
-| 2 | Documentation lacks a semantic tree and graph contract | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | done |
-| 3 | `doc.scaffold` can emit sequence-named child files | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | done |
-| 4 | `doc.audit` does not enforce the desired topology contract | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | done |
-| 5 | Action parameter drift can produce weak unknown-param loops | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | done |
-| 6 | Runtime transition controller does not consume transition-quality scoring after every state-changing event | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | done |
-| 7 | Recovery routes can admit unproductive repeated inspection loops | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | done |
-| 8 | `graph.note` examples and accepted kinds disagree | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | done |
-| 9 | Compaction-only mode can conflict with active graph policy | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | done |
-| 10 | Large document tasks can attempt unsafe giant writes | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | done |
-| 11 | Completion and waiting gates need stronger progress proof | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | done |
-| 12 | Status and console omit compact context and token accounting | [current-work/context-accounting.md](current-work/context-accounting.md) | done |
-| 13 | No single current GPT handoff log exists | [current-work/gpt-log.md](current-work/gpt-log.md) | done |
+| 1 | Recovery, maintenance, compaction, and graph policy can contradict each other | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 2 | Owner work does not reliably preempt maintenance | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 3 | Maintenance can save duplicate memory rows and claim pruning without delete or update | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 4 | Long-form content tasks can attempt giant writes and fail into parse loops | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 5 | Document and content tasks can complete after planning only | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 6 | Graph action examples can be syntactically valid but semantically rejected | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 7 | Transition recommendations can point to illegal or impossible targets | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 8 | Structured record identity and deduplication are missing | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 9 | The runtime lacks a deterministic active-mode controller | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 10 | The benchmark corpus does not fully cover the uploaded failure logs | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 11 | Status and console omit compact context and token accounting | [current-work/context-accounting.md](current-work/context-accounting.md) | done |
+| 12 | No single current GPT handoff log exists | [current-work/gpt-log.md](current-work/gpt-log.md) | done |
 
 ## Owner Failure
 
-The main remaining risk is live endpoint quality under real model output.
-Repository gates and Docker Compose verification pass for the deterministic
-controller changes. Earlier failures also include semantically poor files such
-as part-001.md and parameter faults such as unknown params [path].
+The uploaded GPT-5.5-Pro logs are the active evidence. They show invalid
+parameter loops, contradictory maintenance and graph policy layers, duplicate
+memory writes, unsafe long-content writes, scaffold-only completion, and
+maintenance restarts after no useful work.
 
 ## Ordering Notes
 
-- Rows 1 and 2 must move before Rust behavior is claimed complete.
-- Rows 3 and 4 are the first implementation slice because they have a direct
-  confirmed code cause.
-- Rows 5 through 11 may proceed after the document scaffold tests establish the
-  shape contract.
-- Docker Compose verification passed after the controller integration.
+- Rows 1 through 10 remain open until focused tests and Docker Compose
+  verification prove the uploaded failure patterns cannot recur.
+- Documentation moves first, then code. Do not mark prompt-only guidance done.
+- Docker Compose verification is required for any implemented claim.
 
 ## Done
 

@@ -11,24 +11,24 @@ focused tests, and gates prove it.
 The repository contains a Rust workspace, documentation contracts, local gates,
 a tag-based action parser, graph case state, context budgeting, SQLite storage,
 an endpoint client, tool dispatch, a daemon loop, and CLI surfaces for queue,
-status, log, console, and memory. Those pieces exist, but owner-visible task
-completion still depends on endpoint quality and graph-controller depth.
+status, log, console, and memory.
+
+The parser, dispatcher, graph, context engine, store, endpoint client, and
+queue exist. The implementation is not yet safe for the uploaded GPT-5.5-Pro
+failure logs. Runtime completion remains unsafe for long content tasks,
+maintenance can loop and duplicate records, recovery can suggest or allow
+actions that active policy refuses, and compaction can contradict graph policy.
+Structured record identity is not yet sufficient to prevent duplicate
+knowledge artifacts.
 
 Owner-reported failures are current evidence. The harness previously generated
 semantically poor documentation files such as part-001.md and could loop on
-action parameter faults such as unknown params [path]. The generic document
-scaffold now has focused tests for semantic names, README indexes, exact-count
-semantic files, graph manifests, and audit rejection of sequence-only names.
-Safe action parameter drift now normalizes documented aliases, prints exact
-valid examples for refusals, and routes repeated parser-level parameter faults
-through a dedicated `recover-params` node. A newer owner run shows broader
-recovery failure: repeated parse faults, invalid recovery actions, invalid
-`graph.note` kinds, blocked mutation during recovery, and compaction guidance
-that conflicted with graph policy. Focused fixes now cover valid
-`graph.note` examples, graph-selected recovery routing, diagnostic-loop
-refusals, runtime-owned compaction, long-content document routing, oversized
-write payload recovery, owner-question gating, and a benchmark regression for
-the long-story recovery loop.
+action parameter faults such as unknown params [path]. Newer logs show broader
+system failure: repeated parse faults, invalid parameter loops, invalid
+`graph.note` kinds, invalid `memory.save` kinds, duplicate memory entries,
+blocked `memory.save` during maintenance, blocked `doc.scaffold` during
+recovery, repeated `graph.next`, premature `agent.done`, and content tasks that
+completed without the requested story or cookbook artifact.
 
 The graph now has neutral ranked state tracks, an objective envelope that does
 not copy raw owner text, SQLite track snapshots, graph notice rendering,
@@ -51,25 +51,27 @@ changes.
 | Cargo workspace and gates | implemented | `Cargo.toml`; `crates/lkjagent-xtask` |
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol` |
-| Tool dispatcher | partially implemented | safe parameter normalization, valid graph.note examples, and actionable graph-policy refusals exist; remaining policy depth depends on full controller integration |
+| Tool dispatcher | partially implemented | registry validation exists; generated examples and semantic constraints need dispatcher proof |
 | Document scaffold tool | implemented | semantic scaffold tests, quiet verify, compose smoke |
 | Document audit tool | implemented | topology and graph checks pass local gates |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md` |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
-| Runtime recovery | implemented | parse/tool/repeat recovery, `recover-params`, selector routing, payload-risk recovery, repeated-diagnostic refusal, selector-driven post-event refresh, and partial completion handoff proof exist |
+| Runtime recovery | partially implemented | fault routes exist, but policy contradictions and repeated invalid actions still need deterministic active-mode control |
 | Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
 | GPT handoff log | implemented | runtime and CLI write one current Markdown snapshot |
-| Mechanical benchmarks | implemented | owner failure cases are covered by corpus fixtures and `benchmark check-corpus` passes |
+| Mechanical benchmarks | partially implemented | existing corpus passes; uploaded loop failures need direct fixtures and judges |
 
 ## Open Work
 
 The dependency queue is
-[execution/current-blockers.md](execution/current-blockers.md). The remaining
-open risk is live endpoint quality under real model output; repository gates and
-Docker Compose verification pass for the deterministic controller changes.
+[execution/current-blockers.md](execution/current-blockers.md). The open work is
+structural, not only endpoint quality: active-mode selection, maintenance
+idempotency, compaction ownership, semantic artifact planning, completion
+readiness, and benchmark coverage must move before the ledger can call the
+loop redesign implemented.
 
 ## Out of Scope
 

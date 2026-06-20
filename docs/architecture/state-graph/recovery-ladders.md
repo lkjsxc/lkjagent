@@ -49,9 +49,24 @@ escape, blocked step, or owner-required question.
 invariant, success, and path. Registry examples and refusal text must render
 only those accepted kinds.
 
+Safe aliases may normalize to accepted kinds when the meaning is clear:
+planning, note, recovery, and compaction-state become decision; completed
+progress becomes success; policy-refinement becomes decision or constraint
+based on the target field. The observation records normalization rather than
+silently mutating durable state.
+
+`graph.evidence` targets known missing requirements, not note kinds. Unknown
+requirements render the current allowed list and a copyable example for a
+known requirement.
+
 Waiting is forbidden when an internal transition, alternate native tool, or
 smaller independent step can continue.
 
+Recovery suggestions must be admitted by the active mode. If graph policy and
+maintenance or compaction policy would disagree, active-mode selection decides
+which one renders; the other stays silent.
+
 ## Status
 
-implemented.
+partially implemented; active-mode integration and semantic examples remain
+open.
