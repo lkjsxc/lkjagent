@@ -145,5 +145,4 @@ verification and Docker Compose verification were not rerun for this
 artifact-next slice. Remaining work: full loop selection before endpoint
 turns, semantic maintenance merge/rewrite pruning, richer structured
 compaction snapshots, transition selector runtime integration, artifact
-adoption/repair, completion wiring, benchmark fixtures for `artifact.next`,
-and blocked handoff states.
+adoption/repair, completion wiring, and blocked handoff states.

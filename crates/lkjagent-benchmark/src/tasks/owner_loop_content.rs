@@ -90,7 +90,7 @@ pub const NOTE_TASK: BenchmarkTask = BenchmarkTask {
 
 const BREAD_GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "owner_input=Create a big bread cookbook.\nsubroute=content-artifact\nroot=cookbooks/bread-cookbook\nprofile=Cookbook\nsemantic_paths=cookbooks/README.md,cookbooks/foundations/flour-water-salt-yeast.md,cookbooks/recipes/sourdough-country-loaf.md\ncontent-bearing files verified\ndoc.audit passed\nagent.done complete after artifact audit\n",
+    content: "owner_input=Create a big bread cookbook.\nsubroute=content-artifact\nroot=cookbooks/bread-cookbook\nprofile=Cookbook\nartifact.next next_action=fs.batch_write\nsemantic_paths=cookbooks/README.md,cookbooks/foundations/flour-water-salt-yeast.md,cookbooks/recipes/sourdough-country-loaf.md\ncontent-bearing files verified\nartifact.audit passed\nagent.done complete after artifact audit\n",
 }];
 
 const BREAD_BAD_GENERIC: &[FileSpec] = &[FileSpec {
@@ -106,6 +106,11 @@ const BREAD_BAD_SCAFFOLD: &[FileSpec] = &[FileSpec {
 const BREAD_BAD_EMPTY_ROOT: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
     content: "root=cookbooks/cookbook-about-bread\nempty artifact root after many turns\nrecover-by-smaller-scope blocked doc.scaffold\nagent.done claimed progress\n",
+}];
+
+const BREAD_BAD_BLOCKED_NEXT: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content: "subroute=content-artifact\nroot=cookbooks/bread-cookbook\nartifact.next blocked by graph policy\nnext_action=graph.next\nagent.done claimed progress\n",
 }];
 
 pub const BREAD_TASK: BenchmarkTask = BenchmarkTask {
@@ -133,6 +138,10 @@ pub const BREAD_TASK: BenchmarkTask = BenchmarkTask {
         Fixture {
             name: "recovery-big-bread-cookbook-empty-root",
             files: BREAD_BAD_EMPTY_ROOT,
+        },
+        Fixture {
+            name: "bread-cookbook-artifact-next-blocked",
+            files: BREAD_BAD_BLOCKED_NEXT,
         },
     ],
     judge: JudgeKind::BreadCookbookArtifact,
