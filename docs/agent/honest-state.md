@@ -23,6 +23,10 @@ Nothing in this project may present a state that did not actually happen.
 - No docs describing unbuilt behavior as existing: design-only status marks
   the line, and [../current-state.md](../current-state.md) is the ledger.
 - Deleting something is honest; hiding it behind a flag that pretends is not.
+- Owner-visible failure reports are evidence. When code or docs disagree
+  with a fresh report, record the report in
+  [../execution/current-blockers.md](../execution/current-blockers.md) before
+  claiming the system is complete.
 
 ## For the Running Agent
 
