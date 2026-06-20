@@ -101,7 +101,9 @@ fn guard_passes(guard: Guard, graph: &GraphDefinition, state: &TaskGraphState) -
                 crate::case_document::TopologyStatus::Present
             )
         }),
-        Guard::OwnerQuestionOpen => !state.open_questions.is_empty(),
+        Guard::OwnerQuestionOpen => state.open_questions.iter().any(|question| {
+            question.owner_required && question.status == crate::case_fields::FieldStatus::Open
+        }),
         Guard::OwnerQuestionAbsent => state.open_questions.is_empty(),
     }
 }

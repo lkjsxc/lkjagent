@@ -38,9 +38,13 @@ fn policy_for(graph: &lkjagent_graph::TaskGraphState) -> GraphDispatchPolicy {
         .nodes
         .iter()
         .find(|node| node.id == graph.active_node);
+    let owner_question = graph.open_questions.iter().any(|question| {
+        question.owner_required && question.status == lkjagent_graph::case_fields::FieldStatus::Open
+    });
     let allowed = node.map_or_else(Vec::new, |node| {
         node.allowed_actions
             .iter()
+            .filter(|tool| **tool != "agent.ask" || owner_question)
             .map(|tool| (*tool).to_string())
             .collect()
     });
