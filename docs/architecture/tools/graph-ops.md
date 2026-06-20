@@ -41,6 +41,10 @@ at least one step, and checks or paths.
 Requests a target node. The harness evaluates typed edge guards and refuses
 illegal transitions with missing evidence or policy reasons.
 
+Targets are graph node ids only. The runtime must never render labels such as
+`plan:admitted` as targets, and must not recommend `plan` when that transition
+is illegal from the active node.
+
 ## graph.context
 
 Selects graph context packages by id. The runtime validates package ids
@@ -60,6 +64,9 @@ after such a question exists and remains open.
 
 Records explicit evidence against a known requirement when the harness cannot
 infer it from a tool output. The runtime links evidence to the active case.
+Known requirements include `plan`, `observation`, `verification`, and
+`document-structure`, plus dynamically registered requirements. Note-like
+kinds such as decision, risk, planning, and recovery are rejected.
 
 ## graph.compact
 
@@ -69,4 +76,5 @@ action that graph policy blocks.
 
 ## Status
 
-implemented.
+partially implemented; dispatch validation and examples exist. Runtime
+transition selection and artifact-specific evidence coverage remain open.

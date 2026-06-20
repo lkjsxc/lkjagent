@@ -15,6 +15,7 @@ verification.
 - [context-accounting.md](context-accounting.md): context and token display work.
 - [multi-state-runtime.md](multi-state-runtime.md): neutral task-track modeling work.
 - [runtime-recovery-controller.md](runtime-recovery-controller.md): deterministic recovery controller work.
+- [active-mode-controller.md](active-mode-controller.md): one owner of policy per turn.
 - [recovery-and-maintenance-loop-redesign.md](recovery-and-maintenance-loop-redesign.md): active-mode loop redesign.
 - [gpt-log.md](gpt-log.md): single handoff-log work.
 - [verification-plan.md](verification-plan.md): focused tests, benchmarks, and compose gates.

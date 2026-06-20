@@ -11,9 +11,15 @@ An ArtifactPlan records root, title, kind, nodes, links, checks, and the
 adoption or repair decision for existing files. Nodes carry path, role, title,
 required flag, content policy, and artifact identity.
 
-The planner rejects sequence-only names such as part-001.md unless the owner
-asks for numbered parts. It generates semantic section names and writes bounded
-sections only.
+Rules:
+
+- Never create sequence-only files unless the owner explicitly asks for
+  numbered parts.
+- Never generate `part-001.md` as a generic fallback.
+- Never create a second semantic equivalent file when one exists.
+- Adopt existing artifact roots before creating new roots.
+- Repair stale generated files rather than duplicate them.
+- Use manifests to track semantic roles and artifact identity.
 
 ## Content Artifacts
 

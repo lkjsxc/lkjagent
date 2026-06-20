@@ -24,8 +24,14 @@ state, and one copyable next executable action.
 
 Code, bug, architecture, benchmark, and verification families require typed
 verification evidence. Documentation and knowledge-base families require
-document-structure evidence from doc.audit, doc.scaffold, or a deterministic
-harness scaffold.
+document-structure evidence from a passed `doc.audit` or deterministic harness
+audit. Scaffold creation alone is never completion evidence for content
+artifacts.
+
+Content artifacts require root, README, manifest, semantic children,
+content-bearing files, audit evidence, graph plan evidence, observation
+evidence, verification or audit evidence, and no active unrecovered fault over
+threshold.
 
 Architecture changes require matching code and docs evidence. Recovery tasks
 require a fault record, a non-repeating alternate action, and improved state
@@ -34,4 +40,5 @@ rebuilt context notice before they can close.
 
 ## Status
 
-implemented.
+partially implemented; graph completion checks exist. Artifact-aware readiness
+and blocked handoff states remain open.

@@ -28,6 +28,12 @@ allows one state inspection, then alternate native tools or smaller scope.
 `recover-repeat` requires a different action fingerprint. Shell is allowed
 only from `recover-by-shell-escape`.
 
+`recover-by-smaller-scope` must admit `graph.plan` or transition to a
+planning node that admits it. `recover-by-artifact-plan` admits artifact
+planning or document scaffold for content tasks. `recover-by-bounded-write`
+admits batch writes or section-limited writes and blocks another raw large
+write after payload risk.
+
 The dispatcher uses the same registry as the prompt. If graph policy refuses
 a tool, the observation names the active node, phase, reason, preferred next
 action, and one copyable allowed example. No rendered valid example may be
@@ -35,4 +41,5 @@ rejected by the same registry or dispatcher.
 
 ## Status
 
-implemented.
+partially implemented; core affordance checks exist. Full recovery-node
+escape coverage and artifact-plan affordances remain open.

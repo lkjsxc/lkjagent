@@ -39,6 +39,11 @@ presence evidence, and a restart or read-order signal when relevant.
 The model cannot complete a large document task by saying it is done; the
 completion gate requires deterministic audit evidence.
 
+For content artifacts, completion also requires an artifact root, README,
+manifest, semantic children, content-bearing files, plan evidence, observation
+evidence, and verification or audit evidence. Planning alone and generic
+scaffold alone are never completion.
+
 ## Status
 
 partially implemented; long story and bread cookbook classification now route

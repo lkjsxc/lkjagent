@@ -11,6 +11,9 @@ This file defines the evidence required before documentation work can close.
 - Completion is illegal while sequence-only paths, missing README files, or
   missing graph manifest checks remain open.
 - Completion summaries name the generated root and verification command.
+- Content artifacts require README, manifest, semantic children,
+  content-bearing files, and a passing audit.
+- Planning-only or scaffold-only output cannot close an artifact task.
 
 ## Implementation Hooks
 
@@ -26,4 +29,5 @@ This file defines the evidence required before documentation work can close.
 
 ## Status
 
-design-only
+partially implemented; audit and scaffold-only refusal exist. Full artifact
+completion readiness remains open.

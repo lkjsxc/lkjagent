@@ -31,10 +31,11 @@ at the next boundary.
 ## Procedure
 
 1. Runtime snapshot. The harness writes a typed `CompactionPlan` that
-   preserves graph state, recovery state, and the active task summary.
+   preserves graph state, recovery state, artifact ledger, fault ledger,
+   missing evidence, blocked next action, and the active task summary.
 2. Optional maintenance distillation. Reusable lessons may be written through
-   `memory.save` only during maintenance or a node whose graph policy admits
-   memory tools. Forced compaction never waits for a model action.
+   internal store APIs or through model-authored maintenance only when the
+   active mode admits it. Forced compaction never waits for a model action.
 3. Digest rebuild. The harness rebuilds the memory digest from the memory
    store within its budget: top entries by rank, task summary first.
 4. Prefix rebuild. A fresh prefix is assembled: identity, grammar and
@@ -56,6 +57,7 @@ forbidden by [../../agent/honest-state.md](../../agent/honest-state.md).
 | Content | Survives as |
 | --- | --- |
 | task state and open threads | graph case, graph evidence, and log-head notice |
+| artifact ledger and blockers | graph artifact state plus compaction snapshot |
 | lessons and discoveries | memory rows, retrievable by memory.find |
 | selected context packages | package identities in graph state; text reselected after rebuild |
 | legal next transitions | graph case plus compaction snapshot |
@@ -71,4 +73,5 @@ pressure toward narrow tool use.
 
 ## Status
 
-implemented.
+partially implemented; runtime-owned compaction exists. Rich artifact and
+blocked-action snapshots remain open.

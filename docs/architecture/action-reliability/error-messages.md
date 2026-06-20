@@ -16,6 +16,11 @@ This file defines model-visible parameter refusal text.
 - Messages name a different tool when the emitted parameter belongs elsewhere.
 - The registry prompt shows no-param tools as `no params` and gives examples
   for graph inspection and document tools.
+- Recovery advice must never suggest a tool that active policy will reject.
+- Large-payload parse faults suggest artifact planning or bounded section
+  writes, not another raw large write.
+- Owner questions are refused when the question is about internal tool use,
+  valid parameters, stale memory rows, or recovery strategy.
 
 ## Implementation Hooks
 
@@ -31,4 +36,5 @@ This file defines model-visible parameter refusal text.
 
 ## Status
 
-implemented
+partially implemented; parameter and graph-note messages are covered, but full
+payload-risk and recovery-node examples remain open.

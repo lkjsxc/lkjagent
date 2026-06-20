@@ -66,6 +66,18 @@ Recovery suggestions must be admitted by the active mode. If graph policy and
 maintenance or compaction policy would disagree, active-mode selection decides
 which one renders; the other stays silent.
 
+Recovery nodes include `recover-parse`, `recover-params`, `recover-tool`,
+`recover-repeat`, `recover-by-state-inspection`, `recover-by-alternate-tool`,
+`recover-by-smaller-scope`, `recover-by-artifact-plan`,
+`recover-by-bounded-write`, `recover-by-shell-escape`, and
+`blocked-with-evidence`.
+
+Long-payload parse faults route to artifact planning or bounded batch writes,
+not raw `fs.write` retries. If the current recovery node blocks the only
+productive tool class, the controller transitions to a node that admits that
+tool or produces a blocked handoff. `agent.ask` is forbidden for internal tool
+uncertainty.
+
 ## Status
 
 partially implemented; active-mode integration and semantic examples remain

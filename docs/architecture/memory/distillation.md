@@ -29,6 +29,8 @@ Memory rows are written at controlled moments:
 - Accepted kinds are lesson, fact, task-summary, and incident.
 - Writes are idempotent. Equivalent rows are skipped, updated, or merged
   instead of inserted again.
+- Optional model-authored lessons are allowed only during Maintenance mode or
+  an owner node whose effective policy admits memory tools.
 
 ## Digest Rendering
 
@@ -51,7 +53,8 @@ the memory table sharp:
 
 Memory rows may be updated and deleted; events rows may not. The distinction
 is fixed in [store.md](store.md). Pruning records the actual merge, rewrite,
-or delete effect.
+or delete effect. If no mutation runs, pruning reports no-op and sets
+cooldown.
 
 ## Status
 

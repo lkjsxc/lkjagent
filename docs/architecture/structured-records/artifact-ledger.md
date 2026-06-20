@@ -10,18 +10,19 @@ workspace files.
 Artifact identity is:
 
 ```text
-artifact_id = normalized_owner_objective + root_path + artifact_kind
+artifact_key = normalized owner objective + artifact root + artifact kind
 ```
 
-Artifact kinds include documentation tree, content artifact, story, cookbook,
-guide, corpus, report, and repair bundle. The exact enum may be smaller, but
-long stories and cookbooks must be classified as content artifacts.
+Artifact kinds include story, cookbook, guide, encyclopedia, knowledge base,
+and project docs. Long stories and cookbooks must never fall back to generic
+project documentation unless the owner explicitly asks for project docs.
 
 ## Manifest
 
 Every artifact root carries `.lkj-artifact.md` or an equivalent extension of
-`.lkj-doc-graph.md`. The manifest records artifact id, root, kind, title,
-section roles, paths, required flags, content policy, and last audit result.
+`.lkj-doc-graph.md`. The manifest records artifact key, root, kind, title,
+owner objective hash, node roles, required files, content minimums, audit
+state, and completion state.
 
 ## Status
 
