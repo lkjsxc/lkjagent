@@ -67,8 +67,11 @@ pub fn find(conn: &Connection, query: &str, limit: usize) -> ToolResult<String> 
 pub fn prune(conn: &mut Connection) -> ToolResult<String> {
     let report = lkjagent_store::memory::prune_exact_duplicates(conn)?;
     Ok(format!(
-        "memory prune completed\nkept_duplicate_groups={}\ndeleted_rows={}",
-        report.kept, report.deleted
+        "memory prune completed\nkept_duplicate_groups={}\ndeleted_rows={}\nmerged_rows={}\nsource_rows={}",
+        report.kept,
+        report.deleted,
+        report.merged,
+        join_ids(&report.source_rows)
     ))
 }
 
@@ -84,4 +87,15 @@ fn parse_kind(kind: &str) -> ToolResult<lkjagent_store::memory::MemoryKind> {
 
 fn snippet(content: &str) -> String {
     content.chars().take(120).collect()
+}
+
+fn join_ids(ids: &[i64]) -> String {
+    if ids.is_empty() {
+        "none".to_string()
+    } else {
+        ids.iter()
+            .map(ToString::to_string)
+            .collect::<Vec<_>>()
+            .join(",")
+    }
 }

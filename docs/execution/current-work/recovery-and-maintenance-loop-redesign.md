@@ -137,12 +137,13 @@ invalid-note-kind, long-story, and bread-cookbook false-completion patterns.
 Empty maintenance closes now defer all directives before the next idle poll,
 preventing immediate no-op restarts. `doc.audit` now rejects scaffold-only and
 weak story or cookbook leaves before document-structure evidence can pass.
-`memory.prune` now performs real exact-duplicate deletes. Current artifact
+`memory.prune` now performs real exact-duplicate deletes and same-title
+high-overlap merges with source row IDs. Current artifact
 next-batch evidence: `cargo test -p lkjagent-tools`, `cargo test -p
 lkjagent-graph`, `cargo test -p lkjagent-protocol`, `check-docs`, and
 `check-lines` pass; `benchmark check-corpus` also passes. Final quiet
 verification and Docker Compose verification were not rerun for this
 artifact-next slice. Remaining work: full loop selection before endpoint
-turns, semantic maintenance merge/rewrite pruning, richer structured
+turns, maintenance rewrite pruning, richer structured
 compaction snapshots, transition selector runtime integration, artifact
 adoption/repair, completion wiring, and blocked handoff states.
