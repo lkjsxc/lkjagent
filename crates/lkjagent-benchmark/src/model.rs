@@ -54,6 +54,7 @@ pub enum JudgeKind {
     ThirtySemanticDocs,
     GraphStateParamRecovery,
     DocScaffoldParamRecovery,
+    RecoveryLoopLongStory,
     StatusAccounting,
     GptHandoffLog,
 }

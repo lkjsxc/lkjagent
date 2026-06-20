@@ -13,8 +13,9 @@ a DFA table, an executable shell program, a repaired file, or a linked file
 tree. The judge recomputes the answer or checks the artifact independently.
 The tiny suite also includes owner-reported reliability regressions: semantic
 documentation trees, recursive README indexes, counted documentation without
-serial filenames, action-parameter recovery, compact context/token status, and
-the single current GPT handoff log.
+serial filenames, action-parameter recovery, recovery-loop routing,
+long-form document routing, compact context/token status, and the single
+current GPT handoff log.
 
 Mechanical benchmarks are not a replacement for owner judgment. They are the
 repeatable loop that shows whether changes to tools, prompts, memory,

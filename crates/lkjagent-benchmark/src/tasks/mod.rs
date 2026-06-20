@@ -25,6 +25,7 @@ pub const TINY: &[BenchmarkTask] = &[
     owner_thirty::TASK,
     owner_faults::GRAPH_TASK,
     owner_faults::SCAFFOLD_TASK,
+    owner_faults::STORY_TASK,
     owner_observability::STATUS_TASK,
     owner_observability::LOG_TASK,
 ];

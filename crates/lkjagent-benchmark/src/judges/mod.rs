@@ -26,6 +26,7 @@ pub fn judge_task(task: &BenchmarkTask, workspace: &Path) -> BenchResult<JudgeOu
         JudgeKind::ThirtySemanticDocs => owner_docs::thirty_docs(workspace),
         JudgeKind::GraphStateParamRecovery => owner_ops::graph_state_recovery(workspace),
         JudgeKind::DocScaffoldParamRecovery => owner_ops::doc_scaffold_recovery(workspace),
+        JudgeKind::RecoveryLoopLongStory => owner_ops::recovery_loop_long_story(workspace),
         JudgeKind::StatusAccounting => owner_ops::status_accounting(workspace),
         JudgeKind::GptHandoffLog => owner_ops::gpt_handoff_log(workspace),
     };
