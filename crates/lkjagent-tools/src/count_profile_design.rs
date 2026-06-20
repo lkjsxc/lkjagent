@@ -1,4 +1,5 @@
 use crate::count_profile::{DeliverableKind, Language};
+use crate::count_profile_paths::main_path;
 
 pub(crate) fn design_text(
     language: Language,
@@ -11,7 +12,7 @@ pub(crate) fn design_text(
     let task = design_task(language, kind);
     match language {
         Language::Japanese => format!(
-            "## 対象範囲\n\n{coverage}\n\n## 設計タスク\n\n{task}\n\n## 検証観点\n\n- 担当範囲の前後関係が連続していること。\n- 本編ファイルが依頼文、段階、次の接続先を保っていること。\n- 追加や削除で合計ファイル数を変えないこと。\n"
+            "## 対象範囲\n\n{coverage}\n\n## 設計タスク\n\n{task}\n\n## 検証観点\n\n- 担当範囲の前後関係が連続していること。\n- 本編ファイルが依頼文、段階、次の接続先を保っていること。\n- 追加や削除で規模目安を崩さないこと。\n"
         ),
         Language::English => format!(
             "## Coverage\n\n{coverage}\n\n## Design Task\n\n{task}\n\n## Verification Checks\n\n- The covered range preserves sequence continuity.\n- Main files retain objective context, stage, and next-link information.\n- Revisions do not change the total file count.\n"
@@ -32,16 +33,20 @@ fn coverage_text(language: Language, index: usize, docs: usize, main: usize) -> 
     };
     match language {
         Language::Japanese if start == end => {
-            format!("- 担当本編: main/part-{start:03}.md")
+            format!("- 担当本編: {}", main_path(start))
         }
         Language::Japanese => {
-            format!("- 担当本編: main/part-{start:03}.md から main/part-{end:03}.md")
+            format!("- 担当本編: {} から {}", main_path(start), main_path(end))
         }
         Language::English if start == end => {
-            format!("- Covered main file: main/part-{start:03}.md")
+            format!("- Covered main file: {}", main_path(start))
         }
         Language::English => {
-            format!("- Covered main files: main/part-{start:03}.md through main/part-{end:03}.md")
+            format!(
+                "- Covered main files: {} through {}",
+                main_path(start),
+                main_path(end)
+            )
         }
     }
 }

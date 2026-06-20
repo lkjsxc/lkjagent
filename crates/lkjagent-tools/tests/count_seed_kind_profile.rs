@@ -17,8 +17,8 @@ fn playbook_profiles_as_guide() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
-    let second = fs::read_to_string(root.join("main/part-002.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
+    let second = fs::read_to_string(root.join(support::main_path(2)))?;
     assert!(readme.contains("audit this deliverable as a guide"));
     assert!(first.contains("### Procedure Role"));
     assert!(first.contains("### Execution Commitments"));
@@ -37,8 +37,8 @@ fn screenplay_profiles_as_narrative() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
-    let second = fs::read_to_string(root.join("main/part-002.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
+    let second = fs::read_to_string(root.join(support::main_path(2)))?;
     assert!(readme.contains("audit this deliverable as a narrative"));
     assert!(first.contains("### Scene Role"));
     assert!(first.contains("### Concrete Commitments"));
@@ -63,8 +63,8 @@ fn large_novel_varies_first_and_final_segments() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
-    let last = fs::read_to_string(root.join("main/part-085.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
+    let last = fs::read_to_string(root.join(support::main_path(85)))?;
     assert!(first.contains("archive stair"));
     assert!(!last.contains("archive stair"));
     assert!(!last.contains("justifies the next part"));
@@ -83,8 +83,8 @@ fn whitepaper_profiles_as_report() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
-    let second = fs::read_to_string(root.join("main/part-002.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
+    let second = fs::read_to_string(root.join(support::main_path(2)))?;
     assert!(readme.contains("audit this deliverable as a report"));
     assert!(first.contains("### Analysis Role"));
     assert!(first.contains("### Analysis Commitments"));
@@ -103,7 +103,7 @@ fn training_course_profiles_as_guide() -> TestResult<()> {
 
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(readme.contains("audit this deliverable as a guide"));
     assert!(first.contains("### Procedure Role"));
     assert!(first.contains("### Execution Commitments"));

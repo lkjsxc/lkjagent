@@ -22,7 +22,7 @@ fn english_parenthetical_composition_keeps_manual_as_main_anchor() -> TestResult
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("documentation files and main procedure files combined"));
-    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first_part = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(first_part.contains(
         "Local objective: Turn \"operations readiness manual\" into this file's distinct contribution."
     ));

@@ -1,6 +1,8 @@
 use std::fs;
 use std::path::Path;
 
+use crate::count_guard::CountGuard;
+use crate::count_profile_paths::{design_path, main_path};
 use crate::count_seed_verify_main::{verify_main_file_content, verify_main_file_sections};
 use crate::count_seed_verify_manifest::verify_audit_manifest;
 use crate::count_seed_verify_reading::verify_reading_path;
@@ -37,22 +39,24 @@ pub(crate) struct ScaffoldCheck {
 
 pub(crate) fn verify_scaffold(
     root: &Path,
-    target: usize,
+    guard: CountGuard,
     docs: usize,
     main: usize,
     indexes: bool,
 ) -> ToolResult<ScaffoldCheck> {
     let files = count_files(root)?;
-    if files != target {
+    if !guard.accepts(files) {
         return Err(ToolError::invalid(format!(
-            "counted document scaffold expected {target} files, got {files}"
+            "counted document scaffold expected {} files, got {files}",
+            guard.target
         )));
     }
     let root_text = require_text(&root.join("README.md"), "root index")?;
     let acceptance_audit = verify_acceptance_audit(&root_text, docs, main)?;
-    let file_budget = verify_file_budget(&root_text, target, docs, main, index_count(indexes))?;
+    let file_budget =
+        verify_file_budget(&root_text, guard, files, docs, main, index_count(indexes))?;
     let audit_manifest =
-        verify_audit_manifest(&root_text, target, docs, main, index_count(indexes))?;
+        verify_audit_manifest(&root_text, guard, files, docs, main, index_count(indexes))?;
     let restart_guide = verify_restart_guide(&root_text, index_count(indexes), main)?;
     let reading_path = verify_reading_path(&root_text, main)?;
     let design_sections = verify_design_files(root, docs, main > 0)?;
@@ -116,7 +120,7 @@ fn verify_design_files(root: &Path, docs: usize, has_main: bool) -> ToolResult<&
     }
     for index in 1..=docs {
         let label = format!("design memo {index:03}");
-        let text = require_text(&root.join(format!("docs/design-{index:03}.md")), &label)?;
+        let text = require_text(&root.join(design_path(index)), &label)?;
         verify_design_file_sections(&text, &label)?;
         verify_design_file_content(&text, &label, has_main)?;
     }
@@ -129,7 +133,7 @@ fn verify_main_files(root: &Path, docs: usize, main: usize) -> ToolResult<&'stat
     }
     for index in 1..=main {
         let label = format!("main part {index:03}");
-        let text = require_text(&root.join(format!("main/part-{index:03}.md")), &label)?;
+        let text = require_text(&root.join(main_path(index)), &label)?;
         verify_main_file_sections(&text, &label)?;
         verify_main_file_content(&text, &label, index, docs, main)?;
     }

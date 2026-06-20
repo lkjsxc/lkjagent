@@ -1,4 +1,5 @@
 use crate::count_profile_index::design_owner;
+use crate::count_profile_paths::{design_path, main_path};
 use crate::error::{ToolError, ToolResult};
 
 pub(crate) fn verify_main_file_sections(text: &str, label: &str) -> ToolResult<()> {
@@ -67,28 +68,20 @@ pub(crate) fn verify_main_file_content(
         label,
     )?;
     if let Some(owner) = design_owner(index, docs, main) {
-        require_contains(
-            text,
-            &format!("docs/design-{owner:03}.md"),
-            "main file design owner",
-        )?;
+        require_contains(text, &design_path(owner), "main file design owner")?;
     }
-    require_contains(
-        text,
-        &format!("main/part-{index:03}.md"),
-        "main file current path",
-    )?;
+    require_contains(text, &main_path(index), "main file current path")?;
     if index > 1 {
         require_contains(
             text,
-            &format!("main/part-{:03}.md", index.saturating_sub(1)),
+            &main_path(index.saturating_sub(1)),
             "main file previous path",
         )?;
     }
     if index < main {
         require_contains(
             text,
-            &format!("main/part-{:03}.md", index.saturating_add(1)),
+            &main_path(index.saturating_add(1)),
             "main file next path",
         )?;
     }

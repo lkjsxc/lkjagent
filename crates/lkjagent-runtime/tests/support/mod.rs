@@ -16,8 +16,29 @@ pub mod http;
 
 pub type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
+pub fn design_path(index: usize) -> String {
+    format!("docs/designs/{}/design-{index:03}.md", design_group(index))
+}
+
+pub fn main_path(index: usize) -> String {
+    format!("main/arcs/{}/part-{index:03}.md", main_group(index))
+}
+
 pub fn contains_all(text: &str, needles: &[&str]) -> bool {
     needles.iter().all(|needle| text.contains(needle))
+}
+
+fn design_group(index: usize) -> String {
+    group_name("set", index)
+}
+
+fn main_group(index: usize) -> String {
+    group_name("arc", index)
+}
+
+fn group_name(prefix: &str, index: usize) -> String {
+    let group = index.saturating_sub(1) / 10 + 1;
+    format!("{prefix}-{group:03}")
 }
 
 pub const COUNTED_EVIDENCE_TERMS: &[&str] = &[

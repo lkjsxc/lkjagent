@@ -22,7 +22,7 @@ fn count_seed_root_audit_matches_generated_counts() -> TestResult<()> {
 
     let readme = fs::read_to_string(workspace.join("structured-output/README.md"))?;
     assert!(readme.contains("## Audit Manifest"));
-    assert!(readme.contains("- files: 100"));
+    assert!(readme.contains("- scale_files: about 100"));
     assert!(readme.contains("- index_files: 2"));
     assert!(readme.contains("- design_memos: 12"));
     assert!(readme.contains("- main_files: 85"));
@@ -33,8 +33,8 @@ fn count_seed_root_audit_matches_generated_counts() -> TestResult<()> {
     assert!(readme.contains("- sequence_paths: required"));
     assert!(readme.contains("- closure_reason: deterministic_scaffold"));
     assert!(readme.contains("## Reading Path"));
-    assert!(readme.contains("- First main: main/part-001.md"));
-    assert!(readme.contains("- Last main: main/part-085.md"));
+    assert!(readme.contains(&format!("- First main: {}", support::main_path(1))));
+    assert!(readme.contains(&format!("- Last main: {}", support::main_path(85))));
     assert!(readme.contains("- completion: ready"));
     assert!(readme.contains("Design coverage: 12 design memos"));
     assert!(readme.contains("Main coverage: 85 main files"));

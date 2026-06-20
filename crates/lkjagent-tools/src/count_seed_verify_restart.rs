@@ -14,8 +14,8 @@ pub(crate) fn verify_restart_guide(
     require_one(root_index, "README.md", "README.md", "restart guide root")?;
     require_one(
         root_index,
-        "recorded total file count",
-        "記録済み合計ファイル数",
+        "recorded scale target",
+        "記録済みの規模目安",
         "restart guide count rule",
     )?;
     if index_files > 0 && main > 0 {

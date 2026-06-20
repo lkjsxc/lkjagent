@@ -1,8 +1,10 @@
+use crate::count_guard::{CountGuard, CountMode};
 use crate::error::{ToolError, ToolResult};
 
 pub(crate) fn verify_audit_manifest(
     root_index: &str,
-    target: usize,
+    guard: CountGuard,
+    files: usize,
     docs: usize,
     main: usize,
     index_files: usize,
@@ -33,11 +35,18 @@ pub(crate) fn verify_audit_manifest(
         "- root: structured-output",
         "audit manifest root",
     )?;
-    require_manifest_line(
-        root_index,
-        format!("- files: {target}"),
-        "audit manifest file count",
-    )?;
+    match guard.mode {
+        CountMode::Exact => require_manifest_line(
+            root_index,
+            format!("- files: {}", guard.target),
+            "audit manifest file count",
+        )?,
+        CountMode::Approximate => require_manifest_line(
+            root_index,
+            format!("- scale_files: about {files}"),
+            "audit manifest scale file count",
+        )?,
+    }
     require_manifest_line(
         root_index,
         format!("- index_files: {index_files}"),

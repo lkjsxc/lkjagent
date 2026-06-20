@@ -23,10 +23,10 @@ fn count_seed_honors_japanese_design_file_count_phrase() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-016.md").exists());
-    assert!(!root.join("docs/design-017.md").exists());
-    assert!(root.join("main/part-081.md").exists());
-    assert!(!root.join("main/part-082.md").exists());
+    assert!(root.join(support::design_path(16)).exists());
+    assert!(!root.join(support::design_path(17)).exists());
+    assert!(root.join(support::main_path(81)).exists());
+    assert!(!root.join(support::main_path(82)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- 設計メモ: 16"));
     assert!(readme.contains("- 本編ファイル: 81"));
@@ -50,10 +50,10 @@ fn count_seed_honors_japanese_setting_reference_file_count_phrase() -> TestResul
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-018.md").exists());
-    assert!(!root.join("docs/design-019.md").exists());
-    assert!(root.join("main/part-079.md").exists());
-    assert!(!root.join("main/part-080.md").exists());
+    assert!(root.join(support::design_path(18)).exists());
+    assert!(!root.join(support::design_path(19)).exists());
+    assert!(root.join(support::main_path(79)).exists());
+    assert!(!root.join(support::main_path(80)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- 設計メモ: 18"));
     assert!(readme.contains("- 本編ファイル: 79"));
@@ -78,10 +78,10 @@ fn count_seed_honors_japanese_character_introductions_without_file_noun() -> Tes
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-024.md").exists());
-    assert!(!root.join("docs/design-025.md").exists());
-    assert!(root.join("main/part-073.md").exists());
-    assert!(!root.join("main/part-074.md").exists());
+    assert!(root.join(support::design_path(24)).exists());
+    assert!(!root.join(support::design_path(25)).exists());
+    assert!(root.join(support::main_path(73)).exists());
+    assert!(!root.join(support::main_path(74)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- 設計メモ: 24"));
     assert!(readme.contains("- 本編ファイル: 73"));
@@ -106,10 +106,10 @@ fn count_seed_honors_japanese_relationship_charts_without_file_noun() -> TestRes
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-024.md").exists());
-    assert!(!root.join("docs/design-025.md").exists());
-    assert!(root.join("main/part-073.md").exists());
-    assert!(!root.join("main/part-074.md").exists());
+    assert!(root.join(support::design_path(24)).exists());
+    assert!(!root.join(support::design_path(25)).exists());
+    assert!(root.join(support::main_path(73)).exists());
+    assert!(!root.join(support::main_path(74)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- 設計メモ: 24"));
     assert!(readme.contains("- 本編ファイル: 73"));
@@ -134,10 +134,10 @@ fn count_seed_honors_japanese_synopses_without_file_noun() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-024.md").exists());
-    assert!(!root.join("docs/design-025.md").exists());
-    assert!(root.join("main/part-073.md").exists());
-    assert!(!root.join("main/part-074.md").exists());
+    assert!(root.join(support::design_path(24)).exists());
+    assert!(!root.join(support::design_path(25)).exists());
+    assert!(root.join(support::main_path(73)).exists());
+    assert!(!root.join(support::main_path(74)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- 設計メモ: 24"));
     assert!(readme.contains("- 本編ファイル: 73"));

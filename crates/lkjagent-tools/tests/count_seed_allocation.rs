@@ -21,10 +21,10 @@ fn count_seed_honors_design_count_hint_inside_total() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-020.md").exists());
-    assert!(!root.join("docs/design-021.md").exists());
-    assert!(root.join("main/part-077.md").exists());
-    assert!(!root.join("main/part-078.md").exists());
+    assert!(root.join(support::design_path(20)).exists());
+    assert!(!root.join(support::design_path(21)).exists());
+    assert!(root.join(support::main_path(77)).exists());
+    assert!(!root.join(support::main_path(78)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- 設計メモ: 20"));
     assert!(readme.contains("- 本編ファイル: 77"));
@@ -46,9 +46,9 @@ fn count_seed_honors_kanji_design_count_hint_inside_total() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-020.md").exists());
-    assert!(!root.join("docs/design-021.md").exists());
-    assert!(root.join("main/part-077.md").exists());
+    assert!(root.join(support::design_path(20)).exists());
+    assert!(!root.join(support::design_path(21)).exists());
+    assert!(root.join(support::main_path(77)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- 設計メモ: 20"));
     assert!(readme.contains("- 本編ファイル: 77"));
@@ -70,10 +70,10 @@ fn count_seed_honors_english_word_design_count_hint_inside_total() -> TestResult
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-020.md").exists());
-    assert!(!root.join("docs/design-021.md").exists());
-    assert!(root.join("main/part-077.md").exists());
-    let late_design = fs::read_to_string(root.join("docs/design-020.md"))?;
+    assert!(root.join(support::design_path(20)).exists());
+    assert!(!root.join(support::design_path(21)).exists());
+    assert!(root.join(support::main_path(77)).exists());
+    let late_design = fs::read_to_string(root.join(support::design_path(20)))?;
     assert!(late_design.contains("release readiness record"));
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- Design memos: 20"));
@@ -96,9 +96,9 @@ fn count_seed_honors_outline_count_hint_inside_total() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-020.md").exists());
-    assert!(!root.join("docs/design-021.md").exists());
-    assert!(root.join("main/part-077.md").exists());
+    assert!(root.join(support::design_path(20)).exists());
+    assert!(!root.join(support::design_path(21)).exists());
+    assert!(root.join(support::main_path(77)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- Design memos: 20"));
     assert!(readme.contains("- Main files: 77"));
@@ -120,19 +120,19 @@ fn count_seed_keeps_file_count_stronger_than_design_wording() -> TestResult<()> 
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-012.md").exists());
-    assert!(!root.join("docs/design-013.md").exists());
-    assert!(root.join("main/part-085.md").exists());
-    let mid_design = fs::read_to_string(root.join("docs/design-006.md"))?;
+    assert!(root.join(support::design_path(12)).exists());
+    assert!(!root.join(support::design_path(13)).exists());
+    assert!(root.join(support::main_path(85)).exists());
+    let mid_design = fs::read_to_string(root.join(support::design_path(6)))?;
     assert!(mid_design.contains("## Verification Checks"));
-    assert!(mid_design.contains("main/part-"));
-    let mid_part = fs::read_to_string(root.join("main/part-042.md"))?;
+    assert!(mid_design.contains("main/arcs/"));
+    let mid_part = fs::read_to_string(root.join(support::main_path(42)))?;
     assert!(mid_part.contains("## Continuity Hand-Off"));
     assert!(mid_part.contains("### Draft Passage"));
     let docs_index = fs::read_to_string(root.join("docs/README.md"))?;
     assert!(docs_index.contains("design-012.md"));
     let main_index = fs::read_to_string(root.join("main/README.md"))?;
-    assert!(main_index.contains("main/part-042.md"));
+    assert!(main_index.contains(&support::main_path(42)));
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- Design memos: 12"));
     assert!(readme.contains("- Main files: 85"));
@@ -172,7 +172,7 @@ fn count_seed_readme_preserves_approximate_count_mode() -> TestResult<()> {
     )?;
 
     let readme = fs::read_to_string(workspace.join("structured-output/README.md"))?;
-    assert!(readme.contains("within the approximate-count guard"));
+    assert!(readme.contains("long-form scale hint"));
     assert!(!readme.contains("exact counted deliverable"));
     Ok(())
 }

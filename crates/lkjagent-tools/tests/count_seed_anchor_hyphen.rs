@@ -39,7 +39,7 @@ fn assert_hyphen_anchor(name: &str, objective: &str, rejected_prefix: &str) -> T
     let root = workspace.join("structured-output");
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains(rejected_prefix));
-    let first_part = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first_part = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(first_part.contains(
         "Local objective: Turn \"large story deliverable\" into this file's distinct contribution."
     ));

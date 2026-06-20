@@ -23,10 +23,10 @@ fn count_seed_honors_english_appendix_note_file_count() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-016.md").exists());
-    assert!(!root.join("docs/design-017.md").exists());
-    assert!(root.join("main/part-081.md").exists());
-    assert!(!root.join("main/part-082.md").exists());
+    assert!(root.join(support::design_path(16)).exists());
+    assert!(!root.join(support::design_path(17)).exists());
+    assert!(root.join(support::main_path(81)).exists());
+    assert!(!root.join(support::main_path(82)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
     assert!(readme.contains("- Design memos: 16"));
     assert!(readme.contains("- Main files: 81"));
@@ -51,12 +51,12 @@ fn count_seed_honors_english_checklist_file_count() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-018.md").exists());
-    assert!(!root.join("docs/design-019.md").exists());
-    assert!(root.join("main/part-079.md").exists());
-    assert!(!root.join("main/part-080.md").exists());
+    assert!(root.join(support::design_path(18)).exists());
+    assert!(!root.join(support::design_path(19)).exists());
+    assert!(root.join(support::main_path(79)).exists());
+    assert!(!root.join(support::main_path(80)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(readme.contains("- Design memos: 18"));
     assert!(readme.contains("- Main files: 79"));
     assert!(readme.contains("Kind contract: audit this deliverable as a guide"));
@@ -81,12 +81,12 @@ fn count_seed_honors_english_timeline_file_count() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-017.md").exists());
-    assert!(!root.join("docs/design-018.md").exists());
-    assert!(root.join("main/part-080.md").exists());
-    assert!(!root.join("main/part-081.md").exists());
+    assert!(root.join(support::design_path(17)).exists());
+    assert!(!root.join(support::design_path(18)).exists());
+    assert!(root.join(support::main_path(80)).exists());
+    assert!(!root.join(support::main_path(81)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(readme.contains("- Design memos: 17"));
     assert!(readme.contains("- Main files: 80"));
     assert!(readme.contains("Kind contract: audit this deliverable as a guide"));
@@ -111,12 +111,12 @@ fn count_seed_honors_english_worldbuilding_file_count() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-022.md").exists());
-    assert!(!root.join("docs/design-023.md").exists());
-    assert!(root.join("main/part-075.md").exists());
-    assert!(!root.join("main/part-076.md").exists());
+    assert!(root.join(support::design_path(22)).exists());
+    assert!(!root.join(support::design_path(23)).exists());
+    assert!(root.join(support::main_path(75)).exists());
+    assert!(!root.join(support::main_path(76)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(readme.contains("- Design memos: 22"));
     assert!(readme.contains("- Main files: 75"));
     assert!(readme.contains("Kind contract: audit this deliverable as a narrative"));
@@ -141,12 +141,12 @@ fn count_seed_honors_english_lore_file_count() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-021.md").exists());
-    assert!(!root.join("docs/design-022.md").exists());
-    assert!(root.join("main/part-076.md").exists());
-    assert!(!root.join("main/part-077.md").exists());
+    assert!(root.join(support::design_path(21)).exists());
+    assert!(!root.join(support::design_path(22)).exists());
+    assert!(root.join(support::main_path(76)).exists());
+    assert!(!root.join(support::main_path(77)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(readme.contains("- Design memos: 21"));
     assert!(readme.contains("- Main files: 76"));
     assert!(readme.contains("Kind contract: audit this deliverable as a narrative"));
@@ -171,12 +171,12 @@ fn count_seed_honors_english_character_sheet_file_count() -> TestResult<()> {
     )?;
 
     let root = workspace.join("structured-output");
-    assert!(root.join("docs/design-019.md").exists());
-    assert!(!root.join("docs/design-020.md").exists());
-    assert!(root.join("main/part-078.md").exists());
-    assert!(!root.join("main/part-079.md").exists());
+    assert!(root.join(support::design_path(19)).exists());
+    assert!(!root.join(support::design_path(20)).exists());
+    assert!(root.join(support::main_path(78)).exists());
+    assert!(!root.join(support::main_path(79)).exists());
     let readme = fs::read_to_string(root.join("README.md"))?;
-    let first = fs::read_to_string(root.join("main/part-001.md"))?;
+    let first = fs::read_to_string(root.join(support::main_path(1)))?;
     assert!(readme.contains("- Design memos: 19"));
     assert!(readme.contains("- Main files: 78"));
     assert!(readme.contains("Kind contract: audit this deliverable as a narrative"));

@@ -1,3 +1,4 @@
+use crate::count_profile_paths::main_path;
 use crate::error::{ToolError, ToolResult};
 
 pub(crate) fn verify_reading_path(root_index: &str, main: usize) -> ToolResult<&'static str> {
@@ -13,14 +14,14 @@ pub(crate) fn verify_reading_path(root_index: &str, main: usize) -> ToolResult<&
     }
     require_one(
         root_index,
-        "First main: main/part-001.md",
-        "最初の本編: main/part-001.md",
+        &format!("First main: {}", main_path(1)),
+        &format!("最初の本編: {}", main_path(1)),
         "reading path first main",
     )?;
     require_one(
         root_index,
-        &format!("Last main: main/part-{main:03}.md"),
-        &format!("最後の本編: main/part-{main:03}.md"),
+        &format!("Last main: {}", main_path(main)),
+        &format!("最後の本編: {}", main_path(main)),
         "reading path last main",
     )?;
     require_one(

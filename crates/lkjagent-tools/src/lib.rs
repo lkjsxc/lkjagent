@@ -18,6 +18,7 @@ mod count_profile_kind;
 mod count_profile_local;
 mod count_profile_manifest;
 mod count_profile_passage;
+mod count_profile_paths;
 mod count_profile_reading;
 mod count_profile_restart;
 mod count_profile_stage;

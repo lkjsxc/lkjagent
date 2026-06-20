@@ -3,6 +3,7 @@ use std::path::Path;
 
 use crate::count_guard::CountGuard;
 use crate::count_profile::DeliverableProfile;
+use crate::count_profile_paths::{design_path, main_path};
 use crate::count_seed_allocation::allocation_for;
 use crate::count_seed_verify::verify_scaffold;
 use crate::error::{ToolError, ToolResult};
@@ -48,19 +49,19 @@ pub fn scaffold_counted_documents(
     }
     for index in 1..=allocation.docs {
         write_file(
-            &root.join(format!("docs/design-{index:03}.md")),
+            &root.join(design_path(index)),
             &profile.doc_page(index, allocation.docs, allocation.main, &objective),
         )?;
     }
     for index in 1..=allocation.main {
         write_file(
-            &root.join(format!("main/part-{index:03}.md")),
+            &root.join(main_path(index)),
             &profile.main_page(index, allocation.docs, allocation.main, &objective),
         )?;
     }
     let check = verify_scaffold(
         &root,
-        guard.target,
+        guard,
         allocation.docs,
         allocation.main,
         allocation.indexes,

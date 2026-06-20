@@ -11,6 +11,14 @@ use rusqlite::Connection;
 
 pub type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
+pub fn design_path(index: usize) -> String {
+    format!("docs/designs/{}/design-{index:03}.md", design_group(index))
+}
+
+pub fn main_path(index: usize) -> String {
+    format!("main/arcs/{}/part-{index:03}.md", main_group(index))
+}
+
 pub fn temp_workspace(name: &str) -> TestResult<PathBuf> {
     let mut path = std::env::temp_dir();
     let stamp = SystemTime::now().duration_since(UNIX_EPOCH)?.as_nanos();
@@ -23,6 +31,19 @@ pub fn temp_workspace(name: &str) -> TestResult<PathBuf> {
     }
     fs::create_dir_all(&path)?;
     Ok(path)
+}
+
+fn design_group(index: usize) -> String {
+    group_name("set", index)
+}
+
+fn main_group(index: usize) -> String {
+    group_name("arc", index)
+}
+
+fn group_name(prefix: &str, index: usize) -> String {
+    let group = index.saturating_sub(1) / 10 + 1;
+    format!("{prefix}-{group:03}")
 }
 
 pub fn runtime(workspace: PathBuf) -> TestResult<ToolRuntime> {

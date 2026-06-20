@@ -1,6 +1,7 @@
 use crate::count_profile::{DeliverableKind, Language};
 use crate::count_profile_detail::detail_block;
 use crate::count_profile_passage::passage_block;
+use crate::count_profile_paths::main_path;
 use crate::count_profile_stage::stage_name;
 
 pub(crate) fn main_title(language: Language, kind: DeliverableKind, index: usize) -> String {
@@ -42,13 +43,14 @@ pub(crate) fn body_text(
 pub(crate) fn sequence_text(language: Language, index: usize, total: usize) -> String {
     let previous = previous_label(language, index);
     let next = next_label(language, index, total);
+    let current = main_path(index);
     match language {
         Language::Japanese => format!(
-            "- 前: {previous}\n- 現在: main/part-{index:03}.md\n- 次: {next}\n- 現在の段階: {}",
+            "- 前: {previous}\n- 現在: {current}\n- 次: {next}\n- 現在の段階: {}",
             stage_name(language, index, total)
         ),
         Language::English => format!(
-            "- Previous: {previous}\n- Current: main/part-{index:03}.md\n- Next: {next}\n- Current stage: {}",
+            "- Previous: {previous}\n- Current: {current}\n- Next: {next}\n- Current stage: {}",
             stage_name(language, index, total)
         ),
     }
@@ -67,12 +69,13 @@ pub(crate) fn handoff_text(language: Language, index: usize, total: usize) -> St
         };
     }
     let next = index.saturating_add(1);
+    let next_path = main_path(next);
     match language {
         Language::Japanese => {
-            format!("- 前節までの用語、判断、未解決点を引き継ぎます。\n- 次の接続先: main/part-{next:03}.md")
+            format!("- 前節までの用語、判断、未解決点を引き継ぎます。\n- 次の接続先: {next_path}")
         }
         Language::English => format!(
-            "- Carry forward terms, decisions, and open questions from earlier parts.\n- Next segment: main/part-{next:03}.md"
+            "- Carry forward terms, decisions, and open questions from earlier parts.\n- Next segment: {next_path}"
         ),
     }
 }
@@ -84,7 +87,7 @@ fn previous_label(language: Language, index: usize) -> String {
             Language::English => "none".to_string(),
         };
     }
-    format!("main/part-{:03}.md", index.saturating_sub(1))
+    main_path(index.saturating_sub(1))
 }
 
 fn next_label(language: Language, index: usize, total: usize) -> String {
@@ -94,7 +97,7 @@ fn next_label(language: Language, index: usize, total: usize) -> String {
             Language::English => "none".to_string(),
         };
     }
-    format!("main/part-{:03}.md", index.saturating_add(1))
+    main_path(index.saturating_add(1))
 }
 
 fn jp_narrative(index: usize, total: usize) -> String {

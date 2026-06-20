@@ -62,22 +62,25 @@ guards and compose with recursive or knowledge-base requirements instead of
 replacing them. Exact or approximate wording is scored near the chosen count
 target, so direct exact wording is strict while exact wording attached to a
 smaller subcount does not make an approximate total strict. Approximate
-wording accepts the documented tolerance. Active count guards are rendered in
-the graph-state prefix with an instruction to use one compact `shell.run`
-command with direct `/bin/sh` loops and `printf` templates for bulk creation
-and count verification, keep the act payload under about 1200 characters,
-and avoid hardcoded `/workspace` paths, brace expansion, cat heredocs, bash
-scripts, literal bodies, or one `fs.write` per file.
+wording is a scale hint and accepts the documented tolerance. Active count
+guards are rendered in the graph-state prefix with an instruction to use
+recursive directories for large outputs, one compact `shell.run` command with
+direct `/bin/sh` loops and `printf` templates for bulk creation and
+verification, keep the act payload under about 1200 characters, and avoid
+hardcoded `/workspace` paths, brace expansion, cat heredocs, bash scripts,
+literal bodies, or one `fs.write` per file.
 For counted documentation tasks without recursive or benchmark scaffolds, the
 daemon writes a generic `structured-output/` tree before the first endpoint
 turn. The scaffold profiles the owner's objective by detected language and
-priority deliverable kind, gives each main file a kind-aware segment brief, adds
-a root machine-readable audit manifest, a root acceptance-audit section, and
-a root reading path, adds a per-part role ledger to the main index, gives each
-main file a design-owner link, content-bearing objective anchor, local verification checklist, and sequence path ledger,
-verifies the requested count, root index, root file budget, count-linked
-audit manifest, acceptance audit, optional directory indexes, docs coverage
-map, all design memo sections, all main-file sections, design-owner links,
+priority deliverable kind, stores design files under `docs/designs/set-*` and
+main files under `main/arcs/arc-*`, gives each main file a kind-aware segment
+brief, adds a root machine-readable audit manifest, a root acceptance-audit
+section, and a root reading path, adds a per-part role ledger to the main
+index, gives each main file a design-owner link, content-bearing objective
+anchor, local verification checklist, and sequence path ledger, verifies the
+requested exact count or approximate scale, root index, root file budget or
+scale plan, audit manifest, acceptance audit, optional directory indexes, docs
+coverage map, all design memo sections, all main-file sections, design-owner links,
 local verification checklists, sequence paths, required content blocks
 including per-part specific detail markers, and part ledger, records graph
 evidence, saves the same verification evidence in the task summary, and closes
@@ -85,7 +88,7 @@ the task only after the graph completion gate admits that evidence, without
 asking the endpoint to repeat the same bulk generation. If the graph gate is
 not admitted, the daemon waits with the missing gate reason instead. The
 recorded evidence includes the `structured-output`
-path, target file count, index file count, design memo count, main file count,
+path, target or scale file count, index file count, design memo count, main file count,
 file-budget status, audit-manifest status, restart-guide status,
 acceptance-audit status, coverage-map status,
 `index_scope=all`, `section_scope=all`, content-block status, required
