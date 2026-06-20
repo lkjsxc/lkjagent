@@ -15,28 +15,22 @@ pub fn dispatch_graph_evidence(
     state: &mut DispatchState,
 ) -> DispatchOutput {
     let kind = param(params, "kind");
-    if let Some(policy) = &state.graph_policy {
-        if !policy
-            .evidence_requirements
-            .iter()
-            .any(|item| item == &kind)
-        {
-            let known = policy.evidence_requirements.join(", ");
-            let example_kind = policy
-                .evidence_requirements
-                .first()
-                .cloned()
-                .unwrap_or_else(|| "observation".to_string());
-            let example = evidence_example(example_kind);
-            return observe_error(
-                ToolError::invalid(format!(
-                    "unknown graph evidence requirement: {kind}\nknown requirements now: {known}\nvalid examples:\n{example}"
-                )),
-                action_text,
-                runtime,
-                state,
-            );
-        }
+    let known = known_requirements(state);
+    if !known.iter().any(|item| item == &kind) {
+        let example_kind = known
+            .first()
+            .cloned()
+            .unwrap_or_else(|| "observation".to_string());
+        let example = evidence_example(example_kind);
+        return observe_error(
+            ToolError::invalid(format!(
+                "unknown graph evidence requirement: {kind}\nknown requirements now: {}\nvalid examples:\n{example}",
+                known.join(", ")
+            )),
+            action_text,
+            runtime,
+            state,
+        );
     }
     let summary = param(params, "summary");
     let path = params
@@ -63,11 +57,26 @@ pub fn dispatch_graph_evidence(
     output
 }
 
+fn known_requirements(state: &DispatchState) -> Vec<String> {
+    state
+        .graph_policy
+        .as_ref()
+        .map(|policy| policy.evidence_requirements.clone())
+        .filter(|items| !items.is_empty())
+        .unwrap_or_else(|| {
+            ["plan", "observation", "verification", "document-structure"]
+                .iter()
+                .map(|item| (*item).to_string())
+                .collect()
+        })
+}
+
 fn evidence_example(kind: String) -> String {
     valid_example_for(
         "graph.evidence",
         ExampleContext {
             evidence_requirement: Some(kind),
+            ..ExampleContext::default()
         },
     )
     .map(|example| example.render())

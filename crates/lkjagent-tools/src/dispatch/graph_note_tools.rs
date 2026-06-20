@@ -15,7 +15,8 @@ pub fn dispatch_graph_note(
 ) -> DispatchOutput {
     let raw_kind = param(params, "kind");
     let summary = param(params, "summary");
-    let Some(kind) = normalize_kind(&raw_kind, &summary) else {
+    let path = param(params, "path");
+    let Some(kind) = normalize_kind(&raw_kind, &summary, !path.trim().is_empty()) else {
         return observe_error(
             ToolError::invalid(unknown_kind_message()),
             action_text,
@@ -44,16 +45,20 @@ pub fn dispatch_graph_note(
     output
 }
 
-fn normalize_kind(kind: &str, summary: &str) -> Option<String> {
+fn normalize_kind(kind: &str, summary: &str, has_path: bool) -> Option<String> {
     if allowed().contains(&kind) {
         return Some(kind.to_string());
     }
     match kind {
-        "planning" | "note" | "recovery" | "compaction-state" => Some("decision".to_string()),
+        "planning" | "note" | "attempt" | "recovery" | "compaction-state" => {
+            Some("decision".to_string())
+        }
         "progress" if completed(summary) => Some("success".to_string()),
         "progress" => Some("decision".to_string()),
         "policy-refinement" if constraint_like(summary) => Some("constraint".to_string()),
         "policy-refinement" => Some("decision".to_string()),
+        "document-structure" if has_path => Some("path".to_string()),
+        "document-structure" => Some("decision".to_string()),
         _ => None,
     }
 }

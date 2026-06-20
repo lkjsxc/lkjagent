@@ -32,6 +32,7 @@ fn graph_evidence_valid_example_uses_missing_requirement() -> TestResult<()> {
         "graph.evidence",
         ExampleContext {
             evidence_requirement: Some("document-structure".to_string()),
+            ..ExampleContext::default()
         },
     )?
     .render();
