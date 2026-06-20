@@ -14,7 +14,6 @@ use crate::prompt::token_estimate;
 use crate::task::{RuntimeState, TaskState};
 
 mod compaction;
-mod compaction_gate;
 mod compaction_support;
 mod context_budget;
 mod count_scaffold;

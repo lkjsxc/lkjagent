@@ -8,47 +8,25 @@ use lkjagent_runtime::daemon::{
 };
 use lkjagent_runtime::task::TaskState;
 use lkjagent_store::{events, memory, state};
-use support::http::{completion, serve_responses};
+use support::http::serve_responses;
 use support::{runtime_state, store, temp_workspace, TestResult};
 
-const SAVE_TASK_SUMMARY: &str = "<act>
-<tool>memory.save</tool>
-<kind>task-summary</kind>
-<title>compaction resume</title>
-<tags>compaction</tags>
-<content>resume after compaction</content>
-</act>";
-const WRITE_DURING_COMPACTION: &str = "<act>
-<tool>fs.write</tool>
-<path>should-not-exist.txt</path>
-<content>bad write</content>
-</act>";
-
 #[test]
-fn orange_pressure_distills_before_rebuild() -> TestResult<()> {
+fn orange_pressure_compacts_without_model_distillation() -> TestResult<()> {
     let mut conn = store()?;
     take_lock(&conn)?;
     state::set(&conn, "open task", "continue the active task")?;
     let workspace = temp_workspace("daemon-orange-compaction")?;
-    let server = serve_responses(vec![completion(SAVE_TASK_SUMMARY)])?;
+    let server = serve_responses(Vec::new())?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
     daemon.state.task = TaskState::Open { turns_remaining: 7 };
     push_orange_pressure(&mut daemon);
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
-    assert!(daemon.state.compaction.is_some());
-    assert_eq!(daemon.endpoint_attempt, 0);
-    assert!(daemon
-        .state
-        .context
-        .log
-        .iter()
-        .any(|frame| frame.content.contains("distill before compaction")));
-
-    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     server.join()?;
 
     assert!(daemon.state.compaction.is_none());
+    assert_eq!(daemon.endpoint_attempt, 0);
     assert!(daemon.state.context.used_tokens() <= daemon.runtime.budget.post_compaction_target);
     assert!(memory::find(&conn, "resume", 5)?
         .iter()
@@ -62,32 +40,24 @@ fn orange_pressure_distills_before_rebuild() -> TestResult<()> {
 }
 
 #[test]
-fn compaction_rejects_non_memory_save_actions() -> TestResult<()> {
+fn forced_compaction_never_requires_graph_blocked_tool() -> TestResult<()> {
     let mut conn = store()?;
     take_lock(&conn)?;
     state::set(&conn, "open task", "continue the active task")?;
     let workspace = temp_workspace("daemon-compaction-tool-gate")?;
-    let server = serve_responses(vec![completion(WRITE_DURING_COMPACTION)])?;
+    let server = serve_responses(Vec::new())?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
     daemon.state.task = TaskState::Open { turns_remaining: 7 };
     push_orange_pressure(&mut daemon);
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     server.join()?;
 
     assert!(!workspace.join("should-not-exist.txt").exists());
-    assert_eq!(
-        daemon
-            .state
-            .compaction
-            .as_ref()
-            .map(|cycle| cycle.turns_remaining),
-        Some(3)
-    );
-    assert!(events::read_events(&conn)?
+    assert!(daemon.state.compaction.is_none());
+    assert!(!events::read_events(&conn)?
         .iter()
-        .any(|event| { event.kind == "notice" && event.content.contains("memory.save actions") }));
+        .any(|event| { event.content.contains("memory.save actions") }));
     Ok(())
 }
 
