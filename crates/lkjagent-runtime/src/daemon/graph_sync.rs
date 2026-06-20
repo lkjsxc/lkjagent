@@ -4,12 +4,16 @@ use lkjagent_graph::{admitted_targets, source_graph};
 use lkjagent_tools::dispatch::GraphDispatchPolicy;
 
 impl ResidentDaemon {
+    pub(super) fn clear_graph_dispatch_state(&mut self) {
+        self.dispatch_state.graph_state = None;
+        self.dispatch_state.graph_completion_ready = true;
+        self.dispatch_state.graph_missing.clear();
+        self.dispatch_state.graph_policy = None;
+    }
+
     pub(super) fn sync_graph_dispatch_state(&mut self) {
         let Some(graph) = self.state.graph.as_ref() else {
-            self.dispatch_state.graph_state = None;
-            self.dispatch_state.graph_completion_ready = true;
-            self.dispatch_state.graph_missing.clear();
-            self.dispatch_state.graph_policy = None;
+            self.clear_graph_dispatch_state();
             return;
         };
         self.dispatch_state.graph_state = Some(render_state(graph));
