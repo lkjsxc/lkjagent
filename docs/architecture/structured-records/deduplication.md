@@ -18,9 +18,10 @@ Duplicate detection uses these checks before writes:
 
 ## Decisions
 
-A candidate becomes Insert, SkipDuplicate, UpdateExisting, MergeWith, or
-RepairExisting. The decision is recorded as evidence and returned to the model
-as a bounded observation. Silent duplicate writes are forbidden.
+A memory candidate becomes Insert, SkipDuplicate, or UpdateExisting. Artifact
+adoption, semantic merge, and repair decisions remain separate open contracts.
+The decision is recorded as evidence and returned to the model as a bounded
+observation. Silent duplicate writes are forbidden.
 
 ## Memory Identity
 
