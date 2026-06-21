@@ -38,10 +38,19 @@ benchmark fixtures.
 
 - [reducer.md](reducer.md): pure snapshot, event, and decision contract.
 - [missions.md](missions.md): owner, recovery, verification, maintenance, compaction, and idle rules.
+- [turn-authority.md](turn-authority.md): single turn decision object.
+- [mode-priority.md](mode-priority.md): deterministic mission priority order.
 - [tool-admission.md](tool-admission.md): explainable admission and refusal data.
+- [tool-policy.md](tool-policy.md): admitted and blocked tool classes.
+- [evidence-policy.md](evidence-policy.md): evidence ledger requirements.
 - [completion.md](completion.md): close eligibility and refusal contract.
+- [completion-policy.md](completion-policy.md): close gate inputs and refusal output.
+- [recovery-policy.md](recovery-policy.md): fault recovery ownership.
 - [maintenance.md](maintenance.md): idle-only maintenance policy.
+- [maintenance-policy.md](maintenance-policy.md): maintenance eligibility and effect rules.
 - [compaction.md](compaction.md): runtime-owned snapshot and resume contract.
+- [compaction-policy.md](compaction-policy.md): hard and soft compaction authority.
+- [exact-examples.md](exact-examples.md): schema-rendered valid action examples.
 
 ## Related Files
 

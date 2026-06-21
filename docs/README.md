@@ -39,6 +39,9 @@ directories with short focused files.
   `architecture/artifacts/audit.md` `architecture/artifacts/completion.md`
   `architecture/artifacts/completion-gates.md` `architecture/artifacts/adoption.md`
   `architecture/artifacts/repair.md` `architecture/artifacts/write-batches.md`
+  `architecture/artifacts/semantic-identity.md` `architecture/artifacts/adoption-and-repair.md`
+  `architecture/artifacts/batch-cursors.md` `architecture/artifacts/readiness-evidence.md`
+  `architecture/artifacts/false-completion.md`
 - `architecture/structured-records/README.md` `architecture/structured-records/record-model.md`
   `architecture/structured-records/identity.md`
   `architecture/structured-records/topic-map.md` `architecture/structured-records/artifact-ledger.md`
@@ -59,7 +62,14 @@ directories with short focused files.
 - `architecture/runtime/authority/README.md` `architecture/runtime/authority/reducer.md`
   `architecture/runtime/authority/missions.md` `architecture/runtime/authority/tool-admission.md`
   `architecture/runtime/authority/completion.md` `architecture/runtime/authority/maintenance.md`
-  `architecture/runtime/authority/compaction.md`
+  `architecture/runtime/authority/compaction.md` `architecture/runtime/authority/turn-authority.md`
+  `architecture/runtime/authority/mode-priority.md` `architecture/runtime/authority/tool-policy.md`
+  `architecture/runtime/authority/evidence-policy.md`
+  `architecture/runtime/authority/completion-policy.md`
+  `architecture/runtime/authority/recovery-policy.md`
+  `architecture/runtime/authority/maintenance-policy.md`
+  `architecture/runtime/authority/compaction-policy.md`
+  `architecture/runtime/authority/exact-examples.md`
 - `architecture/runtime/active-mode/README.md` `architecture/runtime/active-mode/selection.md`
   `architecture/runtime/active-mode/turn-authority.md`
   `architecture/runtime/active-mode/prompt-rendering.md`
@@ -80,6 +90,9 @@ directories with short focused files.
   `architecture/context/compaction.md` `architecture/context/caching.md` `architecture/context/hygiene.md`
 - `architecture/protocol/README.md` `architecture/protocol/action-format.md` `architecture/protocol/parsing.md`
   `architecture/protocol/system-prompt.md` `architecture/protocol/recovery.md`
+- `architecture/recovery/README.md` `architecture/recovery/fault-classes.md`
+  `architecture/recovery/retry-budget.md` `architecture/recovery/non-repetition.md`
+  `architecture/recovery/tool-escape-hatches.md` `architecture/recovery/partial-handoff.md`
 - `architecture/tools/README.md` `architecture/tools/registry.md` `architecture/tools/fs.md`
   `architecture/tools/shell.md` `architecture/tools/queue-ops.md` `architecture/tools/memory-ops.md`
   `architecture/tools/graph-ops.md` `architecture/tools/workspace.md`
@@ -94,7 +107,10 @@ directories with short focused files.
   `architecture/sandbox/safety.md`
 - `evaluation/README.md` `evaluation/mechanical-benchmarks.md` `evaluation/task-contract.md`
   `evaluation/uploaded-run-fixtures.md` `evaluation/metrics-reports.md`
-  `evaluation/running.md` `evaluation/improvement-loop.md` `evaluation/overfitting.md`
+  `evaluation/regression-suites.md` `evaluation/authority-contradictions.md`
+  `evaluation/artifact-readiness.md` `evaluation/recovery-deadlocks.md`
+  `evaluation/false-completion.md` `evaluation/running.md`
+  `evaluation/improvement-loop.md` `evaluation/overfitting.md`
 - `decisions/README.md` `decisions/rust-workspace.md` `decisions/openai-endpoint.md`
   `decisions/xml-action-protocol.md` `decisions/append-only-context.md` `decisions/single-loop.md`
   `decisions/sqlite-store.md` `decisions/state-graph-runtime.md` `decisions/no-mcp.md`
