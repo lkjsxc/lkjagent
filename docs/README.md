@@ -55,6 +55,10 @@ directories with short focused files.
   `architecture/observability/status-format.md`
 - `architecture/runtime/README.md` `architecture/runtime/agent-loop.md` `architecture/runtime/daemon-process.md`
   `architecture/runtime/queue-intake.md` `architecture/runtime/self-maintenance.md`
+- `architecture/runtime/authority/README.md` `architecture/runtime/authority/reducer.md`
+  `architecture/runtime/authority/missions.md` `architecture/runtime/authority/tool-admission.md`
+  `architecture/runtime/authority/completion.md` `architecture/runtime/authority/maintenance.md`
+  `architecture/runtime/authority/compaction.md`
 - `architecture/runtime/active-mode/README.md` `architecture/runtime/active-mode/selection.md`
   `architecture/runtime/active-mode/turn-authority.md`
   `architecture/runtime/active-mode/prompt-rendering.md`

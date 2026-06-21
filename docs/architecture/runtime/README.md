@@ -9,6 +9,7 @@ lkjagent-runtime crate per [../overview.md](../overview.md).
 
 ## Table of Contents
 
+- [authority/](authority/README.md): runtime reducer, missions, admission, completion, maintenance, compaction.
 - [active-mode/](active-mode/README.md): turn authority, policy, completion, and preemption.
 - [agent-loop.md](agent-loop.md): the graph case, turn, and task lifecycle.
 - [daemon-process.md](daemon-process.md): process model, startup, shutdown, restart.
