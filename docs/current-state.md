@@ -82,7 +82,7 @@ target outcomes are:
 | Action parser | implemented | `crates/lkjagent-protocol`; child-tag file tool parameters have focused fixtures |
 | Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; dispatch now checks one effective policy object before routing, including `agent.done` completion refusal; schema repair emits one canonical example for covered parameter and evidence-kind faults |
 | Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; artifact.apply reuses the planner and writer |
-| Document audit tool | implemented | topology checks pass local gates; artifact.audit checks kind mismatch; content artifacts reject scaffold-only and weak cookbook/story leaves |
+| Document audit tool | implemented | topology checks pass local gates; artifact.audit checks kind mismatch; content artifacts reject scaffold-only leaves, weak cookbook/story leaves, and shallow dictionary term lists |
 | Artifact next batch | implemented | `artifact.next` returns exact weak paths and an admitted `fs.batch_write` skeleton; scaffold-only cookbook and meaningful cookbook tests pass |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, same-title overlap update, punctuation-safe FTS queries, exact duplicate prune, and same-title prune merge have focused tests; rewrite pruning remains open |
@@ -93,7 +93,7 @@ target outcomes are:
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
 | GPT handoff log | implemented | runtime and CLI write one current Markdown snapshot |
-| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist, including bread `artifact.next` recovery; corpus, quiet verify, and Docker Compose verify passed for this slice |
+| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist, including bread `artifact.next` recovery and shallow dictionary readiness; corpus, quiet verify, and Docker Compose verify passed for this slice |
 
 ## Open Work
 

@@ -43,7 +43,8 @@ dictionaries/<semantic-title>/
 ## Verification
 
 Readiness tests include shallow bread terminology as bad, meaningful bread
-dictionary entries as good, and unsupported verification-claim detection.
+dictionary entries as good. Unsupported verification-claim detection remains
+open.
 
 ## Related Files
 
@@ -53,4 +54,6 @@ dictionary entries as good, and unsupported verification-claim detection.
 
 ## Status
 
-not implemented
+partially implemented for single-file and directory dictionary readiness in
+`artifact.audit kind=dictionary`; manifest adoption, alphabetical organization,
+and unsupported verification-claim checks remain open.

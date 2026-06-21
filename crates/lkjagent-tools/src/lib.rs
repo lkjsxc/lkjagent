@@ -42,6 +42,7 @@ mod count_seed_verify_reading;
 mod count_seed_verify_restart;
 mod count_seed_verify_root;
 mod count_seed_verify_text;
+mod dictionary_audit;
 pub mod dispatch;
 pub mod doc;
 pub mod error;
