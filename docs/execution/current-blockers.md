@@ -9,18 +9,15 @@ evidence named by the task contract and the actual gates that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Active mode is not authoritative across owner work, recovery, maintenance, and compaction | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | open |
-| 2 | Maintenance and graph policy can both reject each other's allowed actions | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | open |
-| 3 | Compaction can require memory.save while graph policy refuses memory.save | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | open |
-| 4 | Generated action examples can be rejected by semantic dispatch | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 5 | memory.save is not idempotent enough and maintenance creates duplicate rows | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 6 | memory.find can pass unsafe FTS queries | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 7 | Long content tasks can attempt giant fs.write and enter parse loops | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 8 | Content artifacts can be scaffolded as generic project docs instead of semantic artifact trees | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 9 | Recovery nodes can block doc.scaffold, fs.write, graph.plan, or graph.evidence when needed | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 10 | Completion can close scaffold-only or planning-only tasks | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 11 | Owner questions can be used for internal runtime or tool uncertainty | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 12 | Uploaded run logs are not fully covered by benchmark regressions | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
+| 1 | Runtime authority is not the single source of active mission and tool admission | [current-work/runtime-authority-redesign.md](current-work/runtime-authority-redesign.md) | open |
+| 2 | Recovery can block the exact observation, repair, or batch tool needed to escape | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | open |
+| 3 | Content artifacts can pass on scaffold or planning evidence instead of real content | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 4 | Completion can close while artifact readiness, verification, or recovery evidence is missing | [current-work/runtime-authority-redesign.md](current-work/runtime-authority-redesign.md) | open |
+| 5 | Compaction snapshots are not rich enough to resume artifact repair and recovery | [current-work/context-accounting.md](current-work/context-accounting.md) | open |
+| 6 | Maintenance is not strictly idle-only and preemptable by owner work | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | open |
+| 7 | Uploaded run logs are not fully covered by benchmark regressions | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
+| 8 | Semantic maintenance pruning still allows repeated low-value memory rows | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 9 | Protocol schema repair can render examples that dispatch later rejects | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | open |
 
 ## Owner Failure
 
@@ -34,6 +31,9 @@ maintenance restarts after no useful work.
 - Rows stay open until focused tests and Docker Compose verification prove the
   uploaded failure patterns cannot recur.
 - Documentation moves first, then code. Do not mark prompt-only guidance done.
+- Runtime authority, recovery, artifact readiness, completion, compaction,
+  maintenance, fixtures, memory, and protocol repair move in that order unless
+  repository inspection proves a stricter dependency.
 - Stable active-mode and artifact docs are contracts, not proof that the
   blockers are closed.
 - Docker Compose verification is required for any implemented claim.

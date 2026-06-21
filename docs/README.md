@@ -103,6 +103,7 @@ directories with short focused files.
   `execution/current-work/action-fault-recovery.md` `execution/current-work/document-structure-redesign.md`
   `execution/current-work/context-accounting.md` `execution/current-work/multi-state-runtime.md`
   `execution/current-work/runtime-recovery-controller.md`
+  `execution/current-work/runtime-authority-redesign.md`
   `execution/current-work/active-mode-controller.md`
   `execution/current-work/recovery-and-maintenance-loop-redesign.md`
   `execution/current-work/gpt-log.md` `execution/current-work/verification-plan.md`

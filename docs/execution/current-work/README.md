@@ -15,6 +15,7 @@ verification.
 - [context-accounting.md](context-accounting.md): context and token display work.
 - [multi-state-runtime.md](multi-state-runtime.md): neutral task-track modeling work.
 - [runtime-recovery-controller.md](runtime-recovery-controller.md): deterministic recovery controller work.
+- [runtime-authority-redesign.md](runtime-authority-redesign.md): authority reducer execution plan.
 - [active-mode-controller.md](active-mode-controller.md): one owner of policy per turn.
 - [recovery-and-maintenance-loop-redesign.md](recovery-and-maintenance-loop-redesign.md): active-mode loop redesign.
 - [gpt-log.md](gpt-log.md): single handoff-log work.
@@ -22,8 +23,8 @@ verification.
 
 ## Reading Paths
 
-- Implementation path: document-structure-redesign, action-fault-recovery,
-  runtime-recovery-controller, then context-accounting.
+- Implementation path: runtime-authority-redesign, runtime-recovery-controller,
+  document-structure-redesign, action-fault-recovery, then context-accounting.
 - Diagnosis path: owner-reported-failures, multi-state-runtime,
   runtime-recovery-controller, then gpt-log.
 - Verification path: verification-plan, then the gate commands it names.
