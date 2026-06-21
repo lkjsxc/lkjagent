@@ -44,13 +44,15 @@ fn completion_gate_requires_artifact_readiness() {
         ..TurnAuthorityInput::default()
     });
 
-    match authority.completion_policy {
-        CompletionPolicy::OwnerTask(gate) => {
-            assert!(gate.requires_artifact_readiness);
-            assert!(gate.requires_verification);
-        }
-        other => panic!("unexpected completion policy: {other:?}"),
-    }
+    assert!(matches!(
+        authority.completion_policy,
+        CompletionPolicy::OwnerTask(_)
+    ));
+    let CompletionPolicy::OwnerTask(gate) = authority.completion_policy else {
+        return;
+    };
+    assert!(gate.requires_artifact_readiness);
+    assert!(gate.requires_verification);
 }
 
 #[test]
@@ -60,7 +62,12 @@ fn completion_node_keeps_audit_and_repair_tools_visible() {
         ..TurnAuthorityInput::default()
     });
 
-    for tool in ["fs.read", "artifact.audit", "artifact.next", "fs.batch_write"] {
+    for tool in [
+        "fs.read",
+        "artifact.audit",
+        "artifact.next",
+        "fs.batch_write",
+    ] {
         assert!(
             !authority.effective_policy.blocked_tools.contains(&tool),
             "{tool} must stay unblocked while artifact evidence is missing"
@@ -76,7 +83,10 @@ fn hard_compaction_renders_resumable_recovery_snapshot_fields() {
         ..TurnAuthorityInput::default()
     });
 
-    assert_eq!(authority.endpoint_decision, EndpointDecision::RuntimeCompact);
+    assert_eq!(
+        authority.endpoint_decision,
+        EndpointDecision::RuntimeCompact
+    );
     for field in [
         "active_case",
         "missing_evidence",
@@ -96,8 +106,7 @@ fn repeated_invalid_actions_do_not_repeat_graph_state() {
     });
 
     assert_ne!(
-        authority.valid_example,
-        "<act>\n<tool>graph.state</tool>\n</act>",
+        authority.valid_example, "<act>\n<tool>graph.state</tool>\n</act>",
         "recover-repeat needs a different exact next action"
     );
 }

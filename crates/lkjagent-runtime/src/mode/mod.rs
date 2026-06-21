@@ -14,7 +14,10 @@ pub use completion::{
 };
 pub use decision::{endpoint_decision_for, EndpointDecision};
 pub use input::TurnAuthorityInput;
-pub use model::{ActiveMode, ActiveModeInput, ActiveModePolicy};
+pub use model::{
+    ActiveMode, ActiveModeInput, ActiveModePolicy, RuntimeDecision, RuntimeEvent, RuntimeSnapshot,
+    ToolAdmission,
+};
 pub use policy::policy_for_mode;
 pub use render::{render_mode_policy, render_turn_authority};
 pub use select::select_active_mode;
