@@ -44,4 +44,6 @@ Run `cargo test -p lkjagent-protocol schema_examples` and
 
 ## Status
 
-partially implemented.
+Partially implemented. Runtime authority cards and pure admission responses now
+reuse the dispatcher registry example renderer for covered tools. Contextual
+examples still need wider dispatch-mode round-trip coverage.

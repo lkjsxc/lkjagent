@@ -37,6 +37,20 @@ fn recovery_owner_case_blocks_maintenance_cycle() {
 }
 
 #[test]
+fn hard_compaction_preempts_owner_recovery_and_maintenance() {
+    let mode = select_active_mode(ActiveModeInput {
+        pending_owner_rows: 1,
+        active_owner_case: true,
+        recoverable_owner_case: true,
+        compaction_required: true,
+        maintenance_active: true,
+        maintenance_due: true,
+    });
+
+    assert_eq!(mode, ActiveMode::Compaction);
+}
+
+#[test]
 fn closed_case_allows_maintenance_only_after_cooldown() {
     let idle = select_active_mode(ActiveModeInput::default());
     let due = select_active_mode(ActiveModeInput {

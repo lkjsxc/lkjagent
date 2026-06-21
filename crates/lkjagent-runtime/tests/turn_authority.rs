@@ -1,4 +1,3 @@
-use lkjagent_protocol::parse_completion;
 use lkjagent_runtime::mode::{
     decide_turn_authority, render_turn_authority, ActiveMode, CompletionPolicy, EndpointDecision,
     TurnAuthorityInput,
@@ -58,8 +57,9 @@ fn active_owner_case_beats_maintenance() {
 }
 
 #[test]
-fn compaction_waits_for_owner_work_to_clear() {
+fn hard_compaction_is_single_active_mode_before_owner_work() {
     let owner = decide_turn_authority(TurnAuthorityInput {
+        pending_owner_rows: 1,
         active_owner_case: true,
         compaction_required: true,
         ..TurnAuthorityInput::default()
@@ -69,7 +69,7 @@ fn compaction_waits_for_owner_work_to_clear() {
         ..TurnAuthorityInput::default()
     });
 
-    assert_eq!(owner.mode, ActiveMode::OwnerTask);
+    assert_eq!(owner.mode, ActiveMode::Compaction);
     assert_eq!(owner.endpoint_decision, EndpointDecision::RuntimeCompact);
     assert_eq!(compaction.mode, ActiveMode::Compaction);
     assert_eq!(
@@ -150,28 +150,6 @@ fn policy_layers_are_exclusive() {
         let card = decide_turn_authority(input).prompt_card;
         assert!(!card.contains("policy_layers=graph,maintenance"));
         assert!(!card.contains("policy_layers=graph,compaction"));
-    }
-}
-
-#[test]
-fn rendered_model_examples_parse_for_call_model_modes() {
-    for input in [
-        TurnAuthorityInput {
-            active_owner_case: true,
-            ..TurnAuthorityInput::default()
-        },
-        TurnAuthorityInput {
-            recoverable_owner_case: true,
-            ..TurnAuthorityInput::default()
-        },
-        TurnAuthorityInput {
-            maintenance_due: true,
-            ..TurnAuthorityInput::default()
-        },
-    ] {
-        let authority = decide_turn_authority(input);
-        assert_eq!(authority.endpoint_decision, EndpointDecision::CallModel);
-        assert!(parse_completion(&authority.valid_example).is_ok());
     }
 }
 

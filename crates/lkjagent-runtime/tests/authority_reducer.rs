@@ -1,6 +1,7 @@
 use lkjagent_runtime::mode::{
     admit_tool, decide, ActiveMode, RuntimeDecision, RuntimeEvent, RuntimeFault, RuntimeSnapshot,
 };
+use lkjagent_tools::dispatch::registry_valid_example;
 
 #[test]
 fn admit_tool_blocks_done_when_content_evidence_is_missing() {
@@ -10,6 +11,10 @@ fn admit_tool_blocks_done_when_content_evidence_is_missing() {
 
     assert!(!admission.admitted);
     assert!(admission.reason.contains("completion missing"));
+    assert_eq!(
+        admission.exact_valid_example.as_deref(),
+        registry_valid_example("fs.read").as_deref()
+    );
     assert!(admission
         .next_valid_tools
         .contains(&"artifact.next".to_string()));

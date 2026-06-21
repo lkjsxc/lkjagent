@@ -5,6 +5,7 @@ use super::model::{ActiveMode, ActiveModePolicy};
 use super::policy::policy_for_mode;
 use super::render::render_mode_policy;
 use super::select::select_active_mode;
+use lkjagent_tools::dispatch::registry_valid_example;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TurnAuthority {
@@ -109,13 +110,15 @@ fn valid_example_for(mode: ActiveMode, endpoint_decision: EndpointDecision) -> S
         return "runtime action; no model act block".to_string();
     }
     match mode {
-        ActiveMode::OwnerTask => "<act>\n<tool>graph.state</tool>\n</act>".to_string(),
-        ActiveMode::Recovery => "<act>\n<tool>graph.recover</tool>\n</act>".to_string(),
-        ActiveMode::Maintenance => {
-            "<act>\n<tool>memory.find</tool>\n<query>maintenance</query>\n</act>".to_string()
-        }
+        ActiveMode::OwnerTask => rendered_registry_example("graph.state"),
+        ActiveMode::Recovery => rendered_registry_example("graph.recover"),
+        ActiveMode::Maintenance => rendered_registry_example("memory.find"),
         ActiveMode::Compaction | ActiveMode::ClosedIdle => {
             "runtime action; no model act block".to_string()
         }
     }
+}
+
+fn rendered_registry_example(tool: &str) -> String {
+    registry_valid_example(tool).unwrap_or_else(|| format!("<act>\n<tool>{tool}</tool>\n</act>"))
 }

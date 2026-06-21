@@ -1,6 +1,9 @@
 use super::model::{ActiveMode, ActiveModeInput};
 
 pub fn select_active_mode(input: ActiveModeInput) -> ActiveMode {
+    if input.compaction_required {
+        return ActiveMode::Compaction;
+    }
     if input.pending_owner_rows > 0 {
         return ActiveMode::OwnerTask;
     }
@@ -9,9 +12,6 @@ pub fn select_active_mode(input: ActiveModeInput) -> ActiveMode {
     }
     if input.active_owner_case {
         return ActiveMode::OwnerTask;
-    }
-    if input.compaction_required {
-        return ActiveMode::Compaction;
     }
     if input.maintenance_active || input.maintenance_due {
         return ActiveMode::Maintenance;

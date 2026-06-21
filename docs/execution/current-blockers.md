@@ -46,6 +46,10 @@ maintenance restarts after no useful work.
   `document-structure`, and the uploaded-run corpus covers the
   artifact-readiness graph-evidence bypass. This is a focused proof, not
   closure of rows 1 to 4.
+- Current code selects one hard-compaction active mode before owner intake,
+  recovery, or maintenance when context pressure requires a runtime snapshot,
+  and runtime authority examples reuse the dispatcher registry renderer. This
+  narrows rows 1 and 9 but does not close them.
 - Current code admits `artifact.next` and stricter content audit for bounded
   cookbook/story recovery, and quiet plus Docker Compose verification passed
   for this slice on 2026-06-20. Rows 7 to 10 stay open until completion wiring
