@@ -28,6 +28,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [count_seed_root_contract.rs](count_seed_root_contract.rs): counted scaffold root contract fixtures.
 - [doc_content_audit.rs](doc_content_audit.rs): content-artifact scaffold-only audit fixtures.
 - [doc_tools.rs](doc_tools.rs): document scaffold and audit fixtures.
+- [dispatch_normalize.rs](dispatch_normalize.rs): safe parameter repair and schema example fixtures.
 - [effective_policy_repair.rs](effective_policy_repair.rs): runtime repair admission over graph completion fixtures.
 - [fs_shell.rs](fs_shell.rs): filesystem and shell tool fixtures.
 - [knowledge_path_guard.rs](knowledge_path_guard.rs): recursive knowledge write fences.

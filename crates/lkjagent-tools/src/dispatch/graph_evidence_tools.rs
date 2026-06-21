@@ -24,7 +24,7 @@ pub fn dispatch_graph_evidence(
         let example = evidence_example(example_kind);
         return observe_error(
             ToolError::invalid(format!(
-                "unknown graph evidence requirement: {kind}\nknown requirements now: {}\nvalid examples:\n{example}",
+                "unknown graph evidence requirement: {kind}\nallowed_values={}\nvalid_example:\n{example}",
                 known.join(", ")
             )),
             action_text,

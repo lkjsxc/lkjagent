@@ -71,9 +71,8 @@ fn graph_evidence_rejects_risk_without_policy() -> TestResult<()> {
     ))?;
 
     assert!(is_error(&output));
-    assert!(output
-        .content
-        .contains("known requirements now: plan, observation"));
+    assert!(output.content.contains("allowed_values=plan, observation"));
+    assert_eq!(output.content.matches("valid_example:").count(), 1);
     assert!(output.content.contains("<kind>plan</kind>"));
     Ok(())
 }

@@ -64,6 +64,33 @@ fn agent_done_refusal_points_to_missing_graph_evidence() -> TestResult<()> {
 }
 
 #[test]
+fn graph_evidence_unknown_kind_lists_allowed_values_and_one_example() -> TestResult<()> {
+    let workspace = temp_workspace("graph-evidence-kind")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+
+    let output = dispatch(
+        &action(
+            "graph.evidence",
+            &[("kind", "evidence"), ("summary", "claimed evidence")],
+        ),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+
+    assert!(is_error(&output));
+    assert!(output
+        .content
+        .contains("unknown graph evidence requirement"));
+    assert!(output.content.contains("allowed_values=plan"));
+    assert_eq!(output.content.matches("valid_example:").count(), 1);
+    assert!(output.content.contains("<kind>plan</kind>"));
+    Ok(())
+}
+
+#[test]
 fn dispatcher_reports_validation_and_repeat_notices() -> TestResult<()> {
     let workspace = temp_workspace("dispatch")?;
     let runtime = runtime(workspace)?;

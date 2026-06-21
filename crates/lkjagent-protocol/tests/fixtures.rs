@@ -89,6 +89,35 @@ fn produces_each_parse_fault_variant() {
 }
 
 #[test]
+fn parses_core_file_tool_child_parameters() {
+    let cases = [
+        (
+            "<act>\n<tool>fs.read</tool>\n<path>README.md</path>\n</act>",
+            Action::new("fs.read", vec![Param::new("path", "README.md")]),
+        ),
+        (
+            "<act>\n<tool>fs.stat</tool>\n<path>README.md</path>\n</act>",
+            Action::new("fs.stat", vec![Param::new("path", "README.md")]),
+        ),
+        (
+            "<act>\n<tool>fs.list</tool>\n<path>docs</path>\n<depth>2</depth>\n<limit>5</limit>\n</act>",
+            Action::new(
+                "fs.list",
+                vec![
+                    Param::new("path", "docs"),
+                    Param::new("depth", "2"),
+                    Param::new("limit", "5"),
+                ],
+            ),
+        ),
+    ];
+
+    for (text, expected) in cases {
+        assert_eq!(parse_completion(text), Ok(expected));
+    }
+}
+
+#[test]
 fn renders_context_frames() {
     assert_eq!(
         render_observation("ok", "done"),
