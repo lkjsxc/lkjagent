@@ -6,10 +6,10 @@ State the common contract for large content deliverables.
 
 ## Contract
 
-Long stories, cookbooks, guides, encyclopedias, knowledge bases, and other
-large deliverables route to semantic artifact roots. The root contains a
-README, manifest, semantic child files, audit evidence, and completion
-evidence.
+Long stories, dictionaries, cookbooks, guides, encyclopedias, knowledge bases,
+and other large deliverables route to semantic artifact roots. The root
+contains a README, manifest, semantic child files, audit evidence, and
+completion evidence.
 
 Artifact states are defined in [lifecycle.md](lifecycle.md). Scaffold creates
 topology only. Content pass writes meaningful leaves. Audit proves topology
@@ -24,7 +24,7 @@ not retry one giant `fs.write`.
 
 ## Roots
 
-Default roots are `stories/<semantic-title>`,
+Default roots are `stories/<semantic-title>`, `dictionaries/<semantic-title>`,
 `cookbooks/<semantic-title>`, `guides/<semantic-title>`, and
 `knowledge/<semantic-title>`. Generic `docs/` is used only when the owner asks
 for project documentation.

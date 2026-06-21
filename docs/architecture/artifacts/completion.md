@@ -14,6 +14,7 @@ exists. For content artifacts, completion requires:
 - manifest exists.
 - semantic children exist.
 - content-bearing files exist.
+- profile-specific content readiness passes.
 - audit passes or blocked handoff names exact failures.
 - graph plan evidence exists.
 - observation evidence exists.
@@ -26,8 +27,8 @@ Scaffold, content pass, audit pass, and completion are separate states.
 ## Refusals
 
 Planning alone is never completion. Generic scaffold alone is never
-completion. A file tree unrelated to the owner's requested artifact is never
-completion.
+completion. File count alone is never completion. A file tree unrelated to the
+owner's requested artifact is never completion.
 
 ## Status
 

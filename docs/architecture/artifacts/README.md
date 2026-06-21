@@ -2,14 +2,15 @@
 
 ## Purpose
 
-Define semantic artifact construction for long stories, cookbooks, guides,
-encyclopedias, and other large content deliverables.
+Define semantic artifact construction for dictionaries, long stories,
+cookbooks, guides, encyclopedias, and other large content deliverables.
 
 ## Table of Contents
 
 - [lifecycle.md](lifecycle.md): scaffold, content pass, audit pass, and completion.
 - [content-artifacts.md](content-artifacts.md): general large-content contract.
 - [content-readiness.md](content-readiness.md): meaningful leaf-file checks.
+- [dictionary-profile.md](dictionary-profile.md): dictionary artifact profile.
 - [cookbook-profile.md](cookbook-profile.md): cookbook profile example.
 - [story-profile.md](story-profile.md): story profile example.
 - [manifest.md](manifest.md): artifact manifest fields and identity.
@@ -25,11 +26,11 @@ encyclopedias, and other large content deliverables.
 
 A large content request is never one giant `fs.write`. It is a semantic
 artifact root with README, manifest, section files, audit evidence, and
-completion evidence. Scaffold, content pass, audit pass, and completion are
-separate states.
+completion evidence. Scaffold, content pass, audit pass, repair, and completion
+are separate states.
 
 ## Status
 
 partially implemented through document scaffold profiles, artifact tool
-wrappers, bounded next-batch planning, and audit checks. Manifest adoption and
-repair remain open.
+wrappers, bounded next-batch planning, and audit checks. Manifest adoption,
+semantic dictionary readiness, and full repair remain open.
