@@ -52,8 +52,9 @@ pub fn initial_state(objective: &str, case_id: Option<i64>) -> TaskGraphState {
     let confidence = confidence_for(family);
     let mut objective_state = ObjectiveState::new(objective);
     let route = route_spec(family, objective);
-    let requirements = requirements_for(family);
-    let pending_checks = checks_for(family);
+    let mut requirements = requirements_for(family);
+    let mut pending_checks = checks_for(family);
+    add_content_artifact_gate(&route, &mut requirements, &mut pending_checks);
     let active_node = GraphNodeId("plan");
     let state_tracks = initial_state_tracks(family, active_node, confidence);
     objective_state.attach_tracks(&state_tracks);
@@ -151,4 +152,20 @@ fn checks_for(family: TaskFamily) -> Vec<String> {
     } else {
         vec!["focused verification".to_string()]
     }
+}
+
+fn add_content_artifact_gate(
+    route: &crate::classify_artifact::RouteSpec,
+    requirements: &mut Vec<String>,
+    pending_checks: &mut Vec<String>,
+) {
+    let content_artifact = route
+        .document
+        .as_ref()
+        .is_some_and(|document| document.kind == "content-artifact");
+    if !content_artifact {
+        return;
+    }
+    requirements.push("artifact-readiness".to_string());
+    pending_checks.push("artifact readiness audit".to_string());
 }

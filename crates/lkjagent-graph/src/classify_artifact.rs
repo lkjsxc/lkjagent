@@ -78,7 +78,9 @@ fn route_reason_for(family: TaskFamily, content_artifact: bool) -> &'static str 
 }
 
 fn artifact_kind(lower: &str) -> &'static str {
-    if lower.contains("cookbook") || lower.contains("recipe") || lower.contains("bread") {
+    if lower.contains("dictionary") || lower.contains("glossary") || lower.contains("lexicon") {
+        "dictionary"
+    } else if lower.contains("cookbook") || lower.contains("recipe") || lower.contains("bread") {
         "cookbook"
     } else if lower.contains("story")
         || lower.contains("novel")
@@ -93,6 +95,7 @@ fn artifact_kind(lower: &str) -> &'static str {
 
 fn artifact_root(kind: &str, objective: &str) -> String {
     let parent = match kind {
+        "dictionary" => "dictionaries",
         "cookbook" => "cookbooks",
         "story" => "stories",
         _ => "artifacts",

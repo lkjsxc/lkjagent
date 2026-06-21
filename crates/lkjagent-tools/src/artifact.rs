@@ -56,7 +56,7 @@ pub fn audit(
             "document audit failed\nroot={root}\nchecks=15\npassed=14\nfailed=1\nfailures:\n- artifact_kind_mismatch: expected={kind}\nnext_action=artifact.apply matching artifact kind"
         ));
     }
-    Ok(report.replace("document audit", "artifact audit"))
+    Ok(readiness_report(kind, &report))
 }
 
 pub fn next(workspace: &Path, root: &str, kind: &str) -> ToolResult<String> {
@@ -98,6 +98,24 @@ fn kind_mismatch(kind: &str, manifest: &str) -> bool {
         "cookbook" => !manifest.contains("Cookbook"),
         _ => false,
     }
+}
+
+fn readiness_report(kind: &str, report: &str) -> String {
+    let converted = report.replace("document audit", "artifact audit");
+    if !content_kind(kind) || !converted.starts_with("artifact audit passed") {
+        return converted;
+    }
+    converted.replace(
+        "next_action=record document-structure evidence",
+        "readiness=content-bearing\nnext_action=record document-structure and artifact-readiness evidence",
+    )
+}
+
+fn content_kind(kind: &str) -> bool {
+    matches!(
+        kind.trim().to_ascii_lowercase().as_str(),
+        "cookbook" | "story"
+    )
 }
 
 #[allow(clippy::manual_unwrap_or_default)]

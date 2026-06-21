@@ -12,6 +12,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [automatic_maintenance.rs](automatic_maintenance.rs): daemon idle maintenance and owner preemption fixtures.
 - [authority_reducer.rs](authority_reducer.rs): pure runtime decision and admission fixtures.
 - [authority_redesign.rs](authority_redesign.rs): uploaded-log authority redesign fixtures.
+- [artifact_completion_gate.rs](artifact_completion_gate.rs): content artifact readiness completion fixtures.
 - [budget_recovery.rs](budget_recovery.rs): exhausted task budget waiting and owner-send resume fixtures.
 - [compaction_snapshot.rs](compaction_snapshot.rs): structured runtime compaction resume fields.
 - [daemon_loop.rs](daemon_loop.rs): resident queue, endpoint, tool, ask, and error fixtures.

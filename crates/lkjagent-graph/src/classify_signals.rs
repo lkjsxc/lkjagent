@@ -25,7 +25,9 @@ pub(crate) fn priority_long_content_request(lower: &str, content: &str) -> bool 
 }
 
 pub(crate) fn content_artifact_request(lower: &str, content: &str) -> bool {
-    long_content_request(lower, content) && creation_request(lower, content)
+    long_content_request(lower, content)
+        && creation_request(lower, content)
+        && !counted_content_request(lower, content)
 }
 
 fn counted_content_request(lower: &str, content: &str) -> bool {
@@ -91,10 +93,13 @@ fn content_signal(lower: &str, content: &str) -> bool {
             "content",
             "corpus",
             "deliverable",
+            "dictionary",
             "draft",
             "essay",
+            "glossary",
             "guide",
             "lesson",
+            "lexicon",
             "manual",
             "manuscript",
             "narrative",
@@ -124,7 +129,17 @@ fn content_signal(lower: &str, content: &str) -> bool {
 fn large_content_signal(lower: &str, content: &str) -> bool {
     contains_any(
         lower,
-        &["big", "large", "long", "many", "multi-file", "structured"],
+        &[
+            "big",
+            "comprehensive",
+            "detailed",
+            "full",
+            "large",
+            "long",
+            "many",
+            "multi-file",
+            "structured",
+        ],
     ) || contains_any(content, &["長編", "大規模", "構造化"])
 }
 

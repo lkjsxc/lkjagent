@@ -34,7 +34,19 @@ pub(super) fn add_document_evidence(
     } else {
         false
     };
-    observed || structured
+    let ready = if output.content.contains("readiness=content-bearing") {
+        ensure_evidence(
+            graph,
+            "artifact-readiness",
+            EvidenceKind::File,
+            output,
+            None,
+            effects,
+        )
+    } else {
+        false
+    };
+    observed || structured || ready
 }
 
 pub(super) fn add_document_scaffold_observation(
@@ -142,8 +154,10 @@ fn add_evidence(
     push_evidence_record(graph, &evidence, effects);
     graph.evidence.records.push(evidence);
     graph.evidence.pending_checks.retain(|check| {
-        !((requirement == "verification" && check == "focused verification")
-            || (requirement == "document-structure" && check == "document audit"))
+        let satisfied = (requirement == "verification" && check == "focused verification")
+            || (requirement == "document-structure" && check == "document audit")
+            || (requirement == "artifact-readiness" && check == "artifact readiness audit");
+        !satisfied
     });
     true
 }
