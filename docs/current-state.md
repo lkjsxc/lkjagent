@@ -22,9 +22,9 @@ so hard pressure never requires a blocked model `memory.save`.
 
 Memory writes now skip exact equivalents, update same-title high-overlap rows,
 merge same-title high-overlap prune groups, and use punctuation-safe search,
-but rewrite pruning remains incomplete. Long content tasks route toward story and cookbook
-scaffolds, and `artifact.next` can plan bounded write batches from weak
-content paths, but semantic artifact identity, adoption, repair, and
+but rewrite pruning remains incomplete. Long content tasks route toward story
+and cookbook scaffolds, and `artifact.next` can plan bounded write batches from
+weak content paths, but semantic artifact identity, adoption, repair, and
 content-bearing completion need deeper runtime enforcement. The artifact
 lifecycle contract is
 [architecture/artifacts/lifecycle.md](architecture/artifacts/lifecycle.md).
@@ -40,6 +40,11 @@ contradictions, false completion after scaffold-only output, repeated
 `graph.next`, invalid note and memory kinds, compaction deadlocks, and owner
 questions about internal tool uncertainty.
 
+The bread dictionary and cookbook logs are benchmark fixtures, not content
+authoring tasks. They prove systemic failures in runtime authority, recovery,
+artifact adoption and repair, write batching, content-bearing completion,
+maintenance preemption, compaction resumability, and evidence accounting.
+
 The graph now has neutral ranked state tracks, an objective envelope that does
 not copy raw owner text, SQLite track snapshots, graph notice rendering,
 transition selection, and status/console display tests. Runtime recovery and
@@ -53,6 +58,20 @@ example, FTS punctuation, duplicate-memory, active-policy contradiction,
 invalid-note-kind, bread-cookbook false-completion, accounting, and GPT log
 failure cases with known-good and known-bad fixtures. Final quiet verification
 and Docker Compose verification passed for this redesign slice on 2026-06-20.
+
+## Active Redesign Target
+
+The current target is a runtime-owned authority layer above graph suggestions,
+model actions, maintenance, compaction, verification, and completion. The
+target outcomes are:
+
+1. Runtime-owned active mode and tool admission.
+2. Deterministic recovery controller.
+3. Content-bearing artifact completion gates.
+4. Runtime-owned compaction snapshots.
+5. Maintenance defers owner work.
+6. Uploaded run-log fixtures are covered by mechanical benchmarks.
+7. Docker Compose verification passes after the implementation slice.
 
 ## Area Status
 
