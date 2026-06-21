@@ -30,6 +30,33 @@ fn prune_merges_same_title_high_overlap_rows() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn prune_merges_maintenance_noop_lessons_with_different_titles() -> TestResult<()> {
+    let mut conn = memory_store()?;
+    insert_memory(
+        &mut conn,
+        "Empty maintenance cycle",
+        "maintenance",
+        "Empty maintenance cycle closed with no useful workspace or memory change.",
+    )?;
+    let source = insert_memory(
+        &mut conn,
+        "Maintenance found nothing useful",
+        "maintenance,loop",
+        "Maintenance no-op closed because nothing useful changed in workspace or memory.",
+    )?;
+
+    let report = prune_exact_duplicates(&mut conn)?;
+    let found = find(&conn, "maintenance nothing useful", 5)?;
+
+    assert_eq!(report.merged, 1);
+    assert_eq!(report.deleted, 1);
+    assert_eq!(report.source_rows, vec![source]);
+    assert_eq!(found.len(), 1);
+    assert!(found[0].tags.contains("loop"));
+    Ok(())
+}
+
 fn insert_memory(
     conn: &mut rusqlite::Connection,
     title: &str,
