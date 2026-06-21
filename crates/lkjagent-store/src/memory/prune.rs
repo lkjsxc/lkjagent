@@ -69,9 +69,10 @@ fn semantic_merge(
             continue;
         };
         let mut merged = keeper.clone();
+        let noop_group = maintenance_noop(&merged);
         let mut source_rows = Vec::new();
         for row in rest {
-            if !high_overlap(&merged.content, &row.content) {
+            if !noop_group && !high_overlap(&merged.content, &row.content) {
                 continue;
             }
             merged.content = merged_content(&merged, row);
@@ -102,13 +103,31 @@ fn title_groups(tx: &rusqlite::Transaction<'_>) -> StoreResult<BTreeMap<String, 
         let Some(kind) = MemoryKind::parse(&row.kind) else {
             continue;
         };
-        let identity = memory_identity(kind, &row.title, &row.tags, &row.content);
-        groups
-            .entry(format!("{}:{}", row.kind, identity.title_slug))
-            .or_default()
-            .push(row);
+        let key = if maintenance_noop(&row) {
+            format!("{}:maintenance-noop", row.kind)
+        } else {
+            let identity = memory_identity(kind, &row.title, &row.tags, &row.content);
+            format!("{}:{}", row.kind, identity.title_slug)
+        };
+        groups.entry(key).or_default().push(row);
     }
     Ok(groups)
+}
+
+fn maintenance_noop(row: &MemoryRow) -> bool {
+    if row.kind != MemoryKind::Lesson.as_str() || !tagged(&row.tags, "maintenance") {
+        return false;
+    }
+    let text = format!("{} {} {}", row.title, row.tags, row.content).to_ascii_lowercase();
+    text.contains("empty maintenance")
+        || text.contains("maintenance no-op")
+        || text.contains("nothing useful")
+        || text.contains("no useful")
+}
+
+fn tagged(tags: &str, needle: &str) -> bool {
+    tags.split(',')
+        .any(|tag| tag.trim().eq_ignore_ascii_case(needle))
 }
 
 fn update_merged(tx: &rusqlite::Transaction<'_>, row: &MemoryRow) -> StoreResult<()> {
