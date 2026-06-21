@@ -2,14 +2,21 @@ use std::path::Path;
 use std::time::Duration;
 
 use crate::config::RuntimeConfig;
-use crate::config::{load_or_initialize, ConfigLoad};
+use crate::config::{load_or_initialize_with_env, ConfigLoad};
 use crate::error::CliError;
 use crate::paths::workspace;
 use crate::store::{now_stamp, open_store};
 
 pub fn run(data_dir: &Path) -> Result<String, CliError> {
+    run_with_env(data_dir, |key| std::env::var(key).ok())
+}
+
+pub fn run_with_env<F>(data_dir: &Path, env: F) -> Result<String, CliError>
+where
+    F: Fn(&str) -> Option<String>,
+{
     let workspace = workspace(data_dir)?;
-    let config = match load_or_initialize(data_dir)? {
+    let config = match load_or_initialize_with_env(data_dir, env)? {
         ConfigLoad::WroteDefault { path } => {
             return Err(CliError::failure(format!(
                 "config_written={}\nmissing=endpoint.model",

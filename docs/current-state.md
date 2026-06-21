@@ -65,6 +65,8 @@ example, FTS punctuation, duplicate-memory, active-policy contradiction,
 invalid-note-kind, bread-cookbook false-completion, accounting, and GPT log
 failure cases with known-good and known-bad fixtures. Final quiet verification
 and Docker Compose verification passed for this redesign slice on 2026-06-21.
+CLI run tests now isolate their configuration environment, so local endpoint
+variables do not turn missing-config and lock-refusal tests into daemon loops.
 
 ## Active Redesign Target
 
