@@ -19,5 +19,6 @@ files, and good and bad fixtures.
 - [owner-loop-regressions.rs](owner_loop_regressions.rs): graph, memory, and FTS loop tasks.
 - [owner-observability.rs](owner_observability.rs): owner-reported status and GPT log tasks.
 - [owner-thirty.rs](owner_thirty.rs): counted semantic documentation task.
+- [owner-uploaded.rs](owner_uploaded.rs): uploaded run-log fixture matrix task.
 - [repair.rs](repair.rs): shell program repair task.
 - [synthesis.rs](synthesis.rs): shell program synthesis task.

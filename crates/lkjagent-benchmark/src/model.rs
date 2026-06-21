@@ -62,6 +62,7 @@ pub enum JudgeKind {
     PolicyContradiction,
     GraphNoteKindRecovery,
     BreadCookbookArtifact,
+    UploadedRunFixtures,
     StatusAccounting,
     GptHandoffLog,
 }

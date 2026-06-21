@@ -9,6 +9,7 @@ pub mod owner_loop_content;
 pub mod owner_loop_regressions;
 pub mod owner_observability;
 pub mod owner_thirty;
+pub mod owner_uploaded;
 pub mod repair;
 pub mod synthesis;
 
@@ -35,6 +36,7 @@ pub const TINY: &[BenchmarkTask] = &[
     owner_loop_content::POLICY_TASK,
     owner_loop_content::NOTE_TASK,
     owner_loop_content::BREAD_TASK,
+    owner_uploaded::TASK,
     owner_observability::STATUS_TASK,
     owner_observability::LOG_TASK,
 ];
