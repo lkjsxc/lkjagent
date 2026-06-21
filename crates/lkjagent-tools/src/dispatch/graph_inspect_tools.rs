@@ -62,12 +62,17 @@ pub fn dispatch_graph_recover(
     runtime: &ToolRuntime,
     state: &mut DispatchState,
 ) -> DispatchOutput {
-    let policy_line = state.graph_policy.as_ref().map_or_else(
-        || "node=none".to_string(),
-        |policy| format!("node={}\nphase={}", policy.active_node, policy.phase),
+    let (policy_line, next) = state.graph_policy.as_ref().map_or_else(
+        || ("node=none".to_string(), "graph.state".to_string()),
+        |policy| {
+            (
+                format!("node={}\nphase={}", policy.active_node, policy.phase),
+                recovery_actions(policy),
+            )
+        },
     );
     let content = format!(
-        "{policy_line}\nrecovery_ladder=inspect-state,smaller-scope,alternate-native-tool,replan,admitted-shell-escape,block-step-and-continue\nrepeat_count={}\nnext=use graph.transition, graph.plan when admitted, or a non-repeating native tool",
+        "{policy_line}\nrecovery_ladder=inspect-state,smaller-scope,alternate-native-tool,replan,admitted-shell-escape,block-step-and-continue\nrepeat_count={}\nnext=use {next}",
         state.repeat_count
     );
     finish(
@@ -79,6 +84,39 @@ pub fn dispatch_graph_recover(
             "choose a different action",
         ),
     )
+}
+
+fn recovery_actions(policy: &crate::dispatch::GraphDispatchPolicy) -> String {
+    let mut actions = Vec::new();
+    if let Some(target) = policy.legal_transitions.first() {
+        actions.push(format!("graph.transition to {target}"));
+    }
+    if !policy.plan_ready && allowed(policy, "graph.plan") {
+        actions.push("graph.plan".to_string());
+    }
+    for tool in [
+        "artifact.next",
+        "artifact.audit",
+        "doc.audit",
+        "fs.batch_write",
+        "fs.list",
+        "fs.tree",
+        "fs.search",
+        "graph.state",
+    ] {
+        if allowed(policy, tool) {
+            actions.push(tool.to_string());
+        }
+    }
+    if actions.is_empty() {
+        "no admitted non-repeating recovery action".to_string()
+    } else {
+        actions.join(", ")
+    }
+}
+
+fn allowed(policy: &crate::dispatch::GraphDispatchPolicy, tool: &str) -> bool {
+    policy.allowed_tools.iter().any(|allowed| allowed == tool)
 }
 
 fn join_or_none(values: &[String]) -> String {

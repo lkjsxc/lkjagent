@@ -24,9 +24,10 @@ Memory writes now skip exact equivalents, update same-title high-overlap rows,
 merge same-title and maintenance no-op prune groups, and use punctuation-safe
 search, but rewrite pruning remains incomplete. Long content tasks route toward
 story, cookbook, and dictionary artifacts, and `artifact.next` can plan bounded
-write batches from weak content paths, but semantic artifact identity,
-adoption, and durable batch cursors need deeper runtime enforcement. The artifact
-lifecycle contract is
+write batches from weak content paths with a root-scoped SQLite cursor. Direct
+file writes and batch writes now reject scaffold phrases before mutation, but
+semantic artifact identity and adoption need deeper runtime enforcement. The
+artifact lifecycle contract is
 [architecture/artifacts/lifecycle.md](architecture/artifacts/lifecycle.md).
 Recovery can still block the tools required to escape a fault. Completion can
 still be too close to planning evidence on non-artifact close paths. Visible
@@ -93,13 +94,13 @@ requirements, not proof that the runtime behavior is complete.
 | Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; dispatch now checks one effective policy object before routing, including `agent.done` completion refusal; schema repair emits one canonical example for covered parameter and evidence-kind faults; audit-owned evidence refuses direct `graph.evidence` |
 | Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; artifact.apply reuses the planner and writer |
 | Document audit tool | implemented | topology checks pass local gates; artifact.audit checks kind mismatch; content artifacts reject scaffold-only leaves, weak cookbook/story leaves, and shallow dictionary term lists |
-| Artifact next batch | implemented | `artifact.next` returns exact weak paths and an admitted `fs.batch_write` skeleton; scaffold-only cookbook and meaningful cookbook tests pass |
+| Artifact next batch | partially implemented | `artifact.next` returns exact weak paths, content-bearing `fs.batch_write` examples, and root-scoped cursor advancement; scaffold-only cookbook, cursor, and meaningful cookbook tests pass |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, same-title overlap update, punctuation-safe FTS queries, exact duplicate prune, same-title prune merge, and maintenance no-op lesson merge have focused tests; rewrite pruning remains open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
-| Runtime recovery | partially implemented | pure turn authority selection, pure reducer/admission helpers, authority snapshot/event/decision types, store-backed runtime snapshots, one active-mode endpoint card, cached dispatch authority, recovery escape-tool visibility, batch-oriented recovery examples, and effective dispatch repair admissions exist; internal `agent.ask` questions are refused, runtime close rechecks graph completion, content artifacts require separate audit-derived artifact-readiness evidence, and no-op maintenance defers restart; fault-class-specific deterministic recovery control remains open |
-| Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned and renders mission, evidence gaps, artifact root/id, recovery step, last failed action, admitted tools, exact next action, and completion blockers; durable batch cursors and last-successful-observation snapshots remain open |
+| Runtime recovery | partially implemented | pure turn authority selection, pure reducer/admission helpers, authority snapshot/event/decision types, store-backed runtime snapshots, one active-mode endpoint card, cached dispatch authority, recovery escape-tool visibility, batch-oriented recovery examples, and effective dispatch repair admissions exist; `graph.recover` now derives next actions from legal transitions, admitted tools, and plan readiness; internal `agent.ask` questions are refused, runtime close rechecks graph completion, content artifacts require separate audit-derived artifact-readiness evidence, and no-op maintenance defers restart; fault-class-specific deterministic recovery control remains open |
+| Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned and renders mission, evidence gaps, artifact root/id, recovery step, last failed action, admitted tools, exact next action, and completion blockers; artifact.next root cursors exist, while richer cursor fields and last-successful-observation snapshots remain open |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
 | GPT handoff log | implemented | runtime and CLI write one current Markdown snapshot |

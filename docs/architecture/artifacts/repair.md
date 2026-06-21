@@ -20,6 +20,9 @@ requires a new audit before completion evidence can pass.
 Failed audit and repair output must include a copyable next action admitted by
 the same active policy, usually `artifact.next`, `fs.batch_write`,
 `doc.audit`, or `artifact.audit`.
+`graph.recover` guidance is derived from the currently admitted tools and plan
+state; it does not name `graph.plan` after the plan is ready or when that tool
+is blocked.
 
 ## Invariants
 

@@ -32,9 +32,11 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [dispatch_normalize.rs](dispatch_normalize.rs): safe parameter repair and schema example fixtures.
 - [effective_policy_repair.rs](effective_policy_repair.rs): runtime repair admission over graph completion fixtures.
 - [fs_shell.rs](fs_shell.rs): filesystem and shell tool fixtures.
+- [fs_placeholder.rs](fs_placeholder.rs): write placeholder and atomic batch fixtures.
 - [knowledge_path_guard.rs](knowledge_path_guard.rs): recursive knowledge write fences.
 - [graph_control_dispatch.rs](graph_control_dispatch.rs): graph, control, and dispatcher notice fixtures.
 - [graph_policy.rs](graph_policy.rs): graph dispatch policy refusal fixtures.
+- [graph_recover.rs](graph_recover.rs): admitted recovery guidance fixtures.
 - [memory_tools.rs](memory_tools.rs): memory dedupe and punctuation search fixtures.
 - [memory_prune.rs](memory_prune.rs): memory prune merge-output fixtures.
 - [native_tools.rs](native_tools.rs): native multi-read, patch, tree, and index fixtures.

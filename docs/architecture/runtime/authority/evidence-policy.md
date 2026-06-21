@@ -26,8 +26,10 @@ missing fact.
 
 Artifact tasks require plan evidence, observation evidence, artifact identity,
 structure audit, content readiness, verification evidence, and a completion
-summary tied to observed effects. Recovery tasks require the current fault
-class, retry count, last invalid action, and admitted escape action.
+summary tied to observed effects. Document-structure evidence is satisfied by
+`doc.audit`; artifact-readiness evidence is satisfied by `artifact.audit`.
+Recovery tasks require the current fault class, retry count, last invalid
+action, and admitted escape action.
 
 ## Prohibited States
 

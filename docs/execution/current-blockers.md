@@ -55,6 +55,12 @@ maintenance restarts after no useful work.
   for this slice on 2026-06-20. Rows 7 to 10 stay open until completion wiring
   and broader regression coverage prove the uploaded failure pattern cannot
   recur across every close path.
+- Current code rejects scaffold phrases in `fs.write`, `fs.batch_write`, and
+  content audit; `fs.batch_write` preflights paths, duplicates, sizes, and
+  count before mutation; `artifact.next` uses content-bearing examples plus a
+  root-scoped SQLite cursor; and `graph.recover` omits `graph.plan` unless it
+  is both admitted and still needed. Rows 1 to 4 and 7 stay open pending the
+  full controller and completion wiring proof.
 - Current memory pruning deletes exact duplicates and merges same-title
   high-overlap rows with source IDs, but rewrite pruning remains open under
   row 5.

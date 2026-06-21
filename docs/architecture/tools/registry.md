@@ -15,7 +15,7 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | --- | --- | --- | --- |
 | fs.read | path req; start opt 1; count opt 200 | ranged raw read, one header line | missing file; duplicate read |
 | fs.read_many | paths req; start opt 1; count opt 80; total opt 400 | bounded multi-file ranged read | empty paths; workspace escape; total cap |
-| fs.write | path req; content req | write file, create parent directories | write failure |
+| fs.write | path req; content req | write file, create parent directories | scaffold phrase; write failure |
 | fs.edit | path req; find req; replace req | replace exactly one match of find | zero or many matches, count reported |
 | fs.patch | path req; patch req | apply exact find/replace edit blocks | zero or many matches; too many edits |
 | fs.list | path opt .; depth opt 2; kind opt all; limit opt 200 | sorted bounded workspace listing | workspace escape; invalid depth or limit |
@@ -23,7 +23,7 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | fs.search | query req; path opt .; include opt; case opt insensitive; context opt 1; limit opt 50 | bounded substring search | workspace escape; invalid limit |
 | fs.stat | path req | kind, bytes, lines, stable checksum | missing path; workspace escape |
 | fs.mkdir | path req | create a workspace directory | workspace escape; create failure |
-| fs.batch_write | files req | write several files from line protocol | duplicate path; empty path; workspace escape |
+| fs.batch_write | files req | atomically validate and write several files from line protocol | duplicate path; empty path; workspace escape; scaffold phrase; size limit |
 | shell.run | command req; timeout opt 60, max 600 | escape hatch /bin/sh -lc in the workspace | graph policy refusal; non-zero exit; timeout |
 | queue.list | status opt all; limit opt 20 | list queue rows by id, status, source, and preview | unknown status |
 | queue.enqueue | content req; reason req | append a pending queue row | empty content |

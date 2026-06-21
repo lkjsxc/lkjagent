@@ -34,6 +34,8 @@ selects a productive next action.
   active and must not create a memory loop.
 - `cookbook-scaffold-false-ready`: scaffold-only cookbook output may pass
   structure but must fail content readiness and refuse `agent.done`.
+- `cookbook-placeholder-batch`: `artifact.next` examples and direct write tools
+  must reject scaffold phrases before overwriting richer content.
 
 ## Verification
 

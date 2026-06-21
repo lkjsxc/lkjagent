@@ -77,6 +77,9 @@ fn scaffold_only(text: &str) -> bool {
 
 fn content_failure(kind: &ContentKind, root: &Path, file: &Path, text: &str) -> Option<String> {
     let relative = rel(root, file);
+    if let Some(phrase) = crate::placeholder::detect(text) {
+        return Some(format!("placeholder_content: {relative} phrase={phrase}"));
+    }
     if scaffold_only(text) {
         return Some(format!("scaffold_only_content: {relative}"));
     }

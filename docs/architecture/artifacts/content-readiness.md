@@ -9,7 +9,8 @@ Define how audits decide whether leaf files contain the requested content.
 Content-bearing files must contain domain-specific sections, concrete facts,
 and enough non-boilerplate prose to satisfy the artifact kind. Scaffold
 phrases, status-only files, empty headings, and generic "this file records"
-language fail readiness.
+language fail readiness. The same normalized scaffold-phrase detector gates
+content audit, `fs.write`, and `fs.batch_write`.
 
 Content readiness inspects actual file content. File count, line count,
 manifest shape, README links, and scaffold topology can satisfy structural

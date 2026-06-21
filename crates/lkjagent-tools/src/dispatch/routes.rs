@@ -90,7 +90,9 @@ pub fn route(
         "artifact.plan" => dispatch_artifact_plan(&action.params, action_text, runtime, state),
         "artifact.apply" => dispatch_artifact_apply(&action.params, action_text, runtime, state),
         "artifact.audit" => dispatch_artifact_audit(&action.params, action_text, runtime, state),
-        "artifact.next" => dispatch_artifact_next(&action.params, action_text, runtime, state),
+        "artifact.next" => {
+            dispatch_artifact_next(&action.params, action_text, runtime, conn, state)
+        }
         "agent.done" => dispatch_done(&action.params, action_text, runtime, state),
         "agent.ask" => observe_result(
             control::ask(

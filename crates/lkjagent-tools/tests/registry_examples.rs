@@ -71,6 +71,14 @@ fn fs_stat_example_dispatches() -> TestResult<()> {
 }
 
 #[test]
+fn fs_batch_write_example_dispatches() -> TestResult<()> {
+    let output = dispatch_example(parse_example(&example_for("fs.batch_write")?)?)?;
+
+    assert!(output.content.contains("files_written=1"));
+    Ok(())
+}
+
+#[test]
 fn doc_scaffold_example_dispatches() -> TestResult<()> {
     let output = dispatch_example(parse_example(&example_for("doc.scaffold")?)?)?;
     assert!(output.content.contains("document scaffold created"));
@@ -97,6 +105,25 @@ fn all_registry_examples_validate() -> TestResult<()> {
                 spec.name
             )
         })?;
+    }
+    Ok(())
+}
+
+#[test]
+fn registry_examples_do_not_contain_scaffold_phrases() -> TestResult<()> {
+    for spec in TOOLS {
+        let example = example_for(spec.name)?;
+        for phrase in [
+            "Replace this skeleton",
+            "Add the requested substance",
+            "real cookbook content before dispatch",
+        ] {
+            assert!(
+                !example.contains(phrase),
+                "{} example contains scaffold phrase {phrase}",
+                spec.name
+            );
+        }
     }
     Ok(())
 }
