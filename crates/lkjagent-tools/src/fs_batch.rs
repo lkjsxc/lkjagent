@@ -5,6 +5,9 @@ use std::path::Path;
 use crate::error::{ToolError, ToolResult};
 use crate::fs::{workspace_path, write};
 
+const MAX_FILE_BYTES: usize = 65_536;
+const MAX_TOTAL_BYTES: usize = 262_144;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct BatchFile {
     path: String,
@@ -19,15 +22,9 @@ pub fn mkdir(workspace: &Path, path: &str) -> ToolResult<String> {
 
 pub fn batch_write(workspace: &Path, files: &str, max_files: usize) -> ToolResult<String> {
     let parsed = parse_files(files)?;
-    if parsed.len() > max_files {
-        return Err(ToolError::invalid(format!(
-            "too many files; max={max_files}"
-        )));
-    }
-    reject_duplicates(&parsed)?;
+    validate_batch(workspace, &parsed, max_files)?;
     let mut written = Vec::new();
     for file in parsed {
-        workspace_path(workspace, &file.path)?;
         write(workspace, &file.path, &file.content)?;
         written.push(format!("{} bytes={}", file.path, file.content.len()));
     }
@@ -52,6 +49,34 @@ fn parse_files(input: &str) -> ToolResult<Vec<BatchFile>> {
         ));
     }
     Ok(out)
+}
+
+fn validate_batch(workspace: &Path, files: &[BatchFile], max_files: usize) -> ToolResult<()> {
+    if files.len() > max_files {
+        return Err(ToolError::invalid(format!(
+            "too many files; max={max_files}"
+        )));
+    }
+    reject_duplicates(files)?;
+    let mut total = 0usize;
+    for file in files {
+        workspace_path(workspace, &file.path)?;
+        crate::placeholder::reject(&file.content)?;
+        let bytes = file.content.len();
+        if bytes > MAX_FILE_BYTES {
+            return Err(ToolError::invalid(format!(
+                "file too large: {} bytes={bytes} max={MAX_FILE_BYTES}",
+                file.path
+            )));
+        }
+        total = total.saturating_add(bytes);
+        if total > MAX_TOTAL_BYTES {
+            return Err(ToolError::invalid(format!(
+                "batch too large: bytes={total} max={MAX_TOTAL_BYTES}"
+            )));
+        }
+    }
+    Ok(())
 }
 
 fn parse_block(block: &str) -> ToolResult<Option<BatchFile>> {

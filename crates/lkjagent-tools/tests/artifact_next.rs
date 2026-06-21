@@ -1,5 +1,6 @@
 mod support;
 
+use std::collections::BTreeSet;
 use std::fs;
 use std::path::Path;
 
@@ -45,7 +46,53 @@ fn artifact_next_for_scaffolded_cookbook_returns_batch_write() -> TestResult<()>
     assert!(output.contains("kind=cookbook"));
     assert!(output.contains("next_action=fs.batch_write"));
     assert!(output.contains("- foundations/"));
+    assert_no_scaffold_phrases(&output);
     assert_eq!(parsed.tool, "fs.batch_write");
+    Ok(())
+}
+
+#[test]
+fn artifact_next_advances_cursor_then_requests_audit() -> TestResult<()> {
+    let workspace = temp_workspace("artifact-next-cursor")?;
+    let root = "cookbooks/bread-cookbook";
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut dispatch_state = state();
+    dispatch(
+        &action(
+            "artifact.apply",
+            &[
+                ("root", root),
+                ("title", "Bread Cookbook"),
+                ("kind", "cookbook"),
+            ],
+        ),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    );
+    let mut seen = BTreeSet::new();
+    let mut requested_audit = false;
+    for _ in 0..10 {
+        dispatch_state.reset_repeat_tracking();
+        let output = dispatch(
+            &action("artifact.next", &[("root", root)]),
+            &runtime,
+            &mut conn,
+            &mut dispatch_state,
+        )
+        .content;
+        if output.contains("next_action=artifact.audit") {
+            requested_audit = true;
+            break;
+        }
+        for path in next_paths(&output) {
+            assert!(seen.insert(path), "artifact.next repeated weak path");
+        }
+    }
+
+    assert!(requested_audit, "artifact.next did not exhaust to audit");
+    assert!(lkjagent_store::state::get(&conn, &format!("artifact.next cursor {root}"))?.is_some());
     Ok(())
 }
 
@@ -90,6 +137,30 @@ fn valid_example_from(output: &str) -> TestResult<&str> {
         .split_once("valid_example:\n")
         .map(|(_, example)| example)
         .ok_or_else(|| "missing valid example".into())
+}
+
+fn assert_no_scaffold_phrases(text: &str) {
+    for phrase in [
+        "Replace this skeleton",
+        "Add the requested substance",
+        "real cookbook content before dispatch",
+    ] {
+        assert!(!text.contains(phrase), "scaffold phrase found: {phrase}");
+    }
+}
+
+fn next_paths(output: &str) -> Vec<String> {
+    let Some((_, rest)) = output.split_once("next_paths:\n") else {
+        return Vec::new();
+    };
+    let block = rest
+        .split_once("\nrequired_sections:")
+        .map_or(rest, |(paths, _)| paths);
+    block
+        .lines()
+        .filter_map(|line| line.strip_prefix("- "))
+        .map(str::to_string)
+        .collect()
 }
 
 fn replace_leaves(root: &Path) -> TestResult<()> {

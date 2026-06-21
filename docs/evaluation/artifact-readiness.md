@@ -23,6 +23,8 @@ Known-good traces refuse readiness, name weak paths, and admit bounded repair.
 Structure evidence and readiness evidence remain separate. Direct
 `graph.evidence` cannot satisfy artifact readiness. Cookbook recipes and
 techniques pass only when the profile-specific content sections are present.
+Scaffold phrases in artifact examples or write payloads fail before they can be
+recorded as readiness evidence.
 
 ## Verification
 

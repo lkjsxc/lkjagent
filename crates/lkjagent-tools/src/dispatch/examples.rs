@@ -115,7 +115,9 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
         ("fs.edit", "find") => "Example",
         ("fs.edit", "replace") => "Updated",
         ("fs.patch", "patch") => "*** Begin Patch\n*** End Patch",
-        ("fs.batch_write", "files") => "docs/example.md|# Example",
+        ("fs.batch_write", "files") => {
+            "path: docs/example.md\ncontent:\n# Example\n\nConcrete example content."
+        }
         ("fs.search", "query") | ("memory.find", "query") => "README",
         ("graph.note", "kind") => "decision",
         ("graph.evidence", "summary") => "Read README.md",

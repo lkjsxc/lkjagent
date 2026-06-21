@@ -62,12 +62,14 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [lib.rs](lib.rs): library root.
 - [memory.rs](memory.rs): memory save, find, and prune adapters.
 - [observe.rs](observe.rs): bounded frame construction helpers.
+- [placeholder.rs](placeholder.rs): normalized scaffold-phrase detector.
 - [queue.rs](queue.rs): queue list and mutation adapters.
 - [shell.rs](shell.rs): /bin/sh adapter with timeout handling.
 - [workspace.rs](workspace.rs): repository shape summaries and compact index.
 - [verify.rs](verify.rs): direct cargo and xtask verification runners.
 - [artifact.rs](artifact.rs): artifact plan, apply, audit, and next entrypoints.
 - [artifact_next.rs](artifact_next.rs): bounded artifact write-batch planner.
+- [artifact_next_example.rs](artifact_next_example.rs): content-bearing next-batch examples.
 - [doc/](doc/README.md): semantic scaffold and audit helper modules.
 - [doc.rs](doc.rs): document scaffold and audit entrypoints.
 - [structure.rs](structure.rs): recursive tree completion checks.

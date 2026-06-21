@@ -1,5 +1,6 @@
 pub mod artifact;
 mod artifact_next;
+mod artifact_next_example;
 pub mod benchmark_seed;
 pub mod control;
 pub mod count_guard;
@@ -54,6 +55,7 @@ pub mod fs_stat;
 pub mod fs_tree;
 pub mod memory;
 pub mod observe;
+mod placeholder;
 pub mod queue;
 pub mod shell;
 pub mod structure;

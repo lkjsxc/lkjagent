@@ -3,6 +3,7 @@ use std::path::Path;
 
 use crate::error::{ToolError, ToolResult};
 use crate::fs::workspace_path;
+use rusqlite::Connection;
 
 pub fn plan(
     root: &str,
@@ -61,6 +62,15 @@ pub fn audit(
 
 pub fn next(workspace: &Path, root: &str, kind: &str) -> ToolResult<String> {
     crate::artifact_next::next(workspace, root, kind)
+}
+
+pub fn next_with_cursor(
+    workspace: &Path,
+    conn: &Connection,
+    root: &str,
+    kind: &str,
+) -> ToolResult<String> {
+    crate::artifact_next::next_with_cursor(workspace, conn, root, kind)
 }
 
 fn scale_count(scale: &str) -> &str {

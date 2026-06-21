@@ -36,14 +36,18 @@ as the current manifest.
 
 Audits a semantic artifact root. Parameters are `root`, optional `kind`,
 optional `count`, and optional `mode`. When `kind` is story or cookbook, audit
-rejects a generic project-doc manifest for that artifact request.
+rejects a generic project-doc manifest for that artifact request. Passing
+artifact audit is the only audit-owned readiness proof for artifact-readiness
+evidence.
 
 ## artifact.next
 
 Plans the next bounded artifact write batch from readiness gaps. Parameters
 are `root` and optional `kind`. It returns exact weak paths, required sections,
-and a copyable `fs.batch_write` skeleton for the model to fill with real
-content before dispatch.
+and a copyable `fs.batch_write` example only when the example already contains
+profile-specific content. When no current weak path remains in the durable
+cursor window, it requests audit or focused reads instead of rendering a
+placeholder write.
 
 ## Status
 

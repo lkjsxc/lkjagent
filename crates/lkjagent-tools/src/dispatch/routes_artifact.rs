@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 
 use crate::dispatch::params::param;
 use crate::dispatch::{observe_result, DispatchOutput, DispatchState, ToolRuntime};
+use rusqlite::Connection;
 
 pub fn dispatch_artifact_plan(
     params: &BTreeMap<String, String>,
@@ -68,11 +69,13 @@ pub fn dispatch_artifact_next(
     params: &BTreeMap<String, String>,
     action_text: &str,
     runtime: &ToolRuntime,
+    conn: &Connection,
     state: &mut DispatchState,
 ) -> DispatchOutput {
     observe_result(
-        crate::artifact::next(
+        crate::artifact::next_with_cursor(
             &runtime.workspace,
+            conn,
             &param(params, "root"),
             &param(params, "kind"),
         ),

@@ -21,7 +21,9 @@ and optional `total` default `400`. The paths value is newline-separated.
 ## fs.write
 
 Writes one file, creating parent directories. The observation confirms path
-and byte count and does not echo the content.
+and byte count and does not echo the content. The write is rejected before any
+filesystem mutation when content contains scaffold phrases such as instructions
+to replace a skeleton or add substance later.
 
 ## fs.edit
 
@@ -81,7 +83,10 @@ content:
 # B
 ```
 
-The dispatcher rejects empty paths, duplicate paths, and workspace escapes.
+The dispatcher validates every file before writing any file. It rejects empty
+paths, duplicate paths, workspace escapes, scaffold phrases, files over 65,536
+bytes, total batches over 262,144 bytes, and file counts above the active
+limit.
 
 ## Graph Policy
 
