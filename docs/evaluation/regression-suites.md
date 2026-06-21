@@ -20,7 +20,9 @@ The suite includes `cookbook_missing_evidence`,
 `cookbook_weak_content_audit`, `tool_admission_graph_plan_contradiction`,
 `parameter_fault_memory_save`, `parse_fault_unclosed_content`,
 `repeat_action_refused`, `maintenance_noop_claim`, and
-`false_completion_after_scaffold`.
+`false_completion_after_scaffold`. The uploaded-run matrix also includes
+`artifact-readiness-graph-evidence-bypass`, which proves direct graph evidence
+cannot replace artifact audit readiness.
 
 ## Verification
 
@@ -28,4 +30,4 @@ Run `cargo run -p lkjagent-xtask -- benchmark check-corpus`.
 
 ## Status
 
-design-only for several named fixtures not yet present in the corpus.
+partially implemented.

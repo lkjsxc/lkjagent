@@ -15,6 +15,17 @@ pub fn dispatch_graph_evidence(
     state: &mut DispatchState,
 ) -> DispatchOutput {
     let kind = param(params, "kind");
+    if let Some((tool, reason)) = audit_owned_requirement(&kind) {
+        let example = audit_example(tool, params);
+        return observe_error(
+            ToolError::invalid(format!(
+                "audit-owned graph evidence requirement: {kind}\nreason={reason}\nvalid_example:\n{example}"
+            )),
+            action_text,
+            runtime,
+            state,
+        );
+    }
     let known = known_requirements(state);
     if !known.iter().any(|item| item == &kind) {
         let example_kind = known
@@ -64,11 +75,37 @@ fn known_requirements(state: &DispatchState) -> Vec<String> {
         .map(|policy| policy.evidence_requirements.clone())
         .filter(|items| !items.is_empty())
         .unwrap_or_else(|| {
-            ["plan", "observation", "verification", "document-structure"]
+            ["plan", "observation", "verification"]
                 .iter()
                 .map(|item| (*item).to_string())
                 .collect()
         })
+        .into_iter()
+        .filter(|item| audit_owned_requirement(item).is_none())
+        .collect()
+}
+
+fn audit_owned_requirement(kind: &str) -> Option<(&'static str, &'static str)> {
+    match kind {
+        "document-structure" => Some(("doc.audit", "document structure comes from doc.audit")),
+        "artifact-readiness" => Some((
+            "artifact.audit",
+            "artifact readiness comes from content-bearing artifact.audit",
+        )),
+        _ => None,
+    }
+}
+
+fn audit_example(tool: &str, params: &BTreeMap<String, String>) -> String {
+    valid_example_for(
+        tool,
+        ExampleContext {
+            artifact_root: params.get("path").filter(|path| !path.is_empty()).cloned(),
+            ..ExampleContext::default()
+        },
+    )
+    .map(|example| example.render())
+    .unwrap_or_else(|_| "<act>\n<tool>doc.audit</tool>\n<root>docs</root>\n</act>".to_string())
 }
 
 fn evidence_example(kind: String) -> String {

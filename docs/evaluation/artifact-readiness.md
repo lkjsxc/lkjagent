@@ -16,10 +16,12 @@ Known-good traces refuse readiness, name weak paths, and admit bounded repair.
 - `cookbook_scaffold_only_foundations`.
 - `cookbook_missing_readme_links`.
 - `cookbook_weak_content_audit`.
+- `artifact-readiness-graph-evidence-bypass`.
 
 ## Pass Condition
 
-Structure evidence and readiness evidence remain separate. Cookbook recipes and
+Structure evidence and readiness evidence remain separate. Direct
+`graph.evidence` cannot satisfy artifact readiness. Cookbook recipes and
 techniques pass only when the profile-specific content sections are present.
 
 ## Verification

@@ -42,6 +42,10 @@ maintenance restarts after no useful work.
 - The expanded authority, artifact, recovery, and evaluation docs are contract
   text only until focused tests and Docker Compose verification prove the
   corresponding runtime behavior.
+- Current code refuses direct `graph.evidence` for `artifact-readiness` and
+  `document-structure`, and the uploaded-run corpus covers the
+  artifact-readiness graph-evidence bypass. This is a focused proof, not
+  closure of rows 1 to 4.
 - Current code admits `artifact.next` and stricter content audit for bounded
   cookbook/story recovery, and quiet plus Docker Compose verification passed
   for this slice on 2026-06-20. Rows 7 to 10 stay open until completion wiring
