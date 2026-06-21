@@ -51,6 +51,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [count_seed_verify_text.rs](count_seed_verify_text.rs): counted scaffold text-section verifier.
 - [dispatch/](dispatch/README.md): dispatch helper modules.
 - [dispatch.rs](dispatch.rs): registry validation and tool routing.
+- [dictionary_audit.rs](dictionary_audit.rs): dictionary content-readiness checks.
 - [error.rs](error.rs): tool error type.
 - [fs.rs](fs.rs): filesystem read, write, and edit adapters.
 - [fs_list.rs](fs_list.rs): bounded deterministic file listing.

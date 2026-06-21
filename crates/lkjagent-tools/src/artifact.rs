@@ -41,6 +41,9 @@ pub fn audit(
     count: &str,
     mode: &str,
 ) -> ToolResult<String> {
+    if kind.trim().eq_ignore_ascii_case("dictionary") {
+        return crate::dictionary_audit::audit(workspace, root);
+    }
     let report = crate::doc::audit(workspace, root, count, mode)?;
     let kind = kind.trim();
     if kind.is_empty() || !report.starts_with("document audit passed") {
