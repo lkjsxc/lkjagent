@@ -21,17 +21,16 @@ each other in some paths. Compaction and graph policy must stay runtime-owned
 so hard pressure never requires a blocked model `memory.save`.
 
 Memory writes now skip exact equivalents, update same-title high-overlap rows,
-merge same-title high-overlap prune groups, and use punctuation-safe search,
-but rewrite pruning remains incomplete. Long content tasks route toward story
-and cookbook scaffolds, and `artifact.next` can plan bounded write batches from
-weak content paths, but semantic artifact identity, adoption, repair, and
-content-bearing completion need deeper runtime enforcement. The artifact
+merge same-title and maintenance no-op prune groups, and use punctuation-safe
+search, but rewrite pruning remains incomplete. Long content tasks route toward
+story, cookbook, and dictionary artifacts, and `artifact.next` can plan bounded
+write batches from weak content paths, but semantic artifact identity,
+adoption, and durable batch cursors need deeper runtime enforcement. The artifact
 lifecycle contract is
 [architecture/artifacts/lifecycle.md](architecture/artifacts/lifecycle.md).
 Recovery can still block the tools required to escape a fault. Completion can
-still be too close to planning or scaffold evidence unless artifact audit
-gates are enforced at every close path. Visible objective rendering must not
-show visible counter prefixes.
+still be too close to planning evidence on non-artifact close paths. Visible
+objective rendering must not show visible counter prefixes.
 
 Owner-reported failures remain active evidence: repeated parse faults,
 invalid `graph.plan`, blocked `doc.scaffold`, blocked `fs.write`, empty
@@ -57,7 +56,7 @@ owner-reported documentation, action recovery, recovery-loop, graph-plan
 example, FTS punctuation, duplicate-memory, active-policy contradiction,
 invalid-note-kind, bread-cookbook false-completion, accounting, and GPT log
 failure cases with known-good and known-bad fixtures. Final quiet verification
-and Docker Compose verification passed for this redesign slice on 2026-06-20.
+and Docker Compose verification passed for this redesign slice on 2026-06-21.
 
 ## Active Redesign Target
 
@@ -100,9 +99,10 @@ target outcomes are:
 The dependency queue is
 [execution/current-blockers.md](execution/current-blockers.md). The open work is
 structural, not only endpoint quality: endpoint-turn mode selection,
-semantic maintenance pruning, compaction snapshots, artifact adoption/repair,
-and blocked handoffs need deeper coverage before the ledger can call the loop
-redesign implemented. Final verification must be rerun after each later slice.
+artifact adoption/repair, durable batch cursors, last-observation compaction
+snapshots, and blocked handoffs need deeper coverage before the ledger can call
+the loop redesign implemented. Final verification must be rerun after each
+later slice.
 
 ## Out of Scope
 
