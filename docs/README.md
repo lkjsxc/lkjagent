@@ -46,8 +46,8 @@ directories with short focused files.
   `architecture/structured-records/memory-records.md`
   `architecture/structured-records/completion-evidence.md`
 - `architecture/action-reliability/README.md` `architecture/action-reliability/parameter-contract.md`
-  `architecture/action-reliability/recovery.md` `architecture/action-reliability/normalization.md`
-  `architecture/action-reliability/error-messages.md`
+  `architecture/action-reliability/recovery.md` `architecture/action-reliability/schema-repair.md`
+  `architecture/action-reliability/normalization.md` `architecture/action-reliability/error-messages.md`
 - `architecture/state-model/README.md` `architecture/state-model/multi-state.md`
   `architecture/state-model/state-intensity.md` `architecture/state-model/transition-quality.md`
   `architecture/state-model/owner-input.md`
@@ -72,7 +72,8 @@ directories with short focused files.
   `architecture/state-graph/transitions.md` `architecture/state-graph/context-packages.md`
   `architecture/state-graph/task-state.md` `architecture/state-graph/compaction.md`
   `architecture/state-graph/completion.md` `architecture/state-graph/maintenance.md`
-  `architecture/state-graph/policy.md` `architecture/state-graph/tool-affordances.md`
+  `architecture/state-graph/policy.md` `architecture/state-graph/escape-hatches.md`
+  `architecture/state-graph/tool-affordances.md`
   `architecture/state-graph/recovery-ladders.md` `architecture/state-graph/graph-guidance.md`
   `architecture/state-graph/document-construction.md`
 - `architecture/context/README.md` `architecture/context/layout.md` `architecture/context/budgets.md`
