@@ -14,6 +14,7 @@ maintenance. Known-good traces refuse close and name the next admitted action.
 
 - `false_completion_after_scaffold`.
 - `maintenance_noop_claim`.
+- `artifact-readiness-graph-evidence-bypass`.
 - Cookbook artifact readiness failure before close.
 - Missing document audit before close.
 

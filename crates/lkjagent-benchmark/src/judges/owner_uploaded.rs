@@ -25,6 +25,9 @@ pub fn uploaded_run_fixtures(workspace: &Path) -> Result<(), String> {
             "fixture=cookbook-scaffold-false-ready",
             "structure_audit=passed",
             "agent.done=refused",
+            "fixture=artifact-readiness-graph-evidence-bypass",
+            "graph.evidence artifact-readiness=refused",
+            "next_action=artifact.audit",
         ],
     )?;
     if text.matches("completion=refused").count() < 2 {
@@ -41,6 +44,8 @@ pub fn uploaded_run_fixtures(workspace: &Path) -> Result<(), String> {
             "mutation_tools=blocked",
             "empty maintenance cycle",
             "content_readiness=passed",
+            "graph.evidence kind=artifact-readiness",
+            "completion=ready",
         ],
     )
 }

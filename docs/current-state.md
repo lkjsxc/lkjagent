@@ -49,6 +49,9 @@ not copy raw owner text, SQLite track snapshots, graph notice rendering,
 transition selection, and status/console display tests. Runtime recovery and
 normal post-event graph refresh routes consume the selector. Completion
 refusals now produce structured partial handoffs instead of vague denials.
+Audit-owned evidence requirements now stay audit-derived: `graph.evidence`
+cannot satisfy `artifact-readiness` or `document-structure`, and completion
+refusals point to `artifact.audit` or `doc.audit` for those gates.
 Compact token accounting is implemented for endpoint usage, status, and console.
 A single synthesized GPT handoff log is implemented and exposed through status,
 console, and `lkjagent gpt-log`. The benchmark corpus now includes
@@ -83,7 +86,7 @@ requirements, not proof that the runtime behavior is complete.
 | Cargo workspace and gates | implemented | `Cargo.toml`; `crates/lkjagent-xtask` |
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol`; child-tag file tool parameters have focused fixtures |
-| Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; dispatch now checks one effective policy object before routing, including `agent.done` completion refusal; schema repair emits one canonical example for covered parameter and evidence-kind faults |
+| Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; dispatch now checks one effective policy object before routing, including `agent.done` completion refusal; schema repair emits one canonical example for covered parameter and evidence-kind faults; audit-owned evidence refuses direct `graph.evidence` |
 | Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; artifact.apply reuses the planner and writer |
 | Document audit tool | implemented | topology checks pass local gates; artifact.audit checks kind mismatch; content artifacts reject scaffold-only leaves, weak cookbook/story leaves, and shallow dictionary term lists |
 | Artifact next batch | implemented | `artifact.next` returns exact weak paths and an admitted `fs.batch_write` skeleton; scaffold-only cookbook and meaningful cookbook tests pass |
@@ -91,7 +94,7 @@ requirements, not proof that the runtime behavior is complete.
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, same-title overlap update, punctuation-safe FTS queries, exact duplicate prune, same-title prune merge, and maintenance no-op lesson merge have focused tests; rewrite pruning remains open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
-| Runtime recovery | partially implemented | pure turn authority selection, pure reducer/admission helpers, authority snapshot/event/decision types, store-backed runtime snapshots, one active-mode endpoint card, cached dispatch authority, recovery escape-tool visibility, batch-oriented recovery examples, and effective dispatch repair admissions exist; internal `agent.ask` questions are refused, runtime close rechecks graph completion, content artifacts require separate artifact-readiness evidence, and no-op maintenance defers restart; fault-class-specific deterministic recovery control remains open |
+| Runtime recovery | partially implemented | pure turn authority selection, pure reducer/admission helpers, authority snapshot/event/decision types, store-backed runtime snapshots, one active-mode endpoint card, cached dispatch authority, recovery escape-tool visibility, batch-oriented recovery examples, and effective dispatch repair admissions exist; internal `agent.ask` questions are refused, runtime close rechecks graph completion, content artifacts require separate audit-derived artifact-readiness evidence, and no-op maintenance defers restart; fault-class-specific deterministic recovery control remains open |
 | Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned and renders mission, evidence gaps, artifact root/id, recovery step, last failed action, admitted tools, exact next action, and completion blockers; durable batch cursors and last-successful-observation snapshots remain open |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |

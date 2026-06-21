@@ -160,6 +160,20 @@ struct CompletionNextAction {
 }
 
 fn next_completion_action(first: &str) -> CompletionNextAction {
+    if first == "artifact-readiness" {
+        return CompletionNextAction {
+            label: "run artifact.audit before retrying agent.done",
+            example:
+                "<act>\n<tool>artifact.audit</tool>\n<root>stories/example-story</root>\n</act>"
+                    .to_string(),
+        };
+    }
+    if first == "document-structure" {
+        return CompletionNextAction {
+            label: "run doc.audit before retrying agent.done",
+            example: "<act>\n<tool>doc.audit</tool>\n<root>docs</root>\n</act>".to_string(),
+        };
+    }
     if first == "plan" {
         return CompletionNextAction {
             label: "record graph.plan with steps, checks, paths, and reason",

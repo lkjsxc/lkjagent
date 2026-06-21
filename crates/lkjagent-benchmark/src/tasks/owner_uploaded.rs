@@ -2,7 +2,7 @@ use crate::model::{BenchmarkTask, Difficulty, FileSpec, Fixture, JudgeKind, Task
 
 const GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "fixture=recover-repeat-parameter-fault\nschema_repair=one canonical example\nnext_action=graph.recover\ncompletion=refused\nfixture=bread-dictionary-shallow-content\nartifact_kind=Dictionary\ncontent_readiness=failed\nrepair_admitted=artifact.next,fs.batch_write\nfixture=large-write-payload-risk\npayload_too_large=blocked raw fs.write\nnext_action=fs.batch_write\nfixture=completion-with-blocked-mutation\ncompletion=refused\nmission=Repair\nmutation_tools=admitted\nfixture=maintenance-during-owner-work\nmaintenance=yielded\nmemory_loop=absent\nfixture=cookbook-scaffold-false-ready\nstructure_audit=passed\ncontent_readiness=failed\nagent.done=refused\n",
+    content: "fixture=recover-repeat-parameter-fault\nschema_repair=one canonical example\nnext_action=graph.recover\ncompletion=refused\nfixture=bread-dictionary-shallow-content\nartifact_kind=Dictionary\ncontent_readiness=failed\nrepair_admitted=artifact.next,fs.batch_write\nfixture=large-write-payload-risk\npayload_too_large=blocked raw fs.write\nnext_action=fs.batch_write\nfixture=completion-with-blocked-mutation\ncompletion=refused\nmission=Repair\nmutation_tools=admitted\nfixture=maintenance-during-owner-work\nmaintenance=yielded\nmemory_loop=absent\nfixture=cookbook-scaffold-false-ready\nstructure_audit=passed\ncontent_readiness=failed\nagent.done=refused\nfixture=artifact-readiness-graph-evidence-bypass\ngraph.evidence artifact-readiness=refused\nnext_action=artifact.audit\n",
 }];
 
 const BAD_RECOVER_REPEAT: &[FileSpec] = &[FileSpec {
@@ -34,6 +34,11 @@ const BAD_MAINTENANCE: &[FileSpec] = &[FileSpec {
 const BAD_COOKBOOK: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
     content: "fixture=cookbook-scaffold-false-ready\n100 files\nstructure_audit=passed\ncontent_readiness=passed\nagent.done complete\n",
+}];
+
+const BAD_ARTIFACT_EVIDENCE: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content: "fixture=artifact-readiness-graph-evidence-bypass\ngraph.evidence kind=artifact-readiness\ncompletion=ready\nagent.done complete\n",
 }];
 
 pub const TASK: BenchmarkTask = BenchmarkTask {
@@ -73,6 +78,10 @@ pub const TASK: BenchmarkTask = BenchmarkTask {
         Fixture {
             name: "cookbook-scaffold-false-ready",
             files: BAD_COOKBOOK,
+        },
+        Fixture {
+            name: "artifact-readiness-graph-evidence-bypass",
+            files: BAD_ARTIFACT_EVIDENCE,
         },
     ],
     judge: JudgeKind::UploadedRunFixtures,

@@ -38,6 +38,51 @@ fn content_artifact_done_refuses_structure_without_readiness() -> TestResult<()>
     Ok(())
 }
 
+#[test]
+fn explicit_artifact_readiness_evidence_does_not_bypass_audit() -> TestResult<()> {
+    let planned = apply_tool(
+        open_content_task()?,
+        "graph.plan",
+        &[
+            ("objective", "Finish long SF story artifact"),
+            ("steps", "audit story tree; confirm content readiness"),
+            ("checks", "artifact audit passed with readiness"),
+            ("paths", "stories/long-sf-story"),
+            ("reason", "content artifacts need readiness evidence"),
+        ],
+        "graph plan recorded",
+    );
+    let structured = apply_tool(
+        planned,
+        "artifact.audit",
+        &[("root", "stories/long-sf-story"), ("kind", "story")],
+        "artifact audit passed\nroot=stories/long-sf-story\nfailed=0",
+    );
+    let claimed = apply_tool(
+        structured,
+        "graph.evidence",
+        &[
+            ("kind", "artifact-readiness"),
+            ("summary", "claimed content readiness"),
+            ("path", "stories/long-sf-story"),
+        ],
+        "graph evidence recorded\nkind=artifact-readiness\npath=stories/long-sf-story",
+    );
+
+    assert!(claimed.graph.as_ref().is_some_and(|graph| {
+        graph.evidence.has("document-structure") && !graph.evidence.has("artifact-readiness")
+    }));
+    let result = attempt_done(claimed);
+
+    assert_eq!(result.stop_reason, Some(StopReason::ToolError));
+    assert!(matches!(result.state.task, TaskState::Open { .. }));
+    assert!(result
+        .effects
+        .iter()
+        .any(|effect| format!("{effect:?}").contains("artifact-readiness")));
+    Ok(())
+}
+
 fn open_content_task() -> TestResult<RuntimeState> {
     let mut state = runtime_state()?;
     state.task = TaskState::Open { turns_remaining: 8 };

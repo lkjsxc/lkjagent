@@ -31,15 +31,43 @@ fn graph_evidence_valid_example_uses_missing_requirement() -> TestResult<()> {
     let example = valid_example_for(
         "graph.evidence",
         ExampleContext {
-            evidence_requirement: Some("document-structure".to_string()),
+            evidence_requirement: Some("verification".to_string()),
             ..ExampleContext::default()
         },
     )?
     .render();
 
-    assert!(example.contains("<kind>document-structure</kind>"));
+    assert!(example.contains("<kind>verification</kind>"));
     let parsed = parse_example(&example)?;
     validate_action(&parsed).map_err(|err| format!("validation failed: {err}"))?;
+    Ok(())
+}
+
+#[test]
+fn graph_evidence_rejects_audit_owned_requirement() -> TestResult<()> {
+    let mut state = state();
+    state.graph_policy = Some(policy_with_evidence(&[
+        "plan",
+        "observation",
+        "document-structure",
+        "artifact-readiness",
+    ]));
+    let output = dispatch_example_with_state(
+        action(
+            "graph.evidence",
+            &[
+                ("kind", "artifact-readiness"),
+                ("summary", "claimed content readiness"),
+                ("path", "stories/example-story"),
+            ],
+        ),
+        state,
+    )?;
+
+    assert!(is_error(&output));
+    assert!(output.content.contains("audit-owned graph evidence"));
+    assert!(output.content.contains("<tool>artifact.audit</tool>"));
+    assert!(!output.content.contains("<tool>graph.evidence</tool>"));
     Ok(())
 }
 

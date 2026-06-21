@@ -94,6 +94,12 @@ pub(super) fn add_explicit_graph_evidence(
     effects: &mut Vec<Effect>,
 ) -> bool {
     let requirement = action_param(action, "kind");
+    if matches!(
+        requirement.as_str(),
+        "document-structure" | "artifact-readiness"
+    ) {
+        return false;
+    }
     if !graph.evidence.knows_requirement(&requirement) {
         return false;
     }
