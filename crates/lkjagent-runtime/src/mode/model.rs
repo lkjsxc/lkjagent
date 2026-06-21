@@ -42,18 +42,34 @@ pub struct RuntimeSnapshot {
     pub recovery_ladder_active: bool,
     pub context_pressure_active: bool,
     pub maintenance_eligible: bool,
-    pub required_evidence: Vec<&'static str>,
-    pub missing_evidence: Vec<&'static str>,
-    pub active_artifact: Option<&'static str>,
+    pub required_evidence: Vec<String>,
+    pub missing_evidence: Vec<String>,
+    pub active_artifact: Option<String>,
+    pub last_tool_attempt: Option<String>,
+    pub repeated_action: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RuntimeFault {
+    Parse,
+    Parameter,
+    ToolRuntime,
+    Repeat,
+    PolicyContradiction,
+    PayloadTooLarge,
+    VerificationMismatch,
+    CompletionRefused,
+    CompactionPressure,
+    MaintenanceConflict,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum RuntimeEvent {
     OwnerMessageQueued,
-    EndpointActionParsed,
+    EndpointActionParsed { tool: String },
     EndpointActionParseFailed,
     ToolSucceeded,
-    ToolFailed,
+    ToolFailed { fault: RuntimeFault },
     VerificationSucceeded,
     VerificationFailed,
     ContextPressureRaised,
@@ -65,13 +81,13 @@ pub enum RuntimeEvent {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ToolAdmission {
     pub admitted: bool,
-    pub reason: &'static str,
+    pub reason: String,
     pub active_mission: ActiveMode,
-    pub required_evidence: Vec<&'static str>,
-    pub missing_evidence: Vec<&'static str>,
-    pub next_valid_tools: Vec<&'static str>,
-    pub exact_valid_example: Option<&'static str>,
-    pub contradiction: Option<&'static str>,
+    pub required_evidence: Vec<String>,
+    pub missing_evidence: Vec<String>,
+    pub next_valid_tools: Vec<String>,
+    pub exact_valid_example: Option<String>,
+    pub contradiction: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
