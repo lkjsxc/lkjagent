@@ -51,6 +51,14 @@ Required evidence includes focused authority unit tests, uploaded benchmark
 fixtures, artifact readiness tests, protocol repair tests, `quiet verify`, and
 the Docker Compose final gate.
 
+## Inventory
+
+The 2026-06-21 orientation found 219 markdown files under 29 docs directories.
+The expected authority, artifact, action-reliability, and uploaded-run fixture
+contract files exist and are under the 200-line cap. Initial local doc gates
+failed only because an untracked `tmp/prompt01.md` copy of the execution brief
+was inside the repository and violated markdown shape and line limits.
+
 ## Related Files
 
 - [../../architecture/runtime/active-mode/README.md](../../architecture/runtime/active-mode/README.md)

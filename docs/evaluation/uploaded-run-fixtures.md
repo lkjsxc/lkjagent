@@ -11,6 +11,25 @@ quality. Each fixture has a known-bad workspace or transcript pattern and a
 known-good expectation that proves the runtime refuses false completion and
 selects a productive next action.
 
+## Fixture Shape
+
+```text
+UploadedRunFixture
+- fixture_name
+- transcript_slice
+- initial_runtime_snapshot
+- event
+- expected_authority_decision
+- expected_admitted_tools
+- expected_blocked_tools
+- expected_exact_next_action
+- expected_evidence_delta
+- expected_persistence_delta
+```
+
+Judges are deterministic. Control-plane fixtures do not score model prose
+quality.
+
 ## Invariants
 
 - Fixtures must detect the failure class, not the exact prose of one run.
@@ -19,7 +38,20 @@ selects a productive next action.
   as completion.
 - Fixture names must be stable and descriptive.
 
-## Failure Cases
+## Required Uploaded Cookbook Cases
+
+- `uploaded-cookbook-parse-recovery`
+- `uploaded-cookbook-maintenance-preemption`
+- `uploaded-cookbook-large-write-overflow`
+- `uploaded-cookbook-batch-write-schema-fault`
+- `uploaded-cookbook-scaffold-only-readiness`
+- `uploaded-cookbook-semantic-mismatch-bread`
+- `uploaded-cookbook-recovery-tool-block`
+- `uploaded-cookbook-turn-budget-handoff`
+- `uploaded-cookbook-completion-refusal`
+- `uploaded-cookbook-compaction-resume`
+
+## Existing Failure Classes
 
 - `recover-repeat-parameter-fault`: repeated `fs.list`, `fs.stat`, or
   `fs.read` parameter refusals must produce one canonical schema repair, no

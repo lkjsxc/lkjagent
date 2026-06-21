@@ -3,35 +3,80 @@
 ## Purpose
 
 Define the runtime-owned authority layer that decides active mission, tool
-admission, compaction ownership, maintenance eligibility, and completion
-closure.
+admission, compaction ownership, maintenance eligibility, recovery shape, and
+completion closure.
 
 ## Contract
 
 Runtime authority is the only source of action truth. Model output is intent.
 Graph transitions are guidance. Context pressure, maintenance ticks, verifier
-results, and completion requests are events. The authority reducer turns those
-facts into one decision before effects run.
+results, tool observations, parser faults, and completion requests are events.
+The pure reducer turns one snapshot plus one event into one decision before any
+effect runs.
+
+```text
+RuntimeSnapshot + RuntimeEvent -> RuntimeDecision
+RuntimeDecision + requested_tool -> ToolAdmission
+```
+
+## Decision Boundary
+
+The reducer decides the active mission, admitted tools, blocked tools, missing
+evidence, exact next action, recovery plan, compaction requirement, maintenance
+eligibility, persistence writes, and prompt card. Effects may execute only the
+admitted action named by that decision.
+
+The graph may rank states, provide context packages, and suggest transitions.
+It may not close a case, admit `agent.done`, start maintenance, or remove the
+repair tools needed by the current mission.
+
+## Mission Priority
+
+```text
+hard_runtime_compaction
+owner_recovery
+schema_repair
+artifact_repair
+verification_repair
+owner_execution
+owner_verification
+owner_completion
+idle_maintenance
+closed_idle
+```
+
+Higher missions preempt lower missions. Maintenance is lower than every owner,
+recovery, verification, and compaction mission.
 
 ## Invariants
 
-- The reducer has no I/O.
+- The reducer has no I/O, clock reads, filesystem reads, SQLite reads, or
+  endpoint calls.
 - Every decision names active mission, admitted tools, blocked tools, missing
-  evidence, and next valid action.
+  evidence, completion state, and next valid action.
 - Completion must pass the same gate on every close path.
-- Graph policy cannot trap repair, audit, or compaction.
+- Recovery must preserve the read, audit, repair, and batch tools needed by the
+  mission that failed.
+- Compaction is runtime-owned and persists resume data without a model-authored
+  memory action.
+- Maintenance is strictly idle-only and must be preempted by owner work.
 
-## Failure Cases
+## Uploaded Failure Mapping
 
-- A graph completion node blocks `fs.read`, `artifact.audit`, or repair tools.
-- Recovery refuses the exact tool needed to leave recovery.
-- Maintenance runs while owner work or verification is pending.
-- Compaction depends on model-authored `memory.save`.
+- Early `agent.done` maps to completion-policy and evidence invariants.
+- Maintenance memory writes during owner work map to maintenance-policy
+  invariants.
+- Large raw writes map to compaction-policy and batch recovery invariants.
+- Invalid `fs.batch_write` examples map to schema-repair invariants.
+- Scaffold-only cookbook leaves map to artifact-readiness invariants.
+- Recovery blocking artifact tools maps to tool-admission invariants.
+- Turn-budget exhaustion maps to compaction and partial-handoff invariants.
 
 ## Verification
 
 Authority is verified by pure reducer tests, dispatcher admission tests,
-completion-refusal tests, compaction snapshot tests, and uploaded run-log
+completion-refusal tests, compaction snapshot tests, maintenance-preemption
+tests, schema-example tests, artifact-readiness tests, and uploaded run-log
 benchmark fixtures.
 
 ## Table of Contents

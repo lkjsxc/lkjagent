@@ -18,6 +18,42 @@ tool is still needed, then chooses an alternate observation or emits a policy
 contradiction. A payload fault never retries raw `fs.write`; it routes to
 artifact planning, `artifact.next`, or bounded `fs.batch_write`.
 
+## Schema Source
+
+One registry owns tool name, required fields, optional fields, field encoding,
+canonical example, normalization rules, dispatcher parser, and admission
+metadata. Every valid example shown to the model must parse, validate, and
+pass dispatcher admission in tests.
+
+## Batch Write Rules
+
+The canonical `fs.batch_write` example is:
+
+```text
+<act>
+<tool>fs.batch_write</tool>
+<files>
+path: some/path.md
+content:
+# Title
+
+Body.
+
+-- lkjagent-next-file --
+path: other/path.md
+content:
+# Title
+
+Body.
+</files>
+</act>
+```
+
+Normalization may accept `path:foo`, `<path>foo</path>`, XML-ish accidental
+wrappers, and extra blank lines before `path:`. Rendered examples always use
+canonical format. If the same syntax fault repeats, authority switches to
+normalized parse, one-file fallback, deterministic writer, or blocked handoff.
+
 ## Invariants
 
 - A refusal shows exactly one canonical valid action example.
@@ -26,6 +62,7 @@ artifact planning, `artifact.next`, or bounded `fs.batch_write`.
 - Unknown `scale` in `artifact.apply` names accepted parameters.
 - Repeated invalid `graph.state` must select a different next action.
 - Nested `<path>` child parameters are valid for `fs.read` and `fs.stat`.
+- Large payload recovery never suggests another raw large write.
 
 ## Failure Cases
 
@@ -39,7 +76,8 @@ artifact planning, `artifact.next`, or bounded `fs.batch_write`.
 
 Focused tests cover child tags for `fs.read`, `fs.stat`, and `fs.list`,
 allowed evidence kinds, unknown parameter rejection, exact example rendering,
-no repeated invalid example loop, and payload-to-batch recovery.
+no repeated invalid example loop, payload-to-batch recovery, XML-ish accidental
+wrappers, and dispatch of every generated valid example.
 
 ## Related Files
 

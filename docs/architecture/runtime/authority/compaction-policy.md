@@ -19,24 +19,51 @@ batch cursor, admitted tools, and verification state.
 
 The output is snapshot now, continue without snapshot, or soft compaction
 eligible. Snapshot output includes the resume card rendered to the next turn.
+No model-authored `memory.save` is required.
 
-## Required Snapshot Fields
+## Resume Shape
 
-Snapshots include case id, objective, active mode, graph node, artifact root,
-profile, evidence gaps, audit failures, weak paths, missing links,
-scaffold-only paths, batch cursor, last observation, last failed action, fault
-class, retry count, admitted tools, blocked tools, next action, verification
-state, and queue depth.
+```text
+CompactionResume
+- case_id
+- active_mission
+- previous_mission
+- active_node
+- objective_summary
+- artifact_id
+- root
+- batch_cursor
+- missing_evidence
+- last_failed_action
+- last_failed_error
+- last_successful_action
+- last_successful_observation
+- admitted_tools
+- exact_next_action
+- completion_blockers
+- open_faults
+```
+
+## Invariants
+
+- Hard pressure snapshots before owner intake, recovery prompts, maintenance,
+  or completion prompts.
+- Post-compaction state resumes the previous mission, not idle maintenance.
+- Artifact repair resumes at the next unwritten weak path.
+- Parse recovery resumes with previous mission escape tools preserved.
+- Verification resumes with the failing command and next file if any.
 
 ## Prohibited States
 
 - Hard pressure depends on a model-authored memory action.
 - Snapshot loses artifact repair cursor or recovery class.
 - Post-compaction authority is reconstructed from prose only.
+- Compaction enters maintenance while owner evidence is missing.
 
 ## Fixture
 
-`compaction_resume_missing` proves resume fields are mandatory.
+`compaction_resume_missing` proves resume fields are mandatory. Uploaded
+cookbook compaction fixtures prove batch cursor and readiness blockers survive.
 
 ## Verification
 

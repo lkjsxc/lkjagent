@@ -21,6 +21,13 @@ welcome; work outside it is rejected regardless of quality.
 - Container-first operation via docker compose.
 - The xtask verification gates that keep this repository lawful.
 
+## Builder Helpers
+
+Implementation-time helpers supplied by a coding harness are allowed for
+reading, planning, test design, or review. Product behavior may not depend on
+external subagents, MCP servers, or parallel worker sessions. Adding product
+subagents requires a deliberate scope change first.
+
 ## Out of Scope
 
 - MCP in any form. Capabilities arrive as graph policy, not servers.
