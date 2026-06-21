@@ -24,7 +24,7 @@ pub fn decide_turn_authority(input: TurnAuthorityInput) -> TurnAuthority {
     let completion_policy = completion_policy_for(mode);
     let endpoint_decision = endpoint_decision_for(mode, input);
     let valid_example = valid_example_for(mode, endpoint_decision);
-    let prompt_card = prompt_card(&effective_policy, &valid_example);
+    let prompt_card = prompt_card(&effective_policy, input, endpoint_decision, &valid_example);
     let dispatch_card = render_mode_policy(&effective_policy);
 
     TurnAuthority {
@@ -39,8 +39,13 @@ pub fn decide_turn_authority(input: TurnAuthorityInput) -> TurnAuthority {
     }
 }
 
-fn prompt_card(policy: &ActiveModePolicy, valid_example: &str) -> String {
-    format!(
+fn prompt_card(
+    policy: &ActiveModePolicy,
+    input: TurnAuthorityInput,
+    endpoint_decision: EndpointDecision,
+    valid_example: &str,
+) -> String {
+    let mut card = format!(
         "Active Mode:\nmode={:?}\npolicy_layers={}\nallowed_tools={}\nblocked_tools={}\npreferred_next_action={}\ncompletion_condition={}\nvalid_example:\n{}",
         policy.mode,
         policy_layers(policy),
@@ -49,6 +54,27 @@ fn prompt_card(policy: &ActiveModePolicy, valid_example: &str) -> String {
         policy.preferred_next_action,
         policy.completion_condition,
         valid_example,
+    );
+    if endpoint_decision == EndpointDecision::RuntimeCompact {
+        card.push_str(&compaction_resume_card(input, policy));
+    }
+    card
+}
+
+fn compaction_resume_card(input: TurnAuthorityInput, policy: &ActiveModePolicy) -> String {
+    let active_case = if input.owner_work_exists() {
+        "open-or-recoverable"
+    } else {
+        "none"
+    };
+    let recovery_ladder = if input.recoverable_owner_case {
+        "active"
+    } else {
+        "inactive"
+    };
+    format!(
+        "\nCompaction Snapshot:\nactive_case={active_case}\nmissing_evidence=artifact-readiness,verification,recovery-resolution\nactive_artifact=pending-or-unknown\nrecovery_ladder={recovery_ladder}\nnext_valid_action={}",
+        policy.preferred_next_action
     )
 }
 
@@ -83,9 +109,8 @@ fn valid_example_for(mode: ActiveMode, endpoint_decision: EndpointDecision) -> S
         return "runtime action; no model act block".to_string();
     }
     match mode {
-        ActiveMode::OwnerTask | ActiveMode::Recovery => {
-            "<act>\n<tool>graph.state</tool>\n</act>".to_string()
-        }
+        ActiveMode::OwnerTask => "<act>\n<tool>graph.state</tool>\n</act>".to_string(),
+        ActiveMode::Recovery => "<act>\n<tool>graph.recover</tool>\n</act>".to_string(),
         ActiveMode::Maintenance => {
             "<act>\n<tool>memory.find</tool>\n<query>maintenance</query>\n</act>".to_string()
         }

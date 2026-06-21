@@ -17,7 +17,8 @@ const BAD_DICTIONARY: &[FileSpec] = &[FileSpec {
 
 const BAD_PAYLOAD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "fixture=large-write-payload-risk\n<tool>fs.write</tool>\nmax_tokens\nretry raw fs.write\n",
+    content:
+        "fixture=large-write-payload-risk\n<tool>fs.write</tool>\nmax_tokens\nretry raw fs.write\n",
 }];
 
 const BAD_BLOCKED_COMPLETION: &[FileSpec] = &[FileSpec {
