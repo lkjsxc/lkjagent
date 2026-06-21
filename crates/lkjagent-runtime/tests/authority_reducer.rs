@@ -60,6 +60,28 @@ fn payload_too_large_routes_to_batch_write_recovery() {
 }
 
 #[test]
+fn recovery_keeps_artifact_escape_tools_admitted() {
+    let snapshot = recovery_snapshot();
+    let tools = admit_tool(&snapshot, "artifact.next").next_valid_tools;
+
+    for tool in [
+        "artifact.next",
+        "artifact.audit",
+        "doc.audit",
+        "doc.scaffold",
+        "fs.read",
+        "fs.tree",
+        "fs.write",
+        "fs.batch_write",
+    ] {
+        assert!(
+            tools.iter().any(|candidate| candidate == tool),
+            "missing {tool}"
+        );
+    }
+}
+
+#[test]
 fn repeated_action_is_not_executed_again() {
     let mut snapshot = recovery_snapshot();
     snapshot.last_tool_attempt = Some("graph.recover".to_string());
