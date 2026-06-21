@@ -72,6 +72,34 @@ fn graph_evidence_rejects_audit_owned_requirement() -> TestResult<()> {
 }
 
 #[test]
+fn graph_evidence_rejects_document_structure_requirement() -> TestResult<()> {
+    let mut state = state();
+    state.graph_policy = Some(policy_with_evidence(&[
+        "plan",
+        "observation",
+        "document-structure",
+    ]));
+    let output = dispatch_example_with_state(
+        action(
+            "graph.evidence",
+            &[
+                ("kind", "document-structure"),
+                ("summary", "claimed document structure"),
+                ("path", "docs"),
+            ],
+        ),
+        state,
+    )?;
+
+    assert!(is_error(&output));
+    assert!(output
+        .content
+        .contains("document structure comes from doc.audit"));
+    assert!(output.content.contains("<tool>doc.audit</tool>"));
+    Ok(())
+}
+
+#[test]
 fn graph_evidence_rejects_decision_with_known_requirements() -> TestResult<()> {
     let mut state = state();
     state.graph_policy = Some(policy_with_evidence(&[
