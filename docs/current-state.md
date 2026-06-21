@@ -72,6 +72,10 @@ target outcomes are:
 6. Uploaded run-log fixtures are covered by mechanical benchmarks.
 7. Docker Compose verification passes after the implementation slice.
 
+The documentation contract now names the required authority, artifact,
+recovery, and uploaded-run evaluation pages. Those pages are implementation
+requirements, not proof that the runtime behavior is complete.
+
 ## Area Status
 
 | Area | Status | Evidence |

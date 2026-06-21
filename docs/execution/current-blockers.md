@@ -39,6 +39,9 @@ maintenance restarts after no useful work.
 - Docker Compose verification is required for any implemented claim.
 - Historical fixes may exist, but this queue tracks the current controller and
   artifact hardening work until it passes the current final gate.
+- The expanded authority, artifact, recovery, and evaluation docs are contract
+  text only until focused tests and Docker Compose verification prove the
+  corresponding runtime behavior.
 - Current code admits `artifact.next` and stricter content audit for bounded
   cookbook/story recovery, and quiet plus Docker Compose verification passed
   for this slice on 2026-06-20. Rows 7 to 10 stay open until completion wiring

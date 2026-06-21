@@ -21,6 +21,11 @@ cookbooks, guides, encyclopedias, and other large content deliverables.
 - [adoption.md](adoption.md): existing root adoption.
 - [repair.md](repair.md): bounded repair after failed audit.
 - [write-batches.md](write-batches.md): bounded content write loop.
+- [semantic-identity.md](semantic-identity.md): artifact identity fields.
+- [adoption-and-repair.md](adoption-and-repair.md): adoption followed by readiness repair.
+- [batch-cursors.md](batch-cursors.md): durable batch progress state.
+- [readiness-evidence.md](readiness-evidence.md): evidence that can satisfy readiness.
+- [false-completion.md](false-completion.md): scaffold-only and weak-content close refusal.
 
 ## Contract
 
