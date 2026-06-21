@@ -47,6 +47,11 @@ a tool, the observation names the active node, phase, reason, preferred next
 action, and one copyable allowed example. No rendered valid example may be
 rejected by the same registry or dispatcher.
 
+When graph policy contradicts missing completion evidence or recovery needs,
+runtime authority follows [escape-hatches.md](escape-hatches.md). The graph
+recommendation stays visible as evidence, but it does not decide close
+eligibility or block required audit and repair tools.
+
 ## Status
 
 partially implemented; core affordance checks exist. Full recovery-node

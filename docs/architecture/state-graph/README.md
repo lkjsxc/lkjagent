@@ -17,6 +17,7 @@ context engine, and tools.
 - [compaction.md](compaction.md): graph-aware pressure and preservation rules.
 - [completion.md](completion.md): evidence-gated closure.
 - [policy.md](policy.md): graph policy fields and enforcement boundary.
+- [escape-hatches.md](escape-hatches.md): deterministic runtime correction for policy contradictions.
 - [tool-affordances.md](tool-affordances.md): allowed tools by phase and node.
 - [maintenance.md](maintenance.md): idle graph evolution and policy cleanup.
 - [recovery-ladders.md](recovery-ladders.md): fault routing and alternate actions.

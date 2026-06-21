@@ -9,6 +9,7 @@ without silently guessing semantic content.
 
 - [parameter-contract.md](parameter-contract.md): accepted parameter behavior.
 - [recovery.md](recovery.md): bounded recovery after action faults.
+- [schema-repair.md](schema-repair.md): deterministic schema and example repair.
 - [normalization.md](normalization.md): deterministic alias and drop rules.
 - [error-messages.md](error-messages.md): actionable refusal text.
 
@@ -16,13 +17,14 @@ without silently guessing semantic content.
 
 - [parameter-contract.md](parameter-contract.md): owns required, optional, and no-param rules.
 - [recovery.md](recovery.md): owns recovery states and repetition bounds.
+- [schema-repair.md](schema-repair.md): owns fault ladders and canonical examples.
 - [normalization.md](normalization.md): owns safe parameter rewrite rules.
 - [error-messages.md](error-messages.md): owns model-visible correction format.
 
 ## Reading Paths
 
-- Implementation path: parameter-contract, normalization, error-messages.
-- Diagnosis path: error-messages, recovery, normalization.
+- Implementation path: parameter-contract, schema-repair, normalization, error-messages.
+- Diagnosis path: error-messages, recovery, schema-repair, normalization.
 - Verification path: recovery, then focused dispatch tests.
 
 ## Cross-Links

@@ -17,6 +17,8 @@ This file owns bounded recovery after action parameter faults.
   before another raw write.
 - Rendered recovery examples must be admitted by the active mode and
   dispatcher.
+- Recovery ladders are finite for parse, parameter, runtime, repeat, policy,
+  payload, verification, completion, compaction, and maintenance faults.
 
 ## Implementation Hooks
 
@@ -33,6 +35,8 @@ This file owns bounded recovery after action parameter faults.
 - A parameter fault falls into a generic parse recovery state with no recipe.
 - The owner is asked a question that the registry could answer.
 - `recover-params` exposes mutation tools instead of schema and state tools.
+- Payload-too-large retries one raw `fs.write`.
+- Repeat protection emits the same `graph.state` action again.
 
 ## Status
 
