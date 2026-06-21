@@ -16,6 +16,10 @@ documentation trees, recursive README indexes, counted documentation without
 serial filenames, action-parameter recovery, recovery-loop routing,
 long-form document routing, compact context/token status, and the single
 current GPT handoff log.
+Uploaded run-log fixtures are specified in
+[uploaded-run-fixtures.md](uploaded-run-fixtures.md). They cover recovery
+loops, content readiness, blocked mutation, large payload risk, maintenance
+preemption, and false scaffold completion.
 
 Mechanical benchmarks are not a replacement for owner judgment. They are the
 repeatable loop that shows whether changes to tools, prompts, memory,
