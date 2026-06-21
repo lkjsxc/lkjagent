@@ -93,8 +93,8 @@ directories with short focused files.
 - `architecture/sandbox/README.md` `architecture/sandbox/container.md` `architecture/sandbox/workspace.md`
   `architecture/sandbox/safety.md`
 - `evaluation/README.md` `evaluation/mechanical-benchmarks.md` `evaluation/task-contract.md`
-  `evaluation/metrics-reports.md` `evaluation/running.md` `evaluation/improvement-loop.md`
-  `evaluation/overfitting.md`
+  `evaluation/uploaded-run-fixtures.md` `evaluation/metrics-reports.md`
+  `evaluation/running.md` `evaluation/improvement-loop.md` `evaluation/overfitting.md`
 - `decisions/README.md` `decisions/rust-workspace.md` `decisions/openai-endpoint.md`
   `decisions/xml-action-protocol.md` `decisions/append-only-context.md` `decisions/single-loop.md`
   `decisions/sqlite-store.md` `decisions/state-graph-runtime.md` `decisions/no-mcp.md`
