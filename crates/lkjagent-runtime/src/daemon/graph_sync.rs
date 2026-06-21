@@ -1,6 +1,6 @@
 use super::runner::ResidentDaemon;
 use crate::graph_state::render_state;
-use crate::mode::ActiveModePolicy;
+use crate::mode::{ActiveMode, ActiveModePolicy};
 use lkjagent_graph::{admitted_targets, source_graph};
 use lkjagent_tools::dispatch::{EffectivePolicy, GraphDispatchPolicy};
 
@@ -56,10 +56,12 @@ fn effective_policy(
 ) -> EffectivePolicy {
     if mode_policy.graph_policy_applies {
         if let Some(graph) = graph_policy {
+            let allowed_tools = effective_allowed_tools(mode_policy, graph);
+            let blocked_tools = effective_blocked_tools(graph, &allowed_tools);
             return EffectivePolicy {
                 mode: format!("{:?}", mode_policy.mode),
-                allowed_tools: graph.allowed_tools.clone(),
-                blocked_tools: graph.blocked_tools.clone(),
+                allowed_tools,
+                blocked_tools,
                 shell_allowed: graph.shell_allowed,
                 completion_allowed: graph.completion_ready,
                 reason: graph
@@ -86,6 +88,61 @@ fn effective_policy(
         completion_allowed: mode_policy.mode.allows_completion(),
         reason: format!("tool is not admitted by {:?} active mode", mode_policy.mode),
         preferred_next_action: mode_policy.preferred_next_action.to_string(),
+    }
+}
+
+fn effective_allowed_tools(
+    mode_policy: &ActiveModePolicy,
+    graph: &GraphDispatchPolicy,
+) -> Vec<String> {
+    let mut allowed = graph.allowed_tools.clone();
+    let escape_tools = authority_escape_tools(mode_policy.mode, graph);
+    for tool in escape_tools {
+        if !allowed.iter().any(|existing| existing == tool) {
+            allowed.push((*tool).to_string());
+        }
+    }
+    allowed
+}
+
+fn effective_blocked_tools(graph: &GraphDispatchPolicy, allowed: &[String]) -> Vec<String> {
+    graph
+        .blocked_tools
+        .iter()
+        .filter(|tool| !allowed.iter().any(|allowed| allowed == *tool))
+        .cloned()
+        .collect()
+}
+
+fn authority_escape_tools(
+    mode: ActiveMode,
+    graph: &GraphDispatchPolicy,
+) -> &'static [&'static str] {
+    match mode {
+        ActiveMode::Recovery => &[
+            "graph.recover",
+            "graph.transition",
+            "artifact.next",
+            "artifact.audit",
+            "doc.audit",
+            "fs.read",
+            "fs.list",
+            "fs.stat",
+            "fs.batch_write",
+            "workspace.summary",
+        ],
+        ActiveMode::OwnerTask if !graph.completion_ready => &[
+            "fs.read",
+            "fs.list",
+            "fs.stat",
+            "artifact.audit",
+            "artifact.next",
+            "doc.audit",
+            "fs.batch_write",
+            "graph.evidence",
+            "workspace.summary",
+        ],
+        _ => &[],
     }
 }
 
