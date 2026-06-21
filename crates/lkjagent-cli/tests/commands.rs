@@ -5,7 +5,7 @@ use std::io::Cursor;
 use std::path::Path;
 
 use lkjagent_cli::console::run_console;
-use lkjagent_cli::run_cli;
+use lkjagent_cli::{run, run_cli};
 use lkjagent_store::events::read_events;
 use lkjagent_store::memory::{save, MemoryKind};
 use support::{open_store, temp_data, TestResult};
@@ -164,10 +164,10 @@ fn memory_command_reads_store_and_graph_command_reports_source_graph() -> TestRe
 #[test]
 fn run_writes_first_config_and_refuses_existing_lock() -> TestResult<()> {
     let first = temp_data("first")?;
-    let first_start = run_cli(["--data", first.to_string_lossy().as_ref(), "run"]);
-    assert_eq!(first_start.code, 1);
-    assert!(first_start.stderr.contains("config_written="));
-    assert!(first_start.stderr.contains("missing=endpoint.model"));
+    let first_error = run::run_with_env(&first, |_| None).expect_err("missing model");
+    assert_eq!(first_error.code(), 1);
+    assert!(first_error.to_string().contains("config_written="));
+    assert!(first_error.to_string().contains("missing=endpoint.model"));
     assert!(first.join("lkjagent.json").exists());
     assert!(first.join("workspace").is_dir());
 
@@ -175,9 +175,9 @@ fn run_writes_first_config_and_refuses_existing_lock() -> TestResult<()> {
     write_config(&locked)?;
     let conn = open_store(&locked)?;
     lkjagent_store::state::take_lock(&conn, "other", "9999999999", "0")?;
-    let refused = run_cli(["--data", locked.to_string_lossy().as_ref(), "run"]);
-    assert_eq!(refused.code, 1);
-    assert!(refused.stderr.contains("daemon_refused=other"));
+    let refused = run::run_with_env(&locked, |_| None).expect_err("locked daemon");
+    assert_eq!(refused.code(), 1);
+    assert!(refused.to_string().contains("daemon_refused=other"));
     Ok(())
 }
 
