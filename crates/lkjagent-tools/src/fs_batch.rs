@@ -80,23 +80,55 @@ fn validate_batch(workspace: &Path, files: &[BatchFile], max_files: usize) -> To
 }
 
 fn parse_block(block: &str) -> ToolResult<Option<BatchFile>> {
-    let trimmed = block.trim_matches('\n');
+    let trimmed = block.trim_start_matches(['\n', '\r', ' ', '\t']);
     if trimmed.trim().is_empty() {
         return Ok(None);
     }
-    let Some(rest) = trimmed.strip_prefix("path: ") else {
-        return Err(ToolError::invalid("each block must start with path: "));
-    };
-    let Some((path, content)) = rest.split_once("\ncontent:\n") else {
+    let Some((header, body)) = trimmed.split_once('\n') else {
         return Err(ToolError::invalid("each block needs content:"));
     };
-    if path.trim().is_empty() {
-        return Err(ToolError::invalid("path must not be empty"));
-    }
+    let path = parse_path_header(header)?;
+    let content = parse_content(body)?;
     Ok(Some(BatchFile {
-        path: path.trim().to_string(),
+        path,
         content: content.to_string(),
     }))
+}
+
+fn parse_path_header(header: &str) -> ToolResult<String> {
+    let trimmed = header.trim();
+    let path = trimmed
+        .strip_prefix("path:")
+        .map(str::trim)
+        .or_else(|| xml_path(trimmed))
+        .or_else(|| angled_path(trimmed));
+    let Some(path) = path.filter(|path| !path.is_empty()) else {
+        return Err(ToolError::invalid("each block must start with path: "));
+    };
+    Ok(path.to_string())
+}
+
+fn xml_path(header: &str) -> Option<&str> {
+    header
+        .strip_prefix("<path>")
+        .and_then(|rest| rest.strip_suffix("</path>"))
+        .map(str::trim)
+}
+
+fn angled_path(header: &str) -> Option<&str> {
+    header
+        .strip_prefix("<path:")
+        .map(|path| path.trim_end_matches('>').trim())
+}
+
+fn parse_content(body: &str) -> ToolResult<&str> {
+    if let Some(content) = body.strip_prefix("content:\n") {
+        return Ok(content);
+    }
+    if let Some(content) = body.strip_prefix("content:\r\n") {
+        return Ok(content);
+    }
+    Err(ToolError::invalid("each block needs content:"))
 }
 
 fn reject_duplicates(files: &[BatchFile]) -> ToolResult<()> {
