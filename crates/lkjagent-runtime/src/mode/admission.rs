@@ -1,5 +1,6 @@
 use super::model::{ActiveMode, RuntimeSnapshot, ToolAdmission};
 use super::policy::policy_for_mode;
+use lkjagent_tools::dispatch::registry_valid_example;
 
 pub fn admit_tool(snapshot: &RuntimeSnapshot, requested_tool: &str) -> ToolAdmission {
     let next_valid_tools = next_valid_tools(snapshot);
@@ -102,31 +103,12 @@ fn contradiction(
 }
 
 fn valid_example(tool: &str) -> String {
+    registry_valid_example(tool).unwrap_or_else(|| runtime_only_example(tool))
+}
+
+fn runtime_only_example(tool: &str) -> String {
     match tool {
-        "artifact.next" => {
-            "<act>\n<tool>artifact.next</tool>\n<root>dictionary</root>\n</act>".to_string()
-        }
-        "artifact.audit" => {
-            "<act>\n<tool>artifact.audit</tool>\n<root>dictionary</root>\n</act>".to_string()
-        }
-        "doc.audit" => "<act>\n<tool>doc.audit</tool>\n<root>docs</root>\n</act>".to_string(),
-        "fs.batch_write" => {
-            "<act>\n<tool>fs.batch_write</tool>\n<files>\ndictionary/bread.md|# Bread\n</files>\n</act>"
-                .to_string()
-        }
-        "fs.read" => "<act>\n<tool>fs.read</tool>\n<path>README.md</path>\n</act>".to_string(),
-        "fs.list" => "<act>\n<tool>fs.list</tool>\n<path>.</path>\n</act>".to_string(),
-        "fs.stat" => "<act>\n<tool>fs.stat</tool>\n<path>README.md</path>\n</act>".to_string(),
-        "graph.evidence" => {
-            "<act>\n<tool>graph.evidence</tool>\n<kind>verification</kind>\n<summary>Observed required evidence</summary>\n</act>".to_string()
-        }
-        "graph.recover" => "<act>\n<tool>graph.recover</tool>\n</act>".to_string(),
-        "graph.transition" => {
-            "<act>\n<tool>graph.transition</tool>\n<target>recover-by-bounded-write</target>\n<reason>Use admitted recovery path</reason>\n</act>".to_string()
-        }
-        "workspace.summary" => "<act>\n<tool>workspace.summary</tool>\n</act>".to_string(),
-        "runtime.compact" => "runtime action; no model act block".to_string(),
-        "runtime.wait" => "runtime action; no model act block".to_string(),
+        "runtime.compact" | "runtime.wait" => "runtime action; no model act block".to_string(),
         other => format!("<act>\n<tool>{other}</tool>\n</act>"),
     }
 }

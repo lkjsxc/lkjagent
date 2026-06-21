@@ -52,6 +52,10 @@ refusals now produce structured partial handoffs instead of vague denials.
 Audit-owned evidence requirements now stay audit-derived: `graph.evidence`
 cannot satisfy `artifact-readiness` or `document-structure`, and completion
 refusals point to `artifact.audit` or `doc.audit` for those gates.
+Hard compaction now selects a single `Compaction` active mode before queued
+owner intake, recovery, or maintenance, and runtime authority examples for
+model-call modes come from the dispatcher registry renderer instead of separate
+hand-written strings.
 Compact token accounting is implemented for endpoint usage, status, and console.
 A single synthesized GPT handoff log is implemented and exposed through status,
 console, and `lkjagent gpt-log`. The benchmark corpus now includes

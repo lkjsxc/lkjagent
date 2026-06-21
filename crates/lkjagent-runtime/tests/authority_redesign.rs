@@ -83,6 +83,7 @@ fn hard_compaction_renders_resumable_recovery_snapshot_fields() {
         ..TurnAuthorityInput::default()
     });
 
+    assert_eq!(authority.mode, ActiveMode::Compaction);
     assert_eq!(
         authority.endpoint_decision,
         EndpointDecision::RuntimeCompact

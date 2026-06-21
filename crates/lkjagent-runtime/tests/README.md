@@ -11,6 +11,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [active_mode.rs](active_mode.rs): active-mode selection and policy rendering fixtures.
 - [automatic_maintenance.rs](automatic_maintenance.rs): daemon idle maintenance and owner preemption fixtures.
 - [authority_reducer.rs](authority_reducer.rs): pure runtime decision and admission fixtures.
+- [authority_examples.rs](authority_examples.rs): runtime authority valid-example renderer fixtures.
 - [authority_redesign.rs](authority_redesign.rs): uploaded-log authority redesign fixtures.
 - [artifact_completion_gate.rs](artifact_completion_gate.rs): content artifact readiness completion fixtures.
 - [audit_owned_evidence.rs](audit_owned_evidence.rs): audit-owned evidence cannot be graph-authored.

@@ -48,4 +48,6 @@ Run `cargo test -p lkjagent-runtime active_mode`.
 
 ## Status
 
-partially implemented.
+Implemented for hard compaction priority, owner-over-maintenance priority, and
+recovery-over-maintenance priority. Artifact repair and verification priority
+remain partial until artifact case state drives mode selection directly.
