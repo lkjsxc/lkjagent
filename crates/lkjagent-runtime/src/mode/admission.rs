@@ -4,7 +4,8 @@ use lkjagent_tools::dispatch::registry_valid_example;
 
 pub fn admit_tool(snapshot: &RuntimeSnapshot, requested_tool: &str) -> ToolAdmission {
     let next_valid_tools = next_valid_tools(snapshot);
-    let exact_valid_example = next_valid_tools.first().map(|tool| valid_example(tool));
+    let example_tool = example_tool(requested_tool, &next_valid_tools);
+    let exact_valid_example = example_tool.map(valid_example);
     let completion_blocked =
         requested_tool == "agent.done" && !snapshot.missing_evidence.is_empty();
     let repeated_blocked = snapshot.repeated_action
@@ -100,6 +101,13 @@ fn contradiction(
         return Some("recovery has no escape tools".to_string());
     }
     None
+}
+
+fn example_tool<'a>(requested_tool: &'a str, next_valid_tools: &'a [String]) -> Option<&'a str> {
+    if next_valid_tools.iter().any(|tool| tool == requested_tool) {
+        return Some(requested_tool);
+    }
+    next_valid_tools.first().map(String::as_str)
 }
 
 fn valid_example(tool: &str) -> String {
