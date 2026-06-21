@@ -6,28 +6,55 @@ Define how audits decide whether leaf files contain the requested content.
 
 ## Contract
 
+Content readiness inspects actual file content. File count, line count,
+manifest shape, README links, and scaffold topology can satisfy structural
+audit only. They cannot satisfy readiness by themselves.
+
 Content-bearing files must contain domain-specific sections, concrete facts,
 and enough non-boilerplate prose to satisfy the artifact kind. Scaffold
 phrases, status-only files, empty headings, and generic "this file records"
 language fail readiness. The same normalized scaffold-phrase detector gates
 content audit, `fs.write`, and `fs.batch_write`.
 
-Content readiness inspects actual file content. File count, line count,
-manifest shape, README links, and scaffold topology can satisfy structural
-audit only. They cannot satisfy readiness by themselves.
+## Records
+
+```text
+ArtifactKind = cookbook | dictionary | story | reference | generic_content
+SemanticArtifactId = owner_case + kind + normalized_topic + requested_scale
+ReadinessRequirement = named field required by kind and path role
+WeakPath = path + missing_requirements + weak_signals + semantic_mismatch
+ContentSignal = concrete fact, recipe field, technique signal, or lookup row
+UnsupportedClaim = claimed fact absent from the artifact body
+SemanticMismatch = path or content domain conflicts with owner objective
+ReadinessEvidence = artifact_id + audit_id + passed_requirements + weak_paths
+```
+
+Readiness evidence is valid only for the current `SemanticArtifactId`.
 
 ## Invariants
 
 - Dictionary readiness requires entry fields requested by the owner objective.
-- Cookbook readiness requires actual recipes or technique leaves.
+- Cookbook readiness requires actual recipes, techniques, or reference leaves.
 - Unsupported verification claims fail readiness.
 - Structural audit can pass while content readiness fails.
+- Planning evidence and graph notes cannot satisfy content readiness.
 
-## Failure Cases
+## Cookbook Rules
 
-- A shallow bread term list is accepted as a detailed dictionary.
-- A 100-file cookbook scaffold is accepted without recipe content.
-- A verification note claims IPA, etymology, or examples that are absent.
+A recipe file needs recipe title, dish category, servings or yield, time,
+ingredient list with quantities, method steps, timing or sensory signals,
+notes or troubleshooting, and semantic relevance to the requested cuisine or
+topic.
+
+A technique file needs concept, procedure, signals, common mistakes,
+corrective action, and applicability.
+
+A reference file needs concrete lookup content, not status prose.
+
+A Japanese cookbook cannot satisfy readiness with generic bread scaffold files
+unless the owner explicitly asks for Japanese bread and the content is
+semantically Japanese. Bread-like leaves in a Japanese cookbook fail readiness
+with `semantic_mismatch` and their missing cookbook requirements.
 
 ## Dictionary Rules
 
@@ -36,22 +63,19 @@ definition, usage example when requested, and any requested pronunciation,
 origin, variants, or cross-reference fields. A shallow term list fails a
 detailed dictionary request even when it has many entries.
 
-## Cookbook Rules
+## Failure Cases
 
-A recipe file needs title, purpose or description, ingredients, method,
-timing or yield, and notes or troubleshooting. A technique file needs concept,
-procedure, signals, common mistakes, and corrective action. A reference file
-needs concrete lookup content.
-
-A scaffold-only cookbook with README files, manifests, empty recipe leaves, or
-status prose can pass structure but fails readiness. A 100-file cookbook tree
-with weak leaves is not close eligible.
+- A shallow bread term list is accepted as a detailed dictionary.
+- A 100-file cookbook scaffold is accepted without recipe content.
+- Bread categories are accepted for a Japanese cookbook without Japanese food
+  semantics.
+- A verification note claims IPA, etymology, or examples that are absent.
 
 ## Evidence
 
-Audit failures name exact weak paths and missing requirements. Passing content
-readiness may contribute artifact evidence only when topology and manifest
-checks also pass and unsupported verification claims are absent.
+Audit failures name exact weak paths and missing requirement labels. Passing
+content readiness may contribute artifact evidence only when topology and
+manifest checks also pass and unsupported verification claims are absent.
 
 ## Related Files
 

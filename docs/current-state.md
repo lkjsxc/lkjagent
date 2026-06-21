@@ -81,8 +81,9 @@ target outcomes are:
 7. Docker Compose verification passes after the implementation slice.
 
 The documentation contract now names the required authority, artifact,
-recovery, and uploaded-run evaluation pages. Those pages are implementation
-requirements, not proof that the runtime behavior is complete.
+recovery, maintenance, compaction, schema-repair, and uploaded-run evaluation
+pages. Those pages are implementation requirements, not proof that the runtime
+behavior is complete.
 
 ## Area Status
 

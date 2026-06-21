@@ -10,16 +10,38 @@ Define the authority-owned gate that every owner-task close path must use.
 and the model can request `agent.done`, but the reducer decides close
 eligibility.
 
-## Inputs
+## Gate
 
-Completion reads owner objective status, required evidence, document audit,
-artifact audit, content readiness, scaffold-only paths, weak paths, line
-limits, recovery state, verification output, and unsupported claims.
+```text
+completion_allowed(case) iff:
+  objective exists
+  plan evidence exists
+  observation evidence exists
+  task-kind required evidence exists
+  declared verification passed or is not applicable
+  artifact tasks have structure and readiness evidence
+  recovery faults are resolved or represented in a blocked handoff
+  unsupported claims are absent
+```
 
-## Output
+The same gate is used by `agent.done`, graph close, maintenance close, recovery
+handoff, turn-budget exhaustion, console close, and daemon shutdown handoff.
 
-The gate emits allowed close, blocked close, or structured handoff. A blocked
-close includes missing requirements and one admitted next valid action.
+## Refusal Shape
+
+```text
+CompletionRefusal
+- failed_gate
+- missing_evidence
+- blocking_faults
+- admitted_tools
+- next_executable_action
+- partial_handoff
+```
+
+The next action must parse, dispatch, and be admitted by the current authority
+decision. Artifact close refusals keep audit, read, repair, and batch tools
+admitted.
 
 ## Required Facts
 
@@ -31,9 +53,19 @@ unsupported verification claim.
 ## Prohibited States
 
 - `agent.done` closes while content readiness is missing.
+- A graph close bypasses the central gate.
 - Failed audit is treated as a warning.
 - Maintenance no-op work closes an owner objective.
 - Partial completion is implied instead of explicitly recorded.
+
+## Mechanical Tests Required
+
+- `agent.done` after artifact planning is refused.
+- `agent.done` after scaffold-only output is refused.
+- Structure pass plus readiness failure is refused.
+- Verification pending is refused when the task kind requires verification.
+- Turn-budget exhaustion writes a blocked partial handoff.
+- The refusal next action parses and dispatches.
 
 ## Fixture
 
