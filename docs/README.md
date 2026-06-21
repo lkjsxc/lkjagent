@@ -33,6 +33,7 @@ directories with short focused files.
   `architecture/document-structure/completion-gates.md`
 - `architecture/artifacts/README.md` `architecture/artifacts/lifecycle.md`
   `architecture/artifacts/content-artifacts.md` `architecture/artifacts/content-readiness.md`
+  `architecture/artifacts/dictionary-profile.md`
   `architecture/artifacts/cookbook-profile.md` `architecture/artifacts/story-profile.md`
   `architecture/artifacts/manifest.md` `architecture/artifacts/scaffold.md`
   `architecture/artifacts/audit.md` `architecture/artifacts/completion.md`

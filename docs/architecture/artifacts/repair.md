@@ -20,3 +20,27 @@ requires a new audit before completion evidence can pass.
 Failed audit and repair output must include a copyable next action admitted by
 the same active policy, usually `artifact.next`, `fs.batch_write`,
 `doc.audit`, or `artifact.audit`.
+
+## Invariants
+
+- Repair targets exact paths and exact missing fields.
+- Repair can use bounded write batches for weak leaves.
+- Recovery mode must admit repair tools when content is missing.
+- Completion stays blocked until repair output is audited.
+
+## Failure Cases
+
+- Repair recommends `fs.batch_write` while active policy blocks it.
+- Recovery loops over graph inspection instead of writing missing content.
+- A repaired file is not re-audited before completion.
+
+## Verification
+
+Repair tests assert failed audits produce an admitted next action and that
+completion remains refused until the repaired content passes audit.
+
+## Related Files
+
+- [write-batches.md](write-batches.md)
+- [audit.md](audit.md)
+- [completion-gates.md](completion-gates.md)
