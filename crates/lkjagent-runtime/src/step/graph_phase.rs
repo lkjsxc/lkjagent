@@ -28,7 +28,7 @@ pub(super) fn evidence_kind_for(requirement: &str) -> EvidenceKind {
     match requirement {
         "plan" => EvidenceKind::Plan,
         "verification" => EvidenceKind::Verification,
-        "document-structure" => EvidenceKind::File,
+        "artifact-readiness" | "document-structure" => EvidenceKind::File,
         _ => EvidenceKind::Observation,
     }
 }
@@ -53,11 +53,7 @@ fn refresh_incomplete_phase(graph: &mut TaskGraphState) {
     } else if needs_verification(graph) && graph.evidence.has("observation") {
         graph.phase = TaskPhase::Verification;
         graph.active_node = GraphNodeId("verify");
-    } else if matches!(
-        graph.family,
-        lkjagent_graph::TaskFamily::Documentation | lkjagent_graph::TaskFamily::KnowledgeBase
-    ) && !graph.evidence.has("document-structure")
-    {
+    } else if document_gap(graph) {
         graph.phase = TaskPhase::Execution;
         graph.active_node = GraphNodeId("document");
     } else {
@@ -88,15 +84,37 @@ fn route_document_structure_gap(graph: &mut TaskGraphState) -> bool {
     if !matches!(
         graph.family,
         lkjagent_graph::TaskFamily::Documentation | lkjagent_graph::TaskFamily::KnowledgeBase
-    ) || graph.evidence.has("document-structure")
-        || !graph.evidence.has("observation")
+    ) || !graph.evidence.has("observation")
     {
+        return false;
+    }
+    if graph.evidence.has("document-structure") && !needs_artifact_readiness(graph) {
         return false;
     }
     graph.phase = TaskPhase::Execution;
     graph.active_node = GraphNodeId("document");
-    graph.next_action_class = "document-structure".to_string();
+    graph.next_action_class = if graph.evidence.has("document-structure") {
+        "artifact-readiness".to_string()
+    } else {
+        "document-structure".to_string()
+    };
     true
+}
+
+fn document_gap(graph: &TaskGraphState) -> bool {
+    matches!(
+        graph.family,
+        lkjagent_graph::TaskFamily::Documentation | lkjagent_graph::TaskFamily::KnowledgeBase
+    ) && (!graph.evidence.has("document-structure") || needs_artifact_readiness(graph))
+}
+
+fn needs_artifact_readiness(graph: &TaskGraphState) -> bool {
+    graph
+        .evidence
+        .requirements
+        .iter()
+        .any(|requirement| requirement.id == "artifact-readiness")
+        && !graph.evidence.has("artifact-readiness")
 }
 
 fn apply_selected_transition(graph: &mut TaskGraphState, intent: TransitionIntent) -> bool {

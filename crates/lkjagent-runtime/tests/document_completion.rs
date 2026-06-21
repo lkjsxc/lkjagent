@@ -53,9 +53,9 @@ fn failed_document_audit_does_not_satisfy_structure() -> TestResult<()> {
 fn passed_document_audit_satisfies_structure() -> TestResult<()> {
     let state = apply_tool(
         open_doc_task()?,
-        "doc.audit",
-        &[("root", "stories/long-sf-story")],
-        "document audit passed\nroot=stories/long-sf-story\nfailed=0",
+        "artifact.audit",
+        &[("root", "stories/long-sf-story"), ("kind", "story")],
+        "artifact audit passed\nroot=stories/long-sf-story\nfailed=0\nreadiness=content-bearing",
     );
 
     assert!(state
@@ -135,17 +135,17 @@ fn agent_done_allows_complete_after_artifact_audit() -> TestResult<()> {
         &[
             ("objective", "Finish long SF story artifact"),
             ("steps", "scaffold story tree; audit story tree"),
-            ("checks", "document audit passed"),
+            ("checks", "artifact audit passed with readiness"),
             ("paths", "stories/long-sf-story"),
-            ("reason", "completion requires plan and audit evidence"),
+            ("reason", "completion requires plan and readiness evidence"),
         ],
         "graph plan recorded",
     );
     let state = apply_tool(
         planned,
-        "doc.audit",
-        &[("root", "stories/long-sf-story")],
-        "document audit passed\nroot=stories/long-sf-story\nfailed=0",
+        "artifact.audit",
+        &[("root", "stories/long-sf-story"), ("kind", "story")],
+        "artifact audit passed\nroot=stories/long-sf-story\nfailed=0\nreadiness=content-bearing",
     );
 
     let result = attempt_done(state);

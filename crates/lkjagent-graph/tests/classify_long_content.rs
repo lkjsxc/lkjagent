@@ -11,6 +11,7 @@ fn long_sf_story_routes_to_content_artifact() {
         .selected_packages
         .contains(&"doc-construction".to_string()));
     assert!(state.evidence.knows_requirement("document-structure"));
+    assert!(state.evidence.knows_requirement("artifact-readiness"));
     assert!(state.document.as_ref().is_some_and(|document| {
         document.root == "stories/long-sf-story" && document.kind == "content-artifact"
     }));
@@ -36,6 +37,23 @@ fn big_bread_cookbook_routes_to_content_artifact() {
     assert_eq!(state.subroute, "content-artifact");
     assert!(state.document.as_ref().is_some_and(|document| {
         document.root == "cookbooks/bread-cookbook" && document.kind == "content-artifact"
+    }));
+}
+
+#[test]
+fn detailed_bread_dictionary_routes_to_dictionary_artifact() {
+    let state = initial_state(
+        "Create a detailed bread dictionary with definitions and examples.",
+        Some(5),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert_eq!(state.subroute, "content-artifact");
+    assert!(state.evidence.knows_requirement("artifact-readiness"));
+    assert!(state.document.as_ref().is_some_and(|document| {
+        document.root.starts_with("dictionaries/")
+            && document.root.contains("bread-dictionary")
+            && document.kind == "content-artifact"
     }));
 }
 
