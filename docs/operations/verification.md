@@ -28,16 +28,22 @@ all run as `cargo run -p lkjagent-xtask -- <gate>`:
 | quiet test | cargo fmt --check, clippy with warnings denied, all workspace tests |
 | quiet verify | check-docs, check-lines, check-style, benchmark check-corpus, then quiet test |
 
-## Final Gate
+## Compose Gates
 
 ```sh
 docker compose run --rm verify
+docker compose run --rm test
+docker compose run --rm lint
+docker compose run --rm bench
+docker compose run --rm replay
 ```
 
-Builds the image from a clean context and runs quiet verify inside it; no
-source bind mounts, so the gate proves the repository as committed, not the
-working tree. Service design in [compose.md](compose.md). Any claim that a
-runtime behavior is implemented requires this gate in the same handoff.
+`verify` is the final gate. It builds the image from a clean context and runs
+quiet verify inside it; no source bind mounts, so the gate proves the
+repository as committed, not the working tree. `test`, `lint`, `bench`, and
+`replay` expose narrower Docker Compose gates for focused diagnosis. Service
+design is in [compose.md](compose.md). Any claim that a runtime behavior is
+implemented requires the final gate in the same handoff.
 
 Real benchmark scoring is not part of CI because it needs an endpoint. The
 operator command is documented in [../evaluation/running.md](../evaluation/running.md).

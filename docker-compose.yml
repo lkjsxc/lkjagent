@@ -53,6 +53,40 @@ services:
       target: build
     command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "quiet", "verify"]
 
+  test:
+    profiles: ["verify"]
+    build:
+      context: .
+      target: build
+    command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "quiet", "test"]
+
+  lint:
+    profiles: ["verify"]
+    build:
+      context: .
+      target: build
+    command:
+      - sh
+      - -lc
+      - >-
+        cargo run -p lkjagent-xtask -- check-docs &&
+        cargo run -p lkjagent-xtask -- check-lines &&
+        cargo run -p lkjagent-xtask -- check-style
+
+  bench:
+    profiles: ["verify"]
+    build:
+      context: .
+      target: build
+    command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "benchmark", "check-corpus"]
+
+  replay:
+    profiles: ["verify"]
+    build:
+      context: .
+      target: build
+    command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "benchmark", "check-corpus"]
+
   endpoint-example:
     profiles: ["endpoint"]
     image: ghcr.io/ggerganov/llama.cpp:server
