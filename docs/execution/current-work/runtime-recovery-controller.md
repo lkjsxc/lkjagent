@@ -17,9 +17,10 @@ The stable recovery route contract is
 Active-mode admission is specified in
 [../../architecture/runtime/active-mode/dispatch-policy.md](../../architecture/runtime/active-mode/dispatch-policy.md).
 
-Fault classification separates parse, parameter, tool, repeat, endpoint,
-budget, context, verification, compaction, payload, and completion faults.
-Each class has a forced route and a bounded retry count.
+Fault classification uses the closed classes parse, parameter, tool, repeat,
+endpoint, budget, context, verification, compaction, payload, and completion.
+Each class has a forced route, allowed action classes, retry budget,
+escalation route, and blocked-handoff behavior.
 
 Recovery node selection uses transition quality over outgoing edges. Legal
 targets with useful evidence gain priority. Repeated targets, blocked guards,
@@ -110,9 +111,9 @@ docker compose run --rm verify
 
 open for full loop enforcement. Implemented recovery pieces include graph
 selector integration, escape-tool visibility, internal-question refusal,
-batch-oriented examples, a pure fault-class recovery plan table, and benchmark
-fixtures named above. The remaining controller work is durable retry state,
-blocked handoff writes, endpoint-loop integration for every fault class, and
-proof that repeated invalid actions always change shape in live dispatch.
-Focused tests and Docker Compose verification are required before this blocker
-can close.
+batch-oriented examples, a pure recovery plan table, and benchmark fixtures
+named above. The remaining controller work is the exact closed `FaultClass`
+model in code, durable retry state, blocked handoff writes, endpoint-loop
+integration for every fault class, and proof that repeated invalid actions
+always change shape in live dispatch. Focused tests and Docker Compose
+verification are required before this blocker can close.

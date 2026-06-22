@@ -4,25 +4,42 @@
 
 Define the artifact-specific checks required before owner completion.
 
-## Gates
+## Required Gates
 
-Completion requires:
+Content artifact completion requires all of these gates:
 
-- requested root exists.
-- root README exists.
-- manifest exists.
+- requested root exists and matches the requested artifact kind.
+- root README exists and links local children.
+- manifest exists, including `.lkj-doc-graph.md` for recursive docs artifacts.
 - every directory has a README.
-- README files link every local child.
+- every README links every local child.
 - sequence-only part files are absent unless explicitly requested.
-- expected semantic groups exist.
+- expected semantic groups exist for the request profile.
 - leaf files are content-bearing and not scaffold-only.
 - profile-specific content readiness passes.
-- line limits pass.
-- requested artifact kind matches the manifest or readiness summary.
+- line limits pass before and after mutation.
 - requested scale is met or honestly bounded with evidence.
 - artifact audit passes.
 - unsupported verification claims are absent.
 - graph plan, observation, and verification evidence exist.
 
-Failed completion keeps the task open or blocked and returns a structured
-handoff with missing gates and the next executable action.
+## Evidence Ownership
+
+`artifact-readiness` and `document-structure` are audit-owned. Direct
+`graph.evidence` cannot satisfy them. A graph observation may point to audit
+output, but the readiness state comes from `artifact.audit` or `doc.audit`.
+
+## Refused Completion
+
+Failed completion keeps the task open or blocked. The refusal names the active
+mode, failed gate, missing evidence, existing evidence, failed checks, and one
+next executable action admitted by the same effective policy.
+
+Planning evidence, file existence, README-only output, scaffold-only text, and
+unsupported verification claims never close an owner task.
+
+## Status
+
+partially implemented. Audit-owned evidence guards and many completion refusals
+exist. Every close path still needs proof that it uses the same artifact-aware
+runtime gate.

@@ -19,16 +19,15 @@ maintenance, and completion.
 
 ## Contract
 
-The runtime computes one turn authority before an endpoint call and before any
-dispatch. That authority selects one active mode, one effective tool policy,
-one endpoint decision, and one completion policy. Prompt text explains the
-authority; it does not create it. Continuation checkpoints are reduced through
-this same authority and default to autonomous continuation when admitted work
-remains.
+The runtime computes one authority before an endpoint call and one authority
+before dispatch. Exactly one active mode owns the effective tool policy,
+endpoint decision, recovery route, compaction decision, maintenance boundary,
+and completion policy. Prompt text explains the authority; it does not create
+it.
 
 ## Status
 
-partially implemented. Pure turn authority selection, store-backed runtime
-snapshots, endpoint decision, endpoint card refresh, dispatch authority reuse,
-completion policy, effective `agent.done` refusal, and policy rendering exist.
-Artifact-aware gates remain open.
+partially implemented. Pure selection, authority cards, endpoint decisions,
+effective dispatch policy, completion policy, and many `agent.done` refusals
+exist. Durable authority snapshots, stale-action pre-dispatch refusal, richer
+compaction snapshots, and artifact-aware completion proof remain open.
