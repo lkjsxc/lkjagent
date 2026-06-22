@@ -99,14 +99,13 @@ fn starts_pair(line: &str) -> bool {
 }
 
 fn non_pair_fault(tool: Option<&str>, line: &str) -> ParseFault {
-    if tool.is_none() {
-        ParseFault::MissingTool
-    } else {
-        ParseFault::BadParams {
-            tool: tool.unwrap_or_default().to_string(),
-            missing: Vec::new(),
-            unknown: vec![line.to_string()],
-        }
+    let Some(tool) = tool else {
+        return ParseFault::MissingTool;
+    };
+    ParseFault::BadParams {
+        tool: tool.to_string(),
+        missing: find_tool(tool).map_or_else(Vec::new, |spec| missing_required(spec, &[])),
+        unknown: vec![line.to_string()],
     }
 }
 
