@@ -1,8 +1,8 @@
-# GPT Log Helpers
+# Model Log Helpers
 
 ## Purpose
 
-This directory holds focused renderer helpers for the single current GPT handoff
+This directory holds focused renderer helpers for the single current model handoff
 Markdown file.
 
 ## Table of Contents

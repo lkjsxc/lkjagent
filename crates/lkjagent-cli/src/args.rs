@@ -25,7 +25,7 @@ pub enum Command {
         query: String,
     },
     Graph,
-    GptLog {
+    ModelLog {
         print: bool,
     },
 }
@@ -69,7 +69,7 @@ fn parse_command(command: &str, args: Vec<String>) -> Result<Command, CliError> 
         "console" => parse_no_args(args, "console").map(|()| Command::Console),
         "memory" => parse_memory(args),
         "graph" => parse_no_args(args, "graph").map(|()| Command::Graph),
-        "gpt-log" => parse_gpt_log(args),
+        "model-log" => parse_model_log(args),
         other => Err(CliError::usage(format!("unknown command: {other}"))),
     }
 }
@@ -131,13 +131,17 @@ fn parse_memory(args: Vec<String>) -> Result<Command, CliError> {
     }
 }
 
-fn parse_gpt_log(args: Vec<String>) -> Result<Command, CliError> {
+fn parse_model_log(args: Vec<String>) -> Result<Command, CliError> {
     let mut print = false;
     for arg in args {
         match arg.as_str() {
             "--print" => print = true,
-            other => return Err(CliError::usage(format!("unknown gpt-log option: {other}"))),
+            other => {
+                return Err(CliError::usage(format!(
+                    "unknown model-log option: {other}"
+                )))
+            }
         }
     }
-    Ok(Command::GptLog { print })
+    Ok(Command::ModelLog { print })
 }

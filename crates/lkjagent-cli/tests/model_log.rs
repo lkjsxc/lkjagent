@@ -8,8 +8,8 @@ use lkjagent_store::token_usage::{record, TokenUsageEvent};
 use support::{open_store, temp_data, TestResult};
 
 #[test]
-fn gpt_log_command_writes_and_prints_single_current_markdown_file() -> TestResult<()> {
-    let data = temp_data("gpt-log")?;
+fn model_log_command_writes_and_prints_single_current_markdown_file() -> TestResult<()> {
+    let data = temp_data("model-log")?;
     let conn = open_store(&data)?;
     lkjagent_runtime::graph_state::open_owner_case(
         &conn,
@@ -40,19 +40,19 @@ fn gpt_log_command_writes_and_prints_single_current_markdown_file() -> TestResul
         "2026-06-20T00:00:00Z",
     )?;
 
-    let path_output = run_cli(["--data", data.to_string_lossy().as_ref(), "gpt-log"]);
-    let path = data.join("logs/current-gpt-5.5-pro.md");
+    let path_output = run_cli(["--data", data.to_string_lossy().as_ref(), "model-log"]);
+    let path = data.join("logs/current-model-run.md");
     let printed = run_cli([
         "--data",
         data.to_string_lossy().as_ref(),
-        "gpt-log",
+        "model-log",
         "--print",
     ]);
 
     assert_eq!(path_output.code, 0);
-    assert!(path_output.stdout.contains("current-gpt-5.5-pro.md"));
+    assert!(path_output.stdout.contains("current-model-run.md"));
     assert!(path.exists());
-    assert!(printed.stdout.contains("# lkjagent GPT-5.5-Pro Run Log"));
+    assert!(printed.stdout.contains("# lkjagent Model Run Log"));
     assert!(printed.stdout.contains("## Active State Tracks"));
     assert!(printed.stdout.contains("token_usage: in=8.12K"));
     assert!(printed.stdout.contains("Create structured documentation"));
@@ -61,12 +61,12 @@ fn gpt_log_command_writes_and_prints_single_current_markdown_file() -> TestResul
 }
 
 #[test]
-fn gpt_log_uses_large_manual_handoff_budget() -> TestResult<()> {
-    let data = temp_data("gpt-log-budget")?;
+fn model_log_uses_large_manual_handoff_budget() -> TestResult<()> {
+    let data = temp_data("model-log-budget")?;
     let conn = open_store(&data)?;
     lkjagent_runtime::graph_state::open_owner_case(
         &conn,
-        "Prepare a manual ChatGPT handoff.",
+        "Prepare a manual model handoff.",
         "2026-06-20T00:00:00Z",
     )?;
     for index in 0..30 {
@@ -93,7 +93,7 @@ fn gpt_log_uses_large_manual_handoff_budget() -> TestResult<()> {
     let printed = run_cli([
         "--data",
         data.to_string_lossy().as_ref(),
-        "gpt-log",
+        "model-log",
         "--print",
     ]);
 

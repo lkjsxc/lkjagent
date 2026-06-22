@@ -54,13 +54,13 @@ pub const STATUS_TASK: BenchmarkTask = BenchmarkTask {
 };
 
 const LOG_PROMPT: &str = "\
-Produce the single current GPT-5.5-Pro handoff log with owner objective,
+Produce the single current model handoff log with owner objective,
 state tracks, token usage, fault ledger, and verification sections.
 ";
 
 const LOG_GOOD_FILES: &[FileSpec] = &[FileSpec {
-    path: "data/logs/current-gpt-5.5-pro.md",
-    content: "# lkjagent GPT-5.5-Pro Run Log\n\n## Snapshot\n\n- token_usage: in=8.12K out=1.04K cache=6.88K total=9.16K\n\n## Owner Objective\n\nNormalized objective.\n\n## Active State Tracks\n\n| rank | posture | label |\n| --- | --- | --- |\n| 1 | Implementing | docs |\n\n## Fault Ledger\n\n| turn | kind | message |\n| --- | --- | --- |\n\n## Verification\n\n| command | result |\n| --- | --- |\n",
+    path: "data/logs/current-model-run.md",
+    content: "# lkjagent Model Run Log\n\n## Snapshot\n\n- token_usage: in=8.12K out=1.04K cache=6.88K total=9.16K\n\n## Owner Objective\n\nNormalized objective.\n\n## Active State Tracks\n\n| rank | posture | label |\n| --- | --- | --- |\n| 1 | Implementing | docs |\n\n## Fault Ledger\n\n| turn | kind | message |\n| --- | --- | --- |\n\n## Verification\n\n| command | result |\n| --- | --- |\n",
 }];
 
 const LOG_BAD_FRAGMENTED: &[FileSpec] = &[
@@ -75,8 +75,8 @@ const LOG_BAD_FRAGMENTED: &[FileSpec] = &[
 ];
 
 const LOG_BAD_SHALLOW: &[FileSpec] = &[FileSpec {
-    path: "data/logs/current-gpt-5.5-pro.md",
-    content: "# lkjagent GPT-5.5-Pro Run Log\n\n## Snapshot\n\nNo state tracks.\n",
+    path: "data/logs/current-model-run.md",
+    content: "# lkjagent Model Run Log\n\n## Snapshot\n\nNo state tracks.\n",
 }];
 
 const LOG_GOOD: &[Fixture] = &[Fixture {
@@ -96,17 +96,17 @@ const LOG_BAD: &[Fixture] = &[
 ];
 
 pub const LOG_TASK: BenchmarkTask = BenchmarkTask {
-    id: "owner-gpt-log-001",
+    id: "owner-model-log-001",
     suite: "tiny",
     family: TaskFamily::OwnerReliability,
     difficulty: Difficulty::Tiny,
-    tags: &["owner-failure", "gpt-log", "handoff"],
+    tags: &["owner-failure", "model-log", "handoff"],
     prompt: LOG_PROMPT,
     follow_up: None,
     starter_files: &[],
     good: LOG_GOOD,
     bad: LOG_BAD,
-    judge: JudgeKind::GptHandoffLog,
+    judge: JudgeKind::ModelHandoffLog,
     seed: 8202,
     points: 1,
     timeout_seconds: 120,

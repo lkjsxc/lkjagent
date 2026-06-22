@@ -9,7 +9,9 @@ pub fn select_profile(input: &ScaffoldInput) -> ScaffoldProfile {
         input.sections.join(" ")
     )
     .to_ascii_lowercase();
-    if bread_subject(&text) {
+    if lkjagent_seed_subject(&text) {
+        ScaffoldProfile::LkjagentSemanticSeed
+    } else if bread_subject(&text) {
         ScaffoldProfile::BreadCookbook
     } else if text.contains("cookbook") || text.contains("recipe") {
         ScaffoldProfile::Cookbook
@@ -30,6 +32,12 @@ pub fn select_profile(input: &ScaffoldInput) -> ScaffoldProfile {
     } else {
         ScaffoldProfile::ProjectDocs
     }
+}
+
+fn lkjagent_seed_subject(text: &str) -> bool {
+    text.contains("lkjagent")
+        && text.contains("rust")
+        && (text.contains("qwen") || text.contains("model"))
 }
 
 fn bread_subject(text: &str) -> bool {

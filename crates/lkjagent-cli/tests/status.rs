@@ -19,7 +19,7 @@ fn status_prints_ranked_active_state_tracks() -> TestResult<()> {
     assert!(status.stdout.contains("active_states=1."));
     assert!(status.stdout.contains("document-structure"));
     assert!(status.stdout.contains("phase=planning"));
-    assert!(status.stdout.contains("gpt_log="));
+    assert!(status.stdout.contains("model_log="));
     Ok(())
 }
 

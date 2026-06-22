@@ -27,7 +27,7 @@ pub struct ResidentRuntime {
     pub tools: ToolRuntime,
     pub budget: ContextBudgetPolicy,
     pub task_turn_budget: u16,
-    pub gpt_log_path: Option<PathBuf>,
+    pub model_log_path: Option<PathBuf>,
 }
 
 impl ResidentRuntime {
@@ -38,7 +38,7 @@ impl ResidentRuntime {
             tools: ToolRuntime::new(workspace, now),
             budget: ContextBudgetPolicy::default(),
             task_turn_budget: DEFAULT_TURN_BUDGET,
-            gpt_log_path: None,
+            model_log_path: None,
         }
     }
 
@@ -52,8 +52,8 @@ impl ResidentRuntime {
         self
     }
 
-    pub fn with_gpt_log_path(mut self, path: PathBuf) -> Self {
-        self.gpt_log_path = Some(path);
+    pub fn with_model_log_path(mut self, path: PathBuf) -> Self {
+        self.model_log_path = Some(path);
         self
     }
 }
@@ -83,7 +83,7 @@ impl ResidentDaemon {
     pub fn poll_once(&mut self, conn: &mut Connection, now: &str) -> RuntimeResult<DaemonTick> {
         self.runtime.tools.now = now.to_string();
         let tick = self.poll_once_inner(conn, now)?;
-        self.write_gpt_log(conn, now)?;
+        self.write_model_log(conn, now)?;
         Ok(tick)
     }
 
@@ -118,9 +118,9 @@ impl ResidentDaemon {
         }
     }
 
-    fn write_gpt_log(&self, conn: &Connection, now: &str) -> RuntimeResult<()> {
-        if let Some(path) = &self.runtime.gpt_log_path {
-            crate::gpt_log::write_current_log(conn, path, now, self.runtime.budget)?;
+    fn write_model_log(&self, conn: &Connection, now: &str) -> RuntimeResult<()> {
+        if let Some(path) = &self.runtime.model_log_path {
+            crate::model_log::write_current_log(conn, path, now, self.runtime.budget)?;
         }
         Ok(())
     }

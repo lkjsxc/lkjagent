@@ -4,7 +4,7 @@
 
 This directory owns reliability redesign work opened by owner reports:
 semantic documentation generation, action recovery, state modeling,
-observability, GPT handoff logging, loop recovery, maintenance, and final
+observability, model handoff logging, loop recovery, maintenance, and final
 verification.
 
 ## Table of Contents
@@ -18,7 +18,7 @@ verification.
 - [runtime-authority-redesign.md](runtime-authority-redesign.md): authority reducer execution plan.
 - [active-mode-controller.md](active-mode-controller.md): one owner of policy per turn.
 - [recovery-and-maintenance-loop-redesign.md](recovery-and-maintenance-loop-redesign.md): active-mode loop redesign.
-- [gpt-log.md](gpt-log.md): single handoff-log work.
+- [model-log.md](model-log.md): single handoff-log work.
 - [verification-plan.md](verification-plan.md): focused tests, benchmarks, and compose gates.
 
 ## Reading Paths
@@ -26,7 +26,7 @@ verification.
 - Implementation path: runtime-authority-redesign, runtime-recovery-controller,
   document-structure-redesign, action-fault-recovery, then context-accounting.
 - Diagnosis path: owner-reported-failures, multi-state-runtime,
-  runtime-recovery-controller, then gpt-log.
+  runtime-recovery-controller, then model-log.
 - Verification path: verification-plan, then the gate commands it names.
 
 ## Cross-Links

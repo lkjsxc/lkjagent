@@ -32,9 +32,12 @@ pub(crate) fn floor(vector: &mut StateVector, label: TrackLabel, value: f32) {
 }
 
 pub(crate) fn threshold(track: &StateTrack) -> f32 {
-    match track.guard {
-        Some(GuardPolicy::BlockArtifactMutation) => 0.75,
-        Some(GuardPolicy::RequireQueueClassification) => 0.70,
+    match track.label {
+        TrackLabel::ArtifactDrift => 0.75,
+        TrackLabel::QueueInterruption | TrackLabel::MockContentRisk => 0.70,
+        TrackLabel::ModelSpecificNaming
+        | TrackLabel::StructureConnectivity
+        | TrackLabel::RepeatedActionRisk => 0.60,
         _ => DEFAULT_GUARD_THRESHOLD,
     }
 }
@@ -71,6 +74,9 @@ fn default_track(label: TrackLabel) -> StateTrack {
 
 fn default_guard(label: TrackLabel) -> Option<GuardPolicy> {
     match label {
+        TrackLabel::MockContentRisk
+        | TrackLabel::ModelSpecificNaming
+        | TrackLabel::StructureConnectivity => Some(GuardPolicy::BlockCompletion),
         TrackLabel::ParseRecovery => Some(GuardPolicy::RestrictLargePayload),
         TrackLabel::ArtifactDrift => Some(GuardPolicy::BlockArtifactMutation),
         TrackLabel::ContextPressure | TrackLabel::ContextSnapshotMismatch => {

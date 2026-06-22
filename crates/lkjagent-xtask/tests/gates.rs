@@ -63,18 +63,23 @@ fn doc_topology_reports_missing_readme_thin_toc_and_manifest() {
         RepoFile::new("docs/thin/README.md", "# Thin\n\n## Purpose\n\nthin\n\n## Table of Contents\n"),
         RepoFile::new("docs/thin/only.md", "# Only\n\n## Purpose\n\nonly\n"),
         RepoFile::new("docs/missing/file.md", "# File\n\n## Purpose\n\nfile\n"),
+        RepoFile::new("docs/bad.md/file.md", "# File\n\n## Purpose\n\nfile\n"),
     ];
 
     assert_eq!(
         messages(check_doc_topology(&files)),
         vec![
             "docs/README.md: readme topology: link child 'b.md' from the table of contents",
+            "docs/README.md: readme topology: link child 'bad.md' from the table of contents",
             "docs/README.md: readme topology: link child 'missing' from the table of contents",
             "docs/README.md: readme topology: link child 'thin' from the table of contents",
+            "docs/bad.md: readme topology: directory name must not end with .md",
+            "docs/bad.md: readme topology: directory must contain README.md",
             "docs/missing: readme topology: directory must contain README.md",
             "docs/thin: readme topology: directory must contain at least two children beside README.md",
             "docs/thin/README.md: readme topology: link child 'only.md' from the table of contents",
             "docs/README.md: all files: list 'b.md' in the All Files manifest",
+            "docs/README.md: all files: list 'bad.md/file.md' in the All Files manifest",
             "docs/README.md: all files: list 'missing/file.md' in the All Files manifest",
             "docs/README.md: all files: list 'thin/README.md' in the All Files manifest",
             "docs/README.md: all files: list 'thin/only.md' in the All Files manifest",
@@ -86,6 +91,10 @@ fn doc_topology_reports_missing_readme_thin_toc_and_manifest() {
 fn special_docs_report_task_and_crate_readme_violations() {
     let files = vec![
         RepoFile::new("docs/execution/tasks/foo.md", "# Foo\n\n## Purpose\n\nx\n"),
+        RepoFile::new(
+            "docs/model.md",
+            "# Model\n\n## Purpose\n\nGPT-5.5-Pro is latest model.\n",
+        ),
         RepoFile::new("crates/lkjagent-demo/src/lib.rs", "//! demo\n"),
         RepoFile::new(
             "crates/lkjagent-bad/README.md",
@@ -101,6 +110,7 @@ fn special_docs_report_task_and_crate_readme_violations() {
         messages(check_special_docs(&files)),
         vec![
             "docs/execution/tasks/foo.md: task shape: headings must match the task template",
+            "docs/model.md: model names: line 5 contains 'GPT-'; use provider-neutral wording",
             "crates/lkjagent-bad/README.md: crate readme: name the Doc contract",
             "crates/lkjagent-bad/README.md: crate readme: add a Table of Contents",
             "crates/lkjagent-bad/src/README.md: crate readme: add a Table of Contents",

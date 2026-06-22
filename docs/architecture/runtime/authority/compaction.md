@@ -14,7 +14,7 @@ last failed action, recovery ladder step, admitted next tools, exact next valid
 action, and completion blocked reasons.
 
 The snapshot is rendered as structured data for the next endpoint turn, status,
-logs, and GPT handoff output.
+logs, and model handoff output.
 
 ## Invariants
 

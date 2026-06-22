@@ -13,6 +13,15 @@ directories with short focused files.
 - [current-state.md](current-state.md): honest ledger of what exists versus what is design-only.
 - [vision/](vision/README.md): north star, principles, and scope boundaries.
 - [product/](product/README.md): observable behavior of the daemon, CLI, and queue.
+- [state/](state/README.md): hard state, weighted tracks, transitions, and guards.
+- [prompting/](prompting/README.md): state-derived prompt frames and prompt modes.
+- [documentation-system/](documentation-system/README.md): documentation contracts, growth, and audits.
+- [model-interface/](model-interface/README.md): provider-neutral model boundary and terms.
+- [implementation/](implementation/README.md): Rust substrate and functional core boundary.
+- [relations/](relations/README.md): cross-topic relation pages.
+- [maintenance/](maintenance/README.md): structural health, bias, commonality, and no-op policy.
+- [verification/](verification/README.md): semantic gates and regression fixture contracts.
+- [regressions/](regressions/README.md): owner-reported failure fixtures.
 - [architecture/](architecture/README.md): runtime, graph, context, protocol, tools, memory, llm, sandbox.
 - [evaluation/](evaluation/README.md): mechanical benchmark tasks, judges, reports, and improvement loop.
 - [decisions/](decisions/README.md): durable decision records with rejected directions.
@@ -26,6 +35,23 @@ directories with short focused files.
 - `current-state.md`
 - `vision/README.md` `vision/north-star.md` `vision/principles.md` `vision/scope.md`
 - `product/README.md` `product/daemon.md` `product/cli.md` `product/queue.md` `product/observability.md`
+- `state/README.md` `state/hard-state.md` `state/weighted-state.md` `state/state-vector.md`
+  `state/transition-handbook.md` `state/track-update-policy.md` `state/track-guards.md`
+- `prompting/README.md` `prompting/prompt-frame.md` `prompting/state-selected-prompts.md`
+  `prompting/documentation-prompts.md` `prompting/generic-model-language.md`
+- `documentation-system/README.md` `documentation-system/doc-contract.md`
+  `documentation-system/growth-stages.md` `documentation-system/semantic-seed.md`
+  `documentation-system/relation-graph.md` `documentation-system/mock-content-detection.md`
+- `model-interface/README.md` `model-interface/contract.md` `model-interface/provider-neutral-terms.md`
+- `implementation/README.md` `implementation/rust.md` `implementation/functional-core.md`
+- `relations/README.md` `relations/project-model-implementation.md` `relations/docs-state-prompts.md`
+- `maintenance/README.md` `maintenance/structural-health.md`
+  `maintenance/commonality-discovery.md` `maintenance/bias-detection.md`
+  `maintenance/no-op-suppression.md`
+- `verification/README.md` `verification/semantic-audits.md` `verification/regression-fixtures.md`
+- `regressions/README.md` `regressions/docs-init-lkjagent-model-rust.md`
+  `regressions/improve-structure-no-op.md` `regressions/model-specific-naming.md`
+  `regressions/mock-content.md`
 - `architecture/README.md` `architecture/overview.md`
 - `architecture/document-structure/README.md` `architecture/document-structure/tree-contract.md`
   `architecture/document-structure/network-contract.md` `architecture/document-structure/naming.md`
@@ -55,7 +81,7 @@ directories with short focused files.
   `architecture/state-model/state-intensity.md` `architecture/state-model/transition-quality.md`
   `architecture/state-model/owner-input.md` `architecture/state-model/weighted-state-vector.md`
 - `architecture/observability/README.md` `architecture/observability/token-ledger.md`
-  `architecture/observability/console-deck.md` `architecture/observability/gpt-log.md`
+  `architecture/observability/console-deck.md` `architecture/observability/model-log.md`
   `architecture/observability/status-format.md`
 - `architecture/runtime/README.md` `architecture/runtime/agent-loop.md` `architecture/runtime/daemon-process.md`
   `architecture/runtime/queue-intake.md` `architecture/runtime/self-maintenance.md`
@@ -129,7 +155,7 @@ directories with short focused files.
   `execution/current-work/runtime-authority-redesign.md`
   `execution/current-work/active-mode-controller.md`
   `execution/current-work/recovery-and-maintenance-loop-redesign.md`
-  `execution/current-work/gpt-log.md` `execution/current-work/verification-plan.md`
+  `execution/current-work/model-log.md` `execution/current-work/verification-plan.md`
 - `execution/tasks/README.md` `execution/tasks/bootstrap-workspace.md` `execution/tasks/xtask-checks.md`
   `execution/tasks/llm-client.md` `execution/tasks/protocol-parser.md` `execution/tasks/context-engine.md`
   `execution/tasks/sqlite-store.md` `execution/tasks/state-graph-runtime.md` `execution/tasks/tool-runtime.md`

@@ -40,7 +40,7 @@ pub fn judge_task(task: &BenchmarkTask, workspace: &Path) -> BenchResult<JudgeOu
         JudgeKind::BreadCookbookArtifact => owner_loop_ops::bread_cookbook_artifact(workspace),
         JudgeKind::UploadedRunFixtures => owner_uploaded::uploaded_run_fixtures(workspace),
         JudgeKind::StatusAccounting => owner_ops::status_accounting(workspace),
-        JudgeKind::GptHandoffLog => owner_ops::gpt_handoff_log(workspace),
+        JudgeKind::ModelHandoffLog => owner_ops::model_handoff_log(workspace),
     };
     Ok(match result {
         Ok(()) => JudgeOutcome::pass(task.points),

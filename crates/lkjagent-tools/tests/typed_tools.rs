@@ -144,7 +144,8 @@ fn workspace_doc_and_verify_tools_route_without_shell() -> TestResult<()> {
         &mut conn,
         &mut state,
     );
-    assert!(audit.content.contains("document audit passed"));
+    assert!(audit.content.contains("document audit failed"));
+    assert!(audit.content.contains("scaffold_only_content"));
 
     let bad_gate = dispatch(
         &action("verify.xtask", &[("gate", "unknown")]),

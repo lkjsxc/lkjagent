@@ -46,13 +46,14 @@ fn content_artifact_audit_passes_content_bearing_story() -> TestResult<()> {
 }
 
 #[test]
-fn project_doc_audit_still_passes_generated_scaffold() -> TestResult<()> {
+fn project_doc_audit_rejects_generated_scaffold() -> TestResult<()> {
     let workspace = temp_workspace("doc-content-project")?;
     scaffold(&workspace, &[("root", "docs"), ("title", "Project Docs")])?;
 
     let audit = audit(&workspace, "docs")?;
 
-    assert!(audit.contains("document audit passed"));
+    assert!(audit.contains("document audit failed"));
+    assert!(audit.contains("scaffold_only_content"));
     Ok(())
 }
 

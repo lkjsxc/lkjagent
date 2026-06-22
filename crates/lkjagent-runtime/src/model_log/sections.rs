@@ -1,4 +1,5 @@
 use lkjagent_context::budget::ContextBudgetPolicy;
+use lkjagent_tools::model_names::{replacement_report, sanitize_model_names};
 use rusqlite::Connection;
 
 use super::ledger;
@@ -27,7 +28,7 @@ pub fn render(conn: &Connection, now: &str, budget: ContextBudgetPolicy) -> Runt
     let usage = lkjagent_store::token_usage::latest(conn)?;
     let queue_depth = ledger::queue_depth(conn)?;
     let used = state_u64(conn, "context used tokens")?;
-    let mut out = String::from("# lkjagent GPT-5.5-Pro Run Log\n\n");
+    let mut out = String::from("# lkjagent Model Run Log\n\n");
     snapshot(
         &mut out,
         SnapshotContext {
@@ -52,8 +53,21 @@ pub fn render(conn: &Connection, now: &str, budget: ContextBudgetPolicy) -> Runt
         .saturating_sub(LOG_TAIL_RESERVE_CHARS);
     ledger::transcript(&mut out, &events, transcript_budget);
     ledger::verification(&mut out, case.as_ref());
+    out = sanitize_log(out);
     trim_to_char_budget(&mut out, MAX_LOG_CHARS);
     Ok(out)
+}
+
+fn sanitize_log(text: String) -> String {
+    let sanitized = sanitize_model_names(&text);
+    if sanitized.replacements.is_empty() {
+        return sanitized.text;
+    }
+    format!(
+        "{}\n## Sanitization Report\n\n```text\n{}\n```\n",
+        sanitized.text,
+        replacement_report(&sanitized)
+    )
 }
 
 fn snapshot(out: &mut String, ctx: SnapshotContext<'_>) -> RuntimeResult<()> {

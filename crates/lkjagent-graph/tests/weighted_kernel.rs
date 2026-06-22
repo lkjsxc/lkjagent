@@ -4,8 +4,8 @@ use lkjagent_graph::kernel_types::{
     Posture, StateNode, StateTrack, StateVector, ToolIntent, TrackLabel, TrackSource, Weight,
 };
 use lkjagent_graph::{
-    authorize_tool_intent, check_completion_gates, reduce_case_event,
-    required_context_slices_from_tracks, select_recovery, update_state_vector,
+    authorize_tool_intent, check_completion_gates, compile_prompt_frame, reduce_case_event,
+    required_context_slices_from_tracks, select_recovery, update_state_vector, PromptMode,
 };
 
 #[test]
@@ -48,6 +48,24 @@ fn queue_interruption_preserves_mutation_block_until_classified() {
 }
 
 #[test]
+fn documentation_quality_guards_block_completion_and_memory() {
+    let mock = reduce_case_event(&case(), &CaseEvent::MockContentAudit { passed: false });
+    let done = authorize_tool_intent(&mock, &intent("agent.done", "done:mock", 0));
+    assert!(!done.allowed);
+    assert!(done.blocked_by.contains(&TrackLabel::MockContentRisk));
+
+    let named = reduce_case_event(&case(), &CaseEvent::ModelNameAudit { passed: false });
+    let memory = authorize_tool_intent(&named, &intent("memory.save", "memory:named", 0));
+    assert!(!memory.allowed);
+    assert!(memory.blocked_by.contains(&TrackLabel::ModelSpecificNaming));
+
+    let relation = reduce_case_event(&case(), &CaseEvent::RelationAudit { passed: false });
+    let done = authorize_tool_intent(&relation, &intent("agent.done", "done:relation", 0));
+    assert!(!done.allowed);
+    assert!(done.blocked_by.contains(&TrackLabel::StructureConnectivity));
+}
+
+#[test]
 fn completion_is_hard_gated_even_when_ready_track_is_high() {
     let mut state = case();
     state.hard_state.completion_gates = vec![CompletionGate {
@@ -66,6 +84,25 @@ fn completion_is_hard_gated_even_when_ready_track_is_high() {
 
     assert!(!done.allowed);
     assert!(!gates.allowed);
+}
+
+#[test]
+fn prompt_frame_compiles_state_guards_and_next_action() {
+    let state = reduce_case_event(&case(), &CaseEvent::ModelNameAudit { passed: false });
+    let frame = compile_prompt_frame(&state);
+
+    assert_eq!(frame.case_id, "case-1");
+    assert_eq!(frame.mode, PromptMode::Expansion);
+    assert!(frame
+        .dominant_guards
+        .contains(&TrackLabel::ModelSpecificNaming));
+    assert!(frame
+        .context_slices
+        .contains(&"model-name sanitizer".to_string()));
+    assert_eq!(
+        frame.next_action_recommendation,
+        "run sanitizer or model-name audit repair"
+    );
 }
 
 #[test]
@@ -90,6 +127,7 @@ fn case() -> CaseState {
                 "fs.batch_write".to_string(),
                 "artifact.next".to_string(),
                 "artifact.apply".to_string(),
+                "memory.save".to_string(),
                 "agent.done".to_string(),
             ],
             blocked_tools: Vec::new(),

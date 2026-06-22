@@ -5,6 +5,7 @@ use crate::model::{RepoFile, Violation};
 pub fn check_special_docs(files: &[RepoFile]) -> Vec<Violation> {
     let mut violations = Vec::new();
     violations.extend(check_task_shapes(files));
+    violations.extend(check_model_name_claims(files));
     violations.extend(check_crate_readmes(files));
     violations
 }
@@ -45,6 +46,40 @@ fn is_task(file: &RepoFile) -> bool {
     file.path.starts_with("docs/execution/tasks/")
         && file.path.ends_with(".md")
         && !file.path.ends_with("/README.md")
+}
+
+fn check_model_name_claims(files: &[RepoFile]) -> Vec<Violation> {
+    let mut violations = Vec::new();
+    for file in files.iter().filter(|file| file.path.starts_with("docs/")) {
+        if file.path.starts_with("docs/regressions/") {
+            continue;
+        }
+        for (index, line) in file.text.lines().enumerate() {
+            if let Some(pattern) = model_name_pattern(line) {
+                violations.push(Violation::new(
+                    &file.path,
+                    "model names",
+                    format!(
+                        "line {} contains '{pattern}'; use provider-neutral wording",
+                        index + 1
+                    ),
+                ));
+            }
+        }
+    }
+    violations
+}
+
+fn model_name_pattern(line: &str) -> Option<&'static str> {
+    for pattern in ["GPT-", "Qwen3.5", "Claude-", "Gemini-"] {
+        if line.contains(pattern) {
+            return Some(pattern);
+        }
+    }
+    if line.to_ascii_lowercase().contains("latest model") {
+        return Some("latest model");
+    }
+    None
 }
 
 fn check_crate_readmes(files: &[RepoFile]) -> Vec<Violation> {

@@ -8,7 +8,7 @@ This file defines the compact bottom deck in the interactive console.
 
 - Show daemon state, queue depth, active case, top state tracks, context
   fraction, token usage, last fault, last action, pending owner question, and
-  GPT log path.
+  model log path.
 - Keep the deck compact enough for narrow terminals.
 - Unknown values render as `unknown`.
 - The console remains read-only until the owner sends input.
@@ -24,7 +24,7 @@ This file defines the compact bottom deck in the interactive console.
 - Deck text overlaps the prompt.
 - Token usage disappears when cached input is unknown.
 - State tracks are hidden behind one phase label.
-- GPT handoff path wraps so aggressively that the filename is hidden.
+- Model handoff path wraps so aggressively that the filename is hidden.
 
 ## Status
 

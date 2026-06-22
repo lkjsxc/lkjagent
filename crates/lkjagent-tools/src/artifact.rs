@@ -55,15 +55,15 @@ pub fn audit(
     }
     let report = crate::doc::audit(workspace, root, count, mode)?;
     let kind = kind.trim();
-    if kind.is_empty() || !report.starts_with("document audit passed") {
-        return Ok(report);
-    }
     let full = workspace_path(workspace, root)?;
     let manifest = optional_manifest(&full);
-    if kind_mismatch(kind, &manifest) {
+    if !kind.is_empty() && !manifest.is_empty() && kind_mismatch(kind, &manifest) {
         return Ok(format!(
             "document audit failed\nroot={root}\nchecks=15\npassed=14\nfailed=1\nfailures:\n- artifact_kind_mismatch: expected={kind}\nnext_action=artifact.apply matching artifact kind"
         ));
+    }
+    if kind.is_empty() || !report.starts_with("document audit passed") {
+        return Ok(report);
     }
     if let Some(drift) = crate::artifact_drift::japanese_cookbook(&full)? {
         if !drift.is_empty() {

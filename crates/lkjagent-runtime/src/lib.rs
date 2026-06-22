@@ -1,6 +1,5 @@
 pub mod daemon;
 pub mod error;
-pub mod gpt_log;
 mod graph_guard;
 mod graph_parse;
 pub mod graph_state;
@@ -9,6 +8,7 @@ pub mod graph_state_tracks;
 pub mod intake;
 pub mod maintenance;
 pub mod mode;
+pub mod model_log;
 pub mod prompt;
 pub mod recovery;
 pub mod step;

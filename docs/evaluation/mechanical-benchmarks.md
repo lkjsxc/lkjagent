@@ -15,7 +15,7 @@ The tiny suite also includes owner-reported reliability regressions: semantic
 documentation trees, recursive README indexes, counted documentation without
 serial filenames, action-parameter recovery, recovery-loop routing,
 long-form document routing, compact context/token status, and the single
-current GPT handoff log.
+current model handoff log.
 Uploaded run-log fixtures are specified in
 [uploaded-run-fixtures.md](uploaded-run-fixtures.md). They cover recovery
 loops, content readiness, blocked mutation, large payload risk, maintenance

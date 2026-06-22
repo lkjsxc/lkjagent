@@ -1,4 +1,4 @@
-use crate::kernel_events::{AuditResult, CaseEvent, Fault, ToolObservation};
+use crate::kernel_events::CaseEvent;
 use crate::kernel_track_ops::{bump, floor, lower, threshold, tracks_at, weight};
 use crate::kernel_types::*;
 
@@ -28,6 +28,23 @@ pub fn update_state_vector(vector: &StateVector, event: &CaseEvent) -> StateVect
             floor(&mut next, TrackLabel::RepeatedActionRisk, 0.85);
         }
         CaseEvent::DocAudit { passed } => doc_audit(&mut next, *passed),
+        CaseEvent::RelationAudit { passed } => audit_track(
+            &mut next,
+            TrackLabel::StructureConnectivity,
+            *passed,
+            0.80,
+            0.70,
+        ),
+        CaseEvent::MockContentAudit { passed } => {
+            audit_track(&mut next, TrackLabel::MockContentRisk, *passed, 0.85, 0.80)
+        }
+        CaseEvent::ModelNameAudit { passed } => audit_track(
+            &mut next,
+            TrackLabel::ModelSpecificNaming,
+            *passed,
+            0.80,
+            0.80,
+        ),
         CaseEvent::ArtifactObjectiveMismatch { .. } => artifact_mismatch(&mut next),
         CaseEvent::ArtifactAudit { passed } => artifact_audit(&mut next, *passed),
         CaseEvent::ContextUsage { hard } => {
@@ -81,61 +98,6 @@ pub fn select_next_state(state: &CaseState) -> StateNode {
     promotion_decision(&state.state_vector).unwrap_or(state.hard_state.node)
 }
 
-pub fn apply_audit_result(vector: &StateVector, audit: &AuditResult) -> StateVector {
-    match audit.kind.as_str() {
-        "doc.audit" => update_state_vector(
-            vector,
-            &CaseEvent::DocAudit {
-                passed: audit.passed,
-            },
-        ),
-        "artifact.audit" => update_state_vector(
-            vector,
-            &CaseEvent::ArtifactAudit {
-                passed: audit.passed,
-            },
-        ),
-        _ if audit.passed => vector.clone(),
-        _ => update_state_vector(
-            vector,
-            &CaseEvent::ArtifactObjectiveMismatch {
-                reason: audit.kind.clone(),
-            },
-        ),
-    }
-}
-
-pub fn apply_tool_observation(vector: &StateVector, observation: &ToolObservation) -> StateVector {
-    if observation.succeeded {
-        update_state_vector(vector, &CaseEvent::ParsedAction)
-    } else {
-        update_state_vector(
-            vector,
-            &CaseEvent::ToolParameterFault {
-                expected: observation.tool.clone(),
-                received: "failed observation".to_string(),
-            },
-        )
-    }
-}
-
-pub fn classify_fault(text: &str) -> Fault {
-    let lower_text = text.to_ascii_lowercase();
-    if lower_text.contains("parse") {
-        Fault::ParserFault
-    } else if lower_text.contains("parameter") || lower_text.contains("schema") {
-        Fault::ToolParameterFault
-    } else if lower_text.contains("drift") {
-        Fault::ArtifactDrift
-    } else if lower_text.contains("repeat") {
-        Fault::RepeatedActionRefusal
-    } else if lower_text.contains("queue") {
-        Fault::QueueInterruption
-    } else {
-        Fault::ToolExecutionFault
-    }
-}
-
 fn parse_fault(vector: &mut StateVector, consecutive: u8) {
     bump(vector, TrackLabel::ParseRecovery, 0.25);
     bump(vector, TrackLabel::ActionParamReliability, 0.10);
@@ -151,6 +113,20 @@ fn doc_audit(vector: &mut StateVector, passed: bool) {
     } else {
         floor(vector, TrackLabel::DocumentStructure, 0.85);
         lower(vector, TrackLabel::ArtifactReadiness, 0.40);
+    }
+}
+
+fn audit_track(
+    vector: &mut StateVector,
+    label: TrackLabel,
+    passed: bool,
+    fail_floor: f32,
+    pass_lower: f32,
+) {
+    if passed {
+        lower(vector, label, pass_lower);
+    } else {
+        floor(vector, label, fail_floor);
     }
 }
 

@@ -55,6 +55,7 @@ pub mod fs_search;
 pub mod fs_stat;
 pub mod fs_tree;
 pub mod memory;
+pub mod model_names;
 pub mod observe;
 mod placeholder;
 pub mod queue;

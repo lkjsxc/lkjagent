@@ -8,7 +8,7 @@ Rust data selecting allowed tools, next action classes, and completion gates.
 
 ## Owner Evidence
 
-Uploaded GPT-5.5-Pro logs show repeated parse faults, invalid parameter loops,
+Uploaded model run logs show repeated parse faults, invalid parameter loops,
 invalid `graph.note` kinds, invalid `memory.save` kinds, duplicate memory
 entries, blocked `memory.save` during maintenance, blocked `doc.scaffold`
 during recovery, repeated `graph.next`, premature `agent.done`, and completed
