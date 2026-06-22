@@ -17,7 +17,7 @@ into a recursive filesystem tree.
 ## Local Map
 
 - [tree-contract.md](tree-contract.md): owns directory and README shape.
-- [network-contract.md](network-contract.md): owns `.lkj-doc-graph.md`.
+- [network-contract.md](network-contract.md): owns catalog-derived graph data.
 - [naming.md](naming.md): owns forbidden sequence-only names.
 - [scaffold-profiles.md](scaffold-profiles.md): owns profile selection.
 - [audit.md](audit.md): owns deterministic audit checks.

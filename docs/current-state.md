@@ -31,7 +31,7 @@ prove that their failures cannot recur.
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
 | Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current model run snapshot. |
 | Document scaffold seed | Deterministic scaffold paths exist for project, lkjagent-model, multi-topic docs, story, and cookbook roots. |
-| Document audit basics | Audit checks README topology, links, `.lkj-doc-graph.md`, line limits, and scaffold-only leaves. |
+| Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, and scaffold-only leaves. |
 | Placeholder refusal | `fs.write`, `fs.batch_write`, and content audit reject common scaffold and placeholder phrase classes before mutation. |
 | Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
 | Hard compaction mode | A runtime-owned `Compaction` active mode exists and does not render `memory.save` as a model action. |
@@ -83,10 +83,17 @@ the gates that actually ran. Contract text alone never closes a row.
 
 ## Latest Local Evidence
 
-This session ran these gates after the documentation and recovery-model edits:
+This session ran these gates after the documentation catalog edits:
 
+- `docker compose build`: `EXIT=0`.
+- `docker compose run --rm verify`: `ok verify`, `EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`.
+- `cargo fmt --check`: `EXIT=0`.
+- `cargo test -p lkjagent-xtask`: `TEST_EXIT=0`.
+
+Earlier gates recorded for the recovery-model slice:
+
 - `cargo run -p lkjagent-xtask -- check-style`: `ok check-style`.
 - `cargo fmt --check`: passed.
 - `cargo test -p lkjagent-runtime`: passed after stale action, authority snapshot, and retry-count tests.

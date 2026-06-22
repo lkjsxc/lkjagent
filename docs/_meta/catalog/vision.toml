@@ -1,0 +1,8 @@
+# Catalog: vision
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/vision/README.md" = { title = "Vision", parent = "docs/README.md", children = ["docs/vision/north-star.md", "docs/vision/principles.md", "docs/vision/scope.md"], role = "Table of contents for docs/vision", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/vision/north-star.md" = { title = "North Star", parent = "docs/vision/README.md", children = [], role = "Contract page under docs/vision", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/vision/principles.md" = { title = "Principles", parent = "docs/vision/README.md", children = [], role = "Contract page under docs/vision", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/vision/scope.md" = { title = "Scope", parent = "docs/vision/README.md", children = [], role = "Contract page under docs/vision", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

@@ -13,6 +13,7 @@ after audits prove connected content.
 - [semantic-seed.md](semantic-seed.md): first connected tree for multi-topic tasks.
 - [relation-graph.md](relation-graph.md): relation pages and backlinks.
 - [mock-content-detection.md](mock-content-detection.md): shallow scaffold rejection.
+- [catalog.md](catalog.md): machine-readable index for authored documentation.
 
 ## Local Map
 

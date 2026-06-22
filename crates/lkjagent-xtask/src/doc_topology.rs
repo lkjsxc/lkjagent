@@ -9,7 +9,7 @@ pub fn check_doc_topology(files: &[RepoFile]) -> Vec<Violation> {
         violations.extend(check_markdown_suffix_dir(dir));
         violations.extend(check_dir(files, dir));
     }
-    violations.extend(check_all_files(files));
+    violations.extend(check_path_hygiene(files));
     violations
 }
 
@@ -104,42 +104,44 @@ fn immediate_children(files: &[RepoFile], dir: &str) -> BTreeSet<String> {
 }
 
 fn readme_links_child(text: &str, child: &str) -> bool {
-    if child.ends_with(".md") {
+    if child.contains('.') {
         text.contains(&format!("({child})"))
     } else {
         text.contains(&format!("({child}/README.md)"))
     }
 }
 
-fn check_all_files(files: &[RepoFile]) -> Vec<Violation> {
-    let readme = files.iter().find(|file| file.path == "docs/README.md");
-    let Some(readme_file) = readme else {
-        return vec![Violation::new(
-            "docs/README.md",
-            "all files",
-            "add the documentation root README.md",
-        )];
-    };
-    let mut docs_files: Vec<&RepoFile> = files
-        .iter()
-        .filter(|file| file.path.starts_with("docs/"))
-        .filter(|file| file.path.ends_with(".md"))
-        .filter(|file| file.path != "docs/README.md")
-        .collect();
-    docs_files.sort_by(|left, right| left.path.cmp(&right.path));
-    docs_files
-        .into_iter()
-        .filter_map(|file| {
-            let relative = file.path.trim_start_matches("docs/");
-            if readme_file.text.contains(&format!("`{relative}`")) {
-                None
-            } else {
-                Some(Violation::new(
-                    &readme_file.path,
-                    "all files",
-                    format!("list '{relative}' in the All Files manifest"),
-                ))
-            }
-        })
-        .collect()
+fn check_path_hygiene(files: &[RepoFile]) -> Vec<Violation> {
+    let mut violations = Vec::new();
+    for file in files.iter().filter(|file| file.path.starts_with("docs/")) {
+        if file.path.contains(' ') {
+            violations.push(Violation::new(
+                &file.path,
+                "doc path",
+                "documentation paths must not contain spaces",
+            ));
+        }
+        if file.path.contains("mincraft") {
+            violations.push(Violation::new(
+                &file.path,
+                "doc path",
+                "use 'minecraft' for the domain name",
+            ));
+        }
+        if file.path.contains("-md-") {
+            violations.push(Violation::new(
+                &file.path,
+                "doc path",
+                "remove generated '-md-' path fragments",
+            ));
+        }
+        if let Some(segment) = file.path.split('/').find(|segment| segment.len() > 80) {
+            violations.push(Violation::new(
+                &file.path,
+                "doc path",
+                format!("path segment '{segment}' is too long"),
+            ));
+        }
+    }
+    violations
 }

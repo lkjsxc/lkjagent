@@ -1,0 +1,7 @@
+# Catalog: verification
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/verification/README.md" = { title = "Verification", parent = "docs/README.md", children = ["docs/verification/regression-fixtures.md", "docs/verification/semantic-audits.md"], role = "Table of contents for docs/verification", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/verification/regression-fixtures.md" = { title = "Regression Fixtures", parent = "docs/verification/README.md", children = [], role = "Contract page under docs/verification", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/verification/semantic-audits.md" = { title = "Semantic Audits", parent = "docs/verification/README.md", children = [], role = "Contract page under docs/verification", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

@@ -2,32 +2,23 @@
 
 ## Purpose
 
-This file owns the deterministic document topology audit.
+This file owns deterministic documentation topology and catalog audit rules.
 
-## Contract
+## Facts
 
-- Audit checks the root exists and has `README.md`.
-- Audit checks each directory has one `README.md` and at least two children
-  unless explicitly terminal.
-- Audit checks README purpose sections and local child links.
-- Audit rejects sequence-only documentation names.
-- Audit rejects release-number API shorthand unless a local exception table
-  explains why the path is literal source material.
-- Audit checks one H1 per Markdown file, line caps, graph nodes, and graph edges.
-- Audit output is compact, lists failed check names, and names exact next actions.
+- `crates/lkjagent-xtask` runs repository-level doc checks.
+- The catalog lives under [../../_meta/catalog/](../../_meta/catalog/README.md).
+- Ignored runtime output under `data/` is not part of authored docs.
 
-## Implementation Hooks
+## Design
 
-- Source: `crates/lkjagent-tools/src/doc.rs`
-- Tests: `crates/lkjagent-tools/tests/typed_tools.rs`
-- Verification: `docker compose run --rm verify`
+The audit checks Markdown shape, README topology, local child links, relative
+links, path hygiene, catalog coverage, catalog parent fields, line caps, and
+banned release or compatibility wording. Failures name the path, check, and
+repair text. Generated graph Markdown is not required; graph output is derived
+from the catalog only after the catalog check passes.
 
-## Failure Modes
+## Checks
 
-- Audit passes a README that omits local children.
-- Audit passes a missing `.lkj-doc-graph.md`.
-- Audit reports only generic failure text without repair targets.
-
-## Status
-
-partially implemented
+- `cargo run -p lkjagent-xtask -- check-docs`
+- `cargo run -p lkjagent-xtask -- check-lines`

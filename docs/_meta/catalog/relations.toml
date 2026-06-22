@@ -1,0 +1,7 @@
+# Catalog: relations
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/relations/README.md" = { title = "Relations", parent = "docs/README.md", children = ["docs/relations/docs-state-prompts.md", "docs/relations/project-model-implementation.md"], role = "Table of contents for docs/relations", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/relations/docs-state-prompts.md" = { title = "Docs State Prompts", parent = "docs/relations/README.md", children = [], role = "Contract page under docs/relations", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/relations/project-model-implementation.md" = { title = "Project Model Implementation", parent = "docs/relations/README.md", children = [], role = "Contract page under docs/relations", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

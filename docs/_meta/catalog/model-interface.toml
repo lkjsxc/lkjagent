@@ -1,0 +1,7 @@
+# Catalog: model-interface
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/model-interface/README.md" = { title = "Model Interface", parent = "docs/README.md", children = ["docs/model-interface/contract.md", "docs/model-interface/provider-neutral-terms.md"], role = "Table of contents for docs/model-interface", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/model-interface/contract.md" = { title = "Contract", parent = "docs/model-interface/README.md", children = [], role = "Contract page under docs/model-interface", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/model-interface/provider-neutral-terms.md" = { title = "Provider Neutral Terms", parent = "docs/model-interface/README.md", children = [], role = "Contract page under docs/model-interface", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

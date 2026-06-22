@@ -1,0 +1,9 @@
+# Catalog: maintenance
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/maintenance/README.md" = { title = "Maintenance", parent = "docs/README.md", children = ["docs/maintenance/bias-detection.md", "docs/maintenance/commonality-discovery.md", "docs/maintenance/no-op-suppression.md", "docs/maintenance/structural-health.md"], role = "Table of contents for docs/maintenance", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/maintenance/bias-detection.md" = { title = "Bias Detection", parent = "docs/maintenance/README.md", children = [], role = "Contract page under docs/maintenance", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/maintenance/commonality-discovery.md" = { title = "Commonality Discovery", parent = "docs/maintenance/README.md", children = [], role = "Contract page under docs/maintenance", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/maintenance/no-op-suppression.md" = { title = "No-Op Suppression", parent = "docs/maintenance/README.md", children = [], role = "Contract page under docs/maintenance", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/maintenance/structural-health.md" = { title = "Structural Health", parent = "docs/maintenance/README.md", children = [], role = "Contract page under docs/maintenance", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

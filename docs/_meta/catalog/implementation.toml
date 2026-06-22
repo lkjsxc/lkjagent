@@ -1,0 +1,7 @@
+# Catalog: implementation
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/implementation/README.md" = { title = "Implementation", parent = "docs/README.md", children = ["docs/implementation/functional-core.md", "docs/implementation/rust.md"], role = "Table of contents for docs/implementation", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/implementation/functional-core.md" = { title = "Functional Core", parent = "docs/implementation/README.md", children = [], role = "Contract page under docs/implementation", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/implementation/rust.md" = { title = "Rust", parent = "docs/implementation/README.md", children = [], role = "Contract page under docs/implementation", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

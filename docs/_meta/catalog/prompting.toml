@@ -1,0 +1,10 @@
+# Catalog: prompting
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/prompting/README.md" = { title = "Prompting", parent = "docs/README.md", children = ["docs/prompting/documentation-prompts.md", "docs/prompting/generic-model-language.md", "docs/prompting/prompt-frame.md", "docs/prompting/runtime-source.md", "docs/prompting/state-selected-prompts.md"], role = "Table of contents for docs/prompting", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/prompting/documentation-prompts.md" = { title = "Documentation Prompts", parent = "docs/prompting/README.md", children = [], role = "Contract page under docs/prompting", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/prompting/generic-model-language.md" = { title = "Generic Model Language", parent = "docs/prompting/README.md", children = [], role = "Contract page under docs/prompting", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/prompting/prompt-frame.md" = { title = "Prompt Frame", parent = "docs/prompting/README.md", children = [], role = "Contract page under docs/prompting", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/prompting/runtime-source.md" = { title = "Runtime Source", parent = "docs/prompting/README.md", children = [], role = "Contract page under docs/prompting", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/prompting/state-selected-prompts.md" = { title = "State Selected Prompts", parent = "docs/prompting/README.md", children = [], role = "Contract page under docs/prompting", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

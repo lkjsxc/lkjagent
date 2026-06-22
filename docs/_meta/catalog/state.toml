@@ -1,0 +1,11 @@
+# Catalog: state
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/state/README.md" = { title = "State", parent = "docs/README.md", children = ["docs/state/hard-state.md", "docs/state/state-vector.md", "docs/state/track-guards.md", "docs/state/track-update-policy.md", "docs/state/transition-handbook.md", "docs/state/weighted-state.md"], role = "Table of contents for docs/state", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/state/hard-state.md" = { title = "Hard State", parent = "docs/state/README.md", children = [], role = "Contract page under docs/state", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/state/state-vector.md" = { title = "State Vector", parent = "docs/state/README.md", children = [], role = "Contract page under docs/state", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/state/track-guards.md" = { title = "Track Guards", parent = "docs/state/README.md", children = [], role = "Contract page under docs/state", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/state/track-update-policy.md" = { title = "Track Update Policy", parent = "docs/state/README.md", children = [], role = "Contract page under docs/state", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/state/transition-handbook.md" = { title = "Transition Handbook", parent = "docs/state/README.md", children = [], role = "Contract page under docs/state", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/state/weighted-state.md" = { title = "Weighted State", parent = "docs/state/README.md", children = [], role = "Contract page under docs/state", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
