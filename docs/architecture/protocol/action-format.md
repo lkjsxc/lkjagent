@@ -2,12 +2,11 @@
 
 ## Purpose
 
-The grammar of a model turn. The model writes plain text inside one act
-envelope. The preferred form is line-oriented `name: value` fields; the older
-paired-tag form is still parsed by the same pure parser. JSON never appears as
-an action payload.
+The grammar of a model turn. The model emits exactly one action envelope.
+Line-oriented fields, paired tags, and the JSON `lkj-action` envelope all parse
+through the same pure action model before dispatch.
 
-## A Turn
+## Line-Oriented Turn
 
 ```
 <think>
@@ -31,6 +30,27 @@ count: 60
 - Scalar values use `name: value` on one line.
 - Payload fields such as `content:`, `files:`, and `patch:` keep every
   following line byte-exact until the act closes.
+
+## JSON Envelope
+
+```json
+{
+  "schema": "lkj-action",
+  "action": {
+    "tool": "fs.batch_write",
+    "params": {
+      "files": [
+        { "path": "docs/a.md", "content": "# A\n\n## Purpose\n\nA." }
+      ]
+    }
+  }
+}
+```
+
+The JSON envelope rejects unknown top-level fields, unknown action fields,
+unknown params, missing required params, and null param values. `schema` is
+optional; when present it must be `lkj-action`. No release-number schema field
+is valid.
 
 ## Multi-Line Values
 

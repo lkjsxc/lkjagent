@@ -1,4 +1,5 @@
 pub mod error;
+mod json_parse;
 mod line_parse;
 pub mod model;
 pub mod parse;

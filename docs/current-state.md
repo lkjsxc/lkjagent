@@ -24,7 +24,7 @@ prove that their failures cannot recur.
 | Area | Evidence |
 | --- | --- |
 | Workspace and gates | `Cargo.toml`, `crates/lkjagent-xtask`, and `docker-compose.yml` exist. |
-| Parser | `lkjagent-protocol` parses paired-tag, line-oriented, and batch file action forms covered by focused fixtures. |
+| Parser | `lkjagent-protocol` parses line-oriented, paired-tag, JSON envelope, and batch file action forms covered by focused fixtures. |
 | Dispatcher registry | `lkjagent-tools` validates registered tools and renders registry examples for covered action families. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
 | SQLite store | Queue, state, event, memory, and task summary surfaces exist in `lkjagent-store`. |
@@ -94,6 +94,8 @@ This session ran these gates after the documentation catalog edits:
 - `cargo test -p lkjagent-tools --test fs_payload`: `PAYLOAD_EXIT=0`.
 - `cargo test -p lkjagent-tools --test typed_tools`: `TYPED_EXIT=0`.
 - `cargo test -p lkjagent-tools`: `TEST_EXIT=0`.
+- `cargo test -p lkjagent-protocol`: `PROTO_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test fault_wait`: `FAULT_EXIT=0`.
 
 Earlier gates recorded for the recovery-model slice:
 

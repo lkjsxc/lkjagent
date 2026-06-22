@@ -47,4 +47,7 @@ pub enum ParseFault {
         missing: Vec<String>,
         unknown: Vec<String>,
     },
+    BadEnvelope {
+        reason: String,
+    },
 }
