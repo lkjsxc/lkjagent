@@ -5,7 +5,7 @@ pub const README_DATA: &[Readme] = &[
         "docs/README.md",
         "Encyclopedia Nucleus",
         "Small starting map for an encyclopedia that grows by reviewed batches.",
-        "- [current-state.md](current-state.md): durable state ledger.\n- [maps/](maps/README.md): network maps.\n- [domains/](domains/README.md): topic branches.\n- [reference/](reference/README.md): shared definitions.\n- [curation/](curation/README.md): quality rules.\n- [execution/](execution/README.md): expansion queue.",
+        "- [current-state.md](current-state.md): durable state ledger.\n- [maps/](maps/README.md): network maps.\n- [domains/](domains/README.md): topic branches.\n- [reference/](reference/README.md): shared definitions.\n- [curation/](curation/README.md): quality rules.\n- [execution/](execution/README.md): expansion queue.\n- [catalog.toml](catalog.toml): compact scaffold metadata.",
     ),
     (
         "docs/maps/README.md",

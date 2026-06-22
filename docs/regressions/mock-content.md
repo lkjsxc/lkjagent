@@ -26,7 +26,7 @@ no relation page updates
 ## Forbidden Behavior
 
 - Passing because every file has an H1 and a README link.
-- Passing because a graph manifest mentions the paths.
+- Passing because a catalog metadata mentions the paths.
 - Closing after topology-only audit.
 
 ## Status

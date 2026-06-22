@@ -52,7 +52,7 @@ fn artifact_apply_writes_manifest_and_readmes() -> TestResult<()> {
     assert!(output.content.contains("document scaffold created"));
     assert!(workspace.join("stories/memory-market/README.md").is_file());
     assert!(workspace
-        .join("stories/memory-market/.lkj-doc-graph.md")
+        .join("stories/memory-market/catalog.toml")
         .is_file());
     Ok(())
 }
@@ -180,8 +180,8 @@ fn artifact_audit_rejects_generic_project_docs_for_story() -> TestResult<()> {
     );
 
     assert!(output.content.contains("artifact_kind_mismatch"));
-    let manifest = fs::read_to_string(workspace.join("stories/not-a-story/.lkj-doc-graph.md"))?;
-    assert!(manifest.contains("ProjectDocs"));
+    let catalog = fs::read_to_string(workspace.join("stories/not-a-story/catalog.toml"))?;
+    assert!(catalog.contains("ProjectDocs"));
     Ok(())
 }
 

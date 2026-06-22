@@ -5,7 +5,6 @@ use crate::error::ToolResult;
 use crate::fs::workspace_path;
 
 use super::content_audit::content_checks;
-use super::graph::parse_graph;
 use super::model::ScaffoldMode;
 use super::names::{banned_release_wording, forbidden_serial_name, link_target};
 
@@ -22,7 +21,6 @@ pub fn audit_root(
         return Ok(report(root, failures));
     }
     collect_dir_checks(&full, &full, &mut failures)?;
-    graph_checks(&full, &mut failures);
     content_checks(&full, &mut failures)?;
     count_check(&full, count, mode, &mut failures)?;
     Ok(report(root, failures))
@@ -97,23 +95,6 @@ fn file_checks(root: &Path, file: &Path, failures: &mut Vec<String>) -> ToolResu
         failures.push(format!("banned_release_wording: {relative} {token}"));
     }
     Ok(())
-}
-
-fn graph_checks(root: &Path, failures: &mut Vec<String>) {
-    let Some(graph) = parse_graph(root) else {
-        failures.push("missing_doc_graph: .lkj-doc-graph.md".to_string());
-        return;
-    };
-    for path in &graph.paths {
-        if !root.join(path).exists() {
-            failures.push(format!("graph_missing_path: {path}"));
-        }
-    }
-    for (from, to) in &graph.edges {
-        if !graph.nodes.contains(from) || !graph.nodes.contains(to) {
-            failures.push(format!("graph_bad_edge: {from}->{to}"));
-        }
-    }
 }
 
 fn count_check(

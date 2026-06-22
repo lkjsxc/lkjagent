@@ -20,7 +20,7 @@ project documentation unless the owner explicitly asks for project docs.
 ## Manifest
 
 Every artifact root carries `.lkj-artifact.md` or an equivalent extension of
-`.lkj-doc-graph.md`. The manifest records artifact key, root, kind, title,
+`catalog.toml`. The manifest records artifact key, root, kind, title,
 owner objective hash, node roles, required files, content minimums, audit
 state, and completion state.
 
@@ -30,5 +30,5 @@ manifest IDs when available, readiness gaps, and next executable action.
 ## Status
 
 partially implemented; graph classification assigns content-artifact roots for
-long stories and cookbooks, and `.lkj-doc-graph.md` records scaffold paths.
+long stories and cookbooks, and `catalog.toml` records scaffold paths.
 Stable `.lkj-artifact.md` identity, adoption, and repair decisions remain open.

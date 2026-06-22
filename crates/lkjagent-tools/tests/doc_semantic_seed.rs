@@ -24,8 +24,8 @@ fn lkjagent_model_rust_request_creates_connected_seed() -> TestResult<()> {
         .join("docs/relations/project-model-implementation.md")
         .is_file());
     assert!(!workspace.join("docs/lkjagent.md").exists());
-    let graph = std::fs::read_to_string(workspace.join("docs/.lkj-doc-graph.md"))?;
-    assert!(!graph.contains("qwen"));
+    let catalog = std::fs::read_to_string(workspace.join("docs/catalog.toml"))?;
+    assert!(!catalog.contains("qwen"));
 
     let audit = audit(&workspace, "docs")?;
     assert!(audit.contains("document audit passed"), "{audit}");

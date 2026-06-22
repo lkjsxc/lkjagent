@@ -5,7 +5,7 @@ use std::path::{Path, PathBuf};
 pub fn project_docs(workspace: &Path) -> Result<(), String> {
     let root = workspace.join("docs");
     require_file(&root.join("README.md"))?;
-    require_file(&root.join(".lkj-doc-graph.md"))?;
+    require_file(&root.join("catalog.toml"))?;
     no_serial_names(&root)?;
     for dir in "overview architecture guides operations reference".split_whitespace() {
         let local = root.join(dir);
@@ -13,12 +13,12 @@ pub fn project_docs(workspace: &Path) -> Result<(), String> {
         require_link(&root.join("README.md"), &format!("{dir}/README.md"))?;
     }
     require_link(&root.join("architecture/README.md"), "runtime.md")?;
-    require_graph_sections(&root.join(".lkj-doc-graph.md"))
+    require_catalog(&root.join("catalog.toml"))
 }
 
 pub fn recursive_tree(workspace: &Path) -> Result<(), String> {
     let root = workspace.join("docs");
-    require_file(&root.join(".lkj-doc-graph.md"))?;
+    require_file(&root.join("catalog.toml"))?;
     no_serial_names(&root)?;
     let dirs = directories(&root)?;
     if !dirs.iter().any(|dir| depth_after(&root, dir) >= 2) {
@@ -36,14 +36,11 @@ pub fn recursive_tree(workspace: &Path) -> Result<(), String> {
 pub fn thirty_docs(workspace: &Path) -> Result<(), String> {
     let root = workspace.join("docs");
     let files = markdown_files(&root)?;
-    let docs = files
-        .iter()
-        .filter(|path| path.as_str() != ".lkj-doc-graph.md")
-        .count();
+    let docs = files.iter().count();
     if docs != 30 {
         return Err(format!("expected 30 documentation files, got {docs}"));
     }
-    require_file(&root.join(".lkj-doc-graph.md"))?;
+    require_file(&root.join("catalog.toml"))?;
     no_serial_names(&root)?;
     for dir in directories(&root)? {
         require_file(&dir.join("README.md"))?;
@@ -103,11 +100,9 @@ fn is_serial(path: &str) -> bool {
         })
 }
 
-fn require_graph_sections(path: &Path) -> Result<(), String> {
-    for section in ["## Nodes", "## Edges", "## Coverage"] {
-        require_text(path, section)?;
-    }
-    Ok(())
+fn require_catalog(path: &Path) -> Result<(), String> {
+    require_text(path, "profile")?;
+    require_text(path, "root")
 }
 
 fn require_file(path: &Path) -> Result<(), String> {

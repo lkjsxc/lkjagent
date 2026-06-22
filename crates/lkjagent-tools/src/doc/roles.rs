@@ -18,7 +18,7 @@ pub const EXTRA_ROLES: &[&str] = &[
     "memory retrieval",
     "console status",
     "token ledger",
-    "graph manifest",
+    "catalog metadata",
     "test case",
     "acceptance gate",
     "risk register",

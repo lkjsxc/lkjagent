@@ -12,7 +12,7 @@ fn doc_scaffold_project_docs_uses_semantic_paths() -> TestResult<()> {
 
     assert!(output.contains("profile=ProjectDocs"));
     assert!(workspace.join("docs/README.md").is_file());
-    assert!(workspace.join("docs/.lkj-doc-graph.md").is_file());
+    assert!(workspace.join("docs/catalog.toml").is_file());
     assert!(workspace.join("docs/architecture/runtime.md").is_file());
     assert!(workspace.join("docs/operations/verification.md").is_file());
     assert_no_serial_files(&workspace.join("docs"))?;
@@ -104,7 +104,7 @@ fn doc_audit_rejects_part_files_and_missing_links() -> TestResult<()> {
     assert!(audit.contains("document audit failed"));
     assert!(audit.contains("serial_filename: part-001.md"));
     assert!(audit.contains("missing_readme_link: part-001.md"));
-    assert!(audit.contains("missing_doc_graph"));
+    assert!(audit.contains("serial_filename"));
     Ok(())
 }
 

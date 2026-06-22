@@ -29,5 +29,5 @@ equivalent exists, the write plan adopts or repairs it.
 
 ## Status
 
-partially implemented for memory and document graph manifests. Artifact,
+partially implemented for memory and document catalog metadata. Artifact,
 section, and failure-key adoption remain open.

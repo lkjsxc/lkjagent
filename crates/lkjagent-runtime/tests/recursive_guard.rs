@@ -150,15 +150,8 @@ fn assert_no_unindexed_directory(root: &Path) -> TestResult<()> {
     Ok(())
 }
 
-const DOCS_README: &str = "# Docs\n\n## Purpose\n\nRoot docs index.\n\n## Table of Contents\n\n- [product/](product/README.md): product contracts.\n- [architecture/](architecture/README.md): architecture contracts.\n- [.lkj-doc-graph.md](.lkj-doc-graph.md): graph manifest.\n";
-const DOC_GRAPH: &str = concat!(
-    "# Document Graph\n\n## Purpose\n\nGraph ledger for the recursive docs tree.\n\n",
-    "## Nodes\n\n| id | path | role | status |\n| --- | --- | --- | --- |\n",
-    "| root | README.md | root index | complete |\n\n",
-    "## Edges\n\n| from | to | kind | reason |\n| --- | --- | --- | --- |\n\n",
-    "## Coverage\n\n| owner requirement | covered by | status |\n| --- | --- | --- |\n",
-    "| recursive structure | README.md and local README indexes | satisfied |\n"
-);
+const DOCS_README: &str = "# Docs\n\n## Purpose\n\nRoot docs index.\n\n## Table of Contents\n\n- [product/](product/README.md): product contracts.\n- [architecture/](architecture/README.md): architecture contracts.\n- [catalog.toml](catalog.toml): compact tree metadata.\n";
+const DOC_CATALOG: &str = "profile = \"recursive-test\"\nroot = \"docs\"\n";
 
 const PRODUCT_README: &str = "# Product\n\n## Purpose\n\nProduct index.\n\n## Table of Contents\n\n- [contracts/](contracts/README.md): product contracts.\n- [surfaces.md](surfaces.md): product surfaces.\n";
 
@@ -173,7 +166,7 @@ const RUNTIME_README: &str = "# Runtime\n\n## Purpose\n\nRuntime index.\n\n## Ta
 const LEAF: &str = "# Leaf\n\n## Purpose\n\nLeaf contract.\n\n## Status\n\nimplemented.\n";
 
 const TREE_FILES: &[(&str, &str)] = &[
-    ("docs/.lkj-doc-graph.md", DOC_GRAPH),
+    ("docs/catalog.toml", DOC_CATALOG),
     ("docs/product/README.md", PRODUCT_README),
     ("docs/product/contracts/README.md", CONTRACTS_README),
     ("docs/product/contracts/domain/README.md", DOMAIN_README),

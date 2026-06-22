@@ -26,7 +26,7 @@ pub fn multi_topic_docs(workspace: &Path) -> Result<(), String> {
 fn required_paths() -> &'static [&'static str] {
     &[
         "README.md",
-        ".lkj-doc-graph.md",
+        "catalog.toml",
         "project/README.md",
         "project/lkjagent.md",
         "model-interface/README.md",

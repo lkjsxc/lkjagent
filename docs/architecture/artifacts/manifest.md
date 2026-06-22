@@ -2,36 +2,21 @@
 
 ## Purpose
 
-Define the artifact manifest that prevents duplicate roots and section roles.
+Define the artifact metadata that prevents duplicate roots and weak section
+roles.
 
 ## Fields
 
-The manifest records:
-
-- artifact key.
-- kind.
-- title.
-- root.
-- owner objective hash.
-- nodes.
-- roles.
-- required files.
-- content minimums.
-- audit state.
-- completion state.
-
-The manifest stores identity and audit metadata, not huge raw content.
-
-Adoption uses this identity to continue an existing equivalent root instead
-of creating duplicates. See [adoption.md](adoption.md).
+The metadata records artifact key, kind, title, root, owner objective hash,
+nodes, roles, required files, content minimums, audit state, and completion
+state. It stores identity and audit metadata, not raw content.
 
 ## Location
 
-Use `.lkj-artifact.md` or an artifact-specific extension of
-`.lkj-doc-graph.md`. The runtime may read either while migrating toward one
-manifest format.
+Generated artifact roots use `catalog.toml` for compact scaffold metadata.
+Artifact-specific readiness fields are stored in the runtime state ledger until
+a dedicated artifact metadata file is implemented.
 
-## Status
+## Checks
 
-partially implemented through `.lkj-doc-graph.md`; stable artifact manifest
-fields remain open.
+- `cargo test -p lkjagent-tools --test artifact_tools`

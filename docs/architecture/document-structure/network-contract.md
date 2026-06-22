@@ -8,7 +8,7 @@ This file defines the documentation graph data used for audit and repair.
 
 - Authored docs are indexed in [../../_meta/catalog/](../../_meta/catalog/README.md).
 - Generated graph views are transient and belong under `tmp/`.
-- README files are table-of-contents pages, not graph manifests.
+- README files are table-of-contents pages, not catalog metadata.
 
 ## Design
 

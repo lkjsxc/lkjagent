@@ -178,7 +178,6 @@ fn replace_leaves(root: &Path) -> TestResult<()> {
 fn is_leaf_markdown(path: &Path) -> bool {
     path.extension().is_some_and(|ext| ext == "md")
         && path.file_name().and_then(|name| name.to_str()) != Some("README.md")
-        && path.file_name().and_then(|name| name.to_str()) != Some(".lkj-doc-graph.md")
 }
 
 fn cookbook_leaf_text(path: &Path) -> String {
