@@ -88,13 +88,13 @@ pub fn status_accounting(workspace: &Path) -> Result<(), String> {
     Ok(())
 }
 
-pub fn gpt_handoff_log(workspace: &Path) -> Result<(), String> {
-    let path = workspace.join("data/logs/current-gpt-5.5-pro.md");
+pub fn model_handoff_log(workspace: &Path) -> Result<(), String> {
+    let path = workspace.join("data/logs/current-model-run.md");
     let text = read_file(&path)?;
     require_all(
         &text,
         &[
-            "# lkjagent GPT-5.5-Pro Run Log",
+            "# lkjagent Model Run Log",
             "## Snapshot",
             "## Owner Objective",
             "## Active State Tracks",

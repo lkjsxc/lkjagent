@@ -10,10 +10,10 @@ use rusqlite::Connection;
 
 use crate::error::{RuntimeError, RuntimeResult};
 
-pub const CURRENT_GPT_LOG: &str = "logs/current-gpt-5.5-pro.md";
+pub const CURRENT_MODEL_LOG: &str = "logs/current-model-run.md";
 
 pub fn current_log_path(data_dir: &Path) -> PathBuf {
-    data_dir.join(CURRENT_GPT_LOG)
+    data_dir.join(CURRENT_MODEL_LOG)
 }
 
 pub fn write_current_log(

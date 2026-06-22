@@ -6,6 +6,7 @@ pub fn check_doc_topology(files: &[RepoFile]) -> Vec<Violation> {
     let mut violations = Vec::new();
     let dirs = docs_dirs(files);
     for dir in &dirs {
+        violations.extend(check_markdown_suffix_dir(dir));
         violations.extend(check_dir(files, dir));
     }
     violations.extend(check_all_files(files));
@@ -30,6 +31,22 @@ fn docs_dirs(files: &[RepoFile]) -> BTreeSet<String> {
         }
     }
     dirs
+}
+
+fn check_markdown_suffix_dir(dir: &str) -> Vec<Violation> {
+    if dir
+        .rsplit('/')
+        .next()
+        .is_some_and(|name| name.ends_with(".md"))
+    {
+        vec![Violation::new(
+            dir,
+            "readme topology",
+            "directory name must not end with .md",
+        )]
+    } else {
+        Vec::new()
+    }
 }
 
 fn check_dir(files: &[RepoFile], dir: &str) -> Vec<Violation> {

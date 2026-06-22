@@ -29,6 +29,9 @@ pub fn audit_root(
 }
 
 fn collect_dir_checks(root: &Path, dir: &Path, failures: &mut Vec<String>) -> ToolResult<()> {
+    if dir_name_ends_md(dir) {
+        failures.push(format!("markdown_suffix_directory: {}", rel(root, dir)));
+    }
     let readme = dir.join("README.md");
     if !readme.is_file() {
         failures.push(format!("missing_readme: {}", rel(root, dir)));
@@ -143,6 +146,12 @@ fn markdown_count(root: &Path) -> ToolResult<usize> {
         }
     }
     Ok(count)
+}
+
+fn dir_name_ends_md(dir: &Path) -> bool {
+    dir.file_name()
+        .and_then(|name| name.to_str())
+        .is_some_and(|name| name.ends_with(".md"))
 }
 
 fn immediate_children(dir: &Path) -> ToolResult<Vec<PathBuf>> {

@@ -20,7 +20,7 @@ This directory holds CLI argument dispatch and one module per command.
 - [env_file.rs](env_file.rs): optional .env loading for the binary entrypoint.
 - [error.rs](error.rs): CLI error type and exit-code mapping.
 - [graph.rs](graph.rs): active graph case rendering.
-- [gpt_log.rs](gpt_log.rs): current GPT handoff log command.
+- [model_log.rs](model_log.rs): current model handoff log command.
 - [lib.rs](lib.rs): command dispatcher used by tests and main.
 - [log.rs](log.rs): transcript log rendering.
 - [main.rs](main.rs): binary entrypoint.

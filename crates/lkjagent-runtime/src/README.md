@@ -13,8 +13,8 @@ This directory holds the runtime state machine and thin daemon adapters.
 - [graph_state.rs](graph_state.rs): graph case opening, rendering, and row hydration.
 - [graph_state_row.rs](graph_state_row.rs): graph case row hydration helpers.
 - [graph_state_tracks.rs](graph_state_tracks.rs): state track row and effect conversion.
-- [gpt_log.rs](gpt_log.rs): current external-model handoff log writer.
-- [gpt_log/](gpt_log/README.md): GPT log rendering helpers.
+- [model_log.rs](model_log.rs): current external-model handoff log writer.
+- [model_log/](model_log/README.md): model log rendering helpers.
 - [intake.rs](intake.rs): queue delivery helpers.
 - [lib.rs](lib.rs): library root.
 - [maintenance.rs](maintenance.rs): idle directive rotation, cycle budgets, and distillation prompts.

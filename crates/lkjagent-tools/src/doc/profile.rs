@@ -3,13 +3,17 @@ use crate::error::{ToolError, ToolResult};
 use super::body::{leaf_body, readme_body};
 use super::fit::{exact_group_count, max_tree_count};
 use super::graph::graph_manifest;
-use super::model::{PlannedFile, ScaffoldInput, ScaffoldPlan, ShapeGroup};
+use super::model::{PlannedFile, ScaffoldInput, ScaffoldPlan, ScaffoldProfile, ShapeGroup};
 use super::names::{slug, title_from_path};
 use super::roles::EXTRA_ROLES;
+use super::semantic_seed;
 use super::shapes::{select_profile, shape};
 
 pub fn semantic_doc_plan(input: &ScaffoldInput) -> ToolResult<ScaffoldPlan> {
     let profile = select_profile(input);
+    if profile == ScaffoldProfile::LkjagentSemanticSeed && input.count.is_none() {
+        return Ok(semantic_seed::plan(input));
+    }
     let mut files = if let Some(target) = input.count {
         counted_files(input, shape(profile), target)?
     } else {

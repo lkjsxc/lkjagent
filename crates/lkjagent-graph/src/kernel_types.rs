@@ -85,6 +85,15 @@ pub struct StateTrack {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum TrackLabel {
     ObjectiveNormalization,
+    DocumentationContract,
+    StructureSeed,
+    StructureExpansion,
+    StructureConnectivity,
+    SemanticCoverage,
+    DuplicationRisk,
+    MockContentRisk,
+    ModelSpecificNaming,
+    PromptContract,
     Planning,
     DocumentStructure,
     ArtifactContract,
@@ -100,6 +109,7 @@ pub enum TrackLabel {
     CompletionReadiness,
     ObservabilityLedger,
     RepeatedActionRisk,
+    MaintenanceOpportunity,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -114,6 +124,7 @@ pub enum Posture {
     Observing,
     Compacting,
     Scheduling,
+    Maintaining,
     Blocking,
 }
 

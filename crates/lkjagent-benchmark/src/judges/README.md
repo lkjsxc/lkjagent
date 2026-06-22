@@ -16,6 +16,6 @@ this crate.
 - [mod.rs](mod.rs): judge dispatcher.
 - [owner-docs.rs](owner_docs.rs): semantic documentation topology judges.
 - [owner-loop-ops.rs](owner_loop_ops.rs): uploaded loop-regression judges.
-- [owner-ops.rs](owner_ops.rs): action recovery, status, and GPT log judges.
+- [owner-ops.rs](owner_ops.rs): action recovery, status, and model log judges.
 - [owner-uploaded.rs](owner_uploaded.rs): uploaded run-log fixture matrix judge.
 - [program.rs](program.rs): bounded shell program judges.

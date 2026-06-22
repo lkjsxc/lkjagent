@@ -17,7 +17,7 @@ files, and good and bad fixtures.
 - [owner-faults.rs](owner_faults.rs): owner-reported parameter and recovery-loop tasks.
 - [owner-loop-content.rs](owner_loop_content.rs): content artifact and policy loop tasks.
 - [owner-loop-regressions.rs](owner_loop_regressions.rs): graph, memory, and FTS loop tasks.
-- [owner-observability.rs](owner_observability.rs): owner-reported status and GPT log tasks.
+- [owner-observability.rs](owner_observability.rs): owner-reported status and model log tasks.
 - [owner-thirty.rs](owner_thirty.rs): counted semantic documentation task.
 - [owner-uploaded.rs](owner_uploaded.rs): uploaded run-log fixture matrix task.
 - [repair.rs](repair.rs): shell program repair task.

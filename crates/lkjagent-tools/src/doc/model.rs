@@ -1,6 +1,7 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ScaffoldProfile {
     ProjectDocs,
+    LkjagentSemanticSeed,
     ArchitectureDocs,
     AgentManual,
     KnowledgeBase,

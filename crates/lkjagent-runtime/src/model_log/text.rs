@@ -72,7 +72,7 @@ pub fn trim_to_char_budget(text: &mut String, max_chars: usize) {
     if text.chars().count() <= max_chars {
         return;
     }
-    let marker = "\n\n<!-- truncated to configured GPT handoff budget -->\n";
+    let marker = "\n\n<!-- truncated to configured model handoff budget -->\n";
     if max_chars <= marker.chars().count() {
         *text = marker.chars().take(max_chars).collect();
         return;
@@ -136,6 +136,6 @@ mod tests {
         let mut text = "x".repeat(200);
         trim_to_char_budget(&mut text, 100);
         assert!(text.chars().count() <= 100);
-        assert!(text.contains("truncated to configured GPT handoff budget"));
+        assert!(text.contains("truncated to configured model handoff budget"));
     }
 }

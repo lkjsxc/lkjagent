@@ -77,6 +77,7 @@ pub const BREAD_COOKBOOK: &[ShapeGroup] = &[
 
 pub fn shape(profile: ScaffoldProfile) -> &'static [ShapeGroup] {
     match profile {
+        ScaffoldProfile::LkjagentSemanticSeed => &[],
         ScaffoldProfile::KnowledgeBase => KNOWLEDGE,
         ScaffoldProfile::ImplementationPlan => PLAN,
         ScaffoldProfile::ResearchReport => REPORT,

@@ -21,7 +21,7 @@ evidence named by the task contract and the actual gates that ran.
 
 ## Owner Failure
 
-The uploaded GPT-5.5-Pro logs are the active evidence. They show invalid
+The uploaded model run logs are the active evidence. They show invalid
 parameter loops, contradictory maintenance and graph policy layers, duplicate
 memory writes, unsafe long-content writes, scaffold-only completion, and
 maintenance restarts after no useful work.

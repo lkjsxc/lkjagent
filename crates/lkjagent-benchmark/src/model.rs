@@ -64,7 +64,7 @@ pub enum JudgeKind {
     BreadCookbookArtifact,
     UploadedRunFixtures,
     StatusAccounting,
-    GptHandoffLog,
+    ModelHandoffLog,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

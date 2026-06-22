@@ -109,7 +109,7 @@ fn doc_audit_rejects_part_files_and_missing_links() -> TestResult<()> {
 }
 
 #[test]
-fn doc_audit_passes_generated_scaffold() -> TestResult<()> {
+fn doc_audit_rejects_generated_scaffold_as_mock_content() -> TestResult<()> {
     let workspace = temp_workspace("doc-audit-pass")?;
     scaffold(
         &workspace,
@@ -125,8 +125,8 @@ fn doc_audit_passes_generated_scaffold() -> TestResult<()> {
         &workspace,
         &[("root", "guide"), ("count", "3"), ("mode", "exact")],
     )?;
-    assert!(audit.contains("document audit passed"));
-    assert!(audit.contains("checks=15"));
+    assert!(audit.contains("document audit failed"));
+    assert!(audit.contains("scaffold_only_content"));
     Ok(())
 }
 

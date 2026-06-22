@@ -9,7 +9,7 @@ read-only and never perturbs the loop: looking at the agent costs it nothing.
 
 | Surface | Content |
 | --- | --- |
-| `lkjagent status` | Daemon state, queue depth, open task, question, error, turns, context usage, token usage, GPT log |
+| `lkjagent status` | Daemon state, queue depth, open task, question, error, turns, context usage, token usage, model log |
 | `lkjagent log` | Transcript events in order: messages, actions, observations, notices, queue mutations, compactions |
 | `lkjagent console` | Owner screen with transcript top, pending preview, bottom status deck, and send prompt |
 | `lkjagent memory` | Full-text search over distilled memory entries |
@@ -37,10 +37,10 @@ compaction threshold from [../architecture/context/budgets.md](../architecture/c
 `lkjagent status` and `lkjagent console` now also render the compact accounting
 deck: `ctx=used/window percent pressure=color`, endpoint `in/out/cache/total`,
 and `prefix/log/reserve/headroom`. Missing endpoint usage fields render as
-`unknown`, not zero. Status and console also expose the current GPT handoff
+`unknown`, not zero. Status and console also expose the current model handoff
 path tracked in
-[../architecture/observability/gpt-log.md](../architecture/observability/gpt-log.md),
-and `lkjagent gpt-log --print` prints the synthesized Markdown snapshot.
+[../architecture/observability/model-log.md](../architecture/observability/model-log.md),
+and `lkjagent model-log --print` prints the synthesized Markdown snapshot.
 
 ## Boundaries
 

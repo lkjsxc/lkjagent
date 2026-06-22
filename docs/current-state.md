@@ -59,11 +59,11 @@ model-call modes come from the dispatcher registry renderer instead of separate
 hand-written strings. Admission now prefers the requested admitted tool when
 selecting the exact example, so batch-write recovery can show batch syntax.
 Compact token accounting is implemented for endpoint usage, status, and console.
-A single synthesized GPT handoff log is implemented and exposed through status,
-console, and `lkjagent gpt-log`. The benchmark corpus now includes
+A single synthesized model handoff log is implemented and exposed through status,
+console, and `lkjagent model-log`. The benchmark corpus now includes
 owner-reported documentation, action recovery, recovery-loop, graph-plan
 example, FTS punctuation, duplicate-memory, active-policy contradiction,
-invalid-note-kind, bread-cookbook false-completion, accounting, and GPT log
+invalid-note-kind, bread-cookbook false-completion, accounting, and model log
 failure cases with known-good and known-bad fixtures. Final quiet verification
 and Docker Compose verification passed for this redesign slice on 2026-06-21.
 CLI run tests now isolate their configuration environment, so local endpoint
@@ -96,18 +96,18 @@ behavior is complete.
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol`; child-tag parameters, line-grammar scalar actions, and batch file blocks have focused fixtures |
 | Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; `fs.batch_write` accepts canonical, no-space, and XML-ish path headers while rejecting JSON payloads before mutation; dispatch now checks one effective policy object before routing, including `agent.done` completion refusal; schema repair emits one canonical example for covered parameter, missing shell-command, and evidence-kind faults; audit-owned evidence refuses direct `graph.evidence` |
-| Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; artifact.apply reuses the planner and writer |
-| Document audit tool | implemented | topology checks pass local gates; artifact.audit checks kind mismatch; content artifacts reject scaffold-only leaves, weak cookbook/story leaves, and shallow dictionary term lists |
+| Document scaffold tool | implemented | semantic project, lkjagent model Rust seed, story, and cookbook scaffold tests pass; artifact.apply reuses the planner and writer |
+| Document audit tool | implemented | topology checks pass local gates; `.md` suffix directories fail; generated scaffold leaves fail as mock content until replaced |
 | Artifact next batch | partially implemented | `artifact.next` returns exact weak paths, content-bearing `fs.batch_write` examples, and root-scoped cursor advancement; scaffold-only cookbook, cursor, meaningful cookbook, and Japanese drift guard tests pass |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, same-title overlap update, punctuation-safe FTS queries, exact duplicate prune, same-title prune merge, and maintenance no-op lesson merge have focused tests; rewrite pruning remains open |
-| State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; the new pure weighted-state kernel has event reducers and guard authorization tests |
+| State graph cases | implemented | weighted guards cover mock content, model naming, structure connectivity, parser recovery, artifact drift, queue interruption, and prompt-frame compilation |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
 | Runtime recovery | partially implemented | pure turn authority selection, pure reducer/admission helpers, authority snapshot/event/decision types, store-backed runtime snapshots, one active-mode endpoint card, cached dispatch authority, recovery escape-tool visibility, batch-oriented recovery examples, and effective dispatch repair admissions exist; pure recovery admission includes artifact audit/next/apply, doc audit/scaffold, read/tree/write, and batch tools; `graph.recover` now derives next actions from legal transitions, admitted tools, and plan readiness; internal `agent.ask` questions are refused, runtime close rechecks graph completion, content artifacts require separate audit-derived artifact-readiness evidence, and no-op maintenance defers restart; fault-class-specific deterministic recovery control remains open |
 | Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned and renders mission, evidence gaps, artifact root/id, recovery step, last failed action, admitted tools, exact next action, and completion blockers; artifact.next root cursors exist, while richer cursor fields and last-successful-observation snapshots remain open |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
-| Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
-| GPT handoff log | implemented | runtime and CLI write one current Markdown snapshot |
+| Console/status accounting | partially implemented | ranked states plus compact context/token deck and model log path display; last successful action is still shallow |
+| Model handoff log | implemented | runtime and CLI write one provider-neutral Markdown snapshot with sanitizer report when needed |
 | Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist, including bread `artifact.next` recovery, shallow dictionary readiness, Japanese-cookbook drift, document-structure evidence bypass, batch-write schema faults, shell parameter faults, queue interruption, compaction resume, and repeated recovery action cases; corpus, quiet verify, and Docker Compose verify passed for the prior slice |
 
 ## Open Work
@@ -123,7 +123,9 @@ later slice.
 The current redesign slice baseline is recorded in
 [evaluation/baseline-audit-2026-06-22.md](evaluation/baseline-audit-2026-06-22.md):
 `docker compose run --rm verify` exited 0 before new implementation changes,
-and the only pre-existing working-tree entry was `tmp/prompt01.md`.
+and this session observed a pre-existing deletion of
+`tmp/console-responsive-handoff.md`; the tracked tmp file was restored before
+handoff, and `tmp/prompt01.md` remains present in `tmp/`.
 After that baseline, cookbook scaffold selection was split so explicit bread
 cookbooks use the bread shape while generic or Japanese cookbook objectives use
 Japanese-food topic paths. Artifact next/apply now block Japanese cookbook roots
@@ -131,7 +133,12 @@ when forbidden bread drift is present. The action parser now accepts the
 line-oriented `tool:` grammar and canonical `fs.batch_write` file blocks while
 preserving the paired-tag grammar. A pure weighted-state kernel now exists in
 `lkjagent-graph` with deterministic event updates, guard-track authorization,
-context-slice selection, recovery selection, and focused weighted-kernel tests.
+context-slice selection, recovery selection, prompt-frame compilation, and
+focused weighted-kernel tests. The current slice adds top-level contracts for
+state-guided documentation growth, provider-neutral model language, semantic
+audits, maintenance no-op suppression, and regression fixtures. It also renames
+owner-visible model handoff surfaces from provider-branded wording to
+`model-log` and `current-model-run.md`.
 
 ## Out of Scope
 

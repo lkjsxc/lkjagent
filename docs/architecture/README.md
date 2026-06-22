@@ -21,7 +21,7 @@ and rejected directions live in [../decisions/](../decisions/README.md).
 - [structured-records/](structured-records/README.md): semantic records, identity, ledgers, and deduplication.
 - [action-reliability/](action-reliability/README.md): parameter normalization and recovery.
 - [state-model/](state-model/README.md): objective envelopes and ranked neutral tracks.
-- [observability/](observability/README.md): token accounting, status, console, and GPT log.
+- [observability/](observability/README.md): token accounting, status, console, and model log.
 - [tools/](tools/README.md): the fixed toolset and its contracts.
 - [memory/](memory/README.md): SQLite store, graph evidence, transcripts, retrieval, distillation.
 - [llm/](llm/README.md): endpoint contract, model target, sampling.

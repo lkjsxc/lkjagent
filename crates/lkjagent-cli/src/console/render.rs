@@ -92,8 +92,8 @@ fn bottom_deck(
     lines.extend(wrap_limited(&accounting.prefix_line, width, 1));
     lines.extend(wrap_limited(
         &format!(
-            "gpt_log {}",
-            lkjagent_runtime::gpt_log::current_log_path(data_dir).to_string_lossy()
+            "model_log {}",
+            lkjagent_runtime::model_log::current_log_path(data_dir).to_string_lossy()
         ),
         width,
         1,

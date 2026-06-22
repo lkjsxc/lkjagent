@@ -3,15 +3,21 @@ use std::path::{Path, PathBuf};
 
 use crate::error::ToolResult;
 
+use super::mock_content::mock_sibling_checks;
+
 pub fn content_checks(root: &Path, failures: &mut Vec<String>) -> ToolResult<()> {
     let Some(kind) = content_kind(root)? else {
         return Ok(());
     };
-    for file in markdown_leaves(root)? {
-        let text = fs::read_to_string(&file)?;
-        if let Some(failure) = content_failure(&kind, root, &file, &text) {
+    let files = markdown_leaves(root)?;
+    for file in &files {
+        let text = fs::read_to_string(file)?;
+        if let Some(failure) = content_failure(&kind, root, file, &text) {
             failures.push(failure);
         }
+    }
+    if matches!(kind, ContentKind::Documentation) {
+        mock_sibling_checks(root, &files, failures)?;
     }
     Ok(())
 }
@@ -42,7 +48,7 @@ fn content_kind(root: &Path) -> ToolResult<Option<ContentKind>> {
     if text.contains("NarrativeManuscript") {
         return Ok(Some(ContentKind::Story));
     }
-    Ok(None)
+    Ok(Some(ContentKind::Documentation))
 }
 
 fn markdown_leaves(root: &Path) -> ToolResult<Vec<PathBuf>> {
@@ -86,6 +92,7 @@ fn content_failure(kind: &ContentKind, root: &Path, file: &Path, text: &str) -> 
     match kind {
         ContentKind::Cookbook => cookbook_failure(&relative, text),
         ContentKind::Story => story_failure(&relative, text),
+        ContentKind::Documentation => None,
     }
 }
 
@@ -172,6 +179,7 @@ fn word_count(text: &str) -> usize {
 enum ContentKind {
     Cookbook,
     Story,
+    Documentation,
 }
 
 fn rel(root: &Path, path: &Path) -> String {
