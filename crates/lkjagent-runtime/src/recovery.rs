@@ -20,6 +20,7 @@ pub fn parse_notice(fault: &ParseFault) -> String {
             missing,
             unknown,
         } => param_fault_notice(tool, missing, unknown),
+        ParseFault::BadEnvelope { reason } => format!("parse fault: bad envelope {reason}"),
     }
 }
 
@@ -27,6 +28,7 @@ pub fn stop_reason(fault: &ParseFault) -> StopReason {
     match fault {
         ParseFault::UnknownTool { .. } => StopReason::UnknownTool,
         ParseFault::DuplicateParam { .. } | ParseFault::BadParams { .. } => StopReason::BadParams,
+        ParseFault::BadEnvelope { .. } => StopReason::InvalidAction,
         _ => StopReason::InvalidAction,
     }
 }

@@ -1,9 +1,13 @@
 use crate::error::ParseResult;
+use crate::json_parse::parse_json_action;
 use crate::line_parse::{parse_line_act, starts_line_act};
 use crate::model::{Action, ParseFault};
 use crate::xml_parse::{is_open, parse_xml_act};
 
 pub fn parse_completion(text: &str) -> ParseResult<Action> {
+    if text.trim_start().starts_with('{') {
+        return parse_json_action(text);
+    }
     let lines: Vec<&str> = text.lines().collect();
     let start = find_act_start(&lines)?;
     let body = start + 1;
