@@ -93,7 +93,7 @@ services:
     build:
       context: .
       target: build
-    command: cargo run -p lkjagent-xtask -- check-docs && ...
+    command: /usr/local/cargo/bin/cargo run -p lkjagent-xtask -- check-docs && ...
   bench:
     profiles: ["verify"]
     build:

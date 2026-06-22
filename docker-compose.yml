@@ -66,12 +66,12 @@ services:
       context: .
       target: build
     command:
-      - sh
-      - -lc
+      - /bin/sh
+      - -c
       - >-
-        cargo run -p lkjagent-xtask -- check-docs &&
-        cargo run -p lkjagent-xtask -- check-lines &&
-        cargo run -p lkjagent-xtask -- check-style
+        /usr/local/cargo/bin/cargo run -p lkjagent-xtask -- check-docs &&
+        /usr/local/cargo/bin/cargo run -p lkjagent-xtask -- check-lines &&
+        /usr/local/cargo/bin/cargo run -p lkjagent-xtask -- check-style
 
   bench:
     profiles: ["verify"]
