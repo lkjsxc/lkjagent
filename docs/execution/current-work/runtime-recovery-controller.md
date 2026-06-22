@@ -108,6 +108,10 @@ docker compose run --rm verify
 
 ## Status
 
-done for the deterministic controller scope. Focused tests, corpus checks,
-quiet verify, and Docker Compose verification pass. Live endpoint quality
-remains tracked in the current-state ledger.
+open for the full fault-class table. Implemented recovery pieces include graph
+selector integration, escape-tool visibility, internal-question refusal,
+batch-oriented examples, and benchmark fixtures named above. The remaining
+controller work is fault-class-specific retry budgets, fallback actions,
+partial handoff policy, and proof that repeated invalid actions always change
+shape. Focused tests and Docker Compose verification are required before this
+blocker can close.

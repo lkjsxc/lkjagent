@@ -84,9 +84,9 @@ target outcomes are:
 7. Docker Compose verification passes after the implementation slice.
 
 The documentation contract now names the required authority, artifact,
-recovery, maintenance, compaction, schema-repair, and uploaded-run evaluation
-pages. Those pages are implementation requirements, not proof that the runtime
-behavior is complete.
+recovery, maintenance, compaction, schema-repair, prompt-source,
+placeholder-refusal, and uploaded-run evaluation pages. Those pages are
+implementation requirements, not proof that the runtime behavior is complete.
 
 ## Area Status
 
@@ -120,10 +120,11 @@ snapshots, and blocked handoffs need deeper coverage before the ledger can call
 the loop redesign implemented. Final verification must be rerun after each
 later slice.
 
-This session reran the required baseline commands. `docker compose run --rm verify`
-exited 0 before the implementation edit, `git status --short` showed only a
+This implementation session reran the required baseline commands. `check-docs`,
+`check-lines`, `benchmark check-corpus`, and `docker compose run --rm verify`
+exited 0 before the documentation edit. `git status --short` showed only a
 pre-existing deletion of `tmp/console-responsive-handoff.md`, and that tracked
-file was restored before code changes. The current redesign slice baseline is
+file was restored before docs changed. The current redesign slice baseline is
 also recorded in
 [evaluation/baseline-audit-2026-06-22.md](evaluation/baseline-audit-2026-06-22.md);
 `tmp/prompt01.md` remains present in `tmp/`.

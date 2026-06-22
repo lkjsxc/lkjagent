@@ -82,6 +82,7 @@ benchmark fixtures.
 ## Table of Contents
 
 - [reducer.md](reducer.md): pure snapshot, event, and decision contract.
+- [wiring-map.md](wiring-map.md): reducer and admission ownership for runtime paths.
 - [missions.md](missions.md): owner, recovery, verification, maintenance, compaction, and idle rules.
 - [turn-authority.md](turn-authority.md): single turn decision object.
 - [mode-priority.md](mode-priority.md): deterministic mission priority order.
