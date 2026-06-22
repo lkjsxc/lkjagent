@@ -1,3 +1,4 @@
+use crate::kernel_context_select::tool_biases_from_tracks;
 use crate::kernel_track_ops::weight;
 use crate::kernel_types::*;
 use crate::kernel_vector::guard_tracks;
@@ -20,78 +21,6 @@ pub fn authorize_tool_intent(state: &CaseState, intent: &ToolIntent) -> ToolAuth
     } else {
         refusal("weighted guard blocks tool", blocked_by, state)
     }
-}
-
-pub fn tool_biases_from_tracks(vector: &StateVector) -> Vec<String> {
-    let mut tools = Vec::new();
-    if weight(vector, TrackLabel::ParseRecovery) >= 0.80 {
-        tools.extend(names(&[
-            "graph.state",
-            "doc.audit",
-            "fs.list",
-            "fs.tree",
-            "fs.write",
-        ]));
-    }
-    if weight(vector, TrackLabel::ArtifactDrift) >= 0.75 {
-        tools.extend(names(&["artifact.audit", "fs.read", "fs.tree"]));
-    }
-    if weight(vector, TrackLabel::DocumentStructure) >= 0.60
-        || weight(vector, TrackLabel::StructureConnectivity) >= 0.60
-        || weight(vector, TrackLabel::MockContentRisk) >= 0.70
-    {
-        tools.extend(names(&["doc.audit", "fs.tree", "fs.list"]));
-    }
-    if weight(vector, TrackLabel::ModelSpecificNaming) >= 0.60 {
-        tools.extend(names(&["fs.read", "fs.edit", "doc.audit"]));
-    }
-    if weight(vector, TrackLabel::QueueInterruption) >= 0.70 {
-        tools.extend(names(&["queue.list", "graph.state"]));
-    }
-    tools.sort();
-    tools.dedup();
-    tools
-}
-
-pub fn required_context_slices_from_tracks(vector: &StateVector) -> Vec<String> {
-    let mut slices = Vec::new();
-    if weight(vector, TrackLabel::ParseRecovery) >= 0.80
-        || weight(vector, TrackLabel::ActionParamReliability) >= 0.60
-    {
-        slices.extend(names(&[
-            "action grammar",
-            "tool schemas",
-            "last parser faults",
-        ]));
-    }
-    if weight(vector, TrackLabel::ArtifactDrift) >= 0.75
-        || weight(vector, TrackLabel::ArtifactReadiness) >= 0.60
-    {
-        slices.extend(names(&[
-            "owner objective",
-            "artifact contract",
-            "drifted paths",
-        ]));
-    }
-    if weight(vector, TrackLabel::DocumentStructure) >= 0.60
-        || weight(vector, TrackLabel::StructureConnectivity) >= 0.60
-        || weight(vector, TrackLabel::MockContentRisk) >= 0.70
-    {
-        slices.extend(names(&[
-            "doc topology rules",
-            "relation graph",
-            "last doc.audit failures",
-        ]));
-    }
-    if weight(vector, TrackLabel::ModelSpecificNaming) >= 0.60 {
-        slices.extend(names(&["model-name sanitizer", "raw fixture pointer"]));
-    }
-    if weight(vector, TrackLabel::ContextPressure) >= 0.60 {
-        slices.extend(names(&["context budget", "post-compaction checklist"]));
-    }
-    slices.sort();
-    slices.dedup();
-    slices
 }
 
 pub fn check_completion_gates(state: &CaseState) -> ToolAuthorization {
@@ -136,22 +65,42 @@ fn apply_weighted_guards(state: &CaseState, intent: &ToolIntent, blocked_by: &mu
     if weight(vector, TrackLabel::QueueInterruption) >= 0.70 && is_mutating(intent) {
         blocked_by.push(TrackLabel::QueueInterruption);
     }
-    if weight(vector, TrackLabel::MockContentRisk) >= 0.70 && intent.name == "agent.done" {
-        blocked_by.push(TrackLabel::MockContentRisk);
-    }
+    block_completion_guards(vector, intent, blocked_by);
     if weight(vector, TrackLabel::ModelSpecificNaming) >= 0.60
         && matches!(intent.name.as_str(), "memory.save" | "agent.done")
     {
         blocked_by.push(TrackLabel::ModelSpecificNaming);
-    }
-    if weight(vector, TrackLabel::StructureConnectivity) >= 0.60 && intent.name == "agent.done" {
-        blocked_by.push(TrackLabel::StructureConnectivity);
     }
     if intent.name == "agent.done" && !check_completion_gates(state).allowed {
         blocked_by.push(TrackLabel::CompletionReadiness);
     }
     if state.repeated_signatures.contains(&intent.signature) {
         blocked_by.push(TrackLabel::RepeatedActionRisk);
+    }
+}
+
+fn block_completion_guards(
+    vector: &StateVector,
+    intent: &ToolIntent,
+    blocked_by: &mut Vec<TrackLabel>,
+) {
+    if intent.name != "agent.done" {
+        return;
+    }
+    push_if(vector, TrackLabel::MockContentRisk, 0.70, blocked_by);
+    push_if(vector, TrackLabel::StructureConnectivity, 0.60, blocked_by);
+    push_if(vector, TrackLabel::MaintenanceNoopRisk, 0.60, blocked_by);
+    push_if(vector, TrackLabel::WorkspaceEvidenceRisk, 0.60, blocked_by);
+}
+
+fn push_if(
+    vector: &StateVector,
+    label: TrackLabel,
+    threshold: f32,
+    blocked_by: &mut Vec<TrackLabel>,
+) {
+    if weight(vector, label) >= threshold {
+        blocked_by.push(label);
     }
 }
 
@@ -178,8 +127,4 @@ fn refusal(reason: &str, blocked_by: Vec<TrackLabel>, state: &CaseState) -> Tool
         blocked_by,
         preferred_tools: tool_biases_from_tracks(&state.state_vector),
     }
-}
-
-fn names(values: &[&str]) -> Vec<String> {
-    values.iter().map(|value| (*value).to_string()).collect()
 }

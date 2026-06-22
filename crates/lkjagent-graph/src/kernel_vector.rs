@@ -57,6 +57,12 @@ pub fn update_state_vector(vector: &StateVector, event: &CaseEvent) -> StateVect
         CaseEvent::PostCompaction { matched } => compaction(&mut next, *matched),
         CaseEvent::OwnerTaskArrived => floor(&mut next, TrackLabel::QueueInterruption, 0.75),
         CaseEvent::QueueClassified => lower(&mut next, TrackLabel::QueueInterruption, 0.50),
+        CaseEvent::MaintenanceCycleNoop {
+            suppression_created,
+        } => maintenance_noop(&mut next, *suppression_created),
+        CaseEvent::WorkspaceClaimFromMemory => {
+            floor(&mut next, TrackLabel::WorkspaceEvidenceRisk, 0.75)
+        }
         CaseEvent::CompletionEvidenceReady => {
             bump(&mut next, TrackLabel::CompletionReadiness, 0.35)
         }
@@ -89,6 +95,10 @@ pub fn promotion_decision(vector: &StateVector) -> Option<StateNode> {
         Some(StateNode::Recovering)
     } else if weight(vector, TrackLabel::QueueInterruption) >= 0.70 {
         Some(StateNode::Intake)
+    } else if weight(vector, TrackLabel::MaintenanceNoopRisk) >= 0.60
+        || weight(vector, TrackLabel::WorkspaceEvidenceRisk) >= 0.60
+    {
+        Some(StateNode::CompletionBlocked)
     } else {
         None
     }
@@ -141,6 +151,14 @@ fn artifact_audit(vector: &mut StateVector, passed: bool) {
         bump(vector, TrackLabel::ArtifactReadiness, 0.35);
     } else {
         floor(vector, TrackLabel::ArtifactReadiness, 0.20);
+    }
+}
+
+fn maintenance_noop(vector: &mut StateVector, suppression_created: bool) {
+    if suppression_created {
+        lower(vector, TrackLabel::MaintenanceNoopRisk, 0.70);
+    } else {
+        floor(vector, TrackLabel::MaintenanceNoopRisk, 0.75);
     }
 }
 

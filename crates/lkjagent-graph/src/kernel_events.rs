@@ -48,6 +48,8 @@ pub enum Fault {
     ContextSnapshotMismatch,
     CaseConflict,
     QueueInterruption,
+    MaintenanceNoop,
+    WorkspaceClaimFromMemory,
     EvidenceOwnershipViolation,
     CompletionGateFailure,
 }
@@ -80,5 +82,7 @@ pub enum CaseEvent {
     PostCompaction { matched: bool },
     OwnerTaskArrived,
     QueueClassified,
+    MaintenanceCycleNoop { suppression_created: bool },
+    WorkspaceClaimFromMemory,
     CompletionEvidenceReady,
 }

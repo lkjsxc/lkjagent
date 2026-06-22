@@ -101,7 +101,7 @@ behavior is complete.
 | Artifact next batch | partially implemented | `artifact.next` returns exact weak paths, content-bearing `fs.batch_write` examples, and root-scoped cursor advancement; scaffold-only cookbook, cursor, meaningful cookbook, and Japanese drift guard tests pass |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, same-title overlap update, punctuation-safe FTS queries, exact duplicate prune, same-title prune merge, and maintenance no-op lesson merge have focused tests; rewrite pruning remains open |
-| State graph cases | implemented | weighted guards cover mock content, model naming, structure connectivity, parser recovery, artifact drift, queue interruption, context-frame compilation, and prompt-frame compilation |
+| State graph cases | implemented | weighted guards cover mock content, model naming, structure connectivity, parser recovery, artifact drift, queue interruption, maintenance no-op risk, workspace evidence risk, context-frame compilation, and prompt-frame compilation |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
 | Runtime recovery | partially implemented | pure turn authority selection, pure reducer/admission helpers, authority snapshot/event/decision types, store-backed runtime snapshots, one active-mode endpoint card, cached dispatch authority, recovery escape-tool visibility, batch-oriented recovery examples, and effective dispatch repair admissions exist; pure recovery admission includes artifact audit/next/apply, doc audit/scaffold, read/tree/write, and batch tools; `graph.recover` now derives next actions from legal transitions, admitted tools, and plan readiness; internal `agent.ask` questions are refused, runtime close rechecks graph completion, content artifacts require separate audit-derived artifact-readiness evidence, and no-op maintenance defers restart; fault-class-specific deterministic recovery control remains open |
 | Context budgets | partially implemented | budget model, compact context display, and a pure graph-kernel ContextFrame compiler exist; forced compaction is runtime-owned and renders mission, evidence gaps, artifact root/id, recovery step, last failed action, admitted tools, exact next action, and completion blockers; artifact.next root cursors exist, while richer cursor fields and last-successful-observation snapshots remain open |
@@ -142,7 +142,9 @@ planner now routes lkjagent plus model endpoint and domain-topic requests to a
 connected semantic seed with project, model-interface, domain-examples, and
 relations pages instead of a generic project scaffold. The graph kernel now
 compiles `CaseState -> ContextFrame -> PromptFrame` in pure code so prompt
-rendering consumes a structured decision frame. It also renames
+rendering consumes a structured decision frame. Maintenance no-op and
+workspace-evidence risk tracks now block completion in the graph kernel and
+select suppression or workspace-observation context. It also renames
 owner-visible model handoff surfaces from provider-branded wording to
 `model-log` and `current-model-run.md`.
 
