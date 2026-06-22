@@ -112,7 +112,8 @@ directories with short focused files.
   `architecture/state-graph/tool-affordances.md`
   `architecture/state-graph/recovery-ladders.md` `architecture/state-graph/graph-guidance.md`
   `architecture/state-graph/document-construction.md`
-- `architecture/context/README.md` `architecture/context/layout.md` `architecture/context/budgets.md`
+- `architecture/context/README.md` `architecture/context/context-frame.md`
+  `architecture/context/layout.md` `architecture/context/budgets.md`
   `architecture/context/compaction.md` `architecture/context/caching.md` `architecture/context/hygiene.md`
 - `architecture/protocol/README.md` `architecture/protocol/action-format.md` `architecture/protocol/parsing.md`
   `architecture/protocol/system-prompt.md` `architecture/protocol/recovery.md`

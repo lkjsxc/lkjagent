@@ -2,9 +2,18 @@
 
 ## Purpose
 
-The prompt frame owns the compact state-derived context sent to the model
-endpoint for each turn. The model proposes one action; the runtime validates,
-authorizes, executes, observes, and reduces state.
+The prompt frame owns the model-facing rendering compiled from a context frame.
+The model proposes one action; the runtime validates, authorizes, executes,
+observes, and reduces state.
+
+## Pipeline
+
+```text
+CaseState -> ContextFrame -> PromptFrame -> model turn
+```
+
+The context frame is the source of truth. The prompt frame selects the prompt
+mode and renders only the fields needed for the next action.
 
 ## Required Fields
 
@@ -19,27 +28,33 @@ allowed tools
 blocked tools
 required evidence
 missing evidence
-documentation or artifact contract
-growth stage
-last successful action
-last failed action
 forbidden repeated action signatures
 context slices
 output grammar
 completion blockers
 next-action recommendation
+prompt mode
 ```
+
+## Prompt Modes
+
+The compiler maps hard state and guard tracks to intake, semantic seed,
+controlled expansion, audit, repair, recovery, maintenance, or verification
+modes. Parser-recovery and repeated-action guards force recovery mode before
+normal hard-state mapping.
 
 ## Rule
 
 Owner text alone is never the prompt contract. The compiled frame must name the
-current state, guards, missing evidence, and exact output grammar.
+current state, guards, missing evidence, selected context slices, and exact
+output grammar.
 
 ## Links
 
+- Context frame: [../architecture/context/context-frame.md](../architecture/context/context-frame.md).
 - State vector: [../state/state-vector.md](../state/state-vector.md).
 - Generic wording: [generic-model-language.md](generic-model-language.md).
 
 ## Status
 
-design-only
+implemented

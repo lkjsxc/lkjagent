@@ -12,6 +12,7 @@ Owned by the lkjagent-context crate.
 
 ## Table of Contents
 
+- [context-frame.md](context-frame.md): state-derived decision frame for model turns.
 - [layout.md](layout.md): prefix and log, and their mapping onto chat messages.
 - [budgets.md](budgets.md): the token ledger for every window region.
 - [compaction.md](compaction.md): the explicit event that distills and rebuilds.
