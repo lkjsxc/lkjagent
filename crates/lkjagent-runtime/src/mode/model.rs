@@ -35,6 +35,15 @@ pub struct ActiveModePolicy {
     pub compaction_policy_applies: bool,
 }
 
+impl ActiveModePolicy {
+    pub fn blocked_preferred_tool(&self) -> Option<&'static str> {
+        self.blocked_tools
+            .iter()
+            .copied()
+            .find(|tool| self.preferred_next_action.contains(tool))
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RuntimeSnapshot {
     pub active_mission: ActiveMode,

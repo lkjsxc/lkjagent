@@ -97,6 +97,8 @@ This session ran these gates after the documentation catalog edits:
 - `cargo test -p lkjagent-protocol`: `PROTO_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test fault_wait`: `FAULT_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test recursive_guard`: `REC_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test authority_policy`: `POLICY_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test turn_authority`: `TURN_EXIT=0`.
 - `cargo test -p lkjagent-benchmark`: `BENCH_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `ok benchmark-corpus`, `CORPUS_EXIT=0`.
 
