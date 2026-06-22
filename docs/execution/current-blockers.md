@@ -61,6 +61,11 @@ maintenance restarts after no useful work.
   root-scoped SQLite cursor; and `graph.recover` omits `graph.plan` unless it
   is both admitted and still needed. Rows 1 to 4 and 7 stay open pending the
   full controller and completion wiring proof.
+- The uploaded-run benchmark matrix now includes the agent-facing report cases
+  for Japanese-cookbook drift, document-structure evidence ownership, batch
+  write schema faults, shell parameter faults, queue interruption, compaction
+  resume, and repeated recovery signatures. Row 7 remains open until runtime
+  replay and completion wiring prove the patterns cannot recur.
 - Current memory pruning deletes exact duplicates and merges same-title
   high-overlap rows with source IDs, but rewrite pruning remains open under
   row 5.
