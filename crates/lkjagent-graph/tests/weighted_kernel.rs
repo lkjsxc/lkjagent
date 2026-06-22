@@ -4,8 +4,9 @@ use lkjagent_graph::kernel_types::{
     Posture, StateNode, StateTrack, StateVector, ToolIntent, TrackLabel, TrackSource, Weight,
 };
 use lkjagent_graph::{
-    authorize_tool_intent, check_completion_gates, compile_prompt_frame, reduce_case_event,
-    required_context_slices_from_tracks, select_recovery, update_state_vector, PromptMode,
+    authorize_tool_intent, check_completion_gates, compile_context_frame, compile_prompt_frame,
+    compile_prompt_frame_from_context, reduce_case_event, required_context_slices_from_tracks,
+    select_recovery, update_state_vector, PromptMode,
 };
 
 #[test]
@@ -103,6 +104,21 @@ fn prompt_frame_compiles_state_guards_and_next_action() {
         frame.next_action_recommendation,
         "run sanitizer or model-name audit repair"
     );
+}
+
+#[test]
+fn context_frame_compiles_before_prompt_frame() {
+    let state = reduce_case_event(&case(), &CaseEvent::ParseFault { consecutive: 3 });
+    let context = compile_context_frame(&state);
+    let prompt = compile_prompt_frame_from_context(&context);
+
+    assert_eq!(context.case_id, "case-1");
+    assert!(context.guard_tracks.contains(&TrackLabel::ParseRecovery));
+    assert!(context
+        .selected_context_slices
+        .contains(&"action grammar".to_string()));
+    assert_eq!(prompt.mode, PromptMode::Recovery);
+    assert_eq!(prompt.context_slices, context.selected_context_slices);
 }
 
 #[test]
