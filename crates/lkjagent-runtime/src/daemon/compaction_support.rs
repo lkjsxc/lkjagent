@@ -1,3 +1,4 @@
+use lkjagent_context::model::{Frame, FrameKind};
 use lkjagent_graph::{compaction_plan, source_graph, TaskGraphState, TaskPhase};
 use lkjagent_store::state as store_state;
 use rusqlite::Connection;
@@ -9,6 +10,7 @@ pub(super) fn compaction_summary(
     reason: &str,
     before: usize,
     graph: Option<&TaskGraphState>,
+    log: &[Frame],
 ) -> RuntimeResult<String> {
     let task = match store_state::get(conn, "open task")? {
         Some(value) => value,
@@ -19,14 +21,19 @@ pub(super) fn compaction_summary(
         format!("reason={reason}"),
         format!("open_task={task}"),
         format!("before_tokens={before}"),
+        format!("last_successful_observation={}", last_observation(log)),
     ];
     if let Some(graph) = graph {
-        push_graph_summary(&mut lines, graph);
+        push_graph_summary(conn, &mut lines, graph)?;
     }
     Ok(lines.join("\n"))
 }
 
-fn push_graph_summary(lines: &mut Vec<String>, graph: &TaskGraphState) {
+fn push_graph_summary(
+    conn: &Connection,
+    lines: &mut Vec<String>,
+    graph: &TaskGraphState,
+) -> RuntimeResult<()> {
     let plan = compaction_plan(graph);
     lines.push(format!("graph_case={}", plan.case_id.unwrap_or_default()));
     lines.push(format!("active_mission={}", active_mission(graph)));
@@ -86,11 +93,22 @@ fn push_graph_summary(lines: &mut Vec<String>, graph: &TaskGraphState) {
         lines.push(format!("document_root={}", document.root));
         lines.push(format!("document_kind={}", document.kind));
         lines.push(format!("document_audit={:?}", document.audit_status));
-        lines.push("write_batch_cursor=none".to_string());
+        lines.push(format!(
+            "write_batch_cursor={}",
+            cursor_value(conn, &document.root)?
+        ));
     } else {
         lines.push("active_artifact_id=none".to_string());
         lines.push("write_batch_cursor=none".to_string());
     }
+    Ok(())
+}
+
+fn cursor_value(conn: &Connection, root: &str) -> RuntimeResult<String> {
+    Ok(
+        lkjagent_store::state::get(conn, &format!("artifact.next cursor {root}"))?
+            .unwrap_or_else(|| "none".to_string()),
+    )
 }
 
 fn active_mission(graph: &TaskGraphState) -> &'static str {
@@ -147,6 +165,21 @@ fn last_failed_action(fingerprint: &Option<String>) -> &str {
         Some(value) => value,
         None => "none",
     }
+}
+
+fn last_observation(log: &[Frame]) -> String {
+    log.iter()
+        .rev()
+        .find(|frame| matches!(frame.kind, FrameKind::Observation))
+        .map_or_else(|| "none".to_string(), |frame| first_line(&frame.content))
+}
+
+fn first_line(value: &str) -> String {
+    value
+        .lines()
+        .find(|line| !line.trim().is_empty())
+        .map(|line| line.chars().take(160).collect())
+        .unwrap_or_else(|| "none".to_string())
 }
 
 fn join_or_none(values: &[String]) -> String {

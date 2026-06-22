@@ -85,7 +85,13 @@ impl ResidentDaemon {
         reason: &str,
         before: usize,
     ) -> RuntimeResult<(String, Vec<i64>)> {
-        let summary = compaction_summary(conn, reason, before, self.state.graph.as_ref())?;
+        let summary = compaction_summary(
+            conn,
+            reason,
+            before,
+            self.state.graph.as_ref(),
+            &self.state.context.log,
+        )?;
         self.save_harness_summary(conn, now, summary)
     }
 

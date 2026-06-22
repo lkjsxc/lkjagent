@@ -22,6 +22,18 @@ fn compaction_snapshot_renders_recovery_resume_fields() -> TestResult<()> {
     let mut daemon = daemon(&server.base_url, &workspace)?;
     daemon.state.task = TaskState::Open { turns_remaining: 7 };
     daemon.state.graph = Some(recovery_graph());
+    if let Some(root) = daemon
+        .state
+        .graph
+        .as_ref()
+        .and_then(|graph| graph.document.as_ref().map(|doc| doc.root.clone()))
+    {
+        state::set(
+            &conn,
+            &format!("artifact.next cursor {root}"),
+            "docs/next.md",
+        )?;
+    }
     push_orange_pressure(&mut daemon);
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
@@ -33,9 +45,10 @@ fn compaction_snapshot_renders_recovery_resume_fields() -> TestResult<()> {
         "required_evidence=",
         "missing_evidence=",
         "active_artifact_id=",
-        "write_batch_cursor=none",
+        "write_batch_cursor=docs/next.md",
         "recovery_ladder_step=3",
         "last_failed_action=fs.write:large",
+        "last_successful_observation=large prior output",
         "admitted_next_tools=",
         "exact_next_valid_action=",
         "completion_blocked_reasons=",
