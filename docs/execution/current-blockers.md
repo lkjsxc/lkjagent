@@ -59,6 +59,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - Compaction notices now preserve the latest observation summary and
   artifact.next batch cursor in addition to graph, recovery, artifact, and
   next-action fields.
+- Dispatchable registry examples parse, validate, and reach the dispatcher
+  route instead of failing schema repair before routing.
 - `artifact.next` and stricter content audit support bounded cookbook and story
   recovery examples.
 - `fs.write` and `fs.batch_write` reject known scaffold phrases before mutation.
@@ -81,6 +83,7 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - Compaction snapshots still need durable history beyond the latest notice.
 - Broader stale-action contradiction repair is not yet covered for every mode.
 - Recovery shape-change enforcement is not yet proven for every live fault class.
+- Recovery-rendered examples still need a single canonical registry proof.
 - Artifact adoption and semantic readiness remain incomplete.
 - Compaction snapshots still need richer last-observation and batch-cursor
   fields.

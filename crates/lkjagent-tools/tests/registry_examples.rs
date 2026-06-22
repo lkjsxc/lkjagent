@@ -110,6 +110,26 @@ fn all_registry_examples_validate() -> TestResult<()> {
 }
 
 #[test]
+fn all_dispatchable_registry_examples_reach_router() -> TestResult<()> {
+    for spec in TOOLS {
+        if matches!(spec.name, "verify.cargo" | "verify.xtask") {
+            continue;
+        }
+        let example = example_for(spec.name)?;
+        let output = dispatch_example(parse_example(&example)?)?;
+        assert!(
+            !output.content.contains("params refused")
+                && !output.content.contains("unknown tool after validation")
+                && !output.content.contains("effective policy refused"),
+            "{} example did not reach its route: {}",
+            spec.name,
+            output.content
+        );
+    }
+    Ok(())
+}
+
+#[test]
 fn registry_examples_do_not_contain_scaffold_phrases() -> TestResult<()> {
     for spec in TOOLS {
         let example = example_for(spec.name)?;
