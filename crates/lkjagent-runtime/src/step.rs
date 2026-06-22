@@ -15,6 +15,7 @@ mod budget_render;
 mod compact;
 mod cycle;
 mod effects_model;
+mod fault_key;
 mod fault_meta;
 mod fault_wait;
 mod frames;

@@ -88,19 +88,28 @@ impl ResidentDaemon {
             Effect::RecordGraphFault {
                 case_id,
                 kind,
+                node,
+                tool,
+                parameter_shape,
+                fault_class,
                 action_fingerprint,
                 summary,
                 count,
-            } => lkjagent_store::graph::faults::record_fault(
+            } => record_fault(
                 conn,
-                case_id,
-                &kind,
-                action_fingerprint.as_deref(),
-                &summary,
-                count,
                 now,
-            )
-            .map_err(Into::into),
+                GraphFaultEffect {
+                    case_id,
+                    kind,
+                    node,
+                    tool,
+                    parameter_shape,
+                    fault_class,
+                    action_fingerprint,
+                    summary,
+                    count,
+                },
+            ),
             Effect::UpdateGraphRecovery {
                 case_id,
                 ladder_position,
@@ -121,6 +130,43 @@ impl ResidentDaemon {
             _ => Ok(()),
         }
     }
+}
+
+struct GraphFaultEffect {
+    case_id: i64,
+    kind: String,
+    node: String,
+    tool: String,
+    parameter_shape: String,
+    fault_class: String,
+    action_fingerprint: Option<String>,
+    summary: String,
+    count: u8,
+}
+
+fn record_fault(conn: &Connection, now: &str, effect: GraphFaultEffect) -> RuntimeResult<()> {
+    lkjagent_store::graph::faults::record_fault(
+        conn,
+        effect.case_id,
+        &effect.kind,
+        effect.action_fingerprint.as_deref(),
+        &effect.summary,
+        effect.count,
+        now,
+    )?;
+    lkjagent_store::graph::faults::upsert_fault_retry(
+        conn,
+        &lkjagent_store::graph::faults::FaultRetryKey {
+            case_id: effect.case_id,
+            node: &effect.node,
+            tool: &effect.tool,
+            parameter_shape: &effect.parameter_shape,
+            fault_class: &effect.fault_class,
+        },
+        effect.count,
+        now,
+    )?;
+    Ok(())
 }
 
 fn record_evidence(

@@ -113,7 +113,7 @@ open for full loop enforcement. Implemented recovery pieces include graph
 selector integration, escape-tool visibility, internal-question refusal,
 batch-oriented examples, the closed `FaultClass` model, recovery route
 metadata, a pure recovery plan table, and benchmark fixtures named above. The
-remaining controller work is durable retry state, blocked handoff writes,
-endpoint-loop integration for every fault class, and proof that repeated
-invalid actions always change shape in live dispatch. Focused tests and Docker
-Compose verification are required before this blocker can close.
+remaining controller work is blocked handoff writes, endpoint-loop integration
+for every fault class, and proof that repeated invalid actions always change
+shape in live dispatch. Focused tests and Docker Compose verification are
+required before this blocker can close.

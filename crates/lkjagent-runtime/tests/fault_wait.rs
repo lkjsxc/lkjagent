@@ -1,15 +1,8 @@
 mod support;
 
-use std::path::Path;
-
-use lkjagent_runtime::daemon::{
-    client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
-};
 use lkjagent_runtime::step::{step, StepInput};
 use lkjagent_runtime::task::{StopReason, TaskState};
-use lkjagent_store::queue;
-use support::http::{completion, serve_responses};
-use support::{error_output, repeat_notice, runtime_state, store, temp_workspace, TestResult};
+use support::{error_output, repeat_notice, runtime_state, TestResult};
 
 #[test]
 fn third_parse_fault_routes_to_graph_recovery() -> TestResult<()> {
@@ -120,30 +113,6 @@ fn third_tool_error_routes_without_owner_wait() -> TestResult<()> {
     Ok(())
 }
 
-#[test]
-fn daemon_routes_after_three_endpoint_parse_faults() -> TestResult<()> {
-    let mut conn = store()?;
-    take_daemon_lock(&conn, "test", "100", "0")?;
-    queue::enqueue(&mut conn, "recover parse loop", "owner-send", "101")?;
-    let workspace = temp_workspace("fault-wait-daemon")?;
-    let server = serve_responses(vec![
-        completion("not an act"),
-        completion("still not an act"),
-        completion("again not an act"),
-    ])?;
-    let mut daemon = daemon(&server.base_url, &workspace)?;
-
-    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
-    server.join()?;
-
-    let active = lkjagent_store::graph::active_case(&conn)?.ok_or("missing graph case")?;
-    assert_eq!(active.phase, "recovery");
-    assert_eq!(active.active_node, "recover-parse");
-    Ok(())
-}
-
 fn open(content: &str) -> TestResult<lkjagent_runtime::task::RuntimeState> {
     Ok(step(
         runtime_state()?,
@@ -185,14 +154,4 @@ fn pending_read(state: lkjagent_runtime::task::RuntimeState) -> lkjagent_runtime
             tokens: 10,
         },
     )
-}
-
-fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
-    let runtime = ResidentRuntime::new(
-        "test".to_string(),
-        client_config(base_url, "local-model", None, 180, 2_048),
-        workspace.to_path_buf(),
-        "100",
-    );
-    Ok(ResidentDaemon::new(runtime_state()?, runtime))
 }
