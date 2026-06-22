@@ -51,6 +51,9 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   route text, and blocked-handoff behavior on each pure recovery plan.
 - Cached maintenance actions are refused before dispatch when queued owner work
   changes the current authority.
+- The daemon persists authority snapshot fields and CLI status prints active
+  mode, evidence gaps, artifact root, recovery route, failed action, admitted
+  tools, and next executable action.
 - `artifact.next` and stricter content audit support bounded cookbook and story
   recovery examples.
 - `fs.write` and `fs.batch_write` reject known scaffold phrases before mutation.
@@ -68,7 +71,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 
 ## Remaining Proof Gaps
 
-- Authority is not yet durable enough to own every dispatch and completion path.
+- Authority snapshots still need stronger case-specific fields and history for
+  every dispatch and completion path.
 - Broader stale-action contradiction repair is not yet covered for every mode.
 - Recovery retry counts are not yet persisted by case, node, tool, parameter
   shape, and fault class.

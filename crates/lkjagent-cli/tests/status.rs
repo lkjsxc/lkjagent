@@ -67,6 +67,32 @@ fn status_prints_unknown_token_usage_as_unknown() -> TestResult<()> {
 }
 
 #[test]
+fn status_prints_authority_snapshot_fields() -> TestResult<()> {
+    let data = temp_data("status-authority")?;
+    let conn = open_store(&data)?;
+    lkjagent_store::state::set(&conn, "authority active mode", "Recovery")?;
+    lkjagent_store::state::set(&conn, "authority phase", "recovery")?;
+    lkjagent_store::state::set(&conn, "authority node", "recover-repeat")?;
+    lkjagent_store::state::set(&conn, "authority evidence gaps", "artifact-readiness")?;
+    lkjagent_store::state::set(
+        &conn,
+        "authority next action",
+        "<act><tool>artifact.next</tool></act>",
+    )?;
+
+    let status = run_cli(["--data", data.to_string_lossy().as_ref(), "status"]);
+
+    assert!(status.stdout.contains("active_mode=Recovery"));
+    assert!(status.stdout.contains("authority_phase=recovery"));
+    assert!(status.stdout.contains("authority_node=recover-repeat"));
+    assert!(status.stdout.contains("evidence_gaps=artifact-readiness"));
+    assert!(status
+        .stdout
+        .contains("next_executable_action=<act><tool>artifact.next</tool></act>"));
+    Ok(())
+}
+
+#[test]
 fn status_prints_continuation_checkpoint_state() -> TestResult<()> {
     let data = temp_data("status-continuation")?;
     let conn = open_store(&data)?;

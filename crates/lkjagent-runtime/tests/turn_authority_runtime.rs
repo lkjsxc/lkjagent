@@ -9,7 +9,7 @@ use lkjagent_runtime::daemon::{
 use lkjagent_runtime::maintenance::{MaintenanceCycle, MaintenanceDirective};
 use lkjagent_runtime::mode::{decide_turn_authority, TurnAuthorityInput};
 use lkjagent_runtime::task::{PendingAction, TaskState};
-use lkjagent_store::queue;
+use lkjagent_store::{queue, state};
 use support::http::{completion, serve_responses};
 use support::{action, runtime_state, store, temp_workspace, TestResult};
 
@@ -29,6 +29,12 @@ fn endpoint_turn_refreshes_one_active_mode_card() -> TestResult<()> {
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(active_mode_cards(&daemon), 1);
     assert!(active_mode_card(&daemon).contains("mode=OwnerTask"));
+    assert_eq!(
+        state::get(&conn, "authority active mode")?,
+        Some("OwnerTask".to_string())
+    );
+    assert!(state::get(&conn, "authority node")?.is_some());
+    assert!(state::get(&conn, "authority next action")?.is_some());
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     server.join()?;
 

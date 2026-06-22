@@ -41,14 +41,14 @@ prove that their failures cannot recur.
 
 | Area | Current truth |
 | --- | --- |
-| Runtime authority | Pure active-mode selection, turn authority cards, effective dispatch policy reuse, stale maintenance-action refusal before dispatch, and `agent.done` refusal exist. Durable authority snapshots and broader pre-dispatch contradiction repair remain open. |
+| Runtime authority | Pure active-mode selection, turn authority cards, effective dispatch policy reuse, store-backed authority snapshot fields, stale maintenance-action refusal before dispatch, and `agent.done` refusal exist. Broader pre-dispatch contradiction repair remains open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, and a pure recovery plan table exist. Durable retry counts and live shape-change enforcement for every fault class remain open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Every rendered recovery example is not yet proven through one canonical registry validation path. |
 | Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, and root-scoped cursors exist. Artifact identity, adoption, weak-path repair state, and semantic readiness are incomplete. |
 | Completion gates | Runtime completion refusals keep cases open for many artifact and evidence gaps. Every close path is not yet proven to use the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, and next-action fields in notices. The durable snapshot still lacks richer last-successful observation and batch cursor state. |
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, and same-title high-overlap merge exist. Rewrite pruning and pre-dispatch owner preemption remain open. |
-| Status and console | Active graph state, context pressure, token usage, and model-log paths display. Last successful observation and exact authority snapshot details remain shallow. |
+| Status and console | Active graph state, active mode, authority snapshot fields, context pressure, token usage, and model-log paths display. Last successful observation is summarized from recent observations. |
 | Benchmarks | Uploaded-run signatures are represented by deterministic fixtures. Runtime replay coverage and every completion path are not yet complete. |
 
 ## Open Failure Evidence
@@ -89,7 +89,8 @@ This session ran these gates after the documentation and recovery-model edits:
 - `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`.
 - `cargo run -p lkjagent-xtask -- check-style`: `ok check-style`.
 - `cargo fmt --check`: passed.
-- `cargo test -p lkjagent-runtime`: passed after the stale maintenance-action refusal test.
+- `cargo test -p lkjagent-runtime`: passed after the stale maintenance-action and authority snapshot tests.
+- `cargo test -p lkjagent-cli`: passed after status authority snapshot display tests.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`.
 - `docker compose run --rm verify`: `ok verify`.
 
