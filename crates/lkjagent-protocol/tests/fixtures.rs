@@ -136,6 +136,26 @@ fn parses_core_file_tool_child_parameters() {
 }
 
 #[test]
+fn parses_line_action_grammar_and_file_blocks() {
+    assert_eq!(
+        parse_completion("<act>\ntool: doc.audit\nroot: docs\n</act>"),
+        Ok(Action::new("doc.audit", vec![Param::new("root", "docs")]))
+    );
+
+    let batch = "<act>\ntool: fs.batch_write\ncase: current\nfiles:\n-- file --\npath: notes/food.md\ncontent:\n# 和食\n\nだし and rice notes.\n-- end-file --\n-- file --\npath: notes/code.md\ncontent:\n```xml\n<act>literal</act>\n```\n-- end-file --\n</act>";
+    assert_eq!(
+        parse_completion(batch),
+        Ok(Action::new(
+            "fs.batch_write",
+            vec![Param::new(
+                "files",
+                "path: notes/food.md\ncontent:\n# 和食\n\nだし and rice notes.\n-- lkjagent-next-file --\npath: notes/code.md\ncontent:\n```xml\n<act>literal</act>\n```"
+            )]
+        ))
+    );
+}
+
+#[test]
 fn renders_context_frames() {
     assert_eq!(
         render_observation("ok", "done"),

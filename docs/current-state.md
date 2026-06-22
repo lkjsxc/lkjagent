@@ -94,7 +94,7 @@ behavior is complete.
 | --- | --- | --- |
 | Cargo workspace and gates | implemented | `Cargo.toml`; `crates/lkjagent-xtask` |
 | Docker compose services | implemented | `docker-compose.yml` |
-| Action parser | implemented | `crates/lkjagent-protocol`; child-tag file tool parameters have focused fixtures |
+| Action parser | implemented | `crates/lkjagent-protocol`; child-tag parameters, line-grammar scalar actions, and batch file blocks have focused fixtures |
 | Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; `fs.batch_write` accepts canonical, no-space, and XML-ish path headers while rejecting JSON payloads before mutation; dispatch now checks one effective policy object before routing, including `agent.done` completion refusal; schema repair emits one canonical example for covered parameter, missing shell-command, and evidence-kind faults; audit-owned evidence refuses direct `graph.evidence` |
 | Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; artifact.apply reuses the planner and writer |
 | Document audit tool | implemented | topology checks pass local gates; artifact.audit checks kind mismatch; content artifacts reject scaffold-only leaves, weak cookbook/story leaves, and shallow dictionary term lists |
@@ -127,7 +127,9 @@ and the only pre-existing working-tree entry was `tmp/prompt01.md`.
 After that baseline, cookbook scaffold selection was split so explicit bread
 cookbooks use the bread shape while generic or Japanese cookbook objectives use
 Japanese-food topic paths. Artifact next/apply now block Japanese cookbook roots
-when forbidden bread drift is present.
+when forbidden bread drift is present. The action parser now accepts the
+line-oriented `tool:` grammar and canonical `fs.batch_write` file blocks while
+preserving the paired-tag grammar.
 
 ## Out of Scope
 
