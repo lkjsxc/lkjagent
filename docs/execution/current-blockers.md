@@ -47,6 +47,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   model-authored `memory.save` action.
 - Runtime authority examples for model-call modes come from the dispatcher
   registry renderer.
+- Runtime recovery has a closed `FaultClass` enum, route metadata, escalation
+  route text, and blocked-handoff behavior on each pure recovery plan.
 - `artifact.next` and stricter content audit support bounded cookbook and story
   recovery examples.
 - `fs.write` and `fs.batch_write` reject known scaffold phrases before mutation.

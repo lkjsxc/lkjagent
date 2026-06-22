@@ -1,19 +1,27 @@
 use super::admission::next_valid_tools;
 use super::model::{RecoveryClass, RecoveryPlan, RuntimeFault, RuntimeSnapshot};
+use super::recovery_route::{
+    blocked_handoff_behavior, escalation_route, fault_class, recovery_route,
+};
 use lkjagent_tools::dispatch::registry_valid_example;
 
 pub fn recovery_plan_for_fault(snapshot: &RuntimeSnapshot, fault: RuntimeFault) -> RecoveryPlan {
+    let fault_class = fault_class(fault);
     let class = recovery_class(fault);
     let forced_tool = forced_tool(snapshot, class);
     RecoveryPlan {
+        fault_class,
         recovery_class: class,
+        recovery_route: recovery_route(fault_class).to_string(),
         previous_mission: snapshot.active_mission,
         retry_budget: retry_budget(class),
         allowed_observation_tools: observation_tools(class),
         allowed_repair_tools: repair_tools(class),
         forced_next_action: forced_action_text(class, &forced_tool),
+        escalation_route: escalation_route(fault_class).to_string(),
         exact_valid_example: valid_example(&forced_tool),
         fallback_action: fallback_action(class),
+        blocked_handoff_behavior: blocked_handoff_behavior(fault_class).to_string(),
         partial_handoff: allows_partial_handoff(class),
         forced_tool,
     }
@@ -37,7 +45,9 @@ fn recovery_class(fault: RuntimeFault) -> RecoveryClass {
             RecoveryClass::CompactionResumeGap
         }
         RuntimeFault::MaintenanceConflict => RecoveryClass::MaintenancePreemption,
-        RuntimeFault::ToolRuntime | RuntimeFault::EndpointFault => RecoveryClass::EndpointFault,
+        RuntimeFault::ToolRuntime | RuntimeFault::EndpointFault | RuntimeFault::ContextInvalid => {
+            RecoveryClass::EndpointFault
+        }
         RuntimeFault::TurnBudgetExhausted => RecoveryClass::TurnBudgetExhaustion,
     }
 }

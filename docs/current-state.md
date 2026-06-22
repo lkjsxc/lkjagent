@@ -42,7 +42,7 @@ prove that their failures cannot recur.
 | Area | Current truth |
 | --- | --- |
 | Runtime authority | Pure active-mode selection, turn authority cards, effective dispatch policy reuse, and `agent.done` refusal exist. Durable authority snapshots and pre-dispatch contradiction repair remain open. |
-| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, and a pure recovery plan table exist. Durable retry counts and live shape-change enforcement for every fault class remain open. |
+| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, and a pure recovery plan table exist. Durable retry counts and live shape-change enforcement for every fault class remain open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Every rendered recovery example is not yet proven through one canonical registry validation path. |
 | Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, and root-scoped cursors exist. Artifact identity, adoption, weak-path repair state, and semantic readiness are incomplete. |
 | Completion gates | Runtime completion refusals keep cases open for many artifact and evidence gaps. Every close path is not yet proven to use the same artifact-aware gate. |
