@@ -36,8 +36,13 @@ pub fn select_profile(input: &ScaffoldInput) -> ScaffoldProfile {
 
 fn lkjagent_seed_subject(text: &str) -> bool {
     text.contains("lkjagent")
-        && text.contains("rust")
-        && (text.contains("qwen") || text.contains("model"))
+        && (text.contains("model")
+            || text.contains("endpoint")
+            || text.contains("qwen")
+            || text.contains("rust")
+            || text.contains("asia")
+            || text.contains("minecraft")
+            || text.contains("factorio"))
 }
 
 fn bread_subject(text: &str) -> bool {

@@ -24,6 +24,46 @@ fn lkjagent_model_rust_request_creates_connected_seed() -> TestResult<()> {
         .join("docs/relations/project-model-implementation.md")
         .is_file());
     assert!(!workspace.join("docs/lkjagent.md").exists());
+    let graph = std::fs::read_to_string(workspace.join("docs/.lkj-doc-graph.md"))?;
+    assert!(!graph.contains("qwen"));
+
+    let audit = audit(&workspace, "docs")?;
+    assert!(audit.contains("document audit passed"), "{audit}");
+    Ok(())
+}
+
+#[test]
+fn multi_topic_request_preserves_domain_seed() -> TestResult<()> {
+    let workspace = temp_workspace("doc-multi-topic-seed")?;
+    let output = scaffold(
+        &workspace,
+        &[
+            ("root", "docs"),
+            (
+                "title",
+                "lkjagent model endpoint Asia foods Minecraft Factorio documentation",
+            ),
+            ("kind", "documentation-init"),
+        ],
+    )?;
+
+    assert!(output.contains("profile=LkjagentSemanticSeed"));
+    assert!(workspace.join("docs/project/lkjagent.md").is_file());
+    assert!(workspace
+        .join("docs/model-interface/model-endpoint.md")
+        .is_file());
+    assert!(workspace
+        .join("docs/domain-examples/asia-foods.md")
+        .is_file());
+    assert!(workspace
+        .join("docs/domain-examples/minecraft.md")
+        .is_file());
+    assert!(workspace.join("docs/domain-examples/factorio.md").is_file());
+    assert!(workspace
+        .join("docs/relations/project-model-domain-examples.md")
+        .is_file());
+    assert!(!workspace.join("docs/architecture/README.md").exists());
+    assert!(!workspace.join("docs/guides/README.md").exists());
 
     let audit = audit(&workspace, "docs")?;
     assert!(audit.contains("document audit passed"), "{audit}");

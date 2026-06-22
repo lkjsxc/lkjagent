@@ -3,6 +3,7 @@ pub mod automata;
 pub mod bundle;
 pub mod correction;
 pub mod graph;
+pub mod owner_doc_topics;
 pub mod owner_docs;
 pub mod owner_faults;
 pub mod owner_loop_content;
@@ -25,6 +26,7 @@ pub const TINY: &[BenchmarkTask] = &[
     correction::TASK,
     owner_docs::PROJECT_TASK,
     owner_docs::RECURSIVE_TASK,
+    owner_doc_topics::TASK,
     owner_thirty::TASK,
     owner_faults::GRAPH_TASK,
     owner_faults::SCAFFOLD_TASK,

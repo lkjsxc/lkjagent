@@ -96,7 +96,7 @@ behavior is complete.
 | Docker compose services | implemented | `docker-compose.yml` |
 | Action parser | implemented | `crates/lkjagent-protocol`; child-tag parameters, line-grammar scalar actions, and batch file blocks have focused fixtures |
 | Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; `fs.batch_write` accepts canonical, no-space, and XML-ish path headers while rejecting JSON payloads before mutation; dispatch now checks one effective policy object before routing, including `agent.done` completion refusal; schema repair emits one canonical example for covered parameter, missing shell-command, and evidence-kind faults; audit-owned evidence refuses direct `graph.evidence` |
-| Document scaffold tool | implemented | semantic project, lkjagent model Rust seed, story, and cookbook scaffold tests pass; artifact.apply reuses the planner and writer |
+| Document scaffold tool | implemented | semantic project, lkjagent model Rust seed, multi-topic domain-example seed, story, and cookbook scaffold tests pass; artifact.apply reuses the planner and writer |
 | Document audit tool | implemented | topology checks pass local gates; `.md` suffix directories fail; generated scaffold leaves fail as mock content until replaced |
 | Artifact next batch | partially implemented | `artifact.next` returns exact weak paths, content-bearing `fs.batch_write` examples, and root-scoped cursor advancement; scaffold-only cookbook, cursor, meaningful cookbook, and Japanese drift guard tests pass |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
@@ -108,7 +108,7 @@ behavior is complete.
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and model log path display; last successful action is still shallow |
 | Model handoff log | implemented | runtime and CLI write one provider-neutral Markdown snapshot with sanitizer report when needed |
-| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist, including bread `artifact.next` recovery, shallow dictionary readiness, Japanese-cookbook drift, document-structure evidence bypass, batch-write schema faults, shell parameter faults, queue interruption, compaction resume, and repeated recovery action cases; corpus, quiet verify, and Docker Compose verify passed for the prior slice |
+| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist, including multi-topic documentation, bread `artifact.next` recovery, shallow dictionary readiness, Japanese-cookbook drift, document-structure evidence bypass, batch-write schema faults, shell parameter faults, queue interruption, compaction resume, and repeated recovery action cases; corpus, quiet verify, and Docker Compose verify passed for the prior slice |
 
 ## Open Work
 
@@ -120,12 +120,13 @@ snapshots, and blocked handoffs need deeper coverage before the ledger can call
 the loop redesign implemented. Final verification must be rerun after each
 later slice.
 
-The current redesign slice baseline is recorded in
-[evaluation/baseline-audit-2026-06-22.md](evaluation/baseline-audit-2026-06-22.md):
-`docker compose run --rm verify` exited 0 before new implementation changes,
-and this session observed a pre-existing deletion of
-`tmp/console-responsive-handoff.md`; the tracked tmp file was restored before
-handoff, and `tmp/prompt01.md` remains present in `tmp/`.
+This session reran the required baseline commands. `docker compose run --rm verify`
+exited 0 before the implementation edit, `git status --short` showed only a
+pre-existing deletion of `tmp/console-responsive-handoff.md`, and that tracked
+file was restored before code changes. The current redesign slice baseline is
+also recorded in
+[evaluation/baseline-audit-2026-06-22.md](evaluation/baseline-audit-2026-06-22.md);
+`tmp/prompt01.md` remains present in `tmp/`.
 After that baseline, cookbook scaffold selection was split so explicit bread
 cookbooks use the bread shape while generic or Japanese cookbook objectives use
 Japanese-food topic paths. Artifact next/apply now block Japanese cookbook roots
@@ -136,7 +137,10 @@ preserving the paired-tag grammar. A pure weighted-state kernel now exists in
 context-slice selection, recovery selection, prompt-frame compilation, and
 focused weighted-kernel tests. The current slice adds top-level contracts for
 state-guided documentation growth, provider-neutral model language, semantic
-audits, maintenance no-op suppression, and regression fixtures. It also renames
+audits, maintenance no-op suppression, and regression fixtures. The scaffold
+planner now routes lkjagent plus model endpoint and domain-topic requests to a
+connected semantic seed with project, model-interface, domain-examples, and
+relations pages instead of a generic project scaffold. It also renames
 owner-visible model handoff surfaces from provider-branded wording to
 `model-log` and `current-model-run.md`.
 

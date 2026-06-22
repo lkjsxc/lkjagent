@@ -52,6 +52,7 @@ pub enum JudgeKind {
     SemanticProjectDocs,
     RecursiveDocTree,
     ThirtySemanticDocs,
+    MultiTopicDocumentation,
     GraphStateParamRecovery,
     DocScaffoldParamRecovery,
     RecoveryLoopLongStory,
