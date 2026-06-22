@@ -21,6 +21,11 @@ workspace dependencies.
 - [completion.rs](completion.rs): evidence-gated completion checks.
 - [context_selection.rs](context_selection.rs): graph-aware package selection.
 - [guards.rs](guards.rs): transition guard evaluation.
+- [kernel_authority.rs](kernel_authority.rs): pure tool authorization from weighted guards.
+- [kernel_events.rs](kernel_events.rs): pure kernel events, evidence, and fault data.
+- [kernel_track_ops.rs](kernel_track_ops.rs): internal weighted-track update helpers.
+- [kernel_types.rs](kernel_types.rs): pure case, hard-state, and state-vector types.
+- [kernel_vector.rs](kernel_vector.rs): deterministic state-vector reducers.
 - [maintenance.rs](maintenance.rs): idle maintenance directive data.
 - [model.rs](model.rs): graph node, edge, package, and policy data types.
 - [node_policy.rs](node_policy.rs): node and edge affordance policy data.

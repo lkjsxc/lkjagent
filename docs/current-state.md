@@ -101,7 +101,7 @@ behavior is complete.
 | Artifact next batch | partially implemented | `artifact.next` returns exact weak paths, content-bearing `fs.batch_write` examples, and root-scoped cursor advancement; scaffold-only cookbook, cursor, meaningful cookbook, and Japanese drift guard tests pass |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, same-title overlap update, punctuation-safe FTS queries, exact duplicate prune, same-title prune merge, and maintenance no-op lesson merge have focused tests; rewrite pruning remains open |
-| State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
+| State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; the new pure weighted-state kernel has event reducers and guard authorization tests |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
 | Runtime recovery | partially implemented | pure turn authority selection, pure reducer/admission helpers, authority snapshot/event/decision types, store-backed runtime snapshots, one active-mode endpoint card, cached dispatch authority, recovery escape-tool visibility, batch-oriented recovery examples, and effective dispatch repair admissions exist; pure recovery admission includes artifact audit/next/apply, doc audit/scaffold, read/tree/write, and batch tools; `graph.recover` now derives next actions from legal transitions, admitted tools, and plan readiness; internal `agent.ask` questions are refused, runtime close rechecks graph completion, content artifacts require separate audit-derived artifact-readiness evidence, and no-op maintenance defers restart; fault-class-specific deterministic recovery control remains open |
 | Context budgets | partially implemented | budget model and compact context display exist; forced compaction is runtime-owned and renders mission, evidence gaps, artifact root/id, recovery step, last failed action, admitted tools, exact next action, and completion blockers; artifact.next root cursors exist, while richer cursor fields and last-successful-observation snapshots remain open |
@@ -129,7 +129,9 @@ cookbooks use the bread shape while generic or Japanese cookbook objectives use
 Japanese-food topic paths. Artifact next/apply now block Japanese cookbook roots
 when forbidden bread drift is present. The action parser now accepts the
 line-oriented `tool:` grammar and canonical `fs.batch_write` file blocks while
-preserving the paired-tag grammar.
+preserving the paired-tag grammar. A pure weighted-state kernel now exists in
+`lkjagent-graph` with deterministic event updates, guard-track authorization,
+context-slice selection, recovery selection, and focused weighted-kernel tests.
 
 ## Out of Scope
 
