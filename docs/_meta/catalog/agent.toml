@@ -1,0 +1,9 @@
+# Catalog: agent
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/agent/README.md" = { title = "Agent Manual", parent = "docs/README.md", children = ["docs/agent/handoff.md", "docs/agent/honest-state.md", "docs/agent/no-placeholder-runtime.md", "docs/agent/work-loop.md"], role = "Table of contents for docs/agent", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/agent/handoff.md" = { title = "Handoff", parent = "docs/agent/README.md", children = [], role = "Contract page under docs/agent", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/agent/honest-state.md" = { title = "Honest State", parent = "docs/agent/README.md", children = [], role = "Contract page under docs/agent", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/agent/no-placeholder-runtime.md" = { title = "No Placeholder Runtime", parent = "docs/agent/README.md", children = [], role = "Contract page under docs/agent", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/agent/work-loop.md" = { title = "Work Loop", parent = "docs/agent/README.md", children = [], role = "Contract page under docs/agent", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

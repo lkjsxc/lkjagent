@@ -1,4 +1,5 @@
 pub mod benchmark;
+pub mod doc_catalog;
 pub mod doc_common;
 pub mod doc_links;
 pub mod doc_special;

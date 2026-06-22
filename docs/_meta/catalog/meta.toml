@@ -1,0 +1,8 @@
+# Catalog: meta
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/_meta/README.md" = { title = "Documentation Metadata", parent = "docs/README.md", children = ["docs/_meta/audit-log.md", "docs/_meta/catalog/README.md", "docs/_meta/graph-rules.md"], role = "Table of contents for docs/_meta", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/_meta/audit-log.md" = { title = "Audit Log", parent = "docs/_meta/README.md", children = [], role = "Contract page under docs/_meta", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/_meta/catalog/README.md" = { title = "Catalog", parent = "docs/_meta/README.md", children = [], role = "Table of contents for docs/_meta/catalog", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/_meta/graph-rules.md" = { title = "Graph Rules", parent = "docs/_meta/README.md", children = [], role = "Contract page under docs/_meta", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

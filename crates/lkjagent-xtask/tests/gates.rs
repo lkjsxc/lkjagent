@@ -52,7 +52,7 @@ fn markdown_basics_report_exact_messages() {
 }
 
 #[test]
-fn doc_topology_reports_missing_readme_thin_toc_and_manifest() {
+fn doc_topology_reports_missing_readme_and_thin_toc() {
     let files = vec![
         RepoFile::new(
             "docs/README.md",
@@ -78,11 +78,6 @@ fn doc_topology_reports_missing_readme_thin_toc_and_manifest() {
             "docs/missing: readme topology: directory must contain README.md",
             "docs/thin: readme topology: directory must contain at least two children beside README.md",
             "docs/thin/README.md: readme topology: link child 'only.md' from the table of contents",
-            "docs/README.md: all files: list 'b.md' in the All Files manifest",
-            "docs/README.md: all files: list 'bad.md/file.md' in the All Files manifest",
-            "docs/README.md: all files: list 'missing/file.md' in the All Files manifest",
-            "docs/README.md: all files: list 'thin/README.md' in the All Files manifest",
-            "docs/README.md: all files: list 'thin/only.md' in the All Files manifest",
         ]
     );
 }

@@ -1,0 +1,6 @@
+# Catalog: root
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/README.md" = { title = "lkjagent Documentation", parent = "", children = ["docs/_meta/README.md", "docs/agent/README.md", "docs/architecture/README.md", "docs/current-state.md", "docs/decisions/README.md", "docs/documentation-system/README.md", "docs/evaluation/README.md", "docs/execution/README.md", "docs/implementation/README.md", "docs/maintenance/README.md", "docs/model-interface/README.md", "docs/operations/README.md", "docs/product/README.md", "docs/prompting/README.md", "docs/regressions/README.md", "docs/relations/README.md", "docs/repository/README.md", "docs/state/README.md", "docs/verification/README.md", "docs/vision/README.md"], role = "Root documentation entry point and navigation index", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/current-state.md" = { title = "Current State", parent = "docs/README.md", children = [], role = "Contract page under docs", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

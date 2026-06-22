@@ -1,0 +1,8 @@
+# Catalog: operations
+
+# Fields: title, parent, children, role, sources, checks.
+
+"docs/operations/README.md" = { title = "Operations", parent = "docs/README.md", children = ["docs/operations/compose.md", "docs/operations/running.md", "docs/operations/verification.md"], role = "Table of contents for docs/operations", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/operations/compose.md" = { title = "Compose", parent = "docs/operations/README.md", children = [], role = "Contract page under docs/operations", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/operations/running.md" = { title = "Running", parent = "docs/operations/README.md", children = [], role = "Contract page under docs/operations", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/operations/verification.md" = { title = "Verification", parent = "docs/operations/README.md", children = [], role = "Contract page under docs/operations", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

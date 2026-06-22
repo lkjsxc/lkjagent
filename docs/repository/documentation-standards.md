@@ -25,8 +25,8 @@ three links and trust what it reads.
 - Every README.md carries a `## Table of Contents` linking every sibling
   child with a one-clause description. A child not in its README does not
   exist.
-- [../README.md](../README.md) additionally carries the flat All Files
-  manifest for single-scan discovery.
+- [../_meta/catalog/](../_meta/catalog/README.md) carries the machine-readable
+  coverage manifest for every authored documentation page.
 - Depth is bounded by need: a directory appears when a topic outgrows one
   file per [line-limits.md](line-limits.md), not before.
 
@@ -55,7 +55,6 @@ generally, ideally) are rationed to genuinely soft contracts.
 
 ## Enforcement
 
-The check-docs gate enforces shape, topology, TOC completeness, ASCII,
-prose width, table width, and banned tokens. Until it exists, the interim
-checks in [../operations/verification.md](../operations/verification.md)
-cover line caps, README topology, TOC completeness, and banned tokens.
+The check-docs gate enforces shape, topology, TOC completeness, catalog
+coverage, ASCII, prose width, table width, banned tokens, and path hygiene.
+Line caps are enforced by check-lines.

@@ -2,29 +2,21 @@
 
 ## Purpose
 
-This file defines the graph layer generated beside a documentation tree.
+This file defines the documentation graph data used for audit and repair.
 
-## Contract
+## Facts
 
-- Every generated documentation root includes `.lkj-doc-graph.md`.
-- The graph manifest lists nodes with ids, paths, roles, and status.
-- The graph manifest lists edges with source id, target id, kind, and reason.
-- Coverage rows map owner requirements to concrete paths and status.
-- Graph node paths point to files or directories that exist.
-- Graph edge endpoints point to listed node ids.
+- Authored docs are indexed in [../../_meta/catalog/](../../_meta/catalog/README.md).
+- Generated graph views are transient and belong under `tmp/`.
+- README files are table-of-contents pages, not graph manifests.
 
-## Implementation Hooks
+## Design
 
-- Source: `crates/lkjagent-tools/src/doc.rs`
-- Tests: `crates/lkjagent-tools/tests/typed_tools.rs`
-- Verification: `docker compose run --rm verify`
+The graph is derived from catalog entries. Nodes are doc paths. Parent and child
+fields define containment edges. Source links and checks attach implementation
+and verification evidence without repeating boilerplate in every page. A graph
+view is valid only when the catalog checker passes first.
 
-## Failure Modes
+## Checks
 
-- `.lkj-doc-graph.md` is absent after scaffold generation.
-- A graph node points to a missing path.
-- A graph edge points to an unknown node id.
-
-## Status
-
-partially implemented
+- `cargo run -p lkjagent-xtask -- check-docs`
