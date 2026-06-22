@@ -1,90 +1,3 @@
-pub fn root() -> String {
-    doc(
-        "lkjagent Documentation",
-        "This root maps the project runtime, model interface, Rust implementation, and relations.",
-        &[
-            "[project/](project/README.md): lkjagent purpose and operating model.",
-            "[model-interface/](model-interface/README.md): provider-neutral model boundary.",
-            "[implementation/](implementation/README.md): Rust substrate and core boundary.",
-            "[relations/](relations/README.md): runtime, model, and implementation links.",
-            "[.lkj-doc-graph.md](.lkj-doc-graph.md): machine-readable relation ledger.",
-        ],
-        "Read project first, then model-interface, implementation, and relations.",
-    )
-}
-
-pub fn project_readme() -> String {
-    doc(
-        "Project",
-        "Project docs own what lkjagent is and how the daemon works.",
-        &[
-            "[purpose.md](purpose.md): central runtime purpose.",
-            "[operating-model.md](operating-model.md): daemon, queue, graph, and evidence loop.",
-        ],
-        "The project depends on the model interface and Rust implementation.",
-    )
-}
-
-pub fn project_purpose() -> String {
-    leaf(
-        "Purpose",
-        "lkjagent is a graph-governed local agent operating system.",
-        &[
-            "It keeps durable cases, typed transitions, evidence, and completion gates.",
-            "It treats the model endpoint as an action proposer, not an authority.",
-            "Rust modules implement pure reducers while tools keep effects at the edge.",
-        ],
-    )
-}
-
-pub fn project_operating_model() -> String {
-    leaf(
-        "Operating Model",
-        "The daemon advances one case through state-owned turns.",
-        &[
-            "Owner messages enter a persistent queue before mutation.",
-            "Prompt frames name active state, guards, allowed tools, and missing evidence.",
-            "After each observation the reducer updates state and audit requirements.",
-        ],
-    )
-}
-
-pub fn model_readme() -> String {
-    doc(
-        "Model Interface",
-        "The model boundary is provider-neutral and runtime-owned.",
-        &[
-            "[contract.md](contract.md): action proposal pipeline.",
-            "[action-protocol.md](action-protocol.md): tag grammar and validation boundary.",
-        ],
-        "The boundary is constrained by project state and observed by audits.",
-    )
-}
-
-pub fn model_contract() -> String {
-    leaf(
-        "Contract",
-        "Raw model text never executes directly.",
-        &[
-            "The parser extracts one action candidate.",
-            "The schema validator normalizes parameters and rejects unknown fields.",
-            "Graph authorization and guard tracks decide whether an effect can run.",
-        ],
-    )
-}
-
-pub fn action_protocol() -> String {
-    leaf(
-        "Action Protocol",
-        "The action language is small and deterministic.",
-        &[
-            "One action block proposes one tool intent.",
-            "Large Markdown bodies use line-oriented file blocks.",
-            "Parse recovery narrows the next prompt to a small valid action.",
-        ],
-    )
-}
-
 pub fn implementation_readme() -> String {
     doc(
         "Implementation",
@@ -121,18 +34,6 @@ pub fn functional_core() -> String {
     )
 }
 
-pub fn relations_readme() -> String {
-    doc(
-        "Relations",
-        "Relation docs connect requested topics before expansion.",
-        &[
-            "[project-model-implementation.md](project-model-implementation.md): central relation.",
-            "[state-to-prompt.md](state-to-prompt.md): state selected prompt relation.",
-        ],
-        "Every requested topic has an outgoing relation and backlink.",
-    )
-}
-
 pub fn relation_main() -> String {
     leaf(
         "Project Model Implementation",
@@ -141,18 +42,6 @@ pub fn relation_main() -> String {
             "The project depends on Rust for typed reducers and tool schemas.",
             "The project constrains the model through prompt frames and action validation.",
             "Rust implementation audits the evidence needed before completion.",
-        ],
-    )
-}
-
-pub fn relation_state_prompt() -> String {
-    leaf(
-        "State To Prompt",
-        "State tracks select prompt mode and context slices.",
-        &[
-            "Hard state selects the legal phase and allowed tools.",
-            "Weighted guards add completion blockers and recovery instructions.",
-            "The prompt frame exposes the evidence needed for the next safe action.",
         ],
     )
 }

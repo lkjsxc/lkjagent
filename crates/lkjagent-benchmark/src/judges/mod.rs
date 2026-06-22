@@ -3,6 +3,7 @@ pub mod automata;
 pub mod bundle;
 pub mod correction;
 pub mod graph;
+pub mod owner_doc_topics;
 pub mod owner_docs;
 pub mod owner_loop_ops;
 pub mod owner_ops;
@@ -26,6 +27,7 @@ pub fn judge_task(task: &BenchmarkTask, workspace: &Path) -> BenchResult<JudgeOu
         JudgeKind::SemanticProjectDocs => owner_docs::project_docs(workspace),
         JudgeKind::RecursiveDocTree => owner_docs::recursive_tree(workspace),
         JudgeKind::ThirtySemanticDocs => owner_docs::thirty_docs(workspace),
+        JudgeKind::MultiTopicDocumentation => owner_doc_topics::multi_topic_docs(workspace),
         JudgeKind::GraphStateParamRecovery => owner_ops::graph_state_recovery(workspace),
         JudgeKind::DocScaffoldParamRecovery => owner_ops::doc_scaffold_recovery(workspace),
         JudgeKind::RecoveryLoopLongStory => owner_ops::recovery_loop_long_story(workspace),

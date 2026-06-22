@@ -49,9 +49,9 @@ directories with short focused files.
   `maintenance/commonality-discovery.md` `maintenance/bias-detection.md`
   `maintenance/no-op-suppression.md`
 - `verification/README.md` `verification/semantic-audits.md` `verification/regression-fixtures.md`
-- `regressions/README.md` `regressions/docs-init-lkjagent-model-rust.md`
-  `regressions/improve-structure-no-op.md` `regressions/model-specific-naming.md`
-  `regressions/mock-content.md`
+- `regressions/README.md` `regressions/multi-topic-docs.md`
+  `regressions/docs-init-lkjagent-model-rust.md` `regressions/improve-structure-no-op.md`
+  `regressions/model-specific-naming.md` `regressions/mock-content.md`
 - `architecture/README.md` `architecture/overview.md`
 - `architecture/document-structure/README.md` `architecture/document-structure/tree-contract.md`
   `architecture/document-structure/network-contract.md` `architecture/document-structure/naming.md`

@@ -7,6 +7,7 @@ fixture names input, forbidden output, expected guard, and completion evidence.
 
 ## Fixture Set
 
+- multi-topic docs for lkjagent, model endpoint, and domain examples.
 - documentation init for lkjagent, named model topic, and Rust.
 - improve-structure no-op after docs init.
 - directory with `.md` suffix.

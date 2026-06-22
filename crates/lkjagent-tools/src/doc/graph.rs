@@ -29,13 +29,14 @@ pub fn graph_manifest(
             file.path
         ));
     }
+    let title = crate::model_names::sanitize_model_names(&input.title).text;
     PlannedFile {
         path: ".lkj-doc-graph.md".to_string(),
         title: "Document Graph".to_string(),
         role: "graph ledger".to_string(),
         body: format!(
             "# Document Graph\n\n## Purpose\n\nCompact graph ledger for `{}` generated as {:?}.\n\n## Nodes\n\n| id | path | role | status |\n| --- | --- | --- | --- |\n{}\n\n## Edges\n\n| from | to | kind | reason |\n| --- | --- | --- | --- |\n{}\n\n## Coverage\n\n| owner requirement | covered by | status |\n| --- | --- | --- |\n| recursive structure | README.md and local README indexes | satisfied |\n| no sequence-only names | all generated paths | satisfied |\n| graph manifest | .lkj-doc-graph.md | satisfied |\n",
-            input.title,
+            title,
             profile,
             nodes.join("\n"),
             edges.join("\n")
