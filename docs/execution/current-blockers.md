@@ -65,6 +65,9 @@ maintenance restarts after no useful work.
   are empty, refuses planning-only completion, and keeps audit, repair, and
   batch routes visible on refusal. This narrows rows 1 and 4 but does not close
   them until every close path uses the same gate under Docker verification.
+- Live dispatcher repeat refusals now name an admitted alternate action and
+  registry example from effective policy instead of only saying to stop
+  repeating. This narrows row 2 but durable retry state remains open.
 - The uploaded-run benchmark matrix now includes the agent-facing report cases
   for Japanese-cookbook drift, document-structure evidence ownership, batch
   write schema faults, shell parameter faults, queue interruption, compaction

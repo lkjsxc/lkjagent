@@ -14,7 +14,41 @@ pub fn repeat_refusal(action_text: &str, state: &mut DispatchState) -> Option<St
     if action_text.contains("<tool>graph.next</tool>") {
         return Some(graph_next_repeat_refusal(&prior, state));
     }
-    Some(format!("repeat action refused; see {prior}"))
+    Some(repeat_route_refusal(action_text, &prior, state))
+}
+
+fn repeat_route_refusal(action_text: &str, prior: &str, state: &DispatchState) -> String {
+    let repeated = repeated_tool(action_text).unwrap_or("unknown");
+    if let Some(policy) = state.effective_policy.as_ref() {
+        let preferred = policy
+            .allowed_tools
+            .iter()
+            .find(|tool| tool.as_str() != repeated)
+            .cloned()
+            .unwrap_or_else(|| "none".to_string());
+        let example = registry_valid_example(&preferred).unwrap_or_else(|| "none".to_string());
+        return format!(
+            "repeat action refused; see {prior}\nactive_mode={}\nnext_action_must_change_shape=true\nforbidden_tool={repeated}\npreferred_next_action={preferred}\nvalid_example:\n{example}",
+            policy.mode
+        );
+    }
+    if let Some(policy) = state.graph_policy.as_ref() {
+        let preferred = preferred_action(policy, Some(repeated));
+        return format!(
+            "repeat action refused; see {prior}\nnode={}\nphase={}\nnext_action_must_change_shape=true\nforbidden_tool={repeated}\npreferred_next_action={preferred}\nvalid_example:\n{}",
+            policy.active_node,
+            policy.phase,
+            example_for(policy, Some(repeated))
+        );
+    }
+    format!("repeat action refused; see {prior}\nnext_action_must_change_shape=true")
+}
+
+fn repeated_tool(action_text: &str) -> Option<&str> {
+    action_text
+        .split("<tool>")
+        .nth(1)
+        .and_then(|tail| tail.split("</tool>").next())
 }
 
 pub fn policy_refusal(tool: &str, state: &DispatchState) -> Option<String> {
