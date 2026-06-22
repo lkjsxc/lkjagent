@@ -5,8 +5,15 @@ pub fn run_quiet_test(root: &Path) -> Result<(), Vec<String>> {
     run_step(root, "cargo fmt --check", &["fmt", "--check"])?;
     run_step(
         root,
-        "cargo clippy --workspace -- -D warnings",
-        &["clippy", "--workspace", "--", "-D", "warnings"],
+        "cargo clippy --workspace --all-targets -- -D warnings",
+        &[
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings",
+        ],
     )?;
     run_step(root, "cargo test --workspace", &["test", "--workspace"])?;
     Ok(())
