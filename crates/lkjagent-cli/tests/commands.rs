@@ -164,7 +164,10 @@ fn memory_command_reads_store_and_graph_command_reports_source_graph() -> TestRe
 #[test]
 fn run_writes_first_config_and_refuses_existing_lock() -> TestResult<()> {
     let first = temp_data("first")?;
-    let first_error = run::run_with_env(&first, |_| None).expect_err("missing model");
+    let first_error = match run::run_with_env(&first, |_| None) {
+        Ok(_) => return Err("missing model config was accepted".into()),
+        Err(error) => error,
+    };
     assert_eq!(first_error.code(), 1);
     assert!(first_error.to_string().contains("config_written="));
     assert!(first_error.to_string().contains("missing=endpoint.model"));
@@ -175,7 +178,10 @@ fn run_writes_first_config_and_refuses_existing_lock() -> TestResult<()> {
     write_config(&locked)?;
     let conn = open_store(&locked)?;
     lkjagent_store::state::take_lock(&conn, "other", "9999999999", "0")?;
-    let refused = run::run_with_env(&locked, |_| None).expect_err("locked daemon");
+    let refused = match run::run_with_env(&locked, |_| None) {
+        Ok(_) => return Err("locked daemon was accepted".into()),
+        Err(error) => error,
+    };
     assert_eq!(refused.code(), 1);
     assert!(refused.to_string().contains("daemon_refused=other"));
     Ok(())

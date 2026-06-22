@@ -36,7 +36,7 @@ pub fn recursive_tree(workspace: &Path) -> Result<(), String> {
 pub fn thirty_docs(workspace: &Path) -> Result<(), String> {
     let root = workspace.join("docs");
     let files = markdown_files(&root)?;
-    let docs = files.iter().count();
+    let docs = files.len();
     if docs != 30 {
         return Err(format!("expected 30 documentation files, got {docs}"));
     }
