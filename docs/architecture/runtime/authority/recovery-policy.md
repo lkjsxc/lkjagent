@@ -71,5 +71,6 @@ Run `cargo test -p lkjagent-runtime recovery_controller`.
 
 partially implemented. A pure recovery-plan table names the fault class, retry
 budget, forced tool, exact example, fallback, and partial-handoff flag for each
-runtime fault. Durable handoff writes, richer retry state, and full loop wiring
-remain open.
+runtime fault. Verification-failure and maintenance-preemption recovery forced
+tools are admitted by the recovery tool policy. Durable handoff writes, richer
+retry state, and full loop wiring remain open.

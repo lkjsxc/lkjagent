@@ -67,7 +67,9 @@ maintenance restarts after no useful work.
   them until every close path uses the same gate under Docker verification.
 - Live dispatcher repeat refusals now name an admitted alternate action and
   registry example from effective policy instead of only saying to stop
-  repeating. This narrows row 2 but durable retry state remains open.
+  repeating. Recovery policy also admits the forced tools for verification
+  failure and maintenance preemption. This narrows row 2 but durable retry
+  state remains open.
 - The uploaded-run benchmark matrix now includes the agent-facing report cases
   for Japanese-cookbook drift, document-structure evidence ownership, batch
   write schema faults, shell parameter faults, queue interruption, compaction

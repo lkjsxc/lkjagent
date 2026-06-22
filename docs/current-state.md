@@ -158,7 +158,8 @@ pure completion admission so `agent.done` executes only when owner evidence gaps
 are empty, and completion refusals preserve audit, repair, and batch routes.
 Live dispatcher repeat refusals now render the active mode, forbidden repeated
 tool, shape-change requirement, preferred alternate, and registry example from
-the effective policy.
+the effective policy. Recovery tool policy now admits the forced tools for
+verification-failure repair and maintenance-preemption inspection.
 
 ## Out of Scope
 
