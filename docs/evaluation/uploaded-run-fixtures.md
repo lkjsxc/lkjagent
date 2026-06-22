@@ -69,6 +69,24 @@ quality.
 - `cookbook-placeholder-batch`: `artifact.next` examples and direct write tools
   must reject scaffold phrases before overwriting richer content.
 
+## Agent-Facing Report Matrix
+
+- `japanese-cookbook-drift`: a Japanese-food cookbook must record a cookbook
+  contract with Japanese food as subject, reject a bread profile, and keep
+  ciabatta or focaccia paths absent unless explicitly requested.
+- `document-structure-graph-evidence-bypass`: direct `graph.evidence` for
+  `document-structure` is refused and the next action is `doc.audit`.
+- `batch-write-payload-schema-fault`: JSON-like `fs.batch_write` payloads are
+  refused or losslessly normalized before mutation; partial writes are absent.
+- `shell-parameter-missing-command`: `shell.run` without `command` is refused
+  with a canonical command-required repair and no timeout retry loop.
+- `queue-story-interrupt`: cookbook and Japanese story owner tasks remain
+  separate cases with no cross-case artifact contamination.
+- `context-compaction-resume`: compaction creates a durable snapshot, passes a
+  post-compaction check, and preserves missing evidence plus refused actions.
+- `repeated-recovery-action`: a refused recovery action signature is blocked
+  and the next action uses a different action class.
+
 ## Verification
 
 `benchmark check-corpus` must materialize known-good and known-bad fixtures for

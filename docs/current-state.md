@@ -108,7 +108,7 @@ behavior is complete.
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and GPT path display; last successful action is still shallow |
 | GPT handoff log | implemented | runtime and CLI write one current Markdown snapshot |
-| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist, including bread `artifact.next` recovery and shallow dictionary readiness; corpus, quiet verify, and Docker Compose verify passed for this slice |
+| Mechanical benchmarks | partially implemented | uploaded loop fixtures and judges exist, including bread `artifact.next` recovery, shallow dictionary readiness, Japanese-cookbook drift, document-structure evidence bypass, batch-write schema faults, shell parameter faults, queue interruption, compaction resume, and repeated recovery action cases; corpus, quiet verify, and Docker Compose verify passed for the prior slice |
 
 ## Open Work
 
