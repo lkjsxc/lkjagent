@@ -104,5 +104,7 @@ open; pure turn authority selection, store-backed mode snapshots, endpoint
 decisions, one-card endpoint rendering, cached dispatch authority, completion
 policy, mode rendering, dispatch-level effective policy, stale maintenance
 action refusal before dispatch, and effective `agent.done` completion refusal
-exist. Broader stale-action contradiction repair, artifact-aware close gates,
-durable authority snapshots, and richer compaction snapshots remain open.
+exist. The daemon also persists store-backed authority snapshot fields and CLI
+status renders them. Broader stale-action contradiction repair,
+artifact-aware close gates, stronger per-case authority history, and richer
+compaction snapshots remain open.

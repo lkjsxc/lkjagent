@@ -23,6 +23,7 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
     let continuation_decision = state_value(&conn, "continuation decision", "none")?;
     let last_compaction = last_compaction(&conn)?;
     let active_states = active_states(&conn)?;
+    let authority = authority_deck(&conn)?;
     let model_log = lkjagent_runtime::model_log::current_log_path(data_dir);
     let policy = load_context_policy_for_status(data_dir)?;
     let accounting = accounting::deck(&conn, policy)?;
@@ -34,10 +35,11 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
         pressure_name(policy.pressure(used_tokens, 0)),
     )?;
     Ok(format!(
-        "{}\n{}\n{}\ndaemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\ndaemon_question={daemon_question}\ndaemon_error={daemon_error}\nturns={turns}\ncontinuation_epoch={continuation_epoch}\ncontinuation_turns={continuation_turns}\ncheckpoint_turns={checkpoint_turns}\nlast_checkpoint_reason={checkpoint_reason}\ncontinuation_decision={continuation_decision}\nactive_states={active_states}\nmodel_log={}\ncontext_window={}\ncontext_reserve={}\ncontext_used_tokens={used}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_soft_trigger={}\ncontext_hard_trigger={}\ncontext_post_compaction_target={}\ncontext_pressure={pressure}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
+        "{}\n{}\n{}\ndaemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\ndaemon_question={daemon_question}\ndaemon_error={daemon_error}\nturns={turns}\ncontinuation_epoch={continuation_epoch}\ncontinuation_turns={continuation_turns}\ncheckpoint_turns={checkpoint_turns}\nlast_checkpoint_reason={checkpoint_reason}\ncontinuation_decision={continuation_decision}\nactive_states={active_states}\n{}\nmodel_log={}\ncontext_window={}\ncontext_reserve={}\ncontext_used_tokens={used}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_soft_trigger={}\ncontext_hard_trigger={}\ncontext_post_compaction_target={}\ncontext_pressure={pressure}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
         accounting.context_line,
         accounting.token_line,
         accounting.prefix_line,
+        authority,
         model_log.to_string_lossy(),
         policy.window,
         policy.reserve,
@@ -48,6 +50,31 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
         policy.post_compaction_target,
         policy.hard_trigger
     ))
+}
+
+fn authority_deck(conn: &rusqlite::Connection) -> Result<String, CliError> {
+    let fields = [
+        ("active_mode", "authority active mode"),
+        ("authority_case", "authority case id"),
+        ("authority_phase", "authority phase"),
+        ("authority_node", "authority node"),
+        ("evidence_gaps", "authority evidence gaps"),
+        ("active_artifact_root", "authority artifact root"),
+        ("recovery_route", "authority recovery route"),
+        ("last_failed_action", "authority last failed action"),
+        (
+            "last_successful_observation",
+            "authority last successful observation",
+        ),
+        ("authority_allowed_tools", "authority allowed tools"),
+        ("authority_blocked_tools", "authority blocked tools"),
+        ("next_executable_action", "authority next action"),
+    ];
+    let mut lines = Vec::new();
+    for (label, key) in fields {
+        lines.push(format!("{label}={}", state_value(conn, key, "none")?));
+    }
+    Ok(lines.join("\n"))
 }
 
 fn active_states(conn: &rusqlite::Connection) -> Result<String, CliError> {

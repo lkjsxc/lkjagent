@@ -2,6 +2,7 @@ use lkjagent_context::budget::{ContextPressure, LOG_OBSERVATION};
 use lkjagent_context::model::{Frame, FrameKind};
 use rusqlite::Connection;
 
+use super::authority_store::persist_authority_snapshot;
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
 use crate::mode::{
@@ -28,10 +29,12 @@ impl ResidentDaemon {
         now: &str,
         endpoint_retry_pending: bool,
     ) -> RuntimeResult<TurnAuthority> {
-        Ok(decide_turn_authority(
+        let authority = decide_turn_authority(
             self.authority_snapshot(conn, now, endpoint_retry_pending)?
                 .into(),
-        ))
+        );
+        persist_authority_snapshot(self, conn, &authority)?;
+        Ok(authority)
     }
 
     pub(super) fn refresh_authority_card(&mut self, authority: &TurnAuthority) {
