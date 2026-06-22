@@ -24,8 +24,10 @@ all run as `cargo run -p lkjagent-xtask -- <gate>`:
 | check-docs | doc shape, topology, TOC completeness, internal links, ASCII, width, banned tokens, task format, README coverage |
 | check-lines | the 200-line cap on every tracked file |
 | check-style | panic-path scan and dependency allowlist on product crates |
+| docs-check | alias for check-docs |
+| hygiene-check | check-lines plus check-style |
 | benchmark check-corpus | deterministic benchmark task, fixture, and judge validity |
-| quiet test | cargo fmt --check, clippy with warnings denied, all workspace tests |
+| quiet test | cargo fmt --check, clippy with warnings denied for all targets, all workspace tests |
 | quiet verify | check-docs, check-lines, check-style, benchmark check-corpus, then quiet test |
 
 ## Compose Gates

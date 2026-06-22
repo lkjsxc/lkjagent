@@ -25,6 +25,7 @@ pub fn run(args: &[String], root: &Path) -> i32 {
         Ok(Gate::CheckDocs) => run_static_gate(root, "check-docs", check_docs),
         Ok(Gate::CheckLines) => run_static_gate(root, "check-lines", check_lines),
         Ok(Gate::CheckStyle) => run_static_gate(root, "check-style", check_style),
+        Ok(Gate::HygieneCheck) => run_hygiene(root),
         Ok(Gate::QuietTest) => run_command_gate(root, "test"),
         Ok(Gate::QuietVerify) => run_verify(root),
         Ok(Gate::Benchmark(rest)) => benchmark::run(&rest, root),
@@ -64,6 +65,23 @@ fn run_command_gate(root: &Path, ok_name: &'static str) -> i32 {
             1
         }
     }
+}
+
+fn run_hygiene(root: &Path) -> i32 {
+    let files = match collect_files(root) {
+        Ok(files) => files,
+        Err(message) => {
+            print_failure(&[
+                "hygiene-check failed".to_string(),
+                "exit status: 1".to_string(),
+                message,
+            ]);
+            return 1;
+        }
+    };
+    let mut violations = check_lines(&files);
+    violations.extend(check_style(&files));
+    report_static("hygiene-check", violations)
 }
 
 fn run_verify(root: &Path) -> i32 {
@@ -125,21 +143,23 @@ enum Gate {
     CheckStyle,
     QuietTest,
     QuietVerify,
+    HygieneCheck,
     Benchmark(Vec<String>),
 }
 
 fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
     match args {
-        [one] if one == "check-docs" => Ok(Gate::CheckDocs),
+        [one] if one == "check-docs" || one == "docs-check" => Ok(Gate::CheckDocs),
         [one] if one == "check-lines" => Ok(Gate::CheckLines),
         [one] if one == "check-style" => Ok(Gate::CheckStyle),
+        [one] if one == "hygiene-check" => Ok(Gate::HygieneCheck),
         [first, second] if first == "quiet" && second == "test" => Ok(Gate::QuietTest),
         [first, second] if first == "quiet" && second == "verify" => Ok(Gate::QuietVerify),
         [first, rest @ ..] if first == "benchmark" => Ok(Gate::Benchmark(rest.to_vec())),
         _ => Err(vec![
             "xtask failed".to_string(),
             "exit status: 2".to_string(),
-            "use: check-docs | check-lines | check-style | quiet test | quiet verify | benchmark ..."
+            "use: check-docs | docs-check | check-lines | check-style | hygiene-check | quiet test | quiet verify | benchmark ..."
                 .to_string(),
         ]),
     }

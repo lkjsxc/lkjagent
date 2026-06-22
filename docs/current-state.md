@@ -101,6 +101,8 @@ This session ran these gates after the documentation catalog edits:
 - `cargo test -p lkjagent-runtime --test turn_authority`: `TURN_EXIT=0`.
 - `cargo test -p lkjagent-benchmark`: `BENCH_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `ok benchmark-corpus`, `CORPUS_EXIT=0`.
+- `cargo test -p lkjagent-xtask`: `XTEST_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- hygiene-check`: `ok hygiene-check`, `HYGIENE_EXIT=0`.
 
 Earlier gates recorded for the recovery-model slice:
 
