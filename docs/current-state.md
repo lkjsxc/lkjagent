@@ -120,6 +120,11 @@ snapshots, and blocked handoffs need deeper coverage before the ledger can call
 the loop redesign implemented. Final verification must be rerun after each
 later slice.
 
+The current redesign slice baseline is recorded in
+[evaluation/baseline-audit-2026-06-22.md](evaluation/baseline-audit-2026-06-22.md):
+`docker compose run --rm verify` exited 0 before new implementation changes,
+and the only pre-existing working-tree entry was `tmp/prompt01.md`.
+
 ## Out of Scope
 
 Messaging channels, web UI, MCP, runtime sub-agents, heartbeat schedules, and

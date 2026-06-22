@@ -41,7 +41,7 @@ directories with short focused files.
   `architecture/artifacts/repair.md` `architecture/artifacts/write-batches.md`
   `architecture/artifacts/semantic-identity.md` `architecture/artifacts/adoption-and-repair.md`
   `architecture/artifacts/batch-cursors.md` `architecture/artifacts/readiness-evidence.md`
-  `architecture/artifacts/false-completion.md`
+  `architecture/artifacts/false-completion.md` `architecture/artifacts/objective-drift.md`
 - `architecture/structured-records/README.md` `architecture/structured-records/record-model.md`
   `architecture/structured-records/identity.md`
   `architecture/structured-records/topic-map.md` `architecture/structured-records/artifact-ledger.md`
@@ -53,7 +53,7 @@ directories with short focused files.
   `architecture/action-reliability/normalization.md` `architecture/action-reliability/error-messages.md`
 - `architecture/state-model/README.md` `architecture/state-model/multi-state.md`
   `architecture/state-model/state-intensity.md` `architecture/state-model/transition-quality.md`
-  `architecture/state-model/owner-input.md`
+  `architecture/state-model/owner-input.md` `architecture/state-model/weighted-state-vector.md`
 - `architecture/observability/README.md` `architecture/observability/token-ledger.md`
   `architecture/observability/console-deck.md` `architecture/observability/gpt-log.md`
   `architecture/observability/status-format.md`
@@ -105,7 +105,8 @@ directories with short focused files.
   `architecture/llm/sampling.md`
 - `architecture/sandbox/README.md` `architecture/sandbox/container.md` `architecture/sandbox/workspace.md`
   `architecture/sandbox/safety.md`
-- `evaluation/README.md` `evaluation/mechanical-benchmarks.md` `evaluation/task-contract.md`
+- `evaluation/README.md` `evaluation/baseline-audit-2026-06-22.md`
+  `evaluation/mechanical-benchmarks.md` `evaluation/task-contract.md`
   `evaluation/uploaded-run-fixtures.md` `evaluation/metrics-reports.md`
   `evaluation/regression-suites.md` `evaluation/authority-contradictions.md`
   `evaluation/artifact-readiness.md` `evaluation/recovery-deadlocks.md`

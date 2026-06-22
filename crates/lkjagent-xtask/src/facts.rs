@@ -86,7 +86,13 @@ fn is_ignored(relative: &str) -> bool {
         || relative.split('/').any(|part| {
             matches!(
                 part,
-                ".git" | ".lkjagent-models" | ".lkjagent-workspace" | ".omx" | "data" | "target"
+                ".git"
+                    | ".lkjagent-models"
+                    | ".lkjagent-workspace"
+                    | ".omx"
+                    | "data"
+                    | "target"
+                    | "tmp"
             )
         })
         || relative.ends_with(".sqlite")

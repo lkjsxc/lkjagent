@@ -7,6 +7,7 @@ mechanically judged math and computer-science tasks.
 
 ## Table of Contents
 
+- [baseline-audit-2026-06-22.md](baseline-audit-2026-06-22.md): current slice baseline commands and results.
 - [mechanical-benchmarks.md](mechanical-benchmarks.md): why benchmarks exist and what they measure.
 - [task-contract.md](task-contract.md): task prompts, public files, hidden judges, fixtures, and seeds.
 - [uploaded-run-fixtures.md](uploaded-run-fixtures.md): owner-log failure fixtures.
