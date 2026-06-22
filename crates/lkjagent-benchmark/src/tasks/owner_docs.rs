@@ -1,16 +1,16 @@
 use crate::model::{BenchmarkTask, Difficulty, FileSpec, Fixture, JudgeKind, TaskFamily};
 
 const DOC: &str = "# Topic\n\n## Purpose\n\nSemantic topic.\n";
-const GRAPH: &str = "# Document Graph\n\n## Nodes\n\n| id | path | role | status |\n| --- | --- | --- | --- |\n| root | README.md | root index | scaffolded |\n\n## Edges\n\n| from | to | kind | reason |\n| --- | --- | --- | --- |\n| root | overview | indexes | local map |\n\n## Coverage\n\n| owner requirement | covered by | status |\n| --- | --- | --- |\n| semantic docs | docs | satisfied |\n";
+const CATALOG: &str = "profile = \"benchmark-docs\"\nroot = \"docs\"\n";
 
 const PROJECT_PROMPT: &str = "\
 Create documentation for this project under docs/. Use semantic recursive
-docs, README indexes, and a graph manifest. Do not create part files.
+docs, README indexes, and catalog metadata. Do not create part files.
 ";
 
 const PROJECT_GOOD_FILES: &[FileSpec] = &[
-    FileSpec { path: "docs/README.md", content: "# Docs\n\n## Purpose\n\nRoot.\n\n## Local Map\n\n- [overview](overview/README.md): overview.\n- [architecture](architecture/README.md): architecture.\n- [guides](guides/README.md): guides.\n- [operations](operations/README.md): operations.\n- [reference](reference/README.md): reference.\n" },
-    FileSpec { path: "docs/.lkj-doc-graph.md", content: GRAPH },
+    FileSpec { path: "docs/README.md", content: "# Docs\n\n## Purpose\n\nRoot.\n\n## Local Map\n\n- [overview](overview/README.md): overview.\n- [architecture](architecture/README.md): architecture.\n- [guides](guides/README.md): guides.\n- [operations](operations/README.md): operations.\n- [reference](reference/README.md): reference.\n- [catalog.toml](catalog.toml): metadata.\n" },
+    FileSpec { path: "docs/catalog.toml", content: CATALOG },
     FileSpec { path: "docs/overview/README.md", content: "# Overview\n\n## Purpose\n\nOverview.\n\n- [purpose.md](purpose.md)\n" },
     FileSpec { path: "docs/overview/purpose.md", content: DOC },
     FileSpec { path: "docs/architecture/README.md", content: "# Architecture\n\n## Purpose\n\nArchitecture.\n\n- [runtime.md](runtime.md)\n" },
@@ -29,8 +29,8 @@ const PROJECT_BAD_SERIAL: &[FileSpec] = &[
         content: "# Docs\n\n## Purpose\n\nRoot.\n\n- [part](part-001.md)\n",
     },
     FileSpec {
-        path: "docs/.lkj-doc-graph.md",
-        content: GRAPH,
+        path: "docs/catalog.toml",
+        content: CATALOG,
     },
     FileSpec {
         path: "docs/part-001.md",
@@ -60,7 +60,7 @@ const PROJECT_BAD: &[Fixture] = &[
         files: PROJECT_BAD_SERIAL,
     },
     Fixture {
-        name: "flat-no-graph",
+        name: "flat-no-catalog",
         files: PROJECT_BAD_FLAT,
     },
 ];
@@ -84,12 +84,12 @@ pub const PROJECT_TASK: BenchmarkTask = BenchmarkTask {
 
 const RECURSIVE_PROMPT: &str = "\
 Create recursive documentation under docs/. Every directory needs README.md,
-local README links, and a compact .lkj-doc-graph.md manifest.
+local README links, and compact catalog metadata.
 ";
 
 const RECURSIVE_GOOD_FILES: &[FileSpec] = &[
-    FileSpec { path: "docs/README.md", content: "# Docs\n\n## Purpose\n\nRoot.\n\n- [architecture](architecture/README.md)\n" },
-    FileSpec { path: "docs/.lkj-doc-graph.md", content: GRAPH },
+    FileSpec { path: "docs/README.md", content: "# Docs\n\n## Purpose\n\nRoot.\n\n- [architecture](architecture/README.md)\n- [catalog.toml](catalog.toml)\n" },
+    FileSpec { path: "docs/catalog.toml", content: CATALOG },
     FileSpec { path: "docs/architecture/README.md", content: "# Architecture\n\n## Purpose\n\nArchitecture.\n\n- [runtime](runtime/README.md)\n- [decisions.md](decisions.md)\n" },
     FileSpec { path: "docs/architecture/decisions.md", content: DOC },
     FileSpec { path: "docs/architecture/runtime/README.md", content: "# Runtime\n\n## Purpose\n\nRuntime.\n\n- [state.md](state.md)\n" },
@@ -102,8 +102,8 @@ const RECURSIVE_BAD_FLAT: &[FileSpec] = &[
         content: "# Docs\n\n## Purpose\n\nRoot.\n\n- [architecture.md](architecture.md)\n",
     },
     FileSpec {
-        path: "docs/.lkj-doc-graph.md",
-        content: GRAPH,
+        path: "docs/catalog.toml",
+        content: CATALOG,
     },
     FileSpec {
         path: "docs/architecture.md",
@@ -117,8 +117,8 @@ const RECURSIVE_BAD_LINK: &[FileSpec] = &[
         content: "# Docs\n\n## Purpose\n\nRoot.\n\n- [architecture](architecture/README.md)\n",
     },
     FileSpec {
-        path: "docs/.lkj-doc-graph.md",
-        content: GRAPH,
+        path: "docs/catalog.toml",
+        content: CATALOG,
     },
     FileSpec {
         path: "docs/architecture/README.md",

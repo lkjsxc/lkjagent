@@ -2,7 +2,6 @@ mod audit;
 mod body;
 mod content_audit;
 mod fit;
-mod graph;
 mod mock_content;
 mod model;
 mod names;
@@ -34,12 +33,12 @@ pub fn plan(
     let input = scaffold_input(root, kind, count, mode, title, sections)?;
     let plan = profile::semantic_doc_plan(&input)?;
     Ok(format!(
-        "document plan created\nroot={}\nkind={}\nprofile={:?}\nmode={}\nfiles={}\nmanifest=.lkj-doc-graph.md\nwrites=0",
+        "document plan created\nroot={}\nkind={}\nprofile={:?}\nmode={}\nfiles={}\ncatalog=catalog.toml\nwrites=0",
         input.root,
         input.kind,
         plan.profile,
         input.mode.as_str(),
-        plan.files.len()
+        plan.markdown_count()
     ))
 }
 
@@ -57,7 +56,7 @@ pub fn scaffold(
     let files = plan.markdown_count();
     write::write_plan(workspace, &plan)?;
     Ok(format!(
-        "document scaffold created\nroot={}\nkind={}\nprofile={:?}\nmode={}\nfiles={files}\nreadme=present\ngraph=.lkj-doc-graph.md",
+        "document scaffold created\nroot={}\nkind={}\nprofile={:?}\nmode={}\nfiles={files}\nreadme=present\ncatalog=catalog.toml",
         input.root,
         input.kind,
         plan.profile,

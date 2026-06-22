@@ -56,8 +56,8 @@ pub fn audit(
     let report = crate::doc::audit(workspace, root, count, mode)?;
     let kind = kind.trim();
     let full = workspace_path(workspace, root)?;
-    let manifest = optional_manifest(&full);
-    if !kind.is_empty() && !manifest.is_empty() && kind_mismatch(kind, &manifest) {
+    let catalog = optional_catalog(&full);
+    if !kind.is_empty() && !catalog.is_empty() && kind_mismatch(kind, &catalog) {
         return Ok(format!(
             "document audit failed\nroot={root}\nchecks=15\npassed=14\nfailed=1\nfailures:\n- artifact_kind_mismatch: expected={kind}\nnext_action=artifact.apply matching artifact kind"
         ));
@@ -115,10 +115,10 @@ fn title_or_root(title: &str, root: &str) -> String {
         .replace('-', " ")
 }
 
-fn kind_mismatch(kind: &str, manifest: &str) -> bool {
+fn kind_mismatch(kind: &str, catalog: &str) -> bool {
     match kind.trim().to_ascii_lowercase().as_str() {
-        "story" => !manifest.contains("NarrativeManuscript"),
-        "cookbook" => !manifest.contains("Cookbook"),
+        "story" => !catalog.contains("NarrativeManuscript"),
+        "cookbook" => !catalog.contains("Cookbook"),
         _ => false,
     }
 }
@@ -142,8 +142,8 @@ fn content_kind(kind: &str) -> bool {
 }
 
 #[allow(clippy::manual_unwrap_or_default)]
-fn optional_manifest(root: &Path) -> String {
-    match fs::read_to_string(root.join(".lkj-doc-graph.md")) {
+fn optional_catalog(root: &Path) -> String {
+    match fs::read_to_string(root.join("catalog.toml")) {
         Ok(text) => text,
         Err(_) => String::new(),
     }

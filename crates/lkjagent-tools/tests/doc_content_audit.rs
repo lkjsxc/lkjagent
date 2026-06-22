@@ -64,7 +64,6 @@ fn replace_leaves(root: &Path) -> TestResult<()> {
             replace_leaves(&path)?;
         } else if path.extension().is_some_and(|ext| ext == "md")
             && path.file_name().and_then(|name| name.to_str()) != Some("README.md")
-            && path.file_name().and_then(|name| name.to_str()) != Some(".lkj-doc-graph.md")
         {
             let title = path
                 .file_stem()

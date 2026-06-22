@@ -10,7 +10,7 @@ Content artifact completion requires all of these gates:
 
 - requested root exists and matches the requested artifact kind.
 - root README exists and links local children.
-- manifest exists, including `.lkj-doc-graph.md` for recursive docs artifacts.
+- manifest exists, including `catalog.toml` for recursive docs artifacts.
 - every directory has a README.
 - every README links every local child.
 - sequence-only part files are absent unless explicitly requested.

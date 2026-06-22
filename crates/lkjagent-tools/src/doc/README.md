@@ -10,7 +10,6 @@ This directory holds the semantic document scaffold and audit implementation.
 - [body.rs](body.rs): generated README and leaf Markdown templates.
 - [content_audit.rs](content_audit.rs): content-artifact scaffold-only checks.
 - [fit.rs](fit.rs): exact-count group fitting helpers.
-- [graph.rs](graph.rs): graph manifest rendering and validation helpers.
 - [model.rs](model.rs): scaffold input, plan, files, and profiles.
 - [names.rs](names.rs): semantic names, joins, and forbidden-name checks.
 - [profile.rs](profile.rs): pure profile selection and plan generation.

@@ -1,7 +1,7 @@
 use crate::model::{BenchmarkTask, Difficulty, FileSpec, Fixture, JudgeKind, TaskFamily};
 
 const DOC: &str = "# Topic\n\n## Purpose\n\nSemantic topic.\n";
-const GRAPH: &str = "# Document Graph\n\n## Nodes\n\n| id | path | role | status |\n| --- | --- | --- | --- |\n| root | README.md | root index | scaffolded |\n\n## Edges\n\n| from | to | kind | reason |\n| --- | --- | --- | --- |\n| root | overview | indexes | local map |\n\n## Coverage\n\n| owner requirement | covered by | status |\n| --- | --- | --- |\n| thirty docs | docs | satisfied |\n";
+const CATALOG: &str = "profile = \"thirty-docs\"\nroot = \"docs\"\n";
 
 macro_rules! doc {
     ($path:literal) => {
@@ -20,8 +20,8 @@ groups and README indexes, not part files or numbered placeholder files.
 const GOOD_FILES: &[FileSpec] = &[
     doc!("docs/README.md"),
     FileSpec {
-        path: "docs/.lkj-doc-graph.md",
-        content: GRAPH,
+        path: "docs/catalog.toml",
+        content: CATALOG,
     },
     doc!("docs/overview/README.md"),
     doc!("docs/overview/purpose.md"),
@@ -57,8 +57,8 @@ const GOOD_FILES: &[FileSpec] = &[
 const BAD_SERIAL_FILES: &[FileSpec] = &[
     doc!("docs/README.md"),
     FileSpec {
-        path: "docs/.lkj-doc-graph.md",
-        content: GRAPH,
+        path: "docs/catalog.toml",
+        content: CATALOG,
     },
     doc!("docs/part-001.md"),
     doc!("docs/part-002.md"),
@@ -67,8 +67,8 @@ const BAD_SERIAL_FILES: &[FileSpec] = &[
 const BAD_COUNT_FILES: &[FileSpec] = &[
     doc!("docs/README.md"),
     FileSpec {
-        path: "docs/.lkj-doc-graph.md",
-        content: GRAPH,
+        path: "docs/catalog.toml",
+        content: CATALOG,
     },
     doc!("docs/overview/README.md"),
     doc!("docs/overview/purpose.md"),

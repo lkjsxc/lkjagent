@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::Path;
 
-use super::model::{write_doc_graph, Counts};
+use super::model::{write_catalog, Counts};
 use crate::error::ToolResult;
 
 mod readmes;
@@ -15,10 +15,10 @@ pub fn scaffold(workspace: &Path) -> ToolResult<String> {
     for (base, topics) in topics::GROUPS {
         write_topics(workspace, base, topics, &mut counts)?;
     }
-    write_doc_graph(workspace, "knowledge", &mut counts)?;
+    write_catalog(workspace, "knowledge", &mut counts)?;
     crate::structure_network::verify_knowledge_network(workspace)?;
     Ok(format!(
-        "knowledge nucleus profile=knowledge root=docs\ngraph=docs/.lkj-doc-graph.md\ncreated_files={}\nskipped_existing={}\ngrowth=incremental\nnext_step=expand one queued topic, then update maps and rebalance-plan\nverification=ok",
+        "knowledge nucleus profile=knowledge root=docs\ncatalog=docs/catalog.toml\ncreated_files={}\nskipped_existing={}\ngrowth=incremental\nnext_step=expand one queued topic, then update maps and rebalance-plan\nverification=ok",
         counts.created, counts.skipped
     ))
 }

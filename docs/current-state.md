@@ -30,7 +30,7 @@ prove that their failures cannot recur.
 | SQLite store | Queue, state, event, memory, and task summary surfaces exist in `lkjagent-store`. |
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
 | Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current model run snapshot. |
-| Document scaffold seed | Deterministic scaffold paths exist for project, lkjagent-model, multi-topic docs, story, and cookbook roots. |
+| Document scaffold seed | Deterministic scaffold paths and compact `catalog.toml` metadata exist for project, multi-topic docs, story, and cookbook roots. |
 | Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, and scaffold-only leaves. |
 | Placeholder and payload refusal | `fs.write`, `fs.batch_write`, and content audit reject common scaffold phrases and oversized payloads before mutation. |
 | Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
@@ -96,6 +96,9 @@ This session ran these gates after the documentation catalog edits:
 - `cargo test -p lkjagent-tools`: `TEST_EXIT=0`.
 - `cargo test -p lkjagent-protocol`: `PROTO_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test fault_wait`: `FAULT_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test recursive_guard`: `REC_EXIT=0`.
+- `cargo test -p lkjagent-benchmark`: `BENCH_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `ok benchmark-corpus`, `CORPUS_EXIT=0`.
 
 Earlier gates recorded for the recovery-model slice:
 

@@ -55,7 +55,7 @@ fn doc(title: &str, purpose: &str, entries: &[&str], map: &str) -> String {
 
 fn leaf(title: &str, purpose: &str, facts: &[&str]) -> String {
     format!(
-        "# {title}\n\n## Purpose\n\n{purpose}\n\n## Contract\n\n- {}\n\n## Links\n\n- Relation: ../relations/project-model-implementation.md.\n- Graph ledger: ../.lkj-doc-graph.md.\n\n## Status\n\nimplemented\n",
+        "# {title}\n\n## Purpose\n\n{purpose}\n\n## Contract\n\n- {}\n\n## Links\n\n- Relation: ../relations/project-model-implementation.md.\n- Catalog metadata: ../catalog.toml.\n\n## Status\n\nimplemented\n",
         facts.join("\n- ")
     )
 }

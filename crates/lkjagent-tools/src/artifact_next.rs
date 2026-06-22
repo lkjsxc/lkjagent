@@ -71,7 +71,7 @@ fn resolved_kind(kind: &str, root: &Path) -> String {
     if !trimmed.is_empty() {
         return trimmed.to_string();
     }
-    let text = optional_manifest(root);
+    let text = optional_catalog(root);
     if text.contains("Cookbook") {
         "cookbook".to_string()
     } else if text.contains("NarrativeManuscript") {
@@ -90,8 +90,8 @@ fn required_sections(kind: &str) -> &'static str {
 }
 
 #[allow(clippy::manual_unwrap_or_default)]
-fn optional_manifest(root: &Path) -> String {
-    match fs::read_to_string(root.join(".lkj-doc-graph.md")) {
+fn optional_catalog(root: &Path) -> String {
+    match fs::read_to_string(root.join("catalog.toml")) {
         Ok(text) => text,
         Err(_) => String::new(),
     }

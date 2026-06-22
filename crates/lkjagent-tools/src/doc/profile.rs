@@ -2,7 +2,6 @@ use crate::error::{ToolError, ToolResult};
 
 use super::body::{leaf_body, readme_body};
 use super::fit::{exact_group_count, max_tree_count};
-use super::graph::graph_manifest;
 use super::model::{PlannedFile, ScaffoldInput, ScaffoldPlan, ScaffoldProfile, ShapeGroup};
 use super::names::{slug, title_from_path};
 use super::roles::EXTRA_ROLES;
@@ -14,12 +13,13 @@ pub fn semantic_doc_plan(input: &ScaffoldInput) -> ToolResult<ScaffoldPlan> {
     if profile == ScaffoldProfile::LkjagentSemanticSeed && input.count.is_none() {
         return Ok(semantic_seed::plan(input));
     }
-    let mut files = if let Some(target) = input.count {
+    let files = if let Some(target) = input.count {
         counted_files(input, shape(profile), target)?
     } else {
         tree_files(input, shape(profile))
     };
-    files.push(graph_manifest(input, profile, &files));
+    let mut files = files;
+    files.push(catalog_file(input, profile));
     Ok(ScaffoldPlan {
         root: input.root.clone(),
         profile,
@@ -59,23 +59,22 @@ fn counted_files(
 ) -> ToolResult<Vec<PlannedFile>> {
     if target < 3 {
         return Err(ToolError::invalid(
-            "doc count must allow README, graph, and one semantic file",
+            "doc count must allow README and two semantic files",
         ));
     }
-    let without_graph = target.saturating_sub(1);
     if target < 8 {
-        return Ok(flat_files(input, without_graph));
+        return Ok(flat_files(input, target));
     }
     if target > max_tree_count(groups) {
-        return Ok(flat_files(input, without_graph));
+        return Ok(flat_files(input, target));
     }
-    let group_count = exact_group_count(groups, without_graph);
-    Ok(counted_tree(input, &groups[..group_count], without_graph))
+    let group_count = exact_group_count(groups, target);
+    Ok(counted_tree(input, &groups[..group_count], target))
 }
 
 fn flat_files(input: &ScaffoldInput, target: usize) -> Vec<PlannedFile> {
     let roles = roles(input, target.saturating_sub(1));
-    let entries = with_graph_entry(role_entries(&roles));
+    let entries = with_catalog_entry(role_entries(&roles));
     let mut files = vec![readme("README.md", &input.title, "root index", entries)];
     files.extend(
         roles
@@ -129,7 +128,7 @@ fn root_entries(groups: &[ShapeGroup]) -> String {
         })
         .collect::<Vec<_>>()
         .join("\n");
-    with_graph_entry(entries)
+    with_catalog_entry(entries)
 }
 
 fn leaf_entries(leaves: &[&str]) -> String {
@@ -148,11 +147,24 @@ fn role_entries(roles: &[String]) -> String {
         .join("\n")
 }
 
-fn with_graph_entry(entries: String) -> String {
+fn with_catalog_entry(entries: String) -> String {
+    let catalog = "- [catalog.toml](catalog.toml): compact scaffold metadata.";
     if entries.is_empty() {
-        "- [.lkj-doc-graph.md](.lkj-doc-graph.md): graph manifest.".to_string()
+        catalog.to_string()
     } else {
-        format!("{entries}\n- [.lkj-doc-graph.md](.lkj-doc-graph.md): graph manifest.")
+        format!("{entries}\n{catalog}")
+    }
+}
+
+fn catalog_file(input: &ScaffoldInput, profile: ScaffoldProfile) -> PlannedFile {
+    PlannedFile {
+        path: "catalog.toml".to_string(),
+        title: "Catalog".to_string(),
+        role: "scaffold metadata".to_string(),
+        body: format!(
+            "title = \"{}\"\nkind = \"{}\"\nprofile = \"{:?}\"\n",
+            input.title, input.kind, profile
+        ),
     }
 }
 

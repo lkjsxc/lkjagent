@@ -1,4 +1,3 @@
-use super::graph::graph_manifest;
 use super::model::{PlannedFile, ScaffoldInput, ScaffoldPlan, ScaffoldProfile};
 use super::semantic_seed_body as body;
 use super::semantic_seed_domain as domain;
@@ -15,10 +14,11 @@ pub fn plan(input: &ScaffoldInput) -> ScaffoldPlan {
         add_domains(&mut files);
     }
     add_relations(&mut files, include_impl, include_domains);
-    files.push(graph_manifest(
-        input,
-        ScaffoldProfile::LkjagentSemanticSeed,
-        &files,
+    files.push(file(
+        "catalog.toml",
+        "Catalog",
+        "scaffold metadata",
+        "title = \"lkjagent Documentation\"\nkind = \"documentation\"\nprofile = \"LkjagentSemanticSeed\"\n".to_string(),
     ));
     ScaffoldPlan {
         root: input.root.clone(),

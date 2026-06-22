@@ -23,7 +23,7 @@ This file defines deterministic semantic shapes for `doc.scaffold`.
 
 - Profile selection copies the raw owner message as the structure.
 - A requested documentation tree falls through to sequence-only files.
-- Count fitting deletes README indexes or the graph manifest.
+- Count fitting deletes README indexes or the catalog metadata.
 
 ## Status
 

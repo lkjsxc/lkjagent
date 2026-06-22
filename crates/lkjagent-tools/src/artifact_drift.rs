@@ -49,8 +49,8 @@ impl DriftReport {
 }
 
 pub fn japanese_cookbook(root: &Path) -> ToolResult<Option<DriftReport>> {
-    let manifest = optional_manifest(root)?;
-    if !is_japanese_cookbook(root, &manifest) {
+    let catalog = optional_catalog(root)?;
+    if !is_japanese_cookbook(root, &catalog) {
         return Ok(None);
     }
     let mut failures = Vec::new();
@@ -67,8 +67,8 @@ pub fn japanese_cookbook(root: &Path) -> ToolResult<Option<DriftReport>> {
     Ok(Some(DriftReport { failures }))
 }
 
-fn is_japanese_cookbook(root: &Path, manifest: &str) -> bool {
-    let haystack = format!("{} {manifest}", root.display()).to_ascii_lowercase();
+fn is_japanese_cookbook(root: &Path, catalog: &str) -> bool {
+    let haystack = format!("{} {catalog}", root.display()).to_ascii_lowercase();
     haystack.contains("japanese") && haystack.contains("cookbook")
 }
 
@@ -91,7 +91,7 @@ fn markdown_files(root: &Path) -> ToolResult<Vec<PathBuf>> {
     files.retain(|path| {
         path.file_name()
             .and_then(|name| name.to_str())
-            .is_some_and(|name| name != "README.md" && name != ".lkj-doc-graph.md")
+            .is_some_and(|name| name != "README.md")
     });
     files.sort();
     Ok(files)
@@ -109,8 +109,8 @@ fn collect(dir: &Path, files: &mut Vec<PathBuf>) -> ToolResult<()> {
     Ok(())
 }
 
-fn optional_manifest(root: &Path) -> ToolResult<String> {
-    let path = root.join(".lkj-doc-graph.md");
+fn optional_catalog(root: &Path) -> ToolResult<String> {
+    let path = root.join("catalog.toml");
     if path.is_file() {
         Ok(fs::read_to_string(path)?)
     } else {

@@ -8,7 +8,7 @@ into a recursive filesystem tree.
 ## Table of Contents
 
 - [tree-contract.md](tree-contract.md): recursive README-indexed tree rules.
-- [network-contract.md](network-contract.md): graph manifest and cross-link rules.
+- [network-contract.md](network-contract.md): catalog metadata and cross-link rules.
 - [naming.md](naming.md): semantic filename and directory rules.
 - [scaffold-profiles.md](scaffold-profiles.md): deterministic profile shapes.
 - [audit.md](audit.md): topology audit requirements.

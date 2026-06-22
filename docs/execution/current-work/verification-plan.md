@@ -11,7 +11,7 @@ required before the reliability redesign can close.
 - Add benchmark cases for semantic docs, parameter recovery, accounting, and the model log.
 - Run focused crate tests before workspace and compose gates.
 - Report only gates that actually ran.
-- The compose smoke must show `.lkj-doc-graph.md`, no part files, compact
+- The compose smoke must show `catalog.toml`, no part files, compact
   context/token accounting, and printable `model-log` output.
 
 ## Implementation Hooks

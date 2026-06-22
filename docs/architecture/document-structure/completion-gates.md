@@ -9,7 +9,7 @@ This file defines the evidence required before documentation work can close.
 - Completion requires a passing `doc.audit` for the generated root.
 - Completion requires document-structure graph evidence on the active case.
 - Completion is illegal while sequence-only paths, missing README files, or
-  missing graph manifest checks remain open.
+  missing catalog metadata checks remain open.
 - Completion summaries name the generated root and verification command.
 - Content artifacts require README, manifest, semantic children,
   content-bearing files, and a passing audit.

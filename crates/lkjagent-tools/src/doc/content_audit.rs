@@ -37,15 +37,15 @@ pub fn weak_content_paths(root: &Path) -> ToolResult<Vec<String>> {
 }
 
 fn content_kind(root: &Path) -> ToolResult<Option<ContentKind>> {
-    let manifest = root.join(".lkj-doc-graph.md");
-    if !manifest.is_file() {
+    let catalog = root.join("catalog.toml");
+    if !catalog.is_file() {
         return Ok(None);
     }
-    let text = fs::read_to_string(manifest)?;
-    if text.contains("Cookbook") {
+    let text = fs::read_to_string(catalog)?;
+    if text.contains("Cookbook") || text.contains("kind = \"cookbook\"") {
         return Ok(Some(ContentKind::Cookbook));
     }
-    if text.contains("NarrativeManuscript") {
+    if text.contains("NarrativeManuscript") || text.contains("kind = \"story\"") {
         return Ok(Some(ContentKind::Story));
     }
     Ok(Some(ContentKind::Documentation))
@@ -57,7 +57,7 @@ fn markdown_leaves(root: &Path) -> ToolResult<Vec<PathBuf>> {
     files.retain(|path| {
         path.file_name()
             .and_then(|name| name.to_str())
-            .is_some_and(|name| name != "README.md" && name != ".lkj-doc-graph.md")
+            .is_some_and(|name| name != "README.md")
     });
     files.sort();
     Ok(files)

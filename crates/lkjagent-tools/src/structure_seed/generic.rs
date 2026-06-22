@@ -1,14 +1,14 @@
 use std::path::Path;
 
 use super::model::{
-    leaf, readme, write_doc_graph, write_leaves, write_readmes, Counts, LeafSeed, ReadmeSeed,
+    leaf, readme, write_catalog, write_leaves, write_readmes, Counts, LeafSeed, ReadmeSeed,
 };
 use crate::error::ToolResult;
 
 const ROOT_LINKS: &str = "- [docs/README.md](README.md): docs root.";
 
 const README_SEEDS: &[ReadmeSeed] = &[
-    readme("docs/README.md", "Docs", "Root index for recursive documentation.", "- [guides/](guides/README.md): task guides.\n- [contracts/](contracts/README.md): interface contracts.\n- [architecture/](architecture/README.md): design records.\n- [operations/](operations/README.md): run and verify work.\n- [reference/](reference/README.md): shared terms."),
+    readme("docs/README.md", "Docs", "Root index for recursive documentation.", "- [guides/](guides/README.md): task guides.\n- [contracts/](contracts/README.md): interface contracts.\n- [architecture/](architecture/README.md): design records.\n- [operations/](operations/README.md): run and verify work.\n- [reference/](reference/README.md): shared terms.\n- [catalog.toml](catalog.toml): compact scaffold metadata."),
     readme("docs/guides/README.md", "Guides", "Workflow guidance by owner task.", "- [setup/](setup/README.md): setup path.\n- [usage/](usage/README.md): usage path.\n- [troubleshooting.md](troubleshooting.md): repair guide."),
     readme("docs/guides/setup/README.md", "Setup", "Setup guide index.", "- [install.md](install.md): install steps.\n- [configure.md](configure.md): configuration steps."),
     readme("docs/guides/usage/README.md", "Usage", "Usage guide index.", "- [workflow.md](workflow.md): primary workflow.\n- [handoff.md](handoff.md): handoff checklist."),
@@ -145,10 +145,10 @@ pub fn scaffold(workspace: &Path) -> ToolResult<String> {
     let mut counts = Counts::default();
     write_readmes(workspace, README_SEEDS, &mut counts)?;
     write_leaves(workspace, LEAF_SEEDS, &mut counts)?;
-    write_doc_graph(workspace, "generic", &mut counts)?;
+    write_catalog(workspace, "generic", &mut counts)?;
     crate::structure::verify_recursive_tree(workspace)?;
     Ok(format!(
-        "recursive docs scaffold profile=generic root=docs\ngraph=docs/.lkj-doc-graph.md\ncreated_files={}\nskipped_existing={}\nverification=ok",
+        "recursive docs scaffold profile=generic root=docs\ncatalog=docs/catalog.toml\ncreated_files={}\nskipped_existing={}\nverification=ok",
         counts.created, counts.skipped
     ))
 }

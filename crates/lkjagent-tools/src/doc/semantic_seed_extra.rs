@@ -11,7 +11,7 @@ pub fn root(include_impl: bool, include_domains: bool) -> String {
         entries.push("[domain-examples/](domain-examples/README.md): scoped external domains used for objective tests.");
     }
     entries.push("[relations/](relations/README.md): runtime, model, and topic links.");
-    entries.push("[.lkj-doc-graph.md](.lkj-doc-graph.md): machine-readable relation ledger.");
+    entries.push("[catalog.toml](catalog.toml): compact scaffold metadata.");
     doc(
         "lkjagent Documentation",
         "This root maps the project runtime, model interface, requested domains, and relations.",
@@ -178,7 +178,7 @@ fn doc(title: &str, purpose: &str, entries: Vec<&str>, map: &str) -> String {
 
 fn leaf(title: &str, purpose: &str, facts: Vec<&str>, relation: &str) -> String {
     format!(
-        "# {title}\n\n## Purpose\n\n{purpose}\n\n## Contract\n\n- {}\n\n## Links\n\n- Relation: {relation}.\n- Graph ledger: ../.lkj-doc-graph.md.\n\n## Status\n\nimplemented\n",
+        "# {title}\n\n## Purpose\n\n{purpose}\n\n## Contract\n\n- {}\n\n## Links\n\n- Relation: {relation}.\n- Catalog metadata: ../catalog.toml.\n\n## Status\n\nimplemented\n",
         facts.join("\n- ")
     )
 }

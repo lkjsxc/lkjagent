@@ -64,7 +64,7 @@ fn dictionary_extension(path: &Path) -> bool {
 fn metadata_file(path: &Path) -> bool {
     path.file_name()
         .and_then(|name| name.to_str())
-        .is_some_and(|name| matches!(name, "README.md" | ".lkj-doc-graph.md"))
+        .is_some_and(|name| name == "README.md")
 }
 
 fn parse_entries(text: &str) -> Vec<Entry> {

@@ -10,7 +10,7 @@ bread shape used only when the owner asks for bread.
 ```text
 cookbooks/<semantic-title>/
   README.md
-  .lkj-doc-graph.md
+  catalog.toml
   foundations/
     README.md
     japanese-pantry.md

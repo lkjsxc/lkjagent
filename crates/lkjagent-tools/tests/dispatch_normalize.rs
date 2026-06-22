@@ -43,7 +43,7 @@ fn doc_scaffold_path_is_renamed_to_root() -> TestResult<()> {
 
     assert!(output.content.contains("renamed=path->root"));
     assert!(output.content.contains("root=docs"));
-    assert!(workspace.join("docs/.lkj-doc-graph.md").is_file());
+    assert!(workspace.join("docs/catalog.toml").is_file());
     Ok(())
 }
 
