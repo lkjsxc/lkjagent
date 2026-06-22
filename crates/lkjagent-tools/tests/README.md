@@ -6,6 +6,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 
 ## Table of Contents
 
+- [action_param_faults.rs](action_param_faults.rs): batch-write and shell schema fault fixtures.
 - [benchmark_seed.rs](benchmark_seed.rs): benchmark and counted scaffold fixtures.
 - [artifact_dictionary.rs](artifact_dictionary.rs): dictionary content-readiness fixtures.
 - [artifact_next.rs](artifact_next.rs): next bounded artifact batch fixtures.

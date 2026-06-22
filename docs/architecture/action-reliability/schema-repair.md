@@ -76,6 +76,7 @@ normalized parse, one-file fallback, deterministic writer, or blocked handoff.
 
 Focused tests cover child tags for `fs.read`, `fs.stat`, and `fs.list`,
 allowed evidence kinds, unknown parameter rejection, exact example rendering,
+JSON-like batch-write payload refusal, missing `shell.run` command repair,
 no repeated invalid example loop, payload-to-batch recovery, XML-ish accidental
 wrappers, and dispatch of every generated valid example.
 

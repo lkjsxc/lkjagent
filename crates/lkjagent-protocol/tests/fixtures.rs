@@ -81,6 +81,24 @@ fn produces_each_parse_fault_variant() {
                 unknown: vec!["bogus".to_string(), "extra".to_string()],
             },
         ),
+        (
+            "<act>\n<tool>shell.run</tool>\n<timeout>30</timeout>\n</act>",
+            ParseFault::BadParams {
+                tool: "shell.run".to_string(),
+                missing: vec!["command".to_string()],
+                unknown: vec![],
+            },
+        ),
+        (
+            "<act>\n<tool>fs.batch_write</tool>\nfiles=[{\"path\":\"x.md\",\"content\":\"body\"}]\n</act>",
+            ParseFault::BadParams {
+                tool: "fs.batch_write".to_string(),
+                missing: vec!["files".to_string()],
+                unknown: vec![
+                    "files=[{\"path\":\"x.md\",\"content\":\"body\"}]".to_string(),
+                ],
+            },
+        ),
     ];
 
     for (text, fault) in cases {
