@@ -24,13 +24,13 @@ fn cookbook_content(title: &str) -> String {
 
 fn story_content(title: &str) -> String {
     format!(
-        "# {title}\n\n## Scene Content\n\nThis section contains concrete scene material with named characters, setting texture, conflict, consequence, and sensory detail. It records what changes in the scene and why the next section follows from that decision.\n\n## Continuity Notes\n\nContinuity notes track intent, unresolved tension, and revision evidence for the manuscript.\n"
+        "# {title}\n\n## Scene Content\n\nA named protagonist enters {title} with a concrete want, an obstacle, sensory pressure, and a visible consequence. The scene names the location, the object under dispute, the decision made on page, and the cost that carries into the following beat.\n\n## Continuity Notes\n\nContinuity notes track intent, unresolved tension, changed relationships, setting details, and revision evidence for the manuscript.\n"
     )
 }
 
 fn generic_content(title: &str) -> String {
     format!(
-        "# {title}\n\n## Purpose\n\nThis section contains concrete artifact content tied to the requested root.\n\n## Details\n\nThe body names facts, decisions, examples, and verification notes so audit can inspect more than headings or status prose.\n"
+        "# {title}\n\n## Concrete Record\n\n{title} defines the artifact role, the observed constraints, the file paths it governs, and the decision that makes the page useful for lookup. It gives named examples, operational checks, and verification evidence tied to this exact path.\n\n## Examples And Checks\n\nExample one names a path, an invariant, and the command or audit that proves it. Example two names a failure mode, the repair owner, and the evidence needed before completion.\n"
     )
 }
 

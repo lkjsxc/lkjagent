@@ -26,6 +26,9 @@ fn fs_write_rejects_scaffold_phrase_without_overwrite() -> TestResult<()> {
 
     assert!(is_error(&output));
     assert!(output.content.contains("scaffold phrase"));
+    assert!(output.content.contains("path=cookbooks/bread.md"));
+    assert!(output.content.contains("phrase_class=skeleton"));
+    assert!(output.content.contains("acceptable_replacement="));
     assert_eq!(
         fs::read_to_string(workspace.join("cookbooks/bread.md"))?,
         existing
@@ -66,6 +69,7 @@ fn fs_write_rejects_generic_coming_soon_placeholder() -> TestResult<()> {
 
     assert!(is_error(&output));
     assert!(output.content.contains("scaffold phrase"));
+    assert!(output.content.contains("phrase_class=status-only"));
     assert!(!workspace.join("docs/status.md").exists());
     Ok(())
 }
@@ -79,6 +83,8 @@ fn fs_batch_write_rejects_generic_record_prose_atomically() -> TestResult<()> {
 
     assert!(is_error(&output));
     assert!(output.content.contains("scaffold phrase"));
+    assert!(output.content.contains("path=out/one.md"));
+    assert!(output.content.contains("phrase_class=generic-record"));
     assert!(!workspace.join("out/one.md").exists());
     assert!(!workspace.join("out/two.md").exists());
     Ok(())

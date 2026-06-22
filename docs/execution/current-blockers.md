@@ -70,6 +70,10 @@ maintenance restarts after no useful work.
   repeating. Recovery policy also admits the forced tools for verification
   failure and maintenance preemption. This narrows row 2 but durable retry
   state remains open.
+- Effective policy refusal now detects missing-plan and preferred-action
+  contradictions, and completion refusals choose an admitted alternate example
+  from the effective policy instead of blocked graph policy. This narrows rows
+  1, 2, and 9; deeper authority pre-model contradiction repair remains open.
 - The uploaded-run benchmark matrix now includes the agent-facing report cases
   for Japanese-cookbook drift, document-structure evidence ownership, batch
   write schema faults, shell parameter faults, queue interruption, compaction
@@ -77,7 +81,9 @@ maintenance restarts after no useful work.
   replay and completion wiring prove the patterns cannot recur.
 - Shared placeholder detection now rejects coming-soon, to-be-written, generic
   record/describe, placeholder, stub, scaffold-only, future-work, and empty-TOC
-  prose before `fs.write` and `fs.batch_write` mutate files. This narrows row
+  prose before `fs.write` and `fs.batch_write` mutate files, and `artifact.next`
+  examples avoid the observed generic placeholder phrase families. Refusals now
+  include path, phrase class, cause, and replacement pattern. This narrows row
   3, but semantic artifact identity and deeper readiness remain open.
 - Turn-budget boundaries now write a continuation checkpoint, reset the epoch,
   expose continuation state, and continue owner work without generic owner

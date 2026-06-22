@@ -84,7 +84,7 @@ pub fn read_observation(read: &FileRead) -> String {
 }
 
 pub fn write(workspace: &Path, path: &str, content: &str) -> ToolResult<String> {
-    crate::placeholder::reject(content)?;
+    crate::placeholder::reject_for_path(path, content)?;
     let full_path = workspace_path(workspace, path)?;
     if let Some(parent) = full_path.parent() {
         fs::create_dir_all(parent)?;

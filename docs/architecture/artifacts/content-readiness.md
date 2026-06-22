@@ -82,7 +82,11 @@ manifest checks also pass and unsupported verification claims are absent.
 The shared scaffold-phrase detector rejects generic `coming soon`, `to be
 written`, `this file records`, `this section describes`, placeholder-content,
 stub-content, scaffold-only, future-work, and table-of-contents-without-body
-prose before `fs.write` or `fs.batch_write` mutates files.
+prose before `fs.write` or `fs.batch_write` mutates files. `artifact.next`
+examples avoid the observed generic `This section contains...` and `The body
+names facts...` phrase families. Scaffold phrase refusals now name the path,
+phrase, phrase class, why it is scaffold-like, and an acceptable replacement
+pattern.
 
 ## Related Files
 

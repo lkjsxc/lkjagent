@@ -29,18 +29,22 @@ handoff tools when repair cannot safely continue.
 ## Prohibited States
 
 - Missing evidence blocks the read or audit tool that would observe it.
+- Missing plan evidence blocks `graph.plan` without an admitted alternate.
 - Recovery blocks every mutation tool while content repair is required.
 - Verification-only mode hides artifact creation or repair tools.
 - Preferred next action names a blocked tool.
+- The exact valid example uses a blocked tool.
 
 ## Fixture
 
-`tool_admission_graph_plan_contradiction` and
-`completion-with-blocked-mutation` prove escape tools remain admitted.
+`tool_admission_graph_plan_contradiction`,
+`effective_policy_contradiction`, and `completion-with-blocked-mutation` prove
+escape tools remain admitted and rendered examples use admitted tools.
 
 ## Verification
 
-Run `cargo test -p lkjagent-runtime tool_admission` and
+Run `cargo test -p lkjagent-runtime tool_admission`,
+`cargo test -p lkjagent-tools --test effective_policy_contradiction`, and
 `cargo test -p lkjagent-tools effective_policy_repair`.
 
 ## Status

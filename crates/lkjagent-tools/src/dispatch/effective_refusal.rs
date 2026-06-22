@@ -1,6 +1,7 @@
 use super::examples::registry_valid_example;
-use super::refusal::{example_for, join_or_none, preferred_action};
-use super::state::{DispatchState, EffectivePolicy};
+use super::refusal::join_or_none;
+use super::state::{DispatchState, EffectivePolicy, GraphDispatchPolicy};
+use lkjagent_protocol::{render_action, Action, Param};
 
 pub fn effective_policy_refusal(
     tool: &str,
@@ -21,7 +22,7 @@ pub fn effective_policy_refusal(
         }
         return None;
     }
-    Some(render(tool, policy.reason.as_str(), policy, state))
+    Some(render(tool, refusal_reason(policy, state), policy, state))
 }
 
 fn completion_refusal(policy: &EffectivePolicy, state: &DispatchState) -> Option<String> {
@@ -57,6 +58,26 @@ fn completion_gate(policy: &EffectivePolicy) -> &'static str {
     }
 }
 
+fn refusal_reason<'a>(policy: &'a EffectivePolicy, state: &DispatchState) -> &'a str {
+    if preferred_blocked(policy) || plan_missing_but_blocked(policy, state) {
+        return "policy contradiction: required or preferred action is blocked";
+    }
+    policy.reason.as_str()
+}
+
+fn preferred_blocked(policy: &EffectivePolicy) -> bool {
+    let preferred = policy.preferred_next_action.as_str();
+    !preferred.is_empty()
+        && policy.blocked_tools.iter().any(|tool| tool == preferred)
+        && !policy.allowed_tools.iter().any(|tool| tool == preferred)
+}
+
+fn plan_missing_but_blocked(policy: &EffectivePolicy, state: &DispatchState) -> bool {
+    state.graph_missing.iter().any(|item| item == "plan")
+        && policy.blocked_tools.iter().any(|tool| tool == "graph.plan")
+        && !policy.allowed_tools.iter().any(|tool| tool == "graph.plan")
+}
+
 fn render(tool: &str, reason: &str, policy: &EffectivePolicy, state: &DispatchState) -> String {
     let node = state
         .graph_policy
@@ -80,22 +101,58 @@ fn effective_preferred_action(
     state: &DispatchState,
     blocked: Option<&str>,
 ) -> String {
-    if let Some(graph) = state.graph_policy.as_ref() {
-        return preferred_action(graph, blocked);
-    }
     if policy
         .allowed_tools
         .iter()
-        .any(|tool| tool == &policy.preferred_next_action)
+        .any(|tool| tool == &policy.preferred_next_action && blocked != Some(tool.as_str()))
     {
         return policy.preferred_next_action.clone();
     }
-    policy
-        .allowed_tools
-        .iter()
-        .find(|tool| blocked != Some(tool.as_str()))
-        .cloned()
+    priority_tool(policy, state.graph_policy.as_ref(), blocked)
+        .or_else(|| {
+            policy
+                .allowed_tools
+                .iter()
+                .find(|tool| blocked != Some(tool.as_str()))
+                .cloned()
+        })
         .unwrap_or_else(|| "none".to_string())
+}
+
+fn priority_tool(
+    policy: &EffectivePolicy,
+    graph: Option<&GraphDispatchPolicy>,
+    blocked: Option<&str>,
+) -> Option<String> {
+    let priority = [
+        "graph.plan",
+        "graph.recover",
+        "graph.transition",
+        "artifact.next",
+        "artifact.audit",
+        "doc.audit",
+        "fs.batch_write",
+        "fs.write",
+        "fs.read",
+        "fs.list",
+        "workspace.summary",
+    ];
+    priority
+        .iter()
+        .find(|tool| admitted(policy, graph, blocked, tool))
+        .map(|tool| (*tool).to_string())
+}
+
+fn admitted(
+    policy: &EffectivePolicy,
+    graph: Option<&GraphDispatchPolicy>,
+    blocked: Option<&str>,
+    tool: &str,
+) -> bool {
+    if blocked == Some(tool) || !policy.allowed_tools.iter().any(|allowed| allowed == tool) {
+        return false;
+    }
+    tool != "graph.transition" || graph.is_some_and(|graph| !graph.legal_transitions.is_empty())
 }
 
 fn effective_example(
@@ -103,9 +160,22 @@ fn effective_example(
     state: &DispatchState,
     blocked: Option<&str>,
 ) -> String {
-    if let Some(graph) = state.graph_policy.as_ref() {
-        return example_for(graph, blocked);
-    }
     let preferred = effective_preferred_action(policy, state, blocked);
+    if preferred == "graph.transition" {
+        return transition_example(state.graph_policy.as_ref());
+    }
     registry_valid_example(&preferred).unwrap_or_else(|| "none".to_string())
+}
+
+fn transition_example(graph: Option<&GraphDispatchPolicy>) -> String {
+    let Some(target) = graph.and_then(|graph| graph.legal_transitions.first()) else {
+        return "none".to_string();
+    };
+    render_action(&Action::new(
+        "graph.transition",
+        vec![
+            Param::new("target", target),
+            Param::new("reason", "Use an admitted graph transition"),
+        ],
+    ))
 }
