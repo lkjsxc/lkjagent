@@ -90,7 +90,7 @@ pub const NOTE_TASK: BenchmarkTask = BenchmarkTask {
 
 const BREAD_GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "owner_input=Create a big bread cookbook.\nsubroute=content-artifact\nroot=cookbooks/bread-cookbook\nprofile=Cookbook\nartifact.next next_action=fs.batch_write\nsemantic_paths=cookbooks/README.md,cookbooks/foundations/flour-water-salt-yeast.md,cookbooks/recipes/sourdough-country-loaf.md\ncontent-bearing files verified\nartifact.audit passed\nagent.done complete after artifact audit\n",
+    content: "owner_input=Create a big bread cookbook.\nsubroute=content-artifact\nroot=cookbooks/bread-cookbook\nprofile=BreadCookbook\nartifact.next next_action=fs.batch_write\nsemantic_paths=cookbooks/README.md,cookbooks/foundations/flour-water-salt-yeast.md,cookbooks/recipes/sourdough-country-loaf.md\ncontent-bearing files verified\nartifact.audit passed\nagent.done complete after artifact audit\n",
 }];
 
 const BREAD_BAD_GENERIC: &[FileSpec] = &[FileSpec {

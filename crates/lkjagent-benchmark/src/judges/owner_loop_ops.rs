@@ -120,7 +120,7 @@ pub fn bread_cookbook_artifact(workspace: &Path) -> Result<(), String> {
         &[
             "subroute=content-artifact",
             "root=cookbooks/bread-cookbook",
-            "profile=Cookbook",
+            "profile=BreadCookbook",
             "artifact.next",
             "next_action=fs.batch_write",
             "foundations/flour-water-salt-yeast.md",

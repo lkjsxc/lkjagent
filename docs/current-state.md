@@ -98,7 +98,7 @@ behavior is complete.
 | Tool dispatcher | partially implemented | generated examples parse, validate, and dispatch for key graph, memory, fs, and doc tools; `fs.batch_write` accepts canonical, no-space, and XML-ish path headers while rejecting JSON payloads before mutation; dispatch now checks one effective policy object before routing, including `agent.done` completion refusal; schema repair emits one canonical example for covered parameter, missing shell-command, and evidence-kind faults; audit-owned evidence refuses direct `graph.evidence` |
 | Document scaffold tool | implemented | semantic project, story, and cookbook scaffold tests pass; artifact.apply reuses the planner and writer |
 | Document audit tool | implemented | topology checks pass local gates; artifact.audit checks kind mismatch; content artifacts reject scaffold-only leaves, weak cookbook/story leaves, and shallow dictionary term lists |
-| Artifact next batch | partially implemented | `artifact.next` returns exact weak paths, content-bearing `fs.batch_write` examples, and root-scoped cursor advancement; scaffold-only cookbook, cursor, and meaningful cookbook tests pass |
+| Artifact next batch | partially implemented | `artifact.next` returns exact weak paths, content-bearing `fs.batch_write` examples, and root-scoped cursor advancement; scaffold-only cookbook, cursor, meaningful cookbook, and Japanese drift guard tests pass |
 | Recursive document seed | implemented | deterministic tree writes README indexes and `.lkj-doc-graph.md`; content-artifact routing now uses semantic roots for long stories and cookbooks |
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, same-title overlap update, punctuation-safe FTS queries, exact duplicate prune, same-title prune merge, and maintenance no-op lesson merge have focused tests; rewrite pruning remains open |
 | State graph cases | implemented | ranked neutral tracks and pure transition selection drive recovery and post-event graph refresh; refusal examples now use admitted transition targets |
@@ -124,6 +124,10 @@ The current redesign slice baseline is recorded in
 [evaluation/baseline-audit-2026-06-22.md](evaluation/baseline-audit-2026-06-22.md):
 `docker compose run --rm verify` exited 0 before new implementation changes,
 and the only pre-existing working-tree entry was `tmp/prompt01.md`.
+After that baseline, cookbook scaffold selection was split so explicit bread
+cookbooks use the bread shape while generic or Japanese cookbook objectives use
+Japanese-food topic paths. Artifact next/apply now block Japanese cookbook roots
+when forbidden bread drift is present.
 
 ## Out of Scope
 
