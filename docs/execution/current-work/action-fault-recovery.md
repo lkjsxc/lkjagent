@@ -35,4 +35,7 @@ produce deterministic normalization or actionable refusal.
 
 ## Status
 
-partially implemented
+partially implemented. Safe alias normalization and canonical examples exist
+for covered cases. Dispatchable registry examples now parse, validate, and
+reach tool routes in focused tests, while recovery-rendered examples still need
+a single canonical registry proof across every refusal path.

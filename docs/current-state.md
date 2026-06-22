@@ -43,7 +43,7 @@ prove that their failures cannot recur.
 | --- | --- |
 | Runtime authority | Pure active-mode selection, turn authority cards, effective dispatch policy reuse, store-backed authority snapshot fields, stale maintenance-action refusal before dispatch, and `agent.done` refusal exist. Broader pre-dispatch contradiction repair remains open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, a pure recovery plan table, and SQLite retry counts keyed by case, node, tool, parameter shape, and fault class exist. Live shape-change enforcement for every fault class remains open. |
-| Schema repair | Safe alias normalization and registry examples exist for covered cases. Every rendered recovery example is not yet proven through one canonical registry validation path. |
+| Schema repair | Safe alias normalization and registry examples exist for covered cases. Registry examples parse, validate, and dispatch to routes except heavyweight verification gates. Recovery examples still need one canonical registry validation path. |
 | Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, and root-scoped cursors exist. Artifact identity, adoption, weak-path repair state, and semantic readiness are incomplete. |
 | Completion gates | Runtime completion refusals keep cases open for many artifact and evidence gaps. Every close path is not yet proven to use the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices. Durable snapshot history remains shallow. |
@@ -94,6 +94,8 @@ This session ran these gates after the documentation and recovery-model edits:
 - `cargo test -p lkjagent-store`: passed after retry-count storage changes.
 - `cargo test -p lkjagent-runtime --test compaction_snapshot`: passed after adding last-observation
   and batch-cursor snapshot evidence.
+- `cargo test -p lkjagent-tools --test registry_examples`: passed after registry examples were
+  checked through dispatch routing.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`.
 - `docker compose run --rm verify`: `ok verify`.
 
