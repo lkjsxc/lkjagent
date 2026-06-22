@@ -7,9 +7,11 @@ Define bounded content writing after artifact planning.
 ## Contract
 
 Long content is written in small semantic batches, not one raw giant
-`fs.write`. Each batch names exact paths, required sections, content
-expectations, and verification notes. The model writes the meaningful content;
-the harness decides whether the batch is admissible and complete.
+`fs.write`. Raw `fs.write` is capped at 1,800 bytes. `fs.batch_write` is capped
+at 1,800 bytes per file and 6,000 bytes per batch. Each batch names exact paths,
+required sections, content expectations, and verification notes. The model
+writes the meaningful content; the harness decides whether the batch is
+admissible and complete.
 
 ## Next Batch
 
@@ -24,5 +26,6 @@ Completion still requires real content and a passing artifact audit.
 
 ## Payload Faults
 
-After max-token truncation or unclosed content tags, recovery blocks another
-large raw write and routes to artifact planning or bounded batch writes.
+After max-token truncation, unclosed content tags, or a payload-limit refusal,
+recovery blocks another large raw write and routes to artifact planning or
+bounded batch writes.
