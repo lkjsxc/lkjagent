@@ -1,4 +1,5 @@
 pub mod artifact;
+mod artifact_drift;
 mod artifact_next;
 mod artifact_next_example;
 pub mod benchmark_seed;

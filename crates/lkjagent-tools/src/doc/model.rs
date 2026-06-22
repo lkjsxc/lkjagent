@@ -11,6 +11,7 @@ pub enum ScaffoldProfile {
     EvaluationSuite,
     NarrativeManuscript,
     Cookbook,
+    BreadCookbook,
     GenericStructuredDocs,
 }
 

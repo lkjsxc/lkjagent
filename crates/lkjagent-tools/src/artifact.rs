@@ -23,6 +23,14 @@ pub fn apply(
     mode: &str,
     sections: &str,
 ) -> ToolResult<String> {
+    let full = workspace_path(workspace, root)?;
+    if full.exists() {
+        if let Some(report) = crate::artifact_drift::japanese_cookbook(&full)? {
+            if !report.is_empty() {
+                return Err(ToolError::invalid(report.block_message(root)));
+            }
+        }
+    }
     let title = title_or_root(title, root);
     crate::doc::scaffold(
         workspace,
@@ -56,6 +64,11 @@ pub fn audit(
         return Ok(format!(
             "document audit failed\nroot={root}\nchecks=15\npassed=14\nfailed=1\nfailures:\n- artifact_kind_mismatch: expected={kind}\nnext_action=artifact.apply matching artifact kind"
         ));
+    }
+    if let Some(drift) = crate::artifact_drift::japanese_cookbook(&full)? {
+        if !drift.is_empty() {
+            return Ok(drift.observation(root));
+        }
     }
     Ok(readiness_report(kind, &report))
 }

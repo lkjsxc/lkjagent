@@ -15,6 +15,11 @@ pub fn next(workspace: &Path, root: &str, kind: &str) -> ToolResult<String> {
             artifact_apply_example(root, &kind)
         ));
     }
+    if let Some(report) = crate::artifact_drift::japanese_cookbook(&full)? {
+        if !report.is_empty() {
+            return Ok(report.block_message(root));
+        }
+    }
     let weak = crate::doc::weak_content_paths(&full)?;
     if weak.is_empty() {
         return audit_response(root, &kind, "missing=0");
@@ -38,6 +43,12 @@ pub fn next_with_cursor(
             "artifact next batch\nroot={root}\nkind={kind}\nmissing=root\nnext_action=artifact.apply\nvalid_example:\n{}",
             artifact_apply_example(root, &kind)
         ));
+    }
+    if let Some(report) = crate::artifact_drift::japanese_cookbook(&full)? {
+        if !report.is_empty() {
+            lkjagent_store::state::delete(conn, &cursor_key(root))?;
+            return Ok(report.block_message(root));
+        }
     }
     let weak = crate::doc::weak_content_paths(&full)?;
     if weak.is_empty() {

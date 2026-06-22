@@ -47,6 +47,26 @@ pub const MANUSCRIPT: &[ShapeGroup] = &[
 #[rustfmt::skip]
 pub const COOKBOOK: &[ShapeGroup] = &[
     group("foundations", "Foundations", "foundation index", &[
+        "japanese pantry", "rice fundamentals", "dashi and stocks", "knife work", "seasoning balance",
+    ]),
+    group("mains", "Mains", "main dish index", &[
+        "sushi rice", "ramen noodles", "miso soup", "yakitori grilling", "nikujaga simmering",
+    ]),
+    group("sides", "Sides", "side dish index", &[
+        "tsukemono pickles", "tempura frying", "nabe hot pots", "okonomiyaki", "sunomono",
+    ]),
+    group("regional", "Regional", "regional cuisine index", &[
+        "kansai dishes", "hokkaido dishes", "okinawan dishes", "kyushu dishes",
+    ]),
+    group("sweets", "Sweets", "sweets index", &["mochi", "dorayaki", "anmitsu"]),
+    group("reference", "Reference", "reference index", &[
+        "menus", "sauces and seasonings", "equipment", "timelines", "troubleshooting",
+    ]),
+];
+
+#[rustfmt::skip]
+pub const BREAD_COOKBOOK: &[ShapeGroup] = &[
+    group("foundations", "Foundations", "foundation index", &[
         "flour water salt yeast", "kneading", "fermentation", "shaping", "baking",
     ]),
     group("recipes", "Recipes", "recipe index", &[
@@ -62,6 +82,7 @@ pub fn shape(profile: ScaffoldProfile) -> &'static [ShapeGroup] {
         ScaffoldProfile::ResearchReport => REPORT,
         ScaffoldProfile::NarrativeManuscript => MANUSCRIPT,
         ScaffoldProfile::Cookbook => COOKBOOK,
+        ScaffoldProfile::BreadCookbook => BREAD_COOKBOOK,
         _ => PROJECT,
     }
 }

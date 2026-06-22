@@ -73,7 +73,7 @@ fn doc_scaffold_bread_cookbook_uses_recipe_paths() -> TestResult<()> {
         ],
     )?;
 
-    assert!(output.contains("profile=Cookbook"));
+    assert!(output.contains("profile=BreadCookbook"));
     assert!(workspace
         .join("cookbooks/bread-cookbook/foundations/flour-water-salt-yeast.md")
         .is_file());

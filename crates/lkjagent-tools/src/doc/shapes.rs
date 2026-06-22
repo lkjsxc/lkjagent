@@ -9,7 +9,9 @@ pub fn select_profile(input: &ScaffoldInput) -> ScaffoldProfile {
         input.sections.join(" ")
     )
     .to_ascii_lowercase();
-    if text.contains("cookbook") || text.contains("recipe") || text.contains("bread") {
+    if bread_subject(&text) {
+        ScaffoldProfile::BreadCookbook
+    } else if text.contains("cookbook") || text.contains("recipe") {
         ScaffoldProfile::Cookbook
     } else if text.contains("knowledge") || text.contains("encyclopedia") {
         ScaffoldProfile::KnowledgeBase
@@ -28,4 +30,10 @@ pub fn select_profile(input: &ScaffoldInput) -> ScaffoldProfile {
     } else {
         ScaffoldProfile::ProjectDocs
     }
+}
+
+fn bread_subject(text: &str) -> bool {
+    ["bread", "sourdough", "ciabatta", "focaccia", "rye loaf"]
+        .iter()
+        .any(|needle| text.contains(needle))
 }
