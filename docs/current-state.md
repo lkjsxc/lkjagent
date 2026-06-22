@@ -90,11 +90,13 @@ This session ran these gates after the documentation and recovery-model edits:
 - `cargo run -p lkjagent-xtask -- check-style`: `ok check-style`.
 - `cargo fmt --check`: passed.
 - `cargo test -p lkjagent-runtime`: passed.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`.
+- `docker compose run --rm verify`: `ok verify`.
 
 These gates prove the documentation shape, line cap, style scan, formatting,
-and runtime focused crate tests for this slice. They do not prove the full
-redesign; `quiet verify` and Docker Compose verification remain unrun in this
-session.
+runtime focused crate tests, workspace quiet verification, and Docker Compose
+verification for this slice. They do not prove the full redesign; the blocker
+queue remains open until each row has focused runtime coverage.
 
 ## Out of Scope
 
