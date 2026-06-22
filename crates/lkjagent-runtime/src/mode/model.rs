@@ -69,6 +69,22 @@ pub enum RuntimeFault {
     MaintenanceConflict,
     EndpointFault,
     TurnBudgetExhausted,
+    ContextInvalid,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum FaultClass {
+    Parse,
+    Parameter,
+    Tool,
+    Repeat,
+    Endpoint,
+    Budget,
+    Context,
+    Verification,
+    Compaction,
+    Payload,
+    Completion,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -91,15 +107,19 @@ pub enum RecoveryClass {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RecoveryPlan {
+    pub fault_class: FaultClass,
     pub recovery_class: RecoveryClass,
+    pub recovery_route: String,
     pub previous_mission: ActiveMode,
     pub retry_budget: u8,
     pub allowed_observation_tools: Vec<String>,
     pub allowed_repair_tools: Vec<String>,
     pub forced_tool: String,
     pub forced_next_action: String,
+    pub escalation_route: String,
     pub exact_valid_example: String,
     pub fallback_action: String,
+    pub blocked_handoff_behavior: String,
     pub partial_handoff: bool,
 }
 
