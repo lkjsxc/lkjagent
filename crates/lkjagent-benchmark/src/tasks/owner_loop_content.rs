@@ -2,7 +2,7 @@ use crate::model::{BenchmarkTask, Difficulty, FileSpec, Fixture, JudgeKind, Task
 
 const POLICY_GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "active_mode=Maintenance\ngraph_policy=disabled\nallowed_tools=memory.find,memory.save,queue.list,agent.done\nactive_mode=Compaction\nhard_compaction=runtime-owned\ngraph_policy=disabled\n",
+    content: "active_mode=Maintenance\ngraph_policy=disabled\nallowed_tools=memory.find,memory.save,queue.list,agent.done\nactive_mode=Compaction\nhard_compaction=runtime-owned\ngraph_policy=disabled\nmissing=plan\nallowed_tools=graph.plan,fs.read\npreferred_next_action=graph.plan\nvalid_example=<tool>graph.plan</tool>\n",
 }];
 
 const POLICY_BAD_MAINT: &[FileSpec] = &[FileSpec {
@@ -13,6 +13,11 @@ const POLICY_BAD_MAINT: &[FileSpec] = &[FileSpec {
 const POLICY_BAD_COMPACT: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
     content: "compaction only allows memory.save actions\nactive graph node=recover-params\ngraph policy refused memory.save\n",
+}];
+
+const POLICY_BAD_PLAN: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content: "missing=plan\npreferred_next_action=graph.plan\nblocked_tools=graph.plan\ngraph policy refused graph.plan\n",
 }];
 
 pub const POLICY_TASK: BenchmarkTask = BenchmarkTask {
@@ -36,6 +41,10 @@ pub const POLICY_TASK: BenchmarkTask = BenchmarkTask {
         Fixture {
             name: "compaction-graph-policy-contradiction",
             files: POLICY_BAD_COMPACT,
+        },
+        Fixture {
+            name: "graph-plan-required-but-refused",
+            files: POLICY_BAD_PLAN,
         },
     ],
     judge: JudgeKind::PolicyContradiction,

@@ -7,8 +7,9 @@ executable.
 
 ## Suites
 
-`authority-contradictions` covers blocked preferred actions and policy
-conflicts. `artifact-readiness` covers scaffold-only and weak content roots.
+`authority-contradictions` covers blocked preferred actions, graph.plan
+required-but-refused paradoxes, and policy conflicts. `artifact-readiness`
+covers scaffold-only and weak content roots.
 `recovery-deadlocks` covers malformed actions, parameter faults, repeat
 refusals, blocked escape tools, and budget checkpoints that must not ask the
 owner to continue. `false-completion` covers close attempts without evidence,
@@ -21,7 +22,8 @@ The suite includes `cookbook_missing_evidence`,
 `cookbook_weak_content_audit`, `tool_admission_graph_plan_contradiction`,
 `parameter_fault_memory_save`, `parse_fault_unclosed_content`,
 `repeat_action_refused`, `turn_budget_continuation_checkpoint`,
-`maintenance_noop_claim`, and `false_completion_after_scaffold`. The uploaded-run matrix also includes
+`graph-plan-required-but-refused`, `maintenance_noop_claim`, and
+`false_completion_after_scaffold`. The uploaded-run matrix also includes
 `artifact-readiness-graph-evidence-bypass`, which proves direct graph evidence
 cannot replace artifact audit readiness.
 

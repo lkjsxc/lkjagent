@@ -132,6 +132,7 @@ fn authority_escape_tools(
             "workspace.summary",
         ],
         ActiveMode::OwnerTask if !graph.completion_ready => &[
+            "graph.plan",
             "fs.read",
             "fs.list",
             "fs.stat",

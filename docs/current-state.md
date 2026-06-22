@@ -165,6 +165,11 @@ record/describe, placeholder, stub, scaffold-only, future-work, and empty-TOC
 prose before single or batch file writes mutate files. Turn-budget boundaries
 now record a typed continuation checkpoint, reset the continuation epoch, avoid
 owner guidance, and let the daemon continue admitted owner work automatically.
+Effective policy refusal now detects plan-missing or preferred-action
+contradictions and renders an admitted alternate plus registry example instead
+of a blocked `graph.plan` loop. `artifact.next` examples now avoid the generic
+placeholder phrase families observed in failed repair writes, and scaffold
+refusals report path, phrase class, cause, and acceptable replacement pattern.
 
 ## Out of Scope
 

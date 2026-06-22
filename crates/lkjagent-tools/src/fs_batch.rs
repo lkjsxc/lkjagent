@@ -61,7 +61,7 @@ fn validate_batch(workspace: &Path, files: &[BatchFile], max_files: usize) -> To
     let mut total = 0usize;
     for file in files {
         workspace_path(workspace, &file.path)?;
-        crate::placeholder::reject(&file.content)?;
+        crate::placeholder::reject_for_path(&file.path, &file.content)?;
         let bytes = file.content.len();
         if bytes > MAX_FILE_BYTES {
             return Err(ToolError::invalid(format!(

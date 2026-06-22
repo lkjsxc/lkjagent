@@ -71,6 +71,9 @@ pub fn policy_contradiction(workspace: &Path) -> Result<(), String> {
             "active_mode=Maintenance",
             "active_mode=Compaction",
             "hard_compaction=runtime-owned",
+            "missing=plan",
+            "allowed_tools=graph.plan",
+            "preferred_next_action=graph.plan",
         ],
     )?;
     if text.matches("graph_policy=disabled").count() < 2 {
@@ -82,6 +85,7 @@ pub fn policy_contradiction(workspace: &Path) -> Result<(), String> {
             "maintenance only allows",
             "compaction only allows memory.save",
             "graph policy refused",
+            "blocked_tools=graph.plan",
         ],
     )
 }
