@@ -156,6 +156,9 @@ runtime admission gating for owner questions, and a pure recovery plan table
 covering schema faults and turn-budget handoff routes. This slice also tightens
 pure completion admission so `agent.done` executes only when owner evidence gaps
 are empty, and completion refusals preserve audit, repair, and batch routes.
+Live dispatcher repeat refusals now render the active mode, forbidden repeated
+tool, shape-change requirement, preferred alternate, and registry example from
+the effective policy.
 
 ## Out of Scope
 

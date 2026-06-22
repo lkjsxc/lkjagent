@@ -26,11 +26,20 @@ alternate must be admitted by authority.
 ## Fixture
 
 `tool_admission_graph_plan_contradiction` proves preferred action repair does
-not repeat a blocked graph action.
+not repeat a blocked graph action. The dispatcher repeat-refusal fixture proves
+a repeated tool receives a copyable alternate action from the effective policy
+instead of only a generic denial.
 
 ## Verification
 
-Run `cargo test -p lkjagent-runtime repeat_scope`.
+Run `cargo test -p lkjagent-runtime repeat_scope` and
+`cargo test -p lkjagent-tools --test repeat_refusal`.
+
+## Implemented Slice
+
+Live dispatcher repeat refusals now name the active mode, forbidden repeated
+tool, action-shape change requirement, preferred alternate, and exact registry
+example when the effective policy can provide one.
 
 ## Status
 
