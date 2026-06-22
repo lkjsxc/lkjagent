@@ -67,10 +67,36 @@ pub fn decide(snapshot: &RuntimeSnapshot, event: RuntimeEvent) -> RuntimeDecisio
                 RuntimeDecision::BlockCompletion(admission)
             }
         }
+        RuntimeEvent::TurnBudgetCheckpoint => checkpoint_decision(snapshot),
         RuntimeEvent::TurnBudgetExhausted => RuntimeDecision::StartRecovery(
             recovery_plan_for_fault(snapshot, RuntimeFault::TurnBudgetExhausted),
         ),
         RuntimeEvent::ContextPressureRaised => RuntimeDecision::StartCompaction,
+    }
+}
+
+fn checkpoint_decision(snapshot: &RuntimeSnapshot) -> RuntimeDecision {
+    if snapshot.recovery_ladder_active {
+        return RuntimeDecision::StartRecovery(recovery_plan_for_fault(
+            snapshot,
+            checkpoint_fault(snapshot),
+        ));
+    }
+    let admission = admit_tool(snapshot, "agent.done");
+    if admission.admitted {
+        RuntimeDecision::CloseCase
+    } else {
+        RuntimeDecision::AskEndpoint
+    }
+}
+
+fn checkpoint_fault(snapshot: &RuntimeSnapshot) -> RuntimeFault {
+    if snapshot.repeated_action {
+        RuntimeFault::Repeat
+    } else if snapshot.last_tool_attempt.is_some() {
+        RuntimeFault::ToolRuntime
+    } else {
+        RuntimeFault::Parse
     }
 }
 

@@ -42,9 +42,10 @@ prompt mode
 ## Prompt Modes
 
 The compiler maps hard state and guard tracks to intake, semantic seed,
-controlled expansion, audit, repair, recovery, maintenance, or verification
-modes. Parser-recovery and repeated-action guards force recovery mode before
-normal hard-state mapping.
+controlled expansion, audit, repair, recovery, maintenance, verification, or
+continuation-checkpoint modes. Parser-recovery, repeated-action guards, and
+checkpoint recovery decisions force recovery mode before normal hard-state
+mapping.
 
 ## Rule
 

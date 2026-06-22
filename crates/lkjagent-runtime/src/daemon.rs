@@ -102,6 +102,7 @@ pub fn startup_state_with_budget(
     task_turn_budget: u16,
 ) -> RuntimeState {
     let mut state = RuntimeState::new(ContextState::new(prefix, Vec::new()));
+    state.continuation_epoch.checkpoint_turns = task_turn_budget.max(1);
     if let Some(summary) = task_summary {
         let frame = Frame::new(
             FrameKind::Notice(NoticeKind::Compaction),

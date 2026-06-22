@@ -9,8 +9,9 @@ and restart the log. Compaction is the only moment the window shrinks.
 ## Trigger
 
 The engine checks pressure at safe turn boundaries: before owner delivery,
-before endpoint calls, and after an action/observation pair completes. The
-trigger is harness-owned; the model neither requests nor refuses compaction.
+before endpoint calls, at continuation checkpoints, and after an
+action/observation pair completes. The trigger is harness-owned; the model
+neither requests nor refuses compaction.
 
 Pressure states:
 

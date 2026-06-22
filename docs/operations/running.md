@@ -65,13 +65,15 @@ It records resolved defaults and non-secret runtime knobs.
 | context.trigger | 21504 | optional hard trigger; stale or unsafe values are derived from the selected window |
 | sampling.temperature | 0.3 | per [../architecture/llm/sampling.md](../architecture/llm/sampling.md) |
 | sampling.top-p | 0.9 | same |
-| task.turn-budget | 64 | endpoint turns granted to each owner task or explicit continuation |
+| task.turn-budget | 64 | endpoint turns before an autonomous runtime checkpoint; not an owner permission boundary |
 | daemon.lock-stale-seconds | 300 | daemon lock reclaim window; never below endpoint timeout plus 60 |
 | shell.timeout-seconds | 60 | default for shell.run, max 600 |
 
 LKJAGENT_ENDPOINT_URL, LKJAGENT_MODEL,
 LKJAGENT_ENDPOINT_TIMEOUT_SECONDS, and LKJAGENT_CONTEXT_LENGTH override the
-runtime table at startup.
+runtime table at startup. `task.turn-budget` is interpreted as checkpoint
+turns: reaching it records a continuation epoch and resumes automatically when
+runtime authority still admits useful owner work.
 The API key value is never written to /data/lkjagent.json; only the
 environment variable name is stored.
 

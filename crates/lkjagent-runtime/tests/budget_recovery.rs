@@ -48,31 +48,32 @@ fn owner_send_refreshes_exhausted_open_task_budget() -> TestResult<()> {
 }
 
 #[test]
-fn exhausted_task_waits_visibly_and_resumes_from_next_send() -> TestResult<()> {
+fn exhausted_task_checkpoints_and_continues_without_owner_guidance() -> TestResult<()> {
     let mut conn = store()?;
     take_lock(&conn)?;
     state::set(&conn, "open task", "long task")?;
-    let workspace = temp_workspace("daemon-exhausted-wait")?;
+    let workspace = temp_workspace("daemon-exhausted-continue")?;
     let server = serve_responses(vec![completion(WRITE_ACTION), completion(DONE_ACTION)])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
     daemon.state.task = TaskState::Open { turns_remaining: 0 };
 
-    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Waiting);
-    assert_eq!(
-        state::get(&conn, "daemon state")?,
-        Some("waiting".to_string())
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    assert_eq!(state::get(&conn, "daemon question")?, None);
+    assert!(
+        matches!(daemon.state.task, TaskState::Open { turns_remaining } if turns_remaining > 0)
     );
-    assert!(state::get(&conn, "daemon question")?
-        .is_some_and(|question| question.contains("Turn budget exhausted")));
 
-    queue::enqueue(&mut conn, "continue", "owner-send", "102")?;
-    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Done);
     server.join()?;
 
     let log = events::read_events(&conn)?;
-    assert!(log.iter().any(|event| {
-        event.kind == "notice" && event.content.contains("turn budget exhausted")
-    }));
+    assert!(log
+        .iter()
+        .any(|event| { event.kind == "notice" && event.content.contains("TurnBudgetCheckpoint") }));
+    assert!(!log.iter().any(|event| event
+        .content
+        .contains("Turn budget exhausted. Send guidance to continue.")));
     assert_eq!(state::get(&conn, "daemon state")?, Some("idle".to_string()));
     Ok(())
 }

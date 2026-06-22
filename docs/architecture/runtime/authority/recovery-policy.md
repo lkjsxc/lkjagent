@@ -48,6 +48,8 @@ turn-budget exhaustion.
 - Audit failures preserve `artifact.next`, `artifact.audit`, `doc.audit`,
   `fs.read`, `fs.tree`, `fs.write`, and `fs.batch_write` when relevant.
 - Repeat faults force a different action shape.
+- Turn-budget checkpoints during active faults enter the selected recovery
+  class instead of asking the owner to continue.
 
 ## Prohibited States
 

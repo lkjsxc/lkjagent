@@ -9,7 +9,7 @@ read-only and never perturbs the loop: looking at the agent costs it nothing.
 
 | Surface | Content |
 | --- | --- |
-| `lkjagent status` | Daemon state, queue depth, open task, question, error, turns, context usage, token usage, model log |
+| `lkjagent status` | Daemon state, queue depth, open task, question, error, turns, continuation epoch, checkpoint interval, continuation decision, context usage, token usage, model log |
 | `lkjagent log` | Transcript events in order: messages, actions, observations, notices, queue mutations, compactions |
 | `lkjagent console` | Owner screen with transcript top, pending preview, bottom status deck, and send prompt |
 | `lkjagent memory` | Full-text search over distilled memory entries |
@@ -41,6 +41,9 @@ and `prefix/log/reserve/headroom`. Missing endpoint usage fields render as
 path tracked in
 [../architecture/observability/model-log.md](../architecture/observability/model-log.md),
 and `lkjagent model-log --print` prints the synthesized Markdown snapshot.
+Status also exposes continuation epoch, turns used, checkpoint interval, last
+checkpoint reason, and continuation decision so budget checkpoints are visible
+as autonomous progress rather than owner waits.
 
 ## Boundaries
 

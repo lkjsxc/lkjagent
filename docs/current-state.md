@@ -162,7 +162,9 @@ the effective policy. Recovery tool policy now admits the forced tools for
 verification-failure repair and maintenance-preemption inspection. The shared
 placeholder detector now rejects generic coming-soon, to-be-written, generic
 record/describe, placeholder, stub, scaffold-only, future-work, and empty-TOC
-prose before single or batch file writes mutate files.
+prose before single or batch file writes mutate files. Turn-budget boundaries
+now record a typed continuation checkpoint, reset the continuation epoch, avoid
+owner guidance, and let the daemon continue admitted owner work automatically.
 
 ## Out of Scope
 

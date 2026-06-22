@@ -7,6 +7,36 @@ use crate::maintenance::MaintenanceCycle;
 pub const DEFAULT_TURN_BUDGET: u16 = 64;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ContinuationEpoch {
+    pub epoch_index: u64,
+    pub turns_used: u16,
+    pub checkpoint_turns: u16,
+    pub last_checkpoint_reason: Option<String>,
+    pub continuation_decision: Option<String>,
+    pub no_progress_count: u16,
+}
+
+impl ContinuationEpoch {
+    pub fn new(checkpoint_turns: u16) -> Self {
+        Self {
+            epoch_index: 0,
+            turns_used: 0,
+            checkpoint_turns: checkpoint_turns.max(1),
+            last_checkpoint_reason: None,
+            continuation_decision: None,
+            no_progress_count: 0,
+        }
+    }
+
+    pub fn open_next(&mut self, reason: &str, decision: &str) {
+        self.epoch_index = self.epoch_index.saturating_add(1);
+        self.turns_used = 0;
+        self.last_checkpoint_reason = Some(reason.to_string());
+        self.continuation_decision = Some(decision.to_string());
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TaskState {
     Idle,
     Open { turns_remaining: u16 },
@@ -42,6 +72,7 @@ pub struct RuntimeState {
     pub repeat_faults: u8,
     pub tool_faults: u8,
     pub turn: i64,
+    pub continuation_epoch: ContinuationEpoch,
 }
 
 impl RuntimeState {
@@ -57,6 +88,7 @@ impl RuntimeState {
             repeat_faults: 0,
             tool_faults: 0,
             turn: 0,
+            continuation_epoch: ContinuationEpoch::new(DEFAULT_TURN_BUDGET),
         }
     }
 }

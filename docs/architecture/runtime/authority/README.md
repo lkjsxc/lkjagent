@@ -55,6 +55,8 @@ recovery, verification, and compaction mission.
 - Every decision names active mission, admitted tools, blocked tools, missing
   evidence, completion state, and next valid action.
 - Completion must pass the same gate on every close path.
+- Turn-budget checkpoints are continuation decisions, not owner-permission
+  prompts.
 - Recovery must preserve the read, audit, repair, and batch tools needed by the
   mission that failed.
 - Compaction is runtime-owned and persists resume data without a model-authored

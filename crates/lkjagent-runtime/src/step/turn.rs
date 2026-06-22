@@ -40,6 +40,7 @@ pub(super) fn owner_step(
     state.parse_faults = 0;
     state.repeat_faults = 0;
     state.tool_faults = 0;
+    state.continuation_epoch.checkpoint_turns = turn_budget.max(1);
     state.task = open_task_with_budget(&state.task, turn_budget);
     StepResult {
         state,
