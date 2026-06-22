@@ -17,11 +17,14 @@ The dispatcher must check hard state first, then guard tracks.
 | repeated action risk | 0.60 | identical action signature |
 | context pressure | 0.85 | mutating tools before snapshot check |
 | queue interruption | 0.70 | mutating tools before classification |
+| maintenance no-op risk | 0.60 | `agent.done` without suppression or real output |
+| workspace evidence risk | 0.60 | `agent.done` after memory-only workspace claims |
 
 ## Tool Bias
 
 Active guards also suggest smaller tools: `doc.audit`, `fs.tree`, `fs.read`,
-`graph.state`, `queue.list`, and the narrow repair action named by the failure.
+`graph.state`, `queue.list`, `workspace.summary`, and the narrow repair action
+named by the failure.
 
 ## Status
 

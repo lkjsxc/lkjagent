@@ -35,7 +35,9 @@ pub(crate) fn threshold(track: &StateTrack) -> f32 {
     match track.label {
         TrackLabel::ArtifactDrift => 0.75,
         TrackLabel::QueueInterruption | TrackLabel::MockContentRisk => 0.70,
-        TrackLabel::ModelSpecificNaming
+        TrackLabel::MaintenanceNoopRisk
+        | TrackLabel::WorkspaceEvidenceRisk
+        | TrackLabel::ModelSpecificNaming
         | TrackLabel::StructureConnectivity
         | TrackLabel::RepeatedActionRisk => 0.60,
         _ => DEFAULT_GUARD_THRESHOLD,
@@ -83,6 +85,8 @@ fn default_guard(label: TrackLabel) -> Option<GuardPolicy> {
             Some(GuardPolicy::BlockMutation)
         }
         TrackLabel::QueueInterruption => Some(GuardPolicy::RequireQueueClassification),
+        TrackLabel::MaintenanceNoopRisk => Some(GuardPolicy::RequireNoopSuppression),
+        TrackLabel::WorkspaceEvidenceRisk => Some(GuardPolicy::RequireWorkspaceEvidence),
         TrackLabel::RepeatedActionRisk => Some(GuardPolicy::BlockRepeatedSignature),
         _ => None,
     }

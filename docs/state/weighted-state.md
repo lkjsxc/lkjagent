@@ -25,13 +25,15 @@ next recommended action
 
 ## Required Labels
 
-The initial vector includes objective normalization, documentation contract,
-structure seed, structure expansion, structure connectivity, semantic coverage,
-duplication risk, mock content risk, model-specific naming, prompt contract,
-document structure, artifact readiness, artifact drift, parse recovery, action
-parameter reliability, tool execution recovery, evidence gap, context pressure,
-context snapshot mismatch, queue interruption, completion readiness,
-observability ledger, repeated action risk, and maintenance opportunity.
+The initial vector includes objective normalization, context-frame quality,
+documentation contract, semantic seed, structure seed, structure expansion,
+structure connectivity, semantic coverage, duplication risk, mock content risk,
+topic drift risk, model-specific naming, prompt contract, document structure,
+artifact readiness, artifact drift, parse recovery, action parameter
+reliability, tool execution recovery, evidence gap, context pressure, context
+snapshot mismatch, queue interruption, completion readiness, observability
+ledger, repeated action risk, maintenance opportunity, maintenance no-op risk,
+and workspace evidence risk.
 
 ## Interpretation
 

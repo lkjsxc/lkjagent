@@ -1,4 +1,4 @@
-use crate::kernel_authority::{required_context_slices_from_tracks, tool_biases_from_tracks};
+use crate::kernel_context_select::{required_context_slices_from_tracks, tool_biases_from_tracks};
 use crate::kernel_types::*;
 use crate::kernel_vector::{dominant_tracks, guard_tracks};
 
@@ -166,6 +166,10 @@ fn next_action(state: &CaseState, guards: &[TrackLabel]) -> String {
         "replace mock content before completion".to_string()
     } else if guards.contains(&TrackLabel::StructureConnectivity) {
         "repair relation graph and backlinks".to_string()
+    } else if guards.contains(&TrackLabel::MaintenanceNoopRisk) {
+        "record no-op suppression or produce real maintenance output".to_string()
+    } else if guards.contains(&TrackLabel::WorkspaceEvidenceRisk) {
+        "collect filesystem or workspace evidence before workspace claims".to_string()
     } else {
         tool_biases_from_tracks(&state.state_vector)
             .first()
