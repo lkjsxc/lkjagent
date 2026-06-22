@@ -75,6 +75,10 @@ maintenance restarts after no useful work.
   write schema faults, shell parameter faults, queue interruption, compaction
   resume, and repeated recovery signatures. Row 7 remains open until runtime
   replay and completion wiring prove the patterns cannot recur.
+- Shared placeholder detection now rejects coming-soon, to-be-written, generic
+  record/describe, placeholder, stub, scaffold-only, future-work, and empty-TOC
+  prose before `fs.write` and `fs.batch_write` mutate files. This narrows row
+  3, but semantic artifact identity and deeper readiness remain open.
 - Current memory pruning deletes exact duplicates and merges same-title
   high-overlap rows with source IDs, but rewrite pruning remains open under
   row 8.

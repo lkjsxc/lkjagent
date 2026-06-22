@@ -50,6 +50,41 @@ fn fs_batch_write_rejects_placeholder_before_any_write() -> TestResult<()> {
 }
 
 #[test]
+fn fs_write_rejects_generic_coming_soon_placeholder() -> TestResult<()> {
+    let workspace = temp_workspace("fs-write-coming-soon")?;
+    let output = dispatch_action(
+        &workspace,
+        "fs.write",
+        &[
+            ("path", "docs/status.md"),
+            (
+                "content",
+                "# Status\n\nComing soon. This section describes the feature.",
+            ),
+        ],
+    )?;
+
+    assert!(is_error(&output));
+    assert!(output.content.contains("scaffold phrase"));
+    assert!(!workspace.join("docs/status.md").exists());
+    Ok(())
+}
+
+#[test]
+fn fs_batch_write_rejects_generic_record_prose_atomically() -> TestResult<()> {
+    let workspace = temp_workspace("fs-batch-generic-record")?;
+    let files = "path: out/one.md\ncontent:\nThis file records the generated documentation tree.\n-- lkjagent-next-file --\npath: out/two.md\ncontent:\n# Two\n\nActual content.\n";
+
+    let output = dispatch_action(&workspace, "fs.batch_write", &[("files", files)])?;
+
+    assert!(is_error(&output));
+    assert!(output.content.contains("scaffold phrase"));
+    assert!(!workspace.join("out/one.md").exists());
+    assert!(!workspace.join("out/two.md").exists());
+    Ok(())
+}
+
+#[test]
 fn fs_batch_write_validates_escape_before_any_write() -> TestResult<()> {
     let workspace = temp_workspace("fs-batch-escape-atomic")?;
     let files = "path: out/one.md\ncontent:\n# One\n-- lkjagent-next-file --\npath: ../two.md\ncontent:\n# Two\n";
