@@ -89,6 +89,16 @@ impl ResidentDaemon {
 
     fn poll_once_inner(&mut self, conn: &mut Connection, now: &str) -> RuntimeResult<DaemonTick> {
         self.heartbeat(conn, now)?;
+        if let Some(action_text) = self
+            .state
+            .pending_action
+            .as_ref()
+            .map(|pending| pending.action_text.clone())
+        {
+            if let Some(tick) = self.execute_pending(conn, now, &action_text)? {
+                return Ok(tick);
+            }
+        }
         if let Some(tick) = self.compact_before_owner(conn, now)? {
             return Ok(tick);
         }
