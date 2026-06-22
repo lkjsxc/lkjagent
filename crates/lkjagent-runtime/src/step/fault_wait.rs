@@ -6,6 +6,7 @@ use lkjagent_store::events::EventKind;
 
 use crate::graph_state::graph_notice_frame;
 use crate::prompt::token_estimate;
+use crate::step::fault_key::retry_key;
 use crate::step::fault_meta::{fault_kind, fault_name, set_graph_fault_count};
 use crate::step::frames::append_notice;
 use crate::step::recovery_select::recovery_transition;
@@ -43,9 +44,14 @@ pub(super) fn record_recoverable_fault(
     let Some(case_id) = graph.case_id else {
         return;
     };
+    let key = retry_key(fault, action_fingerprint.as_deref());
     effects.push(Effect::RecordGraphFault {
         case_id,
         kind: fault_name(kind).to_string(),
+        node: graph.active_node.0.to_string(),
+        tool: key.tool,
+        parameter_shape: key.parameter_shape,
+        fault_class: key.fault_class,
         action_fingerprint,
         summary: summary.to_string(),
         count,

@@ -49,6 +49,12 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             case_id INTEGER NOT NULL, kind TEXT NOT NULL, action_fingerprint TEXT,
             summary TEXT NOT NULL, count INTEGER NOT NULL, created_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS graph_fault_retries (
+            case_id INTEGER NOT NULL, node TEXT NOT NULL, tool TEXT NOT NULL,
+            parameter_shape TEXT NOT NULL, fault_class TEXT NOT NULL,
+            count INTEGER NOT NULL, updated_at TEXT NOT NULL,
+            PRIMARY KEY(case_id, node, tool, parameter_shape, fault_class)
+        );
         CREATE TABLE IF NOT EXISTS graph_artifacts (
             case_id INTEGER NOT NULL, path TEXT NOT NULL, kind TEXT NOT NULL,
             status TEXT NOT NULL, summary TEXT NOT NULL, created_at TEXT NOT NULL

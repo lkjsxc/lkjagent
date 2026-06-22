@@ -54,6 +54,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - The daemon persists authority snapshot fields and CLI status prints active
   mode, evidence gaps, artifact root, recovery route, failed action, admitted
   tools, and next executable action.
+- Recovery retry counts persist in SQLite by case, node, tool, parameter shape,
+  and fault class.
 - `artifact.next` and stricter content audit support bounded cookbook and story
   recovery examples.
 - `fs.write` and `fs.batch_write` reject known scaffold phrases before mutation.
@@ -74,8 +76,7 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - Authority snapshots still need stronger case-specific fields and history for
   every dispatch and completion path.
 - Broader stale-action contradiction repair is not yet covered for every mode.
-- Recovery retry counts are not yet persisted by case, node, tool, parameter
-  shape, and fault class.
+- Recovery shape-change enforcement is not yet proven for every live fault class.
 - Artifact adoption and semantic readiness remain incomplete.
 - Compaction snapshots still need richer last-observation and batch-cursor
   fields.

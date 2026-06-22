@@ -42,7 +42,7 @@ prove that their failures cannot recur.
 | Area | Current truth |
 | --- | --- |
 | Runtime authority | Pure active-mode selection, turn authority cards, effective dispatch policy reuse, store-backed authority snapshot fields, stale maintenance-action refusal before dispatch, and `agent.done` refusal exist. Broader pre-dispatch contradiction repair remains open. |
-| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, and a pure recovery plan table exist. Durable retry counts and live shape-change enforcement for every fault class remain open. |
+| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, a pure recovery plan table, and SQLite retry counts keyed by case, node, tool, parameter shape, and fault class exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Every rendered recovery example is not yet proven through one canonical registry validation path. |
 | Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, and root-scoped cursors exist. Artifact identity, adoption, weak-path repair state, and semantic readiness are incomplete. |
 | Completion gates | Runtime completion refusals keep cases open for many artifact and evidence gaps. Every close path is not yet proven to use the same artifact-aware gate. |
@@ -89,8 +89,9 @@ This session ran these gates after the documentation and recovery-model edits:
 - `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`.
 - `cargo run -p lkjagent-xtask -- check-style`: `ok check-style`.
 - `cargo fmt --check`: passed.
-- `cargo test -p lkjagent-runtime`: passed after the stale maintenance-action and authority snapshot tests.
+- `cargo test -p lkjagent-runtime`: passed after stale action, authority snapshot, and retry-count tests.
 - `cargo test -p lkjagent-cli`: passed after status authority snapshot display tests.
+- `cargo test -p lkjagent-store`: passed after retry-count storage changes.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`.
 - `docker compose run --rm verify`: `ok verify`.
 

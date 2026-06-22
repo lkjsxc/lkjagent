@@ -47,6 +47,10 @@ pub enum Effect {
     RecordGraphFault {
         case_id: i64,
         kind: String,
+        node: String,
+        tool: String,
+        parameter_shape: String,
+        fault_class: String,
         action_fingerprint: Option<String>,
         summary: String,
         count: u8,
