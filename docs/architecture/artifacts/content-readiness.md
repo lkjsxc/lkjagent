@@ -77,6 +77,13 @@ Audit failures name exact weak paths and missing requirement labels. Passing
 content readiness may contribute artifact evidence only when topology and
 manifest checks also pass and unsupported verification claims are absent.
 
+## Implemented Slice
+
+The shared scaffold-phrase detector rejects generic `coming soon`, `to be
+written`, `this file records`, `this section describes`, placeholder-content,
+stub-content, scaffold-only, future-work, and table-of-contents-without-body
+prose before `fs.write` or `fs.batch_write` mutates files.
+
 ## Related Files
 
 - [dictionary-profile.md](dictionary-profile.md)

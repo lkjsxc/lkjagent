@@ -7,6 +7,15 @@ const PHRASES: &[&str] = &[
     "real story content before dispatch",
     "real artifact content before dispatch",
     "requested substance details and verification notes here",
+    "coming soon",
+    "to be written",
+    "this file records",
+    "this section describes",
+    "placeholder content",
+    "stub content",
+    "scaffold only",
+    "future work",
+    "table of contents without body",
 ];
 
 pub fn detect(text: &str) -> Option<&'static str> {
