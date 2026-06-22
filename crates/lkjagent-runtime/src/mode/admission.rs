@@ -4,8 +4,7 @@ use lkjagent_tools::dispatch::registry_valid_example;
 
 pub fn admit_tool(snapshot: &RuntimeSnapshot, requested_tool: &str) -> ToolAdmission {
     let next_valid_tools = next_valid_tools(snapshot);
-    let completion_blocked =
-        requested_tool == "agent.done" && !snapshot.missing_evidence.is_empty();
+    let completion_blocked = requested_tool == "agent.done" && !completion_allowed(snapshot);
     let owner_question_blocked =
         requested_tool == "agent.ask" && !snapshot.external_owner_input_required;
     let repeated_blocked = snapshot.repeated_action
@@ -49,21 +48,28 @@ pub fn next_valid_tools(snapshot: &RuntimeSnapshot) -> Vec<String> {
         .iter()
         .map(|tool| (*tool).to_string())
         .collect::<Vec<_>>();
-    if snapshot.active_mission == ActiveMode::OwnerTask && !snapshot.missing_evidence.is_empty() {
-        extend_unique(
-            &mut tools,
-            &[
-                "fs.read",
-                "fs.list",
-                "fs.stat",
-                "artifact.audit",
-                "artifact.next",
-                "doc.audit",
-                "fs.batch_write",
-                "graph.evidence",
-                "workspace.summary",
-            ],
-        );
+    if snapshot.active_mission == ActiveMode::OwnerTask {
+        if snapshot.missing_evidence.is_empty() {
+            extend_unique(
+                &mut tools,
+                &["agent.done", "verify.xtask", "fs.read", "workspace.summary"],
+            );
+        } else {
+            extend_unique(
+                &mut tools,
+                &[
+                    "fs.read",
+                    "fs.list",
+                    "fs.stat",
+                    "artifact.audit",
+                    "artifact.next",
+                    "doc.audit",
+                    "fs.batch_write",
+                    "graph.evidence",
+                    "workspace.summary",
+                ],
+            );
+        }
     }
     if snapshot.external_owner_input_required {
         extend_unique(&mut tools, &["agent.ask"]);
@@ -72,6 +78,23 @@ pub fn next_valid_tools(snapshot: &RuntimeSnapshot) -> Vec<String> {
         tools.push("runtime.wait".to_string());
     }
     tools
+}
+
+fn completion_allowed(snapshot: &RuntimeSnapshot) -> bool {
+    match snapshot.active_mission {
+        ActiveMode::OwnerTask => {
+            snapshot.owner_work_exists
+                && !snapshot.recovery_ladder_active
+                && snapshot.missing_evidence.is_empty()
+                && !snapshot.context_pressure_active
+        }
+        ActiveMode::Maintenance => {
+            !snapshot.owner_work_exists
+                && !snapshot.recovery_ladder_active
+                && !snapshot.context_pressure_active
+        }
+        ActiveMode::Recovery | ActiveMode::Compaction | ActiveMode::ClosedIdle => false,
+    }
 }
 
 fn reason(

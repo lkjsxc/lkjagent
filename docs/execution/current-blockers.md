@@ -61,6 +61,10 @@ maintenance restarts after no useful work.
   root-scoped SQLite cursor; and `graph.recover` omits `graph.plan` unless it
   is both admitted and still needed. Rows 1 to 4 and 7 stay open pending the
   full controller and completion wiring proof.
+- Current reducer admission admits `agent.done` only when owner evidence gaps
+  are empty, refuses planning-only completion, and keeps audit, repair, and
+  batch routes visible on refusal. This narrows rows 1 and 4 but does not close
+  them until every close path uses the same gate under Docker verification.
 - The uploaded-run benchmark matrix now includes the agent-facing report cases
   for Japanese-cookbook drift, document-structure evidence ownership, batch
   write schema faults, shell parameter faults, queue interruption, compaction

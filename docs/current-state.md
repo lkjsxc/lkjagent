@@ -153,7 +153,9 @@ owner-visible model handoff surfaces from provider-branded wording to
 The current slice adds the product YOLO contract, strict external-only owner
 question docs, dispatcher refusals for vague or internal `agent.ask` attempts,
 runtime admission gating for owner questions, and a pure recovery plan table
-covering schema faults and turn-budget handoff routes.
+covering schema faults and turn-budget handoff routes. This slice also tightens
+pure completion admission so `agent.done` executes only when owner evidence gaps
+are empty, and completion refusals preserve audit, repair, and batch routes.
 
 ## Out of Scope
 
