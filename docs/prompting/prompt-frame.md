@@ -9,11 +9,14 @@ observes, and reduces state.
 ## Pipeline
 
 ```text
-CaseState -> ContextFrame -> PromptFrame -> model turn
+CaseState -> ContextFrame
+RuntimeDecision + ContextFrame -> PromptFrame -> model turn
 ```
 
-The context frame is the source of truth. The prompt frame selects the prompt
-mode and renders only the fields needed for the next action.
+The context frame supplies state facts. The runtime decision supplies mission,
+admission, completion, recovery, maintenance, and compaction authority. The
+prompt frame selects the prompt mode and renders only the fields needed for the
+next action.
 
 ## Required Fields
 
@@ -52,6 +55,7 @@ output grammar.
 ## Links
 
 - Context frame: [../architecture/context/context-frame.md](../architecture/context/context-frame.md).
+- Runtime source: [runtime-source.md](runtime-source.md).
 - State vector: [../state/state-vector.md](../state/state-vector.md).
 - Generic wording: [generic-model-language.md](generic-model-language.md).
 

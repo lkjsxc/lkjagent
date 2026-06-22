@@ -37,8 +37,9 @@ directories with short focused files.
 - `product/README.md` `product/daemon.md` `product/cli.md` `product/queue.md` `product/observability.md`
 - `state/README.md` `state/hard-state.md` `state/weighted-state.md` `state/state-vector.md`
   `state/transition-handbook.md` `state/track-update-policy.md` `state/track-guards.md`
-- `prompting/README.md` `prompting/prompt-frame.md` `prompting/state-selected-prompts.md`
-  `prompting/documentation-prompts.md` `prompting/generic-model-language.md`
+- `prompting/README.md` `prompting/prompt-frame.md` `prompting/runtime-source.md`
+  `prompting/state-selected-prompts.md` `prompting/documentation-prompts.md`
+  `prompting/generic-model-language.md`
 - `documentation-system/README.md` `documentation-system/doc-contract.md`
   `documentation-system/growth-stages.md` `documentation-system/semantic-seed.md`
   `documentation-system/relation-graph.md` `documentation-system/mock-content-detection.md`
@@ -86,7 +87,8 @@ directories with short focused files.
 - `architecture/runtime/README.md` `architecture/runtime/agent-loop.md` `architecture/runtime/daemon-process.md`
   `architecture/runtime/queue-intake.md` `architecture/runtime/self-maintenance.md`
 - `architecture/runtime/authority/README.md` `architecture/runtime/authority/reducer.md`
-  `architecture/runtime/authority/missions.md` `architecture/runtime/authority/tool-admission.md`
+  `architecture/runtime/authority/wiring-map.md` `architecture/runtime/authority/missions.md`
+  `architecture/runtime/authority/tool-admission.md`
   `architecture/runtime/authority/completion.md` `architecture/runtime/authority/maintenance.md`
   `architecture/runtime/authority/compaction.md` `architecture/runtime/authority/turn-authority.md`
   `architecture/runtime/authority/mode-priority.md` `architecture/runtime/authority/tool-policy.md`
@@ -148,6 +150,7 @@ directories with short focused files.
   `repository/commit-protocol.md` `repository/workflow.md`
 - `operations/README.md` `operations/verification.md` `operations/compose.md` `operations/running.md`
 - `agent/README.md` `agent/work-loop.md` `agent/handoff.md` `agent/honest-state.md`
+  `agent/no-placeholder-runtime.md`
 - `execution/README.md` `execution/operating-rules.md` `execution/current-blockers.md`
 - `execution/current-work/README.md` `execution/current-work/owner-reported-failures.md`
   `execution/current-work/action-fault-recovery.md` `execution/current-work/document-structure-redesign.md`

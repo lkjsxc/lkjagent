@@ -8,6 +8,7 @@ case state instead of passing vague owner text directly to the model endpoint.
 ## Table of Contents
 
 - [prompt-frame.md](prompt-frame.md): fields that every model turn receives.
+- [runtime-source.md](runtime-source.md): runtime decision and context-frame source rules.
 - [state-selected-prompts.md](state-selected-prompts.md): prompt mode selection by hard state.
 - [documentation-prompts.md](documentation-prompts.md): documentation task prompt modes.
 - [generic-model-language.md](generic-model-language.md): provider-neutral wording rules.
