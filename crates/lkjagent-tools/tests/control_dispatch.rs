@@ -31,8 +31,19 @@ fn control_tools_close_wait_and_report_errors() -> TestResult<()> {
     assert!(is_error(&second_done));
 
     let mut ask_state = state();
-    let ask = dispatch(
+    let vague_ask = dispatch(
         &action("agent.ask", &[("question", "Need input?")]),
+        &runtime,
+        &mut conn,
+        &mut ask_state,
+    );
+    assert!(is_error(&vague_ask));
+    assert!(vague_ask.content.contains("concrete external"));
+    let ask = dispatch(
+        &action(
+            "agent.ask",
+            &[("question", "Should the report focus on Rust or SQLite?")],
+        ),
         &runtime,
         &mut conn,
         &mut ask_state,

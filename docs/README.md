@@ -34,7 +34,8 @@ directories with short focused files.
 
 - `current-state.md`
 - `vision/README.md` `vision/north-star.md` `vision/principles.md` `vision/scope.md`
-- `product/README.md` `product/daemon.md` `product/cli.md` `product/queue.md` `product/observability.md`
+- `product/README.md` `product/daemon.md` `product/yolo-mode.md` `product/cli.md`
+  `product/queue.md` `product/observability.md`
 - `state/README.md` `state/hard-state.md` `state/weighted-state.md` `state/state-vector.md`
   `state/transition-handbook.md` `state/track-update-policy.md` `state/track-guards.md`
 - `prompting/README.md` `prompting/prompt-frame.md` `prompting/runtime-source.md`
@@ -88,7 +89,7 @@ directories with short focused files.
   `architecture/runtime/queue-intake.md` `architecture/runtime/self-maintenance.md`
 - `architecture/runtime/authority/README.md` `architecture/runtime/authority/reducer.md`
   `architecture/runtime/authority/wiring-map.md` `architecture/runtime/authority/missions.md`
-  `architecture/runtime/authority/tool-admission.md`
+  `architecture/runtime/authority/tool-admission.md` `architecture/runtime/authority/owner-questions.md`
   `architecture/runtime/authority/completion.md` `architecture/runtime/authority/maintenance.md`
   `architecture/runtime/authority/compaction.md` `architecture/runtime/authority/turn-authority.md`
   `architecture/runtime/authority/mode-priority.md` `architecture/runtime/authority/tool-policy.md`

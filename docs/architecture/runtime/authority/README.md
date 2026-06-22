@@ -87,6 +87,7 @@ benchmark fixtures.
 - [turn-authority.md](turn-authority.md): single turn decision object.
 - [mode-priority.md](mode-priority.md): deterministic mission priority order.
 - [tool-admission.md](tool-admission.md): explainable admission and refusal data.
+- [owner-questions.md](owner-questions.md): strict external-question admission gate.
 - [tool-policy.md](tool-policy.md): admitted and blocked tool classes.
 - [evidence-policy.md](evidence-policy.md): evidence ledger requirements.
 - [completion.md](completion.md): close eligibility and refusal contract.

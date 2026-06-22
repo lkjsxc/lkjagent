@@ -24,13 +24,13 @@ pub const PLAN_RESUME_ACTION: &str = "<act>
 
 pub const ASK_ACTION: &str = "<act>
 <tool>agent.ask</tool>
-<question>Need detail?</question>
+<question>Should the output target Rust or SQLite?</question>
 </act>";
 
 pub const OWNER_QUESTION_NOTE_ACTION: &str = "<act>
 <tool>graph.note</tool>
 <kind>question</kind>
-<summary>Need detail?</summary>
+<summary>Should the output target Rust or SQLite?</summary>
 </act>";
 
 pub const DONE_WRITE_ACTION: &str = "<act>

@@ -4,16 +4,19 @@ use lkjagent_tools::dispatch::registry_valid_example;
 
 pub fn admit_tool(snapshot: &RuntimeSnapshot, requested_tool: &str) -> ToolAdmission {
     let next_valid_tools = next_valid_tools(snapshot);
-    let example_tool = example_tool(requested_tool, &next_valid_tools);
-    let exact_valid_example = example_tool.map(valid_example);
     let completion_blocked =
         requested_tool == "agent.done" && !snapshot.missing_evidence.is_empty();
+    let owner_question_blocked =
+        requested_tool == "agent.ask" && !snapshot.external_owner_input_required;
     let repeated_blocked = snapshot.repeated_action
         && snapshot
             .last_tool_attempt
             .as_deref()
             .is_some_and(|tool| tool == requested_tool);
+    let example_tool = example_tool(requested_tool, &next_valid_tools, repeated_blocked);
+    let exact_valid_example = example_tool.map(valid_example);
     let admitted = !completion_blocked
+        && !owner_question_blocked
         && !repeated_blocked
         && next_valid_tools.iter().any(|tool| tool == requested_tool);
     let reason = reason(
@@ -21,6 +24,7 @@ pub fn admit_tool(snapshot: &RuntimeSnapshot, requested_tool: &str) -> ToolAdmis
         requested_tool,
         admitted,
         completion_blocked,
+        owner_question_blocked,
         repeated_blocked,
     );
     ToolAdmission {
@@ -61,6 +65,9 @@ pub fn next_valid_tools(snapshot: &RuntimeSnapshot) -> Vec<String> {
             ],
         );
     }
+    if snapshot.external_owner_input_required {
+        extend_unique(&mut tools, &["agent.ask"]);
+    }
     if tools.is_empty() && snapshot.active_mission == ActiveMode::ClosedIdle {
         tools.push("runtime.wait".to_string());
     }
@@ -72,6 +79,7 @@ fn reason(
     requested_tool: &str,
     admitted: bool,
     completion_blocked: bool,
+    owner_question_blocked: bool,
     repeated_blocked: bool,
 ) -> String {
     if admitted {
@@ -79,6 +87,9 @@ fn reason(
     }
     if completion_blocked {
         return "completion missing required evidence".to_string();
+    }
+    if owner_question_blocked {
+        return "owner question requires concrete external missing input".to_string();
     }
     if repeated_blocked {
         return "repeat action suppressed by runtime authority".to_string();
@@ -103,7 +114,17 @@ fn contradiction(
     None
 }
 
-fn example_tool<'a>(requested_tool: &'a str, next_valid_tools: &'a [String]) -> Option<&'a str> {
+fn example_tool<'a>(
+    requested_tool: &'a str,
+    next_valid_tools: &'a [String],
+    repeated_blocked: bool,
+) -> Option<&'a str> {
+    if repeated_blocked {
+        return next_valid_tools
+            .iter()
+            .find(|tool| tool.as_str() != requested_tool)
+            .map(String::as_str);
+    }
     if next_valid_tools.iter().any(|tool| tool == requested_tool) {
         return Some(requested_tool);
     }

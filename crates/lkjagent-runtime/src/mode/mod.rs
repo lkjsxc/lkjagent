@@ -5,6 +5,7 @@ pub mod decision;
 pub mod input;
 pub mod model;
 pub mod policy;
+pub mod recovery;
 pub mod reducer;
 pub mod render;
 pub mod select;
@@ -18,10 +19,11 @@ pub use completion::{
 pub use decision::{endpoint_decision_for, EndpointDecision};
 pub use input::TurnAuthorityInput;
 pub use model::{
-    ActiveMode, ActiveModeInput, ActiveModePolicy, RuntimeDecision, RuntimeEvent, RuntimeFault,
-    RuntimeSnapshot, ToolAdmission,
+    ActiveMode, ActiveModeInput, ActiveModePolicy, RecoveryClass, RecoveryPlan, RuntimeDecision,
+    RuntimeEvent, RuntimeFault, RuntimeSnapshot, ToolAdmission,
 };
 pub use policy::policy_for_mode;
+pub use recovery::recovery_plan_for_fault;
 pub use reducer::decide;
 pub use render::{render_mode_policy, render_turn_authority};
 pub use select::select_active_mode;

@@ -108,10 +108,11 @@ docker compose run --rm verify
 
 ## Status
 
-open for the full fault-class table. Implemented recovery pieces include graph
+open for full loop enforcement. Implemented recovery pieces include graph
 selector integration, escape-tool visibility, internal-question refusal,
-batch-oriented examples, and benchmark fixtures named above. The remaining
-controller work is fault-class-specific retry budgets, fallback actions,
-partial handoff policy, and proof that repeated invalid actions always change
-shape. Focused tests and Docker Compose verification are required before this
-blocker can close.
+batch-oriented examples, a pure fault-class recovery plan table, and benchmark
+fixtures named above. The remaining controller work is durable retry state,
+blocked handoff writes, endpoint-loop integration for every fault class, and
+proof that repeated invalid actions always change shape in live dispatch.
+Focused tests and Docker Compose verification are required before this blocker
+can close.

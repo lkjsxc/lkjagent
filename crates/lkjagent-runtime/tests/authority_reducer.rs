@@ -1,5 +1,6 @@
 use lkjagent_runtime::mode::{
-    admit_tool, decide, ActiveMode, RuntimeDecision, RuntimeEvent, RuntimeFault, RuntimeSnapshot,
+    admit_tool, decide, ActiveMode, RecoveryClass, RuntimeDecision, RuntimeEvent, RuntimeFault,
+    RuntimeSnapshot,
 };
 use lkjagent_tools::dispatch::registry_valid_example;
 
@@ -49,10 +50,11 @@ fn payload_too_large_routes_to_batch_write_recovery() {
         },
     );
 
-    assert!(matches!(decision, RuntimeDecision::ContinueRecovery(_)));
-    let RuntimeDecision::ContinueRecovery(admission) = decision else {
+    assert!(matches!(decision, RuntimeDecision::ContinueRecovery { .. }));
+    let RuntimeDecision::ContinueRecovery { plan, admission } = decision else {
         return;
     };
+    assert_eq!(plan.recovery_class, RecoveryClass::PayloadOverflow);
     assert!(admission
         .next_valid_tools
         .contains(&"fs.batch_write".to_string()));
@@ -98,12 +100,17 @@ fn repeated_action_is_not_executed_again() {
         },
     );
 
-    assert!(matches!(decision, RuntimeDecision::ContinueRecovery(_)));
-    let RuntimeDecision::ContinueRecovery(admission) = decision else {
+    assert!(matches!(decision, RuntimeDecision::ContinueRecovery { .. }));
+    let RuntimeDecision::ContinueRecovery { plan, admission } = decision else {
         return;
     };
+    assert_eq!(plan.recovery_class, RecoveryClass::RepeatActionFault);
     assert!(!admission.admitted);
     assert!(admission.reason.contains("repeat action"));
+    assert_ne!(
+        admission.exact_valid_example.as_deref(),
+        registry_valid_example("graph.recover").as_deref()
+    );
 }
 
 #[test]
@@ -134,6 +141,7 @@ fn maintenance_tick_yields_when_owner_work_exists() {
         active_artifact: None,
         last_tool_attempt: None,
         repeated_action: false,
+        external_owner_input_required: false,
     };
 
     assert_eq!(
@@ -154,6 +162,7 @@ fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
         active_artifact: Some("dictionary/bread-terms.txt".to_string()),
         last_tool_attempt: None,
         repeated_action: false,
+        external_owner_input_required: false,
     }
 }
 
@@ -169,5 +178,6 @@ fn recovery_snapshot() -> RuntimeSnapshot {
         active_artifact: Some("dictionary/bread-terms.txt".to_string()),
         last_tool_attempt: Some("fs.write".to_string()),
         repeated_action: false,
+        external_owner_input_required: false,
     }
 }

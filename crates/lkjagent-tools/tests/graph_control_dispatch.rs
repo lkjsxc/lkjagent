@@ -117,7 +117,10 @@ fn dispatcher_reports_validation_and_repeat_notices() -> TestResult<()> {
     assert!(matches!(unknown.kind, OutputKind::Notice { .. }));
     assert!(unknown.content.contains("valid tools"));
 
-    let ask = action("agent.ask", &[("question", "Continue?")]);
+    let ask = action(
+        "agent.ask",
+        &[("question", "Should the guide target beginners or experts?")],
+    );
     let first = dispatch_with_text(&ask, "same-act", &runtime, &mut conn, &mut state);
     let second = dispatch_with_text(&ask, "same-act", &runtime, &mut conn, &mut state);
     assert!(first.content.contains("waiting"));
