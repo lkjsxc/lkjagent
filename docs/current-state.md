@@ -32,7 +32,7 @@ prove that their failures cannot recur.
 | Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current model run snapshot. |
 | Document scaffold seed | Deterministic scaffold paths exist for project, lkjagent-model, multi-topic docs, story, and cookbook roots. |
 | Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, and scaffold-only leaves. |
-| Placeholder refusal | `fs.write`, `fs.batch_write`, and content audit reject common scaffold and placeholder phrase classes before mutation. |
+| Placeholder and payload refusal | `fs.write`, `fs.batch_write`, and content audit reject common scaffold phrases and oversized payloads before mutation. |
 | Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
 | Hard compaction mode | A runtime-owned `Compaction` active mode exists and does not render `memory.save` as a model action. |
 | Baseline benchmarks | The corpus includes owner-reported recovery, artifact, memory, accounting, and model-log signatures. |
@@ -91,6 +91,9 @@ This session ran these gates after the documentation catalog edits:
 - `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`.
 - `cargo fmt --check`: `EXIT=0`.
 - `cargo test -p lkjagent-xtask`: `TEST_EXIT=0`.
+- `cargo test -p lkjagent-tools --test fs_payload`: `PAYLOAD_EXIT=0`.
+- `cargo test -p lkjagent-tools --test typed_tools`: `TYPED_EXIT=0`.
+- `cargo test -p lkjagent-tools`: `TEST_EXIT=0`.
 
 Earlier gates recorded for the recovery-model slice:
 

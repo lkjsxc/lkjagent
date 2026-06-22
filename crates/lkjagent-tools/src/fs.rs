@@ -3,6 +3,8 @@ use std::path::{Component, Path, PathBuf};
 
 use crate::error::{ToolError, ToolResult};
 
+pub const MAX_INLINE_FILE_BYTES: usize = 1_800;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FileRead {
     pub path: String,
@@ -85,6 +87,12 @@ pub fn read_observation(read: &FileRead) -> String {
 
 pub fn write(workspace: &Path, path: &str, content: &str) -> ToolResult<String> {
     crate::placeholder::reject_for_path(path, content)?;
+    if content.len() > MAX_INLINE_FILE_BYTES {
+        return Err(ToolError::invalid(format!(
+            "payload too large for fs.write: bytes={} max={MAX_INLINE_FILE_BYTES}; use fs.batch_write",
+            content.len()
+        )));
+    }
     let full_path = workspace_path(workspace, path)?;
     if let Some(parent) = full_path.parent() {
         fs::create_dir_all(parent)?;
@@ -119,7 +127,7 @@ pub fn edit(workspace: &Path, path: &str, find: &str, replace: &str) -> ToolResu
 }
 
 pub fn patch(workspace: &Path, path: &str, patch: &str) -> ToolResult<PatchReport> {
-    let edits = parse_patch(patch)?;
+    let edits = crate::fs_patch::parse_patch(patch)?;
     let full_path = workspace_path(workspace, path)?;
     let original = fs::read_to_string(&full_path)?;
     let mut text = original.clone();
@@ -150,30 +158,6 @@ pub fn edit_observation(report: &EditReport) -> String {
 
 pub fn patch_observation(report: &PatchReport) -> String {
     format!("path={}\nedits={}", report.path, report.edits)
-}
-
-fn parse_patch(patch: &str) -> ToolResult<Vec<(String, String)>> {
-    let mut edits = Vec::new();
-    for block in patch.split("-- lkjagent-next-edit --") {
-        let trimmed = block.trim_matches('\n');
-        if trimmed.trim().is_empty() {
-            continue;
-        }
-        let Some(rest) = trimmed.strip_prefix("find:\n") else {
-            return Err(ToolError::invalid("each patch block must start with find:"));
-        };
-        let Some((find, replace)) = rest.split_once("\nreplace:\n") else {
-            return Err(ToolError::invalid("each patch block needs replace:"));
-        };
-        if find.is_empty() {
-            return Err(ToolError::invalid("patch find must not be empty"));
-        }
-        edits.push((find.to_string(), replace.to_string()));
-    }
-    if edits.is_empty() || edits.len() > 20 {
-        return Err(ToolError::invalid("patch edits must be 1..20"));
-    }
-    Ok(edits)
 }
 
 pub(crate) fn workspace_path(workspace: &Path, path: &str) -> ToolResult<PathBuf> {

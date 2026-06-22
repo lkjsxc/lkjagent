@@ -106,7 +106,7 @@ fn fs_batch_write_validates_escape_before_any_write() -> TestResult<()> {
 #[test]
 fn fs_batch_write_rejects_large_file_before_any_write() -> TestResult<()> {
     let workspace = temp_workspace("fs-batch-large-file")?;
-    let large = "x".repeat(65_537);
+    let large = "x".repeat(1_801);
     let files = format!(
         "path: out/one.md\ncontent:\n# One\n-- lkjagent-next-file --\npath: out/two.md\ncontent:\n{large}\n"
     );
@@ -114,7 +114,7 @@ fn fs_batch_write_rejects_large_file_before_any_write() -> TestResult<()> {
     let output = dispatch_action(&workspace, "fs.batch_write", &[("files", &files)])?;
 
     assert!(is_error(&output));
-    assert!(output.content.contains("file too large"));
+    assert!(output.content.contains("payload too large"));
     assert!(!workspace.join("out/one.md").exists());
     Ok(())
 }

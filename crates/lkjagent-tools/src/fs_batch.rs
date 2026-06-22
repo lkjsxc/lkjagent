@@ -5,8 +5,8 @@ use std::path::Path;
 use crate::error::{ToolError, ToolResult};
 use crate::fs::{workspace_path, write};
 
-const MAX_FILE_BYTES: usize = 65_536;
-const MAX_TOTAL_BYTES: usize = 262_144;
+const MAX_FILE_BYTES: usize = crate::fs::MAX_INLINE_FILE_BYTES;
+const MAX_TOTAL_BYTES: usize = 6_000;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct BatchFile {
@@ -65,14 +65,14 @@ fn validate_batch(workspace: &Path, files: &[BatchFile], max_files: usize) -> To
         let bytes = file.content.len();
         if bytes > MAX_FILE_BYTES {
             return Err(ToolError::invalid(format!(
-                "file too large: {} bytes={bytes} max={MAX_FILE_BYTES}",
+                "payload too large for fs.batch_write file: {} bytes={bytes} max={MAX_FILE_BYTES}",
                 file.path
             )));
         }
         total = total.saturating_add(bytes);
         if total > MAX_TOTAL_BYTES {
             return Err(ToolError::invalid(format!(
-                "batch too large: bytes={total} max={MAX_TOTAL_BYTES}"
+                "payload too large for fs.batch_write batch: bytes={total} max={MAX_TOTAL_BYTES}"
             )));
         }
     }
