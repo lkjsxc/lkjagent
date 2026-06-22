@@ -16,6 +16,11 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
     let daemon_question = state_value(&conn, "daemon question", "none")?;
     let daemon_error = state_value(&conn, "daemon error", "none")?;
     let turns = state_value(&conn, "turn", "0")?;
+    let continuation_epoch = state_value(&conn, "continuation epoch", "0")?;
+    let continuation_turns = state_value(&conn, "continuation turns used", "0")?;
+    let checkpoint_turns = state_value(&conn, "checkpoint turns", "0")?;
+    let checkpoint_reason = state_value(&conn, "last checkpoint reason", "none")?;
+    let continuation_decision = state_value(&conn, "continuation decision", "none")?;
     let last_compaction = last_compaction(&conn)?;
     let active_states = active_states(&conn)?;
     let model_log = lkjagent_runtime::model_log::current_log_path(data_dir);
@@ -29,7 +34,7 @@ pub fn status(data_dir: &Path) -> Result<String, CliError> {
         pressure_name(policy.pressure(used_tokens, 0)),
     )?;
     Ok(format!(
-        "{}\n{}\n{}\ndaemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\ndaemon_question={daemon_question}\ndaemon_error={daemon_error}\nturns={turns}\nactive_states={active_states}\nmodel_log={}\ncontext_window={}\ncontext_reserve={}\ncontext_used_tokens={used}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_soft_trigger={}\ncontext_hard_trigger={}\ncontext_post_compaction_target={}\ncontext_pressure={pressure}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
+        "{}\n{}\n{}\ndaemon_state={daemon_state}\nqueue_depth={queue_depth}\nopen_task={open_task}\ndaemon_question={daemon_question}\ndaemon_error={daemon_error}\nturns={turns}\ncontinuation_epoch={continuation_epoch}\ncontinuation_turns={continuation_turns}\ncheckpoint_turns={checkpoint_turns}\nlast_checkpoint_reason={checkpoint_reason}\ncontinuation_decision={continuation_decision}\nactive_states={active_states}\nmodel_log={}\ncontext_window={}\ncontext_reserve={}\ncontext_used_tokens={used}\ncontext_prefix_cap={}\ncontext_log_space={}\ncontext_soft_trigger={}\ncontext_hard_trigger={}\ncontext_post_compaction_target={}\ncontext_pressure={pressure}\ncontext_compaction_trigger={}\nlast_compaction={last_compaction}",
         accounting.context_line,
         accounting.token_line,
         accounting.prefix_line,

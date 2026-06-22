@@ -6,6 +6,7 @@ use crate::error::{RuntimeError, RuntimeResult};
 use crate::mode::EndpointDecision;
 use crate::prompt::token_estimate;
 use crate::step::{step, StepInput};
+use crate::task::TaskState;
 
 impl ResidentDaemon {
     pub(super) fn endpoint_turn(
@@ -38,6 +39,11 @@ impl ResidentDaemon {
                 return Ok(DaemonTick::Idle);
             }
             EndpointDecision::CallModel => {}
+        }
+        if self.task_checkpoint_due() {
+            self.state.continuation_epoch.checkpoint_turns = self.runtime.task_turn_budget.max(1);
+            let result = step(self.state.clone(), StepInput::TurnBudgetCheckpoint);
+            return self.apply_step_result(conn, now, result, false);
         }
         self.refresh_authority_card(&authority);
         match endpoint_complete(
@@ -97,6 +103,11 @@ impl ResidentDaemon {
         self.endpoint_retry_at = None;
         let result = step(self.state.clone(), StepInput::EndpointOversize { preview });
         self.apply_step_result(conn, now, result, false)
+    }
+
+    fn task_checkpoint_due(&self) -> bool {
+        matches!(self.state.task, TaskState::Open { turns_remaining: 0 })
+            && self.state.pending_action.is_none()
     }
 
     fn endpoint_retry_pending(&mut self, now: &str) -> bool {

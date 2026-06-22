@@ -22,7 +22,9 @@ maintenance, and completion.
 The runtime computes one turn authority before an endpoint call and before any
 dispatch. That authority selects one active mode, one effective tool policy,
 one endpoint decision, and one completion policy. Prompt text explains the
-authority; it does not create it.
+authority; it does not create it. Continuation checkpoints are reduced through
+this same authority and default to autonomous continuation when admitted work
+remains.
 
 ## Status
 

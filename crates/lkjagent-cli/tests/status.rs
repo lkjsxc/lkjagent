@@ -65,3 +65,23 @@ fn status_prints_unknown_token_usage_as_unknown() -> TestResult<()> {
         .contains("in=unknown out=unknown cache=unknown total=unknown"));
     Ok(())
 }
+
+#[test]
+fn status_prints_continuation_checkpoint_state() -> TestResult<()> {
+    let data = temp_data("status-continuation")?;
+    let conn = open_store(&data)?;
+    lkjagent_store::state::set(&conn, "continuation epoch", "2")?;
+    lkjagent_store::state::set(&conn, "continuation turns used", "5")?;
+    lkjagent_store::state::set(&conn, "checkpoint turns", "8")?;
+    lkjagent_store::state::set(&conn, "continuation decision", "continue-owner-execution")?;
+
+    let status = run_cli(["--data", data.to_string_lossy().as_ref(), "status"]);
+
+    assert!(status.stdout.contains("continuation_epoch=2"));
+    assert!(status.stdout.contains("continuation_turns=5"));
+    assert!(status.stdout.contains("checkpoint_turns=8"));
+    assert!(status
+        .stdout
+        .contains("continuation_decision=continue-owner-execution"));
+    Ok(())
+}

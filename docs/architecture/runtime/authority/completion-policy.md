@@ -25,7 +25,9 @@ completion_allowed(case) iff:
 ```
 
 The same gate is used by `agent.done`, graph close, maintenance close, recovery
-handoff, turn-budget exhaustion, console close, and daemon shutdown handoff.
+handoff, turn-budget checkpoint, console close, and daemon shutdown handoff.
+A checkpoint that lacks evidence refuses completion and continues with an
+admitted internal next action when one exists.
 
 ## Refusal Shape
 

@@ -69,6 +69,7 @@ RuntimeEvent
 - context_pressure_detected
 - compaction_completed
 - maintenance_tick
+- turn_budget_checkpoint
 - turn_budget_exhausted
 ```
 
@@ -129,7 +130,8 @@ absent.
 - Parse recovery admits previous mission escape tools.
 - Payload overflow admits `artifact.next` and `fs.batch_write`.
 - Hard compaction preserves previous mission and exact next action.
-- Turn-budget exhaustion produces a partial handoff when evidence is missing.
+- Turn-budget checkpoint continues autonomously when legal work remains.
+- Turn-budget exhaustion produces a partial handoff only when no route remains.
 
 ## Failure Cases
 

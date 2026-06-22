@@ -47,6 +47,8 @@ current task closes.
 - Waiting never blocks senders: with an empty queue the daemon remains
   waiting and returns to work when another message arrives through
   `lkjagent send`.
+- Turn-budget checkpoints do not create waiting state and do not require a
+  queue message that says continue.
 
 ## Bounds
 

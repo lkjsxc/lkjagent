@@ -79,6 +79,10 @@ maintenance restarts after no useful work.
   record/describe, placeholder, stub, scaffold-only, future-work, and empty-TOC
   prose before `fs.write` and `fs.batch_write` mutate files. This narrows row
   3, but semantic artifact identity and deeper readiness remain open.
+- Turn-budget boundaries now write a continuation checkpoint, reset the epoch,
+  expose continuation state, and continue owner work without generic owner
+  guidance. This narrows rows 1, 2, 5, and 6; progress audit and benchmark
+  fixture expansion remain open.
 - Current memory pruning deletes exact duplicates and merges same-title
   high-overlap rows with source IDs, but rewrite pruning remains open under
   row 8.

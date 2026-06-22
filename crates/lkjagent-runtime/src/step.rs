@@ -11,6 +11,7 @@ use crate::task::{RuntimeState, StopReason};
 
 mod action_params;
 mod budget;
+mod budget_render;
 mod compact;
 mod cycle;
 mod effects_model;
@@ -47,6 +48,7 @@ pub enum StepInput {
         content: String,
         tokens: usize,
     },
+    TurnBudgetCheckpoint,
     EndpointOversize {
         preview: String,
     },
@@ -85,6 +87,7 @@ pub fn step(state: RuntimeState, input: StepInput) -> StepResult {
             turn_budget,
         ),
         StepInput::Completion { content, tokens } => completion_step(state, content, tokens),
+        StepInput::TurnBudgetCheckpoint => budget::task_checkpoint_step(state),
         StepInput::EndpointOversize { preview } => turn::endpoint_oversize_step(state, &preview),
         StepInput::ToolOutput(output) => tool_output_step(state, output),
         StepInput::Compact {

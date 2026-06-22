@@ -116,6 +116,7 @@ pub enum RuntimeEvent {
     MaintenanceTick,
     CompletionRequested,
     QueueBecameNonEmpty,
+    TurnBudgetCheckpoint,
     TurnBudgetExhausted,
 }
 

@@ -42,11 +42,13 @@ and closed by an agent.done action admitted by the graph completion gate.
 | waiting | agent.ask emitted; loop waits until another send arrives |
 | closed | agent.done admitted; summary, evidence, and memory links recorded |
 
-A task carries a turn budget loaded from `task.turn-budget`, defaulting to
-64 turns. The final budgeted turn is still admitted. If the daemon reaches
-another endpoint turn after the budget is exhausted, it records a budget
-fault and routes to recovery or a concrete owner question when no legal graph
-path remains.
+A task carries a continuation checkpoint interval loaded from
+`task.turn-budget`, defaulting to 64 endpoint turns. The final budgeted turn is
+still admitted. If the daemon reaches another endpoint turn at the boundary,
+it records a `TurnBudgetCheckpoint`, refreshes runtime authority, opens the
+next epoch, and continues autonomously when a legal internal route remains.
+The budget boundary is not a permission prompt and does not ask the owner to
+say continue.
 Repeated parse faults, repeated actions, or tool errors record typed faults
 and route to recovery nodes such as recover-parse, recover-repeat, or
 recover-tool. Recovery changes the next action class: inspect graph state,

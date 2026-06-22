@@ -52,8 +52,9 @@ stay inside the task: the daemon records the failure and adds a recovery
 notice for the next model turn. Consecutive failures of the same class route
 to graph recovery nodes that inspect state, narrow scope, use alternate
 native tools, replan, or use shell only when graph policy admits it.
-Task budget exhaustion records a budget fault and asks the owner only when no
-legal recovery path remains.
+Task budget exhaustion records a continuation checkpoint, refreshes runtime
+authority, opens the next epoch, and continues without owner guidance when
+admitted work remains. It asks the owner only for a concrete external blocker.
 When a user task closes, the task summary stamps maintenance directives so
 the daemon shows idle until the maintenance cooldown passes or owner work
 arrives. It then returns to due maintenance instead of stopping permanently.

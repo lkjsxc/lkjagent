@@ -47,7 +47,7 @@ CompactionResume
 ## Invariants
 
 - Hard pressure snapshots before owner intake, recovery prompts, maintenance,
-  or completion prompts.
+  completion prompts, or checkpoint continuation prompts.
 - Post-compaction state resumes the previous mission, not idle maintenance.
 - Artifact repair resumes at the next unwritten weak path.
 - Parse recovery resumes with previous mission escape tools preserved.
@@ -59,6 +59,7 @@ CompactionResume
 - Snapshot loses artifact repair cursor or recovery class.
 - Post-compaction authority is reconstructed from prose only.
 - Compaction enters maintenance while owner evidence is missing.
+- A turn-budget checkpoint asks the owner to continue because compaction ran.
 
 ## Fixture
 
