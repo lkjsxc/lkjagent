@@ -1,6 +1,6 @@
 use lkjagent_runtime::mode::{
-    decide, recovery_plan_for_fault, ActiveMode, RecoveryClass, RuntimeDecision, RuntimeEvent,
-    RuntimeFault, RuntimeSnapshot,
+    admit_tool, decide, recovery_plan_for_fault, ActiveMode, RecoveryClass, RuntimeDecision,
+    RuntimeEvent, RuntimeFault, RuntimeSnapshot,
 };
 
 #[test]
@@ -119,6 +119,28 @@ fn turn_budget_exhaustion_selects_blocked_handoff_plan() {
     assert_eq!(plan.recovery_class, RecoveryClass::TurnBudgetExhaustion);
     assert!(plan.partial_handoff);
     assert_eq!(plan.forced_tool, "runtime.handoff");
+}
+
+#[test]
+fn verification_recovery_forced_tool_is_admitted() {
+    let snapshot = recovery_snapshot();
+    let plan = recovery_plan_for_fault(&snapshot, RuntimeFault::VerificationMismatch);
+
+    let admission = admit_tool(&snapshot, &plan.forced_tool);
+
+    assert_eq!(plan.forced_tool, "verify.xtask");
+    assert!(admission.admitted);
+}
+
+#[test]
+fn maintenance_preemption_recovery_forced_tool_is_admitted() {
+    let snapshot = recovery_snapshot();
+    let plan = recovery_plan_for_fault(&snapshot, RuntimeFault::MaintenanceConflict);
+
+    let admission = admit_tool(&snapshot, &plan.forced_tool);
+
+    assert_eq!(plan.forced_tool, "queue.list");
+    assert!(admission.admitted);
 }
 
 fn recovery_snapshot() -> RuntimeSnapshot {
