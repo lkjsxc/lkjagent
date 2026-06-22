@@ -11,6 +11,7 @@ tracks, state intensity, and transition quality.
 - [state-intensity.md](state-intensity.md): ranking score inputs.
 - [transition-quality.md](transition-quality.md): transition scoring.
 - [owner-input.md](owner-input.md): objective envelope from owner evidence.
+- [weighted-state-vector.md](weighted-state-vector.md): concurrent guard tracks and deterministic updates.
 
 ## Local Map
 
@@ -18,6 +19,7 @@ tracks, state intensity, and transition quality.
 - [state-intensity.md](state-intensity.md): owns rank formula.
 - [transition-quality.md](transition-quality.md): owns transition value checks.
 - [owner-input.md](owner-input.md): owns raw-to-normalized task framing.
+- [weighted-state-vector.md](weighted-state-vector.md): owns track labels, guard thresholds, and context slices.
 
 ## Reading Paths
 
