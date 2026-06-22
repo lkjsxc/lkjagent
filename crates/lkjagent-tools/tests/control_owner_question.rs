@@ -67,6 +67,49 @@ fn agent_ask_refuses_internal_graph_recovery_question() -> TestResult<()> {
 }
 
 #[test]
+fn agent_ask_refuses_vague_need_input_question() -> TestResult<()> {
+    let output = ask("Need input?")?;
+
+    assert!(is_error(&output));
+    assert!(output.content.contains("concrete external"));
+    assert!(output.content.contains("<tool>workspace.summary</tool>"));
+    Ok(())
+}
+
+#[test]
+fn agent_ask_refuses_audit_and_repair_questions() -> TestResult<()> {
+    let audit = ask("Should I run doc.audit before completion?")?;
+    let repair = ask("Should I repair placeholder weak paths?")?;
+
+    assert!(is_error(&audit));
+    assert!(audit.content.contains("audits are runtime-owned"));
+    assert!(audit.content.contains("<tool>doc.audit</tool>"));
+    assert!(is_error(&repair));
+    assert!(repair.content.contains("artifact repair is runtime-owned"));
+    assert!(repair.content.contains("<tool>artifact.next</tool>"));
+    Ok(())
+}
+
+#[test]
+fn agent_ask_refuses_compaction_preemption_and_completion_questions() -> TestResult<()> {
+    let compaction = ask("Should I perform compaction now?")?;
+    let preempt = ask("Should I preempt maintenance for queued owner work?")?;
+    let completion = ask("Should I refuse completion because evidence is missing?")?;
+
+    assert!(is_error(&compaction));
+    assert!(compaction.content.contains("compaction is runtime-owned"));
+    assert!(is_error(&preempt));
+    assert!(preempt
+        .content
+        .contains("maintenance preemption is runtime-owned"));
+    assert!(is_error(&completion));
+    assert!(completion
+        .content
+        .contains("completion refusal is runtime-owned"));
+    Ok(())
+}
+
+#[test]
 fn agent_ask_admits_true_owner_scope_choice() -> TestResult<()> {
     let output = ask("Should the cookbook focus on sourdough or quick breads?")?;
 

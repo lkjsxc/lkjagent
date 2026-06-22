@@ -71,17 +71,19 @@ variables do not turn missing-config and lock-refusal tests into daemon loops.
 
 ## Active Redesign Target
 
-The current target is a runtime-owned authority layer above graph suggestions,
-model actions, maintenance, compaction, verification, and completion. The
+The current target is a YOLO-first runtime-owned authority layer above graph
+suggestions, model actions, maintenance, compaction, verification, owner
+questions, and completion. The
 target outcomes are:
 
 1. Runtime-owned active mode and tool admission.
 2. Deterministic recovery controller.
 3. Content-bearing artifact completion gates.
 4. Runtime-owned compaction snapshots.
-5. Maintenance defers owner work.
-6. Uploaded run-log fixtures are covered by mechanical benchmarks.
-7. Docker Compose verification passes after the implementation slice.
+5. Strict owner-question admission for external inputs only.
+6. Maintenance defers owner work.
+7. Uploaded run-log fixtures are covered by mechanical benchmarks.
+8. Docker Compose verification passes after the implementation slice.
 
 The documentation contract now names the required authority, artifact,
 recovery, maintenance, compaction, schema-repair, prompt-source,
@@ -103,7 +105,7 @@ implementation requirements, not proof that the runtime behavior is complete.
 | Memory save and find | partially implemented | accepted kinds, duplicate skip, same-title overlap update, punctuation-safe FTS queries, exact duplicate prune, same-title prune merge, and maintenance no-op lesson merge have focused tests; rewrite pruning remains open |
 | State graph cases | implemented | weighted guards cover mock content, model naming, structure connectivity, parser recovery, artifact drift, queue interruption, maintenance no-op risk, workspace evidence risk, context-frame compilation, and prompt-frame compilation |
 | Owner objective normalization | partially implemented | objective envelope exists; deeper multilingual extraction remains open |
-| Runtime recovery | partially implemented | pure turn authority selection, pure reducer/admission helpers, authority snapshot/event/decision types, store-backed runtime snapshots, one active-mode endpoint card, cached dispatch authority, recovery escape-tool visibility, batch-oriented recovery examples, and effective dispatch repair admissions exist; pure recovery admission includes artifact audit/next/apply, doc audit/scaffold, read/tree/write, and batch tools; `graph.recover` now derives next actions from legal transitions, admitted tools, and plan readiness; internal `agent.ask` questions are refused, runtime close rechecks graph completion, content artifacts require separate audit-derived artifact-readiness evidence, and no-op maintenance defers restart; fault-class-specific deterministic recovery control remains open |
+| Runtime recovery | partially implemented | pure turn authority selection, pure reducer/admission helpers, authority snapshot/event/decision types, store-backed runtime snapshots, one active-mode endpoint card, cached dispatch authority, recovery escape-tool visibility, batch-oriented recovery examples, and effective dispatch repair admissions exist; pure recovery admission includes artifact audit/next/apply, doc audit/scaffold, read/tree/write, and batch tools; `graph.recover` derives next actions from legal transitions, admitted tools, and plan readiness; internal `agent.ask` questions are refused, runtime close rechecks graph completion, content artifacts require audit-derived artifact-readiness evidence, and no-op maintenance defers restart; a pure fault-class recovery plan table now names schema faults, retry budget, forced tool, fallback, and partial-handoff flag; durable retry and handoff wiring remain open |
 | Context budgets | partially implemented | budget model, compact context display, and a pure graph-kernel ContextFrame compiler exist; forced compaction is runtime-owned and renders mission, evidence gaps, artifact root/id, recovery step, last failed action, admitted tools, exact next action, and completion blockers; artifact.next root cursors exist, while richer cursor fields and last-successful-observation snapshots remain open |
 | Token usage ledger | implemented | endpoint usage is parsed, persisted, and preserves unknown fields |
 | Console/status accounting | partially implemented | ranked states plus compact context/token deck and model log path display; last successful action is still shallow |
@@ -148,6 +150,10 @@ workspace-evidence risk tracks now block completion in the graph kernel and
 select suppression or workspace-observation context. It also renames
 owner-visible model handoff surfaces from provider-branded wording to
 `model-log` and `current-model-run.md`.
+The current slice adds the product YOLO contract, strict external-only owner
+question docs, dispatcher refusals for vague or internal `agent.ask` attempts,
+runtime admission gating for owner questions, and a pure recovery plan table
+covering schema faults and turn-budget handoff routes.
 
 ## Out of Scope
 

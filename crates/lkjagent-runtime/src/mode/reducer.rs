@@ -1,5 +1,6 @@
 use super::admission::admit_tool;
 use super::model::{RuntimeDecision, RuntimeEvent, RuntimeFault, RuntimeSnapshot};
+use super::recovery::recovery_plan_for_fault;
 
 pub fn decide(snapshot: &RuntimeSnapshot, event: RuntimeEvent) -> RuntimeDecision {
     if snapshot.context_pressure_active || event == RuntimeEvent::ContextPressureRaised {
@@ -16,12 +17,18 @@ pub fn decide(snapshot: &RuntimeSnapshot, event: RuntimeEvent) -> RuntimeDecisio
             } else if tool == "agent.done" {
                 RuntimeDecision::BlockCompletion(admission)
             } else if snapshot.recovery_ladder_active {
-                RuntimeDecision::ContinueRecovery(admission)
+                let fault = refusal_fault(snapshot, &tool);
+                RuntimeDecision::ContinueRecovery {
+                    plan: recovery_plan_for_fault(snapshot, fault),
+                    admission,
+                }
             } else {
                 RuntimeDecision::RefuseAction(admission)
             }
         }
-        RuntimeEvent::EndpointActionParseFailed => RuntimeDecision::StartRecovery,
+        RuntimeEvent::EndpointActionParseFailed => {
+            RuntimeDecision::StartRecovery(recovery_plan_for_fault(snapshot, RuntimeFault::Parse))
+        }
         RuntimeEvent::ToolFailed { fault } => decision_for_fault(snapshot, fault),
         RuntimeEvent::ToolSucceeded => {
             if snapshot.missing_evidence.is_empty() {
@@ -34,10 +41,15 @@ pub fn decide(snapshot: &RuntimeSnapshot, event: RuntimeEvent) -> RuntimeDecisio
             if snapshot.missing_evidence.is_empty() && !snapshot.recovery_ladder_active {
                 RuntimeDecision::CloseCase
             } else {
-                RuntimeDecision::StartRecovery
+                RuntimeDecision::StartRecovery(recovery_plan_for_fault(
+                    snapshot,
+                    RuntimeFault::VerificationMismatch,
+                ))
             }
         }
-        RuntimeEvent::VerificationFailed => RuntimeDecision::StartRecovery,
+        RuntimeEvent::VerificationFailed => RuntimeDecision::StartRecovery(
+            recovery_plan_for_fault(snapshot, RuntimeFault::VerificationMismatch),
+        ),
         RuntimeEvent::MaintenanceTick => {
             if snapshot.owner_work_exists || snapshot.recovery_ladder_active {
                 RuntimeDecision::AskEndpoint
@@ -55,27 +67,37 @@ pub fn decide(snapshot: &RuntimeSnapshot, event: RuntimeEvent) -> RuntimeDecisio
                 RuntimeDecision::BlockCompletion(admission)
             }
         }
+        RuntimeEvent::TurnBudgetExhausted => RuntimeDecision::StartRecovery(
+            recovery_plan_for_fault(snapshot, RuntimeFault::TurnBudgetExhausted),
+        ),
         RuntimeEvent::ContextPressureRaised => RuntimeDecision::StartCompaction,
     }
 }
 
 fn decision_for_fault(snapshot: &RuntimeSnapshot, fault: RuntimeFault) -> RuntimeDecision {
     match fault {
-        RuntimeFault::PayloadTooLarge => {
-            RuntimeDecision::ContinueRecovery(admit_tool(snapshot, "fs.batch_write"))
-        }
-        RuntimeFault::Repeat => {
-            RuntimeDecision::ContinueRecovery(admit_tool(snapshot, "graph.recover"))
-        }
-        RuntimeFault::CompletionRefused => {
-            RuntimeDecision::BlockCompletion(admit_tool(snapshot, "agent.done"))
-        }
         RuntimeFault::CompactionPressure => RuntimeDecision::StartCompaction,
         RuntimeFault::MaintenanceConflict => RuntimeDecision::AskEndpoint,
-        RuntimeFault::Parse
-        | RuntimeFault::Parameter
-        | RuntimeFault::ToolRuntime
-        | RuntimeFault::PolicyContradiction
-        | RuntimeFault::VerificationMismatch => RuntimeDecision::StartRecovery,
+        RuntimeFault::CompletionRefused | RuntimeFault::FalseCompletion => {
+            RuntimeDecision::BlockCompletion(admit_tool(snapshot, "agent.done"))
+        }
+        other => {
+            let plan = recovery_plan_for_fault(snapshot, other);
+            let admission = admit_tool(snapshot, &plan.forced_tool);
+            RuntimeDecision::ContinueRecovery { plan, admission }
+        }
+    }
+}
+
+fn refusal_fault(snapshot: &RuntimeSnapshot, tool: &str) -> RuntimeFault {
+    if snapshot.repeated_action
+        && snapshot
+            .last_tool_attempt
+            .as_deref()
+            .is_some_and(|last| last == tool)
+    {
+        RuntimeFault::Repeat
+    } else {
+        RuntimeFault::PolicyContradiction
     }
 }

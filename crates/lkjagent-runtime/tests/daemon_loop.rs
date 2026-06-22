@@ -76,7 +76,7 @@ fn daemon_waits_on_ask_and_resumes_from_next_send() -> TestResult<()> {
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Waiting);
     assert_eq!(
         state::get(&conn, "daemon question")?,
-        Some("Need detail?".to_string())
+        Some("Should the output target Rust or SQLite?".to_string())
     );
     queue::enqueue(&mut conn, "guidance", "owner-send", "103")?;
     assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);

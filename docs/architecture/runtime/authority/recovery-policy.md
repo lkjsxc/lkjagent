@@ -32,9 +32,11 @@ RecoveryPlan
 
 ## Classes
 
-Classes include parse faults, parameter faults, tool-admission contradictions,
-repeat-action faults, payload overflow, audit failures, weak artifact content,
-false completion, compaction resume gaps, and maintenance preemption.
+Classes include parse faults, parameter faults, schema faults,
+tool-admission contradictions, repeat-action faults, payload overflow, audit
+failures, weak artifact content, false completion, verification failure,
+compaction resume gaps, maintenance preemption, endpoint faults, and
+turn-budget exhaustion.
 
 ## Required Ladders
 
@@ -67,4 +69,7 @@ Run `cargo test -p lkjagent-runtime recovery_controller`.
 
 ## Status
 
-design-only for the full fault-class table.
+partially implemented. A pure recovery-plan table names the fault class, retry
+budget, forced tool, exact example, fallback, and partial-handoff flag for each
+runtime fault. Durable handoff writes, richer retry state, and full loop wiring
+remain open.

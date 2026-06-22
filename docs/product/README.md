@@ -11,6 +11,7 @@ Internal mechanics live under [../architecture/](../architecture/README.md).
 ## Table of Contents
 
 - [daemon.md](daemon.md): the continuously running process and its lifecycle.
+- [yolo-mode.md](yolo-mode.md): decisive sandbox-first owner-task behavior.
 - [cli.md](cli.md): the thin command-line client and its commands.
 - [queue.md](queue.md): how user messages enter, wait, and resume tasks.
 - [observability.md](observability.md): status, transcript, and memory views.

@@ -47,20 +47,60 @@ pub struct RuntimeSnapshot {
     pub active_artifact: Option<String>,
     pub last_tool_attempt: Option<String>,
     pub repeated_action: bool,
+    pub external_owner_input_required: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RuntimeFault {
     Parse,
     Parameter,
+    Schema,
     ToolRuntime,
     Repeat,
     PolicyContradiction,
     PayloadTooLarge,
+    ArtifactAuditFailure,
+    WeakArtifactContent,
+    FalseCompletion,
     VerificationMismatch,
     CompletionRefused,
     CompactionPressure,
+    CompactionResumeGap,
     MaintenanceConflict,
+    EndpointFault,
+    TurnBudgetExhausted,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RecoveryClass {
+    ParseFault,
+    ParameterFault,
+    SchemaFault,
+    ToolAdmissionContradiction,
+    RepeatActionFault,
+    PayloadOverflow,
+    ArtifactAuditFailure,
+    WeakArtifactContent,
+    FalseCompletion,
+    VerificationFailure,
+    CompactionResumeGap,
+    MaintenancePreemption,
+    EndpointFault,
+    TurnBudgetExhaustion,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RecoveryPlan {
+    pub recovery_class: RecoveryClass,
+    pub previous_mission: ActiveMode,
+    pub retry_budget: u8,
+    pub allowed_observation_tools: Vec<String>,
+    pub allowed_repair_tools: Vec<String>,
+    pub forced_tool: String,
+    pub forced_next_action: String,
+    pub exact_valid_example: String,
+    pub fallback_action: String,
+    pub partial_handoff: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -76,6 +116,7 @@ pub enum RuntimeEvent {
     MaintenanceTick,
     CompletionRequested,
     QueueBecameNonEmpty,
+    TurnBudgetExhausted,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -95,8 +136,11 @@ pub enum RuntimeDecision {
     ExecuteTool(ToolAdmission),
     AskEndpoint,
     RefuseAction(ToolAdmission),
-    StartRecovery,
-    ContinueRecovery(ToolAdmission),
+    StartRecovery(RecoveryPlan),
+    ContinueRecovery {
+        plan: RecoveryPlan,
+        admission: ToolAdmission,
+    },
     StartCompaction,
     StartMaintenance,
     StartVerification,

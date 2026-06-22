@@ -34,8 +34,8 @@ maintenance restarts after no useful work.
 - Runtime authority, recovery, artifact readiness, completion, compaction,
   maintenance, fixtures, memory, and protocol repair move in that order unless
   repository inspection proves a stricter dependency.
-- Stable active-mode, recovery, prompt-source, and artifact docs are contracts,
-  not proof that the blockers are closed.
+- Stable YOLO-mode, active-mode, recovery, prompt-source, and artifact docs are
+  contracts, not proof that the blockers are closed.
 - Docker Compose verification is required for any implemented claim.
 - Historical fixes may exist, but this queue tracks the current controller and
   artifact hardening work until it passes the current final gate.
