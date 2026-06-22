@@ -100,8 +100,9 @@ quiet verify`, then `docker compose run --rm verify`.
 
 ## Status
 
-open; pure turn authority selection, store-backed runtime snapshots, endpoint
+open; pure turn authority selection, store-backed mode snapshots, endpoint
 decisions, one-card endpoint rendering, cached dispatch authority, completion
 policy, mode rendering, dispatch-level effective policy, and effective
-`agent.done` completion refusal exist. Artifact-aware close gates and richer
-compaction snapshots remain open.
+`agent.done` completion refusal exist. Stale-action refusal before dispatch,
+artifact-aware close gates, durable authority snapshots, and richer compaction
+snapshots remain open.

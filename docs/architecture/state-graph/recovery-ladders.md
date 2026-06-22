@@ -2,95 +2,82 @@
 
 ## Purpose
 
-Define how typed faults move through graph recovery without turning generic
-errors into owner waiting.
+Define how typed faults move through graph recovery without turning recoverable
+runtime failures into owner waiting.
 
-## Fault Ledger
+## Fault Classes
 
-Every parse, repeat, tool, shell, endpoint, verification, context, budget, or
-completion fault records:
+The runtime records every fault before selecting recovery. The closed fault
+classes are parse, parameter, tool, repeat, endpoint, budget, context,
+verification, compaction, payload, and completion.
 
-- kind, active node, action fingerprint, summary, count, and timestamp.
-- recovery ladder position and selected strategy.
-- recent-fault health state rendered in the graph card.
+Each record contains kind, active case, active node, action fingerprint,
+parameter shape when present, summary, count, timestamp, ladder position,
+selected route, and the next admitted action class.
 
-Repeated fingerprints are evidence that the next action class must change.
-The runtime records the fault before choosing the next node.
+## Route Table
 
-## Ladder
+| Fault class | First route | Forced action class | Escalation |
+| --- | --- | --- | --- |
+| parse | `recover-parse` | one valid action block | smaller action surface |
+| parameter | `recover-params` | same tool with registry schema | alternate inspection |
+| tool | `recover-tool` | admitted native inspection | alternate native tool |
+| repeat | `recover-repeat` | different tool class | blocked handoff or smaller scope |
+| endpoint | `recover-endpoint` | retry or workspace summary | blocked handoff |
+| budget | `recover-budget` | continuation checkpoint | blocked handoff |
+| context | `recover-context` | runtime context repair | blocked handoff |
+| verification | `recover-verification` | admitted verification or repair | blocked handoff |
+| compaction | `recover-compaction` | runtime compaction snapshot | blocked handoff |
+| payload | `recover-by-bounded-write` | artifact plan or batch write | smaller batch |
+| completion | `recover-completion` | audit or missing evidence repair | blocked completion handoff |
+
+## Ladder Rules
 
 Recovery follows this deterministic order:
 
-1. correct the action format or parameters and retry once.
-2. inspect graph state or workspace state and choose a different native tool.
+1. correct format or parameters and retry once.
+2. inspect graph or workspace state and choose a different native tool.
 3. reduce scope and create a smaller plan step.
 4. route to the matching recovery node and record the decision.
 5. use shell only from a shell-admitted recovery node.
 6. mark the specific plan step blocked and continue an independent step.
 
-Parameter faults have their own route. Three consecutive parser-level
-parameter faults move the graph to `recover-params`, render the valid action
-example for the rejected tool, and expose only `graph.state`, `fs.list`,
-`workspace.summary`, and `agent.ask` as next actions.
+Repeated fingerprints are evidence that the next action class must change. A
+second `graph.next` for the same fault records diagnostic exhaustion and forces
+`graph.recover`, a legal transition, an unused non-mutating native tool, a
+smaller plan step, or a blocked handoff.
 
-Waiting is valid only for a concrete owner decision, context invalidity,
-endpoint outage policy, or sandbox boundary.
+## Parameter Recovery
 
-`graph.next` is diagnostic. It may inspect one fault route, but repeating it
-in the same recovery state records diagnostic exhaustion and forces a
-different action class: `graph.recover`, a legal transition, an unused
-non-mutating native tool, or a smaller plan step.
-
-Recovery nodes never allow endless inspection. Every inspection route has a
-state-changing consequence: alternate tool, smaller scope, shell-admitted
-escape, blocked step, or owner-required question.
+Parameter faults use `recover-params`, not generic parse recovery. Safe aliases
+may normalize when the meaning is clear and the normalized path stays inside
+the workspace. The observation records normalization.
 
 `graph.note` accepts only constraint, assumption, risk, decision, question,
-invariant, success, and path. Registry examples and refusal text must render
-only those accepted kinds.
+invariant, success, and path. `graph.evidence` targets known missing
+requirements and cannot satisfy audit-owned requirements.
 
-Safe aliases may normalize to accepted kinds when the meaning is clear:
-planning, note, recovery, and compaction-state become decision; completed
-progress becomes success; policy-refinement becomes decision or constraint
-based on the target field. The observation records normalization rather than
-silently mutating durable state.
+## Escape Requirements
 
-`graph.evidence` targets known missing requirements, not note kinds. Unknown
-requirements render the current allowed list and a copyable example for a
-known requirement.
+Recovery suggestions must be admitted by the active mode. If the current node
+blocks the only productive mutation tool, the controller transitions to a node
+that admits that tool or produces a blocked handoff with exact evidence.
 
 Waiting is forbidden when an internal transition, alternate native tool, or
-smaller independent step can continue.
+smaller independent step can continue. `agent.ask` is allowed only for a
+concrete owner-required question.
 
-Recovery suggestions must be admitted by the active mode. If graph policy and
-maintenance or compaction policy would disagree, active-mode selection decides
-which one renders; the other stays silent.
+Compaction is runtime-owned. Forced compaction never asks the model to run
+`memory.save` when policy blocks it.
 
-Recovery nodes include `recover-parse`, `recover-params`, `recover-tool`,
-`recover-repeat`, `recover-by-state-inspection`, `recover-by-alternate-tool`,
-`recover-by-smaller-scope`, `recover-by-artifact-plan`,
-`recover-by-bounded-write`, `recover-by-shell-escape`, and
-`blocked-with-evidence`.
+## Long Payloads
 
-Long-payload parse faults route to artifact planning or bounded batch writes,
-not raw `fs.write` retries. If the current recovery node blocks the only
-productive tool class, the controller transitions to a node that admits that
-tool or produces a blocked handoff. `agent.ask` is forbidden for internal tool
-uncertainty.
-
-## Routes
-
-- Parse faults route to `recover-parse`.
-- Parameter faults route to `recover-params`.
-- Repeat faults route to `recover-repeat`.
-- Tool faults route to `recover-tool`.
-- Payload and completion-oversize faults route to
-  `recover-by-artifact-plan`, then `recover-by-bounded-write`.
-
-After payload risk, repeated raw `fs.write` is blocked. The prompt must show
-artifact planning, document scaffold, or bounded batch writes instead.
+Long-payload and completion-oversize faults route to artifact planning or
+bounded batch writes, not raw `fs.write` retries. Batch repair must name exact
+paths and line-limit-safe content.
 
 ## Status
 
-partially implemented; active-mode integration and semantic examples remain
-open.
+partially implemented. Fault notices, graph routes, repeat refusals, escape
+visibility, and a pure recovery plan table exist. Durable retry counts and live
+shape-change enforcement for every fault class remain open.

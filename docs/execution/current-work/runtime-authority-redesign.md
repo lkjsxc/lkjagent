@@ -69,4 +69,9 @@ was inside the repository and violated markdown shape and line limits.
 
 ## Status
 
-open
+open. The documentation contract now states that authority is computed before
+endpoint calls and before dispatch, and that stale maintenance, compaction, or
+idle actions must be refused when stronger runtime facts appear. Current code
+has pure selection, endpoint authority cards, cached dispatch authority, and
+many completion refusals. Durable snapshots, stale-action refusal, and full
+close-path proof remain open.
