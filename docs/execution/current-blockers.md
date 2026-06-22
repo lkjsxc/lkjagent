@@ -49,6 +49,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   registry renderer.
 - Runtime recovery has a closed `FaultClass` enum, route metadata, escalation
   route text, and blocked-handoff behavior on each pure recovery plan.
+- Cached maintenance actions are refused before dispatch when queued owner work
+  changes the current authority.
 - `artifact.next` and stricter content audit support bounded cookbook and story
   recovery examples.
 - `fs.write` and `fs.batch_write` reject known scaffold phrases before mutation.
@@ -67,6 +69,7 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 ## Remaining Proof Gaps
 
 - Authority is not yet durable enough to own every dispatch and completion path.
+- Broader stale-action contradiction repair is not yet covered for every mode.
 - Recovery retry counts are not yet persisted by case, node, tool, parameter
   shape, and fault class.
 - Artifact adoption and semantic readiness remain incomplete.

@@ -2,12 +2,16 @@ mod support;
 
 use std::path::Path;
 
+use lkjagent_protocol::render_action;
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
+use lkjagent_runtime::maintenance::{MaintenanceCycle, MaintenanceDirective};
+use lkjagent_runtime::mode::{decide_turn_authority, TurnAuthorityInput};
+use lkjagent_runtime::task::{PendingAction, TaskState};
 use lkjagent_store::queue;
 use support::http::{completion, serve_responses};
-use support::{runtime_state, store, temp_workspace, TestResult};
+use support::{action, runtime_state, store, temp_workspace, TestResult};
 
 const GRAPH_STATE: &str = "<act>
 <tool>graph.state</tool>
@@ -30,6 +34,44 @@ fn endpoint_turn_refreshes_one_active_mode_card() -> TestResult<()> {
 
     assert_eq!(active_mode_cards(&daemon), 1);
     assert!(active_mode_card(&daemon).contains("policy_layers=graph"));
+    Ok(())
+}
+
+#[test]
+fn stale_maintenance_action_is_refused_when_owner_queue_arrives() -> TestResult<()> {
+    let mut conn = store()?;
+    take_lock(&conn)?;
+    queue::enqueue(&mut conn, "write owner file", "owner-send", "101")?;
+    let workspace = temp_workspace("stale-maintenance-action")?;
+    let server = serve_responses(Vec::new())?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+    let action = action("agent.done", &[("summary", "maintenance complete")]);
+    let action_text = render_action(&action);
+    daemon.state.task = TaskState::Idle;
+    daemon.state.maintenance = Some(MaintenanceCycle {
+        directive: MaintenanceDirective::AuditSelf,
+        turns_remaining: 3,
+    });
+    daemon.state.pending_action = Some(PendingAction {
+        action,
+        action_text: action_text.clone(),
+    });
+    daemon.turn_authority = Some(decide_turn_authority(TurnAuthorityInput {
+        maintenance_active: true,
+        ..TurnAuthorityInput::default()
+    }));
+
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    server.join()?;
+
+    assert!(daemon.state.pending_action.is_none());
+    assert!(daemon.state.maintenance.is_none());
+    assert!(daemon.state.context.log.iter().any(|frame| {
+        frame.content.contains("stale model action refused")
+            && frame.content.contains("active_mode=OwnerTask")
+            && frame.content.contains("failed_gate=stale-turn-authority")
+    }));
+    assert_eq!(queue::pending_count(&conn)?, 1);
     Ok(())
 }
 

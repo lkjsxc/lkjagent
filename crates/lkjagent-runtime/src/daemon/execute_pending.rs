@@ -1,8 +1,10 @@
-use lkjagent_tools::dispatch::dispatch_with_text;
+use lkjagent_tools::dispatch::{dispatch_with_text, DispatchOutput};
+use lkjagent_tools::observe;
 use rusqlite::Connection;
 
 use super::runner::{DaemonTick, ResidentDaemon};
 use crate::error::RuntimeResult;
+use crate::mode::{ActiveMode, EndpointDecision, TurnAuthority};
 use crate::step::{step, StepInput};
 
 impl ResidentDaemon {
@@ -15,22 +17,38 @@ impl ResidentDaemon {
         let Some(pending) = self.state.pending_action.clone() else {
             return Ok(None);
         };
-        let authority = self
-            .turn_authority
-            .clone()
-            .map_or_else(|| self.decide_authority(conn, now, false), Ok)?;
+        let cached = self.turn_authority.clone();
+        let current = self.decide_authority(conn, now, false)?;
+        if let Some(message) = stale_action_refusal(cached.as_ref(), &current, &pending.action.tool)
+        {
+            self.sync_effective_dispatch_policy(&current.effective_policy);
+            if current.endpoint_decision == EndpointDecision::DeferMaintenance {
+                self.state.maintenance = None;
+            }
+            let output = notice_output(&mut self.dispatch_state, action_text, message);
+            return self.finish_pending_output(conn, now, output, false);
+        }
+        let authority = cached.unwrap_or(current);
         let mode_policy = authority.effective_policy.clone();
         let maintenance_ask = self.maintenance_ask_pending(conn, pending.action.tool.as_str())?;
         self.sync_effective_dispatch_policy(&mode_policy);
-        let output = {
-            dispatch_with_text(
-                &pending.action,
-                action_text,
-                &self.runtime.tools,
-                conn,
-                &mut self.dispatch_state,
-            )
-        };
+        let output = dispatch_with_text(
+            &pending.action,
+            action_text,
+            &self.runtime.tools,
+            conn,
+            &mut self.dispatch_state,
+        );
+        self.finish_pending_output(conn, now, output, maintenance_ask)
+    }
+
+    fn finish_pending_output(
+        &mut self,
+        conn: &mut Connection,
+        now: &str,
+        output: DispatchOutput,
+        maintenance_ask: bool,
+    ) -> RuntimeResult<Option<DaemonTick>> {
         let result = step(self.state.clone(), StepInput::ToolOutput(output));
         let tick = self.apply_step_result(conn, now, result, false)?;
         self.turn_authority = None;
@@ -42,5 +60,56 @@ impl ResidentDaemon {
             return Ok(Some(next));
         }
         Ok(Some(tick))
+    }
+}
+
+fn stale_action_refusal(
+    cached: Option<&TurnAuthority>,
+    current: &TurnAuthority,
+    tool: &str,
+) -> Option<String> {
+    let cached = cached?;
+    let stale_maintenance = cached.mode == ActiveMode::Maintenance
+        && (current.mode != ActiveMode::Maintenance
+            || current.endpoint_decision == EndpointDecision::DeferMaintenance);
+    let runtime_only = matches!(
+        current.endpoint_decision,
+        EndpointDecision::RuntimeCompact | EndpointDecision::ClosedIdle
+    );
+    if !stale_maintenance && !runtime_only {
+        return None;
+    }
+    Some(format!(
+        "stale model action refused\nactive_mode={:?}\nprevious_mode={:?}\nfailed_tool={tool}\nfailed_gate=stale-turn-authority\nadmitted_tools={}\nnext_executable_action={}\nreason=current runtime authority preempts the cached model action",
+        current.mode,
+        cached.mode,
+        join_or_none(&current.effective_policy.allowed_tools),
+        current.valid_example
+    ))
+}
+
+fn notice_output(
+    state: &mut lkjagent_tools::dispatch::DispatchState,
+    action_text: &str,
+    message: String,
+) -> DispatchOutput {
+    let frame = observe::notice("error", message);
+    let frame_ref = state.next_frame_ref;
+    state.next_frame_ref = state.next_frame_ref.saturating_add(1);
+    state.last_action_text = Some(action_text.to_string());
+    state.last_frame_ref = Some(frame_ref);
+    DispatchOutput {
+        frame_ref,
+        kind: frame.kind,
+        content: frame.content,
+        rendered: frame.rendered,
+    }
+}
+
+fn join_or_none(values: &[&str]) -> String {
+    if values.is_empty() {
+        "none".to_string()
+    } else {
+        values.join(",")
     }
 }
