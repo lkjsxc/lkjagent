@@ -83,15 +83,18 @@ the gates that actually ran. Contract text alone never closes a row.
 
 ## Latest Local Evidence
 
-This session reran the documentation gates before edits:
+This session ran these gates after the documentation and recovery-model edits:
 
 - `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`.
 - `cargo run -p lkjagent-xtask -- check-style`: `ok check-style`.
+- `cargo fmt --check`: passed.
+- `cargo test -p lkjagent-runtime`: passed.
 
-These gates prove only the pre-edit documentation baseline and style checks.
-Implementation claims still require focused crate tests, `quiet verify`, and
-Docker Compose verification in the slice that moves the behavior.
+These gates prove the documentation shape, line cap, style scan, formatting,
+and runtime focused crate tests for this slice. They do not prove the full
+redesign; `quiet verify` and Docker Compose verification remain unrun in this
+session.
 
 ## Out of Scope
 
