@@ -97,6 +97,14 @@ Dominant tracks select context slices:
 - context-pressure selects budget, durable snapshot, and post-compaction
   checklist.
 
+## Implementation Hooks
+
+- Types live in `crates/lkjagent-graph/src/kernel_types.rs` and
+  `crates/lkjagent-graph/src/kernel_events.rs`.
+- Reducers live in `crates/lkjagent-graph/src/kernel_vector.rs`.
+- Tool authorization lives in `crates/lkjagent-graph/src/kernel_authority.rs`.
+- Focused regressions live in `crates/lkjagent-graph/tests/weighted_kernel.rs`.
+
 ## Completion Check
 
 Every weighted track has update, guard, decay, display, and test policy. A
