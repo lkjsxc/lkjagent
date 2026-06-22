@@ -83,7 +83,8 @@ the gates that actually ran. Contract text alone never closes a row.
 
 ## Latest Local Evidence
 
-This session ran these gates after the documentation catalog edits:
+This session ran these gates after documentation catalog, payload, protocol,
+doc metadata, authority, and verification edits:
 
 - `docker compose build`: `EXIT=0`.
 - `docker compose run --rm verify`: `ok verify`, `EXIT=0`.
@@ -105,6 +106,8 @@ This session ran these gates after the documentation catalog edits:
 - `cargo run -p lkjagent-xtask -- hygiene-check`: `ok hygiene-check`, `HYGIENE_EXIT=0`.
 - `cargo test -p lkjagent-cli --test commands`: `CLI_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `EXIT=0`.
+- Final `docker compose build`: `EXIT=0`.
+- Final `docker compose run --rm verify`: `ok verify`, `EXIT=0`.
 
 Earlier gates recorded for the recovery-model slice:
 
