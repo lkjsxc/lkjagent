@@ -34,6 +34,8 @@ for the failed tool.
 
 ## Mission Rules
 
+- Owner completion admits `agent.done` only when required evidence has no gaps,
+  recovery is inactive, and context pressure is not forcing compaction.
 - `CompletionGate` with missing artifact readiness admits `artifact.audit`,
   `doc.audit`, `artifact.next`, `fs.read`, `fs.tree`, `fs.write`, and
   `fs.batch_write`.

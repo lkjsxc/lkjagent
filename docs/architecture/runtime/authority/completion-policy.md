@@ -77,6 +77,15 @@ unsupported verification claim.
 Run `cargo test -p lkjagent-runtime completion` and
 `cargo test -p lkjagent-benchmark corpus`.
 
+## Implemented Slice
+
+The pure runtime admission reducer admits `agent.done` for owner work only when
+required evidence has no gaps, no recovery ladder is active, and hard context
+pressure is absent. Maintenance `agent.done` remains admitted only when owner
+work and recovery are absent. Missing-evidence refusals keep audit, read,
+repair, and batch tools available. This is focused reducer coverage, not proof
+that every close path is fully wired.
+
 ## Status
 
 partially implemented.
