@@ -1,10 +1,12 @@
 pub mod error;
+mod line_parse;
 pub mod model;
 pub mod parse;
 pub mod registry;
 pub mod registry_render;
 mod registry_spec;
 pub mod render;
+mod xml_parse;
 
 pub use model::{Action, Param, ParseFault};
 pub use parse::parse_completion;

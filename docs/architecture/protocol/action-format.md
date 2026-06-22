@@ -2,9 +2,10 @@
 
 ## Purpose
 
-The grammar of a model turn. The model writes plain text with paired,
-attribute-free tags; the completion must include the closing act tag. JSON
-never appears in either direction.
+The grammar of a model turn. The model writes plain text inside one act
+envelope. The preferred form is line-oriented `name: value` fields; the older
+paired-tag form is still parsed by the same pure parser. JSON never appears as
+an action payload.
 
 ## A Turn
 
@@ -14,44 +15,66 @@ The test expects a trailing newline; the renderer drops it. I will read the
 renderer before changing anything.
 </think>
 <act>
-<tool>fs.read</tool>
-<path>crates/lkjagent-protocol/src/render.rs</path>
-<start>1</start>
-<count>60</count>
+tool: fs.read
+path: crates/lkjagent-protocol/src/render.rs
+start: 1
+count: 60
 </act>
 ```
 
 - The think preamble is optional, free-form, and unparsed; it exists for the
   model's own chain of thought and stays in the log verbatim.
 - Exactly one act block per turn. A second act block is a parse fault.
-- The first child of act is always tool, naming an entry in
-  [../tools/registry.md](../tools/registry.md). The remaining children are
-  that tool's parameters, in any order.
-- All tags sit alone on their own lines. Parameter values are the raw lines
-  between a tag pair; single-line values may sit inline between the tags.
+- The first field inside act is always `tool:`, naming an entry in
+  [../tools/registry.md](../tools/registry.md). Remaining fields are that
+  tool's parameters. `case:` is envelope metadata and is not a tool parameter.
+- Scalar values use `name: value` on one line.
+- Payload fields such as `content:`, `files:`, and `patch:` keep every
+  following line byte-exact until the act closes.
 
 ## Multi-Line Values
 
 ```
 <act>
-<tool>fs.write</tool>
-<path>notes/findings.md</path>
-<content>
+tool: fs.write
+path: notes/findings.md
+content:
 # Findings
 
 The renderer drops trailing newlines on every block write.
-</content>
 </act>
 ```
 
-The value of content is everything between its tags, byte-exact including
-inner blank lines. If the first payload bytes follow the opening tag on the
-same line, those bytes are the first value line. One reserved case exists:
-a payload that itself contains a line consisting exactly of a closing
-parameter tag cannot be expressed; the model routes such payloads through
-shell.run with a heredoc per [../tools/shell.md](../tools/shell.md). The
-limitation is stated in the system prompt rather than papered over with
-escaping rules small models would misapply.
+The value of content is everything after `content:` through `</act>`,
+byte-exact including blank lines, code fences, quotes, shell commands, and
+angle-bracket text.
+
+## Batch File Values
+
+```
+<act>
+tool: fs.batch_write
+case: current
+files:
+-- file --
+path: relative/path.md
+content:
+# Title
+
+Body text.
+-- end-file --
+-- file --
+path: another/path.md
+content:
+# Title
+
+Body text.
+-- end-file --
+</act>
+```
+
+The parser converts file blocks into the internal batch-write line protocol
+before validation. It never executes a partially parsed batch.
 
 ## Control Actions
 
@@ -59,19 +82,18 @@ Task control uses the same shape; contracts in [../tools/control.md](../tools/co
 
 ```
 <act>
-<tool>agent.done</tool>
-<summary>
+tool: agent.done
+summary:
 Renamed the flag in both call sites; cargo test passes 41/41.
-</summary>
 </act>
 ```
 
 ## Design Properties
 
-- No attributes, no escaping, no nesting below parameters: the grammar fits
-  in a dozen lines of the system prompt.
-- Every token the model emits is either thought or exactly one decision;
-  there is no place to hide a second side effect.
+- No attributes, no escaping, no nested actions: the grammar fits in a small
+  prompt card.
+- Every token the model emits is either thought or exactly one decision; there
+  is no place to hide a second side effect.
 - The format degrades loudly: any deviation maps to one recovery case in
   [recovery.md](recovery.md), never a partial execution.
 
