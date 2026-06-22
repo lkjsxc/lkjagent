@@ -46,7 +46,7 @@ prove that their failures cannot recur.
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Every rendered recovery example is not yet proven through one canonical registry validation path. |
 | Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, and root-scoped cursors exist. Artifact identity, adoption, weak-path repair state, and semantic readiness are incomplete. |
 | Completion gates | Runtime completion refusals keep cases open for many artifact and evidence gaps. Every close path is not yet proven to use the same artifact-aware gate. |
-| Compaction resumability | Compaction records graph, recovery, artifact, and next-action fields in notices. The durable snapshot still lacks richer last-successful observation and batch cursor state. |
+| Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices. Durable snapshot history remains shallow. |
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, and same-title high-overlap merge exist. Rewrite pruning and pre-dispatch owner preemption remain open. |
 | Status and console | Active graph state, active mode, authority snapshot fields, context pressure, token usage, and model-log paths display. Last successful observation is summarized from recent observations. |
 | Benchmarks | Uploaded-run signatures are represented by deterministic fixtures. Runtime replay coverage and every completion path are not yet complete. |
@@ -92,6 +92,8 @@ This session ran these gates after the documentation and recovery-model edits:
 - `cargo test -p lkjagent-runtime`: passed after stale action, authority snapshot, and retry-count tests.
 - `cargo test -p lkjagent-cli`: passed after status authority snapshot display tests.
 - `cargo test -p lkjagent-store`: passed after retry-count storage changes.
+- `cargo test -p lkjagent-runtime --test compaction_snapshot`: passed after adding last-observation
+  and batch-cursor snapshot evidence.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`.
 - `docker compose run --rm verify`: `ok verify`.
 

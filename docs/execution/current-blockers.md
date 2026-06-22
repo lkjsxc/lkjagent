@@ -56,6 +56,9 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   tools, and next executable action.
 - Recovery retry counts persist in SQLite by case, node, tool, parameter shape,
   and fault class.
+- Compaction notices now preserve the latest observation summary and
+  artifact.next batch cursor in addition to graph, recovery, artifact, and
+  next-action fields.
 - `artifact.next` and stricter content audit support bounded cookbook and story
   recovery examples.
 - `fs.write` and `fs.batch_write` reject known scaffold phrases before mutation.
@@ -75,6 +78,7 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 
 - Authority snapshots still need stronger case-specific fields and history for
   every dispatch and completion path.
+- Compaction snapshots still need durable history beyond the latest notice.
 - Broader stale-action contradiction repair is not yet covered for every mode.
 - Recovery shape-change enforcement is not yet proven for every live fault class.
 - Artifact adoption and semantic readiness remain incomplete.
