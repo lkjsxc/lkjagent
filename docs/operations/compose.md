@@ -12,6 +12,10 @@ itself lands with [../execution/tasks/compose-final-gate.md](../execution/tasks/
 | --- | --- | --- | --- |
 | agent | default | lkjagent run and CLI commands | host data directory at /data |
 | verify | verify | quiet verify inside the build image | none |
+| test | verify | quiet test inside the build image | none |
+| lint | verify | docs, line, and style checks inside the build image | none |
+| bench | verify | benchmark corpus check inside the build image | none |
+| replay | verify | uploaded-run replay fixture check inside the build image | none |
 | endpoint-example | endpoint | optional llama.cpp-class endpoint | model bind read-only |
 
 The endpoint is not a service this file owns: it is whatever
@@ -33,9 +37,9 @@ image creates it for the non-root agent user.
 The default compose profile is production-shaped: it starts only the
 resident agent daemon with the mounted data directory.
 
-The `verify` profile holds the final gate service. It may be run directly
-with `docker compose run --rm verify`, or explicitly with the profile when
-checking service sets.
+The `verify` profile holds verify, test, lint, bench, and replay gate
+services. Each may be run directly with `docker compose run --rm <service>`,
+or explicitly with the profile when checking service sets.
 
 The `endpoint` profile holds the local endpoint example. It is disabled
 unless the owner asks for it with `docker compose --profile endpoint`.
@@ -78,6 +82,30 @@ services:
       context: .
       target: build
     command: cargo run -p lkjagent-xtask -- quiet verify
+  test:
+    profiles: ["verify"]
+    build:
+      context: .
+      target: build
+    command: cargo run -p lkjagent-xtask -- quiet test
+  lint:
+    profiles: ["verify"]
+    build:
+      context: .
+      target: build
+    command: cargo run -p lkjagent-xtask -- check-docs && ...
+  bench:
+    profiles: ["verify"]
+    build:
+      context: .
+      target: build
+    command: cargo run -p lkjagent-xtask -- benchmark check-corpus
+  replay:
+    profiles: ["verify"]
+    build:
+      context: .
+      target: build
+    command: cargo run -p lkjagent-xtask -- benchmark check-corpus
   endpoint-example:
     profiles: ["endpoint"]
     image: ghcr.io/ggerganov/llama.cpp:server
@@ -88,8 +116,8 @@ and the guardrails below bind it.
 
 ## Guardrails
 
-- The verify service never mounts the source tree: it proves the committed
-  repository, per [verification.md](verification.md).
+- The verify, test, lint, bench, and replay services never mount the source
+  tree: they prove the committed repository, per [verification.md](verification.md).
 - The agent service mounts exactly one durable host directory:
   LKJAGENT_DATA_DIR at /data. Mounting more enlarges the blast radius
   described in
@@ -125,6 +153,10 @@ docker compose run --rm agent send "..."   # queue owner work
 docker compose run --rm agent log --follow # read transcript events
 docker compose run --rm agent status       # observe daemon and queue state
 docker compose run --rm verify             # final gate
+docker compose run --rm test               # quiet workspace tests
+docker compose run --rm lint               # static repository checks
+docker compose run --rm bench              # benchmark corpus check
+docker compose run --rm replay             # uploaded-run replay fixtures
 docker compose --profile endpoint up -d endpoint-example
 ```
 
