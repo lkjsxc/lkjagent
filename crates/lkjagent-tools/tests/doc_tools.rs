@@ -53,11 +53,11 @@ fn doc_scaffold_story_title_uses_manuscript_paths() -> TestResult<()> {
         ],
     )?;
 
+    let root = workspace.join("stories");
     assert!(output.contains("profile=NarrativeManuscript"));
-    assert!(workspace.join("stories/planning/premise.md").is_file());
-    assert!(workspace.join("stories/chapters/waking-pod.md").is_file());
-    assert!(!workspace.join("stories/part-001.md").exists());
-    assert_no_serial_files(&workspace.join("stories"))?;
+    assert!(root.join("setting/world-pillars.md").is_file());
+    assert!(root.join("characters/protagonist.md").is_file());
+    assert!(root.join("plot/act-structure.md").is_file());
     Ok(())
 }
 

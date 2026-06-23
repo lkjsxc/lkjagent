@@ -21,8 +21,8 @@ fn content_artifact_audit_rejects_scaffold_only_story() -> TestResult<()> {
 
     assert!(audit.contains("document audit failed"));
     assert!(audit.contains("content_readiness=failed"));
-    assert!(audit.contains("structure_only_content: planning/premise.md"));
-    assert!(audit.contains("structure_only_content: chapters/waking-pod.md"));
+    assert!(audit.contains("structure_only_content: setting/world-pillars.md"));
+    assert!(audit.contains("structure_only_content: draft/opening-scene.md"));
     Ok(())
 }
 

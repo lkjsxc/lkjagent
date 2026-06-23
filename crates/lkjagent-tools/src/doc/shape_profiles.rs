@@ -36,12 +36,16 @@ pub const REPORT: &[ShapeGroup] = &[
 
 #[rustfmt::skip]
 pub const MANUSCRIPT: &[ShapeGroup] = &[
-    group("planning", "Planning", "planning index", &["premise", "cast", "world", "outline"]),
-    group("chapters", "Chapters", "chapter index", &[
-        "waking pod", "cylinder pulse", "laboratory of light", "memory market",
-        "first theft", "mirror in the vial", "final choice", "world after memory",
+    group("request", "Request", "request index", &["objective", "constraints"]),
+    group("setting", "Setting", "setting index", &[
+        "world pillars", "history", "locations", "technology", "factions",
     ]),
-    group("revision", "Revision", "revision index", &["style guide", "continuity checks"]),
+    group("characters", "Characters", "character index", &[
+        "protagonist", "antagonist", "allies", "conflicts",
+    ]),
+    group("plot", "Plot", "plot index", &["premise", "act structure", "scene index"]),
+    group("draft", "Draft", "draft index", &["opening scene", "chapter map"]),
+    group("continuity", "Continuity", "continuity index", &["timeline", "glossary"]),
 ];
 
 #[rustfmt::skip]
