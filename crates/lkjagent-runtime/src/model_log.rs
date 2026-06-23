@@ -2,6 +2,7 @@ mod exchange;
 mod ledger;
 mod sections;
 mod text;
+mod turn_files;
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -14,6 +15,9 @@ use crate::error::{RuntimeError, RuntimeResult};
 pub use exchange::{
     json_escape, record_provider_error, record_provider_request, record_provider_response,
     ProviderLogContext, ProviderLogHandle,
+};
+pub use turn_files::{
+    record_parsed_action, record_provider_admission, record_provider_observation,
 };
 
 pub const CURRENT_MODEL_LOG: &str = "logs/current-model-run.md";

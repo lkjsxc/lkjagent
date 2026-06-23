@@ -8,8 +8,8 @@ use rusqlite::Connection;
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
 use crate::model_log::{
-    json_escape, record_provider_error, record_provider_request, record_provider_response,
-    ProviderLogContext, ProviderLogHandle,
+    json_escape, record_parsed_action, record_provider_error, record_provider_request,
+    record_provider_response, ProviderLogContext, ProviderLogHandle,
 };
 
 impl ResidentDaemon {
@@ -23,7 +23,10 @@ impl ResidentDaemon {
             return Ok(None);
         };
         let context = self.provider_context(conn, now)?;
-        record_provider_request(conn, &root, &context, request_json).map(Some)
+        let handle = record_provider_request(conn, &root, &context, request_json)?;
+        lkjagent_store::state::set(conn, "provider exchange id", &handle.id)?;
+        lkjagent_store::state::set(conn, "provider exchange dir", &handle.dir.to_string_lossy())?;
+        Ok(Some(handle))
     }
 
     pub(super) fn record_model_response(
@@ -46,6 +49,17 @@ impl ResidentDaemon {
             Some(&usage),
             latency_ms(started),
         )
+    }
+
+    pub(super) fn record_model_parse(
+        &self,
+        handle: Option<&ProviderLogHandle>,
+        content: &str,
+    ) -> RuntimeResult<()> {
+        let Some(handle) = handle else {
+            return Ok(());
+        };
+        record_parsed_action(handle, content)
     }
 
     pub(super) fn record_model_error(

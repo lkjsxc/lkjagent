@@ -21,12 +21,12 @@ model/epoch-<created-at>/case-<case-id>/turn-000001/
   request.json
   authority.json
   response.json
+  parsed-action.json
+  admission.json
+  observation.txt
   timing.json
   errors.ndjson
 ```
-
-Later runtime slices add `parsed-action.json`, `admission.json`, and
-`observation.txt` for every turn.
 
 ## Redaction
 
