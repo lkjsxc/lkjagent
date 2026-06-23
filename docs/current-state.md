@@ -31,7 +31,7 @@ prove that their failures cannot recur.
 | SQLite store | Queue, state, event, memory, and task summary surfaces exist in `lkjagent-store`. |
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
 | Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current model run snapshot. Provider exchange rows plus atomic request, authority, response, timing, and error files are written when daemon model calls have a log root. |
-| Document scaffold seed | Deterministic scaffold paths, relation-first generic seeds, bounded slugs, and compact `catalog.toml` metadata exist for project, multi-topic docs, story, and cookbook roots. |
+| Document scaffold seed | Deterministic scaffold paths, relation-first generic seeds, bounded slugs, compact `catalog.toml`, and creative writing profiles exist for project, multi-topic docs, story, novel, character, and cookbook roots. |
 | Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, workspace briefs, structure-only pages, owner-term pages, and old boilerplate leaves. |
 | Placeholder and payload refusal | `fs.write`, `fs.batch_write`, content audit, and check-docs reject common scaffold phrases and oversized payloads before mutation. |
 | Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
@@ -139,6 +139,9 @@ Latest address-controller slice gates:
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0` after formatting.
 - `cargo test -p lkjagent-tools --test artifact_address`: `ARTIFACT_ADDRESS_EXIT=0`.
 - `cargo test -p lkjagent-tools --test doc_root_hygiene`: `DOC_ROOT_HYGIENE_EXIT=0`.
+- `cargo test -p lkjagent-tools --test doc_tools`: `DOC_TOOLS_EXIT=0`.
+- `cargo test -p lkjagent-tools --test doc_boilerplate`: `DOC_BOILERPLATE_EXIT=0`.
+- `cargo test -p lkjagent-tools --test doc_content_audit`: `DOC_CONTENT_AUDIT_EXIT=0`.
 - `cargo test -p lkjagent-tools --test batch_write_formats`: `BATCH_WRITE_FORMATS_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test artifact_address_recovery`: `RUNTIME_ADDRESS_EXIT=0`.
 - `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
@@ -150,8 +153,8 @@ Latest address-controller slice gates:
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
 - `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
 - `cargo test -p lkjagent-runtime --test prompt_daemon`: `PROMPT_DAEMON_EXIT=0`.
-- Post-prompt `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-- Post-prompt `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
+- Post-prompt and creative `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+- Post-prompt and creative `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
 
 Latest focused slice gates:
 

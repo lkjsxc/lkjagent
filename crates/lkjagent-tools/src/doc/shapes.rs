@@ -15,6 +15,8 @@ pub fn select_profile(input: &ScaffoldInput) -> ScaffoldProfile {
         ScaffoldProfile::BreadCookbook
     } else if text.contains("cookbook") || text.contains("recipe") {
         ScaffoldProfile::Cookbook
+    } else if creative_subject(&text, &input.kind) {
+        ScaffoldProfile::NarrativeManuscript
     } else if text.contains("knowledge") || text.contains("encyclopedia") {
         ScaffoldProfile::KnowledgeBase
     } else if text.contains("plan") || text.contains("implementation") {
@@ -25,8 +27,6 @@ pub fn select_profile(input: &ScaffoldInput) -> ScaffoldProfile {
         ScaffoldProfile::UserGuide
     } else if text.contains("runbook") || text.contains("operations") {
         ScaffoldProfile::OperationsRunbook
-    } else if text.contains("manuscript") || text.contains("story") {
-        ScaffoldProfile::NarrativeManuscript
     } else if text.contains("architecture") {
         ScaffoldProfile::ArchitectureDocs
     } else if input.count.is_none() && relation_first_subject(&text) {
@@ -51,6 +51,39 @@ fn bread_subject(text: &str) -> bool {
     ["bread", "sourdough", "ciabatta", "focaccia", "rye loaf"]
         .iter()
         .any(|needle| text.contains(needle))
+}
+
+fn creative_subject(text: &str, kind: &str) -> bool {
+    let kind = kind.to_ascii_lowercase();
+    let explicit_kind = [
+        "story",
+        "novel",
+        "manuscript",
+        "fiction",
+        "character-profile",
+        "setting",
+        "outline",
+        "scene",
+    ]
+    .iter()
+    .any(|needle| kind.contains(needle));
+    let title_signal = [
+        "novel",
+        "sf ",
+        "sci-fi",
+        "science fiction",
+        "character",
+        "setting",
+        "manuscript",
+        "fiction",
+    ]
+    .iter()
+    .any(|needle| text.contains(needle));
+    explicit_kind || (title_signal && !technical_kind(&kind))
+}
+
+fn technical_kind(kind: &str) -> bool {
+    matches!(kind, "architecture" | "runbook" | "guide" | "operations")
 }
 
 fn relation_first_subject(text: &str) -> bool {
