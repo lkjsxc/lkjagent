@@ -23,12 +23,13 @@ pub fn record_next_batch(record: NextBatchRecord<'_>) -> ToolResult<()> {
         record.weak_count,
         record.now,
     )?;
+    let planned_paths = full_paths(record.root, record.selected);
     upsert_batch_cursor(
         record.conn,
         &BatchCursorInput {
             artifact_ledger_id: ledger_id,
             root: record.root,
-            planned_paths: record.selected,
+            planned_paths: &planned_paths,
             completed_paths: &[],
             failed_paths: &[],
             current_index: i64::try_from(record.current_index).unwrap_or(i64::MAX),
@@ -73,6 +74,19 @@ fn upsert_repair_artifact(
         now,
     )
     .map_err(Into::into)
+}
+
+fn full_paths(root: &str, selected: &[String]) -> Vec<String> {
+    selected
+        .iter()
+        .map(|path| {
+            format!(
+                "{}/{}",
+                root.trim_end_matches('/'),
+                path.trim_start_matches('/')
+            )
+        })
+        .collect()
 }
 
 fn case_id(conn: &Connection) -> ToolResult<i64> {

@@ -4,6 +4,7 @@ mod artifact_drift;
 mod artifact_ledger_support;
 mod artifact_next;
 mod artifact_next_example;
+mod artifact_write_support;
 pub mod benchmark_seed;
 pub mod control;
 pub mod count_guard;

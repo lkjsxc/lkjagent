@@ -22,7 +22,9 @@ profile-specific content.
 
 If the current cursor has no next weak path, `artifact.next` requests
 `artifact.audit` or focused reads instead of repeating a placeholder write.
-Completion still requires real content and a passing artifact audit.
+Successful `fs.write` and `fs.batch_write` calls mark matching planned cursor
+paths complete. Completion still requires real content and a passing artifact
+audit.
 
 ## Payload Faults
 

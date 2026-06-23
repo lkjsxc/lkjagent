@@ -7,6 +7,7 @@ use crate::dispatch::{DispatchOutput, DispatchState, ReadRecord, ToolRuntime};
 use crate::error::ToolError;
 use crate::observe;
 use crate::{fs, shell};
+use rusqlite::Connection;
 
 pub fn dispatch_fs_read(
     params: &BTreeMap<String, String>,
@@ -32,18 +33,20 @@ pub fn dispatch_fs_write(
     params: &BTreeMap<String, String>,
     action_text: &str,
     runtime: &ToolRuntime,
+    conn: &Connection,
     state: &mut DispatchState,
 ) -> DispatchOutput {
     let path = param(params, "path");
     if let Err(error) = guard_write_path(state.control.guard, &path) {
         return observe_error(error, action_text, runtime, state);
     }
-    observe_result(
-        fs::write(&runtime.workspace, &path, &param(params, "content")),
-        action_text,
-        runtime,
-        state,
-    )
+    let content = param(params, "content");
+    let result = fs::write(&runtime.workspace, &path, &content).and_then(|output| {
+        let paths = vec![path.clone()];
+        crate::artifact_write_support::record_written_paths(conn, &paths, &runtime.now)?;
+        Ok(output)
+    });
+    observe_result(result, action_text, runtime, state)
 }
 
 pub fn dispatch_fs_edit(

@@ -13,6 +13,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [artifact_next.rs](artifact_next.rs): next bounded artifact batch fixtures.
 - [artifact_next_ledger.rs](artifact_next_ledger.rs): artifact next ledger cursor fixtures.
 - [artifact_tools.rs](artifact_tools.rs): artifact plan, apply, and audit fixtures.
+- [artifact_write_ledger.rs](artifact_write_ledger.rs): artifact cursor completion write fixtures.
 - [authority_admission_view.rs](authority_admission_view.rs): immutable dispatch admission-view fixtures.
 - [control_count_mode_scope.rs](control_count_mode_scope.rs): scoped count-mode wording fixtures.
 - [control_count_hyphen_words.rs](control_count_hyphen_words.rs): hyphenated number-word fixtures.
