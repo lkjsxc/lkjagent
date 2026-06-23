@@ -14,6 +14,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [authority_examples.rs](authority_examples.rs): runtime authority valid-example renderer fixtures.
 - [authority_redesign.rs](authority_redesign.rs): uploaded-log authority redesign fixtures.
 - [artifact_completion_gate.rs](artifact_completion_gate.rs): content artifact readiness completion fixtures.
+- [artifact_ledger_completion.rs](artifact_ledger_completion.rs): artifact ledger completion gate fixtures.
 - [audit_owned_evidence.rs](audit_owned_evidence.rs): audit-owned evidence cannot be graph-authored.
 - [budget_recovery.rs](budget_recovery.rs): exhausted task budget waiting and owner-send resume fixtures.
 - [compaction_snapshot.rs](compaction_snapshot.rs): structured runtime compaction resume fields.

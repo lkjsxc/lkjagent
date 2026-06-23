@@ -24,7 +24,7 @@ impl ResidentDaemon {
         let current = self.decide_authority(conn, now, false)?;
         if let Some(message) = stale_action_refusal(cached.as_ref(), &current, &pending.action.tool)
         {
-            self.sync_effective_dispatch_policy(&current.effective_policy);
+            self.sync_effective_dispatch_policy(conn, &current.effective_policy);
             install_authority_view(conn, &mut self.dispatch_state, &current)?;
             if current.endpoint_decision == EndpointDecision::DeferMaintenance {
                 self.state.maintenance = None;
@@ -42,7 +42,7 @@ impl ResidentDaemon {
         let authority = cached.unwrap_or(current);
         let mode_policy = authority.effective_policy.clone();
         let maintenance_ask = self.maintenance_ask_pending(conn, pending.action.tool.as_str())?;
-        self.sync_effective_dispatch_policy(&mode_policy);
+        self.sync_effective_dispatch_policy(conn, &mode_policy);
         install_authority_view(conn, &mut self.dispatch_state, &authority)?;
         record_authority_admission(
             conn,

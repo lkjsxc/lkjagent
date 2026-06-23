@@ -28,6 +28,7 @@ This directory holds adapter helpers for the foreground daemon.
 - [runner.rs](runner.rs): resident poll loop and effect interpretation.
 - [scaffold.rs](scaffold.rs): graph evidence and scaffold recording helpers.
 - [scaffold_evidence.rs](scaffold_evidence.rs): scaffold graph evidence persistence.
+- [graph_policy.rs](graph_policy.rs): graph dispatch policy and ledger-aware completion helpers.
 - [graph_sync.rs](graph_sync.rs): graph policy synchronization for dispatch.
 - [status.rs](status.rs): daemon state fields written to the store.
 - [startup.rs](startup.rs): seed copying and prefix input loading.

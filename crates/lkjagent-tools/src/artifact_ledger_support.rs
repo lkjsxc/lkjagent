@@ -56,7 +56,7 @@ pub fn record_audit(
     kind: &str,
     report: &str,
     now: &str,
-) -> ToolResult<()> {
+) -> ToolResult<String> {
     let passed = report.starts_with("artifact audit passed")
         || report.starts_with("dictionary audit passed")
         || report.starts_with("document audit passed");
@@ -104,7 +104,7 @@ pub fn record_audit(
             )?;
         }
     }
-    Ok(())
+    Ok(append_ledger_id(report, ledger_id))
 }
 
 struct StateChange<'a> {
@@ -142,6 +142,10 @@ fn record_state(conn: &Connection, change: &StateChange<'_>, now: &str) -> ToolR
         now,
     )
     .map_err(Into::into)
+}
+
+fn append_ledger_id(report: &str, ledger_id: i64) -> String {
+    format!("{report}\nartifact_ledger_id={ledger_id}")
 }
 
 fn weak_paths(workspace: &Path, root: &str) -> ToolResult<Vec<String>> {

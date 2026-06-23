@@ -46,8 +46,8 @@ prove that their failures cannot recur.
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Normalized store tables and unified runtime wiring remain open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, a pure recovery plan table, and SQLite retry counts keyed by case, node, tool, parameter shape, and fault class exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Registry examples parse, validate, and dispatch to routes except heavyweight verification gates. Recovery-plan examples parse, validate, and are admitted by recovery policy when model-authored. |
-| Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, normalized artifact ledger and cursor store APIs, ledger writes from `artifact.plan`, `artifact.apply`, `artifact.audit`, and `artifact.next`, and successful write-path cursor completion marking exist. Semantic readiness and artifact-aware completion remain incomplete. |
-| Completion gates | A pure `decide_completion` reducer returns completion kind, failed gates, missing and existing evidence, next action, valid example, blocked-handoff allowance, and status text. Runtime `agent.done` admission uses it. Every close path is not yet proven to use the same artifact-aware gate. |
+| Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, normalized artifact ledger and cursor store APIs, ledger writes from `artifact.plan`, `artifact.apply`, `artifact.audit`, and `artifact.next`, successful write-path cursor completion marking, audit output `artifact_ledger_id`, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Full close-path coverage remains incomplete. |
+| Completion gates | A pure `decide_completion` reducer returns completion kind, failed gates, missing and existing evidence, next action, valid example, blocked-handoff allowance, and status text. Runtime `agent.done` admission uses it, and daemon graph dispatch checks the artifact ledger before admitting completion. Every close path is not yet proven to use the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices. Durable snapshot history remains shallow. |
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, and same-title high-overlap merge exist. Rewrite pruning and pre-dispatch owner preemption remain open. |
 | Status and console | Active graph state, active mode, authority snapshot fields, context pressure, token usage, and model-log paths display. Last successful observation is summarized from recent observations. |
@@ -155,6 +155,17 @@ Current artifact write cursor slice gates:
 - `cargo test -p lkjagent-tools --test artifact_write_ledger`: `ARTIFACT_WRITE_LEDGER_EXIT=0`.
 - `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
 - `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
+- `cargo fmt --check`: `FMT_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
+
+Current artifact ledger completion slice gates:
+
+- `cargo test -p lkjagent-tools --test artifact_ledger_tools`: `ARTIFACT_LEDGER_TOOLS_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test artifact_ledger_completion`: `ARTIFACT_LEDGER_COMPLETION_EXIT=0`.
+- `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
+- `cargo test -p lkjagent-runtime`: `RUNTIME_TEST_EXIT=0`.
 - `cargo fmt --check`: `FMT_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
