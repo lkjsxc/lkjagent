@@ -47,6 +47,6 @@ from the persisted decision and contains the exact data needed to accept an effe
 
 ## Status
 
-partially implemented. Store APIs record tool admission outcomes, and pending-action dispatch writes admission or
-stale-refusal rows against the latest authority decision. Dispatch still needs to consume an immutable view derived
-from the persisted decision before every route.
+partially implemented. Store APIs record tool admission outcomes. Pending-action dispatch installs a decision-derived
+immutable admission view, consults it before effective-policy or graph fallback refusal, and writes admission or
+stale-refusal rows against the latest authority decision. Broader route coverage remains open.

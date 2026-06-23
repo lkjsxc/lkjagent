@@ -6,6 +6,8 @@ This directory splits dispatcher state, validation, and route helpers.
 
 ## Table of Contents
 
+- [authority_refusal.rs](authority_refusal.rs): immutable admission-view refusal rendering.
+- [effective_refusal.rs](effective_refusal.rs): active effective-policy refusal rendering.
 - [fs_tools.rs](fs_tools.rs): fs and shell dispatch helpers.
 - [examples.rs](examples.rs): generated copyable valid action examples.
 - [fs_extra_tools.rs](fs_extra_tools.rs): list, search, stat, mkdir, and batch-write routing.
@@ -15,6 +17,7 @@ This directory splits dispatcher state, validation, and route helpers.
 - [graph_tools.rs](graph_tools.rs): graph plan, transition, state, and context routing.
 - [graph_evidence_tools.rs](graph_evidence_tools.rs): graph evidence and compaction routing.
 - [guards.rs](guards.rs): task-shape write fences.
+- [join.rs](join.rs): shared compact list renderer.
 - [memory_tools.rs](memory_tools.rs): memory dispatch helpers.
 - [normalize.rs](normalize.rs): safe parameter drift normalization before validation.
 - [params.rs](params.rs): validated parameter access and parsing.

@@ -42,8 +42,8 @@ fn maintenance_blocks_workspace_write_tools() -> TestResult<()> {
         .map(|event| event.content.as_str())
         .collect::<Vec<_>>()
         .join("\n");
-    assert!(event_text.contains("effective policy refused fs.write"));
-    assert!(event_text.contains("active_mode=Maintenance"));
+    assert!(event_text.contains("authority refused fs.write"));
+    assert!(event_text.contains("mission=idle_maintenance"));
 
     assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
     server.join()?;

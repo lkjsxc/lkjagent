@@ -42,7 +42,7 @@ prove that their failures cannot recur.
 
 | Area | Current truth |
 | --- | --- |
-| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, turn authority cards, data-first decision records, normalized authority event, decision, and admission store APIs, turn-authority event and decision persistence, pending-action admission persistence, effective dispatch policy reuse, store-backed authority snapshot fields, stale maintenance-action refusal before dispatch, and `agent.done` refusal exist. Immutable admission-view dispatch and broader pre-dispatch contradiction repair remain open. |
+| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, turn authority cards, data-first decision records, normalized authority event, decision, and admission store APIs, turn-authority event and decision persistence, pending-action admission persistence, pending-action immutable admission-view refusal, effective dispatch policy reuse, store-backed authority snapshot fields, stale maintenance-action refusal before dispatch, and `agent.done` refusal exist. Broader route coverage and pre-dispatch contradiction repair remain open. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Normalized store tables and unified runtime wiring remain open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, a pure recovery plan table, and SQLite retry counts keyed by case, node, tool, parameter shape, and fault class exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Registry examples parse, validate, and dispatch to routes except heavyweight verification gates. Recovery-plan examples parse, validate, and are admitted by recovery policy when model-authored. |
@@ -85,105 +85,32 @@ the gates that actually ran. Contract text alone never closes a row.
 
 ## Latest Local Evidence
 
-This session ran these gates after documentation catalog, payload, protocol,
-doc metadata, authority, and verification edits:
+Current authority admission-view slice gates:
 
-- After adding runtime mission and decision record data,
-  `cargo test -p lkjagent-runtime --test authority_decision_record`: `DECISION_RECORD_EXIT=0`.
-- After adding runtime mission and decision record data,
-  `cargo test -p lkjagent-runtime --test authority_reducer`: `AUTH_REDUCER_EXIT=0`.
-- After adding runtime mission and decision record data,
-  `cargo test -p lkjagent-runtime --test turn_authority`: `TURN_AUTHORITY_EXIT=0`.
-- After adding runtime mission and decision record data, `cargo fmt --check`: `FMT_EXIT=0`.
-- After adding runtime mission and decision record data,
-  `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- After updating this ledger, `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- After updating this ledger, `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- After adding runtime mission and decision record data,
-  `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-- After adding normalized authority store APIs, `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
-- After adding normalized authority store APIs, `cargo fmt --check`: `FMT_EXIT=0`.
-- After adding normalized authority store APIs,
-  `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- After adding normalized authority store APIs,
-  `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- After adding normalized authority store APIs,
-  `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-- After wiring turn authority refresh to the normalized ledger,
-  `cargo test -p lkjagent-runtime --test turn_authority_runtime`: `TURN_RUNTIME_EXIT=0`.
-- After wiring turn authority refresh to the normalized ledger,
-  `cargo test -p lkjagent-runtime --test turn_authority`: `TURN_AUTHORITY_EXIT=0`.
-- After wiring turn authority refresh to the normalized ledger,
-  `cargo test -p lkjagent-runtime --test authority_decision_record`: `DECISION_RECORD_EXIT=0`.
-- After wiring turn authority refresh to the normalized ledger,
-  `cargo test -p lkjagent-store --test runtime_authority`: `STORE_AUTH_EXIT=0`.
-- After wiring turn authority refresh to the normalized ledger, `cargo fmt --check`: `FMT_EXIT=0`.
-- After wiring turn authority refresh to the normalized ledger,
-  `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- After wiring turn authority refresh to the normalized ledger,
-  `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- After wiring turn authority refresh to the normalized ledger,
-  `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-- After recording pending-action admission outcomes,
-  `cargo test -p lkjagent-runtime --test turn_authority_runtime`: `TURN_RUNTIME_EXIT=0`.
-- After recording pending-action admission outcomes,
-  `cargo test -p lkjagent-runtime --test authority_decision_record`: `DECISION_RECORD_EXIT=0`.
-- After recording pending-action admission outcomes,
-  `cargo test -p lkjagent-store --test runtime_authority`: `STORE_AUTH_EXIT=0`.
-- After recording pending-action admission outcomes, `cargo fmt --check`: `FMT_EXIT=0`.
-- After recording pending-action admission outcomes,
-  `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- After recording pending-action admission outcomes,
-  `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- After recording pending-action admission outcomes,
-  `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-- `docker compose build`: `EXIT=0`.
-- `docker compose run --rm verify`: `ok verify`, `EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`.
-- After tracking diagnostic data, `cargo test -p lkjagent-xtask`: `XTEST_EXIT=0`.
-- After tracking diagnostic data, `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- After tracking diagnostic data, `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- After tracking diagnostic data, `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `EXIT=0`.
-- `cargo fmt --check`: `EXIT=0`.
-- `cargo test -p lkjagent-xtask`: `TEST_EXIT=0`.
-- `cargo test -p lkjagent-tools --test fs_payload`: `PAYLOAD_EXIT=0`.
-- `cargo test -p lkjagent-tools --test typed_tools`: `TYPED_EXIT=0`.
-- `cargo test -p lkjagent-tools`: `TEST_EXIT=0`.
-- `cargo test -p lkjagent-protocol`: `PROTO_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test fault_wait`: `FAULT_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test recursive_guard`: `REC_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test authority_policy`: `POLICY_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test turn_authority`: `TURN_EXIT=0`.
-- `cargo test -p lkjagent-benchmark`: `BENCH_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `ok benchmark-corpus`, `CORPUS_EXIT=0`.
-- `cargo test -p lkjagent-xtask`: `XTEST_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- hygiene-check`: `ok hygiene-check`, `HYGIENE_EXIT=0`.
-- `cargo test -p lkjagent-cli --test commands`: `CLI_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `EXIT=0`.
-- Final `docker compose build`: `EXIT=0`.
-- Final `docker compose run --rm verify`: `ok verify`, `EXIT=0`.
+- `cargo test -p lkjagent-tools --test authority_admission_view`: `AUTH_VIEW_EXIT=0`.
+- `cargo test -p lkjagent-tools --test effective_policy`: `EFFECTIVE_POLICY_EXIT=0`.
+- `cargo test -p lkjagent-tools --test effective_policy_repair`: `EFFECTIVE_REPAIR_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test turn_authority_runtime`: `TURN_RUNTIME_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test maintenance_gate`: `MAINT_GATE_EXIT=0`.
+- `cargo fmt --check`: `FMT_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
 
-Earlier gates recorded for the recovery-model slice:
+The first quiet verify after installing admission views failed in
+`cargo test -p lkjagent-runtime --test maintenance_gate` because the expected
+refusal source changed from effective policy to authority view. The test was
+updated and rerun: `MAINT_GATE_EXIT=0`.
 
-- `cargo run -p lkjagent-xtask -- check-style`: `ok check-style`.
-- `cargo fmt --check`: passed.
-- `cargo test -p lkjagent-runtime`: passed after stale action, authority snapshot, and retry-count tests.
-- `cargo test -p lkjagent-cli`: passed after status authority snapshot display tests.
-- `cargo test -p lkjagent-store`: passed after retry-count storage changes.
-- `cargo test -p lkjagent-runtime --test compaction_snapshot`: passed after adding last-observation
-  and batch-cursor snapshot evidence.
-- `cargo test -p lkjagent-tools --test registry_examples`: passed after registry examples were
-  checked through dispatch routing.
-- `cargo test -p lkjagent-runtime --test authority_recovery_plan`: passed after recovery-plan
-  examples were validated against dispatch schemas.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`.
-- `docker compose run --rm verify`: `ok verify`.
+Recent authority data-model and store slices also ran:
 
-These gates prove the documentation shape, line cap, style scan, formatting,
-runtime focused crate tests, workspace quiet verification, and Docker Compose
-verification for this slice. They do not prove the full redesign; the blocker
-queue remains open until each row has focused runtime coverage.
+- `cargo test -p lkjagent-runtime --test authority_decision_record`: `DECISION_RECORD_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test authority_reducer`: `AUTH_REDUCER_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test turn_authority`: `TURN_AUTHORITY_EXIT=0`.
+- `cargo test -p lkjagent-store --test runtime_authority`: `STORE_AUTH_EXIT=0`.
+- `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
+
+Docker Compose verification is not current for this slice.
 
 ## Out of Scope
 

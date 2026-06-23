@@ -1,4 +1,5 @@
 use super::examples::registry_valid_example;
+use super::join::join_or_none;
 use super::state::DispatchState;
 use lkjagent_protocol::{render_action, Action, Param};
 
@@ -52,6 +53,9 @@ fn repeated_tool(action_text: &str) -> Option<&str> {
 }
 
 pub fn policy_refusal(tool: &str, state: &DispatchState) -> Option<String> {
+    if let Some(view) = state.authority_view.as_ref() {
+        return super::authority_refusal::authority_policy_refusal(tool, view);
+    }
     if let Some(policy) = state.effective_policy.as_ref() {
         return super::effective_refusal::effective_policy_refusal(tool, policy, state);
     }
@@ -176,19 +180,6 @@ fn transition_example(policy: &super::state::GraphDispatchPolicy) -> String {
             Param::new("reason", "Use an admitted graph transition"),
         ],
     ))
-}
-
-pub(super) fn join_or_none(values: &[String]) -> String {
-    if values.is_empty() {
-        "none".to_string()
-    } else {
-        values
-            .iter()
-            .take(16)
-            .cloned()
-            .collect::<Vec<_>>()
-            .join(", ")
-    }
 }
 
 fn first_or(values: &[String], fallback: &str) -> String {

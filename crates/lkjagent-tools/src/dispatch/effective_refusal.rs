@@ -1,5 +1,5 @@
 use super::examples::registry_valid_example;
-use super::refusal::join_or_none;
+use super::join::join_or_none;
 use super::state::{DispatchState, EffectivePolicy, GraphDispatchPolicy};
 use lkjagent_protocol::{render_action, Action, Param};
 

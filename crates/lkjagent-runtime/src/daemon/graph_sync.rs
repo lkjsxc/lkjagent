@@ -11,6 +11,7 @@ impl ResidentDaemon {
         self.dispatch_state.graph_missing.clear();
         self.dispatch_state.graph_policy = None;
         self.dispatch_state.effective_policy = None;
+        self.dispatch_state.authority_view = None;
     }
 
     pub(super) fn sync_graph_dispatch_state(&mut self) {
@@ -38,6 +39,7 @@ impl ResidentDaemon {
     }
 
     pub(super) fn sync_effective_dispatch_policy(&mut self, mode_policy: &ActiveModePolicy) {
+        self.dispatch_state.authority_view = None;
         if mode_policy.graph_policy_applies {
             self.sync_graph_dispatch_state();
         } else {

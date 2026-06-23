@@ -1,3 +1,4 @@
+mod authority_refusal;
 mod effective_refusal;
 mod examples;
 mod fs_extra_tools;
@@ -8,6 +9,7 @@ mod graph_inspect_tools;
 mod graph_note_tools;
 mod graph_tools;
 mod guards;
+mod join;
 mod memory_tools;
 mod normalize;
 mod params;
@@ -31,8 +33,8 @@ use normalize::{normalize_action, NormalizationDecision, NormalizationNote};
 use refusal::{policy_refusal, repeat_refusal};
 use routes::route;
 pub use state::{
-    DispatchOutput, DispatchState, EffectivePolicy, GraphDispatchPolicy, GraphEvidenceRecord,
-    ReadRecord, ToolRuntime,
+    AuthorityAdmissionView, DispatchOutput, DispatchState, EffectivePolicy, GraphDispatchPolicy,
+    GraphEvidenceRecord, ReadRecord, ToolRuntime,
 };
 pub use validate::validate_action;
 
