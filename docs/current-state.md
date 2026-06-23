@@ -64,6 +64,8 @@ Uploaded run logs still stand for these failures:
 - blocked escape tools: `doc.scaffold`, `fs.write`, `shell.run`, and internal `agent.ask` attempts.
 - contradictory policy: maintenance and graph policy rendering together.
 - content failure: README-only or scaffold-only output treated as artifact success.
+- generator failure: `leaf_body` still emits one universal scaffold leaf and
+  `artifact.next` still renders generic filler examples.
 - artifact drift: empty cookbook roots, shallow dictionary roots, and topic drift.
 - memory failure: duplicate or low-value maintenance rows.
 - compaction failure: hard pressure depending on model-authored `memory.save`.
@@ -73,8 +75,13 @@ Uploaded run logs still stand for these failures:
 
 ## Active Target
 
-The active target is a runtime-owned authority layer above model output, graph
-suggestions, maintenance, compaction, owner questions, verification, and
+The first active target is the generated documentation source. Scaffold
+structure, path naming, and content readiness must be separated before runtime
+authority work continues, because repeated generated leaves can create false
+artifact evidence.
+
+The runtime target remains a runtime-owned authority layer above model output,
+graph suggestions, maintenance, compaction, owner questions, verification, and
 completion. Model output is intent. Graph transitions are guidance. The
 runtime decides one active mode, one effective policy, one admitted action
 surface, one recovery route, and one completion gate per turn.
@@ -87,6 +94,25 @@ open until the task contract names focused evidence and the same slice records
 the gates that actually ran. Contract text alone never closes a row.
 
 ## Latest Local Evidence
+
+Current baseline for the scaffold-redesign slice:
+
+- `git status --short`: no output.
+- `rg -n "Keep this file semantic|..." .`: `RG_EXIT=127`; this environment
+  does not provide `rg`.
+- Python and `grep` scans found the old generated block in
+  `crates/lkjagent-tools/src/doc/body.rs`, generic artifact example text in
+  `crates/lkjagent-tools/src/artifact_next_example.rs`, detector code, tests,
+  and historical logs.
+- `find data -maxdepth 5 -type f | sort | sed -n '1,200p'`: active evidence
+  includes `data/logs/current-model-run.md`, generated docs under
+  `data/workspace/docs/`, and the combined-topic generated Markdown file.
+- `cargo fmt --check`: `FMT_EXIT=0`, `ok fmt-check`.
+- `cargo run -p lkjagent-xtask -- check-docs`: `DOCS_EXIT=0`, `ok check-docs`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `LINES_EXIT=0`, `ok check-lines`.
+- `cargo run -p lkjagent-xtask -- check-style`: `STYLE_EXIT=0`, `ok check-style`.
+- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCH_EXIT=0`, `ok benchmark-corpus`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `VERIFY_EXIT=0`, `ok verify`.
 
 Latest focused slice gates:
 

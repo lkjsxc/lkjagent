@@ -7,31 +7,28 @@ protocol parser and file tool dispatcher.
 
 ## Canonical Action Form
 
-The canonical prompt example uses one action with a `files` payload and explicit
-file delimiters:
+The canonical prompt example uses paired tags with the dispatcher line protocol.
+No JSON appears inside `<files>`:
 
 ```text
 <act>
-tool: fs.batch_write
-files:
--- file --
+<tool>fs.batch_write</tool>
+<files>
 path: docs/example-a.md
 content:
 # Example A
 
 Concrete content.
--- end-file --
--- file --
+-- lkjagent-next-file --
 path: docs/example-b.md
 content:
 # Example B
 
 Concrete content.
--- end-file --
+</files>
 </act>
 ```
 
-The parser normalizes each `-- file --` block to the dispatcher line protocol.
 The dispatcher receives blocks separated by `-- lkjagent-next-file --`.
 
 ## Paired-Tag Form

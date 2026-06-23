@@ -7,8 +7,11 @@ active.
 
 ## Contract
 
-Prompt text is a rendering of state. It is not a policy layer. The renderer
-uses only facts owned by `ContextFrame` and the current `RuntimeDecision`.
+Prompt text is a rendering of state. It is not a policy layer. The static
+identity text states only invariant behavior: emit one action block, obey the
+runtime decision card, do not claim unobserved results, and stop after the
+action block. The renderer uses only facts owned by `ContextFrame` and the
+current `RuntimeDecision`.
 
 ```text
 RuntimeDecision + ContextFrame -> PromptFrame
@@ -35,6 +38,8 @@ Compaction-resume prompt cards render the preserved mission and next action.
 
 ## Prohibited Sources
 
+- static prompt prose that decides tool policy, recovery ladders, maintenance
+  eligibility, or completion gates.
 - raw owner text prefixes as policy.
 - transcript position as permission.
 - graph guidance as closure authority.
