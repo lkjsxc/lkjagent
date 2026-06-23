@@ -106,9 +106,18 @@ Latest focused slice gates:
 - `cargo run -p lkjagent-xtask -- structure audit --root data/workspace`: `ok structure audit data/workspace`.
 - `cargo run -p lkjagent-xtask -- check-style`: `ok check-style`.
 
-Recent committed slices also ran focused authority, recovery, artifact,
-compaction, `cargo fmt --check`, `check-docs`, `check-lines`, and quiet verify
-gates before commit. Docker Compose verification is not current for these slices.
+Latest provider-log and authority slices also ran:
+
+- `cargo test -p lkjagent-store --test provider_exchange`: `2 passed`.
+- `cargo test -p lkjagent-runtime --test provider_exchange_log`: `2 passed`.
+- `cargo test -p lkjagent-cli --test model_log`: `3 passed`.
+- `cargo test -p lkjagent-llm`: passed.
+- `cargo test -p lkjagent-runtime --test authority_policy`: `3 passed`.
+- `cargo test -p lkjagent-runtime --test authority_reducer`: `7 passed`.
+- `cargo test -p lkjagent-benchmark --test corpus`: `2 passed`.
+- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `ok benchmark-corpus`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`.
+- `docker compose run --rm verify`: `ok verify`.
 
 ## Out of Scope
 
