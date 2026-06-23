@@ -1,0 +1,16 @@
+<notice>
+<kind>error</kind>
+<content>
+authority refused fs.mkdir
+decision_id=116
+mission=owner_recovery
+node=recover-repeat
+reason=tool is not admitted by authority decision; recovery_route=recover-repeat
+admitted_tools=graph.state, graph.next, graph.audit, graph.recover, graph.note, graph.transition, fs.list, fs.tree, fs.search, fs.stat, fs.read, fs.read_many, workspace.index, verify.xtask, artifact.next, artifact.audit
+missing_evidence=plan, document-structure
+valid_example:
+<act>
+<tool>graph.recover</tool>
+</act>
+</content>
+</notice>

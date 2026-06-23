@@ -1,4 +1,4 @@
-# Qwen Documentation
+# structured output
 
 ## Purpose
 

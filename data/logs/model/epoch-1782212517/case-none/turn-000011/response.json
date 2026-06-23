@@ -1,0 +1,1 @@
+{"content":"<act>\n<tool>queue.list</tool>\n<status>all</status>\n<limit>20</limit>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":2744,"completion_tokens":107,"cached_prompt_tokens":null,"total_tokens":2851}}

@@ -1,0 +1,1 @@
+{"content":"<act>\n<tool>memory.find</tool>\n<query>improvement|candidate</query>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":3071,"completion_tokens":97,"cached_prompt_tokens":null,"total_tokens":3168}}

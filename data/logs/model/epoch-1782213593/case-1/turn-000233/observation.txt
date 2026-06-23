@@ -1,0 +1,4 @@
+<observation>
+<status>error</status>
+<content>invalid parameter: each block needs content:</content>
+</observation>

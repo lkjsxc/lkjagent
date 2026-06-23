@@ -1,0 +1,1 @@
+{"content":"<act>\n<tool>artifact.audit</tool>\n<root>structured-output</root>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":4421,"completion_tokens":146,"cached_prompt_tokens":null,"total_tokens":4567}}

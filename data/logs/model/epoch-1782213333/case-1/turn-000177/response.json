@@ -1,0 +1,1 @@
+{"content":"<act>\n<tool>graph.state</tool>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":5966,"completion_tokens":178,"cached_prompt_tokens":null,"total_tokens":6144}}

@@ -1,0 +1,11 @@
+<observation>
+<status>error</status>
+<content>
+invalid parameter: scaffold phrase refused
+path=docs/implementation.md
+phrase=scaffold only
+phrase_class=scaffold-only
+why=scaffold-like generic or status-only prose is not content readiness
+acceptable_replacement=use concrete names, procedures, examples, paths, commands, invariants, observed facts, or domain-specific details
+</content>
+</observation>

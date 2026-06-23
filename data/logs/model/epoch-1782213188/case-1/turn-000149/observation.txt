@@ -1,0 +1,41 @@
+<observation>
+<status>ok</status>
+<content>
+root=.
+docs_root=docs
+dir docs
+file docs/README.md
+file docs/catalog.toml
+file docs/implementation.md
+file docs/overview.md
+file docs/qwen-minecraft-windows-japan-united-states.md
+file docs/verification.md
+dir structured-output
+file structured-output/README.md
+dir structured-output/architecture
+file structured-output/architecture/README.md
+file structured-output/architecture/data-model.md
+file structured-output/architecture/decisions.md
+file structured-output/architecture/runtime.md
+file structured-output/catalog.toml
+dir structured-output/guides
+file structured-output/guides/README.md
+file structured-output/guides/setup.md
+file structured-output/guides/troubleshooting.md
+file structured-output/guides/workflow.md
+dir structured-output/operations
+file structured-output/operations/README.md
+file structured-output/operations/recovery.md
+file structured-output/operations/running.md
+file structured-output/operations/verification.md
+dir structured-output/overview
+file structured-output/overview/README.md
+file structured-output/overview/purpose.md
+file structured-output/overview/system-map.md
+dir structured-output/reference
+file structured-output/reference/README.md
+file structured-output/reference/commands.md
+file structured-output/reference/configuration.md
+file structured-output/reference/glossary.md
+</content>
+</observation>

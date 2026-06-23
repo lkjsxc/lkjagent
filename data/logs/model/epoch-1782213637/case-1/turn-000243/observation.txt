@@ -1,0 +1,9 @@
+<observation>
+<status>ok</status>
+<content>
+files_written=3
+structured-output/overview/purpose.md bytes=473
+structured-output/overview/system-map.md bytes=479
+structured-output/reference/commands.md bytes=473
+</content>
+</observation>

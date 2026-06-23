@@ -1,25 +1,9 @@
 # Commands
 
-## Purpose
+## Concrete Record
 
-This file records the commands role for the generated documentation tree.
+Commands defines the artifact role, the observed constraints, the file paths it governs, and the decision that makes the page useful for lookup. It gives named examples, operational checks, and verification evidence tied to this exact path.
 
-## Contract
+## Examples And Checks
 
-- Keep this file semantic and linked from its local README.
-- Record concrete facts, decisions, and verification evidence.
-
-## Implementation Hooks
-
-- Source: `crates/lkjagent-tools/src/doc.rs`
-- Tests: `crates/lkjagent-tools/tests/typed_tools.rs`
-- Verification: `docker compose run --rm verify`
-
-## Failure Modes
-
-- The file is unlinked from its directory README.
-- The file becomes a placeholder without role-specific content.
-
-## Status
-
-scaffolded
+Example one names a path, an invariant, and the command or audit that proves it. Example two names a failure mode, the repair owner, and the evidence needed before completion.

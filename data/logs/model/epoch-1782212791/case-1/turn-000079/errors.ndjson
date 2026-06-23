@@ -1,0 +1,1 @@
+{"error_class":"EndpointError","message":"endpoint failure: connection: error sending request for url (http://100.73.141.49:1234/v1/chat/completions); retry after 1s"}

@@ -1,0 +1,7 @@
+<observation>
+<status>ok</status>
+<content>
+path=docs/implementation.md
+bytes=71
+</content>
+</observation>

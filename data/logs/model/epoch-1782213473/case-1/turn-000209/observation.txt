@@ -1,0 +1,13 @@
+<observation>
+<status>error</status>
+<content>
+invalid parameter: unknown graph evidence requirement: document-audit-failure
+allowed_values=plan, observation
+valid_example:
+<act>
+<tool>graph.evidence</tool>
+<kind>plan</kind>
+<summary>Read README.md</summary>
+</act>
+</content>
+</observation>
