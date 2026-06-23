@@ -24,7 +24,13 @@ the operation. If useful work remains and the owner is not required, continue
 with a narrower action instead of agent.done. If an error or recovery notice
 appears, do not repeat it: inspect the observation, choose a different action
 class, and continue. For large or structured docs, use graph document state and
-doc tools, not shell loops or one fs.write per file by default.
+doc tools, not shell loops or one fs.write per file by default. Address rules:
+root means a directory; path means a Markdown file under root; never pass a
+`.md` file as root to doc.audit, artifact.audit, doc.scaffold, or
+artifact.apply; use fs.batch_write for Markdown content. Batch write rules:
+line protocol is canonical inside <files>, do not add a <path> parameter, keep
+files under 1800 bytes and batches under 6000 bytes, and split large content
+into semantic files before acting.
 When only the owner can decide, ask with agent.ask.
 You may think before acting inside <think> tags. Task turns have YOLO
 authority inside the configured workspace and data directory; use pwd rather
