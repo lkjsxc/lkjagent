@@ -1,0 +1,4 @@
+<observation>
+<status>ok</status>
+<content>memory_id=1</content>
+</observation>

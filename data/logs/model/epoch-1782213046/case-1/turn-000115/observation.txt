@@ -1,0 +1,12 @@
+<observation>
+<status>ok</status>
+<content>
+dir docs bytes=8 lines=0
+file docs/README.md bytes=1164 lines=32
+file docs/catalog.toml bytes=81 lines=3
+file docs/implementation.md bytes=577 lines=25
+file docs/overview.md bytes=565 lines=25
+file docs/qwen-minecraft-windows-japan-united-states.md bytes=641 lines=25
+file docs/verification.md bytes=573 lines=25
+</content>
+</observation>

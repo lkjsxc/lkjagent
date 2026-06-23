@@ -1,0 +1,1 @@
+{"status":"ok","closure_mode":"StopSequenceClosed","content_bytes":104,"tool":"fs.read_many","params":[{"name":"paths","bytes":50}]}

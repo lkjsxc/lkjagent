@@ -1,0 +1,17 @@
+<observation>
+<status>ok</status>
+<content>
+document audit failed
+root=docs
+checks=15
+passed=11
+failed=4
+failures:
+- scaffold_only_content: implementation.md
+- scaffold_only_content: overview.md
+- scaffold_only_content: qwen-minecraft-windows-japan-united-states.md
+- mock_repeated_content: implementation.md,overview.md,qwen-minecraft-windows-japan-united-states.md
+next_action=doc.scaffold or fs.batch_write exact failed topology
+artifact_ledger_id=2
+</content>
+</observation>

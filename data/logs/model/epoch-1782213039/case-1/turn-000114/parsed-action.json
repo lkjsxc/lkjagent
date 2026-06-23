@@ -1,0 +1,1 @@
+{"status":"fault","closure_mode":"StopSequenceClosed","content_bytes":166,"error":"UnclosedTag { tag: \"command\" }"}

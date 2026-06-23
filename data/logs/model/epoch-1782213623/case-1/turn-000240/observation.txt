@@ -1,0 +1,63 @@
+<observation>
+<status>ok</status>
+<content>
+artifact next batch
+root=docs/operations
+kind=artifact
+missing=3
+next_paths:
+- architecture/data-model.md
+- architecture/decisions.md
+- architecture/runtime.md
+required_sections:
+- title
+- purpose
+- concrete content
+- verification notes
+next_action=fs.batch_write
+valid_example:
+<act>
+<tool>fs.batch_write</tool>
+<files>
+path: docs/operations/architecture/data-model.md
+content:
+# Data Model
+
+## Concrete Record
+
+Data Model defines the artifact role, the observed constraints, the file paths it governs, and the decision that makes the page useful for lookup. It gives named examples, operational checks, and verification evidence tied to this exact path.
+
+## Examples And Checks
+
+Example one names a path, an invariant, and the command or audit that proves it. Example two names a failure mode, the repair owner, and the evidence needed before completion.
+
+-- lkjagent-next-file --
+path: docs/operations/architecture/decisions.md
+content:
+# Decisions
+
+## Concrete Record
+
+Decisions defines the artifact role, the observed constraints, the file paths it governs, and the decision that makes the page useful for lookup. It gives named examples, operational checks, and verification evidence tied to this exact path.
+
+## Examples And Checks
+
+Example one names a path, an invariant, and the command or audit that proves it. Example two names a failure mode, the repair owner, and the evidence needed before completion.
+
+-- lkjagent-next-file --
+path: docs/operations/architecture/runtime.md
+content:
+# Runtime
+
+## Concrete Record
+
+Runtime defines the artifact role, the observed constraints, the file paths it governs, and the decision that makes the page useful for lookup. It gives named examples, operational checks, and verification evidence tied to this exact path.
+
+## Examples And Checks
+
+Example one names a path, an invariant, and the command or audit that proves it. Example two names a failure mode, the repair owner, and the evidence needed before completion.
+
+</files>
+</act>
+</content>
+</observation>

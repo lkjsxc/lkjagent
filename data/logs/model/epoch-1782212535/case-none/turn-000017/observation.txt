@@ -1,0 +1,7 @@
+<observation>
+<status>ok</status>
+<content>
+query_normalized=maintenance cycle 1
+id=1 kind=lesson title=Maintenance Cycle 1: Graph Policy & Context Package Improvement snippet=Cycle opened with directive=refine-graph-policy. Worked on recording graph policy and context package improvement candid
+</content>
+</observation>

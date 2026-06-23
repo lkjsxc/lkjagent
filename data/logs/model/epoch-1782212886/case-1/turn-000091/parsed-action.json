@@ -1,0 +1,1 @@
+{"status":"fault","closure_mode":"StopSequenceClosed","content_bytes":75,"error":"BadParams { tool: \"doc.audit\", missing: [], unknown: [\"kind\"] }"}

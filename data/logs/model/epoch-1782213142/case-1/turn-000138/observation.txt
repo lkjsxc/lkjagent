@@ -1,0 +1,16 @@
+<observation>
+<status>ok</status>
+<content>
+artifact next batch
+root=structured-output
+kind=artifact
+missing=root
+next_action=artifact.apply
+valid_example:
+<act>
+<tool>artifact.apply</tool>
+<root>structured-output</root>
+<kind>artifact</kind>
+</act>
+</content>
+</observation>

@@ -1,0 +1,1 @@
+{"content":"<act>\n<tool>memory.find</tool>\n<query>recent|lesson|transcript</query>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":1989,"completion_tokens":89,"cached_prompt_tokens":null,"total_tokens":2078}}

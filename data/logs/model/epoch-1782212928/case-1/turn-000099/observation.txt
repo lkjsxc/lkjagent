@@ -1,0 +1,10 @@
+<observation>
+<status>ok</status>
+<content>
+path=docs/qwen-minecraft-windows-japan-united-states.md
+kind=file
+bytes=633
+lines=25
+checksum=7170e9418ddcde9c
+</content>
+</observation>

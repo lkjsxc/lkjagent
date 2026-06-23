@@ -1,0 +1,1 @@
+{"content":"<act>\n<tool>fs.read_many</tool>\n<paths>docs/qwen-minecraft-windows-japan-united-states.md</paths>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":5813,"completion_tokens":472,"cached_prompt_tokens":null,"total_tokens":6285}}

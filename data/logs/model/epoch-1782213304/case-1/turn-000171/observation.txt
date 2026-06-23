@@ -1,0 +1,13 @@
+<observation>
+<status>ok</status>
+<content>
+document audit failed
+root=.
+checks=15
+passed=14
+failed=1
+failures:
+- missing_readme: /data/workspace/.
+next_action=doc.scaffold or fs.batch_write exact failed topology
+</content>
+</observation>

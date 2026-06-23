@@ -1,0 +1,13 @@
+<observation>
+<status>ok</status>
+<content>
+document scaffold created
+root=structured-output
+kind=artifact
+profile=ProjectDocs
+mode=approx
+files=20
+readme=present
+catalog=catalog.toml
+</content>
+</observation>

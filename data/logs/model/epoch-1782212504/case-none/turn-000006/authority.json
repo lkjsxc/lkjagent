@@ -1,0 +1,1 @@
+{"active_mode":"Maintenance","mission":"idle_maintenance","admitted_tools":"memory.find,memory.prune,memory.save,queue.list,agent.done","blocked_tools":"graph.state,graph.next,graph.plan,graph.transition,doc.scaffold,fs.write,shell.run,agent.ask"}

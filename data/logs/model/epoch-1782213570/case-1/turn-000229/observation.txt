@@ -1,0 +1,7 @@
+<observation>
+<status>ok</status>
+<content>
+path=structured-output/operations/running.md
+bytes=479
+</content>
+</observation>

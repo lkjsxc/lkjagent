@@ -1,0 +1,10 @@
+<observation>
+<status>ok</status>
+<content>
+node=document
+phase=execution
+recovery_ladder=inspect-state,smaller-scope,alternate-native-tool,replan,admitted-shell-escape,block-step-and-continue
+repeat_count=0
+next=use graph.transition to document-audit, artifact.next, artifact.audit, doc.audit, fs.batch_write, fs.list, fs.tree, graph.state
+</content>
+</observation>

@@ -1,0 +1,16 @@
+<observation>
+<status>ok</status>
+<content>
+artifact next batch
+root=docs/operations
+kind=artifact
+missing=root
+next_action=artifact.apply
+valid_example:
+<act>
+<tool>artifact.apply</tool>
+<root>docs/operations</root>
+<kind>artifact</kind>
+</act>
+</content>
+</observation>

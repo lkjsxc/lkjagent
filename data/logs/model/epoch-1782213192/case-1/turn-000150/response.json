@@ -1,0 +1,1 @@
+{"content":"<act>\n<tool>doc.audit</tool>\n<root>docs/qwen-minecraft-windows-japan-united-states.md</root>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":8777,"completion_tokens":222,"cached_prompt_tokens":null,"total_tokens":8999}}

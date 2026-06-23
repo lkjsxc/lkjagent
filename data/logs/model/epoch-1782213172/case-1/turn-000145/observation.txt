@@ -1,0 +1,30 @@
+<observation>
+<status>ok</status>
+<content>
+Graph state:
+case: 1
+family: documentation/document-construction
+phase: execution
+node: document
+confidence: 70
+Current state: active
+Active states: 1. Recovering 0.62 tool-recovery phase=recovery gap=recovery evidence; 2. Structuring 0.61 document-structure phase=planning gap=document audit; 3. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests
+Objective: Deliver the owner task by improving semantic recursive documentation, neutral multi-state progress tracking.
+Do not do: none
+Constraints: Neutral multi-state progress tracking; evidence completeness before tool mutation; prevent blocked-step failures from repeated graph.recover attempts
+Assumptions: docs/qwen-minecraft-windows-japan-united-states.md exists and contains the target documentation content
+Risks: first owner message is not a sufficient plan -> record graph.plan before mutating tools; First owner message is not a sufficient plan -> record graph.plan before mutating tools; missing document-structure audit may block completion -> verify during execution
+Success criteria: none
+Active plan step: 1. Collect observation evidence from docs/qwen-minecraft-windows-japan-united-states.md via fs.read
+Required evidence: plan, observation, document-structure
+Missing evidence: document-structure
+Allowed tools now: graph.state, graph.next, graph.audit, graph.evidence, graph.note, graph.transition, fs.list, fs.tree, fs.stat, artifact.plan, artifact.apply, artifact.audit, artifact.next, fs.write, doc.scaffold, doc.audit, fs.batch_write, fs.mkdir
+Blocked tools now: agent.ask, agent.done, fs.edit, fs.patch, fs.read, fs.read_many, fs.search, graph.context, graph.plan, graph.recover, memory.find, memory.save
+Preferred next action: execute the active plan step, record evidence, then verify
+Legal transitions: document-profile:admitted; document-audit:admitted
+Context packages: planning-checklist, context-slice, doc-construction
+Touched paths: 
+Recent faults: Consecutive tool errors reached count=4; graph recovery is active. 
+[graph slice narrowed]
+</content>
+</observation>

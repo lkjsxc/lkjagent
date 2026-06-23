@@ -1,0 +1,16 @@
+<observation>
+<status>ok</status>
+<content>
+document audit failed
+root=docs
+checks=15
+passed=11
+failed=4
+failures:
+- scaffold_only_content: overview.md
+- scaffold_only_content: qwen-minecraft-windows-japan-united-states.md
+- scaffold_only_content: verification.md
+- mock_repeated_content: overview.md,qwen-minecraft-windows-japan-united-states.md,verification.md
+next_action=doc.scaffold or fs.batch_write exact failed topology
+</content>
+</observation>
