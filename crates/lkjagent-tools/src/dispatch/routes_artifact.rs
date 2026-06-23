@@ -8,10 +8,13 @@ pub fn dispatch_artifact_plan(
     params: &BTreeMap<String, String>,
     action_text: &str,
     runtime: &ToolRuntime,
+    conn: &Connection,
     state: &mut DispatchState,
 ) -> DispatchOutput {
     observe_result(
         crate::artifact::plan(
+            conn,
+            &runtime.now,
             &param(params, "root"),
             &param(params, "title"),
             &param(params, "kind"),
@@ -28,17 +31,25 @@ pub fn dispatch_artifact_apply(
     params: &BTreeMap<String, String>,
     action_text: &str,
     runtime: &ToolRuntime,
+    conn: &Connection,
     state: &mut DispatchState,
 ) -> DispatchOutput {
+    let root = param(params, "root");
+    let title = param(params, "title");
+    let kind = param(params, "kind");
+    let mode = param(params, "mode");
+    let sections = param(params, "sections");
     observe_result(
-        crate::artifact::apply(
-            &runtime.workspace,
-            &param(params, "root"),
-            &param(params, "title"),
-            &param(params, "kind"),
-            &param(params, "mode"),
-            &param(params, "sections"),
-        ),
+        crate::artifact::apply(crate::artifact::ApplyRequest {
+            workspace: &runtime.workspace,
+            conn,
+            now: &runtime.now,
+            root: &root,
+            title: &title,
+            kind: &kind,
+            mode: &mode,
+            sections: &sections,
+        }),
         action_text,
         runtime,
         state,
@@ -49,11 +60,14 @@ pub fn dispatch_artifact_audit(
     params: &BTreeMap<String, String>,
     action_text: &str,
     runtime: &ToolRuntime,
+    conn: &Connection,
     state: &mut DispatchState,
 ) -> DispatchOutput {
     observe_result(
         crate::artifact::audit(
             &runtime.workspace,
+            conn,
+            &runtime.now,
             &param(params, "root"),
             &param(params, "kind"),
             &param(params, "count"),
