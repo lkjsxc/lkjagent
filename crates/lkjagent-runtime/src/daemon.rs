@@ -13,32 +13,59 @@ use crate::error::RuntimeResult;
 use crate::prompt::token_estimate;
 use crate::task::{RuntimeState, TaskState};
 
+#[path = "daemon/authority/authority.rs"]
 mod authority;
+#[path = "daemon/authority/authority_admission.rs"]
 mod authority_admission;
+#[path = "daemon/authority/authority_ledger.rs"]
 mod authority_ledger;
+#[path = "daemon/authority/authority_store.rs"]
 mod authority_store;
+#[path = "daemon/context/compaction.rs"]
 mod compaction;
+#[path = "daemon/context/compaction_support.rs"]
 mod compaction_support;
+#[path = "daemon/context/context_budget.rs"]
 mod context_budget;
+#[path = "daemon/artifacts/count_scaffold.rs"]
 mod count_scaffold;
+#[path = "daemon/artifacts/count_scaffold_gate.rs"]
 mod count_scaffold_gate;
+#[path = "daemon/effects/effects.rs"]
 mod effects;
+#[path = "daemon/effects/effects_graph.rs"]
 mod effects_graph;
+#[path = "daemon/loop/endpoint.rs"]
 mod endpoint;
+#[path = "daemon/effects/execute_pending.rs"]
 mod execute_pending;
+#[path = "daemon/authority/graph_policy.rs"]
 mod graph_policy;
+#[path = "daemon/authority/graph_sync.rs"]
 mod graph_sync;
+#[path = "daemon/loop/idle.rs"]
 mod idle;
+#[path = "daemon/loop/maintenance_wait.rs"]
 mod maintenance_wait;
+#[path = "daemon/loop/owner_delivery.rs"]
 mod owner_delivery;
+#[path = "daemon/context/persisted.rs"]
 mod persisted;
+#[path = "daemon/context/pressure.rs"]
 mod pressure;
+#[path = "daemon/effects/record.rs"]
 mod record;
+#[path = "daemon/loop/runner.rs"]
 mod runner;
+#[path = "daemon/artifacts/scaffold.rs"]
 mod scaffold;
+#[path = "daemon/artifacts/scaffold_evidence.rs"]
 mod scaffold_evidence;
+#[path = "daemon/loop/startup.rs"]
 mod startup;
+#[path = "daemon/status/status.rs"]
 mod status;
+#[path = "daemon/status/task_summary.rs"]
 mod task_summary;
 
 pub use persisted::restore_completion_guard;
