@@ -46,4 +46,5 @@ ticks, compaction pressure, verification results, and completion requests are re
 
 ## Status
 
-design-only for the normalized event table.
+partially implemented. The normalized event table and store API exist. Full runtime emission for every event kind
+remains open.
