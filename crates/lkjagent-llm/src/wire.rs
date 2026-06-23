@@ -4,12 +4,12 @@ use lkjagent_context::model::{Message, Role};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::closure::{restore_stop_suffix, ClosureMode, ACT_CLOSE};
 use metrics::collect_cache_metrics;
 
 pub const MAX_TOKENS: u16 = 2048;
 pub const TEMPERATURE: f32 = 0.3;
 pub const TOP_P: f32 = 0.9;
-const ACT_CLOSE: &str = "</act>";
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
 pub struct ChatRequest {
@@ -33,6 +33,7 @@ pub struct ChatMessage {
 pub struct Completion {
     pub content: String,
     pub finish_reason: FinishReason,
+    pub closure_mode: ClosureMode,
     pub usage: CompletionUsage,
     pub cache_metrics: Vec<CacheMetric>,
 }
@@ -119,9 +120,11 @@ pub fn decode_completion(text: &str) -> Result<Completion, WireError> {
         .next()
         .ok_or(WireError::Missing("choices[0]"))?;
     let finish_reason = finish_reason(choice.finish_reason);
+    let (content, closure_mode) = restore_stop_suffix(choice.message.content, &finish_reason);
     Ok(Completion {
-        content: restore_stop_suffix(choice.message.content, &finish_reason),
+        content,
         finish_reason,
+        closure_mode,
         usage: usage_from_response(body.usage, &cache_metrics),
         cache_metrics,
     })
@@ -176,17 +179,6 @@ fn role_name(role: Role) -> &'static str {
         Role::System => "system",
         Role::Assistant => "assistant",
         Role::User => "user",
-    }
-}
-
-fn restore_stop_suffix(content: String, finish_reason: &FinishReason) -> String {
-    if matches!(finish_reason, FinishReason::Stop)
-        && content.contains("<act>")
-        && !content.contains(ACT_CLOSE)
-    {
-        format!("{content}{ACT_CLOSE}")
-    } else {
-        content
     }
 }
 

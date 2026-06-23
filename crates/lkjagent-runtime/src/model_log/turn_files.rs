@@ -7,8 +7,15 @@ use rusqlite::Connection;
 use super::{json_escape, ProviderLogHandle};
 use crate::error::{RuntimeError, RuntimeResult};
 
-pub fn record_parsed_action(handle: &ProviderLogHandle, content: &str) -> RuntimeResult<()> {
-    atomic_write(&handle.dir.join("parsed-action.json"), &parse_json(content))
+pub fn record_parsed_action(
+    handle: &ProviderLogHandle,
+    content: &str,
+    closure_mode: &str,
+) -> RuntimeResult<()> {
+    atomic_write(
+        &handle.dir.join("parsed-action.json"),
+        &parse_json(content, closure_mode),
+    )
 }
 
 pub fn record_provider_admission(
@@ -38,16 +45,17 @@ pub fn record_provider_observation(conn: &Connection, observation: &str) -> Runt
     atomic_write(&dir.join("observation.txt"), observation)
 }
 
-fn parse_json(content: &str) -> String {
+fn parse_json(content: &str, closure_mode: &str) -> String {
     match parse_completion(content) {
-        Ok(action) => action_json(content, &action),
-        Err(fault) => fault_json(content, &fault),
+        Ok(action) => action_json(content, closure_mode, &action),
+        Err(fault) => fault_json(content, closure_mode, &fault),
     }
 }
 
-fn action_json(content: &str, action: &Action) -> String {
+fn action_json(content: &str, closure_mode: &str, action: &Action) -> String {
     format!(
-        "{{\"status\":\"ok\",\"closure_mode\":\"NaturalOrWireNormalized\",\"content_bytes\":{},\"tool\":\"{}\",\"params\":[{}]}}\n",
+        "{{\"status\":\"ok\",\"closure_mode\":\"{}\",\"content_bytes\":{},\"tool\":\"{}\",\"params\":[{}]}}\n",
+        json_escape(closure_mode),
         content.len(),
         json_escape(&action.tool),
         action
@@ -63,9 +71,10 @@ fn action_json(content: &str, action: &Action) -> String {
     )
 }
 
-fn fault_json(content: &str, fault: &ParseFault) -> String {
+fn fault_json(content: &str, closure_mode: &str, fault: &ParseFault) -> String {
     format!(
-        "{{\"status\":\"fault\",\"closure_mode\":\"NaturalOrWireNormalized\",\"content_bytes\":{},\"error\":\"{}\"}}\n",
+        "{{\"status\":\"fault\",\"closure_mode\":\"{}\",\"content_bytes\":{},\"error\":\"{}\"}}\n",
+        json_escape(closure_mode),
         content.len(),
         json_escape(&format!("{fault:?}"))
     )

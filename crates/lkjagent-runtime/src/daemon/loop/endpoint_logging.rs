@@ -55,12 +55,16 @@ impl ResidentDaemon {
     pub(super) fn record_model_parse(
         &self,
         handle: Option<&ProviderLogHandle>,
-        content: &str,
+        completion: &Completion,
     ) -> RuntimeResult<()> {
         let Some(handle) = handle else {
             return Ok(());
         };
-        record_parsed_action(handle, content)
+        record_parsed_action(
+            handle,
+            &completion.content,
+            completion.closure_mode.as_str(),
+        )
     }
 
     pub(super) fn record_model_error(
@@ -127,9 +131,10 @@ impl ResidentDaemon {
 
 fn completion_response_json(completion: &Completion) -> String {
     format!(
-        "{{\"content\":\"{}\",\"finish_reason\":\"{}\",\"usage\":{}}}\n",
+        "{{\"content\":\"{}\",\"finish_reason\":\"{}\",\"closure_mode\":\"{}\",\"usage\":{}}}\n",
         json_escape(&completion.content),
         finish_reason_name(&completion.finish_reason),
+        completion.closure_mode.as_str(),
         usage_json(&completion.usage)
     )
 }

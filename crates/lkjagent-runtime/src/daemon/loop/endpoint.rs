@@ -56,7 +56,7 @@ impl ResidentDaemon {
         match complete(&self.runtime.client, &messages, self.endpoint_attempt) {
             Ok(completion) => {
                 self.record_model_response(conn, provider_log.as_ref(), &completion, started)?;
-                self.record_model_parse(provider_log.as_ref(), &completion.content)?;
+                self.record_model_parse(provider_log.as_ref(), &completion)?;
                 self.apply_completion(conn, now, completion)
             }
             Err(error) => {

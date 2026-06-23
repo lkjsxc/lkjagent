@@ -25,7 +25,7 @@ prove that their failures cannot recur.
 | --- | --- |
 | Workspace and gates | `Cargo.toml`, `crates/lkjagent-xtask`, and `docker-compose.yml` exist. |
 | Diagnostic runtime output | `data/logs/current-model-run.md`, `data/workspace/structured-output/`, and SQLite store files hold active generated evidence; SQLite store files stay ignored. |
-| Parser | `lkjagent-protocol` parses line-oriented, paired-tag, JSON envelope, and batch file action forms covered by focused fixtures. |
+| Parser | `lkjagent-protocol` parses line-oriented, paired-tag, JSON envelope, and batch file action forms covered by focused fixtures. Provider stop-closure restoration records closure mode for parse logs. |
 | Dispatcher registry | `lkjagent-tools` validates registered tools and renders registry examples for covered action families. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
 | SQLite store | Queue, state, event, memory, and task summary surfaces exist in `lkjagent-store`. |
