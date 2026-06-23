@@ -49,7 +49,7 @@ prove that their failures cannot recur.
 | Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, normalized artifact ledger and cursor store APIs, ledger writes from `artifact.plan`, `artifact.apply`, `artifact.audit`, and `artifact.next`, successful write-path cursor completion marking, audit output `artifact_ledger_id`, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Full close-path coverage remains incomplete. |
 | Completion gates | A pure `decide_completion` reducer returns completion kind, failed gates, missing and existing evidence, next action, valid example, blocked-handoff allowance, and status text. Runtime `agent.done` admission uses it, and daemon graph dispatch checks the artifact ledger before admitting completion. Every close path is not yet proven to use the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Store reopen coverage and status rendering for latest snapshots remain open. |
-| Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, and same-title high-overlap merge exist. Rewrite pruning and pre-dispatch owner preemption remain open. |
+| Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, same-title high-overlap merge, and low-signal rewrite pruning exist. Pre-dispatch owner preemption proof remains open. |
 | Status and console | Active graph state, active mode, authority snapshot fields, context pressure, token usage, and model-log paths display. Last successful observation is summarized from recent observations. |
 | Benchmarks | Uploaded-run signatures are represented by deterministic fixtures. Runtime replay coverage and every completion path are not yet complete. |
 
@@ -85,50 +85,10 @@ the gates that actually ran. Contract text alone never closes a row.
 
 ## Latest Local Evidence
 
-Current authority admission-view slice gates:
+Latest focused slice gates:
 
-- `cargo test -p lkjagent-tools --test authority_admission_view`: `AUTH_VIEW_EXIT=0`.
-- `cargo test -p lkjagent-tools --test effective_policy`: `EFFECTIVE_POLICY_EXIT=0`.
-- `cargo test -p lkjagent-tools --test effective_policy_repair`: `EFFECTIVE_REPAIR_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test turn_authority_runtime`: `TURN_RUNTIME_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test maintenance_gate`: `MAINT_GATE_EXIT=0`.
-- `cargo fmt --check`: `FMT_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-
-Current completion reducer slice gates:
-
-- `cargo test -p lkjagent-runtime --test completion_decision`: `COMPLETION_DECISION_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test authority_completion`: `AUTH_COMPLETION_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test authority_reducer`: `AUTH_REDUCER_EXIT=0`.
-- `cargo fmt --check`: `FMT_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-
-Current artifact ledger store slice gates:
-
-- `cargo test -p lkjagent-store --test artifact_ledger`: `ARTIFACT_LEDGER_EXIT=0`.
-- `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
-- `cargo fmt --check`: `FMT_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-
-Current artifact ledger tool wiring slice gates:
-
-- `cargo test -p lkjagent-tools --test artifact_ledger_tools`: `ARTIFACT_LEDGER_TOOLS_EXIT=0`.
-- `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
-- `cargo fmt --check`: `FMT_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-
-Current artifact next cursor slice gates:
-
-- `cargo test -p lkjagent-store --test artifact_cursor`: `ARTIFACT_CURSOR_EXIT=0`.
-- `cargo test -p lkjagent-tools --test artifact_next_ledger`: `ARTIFACT_NEXT_LEDGER_EXIT=0`.
+- `cargo test -p lkjagent-store --test memory_prune`: `STORE_MEMORY_PRUNE_EXIT=0`.
+- `cargo test -p lkjagent-tools --test memory_prune`: `TOOLS_MEMORY_PRUNE_EXIT=0`.
 - `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
 - `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
 - `cargo fmt --check`: `FMT_EXIT=0`.
@@ -136,56 +96,9 @@ Current artifact next cursor slice gates:
 - `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
 
-Current artifact write cursor slice gates:
-
-- `cargo test -p lkjagent-store --test artifact_cursor`: `ARTIFACT_CURSOR_EXIT=0`.
-- `cargo test -p lkjagent-tools --test artifact_write_ledger`: `ARTIFACT_WRITE_LEDGER_EXIT=0`.
-- `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
-- `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
-- `cargo fmt --check`: `FMT_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-
-Current artifact ledger completion slice gates:
-
-- `cargo test -p lkjagent-tools --test artifact_ledger_tools`: `ARTIFACT_LEDGER_TOOLS_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test artifact_ledger_completion`: `ARTIFACT_LEDGER_COMPLETION_EXIT=0`.
-- `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
-- `cargo test -p lkjagent-runtime`: `RUNTIME_TEST_EXIT=0`.
-- `cargo fmt --check`: `FMT_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-
-Current persisted authority prompt-card slice gates:
-
-- `cargo test -p lkjagent-runtime --test turn_authority_runtime`: `TURN_RUNTIME_EXIT=0`.
-- `cargo test -p lkjagent-runtime`: `RUNTIME_TEST_EXIT=0`.
-- `cargo fmt --check`: `FMT_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-
-Current recovery-plan dispatch slice gates:
-
-- `cargo test -p lkjagent-runtime --test authority_recovery_plan`: `AUTH_RECOVERY_PLAN_EXIT=0`.
-- `cargo test -p lkjagent-runtime`: `RUNTIME_TEST_EXIT=0`.
-- `cargo fmt --check`: `FMT_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-
-Current durable compaction snapshot slice gates:
-
-- `cargo test -p lkjagent-runtime --test compaction_snapshot`: `COMPACTION_SNAPSHOT_EXIT=0`.
-- `cargo test -p lkjagent-runtime`: `RUNTIME_TEST_EXIT=0`.
-- `cargo fmt --check`: `FMT_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-
-Docker Compose verification is not current for this slice.
+Recent committed slices also ran focused authority, recovery, artifact,
+compaction, `cargo fmt --check`, `check-docs`, `check-lines`, and quiet verify
+gates before commit. Docker Compose verification is not current for these slices.
 
 ## Out of Scope
 

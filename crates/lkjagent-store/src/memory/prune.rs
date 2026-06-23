@@ -13,6 +13,7 @@ pub struct MemoryPruneReport {
     pub kept: usize,
     pub deleted: usize,
     pub merged: usize,
+    pub rewritten: usize,
     pub source_rows: Vec<i64>,
 }
 
@@ -22,6 +23,7 @@ pub fn prune_exact_duplicates(conn: &mut Connection) -> StoreResult<MemoryPruneR
         kept: 0,
         deleted: 0,
         merged: 0,
+        rewritten: 0,
         source_rows: Vec::new(),
     };
     let groups = duplicate_groups(&tx)?;
@@ -35,6 +37,7 @@ pub fn prune_exact_duplicates(conn: &mut Connection) -> StoreResult<MemoryPruneR
         }
     }
     semantic_merge(&tx, &mut report)?;
+    super::prune_rewrite::rewrite_low_signal(&tx, &mut report)?;
     tx.commit()?;
     Ok(report)
 }

@@ -2,6 +2,7 @@ mod digest;
 mod duplicate;
 mod identity;
 mod prune;
+mod prune_rewrite;
 mod row;
 mod search;
 
