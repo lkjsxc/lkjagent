@@ -32,9 +32,11 @@ The reduction note names any evidence not inspected and why.
 
 The fixture suite covers these classes before the related blocker closes:
 
-- empty model content.
+- empty or interrupted model content.
 - missing action block.
 - unclosed action block and stop-closure repair.
+- contradictory authority frames.
+- provider request and response logging.
 - multiple action blocks.
 - tool outside the active admission surface.
 - payload too large.
@@ -77,5 +79,8 @@ created fixtures, and uninspected evidence.
 
 ## Status
 
-partially implemented. The benchmark corpus already includes uploaded-run
-signatures. Full replay coverage for every listed failure class remains open.
+partially implemented. The benchmark corpus includes uploaded-run signatures for
+missing action blocks, interrupted output, stop-closure repair, contradictory
+authority, provider exchange logging, batch schema faults, compaction resume,
+artifact drift, and repeated recovery. Parser-level replay fixtures and full
+runtime replay coverage remain open.
