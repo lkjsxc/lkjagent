@@ -37,17 +37,22 @@ impl ResidentDaemon {
         Ok(authority)
     }
 
-    pub(super) fn refresh_authority_card(&mut self, authority: &TurnAuthority) {
+    pub(super) fn refresh_authority_card(
+        &mut self,
+        conn: &Connection,
+        authority: &TurnAuthority,
+    ) -> RuntimeResult<()> {
         self.state
             .context
             .log
             .retain(|frame| !frame.content.starts_with("Active Mode:\n"));
-        let rendered = render_turn_authority(authority);
+        let rendered = persisted_authority_card(conn, authority)?;
         self.state.context.log.push(Frame::new(
             FrameKind::GraphNotice,
             rendered.clone(),
             token_estimate(&rendered),
         ));
+        Ok(())
     }
 
     fn authority_snapshot(
@@ -90,6 +95,17 @@ impl ResidentDaemon {
             ContextPressure::Orange | ContextPressure::Red | ContextPressure::BlackInvalid
         )
     }
+}
+
+fn persisted_authority_card(conn: &Connection, authority: &TurnAuthority) -> RuntimeResult<String> {
+    let mut rendered = render_turn_authority(authority);
+    if let Some(decision_id) = lkjagent_store::state::get(conn, "authority decision id")? {
+        rendered.push_str(&format!("\nauthority_decision_id={decision_id}"));
+    }
+    if let Some(fingerprint) = lkjagent_store::state::get(conn, "authority fingerprint")? {
+        rendered.push_str(&format!("\nauthority_fingerprint={fingerprint}"));
+    }
+    Ok(rendered)
 }
 
 impl From<RuntimeAuthoritySnapshot> for TurnAuthorityInput {

@@ -47,10 +47,16 @@ Implement the loop documented in
 
 - `cargo test -p lkjagent-runtime --test authority_reducer`
 - `cargo test -p lkjagent-runtime --test turn_authority`
+- `cargo test -p lkjagent-runtime --test turn_authority_runtime`
 - `cargo test -p lkjagent-runtime --test authority_policy`
 - `cargo test -p lkjagent-tools --test graph_control_dispatch`
 - `cargo run -p lkjagent-xtask -- quiet verify`
 
 ## Status
 
-open.
+partially implemented. Runtime mission selection, data-first decision records,
+normalized authority event and decision persistence, admission persistence,
+dispatch admission views, stale maintenance-action refusal, central completion
+reducer use, and prompt-card decision id and fingerprint rendering exist. Broader
+state-transition history, recovery, compaction, maintenance, and every close path
+remain open.

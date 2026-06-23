@@ -72,8 +72,12 @@ low-value memory row.
 
 Prompt rendering consumes `RuntimeDecision` plus `ContextFrame`. Allowed tools,
 blocked tools, exact examples, completion blockers, missing evidence, and the
-next action in the prompt must match the decision used by dispatch.
+next action in the prompt must match the decision used by dispatch. Runtime
+prompt cards include the persisted authority decision id and fingerprint that
+also back the immutable dispatch admission view.
 
 ## Status
 
-partially implemented.
+partially implemented. Daemon owner-task prompt cards and dispatch admission
+views share the persisted authority decision id and fingerprint. Broader close,
+recovery, compaction, maintenance, and console paths still need proof.

@@ -45,7 +45,7 @@ impl ResidentDaemon {
             let result = step(self.state.clone(), StepInput::TurnBudgetCheckpoint);
             return self.apply_step_result(conn, now, result, false);
         }
-        self.refresh_authority_card(&authority);
+        self.refresh_authority_card(conn, &authority)?;
         match endpoint_complete(
             &self.runtime.client,
             &self.state.context,
