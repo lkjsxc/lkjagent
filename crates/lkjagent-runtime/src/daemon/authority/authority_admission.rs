@@ -17,7 +17,7 @@ pub(super) fn install_authority_view(
     };
     state.authority_view = Some(AuthorityAdmissionView {
         decision_id: text_state(conn, "authority decision id")?.unwrap_or_else(|| "0".to_string()),
-        case_id: text_state(conn, "authority case id")?.unwrap_or_else(|| "0".to_string()),
+        case_id: text_state(conn, "authority case id")?.unwrap_or_else(|| "none".to_string()),
         authority_fingerprint: text_state(conn, "authority fingerprint")?.unwrap_or_default(),
         active_mission: authority.mission.as_str().to_string(),
         active_node: active_node(state),
@@ -89,12 +89,14 @@ fn record(
     let Some(decision_id) = numeric_state(conn, "authority decision id")? else {
         return Ok(());
     };
-    let case_id = numeric_state(conn, "authority case id")?.unwrap_or(0);
+    let case_text = text_state(conn, "authority case id")?.unwrap_or_else(|| "none".to_string());
+    let case_ref = case_ref(&case_text);
     record_tool_admission(
         conn,
         &ToolAdmissionInput {
             decision_id,
-            case_id,
+            case_scope: case_ref.scope,
+            case_id: case_ref.id,
             requested_tool,
             admitted,
             refusal_reason,
@@ -134,6 +136,24 @@ fn numeric_state(conn: &Connection, key: &str) -> RuntimeResult<Option<i64>> {
         return Ok(None);
     };
     Ok(value.parse::<i64>().ok())
+}
+
+struct CaseRef {
+    scope: &'static str,
+    id: Option<i64>,
+}
+
+fn case_ref(value: &str) -> CaseRef {
+    match value.parse::<i64>() {
+        Ok(id) => CaseRef {
+            scope: "case",
+            id: Some(id),
+        },
+        Err(_) => CaseRef {
+            scope: "none",
+            id: None,
+        },
+    }
 }
 
 fn text_state(conn: &Connection, key: &str) -> RuntimeResult<Option<String>> {

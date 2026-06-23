@@ -84,8 +84,9 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 
 ## Remaining Proof Gaps
 
-- Authority snapshots still need stronger case-specific fields and transition
-  history for every dispatch and completion path.
+- Authority snapshots and transition rows exist for turn authority refresh, but
+  still need full case-specific fields and coverage for every dispatch and
+  completion path.
 - Compaction snapshots still need durable history beyond the latest notice.
 - Broader stale-action contradiction repair is not yet covered for every mode.
 - Recovery shape-change enforcement is not yet proven for every live fault class.

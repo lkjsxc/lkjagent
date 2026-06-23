@@ -50,7 +50,7 @@ and close behavior.
 
 ## Status
 
-partially implemented. `RuntimeDecisionRecord` exists. SQLite tables plus store APIs record authority events,
-decisions, and tool admissions. Runtime turn authority refresh writes normalized event and decision rows. Prompt
-authority cards include the persisted decision id and fingerprint, and dispatch admission views read the same id.
-Broader route coverage remains open.
+partially implemented. `RuntimeDecisionRecord` exists. SQLite tables plus store APIs record authority snapshots,
+events, decisions, transitions, effects, and tool admissions. Runtime turn authority refresh writes normalized
+snapshot, event, decision, and transition rows. Prompt authority cards include the persisted decision id and
+fingerprint, and dispatch admission views read the same id. Broader route coverage remains open.

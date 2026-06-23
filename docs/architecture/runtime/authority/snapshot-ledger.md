@@ -48,4 +48,8 @@ policy facts after snapshot construction.
 
 ## Status
 
-design-only for the normalized ledger; current authority snapshots are partial.
+partially implemented. `runtime_snapshots` records case scope, nullable case id,
+queue count, active mode, active node, missing evidence, artifact, fault,
+compaction, maintenance, prompt, context, and staleness fingerprint fields.
+Snapshot construction remains partial until every runtime path builds the full
+read model before reduction.
