@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use crate::error::ToolResult;
 
-pub fn mock_sibling_checks(
+pub fn repeated_sibling_checks(
     root: &Path,
     files: &[PathBuf],
     failures: &mut Vec<String>,
@@ -18,7 +18,7 @@ pub fn mock_sibling_checks(
         }
     }
     for paths in groups.values().filter(|paths| paths.len() >= 3) {
-        failures.push(format!("mock_repeated_content: {}", paths.join(",")));
+        failures.push(format!("repeated_generic_content: {}", paths.join(",")));
     }
     Ok(())
 }

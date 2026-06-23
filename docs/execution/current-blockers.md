@@ -9,8 +9,8 @@ linked task contract names focused evidence and the actual gates that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Generated documentation can repeat universal scaffold boilerplate | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | open |
-| 2 | Generated path names can concatenate unrelated owner topics | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | open |
+| 1 | Generated documentation can repeat universal scaffold boilerplate | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | partially implemented |
+| 2 | Generated path names can concatenate unrelated owner topics | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | partially implemented |
 | 3 | Runtime authority is not the single source of active mission and tool admission | [current-work/state-transition-network.md](current-work/state-transition-network.md) | open |
 | 4 | Recovery can block the exact observation, repair, or batch tool needed to escape | [current-work/recovery-shape-enforcement.md](current-work/recovery-shape-enforcement.md) | open |
 | 5 | Content artifacts can pass on scaffold or planning evidence instead of real content | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | open |
@@ -52,6 +52,16 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 
 ## Current Narrowing Evidence
 
+- `doc.scaffold` no longer emits the old universal leaf body; generated leaves
+  use explicit structure-only or owner-term-only state instead.
+- `artifact.next` generic documentation examples now name the root, kind, target
+  path, source boundary, and required audit evidence.
+- Multi-topic requests such as model endpoint, Minecraft, Windows, Japan, and
+  the United States select a relation-first seed and topic pages instead of one
+  combined filename.
+- `doc.audit` reports topology, links, path hygiene, content readiness, artifact
+  readiness, and exact path-hygiene failures.
+- `check-docs` rejects the old generated boilerplate outside a small allowlist.
 - Direct `graph.evidence` refuses audit-owned `artifact-readiness` and
   `document-structure` requirements.
 - Hard compaction selects one `Compaction` active mode and does not render a
@@ -104,8 +114,7 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - Broader stale-action contradiction repair is not yet covered for every mode.
 - Recovery shape-change enforcement is not yet proven for every live fault class.
 - Refusal-rendered examples still need route-level proof for every policy path.
-- Repeated scaffold boilerplate remains in the central generated leaf body until
-  source changes and tests prove it cannot recur.
+- Docker Compose verification has not run for the scaffold generator slice.
 - Artifact adoption and semantic readiness remain incomplete.
 - Compaction snapshots still need richer last-observation and batch-cursor
   fields.

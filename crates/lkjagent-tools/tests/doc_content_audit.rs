@@ -20,8 +20,9 @@ fn content_artifact_audit_rejects_scaffold_only_story() -> TestResult<()> {
     let audit = audit(&workspace, "stories/long-sf-story")?;
 
     assert!(audit.contains("document audit failed"));
-    assert!(audit.contains("scaffold_only_content: planning/premise.md"));
-    assert!(audit.contains("scaffold_only_content: chapters/waking-pod.md"));
+    assert!(audit.contains("content_readiness=failed"));
+    assert!(audit.contains("structure_only_content: planning/premise.md"));
+    assert!(audit.contains("structure_only_content: chapters/waking-pod.md"));
     Ok(())
 }
 
@@ -53,7 +54,8 @@ fn project_doc_audit_rejects_generated_scaffold() -> TestResult<()> {
     let audit = audit(&workspace, "docs")?;
 
     assert!(audit.contains("document audit failed"));
-    assert!(audit.contains("scaffold_only_content"));
+    assert!(audit.contains("content_readiness=failed"));
+    assert!(audit.contains("structure_only_content"));
     Ok(())
 }
 

@@ -32,7 +32,9 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [count_seed_anchor_parenthetical.rs](count_seed_anchor_parenthetical.rs): parenthetical anchor fixtures.
 - [count_seed_kind_profile.rs](count_seed_kind_profile.rs): counted scaffold kind-profile fixtures.
 - [count_seed_root_contract.rs](count_seed_root_contract.rs): counted scaffold root contract fixtures.
+- [doc_boilerplate.rs](doc_boilerplate.rs): generated boilerplate rejection fixtures.
 - [doc_content_audit.rs](doc_content_audit.rs): content-artifact scaffold-only audit fixtures.
+- [doc_path_hygiene.rs](doc_path_hygiene.rs): bounded generated path fixtures.
 - [doc_tools.rs](doc_tools.rs): document scaffold and audit fixtures.
 - [dispatch_normalize.rs](dispatch_normalize.rs): safe parameter repair and schema example fixtures.
 - [effective_policy_repair.rs](effective_policy_repair.rs): runtime repair admission over graph completion fixtures.
