@@ -3,6 +3,7 @@ use lkjagent_graph::{completion_decision, TaskGraphState, TransitionDecision};
 use lkjagent_store::state as store_state;
 use rusqlite::Connection;
 
+use super::authority_ledger::{persist_authority_ledger, AuthorityGraphView};
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
 use crate::mode::TurnAuthority;
@@ -56,6 +57,17 @@ pub(super) fn persist_authority_snapshot(
         &join_or_none(&authority.effective_policy.blocked_tools),
     )?;
     store_state::set(conn, "authority next action", &authority.valid_example)?;
+    persist_authority_ledger(
+        daemon,
+        conn,
+        authority,
+        AuthorityGraphView {
+            case_id: &graph.case_id,
+            node: &graph.node,
+            evidence_gaps: &graph.evidence_gaps,
+            recovery_route: &graph.recovery_route,
+        },
+    )?;
     Ok(())
 }
 

@@ -14,6 +14,7 @@ use crate::prompt::token_estimate;
 use crate::task::{RuntimeState, TaskState};
 
 mod authority;
+mod authority_ledger;
 mod authority_store;
 mod compaction;
 mod compaction_support;
