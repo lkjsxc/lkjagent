@@ -12,6 +12,7 @@ compaction, or closed idle.
 - [admission.rs](admission.rs): pure tool admission and next-tool examples.
 - [authority.rs](authority.rs): pure turn authority assembly.
 - [completion.rs](completion.rs): mode-specific completion policies.
+- [completion_gate.rs](completion_gate.rs): central completion decision data.
 - [decision.rs](decision.rs): endpoint decisions for runtime actions.
 - [input.rs](input.rs): turn authority snapshot input.
 - [ledger.rs](ledger.rs): persisted decision-record assembly.

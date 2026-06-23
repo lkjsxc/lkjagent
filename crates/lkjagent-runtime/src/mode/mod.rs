@@ -1,6 +1,7 @@
 pub mod admission;
 pub mod authority;
 pub mod completion;
+pub mod completion_gate;
 pub mod decision;
 pub mod input;
 pub mod ledger;
@@ -22,6 +23,7 @@ pub use completion::{
     completion_policy_for, CompletionPolicy, MaintenanceCompletionGate, OwnerCompletionGate,
     RecoveryCompletionGate, RuntimeOnlyCompletionGate,
 };
+pub use completion_gate::{decide_completion, CompletionDecision, CompletionKind};
 pub use decision::{endpoint_decision_for, EndpointDecision};
 pub use input::TurnAuthorityInput;
 pub use ledger::decide_record;

@@ -1,10 +1,12 @@
+use super::completion_gate::decide_completion;
 use super::model::{ActiveMode, RuntimeSnapshot, ToolAdmission};
 use super::policy::policy_for_mode;
 use lkjagent_tools::dispatch::registry_valid_example;
 
 pub fn admit_tool(snapshot: &RuntimeSnapshot, requested_tool: &str) -> ToolAdmission {
     let next_valid_tools = next_valid_tools(snapshot);
-    let completion_blocked = requested_tool == "agent.done" && !completion_allowed(snapshot);
+    let completion = decide_completion(snapshot);
+    let completion_blocked = requested_tool == "agent.done" && !completion.allowed;
     let owner_question_blocked =
         requested_tool == "agent.ask" && !snapshot.external_owner_input_required;
     let repeated_blocked = snapshot.repeated_action
@@ -78,23 +80,6 @@ pub fn next_valid_tools(snapshot: &RuntimeSnapshot) -> Vec<String> {
         tools.push("runtime.wait".to_string());
     }
     tools
-}
-
-fn completion_allowed(snapshot: &RuntimeSnapshot) -> bool {
-    match snapshot.active_mission {
-        ActiveMode::OwnerTask => {
-            snapshot.owner_work_exists
-                && !snapshot.recovery_ladder_active
-                && snapshot.missing_evidence.is_empty()
-                && !snapshot.context_pressure_active
-        }
-        ActiveMode::Maintenance => {
-            !snapshot.owner_work_exists
-                && !snapshot.recovery_ladder_active
-                && !snapshot.context_pressure_active
-        }
-        ActiveMode::Recovery | ActiveMode::Compaction | ActiveMode::ClosedIdle => false,
-    }
 }
 
 fn reason(
