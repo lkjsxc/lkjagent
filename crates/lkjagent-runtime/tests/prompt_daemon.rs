@@ -47,6 +47,12 @@ fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
     assert!(first
         .iter()
         .any(|frame| frame.content.contains("doc.audit")));
+    assert!(first
+        .iter()
+        .any(|frame| frame.content.contains("root means a directory")));
+    assert!(first
+        .iter()
+        .any(|frame| frame.content.contains("line protocol is canonical")));
     for frame in first {
         let cap = match frame.kind {
             FrameKind::Prefix(PrefixSection::Identity) => PREFIX_IDENTITY,
