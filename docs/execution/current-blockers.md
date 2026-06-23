@@ -76,10 +76,11 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   present and keeps audit, repair, and batch routes visible.
 - Repeat refusals name the active mode, forbidden tool, shape-change
   requirement, preferred alternate, and registry example.
-- The benchmark matrix includes Japanese-cookbook drift,
-  document-structure evidence ownership, batch-write schema faults, shell
-  parameter faults, queue interruption, compaction resume, and repeated
-  recovery signatures.
+- The benchmark matrix includes missing action blocks, interrupted output,
+  stop-closure repair, contradictory authority, provider exchange logging,
+  Japanese-cookbook drift, document-structure evidence ownership, batch-write
+  schema faults, shell parameter faults, queue interruption, compaction resume,
+  and repeated recovery signatures.
 - Memory pruning deletes exact duplicates and merges same-title high-overlap
   rows with source IDs.
 - Provider exchange logging has a design contract, implemented store, atomic
@@ -98,6 +99,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - Compaction snapshots still need richer last-observation and batch-cursor
   fields.
 - Maintenance rewrite pruning and pre-dispatch owner preemption remain open.
+- Parser-level replay fixtures still need direct runtime execution beyond the
+  uploaded-run benchmark text signatures.
 - Rendered recovery examples still need a registry-wide parse, validation, and
   dispatch proof.
 - Provider exchange logging still needs parse, admission, observation, index,

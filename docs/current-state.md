@@ -52,7 +52,7 @@ prove that their failures cannot recur.
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, same-title high-overlap merge, and low-signal rewrite pruning exist. Pre-dispatch owner preemption proof remains open. |
 | Status and console | Active graph state, active mode, authority snapshot fields, context pressure, token usage, and model-log paths display. Last successful observation is summarized from recent observations. |
 | Provider exchange logging | SQLite schema, store APIs, atomic filesystem writer, request logging, response logging, error logging, CLI list/show, and focused store/runtime/CLI tests exist. Parse, admission, observation, index, and export remain open. |
-| Benchmarks | Uploaded-run signatures are represented by deterministic fixtures. Runtime replay coverage and every completion path are not yet complete. |
+| Benchmarks | Uploaded-run signatures now include missing action blocks, interrupted output, stop-closure repair, contradictory authority, provider logging, batch schema faults, compaction resume, artifact drift, and repeated recovery. Runtime replay coverage and every completion path are not yet complete. |
 
 ## Open Failure Evidence
 

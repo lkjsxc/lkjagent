@@ -2,7 +2,7 @@ use crate::model::{BenchmarkTask, Difficulty, FileSpec, Fixture, JudgeKind, Task
 
 const GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "fixture=recover-repeat-parameter-fault\nschema_repair=one canonical example\nnext_action=graph.recover\ncompletion=refused\nfixture=bread-dictionary-shallow-content\nartifact_kind=Dictionary\ncontent_readiness=failed\nrepair_admitted=artifact.next,fs.batch_write\nfixture=large-write-payload-risk\npayload_too_large=blocked raw fs.write\nnext_action=fs.batch_write\nfixture=completion-with-blocked-mutation\ncompletion=refused\nmission=Repair\nmutation_tools=admitted\nfixture=maintenance-during-owner-work\nmaintenance=yielded\nmemory_loop=absent\nfixture=cookbook-scaffold-false-ready\nstructure_audit=passed\ncontent_readiness=failed\nagent.done=refused\nfixture=artifact-readiness-graph-evidence-bypass\ngraph.evidence artifact-readiness=refused\nnext_action=artifact.audit\nfixture=japanese-cookbook-drift\nowner_input=Create a very big cookbook about japanese foods.\nartifact_kind=Cookbook\nsubject=Japanese food\nbread_profile=rejected\nforbidden_bread_paths=absent\nfixture=document-structure-graph-evidence-bypass\ngraph.evidence document-structure=refused\nnext_action=doc.audit\nfixture=batch-write-payload-schema-fault\nfs.batch_write json_payload=refused\ncanonical_grammar=line-block\npartial_write=absent\nfixture=shell-parameter-missing-command\nshell.run missing_command=refused\nschema_repair=command required\ninvalid_timeout_retry=absent\nfixture=queue-story-interrupt\ncase1 objective=cookbook\ncase2 objective=japanese story\ncross_case_contamination=absent\nfixture=context-compaction-resume\ndurable_snapshot=created\npost_compaction_check=passed\nmissing_evidence=preserved\nlast_refused_action=preserved\nfixture=repeated-recovery-action\nrepeated_action_signature=blocked\nnext_action=different_action_class\n",
+    content: "fixture=recover-repeat-parameter-fault\nschema_repair=one canonical example\nnext_action=graph.recover\ncompletion=refused\nfixture=bread-dictionary-shallow-content\nartifact_kind=Dictionary\ncontent_readiness=failed\nrepair_admitted=artifact.next,fs.batch_write\nfixture=large-write-payload-risk\npayload_too_large=blocked raw fs.write\nnext_action=fs.batch_write\nfixture=completion-with-blocked-mutation\ncompletion=refused\nmission=Repair\nmutation_tools=admitted\nfixture=maintenance-during-owner-work\nmaintenance=yielded\nmemory_loop=absent\nfixture=cookbook-scaffold-false-ready\nstructure_audit=passed\ncontent_readiness=failed\nagent.done=refused\nfixture=artifact-readiness-graph-evidence-bypass\ngraph.evidence artifact-readiness=refused\nnext_action=artifact.audit\nfixture=japanese-cookbook-drift\nowner_input=Create a very big cookbook about japanese foods.\nartifact_kind=Cookbook\nsubject=Japanese food\nbread_profile=rejected\nforbidden_bread_paths=absent\nfixture=document-structure-graph-evidence-bypass\ngraph.evidence document-structure=refused\nnext_action=doc.audit\nfixture=batch-write-payload-schema-fault\nfs.batch_write json_payload=refused\ncanonical_grammar=line-block\npartial_write=absent\nfixture=shell-parameter-missing-command\nshell.run missing_command=refused\nschema_repair=command required\ninvalid_timeout_retry=absent\nfixture=queue-story-interrupt\ncase1 objective=cookbook\ncase2 objective=japanese story\ncross_case_contamination=absent\nfixture=context-compaction-resume\ndurable_snapshot=created\npost_compaction_check=passed\nmissing_evidence=preserved\nlast_refused_action=preserved\nfixture=missing-act-block\nparse_fault=MissingActBlock\ndispatch=absent\nrecovery_route=RenderSingleExactActionExample\nfixture=empty-content-interrupted\nfault=InterruptedGeneration\nresume=last_durable_observation\nfixture=unclosed-act-from-stop\nclosure_mode=StopSequenceClosed\nparse_repair=logged\nfixture=contradictory-authority\nallowed_tools_none_with_tool_action=impossible\nauthority_recomputed=without_model\nfixture=provider-exchange-logging\nrequest_json=written\nresponse_json=written\nadmission_before_dispatch=required\nfixture=repeated-recovery-action\nrepeated_action_signature=blocked\nnext_action=different_action_class\n",
 }];
 
 const BAD_RECOVER_REPEAT: &[FileSpec] = &[FileSpec {
@@ -70,6 +70,28 @@ const BAD_COMPACTION_RESUME: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
     content:
         "fixture=context-compaction-resume\npost_compaction_check=skipped\nmissing_evidence=lost\n",
+}];
+
+const BAD_MISSING_ACT: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content: "fixture=missing-act-block\nempty assistant content\ndispatched graph.state\n",
+}];
+
+const BAD_UNCLOSED_STOP: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content:
+        "fixture=unclosed-act-from-stop\n<act>\n<tool>graph.recover</tool>\nparse_repair=silent\n",
+}];
+
+const BAD_CONTRADICTORY_AUTHORITY: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content:
+        "fixture=contradictory-authority\nallowed_tools=none\npreferred_next_action=graph.state\n",
+}];
+
+const BAD_PROVIDER_LOGGING: &[FileSpec] = &[FileSpec {
+    path: "transcript.md",
+    content: "fixture=provider-exchange-logging\nrequest_json=missing\nresponse_json=missing\n",
 }];
 
 const BAD_REPEATED_RECOVERY: &[FileSpec] = &[FileSpec {
@@ -142,6 +164,22 @@ pub const TASK: BenchmarkTask = BenchmarkTask {
         Fixture {
             name: "context-compaction-resume",
             files: BAD_COMPACTION_RESUME,
+        },
+        Fixture {
+            name: "missing-act-block",
+            files: BAD_MISSING_ACT,
+        },
+        Fixture {
+            name: "unclosed-act-from-stop",
+            files: BAD_UNCLOSED_STOP,
+        },
+        Fixture {
+            name: "contradictory-authority",
+            files: BAD_CONTRADICTORY_AUTHORITY,
+        },
+        Fixture {
+            name: "provider-exchange-logging",
+            files: BAD_PROVIDER_LOGGING,
         },
         Fixture {
             name: "repeated-recovery-action",
