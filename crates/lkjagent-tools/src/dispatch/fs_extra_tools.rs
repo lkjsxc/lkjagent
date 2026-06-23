@@ -2,6 +2,7 @@ use std::collections::BTreeMap;
 
 use crate::dispatch::params::{param, parse_usize};
 use crate::dispatch::{observe_error, observe_result, DispatchOutput, DispatchState, ToolRuntime};
+use rusqlite::Connection;
 
 pub fn dispatch_fs_list(
     params: &BTreeMap<String, String>,
@@ -93,12 +94,14 @@ pub fn dispatch_fs_batch_write(
     params: &BTreeMap<String, String>,
     action_text: &str,
     runtime: &ToolRuntime,
+    conn: &Connection,
     state: &mut DispatchState,
 ) -> DispatchOutput {
-    observe_result(
-        crate::fs_batch::batch_write(&runtime.workspace, &param(params, "files"), 20),
-        action_text,
-        runtime,
-        state,
-    )
+    let files = param(params, "files");
+    let result = crate::fs_batch::batch_write(&runtime.workspace, &files, 20).and_then(|output| {
+        let paths = crate::fs_batch::paths(&files)?;
+        crate::artifact_write_support::record_written_paths(conn, &paths, &runtime.now)?;
+        Ok(output)
+    });
+    observe_result(result, action_text, runtime, state)
 }

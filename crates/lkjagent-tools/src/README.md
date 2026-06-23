@@ -72,6 +72,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [artifact_ledger_support.rs](artifact_ledger_support.rs): artifact ledger write helpers.
 - [artifact_next.rs](artifact_next.rs): bounded artifact write-batch planner.
 - [artifact_next_example.rs](artifact_next_example.rs): content-bearing next-batch examples.
+- [artifact_write_support.rs](artifact_write_support.rs): artifact cursor completion write helpers.
 - [doc/](doc/README.md): semantic scaffold and audit helper modules.
 - [doc.rs](doc.rs): document scaffold and audit entrypoints.
 - [structure.rs](structure.rs): recursive tree completion checks.

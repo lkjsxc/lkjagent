@@ -1,6 +1,8 @@
 mod support;
 
-use lkjagent_store::artifact_cursor::{latest_batch_cursor, upsert_batch_cursor, BatchCursorInput};
+use lkjagent_store::artifact_cursor::{
+    latest_batch_cursor, mark_paths_completed, upsert_batch_cursor, BatchCursorInput,
+};
 use support::{memory_store, TestResult};
 
 #[test]
@@ -16,6 +18,14 @@ fn batch_cursor_upserts_by_artifact_and_root() -> TestResult<()> {
     assert_eq!(row.planned_paths, "c.md");
     assert_eq!(row.current_index, 2);
     assert_eq!(row.last_valid_example, "example-b");
+
+    let completed = vec!["c.md".to_string()];
+    assert_eq!(
+        mark_paths_completed(&conn, &completed, "2026-01-01T00:00:01Z")?,
+        1
+    );
+    let updated = latest_batch_cursor(&conn, 9)?.ok_or("missing updated cursor")?;
+    assert_eq!(updated.completed_paths, "c.md");
     Ok(())
 }
 

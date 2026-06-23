@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
@@ -92,6 +94,68 @@ pub fn delete_batch_cursor(
         params![artifact_ledger_id, root],
     )?;
     Ok(())
+}
+
+pub fn mark_paths_completed(conn: &Connection, paths: &[String], now: &str) -> StoreResult<usize> {
+    let touched = paths.iter().map(String::as_str).collect::<BTreeSet<_>>();
+    let mut changed = 0usize;
+    for row in mutable_cursors(conn)? {
+        let planned = split(&row.planned_paths);
+        let completed = split(&row.completed_paths);
+        let additions = planned
+            .iter()
+            .filter(|path| touched.contains(path.as_str()))
+            .cloned()
+            .collect::<Vec<_>>();
+        if additions.is_empty() {
+            continue;
+        }
+        let merged = merge(completed, additions);
+        conn.execute(
+            "UPDATE artifact_batch_cursors SET completed_paths = ?1, updated_at = ?2 WHERE id = ?3",
+            params![join(&merged), now, row.id],
+        )?;
+        changed = changed.saturating_add(1);
+    }
+    Ok(changed)
+}
+
+struct MutableCursor {
+    id: i64,
+    planned_paths: String,
+    completed_paths: String,
+}
+
+fn mutable_cursors(conn: &Connection) -> StoreResult<Vec<MutableCursor>> {
+    let mut statement = conn.prepare(
+        "SELECT id, planned_paths, completed_paths FROM artifact_batch_cursors ORDER BY id",
+    )?;
+    let rows = statement.query_map([], |row| {
+        Ok(MutableCursor {
+            id: row.get(0)?,
+            planned_paths: row.get(1)?,
+            completed_paths: row.get(2)?,
+        })
+    })?;
+    let mut out = Vec::new();
+    for row in rows {
+        out.push(row?);
+    }
+    Ok(out)
+}
+
+fn merge(existing: Vec<String>, additions: Vec<String>) -> Vec<String> {
+    let mut seen = existing.into_iter().collect::<BTreeSet<_>>();
+    seen.extend(additions);
+    seen.into_iter().collect()
+}
+
+fn split(values: &str) -> Vec<String> {
+    values
+        .lines()
+        .map(str::to_string)
+        .filter(|path| !path.is_empty())
+        .collect()
 }
 
 fn join(values: &[String]) -> String {

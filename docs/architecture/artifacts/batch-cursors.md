@@ -10,8 +10,9 @@ Large artifact repair is split into bounded semantic batches. A cursor records
 planned paths, completed paths, current index, retry counts, and fallback mode.
 The active implementation stores the current root cursor in the SQLite state
 table and writes normalized artifact batch cursor rows for emitted
-`artifact.next` batches. It advances across current weak paths before asking
-for audit or focused reads.
+`artifact.next` batches. Successful `fs.write` and `fs.batch_write` calls mark
+matching planned cursor paths complete. It advances across current weak paths
+before asking for audit or focused reads.
 
 ## Cursor Shape
 
@@ -86,11 +87,12 @@ before `path:` when the result is unambiguous.
 
 Run `cargo test -p lkjagent-store --test artifact_cursor`,
 `cargo test -p lkjagent-tools --test artifact_next_ledger`,
+`cargo test -p lkjagent-tools --test artifact_write_ledger`,
 `cargo test -p lkjagent-tools artifact_next`, and
 `cargo test -p lkjagent-runtime compaction_snapshot`.
 
 ## Status
 
-partially implemented for root-scoped `artifact.next` cursors and normalized
-batch cursor rows. `fs.batch_write` does not yet mark completed or failed
-cursor paths.
+partially implemented for root-scoped `artifact.next` cursors, normalized
+batch cursor rows, and successful write completion marking. Failed write paths
+are not yet recorded as failed cursor paths.

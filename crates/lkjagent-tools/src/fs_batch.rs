@@ -35,6 +35,13 @@ pub fn batch_write(workspace: &Path, files: &str, max_files: usize) -> ToolResul
     ))
 }
 
+pub fn paths(files: &str) -> ToolResult<Vec<String>> {
+    Ok(parse_files(files)?
+        .into_iter()
+        .map(|file| file.path)
+        .collect())
+}
+
 fn parse_files(input: &str) -> ToolResult<Vec<BatchFile>> {
     let mut out = Vec::new();
     for block in input.split("-- lkjagent-next-file --") {

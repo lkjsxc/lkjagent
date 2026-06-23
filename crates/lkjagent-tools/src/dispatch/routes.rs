@@ -45,7 +45,7 @@ pub fn route(
     match action.tool.as_str() {
         "fs.read" => dispatch_fs_read(&action.params, action_text, runtime, state),
         "fs.read_many" => dispatch_fs_read_many(&action.params, action_text, runtime, state),
-        "fs.write" => dispatch_fs_write(&action.params, action_text, runtime, state),
+        "fs.write" => dispatch_fs_write(&action.params, action_text, runtime, conn, state),
         "fs.edit" => dispatch_fs_edit(&action.params, action_text, runtime, state),
         "fs.patch" => dispatch_fs_patch(&action.params, action_text, runtime, state),
         "fs.list" => dispatch_fs_list(&action.params, action_text, runtime, state),
@@ -53,7 +53,9 @@ pub fn route(
         "fs.search" => dispatch_fs_search(&action.params, action_text, runtime, state),
         "fs.stat" => dispatch_fs_stat(&action.params, action_text, runtime, state),
         "fs.mkdir" => dispatch_fs_mkdir(&action.params, action_text, runtime, state),
-        "fs.batch_write" => dispatch_fs_batch_write(&action.params, action_text, runtime, state),
+        "fs.batch_write" => {
+            dispatch_fs_batch_write(&action.params, action_text, runtime, conn, state)
+        }
         "shell.run" => dispatch_shell(&action.params, action_text, runtime, state),
         "queue.list" => dispatch_queue_list(&action.params, action_text, runtime, conn, state),
         "queue.enqueue" => {
