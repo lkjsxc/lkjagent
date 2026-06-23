@@ -2,6 +2,7 @@ use lkjagent_tools::dispatch::{dispatch_with_text, DispatchOutput};
 use lkjagent_tools::observe;
 use rusqlite::Connection;
 
+use super::authority_admission::{record_authority_admission, record_authority_refusal};
 use super::runner::{DaemonTick, ResidentDaemon};
 use crate::error::RuntimeResult;
 use crate::mode::{ActiveMode, EndpointDecision, TurnAuthority};
@@ -25,6 +26,13 @@ impl ResidentDaemon {
             if current.endpoint_decision == EndpointDecision::DeferMaintenance {
                 self.state.maintenance = None;
             }
+            record_authority_refusal(
+                conn,
+                now,
+                &pending.action.tool,
+                &message,
+                &current.valid_example,
+            )?;
             let output = notice_output(&mut self.dispatch_state, action_text, message);
             return self.finish_pending_output(conn, now, output, false);
         }
@@ -32,6 +40,13 @@ impl ResidentDaemon {
         let mode_policy = authority.effective_policy.clone();
         let maintenance_ask = self.maintenance_ask_pending(conn, pending.action.tool.as_str())?;
         self.sync_effective_dispatch_policy(&mode_policy);
+        record_authority_admission(
+            conn,
+            now,
+            &self.dispatch_state,
+            &pending.action.tool,
+            &authority.valid_example,
+        )?;
         let output = dispatch_with_text(
             &pending.action,
             action_text,

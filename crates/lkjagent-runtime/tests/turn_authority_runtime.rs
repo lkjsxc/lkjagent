@@ -45,6 +45,12 @@ fn endpoint_turn_refreshes_one_active_mode_card() -> TestResult<()> {
     )?;
     assert_eq!(event_kind, "owner_message_received");
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    let admission_count: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM runtime_tool_admissions WHERE case_id = 1 AND admitted = 1",
+        [],
+        |row| row.get(0),
+    )?;
+    assert!(admission_count >= 1);
     server.join()?;
 
     assert_eq!(active_mode_cards(&daemon), 1);
@@ -86,6 +92,12 @@ fn stale_maintenance_action_is_refused_when_owner_queue_arrives() -> TestResult<
             && frame.content.contains("active_mode=OwnerTask")
             && frame.content.contains("failed_gate=stale-turn-authority")
     }));
+    let refused_count: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM runtime_tool_admissions WHERE requested_tool = 'agent.done' AND admitted = 0",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(refused_count, 1);
     assert_eq!(queue::pending_count(&conn)?, 1);
     Ok(())
 }
