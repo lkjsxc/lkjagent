@@ -24,7 +24,7 @@ prove that their failures cannot recur.
 | Area | Evidence |
 | --- | --- |
 | Workspace and gates | `Cargo.toml`, `crates/lkjagent-xtask`, and `docker-compose.yml` exist. |
-| Diagnostic runtime output | `data/workspace` and `data/logs` are tracked for the current handoff; SQLite store files stay ignored. |
+| Diagnostic runtime output | `data/README.md`, `data/workspace/README.md`, `data/workspace/AGENTS.md`, and `data/logs` identify tracked diagnostic evidence; SQLite store files stay ignored. |
 | Parser | `lkjagent-protocol` parses line-oriented, paired-tag, JSON envelope, and batch file action forms covered by focused fixtures. |
 | Dispatcher registry | `lkjagent-tools` validates registered tools and renders registry examples for covered action families. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
