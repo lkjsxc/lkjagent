@@ -3,6 +3,11 @@ pub mod authority;
 pub mod completion;
 pub mod decision;
 pub mod input;
+pub mod ledger;
+mod ledger_data;
+mod ledger_event;
+mod ledger_fields;
+pub mod mission;
 pub mod model;
 pub mod policy;
 pub mod recovery;
@@ -19,6 +24,9 @@ pub use completion::{
 };
 pub use decision::{endpoint_decision_for, EndpointDecision};
 pub use input::TurnAuthorityInput;
+pub use ledger::decide_record;
+pub use ledger_data::{AuthorityFingerprint, DecisionKind, RuntimeDecisionRecord};
+pub use mission::{mission_for_snapshot, select_runtime_mission, RuntimeMission};
 pub use model::{
     ActiveMode, ActiveModeInput, ActiveModePolicy, FaultClass, RecoveryClass, RecoveryPlan,
     RuntimeDecision, RuntimeEvent, RuntimeFault, RuntimeSnapshot, ToolAdmission,

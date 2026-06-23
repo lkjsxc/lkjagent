@@ -13,6 +13,7 @@ pub(super) fn persist_authority_snapshot(
     authority: &TurnAuthority,
 ) -> RuntimeResult<()> {
     let graph = graph_fields(daemon.state.graph.as_ref());
+    store_state::set(conn, "authority mission", authority.mission.as_str())?;
     store_state::set(
         conn,
         "authority active mode",
