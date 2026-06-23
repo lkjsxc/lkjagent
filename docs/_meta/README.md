@@ -3,7 +3,8 @@
 ## Purpose
 
 This directory stores machine-readable documentation navigation data and the
-small rules that keep generated audit output out of the authored docs tree.
+small rules that keep generated audit output out of the authored docs tree. It
+is the machine side of the README and index-network contracts.
 
 ## Table of Contents
 

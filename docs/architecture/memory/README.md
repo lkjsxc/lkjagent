@@ -16,4 +16,5 @@ Owned by the lkjagent-store crate.
 - [retrieval.md](retrieval.md): memory.find ranking and the digest builder.
 - [distillation.md](distillation.md): when memory rows are written, their quality rules, and pruning.
 - [maintenance-pruning.md](maintenance-pruning.md): idle pruning admission and no-op behavior.
+- [maintenance-rewrite-pruning.md](maintenance-rewrite-pruning.md): rewrite pruning with source id preservation.
 - [semantic-merge.md](semantic-merge.md): non-exact merge evidence and source rows.

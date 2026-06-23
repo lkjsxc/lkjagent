@@ -2,9 +2,10 @@
 
 # Fields: title, parent, children, role, sources, checks.
 
-"docs/repository/README.md" = { title = "Repository", parent = "docs/README.md", children = ["docs/repository/commit-protocol.md", "docs/repository/documentation-standards.md", "docs/repository/functional-style.md", "docs/repository/layout.md", "docs/repository/line-limits.md", "docs/repository/workflow.md"], role = "Table of contents for docs/repository", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/repository/README.md" = { title = "Repository", parent = "docs/README.md", children = ["docs/repository/commit-protocol.md", "docs/repository/documentation-standards.md", "docs/repository/fan-out.md", "docs/repository/functional-style.md", "docs/repository/layout.md", "docs/repository/line-limits.md", "docs/repository/workflow.md"], role = "Table of contents for docs/repository", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
 "docs/repository/commit-protocol.md" = { title = "Commit Protocol", parent = "docs/repository/README.md", children = [], role = "Contract page under docs/repository", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
 "docs/repository/documentation-standards.md" = { title = "Documentation Standards", parent = "docs/repository/README.md", children = [], role = "Contract page under docs/repository", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/repository/fan-out.md" = { title = "Fan Out", parent = "docs/repository/README.md", children = [], role = "Contract page under docs/repository", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
 "docs/repository/functional-style.md" = { title = "Functional Style", parent = "docs/repository/README.md", children = [], role = "Contract page under docs/repository", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
 "docs/repository/layout.md" = { title = "Layout", parent = "docs/repository/README.md", children = [], role = "Contract page under docs/repository", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
 "docs/repository/line-limits.md" = { title = "Line Limits", parent = "docs/repository/README.md", children = [], role = "Contract page under docs/repository", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

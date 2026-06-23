@@ -11,6 +11,8 @@ context engine, and tools.
 ## Table of Contents
 
 - [model.md](model.md): node, edge, policy, context, evidence, and case data types.
+- [transition-network.md](transition-network.md): unified event-to-decision state network.
+- [state-transition-ledger.md](state-transition-ledger.md): durable case and transition records.
 - [transitions.md](transitions.md): legal state movement and admission rules.
 - [context-packages.md](context-packages.md): graph-selected context package rendering.
 - [task-state.md](task-state.md): active case state, planning fields, and progress ledger.

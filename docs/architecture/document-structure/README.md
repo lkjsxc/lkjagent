@@ -8,7 +8,9 @@ into a recursive filesystem tree.
 ## Table of Contents
 
 - [tree-contract.md](tree-contract.md): recursive README-indexed tree rules.
+- [fan-out.md](fan-out.md): direct-child cap and semantic grouping rules.
 - [network-contract.md](network-contract.md): catalog metadata and cross-link rules.
+- [index-network.md](index-network.md): required README, catalog, relation, and manifest layers.
 - [naming.md](naming.md): semantic filename and directory rules.
 - [scaffold-profiles.md](scaffold-profiles.md): deterministic profile shapes.
 - [audit.md](audit.md): topology audit requirements.
@@ -17,7 +19,9 @@ into a recursive filesystem tree.
 ## Local Map
 
 - [tree-contract.md](tree-contract.md): owns directory and README shape.
+- [fan-out.md](fan-out.md): owns child-count limits and grouping actions.
 - [network-contract.md](network-contract.md): owns catalog-derived graph data.
+- [index-network.md](index-network.md): owns index layers and orphan rules.
 - [naming.md](naming.md): owns forbidden sequence-only names.
 - [scaffold-profiles.md](scaffold-profiles.md): owns profile selection.
 - [audit.md](audit.md): owns deterministic audit checks.
@@ -25,8 +29,8 @@ into a recursive filesystem tree.
 
 ## Reading Paths
 
-- Implementation path: scaffold-profiles, naming, tree-contract, network-contract.
-- Diagnosis path: audit, naming, completion-gates.
+- Implementation path: scaffold-profiles, naming, tree-contract, fan-out, network-contract, index-network.
+- Diagnosis path: audit, naming, fan-out, completion-gates.
 - Verification path: audit, completion-gates, then `docker compose run --rm verify`.
 
 ## Cross-Links

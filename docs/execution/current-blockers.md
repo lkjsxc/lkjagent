@@ -9,11 +9,11 @@ linked task contract names focused evidence and the actual gates that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Runtime authority is not the single source of active mission and tool admission | [current-work/runtime-authority-redesign.md](current-work/runtime-authority-redesign.md) | open |
-| 2 | Recovery can block the exact observation, repair, or batch tool needed to escape | [current-work/runtime-recovery-controller.md](current-work/runtime-recovery-controller.md) | open |
-| 3 | Content artifacts can pass on scaffold or planning evidence instead of real content | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 4 | Completion can close while artifact readiness, verification, or recovery evidence is missing | [current-work/runtime-authority-redesign.md](current-work/runtime-authority-redesign.md) | open |
-| 5 | Compaction snapshots are not rich enough to resume artifact repair and recovery | [current-work/context-accounting.md](current-work/context-accounting.md) | open |
+| 1 | Runtime authority is not the single source of active mission and tool admission | [current-work/state-transition-network.md](current-work/state-transition-network.md) | open |
+| 2 | Recovery can block the exact observation, repair, or batch tool needed to escape | [current-work/recovery-shape-enforcement.md](current-work/recovery-shape-enforcement.md) | open |
+| 3 | Content artifacts can pass on scaffold or planning evidence instead of real content | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | open |
+| 4 | Completion can close while artifact readiness, verification, or recovery evidence is missing | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | open |
+| 5 | Compaction snapshots are not rich enough to resume artifact repair and recovery | [current-work/durable-compaction-history.md](current-work/durable-compaction-history.md) | open |
 | 6 | Maintenance is not strictly idle-only and preemptable by owner work | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | open |
 | 7 | Uploaded run logs are not fully covered by benchmark regressions | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
 | 8 | Semantic maintenance pruning still allows repeated low-value memory rows | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |

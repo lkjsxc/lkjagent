@@ -3,6 +3,7 @@
 ## Purpose
 
 This directory stores compact TOML entries for every authored Markdown page.
+The catalog is one layer of the documentation index network.
 
 ## Table of Contents
 
