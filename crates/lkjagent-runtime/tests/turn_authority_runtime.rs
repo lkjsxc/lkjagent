@@ -9,7 +9,7 @@ use lkjagent_runtime::daemon::{
 use lkjagent_runtime::maintenance::{MaintenanceCycle, MaintenanceDirective};
 use lkjagent_runtime::mode::{decide_turn_authority, TurnAuthorityInput};
 use lkjagent_runtime::task::{PendingAction, TaskState};
-use lkjagent_store::{queue, state};
+use lkjagent_store::{queue, runtime_authority, state};
 use support::http::{completion, serve_responses};
 use support::{action, runtime_state, store, temp_workspace, TestResult};
 
@@ -35,6 +35,15 @@ fn endpoint_turn_refreshes_one_active_mode_card() -> TestResult<()> {
     );
     assert!(state::get(&conn, "authority node")?.is_some());
     assert!(state::get(&conn, "authority next action")?.is_some());
+    let decision = runtime_authority::latest_decision(&conn, 1)?.ok_or("missing decision")?;
+    assert_eq!(decision.mission, "owner_execution");
+    assert_eq!(decision.active_mode, "OwnerTask");
+    let event_kind: String = conn.query_row(
+        "SELECT event_kind FROM runtime_authority_events ORDER BY id DESC LIMIT 1",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(event_kind, "owner_message_received");
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     server.join()?;
 

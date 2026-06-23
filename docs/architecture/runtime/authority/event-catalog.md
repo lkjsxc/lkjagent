@@ -46,5 +46,6 @@ ticks, compaction pressure, verification results, and completion requests are re
 
 ## Status
 
-partially implemented. The normalized event table and store API exist. Full runtime emission for every event kind
-remains open.
+partially implemented. The normalized event table and store API exist. Turn authority refresh records closed event
+kinds for owner intake, recovery, compaction, maintenance, and turn checkpoints. Tool observations and dispatch-time
+admission events remain open.

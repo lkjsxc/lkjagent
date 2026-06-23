@@ -50,5 +50,6 @@ and close behavior.
 
 ## Status
 
-partially implemented. `RuntimeDecisionRecord` exists and SQLite tables plus store APIs record authority events,
-decisions, and tool admissions. Runtime prompt and dispatch wiring to the normalized ledger remains open.
+partially implemented. `RuntimeDecisionRecord` exists. SQLite tables plus store APIs record authority events,
+decisions, and tool admissions. Runtime turn authority refresh writes normalized event and decision rows. Dispatch
+admission wiring to the normalized ledger remains open.
