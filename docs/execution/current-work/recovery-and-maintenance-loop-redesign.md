@@ -143,7 +143,7 @@ next-batch evidence: `cargo test -p lkjagent-tools`, `cargo test -p
 lkjagent-graph`, `cargo test -p lkjagent-protocol`, `check-docs`, and
 `check-lines` pass; `benchmark check-corpus` also passes. Final quiet
 verification and Docker Compose verification were not rerun for this
-artifact-next slice. Remaining work: full loop selection before endpoint
-turns, maintenance rewrite pruning, richer structured
-compaction snapshots, transition selector runtime integration, artifact
-adoption/repair, completion wiring, and blocked handoff states.
+artifact-next slice. Maintenance pruning now includes low-signal rewrite rows
+with preserved source ids. Remaining work: full loop selection before endpoint
+turns, status rendering for compaction snapshots, transition selector runtime
+integration, failed-route escalation, and blocked handoff states.

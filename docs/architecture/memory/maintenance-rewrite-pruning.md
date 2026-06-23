@@ -48,4 +48,5 @@ no-op result records cooldown and does not write a low-value memory row.
 
 ## Status
 
-partially implemented for duplicate deletion and same-title high-overlap merge; rewrite pruning remains open.
+partially implemented for duplicate deletion, same-title high-overlap merge, and low-signal maintenance rewrite
+pruning with preserved source row ids. Runtime scheduling and no-op cooldown proof remain open.

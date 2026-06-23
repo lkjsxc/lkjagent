@@ -34,6 +34,42 @@ fn memory_prune_reports_semantic_merge_source_rows() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn memory_prune_reports_rewritten_rows() -> TestResult<()> {
+    let workspace = temp_workspace("memory-prune-rewrite")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut dispatch_state = state();
+    insert_memory(
+        &mut conn,
+        "Maintenance scan alpha",
+        "maintenance,alpha",
+        "Reviewed memory alpha and found minor wording drift.",
+    )?;
+    insert_memory(
+        &mut conn,
+        "Maintenance scan beta",
+        "maintenance,beta",
+        "Checked memory beta and found minor stale phrasing.",
+    )?;
+    insert_memory(
+        &mut conn,
+        "Maintenance scan gamma",
+        "maintenance,gamma",
+        "Scanned memory gamma and found minor cleanup notes.",
+    )?;
+
+    let output = dispatch(
+        &action("memory.prune", &[]),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    );
+
+    assert!(output.content.contains("rewritten_rows=1"));
+    Ok(())
+}
+
 fn insert_memory(
     conn: &mut rusqlite::Connection,
     title: &str,

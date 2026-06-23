@@ -67,10 +67,11 @@ pub fn find(conn: &Connection, query: &str, limit: usize) -> ToolResult<String> 
 pub fn prune(conn: &mut Connection) -> ToolResult<String> {
     let report = lkjagent_store::memory::prune_exact_duplicates(conn)?;
     Ok(format!(
-        "memory prune completed\nkept_duplicate_groups={}\ndeleted_rows={}\nmerged_rows={}\nsource_rows={}",
+        "memory prune completed\nkept_duplicate_groups={}\ndeleted_rows={}\nmerged_rows={}\nrewritten_rows={}\nsource_rows={}",
         report.kept,
         report.deleted,
         report.merged,
+        report.rewritten,
         join_ids(&report.source_rows)
     ))
 }
