@@ -42,7 +42,7 @@ prove that their failures cannot recur.
 
 | Area | Current truth |
 | --- | --- |
-| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, turn authority cards, data-first decision records, normalized authority event, decision, and admission store APIs, turn-authority event and decision persistence, effective dispatch policy reuse, store-backed authority snapshot fields, stale maintenance-action refusal before dispatch, and `agent.done` refusal exist. Dispatch-time admission persistence and broader pre-dispatch contradiction repair remain open. |
+| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, turn authority cards, data-first decision records, normalized authority event, decision, and admission store APIs, turn-authority event and decision persistence, pending-action admission persistence, effective dispatch policy reuse, store-backed authority snapshot fields, stale maintenance-action refusal before dispatch, and `agent.done` refusal exist. Immutable admission-view dispatch and broader pre-dispatch contradiction repair remain open. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Normalized store tables and unified runtime wiring remain open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, a pure recovery plan table, and SQLite retry counts keyed by case, node, tool, parameter shape, and fault class exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Registry examples parse, validate, and dispatch to routes except heavyweight verification gates. Recovery-plan examples parse, validate, and are admitted by recovery policy when model-authored. |
@@ -123,6 +123,19 @@ doc metadata, authority, and verification edits:
 - After wiring turn authority refresh to the normalized ledger,
   `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
 - After wiring turn authority refresh to the normalized ledger,
+  `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
+- After recording pending-action admission outcomes,
+  `cargo test -p lkjagent-runtime --test turn_authority_runtime`: `TURN_RUNTIME_EXIT=0`.
+- After recording pending-action admission outcomes,
+  `cargo test -p lkjagent-runtime --test authority_decision_record`: `DECISION_RECORD_EXIT=0`.
+- After recording pending-action admission outcomes,
+  `cargo test -p lkjagent-store --test runtime_authority`: `STORE_AUTH_EXIT=0`.
+- After recording pending-action admission outcomes, `cargo fmt --check`: `FMT_EXIT=0`.
+- After recording pending-action admission outcomes,
+  `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
+- After recording pending-action admission outcomes,
+  `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
+- After recording pending-action admission outcomes,
   `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
 - `docker compose build`: `EXIT=0`.
 - `docker compose run --rm verify`: `ok verify`, `EXIT=0`.

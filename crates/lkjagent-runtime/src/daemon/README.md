@@ -9,6 +9,7 @@ This directory holds adapter helpers for the foreground daemon.
 - [compaction.rs](compaction.rs): runtime-owned compaction and rebuild handoff.
 - [compaction_support.rs](compaction_support.rs): compaction summary helpers.
 - [authority.rs](authority.rs): store-backed turn authority snapshots.
+- [authority_admission.rs](authority_admission.rs): normalized dispatch admission writes.
 - [authority_ledger.rs](authority_ledger.rs): normalized authority event and decision writes.
 - [authority_store.rs](authority_store.rs): flat status-key authority snapshot writes.
 - [context_budget.rs](context_budget.rs): turn-boundary pressure checks.
