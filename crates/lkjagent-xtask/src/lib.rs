@@ -9,6 +9,7 @@ pub mod facts;
 pub mod lines;
 pub mod model;
 pub mod runner;
+pub mod structure;
 pub mod style;
 
 use std::path::Path;
@@ -29,6 +30,7 @@ pub fn run(args: &[String], root: &Path) -> i32 {
         Ok(Gate::QuietTest) => run_command_gate(root, "test"),
         Ok(Gate::QuietVerify) => run_verify(root),
         Ok(Gate::Benchmark(rest)) => benchmark::run(&rest, root),
+        Ok(Gate::Structure(rest)) => structure::run(&rest, root),
         Err(lines) => {
             print_failure(&lines);
             2
@@ -145,6 +147,7 @@ enum Gate {
     QuietVerify,
     HygieneCheck,
     Benchmark(Vec<String>),
+    Structure(Vec<String>),
 }
 
 fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
@@ -156,10 +159,11 @@ fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
         [first, second] if first == "quiet" && second == "test" => Ok(Gate::QuietTest),
         [first, second] if first == "quiet" && second == "verify" => Ok(Gate::QuietVerify),
         [first, rest @ ..] if first == "benchmark" => Ok(Gate::Benchmark(rest.to_vec())),
+        [first, rest @ ..] if first == "structure" => Ok(Gate::Structure(rest.to_vec())),
         _ => Err(vec![
             "xtask failed".to_string(),
             "exit status: 2".to_string(),
-            "use: check-docs | docs-check | check-lines | check-style | hygiene-check | quiet test | quiet verify | benchmark ..."
+            "use: check-docs | docs-check | check-lines | check-style | hygiene-check | quiet test | quiet verify | benchmark ... | structure ..."
                 .to_string(),
         ]),
     }
