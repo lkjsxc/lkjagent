@@ -1,1 +1,0 @@
-{"content":"<act>\n<tool>doc.audit</tool>\n<root>.</root>\n<count>5</count>\n<mode>approx</mode>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":8286,"completion_tokens":102,"cached_prompt_tokens":null,"total_tokens":8388}}

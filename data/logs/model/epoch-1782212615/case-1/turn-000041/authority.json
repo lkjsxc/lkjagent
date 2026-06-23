@@ -1,1 +1,0 @@
-{"active_mode":"OwnerTask","mission":"owner_execution","admitted_tools":"fs.read,fs.list,fs.stat,doc.audit,artifact.next,artifact.audit,fs.batch_write,workspace.summary,graph.state,graph.next,graph.plan,graph.transition","blocked_tools":""}

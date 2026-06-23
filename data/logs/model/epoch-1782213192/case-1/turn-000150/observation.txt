@@ -1,4 +1,0 @@
-<observation>
-<status>error</status>
-<content>io error: Not a directory (os error 20)</content>
-</observation>

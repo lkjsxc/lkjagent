@@ -1,1 +1,0 @@
-{"content":"<act>\n<tool>fs.mkdir</tool>\n<path>structured-output</path>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":4691,"completion_tokens":157,"cached_prompt_tokens":null,"total_tokens":4848}}

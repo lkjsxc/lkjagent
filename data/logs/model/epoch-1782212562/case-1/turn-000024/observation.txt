@@ -1,4 +1,0 @@
-<observation>
-<status>error</status>
-<content>invalid parameter: doc count must be a positive integer</content>
-</observation>

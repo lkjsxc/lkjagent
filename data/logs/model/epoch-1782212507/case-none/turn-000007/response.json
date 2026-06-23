@@ -1,1 +1,0 @@
-{"content":"<act>\n<tool>memory.find</tool>\n<query>README|transcript</query>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":2431,"completion_tokens":103,"cached_prompt_tokens":null,"total_tokens":2534}}

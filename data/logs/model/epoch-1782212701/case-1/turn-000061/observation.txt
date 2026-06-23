@@ -1,4 +1,0 @@
-<observation>
-<status>error</status>
-<content>invalid parameter: graph transition refused from recover-repeat to plan:admitted; legal: recover-by-alternate-tool, plan</content>
-</observation>

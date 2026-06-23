@@ -1,1 +1,0 @@
-{"content":"<act>\n<tool>memory.prune</tool>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":3714,"completion_tokens":149,"cached_prompt_tokens":null,"total_tokens":3863}}

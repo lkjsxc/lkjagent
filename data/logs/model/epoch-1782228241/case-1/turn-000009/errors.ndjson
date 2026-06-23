@@ -1,0 +1,1 @@
+{"error_class":"CompletionOversize","message":"endpoint completion hit max tokens; preview=<act>\\n<tool>fs.write</tool>\\n<path>stories/sf-novel-with-detailed-settings/02-characters.md</path>\\n<content># Character Profiles - The Iron Veil Chronicles\\n\\n## Protagonist: Kaelen \"Kai\" Thorne\\n\\n### Background\\n- **Age**: 28\\n- **Origin**: Aeth"}

@@ -1,0 +1,13 @@
+<observation>
+<status>ok</status>
+<content>
+document scaffold created
+root=stories/sf-novel-with-detailed-settings/02-characters.md
+kind=character-profile
+profile=GenericStructuredDocs
+mode=approx
+files=17
+readme=present
+catalog=catalog.toml
+</content>
+</observation>

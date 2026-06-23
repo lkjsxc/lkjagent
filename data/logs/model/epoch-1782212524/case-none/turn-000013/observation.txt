@@ -1,4 +1,0 @@
-<observation>
-<status>ok</status>
-<content>query_normalized=improvement candidate</content>
-</observation>

@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-files_written=1
-docs/verification.md bytes=481
-</content>
-</observation>

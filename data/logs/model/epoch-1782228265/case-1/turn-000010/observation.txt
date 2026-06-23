@@ -1,0 +1,13 @@
+<observation>
+<status>ok</status>
+<content>
+document plan created
+root=stories/sf-novel-with-detailed-settings/02-characters.md
+kind=character-profile
+profile=GenericStructuredDocs
+mode=approx
+files=17
+catalog=catalog.toml
+writes=0
+</content>
+</observation>

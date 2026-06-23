@@ -1,1 +1,0 @@
-{"status":"fault","closure_mode":"StopSequenceClosed","content_bytes":1798,"error":"BadParams { tool: \"graph.plan\", missing: [], unknown: [\"path\"] }"}

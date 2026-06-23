@@ -1,1 +1,0 @@
-{"content":"<act>\n<tool>fs.list</tool>\n<path>.</path>\n<depth>3</depth>\n<kind>all</kind>\n<limit>200</limit>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":4448,"completion_tokens":179,"cached_prompt_tokens":null,"total_tokens":4627}}

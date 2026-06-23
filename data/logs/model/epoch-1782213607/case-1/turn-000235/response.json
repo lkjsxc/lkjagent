@@ -1,1 +1,0 @@
-{"content":"<act>\n<tool>artifact.next</tool>\n<root>docs/operations</root>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":12504,"completion_tokens":229,"cached_prompt_tokens":null,"total_tokens":12733}}

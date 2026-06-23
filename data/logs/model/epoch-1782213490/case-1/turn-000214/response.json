@@ -1,1 +1,0 @@
-{"content":"<act>\n<tool>shell.run</tool>\n<command>cat docs/qwen-minecraft-windows-japan-united-states.md</command>\n<timeout>30</timeout>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":5740,"completion_tokens":298,"cached_prompt_tokens":null,"total_tokens":6038}}

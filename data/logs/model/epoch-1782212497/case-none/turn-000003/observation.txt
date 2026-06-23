@@ -1,4 +1,0 @@
-<observation>
-<status>ok</status>
-<content>query_normalized=transcript lesson</content>
-</observation>

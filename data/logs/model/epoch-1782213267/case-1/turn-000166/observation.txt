@@ -1,9 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-files_written=3
-structured-output/guides/setup.md bytes=469
-structured-output/guides/troubleshooting.md bytes=489
-structured-output/guides/workflow.md bytes=474
-</content>
-</observation>

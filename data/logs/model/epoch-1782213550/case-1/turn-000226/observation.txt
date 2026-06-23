@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-path=structured-output/operations/recovery.md
-bytes=481
-</content>
-</observation>

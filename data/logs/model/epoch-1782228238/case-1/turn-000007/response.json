@@ -1,0 +1,1 @@
+{"content":"<act>\n<tool>graph.transition</tool>\n<target>document-profile</target>\n<reason>advance from planning gap to active document profiling phase</reason>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":5313,"completion_tokens":131,"cached_prompt_tokens":null,"total_tokens":5444}}
