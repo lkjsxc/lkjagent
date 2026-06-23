@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-query_normalized=maintenance cycle 2
-id=2 kind=lesson title=Maintenance Cycle 2: Stale Row Pruning & Policy Recording snippet=Cycle opened with directive=prune-memory. Worked on merging, rewriting, or dropping stale memory rows. Memory search for
-</content>
-</observation>

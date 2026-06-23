@@ -1,0 +1,28 @@
+<observation>
+<status>ok</status>
+<content>
+document audit failed
+root=stories/sf-novel-with-detailed-settings/02-characters.md
+topology=failed
+links=passed
+path_hygiene=failed
+content_readiness=failed
+artifact_readiness=not-owner
+checks_run=topology,links,path_hygiene,content_readiness
+failed=12
+failures:
+- markdown_suffix_directory: /data/workspace/stories/sf-novel-with-detailed-settings/02-characters.md
+- structure_only_content: project/evidence-gates.md
+- structure_only_content: project/operating-rules.md
+- structure_only_content: relations/artifact-map.md
+- structure_only_content: relations/topic-map.md
+- owner_term_only_content: topics/abilities.md
+- owner_term_only_content: topics/background.md
+- owner_term_only_content: topics/motivation.md
+- owner_term_only_content: topics/relationships.md
+- owner_term_only_content: topics/resilience.md
+- owner_term_only_content: topics/vulnerability.md
+- count_mismatch: expected=5 actual=17
+next_action=fs.batch_write path-specific content or artifact.next
+</content>
+</observation>

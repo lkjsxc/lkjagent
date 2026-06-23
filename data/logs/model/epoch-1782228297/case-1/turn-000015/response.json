@@ -1,0 +1,1 @@
+{"content":"<act>\n<tool>graph.transition</tool>\n<target>document-audit</target>\n<reason>advance from recovery gap to active document audit phase</reason>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":10090,"completion_tokens":112,"cached_prompt_tokens":null,"total_tokens":10202}}

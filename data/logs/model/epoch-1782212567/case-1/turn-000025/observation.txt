@@ -1,4 +1,0 @@
-<observation>
-<status>error</status>
-<content>invalid parameter: doc count must be 3..100</content>
-</observation>

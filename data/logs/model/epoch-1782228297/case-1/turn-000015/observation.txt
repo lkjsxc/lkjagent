@@ -1,0 +1,7 @@
+<observation>
+<status>ok</status>
+<content>
+graph transition admitted
+target=document-audit
+</content>
+</observation>

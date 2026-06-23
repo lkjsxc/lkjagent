@@ -1,1 +1,0 @@
-{"content":"<act>\n<tool>artifact.next</tool>\n<root>structured-output</root>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":4504,"completion_tokens":157,"cached_prompt_tokens":null,"total_tokens":4661}}

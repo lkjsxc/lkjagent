@@ -1,4 +1,0 @@
-<observation>
-<status>error</status>
-<content>invalid parameter: each block must start with path: </content>
-</observation>

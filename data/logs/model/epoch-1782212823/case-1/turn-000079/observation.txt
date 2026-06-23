@@ -1,4 +1,0 @@
-<observation>
-<status>error</status>
-<content>invalid parameter: graph.plan needs checks or paths</content>
-</observation>

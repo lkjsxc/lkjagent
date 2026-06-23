@@ -1,1 +1,0 @@
-{"tool":"artifact.next","admitted":false,"reason":"stale model action refused\nactive_mode=Compaction\nprevious_mode=Recovery\nfailed_tool=artifact.next\nfailed_gate=stale-turn-authority\nadmitted_tools=none\nnext_executable_action=runtime action; no model act block\nreason=current runtime authority preempts the cached model action","example":"runtime action; no model act block"}

@@ -1,1 +1,0 @@
-# Implementation\n\nThis document describes the implementation details.

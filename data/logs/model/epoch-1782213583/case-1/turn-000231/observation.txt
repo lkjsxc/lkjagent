@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-path=structured-output/operations/verification.md
-bytes=489
-</content>
-</observation>
