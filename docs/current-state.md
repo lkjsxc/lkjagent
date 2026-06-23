@@ -32,7 +32,7 @@ prove that their failures cannot recur.
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
 | Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current model run snapshot. |
 | Document scaffold seed | Deterministic scaffold paths and compact `catalog.toml` metadata exist for project, multi-topic docs, story, and cookbook roots. |
-| Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, and scaffold-only leaves. |
+| Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, workspace briefs, and scaffold-only leaves. |
 | Placeholder and payload refusal | `fs.write`, `fs.batch_write`, and content audit reject common scaffold phrases and oversized payloads before mutation. |
 | Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
 | Hard compaction mode | A runtime-owned `Compaction` active mode exists and does not render `memory.save` as a model action. |
@@ -95,6 +95,13 @@ Latest focused slice gates:
 - `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
+- `cargo test -p lkjagent-xtask --test structure_audit`: `test result: ok. 5 passed`.
+- `cargo test -p lkjagent-tools --test workspace_structure`: `test result: ok. 1 passed`.
+- `cargo test -p lkjagent-tools --test structure_seed`: `test result: ok. 3 passed`.
+- `cargo test -p lkjagent-runtime --test recursive_scaffold`: `test result: ok. 2 passed`.
+- `cargo test -p lkjagent-tools`: `TOOLS_FULL_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- structure audit --root data/workspace`: `ok structure audit data/workspace`.
+- `cargo run -p lkjagent-xtask -- check-style`: `ok check-style`.
 
 Recent committed slices also ran focused authority, recovery, artifact,
 compaction, `cargo fmt --check`, `check-docs`, `check-lines`, and quiet verify

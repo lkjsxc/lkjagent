@@ -48,5 +48,6 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [semantic_examples.rs](semantic_examples.rs): semantic action example dispatch fixtures.
 - [structure_seed.rs](structure_seed.rs): deterministic recursive docs scaffold fixture.
 - [store_tools.rs](store_tools.rs): queue and memory tool fixtures.
+- [workspace_structure.rs](workspace_structure.rs): scaffold-only recursive structure refusal fixture.
 - [support/](support/README.md): shared temp workspace and store helpers.
 - [typed_tools.rs](typed_tools.rs): fs list/search/stat/batch, workspace, verify, and doc tool fixtures.

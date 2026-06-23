@@ -66,6 +66,8 @@ pub mod queue;
 pub mod shell;
 pub mod structure;
 pub mod structure_network;
+mod structure_quality;
+mod structure_report;
 pub mod structure_seed;
 pub mod verify;
 pub mod workspace;

@@ -76,6 +76,8 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [doc/](doc/README.md): semantic scaffold and audit helper modules.
 - [doc.rs](doc.rs): document scaffold and audit entrypoints.
 - [structure.rs](structure.rs): recursive tree completion checks.
+- [structure_quality.rs](structure_quality.rs): scaffold-only Markdown detection for structure guards.
+- [structure_report.rs](structure_report.rs): recursive tree failure report rendering.
 - [structure_network.rs](structure_network.rs): knowledge network completion checks.
 - [structure_seed/](structure_seed/README.md): deterministic docs scaffold profiles.
 - [structure_seed.rs](structure_seed.rs): scaffold profile entrypoint.

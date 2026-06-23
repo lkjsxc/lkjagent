@@ -47,4 +47,7 @@ relation updates, backlinks, and audit actions.
 
 ## Status
 
-open.
+partially implemented. The xtask structure audit returns a pure `StructurePlan`, detects README topology,
+catalog drift, fan-out, line-limit, scaffold-content, and missing `/data/workspace/AGENTS.md` findings, and the
+tracked `data/workspace` root now marks scaffold output as failed diagnostic evidence. Recursive completion guards
+reject scaffold-only Markdown leaves. Move planning, relation updates, backlinks, and apply-mode mutation remain open.

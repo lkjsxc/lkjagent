@@ -1,5 +1,6 @@
 use crate::model::RepoFile;
 
+use super::brief::workspace_brief_findings;
 use super::catalog::catalog_findings;
 use super::findings::StructureFinding;
 use super::readme::readme_findings;
@@ -24,6 +25,7 @@ pub struct StructurePlan {
 pub fn build_plan(files: &[RepoFile], root: &str, fanout_cap: usize) -> StructurePlan {
     let normalized = root.trim_end_matches('/').to_string();
     let mut findings = readme_findings(files, &normalized, fanout_cap);
+    findings.extend(workspace_brief_findings(files, &normalized));
     findings.extend(catalog_findings(files, &normalized));
     let line_limit_findings = line_limit_findings(files, &normalized);
     findings.extend(line_limit_findings.clone());
