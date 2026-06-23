@@ -145,7 +145,8 @@ fn artifact_audit_rejects_cookbook_scaffold_without_recipe_content() -> TestResu
     );
 
     assert!(output.content.contains("document audit failed"));
-    assert!(output.content.contains("scaffold_only_content: recipes/"));
+    assert!(output.content.contains("content_readiness=failed"));
+    assert!(output.content.contains("structure_only_content: recipes/"));
     Ok(())
 }
 

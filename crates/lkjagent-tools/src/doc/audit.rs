@@ -4,9 +4,12 @@ use std::path::{Path, PathBuf};
 use crate::error::ToolResult;
 use crate::fs::workspace_path;
 
+use super::audit_report::report;
 use super::content_audit::content_checks;
 use super::model::ScaffoldMode;
-use super::names::{banned_release_wording, forbidden_serial_name, link_target};
+use super::names::{
+    banned_release_wording, forbidden_serial_name, link_target, path_hygiene_failures,
+};
 
 pub fn audit_root(
     workspace: &Path,
@@ -18,12 +21,13 @@ pub fn audit_root(
     let mut failures = Vec::new();
     if !full.exists() {
         failures.push(format!("missing_root: {root}"));
-        return Ok(report(root, failures));
+        return Ok(report(root, failures, false));
     }
     collect_dir_checks(&full, &full, &mut failures)?;
+    let content_requested = full.join("catalog.toml").is_file();
     content_checks(&full, &mut failures)?;
     count_check(&full, count, mode, &mut failures)?;
-    Ok(report(root, failures))
+    Ok(report(root, failures, content_requested))
 }
 
 fn collect_dir_checks(root: &Path, dir: &Path, failures: &mut Vec<String>) -> ToolResult<()> {
@@ -91,6 +95,7 @@ fn file_checks(root: &Path, file: &Path, failures: &mut Vec<String>) -> ToolResu
     if forbidden_serial_name(&relative) {
         failures.push(format!("serial_filename: {relative}"));
     }
+    failures.extend(path_hygiene_failures(&relative));
     if let Some(token) = banned_release_wording(&format!("{relative}\n{text}")) {
         failures.push(format!("banned_release_wording: {relative} {token}"));
     }
@@ -142,20 +147,6 @@ fn immediate_children(dir: &Path) -> ToolResult<Vec<PathBuf>> {
         .collect::<Vec<_>>();
     children.sort();
     Ok(children)
-}
-
-fn report(root: &str, failures: Vec<String>) -> String {
-    let failed = failures.len();
-    let passed = 15usize.saturating_sub(failed.min(15));
-    if failures.is_empty() {
-        return format!(
-            "document audit passed\nroot={root}\nchecks=15\npassed=15\nfailed=0\nnext_action=record document-structure evidence"
-        );
-    }
-    format!(
-        "document audit failed\nroot={root}\nchecks=15\npassed={passed}\nfailed={failed}\nfailures:\n- {}\nnext_action=doc.scaffold or fs.batch_write exact failed topology",
-        failures.join("\n- ")
-    )
 }
 
 fn rel(root: &Path, path: &Path) -> String {

@@ -31,9 +31,9 @@ prove that their failures cannot recur.
 | SQLite store | Queue, state, event, memory, and task summary surfaces exist in `lkjagent-store`. |
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
 | Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current model run snapshot. Provider exchange rows plus atomic request, authority, response, timing, and error files are written when daemon model calls have a log root. |
-| Document scaffold seed | Deterministic scaffold paths and compact `catalog.toml` metadata exist for project, multi-topic docs, story, and cookbook roots. |
-| Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, workspace briefs, and scaffold-only leaves. |
-| Placeholder and payload refusal | `fs.write`, `fs.batch_write`, and content audit reject common scaffold phrases and oversized payloads before mutation. |
+| Document scaffold seed | Deterministic scaffold paths, relation-first generic seeds, bounded slugs, and compact `catalog.toml` metadata exist for project, multi-topic docs, story, and cookbook roots. |
+| Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, workspace briefs, structure-only pages, owner-term pages, and old boilerplate leaves. |
+| Placeholder and payload refusal | `fs.write`, `fs.batch_write`, content audit, and check-docs reject common scaffold phrases and oversized payloads before mutation. |
 | Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
 | Hard compaction mode | A runtime-owned `Compaction` active mode exists and does not render `memory.save` as a model action. |
 | Baseline benchmarks | The corpus includes owner-reported recovery, artifact, memory, accounting, and model-log signatures. |
@@ -64,8 +64,6 @@ Uploaded run logs still stand for these failures:
 - blocked escape tools: `doc.scaffold`, `fs.write`, `shell.run`, and internal `agent.ask` attempts.
 - contradictory policy: maintenance and graph policy rendering together.
 - content failure: README-only or scaffold-only output treated as artifact success.
-- generator failure: `leaf_body` still emits one universal scaffold leaf and
-  `artifact.next` still renders generic filler examples.
 - artifact drift: empty cookbook roots, shallow dictionary roots, and topic drift.
 - memory failure: duplicate or low-value maintenance rows.
 - compaction failure: hard pressure depending on model-authored `memory.save`.
@@ -100,10 +98,10 @@ Current baseline for the scaffold-redesign slice:
 - `git status --short`: no output.
 - `rg -n "Keep this file semantic|..." .`: `RG_EXIT=127`; this environment
   does not provide `rg`.
-- Python and `grep` scans found the old generated block in
+- The baseline Python and `grep` scans found the old generated block in
   `crates/lkjagent-tools/src/doc/body.rs`, generic artifact example text in
   `crates/lkjagent-tools/src/artifact_next_example.rs`, detector code, tests,
-  and historical logs.
+  and historical logs before the scaffold slice changed code.
 - `find data -maxdepth 5 -type f | sort | sed -n '1,200p'`: active evidence
   includes `data/logs/current-model-run.md`, generated docs under
   `data/workspace/docs/`, and the combined-topic generated Markdown file.
@@ -113,6 +111,19 @@ Current baseline for the scaffold-redesign slice:
 - `cargo run -p lkjagent-xtask -- check-style`: `STYLE_EXIT=0`, `ok check-style`.
 - `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCH_EXIT=0`, `ok benchmark-corpus`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `VERIFY_EXIT=0`, `ok verify`.
+
+Latest scaffold slice gates:
+
+- `cargo test -p lkjagent-tools`: `TOOLS_PACKAGE3_EXIT=0`.
+- `cargo test -p lkjagent-xtask`: `XTASK_PACKAGE3_EXIT=0`.
+- `cargo fmt --check`: `FMT_SLICE_EXIT=0`, `ok fmt-check`.
+- `cargo run -p lkjagent-xtask -- check-docs`: `DOCS8_EXIT=0`, `ok check-docs`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `LINES_SLICE_EXIT=0`, `ok check-lines`.
+- `cargo run -p lkjagent-xtask -- check-style`: `STYLE8_EXIT=0`, `ok check-style`.
+- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCH_SLICE_EXIT=0`,
+  `ok benchmark-corpus`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `VERIFY_AFTER_DOCUPDATE_EXIT=0`,
+  `ok verify`.
 
 Latest focused slice gates:
 

@@ -1,11 +1,11 @@
 pub fn readme_body(title: &str, role: &str, entries: &str) -> String {
     format!(
-        "# {title}\n\n## Purpose\n\n{role} for this generated documentation root.\n\n## Table of Contents\n\n{entries}\n\n## Local Map\n\n{entries}\n\n## Reading Paths\n\n- Implementation path: read this README, then follow each linked child.\n- Diagnosis path: inspect catalog metadata, then audit failed paths.\n- Verification path: run `doc.audit` for this root.\n\n## Cross-Links\n\n- Related metadata: `catalog.toml`.\n- Owning crate or module: `crates/lkjagent-tools/src/doc.rs`.\n"
+        "# {title}\n\n## Purpose\n\nThis README is the local map for the {role}.\n\n## Table of Contents\n\n{entries}\n\n## Local Map\n\n{entries}\n\n## Current Gate\n\nCompletion requires a later audit to prove topology, path hygiene, and content readiness.\n\n## Status\n\nstructure-only\n"
     )
 }
 
 pub fn leaf_body(title: &str, role: &str) -> String {
     format!(
-        "# {title}\n\n## Purpose\n\nThis file records the {role} role for the generated documentation tree.\n\n## Contract\n\n- Keep this file semantic and linked from its local README.\n- Record concrete facts, decisions, and verification evidence.\n\n## Implementation Hooks\n\n- Source: `crates/lkjagent-tools/src/doc.rs`\n- Tests: `crates/lkjagent-tools/tests/typed_tools.rs`\n- Verification: `docker compose run --rm verify`\n\n## Failure Modes\n\n- The file is unlinked from its directory README.\n- The file becomes a placeholder without role-specific content.\n\n## Status\n\nscaffolded\n"
+        "# {title}\n\n## Purpose\n\nThis page reserves the `{role}` path for the active documentation objective.\n\n## Structure State\n\ncontent_state=structure-only\npath_role={role}\n\n## Source Boundary\n\n- Known source: generated structure plan.\n- Missing evidence: owner terms, local source paths, observed facts, decisions, or commands for this page.\n\n## Next Evidence\n\nLink this path to a request term, source file, audit result, or verification command before treating it as content-ready.\n\n## Links\n\n- Local README: README.md.\n- Catalog metadata: catalog.toml.\n"
     )
 }

@@ -1,17 +1,21 @@
 use crate::error::{ToolError, ToolResult};
 
-use super::body::{leaf_body, readme_body};
 use super::fit::{exact_group_count, max_tree_count};
 use super::model::{PlannedFile, ScaffoldInput, ScaffoldPlan, ScaffoldProfile, ShapeGroup};
 use super::names::{slug, title_from_path};
+use super::profile_builders::{catalog_file, leaf, readme};
 use super::roles::EXTRA_ROLES;
 use super::semantic_seed;
+use super::semantic_workspace;
 use super::shapes::{select_profile, shape};
 
 pub fn semantic_doc_plan(input: &ScaffoldInput) -> ToolResult<ScaffoldPlan> {
     let profile = select_profile(input);
     if profile == ScaffoldProfile::LkjagentSemanticSeed && input.count.is_none() {
         return Ok(semantic_seed::plan(input));
+    }
+    if profile == ScaffoldProfile::GenericStructuredDocs && input.count.is_none() {
+        return Ok(semantic_workspace::plan(input));
     }
     let files = if let Some(target) = input.count {
         counted_files(input, shape(profile), target)?
@@ -132,11 +136,12 @@ fn root_entries(groups: &[ShapeGroup]) -> String {
 }
 
 fn leaf_entries(leaves: &[&str]) -> String {
-    let roles = leaves
-        .iter()
-        .map(|role| role.to_string())
-        .collect::<Vec<_>>();
-    role_entries(&roles)
+    role_entries(
+        &leaves
+            .iter()
+            .map(|role| role.to_string())
+            .collect::<Vec<_>>(),
+    )
 }
 
 fn role_entries(roles: &[String]) -> String {
@@ -153,36 +158,6 @@ fn with_catalog_entry(entries: String) -> String {
         catalog.to_string()
     } else {
         format!("{entries}\n{catalog}")
-    }
-}
-
-fn catalog_file(input: &ScaffoldInput, profile: ScaffoldProfile) -> PlannedFile {
-    PlannedFile {
-        path: "catalog.toml".to_string(),
-        title: "Catalog".to_string(),
-        role: "scaffold metadata".to_string(),
-        body: format!(
-            "title = \"{}\"\nkind = \"{}\"\nprofile = \"{:?}\"\n",
-            input.title, input.kind, profile
-        ),
-    }
-}
-
-fn readme(path: &str, title: &str, role: &str, entries: String) -> PlannedFile {
-    PlannedFile {
-        path: path.to_string(),
-        title: title.to_string(),
-        role: role.to_string(),
-        body: readme_body(title, role, &entries),
-    }
-}
-
-fn leaf(path: &str, title: &str, role: &str) -> PlannedFile {
-    PlannedFile {
-        path: path.to_string(),
-        title: title.to_string(),
-        role: role.to_string(),
-        body: leaf_body(title, role),
     }
 }
 

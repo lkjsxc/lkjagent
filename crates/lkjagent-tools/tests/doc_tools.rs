@@ -104,12 +104,11 @@ fn doc_audit_rejects_part_files_and_missing_links() -> TestResult<()> {
     assert!(audit.contains("document audit failed"));
     assert!(audit.contains("serial_filename: part-001.md"));
     assert!(audit.contains("missing_readme_link: part-001.md"));
-    assert!(audit.contains("serial_filename"));
     Ok(())
 }
 
 #[test]
-fn doc_audit_rejects_generated_scaffold_as_mock_content() -> TestResult<()> {
+fn doc_audit_rejects_structure_only_generated_content() -> TestResult<()> {
     let workspace = temp_workspace("doc-audit-pass")?;
     scaffold(
         &workspace,
@@ -126,7 +125,8 @@ fn doc_audit_rejects_generated_scaffold_as_mock_content() -> TestResult<()> {
         &[("root", "guide"), ("count", "3"), ("mode", "exact")],
     )?;
     assert!(audit.contains("document audit failed"));
-    assert!(audit.contains("scaffold_only_content"));
+    assert!(audit.contains("content_readiness=failed"));
+    assert!(audit.contains("structure_only_content"));
     Ok(())
 }
 

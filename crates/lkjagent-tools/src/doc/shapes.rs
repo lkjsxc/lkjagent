@@ -29,6 +29,8 @@ pub fn select_profile(input: &ScaffoldInput) -> ScaffoldProfile {
         ScaffoldProfile::NarrativeManuscript
     } else if text.contains("architecture") {
         ScaffoldProfile::ArchitectureDocs
+    } else if input.count.is_none() && relation_first_subject(&text) {
+        ScaffoldProfile::GenericStructuredDocs
     } else {
         ScaffoldProfile::ProjectDocs
     }
@@ -49,4 +51,15 @@ fn bread_subject(text: &str) -> bool {
     ["bread", "sourdough", "ciabatta", "focaccia", "rye loaf"]
         .iter()
         .any(|needle| text.contains(needle))
+}
+
+fn relation_first_subject(text: &str) -> bool {
+    text.contains(',') || topic_word_count(text) > 4
+}
+
+fn topic_word_count(text: &str) -> usize {
+    text.split(|ch: char| !ch.is_ascii_alphanumeric())
+        .filter(|word| !word.is_empty())
+        .filter(|word| !matches!(*word, "a" | "an" | "and" | "the" | "to" | "of" | "for"))
+        .count()
 }

@@ -3,7 +3,8 @@ use std::path::{Path, PathBuf};
 
 use crate::error::ToolResult;
 
-use super::mock_content::mock_sibling_checks;
+use super::content_signals::marker_failure;
+use super::repeated_content::repeated_sibling_checks;
 
 pub fn content_checks(root: &Path, failures: &mut Vec<String>) -> ToolResult<()> {
     let Some(kind) = content_kind(root)? else {
@@ -17,7 +18,7 @@ pub fn content_checks(root: &Path, failures: &mut Vec<String>) -> ToolResult<()>
         }
     }
     if matches!(kind, ContentKind::Documentation) {
-        mock_sibling_checks(root, &files, failures)?;
+        repeated_sibling_checks(root, &files, failures)?;
     }
     Ok(())
 }
@@ -75,19 +76,10 @@ fn collect_markdown(dir: &Path, files: &mut Vec<PathBuf>) -> ToolResult<()> {
     Ok(())
 }
 
-fn scaffold_only(text: &str) -> bool {
-    text.contains("This file records the")
-        && text.contains("generated documentation tree")
-        && text.contains("\nscaffolded\n")
-}
-
 fn content_failure(kind: &ContentKind, root: &Path, file: &Path, text: &str) -> Option<String> {
     let relative = rel(root, file);
-    if scaffold_only(text) {
-        return Some(format!("scaffold_only_content: {relative}"));
-    }
-    if let Some(phrase) = crate::placeholder::detect(text) {
-        return Some(format!("placeholder_content: {relative} phrase={phrase}"));
+    if let Some(failure) = marker_failure(&relative, text) {
+        return Some(failure);
     }
     match kind {
         ContentKind::Cookbook => cookbook_failure(&relative, text),
