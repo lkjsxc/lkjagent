@@ -17,6 +17,19 @@ fn preferred_action_never_points_at_blocked_tool() {
 }
 
 #[test]
+fn tool_requiring_prompt_never_has_empty_tool_surface() {
+    let owner = decide_turn_authority(TurnAuthorityInput {
+        active_owner_case: true,
+        ..TurnAuthorityInput::default()
+    });
+
+    assert_ne!(owner.effective_policy.allowed_tools, Vec::<&str>::new());
+    assert!(!owner.prompt_card.contains("allowed_tools=none"));
+    assert!(owner.prompt_card.contains("allowed_tools=fs.read"));
+    assert!(owner.prompt_card.contains("graph.state"));
+}
+
+#[test]
 fn valid_example_never_renders_blocked_tool() {
     let cases = [
         TurnAuthorityInput {

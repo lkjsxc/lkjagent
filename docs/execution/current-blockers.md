@@ -59,6 +59,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - The daemon persists authority snapshot fields and CLI status prints active
   mode, evidence gaps, artifact root, recovery route, failed action, admitted
   tools, and next executable action.
+- Owner-task prompt authority no longer renders an empty tool surface while
+  recommending a graph-admitted action.
 - Recovery retry counts persist in SQLite by case, node, tool, parameter shape,
   and fault class.
 - Compaction notices now preserve the latest observation summary and
