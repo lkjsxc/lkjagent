@@ -2,14 +2,31 @@
 
 ## Purpose
 
-This file owns the state-transition network that connects runtime authority, graph guidance, recovery, compaction,
-maintenance, artifacts, and completion.
+This file owns the state-transition network that connects runtime authority,
+graph guidance, recovery, compaction, maintenance, artifacts, and completion.
 
 ## Contract
 
-The network is event driven. The graph ranks nodes and proposes edges, but runtime authority decides the active
-mission and the admitted next action. Every prompt, dispatch request, recovery route, compaction snapshot,
+The network is event driven. The graph ranks nodes and proposes edges, but
+runtime authority decides the active mission and the admitted next action.
+Every prompt, dispatch request, recovery route, compaction snapshot,
 maintenance tick, and close path reads the same decision stream.
+
+## Kernel Boundary
+
+```text
+DurableReadModel -> RuntimeSnapshot
+RuntimeSnapshot + RuntimeEvent -> RuntimeDecision
+RuntimeDecision -> PromptFrame
+RuntimeDecision + ModelAction -> ToolAdmission
+ToolAdmission -> EffectCommand
+EffectObservation -> RuntimeEvent
+RuntimeEvent -> next RuntimeDecision
+```
+
+The kernel is pure. Store, prompt, endpoint, dispatcher, compaction,
+maintenance, and completion adapters perform effects only after a persisted
+decision exists.
 
 ## Inputs
 
@@ -49,4 +66,8 @@ maintenance tick, and close path reads the same decision stream.
 
 ## Status
 
-design-only.
+partially implemented. Runtime mission selection, decision records, event and
+admission persistence, prompt-card decision identifiers, and stale maintenance
+action refusal exist. The complete transition history, durable snapshots,
+compaction history, maintenance preemption proof, recovery shape coverage, and
+every close path still need to read the same persisted decision stream.
