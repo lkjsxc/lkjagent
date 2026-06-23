@@ -77,6 +77,6 @@ where
         Command::Console => console::console(&invocation.data_dir),
         Command::Memory { query } => memory::memory(&invocation.data_dir, &query),
         Command::Graph => graph::graph(&invocation.data_dir),
-        Command::ModelLog { print } => model_log::model_log(&invocation.data_dir, print),
+        Command::ModelLog(command) => model_log::model_log(&invocation.data_dir, command),
     }
 }

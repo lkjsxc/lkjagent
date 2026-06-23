@@ -4,6 +4,9 @@ use std::fs;
 
 use lkjagent_cli::run_cli;
 use lkjagent_store::events::{append_event, EventKind};
+use lkjagent_store::provider_exchange::{
+    complete_exchange, record_request, ProviderExchangeCompletion, ProviderExchangeRequest,
+};
 use lkjagent_store::token_usage::{record, TokenUsageEvent};
 use support::{open_store, temp_data, TestResult};
 
@@ -101,5 +104,66 @@ fn model_log_uses_large_manual_handoff_budget() -> TestResult<()> {
     assert!(printed.stdout.chars().count() <= 1_000_000);
     assert!(printed.stdout.contains("event-000"));
     assert!(printed.stdout.contains("event-089"));
+    Ok(())
+}
+
+#[test]
+fn model_log_lists_and_shows_provider_exchanges() -> TestResult<()> {
+    let data = temp_data("model-log-exchange")?;
+    let conn = open_store(&data)?;
+    record_request(
+        &conn,
+        &ProviderExchangeRequest {
+            id: "exchange-cli",
+            case_id: "9",
+            turn_id: 4,
+            prompt_frame_id: Some("prompt"),
+            authority_decision_id: Some("12"),
+            admission_decision_id: None,
+            provider: "openai-compatible",
+            model: "local-model",
+            created_at: "2026-01-01T00:00:00Z",
+            request_json: "{\"messages\":[]}",
+            request_hash: "request-hash",
+            redaction_schema_version: 1,
+        },
+    )?;
+    complete_exchange(
+        &conn,
+        &ProviderExchangeCompletion {
+            id: "exchange-cli",
+            response_json: "{\"content\":\"ok\"}",
+            response_hash: "response-hash",
+            finish_reason: "stop",
+            usage_json: Some("{\"total_tokens\":4}"),
+            stats_json: None,
+            latency_ms: 5,
+        },
+    )?;
+
+    let list = run_cli([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "model-log",
+        "list",
+    ]);
+    let show = run_cli([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "model-log",
+        "show",
+        "--case",
+        "9",
+        "--turn",
+        "4",
+    ]);
+
+    assert_eq!(list.code, 0);
+    assert!(list.stdout.contains("exchange-cli"));
+    assert!(list.stdout.contains("status=succeeded"));
+    assert_eq!(show.code, 0);
+    assert!(show.stdout.contains("request_json:"));
+    assert!(show.stdout.contains("response_hash=response-hash"));
+    assert!(show.stdout.contains("{\"content\":\"ok\"}"));
     Ok(())
 }

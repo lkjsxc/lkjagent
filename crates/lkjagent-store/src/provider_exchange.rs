@@ -43,11 +43,23 @@ pub struct ProviderExchangeRow {
     pub id: String,
     pub case_id: String,
     pub turn_id: i64,
+    pub provider: String,
+    pub model: String,
+    pub created_at: String,
     pub status: String,
     pub finish_reason: Option<String>,
     pub error_class: Option<String>,
     pub request_hash: String,
     pub response_hash: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProviderExchangeDetail {
+    pub row: ProviderExchangeRow,
+    pub request_json: String,
+    pub response_json: Option<String>,
+    pub usage_json: Option<String>,
+    pub latency_ms: Option<i64>,
 }
 
 pub fn record_request(conn: &Connection, input: &ProviderExchangeRequest<'_>) -> StoreResult<()> {
@@ -117,12 +129,36 @@ pub fn latest_for_case_turn(
     turn_id: i64,
 ) -> StoreResult<Option<ProviderExchangeRow>> {
     let mut statement = conn.prepare(
-        "SELECT id, case_id, turn_id, status, finish_reason, error_class,
-         request_hash, response_hash FROM provider_exchange
+        "SELECT id, case_id, turn_id, provider, model, created_at, status,
+         finish_reason, error_class, request_hash, response_hash FROM provider_exchange
          WHERE case_id = ?1 AND turn_id = ?2 ORDER BY created_at DESC LIMIT 1",
     )?;
     let mut rows = statement.query(params![case_id, turn_id])?;
     Ok(rows.next()?.map(row).transpose()?)
+}
+
+pub fn list_recent(conn: &Connection, limit: usize) -> StoreResult<Vec<ProviderExchangeRow>> {
+    let sql = "SELECT id, case_id, turn_id, provider, model, created_at, status,
+        finish_reason, error_class, request_hash, response_hash
+        FROM provider_exchange ORDER BY created_at DESC LIMIT ?1";
+    let mut statement = conn.prepare(sql)?;
+    let rows = statement.query_map(params![limit as i64], row)?;
+    rows.collect::<rusqlite::Result<Vec<_>>>()
+        .map_err(Into::into)
+}
+
+pub fn detail_for_case_turn(
+    conn: &Connection,
+    case_id: &str,
+    turn_id: i64,
+) -> StoreResult<Option<ProviderExchangeDetail>> {
+    let sql = "SELECT id, case_id, turn_id, provider, model, created_at, status,
+        finish_reason, error_class, request_hash, response_hash, request_json,
+        response_json, usage_json, latency_ms FROM provider_exchange
+        WHERE case_id = ?1 AND turn_id = ?2 ORDER BY created_at DESC LIMIT 1";
+    let mut statement = conn.prepare(sql)?;
+    let mut rows = statement.query(params![case_id, turn_id])?;
+    Ok(rows.next()?.map(detail).transpose()?)
 }
 
 fn row(row: &rusqlite::Row<'_>) -> rusqlite::Result<ProviderExchangeRow> {
@@ -130,10 +166,23 @@ fn row(row: &rusqlite::Row<'_>) -> rusqlite::Result<ProviderExchangeRow> {
         id: row.get(0)?,
         case_id: row.get(1)?,
         turn_id: row.get(2)?,
-        status: row.get(3)?,
-        finish_reason: row.get(4)?,
-        error_class: row.get(5)?,
-        request_hash: row.get(6)?,
-        response_hash: row.get(7)?,
+        provider: row.get(3)?,
+        model: row.get(4)?,
+        created_at: row.get(5)?,
+        status: row.get(6)?,
+        finish_reason: row.get(7)?,
+        error_class: row.get(8)?,
+        request_hash: row.get(9)?,
+        response_hash: row.get(10)?,
+    })
+}
+
+fn detail(row: &rusqlite::Row<'_>) -> rusqlite::Result<ProviderExchangeDetail> {
+    Ok(ProviderExchangeDetail {
+        row: self::row(row)?,
+        request_json: row.get(11)?,
+        response_json: row.get(12)?,
+        usage_json: row.get(13)?,
+        latency_ms: row.get(14)?,
     })
 }

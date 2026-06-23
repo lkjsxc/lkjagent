@@ -51,7 +51,7 @@ prove that their failures cannot recur.
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Store reopen coverage and status rendering for latest snapshots remain open. |
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, same-title high-overlap merge, and low-signal rewrite pruning exist. Pre-dispatch owner preemption proof remains open. |
 | Status and console | Active graph state, active mode, authority snapshot fields, context pressure, token usage, and model-log paths display. Last successful observation is summarized from recent observations. |
-| Provider exchange logging | SQLite schema, store APIs, atomic filesystem writer, request logging, response logging, error logging, and focused store/runtime tests exist. Parse, admission, observation, index, export, and CLI inspection remain open. |
+| Provider exchange logging | SQLite schema, store APIs, atomic filesystem writer, request logging, response logging, error logging, CLI list/show, and focused store/runtime/CLI tests exist. Parse, admission, observation, index, and export remain open. |
 | Benchmarks | Uploaded-run signatures are represented by deterministic fixtures. Runtime replay coverage and every completion path are not yet complete. |
 
 ## Open Failure Evidence
