@@ -32,6 +32,10 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   uploaded failure patterns cannot recur.
 - Documentation moves first, then code. Prompt guidance and scaffold output do
   not close implementation rows.
+- The first runtime authority code slice is the transition kernel in
+  [current-work/state-transition-network.md](current-work/state-transition-network.md):
+  snapshot, explicit event, decision, prompt frame, admission, effect, and next
+  event.
 - Runtime authority, recovery, artifact readiness, completion, compaction,
   maintenance, fixtures, memory, and protocol repair move in that order unless
   repository inspection proves a stricter dependency.
@@ -80,8 +84,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 
 ## Remaining Proof Gaps
 
-- Authority snapshots still need stronger case-specific fields and history for
-  every dispatch and completion path.
+- Authority snapshots still need stronger case-specific fields and transition
+  history for every dispatch and completion path.
 - Compaction snapshots still need durable history beyond the latest notice.
 - Broader stale-action contradiction repair is not yet covered for every mode.
 - Recovery shape-change enforcement is not yet proven for every live fault class.

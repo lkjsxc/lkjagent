@@ -10,7 +10,26 @@ and completion use one persisted state-transition network.
 Implement the loop documented in
 [../../architecture/state-graph/transition-network.md](../../architecture/state-graph/transition-network.md) and
 [../../architecture/runtime/authority/decision-ledger.md](../../architecture/runtime/authority/decision-ledger.md):
-`RuntimeSnapshot + RuntimeEvent -> RuntimeDecision`, then decision-derived admission before effects.
+`RuntimeSnapshot + RuntimeEvent -> RuntimeDecision`, then decision-derived
+admission before effects.
+
+## Implementation Task
+
+Replace parallel authority paths with one transition kernel:
+
+```text
+build_runtime_snapshot(conn, daemon_state) -> RuntimeSnapshot
+record_runtime_event(snapshot_id, event) -> RuntimeEventId
+reduce(snapshot, event) -> RuntimeDecision
+record_runtime_decision(snapshot_id, event_id, decision) -> RuntimeDecisionId
+render_prompt_frame(decision_id) -> PromptFrame
+admit_tool(decision_id, model_action, staleness_fingerprint) -> ToolAdmission
+record_effect_observation(admission_id, observation) -> RuntimeEvent
+```
+
+`TurnAuthorityInput` may remain only as an adapter input while building the
+full snapshot. It must not select a mission independently from
+`RuntimeSnapshot`.
 
 ## Inputs
 
@@ -22,11 +41,13 @@ Implement the loop documented in
 
 ## Outputs
 
-- `RuntimeMission` as the reducer mission enum.
+- `RuntimeMission` selected from the snapshot by the priority table.
 - data-first `RuntimeDecision` with decision kind and fingerprint.
-- persisted events, decisions, and admissions.
+- persisted snapshots, explicit events, decisions, transitions, and admissions.
 - prompt authority card rendered from the persisted decision.
-- stale-action refusal when queue, compaction, recovery, or case facts changed.
+- immutable admission view keyed by decision id and staleness fingerprint.
+- stale-action refusal when queue, compaction, recovery, artifact, or case facts
+  changed.
 
 ## Invariants
 
@@ -57,6 +78,7 @@ Implement the loop documented in
 partially implemented. Runtime mission selection, data-first decision records,
 normalized authority event and decision persistence, admission persistence,
 dispatch admission views, stale maintenance-action refusal, central completion
-reducer use, and prompt-card decision id and fingerprint rendering exist. Broader
-state-transition history, recovery, compaction, maintenance, and every close path
-remain open.
+reducer use, and prompt-card decision id and fingerprint rendering exist. The
+unified transition kernel, durable snapshot rows, explicit triggering events,
+transition rows, recovery and compaction history, maintenance preemption proof,
+and every close path remain open.

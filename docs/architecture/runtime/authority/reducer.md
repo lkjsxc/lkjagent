@@ -21,29 +21,41 @@ writes, and case closure happen after the decision.
 
 ```text
 RuntimeSnapshot
-- daemon_state
-- queue_state
-- active_case
-- active_mission
-- active_node
+- case_ref
+- queue_head
+- queue_pending_count
 - owner_objective
 - normalized_objective
-- task_kind
+- task_family
+- active_phase
+- active_node
+- active_plan_step
 - constraints
 - assumptions
 - risks
-- artifact_ledger
-- evidence_ledger
-- fault_ledger
-- tool_policy
-- context_budget
-- compaction_snapshot
-- maintenance_state
+- candidate_paths
+- touched_paths
+- required_evidence
+- missing_evidence
+- evidence_owners
+- artifact_head
+- artifact_weak_paths
+- artifact_batch_cursor
 - verification_state
+- fault_head
+- fault_retry_summary
+- recovery_ladder_state
 - last_action
+- last_action_fingerprint
 - last_observation
 - last_successful_observation
+- context_pressure
+- compaction_head
+- maintenance_state
 - blocked_handoff
+- allowed_graph_transitions
+- source_graph_policy
+- prompt_frame_head
 ```
 
 ## Event Shape
@@ -51,26 +63,44 @@ RuntimeSnapshot
 ```text
 RuntimeEvent
 - owner_message_received
+- queue_changed
+- case_opened
+- case_resumed
+- context_frame_built
+- prompt_frame_rendered
+- endpoint_call_requested
 - model_action_parsed
 - parse_fault
 - schema_fault
-- tool_admission_request
-- tool_observation
-- tool_error
+- tool_admission_requested
+- tool_admission_refused
+- tool_started
+- tool_succeeded
+- tool_failed
 - repeat_action_detected
 - payload_overflow_detected
 - evidence_added
-- artifact_audit_failed
-- artifact_audit_passed
+- artifact_planned
+- artifact_applied
+- artifact_audited
+- artifact_weak_path_found
 - verification_requested
 - verification_passed
 - verification_failed
 - completion_requested
+- completion_blocked
+- case_closed
 - context_pressure_detected
+- compaction_started
 - compaction_completed
 - maintenance_tick
+- maintenance_started
+- maintenance_noop
+- maintenance_completed
 - turn_budget_checkpoint
 - turn_budget_exhausted
+- owner_input_required
+- blocked_handoff_recorded
 ```
 
 ## Decision Shape
@@ -78,20 +108,27 @@ RuntimeEvent
 ```text
 RuntimeDecision
 - mission
+- active_mode
 - state_node
+- decision_kind
 - admitted_tools
 - blocked_tools
 - forced_next_action
 - recommended_next_actions
 - exact_valid_example
 - missing_evidence
+- existing_evidence
 - completion_allowed
 - completion_refusal
 - recovery_plan
-- compaction_required
-- maintenance_allowed
+- compaction_plan
+- maintenance_plan
+- blocked_handoff_plan
+- context_package_ids
 - prompt_card
-- persistence_writes
+- persistence_plan
+- authority_fingerprint
+- staleness_fingerprint
 ```
 
 ## Mission Priority
