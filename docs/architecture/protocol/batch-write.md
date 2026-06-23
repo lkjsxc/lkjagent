@@ -8,7 +8,7 @@ protocol parser and file tool dispatcher.
 ## Canonical Action Form
 
 The canonical prompt example uses paired tags with the dispatcher line protocol.
-No JSON appears inside `<files>`:
+No JSON appears inside `<files>` in default prompt cards:
 
 ```text
 <act>
@@ -53,7 +53,7 @@ parameter names are unique inside one action.
 
 ## JSON Envelope Form
 
-The JSON envelope is valid only when it is the whole model response:
+The JSON envelope is valid when it is the whole model response:
 
 ```json
 {
@@ -69,9 +69,16 @@ The JSON envelope is valid only when it is the whole model response:
 }
 ```
 
-JSON nested as text inside `<files>` is not a batch payload. It reaches the file
-block parser as plain text and fails with a canonical `each block needs content`
-observation.
+## JSON Inside Files Recovery
+
+fs.batch_write canonical payload is line protocol inside `<files>`. The
+dispatcher also accepts a JSON array inside `<files>` when each object contains
+`path` and `content`. It also accepts a JSON object with a `files` array of the
+same objects. JSON-in-files is not preferred, but it is a supported recovery
+normalization. Objects without `path` and `content` are refused before mutation.
+
+The observation records the normalized input format as `line-protocol`,
+`json-array`, or `json-object-files`.
 
 ## Limits
 
@@ -93,7 +100,7 @@ Artifact audit records unexpected paths as weak paths under the active root.
 
 - The documented canonical example parses, validates, admits, and dispatches
   when authority admits `fs.batch_write`.
-- Missing `content:` in any block refuses the whole action.
+- Missing `content:` in any line-protocol block refuses the whole action.
 - Duplicate paths refuse the whole action.
 - Oversized file or batch payloads refuse the whole action before mutation.
 - A batch write can move an artifact to content-written evidence only after the
@@ -107,6 +114,7 @@ oversized payloads, and artifact-ledger recording.
 
 ## Status
 
-implemented for parser normalization, JSON envelope arrays, dispatcher limits,
-duplicate-path refusal, placeholder refusal, and artifact write-path recording.
-Route-level recovery for every batch schema fault remains open.
+partially implemented for parser normalization, JSON envelope arrays,
+JSON-in-files recovery, dispatcher limits, duplicate-path refusal, placeholder
+refusal, and artifact write-path recording. Route-level recovery for every
+batch schema fault remains open.

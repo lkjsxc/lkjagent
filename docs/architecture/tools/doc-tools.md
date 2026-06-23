@@ -30,7 +30,8 @@ Plans a semantic content artifact without writing files. Parameters are
 Writes a semantic artifact scaffold by reusing the document planner and writer.
 Parameters are `root`, optional `title`, optional `kind`, optional `mode`, and
 optional `sections`. The output includes README files and `catalog.toml`
-as the current manifest.
+as the current manifest. `root` is a directory address and `.md` roots are
+refused before mutation.
 
 ## artifact.audit
 
@@ -38,16 +39,27 @@ Audits a semantic artifact root. Parameters are `root`, optional `kind`,
 optional `count`, and optional `mode`. When `kind` is story or cookbook, audit
 rejects a generic project-doc manifest for that artifact request. Passing
 artifact audit is the only audit-owned readiness proof for artifact-readiness
-evidence.
+evidence. If `root` resolves to a file, artifact.audit reports `root_is_file`
+and renders a root-directory next action instead of surfacing an OS error.
 
 ## artifact.next
 
 Plans the next bounded artifact write batch from readiness gaps. Parameters
-are `root` and optional `kind`. It returns exact weak paths, required sections,
-and a copyable `fs.batch_write` example only when the example already contains
-profile-specific content. When no current weak path remains in the durable
-cursor window, it requests audit or focused reads instead of rendering a
-placeholder write.
+are `root`, optional `path`, and optional `kind`. It returns exact weak paths,
+required sections, and a copyable `fs.batch_write` example only when the
+example already contains profile-specific content. When no current weak path
+remains in the durable cursor window, it requests audit or focused reads
+instead of rendering a placeholder write.
+
+If `root` resolves to a file, artifact.next must not claim missing=0 or render
+artifact.audit for that file. It resolves the owning artifact root or asks for a
+directory inspection action.
+
+## Address Contract
+
+The artifact address contract is [artifact-addresses.md](artifact-addresses.md).
+The documentation root contract is
+[../../documentation-system/root-path-contract.md](../../documentation-system/root-path-contract.md).
 
 ## Status
 
