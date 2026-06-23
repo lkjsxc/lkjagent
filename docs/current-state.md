@@ -51,7 +51,7 @@ prove that their failures cannot recur.
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Store reopen coverage and status rendering for latest snapshots remain open. |
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, same-title high-overlap merge, and low-signal rewrite pruning exist. Pre-dispatch owner preemption proof remains open. |
 | Status and console | Active graph state, active mode, authority snapshot fields, context pressure, token usage, and model-log paths display. Last successful observation is summarized from recent observations. |
-| Provider exchange logging | SQLite schema, store APIs, atomic filesystem writer, request logging, response logging, error logging, CLI list/show, and focused store/runtime/CLI tests exist. Parse, admission, observation, index, and export remain open. |
+| Provider exchange logging | SQLite schema, store APIs, atomic filesystem writer, request, response, parse, admission, observation, error, CLI list/show, and focused store/runtime/CLI tests exist. Index and export remain open. |
 | Benchmarks | Uploaded-run signatures now include missing action blocks, interrupted output, stop-closure repair, contradictory authority, provider logging, batch schema faults, compaction resume, artifact drift, and repeated recovery. Runtime replay coverage and every completion path are not yet complete. |
 
 ## Open Failure Evidence
@@ -68,8 +68,8 @@ Uploaded run logs still stand for these failures:
 - memory failure: duplicate or low-value maintenance rows.
 - compaction failure: hard pressure depending on model-authored `memory.save`.
 - completion failure: `agent.done` closing without audit, verification, or recovery evidence.
-- observability failure: parse results, admission decisions, observations,
-  exports, and CLI inspection are not fully logged under `data/logs`.
+- observability failure: provider exchange index and export records are not
+  fully implemented under `data/logs`.
 
 ## Active Target
 

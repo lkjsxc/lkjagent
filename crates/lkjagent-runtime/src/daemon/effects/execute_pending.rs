@@ -36,6 +36,13 @@ impl ResidentDaemon {
                 &message,
                 &current.valid_example,
             )?;
+            crate::model_log::record_provider_admission(
+                conn,
+                &pending.action.tool,
+                false,
+                &message,
+                &current.valid_example,
+            )?;
             let output = notice_output(&mut self.dispatch_state, action_text, message);
             return self.finish_pending_output(conn, now, output, false);
         }
@@ -49,6 +56,13 @@ impl ResidentDaemon {
             now,
             &self.dispatch_state,
             &pending.action.tool,
+            &authority.valid_example,
+        )?;
+        crate::model_log::record_provider_admission(
+            conn,
+            &pending.action.tool,
+            true,
+            "admitted",
             &authority.valid_example,
         )?;
         let output = dispatch_with_text(
@@ -68,6 +82,7 @@ impl ResidentDaemon {
         output: DispatchOutput,
         maintenance_ask: bool,
     ) -> RuntimeResult<Option<DaemonTick>> {
+        crate::model_log::record_provider_observation(conn, &output.rendered)?;
         let result = step(self.state.clone(), StepInput::ToolOutput(output));
         let tick = self.apply_step_result(conn, now, result, false)?;
         self.turn_authority = None;

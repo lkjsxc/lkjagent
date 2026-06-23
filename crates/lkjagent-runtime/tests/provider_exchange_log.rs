@@ -2,7 +2,9 @@ use std::fs;
 use std::path::PathBuf;
 
 use lkjagent_runtime::model_log::{
-    record_provider_error, record_provider_request, record_provider_response, ProviderLogContext,
+    record_parsed_action, record_provider_admission, record_provider_error,
+    record_provider_observation, record_provider_request, record_provider_response,
+    ProviderLogContext,
 };
 use rusqlite::Connection;
 
@@ -27,6 +29,17 @@ fn provider_exchange_writer_persists_files_and_store_rows() -> TestResult<()> {
     assert!(handle.dir.join("authority.json").exists());
     assert!(handle.dir.join("response.json").exists());
     assert!(handle.dir.join("timing.json").exists());
+    record_parsed_action(&handle, "<act>\n<tool>graph.state</tool>\n</act>")?;
+    lkjagent_store::state::set(
+        &conn,
+        "provider exchange dir",
+        &handle.dir.to_string_lossy(),
+    )?;
+    record_provider_admission(&conn, "graph.state", true, "admitted", "<act />")?;
+    record_provider_observation(&conn, "<observation>ok</observation>")?;
+    assert!(handle.dir.join("parsed-action.json").exists());
+    assert!(handle.dir.join("admission.json").exists());
+    assert!(handle.dir.join("observation.txt").exists());
     let row = lkjagent_store::provider_exchange::latest_for_case_turn(&conn, "7", 5)?
         .ok_or("missing provider exchange row")?;
     assert_eq!(row.status, "succeeded");
