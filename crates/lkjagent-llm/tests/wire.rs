@@ -1,4 +1,5 @@
 use lkjagent_context::model::{Message, Role};
+use lkjagent_llm::closure::ClosureMode;
 use lkjagent_llm::wire::{build_request, decode_completion, FinishReason};
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -34,6 +35,7 @@ fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
     let completion = decode_completion(response)?;
     assert_eq!(completion.content, "<act></act>");
     assert_eq!(completion.finish_reason, FinishReason::Stop);
+    assert_eq!(completion.closure_mode, ClosureMode::Natural);
     assert_eq!(completion.usage.prompt_tokens, Some(11));
     assert_eq!(completion.usage.completion_tokens, Some(7));
     assert_eq!(completion.usage.cached_prompt_tokens, Some(5));
@@ -75,5 +77,6 @@ fn stop_stripped_act_close_is_restored() -> TestResult<()> {
 
     assert!(completion.content.ends_with("</act>"));
     assert_eq!(completion.finish_reason, FinishReason::Stop);
+    assert_eq!(completion.closure_mode, ClosureMode::StopSequenceClosed);
     Ok(())
 }

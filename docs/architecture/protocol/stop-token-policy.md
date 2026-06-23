@@ -64,6 +64,7 @@ that contain action-like text.
 
 ## Status
 
-partially implemented. The provider request includes `</act>` as a stop
-sequence and the wire decoder restores stripped closure for provider stop
-finishes. Durable per-turn parse logging for closure mode remains open.
+implemented for provider requests, wire decoding, and per-turn parse logging.
+The provider request includes `</act>` as a stop sequence, the wire decoder
+restores stripped closure for provider stop finishes, and `parsed-action.json`
+records the resulting closure mode.

@@ -31,7 +31,11 @@ fn provider_exchange_writer_persists_files_and_store_rows() -> TestResult<()> {
     assert!(handle.dir.join("response.json").exists());
     assert!(handle.dir.join("timing.json").exists());
     assert!(root.join("index.ndjson").exists());
-    record_parsed_action(&handle, "<act>\n<tool>graph.state</tool>\n</act>")?;
+    record_parsed_action(
+        &handle,
+        "<act>\n<tool>graph.state</tool>\n</act>",
+        "Natural",
+    )?;
     lkjagent_store::state::set(
         &conn,
         "provider exchange dir",
