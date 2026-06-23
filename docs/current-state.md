@@ -46,7 +46,7 @@ prove that their failures cannot recur.
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Normalized store tables and unified runtime wiring remain open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, a pure recovery plan table, and SQLite retry counts keyed by case, node, tool, parameter shape, and fault class exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Registry examples parse, validate, and dispatch to routes except heavyweight verification gates. Recovery-plan examples parse, validate, and are admitted by recovery policy when model-authored. |
-| Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, normalized artifact ledger store APIs, and ledger writes from `artifact.plan`, `artifact.apply`, and `artifact.audit` exist. `artifact.next`, `fs.write`, and `fs.batch_write` do not yet update ledger rows, and semantic readiness remains incomplete. |
+| Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, normalized artifact ledger and cursor store APIs, and ledger writes from `artifact.plan`, `artifact.apply`, `artifact.audit`, and `artifact.next` exist. `fs.write` and `fs.batch_write` do not yet update ledger rows, and semantic readiness remains incomplete. |
 | Completion gates | A pure `decide_completion` reducer returns completion kind, failed gates, missing and existing evidence, next action, valid example, blocked-handoff allowance, and status text. Runtime `agent.done` admission uses it. Every close path is not yet proven to use the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices. Durable snapshot history remains shallow. |
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, and same-title high-overlap merge exist. Rewrite pruning and pre-dispatch owner preemption remain open. |
@@ -132,6 +132,17 @@ Current artifact ledger store slice gates:
 Current artifact ledger tool wiring slice gates:
 
 - `cargo test -p lkjagent-tools --test artifact_ledger_tools`: `ARTIFACT_LEDGER_TOOLS_EXIT=0`.
+- `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
+- `cargo fmt --check`: `FMT_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
+
+Current artifact next cursor slice gates:
+
+- `cargo test -p lkjagent-store --test artifact_cursor`: `ARTIFACT_CURSOR_EXIT=0`.
+- `cargo test -p lkjagent-tools --test artifact_next_ledger`: `ARTIFACT_NEXT_LEDGER_EXIT=0`.
+- `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
 - `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
 - `cargo fmt --check`: `FMT_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.

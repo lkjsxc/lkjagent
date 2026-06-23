@@ -25,12 +25,14 @@ pub fn next(workspace: &Path, root: &str, kind: &str) -> ToolResult<String> {
         return audit_response(root, &kind, "missing=0");
     }
     let selected = weak.into_iter().take(3).collect::<Vec<_>>();
-    Ok(batch_response(root, &kind, &selected))
+    let valid_example = crate::artifact_next_example::batch_write(root, &kind, &selected);
+    Ok(batch_response(root, &kind, &selected, &valid_example))
 }
 
 pub fn next_with_cursor(
     workspace: &Path,
     conn: &Connection,
+    now: &str,
     root: &str,
     kind: &str,
 ) -> ToolResult<String> {
@@ -59,11 +61,25 @@ pub fn next_with_cursor(
     if start >= weak.len() {
         return audit_response(root, &kind, &format!("missing={}", weak.len()));
     }
+    let weak_count = weak.len();
     let selected = weak.into_iter().skip(start).take(3).collect::<Vec<_>>();
+    let valid_example = crate::artifact_next_example::batch_write(root, &kind, &selected);
+    crate::artifact_cursor_support::record_next_batch(
+        crate::artifact_cursor_support::NextBatchRecord {
+            conn,
+            root,
+            kind: &kind,
+            weak_count,
+            selected: &selected,
+            valid_example: &valid_example,
+            current_index: start.saturating_add(selected.len()),
+            now,
+        },
+    )?;
     if let Some(last) = selected.last() {
         lkjagent_store::state::set(conn, &cursor_key(root), last)?;
     }
-    Ok(batch_response(root, &kind, &selected))
+    Ok(batch_response(root, &kind, &selected, &valid_example))
 }
 
 fn resolved_kind(kind: &str, root: &Path) -> String {
@@ -105,7 +121,7 @@ fn artifact_audit_example(root: &str, kind: &str) -> String {
     format!("<act>\n<tool>artifact.audit</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</act>")
 }
 
-fn batch_response(root: &str, kind: &str, selected: &[String]) -> String {
+fn batch_response(root: &str, kind: &str, selected: &[String], valid_example: &str) -> String {
     format!(
         "artifact next batch\nroot={root}\nkind={kind}\nmissing={}\nnext_paths:\n{}\nrequired_sections:\n{}\nnext_action=fs.batch_write\nvalid_example:\n{}",
         selected.len(),
@@ -115,7 +131,7 @@ fn batch_response(root: &str, kind: &str, selected: &[String]) -> String {
             .collect::<Vec<_>>()
             .join("\n"),
         required_sections(kind),
-        crate::artifact_next_example::batch_write(root, kind, selected)
+        valid_example
     )
 }
 
