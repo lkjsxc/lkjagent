@@ -1,0 +1,4 @@
+<observation>
+<status>ok</status>
+<content>file stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md bytes=452 lines=20</content>
+</observation>

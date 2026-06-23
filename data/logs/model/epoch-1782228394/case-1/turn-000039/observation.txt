@@ -1,0 +1,12 @@
+<observation>
+<status>ok</status>
+<content>
+node=document-repair
+phase=recovery
+legal_transitions=document-completion-check
+missing=document-structure, artifact-readiness
+allowed_tools=graph.state, graph.next, graph.audit, graph.evidence, graph.note, graph.transition, fs.list, fs.tree, fs.stat, artifact.plan, artifact.apply, artifact.audit, artifact.next, fs.write, doc.scaffold, doc.audit
+blocked_tools=agent.ask, agent.done, fs.edit, fs.patch, fs.read, fs.read_many, fs.search, graph.context, graph.plan, graph.recover, memory.find, memory.save, queue.list, shell.run, verify.cargo, verify.xtask
+preferred_next_action=execute or verify the active step
+</content>
+</observation>

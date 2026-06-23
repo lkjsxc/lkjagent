@@ -1,0 +1,11 @@
+<observation>
+<status>error</status>
+<content>
+invalid parameter: unknown graph.note kind; allowed: constraint, assumption, risk, decision, question, invariant, success, path; valid_example:
+<act>
+<tool>graph.note</tool>
+<kind>decision</kind>
+<summary>Chose smaller recovery action</summary>
+</act>
+</content>
+</observation>

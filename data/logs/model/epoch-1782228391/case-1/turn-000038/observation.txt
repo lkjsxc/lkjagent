@@ -1,0 +1,7 @@
+<observation>
+<status>ok</status>
+<content>
+graph note recorded
+kind=decision
+</content>
+</observation>

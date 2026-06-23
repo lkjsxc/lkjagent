@@ -1,0 +1,16 @@
+<observation>
+<status>ok</status>
+<content>
+artifact next batch
+root=stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md
+kind=artifact
+missing=0
+next_action=artifact.audit
+valid_example:
+<act>
+<tool>artifact.audit</tool>
+<root>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</root>
+<kind>artifact</kind>
+</act>
+</content>
+</observation>
