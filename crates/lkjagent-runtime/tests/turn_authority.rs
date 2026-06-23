@@ -1,6 +1,6 @@
 use lkjagent_runtime::mode::{
     decide_turn_authority, render_turn_authority, ActiveMode, CompletionPolicy, EndpointDecision,
-    TurnAuthorityInput,
+    RuntimeMission, TurnAuthorityInput,
 };
 
 #[test]
@@ -12,6 +12,7 @@ fn pending_owner_row_beats_active_maintenance() {
         ..TurnAuthorityInput::default()
     });
 
+    assert_eq!(authority.mission, RuntimeMission::OwnerExecution);
     assert_eq!(authority.mode, ActiveMode::OwnerTask);
     assert_eq!(
         authority.endpoint_decision,
@@ -39,6 +40,7 @@ fn recoverable_owner_case_beats_maintenance() {
         ..TurnAuthorityInput::default()
     });
 
+    assert_eq!(authority.mission, RuntimeMission::OwnerRecovery);
     assert_eq!(authority.mode, ActiveMode::Recovery);
     assert_eq!(authority.endpoint_decision, EndpointDecision::CallModel);
     assert!(authority.effective_policy.graph_policy_applies);
@@ -69,8 +71,10 @@ fn hard_compaction_is_single_active_mode_before_owner_work() {
         ..TurnAuthorityInput::default()
     });
 
+    assert_eq!(owner.mission, RuntimeMission::HardRuntimeCompaction);
     assert_eq!(owner.mode, ActiveMode::Compaction);
     assert_eq!(owner.endpoint_decision, EndpointDecision::RuntimeCompact);
+    assert_eq!(compaction.mission, RuntimeMission::HardRuntimeCompaction);
     assert_eq!(compaction.mode, ActiveMode::Compaction);
     assert_eq!(
         compaction.endpoint_decision,
@@ -90,6 +94,7 @@ fn maintenance_only_runs_without_owner_work() {
         ..TurnAuthorityInput::default()
     });
 
+    assert_eq!(maintenance.mission, RuntimeMission::IdleMaintenance);
     assert_eq!(maintenance.mode, ActiveMode::Maintenance);
     assert_eq!(maintenance.endpoint_decision, EndpointDecision::CallModel);
     assert!(!maintenance.effective_policy.graph_policy_applies);
@@ -100,6 +105,7 @@ fn maintenance_only_runs_without_owner_work() {
 fn closed_idle_has_no_endpoint_action() {
     let authority = decide_turn_authority(TurnAuthorityInput::default());
 
+    assert_eq!(authority.mission, RuntimeMission::ClosedIdle);
     assert_eq!(authority.mode, ActiveMode::ClosedIdle);
     assert_eq!(authority.endpoint_decision, EndpointDecision::ClosedIdle);
     assert!(matches!(
@@ -162,6 +168,7 @@ fn authority_card_renders_once_and_matches_dispatch_mode() {
     let card = render_turn_authority(&authority);
 
     assert_eq!(card.matches("Active Mode:").count(), 1);
+    assert!(card.contains("mission=owner_execution"));
     assert!(card.contains("mode=OwnerTask"));
     assert!(authority.dispatch_card.contains("active_mode=OwnerTask"));
 }

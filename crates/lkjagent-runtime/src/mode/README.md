@@ -14,6 +14,11 @@ compaction, or closed idle.
 - [completion.rs](completion.rs): mode-specific completion policies.
 - [decision.rs](decision.rs): endpoint decisions for runtime actions.
 - [input.rs](input.rs): turn authority snapshot input.
+- [ledger.rs](ledger.rs): persisted decision-record assembly.
+- [ledger_data.rs](ledger_data.rs): decision record, kind, and fingerprint data.
+- [ledger_event.rs](ledger_event.rs): event labels and fingerprint helper.
+- [ledger_fields.rs](ledger_fields.rs): decision-to-ledger field projection.
+- [mission.rs](mission.rs): runtime mission enum and mode mapping.
 - [model.rs](model.rs): active-mode input, mode, and policy records.
 - [policy.rs](policy.rs): allowed tools and policy-layer flags per mode.
 - [reducer.rs](reducer.rs): pure runtime snapshot and event reducer.

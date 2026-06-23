@@ -1,6 +1,7 @@
 use super::completion::{completion_policy_for, CompletionPolicy};
 use super::decision::{endpoint_decision_for, EndpointDecision};
 use super::input::TurnAuthorityInput;
+use super::mission::{select_runtime_mission, RuntimeMission};
 use super::model::{ActiveMode, ActiveModePolicy};
 use super::policy::policy_for_mode;
 use super::render::render_mode_policy;
@@ -9,6 +10,7 @@ use lkjagent_tools::dispatch::registry_valid_example;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TurnAuthority {
+    pub mission: RuntimeMission,
     pub mode: ActiveMode,
     pub input: TurnAuthorityInput,
     pub effective_policy: ActiveModePolicy,
@@ -20,7 +22,9 @@ pub struct TurnAuthority {
 }
 
 pub fn decide_turn_authority(input: TurnAuthorityInput) -> TurnAuthority {
+    let mission = select_runtime_mission(input);
     let mode = select_active_mode(input.mode_input());
+    debug_assert_eq!(mission.active_mode(), mode);
     let effective_policy = policy_for_mode(mode);
     let completion_policy = completion_policy_for(mode);
     let endpoint_decision = endpoint_decision_for(mode, input);
@@ -29,6 +33,7 @@ pub fn decide_turn_authority(input: TurnAuthorityInput) -> TurnAuthority {
     let dispatch_card = render_mode_policy(&effective_policy);
 
     TurnAuthority {
+        mission,
         mode,
         input,
         effective_policy,
@@ -47,7 +52,8 @@ fn prompt_card(
     valid_example: &str,
 ) -> String {
     let mut card = format!(
-        "Active Mode:\nmode={:?}\npolicy_layers={}\nallowed_tools={}\nblocked_tools={}\npreferred_next_action={}\ncompletion_condition={}\nvalid_example:\n{}",
+        "Active Mode:\nmission={}\nmode={:?}\npolicy_layers={}\nallowed_tools={}\nblocked_tools={}\npreferred_next_action={}\ncompletion_condition={}\nvalid_example:\n{}",
+        RuntimeMission::from(policy.mode).as_str(),
         policy.mode,
         policy_layers(policy),
         join_or_none(&policy.allowed_tools),
