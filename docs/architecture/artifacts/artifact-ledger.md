@@ -42,13 +42,16 @@ readiness repair, audit, and completion update the ledger.
 
 ## Verification
 
+- `cargo test -p lkjagent-store --test artifact_cursor`
 - `cargo test -p lkjagent-tools --test artifact_ledger_tools`
 - `cargo test -p lkjagent-tools --test artifact_next`
+- `cargo test -p lkjagent-tools --test artifact_next_ledger`
 - artifact adoption, weak-path, and completion reducer tests.
 - benchmark fixtures for scaffold-only and semantic drift failures.
 
 ## Status
 
 partially implemented. SQLite schema and store APIs persist artifact identity, lifecycle status, readiness status,
-weak path counts, weak path requirement labels, and batch cursor rows. `artifact.plan`, `artifact.apply`, and
-`artifact.audit` write ledger state. `artifact.next`, `fs.write`, and `fs.batch_write` do not yet update ledger rows.
+weak path counts, weak path requirement labels, and batch cursor rows. `artifact.plan`, `artifact.apply`,
+`artifact.audit`, and `artifact.next` write ledger state. `fs.write`, `fs.batch_write`, audit-owned evidence, and
+artifact-aware completion do not yet read or update ledger rows.

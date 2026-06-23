@@ -90,6 +90,7 @@ pub fn dispatch_artifact_next(
         crate::artifact::next_with_cursor(
             &runtime.workspace,
             conn,
+            &runtime.now,
             &param(params, "root"),
             &param(params, "kind"),
         ),

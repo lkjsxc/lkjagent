@@ -6,6 +6,7 @@ This directory holds schema setup and typed SQLite store APIs.
 
 ## Table of Contents
 
+- [artifact_cursor.rs](artifact_cursor.rs): semantic artifact batch cursor APIs.
 - [artifact_ledger.rs](artifact_ledger.rs): semantic artifact ledger APIs.
 - [error.rs](error.rs): store error type.
 - [events.rs](events.rs): append-only transcript events.

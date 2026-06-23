@@ -1,4 +1,5 @@
 pub mod artifact;
+mod artifact_cursor_support;
 mod artifact_drift;
 mod artifact_ledger_support;
 mod artifact_next;

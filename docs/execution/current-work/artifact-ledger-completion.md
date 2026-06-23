@@ -42,14 +42,16 @@ reads artifact ledger state, not raw file existence or direct graph notes.
 
 ## Verification
 
+- `cargo test -p lkjagent-store --test artifact_cursor`
 - `cargo test -p lkjagent-tools --test artifact_ledger_tools`
 - `cargo test -p lkjagent-tools --test artifact_tools`
 - `cargo test -p lkjagent-tools --test artifact_next`
+- `cargo test -p lkjagent-tools --test artifact_next_ledger`
 - `cargo test -p lkjagent-tools --test doc_tools`
 - artifact completion reducer tests.
 
 ## Status
 
-partially implemented. Ledger schema, store APIs, and writes from `artifact.plan`, `artifact.apply`, and
-`artifact.audit` exist. `artifact.next`, write-path ledger updates, audit-owned evidence rows, and artifact-aware
-completion refusals remain open.
+partially implemented. Ledger schema, store APIs, and writes from `artifact.plan`, `artifact.apply`,
+`artifact.audit`, and `artifact.next` exist. Write-path ledger updates, audit-owned evidence rows, and
+artifact-aware completion refusals remain open.

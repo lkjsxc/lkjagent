@@ -108,10 +108,11 @@ pub fn next(workspace: &Path, root: &str, kind: &str) -> ToolResult<String> {
 pub fn next_with_cursor(
     workspace: &Path,
     conn: &Connection,
+    now: &str,
     root: &str,
     kind: &str,
 ) -> ToolResult<String> {
-    crate::artifact_next::next_with_cursor(workspace, conn, root, kind)
+    crate::artifact_next::next_with_cursor(workspace, conn, now, root, kind)
 }
 
 fn scale_count(scale: &str) -> &str {
