@@ -118,6 +118,7 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
     ensure_graph_case_columns(conn)?;
     crate::schema_graph::setup(conn)?;
     crate::schema_authority::setup(conn)?;
+    crate::schema_artifacts::setup(conn)?;
     Ok(())
 }
 

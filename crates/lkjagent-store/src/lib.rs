@@ -1,3 +1,4 @@
+pub mod artifact_ledger;
 pub mod error;
 pub mod events;
 pub mod graph;
@@ -5,6 +6,7 @@ pub mod memory;
 pub mod queue;
 pub mod runtime_authority;
 pub mod schema;
+mod schema_artifacts;
 mod schema_authority;
 mod schema_graph;
 pub mod state;
