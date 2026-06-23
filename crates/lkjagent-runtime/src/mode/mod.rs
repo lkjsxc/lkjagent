@@ -36,7 +36,10 @@ pub mod render;
 pub mod select;
 
 pub use admission::{admit_tool, next_valid_tools};
-pub use authority::{decide_turn_authority, TurnAuthority};
+pub use authority::{
+    decide_turn_authority, decide_turn_authority_for_snapshot, runtime_snapshot_for_turn,
+    TurnAuthority,
+};
 pub use completion::{
     completion_policy_for, CompletionPolicy, MaintenanceCompletionGate, OwnerCompletionGate,
     RecoveryCompletionGate, RuntimeOnlyCompletionGate,

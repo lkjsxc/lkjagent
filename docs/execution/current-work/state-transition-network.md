@@ -76,6 +76,7 @@ full snapshot. It must not select a mission independently from
 ## Status
 
 partially implemented. Runtime mission selection, data-first decision records,
+adapter-built turn snapshots, active modes derived from `RuntimeMission`,
 normalized authority event and decision persistence, admission persistence,
 dispatch admission views, stale maintenance-action refusal, central completion
 reducer use, and prompt-card decision id and fingerprint rendering exist. The
