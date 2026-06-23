@@ -68,6 +68,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [workspace.rs](workspace.rs): repository shape summaries and compact index.
 - [verify.rs](verify.rs): direct cargo and xtask verification runners.
 - [artifact.rs](artifact.rs): artifact plan, apply, audit, and next entrypoints.
+- [artifact_ledger_support.rs](artifact_ledger_support.rs): artifact ledger write helpers.
 - [artifact_next.rs](artifact_next.rs): bounded artifact write-batch planner.
 - [artifact_next_example.rs](artifact_next_example.rs): content-bearing next-batch examples.
 - [doc/](doc/README.md): semantic scaffold and audit helper modules.

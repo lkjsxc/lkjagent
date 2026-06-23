@@ -5,72 +5,100 @@ use crate::error::{ToolError, ToolResult};
 use crate::fs::workspace_path;
 use rusqlite::Connection;
 
+pub struct ApplyRequest<'a> {
+    pub workspace: &'a Path,
+    pub conn: &'a Connection,
+    pub now: &'a str,
+    pub root: &'a str,
+    pub title: &'a str,
+    pub kind: &'a str,
+    pub mode: &'a str,
+    pub sections: &'a str,
+}
+
 pub fn plan(
+    conn: &Connection,
+    now: &str,
     root: &str,
     title: &str,
     kind: &str,
     scale: &str,
     sections: &str,
 ) -> ToolResult<String> {
-    crate::doc::plan(root, kind, scale_count(scale), "approx", title, sections)
+    let output = crate::doc::plan(root, kind, scale_count(scale), "approx", title, sections)?;
+    crate::artifact_ledger_support::record_plan(conn, root, kind, scale, now)?;
+    Ok(output)
 }
 
-pub fn apply(
-    workspace: &Path,
-    root: &str,
-    title: &str,
-    kind: &str,
-    mode: &str,
-    sections: &str,
-) -> ToolResult<String> {
-    let full = workspace_path(workspace, root)?;
+pub fn apply(request: ApplyRequest<'_>) -> ToolResult<String> {
+    let full = workspace_path(request.workspace, request.root)?;
     if full.exists() {
         if let Some(report) = crate::artifact_drift::japanese_cookbook(&full)? {
             if !report.is_empty() {
-                return Err(ToolError::invalid(report.block_message(root)));
+                return Err(ToolError::invalid(report.block_message(request.root)));
             }
         }
     }
-    let title = title_or_root(title, root);
-    crate::doc::scaffold(
-        workspace,
-        root,
-        kind_or_default(kind),
+    let title = title_or_root(request.title, request.root);
+    let output = crate::doc::scaffold(
+        request.workspace,
+        request.root,
+        kind_or_default(request.kind),
         "",
-        mode,
+        request.mode,
         &title,
-        sections,
-    )
+        request.sections,
+    )?;
+    crate::artifact_ledger_support::record_apply(
+        request.conn,
+        request.root,
+        request.kind,
+        request.now,
+    )?;
+    Ok(output)
 }
 
 pub fn audit(
     workspace: &Path,
+    conn: &Connection,
+    now: &str,
     root: &str,
     kind: &str,
     count: &str,
     mode: &str,
 ) -> ToolResult<String> {
     if kind.trim().eq_ignore_ascii_case("dictionary") {
-        return crate::dictionary_audit::audit(workspace, root);
+        let report = crate::dictionary_audit::audit(workspace, root)?;
+        crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)?;
+        return Ok(report);
     }
     let report = crate::doc::audit(workspace, root, count, mode)?;
     let kind = kind.trim();
     let full = workspace_path(workspace, root)?;
     let catalog = optional_catalog(&full);
     if !kind.is_empty() && !catalog.is_empty() && kind_mismatch(kind, &catalog) {
-        return Ok(format!(
+        let report = format!(
             "document audit failed\nroot={root}\nchecks=15\npassed=14\nfailed=1\nfailures:\n- artifact_kind_mismatch: expected={kind}\nnext_action=artifact.apply matching artifact kind"
-        ));
+        );
+        crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)?;
+        return Ok(report);
     }
     if kind.is_empty() || !report.starts_with("document audit passed") {
+        crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)?;
         return Ok(report);
     }
     if let Some(drift) = crate::artifact_drift::japanese_cookbook(&full)? {
         if !drift.is_empty() {
-            return Ok(drift.observation(root));
+            let report = drift.observation(root);
+            crate::artifact_ledger_support::record_audit(
+                workspace, conn, root, kind, &report, now,
+            )?;
+            return Ok(report);
         }
     }
-    Ok(readiness_report(kind, &report))
+    let report = readiness_report(kind, &report);
+    crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)?;
+    Ok(report)
 }
 
 pub fn next(workspace: &Path, root: &str, kind: &str) -> ToolResult<String> {
