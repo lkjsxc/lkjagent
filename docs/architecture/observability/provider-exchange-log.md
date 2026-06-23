@@ -120,4 +120,5 @@ partially implemented. The runtime writes the current Markdown model handoff,
 SQLite `provider_exchange` rows, and atomic request, authority, response,
 parsed-action, admission, observation, timing, and error files for daemon
 provider calls that have a log root. The CLI lists and shows provider exchange
-rows. Index and export records remain open.
+rows. `index.ndjson` is written for exchange discovery. Export records remain
+open.

@@ -10,7 +10,7 @@ Describe generated model and runtime logs under `data/logs`.
   external model.
 - `model/`: per-provider exchange records written by the daemon when model
   calls run through a configured log root.
-- `index.ndjson`: optional exchange index when the runtime writer emits it.
+- `index.ndjson`: compact index of provider exchange directories.
 
 ## Provider Exchange Layout
 
