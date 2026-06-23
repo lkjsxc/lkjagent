@@ -69,7 +69,9 @@ pub fn audit(
 ) -> ToolResult<String> {
     if kind.trim().eq_ignore_ascii_case("dictionary") {
         let report = crate::dictionary_audit::audit(workspace, root)?;
-        crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)?;
+        let report = crate::artifact_ledger_support::record_audit(
+            workspace, conn, root, kind, &report, now,
+        )?;
         return Ok(report);
     }
     let report = crate::doc::audit(workspace, root, count, mode)?;
@@ -80,25 +82,28 @@ pub fn audit(
         let report = format!(
             "document audit failed\nroot={root}\nchecks=15\npassed=14\nfailed=1\nfailures:\n- artifact_kind_mismatch: expected={kind}\nnext_action=artifact.apply matching artifact kind"
         );
-        crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)?;
+        let report = crate::artifact_ledger_support::record_audit(
+            workspace, conn, root, kind, &report, now,
+        )?;
         return Ok(report);
     }
     if kind.is_empty() || !report.starts_with("document audit passed") {
-        crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)?;
+        let report = crate::artifact_ledger_support::record_audit(
+            workspace, conn, root, kind, &report, now,
+        )?;
         return Ok(report);
     }
     if let Some(drift) = crate::artifact_drift::japanese_cookbook(&full)? {
         if !drift.is_empty() {
             let report = drift.observation(root);
-            crate::artifact_ledger_support::record_audit(
+            let report = crate::artifact_ledger_support::record_audit(
                 workspace, conn, root, kind, &report, now,
             )?;
             return Ok(report);
         }
     }
     let report = readiness_report(kind, &report);
-    crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)?;
-    Ok(report)
+    crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)
 }
 
 pub fn next(workspace: &Path, root: &str, kind: &str) -> ToolResult<String> {

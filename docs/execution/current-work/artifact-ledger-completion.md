@@ -49,10 +49,12 @@ reads artifact ledger state, not raw file existence or direct graph notes.
 - `cargo test -p lkjagent-tools --test artifact_next_ledger`
 - `cargo test -p lkjagent-tools --test artifact_write_ledger`
 - `cargo test -p lkjagent-tools --test doc_tools`
+- `cargo test -p lkjagent-runtime --test artifact_ledger_completion`
 - artifact completion reducer tests.
 
 ## Status
 
 partially implemented. Ledger schema, store APIs, writes from `artifact.plan`, `artifact.apply`,
-`artifact.audit`, and `artifact.next`, and successful write-path cursor completion marking exist. Audit-owned
-evidence rows, failed cursor path tracking, and artifact-aware completion refusals remain open.
+`artifact.audit`, and `artifact.next`, successful write-path cursor completion marking, audit observations tied to
+`artifact_ledger_id`, and daemon `agent.done` refusals for unresolved ledger weak paths exist. Failed cursor path
+tracking and proof for every close path remain open.

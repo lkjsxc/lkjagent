@@ -1,9 +1,10 @@
 use lkjagent_context::model::{Frame, FrameKind};
-use lkjagent_graph::{completion_decision, TaskGraphState, TransitionDecision};
+use lkjagent_graph::{TaskGraphState, TransitionDecision};
 use lkjagent_store::state as store_state;
 use rusqlite::Connection;
 
 use super::authority_ledger::{persist_authority_ledger, AuthorityGraphView};
+use super::graph_policy::completion_decision;
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
 use crate::mode::TurnAuthority;
@@ -13,7 +14,7 @@ pub(super) fn persist_authority_snapshot(
     conn: &Connection,
     authority: &TurnAuthority,
 ) -> RuntimeResult<()> {
-    let graph = graph_fields(daemon.state.graph.as_ref());
+    let graph = graph_fields(conn, daemon.state.graph.as_ref());
     store_state::set(conn, "authority mission", authority.mission.as_str())?;
     store_state::set(
         conn,
@@ -81,7 +82,7 @@ struct GraphAuthorityFields {
     last_failed_action: String,
 }
 
-fn graph_fields(graph: Option<&TaskGraphState>) -> GraphAuthorityFields {
+fn graph_fields(conn: &Connection, graph: Option<&TaskGraphState>) -> GraphAuthorityFields {
     let Some(graph) = graph else {
         return empty_graph_fields();
     };
@@ -91,7 +92,7 @@ fn graph_fields(graph: Option<&TaskGraphState>) -> GraphAuthorityFields {
             .map_or_else(|| "none".to_string(), |id| id.to_string()),
         node: graph.active_node.0.to_string(),
         phase: graph.phase.as_str().to_string(),
-        evidence_gaps: evidence_gaps(graph),
+        evidence_gaps: evidence_gaps(conn, graph),
         artifact_root: graph
             .document
             .as_ref()
@@ -117,8 +118,8 @@ fn empty_graph_fields() -> GraphAuthorityFields {
     }
 }
 
-fn evidence_gaps(graph: &TaskGraphState) -> String {
-    match completion_decision(graph) {
+fn evidence_gaps(conn: &Connection, graph: &TaskGraphState) -> String {
+    match completion_decision(conn, graph) {
         TransitionDecision::Admit { .. } => "none".to_string(),
         TransitionDecision::Defer { missing } => join_strings(&missing),
         TransitionDecision::Recover { reason, .. } | TransitionDecision::Refuse { reason } => {

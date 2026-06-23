@@ -28,6 +28,7 @@ Content artifact completion requires all of these gates:
 `artifact-readiness` and `document-structure` are audit-owned. Direct
 `graph.evidence` cannot satisfy them. A graph observation may point to audit
 output, but the readiness state comes from `artifact.audit` or `doc.audit`.
+`artifact.audit` observations include the current `artifact_ledger_id`.
 
 ## Refused Completion
 
@@ -40,6 +41,7 @@ unsupported verification claims never close an owner task.
 
 ## Status
 
-partially implemented. Audit-owned evidence guards and many completion refusals
-exist. Every close path still needs proof that it uses the same artifact-aware
-runtime gate.
+partially implemented. Audit-owned evidence guards, artifact audit ledger ids,
+and daemon `agent.done` refusals for unresolved artifact ledger weak paths exist.
+Every close path still needs proof that it uses the same artifact-aware runtime
+gate.

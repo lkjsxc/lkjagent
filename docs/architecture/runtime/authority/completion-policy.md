@@ -86,8 +86,10 @@ failed gates, missing evidence, existing evidence, next executable action,
 valid example, blocked-handoff allowance, and status text. Runtime admission
 uses this reducer for `agent.done`. Maintenance completion remains separate
 from owner completion. Missing-evidence refusals keep audit, read, repair, and
-batch tools available. This is focused reducer coverage, not proof that every
-close path is fully wired.
+batch tools available. Daemon graph dispatch and authority evidence-gap snapshots
+refuse `agent.done` when artifact-readiness evidence exists but the latest
+artifact ledger row is not passed or still has weak paths. This is focused
+coverage, not proof that every close path is fully wired.
 
 ## Status
 

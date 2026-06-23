@@ -26,6 +26,7 @@ mod effects;
 mod effects_graph;
 mod endpoint;
 mod execute_pending;
+mod graph_policy;
 mod graph_sync;
 mod idle;
 mod maintenance_wait;

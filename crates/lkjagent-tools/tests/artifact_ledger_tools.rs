@@ -70,7 +70,7 @@ fn artifact_audit_records_failed_readiness_and_weak_paths() -> TestResult<()> {
         &mut dispatch_state,
     );
     dispatch_state.reset_repeat_tracking();
-    dispatch(
+    let output = dispatch(
         &action(
             "artifact.audit",
             &[("root", "cookbooks/bread"), ("kind", "cookbook")],
@@ -81,6 +81,9 @@ fn artifact_audit_records_failed_readiness_and_weak_paths() -> TestResult<()> {
     );
 
     let latest = latest_for_case(&conn, 0)?.ok_or("missing audited artifact")?;
+    assert!(output
+        .content
+        .contains(&format!("artifact_ledger_id={}", latest.id)));
     assert_eq!(latest.readiness_status, "failed");
     assert!(latest.weak_path_count > 0);
     assert!(!weak_paths(&conn, latest.id)?.is_empty());
