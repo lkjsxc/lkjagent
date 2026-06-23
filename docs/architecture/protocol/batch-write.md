@@ -1,0 +1,115 @@
+# Batch Write
+
+## Purpose
+
+Define the exact model-facing `fs.batch_write` payload forms accepted by the
+protocol parser and file tool dispatcher.
+
+## Canonical Action Form
+
+The canonical prompt example uses one action with a `files` payload and explicit
+file delimiters:
+
+```text
+<act>
+tool: fs.batch_write
+files:
+-- file --
+path: docs/example-a.md
+content:
+# Example A
+
+Concrete content.
+-- end-file --
+-- file --
+path: docs/example-b.md
+content:
+# Example B
+
+Concrete content.
+-- end-file --
+</act>
+```
+
+The parser normalizes each `-- file --` block to the dispatcher line protocol.
+The dispatcher receives blocks separated by `-- lkjagent-next-file --`.
+
+## Paired-Tag Form
+
+The paired-tag action form may wrap the same dispatcher payload in `<files>`:
+
+```text
+<act>
+<tool>fs.batch_write</tool>
+<files>
+path: docs/example.md
+content:
+# Example
+
+Concrete content.
+</files>
+</act>
+```
+
+Repeated `<file>` child tags are not valid in the paired-tag grammar because
+parameter names are unique inside one action.
+
+## JSON Envelope Form
+
+The JSON envelope is valid only when it is the whole model response:
+
+```json
+{
+  "schema": "lkj-action",
+  "action": {
+    "tool": "fs.batch_write",
+    "params": {
+      "files": [
+        { "path": "docs/example.md", "content": "# Example\n\nConcrete content." }
+      ]
+    }
+  }
+}
+```
+
+JSON nested as text inside `<files>` is not a batch payload. It reaches the file
+block parser as plain text and fails with a canonical `each block needs content`
+observation.
+
+## Limits
+
+- Maximum files per action: 20.
+- Maximum bytes per file: 1,800.
+- Maximum bytes per batch: 6,000.
+- Duplicate paths are refused.
+- Append mode is not part of `fs.batch_write`.
+- Validation runs before file mutation; a later filesystem error can still leave
+  earlier writes in place and is reported as a tool error.
+
+## Artifact Scope
+
+Payload-too-large recovery keeps the original artifact identity. Splitting a
+large artifact into unrelated drift files does not satisfy artifact readiness.
+Artifact audit records unexpected paths as weak paths under the active root.
+
+## Invariants
+
+- The documented canonical example parses, validates, admits, and dispatches
+  when authority admits `fs.batch_write`.
+- Missing `content:` in any block refuses the whole action.
+- Duplicate paths refuse the whole action.
+- Oversized file or batch payloads refuse the whole action before mutation.
+- A batch write can move an artifact to content-written evidence only after the
+  artifact ledger records the written paths.
+
+## Verification
+
+Tests cover the canonical delimiter example, paired-tag `<files>` payloads, JSON
+envelope arrays, JSON text inside `<files>`, missing content, duplicate paths,
+oversized payloads, and artifact-ledger recording.
+
+## Status
+
+implemented for parser normalization, JSON envelope arrays, dispatcher limits,
+duplicate-path refusal, placeholder refusal, and artifact write-path recording.
+Route-level recovery for every batch schema fault remains open.

@@ -12,5 +12,7 @@ Owned by the lkjagent-protocol crate.
 
 - [action-format.md](action-format.md): the grammar the model writes.
 - [parsing.md](parsing.md): the strict line-oriented parser rules.
+- [batch-write.md](batch-write.md): the exact accepted `fs.batch_write` payloads.
+- [stop-token-policy.md](stop-token-policy.md): provider stop closure and parser logging.
 - [system-prompt.md](system-prompt.md): the prefix document that teaches the protocol.
 - [recovery.md](recovery.md): the taxonomy of failures and their bounded responses.

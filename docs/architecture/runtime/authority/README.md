@@ -84,6 +84,7 @@ benchmark fixtures.
 ## Table of Contents
 
 - [reducer.md](reducer.md): pure snapshot, event, and decision contract.
+- [transition-kernel.md](transition-kernel.md): durable turn sequence around the reducer.
 - [snapshot-ledger.md](snapshot-ledger.md): durable read-side snapshot fields.
 - [event-catalog.md](event-catalog.md): closed event set that drives decisions.
 - [decision-ledger.md](decision-ledger.md): persisted decision record and invariants.

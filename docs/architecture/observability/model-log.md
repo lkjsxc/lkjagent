@@ -3,7 +3,8 @@
 ## Purpose
 
 This file defines the single current Markdown handoff file that the owner can
-print and send to a selected external model.
+print and send to a selected external model. Raw per-call model input and
+output records live in [provider-exchange-log.md](provider-exchange-log.md).
 
 ## Contract
 
@@ -17,6 +18,7 @@ print and send to a selected external model.
   evidence, faults, recent transcript, and verification.
 - Expose `lkjagent model-log` and show the path in status.
 - Archive only after task closure while keeping one current file.
+- Do not use this file as the only replay record for provider requests and responses.
 
 ## Implementation Hooks
 

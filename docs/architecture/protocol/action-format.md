@@ -94,7 +94,9 @@ Body text.
 ```
 
 The parser converts file blocks into the internal batch-write line protocol
-before validation. It never executes a partially parsed batch.
+before validation. It never executes a partially parsed batch. The full batch
+contract, accepted JSON envelope form, limits, and refusal cases live in
+[batch-write.md](batch-write.md).
 
 ## Control Actions
 
@@ -107,6 +109,17 @@ summary:
 Renamed the flag in both call sites; cargo test passes 41/41.
 </act>
 ```
+
+## Invalid Shapes
+
+These shapes are faults, not partial actions:
+
+- empty assistant content.
+- missing `<act>` or missing `</act>` after stop-closure normalization.
+- more than one action block.
+- JSON text nested inside `<files>` instead of a whole JSON action envelope.
+- repeated paired tags for unique parameters, including repeated `<file>` tags.
+- parameters absent from the active tool schema.
 
 ## Design Properties
 
