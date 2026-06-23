@@ -37,6 +37,7 @@ pub struct DispatchState {
     pub graph_missing: Vec<String>,
     pub graph_policy: Option<GraphDispatchPolicy>,
     pub effective_policy: Option<EffectivePolicy>,
+    pub authority_view: Option<AuthorityAdmissionView>,
     pub control: ControlState,
 }
 
@@ -54,6 +55,7 @@ impl Default for DispatchState {
             graph_missing: Vec::new(),
             graph_policy: None,
             effective_policy: None,
+            authority_view: None,
             control: ControlState::default(),
         }
     }
@@ -68,6 +70,22 @@ pub struct EffectivePolicy {
     pub completion_allowed: bool,
     pub reason: String,
     pub preferred_next_action: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct AuthorityAdmissionView {
+    pub decision_id: String,
+    pub case_id: String,
+    pub authority_fingerprint: String,
+    pub active_mission: String,
+    pub active_node: String,
+    pub admitted_tools: Vec<String>,
+    pub blocked_tools: Vec<String>,
+    pub shell_allowed: bool,
+    pub completion_allowed: bool,
+    pub missing_evidence: Vec<String>,
+    pub recovery_route: Option<String>,
+    pub exact_valid_example: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -1,9 +1,36 @@
 use lkjagent_store::runtime_authority::{record_tool_admission, ToolAdmissionInput};
 use lkjagent_store::state as store_state;
-use lkjagent_tools::dispatch::{DispatchState, EffectivePolicy};
+use lkjagent_tools::dispatch::{AuthorityAdmissionView, DispatchState, EffectivePolicy};
 use rusqlite::Connection;
 
 use crate::error::RuntimeResult;
+use crate::mode::TurnAuthority;
+
+pub(super) fn install_authority_view(
+    conn: &Connection,
+    state: &mut DispatchState,
+    authority: &TurnAuthority,
+) -> RuntimeResult<()> {
+    let Some(policy) = state.effective_policy.clone() else {
+        state.authority_view = None;
+        return Ok(());
+    };
+    state.authority_view = Some(AuthorityAdmissionView {
+        decision_id: text_state(conn, "authority decision id")?.unwrap_or_else(|| "0".to_string()),
+        case_id: text_state(conn, "authority case id")?.unwrap_or_else(|| "0".to_string()),
+        authority_fingerprint: text_state(conn, "authority fingerprint")?.unwrap_or_default(),
+        active_mission: authority.mission.as_str().to_string(),
+        active_node: active_node(state),
+        admitted_tools: policy.allowed_tools,
+        blocked_tools: policy.blocked_tools,
+        shell_allowed: policy.shell_allowed,
+        completion_allowed: policy.completion_allowed,
+        missing_evidence: state.graph_missing.clone(),
+        recovery_route: optional_state(conn, "authority recovery route")?,
+        exact_valid_example: authority.valid_example.clone(),
+    });
+    Ok(())
+}
 
 pub(super) fn record_authority_admission(
     conn: &Connection,
@@ -103,8 +130,23 @@ fn reason(policy: &EffectivePolicy, tool: &str, admitted: bool) -> String {
 }
 
 fn numeric_state(conn: &Connection, key: &str) -> RuntimeResult<Option<i64>> {
-    let Some(value) = store_state::get(conn, key)? else {
+    let Some(value) = text_state(conn, key)? else {
         return Ok(None);
     };
     Ok(value.parse::<i64>().ok())
+}
+
+fn text_state(conn: &Connection, key: &str) -> RuntimeResult<Option<String>> {
+    Ok(store_state::get(conn, key)?)
+}
+
+fn optional_state(conn: &Connection, key: &str) -> RuntimeResult<Option<String>> {
+    Ok(text_state(conn, key)?.filter(|value| value != "none"))
+}
+
+fn active_node(state: &DispatchState) -> String {
+    state
+        .graph_policy
+        .as_ref()
+        .map_or_else(|| "none".to_string(), |policy| policy.active_node.clone())
 }
