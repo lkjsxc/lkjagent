@@ -2,13 +2,21 @@ use crate::model::{RepoFile, Violation};
 
 pub fn check_markdown_basics(files: &[RepoFile]) -> Vec<Violation> {
     let mut violations = Vec::new();
-    for file in files.iter().filter(|file| file.path.ends_with(".md")) {
+    for file in files
+        .iter()
+        .filter(|file| file.path.ends_with(".md"))
+        .filter(|file| !is_runtime_output(file))
+    {
         violations.extend(check_shape(file));
         violations.extend(check_ascii(file));
         violations.extend(check_width_and_tables(file));
         violations.extend(check_banned_tokens(file));
     }
     violations
+}
+
+fn is_runtime_output(file: &RepoFile) -> bool {
+    file.path.starts_with("data/logs/") || file.path.starts_with("data/workspace/")
 }
 
 fn check_shape(file: &RepoFile) -> Vec<Violation> {

@@ -24,6 +24,7 @@ prove that their failures cannot recur.
 | Area | Evidence |
 | --- | --- |
 | Workspace and gates | `Cargo.toml`, `crates/lkjagent-xtask`, and `docker-compose.yml` exist. |
+| Diagnostic runtime output | `data/workspace` and `data/logs` are tracked for the current handoff; SQLite store files stay ignored. |
 | Parser | `lkjagent-protocol` parses line-oriented, paired-tag, JSON envelope, and batch file action forms covered by focused fixtures. |
 | Dispatcher registry | `lkjagent-tools` validates registered tools and renders registry examples for covered action families. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
@@ -90,6 +91,10 @@ doc metadata, authority, and verification edits:
 - `docker compose run --rm verify`: `ok verify`, `EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`.
+- After tracking diagnostic data, `cargo test -p lkjagent-xtask`: `XTEST_EXIT=0`.
+- After tracking diagnostic data, `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
+- After tracking diagnostic data, `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
+- After tracking diagnostic data, `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `EXIT=0`.
 - `cargo fmt --check`: `EXIT=0`.
 - `cargo test -p lkjagent-xtask`: `TEST_EXIT=0`.
 - `cargo test -p lkjagent-tools --test fs_payload`: `PAYLOAD_EXIT=0`.
