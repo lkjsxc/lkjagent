@@ -2,9 +2,10 @@
 
 ## Purpose
 
-The shape, topology, and content rules for every Markdown file. These rules
-exist so an LLM can navigate from any README to any contract in at most
-three links and trust what it reads.
+The shape, topology, and content rules for every authored Markdown file.
+Runtime output under `data/workspace/` and `data/logs/` is diagnostic evidence,
+not repository documentation. These rules exist so an LLM can navigate from any
+README to any contract in at most three links and trust what it reads.
 
 ## File Shape
 
@@ -56,5 +57,6 @@ generally, ideally) are rationed to genuinely soft contracts.
 ## Enforcement
 
 The check-docs gate enforces shape, topology, TOC completeness, catalog
-coverage, ASCII, prose width, table width, banned tokens, and path hygiene.
+coverage, ASCII, prose width, table width, banned tokens, and path hygiene for
+authored docs. Runtime output under `data/workspace/` and `data/logs/` is skipped.
 Line caps are enforced by check-lines.

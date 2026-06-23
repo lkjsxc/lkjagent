@@ -35,6 +35,8 @@ fn markdown_basics_report_exact_messages() {
             "docs/release.md",
             "# Title\n\n## Purpose\n\nThis v2 name is stale.\n",
         ),
+        RepoFile::new("data/logs/current-model-run.md", "not authored docs\n"),
+        RepoFile::new("data/workspace/docs/bad.md", "not authored docs\n"),
     ];
 
     assert_eq!(
@@ -117,7 +119,10 @@ fn special_docs_report_task_and_crate_readme_violations() {
 
 #[test]
 fn line_check_reports_normal_limits() {
-    let files = vec![RepoFile::new("README.md", "x\n".repeat(201))];
+    let files = vec![
+        RepoFile::new("README.md", "x\n".repeat(201)),
+        RepoFile::new("data/logs/current-model-run.md", "x\n".repeat(500)),
+    ];
 
     assert_eq!(
         messages(check_lines(&files)),

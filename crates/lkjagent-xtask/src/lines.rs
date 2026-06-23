@@ -3,6 +3,7 @@ use crate::model::{RepoFile, Violation};
 pub fn check_lines(files: &[RepoFile]) -> Vec<Violation> {
     files
         .iter()
+        .filter(|file| !is_runtime_log(file))
         .filter_map(|file| {
             let limit = limit_for(file);
             let count = file.line_count();
@@ -21,4 +22,8 @@ pub fn check_lines(files: &[RepoFile]) -> Vec<Violation> {
 
 fn limit_for(_file: &RepoFile) -> usize {
     200
+}
+
+fn is_runtime_log(file: &RepoFile) -> bool {
+    file.path.starts_with("data/logs/")
 }

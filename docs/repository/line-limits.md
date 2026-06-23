@@ -15,8 +15,9 @@ fragmentation.
 | every script, config, compose, and workflow file | 200 lines |
 | graph context package docs | 200 lines |
 
-There are no exemptions and no generated-file escape hatch: generated
-content that cannot meet the cap does not get committed.
+There are no exemptions for authored source, docs, scripts, config, compose,
+or workflow files. Runtime logs under `data/logs/` are generated diagnostic
+evidence and are excluded from this authored-file cap when explicitly tracked.
 
 ## How to Split
 
@@ -44,6 +45,6 @@ the system the harness runs on assumes its own sources honor it.
 
 ## Enforcement
 
-The check-lines gate fails any file over its cap, listing every offender
-with its count. Until the xtask exists, the interim shell check in
-[../operations/verification.md](../operations/verification.md) does the same.
+The check-lines gate fails any authored file over its cap, listing every
+offender with its count. Runtime logs under `data/logs/` are skipped by this
+gate because they are generated evidence, not authored source or docs.

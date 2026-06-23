@@ -8,6 +8,10 @@
 /.lkjagent-workspace
 /Cargo.lock
 /crates/**/target
-/data
+/data/*
+!/data/logs/
+!/data/logs/**
+!/data/workspace/
+!/data/workspace/**
 /target
 /tmp
