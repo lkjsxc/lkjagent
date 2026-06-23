@@ -2,10 +2,9 @@ use super::completion::{completion_policy_for, CompletionPolicy};
 use super::decision::{endpoint_decision_for, EndpointDecision};
 use super::input::TurnAuthorityInput;
 use super::mission::{select_runtime_mission, RuntimeMission};
-use super::model::{ActiveMode, ActiveModePolicy};
+use super::model::{ActiveMode, ActiveModePolicy, RuntimeSnapshot};
 use super::policy::policy_for_mode;
 use super::render::render_mode_policy;
-use super::select::select_active_mode;
 use lkjagent_tools::dispatch::registry_valid_example;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -13,6 +12,7 @@ pub struct TurnAuthority {
     pub mission: RuntimeMission,
     pub mode: ActiveMode,
     pub input: TurnAuthorityInput,
+    pub snapshot: RuntimeSnapshot,
     pub effective_policy: ActiveModePolicy,
     pub completion_policy: CompletionPolicy,
     pub endpoint_decision: EndpointDecision,
@@ -22,20 +22,35 @@ pub struct TurnAuthority {
 }
 
 pub fn decide_turn_authority(input: TurnAuthorityInput) -> TurnAuthority {
-    let mission = select_runtime_mission(input);
-    let mode = select_active_mode(input.mode_input());
-    debug_assert_eq!(mission.active_mode(), mode);
+    let snapshot = runtime_snapshot_for_turn(input);
+    decide_turn_authority_for_snapshot(input, snapshot)
+}
+
+pub fn decide_turn_authority_for_snapshot(
+    input: TurnAuthorityInput,
+    mut snapshot: RuntimeSnapshot,
+) -> TurnAuthority {
+    let mission = select_runtime_mission(&snapshot);
+    let mode = mission.active_mode();
+    snapshot.active_mission = mode;
     let effective_policy = policy_for_mode(mode);
     let completion_policy = completion_policy_for(mode);
     let endpoint_decision = endpoint_decision_for(mode, input);
     let valid_example = valid_example_for(mode, endpoint_decision);
-    let prompt_card = prompt_card(&effective_policy, input, endpoint_decision, &valid_example);
+    let prompt_card = prompt_card(
+        mission,
+        &effective_policy,
+        &snapshot,
+        endpoint_decision,
+        &valid_example,
+    );
     let dispatch_card = render_mode_policy(&effective_policy);
 
     TurnAuthority {
         mission,
         mode,
         input,
+        snapshot,
         effective_policy,
         completion_policy,
         endpoint_decision,
@@ -45,15 +60,39 @@ pub fn decide_turn_authority(input: TurnAuthorityInput) -> TurnAuthority {
     }
 }
 
+pub fn runtime_snapshot_for_turn(input: TurnAuthorityInput) -> RuntimeSnapshot {
+    let owner_work_exists = input.owner_work_exists();
+    let recovery_ladder_active = input.recoverable_owner_case;
+    let context_pressure_active = input.compaction_required;
+    let maintenance_eligible =
+        !owner_work_exists && (input.maintenance_due || input.maintenance_active);
+    let mut snapshot = RuntimeSnapshot {
+        active_mission: ActiveMode::ClosedIdle,
+        owner_work_exists,
+        recovery_ladder_active,
+        context_pressure_active,
+        maintenance_eligible,
+        required_evidence: Vec::new(),
+        missing_evidence: Vec::new(),
+        active_artifact: None,
+        last_tool_attempt: None,
+        repeated_action: false,
+        external_owner_input_required: false,
+    };
+    snapshot.active_mission = select_runtime_mission(&snapshot).active_mode();
+    snapshot
+}
+
 fn prompt_card(
+    mission: RuntimeMission,
     policy: &ActiveModePolicy,
-    input: TurnAuthorityInput,
+    snapshot: &RuntimeSnapshot,
     endpoint_decision: EndpointDecision,
     valid_example: &str,
 ) -> String {
     let mut card = format!(
         "Active Mode:\nmission={}\nmode={:?}\npolicy_layers={}\nallowed_tools={}\nblocked_tools={}\npreferred_next_action={}\ncompletion_condition={}\nvalid_example:\n{}",
-        RuntimeMission::from(policy.mode).as_str(),
+        mission.as_str(),
         policy.mode,
         policy_layers(policy),
         join_or_none(&policy.allowed_tools),
@@ -63,24 +102,26 @@ fn prompt_card(
         valid_example,
     );
     if endpoint_decision == EndpointDecision::RuntimeCompact {
-        card.push_str(&compaction_resume_card(input, policy));
+        card.push_str(&compaction_resume_card(snapshot, policy));
     }
     card
 }
 
-fn compaction_resume_card(input: TurnAuthorityInput, policy: &ActiveModePolicy) -> String {
-    let active_case = if input.owner_work_exists() {
+fn compaction_resume_card(snapshot: &RuntimeSnapshot, policy: &ActiveModePolicy) -> String {
+    let active_case = if snapshot.owner_work_exists {
         "open-or-recoverable"
     } else {
         "none"
     };
-    let recovery_ladder = if input.recoverable_owner_case {
+    let recovery_ladder = if snapshot.recovery_ladder_active {
         "active"
     } else {
         "inactive"
     };
+    let active_artifact = snapshot.active_artifact.as_deref().unwrap_or("none");
     format!(
-        "\nCompaction Snapshot:\nactive_case={active_case}\nmissing_evidence=artifact-readiness,verification,recovery-resolution\nactive_artifact=pending-or-unknown\nrecovery_ladder={recovery_ladder}\nnext_valid_action={}",
+        "\nCompaction Snapshot:\nactive_case={active_case}\nmissing_evidence={}\nactive_artifact={active_artifact}\nrecovery_ladder={recovery_ladder}\nnext_valid_action={}",
+        join_strings_or_none(&snapshot.missing_evidence),
         policy.preferred_next_action
     )
 }
@@ -104,6 +145,14 @@ fn policy_layers(policy: &ActiveModePolicy) -> String {
 }
 
 fn join_or_none(values: &[&str]) -> String {
+    if values.is_empty() {
+        "none".to_string()
+    } else {
+        values.join(",")
+    }
+}
+
+fn join_strings_or_none(values: &[String]) -> String {
     if values.is_empty() {
         "none".to_string()
     } else {

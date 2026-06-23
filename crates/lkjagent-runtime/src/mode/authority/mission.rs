@@ -1,4 +1,3 @@
-use super::input::TurnAuthorityInput;
 use super::model::{ActiveMode, RuntimeSnapshot};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -65,28 +64,22 @@ impl From<ActiveMode> for RuntimeMission {
     }
 }
 
-pub fn select_runtime_mission(input: TurnAuthorityInput) -> RuntimeMission {
-    if input.compaction_required {
+pub fn select_runtime_mission(snapshot: &RuntimeSnapshot) -> RuntimeMission {
+    if snapshot.context_pressure_active {
         return RuntimeMission::HardRuntimeCompaction;
     }
-    if input.recoverable_owner_case {
+    if snapshot.recovery_ladder_active {
         return RuntimeMission::OwnerRecovery;
     }
-    if input.pending_owner_rows > 0 || input.active_owner_case {
+    if snapshot.owner_work_exists {
         return RuntimeMission::OwnerExecution;
     }
-    if input.maintenance_due || input.maintenance_active {
+    if snapshot.maintenance_eligible {
         return RuntimeMission::IdleMaintenance;
     }
     RuntimeMission::ClosedIdle
 }
 
 pub fn mission_for_snapshot(snapshot: &RuntimeSnapshot) -> RuntimeMission {
-    if snapshot.context_pressure_active {
-        RuntimeMission::HardRuntimeCompaction
-    } else if snapshot.recovery_ladder_active {
-        RuntimeMission::OwnerRecovery
-    } else {
-        RuntimeMission::from(snapshot.active_mission)
-    }
+    select_runtime_mission(snapshot)
 }
