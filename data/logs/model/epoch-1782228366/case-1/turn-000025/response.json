@@ -1,0 +1,1 @@
+{"content":"<act>\n<tool>artifact.next</tool>\n<root>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</root>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":14284,"completion_tokens":92,"cached_prompt_tokens":null,"total_tokens":14376}}

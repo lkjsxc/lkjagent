@@ -1,0 +1,28 @@
+<observation>
+<status>ok</status>
+<content>
+Graph state:
+case: 1
+family: documentation/content-artifact
+phase: recovery
+node: document-repair
+confidence: 70
+Current state: active
+Active states: 1. Recovering 0.62 parse-recovery phase=recovery gap=recovery evidence; 2. Structuring 0.61 document-structure phase=planning gap=document audit; 3. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests
+Objective: Resolve the owner task through planning, evidence capture, execution, and verification: Create a SF novel. with detailed settings.
+Do not do: none
+Constraints: novel length 80k words, three acts, world-building depth 4 levels, character arcs complete, no plot holes
+Assumptions: author has writing capability and can iterate on drafts
+Risks: first owner message is not a sufficient plan -> record graph.plan before mutating tools; world-building may require multiple passes to achieve consistency -> verify during execution
+Success criteria: none
+Active plan step: 1. Define core setting pillars (time period, geography, magic system, political factions) 2. Create character profiles with motivations and flaws 3. Outline three-act structure with turning points 4. Write act I: exposition and inciting incident 5. Write act II: rising action and mid-point twist 6. Write act III: climax and resolution
+Required evidence: plan, observation, document-structure, artifact-readiness
+Missing evidence: document-structure, artifact-readiness
+Allowed tools now: graph.state, graph.next, graph.audit, graph.evidence, graph.note, graph.transition, fs.list, fs.tree, fs.stat, artifact.plan, artifact.apply, artifact.audit, artifact.next, fs.write, doc.scaffold, doc.audit, fs.batch_write, fs.mkdir
+Blocked tools now: agent.ask, agent.done, fs.edit, fs.patch, fs.read, fs.read_many, fs.search, graph.context, graph.plan, graph.recover, memory.find, memory.save
+Preferred next action: execute the active plan step, record evidence, then verify
+Legal transitions: document-completion-check:admitted
+Context packages: planning-checklist, context-slice,
+[graph slice narrowed]
+</content>
+</observation>
