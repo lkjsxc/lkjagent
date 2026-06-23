@@ -81,9 +81,9 @@ repeated generated leaves can create false artifact evidence.
 The latest run after scaffold redesign showed root/path confusion:
 artifact.apply created a `.md` directory, artifact.next rendered artifact.audit
 for a Markdown file path, and doc/artifact audit surfaced `Not a directory`
-instead of a semantic root/path refusal. Focused tests now cover this class;
-it remains active evidence until Docker Compose verification and a live or
-replayed scenario prove it cannot recur.
+instead of a semantic root/path refusal. Focused tests, replay fixtures, quiet
+verify, and Docker Compose verify now cover this class; a live SF novel run has
+not been rerun in this slice.
 
 The runtime target remains a runtime-owned authority layer above model output,
 graph suggestions, maintenance, compaction, owner questions, verification, and
@@ -149,6 +149,9 @@ Latest address-controller slice gates:
 - `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`, `ok check-style`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
 - `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
+- `cargo test -p lkjagent-runtime --test prompt_daemon`: `PROMPT_DAEMON_EXIT=0`.
+- Post-prompt `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+- Post-prompt `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
 
 Latest focused slice gates:
 
