@@ -8,8 +8,10 @@ cookbooks, guides, encyclopedias, and other large content deliverables.
 ## Table of Contents
 
 - [lifecycle.md](lifecycle.md): scaffold, content pass, audit pass, and completion.
+- [artifact-ledger.md](artifact-ledger.md): durable artifact identity, weak paths, and audit state.
 - [content-artifacts.md](content-artifacts.md): general large-content contract.
 - [content-readiness.md](content-readiness.md): meaningful leaf-file checks.
+- [readiness-reducer.md](readiness-reducer.md): profile-specific content readiness decisions.
 - [dictionary-profile.md](dictionary-profile.md): dictionary artifact profile.
 - [cookbook-profile.md](cookbook-profile.md): cookbook profile example.
 - [story-profile.md](story-profile.md): story profile example.
@@ -23,6 +25,8 @@ cookbooks, guides, encyclopedias, and other large content deliverables.
 - [write-batches.md](write-batches.md): bounded content write loop.
 - [semantic-identity.md](semantic-identity.md): artifact identity fields.
 - [adoption-and-repair.md](adoption-and-repair.md): adoption followed by readiness repair.
+- [adoption-controller.md](adoption-controller.md): runtime adoption route and audit outputs.
+- [repair-controller.md](repair-controller.md): bounded repair routing after failed audit.
 - [batch-cursors.md](batch-cursors.md): durable batch progress state.
 - [readiness-evidence.md](readiness-evidence.md): evidence that can satisfy readiness.
 - [false-completion.md](false-completion.md): scaffold-only and weak-content close refusal.

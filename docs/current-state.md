@@ -43,6 +43,7 @@ prove that their failures cannot recur.
 | Area | Current truth |
 | --- | --- |
 | Runtime authority | Pure active-mode selection, turn authority cards, effective dispatch policy reuse, store-backed authority snapshot fields, stale maintenance-action refusal before dispatch, and `agent.done` refusal exist. Broader pre-dispatch contradiction repair remains open. |
+| State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are now documented. Normalized store tables and unified runtime wiring remain open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, a pure recovery plan table, and SQLite retry counts keyed by case, node, tool, parameter shape, and fault class exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Registry examples parse, validate, and dispatch to routes except heavyweight verification gates. Recovery-plan examples parse, validate, and are admitted by recovery policy when model-authored. |
 | Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, and root-scoped cursors exist. Artifact identity, adoption, weak-path repair state, and semantic readiness are incomplete. |

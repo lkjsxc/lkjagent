@@ -84,6 +84,10 @@ benchmark fixtures.
 ## Table of Contents
 
 - [reducer.md](reducer.md): pure snapshot, event, and decision contract.
+- [snapshot-ledger.md](snapshot-ledger.md): durable read-side snapshot fields.
+- [event-catalog.md](event-catalog.md): closed event set that drives decisions.
+- [decision-ledger.md](decision-ledger.md): persisted decision record and invariants.
+- [admission-view.md](admission-view.md): immutable dispatch admission view.
 - [wiring-map.md](wiring-map.md): reducer and admission ownership for runtime paths.
 - [missions.md](missions.md): owner, recovery, verification, maintenance, compaction, and idle rules.
 - [turn-authority.md](turn-authority.md): single turn decision object.

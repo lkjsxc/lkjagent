@@ -4,7 +4,8 @@
 
 This tree is the implementation contract for lkjagent. Code follows docs.
 Start with [current-state.md](current-state.md), then follow the README for the
-area being changed. Machine-readable coverage lives in
+area being changed. Navigation uses README, catalog, relation, and fan-out
+contracts. Machine-readable coverage lives in
 [_meta/catalog/](./_meta/catalog/README.md); README files are for human and LLM
 navigation.
 

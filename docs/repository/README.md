@@ -12,6 +12,7 @@ rules apply to every file in the repository, including this one.
 - [layout.md](layout.md): path ownership map for the whole repository.
 - [line-limits.md](line-limits.md): the 200-line cap and how to split.
 - [documentation-standards.md](documentation-standards.md): doc shape, topology, and content rules.
+- [fan-out.md](fan-out.md): direct-child count target and root sentinel exceptions.
 - [functional-style.md](functional-style.md): the Rust style contract.
 - [commit-protocol.md](commit-protocol.md): commit message shape and cadence.
 - [workflow.md](workflow.md): the docs-first change loop and its gates.
