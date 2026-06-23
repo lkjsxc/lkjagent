@@ -106,8 +106,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - The benchmark matrix includes missing action blocks, interrupted output,
   stop-closure repair, contradictory authority, provider exchange logging,
   Japanese-cookbook drift, document-structure evidence ownership, batch-write
-  schema faults, shell parameter faults, queue interruption, compaction resume,
-  and repeated recovery signatures.
+  schema faults, artifact address loops, shell parameter faults, queue
+  interruption, compaction resume, and repeated recovery signatures.
 - Memory pruning deletes exact duplicates and merges same-title high-overlap
   rows with source IDs.
 - Provider exchange logging has a design contract, implemented store, atomic

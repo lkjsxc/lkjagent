@@ -144,6 +144,11 @@ Latest address-controller slice gates:
 - `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`, `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
+- `cargo test -p lkjagent-benchmark --test corpus`: `BENCH_CORPUS_TEST_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCHMARK_EXIT=0`, `ok benchmark-corpus`.
+- `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`, `ok check-style`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
 
 Latest focused slice gates:
 
