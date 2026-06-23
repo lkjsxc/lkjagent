@@ -18,4 +18,5 @@ runner.
 - [main.rs](main.rs): binary entrypoint.
 - [model.rs](model.rs): shared check data.
 - [runner.rs](runner.rs): quiet command execution.
+- [structure/](structure/README.md): structure audit and plan commands.
 - [style.rs](style.rs): check-style implementation.
