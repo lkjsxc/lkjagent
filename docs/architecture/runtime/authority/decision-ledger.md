@@ -50,4 +50,5 @@ and close behavior.
 
 ## Status
 
-design-only for the normalized decision ledger.
+partially implemented. `RuntimeDecisionRecord` exists and SQLite tables plus store APIs record authority events,
+decisions, and tool admissions. Runtime prompt and dispatch wiring to the normalized ledger remains open.
