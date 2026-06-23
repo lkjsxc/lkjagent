@@ -1,9 +1,12 @@
+mod support;
+
 use lkjagent_protocol::parse_completion;
 use lkjagent_runtime::mode::{
     admit_tool, decide, recovery_plan_for_fault, ActiveMode, FaultClass, RecoveryClass,
     RuntimeDecision, RuntimeEvent, RuntimeFault, RuntimeSnapshot,
 };
-use lkjagent_tools::dispatch::validate_action;
+use lkjagent_tools::dispatch::{dispatch, validate_action, EffectivePolicy};
+use support::{dispatch_state, store, temp_workspace, tool_runtime, TestResult};
 
 #[test]
 fn turn_budget_exhaustion_selects_blocked_handoff_plan() {
@@ -76,6 +79,34 @@ fn maintenance_preemption_recovery_forced_tool_is_admitted() {
     assert!(admission.admitted);
 }
 
+#[test]
+fn recovery_plan_examples_dispatch_for_local_routes() -> TestResult<()> {
+    let snapshot = recovery_snapshot();
+    for fault in recovery_faults() {
+        let plan = recovery_plan_for_fault(&snapshot, fault);
+        if skip_dispatch_example(&plan.forced_tool) {
+            continue;
+        }
+        let action = parse_completion(&plan.exact_valid_example)
+            .map_err(|err| format!("parse failed for {}: {err:?}", plan.forced_tool))?;
+        let workspace = temp_workspace("recovery-plan-dispatch")?;
+        let runtime = tool_runtime(workspace)?;
+        let mut conn = store()?;
+        let mut dispatch_state = dispatch_state();
+        dispatch_state.effective_policy = Some(recovery_effective_policy(&plan));
+        let output = dispatch(&action, &runtime, &mut conn, &mut dispatch_state);
+        assert!(
+            !output.content.contains("params refused")
+                && !output.content.contains("unknown tool after validation")
+                && !output.content.contains("effective policy refused"),
+            "{} example did not reach route: {}",
+            plan.forced_tool,
+            output.content
+        );
+    }
+    Ok(())
+}
+
 fn recovery_faults() -> [RuntimeFault; 18] {
     [
         RuntimeFault::Parse,
@@ -97,6 +128,31 @@ fn recovery_faults() -> [RuntimeFault; 18] {
         RuntimeFault::TurnBudgetExhausted,
         RuntimeFault::ContextInvalid,
     ]
+}
+
+fn skip_dispatch_example(tool: &str) -> bool {
+    matches!(tool, "verify.xtask" | "runtime.compact" | "runtime.handoff")
+}
+
+fn recovery_effective_policy(plan: &lkjagent_runtime::mode::RecoveryPlan) -> EffectivePolicy {
+    let mut allowed = plan.allowed_observation_tools.clone();
+    for tool in &plan.allowed_repair_tools {
+        if !allowed.iter().any(|item| item == tool) {
+            allowed.push(tool.clone());
+        }
+    }
+    if !allowed.iter().any(|item| item == &plan.forced_tool) {
+        allowed.push(plan.forced_tool.clone());
+    }
+    EffectivePolicy {
+        mode: "Recovery".to_string(),
+        allowed_tools: allowed,
+        blocked_tools: Vec::new(),
+        shell_allowed: false,
+        completion_allowed: false,
+        reason: "recovery route under test".to_string(),
+        preferred_next_action: plan.forced_tool.clone(),
+    }
 }
 
 fn recovery_snapshot() -> RuntimeSnapshot {

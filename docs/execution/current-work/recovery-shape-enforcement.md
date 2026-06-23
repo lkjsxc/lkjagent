@@ -43,6 +43,7 @@ route. Recovery preserves at least one productive escape tool for the failed mis
 
 ## Verification
 
+- `cargo test -p lkjagent-runtime --test authority_recovery_plan`
 - `cargo test -p lkjagent-runtime --test recovery_controller`
 - `cargo test -p lkjagent-runtime --test fault_wait`
 - `cargo test -p lkjagent-runtime --test fault_retry_store`
@@ -51,4 +52,6 @@ route. Recovery preserves at least one productive escape tool for the failed mis
 
 ## Status
 
-open.
+partially implemented. Recovery route metadata, retry count storage, changed action-class repeat routing, registry
+examples, and recovery-plan examples that parse, validate, are admitted, and dispatch to local routes exist. Live
+shape-change enforcement for every fault class and failed-route escalation remain open.
