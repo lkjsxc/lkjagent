@@ -10,6 +10,7 @@ provider-neutral wording, and non-mock content.
 
 - [semantic-audits.md](semantic-audits.md): layered documentation and completion audits.
 - [regression-fixtures.md](regression-fixtures.md): owner-reported failures that must replay.
+- [replay-regressions.md](replay-regressions.md): reducing long-running logs into replay cases.
 
 ## Local Map
 
@@ -17,6 +18,7 @@ provider-neutral wording, and non-mock content.
 - Documentation growth gates live in
   [../documentation-system/growth-stages.md](../documentation-system/growth-stages.md).
 - Regression details live in [../regressions/README.md](../regressions/README.md).
+- Long-running log reduction lives in [replay-regressions.md](replay-regressions.md).
 
 ## Status
 

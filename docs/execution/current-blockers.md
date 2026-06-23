@@ -16,8 +16,9 @@ linked task contract names focused evidence and the actual gates that ran.
 | 5 | Compaction snapshots are not rich enough to resume artifact repair and recovery | [current-work/durable-compaction-history.md](current-work/durable-compaction-history.md) | open |
 | 6 | Maintenance is not strictly idle-only and preemptable by owner work | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | open |
 | 7 | Uploaded run logs are not fully covered by benchmark regressions | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
-| 8 | Semantic maintenance pruning still allows repeated low-value memory rows | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 9 | Protocol schema repair can render examples that dispatch later rejects | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | open |
+| 8 | Raw provider exchanges are not logged as replayable JSON under `data/logs` | [current-work/model-log.md](current-work/model-log.md) | open |
+| 9 | Semantic maintenance pruning still allows repeated low-value memory rows | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
+| 10 | Protocol schema repair can render examples that dispatch later rejects | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | open |
 
 ## Owner Failure Evidence
 
@@ -37,8 +38,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   snapshot, explicit event, decision, prompt frame, admission, effect, and next
   event.
 - Runtime authority, recovery, artifact readiness, completion, compaction,
-  maintenance, fixtures, memory, and protocol repair move in that order unless
-  repository inspection proves a stricter dependency.
+  maintenance, fixtures, provider exchange logging, memory, and protocol repair
+  move in that order unless repository inspection proves a stricter dependency.
 - Stable YOLO-mode, active-mode, recovery, prompt-source, and artifact docs are
   contracts. They are not proof that the runtime implements the behavior.
 - Docker Compose verification is required for any implemented runtime claim.
@@ -81,6 +82,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   recovery signatures.
 - Memory pruning deletes exact duplicates and merges same-title high-overlap
   rows with source IDs.
+- Provider exchange logging has a design contract for per-call JSON records,
+  redaction, atomic writes, and CLI inspection.
 
 ## Remaining Proof Gaps
 
@@ -97,3 +100,5 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - Maintenance rewrite pruning and pre-dispatch owner preemption remain open.
 - Rendered recovery examples still need a registry-wide parse, validation, and
   dispatch proof.
+- Provider exchange logging still needs store schema, filesystem writer,
+  redaction, and CLI inspection implementation.

@@ -10,6 +10,8 @@ parse : CompletionText -> Result<Action, ParseFault>
 ```
 
 ParseFault variants map one-to-one onto the taxonomy in [recovery.md](recovery.md).
+Provider stop-closure normalization is a wire step documented in
+[stop-token-policy.md](stop-token-policy.md).
 
 ## Rules
 
@@ -40,6 +42,8 @@ ParseFault variants map one-to-one onto the taxonomy in [recovery.md](recovery.m
    retry can fix all of them.
 10. Values are bytes. No unescaping, no entity decoding, and no execution from
     partially parsed actions.
+11. Only assistant content is parsed. Provider reasoning fields are log evidence
+    and never become action text.
 
 ## Non-Goals
 
