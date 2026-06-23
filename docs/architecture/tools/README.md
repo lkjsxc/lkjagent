@@ -18,6 +18,7 @@ prompt and behavior cannot drift.
 - [workspace.md](workspace.md): workspace.summary and repository-shape output.
 - [verification-tools.md](verification-tools.md): verify.cargo and verify.xtask direct gates.
 - [doc-tools.md](doc-tools.md): doc and artifact topology tools.
+- [artifact-addresses.md](artifact-addresses.md): root, path, and artifact address rules.
 - [shell.md](shell.md): shell.run, the escape hatch and its capture rules.
 - [queue-ops.md](queue-ops.md): queue.list and queue mutation actions.
 - [memory-ops.md](memory-ops.md): memory.save, memory.find, and memory.prune contracts.

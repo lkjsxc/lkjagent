@@ -12,6 +12,7 @@ verification.
 - [owner-reported-failures.md](owner-reported-failures.md): confirmed user-visible failures.
 - [action-fault-recovery.md](action-fault-recovery.md): parameter drift and recovery tasks.
 - [document-structure-redesign.md](document-structure-redesign.md): scaffold and audit redesign.
+- [artifact-address-controller.md](artifact-address-controller.md): root, path, and weak-path repair.
 - [context-accounting.md](context-accounting.md): context and token display work.
 - [multi-state-runtime.md](multi-state-runtime.md): neutral task-track modeling work.
 - [runtime-recovery-controller.md](runtime-recovery-controller.md): deterministic recovery controller work.

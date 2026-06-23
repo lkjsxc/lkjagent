@@ -73,10 +73,16 @@ Uploaded run logs still stand for these failures:
 
 ## Active Target
 
-The first active target is the generated documentation source. Scaffold
-structure, path naming, and content readiness must be separated before runtime
-authority work continues, because repeated generated leaves can create false
-artifact evidence.
+The first active target is the generated documentation source plus the
+root/path address controller. Scaffold structure, path naming, and content
+readiness must be separated before runtime authority work continues, because
+repeated generated leaves can create false artifact evidence.
+
+The latest run after scaffold redesign shows root/path confusion: artifact.apply
+created a `.md` directory, artifact.next rendered artifact.audit for a Markdown
+file path, and doc/artifact audit surfaced `Not a directory` instead of a
+semantic root/path refusal. This is active evidence until address-controller
+tests and Docker Compose verification prove it cannot recur.
 
 The runtime target remains a runtime-owned authority layer above model output,
 graph suggestions, maintenance, compaction, owner questions, verification, and
@@ -112,7 +118,9 @@ Current baseline for the scaffold-redesign slice:
 - `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCH_EXIT=0`, `ok benchmark-corpus`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `VERIFY_EXIT=0`, `ok verify`.
 
-Latest scaffold slice gates:
+Latest scaffold slice gates. Docker Compose did not run after this scaffold
+slice and must run after the address-controller implementation before any final
+implementation claim:
 
 - `cargo test -p lkjagent-tools`: `TOOLS_PACKAGE3_EXIT=0`.
 - `cargo test -p lkjagent-xtask`: `XTASK_PACKAGE3_EXIT=0`.
