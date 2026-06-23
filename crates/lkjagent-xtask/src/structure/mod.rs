@@ -1,3 +1,4 @@
+pub mod brief;
 pub mod catalog;
 pub mod findings;
 pub mod plan;

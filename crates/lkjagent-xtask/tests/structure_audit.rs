@@ -56,6 +56,16 @@ fn audit_reports_over_cap_direct_children() {
 }
 
 #[test]
+fn audit_reports_missing_workspace_brief() {
+    let files = vec![RepoFile::new(
+        "data/workspace/README.md",
+        "# Workspace\n\n## Purpose\n\nmap\n\n## Table of Contents\n\n- [artifact.md](artifact.md): artifact.\n",
+    )];
+
+    assert!(messages(files, "data/workspace").contains(&"data/workspace: structure workspace-brief: create AGENTS.md with the runtime workspace brief".to_string()));
+}
+
+#[test]
 fn audit_reports_scaffold_only_content() {
     let files = vec![
         RepoFile::new(

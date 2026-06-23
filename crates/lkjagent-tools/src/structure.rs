@@ -2,18 +2,21 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use crate::error::{ToolError, ToolResult};
+use crate::structure_quality::is_weak_markdown_file;
+use crate::structure_report::report_failure;
 
-const MIN_DIRECTORIES: usize = 6;
-const MIN_MARKDOWN_FILES: usize = 12;
-const MIN_DEPTH: usize = 3;
+pub(crate) const MIN_DIRECTORIES: usize = 6;
+pub(crate) const MIN_MARKDOWN_FILES: usize = 12;
+pub(crate) const MIN_DEPTH: usize = 3;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct Evidence {
-    directories: usize,
-    markdown_files: usize,
-    max_depth: usize,
-    missing_readmes: usize,
-    readmes_without_toc: usize,
+pub(crate) struct Evidence {
+    pub(crate) directories: usize,
+    pub(crate) markdown_files: usize,
+    pub(crate) max_depth: usize,
+    pub(crate) missing_readmes: usize,
+    pub(crate) readmes_without_toc: usize,
+    pub(crate) weak_markdown_files: usize,
 }
 
 impl Evidence {
@@ -23,6 +26,7 @@ impl Evidence {
             && self.max_depth >= MIN_DEPTH
             && self.missing_readmes == 0
             && self.readmes_without_toc == 0
+            && self.weak_markdown_files == 0
     }
 
     fn score(self) -> usize {
@@ -31,6 +35,7 @@ impl Evidence {
             .saturating_add(self.max_depth)
             .saturating_sub(self.missing_readmes)
             .saturating_sub(self.readmes_without_toc)
+            .saturating_sub(self.weak_markdown_files)
     }
 }
 
@@ -81,6 +86,7 @@ fn analyze(path: &Path, depth: usize) -> ToolResult<Evidence> {
         max_depth: depth,
         missing_readmes: usize::from(!path.join("README.md").exists()),
         readmes_without_toc: usize::from(readme_without_toc(path)?),
+        weak_markdown_files: 0,
     };
     for entry in fs::read_dir(path)? {
         let entry = entry?;
@@ -90,12 +96,15 @@ fn analyze(path: &Path, depth: usize) -> ToolResult<Evidence> {
             evidence = merge(evidence, child_evidence);
         } else if child.extension().is_some_and(|extension| extension == "md") {
             evidence.markdown_files = evidence.markdown_files.saturating_add(1);
+            evidence.weak_markdown_files = evidence
+                .weak_markdown_files
+                .saturating_add(usize::from(is_weak_markdown_file(&child)?));
         }
     }
     Ok(evidence)
 }
 
-fn readme_without_toc(path: &Path) -> ToolResult<bool> {
+pub(crate) fn readme_without_toc(path: &Path) -> ToolResult<bool> {
     let readme = path.join("README.md");
     if !readme.exists() {
         return Ok(false);
@@ -112,88 +121,14 @@ fn merge(left: Evidence, right: Evidence) -> Evidence {
         readmes_without_toc: left
             .readmes_without_toc
             .saturating_add(right.readmes_without_toc),
+        weak_markdown_files: left
+            .weak_markdown_files
+            .saturating_add(right.weak_markdown_files),
     }
 }
 
-fn hidden(path: &Path) -> bool {
+pub(crate) fn hidden(path: &Path) -> bool {
     path.file_name()
         .and_then(|name| name.to_str())
         .is_some_and(|name| name.starts_with('.'))
-}
-
-fn report_failure(workspace: &Path, best: Option<(PathBuf, Evidence)>) -> ToolResult<String> {
-    let minimum = format!(
-        "recursive structure incomplete: need README-indexed tree with at least {MIN_DIRECTORIES} directories, {MIN_MARKDOWN_FILES} markdown files, depth {MIN_DEPTH}, no directory without README.md, and every README.md containing ## Table of Contents"
-    );
-    let Some((path, evidence)) = best else {
-        return Ok(format!("{minimum}; no README.md candidate found"));
-    };
-    let shown = relative(&path, workspace);
-    let missing = sample_missing_readmes(&path, workspace)?;
-    let without_toc = sample_readmes_without_toc(&path, workspace)?;
-    Ok(format!(
-        "{minimum}; next action should use doc.scaffold, doc.audit, fs.mkdir, or fs.batch_write to repair README-indexed structure; best={shown} directories={} markdown_files={} depth={} missing_readmes={} readmes_without_toc={} missing_readme_paths={} readmes_without_toc_paths={}",
-        evidence.directories,
-        evidence.markdown_files,
-        evidence.max_depth,
-        evidence.missing_readmes,
-        evidence.readmes_without_toc,
-        sample_list(&missing),
-        sample_list(&without_toc)
-    ))
-}
-
-fn sample_missing_readmes(root: &Path, workspace: &Path) -> ToolResult<Vec<String>> {
-    let mut samples = Vec::new();
-    collect_samples(root, workspace, &mut samples, |path| {
-        Ok(path.is_dir() && !path.join("README.md").exists())
-    })?;
-    Ok(samples)
-}
-
-fn sample_readmes_without_toc(root: &Path, workspace: &Path) -> ToolResult<Vec<String>> {
-    let mut samples = Vec::new();
-    collect_samples(root, workspace, &mut samples, readme_without_toc)?;
-    Ok(samples)
-}
-
-fn collect_samples<F>(
-    path: &Path,
-    workspace: &Path,
-    samples: &mut Vec<String>,
-    matches: F,
-) -> ToolResult<()>
-where
-    F: Fn(&Path) -> ToolResult<bool> + Copy,
-{
-    if samples.len() >= 6 || hidden(path) {
-        return Ok(());
-    }
-    if matches(path)? {
-        samples.push(relative(path, workspace));
-    }
-    for entry in fs::read_dir(path)? {
-        let child = entry?.path();
-        if child.is_dir() {
-            collect_samples(&child, workspace, samples, matches)?;
-        }
-    }
-    Ok(())
-}
-
-fn sample_list(samples: &[String]) -> String {
-    if samples.is_empty() {
-        "none".to_string()
-    } else {
-        samples.join(",")
-    }
-}
-
-fn relative(path: &Path, workspace: &Path) -> String {
-    path.strip_prefix(workspace)
-        .ok()
-        .filter(|relative| !relative.as_os_str().is_empty())
-        .unwrap_or(path)
-        .to_string_lossy()
-        .to_string()
 }

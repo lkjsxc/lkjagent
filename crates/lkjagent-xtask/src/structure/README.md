@@ -8,6 +8,7 @@ workspace trees.
 ## Table of Contents
 
 - [mod.rs](mod.rs): public audit entrypoint and CLI adapter.
+- [brief.rs](brief.rs): workspace brief checks for generated workspace roots.
 - [catalog.rs](catalog.rs): catalog coverage and stale path checks.
 - [findings.rs](findings.rs): finding data and messages.
 - [plan.rs](plan.rs): pure structure plan builder.
