@@ -1,0 +1,155 @@
+use std::path::PathBuf;
+use std::time::Instant;
+
+use lkjagent_llm::error::ClientError;
+use lkjagent_llm::wire::{Completion, CompletionUsage, FinishReason};
+use rusqlite::Connection;
+
+use super::runner::ResidentDaemon;
+use crate::error::RuntimeResult;
+use crate::model_log::{
+    json_escape, record_provider_error, record_provider_request, record_provider_response,
+    ProviderLogContext, ProviderLogHandle,
+};
+
+impl ResidentDaemon {
+    pub(super) fn record_model_request(
+        &self,
+        conn: &Connection,
+        now: &str,
+        request_json: &str,
+    ) -> RuntimeResult<Option<ProviderLogHandle>> {
+        let Some(root) = self.provider_log_root() else {
+            return Ok(None);
+        };
+        let context = self.provider_context(conn, now)?;
+        record_provider_request(conn, &root, &context, request_json).map(Some)
+    }
+
+    pub(super) fn record_model_response(
+        &self,
+        conn: &Connection,
+        handle: Option<&ProviderLogHandle>,
+        completion: &Completion,
+        started: Instant,
+    ) -> RuntimeResult<()> {
+        let Some(handle) = handle else {
+            return Ok(());
+        };
+        let response_json = completion_response_json(completion);
+        let usage = usage_json(&completion.usage);
+        record_provider_response(
+            conn,
+            handle,
+            &response_json,
+            finish_reason_name(&completion.finish_reason),
+            Some(&usage),
+            latency_ms(started),
+        )
+    }
+
+    pub(super) fn record_model_error(
+        &self,
+        conn: &Connection,
+        handle: Option<&ProviderLogHandle>,
+        error: &ClientError,
+        started: Instant,
+    ) -> RuntimeResult<()> {
+        let Some(handle) = handle else {
+            return Ok(());
+        };
+        record_provider_error(
+            conn,
+            handle,
+            error_class(error),
+            &error.to_string(),
+            latency_ms(started),
+        )
+    }
+
+    fn provider_log_root(&self) -> Option<PathBuf> {
+        self.runtime
+            .model_log_path
+            .as_ref()
+            .and_then(|path| path.parent())
+            .map(PathBuf::from)
+    }
+
+    fn provider_context(&self, conn: &Connection, now: &str) -> RuntimeResult<ProviderLogContext> {
+        Ok(ProviderLogContext {
+            case_id: self.case_id_string(),
+            turn_id: self.state.turn,
+            prompt_frame_id: lkjagent_store::state::get(conn, "authority fingerprint")?,
+            authority_decision_id: lkjagent_store::state::get(conn, "authority decision id")?,
+            provider: "openai-compatible".to_string(),
+            model: self.runtime.client.model.clone(),
+            created_at: now.to_string(),
+            authority_json: self.authority_json(),
+        })
+    }
+
+    fn case_id_string(&self) -> String {
+        self.state
+            .graph
+            .as_ref()
+            .and_then(|graph| graph.case_id)
+            .map_or_else(|| "none".to_string(), |id| id.to_string())
+    }
+
+    fn authority_json(&self) -> String {
+        let Some(authority) = &self.turn_authority else {
+            return "{}\n".to_string();
+        };
+        format!(
+            "{{\"active_mode\":\"{:?}\",\"mission\":\"{}\",\"admitted_tools\":\"{}\",\"blocked_tools\":\"{}\"}}\n",
+            authority.mode,
+            json_escape(authority.mission.as_str()),
+            json_escape(&authority.effective_policy.allowed_tools.join(",")),
+            json_escape(&authority.effective_policy.blocked_tools.join(",")),
+        )
+    }
+}
+
+fn completion_response_json(completion: &Completion) -> String {
+    format!(
+        "{{\"content\":\"{}\",\"finish_reason\":\"{}\",\"usage\":{}}}\n",
+        json_escape(&completion.content),
+        finish_reason_name(&completion.finish_reason),
+        usage_json(&completion.usage)
+    )
+}
+
+fn usage_json(usage: &CompletionUsage) -> String {
+    format!(
+        "{{\"prompt_tokens\":{},\"completion_tokens\":{},\"cached_prompt_tokens\":{},\"total_tokens\":{}}}",
+        opt_u64(usage.prompt_tokens),
+        opt_u64(usage.completion_tokens),
+        opt_u64(usage.cached_prompt_tokens),
+        opt_u64(usage.total_tokens)
+    )
+}
+
+fn opt_u64(value: Option<u64>) -> String {
+    value.map_or_else(|| "null".to_string(), |value| value.to_string())
+}
+
+fn finish_reason_name(reason: &FinishReason) -> &str {
+    match reason {
+        FinishReason::Stop => "stop",
+        FinishReason::Length => "length",
+        FinishReason::Other(_) => "other",
+        FinishReason::Missing => "missing",
+    }
+}
+
+fn error_class(error: &ClientError) -> &str {
+    match error {
+        ClientError::Endpoint { .. } => "EndpointError",
+        ClientError::EndpointOverflow { .. } => "EndpointOverflow",
+        ClientError::Oversize { .. } => "CompletionOversize",
+    }
+}
+
+fn latency_ms(started: Instant) -> i64 {
+    i64::try_from(started.elapsed().as_millis()).unwrap_or(i64::MAX)
+}

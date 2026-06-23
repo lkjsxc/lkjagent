@@ -39,6 +39,8 @@ mod effects;
 mod effects_graph;
 #[path = "daemon/loop/endpoint.rs"]
 mod endpoint;
+#[path = "daemon/loop/endpoint_logging.rs"]
+mod endpoint_logging;
 #[path = "daemon/effects/execute_pending.rs"]
 mod execute_pending;
 #[path = "daemon/authority/graph_policy.rs"]
@@ -75,7 +77,6 @@ pub use runner::{DaemonTick, ResidentDaemon, ResidentRuntime};
 pub use startup::{build_prefix_from_store, startup_summary};
 
 pub type EndpointClientConfig = ClientConfig;
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StartupLock {
     Taken,

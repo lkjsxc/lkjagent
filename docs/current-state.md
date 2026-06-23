@@ -30,7 +30,7 @@ prove that their failures cannot recur.
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
 | SQLite store | Queue, state, event, memory, and task summary surfaces exist in `lkjagent-store`. |
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
-| Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current model run snapshot. Raw per-provider exchange JSON logging is documented but not implemented. |
+| Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current model run snapshot. Provider exchange rows plus atomic request, authority, response, timing, and error files are written when daemon model calls have a log root. |
 | Document scaffold seed | Deterministic scaffold paths and compact `catalog.toml` metadata exist for project, multi-topic docs, story, and cookbook roots. |
 | Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, workspace briefs, and scaffold-only leaves. |
 | Placeholder and payload refusal | `fs.write`, `fs.batch_write`, and content audit reject common scaffold phrases and oversized payloads before mutation. |
@@ -51,6 +51,7 @@ prove that their failures cannot recur.
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Store reopen coverage and status rendering for latest snapshots remain open. |
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, same-title high-overlap merge, and low-signal rewrite pruning exist. Pre-dispatch owner preemption proof remains open. |
 | Status and console | Active graph state, active mode, authority snapshot fields, context pressure, token usage, and model-log paths display. Last successful observation is summarized from recent observations. |
+| Provider exchange logging | SQLite schema, store APIs, atomic filesystem writer, request logging, response logging, error logging, and focused store/runtime tests exist. Parse, admission, observation, index, export, and CLI inspection remain open. |
 | Benchmarks | Uploaded-run signatures are represented by deterministic fixtures. Runtime replay coverage and every completion path are not yet complete. |
 
 ## Open Failure Evidence
@@ -67,8 +68,8 @@ Uploaded run logs still stand for these failures:
 - memory failure: duplicate or low-value maintenance rows.
 - compaction failure: hard pressure depending on model-authored `memory.save`.
 - completion failure: `agent.done` closing without audit, verification, or recovery evidence.
-- observability failure: raw provider requests, responses, parse results, and
-  admissions are not fully logged under `data/logs`.
+- observability failure: parse results, admission decisions, observations,
+  exports, and CLI inspection are not fully logged under `data/logs`.
 
 ## Active Target
 

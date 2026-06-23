@@ -29,6 +29,15 @@ impl ClientConfig {
     }
 }
 
+pub fn request_json(config: &ClientConfig, messages: &[Message]) -> ClientResult<String> {
+    request_body(
+        &config.model,
+        messages,
+        Duration::from_secs(0),
+        config.max_tokens,
+    )
+}
+
 pub fn complete(
     config: &ClientConfig,
     messages: &[Message],
