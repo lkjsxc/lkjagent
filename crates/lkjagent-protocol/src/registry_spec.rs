@@ -136,7 +136,8 @@ const ARTIFACT_AUDIT: &[ParamSpec] = &[
     ParamSpec::opt("count", None),
     ParamSpec::opt("mode", Some("approx")),
 ];
-const ARTIFACT_NEXT: &[ParamSpec] = &[ParamSpec::req("root"), ParamSpec::opt("kind", None)];
+#[rustfmt::skip]
+const ARTIFACT_NEXT: &[ParamSpec] = &[ParamSpec::req("root"), ParamSpec::opt("path", None), ParamSpec::opt("kind", None)];
 const AGENT_DONE: &[ParamSpec] = &[ParamSpec::req("summary")];
 const AGENT_ASK: &[ParamSpec] = &[ParamSpec::req("question")];
 

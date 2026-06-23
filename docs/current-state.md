@@ -46,7 +46,7 @@ prove that their failures cannot recur.
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. The transition-network contract is partially implemented where current tests prove it; normalized history exists for turn authority snapshots and decisions, while full unified runtime wiring remains open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, a pure recovery plan table, recovery-plan examples that parse, validate, admit, and dispatch to local routes, and SQLite retry counts keyed by case, node, tool, parameter shape, and fault class exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Registry examples parse, validate, and dispatch to routes except heavyweight verification gates. Recovery-plan examples parse, validate, are admitted by recovery policy, and dispatch to local routes when model-authored. |
-| Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, normalized artifact ledger and cursor store APIs, ledger writes from `artifact.plan`, `artifact.apply`, `artifact.audit`, and `artifact.next`, successful write-path cursor completion marking, audit output `artifact_ledger_id`, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Full close-path coverage remains incomplete. |
+| Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, root/path address refusals, normalized artifact ledger and cursor store APIs, ledger writes from `artifact.plan`, `artifact.apply`, `artifact.audit`, and `artifact.next`, successful write-path cursor completion marking, audit output `artifact_ledger_id`, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Full close-path coverage remains incomplete. |
 | Completion gates | A pure `decide_completion` reducer returns completion kind, failed gates, missing and existing evidence, next action, valid example, blocked-handoff allowance, and status text. Runtime `agent.done` admission uses it, and daemon graph dispatch checks the artifact ledger before admitting completion. Every close path is not yet proven to use the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Store reopen coverage and status rendering for latest snapshots remain open. |
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, same-title high-overlap merge, and low-signal rewrite pruning exist. Pre-dispatch owner preemption proof remains open. |
@@ -78,11 +78,12 @@ root/path address controller. Scaffold structure, path naming, and content
 readiness must be separated before runtime authority work continues, because
 repeated generated leaves can create false artifact evidence.
 
-The latest run after scaffold redesign shows root/path confusion: artifact.apply
-created a `.md` directory, artifact.next rendered artifact.audit for a Markdown
-file path, and doc/artifact audit surfaced `Not a directory` instead of a
-semantic root/path refusal. This is active evidence until address-controller
-tests and Docker Compose verification prove it cannot recur.
+The latest run after scaffold redesign showed root/path confusion:
+artifact.apply created a `.md` directory, artifact.next rendered artifact.audit
+for a Markdown file path, and doc/artifact audit surfaced `Not a directory`
+instead of a semantic root/path refusal. Focused tests now cover this class;
+it remains active evidence until Docker Compose verification and a live or
+replayed scenario prove it cannot recur.
 
 The runtime target remains a runtime-owned authority layer above model output,
 graph suggestions, maintenance, compaction, owner questions, verification, and
@@ -132,6 +133,17 @@ implementation claim:
   `ok benchmark-corpus`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `VERIFY_AFTER_DOCUPDATE_EXIT=0`,
   `ok verify`.
+
+Latest address-controller slice gates:
+
+- `cargo fmt --check`: `FMT_CHECK_EXIT=0` after formatting.
+- `cargo test -p lkjagent-tools --test artifact_address`: `ARTIFACT_ADDRESS_EXIT=0`.
+- `cargo test -p lkjagent-tools --test doc_root_hygiene`: `DOC_ROOT_HYGIENE_EXIT=0`.
+- `cargo test -p lkjagent-tools --test batch_write_formats`: `BATCH_WRITE_FORMATS_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test artifact_address_recovery`: `RUNTIME_ADDRESS_EXIT=0`.
+- `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`, `ok check-docs`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
 
 Latest focused slice gates:
 

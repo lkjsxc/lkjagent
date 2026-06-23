@@ -36,9 +36,9 @@ dictionaries/<semantic-title>/
 ## Failure Cases
 
 - A 32-entry bread terminology list is treated as complete.
-- A dictionary-like file omits requested pronunciation, etymology, or examples.
+- A dictionary entry file omits requested pronunciation, etymology, or examples.
 - Entries are duplicated across sections without cross-reference intent.
-- Completion evidence claims fields that are not present in the observed file.
+- Completion evidence claims fields that are not present in the observed root.
 
 ## Verification
 
@@ -54,6 +54,6 @@ open.
 
 ## Status
 
-partially implemented for single-file and directory dictionary readiness in
+partially implemented for directory dictionary readiness in
 `artifact.audit kind=dictionary`; manifest adoption, alphabetical organization,
 and unsupported verification-claim checks remain open.

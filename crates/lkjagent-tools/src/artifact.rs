@@ -31,6 +31,11 @@ pub fn plan(
 }
 
 pub fn apply(request: ApplyRequest<'_>) -> ToolResult<String> {
+    crate::artifact_address_support::ensure_apply_root(
+        request.workspace,
+        request.root,
+        request.kind,
+    )?;
     let full = workspace_path(request.workspace, request.root)?;
     if full.exists() {
         if let Some(report) = crate::artifact_drift::japanese_cookbook(&full)? {
@@ -67,6 +72,11 @@ pub fn audit(
     count: &str,
     mode: &str,
 ) -> ToolResult<String> {
+    if let Some(report) = crate::artifact_address_support::audit_refusal(workspace, root, kind)? {
+        return crate::artifact_ledger_support::record_audit(
+            workspace, conn, root, kind, &report, now,
+        );
+    }
     if kind.trim().eq_ignore_ascii_case("dictionary") {
         let report = crate::dictionary_audit::audit(workspace, root)?;
         let report = crate::artifact_ledger_support::record_audit(
@@ -106,8 +116,8 @@ pub fn audit(
     crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)
 }
 
-pub fn next(workspace: &Path, root: &str, kind: &str) -> ToolResult<String> {
-    crate::artifact_next::next(workspace, root, kind)
+pub fn next(workspace: &Path, root: &str, path: &str, kind: &str) -> ToolResult<String> {
+    crate::artifact_next::next(workspace, root, path, kind)
 }
 
 pub fn next_with_cursor(
@@ -115,9 +125,10 @@ pub fn next_with_cursor(
     conn: &Connection,
     now: &str,
     root: &str,
+    path: &str,
     kind: &str,
 ) -> ToolResult<String> {
-    crate::artifact_next::next_with_cursor(workspace, conn, now, root, kind)
+    crate::artifact_next::next_with_cursor(workspace, conn, now, root, path, kind)
 }
 
 fn scale_count(scale: &str) -> &str {
@@ -169,10 +180,8 @@ fn readiness_report(kind: &str, report: &str) -> String {
 }
 
 fn content_kind(kind: &str) -> bool {
-    matches!(
-        kind.trim().to_ascii_lowercase().as_str(),
-        "cookbook" | "story"
-    )
+    let kind = kind.trim().to_ascii_lowercase();
+    kind == "cookbook" || kind == "story"
 }
 
 #[allow(clippy::manual_unwrap_or_default)]

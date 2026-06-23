@@ -19,10 +19,7 @@ fn artifact_audit_rejects_shallow_dictionary_term_list() -> TestResult<()> {
     let output = dispatch(
         &action(
             "artifact.audit",
-            &[
-                ("root", "dictionary/bread-terms.txt"),
-                ("kind", "dictionary"),
-            ],
+            &[("root", "dictionary"), ("kind", "dictionary")],
         ),
         &runtime,
         &mut conn,
@@ -51,10 +48,7 @@ fn artifact_audit_accepts_detailed_dictionary_entries() -> TestResult<()> {
     let output = dispatch(
         &action(
             "artifact.audit",
-            &[
-                ("root", "dictionary/bread-dictionary.md"),
-                ("kind", "dictionary"),
-            ],
+            &[("root", "dictionary"), ("kind", "dictionary")],
         ),
         &runtime,
         &mut conn,

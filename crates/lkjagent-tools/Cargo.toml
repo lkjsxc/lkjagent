@@ -14,3 +14,4 @@ lkjagent-graph = { path = "../lkjagent-graph" }
 lkjagent-protocol = { path = "../lkjagent-protocol" }
 lkjagent-store = { path = "../lkjagent-store" }
 rusqlite = { version = "0.40.1", features = ["bundled"] }
+serde_json = "1"
