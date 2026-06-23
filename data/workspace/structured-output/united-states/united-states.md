@@ -8,9 +8,9 @@ This document describes the United States of America, including geographic data,
 
 Example one names a path, an invariant, and the command or audit that proves it. Example two names a failure mode, the repair owner, and the evidence needed before completion.
 
-**Path:** `structured-output/united-states.md`  
+**Path:** `structured-output/united-states/united-states.md`  
 **Invariant:** United States documentation includes geographic data, cultural context, and economic indicators.  
-**Check:** `grep -c "population" structured-output/united-states.md` should return at least 1.
+**Check:** `grep -c "population" structured-output/united-states/united-states.md` should return at least 1.
 
 Example two names a failure mode, the repair owner, and the evidence needed before completion.  
 **Failure Mode:** Missing GDP data or demographic statistics documentation.  
