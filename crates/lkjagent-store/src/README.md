@@ -17,7 +17,8 @@ This directory holds schema setup and typed SQLite store APIs.
 - [memory/](memory/README.md): memory row mapping helpers.
 - [queue.rs](queue.rs): queue delivery and mutation APIs.
 - [queue/](queue/README.md): queue row mapping helpers.
-- [runtime_authority.rs](runtime_authority.rs): authority event, decision, and admission APIs.
+- [runtime_authority.rs](runtime_authority.rs): authority history API exports.
+- [runtime_authority/](runtime_authority/README.md): authority rows, reads, writes, and codecs.
 - [schema.rs](schema.rs): current SQLite schema setup.
 - [schema_artifacts.rs](schema_artifacts.rs): semantic artifact ledger SQLite schema setup.
 - [schema_authority.rs](schema_authority.rs): runtime authority SQLite schema setup.

@@ -19,6 +19,8 @@ mod authority;
 mod authority_admission;
 #[path = "daemon/authority/authority_ledger.rs"]
 mod authority_ledger;
+#[path = "daemon/authority/authority_ledger_support.rs"]
+mod authority_ledger_support;
 #[path = "daemon/authority/authority_store.rs"]
 mod authority_store;
 #[path = "daemon/context/compaction.rs"]
