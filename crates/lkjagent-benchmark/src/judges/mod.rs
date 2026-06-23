@@ -3,6 +3,7 @@ pub mod automata;
 pub mod bundle;
 pub mod correction;
 pub mod graph;
+pub mod owner_address;
 pub mod owner_continuation;
 pub mod owner_doc_topics;
 pub mod owner_docs;
@@ -43,6 +44,9 @@ pub fn judge_task(task: &BenchmarkTask, workspace: &Path) -> BenchResult<JudgeOu
         JudgeKind::BreadCookbookArtifact => owner_loop_ops::bread_cookbook_artifact(workspace),
         JudgeKind::TurnBudgetContinuation => owner_continuation::turn_budget_checkpoint(workspace),
         JudgeKind::UploadedRunFixtures => owner_uploaded::uploaded_run_fixtures(workspace),
+        JudgeKind::ArtifactAddressController => {
+            owner_address::artifact_address_controller(workspace)
+        }
         JudgeKind::StatusAccounting => owner_ops::status_accounting(workspace),
         JudgeKind::ModelHandoffLog => owner_ops::model_handoff_log(workspace),
     };

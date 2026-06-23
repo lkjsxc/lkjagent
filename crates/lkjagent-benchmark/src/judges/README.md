@@ -14,6 +14,7 @@ this crate.
 - [correction.rs](correction.rs): latest-instruction answer judge.
 - [graph.rs](graph.rs): shortest-path certificate judge.
 - [mod.rs](mod.rs): judge dispatcher.
+- [owner-address.rs](owner_address.rs): artifact address regression judge.
 - [owner-docs.rs](owner_docs.rs): semantic documentation topology judges.
 - [owner-loop-ops.rs](owner_loop_ops.rs): uploaded loop-regression judges.
 - [owner-ops.rs](owner_ops.rs): action recovery, status, and model log judges.

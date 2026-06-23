@@ -3,6 +3,7 @@ pub mod automata;
 pub mod bundle;
 pub mod correction;
 pub mod graph;
+pub mod owner_address;
 pub mod owner_doc_topics;
 pub mod owner_docs;
 pub mod owner_faults;
@@ -41,6 +42,7 @@ pub const TINY: &[BenchmarkTask] = &[
     owner_loop_content::NOTE_TASK,
     owner_loop_content::BREAD_TASK,
     owner_uploaded::TASK,
+    owner_address::TASK,
     owner_observability::STATUS_TASK,
     owner_observability::LOG_TASK,
 ];

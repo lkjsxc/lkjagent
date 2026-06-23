@@ -9,6 +9,7 @@ and the evidence required before completion.
 ## Table of Contents
 
 - [multi-topic-docs.md](multi-topic-docs.md): multi-topic documentation seed fixture.
+- [artifact-address-loop.md](artifact-address-loop.md): Markdown file-root artifact loop fixture.
 - [generated-boilerplate.md](generated-boilerplate.md): repeated generated leaf-body fixture.
 - [docs-init-lkjagent-model-rust.md](docs-init-lkjagent-model-rust.md): docs init semantic seed fixture.
 - [improve-structure-no-op.md](improve-structure-no-op.md): no-op structural task fixture.
