@@ -59,6 +59,7 @@ impl ResidentDaemon {
             |cycle| cycle.before_tokens,
         );
         let (summary, memory_ids) = self.compaction_summary_rows(conn, now, reason, before)?;
+        self.record_compaction_snapshot(conn, now, "pre", &summary)?;
         let prefix = super::startup::build_prefix_from_store(conn, &self.runtime.tools.workspace)?;
         let rendered = render_notice("compaction", &summary);
         let frame = Frame::new(
@@ -75,7 +76,35 @@ impl ResidentDaemon {
                 policy: self.runtime.budget,
             },
         );
-        self.apply_step_result(conn, now, result, false)
+        let tick = self.apply_step_result(conn, now, result, false)?;
+        self.record_compaction_snapshot(conn, now, "post", &summary)?;
+        Ok(tick)
+    }
+
+    fn record_compaction_snapshot(
+        &self,
+        conn: &Connection,
+        now: &str,
+        stage: &str,
+        summary: &str,
+    ) -> RuntimeResult<()> {
+        let fields = snapshot_fields(stage, summary);
+        let Some(graph) = self.state.graph.as_ref() else {
+            lkjagent_store::graph::snapshots::record_compaction_snapshot(
+                conn, 0, "none", "none", "none", &fields, now,
+            )?;
+            return Ok(());
+        };
+        lkjagent_store::graph::snapshots::record_compaction_snapshot(
+            conn,
+            graph.case_id.unwrap_or_default(),
+            graph.phase.as_str(),
+            graph.active_node.0,
+            graph.objective_text(),
+            &fields,
+            now,
+        )?;
+        Ok(())
     }
 
     fn compaction_summary_rows(
@@ -116,4 +145,10 @@ impl ResidentDaemon {
         store_state::set(conn, "last task summary id", &id.to_string())?;
         Ok((summary, vec![id]))
     }
+}
+
+fn snapshot_fields(stage: &str, summary: &str) -> Vec<String> {
+    let mut fields = vec![format!("stage={stage}")];
+    fields.extend(summary.lines().map(str::to_string));
+    fields
 }

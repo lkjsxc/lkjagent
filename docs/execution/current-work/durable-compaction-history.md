@@ -48,4 +48,6 @@ asked to preserve deterministic state.
 
 ## Status
 
-open.
+partially implemented. Runtime hard compaction writes pre and post rows to the graph compaction snapshot table,
+including summary fields for recovery, artifact cursor, missing evidence, exact next action, and last successful
+observation. Store reopen coverage and status rendering for the latest snapshot remain open.

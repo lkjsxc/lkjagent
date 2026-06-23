@@ -56,6 +56,22 @@ fn compaction_snapshot_renders_recovery_resume_fields() -> TestResult<()> {
         assert!(summary.contains(field), "missing {field}");
     }
     assert!(summary.contains("<tool>artifact.next</tool>"));
+    assert_durable_snapshots(&conn)?;
+    Ok(())
+}
+
+fn assert_durable_snapshots(conn: &rusqlite::Connection) -> TestResult<()> {
+    let rows = conn
+        .prepare(
+            "SELECT preserved_fields FROM graph_compaction_snapshots WHERE case_id = 8 ORDER BY id",
+        )?
+        .query_map([], |row| row.get::<_, String>(0))?
+        .collect::<Result<Vec<_>, _>>()?;
+    assert_eq!(rows.len(), 2);
+    assert!(rows[0].contains("stage=pre"));
+    assert!(rows[1].contains("stage=post"));
+    assert!(rows[0].contains("write_batch_cursor=docs/next.md"));
+    assert!(rows[1].contains("last_successful_observation=large prior output"));
     Ok(())
 }
 
