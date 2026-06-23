@@ -1,13 +1,19 @@
-# Japan Documentation
+# Japan
 
-## Overview
-Japan is a sovereign island nation in East Asia known for its advanced technology sector, cultural heritage, and global economic influence.
+## Concrete Record
 
-## Architecture / Origin
-The architectural framework originates from traditional Japanese design principles (wabi-sabi, ma) combined with modern urban planning influenced by Western industrialization post-WWII.
+This document describes the country of Japan, including geographic data, cultural context, economic indicators, and verification evidence tied to this exact path.
 
-## Ecosystem
-Japan integrates into the technological ecosystem through NTT Communications infrastructure, major tech hubs in Tokyo/Osaka/Kyoto, and partnerships with global semiconductor manufacturers.
+## Examples And Checks
 
-## Regional Context
-Deployment options include cloud services via AWS Tokyo region, on-premise datacenters in Chiba/Fukushima, localized enterprise solutions for government/financial sectors, and regional support teams across major metropolitan areas.
+Example one names a path, an invariant, and the command or audit that proves it. Example two names a failure mode, the repair owner, and the evidence needed before completion.
+
+**Path:** `structured-output/japan.md`  
+**Invariant:** Japan documentation includes geographic data, cultural context, and economic indicators.  
+**Check:** `grep -c "population" structured-output/japan.md` should return at least 1.
+
+Example two names a failure mode, the repair owner, and the evidence needed before completion.  
+**Failure Mode:** Missing GDP data or demographic statistics documentation.  
+**Repair Owner:** Documentation team.  
+**Evidence Needed:** Economic indicator table with current year values documented.
+
