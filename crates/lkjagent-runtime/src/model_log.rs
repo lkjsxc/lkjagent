@@ -1,3 +1,4 @@
+mod exchange;
 mod ledger;
 mod sections;
 mod text;
@@ -9,6 +10,11 @@ use lkjagent_context::budget::ContextBudgetPolicy;
 use rusqlite::Connection;
 
 use crate::error::{RuntimeError, RuntimeResult};
+
+pub use exchange::{
+    json_escape, record_provider_error, record_provider_request, record_provider_response,
+    ProviderLogContext, ProviderLogHandle,
+};
 
 pub const CURRENT_MODEL_LOG: &str = "logs/current-model-run.md";
 

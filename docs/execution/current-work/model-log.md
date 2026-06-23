@@ -14,11 +14,11 @@ Raw provider request and response evidence is recorded under the contract in
 ## Implementation Task
 
 - Keep `data/logs/current-model-run.md` as the synthesized owner handoff.
-- Add per-call provider exchange records under `data/logs/model/`.
+- Keep per-call provider exchange records under `data/logs/model/`.
 - Persist provider exchange rows in SQLite.
 - Redact secrets before writing files or store rows.
-- Record parsed-action, authority, admission, observation, timing, and error
-  files for every turn.
+- Record parsed-action, admission, observation, index, and export files for
+  every turn.
 - Add CLI list, show, export, and raw-case inspection commands.
 
 ## Inputs
@@ -32,8 +32,8 @@ Raw provider request and response evidence is recorded under the contract in
 
 ## Outputs
 
-- atomic request, response, parser, authority, admission, observation, timing,
-  and error files.
+- atomic request, response, authority, timing, and error files.
+- atomic parser, admission, observation, index, and export files.
 - `provider_exchange` store rows with hashes and status.
 - sanitized reproduction archive.
 - focused tests for empty content, interrupted output, stop closure, admission
@@ -48,5 +48,7 @@ Raw provider request and response evidence is recorded under the contract in
 
 ## Status
 
-partially implemented. The current Markdown handoff exists. Raw per-provider
-exchange JSON logging, store rows, redaction, and CLI inspection remain open.
+partially implemented. The current Markdown handoff, provider exchange store
+rows, request files, authority files, response files, timing files, and error
+files exist for daemon provider calls with a log root. Parser files, admission
+files, observation files, index records, exports, and CLI inspection remain open.

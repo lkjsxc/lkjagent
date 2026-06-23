@@ -56,11 +56,11 @@ admission, graph state, or dispatch.
 
 ## Runtime Records
 
-`parsed-action.json` stores parse status, normalized content, closure mode,
-parse faults, tool name, parameters, and byte counts.
-
 `authority.json` stores active mode, mission, tool surface, preferred next
 action, recovery route, completion gate, invariants, and decision id.
+
+`parsed-action.json` stores parse status, normalized content, closure mode,
+parse faults, tool name, parameters, and byte counts.
 
 `admission.json` stores accepted or refused status, reason, schema findings,
 repeat fingerprint, staleness fingerprint, and dispatch plan when accepted.
@@ -111,6 +111,7 @@ are persisted after dispatch, and the CLI can inspect the records.
 
 ## Status
 
-design-only. The runtime writes the current Markdown model handoff today. The
-per-exchange JSON layout, SQLite table, atomic writer, redaction layer, and CLI
-inspection commands are the next logging implementation slice.
+partially implemented. The runtime writes the current Markdown model handoff,
+SQLite `provider_exchange` rows, and atomic request, authority, response,
+timing, and error files for daemon provider calls that have a log root. Parse,
+admission, observation, index, export, and CLI inspection records remain open.

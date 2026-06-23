@@ -1,7 +1,10 @@
+use std::time::Instant;
+
+use lkjagent_context::assemble::assemble_messages;
+use lkjagent_llm::client::{complete, request_json};
 use rusqlite::Connection;
 
 use super::runner::{DaemonTick, ResidentDaemon};
-use crate::daemon::endpoint_complete;
 use crate::error::{RuntimeError, RuntimeResult};
 use crate::mode::EndpointDecision;
 use crate::prompt::token_estimate;
@@ -46,20 +49,28 @@ impl ResidentDaemon {
             return self.apply_step_result(conn, now, result, false);
         }
         self.refresh_authority_card(conn, &authority)?;
-        match endpoint_complete(
-            &self.runtime.client,
-            &self.state.context,
-            self.endpoint_attempt,
-        ) {
-            Ok(completion) => self.apply_completion(conn, now, completion),
-            Err(RuntimeError::CompletionOversize { preview }) => {
-                self.apply_oversize(conn, now, preview)
+        let messages = assemble_messages(&self.state.context);
+        let request = request_json(&self.runtime.client, &messages)?;
+        let provider_log = self.record_model_request(conn, now, &request)?;
+        let started = Instant::now();
+        match complete(&self.runtime.client, &messages, self.endpoint_attempt) {
+            Ok(completion) => {
+                self.record_model_response(conn, provider_log.as_ref(), &completion, started)?;
+                self.apply_completion(conn, now, completion)
             }
             Err(error) => {
-                self.endpoint_attempt = self.endpoint_attempt.saturating_add(1);
-                self.endpoint_retry_at = retry_deadline(now, error.retry_after_secs());
-                self.record_endpoint_error(conn, now, &error.to_string())?;
-                Ok(DaemonTick::EndpointError)
+                self.record_model_error(conn, provider_log.as_ref(), &error, started)?;
+                match RuntimeError::from(error) {
+                    RuntimeError::CompletionOversize { preview } => {
+                        self.apply_oversize(conn, now, preview)
+                    }
+                    error => {
+                        self.endpoint_attempt = self.endpoint_attempt.saturating_add(1);
+                        self.endpoint_retry_at = retry_deadline(now, error.retry_after_secs());
+                        self.record_endpoint_error(conn, now, &error.to_string())?;
+                        Ok(DaemonTick::EndpointError)
+                    }
+                }
             }
         }
     }
