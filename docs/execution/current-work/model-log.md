@@ -17,9 +17,9 @@ Raw provider request and response evidence is recorded under the contract in
 - Keep per-call provider exchange records under `data/logs/model/`.
 - Persist provider exchange rows in SQLite.
 - Redact secrets before writing files or store rows.
-- Keep parsed-action, admission, and observation files for every model-authored
-  tool turn.
-- Add index and export files for every turn.
+- Keep parsed-action, admission, observation, and index files for every
+  model-authored tool turn.
+- Add export files for every turn.
 - Keep CLI list and show inspection commands.
 - Add export and raw-case inspection commands.
 
@@ -36,8 +36,8 @@ Raw provider request and response evidence is recorded under the contract in
 
 - atomic request, response, authority, timing, and error files.
 - CLI list and show inspection output.
-- atomic parsed-action, admission, and observation files.
-- atomic index and export files.
+- atomic parsed-action, admission, observation, and index files.
+- atomic export files.
 - `provider_exchange` store rows with hashes and status.
 - sanitized reproduction archive.
 - focused tests for empty content, interrupted output, stop closure, admission
@@ -55,5 +55,5 @@ Raw provider request and response evidence is recorded under the contract in
 partially implemented. The current Markdown handoff, provider exchange store
 rows, request files, authority files, response files, timing files, and error
 files exist for daemon provider calls with a log root. Parsed-action,
-admission, observation files, and CLI list and show exist. Index records and
-exports remain open.
+admission, observation, index files, and CLI list and show exist. Exports remain
+open.

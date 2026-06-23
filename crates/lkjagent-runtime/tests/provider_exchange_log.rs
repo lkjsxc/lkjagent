@@ -2,7 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use lkjagent_runtime::model_log::{
-    record_parsed_action, record_provider_admission, record_provider_error,
+    record_parsed_action, record_provider_admission, record_provider_error, record_provider_index,
     record_provider_observation, record_provider_request, record_provider_response,
     ProviderLogContext,
 };
@@ -16,6 +16,7 @@ fn provider_exchange_writer_persists_files_and_store_rows() -> TestResult<()> {
     let conn = memory_store()?;
     let context = context("7", 5);
     let handle = record_provider_request(&conn, &root, &context, "{\"messages\":[]}")?;
+    record_provider_index(&root, &handle, &context)?;
     record_provider_response(
         &conn,
         &handle,
@@ -29,6 +30,7 @@ fn provider_exchange_writer_persists_files_and_store_rows() -> TestResult<()> {
     assert!(handle.dir.join("authority.json").exists());
     assert!(handle.dir.join("response.json").exists());
     assert!(handle.dir.join("timing.json").exists());
+    assert!(root.join("index.ndjson").exists());
     record_parsed_action(&handle, "<act>\n<tool>graph.state</tool>\n</act>")?;
     lkjagent_store::state::set(
         &conn,

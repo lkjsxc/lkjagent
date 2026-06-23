@@ -1,4 +1,5 @@
 mod exchange;
+mod index;
 mod ledger;
 mod sections;
 mod text;
@@ -16,6 +17,7 @@ pub use exchange::{
     json_escape, record_provider_error, record_provider_request, record_provider_response,
     ProviderLogContext, ProviderLogHandle,
 };
+pub use index::record_provider_index;
 pub use turn_files::{
     record_parsed_action, record_provider_admission, record_provider_observation,
 };
