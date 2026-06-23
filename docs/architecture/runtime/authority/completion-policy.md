@@ -81,12 +81,13 @@ Run `cargo test -p lkjagent-runtime completion` and
 
 ## Implemented Slice
 
-The pure runtime admission reducer admits `agent.done` for owner work only when
-required evidence has no gaps, no recovery ladder is active, and hard context
-pressure is absent. Maintenance `agent.done` remains admitted only when owner
-work and recovery are absent. Missing-evidence refusals keep audit, read,
-repair, and batch tools available. This is focused reducer coverage, not proof
-that every close path is fully wired.
+The pure `decide_completion` reducer returns allowed status, completion kind,
+failed gates, missing evidence, existing evidence, next executable action,
+valid example, blocked-handoff allowance, and status text. Runtime admission
+uses this reducer for `agent.done`. Maintenance completion remains separate
+from owner completion. Missing-evidence refusals keep audit, read, repair, and
+batch tools available. This is focused reducer coverage, not proof that every
+close path is fully wired.
 
 ## Status
 

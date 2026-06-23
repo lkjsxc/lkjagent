@@ -47,7 +47,7 @@ prove that their failures cannot recur.
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, a pure recovery plan table, and SQLite retry counts keyed by case, node, tool, parameter shape, and fault class exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Registry examples parse, validate, and dispatch to routes except heavyweight verification gates. Recovery-plan examples parse, validate, and are admitted by recovery policy when model-authored. |
 | Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, and root-scoped cursors exist. Artifact identity, adoption, weak-path repair state, and semantic readiness are incomplete. |
-| Completion gates | Runtime completion refusals keep cases open for many artifact and evidence gaps. Every close path is not yet proven to use the same artifact-aware gate. |
+| Completion gates | A pure `decide_completion` reducer returns completion kind, failed gates, missing and existing evidence, next action, valid example, blocked-handoff allowance, and status text. Runtime `agent.done` admission uses it. Every close path is not yet proven to use the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices. Durable snapshot history remains shallow. |
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, and same-title high-overlap merge exist. Rewrite pruning and pre-dispatch owner preemption remain open. |
 | Status and console | Active graph state, active mode, authority snapshot fields, context pressure, token usage, and model-log paths display. Last successful observation is summarized from recent observations. |
@@ -109,6 +109,16 @@ Recent authority data-model and store slices also ran:
 - `cargo test -p lkjagent-runtime --test turn_authority`: `TURN_AUTHORITY_EXIT=0`.
 - `cargo test -p lkjagent-store --test runtime_authority`: `STORE_AUTH_EXIT=0`.
 - `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
+
+Current completion reducer slice gates:
+
+- `cargo test -p lkjagent-runtime --test completion_decision`: `COMPLETION_DECISION_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test authority_completion`: `AUTH_COMPLETION_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test authority_reducer`: `AUTH_REDUCER_EXIT=0`.
+- `cargo fmt --check`: `FMT_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
 
 Docker Compose verification is not current for this slice.
 
