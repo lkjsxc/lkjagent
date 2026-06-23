@@ -48,7 +48,7 @@ prove that their failures cannot recur.
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. Registry examples parse, validate, and dispatch to routes except heavyweight verification gates. Recovery-plan examples parse, validate, are admitted by recovery policy, and dispatch to local routes when model-authored. |
 | Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, normalized artifact ledger and cursor store APIs, ledger writes from `artifact.plan`, `artifact.apply`, `artifact.audit`, and `artifact.next`, successful write-path cursor completion marking, audit output `artifact_ledger_id`, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Full close-path coverage remains incomplete. |
 | Completion gates | A pure `decide_completion` reducer returns completion kind, failed gates, missing and existing evidence, next action, valid example, blocked-handoff allowance, and status text. Runtime `agent.done` admission uses it, and daemon graph dispatch checks the artifact ledger before admitting completion. Every close path is not yet proven to use the same artifact-aware gate. |
-| Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices. Durable snapshot history remains shallow. |
+| Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Store reopen coverage and status rendering for latest snapshots remain open. |
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, and same-title high-overlap merge exist. Rewrite pruning and pre-dispatch owner preemption remain open. |
 | Status and console | Active graph state, active mode, authority snapshot fields, context pressure, token usage, and model-log paths display. Last successful observation is summarized from recent observations. |
 | Benchmarks | Uploaded-run signatures are represented by deterministic fixtures. Runtime replay coverage and every completion path are not yet complete. |
@@ -96,14 +96,6 @@ Current authority admission-view slice gates:
 - `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-
-Recent authority data-model and store slices also ran:
-
-- `cargo test -p lkjagent-runtime --test authority_decision_record`: `DECISION_RECORD_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test authority_reducer`: `AUTH_REDUCER_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test turn_authority`: `TURN_AUTHORITY_EXIT=0`.
-- `cargo test -p lkjagent-store --test runtime_authority`: `STORE_AUTH_EXIT=0`.
-- `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
 
 Current completion reducer slice gates:
 
@@ -178,6 +170,15 @@ Current persisted authority prompt-card slice gates:
 Current recovery-plan dispatch slice gates:
 
 - `cargo test -p lkjagent-runtime --test authority_recovery_plan`: `AUTH_RECOVERY_PLAN_EXIT=0`.
+- `cargo test -p lkjagent-runtime`: `RUNTIME_TEST_EXIT=0`.
+- `cargo fmt --check`: `FMT_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
+
+Current durable compaction snapshot slice gates:
+
+- `cargo test -p lkjagent-runtime --test compaction_snapshot`: `COMPACTION_SNAPSHOT_EXIT=0`.
 - `cargo test -p lkjagent-runtime`: `RUNTIME_TEST_EXIT=0`.
 - `cargo fmt --check`: `FMT_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.

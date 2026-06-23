@@ -49,4 +49,7 @@ digest and resumed next action.
 
 ## Status
 
-partially implemented for current notices; durable snapshot history remains open.
+partially implemented. Current notices and graph compaction snapshot rows preserve
+pre and post compaction fields, including artifact cursor and last observation
+summary. Store reopen coverage and status rendering for the latest snapshot
+remain open.
