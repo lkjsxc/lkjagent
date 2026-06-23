@@ -6,6 +6,7 @@ This directory holds schema setup and typed SQLite store APIs.
 
 ## Table of Contents
 
+- [artifact_ledger.rs](artifact_ledger.rs): semantic artifact ledger APIs.
 - [error.rs](error.rs): store error type.
 - [events.rs](events.rs): append-only transcript events.
 - [graph/](graph/README.md): graph table helper modules.
@@ -17,6 +18,7 @@ This directory holds schema setup and typed SQLite store APIs.
 - [queue/](queue/README.md): queue row mapping helpers.
 - [runtime_authority.rs](runtime_authority.rs): authority event, decision, and admission APIs.
 - [schema.rs](schema.rs): current SQLite schema setup.
+- [schema_artifacts.rs](schema_artifacts.rs): semantic artifact ledger SQLite schema setup.
 - [schema_authority.rs](schema_authority.rs): runtime authority SQLite schema setup.
 - [schema_graph.rs](schema_graph.rs): graph-specific SQLite schema setup.
 - [state.rs](state.rs): key-value state and daemon lock decisions.

@@ -6,6 +6,7 @@ This directory holds in-memory SQLite integration tests for the store crate.
 
 ## Table of Contents
 
+- [artifact_ledger.rs](artifact_ledger.rs): semantic artifact ledger and weak-path fixtures.
 - [events.rs](events.rs): append/read event ordering fixture.
 - [graph.rs](graph.rs): graph case, evidence, and memory-link fixtures.
 - [memory.rs](memory.rs): FTS ranking, digest, update, and delete fixtures.

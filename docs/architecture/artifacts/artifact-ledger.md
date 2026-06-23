@@ -48,4 +48,6 @@ readiness repair, audit, and completion update the ledger.
 
 ## Status
 
-design-only for the normalized ledger; current artifact state is partial.
+partially implemented. SQLite schema and store APIs persist artifact identity, lifecycle status, readiness status,
+weak path counts, weak path requirement labels, and batch cursor rows. Runtime artifact tools do not yet write this
+ledger.
