@@ -19,7 +19,8 @@ Raw provider request and response evidence is recorded under the contract in
 - Redact secrets before writing files or store rows.
 - Record parsed-action, admission, observation, index, and export files for
   every turn.
-- Add CLI list, show, export, and raw-case inspection commands.
+- Keep CLI list and show inspection commands.
+- Add export and raw-case inspection commands.
 
 ## Inputs
 
@@ -33,6 +34,7 @@ Raw provider request and response evidence is recorded under the contract in
 ## Outputs
 
 - atomic request, response, authority, timing, and error files.
+- CLI list and show inspection output.
 - atomic parser, admission, observation, index, and export files.
 - `provider_exchange` store rows with hashes and status.
 - sanitized reproduction archive.
@@ -50,5 +52,6 @@ Raw provider request and response evidence is recorded under the contract in
 
 partially implemented. The current Markdown handoff, provider exchange store
 rows, request files, authority files, response files, timing files, and error
-files exist for daemon provider calls with a log root. Parser files, admission
-files, observation files, index records, exports, and CLI inspection remain open.
+files exist for daemon provider calls with a log root. CLI list and show exist.
+Parser files, admission files, observation files, index records, and exports
+remain open.

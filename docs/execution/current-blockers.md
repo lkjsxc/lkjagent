@@ -82,8 +82,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   recovery signatures.
 - Memory pruning deletes exact duplicates and merges same-title high-overlap
   rows with source IDs.
-- Provider exchange logging has a design contract and an implemented store plus
-  atomic request, authority, response, timing, and error file writer.
+- Provider exchange logging has a design contract, implemented store, atomic
+  request, authority, response, timing, and error file writer, and CLI list/show.
 
 ## Remaining Proof Gaps
 
@@ -101,4 +101,4 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - Rendered recovery examples still need a registry-wide parse, validation, and
   dispatch proof.
 - Provider exchange logging still needs parse, admission, observation, index,
-  export, and CLI inspection implementation.
+  and export implementation.

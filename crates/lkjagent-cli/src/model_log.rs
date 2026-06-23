@@ -1,11 +1,20 @@
 use std::fs;
 use std::path::Path;
 
+use crate::args::ModelLogCommand;
 use crate::config::load_context_policy_for_status;
 use crate::error::CliError;
 use crate::store::{now_stamp, open_store};
 
-pub fn model_log(data_dir: &Path, print: bool) -> Result<String, CliError> {
+pub fn model_log(data_dir: &Path, command: ModelLogCommand) -> Result<String, CliError> {
+    match command {
+        ModelLogCommand::Current { print } => current_model_log(data_dir, print),
+        ModelLogCommand::List { limit } => list_exchanges(data_dir, limit),
+        ModelLogCommand::Show { case_id, turn_id } => show_exchange(data_dir, &case_id, turn_id),
+    }
+}
+
+fn current_model_log(data_dir: &Path, print: bool) -> Result<String, CliError> {
     let conn = open_store(data_dir)?;
     let path = lkjagent_runtime::model_log::current_log_path(data_dir);
     let policy = load_context_policy_for_status(data_dir)?;
@@ -15,4 +24,59 @@ pub fn model_log(data_dir: &Path, print: bool) -> Result<String, CliError> {
     } else {
         Ok(format!("model_log={}", path.to_string_lossy()))
     }
+}
+
+fn list_exchanges(data_dir: &Path, limit: usize) -> Result<String, CliError> {
+    let conn = open_store(data_dir)?;
+    let rows = lkjagent_store::provider_exchange::list_recent(&conn, limit)?;
+    if rows.is_empty() {
+        return Ok("provider_exchange=none".to_string());
+    }
+    Ok(rows
+        .iter()
+        .map(|row| {
+            format!(
+                "id={} case={} turn={} status={} model={} created_at={}",
+                row.id, row.case_id, row.turn_id, row.status, row.model, row.created_at
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n"))
+}
+
+fn show_exchange(data_dir: &Path, case_id: &str, turn_id: i64) -> Result<String, CliError> {
+    let conn = open_store(data_dir)?;
+    let Some(detail) =
+        lkjagent_store::provider_exchange::detail_for_case_turn(&conn, case_id, turn_id)?
+    else {
+        return Err(CliError::failure(format!(
+            "provider_exchange_not_found case={case_id} turn={turn_id}"
+        )));
+    };
+    let mut out = format!(
+        "id={}\ncase={}\nturn={}\nstatus={}\nprovider={}\nmodel={}\ncreated_at={}\nrequest_hash={}\n",
+        detail.row.id,
+        detail.row.case_id,
+        detail.row.turn_id,
+        detail.row.status,
+        detail.row.provider,
+        detail.row.model,
+        detail.row.created_at,
+        detail.row.request_hash
+    );
+    if let Some(hash) = &detail.row.response_hash {
+        out.push_str(&format!("response_hash={hash}\n"));
+    }
+    if let Some(latency) = detail.latency_ms {
+        out.push_str(&format!("latency_ms={latency}\n"));
+    }
+    out.push_str("request_json:\n");
+    out.push_str(&detail.request_json);
+    out.push_str("\nresponse_json:\n");
+    out.push_str(detail.response_json.as_deref().unwrap_or("null"));
+    if let Some(usage) = &detail.usage_json {
+        out.push_str("\nusage_json:\n");
+        out.push_str(usage);
+    }
+    Ok(out)
 }

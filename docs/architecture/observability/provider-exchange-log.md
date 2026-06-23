@@ -88,11 +88,16 @@ hashed or reduced to scheme and host class.
 
 ## CLI Surface
 
-The CLI exposes:
+The CLI exposes implemented inspection commands:
 
 ```sh
 lkjagent model-log list
 lkjagent model-log show --case <case-id> --turn <n>
+```
+
+The export surface remains open:
+
+```sh
 lkjagent model-log export --case <case-id> --out tmp/repro-<case-id>.tar.zst
 lkjagent log --raw --case <case-id>
 ```
@@ -113,5 +118,6 @@ are persisted after dispatch, and the CLI can inspect the records.
 
 partially implemented. The runtime writes the current Markdown model handoff,
 SQLite `provider_exchange` rows, and atomic request, authority, response,
-timing, and error files for daemon provider calls that have a log root. Parse,
-admission, observation, index, export, and CLI inspection records remain open.
+timing, and error files for daemon provider calls that have a log root. The CLI
+lists and shows provider exchange rows. Parse, admission, observation, index,
+and export records remain open.
