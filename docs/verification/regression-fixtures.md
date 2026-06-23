@@ -13,6 +13,7 @@ fixture names input, forbidden output, expected guard, and completion evidence.
 - directory with `.md` suffix.
 - disconnected root README topic blurbs.
 - model-specific durable naming.
+- repeated generated boilerplate across scaffold leaves.
 - mock content across sibling files.
 - Japanese cookbook drifting into bread paths.
 - parser recovery loop and repeated invalid actions.
@@ -28,4 +29,4 @@ runtime contract before the related blocker can close.
 
 ## Status
 
-implemented
+partially implemented

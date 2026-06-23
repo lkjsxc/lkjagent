@@ -9,6 +9,7 @@ and the evidence required before completion.
 ## Table of Contents
 
 - [multi-topic-docs.md](multi-topic-docs.md): multi-topic documentation seed fixture.
+- [generated-boilerplate.md](generated-boilerplate.md): repeated generated leaf-body fixture.
 - [docs-init-lkjagent-model-rust.md](docs-init-lkjagent-model-rust.md): docs init semantic seed fixture.
 - [improve-structure-no-op.md](improve-structure-no-op.md): no-op structural task fixture.
 - [model-specific-naming.md](model-specific-naming.md): provider-neutral durable output fixture.
@@ -24,4 +25,4 @@ and the evidence required before completion.
 
 ## Status
 
-implemented
+partially implemented
