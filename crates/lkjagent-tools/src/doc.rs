@@ -90,6 +90,11 @@ fn scaffold_input(
     if input.root.is_empty() {
         return Err(ToolError::invalid("doc.scaffold root must not be empty"));
     }
+    if crate::address::root_looks_like_markdown_file(&input.root) {
+        return Err(ToolError::invalid(
+            crate::address::render_markdown_root_refusal("doc.scaffold", &input.root),
+        ));
+    }
     if input.title.is_empty() {
         return Err(ToolError::invalid("doc.scaffold title must not be empty"));
     }

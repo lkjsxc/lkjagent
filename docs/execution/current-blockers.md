@@ -59,6 +59,12 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   use explicit structure-only or owner-term-only state instead.
 - `artifact.next` generic documentation examples now name the root, kind, target
   path, source boundary, and required audit evidence.
+- `artifact.next` accepts a focused weak path and no longer renders
+  artifact.audit for a Markdown file root in focused tests.
+- `doc.scaffold`, `artifact.apply`, `doc.audit`, and `artifact.audit` now have
+  semantic Markdown-root refusals covered by focused tests.
+- `fs.batch_write` accepts JSON-in-files recovery payloads while keeping line
+  protocol canonical.
 - Multi-topic requests such as model endpoint, Minecraft, Windows, Japan, and
   the United States select a relation-first seed and topic pages instead of one
   combined filename.

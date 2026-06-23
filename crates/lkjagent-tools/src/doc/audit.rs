@@ -23,11 +23,20 @@ pub fn audit_root(
         failures.push(format!("missing_root: {root}"));
         return Ok(report(root, failures, false));
     }
+    if full.is_file() {
+        return Ok(file_root_report(root));
+    }
     collect_dir_checks(&full, &full, &mut failures)?;
     let content_requested = full.join("catalog.toml").is_file();
     content_checks(&full, &mut failures)?;
     count_check(&full, count, mode, &mut failures)?;
     Ok(report(root, failures, content_requested))
+}
+
+fn file_root_report(root: &str) -> String {
+    format!(
+        "document audit failed\nroot={root}\npath_kind=file\naddress_status=root_is_file\nfailed=1\nfailures:\n- root_is_file: {root}\nnext_action=fs.read file\nvalid_example:\n<act>\n<tool>fs.read</tool>\n<path>{root}</path>\n</act>"
+    )
 }
 
 fn collect_dir_checks(root: &Path, dir: &Path, failures: &mut Vec<String>) -> ToolResult<()> {
