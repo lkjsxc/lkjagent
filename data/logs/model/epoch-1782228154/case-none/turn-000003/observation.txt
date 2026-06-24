@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-done
-summary=maintenance cycle closed: queue empty, memory search yielded no results, no durable lessons captured due to policy block on memory.save
-</content>
-</observation>

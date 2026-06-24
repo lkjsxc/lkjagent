@@ -1,1 +1,0 @@
-{"error_class":"CompletionOversize","message":"endpoint completion hit max tokens; preview=<act>\\n<tool>fs.batch_write</tool>\\n<path>stories/sf-novel-with-detailed-settings/02-characters.md/topics</path>\\n<files>[{\"title\":\"Kaelen Thorne - Background\",\"content\":\"# Kaelen \\\"Kai\\\" Thorne\\n\\n## Core Identity\\n- **Age**: 28\\n- **Origin**"}

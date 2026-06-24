@@ -1,1 +1,0 @@
-{"status":"fault","closure_mode":"StopSequenceClosed","content_bytes":130,"error":"BadParams { tool: \"artifact.next\", missing: [\"root\"], unknown: [\"path\"] }"}
