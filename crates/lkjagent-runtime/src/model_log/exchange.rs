@@ -84,6 +84,7 @@ pub fn record_provider_response(
             latency_ms,
         },
     )?;
+    super::export::record_success_export(&handle.dir, &handle.id, finish_reason, latency_ms)?;
     Ok(())
 }
 
@@ -111,6 +112,7 @@ pub fn record_provider_error(
             latency_ms,
         },
     )?;
+    super::export::record_error_export(&handle.dir, &handle.id, error_class, latency_ms)?;
     Ok(())
 }
 

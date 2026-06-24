@@ -30,6 +30,7 @@ fn provider_exchange_writer_persists_files_and_store_rows() -> TestResult<()> {
     assert!(handle.dir.join("authority.json").exists());
     assert!(handle.dir.join("response.json").exists());
     assert!(handle.dir.join("timing.json").exists());
+    assert!(handle.dir.join("export.json").exists());
     assert!(root.join("index.ndjson").exists());
     record_parsed_action(
         &handle,
@@ -63,6 +64,8 @@ fn provider_exchange_writer_records_errors_ndjson() -> TestResult<()> {
 
     let errors = fs::read_to_string(handle.dir.join("errors.ndjson"))?;
     assert!(errors.contains("EndpointError"));
+    let export = fs::read_to_string(handle.dir.join("export.json"))?;
+    assert!(export.contains("EndpointError"));
     let row = lkjagent_store::provider_exchange::latest_for_case_turn(&conn, "none", 6)?
         .ok_or("missing provider exchange row")?;
     assert_eq!(row.status, "failed");

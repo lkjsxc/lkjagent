@@ -53,7 +53,7 @@ Raw provider request and response evidence is recorded under the contract in
 ## Status
 
 partially implemented. The current Markdown handoff, provider exchange store
-rows, request files, authority files, response files, timing files, and error
-files exist for daemon provider calls with a log root. Parsed-action,
-admission, observation, index files, and CLI list and show exist. Exports remain
-open.
+rows, request files, authority files, response files, timing files, error
+files, per-turn export files, parsed-action, admission, observation, index
+files, and CLI list and show exist for daemon provider calls with a log root.
+Raw-case inspection and sanitized archive commands remain open.
