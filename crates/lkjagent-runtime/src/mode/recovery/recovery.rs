@@ -3,7 +3,7 @@ use super::model::{RecoveryClass, RecoveryPlan, RuntimeFault, RuntimeSnapshot};
 use super::recovery_route::{
     blocked_handoff_behavior, escalation_route, fault_class, recovery_route,
 };
-use lkjagent_tools::dispatch::registry_valid_example;
+use lkjagent_tools::dispatch::{registry_valid_example, valid_example_for, ExampleContext};
 
 pub fn recovery_plan_for_fault(snapshot: &RuntimeSnapshot, fault: RuntimeFault) -> RecoveryPlan {
     let fault_class = fault_class(fault);
@@ -19,7 +19,7 @@ pub fn recovery_plan_for_fault(snapshot: &RuntimeSnapshot, fault: RuntimeFault) 
         allowed_repair_tools: repair_tools(class),
         forced_next_action: forced_action_text(class, &forced_tool),
         escalation_route: escalation_route(fault_class).to_string(),
-        exact_valid_example: valid_example(&forced_tool),
+        exact_valid_example: valid_example(snapshot, &forced_tool),
         fallback_action: fallback_action(class),
         blocked_handoff_behavior: blocked_handoff_behavior(fault_class).to_string(),
         partial_handoff: allows_partial_handoff(class),
@@ -66,6 +66,9 @@ fn forced_tool(snapshot: &RuntimeSnapshot, class: RecoveryClass) -> String {
             .filter(|tool| registry_valid_example(tool).is_some())
             .unwrap_or_else(|| "graph.recover".to_string()),
         RecoveryClass::RepeatActionFault => alternate_tool(snapshot),
+        RecoveryClass::PayloadOverflow if snapshot.active_artifact.is_some() => {
+            "artifact.next".to_string()
+        }
         RecoveryClass::PayloadOverflow => "fs.batch_write".to_string(),
         RecoveryClass::ArtifactAuditFailure | RecoveryClass::WeakArtifactContent => {
             "artifact.next".to_string()
@@ -146,9 +149,7 @@ fn forced_action_text(class: RecoveryClass, tool: &str) -> String {
             format!("retry {tool} with the schema example")
         }
         RecoveryClass::RepeatActionFault => format!("change action shape to {tool}"),
-        RecoveryClass::PayloadOverflow => {
-            "switch from raw write to bounded batch write".to_string()
-        }
+        RecoveryClass::PayloadOverflow => format!("switch from raw write to {tool}"),
         RecoveryClass::TurnBudgetExhaustion => "write a blocked partial handoff".to_string(),
         _ => format!("run {tool}"),
     }
@@ -158,7 +159,7 @@ fn fallback_action(class: RecoveryClass) -> String {
     match class {
         RecoveryClass::TurnBudgetExhaustion => "persist blocked handoff".to_string(),
         RecoveryClass::RepeatActionFault => "select smaller scope or blocked handoff".to_string(),
-        RecoveryClass::PayloadOverflow => "fall back to one-file write or handoff".to_string(),
+        RecoveryClass::PayloadOverflow => "fall back to artifact audit or handoff".to_string(),
         _ => "route to blocked handoff when retries are exhausted".to_string(),
     }
 }
@@ -172,8 +173,16 @@ fn allows_partial_handoff(class: RecoveryClass) -> bool {
     )
 }
 
-fn valid_example(tool: &str) -> String {
-    registry_valid_example(tool).unwrap_or_else(|| format!("runtime action: {tool}"))
+fn valid_example(snapshot: &RuntimeSnapshot, tool: &str) -> String {
+    let context = ExampleContext {
+        artifact_root: snapshot.active_artifact.clone(),
+        ..ExampleContext::default()
+    };
+    valid_example_for(tool, context)
+        .map(|example| example.render())
+        .ok()
+        .or_else(|| registry_valid_example(tool))
+        .unwrap_or_else(|| format!("runtime action: {tool}"))
 }
 
 fn tools(values: &[&str]) -> Vec<String> {

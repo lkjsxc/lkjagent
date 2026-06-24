@@ -1,7 +1,7 @@
 use super::completion_gate::decide_completion;
 use super::model::{ActiveMode, RuntimeFault, RuntimeSnapshot, ToolAdmission};
 use super::policy::policy_for_mode;
-use lkjagent_tools::dispatch::registry_valid_example;
+use lkjagent_tools::dispatch::{registry_valid_example, valid_example_for, ExampleContext};
 
 pub fn admit_tool(snapshot: &RuntimeSnapshot, requested_tool: &str) -> ToolAdmission {
     let next_valid_tools = next_valid_tools(snapshot);
@@ -15,7 +15,7 @@ pub fn admit_tool(snapshot: &RuntimeSnapshot, requested_tool: &str) -> ToolAdmis
             .as_deref()
             .is_some_and(|tool| tool == requested_tool);
     let example_tool = example_tool(requested_tool, &next_valid_tools, repeated_blocked);
-    let exact_valid_example = example_tool.map(valid_example);
+    let exact_valid_example = example_tool.map(|tool| valid_example(snapshot, tool));
     let admitted = !completion_blocked
         && !owner_question_blocked
         && !repeated_blocked
@@ -143,8 +143,16 @@ fn example_tool<'a>(
     next_valid_tools.first().map(String::as_str)
 }
 
-fn valid_example(tool: &str) -> String {
-    registry_valid_example(tool).unwrap_or_else(|| runtime_only_example(tool))
+fn valid_example(snapshot: &RuntimeSnapshot, tool: &str) -> String {
+    let context = ExampleContext {
+        artifact_root: snapshot.active_artifact.clone(),
+        ..ExampleContext::default()
+    };
+    valid_example_for(tool, context)
+        .map(|example| example.render())
+        .ok()
+        .or_else(|| registry_valid_example(tool))
+        .unwrap_or_else(|| runtime_only_example(tool))
 }
 
 fn runtime_only_example(tool: &str) -> String {

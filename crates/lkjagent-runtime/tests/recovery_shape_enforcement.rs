@@ -40,6 +40,33 @@ fn repeated_graph_recover_changes_action_class() {
     assert_eq!(plan.retry_budget, 0);
 }
 
+#[test]
+fn oversized_batch_with_artifact_routes_to_artifact_next() {
+    let snapshot = recovery_snapshot("fs.batch_write", false);
+    let plan = recovery_plan_for_fault(&snapshot, RuntimeFault::PayloadTooLarge);
+
+    assert_eq!(plan.recovery_class, RecoveryClass::PayloadOverflow);
+    assert_eq!(plan.forced_tool, "artifact.next");
+    assert!(plan
+        .exact_valid_example
+        .contains("<tool>artifact.next</tool>"));
+    assert!(plan
+        .exact_valid_example
+        .contains("<root>stories/chronos-fracture</root>"));
+}
+
+#[test]
+fn oversized_batch_without_artifact_keeps_bounded_batch_route() {
+    let mut snapshot = recovery_snapshot("fs.batch_write", false);
+    snapshot.active_artifact = None;
+    let plan = recovery_plan_for_fault(&snapshot, RuntimeFault::PayloadTooLarge);
+
+    assert_eq!(plan.forced_tool, "fs.batch_write");
+    assert!(plan
+        .exact_valid_example
+        .contains("<tool>fs.batch_write</tool>"));
+}
+
 fn recovery_snapshot(last_tool: &str, repeated_action: bool) -> RuntimeSnapshot {
     RuntimeSnapshot {
         active_mode: ActiveMode::Recovery,

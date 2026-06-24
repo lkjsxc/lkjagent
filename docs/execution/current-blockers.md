@@ -70,7 +70,8 @@ Fracture run proves both progress and failure:
   duplicates, empty content, and oversized payloads refuse before mutation.
   Runtime repeated-fault route changes remain open beyond covered classes.
 - Recovery routes now change repeated batch-schema faults from `fs.batch_write`
-  to `artifact.next`, and repeated attribute-like parser faults to `graph.state`
+  to `artifact.next`, payload-overflow faults with a known artifact to
+  `artifact.next`, and repeated attribute-like parser faults to `graph.state`
   inspection. Every other fault class still needs route-level shape-change proof.
 - Existing `.md` directories now render explicit invalid-root marker and repair
   outcome text. Artifact readiness must be tied to the current artifact id.
