@@ -140,7 +140,8 @@ exist. A standalone `kernel` module now defines pure snapshot, event, decision,
 admission, effect, render, fault, and reducer records with tests for mission
 priority and model-call admission invariants. Store ledgers include prompt
 frame and observation rows, reopen lookup proof, and foreign-key proof that an
-admission cannot exist without a decision. The snapshot adapter computes
+admission cannot exist without a decision. The daemon records authority prompt
+frames and effect observations for pending dispatches. The snapshot adapter computes
 staleness fingerprints from queue, case, graph, artifact cursor, fault,
 evidence, compaction, maintenance, and prompt facts; rejects synthetic active
 case ids; and ignores maintenance due state when owner work exists. Kernel

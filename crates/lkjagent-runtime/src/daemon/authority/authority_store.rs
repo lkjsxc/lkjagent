@@ -1,5 +1,6 @@
 use lkjagent_context::model::{Frame, FrameKind};
 use lkjagent_graph::{TaskGraphState, TransitionDecision};
+use lkjagent_store::runtime_authority::{record_prompt_frame, PromptFrameInput};
 use lkjagent_store::state as store_state;
 use rusqlite::Connection;
 
@@ -69,6 +70,37 @@ pub(super) fn persist_authority_snapshot(
             recovery_route: &graph.recovery_route,
         },
     )?;
+    Ok(())
+}
+
+pub(super) fn persist_authority_prompt_frame(
+    conn: &Connection,
+    now: &str,
+    rendered: &str,
+) -> RuntimeResult<()> {
+    let Some(decision_id) = store_state::get(conn, "authority decision id")?
+        .and_then(|value| value.parse::<i64>().ok())
+    else {
+        return Ok(());
+    };
+    let case_id =
+        store_state::get(conn, "authority case id")?.and_then(|value| value.parse::<i64>().ok());
+    let fingerprint = store_state::get(conn, "authority fingerprint")?.unwrap_or_default();
+    let summary = one_line(rendered);
+    let frame_id = record_prompt_frame(
+        conn,
+        &PromptFrameInput {
+            decision_id,
+            case_scope: if case_id.is_some() { "case" } else { "none" },
+            case_id,
+            frame_kind: "authority",
+            prompt_fingerprint: &fingerprint,
+            context_package_ids: &[],
+            rendered_summary: &summary,
+            created_at: now,
+        },
+    )?;
+    store_state::set(conn, "authority prompt frame id", &frame_id.to_string())?;
     Ok(())
 }
 
