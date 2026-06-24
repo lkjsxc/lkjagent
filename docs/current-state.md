@@ -81,9 +81,10 @@ repeated generated leaves can create false artifact evidence.
 The latest run after scaffold redesign showed root/path confusion:
 artifact.apply created a `.md` directory, artifact.next rendered artifact.audit
 for a Markdown file path, and doc/artifact audit surfaced `Not a directory`
-instead of a semantic root/path refusal. Focused tests, replay fixtures, quiet
-verify, and Docker Compose verify now cover this class; a live SF novel run has
-not been rerun in this slice.
+instead of a semantic root/path refusal. Focused tests and prior gates cover
+current file-root refusals, but artifact.plan reducer wiring, old `.md`
+directory adoption, route-level dispatch proof, and a live SF-novel rerun remain
+open.
 
 The runtime target remains a runtime-owned authority layer above model output,
 graph suggestions, maintenance, compaction, owner questions, verification, and

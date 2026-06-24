@@ -6,6 +6,15 @@ Define graph-native document construction helpers for structured artifacts.
 The semantic tree and graph contract lives in
 [../document-structure/](../document-structure/README.md).
 
+## Address Reducer Contract
+
+artifact.plan, artifact.apply, artifact.next, artifact.audit, doc.scaffold,
+and doc.audit call the shared address reducer before any filesystem, audit, or
+ledger effect. The reducer owns root versus weak path classification, Markdown
+leaf refusals, old `.md` directory refusals, normalized roots, and copyable
+examples. fs.write and fs.batch_write remain the only tools that write Markdown
+leaves.
+
 ## doc.scaffold
 
 Creates a compact semantic tree under `root`. Parameters are `root`, optional
@@ -41,6 +50,7 @@ rejects a generic project-doc manifest for that artifact request. Passing
 artifact audit is the only audit-owned readiness proof for artifact-readiness
 evidence. If `root` resolves to a file, artifact.audit reports `root_is_file`
 and renders a root-directory next action instead of surfacing an OS error.
+Graph notes and raw file existence do not satisfy artifact readiness.
 
 ## artifact.next
 
@@ -64,5 +74,6 @@ The documentation root contract is
 ## Status
 
 partially implemented; doc tools, artifact wrappers, bounded next-batch
-planning, and scaffold-only rejection exist. Root adoption and repair planning
-remain open.
+planning, scaffold-only rejection, and focused address refusals exist. Full
+shared-reducer wiring for artifact.plan and every doc route, root adoption,
+and repair planning remain open.

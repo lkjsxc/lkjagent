@@ -11,7 +11,7 @@ linked task contract names focused evidence and the actual gates that ran.
 | --- | --- | --- | --- |
 | 1 | Generated documentation can repeat universal scaffold boilerplate | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | partially implemented |
 | 2 | Generated path names can concatenate unrelated owner topics | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | partially implemented |
-| 3 | Document and artifact tools confuse root directories with Markdown leaf paths | [current-work/artifact-address-controller.md](current-work/artifact-address-controller.md) | open |
+| 3 | Document and artifact tools confuse root directories with Markdown leaf paths | [current-work/artifact-address-controller.md](current-work/artifact-address-controller.md) | partially implemented |
 | 4 | Runtime authority is not the single source of active mission and tool admission | [current-work/state-transition-network.md](current-work/state-transition-network.md) | open |
 | 5 | Recovery can block the exact observation, repair, or batch tool needed to escape | [current-work/recovery-shape-enforcement.md](current-work/recovery-shape-enforcement.md) | open |
 | 6 | Content artifacts can pass on scaffold or planning evidence instead of real content | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | open |
@@ -39,8 +39,9 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - The first implementation slice removes the repeated scaffold generator and
   adds generated path hygiene in
   [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md).
-- Root/path address repair now precedes runtime authority because current logs
-  show tool output can render an invalid file-root audit action.
+- Root/path address repair still precedes runtime authority because focused
+  file-root refusals exist, but artifact.plan, old `.md` directory adoption,
+  and full route-level example dispatch proof remain open.
 - The first runtime authority code slice remains the transition kernel in
   [current-work/state-transition-network.md](current-work/state-transition-network.md):
   snapshot, explicit event, decision, prompt frame, admission, effect, and next
@@ -123,7 +124,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - Broader stale-action contradiction repair is not yet covered for every mode.
 - Recovery shape-change enforcement is not yet proven for every live fault class.
 - Refusal-rendered examples still need route-level proof for every policy path.
-- Docker Compose verification has not run for the scaffold generator slice.
+- Address-controller Docker Compose evidence is recorded for the focused slice;
+  a fresh live SF-novel rerun and adoption proof remain open.
 - Artifact adoption and semantic readiness remain incomplete.
 - Compaction snapshots still need richer last-observation and batch-cursor
   fields.

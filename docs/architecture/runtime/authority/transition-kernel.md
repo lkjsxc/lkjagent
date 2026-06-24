@@ -23,13 +23,16 @@ prompt text. Graph policy is input to the snapshot, not a fallback authority.
 The snapshot adapter collects these facts before the reducer runs:
 
 - queue head and owner message count.
-- active case, node, phase, objective, constraints, assumptions, and risks.
-- graph policy, ranked tracks, missing evidence, and legal transitions.
-- artifact head, weak paths, write batch cursor, and audit state.
+- actual case id, graph node id, graph phase, objective, constraints,
+  assumptions, and risks; synthetic case ids such as `case:unknown` are invalid.
+- graph policy, ranked tracks, missing evidence, existing evidence, and legal
+  transitions as inputs only, never as fallback dispatch authority.
+- artifact root, artifact head, weak paths, weak-path cursor, write batch
+  cursor, audit id, audit status, and drift state.
 - latest fault, retry counters, failed action fingerprint, and recovery route.
 - latest observation and latest successful observation.
 - compaction pressure, compaction head, and maintenance state.
-- last decision id, prompt frame fingerprint, and staleness fingerprint.
+- latest decision id, prompt frame fingerprint, and staleness fingerprint.
 
 ## Decision Data
 

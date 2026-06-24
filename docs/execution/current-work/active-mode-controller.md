@@ -36,11 +36,12 @@ This current-work file tracks the implementation gap against that contract.
 
 ## Selection Rules
 
-If a pending owner queue row exists, select `OwnerTask`. Else, if an active
-owner case exists and is not closed, select `OwnerTask` or `Recovery`. Else,
-if compaction is required to keep the loop recoverable, select `Compaction`.
-Else, if maintenance is due, select `Maintenance`. Otherwise select
-`ClosedIdle`.
+If hard compaction is required or an unfinished compaction cycle exists, select
+`Compaction` as a runtime interrupt. The interrupt snapshots owner state and
+resumes the same owner mission after compaction. Else, if a pending owner queue
+row exists, select `OwnerTask`. Else, if an active owner case exists and is not
+closed, select `OwnerTask` or `Recovery`. Else, if maintenance is due, select
+`Maintenance`. Otherwise select `ClosedIdle`.
 
 ## Policy Rendering
 
@@ -69,9 +70,9 @@ changed.
 
 ## Compaction Interaction
 
-Hard compaction is runtime-owned. It snapshots graph state, recovery state,
-artifact state, fault state, and missing evidence without asking the model to
-run `memory.save`.
+Hard compaction is runtime-owned and precedes endpoint or tool work when the
+context is unsafe. It snapshots graph state, recovery state, artifact state,
+fault state, and missing evidence without asking the model to run `memory.save`.
 
 ## Completion Interaction
 

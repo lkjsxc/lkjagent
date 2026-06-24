@@ -6,22 +6,29 @@ This file owns the model-facing tool address contract for artifact tools.
 
 ## Address Shape
 
-- `root`: directory path of the artifact.
-- `path`: optional relative file path under root.
+- `root`: requested artifact address.
+- `path`: optional relative weak path under the normalized root.
 - `kind`: artifact kind.
-- `state`: missing-root, root-directory, file-under-root, file-without-root, or invalid-root.
+- `state`: root-directory, missing-root, file-under-known-root,
+  file-without-known-root, or invalid-root.
+
+## Root And Path Table
+
+| Tool | Accepts root | Accepts path | Result |
+| --- | --- | --- | --- |
+| artifact.plan | missing or existing directory identity | no | creates ledger identity only for directory-shaped roots. |
+| artifact.apply | missing or existing directory | no | writes or repairs a root; `.md` roots are refused before mutation. |
+| artifact.next | directory or known Markdown leaf | yes | normalizes to root plus weak path, then emits repair, apply, or audit. |
+| artifact.audit | existing directory | no | audits root readiness and records ledger evidence. |
+| fs.write | Markdown file path | no | writes one leaf; never owns artifact root identity. |
+| fs.batch_write | Markdown file paths | no | writes leaves; never owns artifact root identity. |
+| completion | normalized root | ledger weak paths | reads audit readiness and weak-path state only. |
 
 ## Tool Behavior
 
-- artifact.plan creates a ledger identity; it does not require filesystem existence.
-- artifact.apply creates or repairs a root directory; it refuses `.md` roots
-  unless an explicit migration route converts an old bad root.
-- artifact.next returns one of:
-  - apply-root when the root is missing.
-  - repair-paths when weak paths exist.
-  - audit-root when root content readiness has no weak paths.
-  - root-is-file when the address is a file.
-- artifact.audit audits only root directories.
+artifact.next returns apply-root when the root is missing, repair-paths when
+weak paths exist, audit-root when root content has no weak paths, or a semantic
+address refusal when the request is a file or invalid root.
 
 ## File Roots
 
