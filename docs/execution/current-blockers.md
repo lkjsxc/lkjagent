@@ -23,6 +23,7 @@ that ran.
 | 11 | Provider exchange export and raw-case inspection | [current-work/model-log.md](current-work/model-log.md) | implemented |
 | 12 | Replay benchmarks from current model run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | implemented |
 | 13 | Final live Docker story run and compose verification | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
+| 14 | Personal diary, schedule, and TODO records | [current-work/personal-records.md](current-work/personal-records.md) | open |
 
 ## Current Evidence
 

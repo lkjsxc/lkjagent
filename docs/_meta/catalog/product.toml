@@ -2,9 +2,10 @@
 
 # Fields: title, parent, children, role, sources, checks.
 
-"docs/product/README.md" = { title = "Product", parent = "docs/README.md", children = ["docs/product/cli.md", "docs/product/daemon.md", "docs/product/observability.md", "docs/product/queue.md", "docs/product/yolo-mode.md"], role = "Table of contents for docs/product", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/product/README.md" = { title = "Product", parent = "docs/README.md", children = ["docs/product/cli.md", "docs/product/daemon.md", "docs/product/observability.md", "docs/product/personal-operations.md", "docs/product/queue.md", "docs/product/yolo-mode.md"], role = "Table of contents for docs/product", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
 "docs/product/cli.md" = { title = "CLI", parent = "docs/product/README.md", children = [], role = "Contract page under docs/product", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
 "docs/product/daemon.md" = { title = "Daemon", parent = "docs/product/README.md", children = [], role = "Contract page under docs/product", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
 "docs/product/observability.md" = { title = "Observability", parent = "docs/product/README.md", children = [], role = "Contract page under docs/product", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
+"docs/product/personal-operations.md" = { title = "Personal Operations", parent = "docs/product/README.md", children = [], role = "Contract page under docs/product", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
 "docs/product/queue.md" = { title = "Queue", parent = "docs/product/README.md", children = [], role = "Contract page under docs/product", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }
 "docs/product/yolo-mode.md" = { title = "YOLO Mode", parent = "docs/product/README.md", children = [], role = "Contract page under docs/product", sources = [], checks = ["cargo run -p lkjagent-xtask -- check-docs"] }

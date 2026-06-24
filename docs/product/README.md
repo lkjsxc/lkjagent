@@ -15,3 +15,4 @@ Internal mechanics live under [../architecture/](../architecture/README.md).
 - [cli.md](cli.md): the thin command-line client and its commands.
 - [queue.md](queue.md): how user messages enter, wait, and resume tasks.
 - [observability.md](observability.md): status, transcript, and memory views.
+- [personal-operations.md](personal-operations.md): diary, schedule, and TODO behavior.
