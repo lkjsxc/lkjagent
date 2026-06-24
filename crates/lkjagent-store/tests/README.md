@@ -8,6 +8,7 @@ This directory holds in-memory SQLite integration tests for the store crate.
 
 - [artifact_cursor.rs](artifact_cursor.rs): artifact batch cursor fixtures.
 - [artifact_ledger.rs](artifact_ledger.rs): semantic artifact ledger and weak-path fixtures.
+- [compaction_snapshot.rs](compaction_snapshot.rs): compaction snapshot reopen fixtures.
 - [events.rs](events.rs): append/read event ordering fixture.
 - [graph.rs](graph.rs): graph case, evidence, and memory-link fixtures.
 - [memory.rs](memory.rs): FTS ranking, digest, update, and delete fixtures.
