@@ -27,6 +27,30 @@ fn fs_write_marks_artifact_cursor_path_completed() -> TestResult<()> {
 }
 
 #[test]
+fn fs_write_failure_marks_cursor_path_failed() -> TestResult<()> {
+    let (runtime, mut conn, mut dispatch_state, artifact_id) = prepared_cursor("artifact-failed")?;
+    let cursor = latest_batch_cursor(&conn, artifact_id)?.ok_or("missing cursor")?;
+    let path = first_path(&cursor.planned_paths)?;
+
+    let output = dispatch(
+        &action(
+            "fs.write",
+            &[("path", path), ("content", "Replace this skeleton later.")],
+        ),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    )
+    .content;
+
+    let updated = latest_batch_cursor(&conn, artifact_id)?.ok_or("missing updated cursor")?;
+    assert!(output.contains("scaffold phrase refused"));
+    assert!(updated.failed_paths.contains(path));
+    assert!(!updated.completed_paths.contains(path));
+    Ok(())
+}
+
+#[test]
 fn fs_batch_write_marks_artifact_cursor_paths_completed() -> TestResult<()> {
     let (runtime, mut conn, mut dispatch_state, artifact_id) = prepared_cursor("artifact-batch")?;
     let cursor = latest_batch_cursor(&conn, artifact_id)?.ok_or("missing cursor")?;

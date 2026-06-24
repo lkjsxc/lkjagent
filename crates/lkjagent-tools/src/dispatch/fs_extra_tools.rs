@@ -98,10 +98,18 @@ pub fn dispatch_fs_batch_write(
     state: &mut DispatchState,
 ) -> DispatchOutput {
     let files = param(params, "files");
-    let result = crate::fs_batch::batch_write(&runtime.workspace, &files, 20).and_then(|output| {
+    let result = (|| {
         let paths = crate::fs_batch::paths(&files)?;
-        crate::artifact_write_support::record_written_paths(conn, &paths, &runtime.now)?;
-        Ok(output)
-    });
+        match crate::fs_batch::batch_write(&runtime.workspace, &files, 20) {
+            Ok(output) => {
+                crate::artifact_write_support::record_written_paths(conn, &paths, &runtime.now)?;
+                Ok(output)
+            }
+            Err(error) => {
+                crate::artifact_write_support::record_failed_paths(conn, &paths, &runtime.now)?;
+                Err(error)
+            }
+        }
+    })();
     observe_result(result, action_text, runtime, state)
 }
