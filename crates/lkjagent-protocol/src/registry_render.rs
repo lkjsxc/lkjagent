@@ -14,7 +14,7 @@ pub fn render_registry_section() -> String {
 }
 
 fn render_tool(tool: &ToolSpec) -> String {
-    format!("{}: {}; {}", tool.name, render_params(tool), tool.contract)
+    format!("{}: {}", tool.name, render_params(tool))
 }
 
 fn render_params(tool: &ToolSpec) -> String {

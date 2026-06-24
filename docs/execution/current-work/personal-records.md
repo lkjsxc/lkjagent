@@ -9,16 +9,15 @@ Track the implementation work for diary, schedule, and TODO records.
 The contract is documented under
 [../../architecture/personal/](../../architecture/personal/README.md) and
 [../../architecture/tools/personal-tools.md](../../architecture/tools/personal-tools.md).
-Store migrations and typed store APIs now have focused tests. Tool registry
-entries, dispatcher routes, projections, CLI inspection, and final gates remain
-open.
+Store migrations, typed store APIs, registry entries, create/list/search tools,
+and status update routes now have focused tests. Field-update routes,
+projections, CLI inspection, and final gates remain open.
 
 ## Next Slice
 
-1. Add fixed registry tools and dispatcher routes.
-2. Add bounded search and list observations.
-3. Add optional Markdown projections from store state.
-4. Add CLI inspection only if it stays thin and store-backed.
+1. Add field updates beyond status for schedule and TODO records.
+2. Add optional Markdown projections from store state.
+3. Add CLI inspection only if it stays thin and store-backed.
 
 ## Evidence Required
 

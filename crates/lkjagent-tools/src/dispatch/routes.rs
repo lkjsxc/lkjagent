@@ -21,6 +21,10 @@ use crate::dispatch::graph_tools::{
 use crate::dispatch::memory_tools::{
     dispatch_memory_find, dispatch_memory_prune, dispatch_memory_save,
 };
+use crate::dispatch::personal_tools::{
+    dispatch_diary_find, dispatch_diary_record, dispatch_schedule_add, dispatch_schedule_list,
+    dispatch_schedule_update, dispatch_todo_add, dispatch_todo_list, dispatch_todo_update,
+};
 use crate::dispatch::queue_tools::{
     dispatch_queue_delete, dispatch_queue_edit, dispatch_queue_enqueue, dispatch_queue_list,
     dispatch_queue_redeliver,
@@ -70,6 +74,18 @@ pub fn route(
         "memory.save" => dispatch_memory_save(&action.params, action_text, runtime, conn, state),
         "memory.find" => dispatch_memory_find(&action.params, action_text, runtime, conn, state),
         "memory.prune" => dispatch_memory_prune(action_text, runtime, conn, state),
+        "diary.record" => dispatch_diary_record(&action.params, action_text, runtime, conn, state),
+        "diary.find" => dispatch_diary_find(&action.params, action_text, runtime, conn, state),
+        "schedule.add" => dispatch_schedule_add(&action.params, action_text, runtime, conn, state),
+        "schedule.list" => {
+            dispatch_schedule_list(&action.params, action_text, runtime, conn, state)
+        }
+        "schedule.update" => {
+            dispatch_schedule_update(&action.params, action_text, runtime, conn, state)
+        }
+        "todo.add" => dispatch_todo_add(&action.params, action_text, runtime, conn, state),
+        "todo.list" => dispatch_todo_list(&action.params, action_text, runtime, conn, state),
+        "todo.update" => dispatch_todo_update(&action.params, action_text, runtime, conn, state),
         "graph.state" => dispatch_graph_state(action_text, runtime, state),
         "graph.next" => dispatch_graph_next(action_text, runtime, state),
         "graph.audit" => dispatch_graph_audit(action_text, runtime, state),
