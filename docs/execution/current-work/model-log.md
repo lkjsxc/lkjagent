@@ -52,10 +52,10 @@ Raw provider request and response evidence is recorded under the contract in
 
 ## Status
 
-partially implemented. The current Markdown handoff, provider exchange store
-rows, request files, authority files, response files, timing files, error
-files, per-turn export manifests that name parsed-action, admission, and
-observation artifacts, parsed-action, admission, observation, index files,
-prompt-frame ids on exchange rows, CLI list and show, raw-case inspection,
-and sanitized replay export commands with raw turn-file copying exist for daemon
-provider calls with a log root. Live replay proof remains open.
+implemented. The current Markdown handoff, provider exchange store rows,
+request files, authority files, response files, timing files, error files,
+per-turn export manifests that name parsed-action, admission, and observation
+artifacts, parsed-action, admission, observation, index files, prompt-frame ids
+on exchange rows, CLI list and show, raw-case inspection, and sanitized replay
+export commands with raw turn-file copying exist for daemon provider calls with
+a log root. Live replay proof is tracked by the verification plan.
