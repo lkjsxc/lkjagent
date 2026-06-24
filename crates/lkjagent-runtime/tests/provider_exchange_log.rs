@@ -42,7 +42,10 @@ fn provider_exchange_writer_persists_files_and_store_rows() -> TestResult<()> {
         "provider exchange dir",
         &handle.dir.to_string_lossy(),
     )?;
-    record_provider_admission(&conn, "graph.state", true, "admitted", "<act />")?;
+    let parsed = fs::read_to_string(handle.dir.join("parsed-action.json"))?;
+    assert!(parsed.contains("\"envelope_mode\":\"Natural\""));
+    assert!(parsed.contains("\"normalized_text_hash\""));
+    record_provider_admission(&conn, "graph.state", true, "admitted", "<action />")?;
     record_provider_observation(&conn, "<observation>ok</observation>")?;
     assert!(handle.dir.join("parsed-action.json").exists());
     assert!(handle.dir.join("admission.json").exists());

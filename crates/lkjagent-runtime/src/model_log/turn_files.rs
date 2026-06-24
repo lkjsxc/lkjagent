@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use lkjagent_protocol::{parse_completion, Action, ParseFault};
+use lkjagent_protocol::{parse_live_completion, Action, EnvelopeMode, ParseFault};
 use rusqlite::Connection;
 
 use super::{json_escape, ProviderLogHandle};
@@ -46,16 +46,44 @@ pub fn record_provider_observation(conn: &Connection, observation: &str) -> Runt
 }
 
 fn parse_json(content: &str, closure_mode: &str) -> String {
-    match parse_completion(content) {
-        Ok(action) => action_json(content, closure_mode, &action),
-        Err(fault) => fault_json(content, closure_mode, &fault),
+    let outcome = parse_live_completion(content, Default::default());
+    match (outcome.action, outcome.fault) {
+        (Some(action), None) => action_json(
+            content,
+            closure_mode,
+            outcome.envelope_mode,
+            &outcome.normalized_text_hash,
+            &action,
+        ),
+        (_, Some(fault)) => fault_json(
+            content,
+            closure_mode,
+            outcome.envelope_mode,
+            &outcome.normalized_text_hash,
+            &fault,
+        ),
+        (None, None) => fault_json(
+            content,
+            closure_mode,
+            outcome.envelope_mode,
+            &outcome.normalized_text_hash,
+            &ParseFault::MissingActionEnvelope,
+        ),
     }
 }
 
-fn action_json(content: &str, closure_mode: &str, action: &Action) -> String {
+fn action_json(
+    content: &str,
+    closure_mode: &str,
+    envelope_mode: EnvelopeMode,
+    normalized_text_hash: &str,
+    action: &Action,
+) -> String {
     format!(
-        "{{\"status\":\"ok\",\"closure_mode\":\"{}\",\"content_bytes\":{},\"tool\":\"{}\",\"params\":[{}]}}\n",
+        "{{\"status\":\"ok\",\"closure_mode\":\"{}\",\"envelope_mode\":\"{:?}\",\"normalized_text_hash\":\"{}\",\"content_bytes\":{},\"tool\":\"{}\",\"params\":[{}]}}\n",
         json_escape(closure_mode),
+        envelope_mode,
+        json_escape(normalized_text_hash),
         content.len(),
         json_escape(&action.tool),
         action
@@ -71,10 +99,18 @@ fn action_json(content: &str, closure_mode: &str, action: &Action) -> String {
     )
 }
 
-fn fault_json(content: &str, closure_mode: &str, fault: &ParseFault) -> String {
+fn fault_json(
+    content: &str,
+    closure_mode: &str,
+    envelope_mode: EnvelopeMode,
+    normalized_text_hash: &str,
+    fault: &ParseFault,
+) -> String {
     format!(
-        "{{\"status\":\"fault\",\"closure_mode\":\"{}\",\"content_bytes\":{},\"error\":\"{}\"}}\n",
+        "{{\"status\":\"fault\",\"closure_mode\":\"{}\",\"envelope_mode\":\"{:?}\",\"normalized_text_hash\":\"{}\",\"content_bytes\":{},\"error\":\"{}\"}}\n",
         json_escape(closure_mode),
+        envelope_mode,
+        json_escape(normalized_text_hash),
         content.len(),
         json_escape(&format!("{fault:?}"))
     )

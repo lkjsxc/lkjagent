@@ -59,8 +59,8 @@ admission, graph state, or dispatch.
 `authority.json` stores active mode, mission, tool surface, preferred next
 action, recovery route, completion gate, invariants, and decision id.
 
-`parsed-action.json` stores parse status, normalized content, closure mode,
-parse faults, tool name, parameters, and byte counts.
+`parsed-action.json` stores parse status, closure mode, envelope mode,
+normalized text hash, parse faults, tool name, parameters, and byte counts.
 
 `admission.json` stores accepted or refused status, reason, schema findings,
 repeat fingerprint, staleness fingerprint, and dispatch plan when accepted.
@@ -119,6 +119,6 @@ are persisted after dispatch, and the CLI can inspect the records.
 partially implemented. The runtime writes the current Markdown model handoff,
 SQLite `provider_exchange` rows, and atomic request, authority, response,
 parsed-action, admission, observation, timing, and error files for daemon
-provider calls that have a log root. The CLI lists and shows provider exchange
-rows. `index.ndjson` is written for exchange discovery. Export records remain
-open.
+provider calls that have a log root. Parsed-action records include envelope
+mode and normalized text hash. The CLI lists and shows provider exchange rows.
+`index.ndjson` is written for exchange discovery. Export records remain open.
