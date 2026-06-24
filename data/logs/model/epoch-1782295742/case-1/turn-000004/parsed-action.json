@@ -1,1 +1,0 @@
-{"status":"ok","closure_mode":"StopSequenceClosed","content_bytes":2335,"tool":"graph.plan","params":[{"name":"objective","bytes":102},{"name":"constraints","bytes":281},{"name":"assumptions","bytes":132},{"name":"risks","bytes":115},{"name":"steps","bytes":668},{"name":"checks","bytes":131},{"name":"paths","bytes":383},{"name":"reason","bytes":311}]}

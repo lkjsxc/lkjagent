@@ -1,1 +1,0 @@
-{"status":"fault","closure_mode":"StopSequenceClosed","content_bytes":770,"error":"BadParams { tool: \"fs.batch_write\", missing: [\"files\"], unknown: [\"stories/chronos-fracture/catalog.toml\"] }"}

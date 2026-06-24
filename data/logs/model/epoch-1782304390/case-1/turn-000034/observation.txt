@@ -1,0 +1,16 @@
+<observation>
+<status>ok</status>
+<content>
+artifact next batch
+root=stories/chronos-fracture
+kind=artifact
+missing=root
+next_action=artifact.apply
+valid_example:
+<act>
+<tool>artifact.apply</tool>
+<root>stories/chronos-fracture</root>
+<kind>artifact</kind>
+</act>
+</content>
+</observation>
