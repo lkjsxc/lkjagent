@@ -9,18 +9,16 @@ Track the implementation work for diary, schedule, and TODO records.
 The contract is documented under
 [../../architecture/personal/](../../architecture/personal/README.md) and
 [../../architecture/tools/personal-tools.md](../../architecture/tools/personal-tools.md).
-Implementation is open until store migrations, tool registry entries, focused
-tests, and quiet gates pass.
+Store migrations and typed store APIs now have focused tests. Tool registry
+entries, dispatcher routes, projections, CLI inspection, and final gates remain
+open.
 
 ## Next Slice
 
-1. Add store schema and typed APIs in `lkjagent-store`.
-2. Add validation for diary, schedule, TODO, timestamps, statuses, tags, and
-   recurrence strings.
-3. Add fixed registry tools and dispatcher routes.
-4. Add bounded search and list observations.
-5. Add optional Markdown projections from store state.
-6. Add CLI inspection only if it stays thin and store-backed.
+1. Add fixed registry tools and dispatcher routes.
+2. Add bounded search and list observations.
+3. Add optional Markdown projections from store state.
+4. Add CLI inspection only if it stays thin and store-backed.
 
 ## Evidence Required
 
