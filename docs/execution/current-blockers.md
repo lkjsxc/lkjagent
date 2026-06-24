@@ -53,9 +53,11 @@ Fracture run proves both progress and failure:
   ignores maintenance due state while owner work exists. Store ledgers now
   include prompt frames and observations, plus foreign-key proof that admissions
   require a decision. Kernel prompt rendering requires a stored decision id and
-  renders concrete batch-write examples. Daemon wiring still needs one snapshot,
-  one explicit event, one persisted decision, one prompt frame, one admission
-  view, one effect observation, and one next event.
+  renders concrete batch-write examples. Kernel admission refuses stale,
+  blocked, not-admitted, and completion-blocked tools before dispatch. Daemon
+  wiring still needs one snapshot, one explicit event, one persisted decision,
+  one prompt frame, one admission view, one effect observation, and one next
+  event.
 - Graph policy is guidance for the snapshot. It is not fallback dispatch
   authority after runtime admission refuses a tool.
 - Stale-action refusal must use the full staleness fingerprint: queue head,
@@ -116,7 +118,7 @@ Fracture run proves both progress and failure:
 
 ## Remaining Proof Gaps
 
-- Immutable pre-dispatch admission is the next code slice.
+- Batch-write schema recovery is the next code slice.
 - Authority rows still need coverage for every dispatch, provider exchange,
   recovery, compaction, maintenance, and close path.
 - Compaction snapshots need status rendering and prompt-frame resume proof.

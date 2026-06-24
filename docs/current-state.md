@@ -48,7 +48,7 @@ but did not record document-structure or artifact-readiness evidence.
 
 | Area | Current truth |
 | --- | --- |
-| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, normalized authority snapshots, event and decision rows, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, stale maintenance-action refusal, and `agent.done` refusal exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. Kernel prompt rendering requires a persisted decision id and produces path-scoped batch examples. Store rows now cover prompt frames and observations with foreign-key proof for admissions. These are partial authority pieces, not one daemon-wired transition kernel. |
+| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, normalized authority snapshots, event and decision rows, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, stale maintenance-action refusal, and `agent.done` refusal exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. Kernel prompt rendering requires a persisted decision id and produces path-scoped batch examples. Kernel admission refuses stale, blocked, not-admitted, and completion-blocked tools before dispatch. Store rows now cover prompt frames and observations with foreign-key proof for admissions. These are partial authority pieces, not one daemon-wired transition kernel. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Full unified runtime wiring remains open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, dispatcher-valid examples for covered routes, and SQLite retry counts exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. The live `fs.batch_write` path-shaped parameter loop proves batch-write schema recovery remains insufficient. |
@@ -128,6 +128,11 @@ Snapshot-adapter focused gate:
 Prompt-frame focused gate:
 
 - `cargo test -p lkjagent-runtime --test kernel_prompt_render`: `KERNEL_PROMPT_RENDER_EXIT=0`, 4 passed.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+
+Admission focused gate:
+
+- `cargo test -p lkjagent-runtime --test kernel_admission`: `KERNEL_ADMISSION_EXIT=0`, 5 passed.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
 
 Store-ledger focused gates:
