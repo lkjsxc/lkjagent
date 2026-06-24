@@ -51,5 +51,5 @@ digest and resumed next action.
 
 partially implemented. Current notices and graph compaction snapshot rows preserve
 pre and post compaction fields, including artifact cursor and last observation
-summary. Store reopen coverage and status rendering for the latest snapshot
-remain open.
+summary. Latest snapshot lookup survives store reopen. Status rendering for the
+latest snapshot remains open.

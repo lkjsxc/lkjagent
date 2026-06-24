@@ -12,16 +12,16 @@ linked task contract names focused evidence and the actual gates that ran.
 | 1 | Generated documentation can repeat universal scaffold boilerplate | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | partially implemented |
 | 2 | Generated path names can concatenate unrelated owner topics | [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md) | partially implemented |
 | 3 | Document and artifact tools confuse root directories with Markdown leaf paths | [current-work/artifact-address-controller.md](current-work/artifact-address-controller.md) | partially implemented |
-| 4 | Runtime authority is not the single source of active mission and tool admission | [current-work/state-transition-network.md](current-work/state-transition-network.md) | open |
-| 5 | Recovery can block the exact observation, repair, or batch tool needed to escape | [current-work/recovery-shape-enforcement.md](current-work/recovery-shape-enforcement.md) | open |
-| 6 | Content artifacts can pass on scaffold or planning evidence instead of real content | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | open |
-| 7 | Completion can close while artifact readiness, verification, or recovery evidence is missing | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | open |
-| 8 | Compaction snapshots are not rich enough to resume artifact repair and recovery | [current-work/durable-compaction-history.md](current-work/durable-compaction-history.md) | open |
+| 4 | Runtime authority is not the single source of active mission and tool admission | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
+| 5 | Recovery can block the exact observation, repair, or batch tool needed to escape | [current-work/recovery-shape-enforcement.md](current-work/recovery-shape-enforcement.md) | partially implemented |
+| 6 | Content artifacts can pass on scaffold or planning evidence instead of real content | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | partially implemented |
+| 7 | Completion can close while artifact readiness, verification, or recovery evidence is missing | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | partially implemented |
+| 8 | Compaction snapshots are not rich enough to resume artifact repair and recovery | [current-work/durable-compaction-history.md](current-work/durable-compaction-history.md) | partially implemented |
 | 9 | Maintenance is not strictly idle-only and preemptable by owner work | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | open |
 | 10 | Uploaded run logs are not fully covered by benchmark regressions | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
-| 11 | Raw provider exchanges are not logged as replayable JSON under `data/logs` | [current-work/model-log.md](current-work/model-log.md) | open |
-| 12 | Semantic maintenance pruning still allows repeated low-value memory rows | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | open |
-| 13 | Protocol schema repair can render examples that dispatch later rejects | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | open |
+| 11 | Raw provider exchanges are not logged as replayable JSON under `data/logs` | [current-work/model-log.md](current-work/model-log.md) | partially implemented |
+| 12 | Semantic maintenance pruning still allows repeated low-value memory rows | [current-work/recovery-and-maintenance-loop-redesign.md](current-work/recovery-and-maintenance-loop-redesign.md) | partially implemented |
+| 13 | Protocol schema repair can render examples that dispatch later rejects | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | partially implemented |
 
 ## Owner Failure Evidence
 
@@ -113,14 +113,15 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   rows with source IDs.
 - Provider exchange logging has a design contract, implemented store, atomic
   request, authority, response, parse, admission, observation, timing, error,
-  and index file writer, and CLI list/show.
+  index, and export file writer, and CLI list/show.
 
 ## Remaining Proof Gaps
 
-- Authority snapshots and transition rows exist for turn authority refresh, but
-  still need full case-specific fields and coverage for every dispatch and
-  completion path.
-- Compaction snapshots still need durable history beyond the latest notice.
+- Authority snapshots and transition rows exist for turn authority refresh with
+  case, node, phase, artifact, and evidence fields, but still need coverage for
+  every dispatch and completion path.
+- Compaction snapshots have pre/post durable rows and latest reopen lookup, but
+  status rendering for the latest snapshot remains open.
 - Broader stale-action contradiction repair is not yet covered for every mode.
 - Recovery shape-change enforcement is not yet proven for every live fault class.
 - Refusal-rendered examples now dispatch for covered address paths, but still
@@ -128,11 +129,9 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - Address-controller Docker Compose evidence is recorded for the focused slice;
   a fresh live SF-novel rerun and adoption proof remain open.
 - Artifact adoption and semantic readiness remain incomplete.
-- Compaction snapshots still need richer last-observation and batch-cursor
-  fields.
+- Compaction snapshots still need prompt-frame resume proof after rebuild.
 - Maintenance rewrite pruning and pre-dispatch owner preemption remain open.
 - Parser-level replay fixtures still need direct runtime execution beyond the
   uploaded-run benchmark text signatures.
 - Rendered recovery examples still need a registry-wide parse, validation, and
   dispatch proof.
-- Provider exchange logging still needs export implementation.
