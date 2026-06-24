@@ -1,3 +1,6 @@
+#[path = "kernel_shadow.rs"]
+mod kernel_shadow;
+
 use lkjagent_context::budget::{ContextPressure, LOG_OBSERVATION};
 use lkjagent_context::model::{Frame, FrameKind};
 use rusqlite::Connection;
@@ -39,11 +42,10 @@ impl ResidentDaemon {
         now: &str,
         endpoint_retry_pending: bool,
     ) -> RuntimeResult<TurnAuthority> {
-        let mut authority = decide_turn_authority(
-            self.authority_snapshot(conn, now, endpoint_retry_pending)?
-                .into(),
-        );
+        let snapshot = self.authority_snapshot(conn, now, endpoint_retry_pending)?;
+        let mut authority = decide_turn_authority(snapshot.clone().into());
         persist_authority_snapshot(self, conn, &authority)?;
+        kernel_shadow::persist_kernel_shadow(conn, &snapshot)?;
         authority.input.latest_decision_id =
             lkjagent_store::state::get(conn, "authority decision id")?;
         Ok(authority)
