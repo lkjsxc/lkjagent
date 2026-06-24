@@ -1,7 +1,9 @@
 use lkjagent_context::assemble::append_frame;
 use lkjagent_context::model::{Frame, FrameKind, NoticeKind};
 use lkjagent_graph::TaskGraphState;
-use lkjagent_protocol::{parse_completion, render_action, render_owner};
+use lkjagent_protocol::{
+    parse_live_completion, render_action, render_owner, EnvelopeMode, ParseFault,
+};
 use lkjagent_store::events::EventKind;
 
 use crate::graph_state::graph_notice_frame;
@@ -67,9 +69,12 @@ pub(super) fn completion_step(
     if let Some(exhausted) = exhausted {
         return budget_exhausted_step(state, exhausted);
     }
-    match parse_completion(&content) {
-        Ok(action) => action_step(state, action),
-        Err(fault) => parse_fault_step(state, &fault),
+    let outcome = parse_live_completion(&content, Default::default());
+    let normalization = implicit_notice(&outcome);
+    match (outcome.action, outcome.fault) {
+        (Some(action), None) => action_step(state, action, normalization),
+        (_, Some(fault)) => parse_fault_step(state, &fault),
+        (None, None) => parse_fault_step(state, &ParseFault::MissingActionEnvelope),
     }
 }
 
@@ -110,25 +115,42 @@ fn payload_risk(preview: &str) -> bool {
     preview.contains("<tool>fs.write</tool>") || preview.contains("<content>")
 }
 
-fn action_step(mut state: RuntimeState, action: lkjagent_protocol::Action) -> StepResult {
+fn action_step(
+    mut state: RuntimeState,
+    action: lkjagent_protocol::Action,
+    normalization: Option<String>,
+) -> StepResult {
     let action_text = render_action(&action);
     state.pending_action = Some(PendingAction {
         action,
         action_text: action_text.clone(),
     });
     state.parse_faults = 0;
-    result(
-        state,
-        vec![
-            Effect::RecordEvent {
-                kind: EventKind::Action,
-                content: action_text.clone(),
-                tokens: token_estimate(&action_text) as i64,
-            },
-            Effect::ExecuteTool { action_text },
-        ],
-        Some(StopReason::Acted),
-    )
+    let mut effects = Vec::new();
+    if let Some(notice) = normalization {
+        state = append_notice(state, NoticeKind::Error, &notice);
+        effects.push(Effect::RecordEvent {
+            kind: EventKind::Notice,
+            tokens: token_estimate(&notice) as i64,
+            content: notice,
+        });
+    }
+    effects.push(Effect::RecordEvent {
+        kind: EventKind::Action,
+        content: action_text.clone(),
+        tokens: token_estimate(&action_text) as i64,
+    });
+    effects.push(Effect::ExecuteTool { action_text });
+    result(state, effects, Some(StopReason::Acted))
+}
+
+fn implicit_notice(outcome: &lkjagent_protocol::ParseOutcome) -> Option<String> {
+    (outcome.envelope_mode == EnvelopeMode::Implicit).then(|| {
+        format!(
+            "parse normalization recorded\nenvelope_mode=ImplicitActionEnvelope\nnormalized_text_hash={}",
+            outcome.normalized_text_hash
+        )
+    })
 }
 
 fn parse_fault_step(mut state: RuntimeState, fault: &lkjagent_protocol::ParseFault) -> StepResult {
