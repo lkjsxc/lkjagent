@@ -4,7 +4,9 @@ use lkjagent_context::model::{Message, Role};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::closure::{restore_stop_suffix, ClosureMode, ACT_CLOSE};
+use lkjagent_protocol::ACTION_CLOSE;
+
+use crate::closure::{restore_stop_suffix, ClosureMode};
 use metrics::collect_cache_metrics;
 
 pub const MAX_TOKENS: u16 = 2048;
@@ -103,7 +105,7 @@ pub fn build_request(model: &str, messages: &[Message], max_tokens: u16) -> Chat
         max_tokens,
         temperature: TEMPERATURE,
         top_p: TOP_P,
-        stop: vec![ACT_CLOSE.to_string()],
+        stop: vec![ACTION_CLOSE.to_string()],
         stream: false,
     }
 }

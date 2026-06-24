@@ -9,42 +9,42 @@ use lkjagent_store::{events, queue};
 use support::http::{completion, serve_responses};
 use support::{store, temp_workspace, TestResult};
 
-const WRITE: &str = "<act>
+const WRITE: &str = "<action>
 <tool>fs.write</tool>
 <path>done.txt</path>
 <content>done</content>
-</act>";
+</action>";
 
-const PLAN: &str = "<act>
+const PLAN: &str = "<action>
 <tool>graph.plan</tool>
 <objective>write done file</objective>
 <steps>write done.txt; read done.txt; record verification</steps>
 <checks>fs.read done.txt confirms content</checks>
 <paths>done.txt</paths>
 <reason>owner mutation needs graph plan</reason>
-</act>";
+</action>";
 
-const DONE: &str = "<act>
+const DONE: &str = "<action>
 <tool>agent.done</tool>
 <summary>wrote done.txt</summary>
-</act>";
+</action>";
 
-const READ: &str = "<act>
+const READ: &str = "<action>
 <tool>fs.read</tool>
 <path>done.txt</path>
-</act>";
+</action>";
 
-const EVIDENCE: &str = "<act>
+const EVIDENCE: &str = "<action>
 <tool>graph.evidence</tool>
 <kind>verification</kind>
 <summary>fs.read observed done.txt content</summary>
 <path>done.txt</path>
-</act>";
+</action>";
 
-const ASK: &str = "<act>
+const ASK: &str = "<action>
 <tool>agent.ask</tool>
 <question>maintenance paused</question>
-</act>";
+</action>";
 
 #[test]
 fn repeat_tracking_resets_between_maintenance_cycles() -> TestResult<()> {

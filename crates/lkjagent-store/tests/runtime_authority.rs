@@ -60,7 +60,7 @@ fn runtime_authority_tables_persist_replayable_history() -> TestResult<()> {
             blocked_tools: &blocked,
             missing_evidence: &missing,
             forced_next_action: "run artifact.next",
-            exact_valid_example: Some("<act>artifact.next</act>"),
+            exact_valid_example: Some("<action>artifact.next</action>"),
             completion_allowed: false,
             completion_refusal: Some("completion missing required evidence"),
             recovery_route: None,
@@ -80,7 +80,7 @@ fn runtime_authority_tables_persist_replayable_history() -> TestResult<()> {
             requested_tool: "agent.done",
             admitted: false,
             refusal_reason: "completion missing required evidence",
-            exact_valid_example: Some("<act>artifact.next</act>"),
+            exact_valid_example: Some("<action>artifact.next</action>"),
             created_at: "2026-01-01T00:00:03Z",
         },
     )?;

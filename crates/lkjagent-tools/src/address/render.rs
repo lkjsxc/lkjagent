@@ -10,7 +10,7 @@ pub fn render_document_refusal(tool: &str, address: &ArtifactAddress) -> String 
 
 pub fn render_markdown_root_refusal(tool: &str, root: &str) -> String {
     format!(
-        "{}\ntool={tool}\nrequested_root={root}\naddress_status=root_ends_with_markdown_suffix\ndetected_path_kind=missing\nnext_action=fs.write or fs.batch_write owns Markdown leaves\nvalid_example:\n<act>\n<tool>fs.batch_write</tool>\n<files>\npath: {root}\ncontent:\n# Content\n\nConcrete content under the byte limit.\n</files>\n</act>",
+        "{}\ntool={tool}\nrequested_root={root}\naddress_status=root_ends_with_markdown_suffix\ndetected_path_kind=missing\nnext_action=fs.write or fs.batch_write owns Markdown leaves\nvalid_example:\n<action>\n<tool>fs.batch_write</tool>\n<files>\npath: {root}\ncontent:\n# Content\n\nConcrete content under the byte limit.\n</files>\n</action>",
         if tool.starts_with("doc.") { "document address refused" } else { "artifact address refused" }
     )
 }
@@ -84,22 +84,22 @@ fn action_label(action: &AddressNextAction, tool: &str) -> &'static str {
 fn render_action(action: &AddressNextAction, tool: &str, kind: &str) -> String {
     match action {
         AddressNextAction::ApplyRoot { root, kind } => format!(
-            "<act>\n<tool>artifact.apply</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</act>"
+            "<action>\n<tool>artifact.apply</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</action>"
         ),
         AddressNextAction::AuditRoot { root, kind } => format!(
-            "<act>\n<tool>artifact.audit</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</act>"
+            "<action>\n<tool>artifact.audit</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</action>"
         ),
         AddressNextAction::RepairPath { root, path, kind } => format!(
-            "<act>\n<tool>artifact.next</tool>\n<root>{root}</root>\n<path>{path}</path>\n<kind>{kind}</kind>\n</act>"
+            "<action>\n<tool>artifact.next</tool>\n<root>{root}</root>\n<path>{path}</path>\n<kind>{kind}</kind>\n</action>"
         ),
         AddressNextAction::InspectParent { path } if tool.starts_with("doc.") => format!(
-            "<act>\n<tool>fs.list</tool>\n<path>{path}</path>\n<depth>1</depth>\n</act>"
+            "<action>\n<tool>fs.list</tool>\n<path>{path}</path>\n<depth>1</depth>\n</action>"
         ),
         AddressNextAction::InspectParent { path } => format!(
-            "<act>\n<tool>fs.list</tool>\n<path>{path}</path>\n<depth>1</depth>\n</act>"
+            "<action>\n<tool>fs.list</tool>\n<path>{path}</path>\n<depth>1</depth>\n</action>"
         ),
         AddressNextAction::Refuse { reason } => format!(
-            "<act>\n<tool>workspace.summary</tool>\n<path>.</path>\n</act>\nreason={reason}\nkind={kind}"
+            "<action>\n<tool>workspace.summary</tool>\n<path>.</path>\n</action>\nreason={reason}\nkind={kind}"
         ),
     }
 }

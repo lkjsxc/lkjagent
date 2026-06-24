@@ -12,11 +12,11 @@ use lkjagent_store::queue;
 use support::http::{completion, serve_responses};
 use support::{prefix, runtime_state, store, temp_workspace, TestResult};
 
-const WRITE_ACTION: &str = "<act>
+const WRITE_ACTION: &str = "<action>
 <tool>fs.write</tool>
 <path>out.txt</path>
 <content>hello</content>
-</act>";
+</action>";
 
 #[test]
 fn owner_step_uses_supplied_task_budget() -> TestResult<()> {

@@ -80,7 +80,7 @@ const BAD_MISSING_ACT: &[FileSpec] = &[FileSpec {
 const BAD_UNCLOSED_STOP: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
     content:
-        "fixture=unclosed-act-from-stop\n<act>\n<tool>graph.recover</tool>\nparse_repair=silent\n",
+        "fixture=unclosed-act-from-stop\n<action>\n<tool>graph.recover</tool>\nparse_repair=silent\n",
 }];
 
 const BAD_CONTRADICTORY_AUTHORITY: &[FileSpec] = &[FileSpec {

@@ -32,7 +32,7 @@ The reserve is subtracted before any budget math.
 | Frame | Chat role | Content shape |
 | --- | --- | --- |
 | prefix | system | one document per [../protocol/system-prompt.md](../protocol/system-prompt.md) |
-| model turn | assistant | optional think preamble plus one act block, verbatim |
+| model turn | assistant | one `<action>` block, verbatim |
 | observation | user | `<observation>` block per [../tools/registry.md](../tools/registry.md) |
 | owner message | user | `<owner>` block per [../runtime/queue-intake.md](../runtime/queue-intake.md) |
 | notice | user | `<notice>` block, kinds in [hygiene.md](hygiene.md) |

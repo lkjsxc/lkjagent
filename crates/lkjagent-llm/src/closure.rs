@@ -1,6 +1,6 @@
-use crate::wire::FinishReason;
+use lkjagent_protocol::{ACTION_CLOSE, ACTION_OPEN};
 
-pub const ACT_CLOSE: &str = "</act>";
+use crate::wire::FinishReason;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ClosureMode {
@@ -20,12 +20,12 @@ impl ClosureMode {
 }
 
 pub fn restore_stop_suffix(content: String, finish_reason: &FinishReason) -> (String, ClosureMode) {
-    if content.contains(ACT_CLOSE) {
+    if content.contains(ACTION_CLOSE) {
         return (content, ClosureMode::Natural);
     }
-    if matches!(finish_reason, FinishReason::Stop) && content.contains("<act>") {
+    if matches!(finish_reason, FinishReason::Stop) && content.contains(ACTION_OPEN) {
         return (
-            format!("{content}{ACT_CLOSE}"),
+            format!("{content}{ACTION_CLOSE}"),
             ClosureMode::StopSequenceClosed,
         );
     }

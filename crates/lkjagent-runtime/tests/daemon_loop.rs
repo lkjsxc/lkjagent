@@ -136,7 +136,7 @@ fn daemon_recovers_from_max_token_completion_without_retry_loop() -> TestResult<
     queue::enqueue(&mut conn, "write many files", "owner-send", "101")?;
     let workspace = temp_workspace("daemon-oversize")?;
     let server = serve_responses(vec![
-        length_completion("<act>\n<tool>shell.run</tool>\n<command>"),
+        length_completion("<action>\n<tool>shell.run</tool>\n<command>"),
         completion(PLAN_RESUME_ACTION),
         completion(WORKSPACE_ACTION),
         completion(EVIDENCE_GENERIC_ACTION),

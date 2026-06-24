@@ -10,15 +10,15 @@ use lkjagent_store::{events, queue, state};
 use support::http::{completion, serve_responses};
 use support::{runtime_state, store, temp_workspace, TestResult};
 
-const WRITE_ACTION: &str = "<act>
+const WRITE_ACTION: &str = "<action>
 <tool>fs.write</tool>
 <path>out.txt</path>
 <content>hello</content>
-</act>";
-const DONE_ACTION: &str = "<act>
+</action>";
+const DONE_ACTION: &str = "<action>
 <tool>agent.done</tool>
 <summary>wrote file</summary>
-</act>";
+</action>";
 
 #[test]
 fn owner_send_refreshes_exhausted_open_task_budget() -> TestResult<()> {

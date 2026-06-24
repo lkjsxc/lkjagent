@@ -2,7 +2,7 @@ use crate::model::{BenchmarkTask, Difficulty, FileSpec, Fixture, JudgeKind, Task
 
 const CONTINUE_GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "turn budget checkpoint reached; continuing autonomously\ncheckpoint_event=TurnBudgetCheckpoint\ncontinuation_decision=continue-owner-execution\nmissing_evidence=artifact-readiness\nexact_next_action=<act><tool>artifact.next</tool></act>\ndaemon_state=working\n",
+    content: "turn budget checkpoint reached; continuing autonomously\ncheckpoint_event=TurnBudgetCheckpoint\ncontinuation_decision=continue-owner-execution\nmissing_evidence=artifact-readiness\nexact_next_action=<action><tool>artifact.next</tool></action>\ndaemon_state=working\n",
 }];
 
 const CONTINUE_BAD_WAIT: &[FileSpec] = &[FileSpec {

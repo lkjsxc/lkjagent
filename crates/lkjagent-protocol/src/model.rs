@@ -1,3 +1,6 @@
+pub const ACTION_OPEN: &str = "<action>";
+pub const ACTION_CLOSE: &str = "</action>";
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Action {
     pub tool: String,
@@ -29,9 +32,45 @@ impl Param {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParseSettings {
+    pub allow_implicit_envelope: bool,
+}
+
+impl Default for ParseSettings {
+    fn default() -> Self {
+        Self {
+            allow_implicit_envelope: true,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParseOutcome {
+    pub action: Option<Action>,
+    pub fault: Option<ParseFault>,
+    pub envelope_mode: EnvelopeMode,
+    pub normalized_text_hash: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EnvelopeMode {
+    Natural,
+    StopClosed,
+    Implicit,
+    Unclosed,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum MalformedTagReason {
+    AttributeSyntax,
+    BadAngleSyntax,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ParseFault {
-    MissingAct,
-    MultipleAct,
+    MissingActionEnvelope,
+    MultipleActionEnvelopes,
+    UnclosedActionEnvelope,
     MissingTool,
     UnknownTool {
         tool: String,
@@ -42,6 +81,14 @@ pub enum ParseFault {
     DuplicateParam {
         name: String,
     },
+    MalformedTag {
+        line: String,
+        reason: MalformedTagReason,
+    },
+    AttributeLikeTag {
+        tag_name: String,
+        value_hint: Option<String>,
+    },
     BadParams {
         tool: String,
         missing: Vec<String>,
@@ -50,4 +97,5 @@ pub enum ParseFault {
     BadEnvelope {
         reason: String,
     },
+    JsonActionRejected,
 }

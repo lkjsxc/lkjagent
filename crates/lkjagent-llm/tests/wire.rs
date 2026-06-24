@@ -14,7 +14,7 @@ fn request_serializes_exact_documented_fields() -> TestResult<()> {
     let body = serde_json::to_string(&request)?;
     assert_eq!(
         body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system prefix\"},{\"role\":\"user\",\"content\":\"<owner>hello</owner>\"}],\"max_tokens\":2048,\"temperature\":0.3,\"top_p\":0.9,\"stop\":[\"</act>\"],\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system prefix\"},{\"role\":\"user\",\"content\":\"<owner>hello</owner>\"}],\"max_tokens\":2048,\"temperature\":0.3,\"top_p\":0.9,\"stop\":[\"</action>\"],\"stream\":false}"
     );
     Ok(())
 }
@@ -22,7 +22,7 @@ fn request_serializes_exact_documented_fields() -> TestResult<()> {
 #[test]
 fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
     let response = r#"{
-        "choices":[{"message":{"content":"<act></act>"},"finish_reason":"stop"}],
+        "choices":[{"message":{"content":"<action></action>"},"finish_reason":"stop"}],
         "usage":{
           "prompt_tokens":11,
           "completion_tokens":7,
@@ -33,7 +33,7 @@ fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
         "timings":{"prompt_ms":4.5}
     }"#;
     let completion = decode_completion(response)?;
-    assert_eq!(completion.content, "<act></act>");
+    assert_eq!(completion.content, "<action></action>");
     assert_eq!(completion.finish_reason, FinishReason::Stop);
     assert_eq!(completion.closure_mode, ClosureMode::Natural);
     assert_eq!(completion.usage.prompt_tokens, Some(11));
@@ -54,7 +54,7 @@ fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
 #[test]
 fn response_preserves_missing_usage_as_unknown() -> TestResult<()> {
     let response = r#"{
-        "choices":[{"message":{"content":"<act></act>"},"finish_reason":"stop"}]
+        "choices":[{"message":{"content":"<action></action>"},"finish_reason":"stop"}]
     }"#;
 
     let completion = decode_completion(response)?;
@@ -67,15 +67,15 @@ fn response_preserves_missing_usage_as_unknown() -> TestResult<()> {
 }
 
 #[test]
-fn stop_stripped_act_close_is_restored() -> TestResult<()> {
+fn stop_stripped_action_close_is_restored() -> TestResult<()> {
     let response = r#"{
-        "choices":[{"message":{"content":"<act>\n<tool>agent.done</tool>\n<summary>x</summary>\n"},"finish_reason":"stop"}],
+        "choices":[{"message":{"content":"<action>\n<tool>agent.done</tool>\n<summary>x</summary>\n"},"finish_reason":"stop"}],
         "usage":{"prompt_tokens":11,"completion_tokens":7}
     }"#;
 
     let completion = decode_completion(response)?;
 
-    assert!(completion.content.ends_with("</act>"));
+    assert!(completion.content.ends_with("</action>"));
     assert_eq!(completion.finish_reason, FinishReason::Stop);
     assert_eq!(completion.closure_mode, ClosureMode::StopSequenceClosed);
     Ok(())

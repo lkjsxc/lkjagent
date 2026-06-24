@@ -9,7 +9,7 @@ pub fn batch_write(root: &str, kind: &str, paths: &[String]) -> String {
         })
         .collect::<Vec<_>>()
         .join("\n-- lkjagent-next-file --\n");
-    format!("<act>\n<tool>fs.batch_write</tool>\n<files>\n{files}\n</files>\n</act>")
+    format!("<action>\n<tool>fs.batch_write</tool>\n<files>\n{files}\n</files>\n</action>")
 }
 
 fn content_for(root: &str, kind: &str, path: &str) -> String {

@@ -16,7 +16,7 @@ fn max_token_inside_write_routes_to_payload_recovery() -> TestResult<()> {
     queue::enqueue(&mut conn, "Create long SF story.", "owner-send", "101")?;
     let workspace = temp_workspace("payload-risk")?;
     let server = serve_responses(vec![length_completion(
-        "<act>\n<tool>fs.write</tool>\n<path>story.md</path>\n<content>",
+        "<action>\n<tool>fs.write</tool>\n<path>story.md</path>\n<content>",
     )])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 

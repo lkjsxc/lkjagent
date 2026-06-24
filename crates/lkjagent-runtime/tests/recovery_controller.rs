@@ -50,7 +50,8 @@ fn runtime_updates_active_node_after_observation() -> TestResult<()> {
     let pending = step(
         planned,
         StepInput::Completion {
-            content: "<act>\n<tool>fs.read</tool>\n<path>README.md</path>\n</act>".to_string(),
+            content: "<action>\n<tool>fs.read</tool>\n<path>README.md</path>\n</action>"
+                .to_string(),
             tokens: 10,
         },
     )
@@ -133,7 +134,7 @@ fn param_fault(state: lkjagent_runtime::task::RuntimeState) -> lkjagent_runtime:
     step(
         state,
         StepInput::Completion {
-            content: "<act>\n<tool>graph.state</tool>\n<path>.</path>\n</act>".to_string(),
+            content: "<action>\n<tool>graph.state</tool>\n<path>.</path>\n</action>".to_string(),
             tokens: 5,
         },
     )
@@ -143,7 +144,8 @@ fn pending_read(state: lkjagent_runtime::task::RuntimeState) -> lkjagent_runtime
     step(
         state,
         StepInput::Completion {
-            content: "<act>\n<tool>fs.read</tool>\n<path>missing.md</path>\n</act>".to_string(),
+            content: "<action>\n<tool>fs.read</tool>\n<path>missing.md</path>\n</action>"
+                .to_string(),
             tokens: 10,
         },
     )
@@ -151,6 +153,6 @@ fn pending_read(state: lkjagent_runtime::task::RuntimeState) -> lkjagent_runtime
 
 fn plan_action(objective: &str) -> String {
     format!(
-        "<act>\n<tool>graph.plan</tool>\n<objective>{objective}</objective>\n<steps>read README.md</steps>\n<checks>README.md is readable</checks>\n<paths>README.md</paths>\n<reason>establish controlled action</reason>\n</act>"
+        "<action>\n<tool>graph.plan</tool>\n<objective>{objective}</objective>\n<steps>read README.md</steps>\n<checks>README.md is readable</checks>\n<paths>README.md</paths>\n<reason>establish controlled action</reason>\n</action>"
     )
 }

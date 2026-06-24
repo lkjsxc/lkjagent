@@ -29,7 +29,7 @@ fn scripted_task_reaches_done_and_distillation_prompt() -> TestResult<()> {
     let completion = step(
         owner.state,
         StepInput::Completion {
-            content: "<act>\n<tool>agent.done</tool>\n<summary>finished</summary>\n</act>"
+            content: "<action>\n<tool>agent.done</tool>\n<summary>finished</summary>\n</action>"
                 .to_string(),
             tokens: 12,
         },
@@ -82,7 +82,7 @@ fn parse_faults_keep_task_open_and_recover_before_wait_threshold() -> TestResult
         let result = step(
             state,
             StepInput::Completion {
-                content: "no act block".to_string(),
+                content: "no action block".to_string(),
                 tokens: 3,
             },
         );
@@ -92,11 +92,11 @@ fn parse_faults_keep_task_open_and_recover_before_wait_threshold() -> TestResult
     assert!(matches!(state.task, TaskState::Open { .. }));
     assert!(last_effects
         .iter()
-        .any(|effect| matches!(effect, Effect::RecordEvent { content, .. } if content.contains("one valid act block"))));
+        .any(|effect| matches!(effect, Effect::RecordEvent { content, .. } if content.contains("one valid action block"))));
     let recovered = step(
         state,
         StepInput::Completion {
-            content: "<act>\n<tool>agent.done</tool>\n<summary>recovered</summary>\n</act>"
+            content: "<action>\n<tool>agent.done</tool>\n<summary>recovered</summary>\n</action>"
                 .to_string(),
             tokens: 12,
         },
@@ -121,7 +121,8 @@ fn tool_and_repeat_errors_add_recovery_notices_without_pausing() -> TestResult<(
     state = step(
         state,
         StepInput::Completion {
-            content: "<act>\n<tool>fs.read</tool>\n<path>missing.md</path>\n</act>".to_string(),
+            content: "<action>\n<tool>fs.read</tool>\n<path>missing.md</path>\n</action>"
+                .to_string(),
             tokens: 10,
         },
     )
@@ -140,7 +141,8 @@ fn tool_and_repeat_errors_add_recovery_notices_without_pausing() -> TestResult<(
     let pending_repeat = step(
         tool_error.state,
         StepInput::Completion {
-            content: "<act>\n<tool>fs.read</tool>\n<path>missing.md</path>\n</act>".to_string(),
+            content: "<action>\n<tool>fs.read</tool>\n<path>missing.md</path>\n</action>"
+                .to_string(),
             tokens: 10,
         },
     );

@@ -101,6 +101,7 @@ for covered cases. Dispatchable registry examples now parse, validate, and
 reach tool routes in focused tests. Recovery-plan examples parse, validate, and
 are admitted by recovery policy when model-authored. Safe path-shaped
 `fs.batch_write` parameters now normalize into `files`; absolute, duplicate,
-and empty-content path parameters refuse before mutation; and the Chronos
-catalog path shape has focused tool coverage. Runtime repeated-fault route
+and empty-content path parameters refuse before mutation; the Chronos catalog
+path shape has focused tool coverage; and attribute-like tag output now gets a
+dedicated parse fault before registry validation. Runtime repeated-fault route
 changes and route-level proof across every policy path remain open.

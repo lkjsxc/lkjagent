@@ -125,5 +125,5 @@ artifact-ledger recording.
 partially implemented for parser normalization, JSON-in-files recovery,
 dispatcher limits, duplicate-path refusal, placeholder refusal, artifact
 write-path recording, and safe path-shaped unknown parameter normalization.
-Top-level JSON action parsing still needs removal from live dispatch. Route-level
+Top-level JSON action parsing is no longer part of live dispatch. Route-level
 recovery for every batch schema fault remains open.

@@ -7,20 +7,27 @@ pub const ESCALATE_AFTER: u8 = 3;
 
 pub fn parse_notice(fault: &ParseFault) -> String {
     match fault {
-        ParseFault::MissingAct => "parse fault: missing act block".to_string(),
-        ParseFault::MultipleAct => "parse fault: multiple act blocks".to_string(),
+        ParseFault::MissingActionEnvelope => "parse fault: missing action envelope".to_string(),
+        ParseFault::MultipleActionEnvelopes => "parse fault: multiple action envelopes".to_string(),
+        ParseFault::UnclosedActionEnvelope => "parse fault: unclosed action envelope".to_string(),
         ParseFault::MissingTool => "parse fault: missing tool".to_string(),
         ParseFault::UnknownTool { tool } => format!("parse fault: unknown tool {tool}"),
         ParseFault::UnclosedTag { tag } => format!("parse fault: unclosed tag {tag}"),
         ParseFault::DuplicateParam { name } => {
             format!("parse fault: duplicate parameter {name}")
         }
+        ParseFault::MalformedTag { line, .. } => format!("parse fault: malformed tag {line}"),
+        ParseFault::AttributeLikeTag {
+            tag_name,
+            value_hint,
+        } => attribute_like_notice(tag_name, value_hint.as_deref()),
         ParseFault::BadParams {
             tool,
             missing,
             unknown,
         } => param_fault_notice(tool, missing, unknown),
         ParseFault::BadEnvelope { reason } => format!("parse fault: bad envelope {reason}"),
+        ParseFault::JsonActionRejected => "parse fault: json action rejected".to_string(),
     }
 }
 
@@ -46,10 +53,10 @@ pub fn parse_recovery_notice(fault: &ParseFault, count: u8) -> String {
     }
     if should_escalate(count) {
         return format!(
-            "recovery: parse faults are consecutive count={count}; simplify to one valid act block; prefer typed file/doc tools for large payloads; ask only if blocked"
+            "recovery: parse faults are consecutive count={count}; simplify to one valid action block; prefer typed file/doc tools for large payloads; ask only if blocked"
         );
     }
-    "recovery: the previous completion was not executed; emit exactly one valid act block next"
+    "recovery: the previous completion was not executed; emit exactly one valid action block next"
         .to_string()
 }
 
@@ -116,14 +123,53 @@ fn received_params(missing: &[String], unknown: &[String]) -> String {
     )
 }
 
+fn attribute_like_notice(tag_name: &str, value_hint: Option<&str>) -> String {
+    let repair_value = value_hint.unwrap_or("relative/path");
+    format!(
+        "parse fault: attribute-like tag {tag_name}\nrepair_rule=tag names cannot contain values\nrepair_tag=paths\nrepair_value={repair_value}"
+    )
+}
+
 fn valid_example(tool: &str) -> String {
     let Some(spec) = find_tool(tool) else {
-        return format!("<act>\n<tool>{tool}</tool>\n</act>");
+        return format!("<action>\n<tool>{tool}</tool>\n</action>");
     };
-    let mut lines = vec!["<act>".to_string(), format!("<tool>{tool}</tool>")];
+    let mut lines = vec!["<action>".to_string(), format!("<tool>{tool}</tool>")];
     for param in spec.params.iter().filter(|param| param.required) {
-        lines.push(format!("<{}>VALUE</{}>", param.name, param.name));
+        lines.push(render_param_example(param.name));
     }
-    lines.push("</act>".to_string());
+    lines.push("</action>".to_string());
     lines.join("\n")
+}
+
+fn render_param_example(name: &str) -> String {
+    let value = match name {
+        "command" => "cargo test -p lkjagent-protocol",
+        "content" => "# Note\n\nConcrete content for the requested file.",
+        "files" => "path: notes/example.md\ncontent:\n# Example\n\nConcrete content.",
+        "find" => "old text",
+        "gate" => "check-docs",
+        "id" => "1",
+        "kind" => "story",
+        "objective" => "Create a structured story bible for Chronos Fracture.",
+        "packages" => "repo-current-state,protocol-contract",
+        "patch" => "--- a/notes/example.md\n+++ b/notes/example.md",
+        "path" => "README.md",
+        "paths" => "stories/chronos-fracture",
+        "query" => "runtime authority",
+        "question" => "Which artifact root should I use?",
+        "reason" => "The runtime requires one schema-valid action.",
+        "replace" => "new text",
+        "root" => "stories/chronos-fracture",
+        "steps" => "1. Inspect state.\n2. Take one bounded action.",
+        "summary" => "The requested artifact is complete and audited.",
+        "target" => "document-completion-check",
+        "title" => "Chronos Fracture",
+        _ => "concrete value",
+    };
+    if value.contains('\n') {
+        format!("<{name}>\n{value}\n</{name}>")
+    } else {
+        format!("<{name}>{value}</{name}>")
+    }
 }

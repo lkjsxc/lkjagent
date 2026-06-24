@@ -1,7 +1,7 @@
-use lkjagent_protocol::{parse_completion, Action, Param, ParseFault};
+use lkjagent_protocol::{parse_completion, ParseFault};
 
 #[test]
-fn parses_json_action_envelope() {
+fn rejects_json_action_envelope_in_live_parser() {
     let text = r##"{
   "schema": "lkj-action",
   "action": {
@@ -10,20 +10,11 @@ fn parses_json_action_envelope() {
   }
 }"##;
 
-    assert_eq!(
-        parse_completion(text),
-        Ok(Action::new(
-            "fs.write",
-            vec![
-                Param::new("content", "# A\n\n## Purpose\n\nA."),
-                Param::new("path", "docs/a.md"),
-            ]
-        ))
-    );
+    assert_eq!(parse_completion(text), Err(ParseFault::JsonActionRejected));
 }
 
 #[test]
-fn converts_json_batch_files_to_line_protocol() {
+fn rejects_json_batch_files_in_live_parser() {
     let text = r#"{
   "action": {
     "tool": "fs.batch_write",
@@ -36,43 +27,13 @@ fn converts_json_batch_files_to_line_protocol() {
   }
 }"#;
 
-    assert_eq!(
-        parse_completion(text),
-        Ok(Action::new(
-            "fs.batch_write",
-            vec![Param::new(
-                "files",
-                "path: a.md\ncontent:\nA\n-- lkjagent-next-file --\npath: b.md\ncontent:\nB"
-            )]
-        ))
-    );
+    assert_eq!(parse_completion(text), Err(ParseFault::JsonActionRejected));
 }
 
 #[test]
-fn rejects_unknown_json_envelope_fields() {
-    let text = r#"{
-  "schema_version": "bad",
-  "action": { "tool": "graph.state", "params": {} }
-}"#;
-
-    assert!(matches!(
-        parse_completion(text),
-        Err(ParseFault::BadEnvelope { reason }) if reason.contains("schema_version")
-    ));
-}
-
-#[test]
-fn rejects_json_unknown_params_with_typed_fault() {
-    let text = r#"{
-  "action": { "tool": "fs.read", "params": { "path": "a.md", "bogus": true } }
-}"#;
-
+fn rejects_malformed_json_as_json_action_output() {
     assert_eq!(
-        parse_completion(text),
-        Err(ParseFault::BadParams {
-            tool: "fs.read".to_string(),
-            missing: Vec::new(),
-            unknown: vec!["bogus".to_string()],
-        })
+        parse_completion(r#"{"action": { "tool": "graph.state" }"#),
+        Err(ParseFault::JsonActionRejected)
     );
 }

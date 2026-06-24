@@ -145,17 +145,17 @@ fn active_allowed_tools(graph: &TaskGraphState) -> Vec<String> {
 fn exact_next_action(graph: &TaskGraphState) -> String {
     let allowed = active_allowed_tools(graph);
     if allowed.iter().any(|tool| tool == "graph.recover") {
-        return "<act><tool>graph.recover</tool></act>".to_string();
+        return "<action><tool>graph.recover</tool></action>".to_string();
     }
     if allowed.iter().any(|tool| tool == "artifact.next") {
         let root = graph
             .document
             .as_ref()
             .map_or("artifact", |doc| doc.root.as_str());
-        return format!("<act><tool>artifact.next</tool><root>{root}</root></act>");
+        return format!("<action><tool>artifact.next</tool><root>{root}</root></action>");
     }
     match allowed.first() {
-        Some(tool) => format!("<act><tool>{tool}</tool></act>"),
+        Some(tool) => format!("<action><tool>{tool}</tool></action>"),
         None => "none".to_string(),
     }
 }

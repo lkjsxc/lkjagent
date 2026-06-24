@@ -1,8 +1,9 @@
 use crate::error::ParseResult;
-use crate::model::{Action, Param, ParseFault};
+use crate::model::{Action, MalformedTagReason, Param, ParseFault, ACTION_CLOSE};
 use crate::registry::{find_tool, ToolSpec};
+use crate::tag_line::{classify_tag_line, TagLineClass};
 
-pub fn starts_line_act(lines: &[&str], index: usize) -> bool {
+pub fn starts_line_action(lines: &[&str], index: usize) -> bool {
     lines
         .iter()
         .skip(index)
@@ -10,13 +11,13 @@ pub fn starts_line_act(lines: &[&str], index: usize) -> bool {
         .is_some_and(|line| line.trim_start().starts_with("tool:"))
 }
 
-pub fn parse_line_act(lines: &[&str], mut index: usize) -> ParseResult<(Action, usize)> {
+pub fn parse_line_action(lines: &[&str], mut index: usize) -> ParseResult<(Action, usize)> {
     let mut tool: Option<String> = None;
     let mut params = Vec::new();
     let mut seen = Vec::new();
     while index < lines.len() {
         let line = lines[index].trim_end();
-        if line == "</act>" {
+        if line == ACTION_CLOSE {
             let Some(tool_name) = tool else {
                 return Err(ParseFault::MissingTool);
             };
@@ -28,7 +29,7 @@ pub fn parse_line_act(lines: &[&str], mut index: usize) -> ParseResult<(Action, 
             continue;
         }
         let Some((name, value)) = line_pair(line) else {
-            return Err(non_pair_fault(tool.as_deref(), line));
+            return Err(non_pair_fault(tool.as_deref(), &params, line));
         };
         if name == "case" {
             index += 1;
@@ -58,16 +59,14 @@ pub fn parse_line_act(lines: &[&str], mut index: usize) -> ParseResult<(Action, 
             index += 1;
         }
     }
-    Err(ParseFault::UnclosedTag {
-        tag: "act".to_string(),
-    })
+    Err(ParseFault::UnclosedActionEnvelope)
 }
 
 fn collect_block(lines: &[&str], start: usize, name: &str) -> ParseResult<(String, usize)> {
     let mut value = Vec::new();
     let mut index = start;
     while let Some(line) = lines.get(index) {
-        if line.trim_end() == "</act>" {
+        if line.trim_end() == ACTION_CLOSE {
             let text = if name == "files" {
                 normalize_files(&value)
             } else {
@@ -104,13 +103,30 @@ fn line_pair(line: &str) -> Option<(String, String)> {
     valid_name(name.trim()).then(|| (name.trim().to_string(), value.trim_start().to_string()))
 }
 
-fn non_pair_fault(tool: Option<&str>, line: &str) -> ParseFault {
+fn non_pair_fault(tool: Option<&str>, params: &[Param], line: &str) -> ParseFault {
+    match classify_tag_line(line) {
+        TagLineClass::AttributeLikeTag {
+            tag_name,
+            value_hint,
+        } => ParseFault::AttributeLikeTag {
+            tag_name,
+            value_hint,
+        },
+        TagLineClass::MalformedAngleText => ParseFault::MalformedTag {
+            line: line.to_string(),
+            reason: MalformedTagReason::BadAngleSyntax,
+        },
+        _ => bad_params_fault(tool, params, line),
+    }
+}
+
+fn bad_params_fault(tool: Option<&str>, params: &[Param], line: &str) -> ParseFault {
     let Some(tool) = tool else {
         return ParseFault::MissingTool;
     };
     ParseFault::BadParams {
         tool: tool.to_string(),
-        missing: find_tool(tool).map_or_else(Vec::new, |spec| missing_required(spec, &[])),
+        missing: find_tool(tool).map_or_else(Vec::new, |spec| missing_required(spec, params)),
         unknown: vec![line.to_string()],
     }
 }

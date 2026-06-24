@@ -78,7 +78,7 @@ fn constraint_like(summary: &str) -> bool {
 }
 
 fn unknown_kind_message() -> String {
-    let example = "<act>\n<tool>graph.note</tool>\n<kind>decision</kind>\n<summary>Chose smaller recovery action</summary>\n</act>";
+    let example = "<action>\n<tool>graph.note</tool>\n<kind>decision</kind>\n<summary>Chose smaller recovery action</summary>\n</action>";
     format!(
         "unknown graph.note kind; allowed: {}; valid_example:\n{example}",
         allowed().join(", ")

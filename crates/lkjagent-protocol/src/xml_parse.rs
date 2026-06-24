@@ -1,35 +1,34 @@
 use crate::error::ParseResult;
-use crate::model::{Action, Param, ParseFault};
+use crate::model::{Action, MalformedTagReason, Param, ParseFault, ACTION_CLOSE, ACTION_OPEN};
 use crate::registry::{find_tool, ToolSpec};
+use crate::tag_line::{classify_tag_line, valid_tag_name, TagLineClass};
 
-pub fn parse_xml_act(lines: &[&str], mut index: usize) -> ParseResult<(Action, usize)> {
+pub fn parse_tag_action(lines: &[&str], mut index: usize) -> ParseResult<(Action, usize)> {
     let mut tool: Option<String> = None;
     let mut params = Vec::new();
     let mut seen = Vec::new();
 
     loop {
         if index >= lines.len() {
-            return Err(ParseFault::UnclosedTag {
-                tag: "act".to_string(),
-            });
+            return Err(ParseFault::UnclosedActionEnvelope);
         }
         let line = lines[index].trim_end();
-        if line == "</act>" {
+        if line == ACTION_CLOSE {
             let Some(tool_name) = tool else {
                 return Err(ParseFault::MissingTool);
             };
             validate_params(&tool_name, &params)?;
             return Ok((Action::new(tool_name, params), index + 1));
         }
-        if line == "<act>" {
-            return Err(ParseFault::MultipleAct);
+        if line == ACTION_OPEN {
+            return Err(ParseFault::MultipleActionEnvelopes);
         }
         if line.is_empty() {
             index += 1;
             continue;
         }
         if !starts_pair(line) {
-            return Err(non_pair_fault(tool.as_deref(), line));
+            return Err(non_pair_fault(tool.as_deref(), &params, line));
         }
 
         let (name, value, next) = parse_pair(lines, index)?;
@@ -54,7 +53,7 @@ pub fn parse_xml_act(lines: &[&str], mut index: usize) -> ParseResult<(Action, u
 
 fn parse_pair(lines: &[&str], index: usize) -> ParseResult<(String, String, usize)> {
     let line = lines[index].trim_end();
-    if let Some((name, value)) = inline_pair(line) {
+    if let TagLineClass::InlineTag { name, value } = classify_tag_line(line) {
         return Ok((name, value, index + 1));
     }
     let Some((name, first_value)) = open_name_and_tail(line) else {
@@ -77,16 +76,36 @@ fn parse_pair(lines: &[&str], index: usize) -> ParseResult<(String, String, usiz
 }
 
 fn starts_pair(line: &str) -> bool {
-    inline_pair(line).is_some() || open_name_and_tail(line).is_some()
+    matches!(
+        classify_tag_line(line),
+        TagLineClass::InlineTag { .. } | TagLineClass::OpenTag { .. }
+    )
 }
 
-fn non_pair_fault(tool: Option<&str>, line: &str) -> ParseFault {
+fn non_pair_fault(tool: Option<&str>, params: &[Param], line: &str) -> ParseFault {
+    match classify_tag_line(line) {
+        TagLineClass::AttributeLikeTag {
+            tag_name,
+            value_hint,
+        } => ParseFault::AttributeLikeTag {
+            tag_name,
+            value_hint,
+        },
+        TagLineClass::MalformedAngleText => ParseFault::MalformedTag {
+            line: line.to_string(),
+            reason: MalformedTagReason::BadAngleSyntax,
+        },
+        _ => bad_params_fault(tool, params, line),
+    }
+}
+
+fn bad_params_fault(tool: Option<&str>, params: &[Param], line: &str) -> ParseFault {
     let Some(tool) = tool else {
         return ParseFault::MissingTool;
     };
     ParseFault::BadParams {
         tool: tool.to_string(),
-        missing: find_tool(tool).map_or_else(Vec::new, |spec| missing_required(spec, &[])),
+        missing: find_tool(tool).map_or_else(Vec::new, |spec| missing_required(spec, params)),
         unknown: vec![line.to_string()],
     }
 }
@@ -127,8 +146,8 @@ fn unknown_params(spec: &ToolSpec, params: &[Param]) -> Vec<String> {
         .collect()
 }
 
-pub fn is_open(line: &str, name: &str) -> bool {
-    line.trim_end() == format!("<{name}>")
+pub fn is_action_open(line: &str) -> bool {
+    line.trim_end() == ACTION_OPEN
 }
 
 fn open_name_and_tail(line: &str) -> Option<(String, String)> {
@@ -138,41 +157,10 @@ fn open_name_and_tail(line: &str) -> Option<(String, String)> {
     }
     let open_end = trimmed.find('>')?;
     let name = &trimmed[1..open_end];
-    valid_name(name).then(|| {
+    valid_tag_name(name).then(|| {
         (
             name.to_string(),
             trimmed[open_end.saturating_add(1)..].to_string(),
         )
     })
-}
-
-fn inline_pair(line: &str) -> Option<(String, String)> {
-    let trimmed = line.trim_end();
-    let open_end = trimmed.find('>')?;
-    if !trimmed.starts_with('<') || trimmed.starts_with("</") {
-        return None;
-    }
-    let name = &trimmed[1..open_end];
-    if !valid_name(name) {
-        return None;
-    }
-    let close = format!("</{name}>");
-    if !trimmed.ends_with(&close) {
-        return None;
-    }
-    let value_start = open_end + 1;
-    let value_end = trimmed.len().saturating_sub(close.len());
-    (value_start <= value_end).then(|| {
-        (
-            name.to_string(),
-            trimmed[value_start..value_end].to_string(),
-        )
-    })
-}
-
-fn valid_name(name: &str) -> bool {
-    !name.is_empty()
-        && name
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '_' | '-'))
 }

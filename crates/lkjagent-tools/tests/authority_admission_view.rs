@@ -81,6 +81,6 @@ fn authority_view(
         completion_allowed,
         missing_evidence: vec!["artifact-readiness".to_string()],
         recovery_route: None,
-        exact_valid_example: "<act>\n<tool>artifact.next</tool>\n</act>".to_string(),
+        exact_valid_example: "<action>\n<tool>artifact.next</tool>\n</action>".to_string(),
     }
 }

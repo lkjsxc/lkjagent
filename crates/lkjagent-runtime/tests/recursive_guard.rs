@@ -14,32 +14,32 @@ use lkjagent_tools::dispatch::DispatchState;
 use support::http::{completion, serve_responses};
 use support::{store, temp_workspace, TestResult};
 
-const DONE: &str = "<act>
+const DONE: &str = "<action>
 <tool>agent.done</tool>
 <summary>recursive structure complete</summary>
-</act>";
-const PLAN: &str = "<act>
+</action>";
+const PLAN: &str = "<action>
 <tool>graph.plan</tool>
 <objective>build a recursive workspace documentation tree</objective>
 <steps>write root index; write recursive tree; read deep model file; record verification</steps>
 <checks>fs.read docs/product/contracts/domain/model.md confirms tree</checks>
 <paths>docs</paths>
 <reason>recursive structure requires planned indexed files</reason>
-</act>";
-const READ_DEEP_FILE: &str = "<act>
+</action>";
+const READ_DEEP_FILE: &str = "<action>
 <tool>fs.read</tool>
 <path>docs/product/contracts/domain/model.md</path>
-</act>";
-const GRAPH_VERIFY: &str = "<act>
+</action>";
+const GRAPH_VERIFY: &str = "<action>
 <tool>graph.evidence</tool>
 <kind>verification</kind>
 <summary>fs.read observed the deep recursive model file</summary>
 <path>docs/product/contracts/domain/model.md</path>
-</act>";
-const DOC_AUDIT: &str = "<act>
+</action>";
+const DOC_AUDIT: &str = "<action>
 <tool>doc.audit</tool>
 <root>docs</root>
-</act>";
+</action>";
 
 #[test]
 fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestResult<()> {
@@ -115,7 +115,7 @@ fn scripted_responses() -> Vec<String> {
 
 fn write_action(path: &str, content: &str) -> String {
     format!(
-        "<act>\n<tool>fs.write</tool>\n<path>{path}</path>\n<content>\n{content}</content>\n</act>"
+        "<action>\n<tool>fs.write</tool>\n<path>{path}</path>\n<content>\n{content}</content>\n</action>"
     )
 }
 
@@ -125,7 +125,7 @@ fn batch_tree_action() -> String {
         .map(|(path, content)| format!("path: {path}\ncontent:\n{content}"))
         .collect::<Vec<_>>()
         .join("\n-- lkjagent-next-file --\n");
-    format!("<act>\n<tool>fs.batch_write</tool>\n<files>\n{files}</files>\n</act>")
+    format!("<action>\n<tool>fs.batch_write</tool>\n<files>\n{files}</files>\n</action>")
 }
 
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {

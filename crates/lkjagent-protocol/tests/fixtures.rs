@@ -1,42 +1,32 @@
 use lkjagent_protocol::{
-    parse_completion, render_action, render_graph, render_notice, render_observation, render_owner,
-    Action, Param, ParseFault,
+    parse_completion, parse_live_completion, render_action, render_graph, render_notice,
+    render_observation, render_owner, Action, EnvelopeMode, Param, ParseFault,
 };
 
 #[test]
 fn parses_clean_turns_and_round_trips_rendered_actions() {
     let fixtures = vec![
         (
-            "<think>\nread first\n</think>\n<act>\n<tool>fs.read</tool>\n<path>README.md</path>\n<count>10</count>\n</act>",
+            "<action>\n<tool>fs.read</tool>\n<path>README.md</path>\n<count>10</count>\n</action>",
             Action::new("fs.read", vec![Param::new("path", "README.md"), Param::new("count", "10")]),
         ),
         (
-            "<act>\n<tool>fs.write</tool>\n<path>notes.md</path>\n<content>\nline one\n<act>\n  </content>\nline two\n</content>\n</act>",
+            "<action>\n<tool>fs.write</tool>\n<path>notes.md</path>\n<content>\nline one\n<action>\n  </content>\nline two\n</content>\n</action>",
             Action::new(
                 "fs.write",
                 vec![
                     Param::new("path", "notes.md"),
-                    Param::new("content", "line one\n<act>\n  </content>\nline two"),
+                    Param::new("content", "line one\n<action>\n  </content>\nline two"),
                 ],
             ),
         ),
         (
-            "<act>   \n<tool>fs.read</tool>   \n<path> notes.md </path>\n</act>   ",
+            "<action>   \n<tool>fs.read</tool>   \n<path> notes.md </path>\n</action>   ",
             Action::new("fs.read", vec![Param::new("path", " notes.md ")]),
         ),
         (
-            "<act>\n<tool>shell.run</tool>\n<timeout>20</timeout>\n<command>cargo test</command>\n</act>",
+            "<action>\n<tool>shell.run</tool>\n<timeout>20</timeout>\n<command>cargo test</command>\n</action>",
             Action::new("shell.run", vec![Param::new("timeout", "20"), Param::new("command", "cargo test")]),
-        ),
-        (
-            "<act>\n<tool>fs.write</tool>\n<path>docs/README.md</path>\n<content># Docs\n\n## Purpose\n\nRoot index.\n</content>\n</act>",
-            Action::new(
-                "fs.write",
-                vec![
-                    Param::new("path", "docs/README.md"),
-                    Param::new("content", "# Docs\n\n## Purpose\n\nRoot index."),
-                ],
-            ),
         ),
     ];
 
@@ -49,32 +39,32 @@ fn parses_clean_turns_and_round_trips_rendered_actions() {
 #[test]
 fn produces_each_parse_fault_variant() {
     let cases = vec![
-        ("no act here", ParseFault::MissingAct),
+        ("no action here", ParseFault::MissingActionEnvelope),
         (
-            "<act>\n<tool>agent.done</tool>\n<summary>x</summary>\n</act>\n<act>\n<tool>agent.done</tool>\n<summary>y</summary>\n</act>",
-            ParseFault::MultipleAct,
+            "<action>\n<tool>agent.done</tool>\n<summary>x</summary>\n</action>\n<action>\n<tool>agent.done</tool>\n<summary>y</summary>\n</action>",
+            ParseFault::MultipleActionEnvelopes,
         ),
-        ("<act>\n<path>README.md</path>\n</act>", ParseFault::MissingTool),
+        ("<action>\n<path>README.md</path>\n</action>", ParseFault::MissingTool),
         (
-            "<act>\n<tool>missing.tool</tool>\n</act>",
+            "<action>\n<tool>missing.tool</tool>\n</action>",
             ParseFault::UnknownTool {
                 tool: "missing.tool".to_string(),
             },
         ),
         (
-            "<act>\n<tool>fs.write</tool>\n<path>x</path>\n<content>\nbody\n</act>",
+            "<action>\n<tool>fs.write</tool>\n<path>x</path>\n<content>\nbody\n</action>",
             ParseFault::UnclosedTag {
                 tag: "content".to_string(),
             },
         ),
         (
-            "<act>\n<tool>fs.read</tool>\n<path>a</path>\n<path>b</path>\n</act>",
+            "<action>\n<tool>fs.read</tool>\n<path>a</path>\n<path>b</path>\n</action>",
             ParseFault::DuplicateParam {
                 name: "path".to_string(),
             },
         ),
         (
-            "<act>\n<tool>fs.read</tool>\n<bogus>x</bogus>\n<extra>y</extra>\n</act>",
+            "<action>\n<tool>fs.read</tool>\n<bogus>x</bogus>\n<extra>y</extra>\n</action>",
             ParseFault::BadParams {
                 tool: "fs.read".to_string(),
                 missing: vec!["path".to_string()],
@@ -82,21 +72,11 @@ fn produces_each_parse_fault_variant() {
             },
         ),
         (
-            "<act>\n<tool>shell.run</tool>\n<timeout>30</timeout>\n</act>",
+            "<action>\n<tool>shell.run</tool>\n<timeout>30</timeout>\n</action>",
             ParseFault::BadParams {
                 tool: "shell.run".to_string(),
                 missing: vec!["command".to_string()],
                 unknown: vec![],
-            },
-        ),
-        (
-            "<act>\n<tool>fs.batch_write</tool>\nfiles=[{\"path\":\"x.md\",\"content\":\"body\"}]\n</act>",
-            ParseFault::BadParams {
-                tool: "fs.batch_write".to_string(),
-                missing: vec!["files".to_string()],
-                unknown: vec![
-                    "files=[{\"path\":\"x.md\",\"content\":\"body\"}]".to_string(),
-                ],
             },
         ),
     ];
@@ -107,51 +87,65 @@ fn produces_each_parse_fault_variant() {
 }
 
 #[test]
-fn parses_core_file_tool_child_parameters() {
-    let cases = [
-        (
-            "<act>\n<tool>fs.read</tool>\n<path>README.md</path>\n</act>",
-            Action::new("fs.read", vec![Param::new("path", "README.md")]),
-        ),
-        (
-            "<act>\n<tool>fs.stat</tool>\n<path>README.md</path>\n</act>",
-            Action::new("fs.stat", vec![Param::new("path", "README.md")]),
-        ),
-        (
-            "<act>\n<tool>fs.list</tool>\n<path>docs</path>\n<depth>2</depth>\n<limit>5</limit>\n</act>",
-            Action::new(
-                "fs.list",
-                vec![
-                    Param::new("path", "docs"),
-                    Param::new("depth", "2"),
-                    Param::new("limit", "5"),
-                ],
-            ),
-        ),
-    ];
+fn attribute_like_tag_is_dedicated_fault() {
+    let text = "<action>\n<tool>graph.plan</tool>\n<objective>Create structured science-fiction story bible for Chronos Fracture.</objective>\n<steps>Record plan, write bounded batches, audit readiness.</steps>\n<path=stories/chronos-fracture</path>\n<reason>Owner requires a story bible.</reason>\n</action>";
 
-    for (text, expected) in cases {
-        assert_eq!(parse_completion(text), Ok(expected));
-    }
+    assert_eq!(
+        parse_completion(text),
+        Err(ParseFault::AttributeLikeTag {
+            tag_name: "path=stories/chronos-fracture".to_string(),
+            value_hint: Some("stories/chronos-fracture".to_string()),
+        })
+    );
 }
 
 #[test]
 fn parses_line_action_grammar_and_file_blocks() {
     assert_eq!(
-        parse_completion("<act>\ntool: doc.audit\nroot: docs\n</act>"),
+        parse_completion("<action>\ntool: doc.audit\nroot: docs\n</action>"),
         Ok(Action::new("doc.audit", vec![Param::new("root", "docs")]))
     );
 
-    let batch = "<act>\ntool: fs.batch_write\ncase: current\nfiles:\n-- file --\npath: notes/food.md\ncontent:\n# 和食\n\nだし and rice notes.\n-- end-file --\n-- file --\npath: notes/code.md\ncontent:\n```xml\n<act>literal</act>\n```\n-- end-file --\n</act>";
+    let batch = "<action>\ntool: fs.batch_write\ncase: current\nfiles:\n-- file --\npath: notes/food.md\ncontent:\n# Food\n\nRice notes.\n-- end-file --\n-- file --\npath: notes/code.md\ncontent:\n```text\n<action>literal</action>\n```\n-- end-file --\n</action>";
     assert_eq!(
         parse_completion(batch),
         Ok(Action::new(
             "fs.batch_write",
             vec![Param::new(
                 "files",
-                "path: notes/food.md\ncontent:\n# 和食\n\nだし and rice notes.\n-- lkjagent-next-file --\npath: notes/code.md\ncontent:\n```xml\n<act>literal</act>\n```"
+                "path: notes/food.md\ncontent:\n# Food\n\nRice notes.\n-- lkjagent-next-file --\npath: notes/code.md\ncontent:\n```text\n<action>literal</action>\n```"
             )]
         ))
+    );
+}
+
+#[test]
+fn implicit_envelope_accepts_exact_tool_body() {
+    let outcome = parse_live_completion("<tool>graph.state</tool>", Default::default());
+
+    assert_eq!(outcome.action, Some(Action::new("graph.state", Vec::new())));
+    assert_eq!(outcome.fault, None);
+    assert_eq!(outcome.envelope_mode, EnvelopeMode::Implicit);
+
+    let line = parse_live_completion("tool: graph.state", Default::default());
+    assert_eq!(line.action, Some(Action::new("graph.state", Vec::new())));
+    assert_eq!(line.envelope_mode, EnvelopeMode::Implicit);
+}
+
+#[test]
+fn prose_without_action_remains_missing_envelope() {
+    let text = "I will inspect the graph state next and then continue.";
+    assert_eq!(
+        parse_completion(text),
+        Err(ParseFault::MissingActionEnvelope)
+    );
+}
+
+#[test]
+fn top_level_json_is_rejected_for_live_parser() {
+    assert_eq!(
+        parse_completion(r#"{"action":{"tool":"graph.state"}}"#),
+        Err(ParseFault::JsonActionRejected)
     );
 }
 

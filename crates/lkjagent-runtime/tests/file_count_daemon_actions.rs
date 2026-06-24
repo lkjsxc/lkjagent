@@ -1,13 +1,13 @@
-pub const PLAN_BATCH: &str = "<act>
+pub const PLAN_BATCH: &str = "<action>
 <tool>graph.plan</tool>
 <objective>create a five-file package</objective>
 <steps>write batch; list files; record verification</steps>
 <checks>fs.list confirms deliverable files</checks>
 <paths>deliverable</paths>
 <reason>exact file-count task needs planned batch creation</reason>
-</act>";
+</action>";
 
-pub const BATCH_WRITE: &str = "<act>
+pub const BATCH_WRITE: &str = "<action>
 <tool>fs.batch_write</tool>
 <files>
 path: deliverable/README.md
@@ -30,22 +30,22 @@ path: deliverable/main/part-003.md
 content:
 # Main 3
 </files>
-</act>";
+</action>";
 
-pub const LIST_DELIVERABLE: &str = "<act>
+pub const LIST_DELIVERABLE: &str = "<action>
 <tool>fs.list</tool>
 <path>deliverable</path>
 <kind>file</kind>
-</act>";
+</action>";
 
-pub const VERIFY_DELIVERABLE: &str = "<act>
+pub const VERIFY_DELIVERABLE: &str = "<action>
 <tool>graph.evidence</tool>
 <kind>verification</kind>
 <summary>fs.list observed five deliverable files</summary>
 <path>deliverable</path>
-</act>";
+</action>";
 
-pub const DONE: &str = "<act>
+pub const DONE: &str = "<action>
 <tool>agent.done</tool>
 <summary>created a README-indexed five-file deliverable</summary>
-</act>";
+</action>";

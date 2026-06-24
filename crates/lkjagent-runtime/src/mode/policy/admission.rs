@@ -149,8 +149,8 @@ fn valid_example(tool: &str) -> String {
 
 fn runtime_only_example(tool: &str) -> String {
     match tool {
-        "runtime.compact" | "runtime.wait" => "runtime action; no model act block".to_string(),
-        other => format!("<act>\n<tool>{other}</tool>\n</act>"),
+        "runtime.compact" | "runtime.wait" => "runtime action; no model action block".to_string(),
+        other => format!("<action>\n<tool>{other}</tool>\n</action>"),
     }
 }
 

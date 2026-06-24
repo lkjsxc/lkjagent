@@ -36,7 +36,7 @@ pub fn seed_decision(conn: &Connection) -> TestResult<SeededDecision> {
             blocked_tools: &blocked,
             missing_evidence: &missing,
             forced_next_action: "run artifact.next",
-            exact_valid_example: Some("<act>artifact.next</act>"),
+            exact_valid_example: Some("<action>artifact.next</action>"),
             completion_allowed: false,
             completion_refusal: Some("missing artifact readiness"),
             recovery_route: None,

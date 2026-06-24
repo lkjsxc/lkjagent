@@ -34,7 +34,7 @@ fn provider_exchange_writer_persists_files_and_store_rows() -> TestResult<()> {
     assert!(root.join("index.ndjson").exists());
     record_parsed_action(
         &handle,
-        "<act>\n<tool>graph.state</tool>\n</act>",
+        "<action>\n<tool>graph.state</tool>\n</action>",
         "Natural",
     )?;
     lkjagent_store::state::set(

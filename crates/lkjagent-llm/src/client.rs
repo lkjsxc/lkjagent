@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use lkjagent_context::model::Message;
+use lkjagent_protocol::{ACTION_CLOSE, ACTION_OPEN};
 use reqwest::blocking::Client;
 use reqwest::header::CONTENT_TYPE;
 
@@ -72,7 +73,7 @@ pub fn complete(
     let completion = decode_completion(&text).map_err(|error| {
         endpoint_error(EndpointFailure::Malformed(error.to_string()), retry_after)
     })?;
-    if completion.finish_reason == FinishReason::Length && !has_closed_act(&completion.content) {
+    if completion.finish_reason == FinishReason::Length && !has_closed_action(&completion.content) {
         let preview = preview(&completion.content);
         return Err(ClientError::Oversize {
             usage: completion.usage,
@@ -116,10 +117,10 @@ fn chat_url(base_url: &str) -> String {
     format!("{}/v1/chat/completions", base_url.trim_end_matches('/'))
 }
 
-fn has_closed_act(content: &str) -> bool {
+fn has_closed_action(content: &str) -> bool {
     content
-        .find("<act>")
-        .is_some_and(|start| content[start..].contains("</act>"))
+        .find(ACTION_OPEN)
+        .is_some_and(|start| content[start..].contains(ACTION_CLOSE))
 }
 
 fn preview(content: &str) -> String {

@@ -174,26 +174,26 @@ fn next_completion_action(first: &str) -> CompletionNextAction {
         return CompletionNextAction {
             label: "run artifact.audit before retrying agent.done",
             example:
-                "<act>\n<tool>artifact.audit</tool>\n<root>stories/example-story</root>\n</act>"
+                "<action>\n<tool>artifact.audit</tool>\n<root>stories/example-story</root>\n</action>"
                     .to_string(),
         };
     }
     if first == "document-structure" {
         return CompletionNextAction {
             label: "run doc.audit before retrying agent.done",
-            example: "<act>\n<tool>doc.audit</tool>\n<root>docs</root>\n</act>".to_string(),
+            example: "<action>\n<tool>doc.audit</tool>\n<root>docs</root>\n</action>".to_string(),
         };
     }
     if first == "plan" {
         return CompletionNextAction {
             label: "record graph.plan with steps, checks, paths, and reason",
-            example: "<act>\n<tool>graph.plan</tool>\n<objective>Finish the owner task</objective>\n<steps>inspect current state; run verification; record evidence</steps>\n<checks>verification evidence exists before completion</checks>\n<paths>.</paths>\n<reason>completion gate is missing plan evidence</reason>\n</act>".to_string(),
+            example: "<action>\n<tool>graph.plan</tool>\n<objective>Finish the owner task</objective>\n<steps>inspect current state; run verification; record evidence</steps>\n<checks>verification evidence exists before completion</checks>\n<paths>.</paths>\n<reason>completion gate is missing plan evidence</reason>\n</action>".to_string(),
         };
     }
     CompletionNextAction {
         label: "record missing graph.evidence before retrying agent.done",
         example: format!(
-            "<act>\n<tool>graph.evidence</tool>\n<kind>{first}</kind>\n<summary>Observed required completion evidence</summary>\n<path>.</path>\n</act>"
+            "<action>\n<tool>graph.evidence</tool>\n<kind>{first}</kind>\n<summary>Observed required completion evidence</summary>\n<path>.</path>\n</action>"
         ),
     }
 }

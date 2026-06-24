@@ -65,6 +65,6 @@ logging, and reasoning fields that contain action-like text.
 
 ## Status
 
-partially implemented. The provider request and wire decoder still need the live
-stop sequence changed to `</action>` and the parse log modes aligned with this
-contract.
+partially implemented. The provider request, wire decoder, closure repair, and
+length-finish detection now use `</action>`. Persisted parse log mode alignment
+and replay proof across provider exchange records remain open.

@@ -10,21 +10,21 @@ use lkjagent_store::{events, memory, state};
 use support::http::{completion, serve_responses};
 use support::{runtime_state, store, temp_workspace, TestResult};
 
-const WRITE_ACTION: &str = "<act>
+const WRITE_ACTION: &str = "<action>
 <tool>fs.write</tool>
 <path>owner.txt</path>
 <content>owner wins</content>
-</act>";
-const MEMORY_SAVE: &str = "<act>
+</action>";
+const MEMORY_SAVE: &str = "<action>
 <tool>memory.save</tool>
 <kind>lesson</kind>
 <title>maintenance note</title>
 <tags>maintenance</tags>
 <content>idle cycle recorded a durable note</content>
-</act>";
-const MEMORY_PRUNE: &str = "<act>
+</action>";
+const MEMORY_PRUNE: &str = "<action>
 <tool>memory.prune</tool>
-</act>";
+</action>";
 
 #[test]
 fn maintenance_blocks_workspace_write_tools() -> TestResult<()> {

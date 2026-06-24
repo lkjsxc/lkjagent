@@ -13,9 +13,9 @@ use lkjagent_store::{queue, runtime_authority, state};
 use support::http::{completion, serve_responses};
 use support::{action, runtime_state, store, temp_workspace, TestResult};
 
-const GRAPH_STATE: &str = "<act>
+const GRAPH_STATE: &str = "<action>
 <tool>graph.state</tool>
-</act>";
+</action>";
 
 #[test]
 fn endpoint_turn_refreshes_one_active_mode_card() -> TestResult<()> {
