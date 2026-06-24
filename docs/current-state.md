@@ -4,189 +4,112 @@
 
 This file is the honest ledger of lkjagent. It states what exists, what is
 partial, and what is open. A behavior is implemented only when code, focused
-tests, and gates prove it.
+tests, quiet gates, and required Docker gates prove it.
 
 ## Summary
 
 lkjagent has a working Rust workspace with local gates, Docker Compose gates,
-a tag action parser, tool dispatcher, typed graph model, context budgeting,
-SQLite persistence, endpoint client, daemon loop, owner queue intake, status,
-log, console, memory commands, and benchmark fixtures.
+a strict tag action parser, dispatcher registry, typed graph model, context
+budgeting, SQLite persistence, endpoint client, daemon loop, owner queue intake,
+status and log commands, memory commands, model-run logging, artifact ledgers,
+compaction records, and benchmark fixtures.
 
-The open problem is controller reliability. Runtime authority is not yet the
-single durable source for every active mode, dispatch decision, recovery route,
-compaction snapshot, maintenance boundary, and completion gate. Uploaded run
-logs remain active evidence until focused tests and Docker Compose verification
-prove that their failures cannot recur.
+The central transition kernel is still not complete. Runtime authority is not
+yet the single durable source for every prompt, endpoint call, parse fault,
+admission, dispatch, observation, recovery route, compaction interrupt,
+maintenance boundary, and close path. Model text is intent or content. Runtime
+data must be authority.
+
+The latest `data/logs/current-model-run.md` remains active evidence. It shows a
+Chronos Fracture story-bible run that entered recovery at
+`document-completion-check`, recorded plan and directory-observation evidence,
+but did not record document-structure or artifact-readiness evidence.
 
 ## Implemented Behavior
 
 | Area | Evidence |
 | --- | --- |
 | Workspace and gates | `Cargo.toml`, `crates/lkjagent-xtask`, and `docker-compose.yml` exist. |
-| Diagnostic runtime output | `data/logs/current-model-run.md`, `data/workspace/structured-output/`, and SQLite store files hold active generated evidence; SQLite store files stay ignored. |
 | Parser | `lkjagent-protocol` parses line-oriented, paired-tag, JSON envelope, and batch file action forms covered by focused fixtures. Provider stop-closure restoration records closure mode for parse logs. |
 | Dispatcher registry | `lkjagent-tools` validates registered tools and renders registry examples for covered action families. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
-| SQLite store | Queue, state, event, memory, and task summary surfaces exist in `lkjagent-store`. |
+| SQLite store | Queue, state, event, memory, task summary, authority, artifact, compaction, and provider-exchange surfaces exist in `lkjagent-store`. |
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
-| Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current model run snapshot. Provider exchange rows plus atomic request, authority, response, timing, and error files are written when daemon model calls have a log root. |
+| Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current run snapshot. Provider exchange request, authority, response, timing, parse, admission, observation, and error records are written when the daemon has a log root. |
 | Document scaffold seed | Deterministic scaffold paths, relation-first generic seeds, bounded slugs, compact `catalog.toml`, and creative writing profiles exist for project, multi-topic docs, story, novel, character, and cookbook roots. |
-| Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, workspace briefs, structure-only pages, owner-term pages, and old boilerplate leaves. |
+| Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, workspace briefs, structure-only pages, owner-term pages, and old generated boilerplate leaves. |
 | Placeholder and payload refusal | `fs.write`, `fs.batch_write`, content audit, and check-docs reject common scaffold phrases and oversized payloads before mutation. |
 | Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
 | Hard compaction mode | A runtime-owned `Compaction` active mode exists and does not render `memory.save` as a model action. |
-| Baseline benchmarks | The corpus includes owner-reported recovery, artifact, memory, accounting, and model-log signatures. |
+| Maintenance preemption seed | Cached maintenance actions are refused before dispatch when queued owner work changes current authority. |
+| Baseline benchmarks | The corpus includes owner-reported recovery, artifact, memory, accounting, model-log, batch-schema, compaction, and repeated-recovery signatures. |
 
 ## Partially Implemented Behavior
 
 | Area | Current truth |
 | --- | --- |
-| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, turn authority cards, non-empty owner tool surfaces, adapter-built runtime snapshots with case, node, phase, artifact, and evidence fields, mission-derived active modes, a `RuntimeSnapshot.active_mode` field, data-first decision records with snapshot case and graph-node fields, normalized authority snapshot, event, decision, transition, effect, and admission store APIs, turn-authority snapshot, event, decision, and transition persistence, prompt-card decision id and fingerprint rendering, pending-action admission persistence, pending-action immutable admission-view refusal, effective dispatch policy reuse, store-backed authority snapshot fields, stale maintenance-action refusal before dispatch, and `agent.done` refusal exist. These are partial authority pieces, not yet one transition kernel. Broader route coverage and pre-dispatch contradiction repair remain open. |
-| State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. The transition-network contract is partially implemented where current tests prove it; normalized history exists for turn authority snapshots and decisions, while full unified runtime wiring remains open. |
-| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, closed fault classes, route metadata, a pure recovery plan table, recovery-plan examples that parse, validate, admit, and dispatch to local routes, and SQLite retry counts keyed by case, node, tool, parameter shape, and fault class exist. Live shape-change enforcement for every fault class remains open. |
-| Schema repair | Safe alias normalization and registry examples exist for covered cases. Registry examples parse, validate, and dispatch to routes except heavyweight verification gates. Recovery-plan examples parse, validate, are admitted by recovery policy, and dispatch to local routes when model-authored. |
-| Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, root/path address refusals, normalized artifact ledger and cursor store APIs, ledger writes from `artifact.plan`, `artifact.apply`, `artifact.audit`, and `artifact.next`, successful write-path cursor completion marking, audit output `artifact_ledger_id`, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Full close-path coverage remains incomplete. |
-| Completion gates | A pure `decide_completion` reducer returns completion kind, failed gates, missing and existing evidence, next action, valid example, blocked-handoff allowance, and status text. Runtime `agent.done` admission uses it, and daemon graph dispatch checks the artifact ledger before admitting completion. Every close path is not yet proven to use the same artifact-aware gate. |
-| Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Latest snapshot lookup survives store reopen; status rendering for latest snapshots remains open. |
-| Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, same-title high-overlap merge, and low-signal rewrite pruning exist. Pre-dispatch owner preemption proof remains open. |
-| Status and console | Active graph state, active mode, authority snapshot fields, context pressure, token usage, and model-log paths display. Last successful observation is summarized from recent observations. |
-| Provider exchange logging | SQLite schema, store APIs, atomic filesystem writer, request, response, parse, admission, observation, error, index, per-turn export files, CLI list/show, and focused store/runtime/CLI tests exist. Sanitized archive and raw-case inspection commands remain open. |
-| Benchmarks | Uploaded-run signatures now include missing action blocks, interrupted output, stop-closure repair, contradictory authority, provider logging, batch schema faults, compaction resume, artifact drift, and repeated recovery. Runtime replay coverage and every completion path are not yet complete. |
+| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, normalized authority snapshots, event and decision rows, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, stale maintenance-action refusal, and `agent.done` refusal exist. These are partial authority pieces, not one enforced transition kernel. |
+| State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Full unified runtime wiring remains open. |
+| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, dispatcher-valid examples for covered routes, and SQLite retry counts exist. Live shape-change enforcement for every fault class remains open. |
+| Schema repair | Safe alias normalization and registry examples exist for covered cases. The live `fs.batch_write` path-shaped parameter loop proves batch-write schema recovery remains insufficient. |
+| Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, root/path address refusals, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
+| Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, next action, valid example, blocked-handoff allowance, and status text. Every close path is not yet proven to call the same artifact-aware gate. |
+| Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Status rendering and prompt-frame resume proof remain open. |
+| Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Owner preemption before endpoint and every dispatch path remains open. |
+| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, CLI list/show, and focused tests exist. Sanitized archive export and raw case inspection remain open. |
+| Benchmarks | Uploaded-run text signatures exist. Parser-level and runtime-level replay fixtures that assert productive next actions remain open. |
 
-## Open Failure Evidence
+## Active Failure Evidence
 
-Uploaded run logs still stand for these failures:
+`data/logs/current-model-run.md` proves the next reliability gap:
 
-- repeated parse faults: missing action block and unclosed action roots.
-- invalid parameters: absolute `/docs`, invalid `graph.plan`, invalid note and memory kinds.
-- repeated recovery actions: `graph.recover`, `graph.state`, and `graph.next` loops.
-- blocked escape tools: `doc.scaffold`, `fs.write`, `shell.run`, and internal `agent.ask` attempts.
-- contradictory policy: maintenance and graph policy rendering together.
-- content failure: README-only or scaffold-only output treated as artifact success.
-- artifact drift: empty cookbook roots, shallow dictionary roots, and topic drift.
-- memory failure: duplicate or low-value maintenance rows.
-- compaction failure: hard pressure depending on model-authored `memory.save`.
-- completion failure: `agent.done` closing without audit, verification, or recovery evidence.
-- observability failure: provider exchange export records are not fully
-  implemented under `data/logs`.
+- the daemon refused a stale maintenance `memory.find` action after owner work
+  appeared, so active-mode preemption is useful but narrow;
+- the owner requested `stories/chronos-fracture` as a directory story artifact
+  with README, catalog, child directories, line limits, small batches, and audits;
+- the run created `stories/chronos-fracture` and
+  `stories/chronos-fracture/bible`;
+- the task then looped through missing `<act>` blocks and consecutive parse
+  faults reaching at least count 5;
+- `fs.batch_write` was repeatedly refused because `files` was missing and a
+  path-shaped unknown parameter such as
+  `stories/chronos-fracture/catalog.toml` appeared instead;
+- recovery examples were rendered, but the live route did not escape into a
+  productive write or audit path;
+- evidence contained plan and observation rows, not `document-structure` or
+  `artifact-readiness`;
+- no close path can be called implemented until quiet verify, Docker Compose
+  verification, and a live or replayed Chronos story run prove this class does
+  not recur.
 
 ## Active Target
 
-The first active target is the generated documentation source plus the
-root/path address controller. Scaffold structure, path naming, and content
-readiness must be separated before runtime authority work continues, because
-repeated generated leaves can create false artifact evidence.
+The dependency queue is [execution/current-blockers.md](execution/current-blockers.md).
+The first open target is documentation and current-state reconciliation. The
+first implementation target after that is the transition-kernel contract and
+data model: `RuntimeSnapshot + RuntimeEvent -> RuntimeDecision`, persisted
+before prompt rendering or dispatch, with admission derived from the same
+decision id.
 
-The latest run after scaffold redesign showed root/path confusion:
-artifact.apply created a `.md` directory, artifact.next rendered artifact.audit
-for a Markdown file path, and doc/artifact audit surfaced `Not a directory`
-instead of a semantic root/path refusal. Focused tests cover plan/apply/next,
-doc audit/scaffold, file-root, and `.md` directory refusals, but old-root
-adoption, invalid-root completion markers, policy-wide dispatch proof, and a
-live SF-novel rerun remain open.
-
-The runtime target remains a runtime-owned authority layer above model output,
-graph suggestions, maintenance, compaction, owner questions, verification, and
-completion. Model output is intent. Graph transitions are guidance. The
-runtime decides one active mode, one effective policy, one admitted action
-surface, one recovery route, and one completion gate per turn.
-
-## Dependency Queue
-
-The implementation queue is
-[execution/current-blockers.md](execution/current-blockers.md). Rows remain
-open until the task contract names focused evidence and the same slice records
-the gates that actually ran. Contract text alone never closes a row.
+Route-level proof remains open for all admission paths. Stale-action refusal
+must compare the full staleness fingerprint, not only maintenance mode.
+Compaction and maintenance are runtime-owned decisions, not prompt inventions.
+Completion must read the central completion reducer on every path.
 
 ## Latest Local Evidence
 
-Current baseline for the scaffold-redesign slice:
+Baseline at the start of this reconciliation slice:
 
 - `git status --short`: no output.
-- `rg -n "Keep this file semantic|..." .`: `RG_EXIT=127`; this environment
-  does not provide `rg`.
-- The baseline Python and `grep` scans found the old generated block in
-  `crates/lkjagent-tools/src/doc/body.rs`, generic artifact example text in
-  `crates/lkjagent-tools/src/artifact_next_example.rs`, detector code, tests,
-  and historical logs before the scaffold slice changed code.
-- `find data -maxdepth 5 -type f | sort | sed -n '1,200p'`: active evidence
-  includes `data/logs/current-model-run.md`, generated docs under
-  `data/workspace/docs/`, and the combined-topic generated Markdown file.
-- `cargo fmt --check`: `FMT_EXIT=0`, `ok fmt-check`.
+- `docs/current-state.md`: 200 lines before this rewrite.
+- `data/logs/current-model-run.md`: 194 lines and still active evidence.
 - `cargo run -p lkjagent-xtask -- check-docs`: `DOCS_EXIT=0`, `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `LINES_EXIT=0`, `ok check-lines`.
-- `cargo run -p lkjagent-xtask -- check-style`: `STYLE_EXIT=0`, `ok check-style`.
-- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCH_EXIT=0`, `ok benchmark-corpus`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `VERIFY_EXIT=0`, `ok verify`.
 
-Latest scaffold slice gates. Docker Compose did not run after this scaffold
-slice and must run after the address-controller implementation before any final
-implementation claim:
+Post-edit gates for this documentation reconciliation slice:
 
-- `cargo test -p lkjagent-tools`: `TOOLS_PACKAGE3_EXIT=0`.
-- `cargo test -p lkjagent-xtask`: `XTASK_PACKAGE3_EXIT=0`.
-- `cargo fmt --check`: `FMT_SLICE_EXIT=0`, `ok fmt-check`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `DOCS8_EXIT=0`, `ok check-docs`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `LINES_SLICE_EXIT=0`, `ok check-lines`.
-- `cargo run -p lkjagent-xtask -- check-style`: `STYLE8_EXIT=0`, `ok check-style`.
-- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCH_SLICE_EXIT=0`,
-  `ok benchmark-corpus`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `VERIFY_AFTER_DOCUPDATE_EXIT=0`,
-  `ok verify`.
-
-Latest address-controller slice gates:
-
-- `cargo fmt --check`: `FMT_CHECK_EXIT=0` after formatting.
-- `cargo test -p lkjagent-tools --test artifact_address`: `ARTIFACT_ADDRESS_EXIT=0`.
-- `cargo test -p lkjagent-tools --test doc_root_hygiene`: `DOC_ROOT_HYGIENE_EXIT=0`.
-- `cargo test -p lkjagent-tools --test doc_tools`: `DOC_TOOLS_EXIT=0`.
-- `cargo test -p lkjagent-tools --test doc_boilerplate`: `DOC_BOILERPLATE_EXIT=0`.
-- `cargo test -p lkjagent-tools --test doc_content_audit`: `DOC_CONTENT_AUDIT_EXIT=0`.
-- `cargo test -p lkjagent-tools --test batch_write_formats`: `BATCH_WRITE_FORMATS_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test artifact_address_recovery`: `RUNTIME_ADDRESS_EXIT=0`.
-- `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`, `ok check-docs`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
-- `cargo test -p lkjagent-benchmark --test corpus`: `BENCH_CORPUS_TEST_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCHMARK_EXIT=0`, `ok benchmark-corpus`.
-- `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`, `ok check-style`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
-- `cargo test -p lkjagent-runtime --test prompt_daemon`: `PROMPT_DAEMON_EXIT=0`.
-- Post-prompt and creative `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-- Post-prompt and creative `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
-
-Latest focused slice gates:
-
-- `cargo test -p lkjagent-store --test memory_prune`: `STORE_MEMORY_PRUNE_EXIT=0`.
-- `cargo test -p lkjagent-tools --test memory_prune`: `TOOLS_MEMORY_PRUNE_EXIT=0`.
-- `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
-- `cargo test -p lkjagent-tools`: `TOOLS_TEST_EXIT=0`.
-- `cargo fmt --check`: `FMT_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `ok check-docs`, `DOCS_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `ok check-lines`, `LINES_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`, `VERIFY_EXIT=0`.
-- `cargo test -p lkjagent-xtask --test structure_audit`: `test result: ok. 5 passed`.
-- `cargo test -p lkjagent-tools --test workspace_structure`: `test result: ok. 1 passed`.
-- `cargo test -p lkjagent-tools --test structure_seed`: `test result: ok. 3 passed`.
-- `cargo test -p lkjagent-runtime --test recursive_scaffold`: `test result: ok. 2 passed`.
-- `cargo test -p lkjagent-tools`: `TOOLS_FULL_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- structure audit --root data/workspace`: `ok structure audit data/workspace`.
-- `cargo run -p lkjagent-xtask -- check-style`: `ok check-style`.
-
-Latest continuation slices also ran:
-
-- Address, ledger cursor, invalid-root, authority, compaction snapshot,
-  provider export, and payload recovery focused tests named in their commits
-  passed.
-- `cargo fmt --check`: `FMT_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `DOCS_EXIT=0`, `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `LINES_EXIT=0`, `ok check-lines`.
-- `cargo run -p lkjagent-xtask -- check-style`: `STYLE_EXIT=0`, `ok check-style`.
-- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCH_EXIT=0`, `ok benchmark-corpus`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
 
 ## Out of Scope
 
@@ -195,6 +118,6 @@ cron schedules remain outside this product.
 
 ## Honesty Rules
 
-- A behavior is implemented only when code, focused tests, and a passing gate exist.
+- A behavior is implemented only when code, focused tests, and passing gates exist.
 - Missing evidence never proves absence; verify before claiming.
 - When docs and code disagree, fixing the disagreement is the first task.

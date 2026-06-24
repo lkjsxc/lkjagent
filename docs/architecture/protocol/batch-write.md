@@ -80,6 +80,25 @@ normalization. Objects without `path` and `content` are refused before mutation.
 The observation records the normalized input format as `line-protocol`,
 `json-array`, or `json-object-files`.
 
+## Path-Shaped Parameter Recovery
+
+A live schema fault can arrive as a missing `files` parameter plus unknown
+parameters whose names look like relative file paths. Safe normalization may
+convert that shape into a `files` payload only when all of these conditions are
+true:
+
+- every unknown parameter name is a relative path under the current admitted
+  root or admitted weak-path set;
+- no unknown parameter is absolute, parent-traversing, empty, or duplicated;
+- every unknown parameter value is supplied content, not a nested action or
+  schema fragment;
+- file and batch size limits pass;
+- no semantic content is invented.
+
+Unsafe shapes are refused before mutation. The refusal example must be concrete
+and path-scoped. When the current artifact root or weak path is known, the
+example uses that path instead of a generic `VALUE` placeholder.
+
 ## Limits
 
 - Maximum files per action: 20.
@@ -100,6 +119,8 @@ Artifact audit records unexpected paths as weak paths under the active root.
 
 - The documented canonical example parses, validates, admits, and dispatches
   when authority admits `fs.batch_write`.
+- Path-shaped unknown parameters normalize only under the safe recovery rules in
+  this contract.
 - Missing `content:` in any line-protocol block refuses the whole action.
 - Duplicate paths refuse the whole action.
 - Oversized file or batch payloads refuse the whole action before mutation.
@@ -116,5 +137,5 @@ oversized payloads, and artifact-ledger recording.
 
 partially implemented for parser normalization, JSON envelope arrays,
 JSON-in-files recovery, dispatcher limits, duplicate-path refusal, placeholder
-refusal, and artifact write-path recording. Route-level recovery for every
-batch schema fault remains open.
+refusal, and artifact write-path recording. Path-shaped unknown parameter
+normalization and route-level recovery for every batch schema fault remain open.

@@ -17,16 +17,18 @@ maintenance tick, and close path reads the same decision stream.
 ```text
 DurableReadModel -> RuntimeSnapshot
 RuntimeSnapshot + RuntimeEvent -> RuntimeDecision
-RuntimeDecision -> PromptFrame
+RuntimeDecision -> PromptFrame or RuntimeEffectCommand
 RuntimeDecision + ModelAction -> ToolAdmission
 ToolAdmission -> EffectCommand
 EffectObservation -> RuntimeEvent
 RuntimeEvent -> next RuntimeDecision
 ```
 
-The kernel is pure. Store, prompt, endpoint, dispatcher, compaction,
+The kernel reducer is pure. Store, prompt, endpoint, dispatcher, compaction,
 maintenance, and completion adapters perform effects only after a persisted
-decision exists.
+decision exists. Zero-content inspections and runtime bookkeeping can be
+runtime-owned effect commands when the decision says no model-authored semantic
+content is needed.
 
 ## Inputs
 
@@ -63,11 +65,14 @@ decision exists.
 - reducer tests for mission priority and event classes.
 - graph transition tests for legal movement.
 - dispatch tests proving graph policy is guidance, not a fallback authority.
+- replay tests proving the Chronos story schema loop changes route instead of
+  repeating the same invalid action class.
 
 ## Status
 
 partially implemented. Runtime mission selection, decision records, event and
 admission persistence, prompt-card decision identifiers, and stale maintenance
-action refusal exist. The complete transition history, durable snapshots,
-compaction history, maintenance preemption proof, recovery shape coverage, and
-every close path still need to read the same persisted decision stream.
+action refusal exist. The complete transition history, full snapshots,
+runtime-effect commands, prompt resume, full-fingerprint stale refusal,
+maintenance preemption proof, recovery shape coverage, and every close path
+still need to read the same persisted decision stream.
