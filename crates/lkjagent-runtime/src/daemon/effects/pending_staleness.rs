@@ -1,4 +1,30 @@
 use crate::mode::{EndpointDecision, TurnAuthority};
+use crate::task::PendingAction;
+
+pub fn persisted_action_refusal(
+    pending: &PendingAction,
+    current: &TurnAuthority,
+    tool: &str,
+) -> Option<String> {
+    let mut changed_fields = Vec::new();
+    if changed(
+        pending.prompt_frame_id.as_deref(),
+        current.input.prompt_frame_id.as_deref(),
+    ) {
+        changed_fields.push("prompt_frame_id");
+    }
+    if changed_fields.is_empty() {
+        return None;
+    }
+    Some(format!(
+        "stale model action refused\nadmission=refused\nreason=stale_decision\nprevious_decision={}\nactive_mode={:?}\nfailed_tool={tool}\nfailed_gate=stale-persisted-action\nchanged_fields={}\nadmitted_tools={}\nnext_executable_action={}\ndetail=persisted prompt authority no longer matches current runtime authority",
+        pending.authority_decision_id.as_deref().unwrap_or("unknown"),
+        current.mode,
+        changed_fields.join(","),
+        join_or_none(&current.effective_policy.allowed_tools),
+        current.valid_example
+    ))
+}
 
 pub fn stale_action_refusal(
     cached: Option<&TurnAuthority>,
@@ -90,6 +116,10 @@ fn changed_fields(cached: &TurnAuthority, current: &TurnAuthority) -> Vec<&'stat
         cached.input.prompt_frame_id != current.input.prompt_frame_id,
     );
     fields
+}
+
+fn changed(previous: Option<&str>, current: Option<&str>) -> bool {
+    matches!((previous, current), (Some(old), Some(new)) if old != new)
 }
 
 fn maintenance_state(authority: &TurnAuthority) -> (bool, bool) {

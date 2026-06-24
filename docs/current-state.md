@@ -48,7 +48,7 @@ but did not record document-structure or artifact-readiness evidence.
 
 | Area | Current truth |
 | --- | --- |
-| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, normalized authority snapshots, event and decision rows, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, and `agent.done` refusal exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. Kernel prompt rendering requires persisted event and decision ids and produces path-scoped batch examples. Kernel admission refuses stale, blocked, not-admitted, and completion-blocked tools before dispatch. The daemon now records authority prompt frames, effect observations, and kernel shadow mission fields tied to decision/admission rows, and cached actions refuse on prompt-frame head changes. These are partial authority pieces, not one daemon-wired transition kernel. |
+| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, normalized authority snapshots, event and decision rows, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, and `agent.done` refusal exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. Kernel prompt rendering requires persisted event and decision ids and produces path-scoped batch examples. Kernel admission refuses stale, blocked, not-admitted, and completion-blocked tools before dispatch. The daemon records authority prompt frames, effect observations, kernel shadow fingerprints, and pending action authority fields; cached or persisted pending actions refuse on prompt-frame head changes. These are partial authority pieces, not one daemon-wired transition kernel. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Full unified runtime wiring remains open. |
 | Recovery controller | Fault notices, attribute-like tag repair examples, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, dispatcher-valid examples for covered routes, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, and payload-overflow routing to `artifact.next` for known artifacts exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` now normalizes safe path-shaped unknown parameters into `files` and refuses absolute, duplicate, or empty-content path parameters before mutation. Runtime route changes after repeated schema faults remain open. |
@@ -182,7 +182,7 @@ Latest broad local gates:
 Store-ledger focused gates:
 
 - `cargo test -p lkjagent-store --test runtime_kernel_ledger`: `STORE_KERNEL_LEDGER_EXIT=0`, 3 passed.
-- `cargo test -p lkjagent-store --test runtime_authority`: `STORE_AUTHORITY_EXIT=0`, 1 passed.
+- `cargo test -p lkjagent-runtime --test authority_ledger_wiring`: `AUTHORITY_LEDGER_WIRING_EXIT=0`, 2 passed.
 - `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
 

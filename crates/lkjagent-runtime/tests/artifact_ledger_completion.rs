@@ -29,6 +29,9 @@ fn agent_done_refuses_when_artifact_ledger_has_weak_paths() -> TestResult<()> {
     daemon.state.pending_action = Some(PendingAction {
         action: done.clone(),
         action_text: render_action(&done),
+        authority_decision_id: None,
+        prompt_frame_id: None,
+        staleness_fingerprint: None,
     });
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);

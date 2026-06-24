@@ -69,6 +69,16 @@ fn persist_decision_fields(
     store_state::set(conn, "kernel mission", decision.mission.as_str())?;
     store_state::set(conn, "kernel active mode", decision.active_mode.as_str())?;
     store_state::set(conn, "kernel event id", &decision.event_id.0.to_string())?;
+    store_state::set(
+        conn,
+        "kernel authority fingerprint",
+        decision.authority_fingerprint.as_str(),
+    )?;
+    store_state::set(
+        conn,
+        "kernel staleness fingerprint",
+        decision.staleness_fingerprint.as_str(),
+    )?;
     store_state::set(conn, "kernel shadow error", "none")?;
     Ok(())
 }
