@@ -104,5 +104,6 @@ are admitted by recovery policy when model-authored. Safe path-shaped
 and empty-content path parameters refuse before mutation; the Chronos catalog
 path shape has focused tool coverage; `graph.plan` conditional `checks|paths`
 refuses before dispatch; and attribute-like tag output now gets a dedicated
-parse fault before registry validation. Runtime repeated-fault route changes
-and route-level proof across every policy path remain open.
+parse fault plus concrete `<paths>` graph-plan repair before registry validation.
+Runtime repeated-fault route changes and route-level proof across every policy
+path remain open.
