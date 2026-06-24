@@ -45,27 +45,27 @@ BatchCursor
 ## Canonical Batch Format
 
 ```text
-<act>
+<action>
 <tool>fs.batch_write</tool>
 <files>
-path: some/path.md
+path: stories/chronos-fracture/setting/timeline.md
 content:
-# Title
+# Timeline
 
-Body.
+Chronos Fracture begins with a failed archive experiment.
 
 -- lkjagent-next-file --
-path: other/path.md
+path: stories/chronos-fracture/setting/technology.md
 content:
-# Title
+# Technology Rules
 
-Body.
+Time lenses expose causality debt instead of changing the past directly.
 </files>
-</act>
+</action>
 ```
 
 Rendered examples always use this shape. Normalization may accept `path:foo`,
-`<path>foo</path>`, XML-ish accidental path wrappers, and extra blank lines
+`<path>foo</path>`, tag-like accidental path wrappers, and extra blank lines
 before `path:` when the result is unambiguous.
 
 ## Invariants

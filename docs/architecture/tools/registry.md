@@ -37,7 +37,7 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | graph.next | none | show legal transitions, missing guards, and preferred next action | no active case |
 | graph.audit | none | audit active graph case, policy, completion, and shell admission | no active case |
 | graph.recover | none | inspect recovery ladder and alternate action guidance | no active case |
-| graph.plan | objective req; constraints opt; assumptions opt; risks opt; steps req; checks opt; paths opt; reason req | record structured plan | empty objective; no steps; no checks or paths |
+| graph.plan | objective req; steps req; reason req; checks opt; paths opt; constraints opt; assumptions opt; risks opt; checks\|paths any req | record structured plan | empty objective; no steps; missing checks and paths |
 | graph.transition | target req; reason req | request guarded transition | illegal target; missing guard |
 | graph.context | packages req; reason req | select context packages | unknown or empty package list |
 | graph.note | kind req; summary req; path opt | record non-evidence graph state | unknown kind; empty summary |
@@ -62,11 +62,26 @@ Detailed contracts: [fs.md](fs.md), [shell.md](shell.md),
 [verification-tools.md](verification-tools.md), [doc-tools.md](doc-tools.md),
 [control.md](control.md).
 
+## Conditional Requirements
+
+A tool can require at least one parameter from a named group. The registry owns
+that rule so prompt examples, parser validation, dispatcher validation, and
+recovery text cannot disagree. The validation text names the group:
+
+```text
+tool=graph.plan
+missing_any=checks|paths
+```
+
+`graph.plan` requires objective, steps, reason, and at least one of checks or
+paths. When the current artifact root is known, the generated example uses that
+root in `<paths>`.
+
 ## Dispatch
 
-The dispatcher processes each act block in a fixed order:
+The dispatcher processes each action block in a fixed order:
 
-1. Parse: the act block is parsed per
+1. Parse: the action block is parsed per
    [../protocol/action-format.md](../protocol/action-format.md); grammar
    faults follow [../protocol/recovery.md](../protocol/recovery.md).
 2. Registry validation: the tool name and every parameter are checked

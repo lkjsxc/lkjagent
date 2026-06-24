@@ -30,7 +30,7 @@ but did not record document-structure or artifact-readiness evidence.
 | Area | Evidence |
 | --- | --- |
 | Workspace and gates | `Cargo.toml`, `crates/lkjagent-xtask`, and `docker-compose.yml` exist. |
-| Parser | `lkjagent-protocol` parses line-oriented, paired-tag, JSON envelope, and batch file action forms covered by focused fixtures. Provider stop-closure restoration records closure mode for parse logs. |
+| Parser | `lkjagent-protocol` parses line-oriented, paired-tag, and batch file action forms covered by focused fixtures. Provider stop-closure restoration records closure mode for parse logs. Top-level JSON action parsing still needs removal from live dispatch. |
 | Dispatcher registry | `lkjagent-tools` validates registered tools and renders registry examples for covered action families. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
 | SQLite store | Queue, state, event, memory, task summary, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist in `lkjagent-store`. |
@@ -69,7 +69,7 @@ but did not record document-structure or artifact-readiness evidence.
   with README, catalog, child directories, line limits, small batches, and audits;
 - the run created `stories/chronos-fracture` and
   `stories/chronos-fracture/bible`;
-- the task then looped through missing `<act>` blocks and consecutive parse
+- the task then looped through missing action envelopes and consecutive parse
   faults reaching at least count 5;
 - `fs.batch_write` was repeatedly refused because `files` was missing and a
   path-shaped unknown parameter such as
@@ -91,7 +91,8 @@ The first open target is documentation and current-state reconciliation. The
 first implementation target after that is the transition-kernel contract and
 data model: `RuntimeSnapshot + RuntimeEvent -> RuntimeDecision`, persisted
 before prompt rendering or dispatch, with admission derived from the same
-decision id.
+decision id. The protocol contract names `<action>` as the singular live
+action envelope; code still needs to follow it.
 
 Route-level proof remains open for all admission paths. Stale-action refusal
 must compare the full staleness fingerprint, not only maintenance mode.
@@ -108,7 +109,7 @@ Baseline at the start of this reconciliation slice:
 - `cargo run -p lkjagent-xtask -- check-docs`: `DOCS_EXIT=0`, `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `LINES_EXIT=0`, `ok check-lines`.
 
-Post-edit gates for this documentation reconciliation slice:
+Protocol action-envelope documentation gates:
 
 - `cargo run -p lkjagent-xtask -- check-docs`: `DOCS_EXIT=0`, `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `LINES_EXIT=0`, `ok check-lines`.

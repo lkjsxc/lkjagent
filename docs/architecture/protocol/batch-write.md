@@ -2,80 +2,68 @@
 
 ## Purpose
 
-Define the exact model-facing `fs.batch_write` payload forms accepted by the
-protocol parser and file tool dispatcher.
+Define the exact model-facing `fs.batch_write` payload forms accepted inside a
+singular `<action>` envelope.
 
 ## Canonical Action Form
 
 The canonical prompt example uses paired tags with the dispatcher line protocol.
-No JSON appears inside `<files>` in default prompt cards:
+No top-level JSON action output appears in model-facing prompt cards:
 
 ```text
-<act>
+<action>
 <tool>fs.batch_write</tool>
 <files>
-path: docs/example-a.md
+path: stories/chronos-fracture/catalog.toml
 content:
-# Example A
+[artifact]
+root = "stories/chronos-fracture"
+kind = "story"
 
-Concrete content.
 -- lkjagent-next-file --
-path: docs/example-b.md
+path: stories/chronos-fracture/README.md
 content:
-# Example B
+# Chronos Fracture
 
-Concrete content.
+## Purpose
+
+Navigate the story bible for Chronos Fracture.
 </files>
-</act>
+</action>
 ```
 
 The dispatcher receives blocks separated by `-- lkjagent-next-file --`.
 
 ## Paired-Tag Form
 
-The paired-tag action form may wrap the same dispatcher payload in `<files>`:
+The paired-tag action form wraps the dispatcher payload in one `<files>`
+parameter:
 
 ```text
-<act>
+<action>
 <tool>fs.batch_write</tool>
 <files>
-path: docs/example.md
+path: stories/chronos-fracture/setting/timeline.md
 content:
-# Example
+# Timeline
 
-Concrete content.
+## Purpose
+
+Track cause and effect for Chronos Fracture.
 </files>
-</act>
+</action>
 ```
 
 Repeated `<file>` child tags are not valid in the paired-tag grammar because
 parameter names are unique inside one action.
 
-## JSON Envelope Form
-
-The JSON envelope is valid when it is the whole model response:
-
-```json
-{
-  "schema": "lkj-action",
-  "action": {
-    "tool": "fs.batch_write",
-    "params": {
-      "files": [
-        { "path": "docs/example.md", "content": "# Example\n\nConcrete content." }
-      ]
-    }
-  }
-}
-```
-
 ## JSON Inside Files Recovery
 
-fs.batch_write canonical payload is line protocol inside `<files>`. The
-dispatcher also accepts a JSON array inside `<files>` when each object contains
-`path` and `content`. It also accepts a JSON object with a `files` array of the
-same objects. JSON-in-files is not preferred, but it is a supported recovery
-normalization. Objects without `path` and `content` are refused before mutation.
+The model protocol is not top-level JSON. `fs.batch_write` may still accept JSON
+text inside `<files>` when recovery receives a single parameter payload. The
+accepted payload is either a JSON array of objects with `path` and `content`, or
+a JSON object with a `files` array of the same objects. Objects without both
+fields are refused before mutation.
 
 The observation records the normalized input format as `line-protocol`,
 `json-array`, or `json-object-files`.
@@ -84,8 +72,7 @@ The observation records the normalized input format as `line-protocol`,
 
 A live schema fault can arrive as a missing `files` parameter plus unknown
 parameters whose names look like relative file paths. Safe normalization may
-convert that shape into a `files` payload only when all of these conditions are
-true:
+convert that shape into a `files` payload only when all conditions are true:
 
 - every unknown parameter name is a relative path under the current admitted
   root or admitted weak-path set;
@@ -97,7 +84,7 @@ true:
 
 Unsafe shapes are refused before mutation. The refusal example must be concrete
 and path-scoped. When the current artifact root or weak path is known, the
-example uses that path instead of a generic `VALUE` placeholder.
+example uses that path instead of a placeholder.
 
 ## Limits
 
@@ -130,12 +117,13 @@ Artifact audit records unexpected paths as weak paths under the active root.
 ## Verification
 
 Tests cover the canonical delimiter example, paired-tag `<files>` payloads, JSON
-envelope arrays, JSON text inside `<files>`, missing content, duplicate paths,
-oversized payloads, and artifact-ledger recording.
+text inside `<files>`, missing content, duplicate paths, oversized payloads, and
+artifact-ledger recording.
 
 ## Status
 
-partially implemented for parser normalization, JSON envelope arrays,
-JSON-in-files recovery, dispatcher limits, duplicate-path refusal, placeholder
-refusal, artifact write-path recording, and safe path-shaped unknown parameter
-normalization. Route-level recovery for every batch schema fault remains open.
+partially implemented for parser normalization, JSON-in-files recovery,
+dispatcher limits, duplicate-path refusal, placeholder refusal, artifact
+write-path recording, and safe path-shaped unknown parameter normalization.
+Top-level JSON action parsing still needs removal from live dispatch. Route-level
+recovery for every batch schema fault remains open.

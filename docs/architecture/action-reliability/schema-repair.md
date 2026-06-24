@@ -30,26 +30,26 @@ pass dispatcher admission in tests.
 The canonical `fs.batch_write` example is:
 
 ```text
-<act>
+<action>
 <tool>fs.batch_write</tool>
 <files>
-path: some/path.md
+path: stories/chronos-fracture/plot/act-structure.md
 content:
-# Title
+# Act Structure
 
-Body.
+Act one breaks the archive pact and exposes the time debt.
 
 -- lkjagent-next-file --
-path: other/path.md
+path: stories/chronos-fracture/plot/chapter-spine.md
 content:
-# Title
+# Chapter Spine
 
-Body.
+Chapter one follows Mara through the frozen observatory alarm.
 </files>
-</act>
+</action>
 ```
 
-Normalization may accept `path:foo`, `<path>foo</path>`, XML-ish accidental
+Normalization may accept `path:foo`, `<path>foo</path>`, tag-like accidental
 wrappers, and extra blank lines before `path:`. Rendered examples always use
 canonical format. If the same syntax fault repeats, authority switches to
 normalized parse, one-file fallback, deterministic writer, or blocked handoff.
@@ -77,7 +77,7 @@ normalized parse, one-file fallback, deterministic writer, or blocked handoff.
 Focused tests cover child tags for `fs.read`, `fs.stat`, and `fs.list`,
 allowed evidence kinds, unknown parameter rejection, exact example rendering,
 JSON-like batch-write payload refusal, missing `shell.run` command repair,
-no repeated invalid example loop, payload-to-batch recovery, XML-ish accidental
+no repeated invalid example loop, payload-to-batch recovery, tag-like accidental
 wrappers, and dispatch of every generated valid example.
 
 ## Related Files

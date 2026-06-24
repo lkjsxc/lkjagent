@@ -2,112 +2,109 @@
 
 ## Purpose
 
-The grammar of a model turn. The model emits exactly one action envelope.
-Line-oriented fields, paired tags, and the JSON `lkj-action` envelope all parse
-through the same pure action model before dispatch.
+The grammar of a live model turn. The model emits exactly one singular action
+envelope whose fields are attribute-free tags.
 
-## Line-Oriented Turn
+## Canonical Turn
 
-```
-<think>
-The test expects a trailing newline; the renderer drops it. I will read the
-renderer before changing anything.
-</think>
-<act>
-tool: fs.read
-path: crates/lkjagent-protocol/src/render.rs
-start: 1
-count: 60
-</act>
-```
-
-- The think preamble is optional, free-form, and unparsed; it exists for the
-  model's own chain of thought and stays in the log verbatim.
-- Exactly one act block per turn. A second act block is a parse fault.
-- The first field inside act is always `tool:`, naming an entry in
-  [../tools/registry.md](../tools/registry.md). Remaining fields are that
-  tool's parameters. `case:` is envelope metadata and is not a tool parameter.
-- Scalar values use `name: value` on one line.
-- Payload fields such as `content:`, `files:`, and `patch:` keep every
-  following line byte-exact until the act closes.
-
-## JSON Envelope
-
-```json
-{
-  "schema": "lkj-action",
-  "action": {
-    "tool": "fs.batch_write",
-    "params": {
-      "files": [
-        { "path": "docs/a.md", "content": "# A\n\n## Purpose\n\nA." }
-      ]
-    }
-  }
-}
+```text
+<action>
+<tool>graph.plan</tool>
+<objective>Create a structured science-fiction story bible for Chronos Fracture.</objective>
+<constraints>
+Root directory: stories/chronos-fracture.
+Root must contain README.md and catalog.toml.
+Every directory must contain README.md and at least two children.
+Every Markdown file must stay under 160 lines.
+Do not write the full manuscript.
+Do not write scaffold-only pages.
+</constraints>
+<steps>
+1. Record the story-bible plan.
+2. Create the root catalog and README.
+3. Write bounded batches for setting, characters, plot, continuity, and checks.
+4. Audit document structure.
+5. Audit artifact readiness.
+</steps>
+<paths>
+stories/chronos-fracture
+</paths>
+<reason>The owner requested a structured story bible with evidence-gated completion.</reason>
+</action>
 ```
 
-The JSON envelope rejects unknown top-level fields, unknown action fields,
-unknown params, missing required params, and null param values. `schema` is
-optional; when present it must be `lkj-action`. No release-number schema field
-is valid.
+## Grammar
+
+- A turn contains exactly one `<action>...</action>` envelope.
+- `<action>` is singular. `<actions>` is invalid.
+- `<act>` is not a live runtime action envelope.
+- The first child is `<tool>known.tool</tool>`.
+- Each later child is one registry parameter name.
+- Parameter names are unique within the action.
+- Values live between opening and closing parameter tags.
+- Tag names contain names only; tag attributes are invalid.
+- No XML features exist: no attributes, namespaces, comments, CDATA,
+  entities, or nested action envelopes.
+- No prose appears before or after the action envelope.
+- The model stops immediately after `</action>`.
 
 ## Multi-Line Values
 
-```
-<act>
-tool: fs.write
-path: notes/findings.md
-content:
-# Findings
+```text
+<action>
+<tool>fs.write</tool>
+<path>notes/protocol-observation.md</path>
+<content>
+# Protocol Observation
 
-The renderer drops trailing newlines on every block write.
-</act>
+The live action envelope is singular and closed by the provider stop sequence.
+</content>
+</action>
 ```
 
-The value of content is everything after `content:` through `</act>`,
-byte-exact including blank lines, code fences, quotes, shell commands, and
-angle-bracket text.
+The value of `content` is every byte between `<content>` and `</content>`,
+including blank lines, code fences, quotes, shell commands, and angle-bracket
+text that is not a structural line for the current parameter.
 
 ## Batch File Values
 
-```
-<act>
-tool: fs.batch_write
-case: current
-files:
--- file --
-path: relative/path.md
+```text
+<action>
+<tool>fs.batch_write</tool>
+<files>
+path: stories/chronos-fracture/catalog.toml
 content:
-# Title
+[artifact]
+root = "stories/chronos-fracture"
+kind = "story"
 
-Body text.
--- end-file --
--- file --
-path: another/path.md
+-- lkjagent-next-file --
+path: stories/chronos-fracture/README.md
 content:
-# Title
+# Chronos Fracture
 
-Body text.
--- end-file --
-</act>
+## Purpose
+
+Navigate the story bible for Chronos Fracture.
+</files>
+</action>
 ```
 
-The parser converts file blocks into the internal batch-write line protocol
-before validation. It never executes a partially parsed batch. The full batch
-contract, accepted JSON envelope form, limits, and refusal cases live in
-[batch-write.md](batch-write.md).
+`fs.batch_write` is one action with one `files` payload. The dispatcher
+validates the whole payload before mutation. The full batch contract, accepted
+payload formats, limits, and refusal cases live in [batch-write.md](batch-write.md).
 
 ## Control Actions
 
-Task control uses the same shape; contracts in [../tools/control.md](../tools/control.md):
+Task control uses the same envelope:
 
-```
-<act>
-tool: agent.done
-summary:
-Renamed the flag in both call sites; cargo test passes 41/41.
-</act>
+```text
+<action>
+<tool>agent.done</tool>
+<summary>
+The requested story bible is written, audited, and tied to artifact-readiness evidence.
+</summary>
+</action>
 ```
 
 ## Invalid Shapes
@@ -115,21 +112,32 @@ Renamed the flag in both call sites; cargo test passes 41/41.
 These shapes are faults, not partial actions:
 
 - empty assistant content.
-- missing `<act>` or missing `</act>` after stop-closure normalization.
-- more than one action block.
-- JSON text nested inside `<files>` instead of a whole JSON action envelope.
-- repeated paired tags for unique parameters, including repeated `<file>` tags.
+- plain prose without an action body.
+- missing `<action>` or missing `</action>` after provider-stop closure rules.
+- more than one action envelope.
+- `<actions>`, `<act>`, or any other top-level envelope.
+- top-level JSON action output.
+- tag attributes or attribute-like tags such as `<path=stories/chronos-fracture</path>`.
+- repeated parameter tags for unique parameters.
 - parameters absent from the active tool schema.
+- nested action envelopes.
+
+## Implicit Envelope Normalization
+
+A missing opening envelope is accepted only by the strict implicit-envelope path
+in [parsing.md](parsing.md). The body must contain exactly one complete,
+schema-valid, authority-admitted action body and no prose outside recognized
+fields. The parse and provider exchange logs record the normalization.
 
 ## Design Properties
 
-- No attributes, no escaping, no nested actions: the grammar fits in a small
-  prompt card.
-- Every token the model emits is either thought or exactly one decision; there
-  is no place to hide a second side effect.
-- The format degrades loudly: any deviation maps to one recovery case in
-  [recovery.md](recovery.md), never a partial execution.
+- The prompt teaches one side effect per turn.
+- The parser can map every invalid shape to a structured recovery route.
+- Model text supplies intent or file content; runtime data supplies authority.
+- Examples are concrete task actions, not placeholder parse skeletons.
 
 ## Status
 
-implemented.
+partially implemented. Existing code still uses the previous envelope constants
+and still has a top-level JSON action parser; the implementation task is to
+make this contract the live runtime path.
