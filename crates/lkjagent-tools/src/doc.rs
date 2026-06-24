@@ -58,6 +58,7 @@ pub fn scaffold(
     title: &str,
     sections: &str,
 ) -> ToolResult<String> {
+    crate::artifact_address_support::ensure_document_root(workspace, "doc.scaffold", root)?;
     let input = scaffold_input(root, kind, count, mode, title, sections)?;
     let plan = profile::semantic_doc_plan(&input)?;
     let files = plan.markdown_count();

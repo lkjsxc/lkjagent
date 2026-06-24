@@ -26,7 +26,7 @@ fn artifact_next_on_file_root_does_not_render_file_audit() -> TestResult<()> {
     assert!(output.contains("next_action=fs.batch_write"));
     assert!(!output
         .contains("<tool>artifact.audit</tool>\n<root>stories/root/topics/background.md</root>"));
-    validate_example(&output)?;
+    validate_example(&workspace, &output)?;
     Ok(())
 }
 
@@ -51,7 +51,7 @@ fn artifact_audit_on_file_root_returns_semantic_refusal() -> TestResult<()> {
     assert!(output.contains("<tool>artifact.audit</tool>"));
     assert!(output.contains("<root>stories/root</root>"));
     assert!(!output.contains("Not a directory"));
-    validate_example(&output)?;
+    validate_example(&workspace, &output)?;
     Ok(())
 }
 
@@ -70,7 +70,7 @@ fn doc_audit_on_file_root_returns_semantic_refusal() -> TestResult<()> {
     assert!(output.contains("root_is_file: docs/page.md"));
     assert!(output.contains("<tool>fs.read</tool>"));
     assert!(!output.contains("Not a directory"));
-    validate_example(&output)?;
+    validate_example(&workspace, &output)?;
     Ok(())
 }
 
@@ -91,7 +91,7 @@ fn artifact_apply_refuses_missing_markdown_root() -> TestResult<()> {
 
     assert!(output.contains("root_ends_with_markdown_suffix"));
     assert!(!workspace.join("stories/x/characters.md").exists());
-    validate_example(&output)?;
+    validate_example(&workspace, &output)?;
     Ok(())
 }
 
@@ -108,7 +108,7 @@ fn doc_scaffold_refuses_markdown_suffix_root() -> TestResult<()> {
 
     assert!(output.contains("root_ends_with_markdown_suffix"));
     assert!(!workspace.join("docs/page.md").exists());
-    validate_example(&output)?;
+    validate_example(&workspace, &output)?;
     Ok(())
 }
 
@@ -123,7 +123,7 @@ fn artifact_next_missing_directory_root_still_suggests_artifact_apply() -> TestR
     assert!(output.contains("missing=root"));
     assert!(output.contains("next_action=artifact.apply"));
     assert!(output.contains("<root>stories/new</root>"));
-    validate_example(&output)?;
+    validate_example(&workspace, &output)?;
     Ok(())
 }
 
@@ -147,12 +147,17 @@ fn run(workspace: &Path, action: lkjagent_protocol::Action) -> TestResult<String
     Ok(dispatch(&action, &runtime, &mut conn, &mut dispatch_state).content)
 }
 
-fn validate_example(output: &str) -> TestResult<()> {
+fn validate_example(workspace: &Path, output: &str) -> TestResult<()> {
     let example = output
         .split_once("valid_example:\n")
         .map(|(_, example)| example)
         .ok_or_else(|| "missing valid example".to_string())?;
     let parsed = parse_completion(example).map_err(|err| format!("parse failed: {err:?}"))?;
     validate_action(&parsed).map_err(|err| format!("validation failed: {err}"))?;
+    let observation = run(workspace, parsed)?;
+    assert!(!observation.contains("unknown tool"));
+    assert!(!observation.contains("parameter validation failed"));
+    assert!(!observation.contains("effective policy refused"));
+    assert!(!observation.is_empty());
     Ok(())
 }

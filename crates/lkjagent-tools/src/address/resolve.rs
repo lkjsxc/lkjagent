@@ -68,7 +68,7 @@ pub fn resolve_artifact_address(input: ResolveInput<'_>) -> ToolResult<ArtifactA
             },
         ));
     }
-    Ok(missing_root(input, requested, kind))
+    missing_root(input, requested, kind)
 }
 
 fn outside_workspace(requested: &str) -> ArtifactAddress {
@@ -84,11 +84,19 @@ fn outside_workspace(requested: &str) -> ArtifactAddress {
     )
 }
 
-fn missing_root(input: ResolveInput<'_>, requested: &str, kind: String) -> ArtifactAddress {
-    ArtifactAddress {
+fn missing_root(
+    input: ResolveInput<'_>,
+    requested: &str,
+    kind: String,
+) -> ToolResult<ArtifactAddress> {
+    let weak_path = clean_requested_path(input.requested_path);
+    if let Some(path) = &weak_path {
+        reject_escaping_relative(path)?;
+    }
+    Ok(ArtifactAddress {
         requested: requested.to_string(),
         root: Some(requested.to_string()),
-        weak_path: clean_requested_path(input.requested_path),
+        weak_path,
         kind: ArtifactAddressKind::MissingRoot,
         problem: None,
         detected: PathKind::Missing,
@@ -96,7 +104,7 @@ fn missing_root(input: ResolveInput<'_>, requested: &str, kind: String) -> Artif
             root: requested.to_string(),
             kind,
         },
-    }
+    })
 }
 
 fn resolve_directory(

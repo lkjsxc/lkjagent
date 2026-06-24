@@ -13,20 +13,22 @@ pub fn dispatch_artifact_plan(
     conn: &Connection,
     state: &mut DispatchState,
 ) -> DispatchOutput {
-    observe_result(
-        crate::artifact::plan(
-            conn,
-            &runtime.now,
-            &param(params, "root"),
-            &param(params, "title"),
-            &param(params, "kind"),
-            &param(params, "scale"),
-            &param(params, "sections"),
-        ),
-        action_text,
-        runtime,
-        state,
-    )
+    let root = param(params, "root");
+    let kind = param(params, "kind");
+    let result =
+        crate::artifact_address_support::ensure_plan_root(&runtime.workspace, &root, &kind)
+            .and_then(|()| {
+                crate::artifact::plan(
+                    conn,
+                    &runtime.now,
+                    &root,
+                    &param(params, "title"),
+                    &kind,
+                    &param(params, "scale"),
+                    &param(params, "sections"),
+                )
+            });
+    observe_result(result, action_text, runtime, state)
 }
 
 pub fn dispatch_artifact_apply(

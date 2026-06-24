@@ -53,18 +53,20 @@ has a current decision.
 
 ## Proven Slice
 
-Focused tests prove current refusals for artifact.next on file roots,
-artifact.audit on file roots, doc.audit on file roots, artifact.apply `.md`
-roots, doc.scaffold `.md` roots, and missing directory roots. Prior address
-slice notes record quiet verify and Docker Compose verify.
+Focused tests prove current refusals for artifact.plan `.md` roots before
+ledger identity, artifact.next on file roots, artifact.audit on file roots,
+doc.audit on file roots, artifact.apply `.md` roots, doc.scaffold `.md` roots,
+existing `.md` directories, and missing directory roots. Covered refusal
+examples now parse, validate, and dispatch to a route. Prior address slice
+notes record quiet verify and Docker Compose verify.
 
 ## Remaining Proof Gaps
 
-artifact.plan still needs reducer admission before ledger identity. doc.audit
-and doc.scaffold need full shared-reducer wiring before every filesystem path.
-Old bad `.md` directories need explicit adoption or repair output. Rendered
-examples need route-level dispatch proof for every refusal path, not only parse
-and validation. The live SF-novel rerun has not been repeated in this slice.
+Old bad `.md` directories are refused but still need explicit adoption or
+repair output. Ledger roots without catalog ancestors, invalid-root durable
+markers, completion blocking for adopted invalid roots, and route-level proof
+for every policy path remain open. The live SF-novel rerun has not been
+repeated in this slice.
 
 ## Status
 

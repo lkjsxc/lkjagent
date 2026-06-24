@@ -40,8 +40,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
   adds generated path hygiene in
   [current-work/document-structure-redesign.md](current-work/document-structure-redesign.md).
 - Root/path address repair still precedes runtime authority because focused
-  file-root refusals exist, but artifact.plan, old `.md` directory adoption,
-  and full route-level example dispatch proof remain open.
+  reducer refusals exist, but old `.md` directory adoption, ledger-root
+  adoption, and full policy-path dispatch proof remain open.
 - The first runtime authority code slice remains the transition kernel in
   [current-work/state-transition-network.md](current-work/state-transition-network.md):
   snapshot, explicit event, decision, prompt frame, admission, effect, and next
@@ -123,7 +123,8 @@ memory-action deadlocks, and maintenance restarts after no useful work.
 - Compaction snapshots still need durable history beyond the latest notice.
 - Broader stale-action contradiction repair is not yet covered for every mode.
 - Recovery shape-change enforcement is not yet proven for every live fault class.
-- Refusal-rendered examples still need route-level proof for every policy path.
+- Refusal-rendered examples now dispatch for covered address paths, but still
+  need route-level proof for every policy path.
 - Address-controller Docker Compose evidence is recorded for the focused slice;
   a fresh live SF-novel rerun and adoption proof remain open.
 - Artifact adoption and semantic readiness remain incomplete.
