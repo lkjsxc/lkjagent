@@ -57,8 +57,10 @@ Focused tests prove current refusals for artifact.plan `.md` roots before
 ledger identity, artifact.next on file roots, artifact.audit on file roots,
 doc.audit on file roots, artifact.apply `.md` roots, doc.scaffold `.md` roots,
 existing `.md` directories, and missing directory roots. Covered refusal
-examples now parse, validate, and dispatch to a route. Prior address slice
-notes record quiet verify and Docker Compose verify.
+examples now parse, validate, and dispatch to a route. `artifact.next` now
+reports candidate actions as facts with `next_decision_required=true` instead
+of executable authority. Prior address slice notes record quiet verify and
+Docker Compose verify.
 
 ## Remaining Proof Gaps
 

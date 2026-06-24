@@ -124,7 +124,8 @@ fn dispatch_action(workspace: &Path, action: lkjagent_protocol::Action) -> TestR
 
 fn validate_example(output: &str) -> TestResult<()> {
     let example = output
-        .split_once("valid_example:\n")
+        .split_once("candidate_example:\n")
+        .or_else(|| output.split_once("valid_example:\n"))
         .map(|(_, example)| example)
         .ok_or_else(|| "missing valid example".to_string())?;
     let parsed = parse_completion(example).map_err(|err| format!("parse failed: {err:?}"))?;

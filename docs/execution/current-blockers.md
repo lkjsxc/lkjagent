@@ -109,8 +109,9 @@ Fracture run proves both progress and failure:
   batch cursor in addition to graph, recovery, artifact, and next-action fields.
 - Dispatchable registry examples parse, validate, and reach dispatcher routes
   for covered paths.
-- `artifact.next` and stricter content audit support bounded cookbook and story
-  recovery examples.
+- `artifact.next` returns fact-only candidate actions with
+  `next_decision_required=true`; stricter content audit supports bounded
+  cookbook and story recovery examples.
 - `fs.write` and `fs.batch_write` reject known scaffold phrases before
   mutation.
 - Pure completion admission refuses `agent.done` while owner evidence gaps are

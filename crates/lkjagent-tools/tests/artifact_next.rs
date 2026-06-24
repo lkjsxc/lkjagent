@@ -17,7 +17,9 @@ fn artifact_next_missing_root_suggests_apply() -> TestResult<()> {
     )?;
 
     assert!(output.contains("missing=root"));
-    assert!(output.contains("next_action=artifact.apply"));
+    assert!(output.contains("next_decision_required=true"));
+    assert!(output.contains("candidate_action=artifact.apply"));
+    assert!(!output.contains("next_action=artifact.apply"));
     assert!(output.contains("<tool>artifact.apply</tool>"));
     Ok(())
 }
@@ -44,7 +46,9 @@ fn artifact_next_for_scaffolded_cookbook_returns_batch_write() -> TestResult<()>
 
     validate_action(&parsed).map_err(|err| format!("validation failed: {err}"))?;
     assert!(output.contains("kind=cookbook"));
-    assert!(output.contains("next_action=fs.batch_write"));
+    assert!(output.contains("runtime_event=ArtifactWeakPathFound"));
+    assert!(output.contains("candidate_action=fs.batch_write"));
+    assert!(!output.contains("next_action=fs.batch_write"));
     assert!(output.contains("- foundations/"));
     assert_no_scaffold_phrases(&output);
     assert_eq!(parsed.tool, "fs.batch_write");
@@ -82,7 +86,7 @@ fn artifact_next_advances_cursor_then_requests_audit() -> TestResult<()> {
             &mut dispatch_state,
         )
         .content;
-        if output.contains("next_action=artifact.audit") {
+        if output.contains("candidate_action=artifact.audit") {
             requested_audit = true;
             break;
         }
@@ -121,7 +125,7 @@ fn artifact_audit_passes_meaningful_cookbook() -> TestResult<()> {
 
     assert!(audit.contains("artifact audit passed"));
     assert!(next.contains("missing=0"));
-    assert!(next.contains("next_action=artifact.audit"));
+    assert!(next.contains("candidate_action=artifact.audit"));
     Ok(())
 }
 
@@ -134,7 +138,7 @@ fn run(workspace: &Path, action: lkjagent_protocol::Action) -> TestResult<String
 
 fn valid_example_from(output: &str) -> TestResult<&str> {
     output
-        .split_once("valid_example:\n")
+        .split_once("candidate_example:\n")
         .map(|(_, example)| example)
         .ok_or_else(|| "missing valid example".into())
 }
