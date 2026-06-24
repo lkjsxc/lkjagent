@@ -97,11 +97,24 @@ pub fn delete_batch_cursor(
 }
 
 pub fn mark_paths_completed(conn: &Connection, paths: &[String], now: &str) -> StoreResult<usize> {
+    mark_paths(conn, paths, now, CursorPathColumn::Completed)
+}
+
+pub fn mark_paths_failed(conn: &Connection, paths: &[String], now: &str) -> StoreResult<usize> {
+    mark_paths(conn, paths, now, CursorPathColumn::Failed)
+}
+
+fn mark_paths(
+    conn: &Connection,
+    paths: &[String],
+    now: &str,
+    column: CursorPathColumn,
+) -> StoreResult<usize> {
     let touched = paths.iter().map(String::as_str).collect::<BTreeSet<_>>();
     let mut changed = 0usize;
     for row in mutable_cursors(conn)? {
         let planned = split(&row.planned_paths);
-        let completed = split(&row.completed_paths);
+        let existing = split(column.value(&row));
         let additions = planned
             .iter()
             .filter(|path| touched.contains(path.as_str()))
@@ -110,11 +123,8 @@ pub fn mark_paths_completed(conn: &Connection, paths: &[String], now: &str) -> S
         if additions.is_empty() {
             continue;
         }
-        let merged = merge(completed, additions);
-        conn.execute(
-            "UPDATE artifact_batch_cursors SET completed_paths = ?1, updated_at = ?2 WHERE id = ?3",
-            params![join(&merged), now, row.id],
-        )?;
+        let merged = merge(existing, additions);
+        conn.execute(column.update_sql(), params![join(&merged), now, row.id])?;
         changed = changed.saturating_add(1);
     }
     Ok(changed)
@@ -124,17 +134,41 @@ struct MutableCursor {
     id: i64,
     planned_paths: String,
     completed_paths: String,
+    failed_paths: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum CursorPathColumn {
+    Completed,
+    Failed,
+}
+
+impl CursorPathColumn {
+    fn value(self, row: &MutableCursor) -> &str {
+        match self {
+            Self::Completed => &row.completed_paths,
+            Self::Failed => &row.failed_paths,
+        }
+    }
+
+    fn update_sql(self) -> &'static str {
+        match self {
+            Self::Completed => "UPDATE artifact_batch_cursors SET completed_paths = ?1, updated_at = ?2 WHERE id = ?3",
+            Self::Failed => "UPDATE artifact_batch_cursors SET failed_paths = ?1, updated_at = ?2 WHERE id = ?3",
+        }
+    }
 }
 
 fn mutable_cursors(conn: &Connection) -> StoreResult<Vec<MutableCursor>> {
     let mut statement = conn.prepare(
-        "SELECT id, planned_paths, completed_paths FROM artifact_batch_cursors ORDER BY id",
+        "SELECT id, planned_paths, completed_paths, failed_paths FROM artifact_batch_cursors ORDER BY id",
     )?;
     let rows = statement.query_map([], |row| {
         Ok(MutableCursor {
             id: row.get(0)?,
             planned_paths: row.get(1)?,
             completed_paths: row.get(2)?,
+            failed_paths: row.get(3)?,
         })
     })?;
     let mut out = Vec::new();

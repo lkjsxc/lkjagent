@@ -41,11 +41,18 @@ pub fn dispatch_fs_write(
         return observe_error(error, action_text, runtime, state);
     }
     let content = param(params, "content");
-    let result = fs::write(&runtime.workspace, &path, &content).and_then(|output| {
-        let paths = vec![path.clone()];
-        crate::artifact_write_support::record_written_paths(conn, &paths, &runtime.now)?;
-        Ok(output)
-    });
+    let result = (|| match fs::write(&runtime.workspace, &path, &content) {
+        Ok(output) => {
+            let paths = vec![path.clone()];
+            crate::artifact_write_support::record_written_paths(conn, &paths, &runtime.now)?;
+            Ok(output)
+        }
+        Err(error) => {
+            let paths = vec![path.clone()];
+            crate::artifact_write_support::record_failed_paths(conn, &paths, &runtime.now)?;
+            Err(error)
+        }
+    })();
     observe_result(result, action_text, runtime, state)
 }
 
