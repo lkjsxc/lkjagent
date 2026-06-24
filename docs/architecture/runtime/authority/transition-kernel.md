@@ -109,5 +109,7 @@ writes normalized rows and prompt cards cite the decision id. Store tests prove
 latest snapshot and decision reopen lookup and admission-to-decision integrity.
 Snapshot adapter tests prove staleness changes for queue, artifact cursor, and
 compaction pressure, ignore maintenance due state during owner work, and reject
-synthetic active case ids. Full kernel wiring for every dispatch, provider
-exchange, recovery, compaction, maintenance, and close path remains open.
+synthetic active case ids. Kernel prompt rendering requires a persisted decision
+id, cites fingerprints, and renders concrete parseable batch-write examples.
+Full kernel wiring for every dispatch, provider exchange, recovery, compaction,
+maintenance, and close path remains open.

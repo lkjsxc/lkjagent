@@ -28,7 +28,7 @@ pub use facts::{
 };
 pub use fault::{FaultClass, FaultKey, RuntimeFault};
 pub use reduce::{reduce, select_mission};
-pub use render::PromptCardData;
+pub use render::{render_prompt_frame, PromptCardData, PromptRenderError};
 pub use snapshot::{
     AuthorityFingerprint, RuntimeEventId, RuntimeSnapshot, RuntimeSnapshotId, RuntimeSnapshotInput,
     StalenessFingerprint, ToolName,
