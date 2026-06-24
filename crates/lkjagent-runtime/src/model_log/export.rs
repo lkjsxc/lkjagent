@@ -10,10 +10,11 @@ pub(super) fn record_success_export(
     latency_ms: i64,
 ) -> RuntimeResult<()> {
     let content = format!(
-        "{{\"id\":\"{}\",\"status\":\"succeeded\",\"finish_reason\":\"{}\",\"latency_ms\":{},\"files\":[\"request.json\",\"authority.json\",\"response.json\",\"timing.json\"]}}\n",
+        "{{\"id\":\"{}\",\"status\":\"succeeded\",\"finish_reason\":\"{}\",\"latency_ms\":{},\"files\":[{}]}}\n",
         json_escape(id),
         json_escape(finish_reason),
-        latency_ms
+        latency_ms,
+        success_files(),
     );
     atomic_write(&dir.join("export.json"), &content)
 }
@@ -25,12 +26,21 @@ pub(super) fn record_error_export(
     latency_ms: i64,
 ) -> RuntimeResult<()> {
     let content = format!(
-        "{{\"id\":\"{}\",\"status\":\"failed\",\"error_class\":\"{}\",\"latency_ms\":{},\"files\":[\"request.json\",\"authority.json\",\"errors.ndjson\"]}}\n",
+        "{{\"id\":\"{}\",\"status\":\"failed\",\"error_class\":\"{}\",\"latency_ms\":{},\"files\":[{}]}}\n",
         json_escape(id),
         json_escape(error_class),
-        latency_ms
+        latency_ms,
+        error_files(),
     );
     atomic_write(&dir.join("export.json"), &content)
+}
+
+fn success_files() -> &'static str {
+    "\"request.json\",\"authority.json\",\"response.json\",\"timing.json\",\"parsed-action.json\",\"admission.json\",\"observation.txt\""
+}
+
+fn error_files() -> &'static str {
+    "\"request.json\",\"authority.json\",\"errors.ndjson\",\"parsed-action.json\""
 }
 
 fn atomic_write(path: &Path, content: &str) -> RuntimeResult<()> {
