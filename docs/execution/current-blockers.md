@@ -68,8 +68,9 @@ Fracture run proves both progress and failure:
   parameters when every parameter is a relative path and every value is content;
   absolute, duplicate, and empty-content path parameters refuse before mutation.
   Runtime repeated-fault route changes remain open.
-- Recovery routes must change action shape after repeated faults and keep the
-  observation, audit, repair, and batch tools needed to escape.
+- Recovery routes now change repeated batch-schema faults from `fs.batch_write`
+  to `artifact.next` and keep batch repair tools visible. Every other fault
+  class still needs route-level shape-change proof.
 - Artifact readiness must be tied to the current artifact id. Direct graph
   evidence, scaffold topology, README-only content, and owner-term-only pages
   do not satisfy readiness.
@@ -120,7 +121,7 @@ Fracture run proves both progress and failure:
 
 ## Remaining Proof Gaps
 
-- Recovery shape enforcement for repeated faults is the next code slice.
+- Artifact address adoption and invalid-root durability is the next code slice.
 - Authority rows still need coverage for every dispatch, provider exchange,
   recovery, compaction, maintenance, and close path.
 - Compaction snapshots need status rendering and prompt-frame resume proof.

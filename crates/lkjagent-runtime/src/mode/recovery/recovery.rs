@@ -57,6 +57,9 @@ fn forced_tool(snapshot: &RuntimeSnapshot, class: RecoveryClass) -> String {
         RecoveryClass::ParseFault | RecoveryClass::ToolAdmissionContradiction => {
             "graph.recover".to_string()
         }
+        RecoveryClass::ParameterFault | RecoveryClass::SchemaFault if snapshot.repeated_action => {
+            schema_escape_tool(snapshot)
+        }
         RecoveryClass::ParameterFault | RecoveryClass::SchemaFault => snapshot
             .last_tool_attempt
             .clone()
@@ -73,6 +76,14 @@ fn forced_tool(snapshot: &RuntimeSnapshot, class: RecoveryClass) -> String {
         RecoveryClass::MaintenancePreemption => "queue.list".to_string(),
         RecoveryClass::EndpointFault => "workspace.summary".to_string(),
         RecoveryClass::TurnBudgetExhaustion => "runtime.handoff".to_string(),
+    }
+}
+
+fn schema_escape_tool(snapshot: &RuntimeSnapshot) -> String {
+    if snapshot.active_artifact.is_some() {
+        "artifact.next".to_string()
+    } else {
+        "graph.state".to_string()
     }
 }
 
@@ -119,7 +130,9 @@ fn repair_tools(class: RecoveryClass) -> Vec<String> {
             "fs.batch_write",
         ]),
         RecoveryClass::FalseCompletion => tools(&["artifact.audit", "doc.audit"]),
-        RecoveryClass::ParameterFault | RecoveryClass::SchemaFault => tools(&["graph.recover"]),
+        RecoveryClass::ParameterFault | RecoveryClass::SchemaFault => {
+            tools(&["graph.recover", "artifact.next", "fs.batch_write"])
+        }
         RecoveryClass::RepeatActionFault => tools(&["graph.transition", "artifact.next"]),
         RecoveryClass::TurnBudgetExhaustion => tools(&["runtime.handoff"]),
         _ => tools(&["graph.recover"]),
