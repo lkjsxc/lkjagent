@@ -23,7 +23,7 @@ fn artifact_next_on_file_root_does_not_render_file_audit() -> TestResult<()> {
     assert!(output.contains("address_status=root_is_file"));
     assert!(output.contains("normalized_root=stories/root"));
     assert!(output.contains("weak_path=topics/background.md"));
-    assert!(output.contains("next_action=fs.batch_write"));
+    assert!(output.contains("candidate_action=fs.batch_write"));
     assert!(!output
         .contains("<tool>artifact.audit</tool>\n<root>stories/root/topics/background.md</root>"));
     validate_example(&workspace, &output)?;
@@ -121,7 +121,7 @@ fn artifact_next_missing_directory_root_still_suggests_artifact_apply() -> TestR
     )?;
 
     assert!(output.contains("missing=root"));
-    assert!(output.contains("next_action=artifact.apply"));
+    assert!(output.contains("candidate_action=artifact.apply"));
     assert!(output.contains("<root>stories/new</root>"));
     validate_example(&workspace, &output)?;
     Ok(())
@@ -149,7 +149,8 @@ fn run(workspace: &Path, action: lkjagent_protocol::Action) -> TestResult<String
 
 fn validate_example(workspace: &Path, output: &str) -> TestResult<()> {
     let example = output
-        .split_once("valid_example:\n")
+        .split_once("candidate_example:\n")
+        .or_else(|| output.split_once("valid_example:\n"))
         .map(|(_, example)| example)
         .ok_or_else(|| "missing valid example".to_string())?;
     let parsed = parse_completion(example).map_err(|err| format!("parse failed: {err:?}"))?;

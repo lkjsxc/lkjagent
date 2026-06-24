@@ -32,7 +32,7 @@ fn story_artifact_next_example_avoids_placeholder_phrases() -> TestResult<()> {
     )
     .content;
 
-    assert!(output.contains("next_action=fs.batch_write"));
+    assert!(output.contains("candidate_action=fs.batch_write"));
     for phrase in [
         "This section contains",
         "The body names facts",

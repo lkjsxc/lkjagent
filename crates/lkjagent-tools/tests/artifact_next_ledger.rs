@@ -30,7 +30,7 @@ fn artifact_next_records_normalized_batch_cursor() -> TestResult<()> {
     )
     .content;
 
-    assert!(output.contains("next_action=fs.batch_write"));
+    assert!(output.contains("candidate_action=fs.batch_write"));
     let artifact = latest_for_case(&conn, 0)?.ok_or("missing artifact")?;
     assert_eq!(artifact.lifecycle_state, "repair-planned");
     let cursor = latest_batch_cursor(&conn, artifact.id)?.ok_or("missing cursor")?;

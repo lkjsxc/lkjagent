@@ -29,7 +29,7 @@ fn runtime_effective_policy_admits_repair_tool_over_graph_completion_node() -> T
     );
 
     assert!(matches!(output.kind, OutputKind::Observation { .. }));
-    assert!(output.content.contains("artifact next batch"));
+    assert!(output.content.contains("artifact_next_result=root_missing"));
     assert!(!output.content.contains("graph policy refused"));
     Ok(())
 }

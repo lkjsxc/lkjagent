@@ -8,7 +8,7 @@ pub fn missing_root_response(address: &ArtifactAddress) -> String {
     let root = root(address);
     let kind = kind_from_action(&address.next_action).unwrap_or_else(|| "artifact".to_string());
     format!(
-        "artifact next batch\nroot={root}\nkind={kind}\nmissing=root\nnext_action=artifact.apply\nvalid_example:\n{}",
+        "artifact_next_result=root_missing\nroot={root}\nkind={kind}\nmissing=root\nruntime_event=ArtifactRootMissing\nnext_decision_required=true\ncandidate_action=artifact.apply\ncandidate_example:\n{}",
         artifact_apply_example(&root, &kind)
     )
 }
@@ -64,7 +64,7 @@ pub fn resolved_kind(kind: &str, root: &Path) -> String {
 
 pub fn batch_response(root: &str, kind: &str, selected: &[String], valid_example: &str) -> String {
     format!(
-        "artifact next batch\nroot={root}\nkind={kind}\nmissing={}\nnext_paths:\n{}\nrequired_sections:\n{}\nnext_action=fs.batch_write\nvalid_example:\n{}",
+        "artifact_next_result=weak_path_batch_ready\nroot={root}\nkind={kind}\nmissing={}\nnext_paths:\n{}\nrequired_sections:\n{}\nruntime_event=ArtifactWeakPathFound\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_example:\n{}",
         selected.len(),
         selected.iter().map(|path| format!("- {path}")).collect::<Vec<_>>().join("\n"),
         required_sections(kind),
@@ -74,7 +74,7 @@ pub fn batch_response(root: &str, kind: &str, selected: &[String], valid_example
 
 pub fn audit_response(root: &str, kind: &str, missing: &str) -> ToolResult<String> {
     Ok(format!(
-        "artifact next batch\nroot={root}\nkind={kind}\n{missing}\nnext_action=artifact.audit\nvalid_example:\n{}",
+        "artifact_next_result=ready_for_audit\nroot={root}\nkind={kind}\n{missing}\nruntime_event=ArtifactWeakPathsExhausted\nnext_decision_required=true\ncandidate_action=artifact.audit\ncandidate_example:\n{}",
         artifact_audit_example(root, kind)
     ))
 }
