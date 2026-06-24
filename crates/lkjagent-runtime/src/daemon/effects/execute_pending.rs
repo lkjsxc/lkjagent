@@ -9,7 +9,7 @@ use rusqlite::Connection;
 use super::authority_admission::{
     install_authority_view, record_authority_admission, record_authority_refusal,
 };
-use super::pending_staleness::stale_action_refusal;
+use super::pending_staleness::{persisted_action_refusal, stale_action_refusal};
 use super::runner::{DaemonTick, ResidentDaemon};
 use crate::error::RuntimeResult;
 use crate::mode::EndpointDecision;
@@ -27,7 +27,8 @@ impl ResidentDaemon {
         };
         let cached = self.turn_authority.clone();
         let current = self.decide_authority(conn, now, false)?;
-        if let Some(message) = stale_action_refusal(cached.as_ref(), &current, &pending.action.tool)
+        if let Some(message) = persisted_action_refusal(&pending, &current, &pending.action.tool)
+            .or_else(|| stale_action_refusal(cached.as_ref(), &current, &pending.action.tool))
         {
             self.sync_effective_dispatch_policy(conn, &current.effective_policy);
             install_authority_view(conn, &mut self.dispatch_state, &current)?;

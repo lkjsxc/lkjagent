@@ -49,6 +49,9 @@ pub enum TaskState {
 pub struct PendingAction {
     pub action: Action,
     pub action_text: String,
+    pub authority_decision_id: Option<String>,
+    pub prompt_frame_id: Option<String>,
+    pub staleness_fingerprint: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

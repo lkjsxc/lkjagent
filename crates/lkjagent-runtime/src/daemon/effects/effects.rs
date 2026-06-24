@@ -18,6 +18,7 @@ impl ResidentDaemon {
     ) -> RuntimeResult<DaemonTick> {
         let mut tick = tick_for_stop(result.stop_reason);
         self.state = result.state;
+        self.annotate_pending_authority(conn)?;
         for effect in result.effects {
             if let Some(next) = self.apply_effect(conn, now, effect, skip_owner_record)? {
                 tick = next;
@@ -25,6 +26,22 @@ impl ResidentDaemon {
         }
         self.write_observable(conn)?;
         Ok(tick)
+    }
+
+    fn annotate_pending_authority(&mut self, conn: &Connection) -> RuntimeResult<()> {
+        let Some(pending) = self.state.pending_action.as_mut() else {
+            return Ok(());
+        };
+        if pending.authority_decision_id.is_none() {
+            pending.authority_decision_id = store_state::get(conn, "authority decision id")?;
+        }
+        if pending.prompt_frame_id.is_none() {
+            pending.prompt_frame_id = store_state::get(conn, "authority prompt frame id")?;
+        }
+        if pending.staleness_fingerprint.is_none() {
+            pending.staleness_fingerprint = store_state::get(conn, "kernel staleness fingerprint")?;
+        }
+        Ok(())
     }
 
     pub(super) fn record_endpoint_error(

@@ -124,6 +124,9 @@ fn action_step(
     state.pending_action = Some(PendingAction {
         action,
         action_text: action_text.clone(),
+        authority_decision_id: None,
+        prompt_frame_id: None,
+        staleness_fingerprint: None,
     });
     state.parse_faults = 0;
     let mut effects = Vec::new();

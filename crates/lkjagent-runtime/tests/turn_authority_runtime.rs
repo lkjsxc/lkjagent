@@ -79,6 +79,9 @@ fn stale_maintenance_action_is_refused_when_owner_queue_arrives() -> TestResult<
     daemon.state.pending_action = Some(PendingAction {
         action,
         action_text: action_text.clone(),
+        authority_decision_id: None,
+        prompt_frame_id: None,
+        staleness_fingerprint: None,
     });
     daemon.turn_authority = Some(decide_turn_authority(TurnAuthorityInput {
         maintenance_active: true,
@@ -118,6 +121,9 @@ fn pending_owner_row_refuses_cached_owner_action() -> TestResult<()> {
     daemon.state.pending_action = Some(PendingAction {
         action,
         action_text,
+        authority_decision_id: None,
+        prompt_frame_id: None,
+        staleness_fingerprint: None,
     });
     daemon.turn_authority = Some(decide_turn_authority(TurnAuthorityInput {
         active_owner_case: true,

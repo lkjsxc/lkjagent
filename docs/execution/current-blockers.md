@@ -55,9 +55,10 @@ Fracture run proves both progress and failure:
   require a decision. Kernel prompt rendering requires a stored decision id and
   renders concrete batch-write examples. Kernel admission refuses stale,
   blocked, not-admitted, and completion-blocked tools before dispatch. Daemon
-  wiring still needs one snapshot, one explicit event, one persisted decision,
-  one prompt frame, one admission view, one effect observation, and one next
-  event.
+  pending actions now carry persisted authority fields and refuse after prompt
+  frame changes without an in-memory cached authority. Wiring still needs one
+  snapshot, one explicit event, one persisted decision, one prompt frame, one
+  admission view, one effect observation, and one next event.
 - Graph policy is guidance for the snapshot. It is not fallback dispatch
   authority after runtime admission refuses a tool.
 - Stale-action refusal must use the full staleness fingerprint: queue head,

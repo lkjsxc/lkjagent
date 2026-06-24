@@ -6,7 +6,6 @@ use lkjagent_protocol::render_action;
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
-use lkjagent_runtime::mode::{decide_turn_authority, TurnAuthorityInput};
 use lkjagent_runtime::task::{PendingAction, TaskState};
 use lkjagent_store::{queue, runtime_authority, state};
 use support::http::{completion, serve_responses};
@@ -53,7 +52,7 @@ fn daemon_records_prompt_frame_and_effect_observation() -> TestResult<()> {
 }
 
 #[test]
-fn changed_prompt_frame_refuses_cached_action() -> TestResult<()> {
+fn changed_prompt_frame_refuses_persisted_pending_action() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "100", "0")?;
     state::set(&conn, "authority decision id", "1")?;
@@ -66,19 +65,19 @@ fn changed_prompt_frame_refuses_cached_action() -> TestResult<()> {
     daemon.state.pending_action = Some(PendingAction {
         action: action.clone(),
         action_text: render_action(&action),
-    });
-    daemon.turn_authority = Some(decide_turn_authority(TurnAuthorityInput {
-        active_owner_case: true,
-        latest_decision_id: Some("decision-old".to_string()),
+        authority_decision_id: Some("decision-old".to_string()),
         prompt_frame_id: Some("frame-old".to_string()),
-        ..TurnAuthorityInput::default()
-    }));
+        staleness_fingerprint: None,
+    });
+    daemon.turn_authority = None;
 
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     server.join()?;
 
     assert!(daemon.state.context.log.iter().any(|frame| {
-        frame.content.contains("reason=stale_decision") && frame.content.contains("prompt_frame_id")
+        frame.content.contains("reason=stale_decision")
+            && frame.content.contains("failed_gate=stale-persisted-action")
+            && frame.content.contains("prompt_frame_id")
     }));
     Ok(())
 }
