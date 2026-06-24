@@ -25,13 +25,14 @@ verification.
 - [durable-compaction-history.md](durable-compaction-history.md): rich compaction snapshots and resume history.
 - [workspace-structure-controller.md](workspace-structure-controller.md): recursive workspace and docs rebalancer.
 - [model-log.md](model-log.md): single handoff-log work.
+- [personal-records.md](personal-records.md): diary, schedule, and TODO record work.
 - [verification-plan.md](verification-plan.md): focused tests, benchmarks, and compose gates.
 
 ## Reading Paths
 
 - Implementation path: state-transition-network, runtime-authority-redesign,
   recovery-shape-enforcement, artifact-ledger-completion, durable-compaction-history,
-  workspace-structure-controller, then context-accounting.
+  workspace-structure-controller, personal-records, then context-accounting.
 - Diagnosis path: owner-reported-failures, multi-state-runtime,
   runtime-recovery-controller, then model-log.
 - Verification path: verification-plan, then the gate commands it names.

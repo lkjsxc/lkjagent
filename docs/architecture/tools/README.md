@@ -22,6 +22,7 @@ prompt and behavior cannot drift.
 - [shell.md](shell.md): shell.run, the escape hatch and its capture rules.
 - [queue-ops.md](queue-ops.md): queue.list and queue mutation actions.
 - [memory-ops.md](memory-ops.md): memory.save, memory.find, and memory.prune contracts.
+- [personal-tools.md](personal-tools.md): diary, schedule, and TODO tool contracts.
 - [graph-ops.md](graph-ops.md): graph.state, graph.plan,
   graph.transition, graph.context, graph.note, graph.evidence, and graph.compact.
 - [control.md](control.md): agent.done and agent.ask, the actions that close or suspend a task.

@@ -18,6 +18,7 @@ and rejected directions live in [../decisions/](../decisions/README.md).
 - [recovery/](recovery/README.md): deterministic recovery classes, retry budgets, and handoff.
 - [document-structure/](document-structure/README.md): semantic document trees and catalog metadata.
 - [artifacts/](artifacts/README.md): long-form content artifact profiles, manifests, audits, and completion.
+- [personal/](personal/README.md): diary, schedule, TODO records, search, and projections.
 - [structured-records/](structured-records/README.md): semantic records, identity, ledgers, and deduplication.
 - [action-reliability/](action-reliability/README.md): parameter normalization and recovery.
 - [state-model/](state-model/README.md): objective envelopes and ranked neutral tracks.
