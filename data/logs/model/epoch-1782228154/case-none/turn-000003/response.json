@@ -1,1 +1,0 @@
-{"content":"<act>\n<tool>agent.done</tool>\n<summary>maintenance cycle closed: queue empty, memory search yielded no results, no durable lessons captured due to policy block on memory.save</summary>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":2052,"completion_tokens":109,"cached_prompt_tokens":null,"total_tokens":2161}}

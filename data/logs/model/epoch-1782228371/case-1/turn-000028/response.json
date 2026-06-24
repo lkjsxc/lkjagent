@@ -1,1 +1,0 @@
-{"content":"<act>\n<tool>fs.list</tool>\n<path>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</path>\n<depth>1</depth>\n<limit>50</limit>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":14746,"completion_tokens":146,"cached_prompt_tokens":null,"total_tokens":14892}}

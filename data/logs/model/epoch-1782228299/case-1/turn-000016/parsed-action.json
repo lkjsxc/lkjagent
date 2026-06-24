@@ -1,1 +1,0 @@
-{"status":"ok","closure_mode":"StopSequenceClosed","content_bytes":138,"tool":"fs.list","params":[{"name":"path","bytes":56},{"name":"depth","bytes":1},{"name":"limit","bytes":2}]}

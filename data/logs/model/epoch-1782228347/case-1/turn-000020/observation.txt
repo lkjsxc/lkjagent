@@ -1,4 +1,0 @@
-<observation>
-<status>error</status>
-<content>invalid parameter: payload too large for fs.write: bytes=2436 max=1800; use fs.batch_write</content>
-</observation>

@@ -2,27 +2,27 @@
 
 ## Snapshot
 
-- created_at: 1782228404
+- created_at: 1782286341
 - daemon_state: working
 - queue_depth: 0
 - active_case: 1
-- active_node: document-repair
+- active_node: recover-by-alternate-tool
 - active_phase: recovery
-- context: 6.42K/24.58K 26.10% prefix=5.38K log=17.15K reserve=2.05K headroom=18.16K
-- token_usage: in=4.56K out=603 cache=unknown total=5.16K
+- context: 7.96K/24.58K 32.39% prefix=5.38K log=17.15K reserve=2.05K headroom=16.61K
+- token_usage: in=6.73K out=117 cache=unknown total=6.85K
 
 ## Owner Objective
 
 Raw:
 
 ```text
-Create a SF novel. with detailed settings.
+Create docs of minecraft beginner's guide.
 ```
 
 Normalized:
 
 ```text
-Resolve the owner task through planning, evidence capture, execution, and verification: Create a SF novel. with detailed settings.
+Deliver the owner task by improving semantic recursive documentation.
 ```
 
 ## Constraints And Preferences
@@ -30,9 +30,7 @@ Resolve the owner task through planning, evidence capture, execution, and verifi
 * evidence: plan
 * evidence: observation
 * evidence: document-structure
-* evidence: artifact-readiness
 * checks: document audit
-* checks: artifact readiness audit
 * packages: planning-checklist
 * packages: context-slice
 * packages: doc-construction
@@ -50,7 +48,7 @@ Resolve the owner task through planning, evidence capture, execution, and verifi
 
 | step | status | target paths | evidence | checks |
 | --- | --- | --- | --- | --- |
-| active | active | document-repair | pending | document audit; artifact readiness audit |
+| active | active | recover-by-alternate-tool | pending | document audit |
 
 ## Touched Paths
 
@@ -60,130 +58,62 @@ Resolve the owner task through planning, evidence capture, execution, and verifi
 
 | kind | requirement | summary | path | confidence |
 | --- | --- | --- | --- | --- |
-| plan | plan | graph plan recorded | none | medium |
-| observation | observation | document plan created | none | medium |
+| none | none | none | none | low |
 
 ## Fault Ledger
 
 | turn | kind | message | recovery |
 | --- | --- | --- | --- |
-| 23 | error | parse fault: unclosed tag files | document-repair |
-| 24 | error | action params refused<br>tool=artifact.next<br>expected=root required; kind optional<br>received=missing [root]; unknown [path]<br>valid_example:<br><act><br><tool>artifact.next</tool><br><root>VALUE</root><br></act><br>next_action=emit the valid_example exactly, or choose fs.list/workspace.summary if you need a path | document-repair |
-| 24 | notice | recovery: parameter faults are consecutive count=3; use the valid_example exactly, inspect graph.state with no params, or choose fs.list/workspace.summary when you need a path | document-repair |
-| 24 | notice | Consecutive parameter faults reached count=3; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. | document-repair |
-| 25 | error | parse fault: unclosed tag files | document-repair |
-| 25 | notice | recovery: parse faults are consecutive count=4; simplify to one valid act block; prefer typed file/doc tools for large payloads; ask only if blocked | document-repair |
-| 25 | notice | Consecutive parse faults reached count=4; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. | document-repair |
-| 35 | error | parse fault: missing act block | document-repair |
+| 9 | error | parse fault: missing act block | recover-by-alternate-tool |
+| 9 | notice | recovery: parse faults are consecutive count=4; simplify to one valid act block; prefer typed file/doc tools for large payloads; ask only if blocked | recover-by-alternate-tool |
+| 9 | notice | Consecutive parse faults reached count=4; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. | recover-by-alternate-tool |
+| 10 | error | parse fault: missing act block | recover-by-alternate-tool |
+| 10 | notice | recovery: parse faults are consecutive count=5; simplify to one valid act block; prefer typed file/doc tools for large payloads; ask only if blocked | recover-by-alternate-tool |
+| 10 | notice | Consecutive parse faults reached count=5; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. | recover-by-alternate-tool |
+| 12 | error | parse fault: missing act block | recover-by-alternate-tool |
+| 13 | error | parse fault: missing act block | recover-by-alternate-tool |
 
 ## Recent Transcript
 
 | id | turn | kind | preview |
 | --- | --- | --- | --- |
 | 1 | none | notice | maintenance cycle opened<br>directive=distill<br>turn_budget=8<br>work=read recent transcript spans and save durable lessons |
-| 2 | 1 | action | <act><br><tool>memory.find</tool><br><query>owner task plan evidence</query><br></act> |
+| 2 | 1 | action | <act><br><tool>memory.find</tool><br><query>maintenance</query><br><limit>10</limit><br></act> |
 | 3 | 1 | observation | <observation><br><status>ok</status><br><content>no memory results</content><br></observation> |
-| 4 | 2 | action | <act><br><tool>queue.list</tool><br><status>all</status><br><limit>20</limit><br></act> |
-| 5 | 2 | observation | <observation><br><status>ok</status><br><content>queue empty</content><br></observation> |
-| 6 | 3 | action | <act><br><tool>memory.find</tool><br><query>recent transcript lesson</query><br></act> |
-| 7 | 3 | observation | <observation><br><status>ok</status><br><content>no memory results</content><br></observation> |
-| 8 | 4 | action | <act><br><tool>agent.done</tool><br><summary>maintenance cycle closed: queue empty, memory search yielded no results, no durable lessons captured due to policy block on memory.save</summary><br></act> |
-| 9 | 4 | observation | <observation><br><status>ok</status><br><content><br>done<br>summary=maintenance cycle closed: queue empty, memory search yielded no results, no durable lessons captured due to policy block on memory.save<br></content><br></observation> |
-| 10 | none | queue_mutation | operation=enqueue<br>reason=console-send<br>target_id=1<br>source_queue_id=null<br>before=<br>after=Create a SF novel. with detailed settings. |
-| 11 | 5 | owner | Create a SF novel. with detailed settings. |
-| 12 | 5 | action | <act><br><tool>graph.plan</tool><br><objective>Create a SF novel with detailed settings</objective><br><constraints>novel length 80k words, three acts, world-building depth 4 levels, character arcs complete, no plot holes</constraints><br><assumptions>author has writing capability and can iterate on drafts</assumptions><br><risks>world-building may require multiple passes to achieve consistency</risks><br><steps>1. Define core setting pillars (time period, geography, magic system, political factions) 2. Create character profiles with motivations and flaws 3. Outline three-act structure with turning points 4. Write act I: exposition and inciting incident 5. Write act II: rising action and mid-point twist 6. Write act III: climax and resolution</steps><br><checks>world consistency, character motivation alignment, pacing rhythm, theme coherence</checks><br><paths>stories/sf-novel-with-detailed-settings/01-world-pillars.md, stories/sf-novel-with-detailed-settings/02-characters.md, stories/sf-novel-with-detailed-settings/03-outline.md, stories/sf-novel-with-detailed-settings/drafts</paths><br><reason>Structured planning ensures world-building depth and narrative coherence before drafting begins</reason><br></act> |
-| 13 | 5 | observation | <observation><br><status>ok</status><br><content>graph plan recorded</content><br></observation> |
-| 14 | 6 | error | parse fault: unclosed tag content |
+| 4 | 2 | error | parse fault: missing act block |
+| 5 | 2 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
+| 6 | none | queue_mutation | operation=enqueue<br>reason=console-send<br>target_id=1<br>source_queue_id=null<br>before=<br>after=Create docs of minecraft beginner's guide. |
+| 7 | 3 | error | parse fault: missing act block |
+| 8 | 3 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
+| 9 | 4 | owner | Create docs of minecraft beginner's guide. |
+| 10 | 4 | error | parse fault: missing act block |
+| 11 | 4 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
+| 12 | 5 | action | <act><br><tool>graph.recover</tool><br></act> |
+| 13 | 5 | observation | <observation><br><status>ok</status><br><content><br>node=plan<br>phase=planning<br>recovery_ladder=inspect-state,smaller-scope,alternate-native-tool,replan,admitted-shell-escape,block-step-and-continue<br>repeat_count=0<br>next=use graph.plan, fs.list, fs.tree, fs.search, graph.state<br></content><br></observation> |
+| 14 | 6 | error | parse fault: missing act block |
 | 15 | 6 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
-| 16 | 7 | action | <act><br><tool>graph.recover</tool><br></act> |
-| 17 | 7 | observation | <observation><br><status>ok</status><br><content><br>node=document<br>phase=execution<br>recovery_ladder=inspect-state,smaller-scope,alternate-native-tool,replan,admitted-shell-escape,block-step-and-continue<br>repeat_count=0<br>next=use graph.transition to document-profile, artifact.next, artifact.audit, doc.audit, fs.batch_write, fs.list, fs.tree, graph.state<br></content><br></observation> |
-| 18 | 8 | action | <act><br><tool>graph.transition</tool><br><target>document-profile</target><br><reason>advance from planning gap to active document profiling phase</reason><br></act> |
-| 19 | 8 | observation | <observation><br><status>ok</status><br><content><br>graph transition admitted<br>target=document-profile<br></content><br></observation> |
-| 20 | 9 | action | <act><br><tool>graph.state</tool><br></act> |
-| 21 | 9 | observation | <observation><br><status>ok</status><br><content><br>Graph state:<br>case: 1<br>family: documentation/content-artifact<br>phase: execution<br>node: document<br>confidence: 70<br>Current state: active<br>Active states: 1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence<br>Objective: Resolve the owner task through planning, evidence capture, execution, and verification: Create a SF novel. with detailed settings.<br>Do not do: none<br>Constraints: novel length 80k words, three acts, world-building depth 4 levels, character arcs complete, no plot holes<br>Assumptions: author has writing capability and can iterate on drafts<br>Risks: first owner message is not a sufficient plan -> record graph.plan before mutating tools; world-building may require multiple passes to achieve consistency -> verify during execution<br>Success criteria: none<br>Active plan step: 1. Define core setting pillars (time period, geography, magic system, political factions) 2. Create character profiles with motivations and flaws 3. Outline three-act structure with turning points 4. Write act I: exposition and inciting incident 5. Write act II: rising action and mid-point twist 6. Write act III: climax and resolution<br>Required evidence: plan, observation, document-structure, artifact-readiness<br>Missing evidence: observation, document-structure, artifact-readiness<br>Allowed tools now: graph.state, graph.next, graph.audit, graph.evidence, graph.note, graph.transition, fs.list, fs.tree, fs.stat, artifact.plan, artifact.apply, artifact.audit, artifact.next, fs.write, doc.scaffold, doc.audit, fs.batch_write, fs.mkdir<br>Blocked tools now: agent.ask, agent.done, fs.edit, fs.patch, fs.read, fs.read_many, fs.search, graph.context, graph.plan, graph.recover, memory.find, memory.save<br>Preferred next action: execute the active plan step, record evidence, then verify<br>Legal transitions: document-profile:admitted; document-audit:blocked(observation)<br>Context packag<br>[graph slice narrowed]<br></content><br></observation> |
-| 22 | 10 | error | endpoint completion hit max tokens<br>preview=<act>\n<tool>fs.write</tool>\n<path>stories/sf-novel-with-detailed-settings/02-characters.md</path>\n<content># Character Profiles - The Iron Veil Chronicles\n\n## Protagonist: Kaelen "Kai" Thorne\n\n### Background\n- **Age**: 28\n- **Origin**: Aeth |
-| 23 | 10 | notice | recovery: completion hit max tokens inside a write payload; raw fs.write retry is blocked while payload risk is active; use artifact.plan, artifact.apply, doc.scaffold, or fs.batch_write |
-| 24 | 10 | notice | Consecutive large-payload parse faults reached count=1; graph recovery is active. Use artifact.plan, artifact.apply, doc.scaffold, or fs.batch_write. Raw fs.write remains blocked while payload risk is active. |
-| 25 | 11 | action | <act><br><tool>artifact.plan</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md</root><br><title>Kaelen "Kai" Thorne - The Resonance Anomaly</title><br><kind>character-profile</kind><br><scale>detailed</scale><br><sections>background,abilities,resilience,vulnerability,motivation,relationships</sections><br></act> |
-| 26 | 11 | observation | <observation><br><status>ok</status><br><content><br>document plan created<br>root=stories/sf-novel-with-detailed-settings/02-characters.md<br>kind=character-profile<br>profile=GenericStructuredDocs<br>mode=approx<br>files=17<br>catalog=catalog.toml<br>writes=0<br></content><br></observation> |
-| 27 | 12 | action | <act><br><tool>artifact.apply</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md</root><br><title>Kaelen "Kai" Thorne - The Resonance Anomaly</title><br><kind>character-profile</kind><br><mode>approx</mode><br><sections>background,abilities,resilience,vulnerability,motivation,relationships</sections><br></act> |
-| 28 | 12 | observation | <observation><br><status>ok</status><br><content><br>document scaffold created<br>root=stories/sf-novel-with-detailed-settings/02-characters.md<br>kind=character-profile<br>profile=GenericStructuredDocs<br>mode=approx<br>files=17<br>readme=present<br>catalog=catalog.toml<br></content><br></observation> |
-| 29 | 13 | action | <act><br><tool>doc.audit</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md</root><br><count>5</count><br><mode>approx</mode><br></act> |
-| 30 | 13 | observation | <observation><br><status>ok</status><br><content><br>document audit failed<br>root=stories/sf-novel-with-detailed-settings/02-characters.md<br>topology=failed<br>links=passed<br>path_hygiene=failed<br>content_readiness=failed<br>artifact_readiness=not-owner<br>checks_run=topology,links,path_hygiene,content_readiness<br>failed=12<br>failures:<br>- markdown_suffix_directory: /data/workspace/stories/sf-novel-with-detailed-settings/02-characters.md<br>- structure_only_content: project/evidence-gates.md<br>- structure_only_content: project/operating-rules.md<br>- structure_only_content: relations/artifact-map.md<br>- structure_only_content: relations/topic-map.md<br>- owner_term_only_content: topics/abilities.md<br>- owner_term_only_content: topics/background.md<br>- owner_term_only_content: topics/motivation.md<br>- owner_term_only_content: topics/relationships.md<br>- owner_term_only_content: topics/resilience.md<br>- owner_term_only_content: topics/vulnerability.md<br>- count_mismatch: expected=5 actual=17<br>next_action=fs.batch_write path-specific content or artifact.next<br></content><br></observation> |
-| 31 | 14 | error | parse fault: unclosed tag content |
-| 32 | 14 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
-| 33 | 15 | action | <act><br><tool>graph.recover</tool><br></act> |
-| 34 | 15 | observation | <observation><br><status>ok</status><br><content><br>node=document<br>phase=execution<br>recovery_ladder=inspect-state,smaller-scope,alternate-native-tool,replan,admitted-shell-escape,block-step-and-continue<br>repeat_count=0<br>next=use graph.transition to document-audit, artifact.next, artifact.audit, doc.audit, fs.batch_write, fs.list, fs.tree, graph.state<br></content><br></observation> |
-| 35 | 16 | action | <act><br><tool>graph.transition</tool><br><target>document-audit</target><br><reason>advance from recovery gap to active document audit phase</reason><br></act> |
-| 36 | 16 | observation | <observation><br><status>ok</status><br><content><br>graph transition admitted<br>target=document-audit<br></content><br></observation> |
-| 37 | 17 | action | <act><br><tool>fs.list</tool><br><path>stories/sf-novel-with-detailed-settings/02-characters.md</path><br><depth>1</depth><br><limit>50</limit><br></act> |
-| 38 | 17 | observation | <observation><br><status>ok</status><br><content><br>dir stories/sf-novel-with-detailed-settings/02-characters.md bytes=8 lines=0<br>dir stories/sf-novel-with-detailed-settings/02-characters.md/project bytes=5 lines=0<br>dir stories/sf-novel-with-detailed-settings/02-characters.md/relations bytes=5 lines=0<br>dir stories/sf-novel-with-detailed-settings/02-characters.md/request bytes=5 lines=0<br>dir stories/sf-novel-with-detailed-settings/02-characters.md/topics bytes=9 lines=0<br>file stories/sf-novel-with-detailed-settings/02-characters.md/README.md bytes=712 lines=30<br>file stories/sf-novel-with-detailed-settings/02-characters.md/catalog.toml bytes=148 lines=4<br></content><br></observation> |
-| 39 | 18 | error | endpoint completion hit max tokens<br>preview=<act>\n<tool>fs.batch_write</tool>\n<path>stories/sf-novel-with-detailed-settings/02-characters.md/topics</path>\n<files>[{"title":"Kaelen Thorne - Background","content":"# Kaelen \"Kai\" Thorne\n\n## Core Identity\n- **Age**: 28\n- **Origin** |
-| 40 | 18 | notice | recovery: completion hit max tokens after starting an action; next act must stay bounded; use fs.batch_write or doc.scaffold for large file payloads |
-| 41 | 19 | error | endpoint completion hit max tokens<br>preview=<act>\n<tool>fs.batch_write</tool>\n<path>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</path>\n<files>[{"title":"Kaelen Thorne - Background","content":"# Kaelen \"Kai\" Thorne\n\n## Core Identity\n- **Age**: 28 |
-| 42 | 19 | notice | recovery: completion hit max tokens after starting an action; next act must stay bounded; use fs.batch_write or doc.scaffold for large file payloads |
-| 43 | 20 | error | parse fault: unclosed tag files |
-| 44 | 20 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
-| 45 | 21 | action | <act><br><tool>fs.write</tool><br><path>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</path><br><content><br># Kaelen "Kai" Thorne - Background<br><br>## Core Identity<br>- **Age**: 28<br>- **Origin**: Aethelgard, former apprentice to High Chancellor Kaelen Thorne (his namesake)<br>- **Education**: Resonance Academy, Tier III certification in visible-light manipulation<br>- **Family**: Father died during the Great Fracture; mother is a Resonance Purist priestess<br>- **Current status**: Fugitive from Aethelgard after discovering unauthorized Void-tier resonance abilities<br><br>## Timeline of Events<br>**Age 14-20 (Training)**: Completed Tier III visible-light certification at Resonance Academy. Developed exceptional aptitude for photon lattice manipulation, earning top marks in combat simulations.<br><br>**Age 21-25 (Ascendant Council)**: Appointed as junior apprentice to High Chancellor Kaelen Thorne. Assigned to oversee the Core Amplifier Array during terraforming operations. Discovered unauthorized Void-tier resonance abilities during a routine calibration test.<br><br>**Age 26-28 (Discovery & Flight)**: Attempted unauthorized use of Void-frequency amplifiers on a classified mission. Neural degradation symptoms appeared within hours. Reported to Council, but his mother Mara Voss intervened with Resonance Purist support. Fled Aethelgard into the Red Line Collective network.<br><br>## Key Relationships<br>- **Mother (Mara Voss)**: High Priestess of Resonance Purists; believes Kai's Void abilities are a curse that must be removed through ritual sacrifice<br>- **Former mentor**: Discovered his unauthorized abilities during training and reported him to the Ascendant Council<br>- **Jax "The Singer" O'Malley**: Red Line Collective member who helped him escape Aethelgard; sees potential in Kai's abilities but warns of the dangers<br><br>## Psychological Profile<br>**Core Motivation**: Understand the source of his Void-tier resonance before the Void Syndicate does. He believes someone must know what happened during the Great Fracture that gave him these powers.<br><br>**Secondary Motivation**: Protect his mother from the Resonance Purists who want to "purify" her by removing her son's dangerous abilities.<br><br>**Flaws**: Overconfidence in his abilities; refuses help from Coalition Medical Corps; believes all authority figures are corrupt or dangerous.<br><br>**Strengths**: High pain tolerance developed through repeated exposure to Resonance Sickness symptoms; proficient at reading people and manipulating social dynamics; former political apprentice gave him advanced negotiation skills.<br></content><br></act> |
-| 46 | 21 | observation | <observation><br><status>error</status><br><content>invalid parameter: payload too large for fs.write: bytes=2436 max=1800; use fs.batch_write</content><br></observation> |
-| 47 | 21 | notice | recovery: tool error recorded (invalid parameter: payload too large for fs.write: bytes=2436 max=1800; use fs.batch_write); inspect the observation, adjust the path/command/params, and continue with a narrower action |
-| 48 | 22 | error | parse fault: unclosed tag files |
-| 49 | 22 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
-| 50 | 23 | error | parse fault: unclosed tag files |
-| 51 | 23 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
-| 52 | 24 | error | action params refused<br>tool=artifact.next<br>expected=root required; kind optional<br>received=missing [root]; unknown [path]<br>valid_example:<br><act><br><tool>artifact.next</tool><br><root>VALUE</root><br></act><br>next_action=emit the valid_example exactly, or choose fs.list/workspace.summary if you need a path |
-| 53 | 24 | notice | recovery: parameter faults are consecutive count=3; use the valid_example exactly, inspect graph.state with no params, or choose fs.list/workspace.summary when you need a path |
-| 54 | 24 | notice | Consecutive parameter faults reached count=3; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. |
-| 55 | 25 | error | parse fault: unclosed tag files |
-| 56 | 25 | notice | recovery: parse faults are consecutive count=4; simplify to one valid act block; prefer typed file/doc tools for large payloads; ask only if blocked |
-| 57 | 25 | notice | Consecutive parse faults reached count=4; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. |
-| 58 | 26 | action | <act><br><tool>artifact.next</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</root><br></act> |
-| 59 | 26 | observation | <observation><br><status>ok</status><br><content><br>artifact next batch<br>root=stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md<br>kind=artifact<br>missing=0<br>next_action=artifact.audit<br>valid_example:<br><act><br><tool>artifact.audit</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</root><br><kind>artifact</kind><br></act><br></content><br></observation> |
-| 60 | 27 | action | <act><br><tool>artifact.audit</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</root><br><kind>artifact</kind><br></act> |
-| 61 | 27 | observation | <observation><br><status>error</status><br><content>io error: Not a directory (os error 20)</content><br></observation> |
-| 62 | 27 | notice | recovery: tool error recorded (io error: Not a directory (os error 20)); inspect the observation, adjust the path/command/params, and continue with a narrower action |
-| 63 | 28 | action | <act><br><tool>artifact.next</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</root><br></act> |
-| 64 | 28 | observation | <observation><br><status>ok</status><br><content><br>artifact next batch<br>root=stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md<br>kind=artifact<br>missing=0<br>next_action=artifact.audit<br>valid_example:<br><act><br><tool>artifact.audit</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</root><br><kind>artifact</kind><br></act><br></content><br></observation> |
-| 65 | 29 | action | <act><br><tool>fs.list</tool><br><path>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</path><br><depth>1</depth><br><limit>50</limit><br></act> |
-| 66 | 29 | observation | <observation><br><status>ok</status><br><content>file stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md bytes=452 lines=20</content><br></observation> |
-| 67 | 30 | action | <act><br><tool>artifact.audit</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</root><br><kind>artifact</kind><br></act> |
-| 68 | 30 | observation | <observation><br><status>error</status><br><content>io error: Not a directory (os error 20)</content><br></observation> |
-| 69 | 30 | notice | recovery: tool error recorded (io error: Not a directory (os error 20)); inspect the observation, adjust the path/command/params, and continue with a narrower action |
-| 70 | 31 | action | <act><br><tool>fs.read</tool><br><path>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</path><br></act> |
-| 71 | 31 | observation | <observation><br><status>ok</status><br><content><br>path=stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md lines=1-20 total=20<br># Background<br><br>## Purpose<br><br>This page tracks the owner-provided term `background` as a requested documentation topic.<br><br>## Known Source<br><br>content_state=owner-term-only<br>source_type=owner-term<br>observed_term=background<br><br>## Relation<br><br>- The term is part of the active documentation request.<br>- It must connect to the artifact map before expansion.<br><br>## Next Evidence<br><br>Add sourced local facts or owner-confirmed details before treating this page as content-ready.<br><br></content><br></observation> |
-| 72 | 32 | action | <act><br><tool>graph.state</tool><br></act> |
-| 73 | 32 | observation | <observation><br><status>ok</status><br><content><br>Graph state:<br>case: 1<br>family: documentation/content-artifact<br>phase: recovery<br>node: document-repair<br>confidence: 70<br>Current state: active<br>Active states: 1. Recovering 0.62 parse-recovery phase=recovery gap=recovery evidence; 2. Structuring 0.61 document-structure phase=planning gap=document audit; 3. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests<br>Objective: Resolve the owner task through planning, evidence capture, execution, and verification: Create a SF novel. with detailed settings.<br>Do not do: none<br>Constraints: novel length 80k words, three acts, world-building depth 4 levels, character arcs complete, no plot holes<br>Assumptions: author has writing capability and can iterate on drafts<br>Risks: first owner message is not a sufficient plan -> record graph.plan before mutating tools; world-building may require multiple passes to achieve consistency -> verify during execution<br>Success criteria: none<br>Active plan step: 1. Define core setting pillars (time period, geography, magic system, political factions) 2. Create character profiles with motivations and flaws 3. Outline three-act structure with turning points 4. Write act I: exposition and inciting incident 5. Write act II: rising action and mid-point twist 6. Write act III: climax and resolution<br>Required evidence: plan, observation, document-structure, artifact-readiness<br>Missing evidence: document-structure, artifact-readiness<br>Allowed tools now: graph.state, graph.next, graph.audit, graph.evidence, graph.note, graph.transition, fs.list, fs.tree, fs.stat, artifact.plan, artifact.apply, artifact.audit, artifact.next, fs.write, doc.scaffold, doc.audit, fs.batch_write, fs.mkdir<br>Blocked tools now: agent.ask, agent.done, fs.edit, fs.patch, fs.read, fs.read_many, fs.search, graph.context, graph.plan, graph.recover, memory.find, memory.save<br>Preferred next action: execute the active plan step, record evidence, then verify<br>Legal transitions: document-completion-check:admitted<br>Context packages: planning-checklist, context-slice,<br>[graph slice narrowed]<br></content><br></observation> |
-| 74 | 33 | action | <act><br><tool>doc.audit</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</root><br><count>5</count><br><mode>approx</mode><br></act> |
-| 75 | 33 | observation | <observation><br><status>error</status><br><content>io error: Not a directory (os error 20)</content><br></observation> |
-| 76 | 33 | notice | recovery: tool error recorded (io error: Not a directory (os error 20)); inspect the observation, adjust the path/command/params, and continue with a narrower action |
-| 77 | 34 | action | <act><br><tool>artifact.next</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</root><br></act> |
-| 78 | 34 | observation | <observation><br><status>ok</status><br><content><br>artifact next batch<br>root=stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md<br>kind=artifact<br>missing=0<br>next_action=artifact.audit<br>valid_example:<br><act><br><tool>artifact.audit</tool><br><root>stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md</root><br><kind>artifact</kind><br></act><br></content><br></observation> |
-| 79 | 34 | compaction | before_tokens=18473<br>after_tokens=2410<br>memory_ids=[1]<br>context_window=24576<br>context_reserve=2048<br>context_soft_trigger=18432<br>context_hard_trigger=21504<br>context_post_compaction_target=8192 |
-| 80 | 35 | error | parse fault: missing act block |
-| 81 | 35 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
-| 82 | 36 | action | <act><br><tool>graph.recover</tool><br></act> |
-| 83 | 36 | observation | <observation><br><status>ok</status><br><content><br>node=document-repair<br>phase=recovery<br>recovery_ladder=inspect-state,smaller-scope,alternate-native-tool,replan,admitted-shell-escape,block-step-and-continue<br>repeat_count=0<br>next=use graph.transition to document-completion-check, artifact.next, artifact.audit, doc.audit, fs.batch_write, fs.list, fs.tree, graph.state<br></content><br></observation> |
-| 84 | 37 | action | <act><br><tool>graph.state</tool><br></act> |
-| 85 | 37 | observation | <observation><br><status>ok</status><br><content><br>Graph state:<br>case: 1<br>family: documentation/content-artifact<br>phase: recovery<br>node: document-repair<br>confidence: 70<br>Current state: active<br>Active states: 1. Recovering 0.62 parse-recovery phase=recovery gap=recovery evidence; 2. Structuring 0.61 document-structure phase=planning gap=document audit; 3. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests<br>Objective: Resolve the owner task through planning, evidence capture, execution, and verification: Create a SF novel. with detailed settings.<br>Do not do: none<br>Constraints: novel length 80k words, three acts, world-building depth 4 levels, character arcs complete, no plot holes<br>Assumptions: author has writing capability and can iterate on drafts<br>Risks: first owner message is not a sufficient plan -> record graph.plan before mutating tools; world-building may require multiple passes to achieve consistency -> verify during execution<br>Success criteria: none<br>Active plan step: 1. Define core setting pillars (time period, geography, magic system, political factions) 2. Create character profiles with motivations and flaws 3. Outline three-act structure with turning points 4. Write act I: exposition and inciting incident 5. Write act II: rising action and mid-point twist 6. Write act III: climax and resolution<br>Required evidence: plan, observation, document-structure, artifact-readiness<br>Missing evidence: document-structure, artifact-readiness<br>Allowed tools now: graph.state, graph.next, graph.audit, graph.evidence, graph.note, graph.transition, fs.list, fs.tree, fs.stat, artifact.plan, artifact.apply, artifact.audit, artifact.next, fs.write, doc.scaffold, doc.audit, fs.batch_write, fs.mkdir<br>Blocked tools now: agent.ask, agent.done, fs.edit, fs.patch, fs.read, fs.read_many, fs.search, graph.context, graph.plan, graph.recover, memory.find, memory.save<br>Preferred next action: execute the active plan step, record evidence, then verify<br>Legal transitions: document-completion-check:admitted<br>Context packages: planning-checklist, context-slice,<br>[graph slice narrowed]<br></content><br></observation> |
-| 86 | 38 | action | <act><br><tool>graph.note</tool><br><kind>planning-step</kind><br><summary>Define core setting pillars for SF novel: time period, geography, magic system, political factions</summary><br><path>stories/sf-novel-with-detailed-settings/plan-v1.md</path><br></act> |
-| 87 | 38 | observation | <observation><br><status>error</status><br><content><br>invalid parameter: unknown graph.note kind; allowed: constraint, assumption, risk, decision, question, invariant, success, path; valid_example:<br><act><br><tool>graph.note</tool><br><kind>decision</kind><br><summary>Chose smaller recovery action</summary><br></act><br></content><br></observation> |
-| 88 | 38 | notice | recovery: tool error recorded (invalid parameter: unknown graph.note kind; allowed: constraint, assumption, risk, decision, question, invariant, success, path; valid_example:); inspect the observation, adjust the path/command/params, and continue with a narrower action |
-| 89 | 39 | action | <act><br><tool>graph.note</tool><br><kind>decision</kind><br><summary>Chose smaller recovery action to record planning step</summary><br><path>stories/sf-novel-with-detailed-settings/plan-v1.md</path><br></act> |
-| 90 | 39 | observation | <observation><br><status>ok</status><br><content><br>graph note recorded<br>kind=decision<br></content><br></observation> |
-| 91 | 40 | action | <act><br><tool>graph.next</tool><br></act> |
-| 92 | 40 | observation | <observation><br><status>ok</status><br><content><br>node=document-repair<br>phase=recovery<br>legal_transitions=document-completion-check<br>missing=document-structure, artifact-readiness<br>allowed_tools=graph.state, graph.next, graph.audit, graph.evidence, graph.note, graph.transition, fs.list, fs.tree, fs.stat, artifact.plan, artifact.apply, artifact.audit, artifact.next, fs.write, doc.scaffold, doc.audit<br>blocked_tools=agent.ask, agent.done, fs.edit, fs.patch, fs.read, fs.read_many, fs.search, graph.context, graph.plan, graph.recover, memory.find, memory.save, queue.list, shell.run, verify.cargo, verify.xtask<br>preferred_next_action=execute or verify the active step<br></content><br></observation> |
-| 93 | 41 | action | <act><br><tool>graph.state</tool><br></act> |
-| 94 | 41 | observation | <observation><br><status>ok</status><br><content><br>Graph state:<br>case: 1<br>family: documentation/content-artifact<br>phase: recovery<br>node: document-repair<br>confidence: 70<br>Current state: active<br>Active states: 1. Recovering 0.62 parse-recovery phase=recovery gap=recovery evidence; 2. Structuring 0.61 document-structure phase=planning gap=document audit; 3. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests<br>Objective: Resolve the owner task through planning, evidence capture, execution, and verification: Create a SF novel. with detailed settings.<br>Do not do: none<br>Constraints: novel length 80k words, three acts, world-building depth 4 levels, character arcs complete, no plot holes<br>Assumptions: author has writing capability and can iterate on drafts<br>Risks: first owner message is not a sufficient plan -> record graph.plan before mutating tools; world-building may require multiple passes to achieve consistency -> verify during execution<br>Success criteria: none<br>Active plan step: 1. Define core setting pillars (time period, geography, magic system, political factions) 2. Create character profiles with motivations and flaws 3. Outline three-act structure with turning points 4. Write act I: exposition and inciting incident 5. Write act II: rising action and mid-point twist 6. Write act III: climax and resolution<br>Required evidence: plan, observation, document-structure, artifact-readiness<br>Missing evidence: document-structure, artifact-readiness<br>Allowed tools now: graph.state, graph.next, graph.audit, graph.evidence, graph.note, graph.transition, fs.list, fs.tree, fs.stat, artifact.plan, artifact.apply, artifact.audit, artifact.next, fs.write, doc.scaffold, doc.audit, fs.batch_write, fs.mkdir<br>Blocked tools now: agent.ask, agent.done, fs.edit, fs.patch, fs.read, fs.read_many, fs.search, graph.context, graph.plan, graph.recover, memory.find, memory.save<br>Preferred next action: execute the active plan step, record evidence, then verify<br>Legal transitions: document-completion-check:admitted<br>Context packages: planning-checklist, context-slice,<br>[graph slice narrowed]<br></content><br></observation> |
-| 95 | 42 | action | <act><br><tool>fs.list</tool><br><path>stories/sf-novel-with-detailed-settings</path><br></act> |
-| 96 | 42 | observation | <observation><br><status>ok</status><br><content><br>dir stories/sf-novel-with-detailed-settings bytes=3 lines=0<br>dir stories/sf-novel-with-detailed-settings/02-characters.md bytes=8 lines=0<br>dir stories/sf-novel-with-detailed-settings/02-characters.md/project bytes=5 lines=0<br>dir stories/sf-novel-with-detailed-settings/02-characters.md/relations bytes=5 lines=0<br>dir stories/sf-novel-with-detailed-settings/02-characters.md/request bytes=5 lines=0<br>dir stories/sf-novel-with-detailed-settings/02-characters.md/topics bytes=9 lines=0<br>file stories/sf-novel-with-detailed-settings/02-characters.md/README.md bytes=712 lines=30<br>file stories/sf-novel-with-detailed-settings/02-characters.md/catalog.toml bytes=148 lines=4<br></content><br></observation> |
-| 97 | 43 | action | <act><br><tool>fs.write</tool><br><path>stories/sf-novel-with-detailed-settings/01-settings.md</path><br><content><br># Core Setting Pillars: The Chronos Fracture<br><br>## Time Period<br>**Era:** Late 23rd Century, Post-Collapse of the Helios Coalition<br>**Key Feature:** Temporal instability has fractured reality into overlapping timelines. The "Chronos Fracture" is a pervasive phenomenon where past, present, and future bleed together unpredictably.<br><br>## Geography<br>**Primary Setting:** Aterra Prime<br>- **Surface:** A scorched, irradiated planet with floating islands suspended in the upper atmosphere by anomalous magnetic fields.<br>- **Underground:** The "Deep Strata" - a network of abandoned mining tunnels that serve as both transportation and temporal anchor points.<br>- **The Fracture Zones:** Regions where space-time is visibly distorted, creating zones of impossible geometry and time loops.<br><br>## Magic System: Chrono-weaving<br>**Core Principle:** Time itself can be manipulated through ritualistic manipulation of physical objects imbued with temporal resonance.<br>**Key Mechanics:**<br>1. **Anchor Points:** Objects that have existed across multiple timelines create stable temporal coordinates.<br>2. **Weave Threads:** Temporal energy flows between anchor points, allowing limited manipulation of past/future states.<br>3. **Cost:** Each weave drains the user's personal timeline - excessive use risks becoming trapped in a loop or losing one's own existence to the Fracture.<br><br>## Political Factions<br>1. **The Chronos Guard** - Enforcers who patrol the Fracture Zones, attempting to stabilize reality through controlled temporal manipulation.<br>2. **The Anachronists** - A cult that seeks to merge all timelines into a single eternal present, believing this will end suffering.<br>3. **The Strata Syndicate** - Underworld merchants who exploit temporal anomalies for profit, trading in stolen futures and past artifacts.<br>4. **Helios Remnants** - Survivors of the original coalition seeking to restore pre-Fracture governance through political maneuvering.<br><br>---<br><br>*This document records the core setting pillars as required evidence for the active plan step.*<br></content><br></act> |
-| 98 | 43 | observation | <observation><br><status>error</status><br><content>invalid parameter: payload too large for fs.write: bytes=2019 max=1800; use fs.batch_write</content><br></observation> |
-| 99 | 43 | notice | recovery: tool error recorded (invalid parameter: payload too large for fs.write: bytes=2019 max=1800; use fs.batch_write); inspect the observation, adjust the path/command/params, and continue with a narrower action |
+| 16 | 7 | error | parse fault: missing act block |
+| 17 | 7 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
+| 18 | 8 | error | parse fault: missing act block |
+| 19 | 8 | notice | recovery: parse faults are consecutive count=3; simplify to one valid act block; prefer typed file/doc tools for large payloads; ask only if blocked |
+| 20 | 8 | notice | Consecutive parse faults reached count=3; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. |
+| 21 | 9 | error | parse fault: missing act block |
+| 22 | 9 | notice | recovery: parse faults are consecutive count=4; simplify to one valid act block; prefer typed file/doc tools for large payloads; ask only if blocked |
+| 23 | 9 | notice | Consecutive parse faults reached count=4; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. |
+| 24 | 10 | error | parse fault: missing act block |
+| 25 | 10 | notice | recovery: parse faults are consecutive count=5; simplify to one valid act block; prefer typed file/doc tools for large payloads; ask only if blocked |
+| 26 | 10 | notice | Consecutive parse faults reached count=5; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. |
+| 27 | 11 | action | <act><br><tool>graph.recover</tool><br></act> |
+| 28 | 11 | notice | <notice><br><kind>error</kind><br><content><br>repeat action refused; see frame 2<br>active_mode=Recovery<br>next_action_must_change_shape=true<br>forbidden_tool=graph.recover<br>preferred_next_action=graph.state<br>valid_example:<br><act><br><tool>graph.state</tool><br></act><br></content><br></notice> |
+| 29 | 11 | notice | recovery: repeated action was refused; change the next action instead of resending it |
+| 30 | 12 | error | parse fault: missing act block |
+| 31 | 12 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
+| 32 | 13 | error | parse fault: missing act block |
+| 33 | 13 | notice | recovery: the previous completion was not executed; emit exactly one valid act block next |
 
 ## Verification
 
 | command | result | notes |
 | --- | --- | --- |
 | document audit | pending | graph case check |
-| artifact readiness audit | pending | graph case check |
 

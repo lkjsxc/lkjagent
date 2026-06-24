@@ -1,1 +1,0 @@
-{"content":"<act>\n<tool>memory.find</tool>\n<query>owner task plan evidence</query>\n</act>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":1862,"completion_tokens":91,"cached_prompt_tokens":null,"total_tokens":1953}}
