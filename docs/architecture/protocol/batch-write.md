@@ -137,5 +137,5 @@ oversized payloads, and artifact-ledger recording.
 
 partially implemented for parser normalization, JSON envelope arrays,
 JSON-in-files recovery, dispatcher limits, duplicate-path refusal, placeholder
-refusal, and artifact write-path recording. Path-shaped unknown parameter
-normalization and route-level recovery for every batch schema fault remain open.
+refusal, artifact write-path recording, and safe path-shaped unknown parameter
+normalization. Route-level recovery for every batch schema fault remains open.
