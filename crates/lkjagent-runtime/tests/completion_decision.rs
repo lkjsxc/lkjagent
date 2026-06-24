@@ -20,6 +20,22 @@ fn owner_completion_lists_failed_gates_and_next_repair_action() {
 }
 
 #[test]
+fn artifact_readiness_refusal_names_artifact_and_audit_action() {
+    let snapshot = owner_snapshot(&["artifact-readiness"]);
+
+    let decision = decide_completion(&snapshot);
+
+    assert!(!decision.allowed);
+    assert_eq!(
+        decision.current_artifact,
+        Some("cookbook/current".to_string())
+    );
+    assert_eq!(decision.next_executable_action, "artifact.audit");
+    assert!(decision.status_text.contains("artifact=cookbook/current"));
+    assert!(decision.status_text.contains("next=artifact.audit"));
+}
+
+#[test]
 fn owner_completion_allows_done_only_when_gates_are_clear() {
     let snapshot = owner_snapshot(&[]);
 
