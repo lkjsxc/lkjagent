@@ -1,0 +1,4 @@
+<observation>
+<status>error</status>
+<content>invalid parameter: payload too large for fs.batch_write file: stories/chronos-fracture/README.md bytes=5767 max=1800</content>
+</observation>
