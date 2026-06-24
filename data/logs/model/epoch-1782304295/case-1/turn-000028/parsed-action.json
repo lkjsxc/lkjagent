@@ -1,0 +1,1 @@
+{"status":"fault","closure_mode":"StopSequenceClosed","content_bytes":71,"error":"BadParams { tool: \"fs.list\", missing: [], unknown: [\"<path=stories/chronos-fracture</path>\"] }"}

@@ -1,0 +1,16 @@
+<notice>
+<kind>error</kind>
+<content>
+authority refused artifact.apply
+decision_id=40
+mission=owner_execution
+node=plan
+reason=tool is not admitted by authority decision
+admitted_tools=graph.state, graph.next, graph.audit, graph.plan, graph.note, graph.context, graph.transition, fs.list, fs.tree, fs.search, fs.stat, fs.read, fs.read_many, workspace.summary, workspace.index, memory.find
+missing_evidence=plan, observation, document-structure, artifact-readiness
+valid_example:
+<act>
+<tool>graph.state</tool>
+</act>
+</content>
+</notice>

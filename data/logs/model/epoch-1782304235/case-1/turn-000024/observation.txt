@@ -1,0 +1,10 @@
+<observation>
+<status>ok</status>
+<content>
+node=plan
+phase=planning
+recovery_ladder=inspect-state,smaller-scope,alternate-native-tool,replan,admitted-shell-escape,block-step-and-continue
+repeat_count=0
+next=use graph.plan, fs.list, fs.tree, fs.search, graph.state
+</content>
+</observation>
