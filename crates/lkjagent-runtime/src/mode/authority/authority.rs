@@ -79,6 +79,7 @@ pub fn runtime_snapshot_for_turn(input: &TurnAuthorityInput) -> RuntimeSnapshot 
         missing_evidence: input.missing_evidence.clone(),
         active_artifact: input.artifact_root.clone(),
         last_tool_attempt: None,
+        latest_fault: None,
         repeated_action: false,
         external_owner_input_required: false,
     };

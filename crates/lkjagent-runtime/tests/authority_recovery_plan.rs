@@ -169,6 +169,7 @@ fn recovery_snapshot() -> RuntimeSnapshot {
         missing_evidence: vec!["artifact-readiness".to_string()],
         active_artifact: Some("dictionary/bread-terms.txt".to_string()),
         last_tool_attempt: Some("fs.write".to_string()),
+        latest_fault: None,
         repeated_action: false,
         external_owner_input_required: false,
     }

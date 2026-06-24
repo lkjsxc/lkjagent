@@ -143,6 +143,7 @@ fn maintenance_tick_yields_when_owner_work_exists() {
         missing_evidence: Vec::new(),
         active_artifact: None,
         last_tool_attempt: None,
+        latest_fault: None,
         repeated_action: false,
         external_owner_input_required: false,
     };
@@ -167,6 +168,7 @@ fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
         missing_evidence: missing.iter().map(|value| (*value).to_string()).collect(),
         active_artifact: Some("dictionary/bread-terms.txt".to_string()),
         last_tool_attempt: None,
+        latest_fault: None,
         repeated_action: false,
         external_owner_input_required: false,
     }
@@ -186,6 +188,7 @@ fn recovery_snapshot() -> RuntimeSnapshot {
         missing_evidence: vec!["artifact-readiness".to_string()],
         active_artifact: Some("dictionary/bread-terms.txt".to_string()),
         last_tool_attempt: Some("fs.write".to_string()),
+        latest_fault: None,
         repeated_action: false,
         external_owner_input_required: false,
     }

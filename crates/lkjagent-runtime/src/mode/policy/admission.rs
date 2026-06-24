@@ -1,5 +1,5 @@
 use super::completion_gate::decide_completion;
-use super::model::{ActiveMode, RuntimeSnapshot, ToolAdmission};
+use super::model::{ActiveMode, RuntimeFault, RuntimeSnapshot, ToolAdmission};
 use super::policy::policy_for_mode;
 use lkjagent_tools::dispatch::registry_valid_example;
 
@@ -72,6 +72,10 @@ pub fn next_valid_tools(snapshot: &RuntimeSnapshot) -> Vec<String> {
                 ],
             );
         }
+    }
+    if snapshot.latest_fault == Some(RuntimeFault::PayloadTooLarge) {
+        tools.retain(|tool| tool != "fs.write");
+        extend_unique(&mut tools, &["artifact.next", "fs.batch_write"]);
     }
     if snapshot.external_owner_input_required {
         extend_unique(&mut tools, &["agent.ask"]);
