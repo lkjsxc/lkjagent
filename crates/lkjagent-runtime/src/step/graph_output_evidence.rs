@@ -34,7 +34,7 @@ pub(super) fn add_document_evidence(
     } else {
         false
     };
-    let ready = if output.content.contains("readiness=content-bearing") {
+    let ready = if artifact_readiness_passed(&output.content) {
         ensure_evidence(
             graph,
             "artifact-readiness",
@@ -47,6 +47,11 @@ pub(super) fn add_document_evidence(
         false
     };
     observed || structured || ready
+}
+
+fn artifact_readiness_passed(content: &str) -> bool {
+    content.contains("readiness=content-bearing")
+        || content.contains("readiness=story-semantic-content")
 }
 
 pub(super) fn add_document_scaffold_observation(

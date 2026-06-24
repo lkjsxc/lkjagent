@@ -21,7 +21,7 @@ that ran.
 | 9 | Compaction resume proof and status rendering | [current-work/durable-compaction-history.md](current-work/durable-compaction-history.md) | partially implemented |
 | 10 | Idle-only maintenance and owner preemption proof | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | partially implemented |
 | 11 | Provider exchange export and raw-case inspection | [current-work/model-log.md](current-work/model-log.md) | implemented |
-| 12 | Replay benchmarks from current model run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | partially implemented |
+| 12 | Replay benchmarks from current model run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | implemented |
 | 13 | Final live Docker story run and compose verification | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
 
 ## Current Evidence
@@ -142,6 +142,6 @@ Fracture run proves both progress and failure:
   semantic readiness remain incomplete.
 - Owner preemption has turn-boundary proof; every dispatch and close path still
   needs unified kernel authority proof.
-- Parser-level and runtime-level replay fixtures now assert more provider and
-  recovery productive artifacts, but live Chronos-style replay still must prove
-  a successful story artifact close.
+- Parser-level and runtime-level replay fixtures assert provider and recovery
+  productive artifacts, and a Chronos-style daemon replay proves successful
+  story artifact close. Live compose smoke remains open.
