@@ -101,12 +101,30 @@ fn state_value(conn: &rusqlite::Connection, key: &str, default: &str) -> Result<
 }
 
 fn last_compaction(conn: &rusqlite::Connection) -> Result<String, CliError> {
+    if let Some(summary) = latest_compaction_snapshot(conn)? {
+        return Ok(summary);
+    }
     let events = lkjagent_store::events::read_events(conn)?;
     Ok(events
         .iter()
         .rev()
         .find(|event| event.kind == "compaction")
         .map_or_else(|| "none".to_string(), |event| event.created_at.clone()))
+}
+
+fn latest_compaction_snapshot(conn: &rusqlite::Connection) -> Result<Option<String>, CliError> {
+    let Some(case) = lkjagent_store::graph::active_case(conn)? else {
+        return Ok(None);
+    };
+    let Some(row) = lkjagent_store::graph::snapshots::latest_compaction_snapshot(conn, case.id)?
+    else {
+        return Ok(None);
+    };
+    let fields = row.preserved_fields.replace('\n', ";");
+    Ok(Some(format!(
+        "snapshot:{} phase={} node={} fields={fields}",
+        row.created_at, row.phase, row.active_node
+    )))
 }
 
 fn pressure_name(pressure: ContextPressure) -> &'static str {
