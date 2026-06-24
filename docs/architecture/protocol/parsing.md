@@ -2,66 +2,127 @@
 
 ## Purpose
 
-The strict rules turning a completion into one action. The parser is a pure
-function in lkjagent-protocol:
+The strict rules turning completion text into one action or one structured
+parse fault. The parser is pure in lkjagent-protocol:
 
+```text
+parse_live_completion : CompletionText + ParseSettings -> ParseOutcome
 ```
-parse : CompletionText -> Result<Action, ParseFault>
-```
 
-ParseFault variants map one-to-one onto the taxonomy in [recovery.md](recovery.md).
-Provider stop-closure normalization is a wire step documented in
-[stop-token-policy.md](stop-token-policy.md).
+`ParseOutcome` carries the parsed action when present, one fault when present,
+the envelope mode, and a normalized text hash. Parse faults map directly to the
+routes in [recovery.md](recovery.md). Provider stop-closure normalization is a
+wire step documented in [stop-token-policy.md](stop-token-policy.md).
 
-## Rules
+## Envelope Rules
 
-1. Scan line by line. Tags are recognized only when a line, after trailing
-   whitespace removal, is exactly an opening or closing tag. Indented or
-   inline tag-like text is content, not structure.
-2. Everything before `<act>` is preamble. A `<think>` pair is allowed there;
-   unmatched or repeated think tags are preamble text, not errors.
-3. `<act>` must appear exactly once. Absent: ParseFault::MissingAct. A
-   duplicate is ParseFault::MultipleAct.
-4. If the first nonempty act line starts with `tool:`, the parser uses the
-   line grammar. Otherwise it uses the paired-tag grammar.
-5. In line grammar, `tool:` must name a known registry entry. Scalar fields use
-   `name: value`; `content:`, `files:`, and `patch:` collect raw lines until
-   `</act>`. The `case:` field is envelope metadata and is ignored before
-   tool-parameter validation.
-6. `files:` accepts canonical `-- file --`, `path:`, `content:`, and
-   `-- end-file --` blocks and normalizes them into the internal batch-write
-   line protocol.
-7. In paired-tag grammar, each opening tag inside act collects raw lines until
-   the first line exactly matching its closing tag. Single-line form
-   `<path>value</path>` is recognized when open and close sit on one line.
-8. Parameter names must be unique within an act. Duplicate:
-   ParseFault::DuplicateParam.
-9. Parameter sets are validated against the tool's contract from
-   [../tools/registry.md](../tools/registry.md): missing required or unknown
-   names give ParseFault::BadParams listing every offender at once, so one
-   retry can fix all of them.
-10. Values are bytes. No unescaping, no entity decoding, and no execution from
-    partially parsed actions.
-11. Only assistant content is parsed. Provider reasoning fields are log evidence
+1. `<action>` must appear exactly once for the natural live path.
+2. `</action>` must appear exactly once unless provider-stop closure restored
+   it before parsing.
+3. `<actions>` is invalid.
+4. `<act>` is invalid for live dispatch.
+5. Plain prose without a complete action body is `MissingActionEnvelope`.
+6. A duplicate action envelope is `MultipleActionEnvelopes`.
+7. A natural open envelope without a close is `UnclosedActionEnvelope` unless
+   the provider-stop closure rule applies.
+
+## Body Rules
+
+1. The first recognized field is the tool.
+2. Canonical model output uses `<tool>known.tool</tool>`.
+3. The bounded line body `tool: known.tool` exists only for strict implicit
+   envelope normalization and parser fixtures.
+4. The tool must name one registry entry.
+5. Each parameter name must be unique.
+6. Parameter sets are validated against [../tools/registry.md](../tools/registry.md).
+7. Missing required and unknown names produce `BadParams` listing every offender
+   against the parameters parsed so far.
+8. Conditional requirements such as `checks|paths` produce the same registry
+   example renderer as ordinary missing required parameters.
+9. Values are bytes. The parser does no unescaping, entity decoding, or
+   execution from partially parsed actions.
+10. Only assistant content is parsed. Provider reasoning fields are evidence
     and never become action text.
+
+## Tag Line Classification
+
+The parser classifies every structural-looking line before parameter
+validation:
+
+- exact opening action envelope.
+- exact closing action envelope.
+- exact paired opening tag.
+- exact paired inline tag.
+- exact closing tag.
+- attribute-like tag.
+- malformed angle-bracket text.
+- ordinary payload line.
+
+A line such as `<path=stories/chronos-fracture</path>` is an
+`AttributeLikeTag` fault. It is not an unknown parameter. The fault records the
+invalid tag name, a value hint when one is recoverable, and the parameters that
+were recognized before the malformed line. It must not report already parsed
+required fields as missing.
+
+## Implicit Envelope Normalization
+
+A missing opening envelope can normalize only when all conditions hold:
+
+- the response has no natural `<action>` envelope;
+- the response contains exactly one complete action body starting with
+  `<tool>known.tool</tool>` or `tool: known.tool`;
+- no prose exists outside recognized fields;
+- registry validation passes;
+- runtime admission for the persisted decision passes before dispatch;
+- parse and provider exchange logs record `ImplicitActionEnvelope`.
+
+These bodies can normalize:
+
+```text
+<tool>graph.state</tool>
+```
+
+```text
+tool: graph.state
+```
+
+These bodies remain faults:
+
+```text
+I will inspect the graph state next.
+```
+
+```text
+<tool>graph.state</tool>
+<tool>fs.list</tool>
+```
+
+```text
+<tool>graph.plan</tool>
+<path=stories/chronos-fracture</path>
+```
+
+## JSON
+
+Top-level JSON action output is `JsonActionRejected` in the live parser. JSON
+inside a parameter remains tool-specific payload text and is validated by that
+tool contract.
 
 ## Non-Goals
 
 - Not an XML parser: no attributes, namespaces, comments, CDATA, or entities.
-  The paired-tag grammar is a fixed two-level tag language.
-- No semantic repair heuristics: the parser normalizes only the documented
-  batch file delimiter form. Recovery is the loop's job, with the model in the
-  loop, per [recovery.md](recovery.md).
+- No semantic repair heuristics in the parser. Recovery chooses the next route
+  from structured faults and persisted runtime authority.
 
 ## Testing
 
-The parser ships with a table of recorded completions: clean turns, every
-fault variant, line-grammar scalar actions, batch file blocks, pathological
-content (tag-like lines inside values, giant single lines, abrupt cutoffs).
-Tests assert exact Action values and exact
-fault variants. The table grows whenever live operation produces a new
-shape; transcripts make every failure reproducible.
+The parser table covers clean turns, every fault variant, provider-stop closure,
+implicit envelope normalization, attribute-like tags, duplicate parameters,
+conditional requirements, giant lines, and abrupt cutoffs. Tests assert exact
+parse outcomes and grow when live operation produces a new shape.
 
 ## Status
 
-implemented.
+partially implemented. Existing parser behavior still accepts non-action
+envelope constants and top-level JSON in live parsing; the implementation task
+is to align parser outcomes with this contract.

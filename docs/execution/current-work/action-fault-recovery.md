@@ -16,6 +16,8 @@ produce deterministic normalization or actionable refusal.
   mission, not generic parse recovery.
 - Keep recovery examples concrete and path-scoped when the current artifact
   root or weak path is known.
+- Classify attribute-like tags such as `<path=stories/chronos-fracture</path>`
+  before registry validation and render the contextual repair tag.
 
 ## Batch-Write Recovery Contract
 
@@ -29,8 +31,8 @@ classify these parameter shapes:
 - missing `content:`;
 - oversized file;
 - oversized batch;
-- JSON envelope;
-- JSON-in-files;
+- top-level JSON action rejection;
+- JSON-in-files recovery;
 - unsupported child tags.
 
 Safe normalization may convert path-shaped unknown parameters into the
@@ -44,18 +46,20 @@ If normalization is unsafe, the refusal must render the canonical line protocol
 with the actual current path or an artifact weak path when available:
 
 ```text
-<act>
+<action>
 <tool>fs.batch_write</tool>
 <files>
 path: stories/chronos-fracture/catalog.toml
 content:
-[write concrete manifest content here]
+[artifact]
+root = "stories/chronos-fracture"
+kind = "story"
 </files>
-</act>
+</action>
 ```
 
-A refusal that says only `files=VALUE` is not acceptable for a live artifact
-recovery route.
+A refusal that uses a generic placeholder instead of the current artifact path
+is not acceptable for a live artifact recovery route.
 
 ## Repeated Fault Routing
 

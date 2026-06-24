@@ -12,7 +12,7 @@ owner --(lkjagent send)--> store.queue
 store.queue --(turn boundary)--> graph case intake
 graph case intake --> agent loop
 agent loop --(graph-sliced messages)--> endpoint (chat completions, configurable window)
-endpoint --(tag-based action, stops at </act>)--> parser
+endpoint --(tag-based action, stops at </action>)--> parser
 parser --> toolset (fs, shell, queue ops, memory ops, graph ops, control)
 toolset --(bounded observation)--> graph evidence --> agent loop --> store.events
 empty queue --> bounded graph maintenance --> agent loop

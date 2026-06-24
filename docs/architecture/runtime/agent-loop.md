@@ -14,7 +14,7 @@ A turn is the atomic unit of agent activity:
    ([queue-intake.md](queue-intake.md)), check the compaction trigger
    ([../context/compaction.md](../context/compaction.md)).
 2. Render graph state and call the endpoint with the current message list and the stop sequence
-   `</act>`; sampling per [../llm/sampling.md](../llm/sampling.md).
+   `</action>`; sampling per [../llm/sampling.md](../llm/sampling.md).
 3. Parse the completion into one action per
    [../protocol/parsing.md](../protocol/parsing.md). On failure, follow
    [../protocol/recovery.md](../protocol/recovery.md).
@@ -68,7 +68,7 @@ wording is a scale hint and accepts the documented tolerance. Active count
 guards are rendered in the graph-state prefix with an instruction to use
 recursive directories for large outputs, prefer `doc.scaffold`, `doc.audit`,
 `fs.read_many`, `fs.tree`, `workspace.index`, `fs.batch_write`, and `fs.patch`,
-keep the act payload bounded, and avoid shell unless graph policy admits a
+keep the action payload bounded, and avoid shell unless graph policy admits a
 shell escape after native tools are insufficient.
 For counted documentation tasks without recursive or benchmark scaffolds, the
 daemon writes a generic `structured-output/` tree before the first endpoint

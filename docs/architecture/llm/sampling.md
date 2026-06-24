@@ -12,21 +12,20 @@ rationale for each, and the rule that they stay constant within a session.
 | temperature | 0.3 |
 | top_p | 0.9 |
 | max_tokens | 2048 |
-| stop | `</act>` |
+| stop | `</action>` |
 
 ## Rationale
 
 - temperature 0.3: action selection is a precision task, not a creativity
   task. The model picks one tool and one set of params per turn, and drift
-  here costs a turn. The think preamble gives the model room to explore in
-  text before committing, so low temperature does not starve deliberation.
+  here costs a turn.
 - top_p 0.9: trims the improbable tail without narrowing ordinary word
   choice; it backstops the low temperature rather than competing with it.
 - max_tokens: `context.reserve`, default 2048, from
-  [layout.md](../context/layout.md). One think preamble plus one act block
-  fits; a completion that hits this limit is the oversize case in
+  [layout.md](../context/layout.md). One action envelope fits; a completion
+  that hits this limit is the oversize case in
   [../protocol/recovery.md](../protocol/recovery.md).
-- stop `</act>`: generation ends after one action envelope instead of
+- stop `</action>`: generation ends after one action envelope instead of
   drifting into prose or another action. The client restores the stripped
   close tag before parsing.
 

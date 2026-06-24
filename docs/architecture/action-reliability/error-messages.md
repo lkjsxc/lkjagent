@@ -8,7 +8,7 @@ This file defines model-visible parameter refusal text.
 
 - Refusals start with `action params refused`.
 - Refusals include tool, expected shape, received params, hint, and valid example.
-- Examples are copyable action XML with only valid fields.
+- Examples are copyable tag actions with only valid fields.
 - `graph.note` examples use an accepted note kind such as decision.
 - Invalid `graph.note` kind refusals list every allowed value and show a
   copyable valid note action.

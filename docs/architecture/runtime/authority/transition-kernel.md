@@ -53,7 +53,7 @@ immutable admission view derived from the same decision id. Deterministic
 runtime effects such as compaction, closed-idle wait, maintenance defer,
 blocked-handoff recording, status refresh, or zero-content inspection tools are
 also emitted from the persisted decision and do not require a model-authored
-`<act>`.
+`<action>`.
 
 ## Admission Data
 

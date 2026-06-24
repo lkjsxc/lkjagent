@@ -17,7 +17,7 @@ historical evolution.
 
 - [rust-workspace.md](rust-workspace.md): Rust cargo workspace of small focused crates.
 - [openai-endpoint.md](openai-endpoint.md): one OpenAI-compatible HTTP endpoint, no embedded inference.
-- [xml-action-protocol.md](xml-action-protocol.md): tag-based action output, never JSON.
+- [tag-action-protocol.md](tag-action-protocol.md): singular tag-based action output.
 - [append-only-context.md](append-only-context.md): append-only context with graph-aware compaction.
 - [single-loop.md](single-loop.md): one continuous agent loop, no sessions.
 - [sqlite-store.md](sqlite-store.md): one SQLite file for queue, transcripts, memory, state.

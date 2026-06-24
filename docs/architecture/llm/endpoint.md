@@ -32,14 +32,14 @@ The harness sends exactly these fields and no others:
 | max_tokens | context.reserve, default 2048 | the generation reserve in [layout.md](../context/layout.md) |
 | temperature | 0.3 | precision over creativity, per [sampling.md](sampling.md) |
 | top_p | 0.9 | per [sampling.md](sampling.md) |
-| stop | `</act>` | stops generation after one action envelope |
+| stop | `</action>` | stops generation after one action envelope |
 | stream | false | whole completions only, see below |
 
 No tools field, no response-format field, no logit bias: the action protocol
 lives in the message text, and the parser owns it. OpenAI-compatible stop
-sequences remove the matched close tag, so the client restores `</act>` when
-finish_reason is stop, the content contains an open act tag, and the close
-tag is absent.
+sequences remove the matched close tag, so the client restores `</action>` when
+finish_reason is stop, the content contains `<action>`, and the close tag is
+absent.
 
 ## Non-Streaming, Deliberately
 
@@ -58,14 +58,14 @@ The harness reads exactly these fields:
 | Field | Feeds |
 | --- | --- |
 | choices[0].message.content | the model turn handed to the parser |
-| choices[0].finish_reason | stop is expected; length is accepted only when one complete act is already present |
+| choices[0].finish_reason | stop is expected; length is accepted only when one complete action is already present |
 | usage.prompt_tokens | the token ledger in [layout.md](../context/layout.md) |
 | usage.completion_tokens | the same ledger |
 | cache metrics, where provided | the transcript, for observability |
 
-A finish_reason of length without a complete act is the completion-oversize
+A finish_reason of length without a complete action is the completion-oversize
 case in [../protocol/recovery.md](../protocol/recovery.md): it is not retried
-as an endpoint outage. If the response already contains one closed act block,
+as an endpoint outage. If the response already contains one closed action block,
 the daemon accepts it and lets the action parser own validation. Cache metrics
 means server-side data such as llama.cpp timings and prompt cache hit counts;
 the daemon records them into the transcript so cache health is visible as

@@ -32,9 +32,38 @@ shell-admitted escape.
 
 ## graph.plan
 
-Records objective, optional constraints, assumptions, risks, steps, checks,
-paths, and reason. It satisfies plan evidence only with a non-empty objective,
-at least one step, and checks or paths.
+Records objective, steps, reason, optional constraints, assumptions, risks,
+checks, and paths. It satisfies plan evidence only with a non-empty objective,
+at least one step, and at least one of checks or paths.
+
+The Chronos story-bible task renders this dispatch-valid example when the root
+is known:
+
+```text
+<action>
+<tool>graph.plan</tool>
+<objective>Create a structured science-fiction story bible for Chronos Fracture.</objective>
+<constraints>
+Root directory: stories/chronos-fracture.
+Root must contain README.md and catalog.toml.
+Every directory must contain README.md and at least two children.
+Every Markdown file must stay under 160 lines.
+Do not write the full manuscript.
+Do not write scaffold-only pages.
+</constraints>
+<steps>
+1. Record the story-bible plan.
+2. Create the root catalog and README.
+3. Write bounded batches for setting, characters, plot, continuity, and checks.
+4. Audit document structure.
+5. Audit artifact readiness.
+</steps>
+<paths>
+stories/chronos-fracture
+</paths>
+<reason>The owner requested a structured story bible with evidence-gated completion.</reason>
+</action>
+```
 
 ## graph.transition
 

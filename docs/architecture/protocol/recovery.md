@@ -3,83 +3,122 @@
 ## Purpose
 
 The complete taxonomy of turn failures and the bounded response to each.
-Recovery is designed so that one failure costs one small notice, the model
-sees what failed, and the next turn can choose a narrower action. Repeated
-recoverable faults add stronger recovery notices instead of stopping the
-task; the task turn budget remains the hard bound.
+Recovery turns structured faults into a new persisted runtime decision; prompt
+wording, graph guidance, and tool observations cannot grant authority.
 
 ## Taxonomy
 
-| Fault | Detected by | Harness response |
+| Fault class | Detected by | Harness response |
 | --- | --- | --- |
-| missing or malformed act | parser ([parsing.md](parsing.md)) | error notice plus one recovery instruction |
-| unknown tool | parser | error notice listing valid tool names plus recovery instruction |
-| bad or duplicate params | parser | error notice listing every offender plus recovery instruction |
-| repeat action | dispatcher: byte-identical act to previous turn | notice pointing at the prior observation plus recovery instruction |
-| tool error | tool adapter | observation with status error plus a recovery instruction |
-| endpoint error | llm client | one error event per failed attempt, then capped exponential backoff before the next endpoint call |
-| completion oversize | llm client finish_reason length without a closed act | error notice with preview plus instruction to emit one short valid action |
-| endpoint overflow | llm client | treated as a harness bug: error event, compaction forced, incident memory row |
-| oversize payload | context engine | truncation per [../context/budgets.md](../context/budgets.md) with retrieval path |
-| task budget exhausted | loop | budget fault, recovery route, or concrete owner question |
+| missing action envelope | parser | route from `MissingActionEnvelope` |
+| unclosed action envelope | parser or wire | provider-stop repair or route from `UnclosedActionEnvelope` |
+| implicit action envelope | parser and admission | record normalization and require normal admission |
+| malformed tag | parser | exact tag grammar notice |
+| attribute-like tag | parser | contextual repair tag and value |
+| missing required parameter | registry | exact concrete valid example |
+| conditional requirement missing | registry | `missing_any=checks|paths` style notice |
+| unknown parameter | registry | list unknown names and valid names |
+| duplicate parameter | parser | name the duplicate field |
+| unsafe path-shaped parameter | dispatcher validator | refuse before mutation and show scoped batch form |
+| batch-write payload fault | batch validator | refuse whole batch and show scoped `files` payload |
+| payload too large | context or tool validator | route to artifact planning and bounded batches |
+| blocked or not-admitted tool | admission | refuse and render current next executable action |
+| stale decision | admission | compare full fingerprint and rerender current decision |
+| repeat action | dispatcher guard | choose different tool family or deterministic inspection |
+| tool runtime failure | tool adapter | observation event, then recovery decision |
+| endpoint retry or overflow | llm client | bounded retry, compaction, or incident route |
+| context pressure | context engine | runtime-owned compaction or retrieval route |
+| verification failure | verifier | repair or blocked handoff route |
+| completion blocked | completion reducer | audit or evidence repair action |
+| maintenance conflict | runtime kernel | defer, preempt, or refuse stale maintenance action |
+
+## Attribute-Like Tag Repair
+
+A line like this is never a valid parameter:
+
+```text
+<path=stories/chronos-fracture</path>
+```
+
+The parser emits `AttributeLikeTag` with the invalid tag name and value hint.
+The recovery route does not render the malformed line as the next valid action.
+For `graph.plan`, the repair is:
+
+```text
+repair_tag=paths
+repair_value=stories/chronos-fracture
+```
+
+For artifact and document root tools, the repair tag is `root`.
+
+## Route Table Shape
+
+Each route record contains:
+
+```text
+fault_class
+fault_key
+first_route
+second_same_fault_route
+third_same_fault_route
+admitted_tools
+blocked_tools
+exact_valid_example
+runtime_effect_when_no_model_content_needed
+blocked_handoff_condition
+```
+
+The first route may render a concrete repaired action. The second same fault
+cannot render the same action text as the only path. The third same fault uses a
+deterministic inspection effect or records blocked handoff when no internal path
+remains.
 
 ## Repeated Faults
 
-Consecutive faults on one task are counted (resets on any successful
-valid parsed action for parse faults and on non-repeat output for repeat
-faults):
+Consecutive faults on one task are counted by case, node, tool, parameter shape,
+fault class, and action fingerprint. Counts reset on a successful action that
+changes state or on a non-repeat action for repeat faults.
 
-- 3 consecutive parse-class faults: the harness records a parse fault and
-  routes the case to recover-parse. The next graph card asks for one simple
-  valid act block, smaller payloads, and graph inspection before retry.
-- 3 consecutive repeat actions: the repeated action is not re-executed. The
-  case routes to recover-repeat and the next action must inspect state,
-  choose a different tool, or replan a smaller step.
-- 3 consecutive tool errors: the case routes to recover-tool and the ladder
-  favors graph.next, graph.audit, smaller scope, or an alternate native tool
-  before any shell-admitted escape.
-- Endpoint unreachable beyond the backoff cap (initial contract: 15
-  minutes): daemon stays alive, state shows the outage, polls before the
-  retry deadline do not append duplicate error events, and retries continue
-  at the capped interval.
+- First parse or schema fault: render the exact valid action from the registry
+  and current runtime decision.
+- Second same fault: switch tool family, such as from `fs.batch_write` to
+  `artifact.next` or from malformed planning to `graph.state`.
+- Third same fault: execute deterministic inspection when available, otherwise
+  record blocked handoff with the remaining evidence gap.
 
-Recovery never discards state: the task stays open, the transcript holds the
-fault trail, and the next endpoint turn sees the latest recovery notice.
-
-After `graph.next` has inspected the same fault once, later identical
-diagnostics do not count as progress. The controller records diagnostic
-exhaustion and renders a forced route to `graph.recover`, a legal transition,
-an unused native inspection tool, or a smaller plan step.
+Recovery never discards state. The task stays open, the transcript holds the
+fault trail, and the next endpoint turn sees the latest runtime decision.
 
 ## Retry Discipline
 
-- Endpoint retries are invisible to the context until an attempt is made: the
-  request is resent unchanged after the retry deadline, preserving the
-  cache, and polls before the deadline do not append transcript noise.
-- Parse retries are visible by design: the faulty completion and the error
-  notice both stay in the log, because the model needs to see its own
-  mistake to stop making it, and the transcript must stay honest per
-  [../../agent/honest-state.md](../../agent/honest-state.md).
-- Tool errors are never retried by the harness. The observation and recovery
-  notice tell the model to inspect the failure, adjust path, command, or
-  parameters, and continue with a narrower action. For shell.run errors, the
-  observation adds targeted hints for common non-portable commands such as
-  hardcoded /workspace paths or /bin/sh brace expansion.
-- Completion oversize is not an endpoint outage. The daemon records it with
-  a bounded preview, resets endpoint retry state, and appends a recovery
-  notice telling the model to emit one short act block under about 1200
-  characters. If the preview shows a bulk write, the notice directs the next
-  action toward `artifact.next`, `fs.batch_write`, or `doc.scaffold`,
-  and reminds it not to bypass graph policy. A length response that already
-  contains one closed act is accepted and passed to the parser.
-- Payload-risk recovery blocks repeated giant writes. Large story, guide,
-  book, corpus, and structured content requests route to document construction
-  with bounded semantic files.
-- Payload and completion-oversize faults route to artifact planning first,
-  then `artifact.next` and bounded writes. Recovery must not render repeated
-  raw `fs.write` as the valid example after the same payload risk.
+- Endpoint retries are invisible until an attempt occurs: the request is resent
+  unchanged after the retry deadline.
+- Parse retries are visible: the faulty completion and error notice remain in
+  the log because the transcript must stay honest.
+- Tool errors are not retried by the harness. The observation becomes a runtime
+  event and the kernel selects the next route.
+- Completion oversize records a bounded preview and routes to one short valid
+  action, artifact planning, bounded batch writing, or document audit.
+- Payload-risk recovery never repeats the same raw oversized write after the
+  same fault.
+
+## Observation Authority
+
+Tool observations report facts:
+
+```text
+observation_result=...
+next_runtime_event=...
+next_decision_required=true
+```
+
+An observation may include `next_executable_action` only when it cites a
+persisted decision id whose admitted tool surface includes that action. The
+runtime decision stream, not tool text, supplies executable authority.
 
 ## Status
 
-partially implemented; recovery topology exists, but full active-mode
-authority and artifact-plan admission remain open.
+partially implemented. Recovery topology, retry counts, route metadata, and
+some shape-changing routes exist. Attribute-like tag faults, strict implicit
+envelope records, full route-table coverage, and authority-aware observation
+text remain implementation tasks.
