@@ -2,6 +2,7 @@ pub mod active_mode;
 pub mod adapter;
 mod adapter_fingerprint;
 pub mod admission;
+pub mod admission_decide;
 pub mod decision;
 pub mod effect;
 pub mod event;
@@ -15,6 +16,9 @@ pub mod snapshot;
 pub use active_mode::ActiveMode;
 pub use adapter::{build_snapshot, SnapshotAdapterError, SnapshotAdapterInput};
 pub use admission::ToolAdmissionView;
+pub use admission_decide::{
+    admit_requested_tool, AdmissionDecision, AdmissionRefusalKind, AdmissionRequest,
+};
 pub use decision::{
     ActionTemplate, DecisionInvariantError, RuntimeDecision, RuntimeDecisionId,
     RuntimeDecisionInput, RuntimeDecisionKind, RuntimeMission,

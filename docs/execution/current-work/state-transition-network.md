@@ -146,7 +146,9 @@ evidence, compaction, maintenance, and prompt facts; rejects synthetic active
 case ids; and ignores maintenance due state when owner work exists. Kernel
 prompt rendering requires a persisted decision id, cites authority and staleness
 fingerprints, preserves the admitted tool surface, and renders concrete
-path-scoped `fs.batch_write` examples that parse. Daemon wiring through the new
-kernel, explicit triggering events on every path, prompt-frame resume proof,
-maintenance preemption proof, route-wide admission proof, and every close path
-remain open.
+path-scoped `fs.batch_write` examples that parse. Kernel admission refuses
+stale cached maintenance actions, changed artifact-cursor writes, compaction
+pressure writes, blocked tools, and completion requests before dispatch. Daemon
+wiring through the new kernel, explicit triggering events on every path,
+prompt-frame resume proof, maintenance preemption proof, route-wide admission
+proof, and every close path remain open.

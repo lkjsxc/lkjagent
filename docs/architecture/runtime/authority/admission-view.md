@@ -55,5 +55,6 @@ from the persisted decision and contains the exact data needed to accept an effe
 
 partially implemented. Store APIs record tool admission outcomes. Pending-action dispatch installs a decision-derived
 immutable admission view, consults it before effective-policy or graph fallback refusal, and writes admission or
-stale-refusal rows against the latest authority decision. Full-fingerprint stale refusal and broader route coverage
-remain open.
+stale-refusal rows against the latest authority decision. The kernel admission checker now refuses stale,
+blocked, not-admitted, and completion-blocked tools in pure tests. Daemon-wide full-fingerprint stale refusal and
+broader route coverage remain open.
