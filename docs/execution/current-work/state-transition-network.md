@@ -136,6 +136,9 @@ partially implemented. Runtime mission selection, data-first decision records,
 authority snapshot, event, decision, transition, effect, and admission store
 APIs, dispatch admission views, stale maintenance-action refusal, central
 completion reducer use, and prompt-card decision id and fingerprint rendering
-exist. The unified transition kernel, full snapshot data contract, explicit
-triggering events on every path, prompt-frame resume proof, maintenance
-preemption proof, route-wide admission proof, and every close path remain open.
+exist. A standalone `kernel` module now defines pure snapshot, event, decision,
+admission, effect, render, fault, and reducer records with tests for mission
+priority and model-call admission invariants. Daemon wiring through the new
+kernel, store-ledger joins, explicit triggering events on every path,
+prompt-frame resume proof, maintenance preemption proof, route-wide admission
+proof, and every close path remain open.
