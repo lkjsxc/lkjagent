@@ -41,6 +41,9 @@ fn checkpoint_does_not_start_maintenance_while_owner_work_exists() {
 fn owner_snapshot(missing: Vec<&str>) -> RuntimeSnapshot {
     RuntimeSnapshot {
         active_mission: ActiveMode::OwnerTask,
+        case_id: None,
+        graph_node: None,
+        graph_phase: None,
         owner_work_exists: true,
         recovery_ladder_active: false,
         context_pressure_active: false,

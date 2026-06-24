@@ -158,6 +158,9 @@ fn recovery_effective_policy(plan: &lkjagent_runtime::mode::RecoveryPlan) -> Eff
 fn recovery_snapshot() -> RuntimeSnapshot {
     RuntimeSnapshot {
         active_mission: ActiveMode::Recovery,
+        case_id: None,
+        graph_node: None,
+        graph_phase: None,
         owner_work_exists: true,
         recovery_ladder_active: true,
         context_pressure_active: false,

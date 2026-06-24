@@ -68,6 +68,9 @@ pub fn runtime_snapshot_for_turn(input: TurnAuthorityInput) -> RuntimeSnapshot {
         !owner_work_exists && (input.maintenance_due || input.maintenance_active);
     let mut snapshot = RuntimeSnapshot {
         active_mission: ActiveMode::ClosedIdle,
+        case_id: None,
+        graph_node: None,
+        graph_phase: None,
         owner_work_exists,
         recovery_ladder_active,
         context_pressure_active,

@@ -16,14 +16,19 @@ pub fn decide_record(snapshot: &RuntimeSnapshot, event: RuntimeEvent) -> Runtime
     let policy = policy_for_mode(active_mode);
     let fields = decision_fields(snapshot, &decision);
     let state_node = snapshot
-        .active_artifact
+        .graph_node
         .clone()
         .unwrap_or_else(|| "none".to_string());
-    let case_id = format!("case:unknown:{state_node}");
+    let case_id = snapshot
+        .case_id
+        .clone()
+        .unwrap_or_else(|| "none".to_string());
+    let graph_phase = snapshot.graph_phase.as_deref().unwrap_or("none");
     let fp = fingerprint(&[
         &case_id,
         mission.as_str(),
         &state_node,
+        graph_phase,
         &fields.admitted_tools.join(","),
         &snapshot.missing_evidence.join(","),
         &event_debug,

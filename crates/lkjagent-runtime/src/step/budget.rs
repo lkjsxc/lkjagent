@@ -96,6 +96,18 @@ fn checkpoint_snapshot(state: &RuntimeState) -> RuntimeSnapshot {
     let (required, missing) = evidence_state(state);
     RuntimeSnapshot {
         active_mission: active_mission(state),
+        case_id: state
+            .graph
+            .as_ref()
+            .and_then(|graph| graph.case_id.map(|id| id.to_string())),
+        graph_node: state
+            .graph
+            .as_ref()
+            .map(|graph| graph.active_node.0.to_string()),
+        graph_phase: state
+            .graph
+            .as_ref()
+            .map(|graph| graph.phase.as_str().to_string()),
         owner_work_exists: matches!(state.task, TaskState::Open { .. }),
         recovery_ladder_active: recovery_active(state),
         context_pressure_active: state.compaction.is_some(),

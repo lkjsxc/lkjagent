@@ -132,6 +132,9 @@ fn compaction_pressure_preempts_recovery_as_runtime_action() {
 fn maintenance_tick_yields_when_owner_work_exists() {
     let snapshot = RuntimeSnapshot {
         active_mission: ActiveMode::OwnerTask,
+        case_id: None,
+        graph_node: None,
+        graph_phase: None,
         owner_work_exists: true,
         recovery_ladder_active: false,
         context_pressure_active: false,
@@ -153,6 +156,9 @@ fn maintenance_tick_yields_when_owner_work_exists() {
 fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
     RuntimeSnapshot {
         active_mission: ActiveMode::OwnerTask,
+        case_id: None,
+        graph_node: None,
+        graph_phase: None,
         owner_work_exists: true,
         recovery_ladder_active: false,
         context_pressure_active: false,
@@ -169,6 +175,9 @@ fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
 fn recovery_snapshot() -> RuntimeSnapshot {
     RuntimeSnapshot {
         active_mission: ActiveMode::Recovery,
+        case_id: None,
+        graph_node: None,
+        graph_phase: None,
         owner_work_exists: true,
         recovery_ladder_active: true,
         context_pressure_active: false,
