@@ -106,6 +106,37 @@ fn stale_maintenance_action_is_refused_when_owner_queue_arrives() -> TestResult<
 }
 
 #[test]
+fn pending_owner_row_refuses_cached_owner_action() -> TestResult<()> {
+    let mut conn = store()?;
+    take_lock(&conn)?;
+    let workspace = temp_workspace("stale-owner-action")?;
+    let server = serve_responses(Vec::new())?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+    let action = action("graph.state", &[]);
+    let action_text = render_action(&action);
+    daemon.state.task = TaskState::Open { turns_remaining: 3 };
+    daemon.state.pending_action = Some(PendingAction {
+        action,
+        action_text,
+    });
+    daemon.turn_authority = Some(decide_turn_authority(TurnAuthorityInput {
+        active_owner_case: true,
+        ..TurnAuthorityInput::default()
+    }));
+    queue::enqueue(&mut conn, "new owner row", "owner-send", "102")?;
+
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
+    server.join()?;
+
+    assert!(daemon.state.context.log.iter().any(|frame| {
+        frame.content.contains("reason=stale_decision")
+            && frame.content.contains("changed_fields=pending_owner_rows")
+    }));
+    assert_eq!(queue::pending_count(&conn)?, 1);
+    Ok(())
+}
+
+#[test]
 fn closed_idle_does_not_call_endpoint() -> TestResult<()> {
     let mut conn = store()?;
     take_lock(&conn)?;

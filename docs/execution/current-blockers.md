@@ -96,8 +96,8 @@ Fracture run proves both progress and failure:
   registry renderer.
 - Recovery has a closed `FaultClass` enum, route metadata, escalation route
   text, and blocked-handoff behavior on each pure recovery plan.
-- Cached maintenance actions are refused before dispatch when queued owner work
-  changes the current authority.
+- Cached actions are refused before dispatch when queued owner work or
+  runtime-only authority changes the current decision fields.
 - The daemon persists authority snapshot fields and CLI status prints active
   mode, evidence gaps, artifact root, recovery route, failed action, admitted
   tools, and next executable action.
