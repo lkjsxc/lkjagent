@@ -128,7 +128,13 @@ fn validate_example(output: &str) -> TestResult<()> {
         .or_else(|| output.split_once("valid_example:\n"))
         .map(|(_, example)| example)
         .ok_or_else(|| "missing valid example".to_string())?;
+    let example = exact_action(example).ok_or("missing action close")?;
     let parsed = parse_completion(example).map_err(|err| format!("parse failed: {err:?}"))?;
     validate_action(&parsed).map_err(|err| format!("validation failed: {err}"))?;
     Ok(())
+}
+
+fn exact_action(text: &str) -> Option<&str> {
+    let end = text.find("</action>")?.saturating_add("</action>".len());
+    text.get(..end)
 }

@@ -40,17 +40,15 @@ fn parse_natural(text: &str) -> ParseResult<(Action, EnvelopeMode)> {
     }
     let lines: Vec<&str> = text.lines().collect();
     let start = find_action_start(&lines)?;
+    reject_prefix(&lines, start)?;
     let body = start + 1;
     let (action, next) = if starts_line_action(&lines, body) {
         parse_line_action(&lines, body)?
     } else {
         parse_tag_action(&lines, body)?
     };
-    if lines.iter().skip(next).any(|line| is_action_open(line)) {
-        Err(ParseFault::MultipleActionEnvelopes)
-    } else {
-        Ok((action, EnvelopeMode::Natural))
-    }
+    reject_suffix(&lines, next)?;
+    Ok((action, EnvelopeMode::Natural))
 }
 
 fn parse_implicit(
@@ -73,6 +71,27 @@ fn find_action_start(lines: &[&str]) -> ParseResult<usize> {
         .iter()
         .position(|line| matches!(classify_tag_line(line), TagLineClass::ActionOpen))
         .ok_or(ParseFault::MissingActionEnvelope)
+}
+
+fn reject_prefix(lines: &[&str], start: usize) -> ParseResult<()> {
+    if lines.iter().take(start).any(|line| !line.trim().is_empty()) {
+        return Err(ParseFault::BadEnvelope {
+            reason: "prose before action envelope".to_string(),
+        });
+    }
+    Ok(())
+}
+
+fn reject_suffix(lines: &[&str], next: usize) -> ParseResult<()> {
+    if lines.iter().skip(next).any(|line| is_action_open(line)) {
+        return Err(ParseFault::MultipleActionEnvelopes);
+    }
+    if lines.iter().skip(next).any(|line| !line.trim().is_empty()) {
+        return Err(ParseFault::BadEnvelope {
+            reason: "prose after action envelope".to_string(),
+        });
+    }
+    Ok(())
 }
 
 fn has_action_envelope(text: &str) -> bool {
