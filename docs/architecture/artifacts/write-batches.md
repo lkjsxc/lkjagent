@@ -26,8 +26,17 @@ Successful `fs.write` and `fs.batch_write` calls mark matching planned cursor
 paths complete. Completion still requires real content and a passing artifact
 audit.
 
+## Empty Roots
+
+A missing or empty artifact root is not success. The next route adopts or
+creates the root identity, writes `catalog.toml`, writes a bounded navigation
+README, then writes the smallest meaningful semantic leaves for the profile. A
+story bible never recovers from an empty root by writing one monolithic README.
+
 ## Payload Faults
 
-After max-token truncation, unclosed content tags, or a payload-limit refusal,
-recovery blocks another large raw write and routes to artifact planning or
-bounded batch writes.
+After invalid JSON-in-`files`, max-token truncation, unclosed content tags, or a
+payload-limit refusal, recovery blocks another large raw write and routes to
+`artifact.next`, `artifact.audit`, or a concrete bounded `fs.batch_write` under
+the current root. The next example must be parseable, registry-valid, and below
+the existing limits.

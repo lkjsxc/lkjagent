@@ -67,17 +67,13 @@ but did not record document-structure or artifact-readiness evidence.
   appeared, so active-mode preemption is useful but narrow;
 - the owner requested `stories/chronos-fracture` as a directory story artifact
   with README, catalog, child directories, line limits, small batches, and audits;
-- the run created `stories/chronos-fracture` and
-  `stories/chronos-fracture/bible`;
-- the task then looped through missing action envelopes and consecutive parse
-  faults reaching at least count 5;
-- `fs.batch_write` was repeatedly refused because `files` was missing and a
-  path-shaped unknown parameter such as
-  `stories/chronos-fracture/catalog.toml` appeared instead; focused tool tests
-  now cover safe normalization for that shape, but live runtime replay remains
-  open;
-- recovery examples were rendered, but the live route did not escape into a
-  productive write or audit path;
+- the run created `stories/chronos-fracture` but no files under that root;
+- `fs.batch_write` first received JSON text inside `<files>` that was invalid
+  or truncated, so the dispatcher refused before mutation;
+- the next `fs.batch_write` attempted one 5,767-byte README where the limit is
+  1,800 bytes per file, so the dispatcher again refused before mutation;
+- both write refusals were correct; the defect is that recovery did not force
+  artifact-aware bounded batches under the same root;
 - evidence contained plan and observation rows, not `document-structure` or
   `artifact-readiness`;
 - no close path can be called implemented until quiet verify, Docker Compose
@@ -104,10 +100,10 @@ Completion must read the central completion reducer on every path.
 Baseline at the start of this reconciliation slice:
 
 - `git status --short`: no output.
-- `docs/current-state.md`: 200 lines before this rewrite.
+- `docs/current-state.md`: 195 lines after the Chronos evidence correction.
 - `data/logs/current-model-run.md`: 194 lines and still active evidence.
-- `cargo run -p lkjagent-xtask -- check-docs`: `DOCS_EXIT=0`, `ok check-docs`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `LINES_EXIT=0`, `ok check-lines`.
+- `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`, `ok check-docs`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
 
 Protocol live-envelope focused gates:
 
