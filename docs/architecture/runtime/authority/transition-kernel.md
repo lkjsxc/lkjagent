@@ -107,5 +107,7 @@ partially implemented. Snapshot, event, decision, transition, effect,
 admission, prompt-frame, and observation ledgers exist. Runtime turn authority
 writes normalized rows and prompt cards cite the decision id. Store tests prove
 latest snapshot and decision reopen lookup and admission-to-decision integrity.
-Full kernel wiring for every dispatch, provider exchange, recovery, compaction,
-maintenance, and close path remains open.
+Snapshot adapter tests prove staleness changes for queue, artifact cursor, and
+compaction pressure, ignore maintenance due state during owner work, and reject
+synthetic active case ids. Full kernel wiring for every dispatch, provider
+exchange, recovery, compaction, maintenance, and close path remains open.

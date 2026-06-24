@@ -9,6 +9,8 @@ effects stay in daemon, store, tool, or CLI adapters.
 ## Table of Contents
 
 - [active_mode.rs](active_mode.rs): runtime active modes.
+- [adapter.rs](adapter.rs): snapshot adapter input and normalization.
+- [adapter_fingerprint.rs](adapter_fingerprint.rs): authority and staleness fingerprints.
 - [snapshot.rs](snapshot.rs): durable snapshot records and newtype identifiers.
 - [facts.rs](facts.rs): grouped case, graph, queue, evidence, artifact, context,
   observation, and maintenance facts.
