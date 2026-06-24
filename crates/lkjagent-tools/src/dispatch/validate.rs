@@ -1,7 +1,9 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use super::examples::valid_example;
-use lkjagent_protocol::registry::{find_tool, TOOLS};
+use lkjagent_protocol::registry::{
+    find_tool, missing_required, missing_required_any, unknown_params, ParamSpec, ToolSpec, TOOLS,
+};
 use lkjagent_protocol::Action;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -23,25 +25,20 @@ pub fn validate_action(action: &Action) -> Result<ValidatedAction, String> {
         ));
     };
     let duplicate = duplicate_params(action);
-    let missing = spec
-        .params
-        .iter()
-        .filter(|param| param.required)
-        .filter(|param| !action.params.iter().any(|given| given.name == param.name))
-        .map(|param| param.name)
-        .collect::<Vec<_>>();
-    let unknown = action
-        .params
-        .iter()
-        .filter(|given| !spec.params.iter().any(|param| param.name == given.name))
-        .map(|param| param.name.as_str())
-        .collect::<Vec<_>>();
-    if !duplicate.is_empty() || !missing.is_empty() || !unknown.is_empty() {
+    let names = param_names(action);
+    let missing = missing_required(spec, &names);
+    let missing_any = missing_required_any(spec, &names);
+    let unknown = unknown_params(spec, &names);
+    if !duplicate.is_empty()
+        || !missing.is_empty()
+        || !missing_any.is_empty()
+        || !unknown.is_empty()
+    {
         return Err(validation_message(
-            &action.tool,
-            spec.params,
+            spec,
             &duplicate,
             &missing,
+            &missing_any,
             &unknown,
         ));
     }
@@ -51,10 +48,7 @@ pub fn validate_action(action: &Action) -> Result<ValidatedAction, String> {
     })
 }
 
-fn defaulted_params(
-    action: &Action,
-    specs: &[lkjagent_protocol::registry::ParamSpec],
-) -> BTreeMap<String, String> {
+fn defaulted_params(action: &Action, specs: &[ParamSpec]) -> BTreeMap<String, String> {
     let mut params = BTreeMap::new();
     for spec in specs {
         if let Some(given) = action.params.iter().find(|given| given.name == spec.name) {
@@ -77,17 +71,25 @@ fn duplicate_params(action: &Action) -> Vec<&str> {
     duplicate
 }
 
+fn param_names(action: &Action) -> Vec<&str> {
+    action
+        .params
+        .iter()
+        .map(|param| param.name.as_str())
+        .collect()
+}
+
 fn validation_message(
-    tool: &str,
-    specs: &[lkjagent_protocol::registry::ParamSpec],
+    spec: &ToolSpec,
     duplicate: &[&str],
-    missing: &[&str],
-    unknown: &[&str],
+    missing: &[String],
+    missing_any: &[String],
+    unknown: &[String],
 ) -> String {
     let mut lines = vec![
         "action params refused".to_string(),
-        format!("tool={tool}"),
-        format!("expected={}", expected(specs)),
+        format!("tool={}", spec.name),
+        format!("expected={}", expected(spec)),
         format!("received={}", received(duplicate, unknown)),
     ];
     if !duplicate.is_empty() {
@@ -96,40 +98,49 @@ fn validation_message(
     if !missing.is_empty() {
         lines.push(format!("missing={}", missing.join(",")));
     }
+    if !missing_any.is_empty() {
+        lines.push(format!("missing_any={}", missing_any.join(",")));
+    }
     if !unknown.is_empty() {
         lines.push(format!("unknown={}", unknown.join(",")));
     }
-    lines.push(format!("hint={}", hint(tool, specs, unknown)));
+    lines.push(format!("hint={}", hint(spec, unknown)));
     lines.push("valid_example:".to_string());
-    lines.push(valid_example(tool, specs));
+    lines.push(valid_example(spec.name, spec.params));
     lines.join("\n")
 }
 
-fn expected(specs: &[lkjagent_protocol::registry::ParamSpec]) -> String {
-    if specs.is_empty() {
+fn expected(spec: &ToolSpec) -> String {
+    if spec.params.is_empty() && spec.required_any.is_empty() {
         return "no parameters".to_string();
     }
-    specs
+    let mut rendered = spec
+        .params
         .iter()
-        .map(|spec| {
-            if spec.required {
-                format!("{} required", spec.name)
-            } else if let Some(default) = spec.default {
-                format!("{} optional default={default}", spec.name)
+        .map(|param| {
+            if param.required {
+                format!("{} required", param.name)
+            } else if let Some(default) = param.default {
+                format!("{} optional default={default}", param.name)
             } else {
-                format!("{} optional", spec.name)
+                format!("{} optional", param.name)
             }
         })
-        .collect::<Vec<_>>()
-        .join("; ")
+        .collect::<Vec<_>>();
+    rendered.extend(
+        spec.required_any
+            .iter()
+            .map(|group| format!("{} any required", group.label)),
+    );
+    rendered.join("; ")
 }
 
-fn received(duplicate: &[&str], unknown: &[&str]) -> String {
+fn received(duplicate: &[&str], unknown: &[String]) -> String {
     let mut names = duplicate
         .iter()
-        .chain(unknown.iter())
-        .copied()
+        .map(|name| (*name).to_string())
         .collect::<Vec<_>>();
+    names.extend(unknown.iter().cloned());
     names.sort_unstable();
     names.dedup();
     if names.is_empty() {
@@ -139,14 +150,17 @@ fn received(duplicate: &[&str], unknown: &[&str]) -> String {
     }
 }
 
-fn hint(tool: &str, specs: &[lkjagent_protocol::registry::ParamSpec], unknown: &[&str]) -> String {
-    if specs.is_empty() && unknown.contains(&"path") {
+fn hint(spec: &ToolSpec, unknown: &[String]) -> String {
+    if spec.params.is_empty() && unknown.iter().any(|name| name == "path") {
         return format!(
-            "{tool} never takes path; use fs.list or workspace.summary for path inspection"
+            "{} never takes path; use fs.list or workspace.summary for path inspection",
+            spec.name
         );
     }
-    if matches!(tool, "doc.scaffold" | "doc.audit") && unknown.contains(&"path") {
-        return format!("{tool} uses root, not path");
+    if matches!(spec.name, "doc.scaffold" | "doc.audit")
+        && unknown.iter().any(|name| name == "path")
+    {
+        return format!("{} uses root, not path", spec.name);
     }
     "emit the valid_example exactly, or choose a tool whose schema names the received parameter"
         .to_string()

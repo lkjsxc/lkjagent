@@ -66,7 +66,13 @@ fn example_params(tool: &str, specs: &[ParamSpec], context: &ExampleContext) -> 
         .collect::<Vec<_>>();
     if tool == "graph.plan" {
         params.push(Param::new("checks", "dispatch accepts semantic plan"));
-        params.push(Param::new("paths", "."));
+        params.push(Param::new(
+            "paths",
+            context
+                .artifact_root
+                .clone()
+                .unwrap_or_else(|| ".".to_string()),
+        ));
     }
     params
 }
