@@ -19,7 +19,7 @@ that ran.
 | 7 | Artifact address adoption and invalid-root durability | [current-work/artifact-address-controller.md](current-work/artifact-address-controller.md) | partially implemented |
 | 8 | Artifact readiness and completion gate coverage | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | partially implemented |
 | 9 | Compaction resume proof and status rendering | [current-work/durable-compaction-history.md](current-work/durable-compaction-history.md) | partially implemented |
-| 10 | Idle-only maintenance and owner preemption proof | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | open |
+| 10 | Idle-only maintenance and owner preemption proof | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | partially implemented |
 | 11 | Provider exchange export and raw-case inspection | [current-work/model-log.md](current-work/model-log.md) | partially implemented |
 | 12 | Replay benchmarks from current model run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
 | 13 | Final live Docker story run and compose verification | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
@@ -126,7 +126,10 @@ Fracture run proves both progress and failure:
 
 ## Remaining Proof Gaps
 
-- Idle-only maintenance and owner preemption proof is the next code slice.
+- Idle-only maintenance, owner queue preemption at turn boundaries, maintenance
+  write-tool refusal, stale graph-policy isolation, and closed-idle suppression
+  have focused runtime proof; every dispatch and close path still needs unified
+  kernel authority proof.
 - Authority rows still need coverage for every dispatch, provider exchange,
   recovery, compaction, maintenance, and close path.
 - Compaction snapshots need status rendering and prompt-frame resume proof.
