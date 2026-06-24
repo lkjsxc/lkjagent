@@ -140,7 +140,10 @@ exist. A standalone `kernel` module now defines pure snapshot, event, decision,
 admission, effect, render, fault, and reducer records with tests for mission
 priority and model-call admission invariants. Store ledgers include prompt
 frame and observation rows, reopen lookup proof, and foreign-key proof that an
-admission cannot exist without a decision. Daemon wiring through the new kernel,
-snapshot adapter construction, explicit triggering events on every path,
+admission cannot exist without a decision. The snapshot adapter computes
+staleness fingerprints from queue, case, graph, artifact cursor, fault,
+evidence, compaction, maintenance, and prompt facts; rejects synthetic active
+case ids; and ignores maintenance due state when owner work exists. Daemon
+wiring through the new kernel, explicit triggering events on every path,
 prompt-frame resume proof, maintenance preemption proof, route-wide admission
 proof, and every close path remain open.
