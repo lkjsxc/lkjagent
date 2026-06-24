@@ -37,6 +37,11 @@ fn daemon_records_prompt_frame_and_effect_observation() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert_eq!(prompt_kind, "authority");
+    assert_eq!(
+        state::get(&conn, "kernel mission")?,
+        Some("owner_execution".to_string())
+    );
+    assert!(state::get(&conn, "kernel event id")?.is_some());
 
     let decision = runtime_authority::latest_decision(&conn, 1)?.ok_or("missing decision")?;
     let observation = runtime_authority::latest_observation_for_decision(&conn, decision.id)?

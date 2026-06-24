@@ -108,6 +108,7 @@ pub(super) fn persist_authority_ledger(
         },
     )?;
     store_state::set(conn, "authority snapshot id", &snapshot_id.to_string())?;
+    store_state::set(conn, "authority event id", &event_id.to_string())?;
     store_state::set(conn, "authority decision id", &decision_id.to_string())?;
     store_state::set(conn, "authority fingerprint", &fingerprint)?;
     Ok(())
