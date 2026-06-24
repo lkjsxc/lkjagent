@@ -175,18 +175,18 @@ Latest focused slice gates:
 - `cargo run -p lkjagent-xtask -- structure audit --root data/workspace`: `ok structure audit data/workspace`.
 - `cargo run -p lkjagent-xtask -- check-style`: `ok check-style`.
 
-Latest provider-log and authority slices also ran:
+Latest continuation slices also ran:
 
-- `cargo test -p lkjagent-store --test provider_exchange`: `2 passed`.
-- `cargo test -p lkjagent-runtime --test provider_exchange_log`: `2 passed`.
-- `cargo test -p lkjagent-cli --test model_log`: `3 passed`.
-- `cargo test -p lkjagent-llm`: passed.
-- `cargo test -p lkjagent-runtime --test authority_policy`: `3 passed`.
-- `cargo test -p lkjagent-runtime --test authority_reducer`: `7 passed`.
-- `cargo test -p lkjagent-benchmark --test corpus`: `2 passed`.
-- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `ok benchmark-corpus`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `ok verify`.
-- `docker compose run --rm verify`: `ok verify`.
+- Address, ledger cursor, invalid-root, authority, compaction snapshot,
+  provider export, and payload recovery focused tests named in their commits
+  passed.
+- `cargo fmt --check`: `FMT_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-docs`: `DOCS_EXIT=0`, `ok check-docs`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `LINES_EXIT=0`, `ok check-lines`.
+- `cargo run -p lkjagent-xtask -- check-style`: `STYLE_EXIT=0`, `ok check-style`.
+- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCH_EXIT=0`, `ok benchmark-corpus`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
 
 ## Out of Scope
 
