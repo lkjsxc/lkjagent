@@ -1,0 +1,1 @@
+{"content":"<action>\n<tool>workspace.summary</tool>\n<path>.</path>\n</action>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":2066,"completion_tokens":27,"cached_prompt_tokens":null,"total_tokens":2093}}

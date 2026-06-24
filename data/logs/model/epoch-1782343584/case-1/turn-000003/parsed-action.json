@@ -1,0 +1,1 @@
+{"status":"fault","closure_mode":"StopSequenceClosed","envelope_mode":"Natural","normalized_text_hash":"fcc0665d420cb578","content_bytes":3897,"error":"BadEnvelope { reason: \"prose before action envelope\" }"}

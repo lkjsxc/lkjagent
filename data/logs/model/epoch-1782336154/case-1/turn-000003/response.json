@@ -1,1 +1,0 @@
-{"content":"\n\n<action>\n<tool>doc.audit</tool>\n<root>stories/chronos-fracture</root>\n</action>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":4287,"completion_tokens":174,"cached_prompt_tokens":null,"total_tokens":4461}}

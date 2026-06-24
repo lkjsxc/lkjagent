@@ -1,4 +1,0 @@
-<observation>
-<status>ok</status>
-<content>root=.</content>
-</observation>
