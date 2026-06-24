@@ -143,7 +143,10 @@ frame and observation rows, reopen lookup proof, and foreign-key proof that an
 admission cannot exist without a decision. The snapshot adapter computes
 staleness fingerprints from queue, case, graph, artifact cursor, fault,
 evidence, compaction, maintenance, and prompt facts; rejects synthetic active
-case ids; and ignores maintenance due state when owner work exists. Daemon
-wiring through the new kernel, explicit triggering events on every path,
-prompt-frame resume proof, maintenance preemption proof, route-wide admission
-proof, and every close path remain open.
+case ids; and ignores maintenance due state when owner work exists. Kernel
+prompt rendering requires a persisted decision id, cites authority and staleness
+fingerprints, preserves the admitted tool surface, and renders concrete
+path-scoped `fs.batch_write` examples that parse. Daemon wiring through the new
+kernel, explicit triggering events on every path, prompt-frame resume proof,
+maintenance preemption proof, route-wide admission proof, and every close path
+remain open.

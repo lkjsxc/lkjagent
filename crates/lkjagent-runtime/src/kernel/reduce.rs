@@ -66,6 +66,9 @@ pub fn reduce(
     decision.existing_evidence = snapshot.evidence.existing.clone();
     decision.context_package_ids = snapshot.graph.context_package_ids.clone();
     decision.forced_next_action = next_action_for(mission, snapshot);
+    if let Some(ActionTemplate::ExactTool { body, .. }) = &decision.forced_next_action {
+        decision.admission_view.exact_next_action = Some(body.clone());
+    }
     decision.prompt_card = prompt_card_for(snapshot, mission, active_mode, &decision);
     with_runtime_effect(decision, mission)
 }
