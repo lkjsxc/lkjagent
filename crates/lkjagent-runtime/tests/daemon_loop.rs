@@ -32,6 +32,13 @@ fn daemon_delivers_queue_writes_file_and_records_done() -> TestResult<()> {
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert!(fs::read_to_string(&model_log_path)?.contains("Model Run Log"));
+    let prompt_frame_id = state::get(&conn, "authority prompt frame id")?;
+    let logged_prompt_frame_id: Option<String> = conn.query_row(
+        "SELECT prompt_frame_id FROM provider_exchange ORDER BY created_at DESC LIMIT 1",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(logged_prompt_frame_id, prompt_frame_id);
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     assert_eq!(fs::read_to_string(workspace.join("out.txt"))?, "hello");
     assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
