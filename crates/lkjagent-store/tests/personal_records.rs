@@ -1,7 +1,8 @@
 mod support;
 
 use lkjagent_store::personal::{
-    create, get, list, search, update_status, PersonalListFilter, PersonalRecordInput,
+    create, get, list, search, update, update_status, PersonalListFilter, PersonalRecordInput,
+    PersonalRecordUpdate,
 };
 use support::{memory_store, TestResult};
 
@@ -49,6 +50,34 @@ fn schedule_rejects_invalid_time_range_before_mutation() -> TestResult<()> {
 
     assert!(error.to_string().contains("end_at must be after start_at"));
     assert!(list(&conn, &PersonalListFilter::default())?.is_empty());
+    Ok(())
+}
+
+#[test]
+fn todo_field_update_changes_body_and_search_index() -> TestResult<()> {
+    let conn = memory_store()?;
+    let id = create(&conn, &todo_input())?;
+    update(
+        &conn,
+        &PersonalRecordUpdate {
+            id,
+            title: Some("Finish transition proof"),
+            body: Some("Reducer proof finished with focused tests."),
+            status: None,
+            tags: Some("runtime proof"),
+            timezone: None,
+            start_at: None,
+            end_at: None,
+            due_at: None,
+            recurrence: None,
+            priority: Some("urgent"),
+            project: Some("lkjagent"),
+            now: "2026-06-25T09:00:00Z",
+        },
+    )?;
+
+    assert_eq!(get(&conn, id)?.title, "Finish transition proof");
+    assert_eq!(search(&conn, "Reducer", 5)?[0].id, id);
     Ok(())
 }
 

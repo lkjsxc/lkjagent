@@ -67,7 +67,10 @@ fn schedule_add_list_and_update_status() -> TestResult<()> {
         &mut state,
     );
     let update = dispatch(
-        &action("schedule.update", &[("id", "1"), ("status", "done")]),
+        &action(
+            "schedule.update",
+            &[("id", "1"), ("status", "done"), ("notes", "Reviewed log")],
+        ),
         &runtime,
         &mut conn,
         &mut state,
@@ -76,7 +79,7 @@ fn schedule_add_list_and_update_status() -> TestResult<()> {
     assert!(list.content.contains("returned=1"));
     assert!(list.content.contains("kind=schedule"));
     assert!(update.content.contains("personal_record_updated"));
-    assert!(update.content.contains("status=done"));
+    assert!(update.content.contains("changed_fields=notes,status"));
     Ok(())
 }
 
@@ -111,7 +114,14 @@ fn todo_add_list_and_close() -> TestResult<()> {
         &mut state,
     );
     let update = dispatch(
-        &action("todo.update", &[("id", "1"), ("status", "done")]),
+        &action(
+            "todo.update",
+            &[
+                ("id", "1"),
+                ("status", "done"),
+                ("details", "Proof finished"),
+            ],
+        ),
         &runtime,
         &mut conn,
         &mut state,
@@ -119,6 +129,6 @@ fn todo_add_list_and_close() -> TestResult<()> {
 
     assert!(list.content.contains("returned=1"));
     assert!(list.content.contains("kind=todo"));
-    assert!(update.content.contains("status=done"));
+    assert!(update.content.contains("changed_fields=details,status"));
     Ok(())
 }
