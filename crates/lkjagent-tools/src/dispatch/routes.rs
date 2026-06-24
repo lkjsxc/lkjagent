@@ -1,6 +1,7 @@
 use rusqlite::Connection;
 
 use crate::control;
+use crate::dispatch::completion::dispatch_done;
 use crate::dispatch::fs_extra_tools::{
     dispatch_fs_batch_write, dispatch_fs_list, dispatch_fs_mkdir, dispatch_fs_search,
     dispatch_fs_stat,
@@ -115,85 +116,6 @@ pub fn route(
             state,
             action_text,
             observe::notice("error", format!("unknown tool after validation: {other}")),
-        ),
-    }
-}
-
-fn dispatch_done(
-    params: &std::collections::BTreeMap<String, String>,
-    action_text: &str,
-    runtime: &ToolRuntime,
-    state: &mut DispatchState,
-) -> DispatchOutput {
-    if state.graph_state.is_some() && !state.graph_completion_ready {
-        return observe_result(
-            Err(crate::error::ToolError::invalid(done_refusal(state))),
-            action_text,
-            runtime,
-            state,
-        );
-    }
-    observe_result(
-        control::done(
-            &mut state.control,
-            &runtime.workspace,
-            &crate::dispatch::params::param(params, "summary"),
-        ),
-        action_text,
-        runtime,
-        state,
-    )
-}
-
-fn done_refusal(state: &DispatchState) -> String {
-    let listed = state.graph_missing.join(", ");
-    let first = state
-        .graph_missing
-        .first()
-        .cloned()
-        .unwrap_or_else(|| "required-evidence".to_string());
-    let next = next_completion_action(&first);
-    let graph_line = state
-        .graph_state
-        .as_deref()
-        .and_then(|text| text.lines().find(|line| !line.trim().is_empty()))
-        .unwrap_or("graph_state=unavailable");
-    format!(
-        "graph completion refused\npartial_handoff=blocked-with-evidence\nattempted=agent.done\nfailed_gate=completion\nmissing={listed}\nexisting_graph={graph_line}\nnext_executable_action={}\nvalid_example:\n{}",
-        next.label, next.example
-    )
-}
-
-struct CompletionNextAction {
-    label: &'static str,
-    example: String,
-}
-
-fn next_completion_action(first: &str) -> CompletionNextAction {
-    if first == "artifact-readiness" {
-        return CompletionNextAction {
-            label: "run artifact.audit before retrying agent.done",
-            example:
-                "<action>\n<tool>artifact.audit</tool>\n<root>stories/example-story</root>\n</action>"
-                    .to_string(),
-        };
-    }
-    if first == "document-structure" {
-        return CompletionNextAction {
-            label: "run doc.audit before retrying agent.done",
-            example: "<action>\n<tool>doc.audit</tool>\n<root>docs</root>\n</action>".to_string(),
-        };
-    }
-    if first == "plan" {
-        return CompletionNextAction {
-            label: "record graph.plan with steps, checks, paths, and reason",
-            example: "<action>\n<tool>graph.plan</tool>\n<objective>Finish the owner task</objective>\n<steps>inspect current state; run verification; record evidence</steps>\n<checks>verification evidence exists before completion</checks>\n<paths>.</paths>\n<reason>completion gate is missing plan evidence</reason>\n</action>".to_string(),
-        };
-    }
-    CompletionNextAction {
-        label: "record missing graph.evidence before retrying agent.done",
-        example: format!(
-            "<action>\n<tool>graph.evidence</tool>\n<kind>{first}</kind>\n<summary>Observed required completion evidence</summary>\n<path>.</path>\n</action>"
         ),
     }
 }
