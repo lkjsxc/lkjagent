@@ -47,6 +47,10 @@ fn provider_exchange_writer_persists_files_and_store_rows() -> TestResult<()> {
     assert!(parsed.contains("\"normalized_text_hash\""));
     record_provider_admission(&conn, "graph.state", true, "admitted", "<action />")?;
     record_provider_observation(&conn, "<observation>ok</observation>")?;
+    let export = fs::read_to_string(handle.dir.join("export.json"))?;
+    assert!(export.contains("parsed-action.json"));
+    assert!(export.contains("admission.json"));
+    assert!(export.contains("observation.txt"));
     assert!(handle.dir.join("parsed-action.json").exists());
     assert!(handle.dir.join("admission.json").exists());
     assert!(handle.dir.join("observation.txt").exists());
@@ -69,6 +73,7 @@ fn provider_exchange_writer_records_errors_ndjson() -> TestResult<()> {
     assert!(errors.contains("EndpointError"));
     let export = fs::read_to_string(handle.dir.join("export.json"))?;
     assert!(export.contains("EndpointError"));
+    assert!(export.contains("parsed-action.json"));
     let row = lkjagent_store::provider_exchange::latest_for_case_turn(&conn, "none", 6)?
         .ok_or("missing provider exchange row")?;
     assert_eq!(row.status, "failed");
