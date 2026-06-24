@@ -166,6 +166,12 @@ Status compaction focused gate:
 - `cargo test -p lkjagent-cli --test status`: `CLI_STATUS_TEST_EXIT=0`, 6 passed.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
 
+Latest broad local gates:
+
+- `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`, `ok check-style`.
+- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCHMARK_EXIT=0`, `ok benchmark-corpus`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+
 Store-ledger focused gates:
 
 - `cargo test -p lkjagent-store --test runtime_kernel_ledger`: `STORE_KERNEL_LEDGER_EXIT=0`, 3 passed.
