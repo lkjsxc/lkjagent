@@ -55,6 +55,7 @@ Raw provider request and response evidence is recorded under the contract in
 partially implemented. The current Markdown handoff, provider exchange store
 rows, request files, authority files, response files, timing files, error
 files, per-turn export manifests that name parsed-action, admission, and
-observation artifacts, parsed-action, admission, observation, index files, and
-CLI list and show exist for daemon provider calls with a log root. Raw-case
-inspection and sanitized archive commands remain open.
+observation artifacts, parsed-action, admission, observation, index files,
+prompt-frame ids on exchange rows, and CLI list and show exist for daemon
+provider calls with a log root. Raw-case inspection and sanitized archive
+commands remain open.

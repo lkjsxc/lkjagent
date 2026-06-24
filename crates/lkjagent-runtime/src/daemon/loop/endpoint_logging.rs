@@ -98,7 +98,7 @@ impl ResidentDaemon {
         Ok(ProviderLogContext {
             case_id: self.case_id_string(),
             turn_id: self.state.turn,
-            prompt_frame_id: lkjagent_store::state::get(conn, "authority fingerprint")?,
+            prompt_frame_id: lkjagent_store::state::get(conn, "authority prompt frame id")?,
             authority_decision_id: lkjagent_store::state::get(conn, "authority decision id")?,
             provider: "openai-compatible".to_string(),
             model: self.runtime.client.model.clone(),
