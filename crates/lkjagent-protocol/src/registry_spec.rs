@@ -1,4 +1,8 @@
-use crate::registry::{ParamSpec, ToolSpec};
+use crate::registry::{ParamSpec, RequiredAnySpec, ToolSpec};
+use crate::registry_graph::{
+    GRAPH_COMPACT, GRAPH_CONTEXT, GRAPH_EVIDENCE, GRAPH_NOTE, GRAPH_PLAN, GRAPH_PLAN_ANY,
+    GRAPH_TRANSITION,
+};
 
 const FS_READ: &[ParamSpec] = &[
     ParamSpec::req("path"),
@@ -66,29 +70,6 @@ const MEMORY_SAVE: &[ParamSpec] = &[
     ParamSpec::req("content"),
 ];
 const MEMORY_FIND: &[ParamSpec] = &[ParamSpec::req("query"), ParamSpec::opt("limit", Some("5"))];
-const GRAPH_PLAN: &[ParamSpec] = &[
-    ParamSpec::req("objective"),
-    ParamSpec::opt("constraints", None),
-    ParamSpec::opt("assumptions", None),
-    ParamSpec::opt("risks", None),
-    ParamSpec::req("steps"),
-    ParamSpec::opt("checks", None),
-    ParamSpec::opt("paths", None),
-    ParamSpec::req("reason"),
-];
-const GRAPH_TRANSITION: &[ParamSpec] = &[ParamSpec::req("target"), ParamSpec::req("reason")];
-const GRAPH_CONTEXT: &[ParamSpec] = &[ParamSpec::req("packages"), ParamSpec::req("reason")];
-const GRAPH_NOTE: &[ParamSpec] = &[
-    ParamSpec::req("kind"),
-    ParamSpec::req("summary"),
-    ParamSpec::opt("path", None),
-];
-const GRAPH_EVIDENCE: &[ParamSpec] = &[
-    ParamSpec::req("kind"),
-    ParamSpec::req("summary"),
-    ParamSpec::opt("path", None),
-];
-const GRAPH_COMPACT: &[ParamSpec] = &[ParamSpec::req("reason")];
 const WORKSPACE_SUMMARY: &[ParamSpec] = &[
     ParamSpec::opt("path", Some(".")),
     ParamSpec::opt("depth", Some("3")),
@@ -167,7 +148,7 @@ pub const TOOLS: &[ToolSpec] = &[
     tool("graph.next", &[], "show legal graph transitions and missing guards"),
     tool("graph.audit", &[], "audit active graph case consistency"),
     tool("graph.recover", &[], "inspect graph recovery ladder"),
-    tool("graph.plan", GRAPH_PLAN, "record structured plan"),
+    tool_any("graph.plan", GRAPH_PLAN, GRAPH_PLAN_ANY, "record structured plan"),
     tool("graph.transition", GRAPH_TRANSITION, "request guarded graph transition"),
     tool("graph.context", GRAPH_CONTEXT, "select context packages"),
     tool("graph.note", GRAPH_NOTE, "record structured graph note"),
@@ -192,9 +173,19 @@ const fn tool(
     params: &'static [ParamSpec],
     contract: &'static str,
 ) -> ToolSpec {
+    tool_any(name, params, &[], contract)
+}
+
+const fn tool_any(
+    name: &'static str,
+    params: &'static [ParamSpec],
+    required_any: &'static [RequiredAnySpec],
+    contract: &'static str,
+) -> ToolSpec {
     ToolSpec {
         name,
         params,
+        required_any,
         contract,
     }
 }

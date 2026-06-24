@@ -131,7 +131,6 @@ fn graph_plan_valid_example_dispatches() -> TestResult<()> {
     let example = example_for("graph.plan")?;
     assert!(example.contains("<checks>dispatch accepts semantic plan</checks>"));
     assert!(example.contains("<paths>.</paths>"));
-
     let output = dispatch_example(parse_example(&example)?)?;
     assert!(output.content.contains("graph plan recorded"));
     Ok(())

@@ -39,14 +39,6 @@ pub fn dispatch_graph_plan(
             state,
         );
     }
-    if param(params, "checks").trim().is_empty() && param(params, "paths").trim().is_empty() {
-        return observe_error(
-            ToolError::invalid("graph.plan needs checks or paths"),
-            action_text,
-            runtime,
-            state,
-        );
-    }
     finish(
         state,
         action_text,

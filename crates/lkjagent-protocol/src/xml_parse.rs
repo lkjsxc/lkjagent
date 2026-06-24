@@ -1,6 +1,6 @@
 use crate::error::ParseResult;
 use crate::model::{Action, MalformedTagReason, Param, ParseFault, ACTION_CLOSE, ACTION_OPEN};
-use crate::registry::{find_tool, ToolSpec};
+use crate::registry::{find_tool, missing_required, missing_required_any, unknown_params};
 use crate::tag_line::{classify_tag_line, valid_tag_name, TagLineClass};
 
 pub fn parse_tag_action(lines: &[&str], mut index: usize) -> ParseResult<(Action, usize)> {
@@ -105,7 +105,12 @@ fn bad_params_fault(tool: Option<&str>, params: &[Param], line: &str) -> ParseFa
     };
     ParseFault::BadParams {
         tool: tool.to_string(),
-        missing: find_tool(tool).map_or_else(Vec::new, |spec| missing_required(spec, params)),
+        missing: find_tool(tool).map_or_else(Vec::new, |spec| {
+            let names = param_names(params);
+            let mut missing = missing_required(spec, &names);
+            missing.extend(missing_required_any(spec, &names));
+            missing
+        }),
         unknown: vec![line.to_string()],
     }
 }
@@ -116,8 +121,10 @@ fn validate_params(tool_name: &str, params: &[Param]) -> ParseResult<()> {
             tool: tool_name.to_string(),
         });
     };
-    let missing = missing_required(spec, params);
-    let unknown = unknown_params(spec, params);
+    let names = param_names(params);
+    let mut missing = missing_required(spec, &names);
+    missing.extend(missing_required_any(spec, &names));
+    let unknown = unknown_params(spec, &names);
     if missing.is_empty() && unknown.is_empty() {
         Ok(())
     } else {
@@ -129,21 +136,8 @@ fn validate_params(tool_name: &str, params: &[Param]) -> ParseResult<()> {
     }
 }
 
-fn missing_required(spec: &ToolSpec, params: &[Param]) -> Vec<String> {
-    spec.params
-        .iter()
-        .filter(|param| param.required)
-        .filter(|param| !params.iter().any(|given| given.name == param.name))
-        .map(|param| param.name.to_string())
-        .collect()
-}
-
-fn unknown_params(spec: &ToolSpec, params: &[Param]) -> Vec<String> {
-    params
-        .iter()
-        .filter(|given| !spec.params.iter().any(|param| param.name == given.name))
-        .map(|given| given.name.clone())
-        .collect()
+fn param_names(params: &[Param]) -> Vec<&str> {
+    params.iter().map(|param| param.name.as_str()).collect()
 }
 
 pub fn is_action_open(line: &str) -> bool {

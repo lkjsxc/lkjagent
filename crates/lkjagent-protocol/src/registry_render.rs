@@ -18,18 +18,24 @@ fn render_tool(tool: &ToolSpec) -> String {
 }
 
 fn render_params(tool: &ToolSpec) -> String {
-    if tool.params.is_empty() {
+    if tool.params.is_empty() && tool.required_any.is_empty() {
         return "no params".to_string();
     }
-    tool.params
+    let mut rendered = tool
+        .params
         .iter()
         .map(|param| match (param.required, param.default) {
             (true, _) => format!("{}!", param.name),
             (false, Some(default)) => format!("{}?={}", param.name, default),
             (false, None) => format!("{}?", param.name),
         })
-        .collect::<Vec<_>>()
-        .join(",")
+        .collect::<Vec<_>>();
+    rendered.extend(
+        tool.required_any
+            .iter()
+            .map(|group| format!("{}!any", group.label)),
+    );
+    rendered.join(",")
 }
 
 #[cfg(test)]

@@ -31,6 +31,21 @@ fn graph_transition_valid_example_uses_legal_target() -> TestResult<()> {
 }
 
 #[test]
+fn graph_plan_valid_example_uses_artifact_root() -> TestResult<()> {
+    let example = valid_example_for(
+        "graph.plan",
+        ExampleContext {
+            artifact_root: Some("stories/chronos-fracture".to_string()),
+            ..ExampleContext::default()
+        },
+    )?
+    .render();
+
+    assert!(example.contains("<paths>stories/chronos-fracture</paths>"));
+    Ok(())
+}
+
+#[test]
 fn graph_note_normalizes_attempt_to_decision() -> TestResult<()> {
     let output = dispatch_example(action(
         "graph.note",

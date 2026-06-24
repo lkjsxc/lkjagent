@@ -100,6 +100,20 @@ fn attribute_like_tag_is_dedicated_fault() {
 }
 
 #[test]
+fn graph_plan_missing_paths_or_checks_is_bad_params() {
+    let text = "<action>\n<tool>graph.plan</tool>\n<objective>Create structured story bible.</objective>\n<steps>Record plan.</steps>\n<reason>Owner requested it.</reason>\n</action>";
+
+    assert_eq!(
+        parse_completion(text),
+        Err(ParseFault::BadParams {
+            tool: "graph.plan".to_string(),
+            missing: vec!["checks|paths".to_string()],
+            unknown: Vec::new(),
+        })
+    );
+}
+
+#[test]
 fn parses_line_action_grammar_and_file_blocks() {
     assert_eq!(
         parse_completion("<action>\ntool: doc.audit\nroot: docs\n</action>"),

@@ -31,7 +31,7 @@ but did not record document-structure or artifact-readiness evidence.
 | --- | --- |
 | Workspace and gates | `Cargo.toml`, `crates/lkjagent-xtask`, and `docker-compose.yml` exist. |
 | Parser | `lkjagent-protocol` parses line-oriented, paired-tag, and batch file action forms covered by focused fixtures. The live parser uses `<action>`, rejects top-level JSON, records implicit-envelope outcomes, and emits dedicated attribute-like tag faults. Provider stop-closure restoration records closure mode for parse logs. |
-| Dispatcher registry | `lkjagent-tools` validates registered tools and renders registry examples for covered action families. |
+| Dispatcher registry | `lkjagent-tools` validates registered tools, required-any groups, and renders registry examples for covered action families. `graph.plan` requires checks or paths before dispatch. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
 | SQLite store | Queue, state, event, memory, task summary, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist in `lkjagent-store`. |
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
@@ -117,6 +117,8 @@ Protocol live-envelope focused gates:
 - `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`, `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+- Registry conditional slice: `cargo test -p lkjagent-protocol`: `PROTOCOL_EXIT=0`;
+  `cargo test -p lkjagent-tools`: `TOOLS_EXIT=0`; focused registry tests passed.
 
 Runtime-kernel data-model focused gates:
 
