@@ -34,7 +34,7 @@ fn reducer_blocks_completion_with_explainable_admission() {
     let RuntimeDecision::BlockCompletion(admission) = decision else {
         return;
     };
-    assert_eq!(admission.active_mission, ActiveMode::OwnerTask);
+    assert_eq!(admission.active_mode, ActiveMode::OwnerTask);
     assert_eq!(admission.missing_evidence, vec!["artifact-readiness"]);
     assert!(admission.exact_valid_example.is_some());
 }
@@ -131,7 +131,7 @@ fn compaction_pressure_preempts_recovery_as_runtime_action() {
 #[test]
 fn maintenance_tick_yields_when_owner_work_exists() {
     let snapshot = RuntimeSnapshot {
-        active_mission: ActiveMode::OwnerTask,
+        active_mode: ActiveMode::OwnerTask,
         case_id: None,
         graph_node: None,
         graph_phase: None,
@@ -155,7 +155,7 @@ fn maintenance_tick_yields_when_owner_work_exists() {
 
 fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
     RuntimeSnapshot {
-        active_mission: ActiveMode::OwnerTask,
+        active_mode: ActiveMode::OwnerTask,
         case_id: None,
         graph_node: None,
         graph_phase: None,
@@ -174,7 +174,7 @@ fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
 
 fn recovery_snapshot() -> RuntimeSnapshot {
     RuntimeSnapshot {
-        active_mission: ActiveMode::Recovery,
+        active_mode: ActiveMode::Recovery,
         case_id: None,
         graph_node: None,
         graph_phase: None,

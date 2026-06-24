@@ -31,7 +31,7 @@ pub fn admit_tool(snapshot: &RuntimeSnapshot, requested_tool: &str) -> ToolAdmis
     ToolAdmission {
         admitted,
         reason,
-        active_mission: snapshot.active_mission,
+        active_mode: snapshot.active_mode,
         required_evidence: snapshot.required_evidence.clone(),
         missing_evidence: snapshot.missing_evidence.clone(),
         next_valid_tools,
@@ -44,13 +44,13 @@ pub fn next_valid_tools(snapshot: &RuntimeSnapshot) -> Vec<String> {
     if snapshot.context_pressure_active {
         return vec!["runtime.compact".to_string()];
     }
-    let policy = policy_for_mode(snapshot.active_mission);
+    let policy = policy_for_mode(snapshot.active_mode);
     let mut tools = policy
         .allowed_tools
         .iter()
         .map(|tool| (*tool).to_string())
         .collect::<Vec<_>>();
-    if snapshot.active_mission == ActiveMode::OwnerTask {
+    if snapshot.active_mode == ActiveMode::OwnerTask {
         if snapshot.missing_evidence.is_empty() {
             extend_unique(
                 &mut tools,
@@ -76,7 +76,7 @@ pub fn next_valid_tools(snapshot: &RuntimeSnapshot) -> Vec<String> {
     if snapshot.external_owner_input_required {
         extend_unique(&mut tools, &["agent.ask"]);
     }
-    if tools.is_empty() && snapshot.active_mission == ActiveMode::ClosedIdle {
+    if tools.is_empty() && snapshot.active_mode == ActiveMode::ClosedIdle {
         tools.push("runtime.wait".to_string());
     }
     tools
@@ -116,7 +116,7 @@ fn contradiction(
     if admitted || requested_tool == "agent.done" {
         return None;
     }
-    if snapshot.active_mission == ActiveMode::Recovery && next_valid_tools(snapshot).is_empty() {
+    if snapshot.active_mode == ActiveMode::Recovery && next_valid_tools(snapshot).is_empty() {
         return Some("recovery has no escape tools".to_string());
     }
     None

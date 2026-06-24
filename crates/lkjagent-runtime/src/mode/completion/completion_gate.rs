@@ -45,7 +45,7 @@ pub fn decide_completion(snapshot: &RuntimeSnapshot) -> CompletionDecision {
 
 fn failed_gates(snapshot: &RuntimeSnapshot) -> Vec<String> {
     let mut gates = Vec::new();
-    match snapshot.active_mission {
+    match snapshot.active_mode {
         ActiveMode::OwnerTask => owner_gates(snapshot, &mut gates),
         ActiveMode::Maintenance => maintenance_gates(snapshot, &mut gates),
         ActiveMode::Recovery => gates.push("recovery-resolution".to_string()),
@@ -81,7 +81,7 @@ fn maintenance_gates(snapshot: &RuntimeSnapshot, gates: &mut Vec<String>) {
 }
 
 fn completion_kind(snapshot: &RuntimeSnapshot) -> CompletionKind {
-    match snapshot.active_mission {
+    match snapshot.active_mode {
         ActiveMode::OwnerTask => CompletionKind::OwnerTask,
         ActiveMode::Maintenance => CompletionKind::Maintenance,
         ActiveMode::Recovery => CompletionKind::BlockedHandoff,

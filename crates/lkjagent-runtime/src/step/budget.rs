@@ -95,7 +95,7 @@ fn maintenance_budget_notice(mut state: RuntimeState, notice: &str) -> StepResul
 fn checkpoint_snapshot(state: &RuntimeState) -> RuntimeSnapshot {
     let (required, missing) = evidence_state(state);
     RuntimeSnapshot {
-        active_mission: active_mission(state),
+        active_mode: active_mode(state),
         case_id: state
             .graph
             .as_ref()
@@ -142,7 +142,7 @@ fn evidence_state(state: &RuntimeState) -> (Vec<String>, Vec<String>) {
     (required, missing)
 }
 
-fn active_mission(state: &RuntimeState) -> ActiveMode {
+fn active_mode(state: &RuntimeState) -> ActiveMode {
     if recovery_active(state) {
         ActiveMode::Recovery
     } else {

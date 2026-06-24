@@ -14,7 +14,7 @@ fn checkpoint_with_actionable_work_continues_owner_execution() {
 #[test]
 fn checkpoint_with_repeated_fault_enters_recovery() {
     let mut snapshot = owner_snapshot(vec!["artifact-readiness"]);
-    snapshot.active_mission = ActiveMode::Recovery;
+    snapshot.active_mode = ActiveMode::Recovery;
     snapshot.recovery_ladder_active = true;
     snapshot.repeated_action = true;
     snapshot.last_tool_attempt = Some("graph.next".to_string());
@@ -40,7 +40,7 @@ fn checkpoint_does_not_start_maintenance_while_owner_work_exists() {
 
 fn owner_snapshot(missing: Vec<&str>) -> RuntimeSnapshot {
     RuntimeSnapshot {
-        active_mission: ActiveMode::OwnerTask,
+        active_mode: ActiveMode::OwnerTask,
         case_id: None,
         graph_node: None,
         graph_phase: None,

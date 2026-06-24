@@ -27,7 +27,7 @@ fn decision_record_carries_mission_fingerprint_and_completion_refusal() {
 
 fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
     RuntimeSnapshot {
-        active_mission: ActiveMode::OwnerTask,
+        active_mode: ActiveMode::OwnerTask,
         case_id: Some("42".to_string()),
         graph_node: Some("audit".to_string()),
         graph_phase: Some("verification".to_string()),

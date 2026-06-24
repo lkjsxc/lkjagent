@@ -35,7 +35,7 @@ fn owner_completion_allows_done_only_when_gates_are_clear() {
 #[test]
 fn maintenance_completion_is_separate_from_owner_completion() {
     let mut snapshot = owner_snapshot(&[]);
-    snapshot.active_mission = ActiveMode::Maintenance;
+    snapshot.active_mode = ActiveMode::Maintenance;
     snapshot.owner_work_exists = false;
 
     let decision = decide_completion(&snapshot);
@@ -47,7 +47,7 @@ fn maintenance_completion_is_separate_from_owner_completion() {
 #[test]
 fn compaction_blocks_model_completion() {
     let mut snapshot = owner_snapshot(&[]);
-    snapshot.active_mission = ActiveMode::Compaction;
+    snapshot.active_mode = ActiveMode::Compaction;
     snapshot.context_pressure_active = true;
 
     let decision = decide_completion(&snapshot);
@@ -59,7 +59,7 @@ fn compaction_blocks_model_completion() {
 
 fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
     RuntimeSnapshot {
-        active_mission: ActiveMode::OwnerTask,
+        active_mode: ActiveMode::OwnerTask,
         case_id: None,
         graph_node: None,
         graph_phase: None,

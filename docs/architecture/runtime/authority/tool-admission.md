@@ -20,7 +20,7 @@ admit_tool(decision, requested_tool) -> ToolAdmission
 ToolAdmission
 - admitted
 - reason
-- active_mission
+- active_mode
 - required_evidence
 - missing_evidence
 - next_valid_tools

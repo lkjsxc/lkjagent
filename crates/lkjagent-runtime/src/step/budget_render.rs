@@ -26,11 +26,11 @@ pub(super) fn checkpoint_notice(
     decision_label: &str,
 ) -> String {
     format!(
-        "turn budget checkpoint reached; continuing autonomously\ncheckpoint_event=TurnBudgetCheckpoint\nepoch_index={}\nturns_used={}\ncheckpoint_interval={}\nactive_mission={:?}\ncontinuation_decision={decision_label}\nmissing_evidence={}\nexact_next_action={}",
+        "turn budget checkpoint reached; continuing autonomously\ncheckpoint_event=TurnBudgetCheckpoint\nepoch_index={}\nturns_used={}\ncheckpoint_interval={}\nactive_mode={:?}\ncontinuation_decision={decision_label}\nmissing_evidence={}\nexact_next_action={}",
         state.continuation_epoch.epoch_index,
         state.continuation_epoch.turns_used,
         state.continuation_epoch.checkpoint_turns,
-        snapshot.active_mission,
+        snapshot.active_mode,
         join_or_none(&snapshot.missing_evidence),
         exact_next_action(decision)
     )
