@@ -35,7 +35,7 @@ but did not record document-structure or artifact-readiness evidence.
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
 | SQLite store | Queue, state, event, memory, task summary, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist in `lkjagent-store`. |
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
-| Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current run snapshot. Provider exchange request, authority, response, timing, parse with envelope mode and text hash, admission, observation, and error records are written when the daemon has a log root. |
+| Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current run snapshot. Provider exchange request, authority, response, timing, parse with envelope mode and text hash, admission, observation, error records, raw-case inspection, and replay export files are written when the daemon has a log root. |
 | Document scaffold seed | Deterministic scaffold paths, relation-first generic seeds, bounded slugs, compact `catalog.toml`, and creative writing profiles exist for project, multi-topic docs, story, novel, character, and cookbook roots. |
 | Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, workspace briefs, structure-only pages, owner-term pages, and old generated boilerplate leaves. |
 | Placeholder and payload refusal | `fs.write`, `fs.batch_write`, content audit, and check-docs reject common scaffold phrases and oversized payloads before mutation. |

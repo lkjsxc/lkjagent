@@ -82,9 +82,9 @@ Fracture run proves both progress and failure:
 - CLI status now renders latest compaction snapshot fields for the active case;
   prompt-frame resume proof remains open.
 - Provider exchange manifests now name parsed-action, admission, and observation
-  artifacts, and exchange rows point at prompt-frame ids. Sanitized archive and
-  raw-case inspection commands remain open before raw model-run failures can be
-  fully reproduced.
+  artifacts, exchange rows point at prompt-frame ids, and CLI raw-case plus
+  sanitized replay export commands exist. Full raw file archive packaging remains
+  open before raw model-run failures can be fully reproduced.
 - The live Chronos story run is required before closing the reliability
   redesign.
 

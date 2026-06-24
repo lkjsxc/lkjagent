@@ -1,6 +1,10 @@
 use std::path::PathBuf;
 
+#[path = "args_model_log.rs"]
+mod args_model_log;
+
 use crate::error::CliError;
+use args_model_log::parse_model_log;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Invocation {
@@ -33,6 +37,8 @@ pub enum ModelLogCommand {
     Current { print: bool },
     List { limit: usize },
     Show { case_id: String, turn_id: i64 },
+    Export { case_id: String, turn_id: i64 },
+    RawCase { case_id: String, limit: usize },
 }
 
 pub fn parse_args<I, S>(args: I) -> Result<Invocation, CliError>
@@ -134,66 +140,4 @@ fn parse_memory(args: Vec<String>) -> Result<Command, CliError> {
     } else {
         Ok(Command::Memory { query })
     }
-}
-
-fn parse_model_log(args: Vec<String>) -> Result<Command, CliError> {
-    if args.first().is_some_and(|arg| arg == "list") {
-        return parse_model_log_list(args.into_iter().skip(1).collect());
-    }
-    if args.first().is_some_and(|arg| arg == "show") {
-        return parse_model_log_show(args.into_iter().skip(1).collect());
-    }
-    let mut print = false;
-    for arg in args {
-        match arg.as_str() {
-            "--print" => print = true,
-            other => return Err(unknown_option("model-log", other)),
-        }
-    }
-    model_log_command(ModelLogCommand::Current { print })
-}
-
-fn parse_model_log_list(args: Vec<String>) -> Result<Command, CliError> {
-    let mut limit = 20usize;
-    let mut iter = args.into_iter();
-    while let Some(arg) = iter.next() {
-        match arg.as_str() {
-            "--limit" => {
-                let Some(value) = iter.next() else {
-                    return Err(CliError::usage("--limit requires a number"));
-                };
-                limit = parse_limit(&value)?;
-            }
-            other => return Err(unknown_option("model-log list", other)),
-        }
-    }
-    model_log_command(ModelLogCommand::List { limit })
-}
-
-fn parse_model_log_show(args: Vec<String>) -> Result<Command, CliError> {
-    let mut case_id = None;
-    let mut turn_id = None;
-    let mut iter = args.into_iter();
-    while let Some(arg) = iter.next() {
-        match arg.as_str() {
-            "--case" => case_id = iter.next(),
-            "--turn" => turn_id = iter.next().map(|value| value.parse()),
-            other => return Err(unknown_option("model-log show", other)),
-        }
-    }
-    let Some(case_id) = case_id else {
-        return Err(CliError::usage("model-log show requires --case"));
-    };
-    let Some(Ok(turn_id)) = turn_id else {
-        return Err(CliError::usage("model-log show requires numeric --turn"));
-    };
-    model_log_command(ModelLogCommand::Show { case_id, turn_id })
-}
-
-fn model_log_command(command: ModelLogCommand) -> Result<Command, CliError> {
-    Ok(Command::ModelLog(command))
-}
-
-fn unknown_option(command: &str, option: &str) -> CliError {
-    CliError::usage(format!("unknown {command} option: {option}"))
 }
