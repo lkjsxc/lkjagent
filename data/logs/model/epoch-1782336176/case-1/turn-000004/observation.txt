@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-directory created
-path=stories/chronos-fracture
-</content>
-</observation>

@@ -1,1 +1,0 @@
-{"content":"\n\n<action>\n<tool>graph.recover</tool>\n</action>","finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":7084,"completion_tokens":58,"cached_prompt_tokens":null,"total_tokens":7142}}
