@@ -31,13 +31,13 @@ Fracture run proves both progress and failure:
 
 - stale maintenance action refusal worked when owner work appeared;
 - the owner task stayed active at `document-completion-check` in recovery;
-- the run created directories but did not prove document-structure or
-  artifact-readiness;
-- repeated missing action blocks and parse faults reached at least count 5;
-- `fs.batch_write` repeatedly missed `files` and used a path-shaped unknown
-  parameter;
-- recovery rendered examples but did not force a productive write, audit, or
-  deterministic inspection route;
+- the run created `stories/chronos-fracture` but wrote no files there;
+- `fs.batch_write` first refused invalid or truncated JSON inside `<files>`;
+- `fs.batch_write` then refused a 5,767-byte single README because the per-file
+  limit is 1,800 bytes;
+- both write refusals were valid pre-mutation guards;
+- recovery rendered examples but did not force a productive artifact-aware
+  bounded batch, audit, or deterministic inspection route;
 - no successful close claim is valid until a replayed or live story run and
   Docker Compose verification prove this failure class is gone.
 
@@ -64,9 +64,10 @@ Fracture run proves both progress and failure:
   case id, graph node and phase, active mode, artifact root and cursor, latest
   fault, missing evidence, compaction pressure, maintenance state, and prompt
   frame head.
-- Schema repair for `fs.batch_write` now safely normalizes path-shaped unknown
-  parameters when every parameter is a relative path and every value is content;
-  absolute, duplicate, and empty-content path parameters refuse before mutation.
+- Schema repair for `fs.batch_write` now safely handles JSON-in-`files`, line
+  protocol, and path-shaped unknown parameters when every parameter is a
+  relative path and every value is content; invalid JSON, absolute paths,
+  duplicates, empty content, and oversized payloads refuse before mutation.
   Runtime repeated-fault route changes remain open beyond covered classes.
 - Recovery routes now change repeated batch-schema faults from `fs.batch_write`
   to `artifact.next`, and repeated attribute-like parser faults to `graph.state`
