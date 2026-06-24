@@ -37,15 +37,29 @@ pub const REPORT: &[ShapeGroup] = &[
 #[rustfmt::skip]
 pub const MANUSCRIPT: &[ShapeGroup] = &[
     group("request", "Request", "request index", &["objective", "constraints"]),
+    group("project", "Project", "project index", &["premise", "themes"]),
     group("setting", "Setting", "setting index", &[
-        "world pillars", "history", "locations", "technology", "factions",
+        "cosmology", "timeline", "locations", "society", "factions", "technology",
     ]),
     group("characters", "Characters", "character index", &[
-        "protagonist", "antagonist", "allies", "conflicts",
+        "protagonist", "antagonist", "supporting cast", "relationships",
     ]),
-    group("plot", "Plot", "plot index", &["premise", "act structure", "scene index"]),
-    group("draft", "Draft", "draft index", &["opening scene", "chapter map"]),
-    group("continuity", "Continuity", "continuity index", &["timeline", "glossary"]),
+    group("plot", "Plot", "plot index", &[
+        "conflict lattice", "act structure", "chapter spine",
+    ]),
+    group("continuity", "Continuity", "continuity index", &[
+        "rules", "glossary", "open questions",
+    ]),
+    group("style", "Style", "style index", &["tone", "motifs"]),
+    group("manuscript", "Manuscript", "manuscript index", &[
+        "draft boundary", "scene seeds",
+    ]),
+    group("relations", "Relations", "relations index", &[
+        "character plot", "setting plot",
+    ]),
+    group("checks", "Checks", "checks index", &[
+        "structure audit", "readiness audit",
+    ]),
 ];
 
 #[rustfmt::skip]
