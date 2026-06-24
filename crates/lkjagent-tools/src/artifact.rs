@@ -112,7 +112,7 @@ pub fn audit(
             return Ok(report);
         }
     }
-    let report = readiness_report(kind, &report);
+    let report = crate::artifact_readiness::readiness_report(kind, root, &full, &report)?;
     crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)
 }
 
@@ -166,22 +166,6 @@ fn kind_mismatch(kind: &str, catalog: &str) -> bool {
         "cookbook" => !catalog.contains("Cookbook"),
         _ => false,
     }
-}
-
-fn readiness_report(kind: &str, report: &str) -> String {
-    let converted = report.replace("document audit", "artifact audit");
-    if !content_kind(kind) || !converted.starts_with("artifact audit passed") {
-        return converted;
-    }
-    converted.replace(
-        "next_action=record document-structure evidence",
-        "readiness=content-bearing\nnext_action=record document-structure and artifact-readiness evidence",
-    )
-}
-
-fn content_kind(kind: &str) -> bool {
-    let kind = kind.trim().to_ascii_lowercase();
-    kind == "cookbook" || kind == "story"
 }
 
 #[allow(clippy::manual_unwrap_or_default)]

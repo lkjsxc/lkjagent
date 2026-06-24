@@ -57,5 +57,6 @@ reads artifact ledger state, not raw file existence or direct graph notes.
 partially implemented. Ledger schema, store APIs, writes from `artifact.plan`, `artifact.apply`,
 `artifact.audit`, and `artifact.next`, successful write-path cursor completion marking, failed write-path cursor
 marking, audit observations tied to `artifact_ledger_id`, invalid-root markers for audited `.md` roots, daemon
-`agent.done` refusals for unresolved ledger weak paths, and completion refusal status with current artifact plus next
-audit action exist. Adoption repair flow and proof for every close path remain open.
+`agent.done` refusals for unresolved ledger weak paths, story semantic readiness checks in `artifact.audit`, and
+completion refusal status with current artifact plus next audit action exist. Adoption repair flow and proof for every
+close path remain open.
