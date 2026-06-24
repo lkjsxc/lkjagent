@@ -1,10 +1,11 @@
 use std::path::Path;
 
-use lkjagent_store::artifact_ledger::{
-    record_weak_path, upsert_artifact, ArtifactLedgerInput, WeakPathInput,
-};
+use lkjagent_store::artifact_ledger::{record_weak_path, WeakPathInput};
 use rusqlite::Connection;
 
+use crate::artifact_ledger_state::{
+    record_state, scale_key, scale_or_default, stored_scale, LedgerStateChange,
+};
 use crate::error::ToolResult;
 use crate::fs::workspace_path;
 
@@ -18,12 +19,13 @@ pub fn record_plan(
     let selected_scale = scale_or_default(scale);
     record_state(
         conn,
-        &StateChange {
+        &LedgerStateChange {
             root,
             kind,
             scale: &selected_scale,
             lifecycle: "identity-ready",
             readiness: "not-audited",
+            objective_match: "unknown",
             weak_path_count: 0,
         },
         now,
@@ -36,12 +38,13 @@ pub fn record_apply(conn: &Connection, root: &str, kind: &str, now: &str) -> Too
     let scale = stored_scale(conn, root)?;
     record_state(
         conn,
-        &StateChange {
+        &LedgerStateChange {
             root,
             kind,
             scale: &scale,
             lifecycle: "adopted-or-scaffolded",
             readiness: "needs-audit",
+            objective_match: "unknown",
             weak_path_count: 0,
         },
         now,
@@ -67,20 +70,17 @@ pub fn record_audit(
         weak_paths.len().max(1) as i64
     };
     let scale = stored_scale(conn, root)?;
-    let lifecycle = if passed {
-        "audit-passed"
-    } else {
-        "content-partial"
-    };
-    let readiness = if passed { "passed" } else { "failed" };
+    let lifecycle = lifecycle_for_report(passed, report);
+    let readiness = readiness_for_report(passed, report);
     let ledger_id = record_state(
         conn,
-        &StateChange {
+        &LedgerStateChange {
             root,
             kind,
             scale: &scale,
             lifecycle,
             readiness,
+            objective_match: objective_match(report),
             weak_path_count: weak_count,
         },
         now,
@@ -107,89 +107,42 @@ pub fn record_audit(
     Ok(append_ledger_id(report, ledger_id))
 }
 
-struct StateChange<'a> {
-    root: &'a str,
-    kind: &'a str,
-    scale: &'a str,
-    lifecycle: &'a str,
-    readiness: &'a str,
-    weak_path_count: i64,
-}
-
-fn record_state(conn: &Connection, change: &StateChange<'_>, now: &str) -> ToolResult<i64> {
-    let case_id = case_id(conn)?;
-    let kind = kind_or_default(change.kind);
-    let topic = normalized_topic(change.root);
-    let scale = scale_or_default(change.scale);
-    let artifact_id = format!("{case_id}:{kind}:{topic}:{scale}");
-    upsert_artifact(
-        conn,
-        &ArtifactLedgerInput {
-            case_id,
-            artifact_id: &artifact_id,
-            root: change.root,
-            kind: &kind,
-            normalized_topic: &topic,
-            requested_scale: &scale,
-            profile: &kind,
-            lifecycle_state: change.lifecycle,
-            topology_status: "unknown",
-            readiness_status: change.readiness,
-            objective_match_status: "unknown",
-            latest_audit_id: None,
-            weak_path_count: change.weak_path_count,
-        },
-        now,
-    )
-    .map_err(Into::into)
-}
-
 fn append_ledger_id(report: &str, ledger_id: i64) -> String {
     format!("{report}\nartifact_ledger_id={ledger_id}")
 }
 
 fn weak_paths(workspace: &Path, root: &str) -> ToolResult<Vec<String>> {
     let full = workspace_path(workspace, root)?;
-    if !full.exists() {
+    if !full.exists() || full.is_file() {
         return Ok(vec![root.to_string()]);
     }
     crate::doc::weak_content_paths(&full)
 }
 
-fn case_id(conn: &Connection) -> ToolResult<i64> {
-    let Some(value) = lkjagent_store::state::get(conn, "authority case id")? else {
-        return Ok(0);
-    };
-    Ok(value.parse::<i64>().ok().unwrap_or(0))
-}
-
-fn normalized_topic(root: &str) -> String {
-    root.rsplit('/').next().unwrap_or(root).replace('_', "-")
-}
-
-fn kind_or_default(kind: &str) -> String {
-    let trimmed = kind.trim();
-    if trimmed.is_empty() {
-        "artifact".to_string()
+fn lifecycle_for_report(passed: bool, report: &str) -> &'static str {
+    if passed {
+        "audit-passed"
+    } else if report.contains("address_status=root_ends_with_markdown_suffix") {
+        "invalid-root"
     } else {
-        trimmed.to_ascii_lowercase()
+        "content-partial"
     }
 }
 
-fn scale_or_default(scale: &str) -> String {
-    let trimmed = scale.trim();
-    if trimmed.is_empty() {
-        "unspecified".to_string()
+fn readiness_for_report(passed: bool, report: &str) -> &'static str {
+    if passed {
+        "passed"
+    } else if report.contains("address_status=root_ends_with_markdown_suffix") {
+        "invalid"
     } else {
-        trimmed.to_string()
+        "failed"
     }
 }
 
-fn stored_scale(conn: &Connection, root: &str) -> ToolResult<String> {
-    Ok(lkjagent_store::state::get(conn, &scale_key(root))?
-        .unwrap_or_else(|| "unspecified".to_string()))
-}
-
-fn scale_key(root: &str) -> String {
-    format!("artifact requested scale {root}")
+fn objective_match(report: &str) -> &'static str {
+    if report.contains("address_status=root_ends_with_markdown_suffix") {
+        "failed"
+    } else {
+        "unknown"
+    }
 }
