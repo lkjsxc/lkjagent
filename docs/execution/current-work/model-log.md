@@ -56,6 +56,6 @@ partially implemented. The current Markdown handoff, provider exchange store
 rows, request files, authority files, response files, timing files, error
 files, per-turn export manifests that name parsed-action, admission, and
 observation artifacts, parsed-action, admission, observation, index files,
-prompt-frame ids on exchange rows, and CLI list and show exist for daemon
-provider calls with a log root. Raw-case inspection and sanitized archive
-commands remain open.
+prompt-frame ids on exchange rows, CLI list and show, raw-case inspection,
+and sanitized replay export commands exist for daemon provider calls with a log
+root. Full raw file archive packaging remains open.
