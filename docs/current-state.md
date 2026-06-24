@@ -33,7 +33,7 @@ but did not record document-structure or artifact-readiness evidence.
 | Parser | `lkjagent-protocol` parses line-oriented, paired-tag, and batch file action forms covered by focused fixtures. The live parser uses `<action>`, rejects top-level JSON and prose outside the envelope, records implicit-envelope outcomes in provider logs and runtime notices, and emits dedicated attribute-like tag faults. Provider stop-closure restoration records closure mode for parse logs. |
 | Dispatcher registry | `lkjagent-tools` validates registered tools, required-any groups, and renders registry examples for covered action families. `graph.plan` requires checks or paths before dispatch. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
-| SQLite store | Queue, state, event, memory, task summary, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist in `lkjagent-store`. |
+| SQLite store | Queue, state, event, memory, personal record, task summary, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist in `lkjagent-store`. |
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
 | Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current run snapshot. Provider exchange request, authority, response, timing, parse with envelope mode and text hash, admission, observation, error records, raw-case inspection, and replay export files are written when the daemon has a log root. |
 | Document scaffold seed | Deterministic scaffold paths, relation-first generic seeds, bounded slugs, compact `catalog.toml`, and creative writing profiles exist for project, multi-topic docs, story, novel, character, and cookbook roots. |
@@ -181,7 +181,7 @@ Latest broad local gates:
 
 Store-ledger focused gates:
 
-- `cargo test -p lkjagent-store --test runtime_kernel_ledger`: `STORE_KERNEL_LEDGER_EXIT=0`, 3 passed.
+- `cargo test -p lkjagent-store --test personal_records`: `PERSONAL_RECORDS_EXIT=0`, 4 passed.
 - `cargo test -p lkjagent-runtime --test authority_ledger_wiring`: `AUTHORITY_LEDGER_WIRING_EXIT=0`, 2 passed.
 - `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.

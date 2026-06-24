@@ -119,6 +119,7 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
     crate::schema_graph::setup(conn)?;
     crate::schema_authority::setup(conn)?;
     crate::schema_artifacts::setup(conn)?;
+    crate::schema_personal::setup(conn)?;
     crate::schema_provider_exchange::setup(conn)?;
     Ok(())
 }

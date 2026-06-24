@@ -15,6 +15,8 @@ This directory holds schema setup and typed SQLite store APIs.
 - [lib.rs](lib.rs): library root.
 - [memory.rs](memory.rs): memory write, edit, search, and digest APIs.
 - [memory/](memory/README.md): memory row mapping helpers.
+- [personal.rs](personal.rs): diary, schedule, and TODO store API exports.
+- [personal/](personal/README.md): personal record models, validation, reads, and writes.
 - [queue.rs](queue.rs): queue delivery and mutation APIs.
 - [queue/](queue/README.md): queue row mapping helpers.
 - [runtime_authority.rs](runtime_authority.rs): authority history API exports.
@@ -23,5 +25,6 @@ This directory holds schema setup and typed SQLite store APIs.
 - [schema_artifacts.rs](schema_artifacts.rs): semantic artifact ledger SQLite schema setup.
 - [schema_authority.rs](schema_authority.rs): runtime authority SQLite schema setup.
 - [schema_graph.rs](schema_graph.rs): graph-specific SQLite schema setup.
+- [schema_personal.rs](schema_personal.rs): personal record SQLite schema setup.
 - [state.rs](state.rs): key-value state and daemon lock decisions.
 - [token_usage.rs](token_usage.rs): normalized token usage event ledger.
