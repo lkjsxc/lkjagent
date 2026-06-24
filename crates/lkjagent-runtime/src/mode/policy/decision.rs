@@ -12,7 +12,7 @@ pub enum EndpointDecision {
 
 pub fn endpoint_decision_for(
     mode: ActiveMode,
-    input: super::input::TurnAuthorityInput,
+    input: &super::input::TurnAuthorityInput,
 ) -> EndpointDecision {
     if input.compaction_required || mode == ActiveMode::Compaction {
         return EndpointDecision::RuntimeCompact;

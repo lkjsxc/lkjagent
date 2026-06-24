@@ -22,7 +22,7 @@ pub struct TurnAuthority {
 }
 
 pub fn decide_turn_authority(input: TurnAuthorityInput) -> TurnAuthority {
-    let snapshot = runtime_snapshot_for_turn(input);
+    let snapshot = runtime_snapshot_for_turn(&input);
     decide_turn_authority_for_snapshot(input, snapshot)
 }
 
@@ -35,7 +35,7 @@ pub fn decide_turn_authority_for_snapshot(
     snapshot.active_mode = mode;
     let effective_policy = policy_for_mode(mode);
     let completion_policy = completion_policy_for(mode);
-    let endpoint_decision = endpoint_decision_for(mode, input);
+    let endpoint_decision = endpoint_decision_for(mode, &input);
     let valid_example = valid_example_for(mode, endpoint_decision);
     let prompt_card = prompt_card(
         mission,
@@ -60,7 +60,7 @@ pub fn decide_turn_authority_for_snapshot(
     }
 }
 
-pub fn runtime_snapshot_for_turn(input: TurnAuthorityInput) -> RuntimeSnapshot {
+pub fn runtime_snapshot_for_turn(input: &TurnAuthorityInput) -> RuntimeSnapshot {
     let owner_work_exists = input.owner_work_exists();
     let recovery_ladder_active = input.recoverable_owner_case;
     let context_pressure_active = input.compaction_required;
@@ -68,16 +68,16 @@ pub fn runtime_snapshot_for_turn(input: TurnAuthorityInput) -> RuntimeSnapshot {
         !owner_work_exists && (input.maintenance_due || input.maintenance_active);
     let mut snapshot = RuntimeSnapshot {
         active_mode: ActiveMode::ClosedIdle,
-        case_id: None,
-        graph_node: None,
-        graph_phase: None,
+        case_id: input.case_id.map(|id| id.to_string()),
+        graph_node: input.graph_node.clone(),
+        graph_phase: input.graph_phase.clone(),
         owner_work_exists,
         recovery_ladder_active,
         context_pressure_active,
         maintenance_eligible,
-        required_evidence: Vec::new(),
-        missing_evidence: Vec::new(),
-        active_artifact: None,
+        required_evidence: input.required_evidence.clone(),
+        missing_evidence: input.missing_evidence.clone(),
+        active_artifact: input.artifact_root.clone(),
         last_tool_attempt: None,
         repeated_action: false,
         external_owner_input_required: false,

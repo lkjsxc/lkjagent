@@ -3,6 +3,7 @@ use lkjagent_context::model::{Frame, FrameKind};
 use rusqlite::Connection;
 
 use super::authority_store::persist_authority_snapshot;
+use super::graph_policy::completion_decision;
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
 use crate::mode::{
@@ -10,8 +11,9 @@ use crate::mode::{
 };
 use crate::prompt::token_estimate;
 use crate::task::TaskState;
+use lkjagent_graph::{TaskGraphState, TransitionDecision};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RuntimeAuthoritySnapshot {
     pub pending_owner_rows: usize,
     pub active_owner_case: bool,
@@ -20,6 +22,12 @@ pub struct RuntimeAuthoritySnapshot {
     pub maintenance_due: bool,
     pub maintenance_active: bool,
     pub endpoint_retry_pending: bool,
+    pub case_id: Option<i64>,
+    pub graph_node: Option<String>,
+    pub graph_phase: Option<String>,
+    pub artifact_root: Option<String>,
+    pub required_evidence: Vec<String>,
+    pub missing_evidence: Vec<String>,
 }
 
 impl ResidentDaemon {
@@ -62,6 +70,7 @@ impl ResidentDaemon {
         endpoint_retry_pending: bool,
     ) -> RuntimeResult<RuntimeAuthoritySnapshot> {
         let active_owner_case = self.active_owner_case();
+        let graph = graph_snapshot(conn, self.state.graph.as_ref());
         Ok(RuntimeAuthoritySnapshot {
             pending_owner_rows: lkjagent_store::queue::pending_count(conn)?,
             active_owner_case,
@@ -70,6 +79,12 @@ impl ResidentDaemon {
             maintenance_due: crate::maintenance::maintenance_due(conn, &self.state, now)?,
             maintenance_active: self.state.maintenance.is_some(),
             endpoint_retry_pending,
+            case_id: graph.case_id,
+            graph_node: graph.node,
+            graph_phase: graph.phase,
+            artifact_root: graph.artifact_root,
+            required_evidence: graph.required_evidence,
+            missing_evidence: graph.missing_evidence,
         })
     }
 
@@ -97,6 +112,46 @@ impl ResidentDaemon {
     }
 }
 
+struct GraphSnapshotFields {
+    case_id: Option<i64>,
+    node: Option<String>,
+    phase: Option<String>,
+    artifact_root: Option<String>,
+    required_evidence: Vec<String>,
+    missing_evidence: Vec<String>,
+}
+
+fn graph_snapshot(conn: &Connection, graph: Option<&TaskGraphState>) -> GraphSnapshotFields {
+    let Some(graph) = graph else {
+        return GraphSnapshotFields {
+            case_id: None,
+            node: None,
+            phase: None,
+            artifact_root: None,
+            required_evidence: Vec::new(),
+            missing_evidence: Vec::new(),
+        };
+    };
+    GraphSnapshotFields {
+        case_id: graph.case_id,
+        node: Some(graph.active_node.0.to_string()),
+        phase: Some(graph.phase.as_str().to_string()),
+        artifact_root: graph.document.as_ref().map(|doc| doc.root.clone()),
+        required_evidence: graph.evidence.requirement_ids(),
+        missing_evidence: graph_missing_evidence(conn, graph),
+    }
+}
+
+fn graph_missing_evidence(conn: &Connection, graph: &TaskGraphState) -> Vec<String> {
+    match completion_decision(conn, graph) {
+        TransitionDecision::Admit { .. } => Vec::new(),
+        TransitionDecision::Defer { missing } => missing,
+        TransitionDecision::Recover { reason, .. } | TransitionDecision::Refuse { reason } => {
+            vec![reason]
+        }
+    }
+}
+
 fn persisted_authority_card(conn: &Connection, authority: &TurnAuthority) -> RuntimeResult<String> {
     let mut rendered = render_turn_authority(authority);
     if let Some(decision_id) = lkjagent_store::state::get(conn, "authority decision id")? {
@@ -118,6 +173,12 @@ impl From<RuntimeAuthoritySnapshot> for TurnAuthorityInput {
             maintenance_due: snapshot.maintenance_due,
             maintenance_active: snapshot.maintenance_active,
             endpoint_retry_pending: snapshot.endpoint_retry_pending,
+            case_id: snapshot.case_id,
+            graph_node: snapshot.graph_node,
+            graph_phase: snapshot.graph_phase,
+            artifact_root: snapshot.artifact_root,
+            required_evidence: snapshot.required_evidence,
+            missing_evidence: snapshot.missing_evidence,
         }
     }
 }
