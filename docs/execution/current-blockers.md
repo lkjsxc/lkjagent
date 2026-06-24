@@ -11,7 +11,7 @@ that ran.
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
 | 1 | Documentation and current-state reconciliation | [current-work/state-transition-network.md](current-work/state-transition-network.md) | active |
-| 2 | Complete transition-kernel contract and data model | [current-work/state-transition-network.md](current-work/state-transition-network.md) | open |
+| 2 | Complete transition-kernel contract and data model | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
 | 3 | Store ledgers and snapshot adapter for kernel records | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
 | 4 | Prompt frame and dispatch admission through one decision id | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
 | 5 | Schema and batch-write recovery | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | partially implemented |
@@ -47,9 +47,10 @@ Fracture run proves both progress and failure:
   implementation row.
 - Rows stay open until focused tests, quiet verify, and any required Docker
   Compose verification prove the uploaded failure patterns cannot recur.
-- The transition kernel is the first implementation target: one snapshot, one
-  explicit event, one persisted decision, one prompt frame, one admission view,
-  one effect observation, and one next event.
+- The transition kernel remains the first implementation target. A pure kernel
+  data module and invariant tests now exist, but daemon wiring still needs one
+  snapshot, one explicit event, one persisted decision, one prompt frame, one
+  admission view, one effect observation, and one next event.
 - Graph policy is guidance for the snapshot. It is not fallback dispatch
   authority after runtime admission refuses a tool.
 - Stale-action refusal must use the full staleness fingerprint: queue head,
@@ -110,8 +111,7 @@ Fracture run proves both progress and failure:
 
 ## Remaining Proof Gaps
 
-- The current docs, blocker queue, and task files must finish aligning before
-  the next code slice.
+- Store ledgers and snapshot adapter work are the next code slice.
 - Authority rows still need coverage for every dispatch, provider exchange,
   recovery, compaction, maintenance, and close path.
 - Compaction snapshots need status rendering and prompt-frame resume proof.
