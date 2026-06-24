@@ -75,7 +75,7 @@ Fracture run proves both progress and failure:
   `artifact.next`, and repeated attribute-like parser faults to `graph.state`
   inspection. Every other fault class still needs route-level shape-change proof.
 - Existing `.md` directories now render explicit invalid-root marker and repair
-  outcome text. Artifact readiness must be tied to the current artifact id.
+  outcome text, and empty roots route to identity batches. Artifact readiness must be tied to the current artifact id.
   Direct graph evidence, scaffold topology, README-only content, and
   owner-term-only pages do not satisfy readiness. Completion refusal now names
   the current artifact and next audit action for artifact-readiness gaps.

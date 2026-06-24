@@ -52,7 +52,7 @@ but did not record document-structure or artifact-readiness evidence.
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Full unified runtime wiring remains open. |
 | Recovery controller | Fault notices, attribute-like tag repair examples, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, dispatcher-valid examples for covered routes, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, and payload-overflow routing to `artifact.next` for known artifacts exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` now normalizes safe path-shaped unknown parameters into `files` and refuses absolute, duplicate, or empty-content path parameters before mutation. Runtime route changes after repeated schema faults remain open. |
-| Artifact lifecycle | Scaffold, audit, fact-only `artifact.next`, story semantic readiness checks, bounded write examples, root-scoped cursors, root/path address refusals, explicit `.md` directory invalid-root repair output, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
+| Artifact lifecycle | Scaffold, audit, fact-only `artifact.next`, empty-root identity batches, story semantic readiness checks, bounded write examples, root-scoped cursors, root/path address refusals, explicit `.md` directory invalid-root repair output, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
 | Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, current artifact, next action, valid example, blocked-handoff allowance, and status text. Artifact-readiness refusal names the current artifact when authority supplies it; graph-only fallback now uses `graph.state` instead of generic roots. Story semantic audit output now records artifact-readiness evidence for close checks. Every close path is not yet proven to call the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. CLI status now renders the latest compaction snapshot fields for the active case. Prompt-frame resume proof remains open. |
 | Maintenance | Idle maintenance, owner queue preemption at turn boundaries, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Every dispatch and close path still needs unified kernel authority proof. |
@@ -157,7 +157,7 @@ Recovery-shape focused gates:
 
 Artifact-address focused gates:
 
-- `cargo test -p lkjagent-tools --test artifact_address_invalid_root`: `ARTIFACT_ADDRESS_INVALID_ROOT_EXIT=0`, 1 passed.
+- `cargo test -p lkjagent-tools --test artifact_next_empty_root`: `ARTIFACT_NEXT_EMPTY_ROOT_EXIT=0`, 1 passed.
 - `cargo test -p lkjagent-tools --test artifact_address`: `ARTIFACT_ADDRESS_EXIT=0`, 6 passed.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
 

@@ -13,6 +13,14 @@ pub fn missing_root_response(address: &ArtifactAddress) -> String {
     )
 }
 
+pub fn root_identity_response(root: &str, kind: &str) -> String {
+    let kind = kind_or_default(kind);
+    format!(
+        "artifact_next_result=root_needs_identity\nroot={root}\nkind={kind}\nmissing=catalog,readme,semantic-leaf\nruntime_event=ArtifactRootIncomplete\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_example:\n{}",
+        root_identity_example(root, &kind)
+    )
+}
+
 pub fn focused_response(address: &ArtifactAddress, kind: &str) -> String {
     let root = root(address);
     let kind = kind_from_action(&address.next_action).unwrap_or_else(|| kind_or_default(kind));
@@ -114,6 +122,32 @@ fn optional_catalog(root: &Path) -> String {
         Ok(text) => text,
         Err(_) => String::new(),
     }
+}
+
+fn root_identity_example(root: &str, kind: &str) -> String {
+    let title = title_from_root(root);
+    format!(
+        "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: {root}/catalog.toml\ncontent:\n[artifact]\nroot = \"{root}\"\nkind = \"{kind}\"\ntitle = \"{title}\"\n\n-- lkjagent-next-file --\npath: {root}/README.md\ncontent:\n# {title}\n\n## Purpose\n\nNavigate the {kind} artifact and keep large content in semantic child files.\n\n## Start Here\n\n- Request scope lives in request/objective.md.\n- Continue with bounded batches before audit.\n\n-- lkjagent-next-file --\npath: {root}/request/objective.md\ncontent:\n# Objective\n\n## Purpose\n\nRecord the owner scope and the first semantic content leaf for this artifact.\n\nThe artifact is rooted at {root} and must grow through small, concrete batches.\n</files>\n</action>"
+    )
+}
+
+fn title_from_root(root: &str) -> String {
+    root.rsplit('/')
+        .next()
+        .unwrap_or("Artifact")
+        .split('-')
+        .filter(|part| !part.is_empty())
+        .map(capitalize)
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+fn capitalize(part: &str) -> String {
+    let mut chars = part.chars();
+    let Some(first) = chars.next() else {
+        return String::new();
+    };
+    format!("{}{}", first.to_ascii_uppercase(), chars.as_str())
 }
 
 fn artifact_apply_example(root: &str, kind: &str) -> String {
