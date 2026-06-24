@@ -45,6 +45,9 @@ pub fn should_escalate(count: u8) -> bool {
 }
 
 pub fn parse_recovery_notice(fault: &ParseFault, count: u8) -> String {
+    if matches!(fault, ParseFault::AttributeLikeTag { .. }) {
+        return attribute_like_recovery_notice(count);
+    }
     if matches!(
         fault,
         ParseFault::BadParams { .. } | ParseFault::DuplicateParam { .. }
@@ -57,6 +60,17 @@ pub fn parse_recovery_notice(fault: &ParseFault, count: u8) -> String {
         );
     }
     "recovery: the previous completion was not executed; emit exactly one valid action block next"
+        .to_string()
+}
+
+fn attribute_like_recovery_notice(count: u8) -> String {
+    if count >= ESCALATE_AFTER {
+        return "recovery: attribute-like tag repeated; run deterministic graph.state inspection or record blocked handoff before asking for another repair".to_string();
+    }
+    if count >= 2 {
+        return "recovery: attribute-like tag repeated; switch action class to graph.state before another graph.plan repair".to_string();
+    }
+    "recovery: attribute-like tag recorded; emit the next_executable_action with values between tags"
         .to_string()
 }
 
