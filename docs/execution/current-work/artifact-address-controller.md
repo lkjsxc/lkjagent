@@ -8,7 +8,9 @@ from being confused by tools, prompt examples, recovery, audit, and completion.
 ## Contract
 
 All doc and artifact tools resolve input through one pure address reducer before
-performing filesystem or ledger effects.
+performing filesystem or ledger effects. Graph policy may request an address,
+but it does not classify roots or admit a fallback route once runtime authority
+has a current decision.
 
 ## Inputs
 
@@ -24,27 +26,46 @@ performing filesystem or ledger effects.
 
 - normalized root directory.
 - optional relative weak path.
-- path role.
-- next valid action.
-- exact example that parses and dispatches.
+- path role and detected filesystem kind.
+- address status and next valid action.
+- exact example that parses, validates, and dispatches to the intended route.
 - semantic refusal when input is a file where a directory is required.
 
 ## Invariants
 
-- roots for doc.audit, artifact.audit, doc.scaffold, and artifact.apply are directories.
-- a root ending in `.md` is refused or migrated before write, never silently created as a directory.
-- artifact.next never renders artifact.audit for a Markdown file.
+- roots for doc.audit, artifact.audit, doc.scaffold, artifact.plan, and
+  artifact.apply are directory identities.
+- a root ending in `.md` is refused or repaired before write, never silently
+  created as a directory or ledger identity.
+- artifact.next may accept a Markdown file only as a weak path under a known
+  root and never renders artifact.audit for that file.
+- old `.md` directories are invalid roots and need adoption or repair output.
 - OS `Not a directory` is not the primary user-facing failure for known file roots.
 - completion cannot close an artifact whose only evidence is a structure-only or owner-term-only page.
 
 ## Verification
 
-- focused reducer tests.
-- tool route tests.
+- focused reducer table tests for every path classification.
+- tool route tests for plan, apply, next, audit, scaffold, and doc audit.
 - dispatch-level tests proving rendered examples parse, validate, and dispatch.
 - current-model-run regression fixture.
 - Docker Compose verify.
 
+## Proven Slice
+
+Focused tests prove current refusals for artifact.next on file roots,
+artifact.audit on file roots, doc.audit on file roots, artifact.apply `.md`
+roots, doc.scaffold `.md` roots, and missing directory roots. Prior address
+slice notes record quiet verify and Docker Compose verify.
+
+## Remaining Proof Gaps
+
+artifact.plan still needs reducer admission before ledger identity. doc.audit
+and doc.scaffold need full shared-reducer wiring before every filesystem path.
+Old bad `.md` directories need explicit adoption or repair output. Rendered
+examples need route-level dispatch proof for every refusal path, not only parse
+and validation. The live SF-novel rerun has not been repeated in this slice.
+
 ## Status
 
-open
+partially implemented
