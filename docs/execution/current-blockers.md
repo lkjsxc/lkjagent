@@ -67,10 +67,10 @@ Fracture run proves both progress and failure:
 - Schema repair for `fs.batch_write` now safely normalizes path-shaped unknown
   parameters when every parameter is a relative path and every value is content;
   absolute, duplicate, and empty-content path parameters refuse before mutation.
-  Runtime repeated-fault route changes remain open.
+  Runtime repeated-fault route changes remain open beyond covered classes.
 - Recovery routes now change repeated batch-schema faults from `fs.batch_write`
-  to `artifact.next` and keep batch repair tools visible. Every other fault
-  class still needs route-level shape-change proof.
+  to `artifact.next`, and repeated attribute-like parser faults to `graph.state`
+  inspection. Every other fault class still needs route-level shape-change proof.
 - Existing `.md` directories now render explicit invalid-root marker and repair
   outcome text. Artifact readiness must be tied to the current artifact id.
   Direct graph evidence, scaffold topology, README-only content, and
