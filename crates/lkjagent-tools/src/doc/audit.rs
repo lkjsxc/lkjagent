@@ -1,6 +1,10 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use crate::address::{
+    render_document_refusal, resolve_artifact_address, ArtifactAddress, ArtifactAddressKind,
+    ResolveInput, RootPathProblem,
+};
 use crate::error::ToolResult;
 use crate::fs::workspace_path;
 
@@ -17,6 +21,9 @@ pub fn audit_root(
     count: Option<usize>,
     mode: ScaffoldMode,
 ) -> ToolResult<String> {
+    if let Some(refusal) = address_refusal(workspace, root)? {
+        return Ok(refusal);
+    }
     let full = workspace_path(workspace, root)?;
     let mut failures = Vec::new();
     if !full.exists() {
@@ -31,6 +38,29 @@ pub fn audit_root(
     content_checks(&full, &mut failures)?;
     count_check(&full, count, mode, &mut failures)?;
     Ok(report(root, failures, content_requested))
+}
+
+fn address_refusal(workspace: &Path, root: &str) -> ToolResult<Option<String>> {
+    let address = resolve_artifact_address(ResolveInput {
+        workspace,
+        requested_root: root,
+        requested_path: None,
+        kind: "documentation",
+    })?;
+    if can_audit_directory(&address) {
+        return Ok(None);
+    }
+    if address.problem == Some(RootPathProblem::RootIsFile) {
+        return Ok(Some(file_root_report(root)));
+    }
+    Ok(Some(render_document_refusal("doc.audit", &address)))
+}
+
+fn can_audit_directory(address: &ArtifactAddress) -> bool {
+    matches!(
+        address.kind,
+        ArtifactAddressKind::MissingRoot | ArtifactAddressKind::RootDirectory
+    ) && address.problem.is_none()
 }
 
 fn file_root_report(root: &str) -> String {

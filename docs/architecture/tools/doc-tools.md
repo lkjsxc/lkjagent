@@ -74,6 +74,6 @@ The documentation root contract is
 ## Status
 
 partially implemented; doc tools, artifact wrappers, bounded next-batch
-planning, scaffold-only rejection, and focused address refusals exist. Full
-shared-reducer wiring for artifact.plan and every doc route, root adoption,
-and repair planning remain open.
+planning, scaffold-only rejection, focused address refusals, artifact.plan
+root admission, and doc route reducer checks exist. Root adoption and repair
+planning remain open.
