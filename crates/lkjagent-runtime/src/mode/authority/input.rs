@@ -13,6 +13,8 @@ pub struct TurnAuthorityInput {
     pub artifact_root: Option<String>,
     pub required_evidence: Vec<String>,
     pub missing_evidence: Vec<String>,
+    pub latest_decision_id: Option<String>,
+    pub prompt_frame_id: Option<String>,
 }
 
 impl TurnAuthorityInput {

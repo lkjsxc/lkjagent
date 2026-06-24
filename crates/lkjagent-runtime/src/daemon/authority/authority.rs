@@ -28,6 +28,8 @@ pub struct RuntimeAuthoritySnapshot {
     pub artifact_root: Option<String>,
     pub required_evidence: Vec<String>,
     pub missing_evidence: Vec<String>,
+    pub latest_decision_id: Option<String>,
+    pub prompt_frame_id: Option<String>,
 }
 
 impl ResidentDaemon {
@@ -37,11 +39,13 @@ impl ResidentDaemon {
         now: &str,
         endpoint_retry_pending: bool,
     ) -> RuntimeResult<TurnAuthority> {
-        let authority = decide_turn_authority(
+        let mut authority = decide_turn_authority(
             self.authority_snapshot(conn, now, endpoint_retry_pending)?
                 .into(),
         );
         persist_authority_snapshot(self, conn, &authority)?;
+        authority.input.latest_decision_id =
+            lkjagent_store::state::get(conn, "authority decision id")?;
         Ok(authority)
     }
 
@@ -56,6 +60,10 @@ impl ResidentDaemon {
             .retain(|frame| !frame.content.starts_with("Active Mode:\n"));
         let rendered = persisted_authority_card(conn, authority)?;
         persist_authority_prompt_frame(conn, &self.runtime.tools.now, &rendered)?;
+        if let Some(cached) = self.turn_authority.as_mut() {
+            cached.input.prompt_frame_id =
+                lkjagent_store::state::get(conn, "authority prompt frame id")?;
+        }
         self.state.context.log.push(Frame::new(
             FrameKind::GraphNotice,
             rendered.clone(),
@@ -86,6 +94,8 @@ impl ResidentDaemon {
             artifact_root: graph.artifact_root,
             required_evidence: graph.required_evidence,
             missing_evidence: graph.missing_evidence,
+            latest_decision_id: lkjagent_store::state::get(conn, "authority decision id")?,
+            prompt_frame_id: lkjagent_store::state::get(conn, "authority prompt frame id")?,
         })
     }
 
@@ -180,6 +190,8 @@ impl From<RuntimeAuthoritySnapshot> for TurnAuthorityInput {
             artifact_root: snapshot.artifact_root,
             required_evidence: snapshot.required_evidence,
             missing_evidence: snapshot.missing_evidence,
+            latest_decision_id: snapshot.latest_decision_id,
+            prompt_frame_id: snapshot.prompt_frame_id,
         }
     }
 }

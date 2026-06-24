@@ -48,7 +48,7 @@ pub(super) fn persist_authority_ledger(
             fault_head: authority.snapshot.last_tool_attempt.as_deref(),
             compaction_head: compaction_head(authority),
             maintenance_state: maintenance_state(authority),
-            prompt_frame_id: None,
+            prompt_frame_id: authority.input.prompt_frame_id.as_deref(),
             context_frame_id: None,
             staleness_fingerprint: &fingerprint,
             created_at,
