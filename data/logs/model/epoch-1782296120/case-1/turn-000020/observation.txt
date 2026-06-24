@@ -1,0 +1,7 @@
+<observation>
+<status>ok</status>
+<content>
+directory created
+path=stories/chronos-fracture/bible
+</content>
+</observation>
