@@ -1,3 +1,6 @@
+use crate::error::RuntimeResult;
+use crate::prompt::token_estimate;
+use crate::task::{RuntimeState, TaskState};
 use lkjagent_context::assemble::assemble_messages;
 use lkjagent_context::model::{ContextState, Frame, FrameKind, NoticeKind};
 use lkjagent_llm::client::{complete, ClientConfig};
@@ -8,10 +11,6 @@ use lkjagent_store::state::{take_lock, LockDecision};
 use lkjagent_tools::dispatch::{dispatch, DispatchOutput, DispatchState, ToolRuntime};
 use rusqlite::Connection;
 use std::time::Duration;
-
-use crate::error::RuntimeResult;
-use crate::prompt::token_estimate;
-use crate::task::{RuntimeState, TaskState};
 
 #[path = "daemon/authority/authority.rs"]
 mod authority;
@@ -53,6 +52,8 @@ mod idle;
 mod maintenance_wait;
 #[path = "daemon/loop/owner_delivery.rs"]
 mod owner_delivery;
+#[path = "daemon/effects/pending_staleness.rs"]
+mod pending_staleness;
 #[path = "daemon/context/persisted.rs"]
 mod persisted;
 #[path = "daemon/context/pressure.rs"]
@@ -71,7 +72,6 @@ mod startup;
 mod status;
 #[path = "daemon/status/task_summary.rs"]
 mod task_summary;
-
 pub use persisted::restore_completion_guard;
 pub use runner::{DaemonTick, ResidentDaemon, ResidentRuntime};
 pub use startup::{build_prefix_from_store, startup_summary};

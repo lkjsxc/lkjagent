@@ -5,9 +5,10 @@ use rusqlite::Connection;
 use super::authority_admission::{
     install_authority_view, record_authority_admission, record_authority_refusal,
 };
+use super::pending_staleness::stale_action_refusal;
 use super::runner::{DaemonTick, ResidentDaemon};
 use crate::error::RuntimeResult;
-use crate::mode::{ActiveMode, EndpointDecision, TurnAuthority};
+use crate::mode::EndpointDecision;
 use crate::step::{step, StepInput};
 
 impl ResidentDaemon {
@@ -97,31 +98,6 @@ impl ResidentDaemon {
     }
 }
 
-fn stale_action_refusal(
-    cached: Option<&TurnAuthority>,
-    current: &TurnAuthority,
-    tool: &str,
-) -> Option<String> {
-    let cached = cached?;
-    let stale_maintenance = cached.mode == ActiveMode::Maintenance
-        && (current.mode != ActiveMode::Maintenance
-            || current.endpoint_decision == EndpointDecision::DeferMaintenance);
-    let runtime_only = matches!(
-        current.endpoint_decision,
-        EndpointDecision::RuntimeCompact | EndpointDecision::ClosedIdle
-    );
-    if !stale_maintenance && !runtime_only {
-        return None;
-    }
-    Some(format!(
-        "stale model action refused\nactive_mode={:?}\nprevious_mode={:?}\nfailed_tool={tool}\nfailed_gate=stale-turn-authority\nadmitted_tools={}\nnext_executable_action={}\nreason=current runtime authority preempts the cached model action",
-        current.mode,
-        cached.mode,
-        join_or_none(&current.effective_policy.allowed_tools),
-        current.valid_example
-    ))
-}
-
 fn notice_output(
     state: &mut lkjagent_tools::dispatch::DispatchState,
     action_text: &str,
@@ -137,13 +113,5 @@ fn notice_output(
         kind: frame.kind,
         content: frame.content,
         rendered: frame.rendered,
-    }
-}
-
-fn join_or_none(values: &[&str]) -> String {
-    if values.is_empty() {
-        "none".to_string()
-    } else {
-        values.join(",")
     }
 }
