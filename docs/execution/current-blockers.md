@@ -74,7 +74,8 @@ Fracture run proves both progress and failure:
 - Existing `.md` directories now render explicit invalid-root marker and repair
   outcome text. Artifact readiness must be tied to the current artifact id.
   Direct graph evidence, scaffold topology, README-only content, and
-  owner-term-only pages do not satisfy readiness.
+  owner-term-only pages do not satisfy readiness. Completion refusal now names
+  the current artifact and next audit action for artifact-readiness gaps.
 - Maintenance can start only from closed idle with an empty owner queue and no
   recoverable owner task. Owner work preempts maintenance before endpoint and
   before dispatch.
@@ -122,7 +123,7 @@ Fracture run proves both progress and failure:
 
 ## Remaining Proof Gaps
 
-- Artifact readiness and completion gate coverage is the next code slice.
+- Compaction resume proof and status rendering is the next code slice.
 - Authority rows still need coverage for every dispatch, provider exchange,
   recovery, compaction, maintenance, and close path.
 - Compaction snapshots need status rendering and prompt-frame resume proof.

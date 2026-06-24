@@ -20,6 +20,7 @@ pub struct CompletionDecision {
     pub next_executable_action: String,
     pub valid_example: String,
     pub blocked_handoff_allowed: bool,
+    pub current_artifact: Option<String>,
     pub status_text: String,
 }
 
@@ -39,7 +40,8 @@ pub fn decide_completion(snapshot: &RuntimeSnapshot) -> CompletionDecision {
         next_executable_action,
         valid_example,
         blocked_handoff_allowed: completion_kind == CompletionKind::BlockedHandoff,
-        status_text: status_text(allowed, &failed_gates),
+        current_artifact: snapshot.active_artifact.clone(),
+        status_text: status_text(snapshot, allowed, &failed_gates),
     }
 }
 
@@ -109,7 +111,7 @@ fn next_action(snapshot: &RuntimeSnapshot, allowed: bool) -> String {
         .iter()
         .any(|item| item == "artifact-readiness")
     {
-        return "artifact.next".to_string();
+        return "artifact.audit".to_string();
     }
     if snapshot.missing_evidence.iter().any(|item| item == "plan") {
         return "graph.plan".to_string();
@@ -131,10 +133,14 @@ fn existing_evidence(snapshot: &RuntimeSnapshot) -> Vec<String> {
         .collect()
 }
 
-fn status_text(allowed: bool, failed_gates: &[String]) -> String {
+fn status_text(snapshot: &RuntimeSnapshot, allowed: bool, failed_gates: &[String]) -> String {
     if allowed {
-        "completion admitted".to_string()
-    } else {
-        format!("completion refused: {}", failed_gates.join(","))
+        return "completion admitted".to_string();
     }
+    let artifact = snapshot.active_artifact.as_deref().unwrap_or("none");
+    format!(
+        "completion refused: {}; artifact={artifact}; next={}",
+        failed_gates.join(","),
+        next_action(snapshot, false)
+    )
 }
