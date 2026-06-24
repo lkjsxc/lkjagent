@@ -52,7 +52,7 @@ but did not record document-structure or artifact-readiness evidence.
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Full unified runtime wiring remains open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, dispatcher-valid examples for covered routes, SQLite retry counts, and repeated batch-schema shape change to `artifact.next` exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` now normalizes safe path-shaped unknown parameters into `files` and refuses absolute, duplicate, or empty-content path parameters before mutation. Runtime route changes after repeated schema faults remain open. |
-| Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, root/path address refusals, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
+| Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, root/path address refusals, explicit `.md` directory invalid-root repair output, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
 | Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, next action, valid example, blocked-handoff allowance, and status text. Every close path is not yet proven to call the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Status rendering and prompt-frame resume proof remain open. |
 | Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Owner preemption before endpoint and every dispatch path remains open. |
@@ -147,6 +147,12 @@ Recovery-shape focused gates:
 
 - `cargo test -p lkjagent-runtime --test recovery_shape_enforcement`: `RECOVERY_SHAPE_EXIT=0`, 3 passed.
 - `cargo test -p lkjagent-runtime --test authority_recovery_plan`: `AUTHORITY_RECOVERY_PLAN_EXIT=0`, 5 passed.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+
+Artifact-address focused gates:
+
+- `cargo test -p lkjagent-tools --test artifact_address_invalid_root`: `ARTIFACT_ADDRESS_INVALID_ROOT_EXIT=0`, 1 passed.
+- `cargo test -p lkjagent-tools --test artifact_address`: `ARTIFACT_ADDRESS_EXIT=0`, 6 passed.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
 
 Store-ledger focused gates:
