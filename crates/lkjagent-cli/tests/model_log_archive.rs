@@ -12,6 +12,10 @@ use support::{open_store, temp_data, TestResult};
 fn model_log_export_writes_replay_json() -> TestResult<()> {
     let data = temp_data("model-log-export")?;
     seed_exchange(&data, "7", 3, "exchange-export")?;
+    let turn_dir = data.join("logs/model/epoch-2026/case-7/turn-000003");
+    fs::create_dir_all(&turn_dir)?;
+    fs::write(turn_dir.join("request.json"), "{\"messages\":[]}")?;
+    fs::write(turn_dir.join("parsed-action.json"), "{\"status\":\"ok\"}")?;
 
     let output = run_cli([
         "--data",
@@ -31,6 +35,12 @@ fn model_log_export_writes_replay_json() -> TestResult<()> {
     assert!(replay.contains("exchange-export"));
     assert!(replay.contains("request_json"));
     assert!(replay.contains("response_json"));
+    assert!(data
+        .join("logs/model/archive/case-7/files/request.json")
+        .exists());
+    assert!(data
+        .join("logs/model/archive/case-7/files/parsed-action.json")
+        .exists());
     Ok(())
 }
 

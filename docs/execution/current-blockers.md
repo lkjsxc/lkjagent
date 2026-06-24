@@ -83,8 +83,8 @@ Fracture run proves both progress and failure:
   prompt-frame resume proof remains open.
 - Provider exchange manifests now name parsed-action, admission, and observation
   artifacts, exchange rows point at prompt-frame ids, and CLI raw-case plus
-  sanitized replay export commands exist. Full raw file archive packaging remains
-  open before raw model-run failures can be fully reproduced.
+  sanitized replay export commands copy raw turn files when present. Live replay
+  proof remains open before raw model-run failures can be fully reproduced.
 - The live Chronos story run is required before closing the reliability
   redesign.
 
