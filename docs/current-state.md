@@ -171,6 +171,7 @@ Latest broad local gates:
 - `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`, `ok check-style`.
 - `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCHMARK_EXIT=0`, `ok benchmark-corpus`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
 
 Store-ledger focused gates:
 
