@@ -46,6 +46,8 @@ fn completion_refusal_does_not_render_file_root_audit() -> TestResult<()> {
     );
 
     assert!(output.content.contains("graph completion refused"));
+    assert!(output.content.contains("<tool>graph.state</tool>"));
+    assert!(!output.content.contains("stories/example-story"));
     assert!(!output.content.contains(".md</root>"));
     validate_example(&output.content)?;
     Ok(())

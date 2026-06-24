@@ -59,7 +59,8 @@ fn agent_done_refusal_points_to_missing_graph_evidence() -> TestResult<()> {
         .contains("partial_handoff=blocked-with-evidence"));
     assert!(refused.content.contains("failed_gate=completion"));
     assert!(refused.content.contains("existing_graph=case=1"));
-    assert!(refused.content.contains("<tool>doc.audit</tool>"));
+    assert!(refused.content.contains("<tool>graph.state</tool>"));
+    assert!(!refused.content.contains("<root>docs</root>"));
     Ok(())
 }
 
