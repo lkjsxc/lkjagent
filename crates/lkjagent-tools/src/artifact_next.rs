@@ -1,3 +1,4 @@
+use std::fs;
 use std::path::Path;
 
 use crate::address::{
@@ -6,7 +7,7 @@ use crate::address::{
 };
 use crate::artifact_next_response::{
     audit_response, batch_response, can_repair_file, cursor_key, focused_response,
-    missing_root_response, path_param, resolved_kind, root,
+    missing_root_response, path_param, resolved_kind, root, root_identity_response,
 };
 use crate::error::ToolResult;
 use crate::fs::workspace_path;
@@ -86,6 +87,9 @@ fn root_next(workspace: &Path, address: &ArtifactAddress, kind: &str) -> ToolRes
     let root = root(address);
     let full = workspace_path(workspace, &root)?;
     let kind = resolved_kind(kind, &full);
+    if root_needs_identity(&full)? {
+        return Ok(root_identity_response(&root, &kind));
+    }
     if let Some(report) = crate::artifact_drift::japanese_cookbook(&full)? {
         if !report.is_empty() {
             return Ok(report.block_message(&root));
@@ -110,6 +114,10 @@ fn root_next_with_cursor(
     let root = root(address);
     let full = workspace_path(workspace, &root)?;
     let kind = resolved_kind(kind, &full);
+    if root_needs_identity(&full)? {
+        lkjagent_store::state::delete(conn, &cursor_key(&root))?;
+        return Ok(root_identity_response(&root, &kind));
+    }
     if let Some(report) = crate::artifact_drift::japanese_cookbook(&full)? {
         if !report.is_empty() {
             lkjagent_store::state::delete(conn, &cursor_key(&root))?;
@@ -154,6 +162,28 @@ fn cursor_batch(
         lkjagent_store::state::set(conn, &cursor_key(root), last)?;
     }
     Ok(batch_response(root, kind, &selected, &valid_example))
+}
+
+fn root_needs_identity(root: &Path) -> ToolResult<bool> {
+    if !root.join("catalog.toml").is_file() || !root.join("README.md").is_file() {
+        return Ok(true);
+    }
+    Ok(!has_markdown_leaf(root)?)
+}
+
+fn has_markdown_leaf(dir: &Path) -> ToolResult<bool> {
+    for entry in fs::read_dir(dir)? {
+        let path = entry?.path();
+        if path.is_dir() && has_markdown_leaf(&path)? {
+            return Ok(true);
+        }
+        if path.extension().is_some_and(|ext| ext == "md")
+            && path.file_name().and_then(|name| name.to_str()) != Some("README.md")
+        {
+            return Ok(true);
+        }
+    }
+    Ok(false)
 }
 
 fn next_start(conn: &Connection, root: &str, weak: &[String]) -> ToolResult<usize> {
