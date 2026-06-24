@@ -1,6 +1,9 @@
 use std::fs;
 use std::path::Path;
 
+#[path = "model_log_export.rs"]
+mod model_log_export;
+
 use crate::args::ModelLogCommand;
 use crate::config::load_context_policy_for_status;
 use crate::error::CliError;
@@ -12,7 +15,7 @@ pub fn model_log(data_dir: &Path, command: ModelLogCommand) -> Result<String, Cl
         ModelLogCommand::List { limit } => list_exchanges(data_dir, limit),
         ModelLogCommand::Show { case_id, turn_id } => show_exchange(data_dir, &case_id, turn_id),
         ModelLogCommand::Export { case_id, turn_id } => {
-            export_exchange(data_dir, &case_id, turn_id)
+            model_log_export::export_exchange(data_dir, &case_id, turn_id)
         }
         ModelLogCommand::RawCase { case_id, limit } => raw_case(data_dir, &case_id, limit),
     }
@@ -46,27 +49,6 @@ fn list_exchanges(data_dir: &Path, limit: usize) -> Result<String, CliError> {
         })
         .collect::<Vec<_>>()
         .join("\n"))
-}
-
-fn export_exchange(data_dir: &Path, case_id: &str, turn_id: i64) -> Result<String, CliError> {
-    let conn = open_store(data_dir)?;
-    let Some(detail) =
-        lkjagent_store::provider_exchange::detail_for_case_turn(&conn, case_id, turn_id)?
-    else {
-        return Err(CliError::failure(format!(
-            "provider_exchange_not_found case={case_id} turn={turn_id}"
-        )));
-    };
-    let path = data_dir
-        .join("logs/model/archive")
-        .join(format!("case-{case_id}"));
-    fs::create_dir_all(&path)?;
-    let file = path.join(format!("turn-{turn_id:06}.json"));
-    fs::write(&file, replay_json(&detail))?;
-    Ok(format!(
-        "provider_exchange_export={}",
-        file.to_string_lossy()
-    ))
 }
 
 fn raw_case(data_dir: &Path, case_id: &str, limit: usize) -> Result<String, CliError> {
@@ -127,27 +109,4 @@ fn show_exchange(data_dir: &Path, case_id: &str, turn_id: i64) -> Result<String,
         out.push_str(usage);
     }
     Ok(out)
-}
-
-fn replay_json(detail: &lkjagent_store::provider_exchange::ProviderExchangeDetail) -> String {
-    format!(
-        "{{\"id\":\"{}\",\"case\":\"{}\",\"turn\":{},\"status\":\"{}\",\"provider\":\"{}\",\"model\":\"{}\",\"request_json\":\"{}\",\"response_json\":{},\"usage_json\":{}}}\n",
-        esc(&detail.row.id),
-        esc(&detail.row.case_id),
-        detail.row.turn_id,
-        esc(&detail.row.status),
-        esc(&detail.row.provider),
-        esc(&detail.row.model),
-        esc(&detail.request_json),
-        opt_json(detail.response_json.as_deref()),
-        opt_json(detail.usage_json.as_deref())
-    )
-}
-
-fn opt_json(value: Option<&str>) -> String {
-    value.map_or_else(|| "null".to_string(), |value| format!("\"{}\"", esc(value)))
-}
-
-fn esc(value: &str) -> String {
-    lkjagent_runtime::model_log::json_escape(value)
 }
