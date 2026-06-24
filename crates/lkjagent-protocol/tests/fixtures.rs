@@ -147,6 +147,22 @@ fn implicit_envelope_accepts_exact_tool_body() {
 }
 
 #[test]
+fn prose_outside_action_is_bad_envelope() {
+    assert_eq!(
+        parse_completion("prefix\n<action>\n<tool>graph.state</tool>\n</action>"),
+        Err(ParseFault::BadEnvelope {
+            reason: "prose before action envelope".to_string(),
+        })
+    );
+    assert_eq!(
+        parse_completion("<action>\n<tool>graph.state</tool>\n</action>\ntrailing"),
+        Err(ParseFault::BadEnvelope {
+            reason: "prose after action envelope".to_string(),
+        })
+    );
+}
+
+#[test]
 fn prose_without_action_remains_missing_envelope() {
     let text = "I will inspect the graph state next and then continue.";
     assert_eq!(

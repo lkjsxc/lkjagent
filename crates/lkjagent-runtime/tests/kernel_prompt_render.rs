@@ -52,7 +52,8 @@ fn schema_repair_batch_example_is_concrete_and_parseable() -> Result<(), String>
     decision.decision_id = RuntimeDecisionId::Stored(77);
     let frame = render_prompt_frame(&decision).map_err(format_error)?;
     assert!(frame.contains("path: stories/chronos-fracture/README.md"));
-    let action = parse_completion(&frame).map_err(format_error)?;
+    let action_text = exact_action(&frame).ok_or_else(|| "missing action".to_string())?;
+    let action = parse_completion(action_text).map_err(format_error)?;
     assert_eq!(action.tool, "fs.batch_write");
     assert!(action.params.iter().any(|param| param.name == "files"));
     Ok(())
@@ -68,6 +69,15 @@ fn runtime_effect_decision_produces_no_prompt() -> Result<(), String> {
         Err(PromptRenderError::RuntimeEffectHasNoPrompt)
     );
     Ok(())
+}
+
+fn exact_action(text: &str) -> Option<&str> {
+    let start = text.find("<action>")?;
+    let end = text[start..]
+        .find("</action>")?
+        .saturating_add(start)
+        .saturating_add("</action>".len());
+    text.get(start..end)
 }
 
 fn format_error(error: impl std::fmt::Debug) -> String {
