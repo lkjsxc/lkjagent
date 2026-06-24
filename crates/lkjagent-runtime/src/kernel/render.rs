@@ -1,6 +1,6 @@
 use crate::kernel::active_mode::ActiveMode;
 use crate::kernel::decision::{ActionTemplate, RuntimeDecision, RuntimeDecisionId, RuntimeMission};
-use crate::kernel::snapshot::{RuntimeSnapshot, ToolName};
+use crate::kernel::snapshot::{RuntimeEventId, RuntimeSnapshot, ToolName};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PromptCardData {
@@ -26,6 +26,7 @@ impl PromptCardData {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PromptRenderError {
     DecisionNotPersisted,
+    EventNotPersisted,
     RuntimeEffectHasNoPrompt,
 }
 
@@ -34,12 +35,16 @@ pub fn render_prompt_frame(decision: &RuntimeDecision) -> Result<String, PromptR
         RuntimeDecisionId::Stored(id) => id,
         RuntimeDecisionId::Pending => return Err(PromptRenderError::DecisionNotPersisted),
     };
+    let event_id = match decision.event_id {
+        RuntimeEventId(0) => return Err(PromptRenderError::EventNotPersisted),
+        RuntimeEventId(id) => id,
+    };
     if !decision.active_mode.allows_model_call() {
         return Err(PromptRenderError::RuntimeEffectHasNoPrompt);
     }
     let next_action = render_next_action(decision);
     Ok(format!(
-        "Runtime Authority\ndecision_id={decision_id}\nmission={}\nmode={}\ngraph_node={}\ngraph_phase={}\nmissing_evidence={}\nadmitted_tools={}\nblocked_tools={}\nauthority_fingerprint={}\nstaleness_fingerprint={}\nnext_action:\n{}",
+        "Runtime Authority\ndecision_id={decision_id}\nevent_id={event_id}\nmission={}\nmode={}\ngraph_node={}\ngraph_phase={}\nmissing_evidence={}\nadmitted_tools={}\nblocked_tools={}\nauthority_fingerprint={}\nstaleness_fingerprint={}\nnext_action:\n{}",
         decision.mission.as_str(),
         decision.active_mode.as_str(),
         optional(decision.graph_node.as_deref()),
