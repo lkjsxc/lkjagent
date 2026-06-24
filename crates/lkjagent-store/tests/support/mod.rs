@@ -1,3 +1,6 @@
+#[allow(dead_code)]
+pub mod runtime_kernel;
+
 use rusqlite::Connection;
 
 use lkjagent_store::schema::setup;

@@ -87,6 +87,30 @@ pub struct RuntimeEffectInput<'a> {
     pub created_at: &'a str,
 }
 
+#[derive(Debug, Clone, Copy)]
+pub struct PromptFrameInput<'a> {
+    pub decision_id: i64,
+    pub case_scope: &'a str,
+    pub case_id: Option<i64>,
+    pub frame_kind: &'a str,
+    pub prompt_fingerprint: &'a str,
+    pub context_package_ids: &'a [String],
+    pub rendered_summary: &'a str,
+    pub created_at: &'a str,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct RuntimeObservationInput<'a> {
+    pub decision_id: i64,
+    pub admission_id: Option<i64>,
+    pub effect_id: Option<i64>,
+    pub observation_event_id: Option<i64>,
+    pub observation_kind: &'a str,
+    pub status: &'a str,
+    pub summary: &'a str,
+    pub created_at: &'a str,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AuthoritySnapshotRow {
     pub id: i64,
@@ -138,4 +162,26 @@ pub struct RuntimeTransitionRow {
     pub from_node: String,
     pub to_node: String,
     pub transition_kind: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PromptFrameRow {
+    pub id: i64,
+    pub decision_id: i64,
+    pub frame_kind: String,
+    pub prompt_fingerprint: String,
+    pub context_package_ids: String,
+    pub rendered_summary: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RuntimeObservationRow {
+    pub id: i64,
+    pub decision_id: i64,
+    pub admission_id: Option<i64>,
+    pub effect_id: Option<i64>,
+    pub observation_event_id: Option<i64>,
+    pub observation_kind: String,
+    pub status: String,
+    pub summary: String,
 }

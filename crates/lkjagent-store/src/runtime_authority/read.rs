@@ -3,7 +3,8 @@ use rusqlite::{params, Connection};
 use crate::error::StoreResult;
 
 use super::model::{
-    AuthorityDecisionRow, AuthoritySnapshotRow, RuntimeTransitionRow, ToolAdmissionRow,
+    AuthorityDecisionRow, AuthoritySnapshotRow, PromptFrameRow, RuntimeObservationRow,
+    RuntimeTransitionRow, ToolAdmissionRow,
 };
 
 pub fn latest_snapshot_for_case(
@@ -49,6 +50,30 @@ pub fn latest_transition_for_case(
     let mut statement = conn.prepare(sql)?;
     let mut rows = statement.query(params![case_id])?;
     Ok(rows.next()?.map(transition_row).transpose()?)
+}
+
+pub fn latest_prompt_frame_for_decision(
+    conn: &Connection,
+    decision_id: i64,
+) -> StoreResult<Option<PromptFrameRow>> {
+    let sql = "SELECT id, decision_id, frame_kind, prompt_fingerprint,
+        context_package_ids, rendered_summary FROM runtime_prompt_frames
+        WHERE decision_id = ?1 ORDER BY id DESC LIMIT 1";
+    let mut statement = conn.prepare(sql)?;
+    let mut rows = statement.query(params![decision_id])?;
+    Ok(rows.next()?.map(prompt_frame_row).transpose()?)
+}
+
+pub fn latest_observation_for_decision(
+    conn: &Connection,
+    decision_id: i64,
+) -> StoreResult<Option<RuntimeObservationRow>> {
+    let sql = "SELECT id, decision_id, admission_id, effect_id, observation_event_id,
+        observation_kind, status, summary FROM runtime_observations
+        WHERE decision_id = ?1 ORDER BY id DESC LIMIT 1";
+    let mut statement = conn.prepare(sql)?;
+    let mut rows = statement.query(params![decision_id])?;
+    Ok(rows.next()?.map(observation_row).transpose()?)
 }
 
 pub fn admission_for_decision_and_tool(
@@ -118,5 +143,29 @@ fn transition_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<RuntimeTransition
         from_node: row.get(2)?,
         to_node: row.get(3)?,
         transition_kind: row.get(4)?,
+    })
+}
+
+fn prompt_frame_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<PromptFrameRow> {
+    Ok(PromptFrameRow {
+        id: row.get(0)?,
+        decision_id: row.get(1)?,
+        frame_kind: row.get(2)?,
+        prompt_fingerprint: row.get(3)?,
+        context_package_ids: row.get(4)?,
+        rendered_summary: row.get(5)?,
+    })
+}
+
+fn observation_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<RuntimeObservationRow> {
+    Ok(RuntimeObservationRow {
+        id: row.get(0)?,
+        decision_id: row.get(1)?,
+        admission_id: row.get(2)?,
+        effect_id: row.get(3)?,
+        observation_event_id: row.get(4)?,
+        observation_kind: row.get(5)?,
+        status: row.get(6)?,
+        summary: row.get(7)?,
     })
 }

@@ -48,9 +48,11 @@ Fracture run proves both progress and failure:
 - Rows stay open until focused tests, quiet verify, and any required Docker
   Compose verification prove the uploaded failure patterns cannot recur.
 - The transition kernel remains the first implementation target. A pure kernel
-  data module and invariant tests now exist, but daemon wiring still needs one
-  snapshot, one explicit event, one persisted decision, one prompt frame, one
-  admission view, one effect observation, and one next event.
+  data module and invariant tests now exist. Store ledgers now include prompt
+  frames and observations, plus foreign-key proof that admissions require a
+  decision. Daemon wiring still needs one snapshot, one explicit event, one
+  persisted decision, one prompt frame, one admission view, one effect
+  observation, and one next event.
 - Graph policy is guidance for the snapshot. It is not fallback dispatch
   authority after runtime admission refuses a tool.
 - Stale-action refusal must use the full staleness fingerprint: queue head,
@@ -111,7 +113,7 @@ Fracture run proves both progress and failure:
 
 ## Remaining Proof Gaps
 
-- Store ledgers and snapshot adapter work are the next code slice.
+- Snapshot adapter work is the next code slice.
 - Authority rows still need coverage for every dispatch, provider exchange,
   recovery, compaction, maintenance, and close path.
 - Compaction snapshots need status rendering and prompt-frame resume proof.

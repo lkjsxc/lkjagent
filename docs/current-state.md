@@ -33,7 +33,7 @@ but did not record document-structure or artifact-readiness evidence.
 | Parser | `lkjagent-protocol` parses line-oriented, paired-tag, JSON envelope, and batch file action forms covered by focused fixtures. Provider stop-closure restoration records closure mode for parse logs. |
 | Dispatcher registry | `lkjagent-tools` validates registered tools and renders registry examples for covered action families. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
-| SQLite store | Queue, state, event, memory, task summary, authority, artifact, compaction, and provider-exchange surfaces exist in `lkjagent-store`. |
+| SQLite store | Queue, state, event, memory, task summary, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist in `lkjagent-store`. |
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
 | Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current run snapshot. Provider exchange request, authority, response, timing, parse, admission, observation, and error records are written when the daemon has a log root. |
 | Document scaffold seed | Deterministic scaffold paths, relation-first generic seeds, bounded slugs, compact `catalog.toml`, and creative writing profiles exist for project, multi-topic docs, story, novel, character, and cookbook roots. |
@@ -48,7 +48,7 @@ but did not record document-structure or artifact-readiness evidence.
 
 | Area | Current truth |
 | --- | --- |
-| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, normalized authority snapshots, event and decision rows, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, stale maintenance-action refusal, and `agent.done` refusal exist. A standalone `kernel` module now defines pure snapshot, event, decision, admission, effect, render, fault, and reducer records with invariant tests. These are partial authority pieces, not one daemon-wired transition kernel. |
+| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, normalized authority snapshots, event and decision rows, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, stale maintenance-action refusal, and `agent.done` refusal exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, and reducer records with invariant tests. Store rows now cover prompt frames and observations with foreign-key proof for admissions. These are partial authority pieces, not one daemon-wired transition kernel. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Full unified runtime wiring remains open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, dispatcher-valid examples for covered routes, and SQLite retry counts exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. The live `fs.batch_write` path-shaped parameter loop proves batch-write schema recovery remains insufficient. |
@@ -118,6 +118,13 @@ Runtime-kernel data-model focused gates:
 - `cargo test -p lkjagent-runtime --test authority_reducer`: `AUTHORITY_REDUCER_EXIT=0`, 7 passed.
 - `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`, `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+
+Store-ledger focused gates:
+
+- `cargo test -p lkjagent-store --test runtime_kernel_ledger`: `STORE_KERNEL_LEDGER_EXIT=0`, 3 passed.
+- `cargo test -p lkjagent-store --test runtime_authority`: `STORE_AUTHORITY_EXIT=0`, 1 passed.
+- `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
 
 ## Out of Scope
