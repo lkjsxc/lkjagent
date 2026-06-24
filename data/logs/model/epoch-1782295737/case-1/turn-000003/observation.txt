@@ -1,0 +1,33 @@
+<observation>
+<status>ok</status>
+<content>
+Graph state:
+case: 1
+family: documentation/content-artifact
+phase: planning
+node: plan
+confidence: 70
+Current state: active
+Active states: 1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+Objective: Resolve the owner task through planning, evidence capture, execution, and verification: Create a structured science-fiction novel artifact.
+Do not do: none
+Constraints: 
+Assumptions: 
+Risks: first owner message is not a sufficient plan -> record graph.plan before mutating tools
+Success criteria: none
+Active plan step: plan: create structured plan
+Required evidence: plan, observation, document-structure, artifact-readiness
+Missing evidence: plan, observation, document-structure, artifact-readiness
+Allowed tools now: graph.state, graph.next, graph.audit, graph.plan, graph.note, graph.context, graph.transition, fs.list, fs.tree, fs.search, fs.stat, fs.read, fs.read_many, workspace.summary, workspace.index, memory.find
+Blocked tools now: agent.ask, agent.done, artifact.apply, artifact.audit, artifact.next, artifact.plan, doc.audit, doc.scaffold, fs.batch_write, fs.edit, fs.mkdir, fs.patch
+Preferred next action: record graph.plan or inspect candidate files before planning
+Legal transitions: review-plan:blocked(plan); document:blocked(plan)
+Context packages: planning-checklist, context-slice, doc-construction
+Touched paths: 
+Recent faults: parse=1 params=0 tool=0 repeat=0
+Recovery instruction if next action fails: correct format or parameters, then retry once
+Compaction instruction if context pressure rises: normal packages
+Completion: required evidence is missing
+document=root=stories/structured-science-fiction-novel-artifact mode=Unspecified count=None topology=Planned audit=Missing
+</content>
+</observation>
