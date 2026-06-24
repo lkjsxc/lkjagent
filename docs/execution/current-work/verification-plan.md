@@ -30,4 +30,7 @@ required before the reliability redesign can close.
 
 ## Status
 
-implemented
+partially implemented. Benchmark fixtures cover uploaded owner failures,
+including provider exchange parsed-action, admission, observation,
+prompt-frame-id, and replay-export requirements. Live compose story smoke with
+Chronos-style artifact proof remains open.

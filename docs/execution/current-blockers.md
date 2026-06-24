@@ -21,7 +21,7 @@ that ran.
 | 9 | Compaction resume proof and status rendering | [current-work/durable-compaction-history.md](current-work/durable-compaction-history.md) | partially implemented |
 | 10 | Idle-only maintenance and owner preemption proof | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | partially implemented |
 | 11 | Provider exchange export and raw-case inspection | [current-work/model-log.md](current-work/model-log.md) | implemented |
-| 12 | Replay benchmarks from current model run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
+| 12 | Replay benchmarks from current model run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | partially implemented |
 | 13 | Final live Docker story run and compose verification | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
 
 ## Current Evidence
@@ -142,5 +142,6 @@ Fracture run proves both progress and failure:
   semantic readiness remain incomplete.
 - Maintenance owner preemption remains open before endpoint and every dispatch
   path.
-- Parser-level and runtime-level replay fixtures must assert productive next
-  actions, not only error recognition.
+- Parser-level and runtime-level replay fixtures now assert more provider and
+  recovery productive artifacts, but live Chronos-style replay still must prove
+  a successful story artifact close.
