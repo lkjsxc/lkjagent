@@ -32,5 +32,7 @@ required before the reliability redesign can close.
 
 partially implemented. Benchmark fixtures cover uploaded owner failures,
 including provider exchange parsed-action, admission, observation,
-prompt-frame-id, and replay-export requirements. Live compose story smoke with
-Chronos-style artifact proof remains open.
+prompt-frame-id, and replay-export requirements. A Chronos-style daemon replay
+proves story artifact close after plan, semantic audit, verification evidence,
+catalog presence, no part files, and printable model-log output. Live compose
+story smoke remains open.
