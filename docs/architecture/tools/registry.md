@@ -37,10 +37,10 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | diary.find | query opt; start opt; end opt; tags opt; limit opt 10 | find diary records | invalid limit |
 | schedule.add | title req; start req; end opt; timezone opt; location opt; notes opt; recurrence opt; tags opt | create one schedule record | invalid time range |
 | schedule.list | start opt; end opt; query opt; status opt all; limit opt 20 | list schedule records | invalid limit |
-| schedule.update | id req; status opt; other fields opt | update schedule status | missing row; unsupported update shape |
+| schedule.update | id req; title opt; start opt; end opt; status opt; notes opt; tags opt | update one schedule record | missing row; invalid time range |
 | todo.add | title req; details opt; due opt; priority opt normal; project opt; tags opt | create one TODO record | invalid due date |
 | todo.list | status opt open; query opt; due_before opt; project opt; limit opt 20 | list TODO records | invalid limit |
-| todo.update | id req; status opt; other fields opt | update TODO status | missing row; unsupported update shape |
+| todo.update | id req; title opt; details opt; due opt; priority opt; project opt; status opt; tags opt | update one TODO record | missing row; invalid date |
 | graph.state | none | show active graph case, phase, node, evidence, and transitions | no active case |
 | graph.next | none | show legal transitions, missing guards, and preferred next action | no active case |
 | graph.audit | none | audit active graph case, policy, completion, and shell admission | no active case |

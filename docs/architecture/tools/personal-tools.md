@@ -13,12 +13,11 @@ The personal tools are store-backed and use the live action envelope:
 - `schedule.add`: title and start required; end, timezone, location, notes,
   recurrence, and tags optional.
 - `schedule.list`: start, end, query, status, and limit filters.
-- `schedule.update`: ID and status are supported now; title, start, end, notes,
-  and tags are registry-shaped inputs that refuse until field updates land.
+- `schedule.update`: ID required; title, start, end, status, notes, and tags optional.
 - `todo.add`: title required; details, due, priority, project, and tags optional.
 - `todo.list`: status, query, due_before, project, and limit filters.
-- `todo.update`: ID and status are supported now; title, details, due,
-  priority, project, and tags refuse until field updates land.
+- `todo.update`: ID required; title, details, due, priority, project, status,
+  and tags optional.
 
 ## Observation Shape
 

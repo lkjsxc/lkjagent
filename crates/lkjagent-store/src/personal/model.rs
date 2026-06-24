@@ -37,6 +37,23 @@ pub struct PersonalRecord {
     pub closed_at: Option<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PersonalRecordUpdate<'a> {
+    pub id: i64,
+    pub title: Option<&'a str>,
+    pub body: Option<&'a str>,
+    pub status: Option<&'a str>,
+    pub tags: Option<&'a str>,
+    pub timezone: Option<&'a str>,
+    pub start_at: Option<&'a str>,
+    pub end_at: Option<&'a str>,
+    pub due_at: Option<&'a str>,
+    pub recurrence: Option<&'a str>,
+    pub priority: Option<&'a str>,
+    pub project: Option<&'a str>,
+    pub now: &'a str,
+}
+
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct PersonalListFilter<'a> {
     pub kind: Option<&'a str>,

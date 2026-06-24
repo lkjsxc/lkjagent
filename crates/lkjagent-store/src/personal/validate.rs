@@ -8,6 +8,7 @@ pub fn validate_input(input: &PersonalRecordInput<'_>) -> StoreResult<()> {
     validate_optional_time(input.start_at, "start_at")?;
     validate_optional_time(input.end_at, "end_at")?;
     validate_optional_time(input.due_at, "due_at")?;
+    validate_priority(input.priority)?;
     validate_recurrence(input.recurrence)?;
     match input.kind {
         "diary" => validate_diary(input),
@@ -87,6 +88,13 @@ fn validate_rfc3339(value: &str, label: &str) -> StoreResult<()> {
         Ok(())
     } else {
         invalid(&format!("{label} must be RFC3339 with timezone"))
+    }
+}
+
+fn validate_priority(value: Option<&str>) -> StoreResult<()> {
+    match value.filter(|item| !item.trim().is_empty()) {
+        None | Some("low" | "normal" | "high" | "urgent") => Ok(()),
+        Some(_) => invalid("unknown priority"),
     }
 }
 
