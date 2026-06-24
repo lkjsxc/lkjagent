@@ -55,9 +55,9 @@ fn doc_scaffold_story_title_uses_manuscript_paths() -> TestResult<()> {
 
     let root = workspace.join("stories");
     assert!(output.contains("profile=NarrativeManuscript"));
-    assert!(root.join("setting/world-pillars.md").is_file());
+    assert!(root.join("project/premise.md").is_file());
     assert!(root.join("characters/protagonist.md").is_file());
-    assert!(root.join("plot/act-structure.md").is_file());
+    assert!(root.join("manuscript/draft-boundary.md").is_file());
     Ok(())
 }
 
