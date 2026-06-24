@@ -20,8 +20,8 @@ store facts + graph guidance + context facts
 -> reducer
 -> RuntimeDecision
 -> ContextFrame
--> PromptFrame
--> model action intent
+-> PromptFrame or RuntimeEffectCommand
+-> model action intent when semantic content is needed
 -> admission check from the same RuntimeDecision
 -> effect or structured refusal
 -> observation event
@@ -59,7 +59,9 @@ scope, or blocked handoff route.
 Context pressure emits a runtime event. Hard compaction selects the compaction
 mission before owner intake, recovery, maintenance, normal execution, or idle.
 The persisted snapshot is written by runtime effects after the decision. The
-model is not asked to run `memory.save` to preserve deterministic state.
+model is not asked to run `memory.save` to preserve deterministic state. After
+store reopen and prompt rebuild, the next frame resumes the same admitted
+action unless snapshot facts changed.
 
 ## Maintenance Paths
 
@@ -74,10 +76,12 @@ Prompt rendering consumes `RuntimeDecision` plus `ContextFrame`. Allowed tools,
 blocked tools, exact examples, completion blockers, missing evidence, and the
 next action in the prompt must match the decision used by dispatch. Runtime
 prompt cards include the persisted authority decision id and fingerprint that
-also back the immutable dispatch admission view.
+also back the immutable dispatch admission view. When the decision emits a
+zero-content runtime effect, no endpoint call is made.
 
 ## Status
 
 partially implemented. Daemon owner-task prompt cards and dispatch admission
 views share the persisted authority decision id and fingerprint. Broader close,
-recovery, compaction, maintenance, and console paths still need proof.
+recovery, compaction, maintenance, runtime-effect, prompt-resume, and console
+paths still need proof.

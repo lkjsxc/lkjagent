@@ -10,13 +10,14 @@ any prompt rendering, provider call, tool dispatch, or completion closure.
 One kernel owns the turn sequence:
 
 ```text
-snapshot -> event -> decision -> prompt frame -> provider exchange
+snapshot -> event -> decision -> prompt frame or runtime effect
 provider exchange -> parse -> admission -> effect -> observation -> next event
 ```
 
 The model proposes intent inside the provider exchange. The runtime decision is
-the source of active mode, admitted tools, recovery route, completion gate, and
-prompt text. Graph policy is input to the snapshot, not a fallback authority.
+the source of active mode, admitted tools, recovery route, completion gate,
+runtime-owned deterministic effects, and prompt text. Graph policy is input to
+the snapshot, not a fallback authority.
 
 ## Inputs
 
@@ -33,6 +34,8 @@ The snapshot adapter collects these facts before the reducer runs:
 - latest observation and latest successful observation.
 - compaction pressure, compaction head, and maintenance state.
 - latest decision id, prompt frame fingerprint, and staleness fingerprint.
+- queue, case, graph, active-mode, artifact, fault, evidence, compaction,
+  maintenance, and prompt-frame facts that can invalidate a cached action.
 
 ## Decision Data
 
@@ -46,7 +49,11 @@ The pure reducer emits one persisted decision for one event. The decision names:
 - authority fingerprint and staleness fingerprint.
 
 Prompt frames render only from this persisted decision. Dispatch receives an
-immutable admission view derived from the same decision id.
+immutable admission view derived from the same decision id. Deterministic
+runtime effects such as compaction, closed-idle wait, maintenance defer,
+blocked-handoff recording, status refresh, or zero-content inspection tools are
+also emitted from the persisted decision and do not require a model-authored
+`<act>`.
 
 ## Admission Data
 
@@ -81,7 +88,8 @@ The runtime writes records in this order:
 - One event emits one decision.
 - One prompt frame cites one decision id.
 - A tool-requiring next action always has a non-empty admitted tool set.
-- Empty tool sets pair only with admitted completion, external owner wait, or idle.
+- Empty tool sets pair only with runtime compaction, admitted completion,
+  external owner wait, or idle.
 - Maintenance is never active during owner work, recovery, verification, or compaction.
 - Completion uses the central completion reducer on every close path.
 - Recovery keeps the read, audit, repair, and batch tools needed to escape.
@@ -89,8 +97,9 @@ The runtime writes records in this order:
 ## Verification
 
 Focused tests cover the pure reducer, prompt rendering from a decision id,
-admission from an immutable view, stale-action refusal, maintenance preemption,
-completion refusal, and recovery escape-tool visibility.
+admission from an immutable view, stale-action refusal by full fingerprint,
+maintenance preemption, completion refusal, runtime-owned compaction or
+inspection effects, and recovery escape-tool visibility.
 
 ## Status
 

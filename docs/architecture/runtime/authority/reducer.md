@@ -69,6 +69,8 @@ RuntimeEvent
 - context_frame_built
 - prompt_frame_rendered
 - endpoint_call_requested
+- endpoint_response_received
+- endpoint_fault
 - model_action_parsed
 - parse_fault
 - schema_fault
@@ -126,6 +128,7 @@ RuntimeDecision
 - blocked_handoff_plan
 - context_package_ids
 - prompt_card
+- runtime_effect_command
 - persistence_plan
 - authority_fingerprint
 - staleness_fingerprint
@@ -157,7 +160,8 @@ absent.
 - Graph evidence cannot satisfy `artifact-readiness`.
 - Artifact readiness must name the current artifact id.
 - Recovery evidence is required when any unresolved recovery fault exists.
-- Missing evidence always yields one exact next executable action.
+- Missing evidence always yields one exact next executable action or one
+  deterministic runtime effect command.
 
 ## Mechanical Tests Required
 
@@ -166,6 +170,7 @@ absent.
 - Completion refusal admits artifact audit and repair tools.
 - Parse recovery admits previous mission escape tools.
 - Payload overflow admits `artifact.next` and `fs.batch_write`.
+- Repeated schema faults change the next action class before another loop.
 - Hard compaction preserves previous mission and exact next action.
 - Turn-budget checkpoint continues autonomously when legal work remains.
 - Turn-budget exhaustion produces a partial handoff only when no route remains.
@@ -174,7 +179,8 @@ absent.
 
 - Reducer logic calls an effect or consults current time directly.
 - Two decisions are emitted for one event.
-- A decision omits missing evidence or next valid action.
+- A decision omits missing evidence, next valid action, or runtime effect when
+  no model-authored action is needed.
 - Completion and dispatch use different admission gates.
 
 ## Verification
