@@ -40,7 +40,7 @@ fn reducer_blocks_completion_with_explainable_admission() {
 }
 
 #[test]
-fn payload_too_large_routes_to_batch_write_recovery() {
+fn payload_too_large_routes_to_artifact_next_when_artifact_exists() {
     let snapshot = recovery_snapshot();
 
     let decision = decide(
@@ -55,14 +55,15 @@ fn payload_too_large_routes_to_batch_write_recovery() {
         return;
     };
     assert_eq!(plan.recovery_class, RecoveryClass::PayloadOverflow);
+    assert_eq!(plan.forced_tool, "artifact.next");
     assert!(admission
         .next_valid_tools
         .contains(&"fs.batch_write".to_string()));
     assert!(admission.admitted);
-    assert_eq!(
-        admission.exact_valid_example.as_deref(),
-        registry_valid_example("fs.batch_write").as_deref()
-    );
+    assert!(admission
+        .exact_valid_example
+        .as_deref()
+        .is_some_and(|example| example.contains("dictionary/bread-terms.txt")));
 }
 
 #[test]

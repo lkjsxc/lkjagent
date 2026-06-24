@@ -74,7 +74,7 @@ fn recovery_fault_table_names_escape_route_for_each_class() {
             PayloadTooLarge,
             Fc::Payload,
             Rc::PayloadOverflow,
-            "fs.batch_write",
+            "artifact.next",
         ),
         (
             ArtifactAuditFailure,

@@ -50,7 +50,7 @@ but did not record document-structure or artifact-readiness evidence.
 | --- | --- |
 | Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, normalized authority snapshots, event and decision rows, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, and `agent.done` refusal exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. Kernel prompt rendering requires persisted event and decision ids and produces path-scoped batch examples. Kernel admission refuses stale, blocked, not-admitted, and completion-blocked tools before dispatch. The daemon now records authority prompt frames, effect observations, and kernel shadow mission fields tied to decision/admission rows, and cached actions refuse on prompt-frame head changes. These are partial authority pieces, not one daemon-wired transition kernel. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Full unified runtime wiring remains open. |
-| Recovery controller | Fault notices, attribute-like tag repair examples, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, dispatcher-valid examples for covered routes, SQLite retry counts, and repeated batch-schema shape change to `artifact.next` exist. Live shape-change enforcement for every fault class remains open. |
+| Recovery controller | Fault notices, attribute-like tag repair examples, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, dispatcher-valid examples for covered routes, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, and payload-overflow routing to `artifact.next` for known artifacts exist. Live shape-change enforcement for every fault class remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` now normalizes safe path-shaped unknown parameters into `files` and refuses absolute, duplicate, or empty-content path parameters before mutation. Runtime route changes after repeated schema faults remain open. |
 | Artifact lifecycle | Scaffold, audit, fact-only `artifact.next`, story semantic readiness checks, bounded write examples, root-scoped cursors, root/path address refusals, explicit `.md` directory invalid-root repair output, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
 | Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, current artifact, next action, valid example, blocked-handoff allowance, and status text. Artifact-readiness refusal names the current artifact when authority supplies it; graph-only fallback now uses `graph.state` instead of generic roots. Story semantic audit output now records artifact-readiness evidence for close checks. Every close path is not yet proven to call the same artifact-aware gate. |
@@ -148,7 +148,10 @@ Batch-write schema focused gate:
 
 Recovery-shape focused gates:
 
-- `cargo test -p lkjagent-runtime --test recovery_shape_enforcement`: `RECOVERY_SHAPE_EXIT=0`, 3 passed.
+- `cargo test -p lkjagent-tools --test chronos_batch_recovery`: `CHRONOS_BATCH_RECOVERY_EXIT=0`, 3 passed.
+- `cargo test -p lkjagent-runtime --test recovery_shape_enforcement`: `RECOVERY_SHAPE_EXIT=0`, 5 passed.
+- `cargo test -p lkjagent-runtime --test authority_reducer`: `AUTHORITY_REDUCER_EXIT=0`, 7 passed.
+- `cargo test -p lkjagent-runtime --test authority_fault_class`: `AUTHORITY_FAULT_CLASS_EXIT=0`, 1 passed.
 - `cargo test -p lkjagent-runtime --test authority_recovery_plan`: `AUTHORITY_RECOVERY_PLAN_EXIT=0`, 5 passed.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
 
