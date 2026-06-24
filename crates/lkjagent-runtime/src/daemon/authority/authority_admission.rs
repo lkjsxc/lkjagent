@@ -38,7 +38,7 @@ pub(super) fn record_authority_admission(
     state: &DispatchState,
     requested_tool: &str,
     exact_valid_example: &str,
-) -> RuntimeResult<()> {
+) -> RuntimeResult<Option<i64>> {
     let Some(policy) = state.effective_policy.as_ref() else {
         return record(
             conn,
@@ -67,7 +67,7 @@ pub(super) fn record_authority_refusal(
     requested_tool: &str,
     refusal_reason: &str,
     exact_valid_example: &str,
-) -> RuntimeResult<()> {
+) -> RuntimeResult<Option<i64>> {
     record(
         conn,
         now,
@@ -85,13 +85,13 @@ fn record(
     admitted: bool,
     refusal_reason: &str,
     exact_valid_example: Option<&str>,
-) -> RuntimeResult<()> {
+) -> RuntimeResult<Option<i64>> {
     let Some(decision_id) = numeric_state(conn, "authority decision id")? else {
-        return Ok(());
+        return Ok(None);
     };
     let case_text = text_state(conn, "authority case id")?.unwrap_or_else(|| "none".to_string());
     let case_ref = case_ref(&case_text);
-    record_tool_admission(
+    let admission_id = record_tool_admission(
         conn,
         &ToolAdmissionInput {
             decision_id,
@@ -104,7 +104,7 @@ fn record(
             created_at: now,
         },
     )?;
-    Ok(())
+    Ok(Some(admission_id))
 }
 
 fn admitted(policy: &EffectivePolicy, tool: &str) -> bool {

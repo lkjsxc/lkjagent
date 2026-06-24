@@ -2,7 +2,7 @@ use lkjagent_context::budget::{ContextPressure, LOG_OBSERVATION};
 use lkjagent_context::model::{Frame, FrameKind};
 use rusqlite::Connection;
 
-use super::authority_store::persist_authority_snapshot;
+use super::authority_store::{persist_authority_prompt_frame, persist_authority_snapshot};
 use super::graph_policy::completion_decision;
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
@@ -55,6 +55,7 @@ impl ResidentDaemon {
             .log
             .retain(|frame| !frame.content.starts_with("Active Mode:\n"));
         let rendered = persisted_authority_card(conn, authority)?;
+        persist_authority_prompt_frame(conn, &self.runtime.tools.now, &rendered)?;
         self.state.context.log.push(Frame::new(
             FrameKind::GraphNotice,
             rendered.clone(),
