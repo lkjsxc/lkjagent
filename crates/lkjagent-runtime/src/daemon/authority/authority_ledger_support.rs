@@ -116,6 +116,8 @@ pub(super) fn authority_fingerprint(
     authority.mission.as_str().hash(&mut hasher);
     graph.case_id.hash(&mut hasher);
     graph.node.hash(&mut hasher);
+    authority.input.latest_decision_id.hash(&mut hasher);
+    authority.input.prompt_frame_id.hash(&mut hasher);
     tools.hash(&mut hasher);
     missing.hash(&mut hasher);
     format!("{:016x}", hasher.finish())

@@ -84,6 +84,11 @@ fn changed_fields(cached: &TurnAuthority, current: &TurnAuthority) -> Vec<&'stat
         "missing_evidence",
         cached.input.missing_evidence != current.input.missing_evidence,
     );
+    push_if(
+        &mut fields,
+        "prompt_frame_id",
+        cached.input.prompt_frame_id != current.input.prompt_frame_id,
+    );
     fields
 }
 
