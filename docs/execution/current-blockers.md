@@ -79,6 +79,8 @@ Fracture run proves both progress and failure:
 - Maintenance can start only from closed idle with an empty owner queue and no
   recoverable owner task. Owner work preempts maintenance before endpoint and
   before dispatch.
+- CLI status now renders latest compaction snapshot fields for the active case;
+  prompt-frame resume proof remains open.
 - Provider exchanges must be exportable as sanitized replay records before raw
   model-run failures can be fully reproduced.
 - The live Chronos story run is required before closing the reliability
@@ -123,7 +125,7 @@ Fracture run proves both progress and failure:
 
 ## Remaining Proof Gaps
 
-- Compaction resume proof and status rendering is the next code slice.
+- Idle-only maintenance and owner preemption proof is the next code slice.
 - Authority rows still need coverage for every dispatch, provider exchange,
   recovery, compaction, maintenance, and close path.
 - Compaction snapshots need status rendering and prompt-frame resume proof.

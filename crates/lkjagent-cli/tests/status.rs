@@ -1,6 +1,7 @@
 mod support;
 
 use lkjagent_cli::run_cli;
+use lkjagent_store::graph::snapshots::record_compaction_snapshot;
 use lkjagent_store::token_usage::{record, TokenUsageEvent};
 use support::{open_store, temp_data, TestResult};
 
@@ -89,6 +90,39 @@ fn status_prints_authority_snapshot_fields() -> TestResult<()> {
     assert!(status
         .stdout
         .contains("next_executable_action=<act><tool>artifact.next</tool></act>"));
+    Ok(())
+}
+
+#[test]
+fn status_prints_latest_compaction_snapshot_fields() -> TestResult<()> {
+    let data = temp_data("status-compaction-snapshot")?;
+    let conn = open_store(&data)?;
+    let case = lkjagent_runtime::graph_state::open_owner_case(
+        &conn,
+        "Create structured documentation.",
+        "2026-06-20T00:00:00Z",
+    )?;
+    record_compaction_snapshot(
+        &conn,
+        case.case_id.ok_or("missing case id")?,
+        "recovery",
+        "recover-by-artifact-plan",
+        "Create structured documentation.",
+        &[
+            "stage=post".to_string(),
+            "write_batch_cursor=docs/a.md".to_string(),
+        ],
+        "2026-06-20T00:00:01Z",
+    )?;
+
+    let status = run_cli(["--data", data.to_string_lossy().as_ref(), "status"]);
+
+    assert!(status
+        .stdout
+        .contains("last_compaction=snapshot:2026-06-20T00:00:01Z"));
+    assert!(status.stdout.contains("phase=recovery"));
+    assert!(status.stdout.contains("node=recover-by-artifact-plan"));
+    assert!(status.stdout.contains("write_batch_cursor=docs/a.md"));
     Ok(())
 }
 
