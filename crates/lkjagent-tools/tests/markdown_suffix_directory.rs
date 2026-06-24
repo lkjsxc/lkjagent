@@ -4,6 +4,7 @@ use std::fs;
 use std::path::Path;
 
 use lkjagent_protocol::parse_completion;
+use lkjagent_store::artifact_ledger::latest_for_case;
 use lkjagent_tools::dispatch::{dispatch, validate_action};
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
@@ -12,14 +13,23 @@ fn artifact_audit_refuses_existing_markdown_suffix_directory() -> TestResult<()>
     let workspace = temp_workspace("md-dir-artifact-audit")?;
     seed_bad_root(&workspace)?;
 
-    let output = run(
-        &workspace,
-        action(
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut dispatch_state = state();
+    let output = dispatch(
+        &action(
             "artifact.audit",
             &[("root", "stories/characters.md"), ("kind", "story")],
         ),
-    )?;
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    )
+    .content;
 
+    let ledger = latest_for_case(&conn, 0)?.ok_or("missing invalid root marker")?;
+    assert_eq!(ledger.lifecycle_state, "invalid-root");
+    assert_eq!(ledger.readiness_status, "invalid");
     assert!(output.contains("address_status=root_ends_with_markdown_suffix"));
     assert!(!output.contains("Not a directory"));
     assert!(!output.contains("artifact audit passed"));
