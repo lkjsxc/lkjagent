@@ -8,6 +8,7 @@ mod artifact_ledger_support;
 mod artifact_next;
 mod artifact_next_example;
 mod artifact_next_response;
+mod artifact_readiness;
 mod artifact_write_support;
 pub mod benchmark_seed;
 pub mod control;

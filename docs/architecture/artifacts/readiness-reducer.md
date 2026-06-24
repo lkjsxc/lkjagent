@@ -30,6 +30,9 @@ readiness alone.
 
 - Cookbook recipes include title, category, yield, time, ingredients with quantities, method, signals, notes, and
   semantic match.
+- Story artifacts require premise, timeline, cosmology, technology rules, locations, society, factions,
+  protagonist, antagonist, supporting cast, relationship matrix, logline, themes, conflict lattice, act structure,
+  chapter spine, continuity rules, and completion evidence.
 - Techniques include concept, procedure, signals, common mistakes, corrective action, and applicability.
 - Dictionary entries include term, term class, non-trivial definition, and requested optional fields.
 - Documentation leaves include owned topic, contract, inputs or dependencies, outputs or effects, transitions or
@@ -51,4 +54,5 @@ readiness alone.
 
 ## Status
 
-partially implemented for scaffold phrase refusal and selected profile checks; ledger-backed reducer work remains open.
+partially implemented for scaffold phrase refusal, selected profile checks, and story-wide semantic requirement
+checks during `artifact.audit`; ledger-backed reducer work remains open.
