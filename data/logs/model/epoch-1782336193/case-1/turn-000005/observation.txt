@@ -1,0 +1,4 @@
+<observation>
+<status>error</status>
+<content>invalid parameter: invalid JSON fs.batch_write files payload</content>
+</observation>

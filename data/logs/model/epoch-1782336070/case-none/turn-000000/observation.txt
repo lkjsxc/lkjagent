@@ -1,0 +1,16 @@
+<notice>
+<kind>error</kind>
+<content>
+stale model action refused
+admission=refused
+reason=stale_decision
+previous_mode=Maintenance
+active_mode=OwnerTask
+failed_tool=memory.find
+failed_gate=stale-turn-authority
+changed_fields=pending_owner_rows,maintenance_state
+admitted_tools=fs.read,fs.list,fs.stat,doc.audit,artifact.next,artifact.audit,fs.batch_write,workspace.summary,graph.state,graph.next,graph.plan,graph.transition
+next_executable_action=runtime action; no model action block
+detail=current runtime authority preempts the cached model action
+</content>
+</notice>

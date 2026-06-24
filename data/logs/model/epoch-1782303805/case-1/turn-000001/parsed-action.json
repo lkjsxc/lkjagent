@@ -1,1 +1,0 @@
-{"status":"fault","closure_mode":"StopSequenceClosed","content_bytes":1008,"error":"BadParams { tool: \"graph.plan\", missing: [\"objective\", \"steps\", \"reason\"], unknown: [\"<path=stories/chronos-fracture</path>\"] }"}
