@@ -62,11 +62,11 @@ notes record quiet verify and Docker Compose verify.
 
 ## Remaining Proof Gaps
 
-Old bad `.md` directories are refused but still need explicit adoption or
-repair output. Ledger roots without catalog ancestors, invalid-root durable
-markers, completion blocking for adopted invalid roots, and route-level proof
-for every policy path remain open. The live SF-novel rerun has not been
-repeated in this slice.
+Old bad `.md` directories are refused and now render explicit invalid-root
+marker plus repair outcome text. Ledger roots without catalog ancestors,
+invalid-root durable markers on every route, completion blocking for adopted
+invalid roots, and route-level proof for every policy path remain open. The
+live SF-novel rerun has not been repeated in this slice.
 
 ## Status
 

@@ -71,9 +71,10 @@ Fracture run proves both progress and failure:
 - Recovery routes now change repeated batch-schema faults from `fs.batch_write`
   to `artifact.next` and keep batch repair tools visible. Every other fault
   class still needs route-level shape-change proof.
-- Artifact readiness must be tied to the current artifact id. Direct graph
-  evidence, scaffold topology, README-only content, and owner-term-only pages
-  do not satisfy readiness.
+- Existing `.md` directories now render explicit invalid-root marker and repair
+  outcome text. Artifact readiness must be tied to the current artifact id.
+  Direct graph evidence, scaffold topology, README-only content, and
+  owner-term-only pages do not satisfy readiness.
 - Maintenance can start only from closed idle with an empty owner queue and no
   recoverable owner task. Owner work preempts maintenance before endpoint and
   before dispatch.
@@ -121,7 +122,7 @@ Fracture run proves both progress and failure:
 
 ## Remaining Proof Gaps
 
-- Artifact address adoption and invalid-root durability is the next code slice.
+- Artifact readiness and completion gate coverage is the next code slice.
 - Authority rows still need coverage for every dispatch, provider exchange,
   recovery, compaction, maintenance, and close path.
 - Compaction snapshots need status rendering and prompt-frame resume proof.

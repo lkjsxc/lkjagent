@@ -29,6 +29,7 @@ fn render_refusal(prefix: &str, tool: &str, address: &ArtifactAddress, kind: &st
     if let Some(path) = &address.weak_path {
         lines.push(format!("weak_path={path}"));
     }
+    append_invalid_root_repair(&mut lines, address);
     lines.push(format!(
         "next_action={}",
         action_label(&address.next_action, tool)
@@ -47,6 +48,17 @@ pub fn status(address: &ArtifactAddress) -> &'static str {
         Some(RootPathProblem::RootOutsideWorkspace) => "root_outside_workspace",
         None => "ok",
     }
+}
+
+fn append_invalid_root_repair(lines: &mut Vec<String>, address: &ArtifactAddress) {
+    if address.problem != Some(RootPathProblem::RootEndsWithMarkdownSuffix) {
+        return;
+    }
+    if address.detected != PathKind::Directory {
+        return;
+    }
+    lines.push("invalid_root_marker=required".to_string());
+    lines.push("repair_outcome=choose_catalog_root_or_repair_markdown_directory".to_string());
 }
 
 fn path_kind(kind: &PathKind) -> &'static str {
