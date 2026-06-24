@@ -52,6 +52,7 @@ route. Recovery preserves at least one productive escape tool for the failed mis
 
 ## Status
 
-partially implemented. Recovery route metadata, retry count storage, changed action-class repeat routing, registry
-examples, and recovery-plan examples that parse, validate, are admitted, and dispatch to local routes exist. Live
-shape-change enforcement for every fault class and failed-route escalation remain open.
+partially implemented. Recovery route metadata, retry count storage, changed action-class repeat routing, payload
+fault suppression of raw `fs.write` retries, registry examples, and recovery-plan examples that parse, validate, are
+admitted, and dispatch to local routes exist. Live shape-change enforcement for every fault class and failed-route
+escalation remain open.

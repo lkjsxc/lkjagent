@@ -39,6 +39,7 @@ fn snapshot(external_owner_input_required: bool) -> RuntimeSnapshot {
         missing_evidence: vec!["owner-preference".to_string()],
         active_artifact: Some("cookbook".to_string()),
         last_tool_attempt: None,
+        latest_fault: None,
         repeated_action: false,
         external_owner_input_required,
     }

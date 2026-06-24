@@ -52,6 +52,7 @@ fn owner_snapshot(missing: Vec<&str>) -> RuntimeSnapshot {
         missing_evidence: missing.into_iter().map(str::to_string).collect(),
         active_artifact: Some("cookbook/current".to_string()),
         last_tool_attempt: None,
+        latest_fault: None,
         repeated_action: false,
         external_owner_input_required: false,
     }

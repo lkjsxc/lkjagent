@@ -122,6 +122,7 @@ fn checkpoint_snapshot(state: &RuntimeState) -> RuntimeSnapshot {
             .pending_action
             .as_ref()
             .map(|pending| pending.action.tool.clone()),
+        latest_fault: None,
         repeated_action: state.repeat_faults > 0,
         external_owner_input_required: false,
     }

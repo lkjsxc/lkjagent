@@ -58,6 +58,7 @@ pub struct RuntimeSnapshot {
     pub missing_evidence: Vec<String>,
     pub active_artifact: Option<String>,
     pub last_tool_attempt: Option<String>,
+    pub latest_fault: Option<RuntimeFault>,
     pub repeated_action: bool,
     pub external_owner_input_required: bool,
 }
