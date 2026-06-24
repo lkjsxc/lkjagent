@@ -76,9 +76,9 @@ full snapshot. It must not select a mission independently from
 ## Status
 
 partially implemented. Runtime mission selection, data-first decision records
-with real snapshot case and graph-node fields, `RuntimeSnapshot.active_mode`,
-adapter-built turn snapshots, active modes derived from `RuntimeMission`,
-normalized authority snapshot,
+with real snapshot case, graph-node, graph-phase, artifact-root, and evidence
+fields, `RuntimeSnapshot.active_mode`, adapter-built turn snapshots, active
+modes derived from `RuntimeMission`, normalized authority snapshot,
 event, decision, transition, effect, and admission store APIs, dispatch
 admission views, stale maintenance-action refusal, central completion reducer
 use, and prompt-card decision id and fingerprint rendering exist. The unified
