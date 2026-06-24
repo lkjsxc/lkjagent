@@ -38,21 +38,21 @@ than hardcoded paths. When no owner task is open and the queue is empty,
 follow the maintenance notice's bounded graph-maintenance work.";
 
 pub const GRAMMAR: &str = "## grammar
-Emit exactly one <act> block per turn and no prose outside tags. The first
+Emit exactly one <action> block per turn and no prose outside tags. The first
 child is <tool>; remaining children are parameters from the registry. Values
-are raw text between tags. Stop immediately after </act>.
+are raw text between tags. Stop immediately after </action>.
 
 Examples:
-<act>
+<action>
 <tool>fs.write</tool>
 <path>notes.txt</path>
 <content>done</content>
-</act>
+</action>
 
-<act>
+<action>
 <tool>agent.done</tool>
 <summary>wrote notes.txt and observed success</summary>
-</act>";
+</action>";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PromptInputs {

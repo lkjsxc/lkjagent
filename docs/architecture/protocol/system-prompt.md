@@ -78,6 +78,6 @@ sentence either changes behavior or leaves.
 
 ## Status
 
-partially implemented. The prompt renderer still needs the `<action>` grammar,
-concrete registry examples for all visible tools, and persisted decision-id
-authority cards on every endpoint turn.
+partially implemented. Runtime prompt examples now use the `<action>` envelope,
+but concrete registry examples for all visible tools and persisted decision-id
+authority cards on every endpoint turn remain open.

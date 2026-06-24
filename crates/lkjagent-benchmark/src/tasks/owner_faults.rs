@@ -7,7 +7,7 @@ parameter. The next visible notice must show the valid graph.state action.
 
 const GRAPH_GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "action params refused\ntool=graph.state\nexpected=no parameters\nreceived=missing []; unknown [path]\nvalid_example:\n<act>\n<tool>graph.state</tool>\n</act>\nnext_node=recover-params\n",
+    content: "action params refused\ntool=graph.state\nexpected=no parameters\nreceived=missing []; unknown [path]\nvalid_example:\n<action>\n<tool>graph.state</tool>\n</action>\nnext_node=recover-params\n",
 }];
 
 const GRAPH_BAD_OLD: &[FileSpec] = &[FileSpec {
@@ -17,7 +17,7 @@ const GRAPH_BAD_OLD: &[FileSpec] = &[FileSpec {
 
 const GRAPH_BAD_EXAMPLE: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "action params refused\ntool=graph.state\nvalid_example:\n<act>\n<tool>graph.state</tool>\n<path>.</path>\n</act>\nnext_node=recover-params\n",
+    content: "action params refused\ntool=graph.state\nvalid_example:\n<action>\n<tool>graph.state</tool>\n<path>.</path>\n</action>\nnext_node=recover-params\n",
 }];
 
 const GRAPH_GOOD_FIXTURES: &[Fixture] = &[Fixture {
@@ -70,7 +70,7 @@ const SCAFFOLD_BAD_OLD: &[FileSpec] = &[FileSpec {
 
 const SCAFFOLD_BAD_PATH: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "action params refused\ntool=doc.scaffold\nvalid_example:\n<act>\n<tool>doc.scaffold</tool>\n<path>docs</path>\n</act>\n",
+    content: "action params refused\ntool=doc.scaffold\nvalid_example:\n<action>\n<tool>doc.scaffold</tool>\n<path>docs</path>\n</action>\n",
 }];
 
 const SCAFFOLD_GOOD_FIXTURES: &[Fixture] = &[Fixture {

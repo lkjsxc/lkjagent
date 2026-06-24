@@ -1,10 +1,15 @@
+use crate::model::{ACTION_CLOSE, ACTION_OPEN};
 use crate::registry::{ToolSpec, TOOLS};
 
 pub fn render_registry_section() -> String {
     let mut lines = TOOLS.iter().map(render_tool).collect::<Vec<_>>();
     lines.push("doc.scaffold/doc.audit/artifact.*: do not use path; use root".to_string());
-    lines.push("example graph.state: <act><tool>graph.state</tool></act>".to_string());
-    lines.push("example doc.audit: <act><tool>doc.audit</tool><root>docs</root></act>".to_string());
+    lines.push(format!(
+        "example graph.state: {ACTION_OPEN}<tool>graph.state</tool>{ACTION_CLOSE}"
+    ));
+    lines.push(format!(
+        "example doc.audit: {ACTION_OPEN}<tool>doc.audit</tool><root>docs</root>{ACTION_CLOSE}"
+    ));
     lines.join("\n")
 }
 

@@ -117,9 +117,9 @@ fn optional_catalog(root: &Path) -> String {
 }
 
 fn artifact_apply_example(root: &str, kind: &str) -> String {
-    format!("<act>\n<tool>artifact.apply</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</act>")
+    format!("<action>\n<tool>artifact.apply</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</action>")
 }
 
 fn artifact_audit_example(root: &str, kind: &str) -> String {
-    format!("<act>\n<tool>artifact.audit</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</act>")
+    format!("<action>\n<tool>artifact.audit</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</action>")
 }

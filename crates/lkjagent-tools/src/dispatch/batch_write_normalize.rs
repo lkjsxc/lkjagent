@@ -65,5 +65,5 @@ fn safe_relative_path(path: &str) -> bool {
 
 fn safe_content(content: &str) -> bool {
     let trimmed = content.trim();
-    !trimmed.is_empty() && !trimmed.contains("<act>") && !trimmed.contains("</act>")
+    !trimmed.is_empty() && !trimmed.contains("<action>") && !trimmed.contains("</action>")
 }

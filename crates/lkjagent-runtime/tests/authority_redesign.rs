@@ -107,7 +107,7 @@ fn repeated_invalid_actions_do_not_repeat_graph_state() {
     });
 
     assert_ne!(
-        authority.valid_example, "<act>\n<tool>graph.state</tool>\n</act>",
+        authority.valid_example, "<action>\n<tool>graph.state</tool>\n</action>",
         "recover-repeat needs a different exact next action"
     );
 }

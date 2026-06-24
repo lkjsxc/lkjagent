@@ -65,7 +65,7 @@ fn can_audit_directory(address: &ArtifactAddress) -> bool {
 
 fn file_root_report(root: &str) -> String {
     format!(
-        "document audit failed\nroot={root}\npath_kind=file\naddress_status=root_is_file\nfailed=1\nfailures:\n- root_is_file: {root}\nnext_action=fs.read file\nvalid_example:\n<act>\n<tool>fs.read</tool>\n<path>{root}</path>\n</act>"
+        "document audit failed\nroot={root}\npath_kind=file\naddress_status=root_is_file\nfailed=1\nfailures:\n- root_is_file: {root}\nnext_action=fs.read file\nvalid_example:\n<action>\n<tool>fs.read</tool>\n<path>{root}</path>\n</action>"
     )
 }
 

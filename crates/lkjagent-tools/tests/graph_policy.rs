@@ -74,7 +74,7 @@ fn second_graph_next_in_recovery_forces_alternate_action_class() -> TestResult<(
     let mut state = state();
     state.graph_policy = Some(recovery_policy());
     let next = action("graph.next", &[]);
-    let text = "<act>\n<tool>graph.next</tool>\n</act>";
+    let text = "<action>\n<tool>graph.next</tool>\n</action>";
 
     let first = dispatch_with_text(&next, text, &runtime, &mut conn, &mut state);
     let second = dispatch_with_text(&next, text, &runtime, &mut conn, &mut state);

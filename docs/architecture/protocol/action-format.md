@@ -138,6 +138,7 @@ fields. The parse and provider exchange logs record the normalization.
 
 ## Status
 
-partially implemented. Existing code still uses the previous envelope constants
-and still has a top-level JSON action parser; the implementation task is to
-make this contract the live runtime path.
+partially implemented. The protocol and LLM crates now use `<action>` and
+`</action>` for live parsing, rendering, stop sequences, closure repair, and
+oversize detection. Runtime prompt authority, recovery routes, and daemon
+admission still need full decision-ledger wiring.

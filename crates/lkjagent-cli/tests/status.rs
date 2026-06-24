@@ -78,7 +78,7 @@ fn status_prints_authority_snapshot_fields() -> TestResult<()> {
     lkjagent_store::state::set(
         &conn,
         "authority next action",
-        "<act><tool>artifact.next</tool></act>",
+        "<action><tool>artifact.next</tool></action>",
     )?;
 
     let status = run_cli(["--data", data.to_string_lossy().as_ref(), "status"]);
@@ -89,7 +89,7 @@ fn status_prints_authority_snapshot_fields() -> TestResult<()> {
     assert!(status.stdout.contains("evidence_gaps=artifact-readiness"));
     assert!(status
         .stdout
-        .contains("next_executable_action=<act><tool>artifact.next</tool></act>"));
+        .contains("next_executable_action=<action><tool>artifact.next</tool></action>"));
     Ok(())
 }
 

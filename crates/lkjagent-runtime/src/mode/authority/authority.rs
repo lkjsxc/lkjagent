@@ -166,18 +166,19 @@ fn join_strings_or_none(values: &[String]) -> String {
 
 fn valid_example_for(mode: ActiveMode, endpoint_decision: EndpointDecision) -> String {
     if endpoint_decision != EndpointDecision::CallModel {
-        return "runtime action; no model act block".to_string();
+        return "runtime action; no model action block".to_string();
     }
     match mode {
         ActiveMode::OwnerTask => rendered_registry_example("graph.state"),
         ActiveMode::Recovery => rendered_registry_example("graph.recover"),
         ActiveMode::Maintenance => rendered_registry_example("memory.find"),
         ActiveMode::Compaction | ActiveMode::ClosedIdle => {
-            "runtime action; no model act block".to_string()
+            "runtime action; no model action block".to_string()
         }
     }
 }
 
 fn rendered_registry_example(tool: &str) -> String {
-    registry_valid_example(tool).unwrap_or_else(|| format!("<act>\n<tool>{tool}</tool>\n</act>"))
+    registry_valid_example(tool)
+        .unwrap_or_else(|| format!("<action>\n<tool>{tool}</tool>\n</action>"))
 }

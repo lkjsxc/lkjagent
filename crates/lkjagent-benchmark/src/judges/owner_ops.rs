@@ -9,11 +9,11 @@ pub fn graph_state_recovery(workspace: &Path) -> Result<(), String> {
             "action params refused",
             "tool=graph.state",
             "expected=no parameters",
-            "<tool>graph.state</tool>\n</act>",
+            "<tool>graph.state</tool>\n</action>",
             "recover-params",
         ],
     )?;
-    forbid(&text, "<path>.</path>\n</act>")
+    forbid(&text, "<path>.</path>\n</action>")
 }
 
 pub fn doc_scaffold_recovery(workspace: &Path) -> Result<(), String> {
@@ -30,7 +30,7 @@ pub fn doc_scaffold_recovery(workspace: &Path) -> Result<(), String> {
             ],
         )?;
     }
-    forbid(&text, "<path>docs</path>\n</act>")
+    forbid(&text, "<path>docs</path>\n</action>")
 }
 
 pub fn recovery_loop_long_story(workspace: &Path) -> Result<(), String> {

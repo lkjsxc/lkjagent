@@ -10,33 +10,33 @@ use lkjagent_store::{events, queue, state};
 use support::http::{completion, serve_responses};
 use support::{runtime_state, store, temp_workspace, TestResult};
 
-const WRITE_ACTION: &str = "<act>
+const WRITE_ACTION: &str = "<action>
 <tool>fs.write</tool>
 <path>notes.md</path>
 <content># Notes</content>
-</act>";
-const PLAN_ACTION: &str = "<act>
+</action>";
+const PLAN_ACTION: &str = "<action>
 <tool>graph.plan</tool>
 <objective>start long work</objective>
 <steps>write notes; read notes; record verification</steps>
 <checks>fs.read notes.md confirms content</checks>
 <paths>notes.md</paths>
 <reason>mutation requires a graph plan</reason>
-</act>";
-const DONE_ACTION: &str = "<act>
+</action>";
+const DONE_ACTION: &str = "<action>
 <tool>agent.done</tool>
 <summary>three markdown files complete</summary>
-</act>";
-const READ_ACTION: &str = "<act>
+</action>";
+const READ_ACTION: &str = "<action>
 <tool>fs.read</tool>
 <path>notes.md</path>
-</act>";
-const EVIDENCE_ACTION: &str = "<act>
+</action>";
+const EVIDENCE_ACTION: &str = "<action>
 <tool>graph.evidence</tool>
 <kind>verification</kind>
 <summary>fs.read observed notes.md content</summary>
 <path>notes.md</path>
-</act>";
+</action>";
 
 #[test]
 fn owner_guidance_during_open_task_persists_count_guard() -> TestResult<()> {

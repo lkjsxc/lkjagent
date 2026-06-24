@@ -70,7 +70,7 @@ fn recover_params_renders_valid_example() -> TestResult<()> {
     assert!(joined.contains("action params refused"));
     assert!(joined.contains("tool=graph.state"));
     assert!(joined.contains("expected=no parameters"));
-    assert!(joined.contains("<tool>graph.state</tool>\n</act>"));
+    assert!(joined.contains("<tool>graph.state</tool>\n</action>"));
     assert!(joined.contains("fs.list/workspace.summary"));
     Ok(())
 }
@@ -130,7 +130,7 @@ fn parse_fault(state: lkjagent_runtime::task::RuntimeState) -> lkjagent_runtime:
     step(
         state,
         StepInput::Completion {
-            content: "no act block".to_string(),
+            content: "no action envelope".to_string(),
             tokens: 3,
         },
     )
@@ -140,7 +140,7 @@ fn param_fault(state: lkjagent_runtime::task::RuntimeState) -> lkjagent_runtime:
     step(
         state,
         StepInput::Completion {
-            content: "<act>\n<tool>graph.state</tool>\n<path>.</path>\n</act>".to_string(),
+            content: "<action>\n<tool>graph.state</tool>\n<path>.</path>\n</action>".to_string(),
             tokens: 5,
         },
     )
@@ -150,7 +150,8 @@ fn pending_read(state: lkjagent_runtime::task::RuntimeState) -> lkjagent_runtime
     step(
         state,
         StepInput::Completion {
-            content: "<act>\n<tool>fs.read</tool>\n<path>missing.md</path>\n</act>".to_string(),
+            content: "<action>\n<tool>fs.read</tool>\n<path>missing.md</path>\n</action>"
+                .to_string(),
             tokens: 10,
         },
     )

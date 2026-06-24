@@ -9,41 +9,41 @@ use lkjagent_store::{events, queue, state};
 use support::http::{completion, serve_responses};
 use support::{runtime_state, store, temp_workspace, TestResult};
 
-const MAINT_DONE: &str = "<act>
+const MAINT_DONE: &str = "<action>
 <tool>agent.done</tool>
 <summary>maintenance cycle checked current state</summary>
-</act>";
-const WRITE_ACTION: &str = "<act>
+</action>";
+const WRITE_ACTION: &str = "<action>
 <tool>fs.write</tool>
 <path>owner.txt</path>
 <content>owner wins</content>
-</act>";
-const MAINT_ASK: &str = "<act>
+</action>";
+const MAINT_ASK: &str = "<action>
 <tool>agent.ask</tool>
 <question>Should maintenance wait?</question>
-</act>";
-const PLAN_ACTION: &str = "<act>
+</action>";
+const PLAN_ACTION: &str = "<action>
 <tool>graph.plan</tool>
 <objective>write owner file</objective>
 <steps>Write owner file; read owner file; record verification evidence</steps>
 <checks>fs.read owner.txt confirms content</checks>
 <paths>owner.txt</paths>
 <reason>owner request needs planned mutation</reason>
-</act>";
-const DONE_ACTION: &str = "<act>
+</action>";
+const DONE_ACTION: &str = "<action>
 <tool>agent.done</tool>
 <summary>owner task complete</summary>
-</act>";
-const READ_ACTION: &str = "<act>
+</action>";
+const READ_ACTION: &str = "<action>
 <tool>fs.read</tool>
 <path>owner.txt</path>
-</act>";
-const EVIDENCE_ACTION: &str = "<act>
+</action>";
+const EVIDENCE_ACTION: &str = "<action>
 <tool>graph.evidence</tool>
 <kind>verification</kind>
 <summary>fs.read observed owner wins in owner.txt</summary>
 <path>owner.txt</path>
-</act>";
+</action>";
 
 #[test]
 fn idle_daemon_runs_maintenance_and_delays_after_empty_cycle() -> TestResult<()> {

@@ -123,6 +123,7 @@ parse outcomes and grow when live operation produces a new shape.
 
 ## Status
 
-partially implemented. Existing parser behavior still accepts non-action
-envelope constants and top-level JSON in live parsing; the implementation task
-is to align parser outcomes with this contract.
+partially implemented. The live parser now rejects top-level JSON, uses the
+singular action envelope, records strict implicit-envelope outcomes, and emits
+dedicated attribute-like tag faults. Admission-backed implicit normalization,
+conditional registry faults, and route-wide recovery proof remain open.

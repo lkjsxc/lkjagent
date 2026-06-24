@@ -13,10 +13,10 @@ use lkjagent_tools::structure_network::verify_knowledge_network;
 use support::http::{completion, serve_responses};
 use support::{store, temp_workspace, TestResult};
 
-const DONE: &str = "<act>
+const DONE: &str = "<action>
 <tool>agent.done</tool>
 <summary>recursive docs scaffold complete</summary>
-</act>";
+</action>";
 
 #[test]
 fn recursive_docs_task_auto_scaffolds_before_done() -> TestResult<()> {

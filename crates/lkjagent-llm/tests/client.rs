@@ -10,7 +10,7 @@ use support::{serve_once, TestResult};
 
 #[test]
 fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()> {
-    let body = r#"{"choices":[{"message":{"content":"<act></act>"},"finish_reason":"stop"}],"usage":{"prompt_tokens":5,"completion_tokens":3},"prompt_cache_hit_tokens":4}"#;
+    let body = r#"{"choices":[{"message":{"content":"<action></action>"},"finish_reason":"stop"}],"usage":{"prompt_tokens":5,"completion_tokens":3},"prompt_cache_hit_tokens":4}"#;
     let server = serve_once(200, body)?;
     let mut config = ClientConfig::new(server.base_url.clone(), "local-model");
     config.api_key = Some("secret-token".to_string());
@@ -20,7 +20,7 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     let completion = complete(&config, &messages, 0)?;
     let request = server.recorded()?;
 
-    assert_eq!(completion.content, "<act></act>");
+    assert_eq!(completion.content, "<action></action>");
     assert_eq!(completion.usage.prompt_tokens, Some(5));
     assert_eq!(request.method, "POST");
     assert_eq!(request.path, "/v1/chat/completions");
@@ -30,7 +30,7 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     );
     assert_eq!(
         request.body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"stop\":[\"</act>\"],\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"stop\":[\"</action>\"],\"stream\":false}"
     );
     Ok(())
 }
@@ -57,14 +57,14 @@ fn length_finish_reason_maps_to_oversize() -> TestResult<()> {
 
 #[test]
 fn length_with_closed_action_is_accepted() -> TestResult<()> {
-    let body = r#"{"choices":[{"message":{"content":"<act>\n<tool>agent.done</tool>\n<summary>x</summary>\n</act>\nextra"},"finish_reason":"length"}],"usage":{"prompt_tokens":5,"completion_tokens":2048}}"#;
+    let body = r#"{"choices":[{"message":{"content":"<action>\n<tool>agent.done</tool>\n<summary>x</summary>\n</action>\nextra"},"finish_reason":"length"}],"usage":{"prompt_tokens":5,"completion_tokens":2048}}"#;
     let server = serve_once(200, body)?;
     let config = ClientConfig::new(server.base_url.clone(), "local-model");
 
     let completion = complete(&config, &[Message::new(Role::System, "system")], 1)?;
     let _request = server.recorded()?;
 
-    assert!(completion.content.contains("</act>"));
+    assert!(completion.content.contains("</action>"));
     assert_eq!(
         completion.finish_reason,
         lkjagent_llm::wire::FinishReason::Length

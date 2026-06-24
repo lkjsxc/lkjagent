@@ -2,12 +2,12 @@ use crate::model::{BenchmarkTask, Difficulty, FileSpec, Fixture, JudgeKind, Task
 
 const GRAPH_PLAN_GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "valid_example:\n<act>\n<tool>graph.plan</tool>\n<objective>Repair loop policy.</objective>\n<steps>Inspect active mode. Render one policy.</steps>\n<checks>policy renders without contradiction</checks>\n<reason>Plan must name a check.</reason>\n</act>\n",
+    content: "valid_example:\n<action>\n<tool>graph.plan</tool>\n<objective>Repair loop policy.</objective>\n<steps>Inspect active mode. Render one policy.</steps>\n<checks>policy renders without contradiction</checks>\n<reason>Plan must name a check.</reason>\n</action>\n",
 }];
 
 const GRAPH_PLAN_BAD_OMITS_CHECKS: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "valid_example:\n<act>\n<tool>graph.plan</tool>\n<objective>Repair loop policy.</objective>\n<steps>Inspect active mode.</steps>\n<reason>Plan first.</reason>\n</act>\ngraph.plan needs checks or paths\n",
+    content: "valid_example:\n<action>\n<tool>graph.plan</tool>\n<objective>Repair loop policy.</objective>\n<steps>Inspect active mode.</steps>\n<reason>Plan first.</reason>\n</action>\ngraph.plan needs checks or paths\n",
 }];
 
 const GRAPH_PLAN_BAD_LOOP: &[FileSpec] = &[FileSpec {
@@ -46,12 +46,12 @@ pub const GRAPH_PLAN_TASK: BenchmarkTask = BenchmarkTask {
 
 const TRANSITION_GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "legal_transitions=document-audit,document-repair\nvalid_example:\n<act>\n<tool>graph.transition</tool>\n<target>document-audit</target>\n<reason>audit document artifact before completion</reason>\n</act>\n",
+    content: "legal_transitions=document-audit,document-repair\nvalid_example:\n<action>\n<tool>graph.transition</tool>\n<target>document-audit</target>\n<reason>audit document artifact before completion</reason>\n</action>\n",
 }];
 
 const TRANSITION_BAD_LABEL: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "valid_example:\n<act>\n<tool>graph.transition</tool>\n<target>plan:admitted</target>\n</act>\n",
+    content: "valid_example:\n<action>\n<tool>graph.transition</tool>\n<target>plan:admitted</target>\n</action>\n",
 }];
 
 const TRANSITION_BAD_ALIAS: &[FileSpec] = &[FileSpec {

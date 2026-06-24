@@ -151,9 +151,9 @@ fn completion_blockers(missing: &[String], guards: &[TrackLabel]) -> Vec<String>
 
 fn output_grammar(guards: &[TrackLabel]) -> String {
     if guards.contains(&TrackLabel::ParseRecovery) {
-        "one scalar <act> block with line-oriented fields".to_string()
+        "one scalar <action> block with line-oriented fields".to_string()
     } else {
-        "one <act> block or line-oriented file block".to_string()
+        "one <action> block or line-oriented file block".to_string()
     }
 }
 

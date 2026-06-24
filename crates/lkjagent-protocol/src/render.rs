@@ -1,12 +1,12 @@
-use crate::model::{Action, Param};
+use crate::model::{Action, Param, ACTION_CLOSE, ACTION_OPEN};
 
 pub fn render_action(action: &Action) -> String {
-    let mut output = String::from("<act>\n");
+    let mut output = format!("{ACTION_OPEN}\n");
     output.push_str(&render_pair("tool", &action.tool));
     for param in &action.params {
         output.push_str(&render_pair(&param.name, &param.value));
     }
-    output.push_str("</act>");
+    output.push_str(ACTION_CLOSE);
     output
 }
 

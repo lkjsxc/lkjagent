@@ -105,7 +105,9 @@ fn audit_example(tool: &str, params: &BTreeMap<String, String>) -> String {
         },
     )
     .map(|example| example.render())
-    .unwrap_or_else(|_| "<act>\n<tool>doc.audit</tool>\n<root>docs</root>\n</act>".to_string())
+    .unwrap_or_else(|_| {
+        "<action>\n<tool>doc.audit</tool>\n<root>docs</root>\n</action>".to_string()
+    })
 }
 
 fn evidence_example(kind: String) -> String {
@@ -118,7 +120,7 @@ fn evidence_example(kind: String) -> String {
     )
     .map(|example| example.render())
     .unwrap_or_else(|_| {
-        "<act>\n<tool>graph.evidence</tool>\n<kind>plan</kind>\n<summary>Recorded structured plan with checks.</summary>\n</act>".to_string()
+        "<action>\n<tool>graph.evidence</tool>\n<kind>plan</kind>\n<summary>Recorded structured plan with checks.</summary>\n</action>".to_string()
     })
 }
 
