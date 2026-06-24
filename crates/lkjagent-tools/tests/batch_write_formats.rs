@@ -47,6 +47,96 @@ fn batch_write_json_object_files_array_works() -> TestResult<()> {
 }
 
 #[test]
+fn batch_write_path_shaped_unknown_params_normalize() -> TestResult<()> {
+    let workspace = temp_workspace("batch-path-params")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut dispatch_state = state();
+    let output = dispatch(
+        &action(
+            "fs.batch_write",
+            &[(
+                "stories/chronos-fracture/catalog.toml",
+                "[artifact]\nname = \"Chronos Fracture\"",
+            )],
+        ),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    );
+
+    assert!(output.content.contains("path-shaped-params->files"));
+    assert!(output.content.contains("files_written=1"));
+    assert!(workspace
+        .join("stories/chronos-fracture/catalog.toml")
+        .is_file());
+    Ok(())
+}
+
+#[test]
+fn batch_write_absolute_path_param_refuses_before_mutation() -> TestResult<()> {
+    let workspace = temp_workspace("batch-absolute-path-param")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut dispatch_state = state();
+    let output = dispatch(
+        &action(
+            "fs.batch_write",
+            &[("/tmp/bad.md", "# Bad\n\nConcrete content.")],
+        ),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    );
+
+    assert!(output.content.contains("missing=files"));
+    assert!(!workspace.join("tmp/bad.md").exists());
+    Ok(())
+}
+
+#[test]
+fn batch_write_duplicate_path_params_refuse_before_mutation() -> TestResult<()> {
+    let workspace = temp_workspace("batch-duplicate-path-params")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut dispatch_state = state();
+    let output = dispatch(
+        &action(
+            "fs.batch_write",
+            &[
+                ("docs/a.md", "# A\n\nConcrete content."),
+                ("docs/a.md", "# A2\n\nConcrete content."),
+            ],
+        ),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    );
+
+    assert!(output.content.contains("duplicate=docs/a.md"));
+    assert!(!workspace.join("docs/a.md").exists());
+    Ok(())
+}
+
+#[test]
+fn batch_write_empty_path_param_content_refuses_before_mutation() -> TestResult<()> {
+    let workspace = temp_workspace("batch-empty-path-param")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+    let mut dispatch_state = state();
+    let output = dispatch(
+        &action("fs.batch_write", &[("docs/a.md", "")]),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    );
+
+    assert!(output.content.contains("missing=files"));
+    assert!(!workspace.join("docs/a.md").exists());
+    Ok(())
+}
+
+#[test]
 fn batch_write_json_missing_path_fails_before_mutation() -> TestResult<()> {
     let workspace = temp_workspace("batch-json-missing-path")?;
     let output = run_batch(

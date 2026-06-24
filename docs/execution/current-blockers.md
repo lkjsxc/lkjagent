@@ -64,8 +64,10 @@ Fracture run proves both progress and failure:
   case id, graph node and phase, active mode, artifact root and cursor, latest
   fault, missing evidence, compaction pressure, maintenance state, and prompt
   frame head.
-- Schema repair for `fs.batch_write` must either safely normalize path-shaped
-  unknown parameters or refuse with a concrete path-scoped canonical example.
+- Schema repair for `fs.batch_write` now safely normalizes path-shaped unknown
+  parameters when every parameter is a relative path and every value is content;
+  absolute, duplicate, and empty-content path parameters refuse before mutation.
+  Runtime repeated-fault route changes remain open.
 - Recovery routes must change action shape after repeated faults and keep the
   observation, audit, repair, and batch tools needed to escape.
 - Artifact readiness must be tied to the current artifact id. Direct graph
@@ -118,7 +120,7 @@ Fracture run proves both progress and failure:
 
 ## Remaining Proof Gaps
 
-- Batch-write schema recovery is the next code slice.
+- Recovery shape enforcement for repeated faults is the next code slice.
 - Authority rows still need coverage for every dispatch, provider exchange,
   recovery, compaction, maintenance, and close path.
 - Compaction snapshots need status rendering and prompt-frame resume proof.

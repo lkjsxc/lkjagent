@@ -1,4 +1,5 @@
 mod authority_refusal;
+mod batch_write_normalize;
 mod effective_refusal;
 mod examples;
 mod fs_extra_tools;

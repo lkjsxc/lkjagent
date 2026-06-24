@@ -1,3 +1,4 @@
+use super::batch_write_normalize::normalize_batch_write_paths;
 use lkjagent_protocol::registry::find_tool;
 use lkjagent_protocol::{Action, Param};
 
@@ -20,6 +21,7 @@ pub fn normalize_action(action: &Action) -> NormalizationDecision {
     let mut next = action.clone();
     let mut notes = Vec::new();
     apply_aliases(&mut next, &mut notes);
+    normalize_batch_write_paths(&mut next, &mut notes);
     drop_safe_no_param_locations(&mut next, &mut notes);
     if notes.is_empty() {
         NormalizationDecision::Unchanged(next)

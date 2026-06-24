@@ -51,7 +51,7 @@ but did not record document-structure or artifact-readiness evidence.
 | Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, normalized authority snapshots, event and decision rows, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, stale maintenance-action refusal, and `agent.done` refusal exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. Kernel prompt rendering requires a persisted decision id and produces path-scoped batch examples. Kernel admission refuses stale, blocked, not-admitted, and completion-blocked tools before dispatch. Store rows now cover prompt frames and observations with foreign-key proof for admissions. These are partial authority pieces, not one daemon-wired transition kernel. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Full unified runtime wiring remains open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, dispatcher-valid examples for covered routes, and SQLite retry counts exist. Live shape-change enforcement for every fault class remains open. |
-| Schema repair | Safe alias normalization and registry examples exist for covered cases. The live `fs.batch_write` path-shaped parameter loop proves batch-write schema recovery remains insufficient. |
+| Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` now normalizes safe path-shaped unknown parameters into `files` and refuses absolute, duplicate, or empty-content path parameters before mutation. Runtime route changes after repeated schema faults remain open. |
 | Artifact lifecycle | Scaffold, audit, `artifact.next`, bounded write examples, root-scoped cursors, root/path address refusals, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
 | Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, next action, valid example, blocked-handoff allowance, and status text. Every close path is not yet proven to call the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Status rendering and prompt-frame resume proof remain open. |
@@ -73,7 +73,9 @@ but did not record document-structure or artifact-readiness evidence.
   faults reaching at least count 5;
 - `fs.batch_write` was repeatedly refused because `files` was missing and a
   path-shaped unknown parameter such as
-  `stories/chronos-fracture/catalog.toml` appeared instead;
+  `stories/chronos-fracture/catalog.toml` appeared instead; focused tool tests
+  now cover safe normalization for that shape, but live runtime replay remains
+  open;
 - recovery examples were rendered, but the live route did not escape into a
   productive write or audit path;
 - evidence contained plan and observation rows, not `document-structure` or
@@ -133,6 +135,12 @@ Prompt-frame focused gate:
 Admission focused gate:
 
 - `cargo test -p lkjagent-runtime --test kernel_admission`: `KERNEL_ADMISSION_EXIT=0`, 5 passed.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+
+Batch-write schema focused gate:
+
+- `cargo test -p lkjagent-tools --test batch_write_formats`: `BATCH_WRITE_FORMATS_EXIT=0`, 10 passed.
+- `cargo test -p lkjagent-tools --test dispatch_normalize`: `DISPATCH_NORMALIZE_EXIT=0`, 6 passed.
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
 
 Store-ledger focused gates:
