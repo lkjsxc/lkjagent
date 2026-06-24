@@ -46,7 +46,7 @@ impl ActiveModePolicy {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RuntimeSnapshot {
-    pub active_mission: ActiveMode,
+    pub active_mode: ActiveMode,
     pub case_id: Option<String>,
     pub graph_node: Option<String>,
     pub graph_phase: Option<String>,
@@ -156,7 +156,7 @@ pub enum RuntimeEvent {
 pub struct ToolAdmission {
     pub admitted: bool,
     pub reason: String,
-    pub active_mission: ActiveMode,
+    pub active_mode: ActiveMode,
     pub required_evidence: Vec<String>,
     pub missing_evidence: Vec<String>,
     pub next_valid_tools: Vec<String>,

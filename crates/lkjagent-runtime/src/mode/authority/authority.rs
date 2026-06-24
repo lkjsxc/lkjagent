@@ -32,7 +32,7 @@ pub fn decide_turn_authority_for_snapshot(
 ) -> TurnAuthority {
     let mission = select_runtime_mission(&snapshot);
     let mode = mission.active_mode();
-    snapshot.active_mission = mode;
+    snapshot.active_mode = mode;
     let effective_policy = policy_for_mode(mode);
     let completion_policy = completion_policy_for(mode);
     let endpoint_decision = endpoint_decision_for(mode, input);
@@ -67,7 +67,7 @@ pub fn runtime_snapshot_for_turn(input: TurnAuthorityInput) -> RuntimeSnapshot {
     let maintenance_eligible =
         !owner_work_exists && (input.maintenance_due || input.maintenance_active);
     let mut snapshot = RuntimeSnapshot {
-        active_mission: ActiveMode::ClosedIdle,
+        active_mode: ActiveMode::ClosedIdle,
         case_id: None,
         graph_node: None,
         graph_phase: None,
@@ -82,7 +82,7 @@ pub fn runtime_snapshot_for_turn(input: TurnAuthorityInput) -> RuntimeSnapshot {
         repeated_action: false,
         external_owner_input_required: false,
     };
-    snapshot.active_mission = select_runtime_mission(&snapshot).active_mode();
+    snapshot.active_mode = select_runtime_mission(&snapshot).active_mode();
     snapshot
 }
 

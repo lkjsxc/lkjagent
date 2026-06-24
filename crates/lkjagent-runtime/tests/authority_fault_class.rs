@@ -157,7 +157,7 @@ fn all_fault_classes() -> BTreeSet<FaultClass> {
 
 fn recovery_snapshot() -> RuntimeSnapshot {
     RuntimeSnapshot {
-        active_mission: ActiveMode::Recovery,
+        active_mode: ActiveMode::Recovery,
         case_id: None,
         graph_node: None,
         graph_phase: None,

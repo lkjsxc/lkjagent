@@ -27,7 +27,7 @@ fn owner_question_is_admitted_only_with_external_input_gate() {
 
 fn snapshot(external_owner_input_required: bool) -> RuntimeSnapshot {
     RuntimeSnapshot {
-        active_mission: ActiveMode::OwnerTask,
+        active_mode: ActiveMode::OwnerTask,
         case_id: None,
         graph_node: None,
         graph_phase: None,

@@ -82,7 +82,7 @@ fn reducer_refuses_done_after_planning_only() {
 #[test]
 fn maintenance_done_stays_admitted_when_owner_work_is_absent() {
     let mut snapshot = owner_snapshot(&[]);
-    snapshot.active_mission = ActiveMode::Maintenance;
+    snapshot.active_mode = ActiveMode::Maintenance;
     snapshot.owner_work_exists = false;
 
     let decision = decide(
@@ -97,7 +97,7 @@ fn maintenance_done_stays_admitted_when_owner_work_is_absent() {
 
 fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
     RuntimeSnapshot {
-        active_mission: ActiveMode::OwnerTask,
+        active_mode: ActiveMode::OwnerTask,
         case_id: None,
         graph_node: None,
         graph_phase: None,

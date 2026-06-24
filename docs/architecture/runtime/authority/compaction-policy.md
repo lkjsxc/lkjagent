@@ -26,7 +26,7 @@ No model-authored `memory.save` is required.
 ```text
 CompactionResume
 - case_id
-- active_mission
+- active_mode
 - previous_mission
 - active_node
 - objective_summary

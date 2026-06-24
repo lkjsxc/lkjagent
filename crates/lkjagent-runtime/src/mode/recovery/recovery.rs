@@ -13,7 +13,7 @@ pub fn recovery_plan_for_fault(snapshot: &RuntimeSnapshot, fault: RuntimeFault) 
         fault_class,
         recovery_class: class,
         recovery_route: recovery_route(fault_class).to_string(),
-        previous_mission: snapshot.active_mission,
+        previous_mission: snapshot.active_mode,
         retry_budget: retry_budget(class),
         allowed_observation_tools: observation_tools(class),
         allowed_repair_tools: repair_tools(class),
