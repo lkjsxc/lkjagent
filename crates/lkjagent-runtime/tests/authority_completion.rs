@@ -98,6 +98,9 @@ fn maintenance_done_stays_admitted_when_owner_work_is_absent() {
 fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
     RuntimeSnapshot {
         active_mission: ActiveMode::OwnerTask,
+        case_id: None,
+        graph_node: None,
+        graph_phase: None,
         owner_work_exists: true,
         recovery_ladder_active: false,
         context_pressure_active: false,

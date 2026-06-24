@@ -12,6 +12,9 @@ fn decision_record_carries_mission_fingerprint_and_completion_refusal() {
     assert_eq!(record.mission, RuntimeMission::OwnerExecution);
     assert_eq!(record.active_mode, ActiveMode::OwnerTask);
     assert_eq!(record.event_kind, "completion_requested");
+    assert_eq!(record.case_id, "42");
+    assert_eq!(record.state_node, "audit");
+    assert!(!record.case_id.contains("case:unknown"));
     assert!(record.decision_id.starts_with("decision-"));
     assert!(record.event_id.starts_with("event-"));
     assert_eq!(record.missing_evidence, vec!["artifact-readiness"]);
@@ -25,6 +28,9 @@ fn decision_record_carries_mission_fingerprint_and_completion_refusal() {
 fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
     RuntimeSnapshot {
         active_mission: ActiveMode::OwnerTask,
+        case_id: Some("42".to_string()),
+        graph_node: Some("audit".to_string()),
+        graph_phase: Some("verification".to_string()),
         owner_work_exists: true,
         recovery_ladder_active: false,
         context_pressure_active: false,

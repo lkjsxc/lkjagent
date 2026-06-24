@@ -47,6 +47,9 @@ impl ActiveModePolicy {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RuntimeSnapshot {
     pub active_mission: ActiveMode,
+    pub case_id: Option<String>,
+    pub graph_node: Option<String>,
+    pub graph_phase: Option<String>,
     pub owner_work_exists: bool,
     pub recovery_ladder_active: bool,
     pub context_pressure_active: bool,

@@ -60,6 +60,9 @@ fn compaction_blocks_model_completion() {
 fn owner_snapshot(missing: &[&str]) -> RuntimeSnapshot {
     RuntimeSnapshot {
         active_mission: ActiveMode::OwnerTask,
+        case_id: None,
+        graph_node: None,
+        graph_phase: None,
         owner_work_exists: true,
         recovery_ladder_active: false,
         context_pressure_active: false,
