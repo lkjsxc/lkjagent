@@ -137,6 +137,16 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
         ("memory.save", "kind") => "lesson",
         ("memory.save", "title") => "Useful lesson",
         ("memory.save", "content") => "Record only observed durable facts.",
+        ("diary.record", "title") => "Prototype notes after Chronos run",
+        ("diary.record", "content") => "Write refusals were valid; recovery routing changed.",
+        ("schedule.add", "title") => "Review recovery smoke",
+        ("schedule.add", "start") => "2026-06-25T09:00:00+09:00",
+        ("todo.add", "title") => "Finish transition-kernel proof",
+        ("diary.find", "query") | ("schedule.list", "query") | ("todo.list", "query") => {
+            "Chronos recovery"
+        }
+        ("schedule.update", "id") | ("todo.update", "id") => "1",
+        ("schedule.update", "status") | ("todo.update", "status") => "done",
         ("agent.done", "summary") => "Completed with evidence",
         ("agent.ask", "question") => "What specific target should I use?",
         ("queue.enqueue", "content") | ("queue.edit", "content") => "Owner task",

@@ -24,23 +24,29 @@ pub fn list(
     filter: &PersonalListFilter<'_>,
 ) -> StoreResult<Vec<PersonalRecord>> {
     let limit = bounded_limit(filter.limit, 20);
-    match (filter.kind, filter.status, filter.project) {
+    let scan_limit = 100;
+    let mut records = match (filter.kind, filter.status, filter.project) {
         (Some(kind), Some(status), Some(project)) => query(
             conn,
             "WHERE kind = ?1 AND status = ?2 AND project = ?3",
             params![kind, status, project],
-            limit,
-        ),
+            scan_limit,
+        )?,
         (Some(kind), Some(status), None) => query(
             conn,
             "WHERE kind = ?1 AND status = ?2",
             params![kind, status],
-            limit,
-        ),
-        (Some(kind), None, None) => query(conn, "WHERE kind = ?1", params![kind], limit),
-        (None, Some(status), None) => query(conn, "WHERE status = ?1", params![status], limit),
-        _ => query(conn, "", params![], limit),
-    }
+            scan_limit,
+        )?,
+        (Some(kind), None, None) => query(conn, "WHERE kind = ?1", params![kind], scan_limit)?,
+        (None, Some(status), None) => {
+            query(conn, "WHERE status = ?1", params![status], scan_limit)?
+        }
+        _ => query(conn, "", params![], scan_limit)?,
+    };
+    records.retain(|record| in_range(record.start_at.as_deref(), filter));
+    records.truncate(limit);
+    Ok(records)
 }
 
 pub fn search(
@@ -92,6 +98,19 @@ where
         out.push(row?);
     }
     Ok(out)
+}
+
+fn in_range(value: Option<&str>, filter: &PersonalListFilter<'_>) -> bool {
+    let Some(value) = value else {
+        return filter.start.is_none() && filter.end.is_none();
+    };
+    if filter.start.is_some_and(|start| value < start) {
+        return false;
+    }
+    if filter.end.is_some_and(|end| value > end) {
+        return false;
+    }
+    true
 }
 
 fn row_to_record(row: &Row<'_>) -> rusqlite::Result<PersonalRecord> {

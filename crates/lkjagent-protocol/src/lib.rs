@@ -4,6 +4,7 @@ pub mod model;
 pub mod parse;
 pub mod registry;
 mod registry_graph;
+mod registry_personal;
 pub mod registry_render;
 mod registry_spec;
 pub mod render;

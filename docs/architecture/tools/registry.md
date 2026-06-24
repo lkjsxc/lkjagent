@@ -33,6 +33,14 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | memory.save | kind req; title req; tags opt; content req | insert one memory row, return its id | unknown kind |
 | memory.find | query req; limit opt 5 | ranked full-text search over memory | none; empty results are ok |
 | memory.prune | none | delete exact duplicate memory rows | store delete failure |
+| diary.record | date opt; title req; content req; tags opt | create one diary record | invalid date; empty title |
+| diary.find | query opt; start opt; end opt; tags opt; limit opt 10 | find diary records | invalid limit |
+| schedule.add | title req; start req; end opt; timezone opt; location opt; notes opt; recurrence opt; tags opt | create one schedule record | invalid time range |
+| schedule.list | start opt; end opt; query opt; status opt all; limit opt 20 | list schedule records | invalid limit |
+| schedule.update | id req; status opt; other fields opt | update schedule status | missing row; unsupported update shape |
+| todo.add | title req; details opt; due opt; priority opt normal; project opt; tags opt | create one TODO record | invalid due date |
+| todo.list | status opt open; query opt; due_before opt; project opt; limit opt 20 | list TODO records | invalid limit |
+| todo.update | id req; status opt; other fields opt | update TODO status | missing row; unsupported update shape |
 | graph.state | none | show active graph case, phase, node, evidence, and transitions | no active case |
 | graph.next | none | show legal transitions, missing guards, and preferred next action | no active case |
 | graph.audit | none | audit active graph case, policy, completion, and shell admission | no active case |
@@ -58,7 +66,7 @@ Parameters are marked req or opt; a default follows opt where one exists.
 
 Detailed contracts: [fs.md](fs.md), [shell.md](shell.md),
 [queue-ops.md](queue-ops.md), [memory-ops.md](memory-ops.md),
-[graph-ops.md](graph-ops.md), [workspace.md](workspace.md),
+[personal-tools.md](personal-tools.md), [graph-ops.md](graph-ops.md), [workspace.md](workspace.md),
 [verification-tools.md](verification-tools.md), [doc-tools.md](doc-tools.md),
 [control.md](control.md).
 

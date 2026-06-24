@@ -15,6 +15,7 @@ mod join;
 mod memory_tools;
 mod normalize;
 mod params;
+mod personal_tools;
 mod queue_tools;
 mod refusal;
 mod routes;

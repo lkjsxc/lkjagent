@@ -31,7 +31,7 @@ but did not record document-structure or artifact-readiness evidence.
 | --- | --- |
 | Workspace and gates | `Cargo.toml`, `crates/lkjagent-xtask`, and `docker-compose.yml` exist. |
 | Parser | `lkjagent-protocol` parses line-oriented, paired-tag, and batch file action forms covered by focused fixtures. The live parser uses `<action>`, rejects top-level JSON and prose outside the envelope, records implicit-envelope outcomes in provider logs and runtime notices, and emits dedicated attribute-like tag faults. Provider stop-closure restoration records closure mode for parse logs. |
-| Dispatcher registry | `lkjagent-tools` validates registered tools, required-any groups, and renders registry examples for covered action families. `graph.plan` requires checks or paths before dispatch. |
+| Dispatcher registry | `lkjagent-tools` validates registered tools, required-any groups, personal record tools, and renders registry examples for covered action families. `graph.plan` requires checks or paths before dispatch. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
 | SQLite store | Queue, state, event, memory, personal record, task summary, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist in `lkjagent-store`. |
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
