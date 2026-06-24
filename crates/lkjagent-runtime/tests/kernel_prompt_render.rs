@@ -1,7 +1,7 @@
 use lkjagent_protocol::parse_completion;
 use lkjagent_runtime::kernel::{
     build_snapshot, reduce, render_prompt_frame, PromptRenderError, RuntimeDecisionId,
-    RuntimeEvent, SnapshotAdapterInput,
+    RuntimeEvent, RuntimeEventId, SnapshotAdapterInput,
 };
 
 fn owner_input() -> SnapshotAdapterInput {
@@ -31,13 +31,28 @@ fn prompt_frame_requires_persisted_decision_id() -> Result<(), String> {
 }
 
 #[test]
+fn prompt_frame_requires_persisted_event_id() -> Result<(), String> {
+    let snapshot = build_snapshot(owner_input()).map_err(format_error)?;
+    let mut decision =
+        reduce(&snapshot, RuntimeEvent::OwnerMessageReceived).map_err(format_error)?;
+    decision.decision_id = RuntimeDecisionId::Stored(42);
+    assert_eq!(
+        render_prompt_frame(&decision),
+        Err(PromptRenderError::EventNotPersisted)
+    );
+    Ok(())
+}
+
+#[test]
 fn owner_prompt_cites_decision_id_and_fingerprints() -> Result<(), String> {
     let snapshot = build_snapshot(owner_input()).map_err(format_error)?;
     let mut decision =
         reduce(&snapshot, RuntimeEvent::OwnerMessageReceived).map_err(format_error)?;
     decision.decision_id = RuntimeDecisionId::Stored(42);
+    decision.event_id = RuntimeEventId(9);
     let frame = render_prompt_frame(&decision).map_err(format_error)?;
     assert!(frame.contains("decision_id=42"));
+    assert!(frame.contains("event_id=9"));
     assert!(frame.contains("authority_fingerprint=authority:"));
     assert!(frame.contains("staleness_fingerprint=stale:"));
     assert!(frame.contains("admitted_tools=graph.state,artifact.next,fs.batch_write"));
@@ -50,6 +65,7 @@ fn schema_repair_batch_example_is_concrete_and_parseable() -> Result<(), String>
     let mut decision =
         reduce(&snapshot, RuntimeEvent::SchemaFault { fault_key: None }).map_err(format_error)?;
     decision.decision_id = RuntimeDecisionId::Stored(77);
+    decision.event_id = RuntimeEventId(10);
     let frame = render_prompt_frame(&decision).map_err(format_error)?;
     assert!(frame.contains("path: stories/chronos-fracture/README.md"));
     let action_text = exact_action(&frame).ok_or_else(|| "missing action".to_string())?;
@@ -64,6 +80,7 @@ fn runtime_effect_decision_produces_no_prompt() -> Result<(), String> {
     let snapshot = build_snapshot(SnapshotAdapterInput::default()).map_err(format_error)?;
     let mut decision = reduce(&snapshot, RuntimeEvent::MaintenanceTick).map_err(format_error)?;
     decision.decision_id = RuntimeDecisionId::Stored(88);
+    decision.event_id = RuntimeEventId(11);
     assert_eq!(
         render_prompt_frame(&decision),
         Err(PromptRenderError::RuntimeEffectHasNoPrompt)

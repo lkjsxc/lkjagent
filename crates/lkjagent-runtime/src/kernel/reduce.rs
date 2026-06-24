@@ -36,6 +36,16 @@ pub fn select_mission(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> Runti
     RuntimeMission::ClosedIdle
 }
 
+pub fn reduce_with_event_id(
+    snapshot: &RuntimeSnapshot,
+    event_id: RuntimeEventId,
+    event: RuntimeEvent,
+) -> Result<RuntimeDecision, DecisionInvariantError> {
+    let mut decision = reduce(snapshot, event)?;
+    decision.event_id = event_id;
+    Ok(decision)
+}
+
 pub fn reduce(
     snapshot: &RuntimeSnapshot,
     event: RuntimeEvent,

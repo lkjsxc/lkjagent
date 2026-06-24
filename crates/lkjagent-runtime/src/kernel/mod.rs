@@ -31,7 +31,7 @@ pub use facts::{
     ObservationFacts, QueueFacts,
 };
 pub use fault::{FaultClass, FaultKey, RuntimeFault};
-pub use reduce::{reduce, select_mission};
+pub use reduce::{reduce, reduce_with_event_id, select_mission};
 pub use render::{render_prompt_frame, PromptCardData, PromptRenderError};
 pub use snapshot::{
     AuthorityFingerprint, RuntimeEventId, RuntimeSnapshot, RuntimeSnapshotId, RuntimeSnapshotInput,

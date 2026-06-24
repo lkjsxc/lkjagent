@@ -1,9 +1,9 @@
 use lkjagent_runtime::kernel::{
-    reduce, select_mission, ActionTemplate, ArtifactFacts, AuthorityFingerprint, CaseFacts,
-    ContextFacts, EvidenceFacts, GraphFacts, MaintenanceFacts, QueueFacts, RuntimeDecision,
-    RuntimeDecisionId, RuntimeDecisionInput, RuntimeDecisionKind, RuntimeEvent, RuntimeEventId,
-    RuntimeMission, RuntimeSnapshot, RuntimeSnapshotId, RuntimeSnapshotInput, StalenessFingerprint,
-    ToolAdmissionView,
+    reduce, reduce_with_event_id, select_mission, ActionTemplate, ArtifactFacts,
+    AuthorityFingerprint, CaseFacts, ContextFacts, EvidenceFacts, GraphFacts, MaintenanceFacts,
+    QueueFacts, RuntimeDecision, RuntimeDecisionId, RuntimeDecisionInput, RuntimeDecisionKind,
+    RuntimeEvent, RuntimeEventId, RuntimeMission, RuntimeSnapshot, RuntimeSnapshotId,
+    RuntimeSnapshotInput, StalenessFingerprint, ToolAdmissionView,
 };
 
 fn snapshot() -> Result<RuntimeSnapshot, String> {
@@ -166,9 +166,10 @@ fn completion_with_missing_artifact_readiness_is_blocked() -> Result<(), String>
 fn one_event_emits_one_decision_with_event_and_snapshot_ids() -> Result<(), String> {
     let mut state = snapshot()?;
     state.queue.pending_owner_count = 1;
-    let decision = reduce(&state, RuntimeEvent::QueueChanged).map_err(format_error)?;
+    let decision = reduce_with_event_id(&state, RuntimeEventId(8), RuntimeEvent::QueueChanged)
+        .map_err(format_error)?;
     assert_eq!(decision.snapshot_id, RuntimeSnapshotId(1));
-    assert_eq!(decision.event_id, RuntimeEventId(0));
+    assert_eq!(decision.event_id, RuntimeEventId(8));
     assert_eq!(decision.decision_id, RuntimeDecisionId::Pending);
     Ok(())
 }
