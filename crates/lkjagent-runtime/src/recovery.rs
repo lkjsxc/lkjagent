@@ -124,9 +124,16 @@ fn received_params(missing: &[String], unknown: &[String]) -> String {
 }
 
 fn attribute_like_notice(tag_name: &str, value_hint: Option<&str>) -> String {
-    let repair_value = value_hint.unwrap_or("relative/path");
+    let repair_value = value_hint.unwrap_or("stories/chronos-fracture");
     format!(
-        "parse fault: attribute-like tag {tag_name}\nrepair_rule=tag names cannot contain values\nrepair_tag=paths\nrepair_value={repair_value}"
+        "parse fault: attribute-like tag {tag_name}\nfault=attribute_like_tag\ninvalid_tag_name={tag_name}\nrepair_rule=tag names cannot contain values\nrepair_tag=paths\nrepair_value={repair_value}\nnext_executable_action:\n{}",
+        graph_plan_repair_example(repair_value)
+    )
+}
+
+fn graph_plan_repair_example(path: &str) -> String {
+    format!(
+        "<action>\n<tool>graph.plan</tool>\n<objective>Create a structured science-fiction story bible for Chronos Fracture.</objective>\n<steps>\n1. Record the plan.\n2. Create the root README and catalog.\n3. Write bounded story-bible content batches.\n4. Audit document structure.\n5. Audit artifact readiness.\n</steps>\n<paths>{path}</paths>\n<reason>The owner requires evidence-gated story-bible construction.</reason>\n</action>"
     )
 }
 
