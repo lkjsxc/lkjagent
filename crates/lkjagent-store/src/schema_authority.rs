@@ -31,7 +31,8 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             case_id INTEGER,
             event_kind TEXT NOT NULL,
             event_payload TEXT NOT NULL,
-            created_at TEXT NOT NULL
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(snapshot_id) REFERENCES runtime_snapshots(id)
         );
         CREATE TABLE IF NOT EXISTS runtime_authority_decisions (
             id INTEGER PRIMARY KEY,
@@ -54,7 +55,21 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             maintenance_allowed INTEGER NOT NULL,
             authority_fingerprint TEXT NOT NULL,
             staleness_fingerprint TEXT NOT NULL,
-            created_at TEXT NOT NULL
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(snapshot_id) REFERENCES runtime_snapshots(id),
+            FOREIGN KEY(event_id) REFERENCES runtime_authority_events(id)
+        );
+        CREATE TABLE IF NOT EXISTS runtime_tool_admissions (
+            id INTEGER PRIMARY KEY,
+            decision_id INTEGER NOT NULL,
+            case_scope TEXT NOT NULL,
+            case_id INTEGER,
+            requested_tool TEXT NOT NULL,
+            admitted INTEGER NOT NULL,
+            refusal_reason TEXT NOT NULL,
+            exact_valid_example TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(decision_id) REFERENCES runtime_authority_decisions(id)
         );
         CREATE TABLE IF NOT EXISTS runtime_transitions (
             id INTEGER PRIMARY KEY,
@@ -66,7 +81,10 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             from_node TEXT NOT NULL,
             to_node TEXT NOT NULL,
             transition_kind TEXT NOT NULL,
-            created_at TEXT NOT NULL
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(snapshot_id) REFERENCES runtime_snapshots(id),
+            FOREIGN KEY(event_id) REFERENCES runtime_authority_events(id),
+            FOREIGN KEY(decision_id) REFERENCES runtime_authority_decisions(id)
         );
         CREATE TABLE IF NOT EXISTS runtime_effects (
             id INTEGER PRIMARY KEY,
@@ -75,18 +93,37 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             effect_kind TEXT NOT NULL,
             effect_summary TEXT NOT NULL,
             observation_event_id INTEGER,
-            created_at TEXT NOT NULL
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(decision_id) REFERENCES runtime_authority_decisions(id),
+            FOREIGN KEY(admission_id) REFERENCES runtime_tool_admissions(id),
+            FOREIGN KEY(observation_event_id) REFERENCES runtime_authority_events(id)
         );
-        CREATE TABLE IF NOT EXISTS runtime_tool_admissions (
+        CREATE TABLE IF NOT EXISTS runtime_prompt_frames (
             id INTEGER PRIMARY KEY,
             decision_id INTEGER NOT NULL,
             case_scope TEXT NOT NULL,
             case_id INTEGER,
-            requested_tool TEXT NOT NULL,
-            admitted INTEGER NOT NULL,
-            refusal_reason TEXT NOT NULL,
-            exact_valid_example TEXT,
-            created_at TEXT NOT NULL
+            frame_kind TEXT NOT NULL,
+            prompt_fingerprint TEXT NOT NULL,
+            context_package_ids TEXT NOT NULL,
+            rendered_summary TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(decision_id) REFERENCES runtime_authority_decisions(id)
+        );
+        CREATE TABLE IF NOT EXISTS runtime_observations (
+            id INTEGER PRIMARY KEY,
+            decision_id INTEGER NOT NULL,
+            admission_id INTEGER,
+            effect_id INTEGER,
+            observation_event_id INTEGER,
+            observation_kind TEXT NOT NULL,
+            status TEXT NOT NULL,
+            summary TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(decision_id) REFERENCES runtime_authority_decisions(id),
+            FOREIGN KEY(admission_id) REFERENCES runtime_tool_admissions(id),
+            FOREIGN KEY(effect_id) REFERENCES runtime_effects(id),
+            FOREIGN KEY(observation_event_id) REFERENCES runtime_authority_events(id)
         );
         CREATE INDEX IF NOT EXISTS runtime_snapshots_case_idx
             ON runtime_snapshots(case_scope, case_id, id);
@@ -98,6 +135,10 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             ON runtime_tool_admissions(decision_id, requested_tool);
         CREATE INDEX IF NOT EXISTS runtime_transitions_case_idx
             ON runtime_transitions(case_scope, case_id, id);
+        CREATE INDEX IF NOT EXISTS runtime_prompt_frames_decision_idx
+            ON runtime_prompt_frames(decision_id, id);
+        CREATE INDEX IF NOT EXISTS runtime_observations_decision_idx
+            ON runtime_observations(decision_id, id);
         ",
     )?;
     Ok(())

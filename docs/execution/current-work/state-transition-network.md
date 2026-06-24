@@ -138,7 +138,9 @@ APIs, dispatch admission views, stale maintenance-action refusal, central
 completion reducer use, and prompt-card decision id and fingerprint rendering
 exist. A standalone `kernel` module now defines pure snapshot, event, decision,
 admission, effect, render, fault, and reducer records with tests for mission
-priority and model-call admission invariants. Daemon wiring through the new
-kernel, store-ledger joins, explicit triggering events on every path,
+priority and model-call admission invariants. Store ledgers include prompt
+frame and observation rows, reopen lookup proof, and foreign-key proof that an
+admission cannot exist without a decision. Daemon wiring through the new kernel,
+snapshot adapter construction, explicit triggering events on every path,
 prompt-frame resume proof, maintenance preemption proof, route-wide admission
 proof, and every close path remain open.

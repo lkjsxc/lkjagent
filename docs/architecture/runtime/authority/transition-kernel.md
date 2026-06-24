@@ -103,8 +103,9 @@ inspection effects, and recovery escape-tool visibility.
 
 ## Status
 
-partially implemented. Snapshot, event, decision, transition, effect, and
-admission ledgers exist. Runtime turn authority writes normalized rows and
-prompt cards cite the decision id. Full kernel wiring for every dispatch,
-provider exchange, recovery, compaction, maintenance, and close path remains
-open.
+partially implemented. Snapshot, event, decision, transition, effect,
+admission, prompt-frame, and observation ledgers exist. Runtime turn authority
+writes normalized rows and prompt cards cite the decision id. Store tests prove
+latest snapshot and decision reopen lookup and admission-to-decision integrity.
+Full kernel wiring for every dispatch, provider exchange, recovery, compaction,
+maintenance, and close path remains open.
