@@ -41,7 +41,7 @@ but did not record document-structure or artifact-readiness evidence.
 | Placeholder and payload refusal | `fs.write`, `fs.batch_write`, content audit, and check-docs reject common scaffold phrases and oversized payloads before mutation. |
 | Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
 | Hard compaction mode | A runtime-owned `Compaction` active mode exists and does not render `memory.save` as a model action. |
-| Stale-action preemption seed | Cached actions are refused before dispatch when owner queue, runtime-only, or maintenance authority fields change. |
+| Stale-action preemption seed | Cached actions are refused before dispatch when owner queue, runtime-only, maintenance, or prompt-frame authority fields change. |
 | Baseline benchmarks | The corpus includes owner-reported recovery, artifact, memory, accounting, model-log, batch-schema, compaction, and repeated-recovery signatures. |
 
 ## Partially Implemented Behavior
@@ -55,9 +55,9 @@ but did not record document-structure or artifact-readiness evidence.
 | Artifact lifecycle | Scaffold, audit, fact-only `artifact.next`, story semantic readiness checks, bounded write examples, root-scoped cursors, root/path address refusals, explicit `.md` directory invalid-root repair output, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
 | Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, current artifact, next action, valid example, blocked-handoff allowance, and status text. Artifact-readiness refusal names the current artifact when authority supplies it; graph-only fallback now uses `graph.state` instead of generic roots. Every close path is not yet proven to call the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. CLI status now renders the latest compaction snapshot fields for the active case. Prompt-frame resume proof remains open. |
-| Maintenance | Idle maintenance, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Owner preemption before endpoint and every dispatch path remains open. |
-| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, CLI list/show, and focused tests exist. Sanitized archive export and raw case inspection remain open. |
-| Benchmarks | Uploaded-run text signatures exist. Parser-level and runtime-level replay fixtures that assert productive next actions remain open. |
+| Maintenance | Idle maintenance, owner queue preemption at turn boundaries, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Every dispatch and close path still needs unified kernel authority proof. |
+| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, and focused tests exist. Live replay proof remains open. |
+| Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Live Chronos-style replay fixtures that prove a successful story artifact close remain open. |
 
 ## Active Failure Evidence
 

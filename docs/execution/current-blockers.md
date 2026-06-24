@@ -140,8 +140,8 @@ Fracture run proves both progress and failure:
 - Rendered refusal examples need route-level proof across every policy path.
 - Artifact adoption, ledger-root repair, invalid-root completion markers, and
   semantic readiness remain incomplete.
-- Maintenance owner preemption remains open before endpoint and every dispatch
-  path.
+- Owner preemption has turn-boundary proof; every dispatch and close path still
+  needs unified kernel authority proof.
 - Parser-level and runtime-level replay fixtures now assert more provider and
   recovery productive artifacts, but live Chronos-style replay still must prove
   a successful story artifact close.
