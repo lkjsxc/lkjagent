@@ -145,7 +145,9 @@ fn non_file_total_unit_does_not_beat_explicit_file_count() {
 fn markdown_line_limit_does_not_create_file_count_guard() {
     let mut state = ControlState::default();
 
-    state.start_task("Every Markdown file must stay under 160 lines.");
+    state.start_task(
+        "Every directory must contain README.md and at least two children. Every Markdown file must stay under 160 lines.",
+    );
 
     assert_eq!(state.guard, CompletionGuard::None);
 }
