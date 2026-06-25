@@ -9,6 +9,7 @@ and completion authority in the runtime.
 ## Table of Contents
 
 - [contract.md](contract.md): runtime-owned contract around model proposals.
+- [provider-anomalies.md](provider-anomalies.md): provider output shapes that are not model actions.
 - [provider-neutral-terms.md](provider-neutral-terms.md): allowed durable wording.
 
 ## Local Map

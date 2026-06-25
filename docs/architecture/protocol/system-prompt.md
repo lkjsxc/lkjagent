@@ -39,8 +39,8 @@ budget at build time; growing it requires shrinking another prefix section.
 Emit exactly one <action> block and no prose outside it. The first child is
 <tool>. Every other child is an attribute-free parameter tag from the registry.
 Values are raw text between opening and closing tags. Do not emit <actions>,
-<act>, tag attributes, JSON tool calls, or hidden reasoning. Stop immediately
-after </action>.
+<act>, <think>, tag attributes, JSON tool calls, or hidden reasoning. Stop
+immediately after </action>.
 ```
 
 The grammar includes one concrete `fs.write` example and one concrete
@@ -72,9 +72,9 @@ before graph-specific guidance.
 
 ## What Is Deliberately Absent
 
-Multi-turn few-shot transcripts, hidden-reasoning requests, personality prose,
-capability marketing, apology templates, and JSON tool-call instructions. Every
-sentence either changes behavior or leaves.
+Multi-turn few-shot transcripts, `<think>` permission, hidden-reasoning
+requests, personality prose, capability marketing, apology templates, and JSON
+tool-call instructions. Every sentence either changes behavior or leaves.
 
 ## Status
 

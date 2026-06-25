@@ -32,15 +32,17 @@ RecoveryPlan
 
 ## Classes
 
-Classes include parse faults, parameter faults, schema faults,
-tool-admission contradictions, repeat-action faults, payload overflow, audit
-failures, weak artifact content, false completion, verification failure,
+Classes include parse faults, provider anomalies, parameter faults, schema
+faults, tool-admission contradictions, repeat-action faults, payload overflow,
+audit failures, weak artifact content, false completion, verification failure,
 compaction resume gaps, maintenance preemption, endpoint faults, and
 turn-budget exhaustion.
 
 ## Required Ladders
 
 - Parse faults simplify the prompt to exactly one action.
+- Provider empty-content anomalies route through endpoint recovery or provider
+  failure notice and do not increment parser repeat-fault counters.
 - Parameter faults render one schema-derived example for the failed tool.
 - Payload overflow blocks raw large `fs.write` and moves to batch repair.
 - Invalid batch syntax retries once with the canonical example, then switches

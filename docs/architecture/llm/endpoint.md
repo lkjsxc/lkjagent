@@ -53,14 +53,17 @@ stream is false because nothing consumes partial tokens:
 
 ## Response Subset
 
-The harness reads exactly these fields:
+The harness reads exactly these fields and classifies the message before
+protocol parsing:
 
 | Field | Feeds |
 | --- | --- |
-| choices[0].message.content | the model turn handed to the parser |
+| choices[0].message.content | the candidate model turn when it is a string |
+| choices[0].message reasoning fields | provider evidence only; never action text |
+| choices[0].message tool-call fields | provider evidence only; product tool calls are not accepted |
 | choices[0].finish_reason | stop is expected; length is accepted only when one complete action is already present |
 | usage.prompt_tokens | the token ledger in [layout.md](../context/layout.md) |
-| usage.completion_tokens | the same ledger |
+| usage.completion_tokens | the same ledger and provider anomaly classifier |
 | cache metrics, where provided | the transcript, for observability |
 
 A finish_reason of length without a complete action is the completion-oversize
@@ -71,6 +74,13 @@ means server-side data such as llama.cpp timings and prompt cache hit counts;
 the daemon records them into the transcript so cache health is visible as
 numbers, and their absence is tolerated.
 
+Empty assistant content with nonzero completion tokens is
+`empty_content_with_usage` in
+[../../model-interface/provider-anomalies.md](../../model-interface/provider-anomalies.md),
+not `MissingActionEnvelope`. Missing content fields, reasoning-only messages,
+provider-native tool calls without content, and malformed message shapes are
+provider anomalies or endpoint faults before protocol parsing.
+
 ## Error Mapping
 
 Every failure classifies onto the taxonomy in
@@ -80,6 +90,9 @@ Every failure classifies onto the taxonomy in
 | --- | --- | --- |
 | connection refused or timeout | endpoint error | capped exponential backoff |
 | malformed response body | endpoint error | the same backoff |
+| missing or malformed message content | provider anomaly | provider failure notice or endpoint recovery |
+| empty content with nonzero completion tokens | provider anomaly | provider recovery; no parse-fault retry |
+| reasoning-only response | provider anomaly | log reasoning evidence only; no dispatch |
 | finish_reason length without closed act | completion oversize | error with preview plus recovery notice; next turn asks for one short action |
 | HTTP 4xx on context overflow | endpoint overflow | error event, forced compaction, incident memory row |
 
