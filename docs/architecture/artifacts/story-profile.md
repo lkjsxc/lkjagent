@@ -75,8 +75,10 @@ continuity rules, cast, relationships or conflict, plot or act structure, style
 or tone, manuscript boundary, README links, and catalog metadata. Catalog
 metadata may come from the story profile or from a handwritten catalog that
 states `kind = "story"` or describes a story bible. It refuses a full manuscript
-when the owner asked for a bible only. Scaffold-only creative labels,
-README-only trees, and owner-term-only pages are not content evidence.
+when the owner asked for a bible only. Concise reference pages are content
+when they carry headed story facts and verification notes. Scaffold-only
+creative labels, bracket placeholders, README-only trees, and owner-term-only
+pages are not content evidence.
 
 ## Status
 

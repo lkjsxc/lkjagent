@@ -148,12 +148,25 @@ fn cookbook_failure(relative: &str, text: &str) -> Option<String> {
 }
 
 fn story_failure(relative: &str, text: &str) -> Option<String> {
-    if word_count(text) >= 40 && text.contains("##") {
+    let lower = text.to_ascii_lowercase();
+    if word_count(text) >= 25 && text.contains("##") && story_reference_signal(&lower) {
         return None;
     }
     Some(format!(
         "weak_story_content: {relative} missing=scene-or-reference-content"
     ))
+}
+
+fn story_reference_signal(text: &str) -> bool {
+    [
+        "scene content",
+        "reference detail",
+        "continuity note",
+        "verification note",
+        "story bible",
+    ]
+    .iter()
+    .any(|needle| text.contains(needle))
 }
 
 fn require_any(text: &str, needles: &[&str], label: &'static str, missing: &mut Vec<&'static str>) {

@@ -25,6 +25,7 @@ const PHRASES: &[(&str, &str)] = &[
     ("scaffold only", "scaffold-only"),
     ("future work", "future-work"),
     ("table of contents without body", "empty-toc"),
+    ("date note content", "bracket-placeholder"),
 ];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
