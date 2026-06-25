@@ -133,7 +133,7 @@ pub const TOOLS: &[ToolSpec] = &[
     tool("fs.tree", FS_TREE, "deterministic bounded tree"),
     tool("fs.search", FS_SEARCH, "bounded substring search"),
     tool("fs.stat", SIMPLE_PATH, "kind, bytes, lines, stable checksum"),
-    tool("fs.mkdir", SIMPLE_PATH, "create a workspace directory"),
+    tool("fs.mkdir", SIMPLE_PATH, "create a workspace directory; not file-like paths"),
     tool("fs.batch_write", FS_BATCH_WRITE, "write multiple files from line protocol"),
     tool("shell.run", SHELL_RUN, "escape hatch /bin/sh -lc in workspace"),
     tool("queue.list", QUEUE_LIST, "list queue rows by status"),

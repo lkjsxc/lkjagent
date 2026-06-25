@@ -67,7 +67,9 @@ the normal replacement for simple wc and existence checks.
 
 ## fs.mkdir
 
-Creates one directory inside the workspace, including parents.
+Creates one directory inside the workspace, including parents. The path must be
+a directory path, not a Markdown or TOML leaf such as `README.md` or
+`catalog.toml`; file leaves are written with `fs.write` or `fs.batch_write`.
 
 ## fs.batch_write
 
