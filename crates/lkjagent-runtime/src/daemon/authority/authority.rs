@@ -1,3 +1,5 @@
+#[path = "graph_snapshot.rs"]
+mod graph_snapshot;
 #[path = "kernel_shadow.rs"]
 mod kernel_shadow;
 
@@ -6,7 +8,6 @@ use lkjagent_context::model::{Frame, FrameKind};
 use rusqlite::Connection;
 
 use super::authority_store::{persist_authority_prompt_frame, persist_authority_snapshot};
-use super::graph_policy::completion_decision;
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
 use crate::mode::{
@@ -14,7 +15,7 @@ use crate::mode::{
 };
 use crate::prompt::token_estimate;
 use crate::task::TaskState;
-use lkjagent_graph::{TaskGraphState, TransitionDecision};
+use graph_snapshot::graph_snapshot;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RuntimeAuthoritySnapshot {
@@ -48,6 +49,8 @@ impl ResidentDaemon {
         kernel_shadow::persist_kernel_shadow(conn, &snapshot)?;
         authority.input.latest_decision_id =
             lkjagent_store::state::get(conn, "authority decision id")?;
+        authority.input.staleness_fingerprint =
+            lkjagent_store::state::get(conn, "kernel staleness fingerprint")?;
         Ok(authority)
     }
 
@@ -62,9 +65,19 @@ impl ResidentDaemon {
             .retain(|frame| !frame.content.starts_with("Active Mode:\n"));
         let rendered = persisted_authority_card(conn, authority)?;
         persist_authority_prompt_frame(conn, &self.runtime.tools.now, &rendered)?;
+        let prompt_frame_id = lkjagent_store::state::get(conn, "authority prompt frame id")?;
         if let Some(cached) = self.turn_authority.as_mut() {
-            cached.input.prompt_frame_id =
-                lkjagent_store::state::get(conn, "authority prompt frame id")?;
+            cached.input.prompt_frame_id = prompt_frame_id;
+        }
+        let snapshot = self.authority_snapshot(
+            conn,
+            &self.runtime.tools.now,
+            authority.input.endpoint_retry_pending,
+        )?;
+        kernel_shadow::persist_kernel_shadow(conn, &snapshot)?;
+        let staleness = lkjagent_store::state::get(conn, "kernel staleness fingerprint")?;
+        if let Some(cached) = self.turn_authority.as_mut() {
+            cached.input.staleness_fingerprint = staleness;
         }
         self.state.context.log.push(Frame::new(
             FrameKind::GraphNotice,
@@ -125,46 +138,6 @@ impl ResidentDaemon {
     }
 }
 
-struct GraphSnapshotFields {
-    case_id: Option<i64>,
-    node: Option<String>,
-    phase: Option<String>,
-    artifact_root: Option<String>,
-    required_evidence: Vec<String>,
-    missing_evidence: Vec<String>,
-}
-
-fn graph_snapshot(conn: &Connection, graph: Option<&TaskGraphState>) -> GraphSnapshotFields {
-    let Some(graph) = graph else {
-        return GraphSnapshotFields {
-            case_id: None,
-            node: None,
-            phase: None,
-            artifact_root: None,
-            required_evidence: Vec::new(),
-            missing_evidence: Vec::new(),
-        };
-    };
-    GraphSnapshotFields {
-        case_id: graph.case_id,
-        node: Some(graph.active_node.0.to_string()),
-        phase: Some(graph.phase.as_str().to_string()),
-        artifact_root: graph.document.as_ref().map(|doc| doc.root.clone()),
-        required_evidence: graph.evidence.requirement_ids(),
-        missing_evidence: graph_missing_evidence(conn, graph),
-    }
-}
-
-fn graph_missing_evidence(conn: &Connection, graph: &TaskGraphState) -> Vec<String> {
-    match completion_decision(conn, graph) {
-        TransitionDecision::Admit { .. } => Vec::new(),
-        TransitionDecision::Defer { missing } => missing,
-        TransitionDecision::Recover { reason, .. } | TransitionDecision::Refuse { reason } => {
-            vec![reason]
-        }
-    }
-}
-
 fn persisted_authority_card(conn: &Connection, authority: &TurnAuthority) -> RuntimeResult<String> {
     let mut rendered = render_turn_authority(authority);
     if let Some(decision_id) = lkjagent_store::state::get(conn, "authority decision id")? {
@@ -194,6 +167,7 @@ impl From<RuntimeAuthoritySnapshot> for TurnAuthorityInput {
             missing_evidence: snapshot.missing_evidence,
             latest_decision_id: snapshot.latest_decision_id,
             prompt_frame_id: snapshot.prompt_frame_id,
+            staleness_fingerprint: None,
         }
     }
 }
