@@ -46,6 +46,23 @@ pub enum TaskState {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PendingActionAuthority {
+    pub authority_decision_id: Option<String>,
+    pub prompt_frame_id: Option<String>,
+    pub staleness_fingerprint: Option<String>,
+}
+
+impl PendingActionAuthority {
+    pub fn empty() -> Self {
+        Self {
+            authority_decision_id: None,
+            prompt_frame_id: None,
+            staleness_fingerprint: None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PendingAction {
     pub action: Action,
     pub action_text: String,

@@ -1,6 +1,6 @@
 use lkjagent_runtime::kernel::{
     admit_requested_tool, build_snapshot, reduce, AdmissionRefusalKind, AdmissionRequest,
-    RuntimeEvent, SnapshotAdapterInput, StalenessFingerprint, ToolName,
+    RuntimeEvent, RuntimeFault, SnapshotAdapterInput, StalenessFingerprint, ToolName,
 };
 
 fn owner_input() -> SnapshotAdapterInput {
@@ -92,6 +92,29 @@ fn blocked_tool_does_not_reach_dispatch() -> Result<(), String> {
         Some(AdmissionRefusalKind::BlockedTool)
     );
     assert!(admission.exact_next_action.is_some());
+    Ok(())
+}
+
+#[test]
+fn exhausted_fault_fingerprint_cannot_be_admitted_again() -> Result<(), String> {
+    let mut input = owner_input();
+    input.latest_fault = Some(RuntimeFault::Parse);
+    input.retry_count = 2;
+    input.prior_action_fingerprint = Some("action-fp".to_string());
+    let snapshot = build_snapshot(input).map_err(format_error)?;
+    let decision =
+        reduce(&snapshot, RuntimeEvent::ParseFault { fault_key: None }).map_err(format_error)?;
+
+    let admission = admit_requested_tool(
+        &decision.admission_view,
+        request("graph.state", snapshot.staleness_fingerprint)?,
+    );
+
+    assert_eq!(
+        admission.refusal_kind,
+        Some(AdmissionRefusalKind::RepeatFingerprintExhausted)
+    );
+    assert!(admission.reason.contains("Parse"));
     Ok(())
 }
 

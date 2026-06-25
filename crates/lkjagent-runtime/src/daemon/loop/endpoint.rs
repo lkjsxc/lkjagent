@@ -9,7 +9,7 @@ use crate::error::{RuntimeError, RuntimeResult};
 use crate::mode::EndpointDecision;
 use crate::prompt::token_estimate;
 use crate::step::{step, StepInput};
-use crate::task::TaskState;
+use crate::task::{PendingActionAuthority, TaskState};
 
 impl ResidentDaemon {
     pub(super) fn endpoint_turn(
@@ -105,10 +105,11 @@ impl ResidentDaemon {
         } else {
             step(
                 self.state.clone(),
-                StepInput::Completion {
-                    content: completion.content,
-                    tokens: tokens as usize,
-                },
+                StepInput::AuthorizedCompletion(
+                    completion.content,
+                    tokens as usize,
+                    pending_authority(conn)?,
+                ),
             )
         };
         self.apply_step_result(conn, now, result, false)
@@ -141,6 +142,14 @@ impl ResidentDaemon {
         self.endpoint_retry_at = None;
         false
     }
+}
+
+fn pending_authority(conn: &Connection) -> RuntimeResult<PendingActionAuthority> {
+    Ok(PendingActionAuthority {
+        authority_decision_id: lkjagent_store::state::get(conn, "authority decision id")?,
+        prompt_frame_id: lkjagent_store::state::get(conn, "authority prompt frame id")?,
+        staleness_fingerprint: lkjagent_store::state::get(conn, "kernel staleness fingerprint")?,
+    })
 }
 
 fn retry_deadline(now: &str, retry_after_secs: Option<u64>) -> Option<String> {

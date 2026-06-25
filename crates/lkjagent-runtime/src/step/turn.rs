@@ -12,9 +12,10 @@ use crate::recovery::{parse_notice, parse_recovery_notice, should_escalate, stop
 use crate::step::budget::{budget_exhausted_step, spend_active_budget};
 use crate::step::fault_wait::{enter_recovery_route, record_recoverable_fault, RecoveryFault};
 use crate::step::frames::{append_notice, result};
-use crate::step::oversize::{oversize_error, oversize_recovery};
 use crate::step::{Effect, StepResult};
-use crate::task::{open_task_with_budget, PendingAction, RuntimeState, StopReason};
+use crate::task::{
+    open_task_with_budget, PendingAction, PendingActionAuthority, RuntimeState, StopReason,
+};
 
 pub(super) fn owner_step(
     mut state: RuntimeState,
@@ -59,6 +60,7 @@ pub(super) fn completion_step(
     mut state: RuntimeState,
     content: String,
     tokens: usize,
+    authority: Option<PendingActionAuthority>,
 ) -> StepResult {
     state.turn = state.turn.saturating_add(1);
     let exhausted = spend_active_budget(&mut state);
@@ -72,61 +74,26 @@ pub(super) fn completion_step(
     let outcome = parse_live_completion(&content, Default::default());
     let normalization = implicit_notice(&outcome);
     match (outcome.action, outcome.fault) {
-        (Some(action), None) => action_step(state, action, normalization),
+        (Some(action), None) => action_step(state, action, normalization, authority),
         (_, Some(fault)) => parse_fault_step(state, &fault),
         (None, None) => parse_fault_step(state, &ParseFault::MissingActionEnvelope),
     }
-}
-
-pub(super) fn endpoint_oversize_step(mut state: RuntimeState, preview: &str) -> StepResult {
-    state.turn = state.turn.saturating_add(1);
-    let exhausted = spend_active_budget(&mut state);
-    if let Some(exhausted) = exhausted {
-        state = append_notice(state, NoticeKind::Budget, exhausted.notice());
-        return result(state, vec![], Some(StopReason::BudgetNotice));
-    }
-    let error = oversize_error(preview);
-    let recovery = oversize_recovery(preview);
-    state = append_notice(state, NoticeKind::Error, &error);
-    state = append_notice(state, NoticeKind::Error, &recovery);
-    let mut effects = vec![
-        Effect::RecordEvent {
-            kind: EventKind::Error,
-            content: error.clone(),
-            tokens: token_estimate(&error) as i64,
-        },
-        Effect::RecordEvent {
-            kind: EventKind::Notice,
-            content: recovery.clone(),
-            tokens: token_estimate(&recovery) as i64,
-        },
-    ];
-    if payload_risk(preview) {
-        state.parse_faults = state.parse_faults.saturating_add(1);
-        let count = state.parse_faults;
-        let fault = RecoveryFault::Payload;
-        record_recoverable_fault(&mut state, fault, count, None, &recovery, &mut effects);
-        state = enter_recovery_route(state, fault, count, None, &mut effects);
-    }
-    result(state, effects, Some(StopReason::InvalidAction))
-}
-
-fn payload_risk(preview: &str) -> bool {
-    preview.contains("<tool>fs.write</tool>") || preview.contains("<content>")
 }
 
 fn action_step(
     mut state: RuntimeState,
     action: lkjagent_protocol::Action,
     normalization: Option<String>,
+    authority: Option<PendingActionAuthority>,
 ) -> StepResult {
     let action_text = render_action(&action);
+    let authority = authority.unwrap_or_else(PendingActionAuthority::empty);
     state.pending_action = Some(PendingAction {
         action,
         action_text: action_text.clone(),
-        authority_decision_id: None,
-        prompt_frame_id: None,
-        staleness_fingerprint: None,
+        authority_decision_id: authority.authority_decision_id,
+        prompt_frame_id: authority.prompt_frame_id,
+        staleness_fingerprint: authority.staleness_fingerprint,
     });
     state.parse_faults = 0;
     let mut effects = Vec::new();

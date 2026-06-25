@@ -117,7 +117,9 @@ Snapshot adapter tests prove staleness changes for queue, artifact cursor, and
 compaction pressure, ignore maintenance due state during owner work, and reject
 synthetic active case ids. Kernel prompt rendering requires a persisted decision
 id, cites fingerprints, and renders concrete parseable batch-write examples.
-Kernel admission refuses stale, blocked, not-admitted, and completion-blocked
-tools before dispatch in pure tests. Full kernel wiring for every dispatch,
-provider exchange, recovery, compaction, maintenance, and close path remains
-open.
+Kernel admission refuses stale, blocked, not-admitted, completion-blocked, and
+retry-exhausted repeated action fingerprints before dispatch in pure tests.
+Daemon model-completion handling can pass decision id, prompt frame id, and
+staleness fingerprint into pending actions before dispatch. Full kernel wiring
+for every dispatch, provider exchange, recovery, compaction, maintenance, and
+close path remains open.

@@ -11,6 +11,7 @@ pub mod facts;
 pub mod fault;
 pub mod reduce;
 pub mod render;
+mod repeat_guard;
 pub mod snapshot;
 
 pub use active_mode::ActiveMode;

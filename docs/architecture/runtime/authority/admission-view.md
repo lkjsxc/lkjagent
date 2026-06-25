@@ -16,7 +16,8 @@ from the persisted decision and contains the exact data needed to accept an effe
 - active mission and active node.
 - admitted and blocked tools.
 - shell allowance and completion allowance.
-- missing evidence, recovery route, and valid examples by tool.
+- missing evidence, recovery route, valid examples by tool, retry-exhausted
+  fault class, and refused action fingerprints.
 
 ## Outputs
 
@@ -36,6 +37,8 @@ from the persisted decision and contains the exact data needed to accept an effe
   active mode, artifact root and cursor, latest fault, missing evidence,
   compaction pressure, maintenance state, and prompt frame head.
 - Shell routes require explicit shell admission in the view.
+- When a fault retry budget is exhausted, the same action fingerprint is refused
+  under that fault class even if the requested tool is otherwise admitted.
 
 ## Failure Cases
 
@@ -56,5 +59,8 @@ from the persisted decision and contains the exact data needed to accept an effe
 partially implemented. Store APIs record tool admission outcomes. Pending-action dispatch installs a decision-derived
 immutable admission view, consults it before effective-policy or graph fallback refusal, and writes admission or
 stale-refusal rows against the latest authority decision. The kernel admission checker now refuses stale,
-blocked, not-admitted, and completion-blocked tools in pure tests. Daemon-wide full-fingerprint stale refusal and
-broader route coverage remain open.
+blocked, not-admitted, completion-blocked, and retry-exhausted repeated action
+fingerprints in pure tests. Daemon pending actions now can carry decision id,
+prompt frame id, and staleness fingerprint from the model turn before dispatch.
+Daemon-wide full-fingerprint stale refusal and broader route coverage remain
+open.

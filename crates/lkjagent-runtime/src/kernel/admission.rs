@@ -1,5 +1,6 @@
 use crate::kernel::active_mode::ActiveMode;
 use crate::kernel::decision::RuntimeMission;
+use crate::kernel::fault::FaultClass;
 use crate::kernel::snapshot::{StalenessFingerprint, ToolName};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -12,6 +13,8 @@ pub struct ToolAdmissionView {
     pub missing_evidence: Vec<String>,
     pub staleness_fingerprint: StalenessFingerprint,
     pub exact_next_action: Option<String>,
+    pub exhausted_fault_class: Option<FaultClass>,
+    pub refused_action_fingerprints: Vec<String>,
 }
 
 impl ToolAdmissionView {
@@ -30,6 +33,8 @@ impl ToolAdmissionView {
             missing_evidence: Vec::new(),
             staleness_fingerprint,
             exact_next_action: None,
+            exhausted_fault_class: None,
+            refused_action_fingerprints: Vec::new(),
         }
     }
 
@@ -49,6 +54,17 @@ impl ToolAdmissionView {
 
     pub fn with_exact_next_action(mut self, exact_next_action: impl Into<String>) -> Self {
         self.exact_next_action = Some(exact_next_action.into());
+        self
+    }
+
+    pub fn with_exhausted_fault_guard(
+        mut self,
+        fault_class: FaultClass,
+        action_fingerprint: impl Into<String>,
+    ) -> Self {
+        self.exhausted_fault_class = Some(fault_class);
+        self.refused_action_fingerprints
+            .push(action_fingerprint.into());
         self
     }
 }
