@@ -63,11 +63,18 @@ pub fn resolved_kind(kind: &str, root: &Path) -> String {
     let text = optional_catalog(root);
     if text.contains("Cookbook") {
         "cookbook".to_string()
-    } else if text.contains("NarrativeManuscript") {
+    } else if story_catalog(&text) {
         "story".to_string()
     } else {
         "artifact".to_string()
     }
+}
+
+fn story_catalog(catalog: &str) -> bool {
+    let lower = catalog.to_ascii_lowercase();
+    catalog.contains("NarrativeManuscript")
+        || lower.contains("kind = \"story\"")
+        || lower.contains("story bible")
 }
 
 pub fn batch_response(root: &str, kind: &str, selected: &[String], valid_example: &str) -> String {
