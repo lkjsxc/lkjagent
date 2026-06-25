@@ -14,7 +14,7 @@ pub(super) fn record_success_export(
         json_escape(id),
         json_escape(finish_reason),
         latency_ms,
-        success_files(),
+        existing_files(dir, SUCCESS_FILES),
     );
     atomic_write(&dir.join("export.json"), &content)
 }
@@ -30,17 +30,70 @@ pub(super) fn record_error_export(
         json_escape(id),
         json_escape(error_class),
         latency_ms,
-        error_files(),
+        existing_files(dir, ERROR_FILES),
     );
     atomic_write(&dir.join("export.json"), &content)
 }
 
-fn success_files() -> &'static str {
-    "\"request.json\",\"authority.json\",\"response.json\",\"timing.json\",\"parsed-action.json\",\"admission.json\",\"observation.txt\""
+const SUCCESS_FILES: &[&str] = &[
+    "request.json",
+    "authority.json",
+    "response.json",
+    "timing.json",
+    "parsed-action.json",
+    "admission.json",
+    "observation.txt",
+];
+
+const ERROR_FILES: &[&str] = &[
+    "request.json",
+    "authority.json",
+    "errors.ndjson",
+    "parsed-action.json",
+];
+
+const ALL_FILES: &[&str] = &[
+    "request.json",
+    "authority.json",
+    "response.json",
+    "timing.json",
+    "errors.ndjson",
+    "parsed-action.json",
+    "admission.json",
+    "observation.txt",
+];
+
+pub(super) fn refresh_export_files(dir: &Path) -> RuntimeResult<()> {
+    let path = dir.join("export.json");
+    if !path.is_file() {
+        return Ok(());
+    }
+    let content = fs::read_to_string(&path).map_err(io_error)?;
+    let Some(start) = content.find("\"files\":") else {
+        return Ok(());
+    };
+    let Some(open) = content[start..].find('[').map(|index| start + index) else {
+        return Ok(());
+    };
+    let Some(close) = content[open..].find(']').map(|index| open + index) else {
+        return Ok(());
+    };
+    let next = format!(
+        "{}[{}]{}",
+        &content[..open],
+        existing_files(dir, ALL_FILES),
+        &content[close + 1..]
+    );
+    atomic_write(&path, &next)
 }
 
-fn error_files() -> &'static str {
-    "\"request.json\",\"authority.json\",\"errors.ndjson\",\"parsed-action.json\""
+fn existing_files(dir: &Path, candidates: &[&str]) -> String {
+    candidates
+        .iter()
+        .filter(|file| dir.join(file).is_file())
+        .map(|file| format!("\"{}\"", json_escape(file)))
+        .collect::<Vec<_>>()
+        .join(",")
 }
 
 fn atomic_write(path: &Path, content: &str) -> RuntimeResult<()> {

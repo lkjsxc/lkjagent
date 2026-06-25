@@ -1,7 +1,8 @@
 mod metrics;
+mod response;
 
 use lkjagent_context::model::{Message, Role};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use serde_json::Value;
 
 use lkjagent_protocol::ACTION_CLOSE;
@@ -38,6 +39,7 @@ pub struct Completion {
     pub closure_mode: ClosureMode,
     pub usage: CompletionUsage,
     pub cache_metrics: Vec<CacheMetric>,
+    pub provider_anomaly: Option<ProviderAnomaly>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -63,39 +65,25 @@ pub enum FinishReason {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProviderAnomaly {
+    pub kind: ProviderAnomalyKind,
+    pub detail: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ProviderAnomalyKind {
+    EmptyContentWithUsage,
+    EmptyContentNoUsage,
+    MissingContentField,
+    ReasoningOnlyResponse,
+    MalformedProviderMessage,
+    ToolCallOnlyResponse,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WireError {
     Json(String),
     Missing(&'static str),
-}
-
-#[derive(Debug, Deserialize)]
-struct ResponseBody {
-    choices: Vec<ResponseChoice>,
-    usage: Option<ResponseUsage>,
-}
-
-#[derive(Debug, Deserialize)]
-struct ResponseChoice {
-    message: ResponseMessage,
-    finish_reason: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-struct ResponseMessage {
-    content: String,
-}
-
-#[derive(Debug, Deserialize)]
-struct ResponseUsage {
-    prompt_tokens: Option<u64>,
-    completion_tokens: Option<u64>,
-    total_tokens: Option<u64>,
-    prompt_tokens_details: Option<PromptTokensDetails>,
-}
-
-#[derive(Debug, Deserialize)]
-struct PromptTokensDetails {
-    cached_tokens: Option<u64>,
 }
 
 pub fn build_request(model: &str, messages: &[Message], max_tokens: u16) -> ChatRequest {
@@ -114,46 +102,38 @@ pub fn decode_completion(text: &str) -> Result<Completion, WireError> {
     let value: Value =
         serde_json::from_str(text).map_err(|error| WireError::Json(error.to_string()))?;
     let cache_metrics = collect_cache_metrics(&value);
-    let body: ResponseBody =
-        serde_json::from_value(value).map_err(|error| WireError::Json(error.to_string()))?;
-    let choice = body
-        .choices
-        .into_iter()
-        .next()
-        .ok_or(WireError::Missing("choices[0]"))?;
-    let finish_reason = finish_reason(choice.finish_reason);
-    let (content, closure_mode) = restore_stop_suffix(choice.message.content, &finish_reason);
+    let parts = response::response_parts(value, &cache_metrics)?;
+    let (content, closure_mode) = restore_stop_suffix(parts.content, &parts.finish_reason);
     Ok(Completion {
         content,
-        finish_reason,
+        finish_reason: parts.finish_reason,
         closure_mode,
-        usage: usage_from_response(body.usage, &cache_metrics),
+        usage: parts.usage,
         cache_metrics,
+        provider_anomaly: parts.anomaly,
     })
 }
 
-fn usage_from_response(
-    usage: Option<ResponseUsage>,
-    cache_metrics: &[CacheMetric],
-) -> CompletionUsage {
-    let cached = usage
-        .as_ref()
-        .and_then(|usage| usage.prompt_tokens_details.as_ref())
-        .and_then(|details| details.cached_tokens)
-        .or_else(|| cache_metric_u64(cache_metrics, "prompt_cache_hit_tokens"));
-    CompletionUsage {
-        prompt_tokens: usage.as_ref().and_then(|usage| usage.prompt_tokens),
-        completion_tokens: usage.as_ref().and_then(|usage| usage.completion_tokens),
-        cached_prompt_tokens: cached,
-        total_tokens: usage.and_then(|usage| usage.total_tokens),
+impl ProviderAnomaly {
+    pub fn new(kind: ProviderAnomalyKind, detail: impl Into<String>) -> Self {
+        Self {
+            kind,
+            detail: detail.into(),
+        }
     }
 }
 
-fn cache_metric_u64(metrics: &[CacheMetric], name: &str) -> Option<u64> {
-    metrics
-        .iter()
-        .find(|metric| metric.name == name)
-        .and_then(|metric| metric.value.parse::<u64>().ok())
+impl ProviderAnomalyKind {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            ProviderAnomalyKind::EmptyContentWithUsage => "empty_content_with_usage",
+            ProviderAnomalyKind::EmptyContentNoUsage => "empty_content_no_usage",
+            ProviderAnomalyKind::MissingContentField => "missing_content_field",
+            ProviderAnomalyKind::ReasoningOnlyResponse => "reasoning_only_response",
+            ProviderAnomalyKind::MalformedProviderMessage => "malformed_provider_message",
+            ProviderAnomalyKind::ToolCallOnlyResponse => "tool_call_only_response",
+        }
+    }
 }
 
 impl ChatMessage {

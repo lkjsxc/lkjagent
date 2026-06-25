@@ -131,11 +131,25 @@ impl ResidentDaemon {
 
 fn completion_response_json(completion: &Completion) -> String {
     format!(
-        "{{\"content\":\"{}\",\"finish_reason\":\"{}\",\"closure_mode\":\"{}\",\"usage\":{}}}\n",
+        "{{\"content\":\"{}\",\"provider_anomaly\":{},\"finish_reason\":\"{}\",\"closure_mode\":\"{}\",\"usage\":{}}}\n",
         json_escape(&completion.content),
+        provider_anomaly_json(completion),
         finish_reason_name(&completion.finish_reason),
         completion.closure_mode.as_str(),
         usage_json(&completion.usage)
+    )
+}
+
+fn provider_anomaly_json(completion: &Completion) -> String {
+    completion.provider_anomaly.as_ref().map_or_else(
+        || "null".to_string(),
+        |anomaly| {
+            format!(
+                "{{\"kind\":\"{}\",\"detail\":\"{}\"}}",
+                anomaly.kind.as_str(),
+                json_escape(&anomaly.detail)
+            )
+        },
     )
 }
 

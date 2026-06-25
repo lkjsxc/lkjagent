@@ -31,16 +31,17 @@ artifact.apply; use fs.batch_write for Markdown content. Batch write rules:
 line protocol is canonical inside <files>, do not add a <path> parameter, keep
 files under 1800 bytes and batches under 6000 bytes, and split large content
 into semantic files before acting.
-When only the owner can decide, ask with agent.ask.
-You may think before acting inside <think> tags. Task turns have YOLO
-authority inside the configured workspace and data directory; use pwd rather
-than hardcoded paths. When no owner task is open and the queue is empty,
-follow the maintenance notice's bounded graph-maintenance work.";
+When only the owner can decide, ask with agent.ask. Do not emit hidden
+reasoning or prose outside the action envelope. Task turns have YOLO authority
+inside the configured workspace and data directory; use pwd rather than
+hardcoded paths. When no owner task is open and the queue is empty, follow the
+maintenance notice's bounded graph-maintenance work.";
 
 pub const GRAMMAR: &str = "## grammar
 Emit exactly one <action> block per turn and no prose outside tags. The first
 child is <tool>; remaining children are parameters from the registry. Values
-are raw text between tags. Stop immediately after </action>.
+are raw text between tags. Do not emit hidden reasoning, JSON tool calls, or
+alternate envelopes. Stop immediately after </action>.
 
 Examples:
 <action>
