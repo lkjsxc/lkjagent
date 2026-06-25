@@ -10,7 +10,9 @@ wording, graph guidance, and tool observations cannot grant authority.
 
 | Fault class | Detected by | Harness response |
 | --- | --- | --- |
-| missing action envelope | parser | route from `MissingActionEnvelope` |
+| provider empty content with usage | LLM wire classifier | provider anomaly route; no parser retry |
+| provider reasoning-only message | LLM wire classifier | provider anomaly route; reasoning stays evidence only |
+| missing action envelope | parser after provider anomaly classification | route from `MissingActionEnvelope` |
 | unclosed action envelope | parser or wire | provider-stop repair or route from `UnclosedActionEnvelope` |
 | implicit action envelope | parser and admission | record normalization and require normal admission |
 | malformed tag | parser | exact tag grammar notice |
@@ -93,6 +95,8 @@ fault trail, and the next endpoint turn sees the latest runtime decision.
 
 - Endpoint retries are invisible until an attempt occurs: the request is resent
   unchanged after the retry deadline.
+- Provider anomalies are visible as provider events, but they are not parser
+  faults and do not replay as invalid assistant examples.
 - Parse retries are visible: the faulty completion and error notice remain in
   the log because the transcript must stay honest.
 - Tool errors are not retried by the harness. The observation becomes a runtime

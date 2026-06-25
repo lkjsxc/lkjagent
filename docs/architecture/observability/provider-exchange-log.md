@@ -49,6 +49,7 @@ partial record and is reported by log inspection.
 - raw response body after redaction.
 - assistant content and provider reasoning fields when present.
 - tool call fields when present.
+- provider anomaly class when content is missing or unusable.
 - finish reason, usage, provider stats, timing, and response hash.
 
 Reasoning fields are logged as evidence only. They never drive parser output,
@@ -106,13 +107,24 @@ The export command includes sanitized requests, responses, authority decisions,
 admission decisions, observations, graph snapshots, artifact ledger snapshots,
 and redacted configuration.
 
+## Export Manifest Integrity
+
+A turn export manifest must be self-consistent. Each file named in `files`
+must exist in that turn directory at export time. If a logical artifact is
+expected but absent, the manifest records it under `missing_files` with a stable
+reason instead of listing it as present. An export with missing logical artifacts
+uses a warning or failed status; it does not report `succeeded` while naming
+absent files. Raw-case replay reads only files proven present plus explicit
+missing-file records.
+
 ## Acceptance Criteria
 
 Verification proves that a request creates `request.json`, a response creates
-`response.json`, empty content records `EmptyContent` without dispatch,
-interrupted output records `InterruptedGeneration`, stop-closure repair appears
-in `parsed-action.json`, admission is persisted before dispatch, observations
-are persisted after dispatch, and the CLI can inspect the records.
+`response.json`, empty content with usage records a provider anomaly without
+dispatch, interrupted output records `InterruptedGeneration`, stop-closure
+repair appears in `parsed-action.json`, admission is persisted before dispatch,
+observations are persisted after dispatch, export manifests list only existing
+files or explicit missing-file records, and the CLI can inspect the records.
 
 ## Status
 

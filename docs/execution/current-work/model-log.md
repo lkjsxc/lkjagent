@@ -19,7 +19,10 @@ Raw provider request and response evidence is recorded under the contract in
 - Redact secrets before writing files or store rows.
 - Keep parsed-action, admission, observation, and index files for every
   model-authored tool turn.
+- Classify provider anomalies before parse records claim ordinary parser faults.
 - Add export files for every turn.
+- Export manifests list only files present on disk or explicit missing-file
+  records with reasons.
 - Keep CLI list and show inspection commands.
 - Add export and raw-case inspection commands.
 
@@ -40,8 +43,8 @@ Raw provider request and response evidence is recorded under the contract in
 - atomic export files.
 - `provider_exchange` store rows with hashes and status.
 - sanitized reproduction archive.
-- focused tests for empty content, interrupted output, stop closure, admission
-  before dispatch, and CLI inspection.
+- focused tests for empty content with usage, interrupted output, stop closure,
+  admission before dispatch, export manifest integrity, and CLI inspection.
 
 ## Verification
 
@@ -52,10 +55,13 @@ Raw provider request and response evidence is recorded under the contract in
 
 ## Status
 
-implemented. The current Markdown handoff, provider exchange store rows,
-request files, authority files, response files, timing files, error files,
-per-turn export manifests that name parsed-action, admission, and observation
-artifacts, parsed-action, admission, observation, index files, prompt-frame ids
-on exchange rows, CLI list and show, raw-case inspection, and sanitized replay
-export commands with raw turn-file copying exist for daemon provider calls with
-a log root. Live replay proof is tracked by the verification plan.
+partially implemented. The current Markdown handoff, provider exchange store
+rows, request files, authority files, response files, timing files, error files,
+per-turn export manifests, parsed-action, admission, observation, index files,
+prompt-frame ids on exchange rows, CLI list and show, raw-case inspection, and
+sanitized replay export commands with raw turn-file copying exist for daemon
+provider calls with a log root. The active current run proves two open gaps:
+empty content with nonzero completion tokens is still recorded as
+`MissingActionEnvelope`, and the latest export manifest names absent
+`admission.json` and `observation.txt` files while reporting success. Live
+replay proof is tracked by the verification plan.

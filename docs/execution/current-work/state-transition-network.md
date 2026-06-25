@@ -111,8 +111,11 @@ snapshot. It must not select a mission independently from `RuntimeSnapshot`.
 - Maintenance and owner graph policy render together.
 - A cached maintenance action runs after owner work appears.
 - A cached write survives artifact cursor or compaction-pressure changes.
+- A live prompt permits `<think>` output or replays invalid assistant history.
+- Empty provider content with nonzero completion tokens loops as a parse fault.
 - A recovery escape tool is hidden by old graph policy.
 - `fs.batch_write` repeats a path-shaped schema fault without route change.
+- A model-log export manifest lists files that are absent on disk.
 - `agent.done` closes through a side path.
 
 ## Verification
@@ -143,15 +146,17 @@ frame and observation rows, reopen lookup proof, and foreign-key proof that an
 admission cannot exist without a decision. The daemon records authority prompt
 frames and effect observations for pending dispatches, records kernel shadow
 mission fields from the persisted authority snapshot and event id, and stale
-cached actions refuse when their prompt-frame head changes. The snapshot adapter computes
-staleness fingerprints from queue, case, graph, artifact cursor, fault,
-evidence, compaction, maintenance, and prompt facts; rejects synthetic active
-case ids; and ignores maintenance due state when owner work exists. Kernel
-prompt rendering requires persisted event and decision ids, cites authority and
-staleness fingerprints, preserves the admitted tool surface, and renders concrete
-path-scoped `fs.batch_write` examples that parse. Kernel admission refuses
-stale cached maintenance actions, changed artifact-cursor writes, compaction
-pressure writes, blocked tools, and completion requests before dispatch. Daemon
-wiring through the new kernel, explicit triggering events on every path,
-prompt-frame resume proof, maintenance preemption proof, route-wide admission
-proof, and every close path remain open.
+cached actions refuse when their prompt-frame head changes. The snapshot adapter
+computes staleness fingerprints from queue, case, graph, artifact cursor,
+fault, evidence, compaction, maintenance, and prompt facts; rejects synthetic
+active case ids; and ignores maintenance due state when owner work exists.
+Kernel prompt rendering requires persisted event and decision ids, cites
+authority and staleness fingerprints, preserves the admitted tool surface, and
+renders concrete path-scoped `fs.batch_write` examples that parse. Kernel
+admission refuses stale cached maintenance actions, changed artifact-cursor
+writes, compaction pressure writes, blocked tools, and completion requests
+before dispatch. The active log adds open requirements: prompt history hygiene,
+provider empty-content anomaly handling, self-consistent export manifests, and
+current-run replay fixtures. Daemon wiring through the new kernel, explicit
+triggering events on every path, prompt-frame resume proof, maintenance
+preemption proof, route-wide admission proof, and every close path remain open.

@@ -19,6 +19,12 @@ the source of active mode, admitted tools, recovery route, completion gate,
 runtime-owned deterministic effects, and prompt text. Graph policy is input to
 the snapshot, not a fallback authority.
 
+The old `mode` tree in the runtime crate is not a second authority system. Until
+it is removed, it may only act as a thin adapter that fills snapshot fields or
+formats decision data. It must not choose missions, prompt tool surfaces,
+admission, recovery, compaction, maintenance, or completion independently of the
+persisted kernel decision.
+
 ## Inputs
 
 The snapshot adapter collects these facts before the reducer runs:

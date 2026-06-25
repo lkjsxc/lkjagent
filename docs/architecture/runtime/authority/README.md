@@ -9,10 +9,11 @@ completion closure.
 ## Contract
 
 Runtime authority is the only source of action truth. Model output is intent.
-Graph transitions are guidance. Context pressure, maintenance ticks, verifier
-results, tool observations, parser faults, and completion requests are events.
-The pure reducer turns one snapshot plus one event into one decision before any
-effect runs.
+Graph transitions are guidance. The old runtime `mode` tree is an adapter only,
+not a parallel source of action truth. Context pressure, maintenance ticks,
+verifier results, tool observations, parser faults, provider anomalies, and
+completion requests are events. The pure reducer turns one snapshot plus one
+event into one decision before any effect runs.
 
 ```text
 RuntimeSnapshot + RuntimeEvent -> RuntimeDecision

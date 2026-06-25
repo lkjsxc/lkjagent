@@ -46,6 +46,8 @@ stories/chronos-fracture
 - No XML features exist: no attributes, namespaces, comments, CDATA,
   entities, or nested action envelopes.
 - No prose appears before or after the action envelope.
+- No `<think>` tag, hidden reasoning tag, or free-form reasoning block is valid
+  live output.
 - The model stops immediately after `</action>`.
 
 ## Multi-Line Values
@@ -111,8 +113,9 @@ The requested story bible is written, audited, and tied to artifact-readiness ev
 
 These shapes are faults, not partial actions:
 
-- empty assistant content.
+- empty assistant content after provider anomaly classification.
 - plain prose without an action body.
+- `<think>...</think>` before, inside, or after an action envelope.
 - missing `<action>` or missing `</action>` after provider-stop closure rules.
 - more than one action envelope.
 - `<actions>`, `<act>`, or any other top-level envelope.
@@ -121,6 +124,16 @@ These shapes are faults, not partial actions:
 - repeated parameter tags for unique parameters.
 - parameters absent from the active tool schema.
 - nested action envelopes.
+
+## Prompt History Hygiene
+
+Provider request history must not replay invalid assistant turns as assistant
+examples. Before rendering a new request, the runtime either drops or summarizes
+assistant messages that contain prose before an action, `<think>` tags, hidden
+reasoning, multiple action envelopes, top-level JSON actions, empty content, or
+any parse fault shape. The summary is a user-visible notice or runtime fact, not
+an assistant exemplar. Live prompt text must not grant permission to use
+`<think>` tags.
 
 ## Implicit Envelope Normalization
 

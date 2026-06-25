@@ -20,171 +20,104 @@ admission, dispatch, observation, recovery route, compaction interrupt,
 maintenance boundary, and close path. Model text is intent or content. Runtime
 data must be authority.
 
-The latest `data/logs/current-model-run.md` remains active evidence. It shows a
-Chronos Fracture story-bible run that entered recovery at
-`document-completion-check`, recorded plan and directory-observation evidence,
-but did not record document-structure or artifact-readiness evidence.
+The active `data/logs/current-model-run.md` shows a Chronos Fracture story-bible
+run stuck in recovery. It does not prove file mutation. It proves repeated
+missing action envelopes, empty provider content with nonzero completion tokens,
+no touched paths, no useful evidence, and a replay manifest that lists missing
+turn artifacts.
 
 ## Implemented Behavior
 
 | Area | Evidence |
 | --- | --- |
 | Workspace and gates | `Cargo.toml`, `crates/lkjagent-xtask`, and `docker-compose.yml` exist. |
-| Parser | `lkjagent-protocol` parses line-oriented, paired-tag, and batch file action forms covered by focused fixtures. The live parser uses `<action>`, rejects top-level JSON and prose outside the envelope, records implicit-envelope outcomes in provider logs and runtime notices, and emits dedicated attribute-like tag faults. Provider stop-closure restoration records closure mode for parse logs. |
-| Dispatcher registry | `lkjagent-tools` validates registered tools, required-any groups, personal record tools, and renders registry examples for covered action families. `graph.plan` requires checks or paths before dispatch. |
+| Parser | `lkjagent-protocol` parses singular `<action>` turns, rejects top-level JSON and prose outside the envelope, records implicit-envelope outcomes, and emits structured parse faults. |
+| Dispatcher registry | `lkjagent-tools` validates registered tools, required-any groups, personal record tools, and registry-rendered examples for covered action families. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
 | SQLite store | Queue, state, event, memory, personal record, task summary, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist in `lkjagent-store`. |
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
-| Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current run snapshot. Provider exchange request, authority, response, timing, parse with envelope mode and text hash, admission, observation, error records, raw-case inspection, and replay export files are written when the daemon has a log root. |
-| Document scaffold seed | Deterministic scaffold paths, relation-first generic seeds, bounded slugs, compact `catalog.toml`, and creative writing profiles exist for project, multi-topic docs, story, novel, character, and cookbook roots. |
+| Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current run snapshot and per-turn request, authority, response, parse, admission, observation, timing, error, index, and export files when present. |
+| Document scaffold seed | Deterministic scaffold paths, relation-first generic seeds, bounded slugs, compact `catalog.toml`, and creative writing profiles exist for covered artifact roots. |
 | Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, workspace briefs, structure-only pages, owner-term pages, and old generated boilerplate leaves. |
 | Placeholder and payload refusal | `fs.write`, `fs.batch_write`, content audit, and check-docs reject common scaffold phrases and oversized payloads before mutation. |
 | Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
 | Hard compaction mode | A runtime-owned `Compaction` active mode exists and does not render `memory.save` as a model action. |
-| Stale-action preemption seed | Cached actions are refused before dispatch when owner queue, runtime-only, maintenance, or prompt-frame authority fields change. |
+| Stale-action preemption seed | Cached actions are refused before dispatch when selected authority fields change. |
 | Baseline benchmarks | The corpus includes owner-reported recovery, artifact, memory, accounting, model-log, batch-schema, compaction, and repeated-recovery signatures. |
 
 ## Partially Implemented Behavior
 
 | Area | Current truth |
 | --- | --- |
-| Runtime authority | Pure active-mode selection, `RuntimeMission` mapping, normalized authority snapshots, event and decision rows, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, and `agent.done` refusal exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. Kernel prompt rendering requires persisted event and decision ids and produces path-scoped batch examples. Kernel admission refuses stale, blocked, not-admitted, and completion-blocked tools before dispatch. The daemon records authority prompt frames, effect observations, kernel shadow fingerprints, and pending action authority fields; cached or persisted pending actions refuse on prompt-frame head changes. These are partial authority pieces, not one daemon-wired transition kernel. |
+| Runtime authority | Pure active-mode selection, normalized authority snapshots, event and decision rows, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, and `agent.done` refusal exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. The daemon still has parallel authority paths that can disagree. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Full unified runtime wiring remains open. |
-| Recovery controller | Fault notices, attribute-like tag repair examples, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, dispatcher-valid examples for covered routes, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, and payload-overflow routing to `artifact.next` for known artifacts exist. Live shape-change enforcement for every fault class remains open. |
-| Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` now normalizes safe path-shaped unknown parameters into `files` and refuses absolute, duplicate, or empty-content path parameters before mutation. Runtime route changes after repeated schema faults remain open. |
-| Artifact lifecycle | Scaffold, audit, fact-only `artifact.next`, empty-root identity batches, Chronos-shaped story scaffolds, story semantic readiness checks, bounded write examples, root-scoped cursors, root/path address refusals, explicit `.md` directory invalid-root repair output, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
-| Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, current artifact, next action, valid example, blocked-handoff allowance, and status text. Artifact-readiness refusal names the current artifact when authority supplies it; graph-only fallback now uses `graph.state` instead of generic roots. Story semantic audit output now records artifact-readiness evidence for close checks. Every close path is not yet proven to call the same artifact-aware gate. |
-| Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. CLI status now renders the latest compaction snapshot fields for the active case. Prompt-frame resume proof remains open. |
+| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, and payload-overflow routing to `artifact.next` for known artifacts exist. Provider empty-content anomaly handling and every-route shape-change proof remain open. |
+| Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` normalizes selected safe payloads and refuses unsafe shapes before mutation. Runtime route changes after repeated schema faults remain open beyond covered classes. |
+| Artifact lifecycle | Scaffold, audit, fact-only `artifact.next`, empty-root identity batches, story semantic readiness checks, bounded write examples, root-scoped cursors, root/path address refusals, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
+| Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, current artifact, next action, valid example, blocked-handoff allowance, and status text. Every close path is not yet proven to call the same artifact-aware gate. |
+| Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Prompt-frame resume proof remains open. |
 | Maintenance | Idle maintenance, owner queue preemption at turn boundaries, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Every dispatch and close path still needs unified kernel authority proof. |
-| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, and focused tests exist. Live replay proof remains open. |
-| Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. A Chronos-style daemon replay closes after plan, semantic story audit, verification evidence, and model-log output. Live endpoint smoke remains open. |
+| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, and focused tests exist. Manifest integrity proof for missing per-turn files remains open. |
+| Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Live endpoint smoke remains open. |
 
 ## Active Failure Evidence
 
-`data/logs/current-model-run.md` proves the next reliability gap:
+`data/logs/current-model-run.md` and the latest turn directory prove the next
+reliability gap:
 
-- the daemon refused a stale maintenance `memory.find` action after owner work
-  appeared, so active-mode preemption is useful but narrow;
-- the owner requested `stories/chronos-fracture` as a directory story artifact
-  with README, catalog, child directories, line limits, small batches, and audits;
-- the run created `stories/chronos-fracture` but no files under that root;
-- `fs.batch_write` first received JSON text inside `<files>` that was invalid
-  or truncated, so the dispatcher refused before mutation;
-- the next `fs.batch_write` attempted one 5,767-byte README where the limit is
-  1,800 bytes per file, so the dispatcher again refused before mutation;
-- both write refusals were correct; the defect is that recovery did not force
-  artifact-aware bounded batches under the same root;
-- evidence contained plan and observation rows, not `document-structure` or
-  `artifact-readiness`;
-- no close path can be called implemented until quiet verify, Docker Compose
-  verification, and a live or replayed Chronos story run prove this class does
-  not recur.
+- snapshot: `daemon_state=working`, `active_case=1`,
+  `active_node=recover-by-smaller-scope`, and `active_phase=recovery`;
+- context: `19.36K/24.58K`, about 79 percent used;
+- owner task: create a structured story bible at `stories/chronos-fracture`;
+- touched paths: `none`;
+- evidence ledger: `none`;
+- fault ledger: repeated `parse fault: missing action envelope` after earlier
+  `bad envelope prose before action envelope` faults;
+- latest request: the system prompt still allowed `<think>` tags and preserved
+  prior assistant turns shaped as `<think>...</think><action>...</action>`;
+- latest response: `content` is empty, `finish_reason=stop`,
+  `closure_mode=Unclosed`, and `completion_tokens=485`;
+- latest parse: `status=fault`, `content_bytes=0`, and
+  `error=MissingActionEnvelope`;
+- latest export manifest lists `admission.json` and `observation.txt`, but both
+  files are absent in the latest turn directory.
+
+The checked-in active log does not prove JSON-in-`files` refusal, oversized
+README refusal, or successful creation under the Chronos root. Those remain
+historical failure classes only when backed by separate fixtures or logs.
 
 ## Active Target
 
 The dependency queue is [execution/current-blockers.md](execution/current-blockers.md).
-The first open target is documentation and current-state reconciliation. The
-first implementation target after that is the transition-kernel contract and
-data model: `RuntimeSnapshot + RuntimeEvent -> RuntimeDecision`, persisted
-before prompt rendering or dispatch, with admission derived from the same
-decision id. The protocol and LLM crates now use `<action>` as the singular live
-action envelope; runtime authority wiring still needs to follow the kernel.
+The first open target is current-state reconciliation plus transition-kernel
+handover. The first implementation target after that is the persisted kernel:
 
-Route-level proof remains open for all admission paths. Stale-action refusal
-must compare the full staleness fingerprint, not only maintenance mode.
-Compaction and maintenance are runtime-owned decisions, not prompt inventions.
-Completion must read the central completion reducer on every path.
+```text
+DurableReadModel -> RuntimeSnapshot
+RuntimeSnapshot + RuntimeEvent -> RuntimeDecision
+RuntimeDecision -> PromptFrame or RuntimeEffectCommand
+RuntimeDecision + ModelAction -> ToolAdmission
+ToolAdmission -> RuntimeEffectCommand
+RuntimeEffectCommand -> EffectObservation
+EffectObservation -> RuntimeEvent
+```
+
+The decision must be persisted before prompt rendering, endpoint calls,
+dispatch, recovery, compaction, maintenance, or close attempts. The protocol and
+LLM layers must prevent live prompts from teaching `<think>` output, must
+sanitize invalid assistant history before replay, and must classify empty
+content with nonzero completion tokens as a provider anomaly instead of an
+ordinary parse fault loop.
 
 ## Latest Local Evidence
 
-Baseline at the start of this reconciliation slice:
+Documentation reconciliation gates for this handoff slice:
 
-- `git status --short`: no output.
-- `docs/current-state.md`: 195 lines after the Chronos evidence correction.
-- `data/logs/current-model-run.md`: 194 lines and still active evidence.
 - `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`, `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
 
-Protocol live-envelope focused gates:
-
-- `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
-- `cargo test -p lkjagent-protocol`: `PROTOCOL_EXIT=0`.
-- `cargo test -p lkjagent-llm`: `LLM_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`, `ok check-docs`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-- Registry conditional slice: `cargo test -p lkjagent-protocol`: `PROTOCOL_EXIT=0`;
-  `cargo test -p lkjagent-tools`: `TOOLS_EXIT=0`; focused registry tests passed.
-
-Runtime-kernel data-model focused gates:
-
-- `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test kernel_model`: `KERNEL_MODEL_EXIT=0`, 9 passed.
-- `cargo test -p lkjagent-runtime --test authority_reducer`: `AUTHORITY_REDUCER_EXIT=0`, 7 passed.
-- `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`, `ok check-docs`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-
-Snapshot-adapter focused gate:
-
-- `cargo test -p lkjagent-runtime --test kernel_snapshot_adapter`: `KERNEL_SNAPSHOT_ADAPTER_EXIT=0`, 6 passed.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-
-Prompt-frame focused gate:
-
-- `cargo test -p lkjagent-runtime --test kernel_prompt_render`: `KERNEL_PROMPT_RENDER_EXIT=0`, 4 passed.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-
-Admission focused gate:
-
-- `cargo test -p lkjagent-runtime --test kernel_admission`: `KERNEL_ADMISSION_EXIT=0`, 5 passed.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-
-Batch-write schema focused gate:
-
-- `cargo test -p lkjagent-tools --test batch_write_formats`: `BATCH_WRITE_FORMATS_EXIT=0`, 10 passed.
-- `cargo test -p lkjagent-tools --test dispatch_normalize`: `DISPATCH_NORMALIZE_EXIT=0`, 6 passed.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-
-Recovery-shape focused gates:
-
-- `cargo test -p lkjagent-tools --test chronos_batch_recovery`: `CHRONOS_BATCH_RECOVERY_EXIT=0`, 3 passed.
-- `cargo test -p lkjagent-runtime --test recovery_shape_enforcement`: `RECOVERY_SHAPE_EXIT=0`, 5 passed.
-- `cargo test -p lkjagent-runtime --test authority_reducer`: `AUTHORITY_REDUCER_EXIT=0`, 7 passed.
-- `cargo test -p lkjagent-runtime --test authority_fault_class`: `AUTHORITY_FAULT_CLASS_EXIT=0`, 1 passed.
-- `cargo test -p lkjagent-runtime --test authority_recovery_plan`: `AUTHORITY_RECOVERY_PLAN_EXIT=0`, 5 passed.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-
-Artifact-address focused gates:
-
-- `cargo test -p lkjagent-tools --test artifact_next_empty_root`: `ARTIFACT_NEXT_EMPTY_ROOT_EXIT=0`, 1 passed.
-- `cargo test -p lkjagent-tools --test artifact_address`: `ARTIFACT_ADDRESS_EXIT=0`, 6 passed.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-
-Completion-gate focused gates:
-
-- `cargo test -p lkjagent-runtime --test completion_decision`: `COMPLETION_DECISION_EXIT=0`, 5 passed.
-- `cargo test -p lkjagent-runtime --test authority_completion`: `AUTHORITY_COMPLETION_EXIT=0`, 5 passed.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-
-Status compaction focused gate:
-
-- `cargo test -p lkjagent-cli --test status`: `CLI_STATUS_TEST_EXIT=0`, 6 passed.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-
-Latest broad local gates:
-
-- `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`, `ok check-style`.
-- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCHMARK_EXIT=0`, `ok benchmark-corpus`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
-- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
-
-Store-ledger focused gates:
-
-- `cargo test -p lkjagent-store --test personal_records`: `PERSONAL_RECORDS_EXIT=0`, 4 passed.
-- `cargo test -p lkjagent-runtime --test authority_ledger_wiring`: `AUTHORITY_LEDGER_WIRING_EXIT=0`, 2 passed.
-- `cargo test -p lkjagent-store`: `STORE_TEST_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+Focused code gates, quiet verify, and Docker Compose verification have not run
+for implementation changes in this slice yet.
 
 ## Out of Scope
 
