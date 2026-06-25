@@ -22,6 +22,27 @@ fn persisted_action_survives_compaction_prompt_rotation() -> Result<(), String> 
 }
 
 #[test]
+fn cached_action_survives_compaction_pressure_only() {
+    let cached = authority_with(
+        "frame-before",
+        stale("false", "head-before", "prompt-before"),
+        None,
+        false,
+    );
+    let current = authority_with(
+        "frame-after",
+        stale("true", "head-after", "prompt-after"),
+        None,
+        true,
+    );
+
+    assert_eq!(
+        stale_action_refusal(Some(&cached), &current, "fs.write"),
+        None
+    );
+}
+
+#[test]
 fn persisted_action_refuses_core_authority_change() -> Result<(), String> {
     let pending = pending(
         "frame-before",
@@ -52,8 +73,13 @@ fn pending(frame: &str, stale: String) -> Result<PendingAction, String> {
 }
 
 fn authority(frame: &str, stale: String, node: Option<&str>) -> TurnAuthority {
+    authority_with(frame, stale, node, false)
+}
+
+fn authority_with(frame: &str, stale: String, node: Option<&str>, compact: bool) -> TurnAuthority {
     decide_turn_authority(TurnAuthorityInput {
         active_owner_case: true,
+        compaction_required: compact,
         graph_node: Some(node.unwrap_or("document").to_string()),
         graph_phase: Some("execution".to_string()),
         prompt_frame_id: Some(frame.to_string()),
