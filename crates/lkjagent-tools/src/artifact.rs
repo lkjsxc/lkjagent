@@ -162,10 +162,17 @@ fn title_or_root(title: &str, root: &str) -> String {
 
 fn kind_mismatch(kind: &str, catalog: &str) -> bool {
     match kind.trim().to_ascii_lowercase().as_str() {
-        "story" => !catalog.contains("NarrativeManuscript"),
+        "story" => !story_catalog(catalog),
         "cookbook" => !catalog.contains("Cookbook"),
         _ => false,
     }
+}
+
+fn story_catalog(catalog: &str) -> bool {
+    let lower = catalog.to_ascii_lowercase();
+    catalog.contains("NarrativeManuscript")
+        || lower.contains("kind = \"story\"")
+        || lower.contains("story bible")
 }
 
 #[allow(clippy::manual_unwrap_or_default)]
