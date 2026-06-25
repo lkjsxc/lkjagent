@@ -84,8 +84,17 @@ impl ResidentDaemon {
         now: &str,
         completion: lkjagent_llm::wire::Completion,
     ) -> RuntimeResult<DaemonTick> {
-        self.endpoint_attempt = 0;
-        self.endpoint_retry_at = None;
+        let provider_anomaly = completion.provider_anomaly.clone();
+        if provider_anomaly.is_some() {
+            self.endpoint_attempt = self.endpoint_attempt.saturating_add(1);
+            self.endpoint_retry_at = retry_deadline(
+                now,
+                Some(lkjagent_llm::backoff::delay_for_attempt(self.endpoint_attempt).as_secs()),
+            );
+        } else {
+            self.endpoint_attempt = 0;
+            self.endpoint_retry_at = None;
+        }
         crate::token_usage::record_completion_usage(
             conn,
             now,
@@ -97,7 +106,7 @@ impl ResidentDaemon {
             .usage
             .completion_tokens
             .unwrap_or_else(|| token_estimate(&completion.content) as u64);
-        let result = if let Some(anomaly) = completion.provider_anomaly {
+        let result = if let Some(anomaly) = provider_anomaly {
             step(
                 self.state.clone(),
                 StepInput::ProviderAnomaly(anomaly.kind.as_str().to_string(), anomaly.detail),

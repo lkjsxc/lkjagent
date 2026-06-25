@@ -10,11 +10,11 @@ that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Reconcile active data log and prompt anomaly contracts | [current-work/state-transition-network.md](current-work/state-transition-network.md) | active |
-| 2 | Complete transition-kernel contract and data model | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
+| 1 | Reconcile active data log and prompt anomaly contracts | [current-work/state-transition-network.md](current-work/state-transition-network.md) | implemented |
+| 2 | Complete transition-kernel contract and data model | [current-work/state-transition-network.md](current-work/state-transition-network.md) | active |
 | 3 | Store ledgers and snapshot adapter for kernel records | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
 | 4 | Prompt frame and dispatch admission through one decision id | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
-| 5 | Provider anomaly handling and endpoint recovery | [current-work/model-log.md](current-work/model-log.md) | open |
+| 5 | Provider anomaly handling and endpoint recovery | [current-work/model-log.md](current-work/model-log.md) | partially implemented |
 | 6 | Schema and batch-write recovery | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | partially implemented |
 | 7 | Recovery shape enforcement for every fault class | [current-work/recovery-shape-enforcement.md](current-work/recovery-shape-enforcement.md) | partially implemented |
 | 8 | Artifact address adoption and invalid-root durability | [current-work/artifact-address-controller.md](current-work/artifact-address-controller.md) | partially implemented |
@@ -118,9 +118,11 @@ and benchmark targets only when supported by separate fixtures.
 
 ## Remaining Proof Gaps
 
-- The live prompt can still permit `<think>` tags and replay invalid assistant
-  history.
-- Provider empty-content anomalies are not yet separated from parse faults.
+- The live prompt no longer permits `<think>` tags, and invalid assistant
+  history is summarized instead of replayed as assistant output.
+- Provider empty-content anomalies are separated from parse faults for new
+  endpoint responses, but endpoint retry and blocked-handoff policy still needs
+  full kernel ownership.
 - Authority rows still need coverage for every dispatch, provider exchange,
   recovery, compaction, maintenance, and close path.
 - Compaction snapshots need prompt-frame resume proof.
