@@ -66,7 +66,9 @@ The live action envelope is singular and closed by the provider stop sequence.
 
 The value of `content` is every byte between `<content>` and `</content>`,
 including blank lines, code fences, quotes, shell commands, and angle-bracket
-text that is not a structural line for the current parameter.
+text that is not a structural line for the current parameter. An opening
+parameter tag may start the first content bytes on the same line, such as
+`<content># Premise`; the value then continues until the matching closing tag.
 
 ## Batch File Values
 
