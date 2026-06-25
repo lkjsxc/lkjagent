@@ -63,9 +63,10 @@ stories/<semantic-title>/
 
 ## Selection
 
-The creative profile is selected when `kind` or title names story, novel,
-manuscript, fiction, character-profile, setting, outline, scene, SF, sci-fi, or
-science fiction, unless the request is clearly for technical documentation.
+The creative profile is selected when `kind`, title, or a `stories/` artifact
+root names story, novel, manuscript, fiction, character-profile, setting,
+outline, scene, SF, sci-fi, or science fiction, unless the request is clearly
+for technical documentation.
 
 ## Audit
 

@@ -131,8 +131,8 @@ Prompt hygiene, provider anomaly, and export-manifest focused gates:
   repeated `<files>...</files>` wrappers for `fs.batch_write` merge into one
   delimiter payload. `fs.mkdir` now refuses Markdown and TOML leaf paths so the
   daemon cannot create `README.md` or `catalog.toml` directories. Story artifact
-  audit and `artifact.next` now accept handwritten catalog metadata that
-  identifies a story bible instead of requiring the scaffold profile token.
+  audit, `artifact.next`, and generic `artifact.apply` requests under `stories/`
+  now infer story kind instead of requiring the scaffold profile token.
   File-count guard detection now ignores child-count and line-limit numbers such
   as `two children` and `160 lines`.
   Startup graph-prefix
