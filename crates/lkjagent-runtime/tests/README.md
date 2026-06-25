@@ -28,6 +28,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [graph_memory_links.rs](graph_memory_links.rs): graph case to task-summary memory links.
 - [owner_guidance.rs](owner_guidance.rs): queued owner guidance guard persistence fixture.
 - [payload_risk.rs](payload_risk.rs): max-token write payload recovery fixture.
+- [pending_action_authority.rs](pending_action_authority.rs): pending action authority id propagation fixture.
 - [prompt_daemon.rs](prompt_daemon.rs): prompt, startup, lock, and shutdown fixtures.
 - [prompt_hygiene.rs](prompt_hygiene.rs): live prompt hidden-reasoning hygiene fixture.
 - [provider_anomaly.rs](provider_anomaly.rs): provider anomaly recovery without parse-fault fixtures.

@@ -1,10 +1,7 @@
-use lkjagent_context::budget::ContextBudgetPolicy;
-use lkjagent_context::model::{Frame, NoticeKind};
-use lkjagent_graph::TaskGraphState;
+use lkjagent_context::model::NoticeKind;
 use lkjagent_store::events::EventKind;
 use lkjagent_tools::dispatch::DispatchOutput;
 
-use crate::maintenance::MaintenanceDirective;
 use crate::prompt::token_estimate;
 use crate::recovery::{repeat_recovery_notice, should_escalate, tool_recovery_notice};
 use crate::task::{RuntimeState, StopReason};
@@ -24,8 +21,10 @@ mod graph_output_evidence;
 mod graph_output_plan;
 mod graph_output_plan_helpers;
 mod graph_phase;
+mod input;
 mod output;
 mod oversize;
+mod oversize_step;
 mod provider_anomaly;
 mod recovery_select;
 mod turn;
@@ -35,39 +34,10 @@ use cycle::maintenance_start_step;
 pub use effects_model::{Effect, GraphPlanStepEffect, GraphStateTrackEffect};
 use fault_wait::{enter_recovery_route, record_recoverable_fault, RecoveryFault};
 use frames::{append_notice, result};
+pub use input::StepInput;
 use output::{append_output_frame, event_kind, handle_control_success, stop_for_output};
 use provider_anomaly::provider_anomaly_step;
-use turn::{completion_step, owner_step};
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum StepInput {
-    Owner {
-        content: String,
-        tokens: usize,
-        graph: Option<Box<TaskGraphState>>,
-        turn_budget: u16,
-    },
-    Completion {
-        content: String,
-        tokens: usize,
-    },
-    TurnBudgetCheckpoint,
-    EndpointOversize {
-        preview: String,
-    },
-    ProviderAnomaly(String, String),
-    ToolOutput(DispatchOutput),
-    Compact {
-        prefix: Vec<Frame>,
-        summary: Frame,
-        memory_ids: Vec<i64>,
-        policy: ContextBudgetPolicy,
-    },
-    StartMaintenance {
-        directive: MaintenanceDirective,
-        budget: u16,
-    },
-}
+use turn::{completion_step as complete, owner_step};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StepResult {
@@ -90,9 +60,14 @@ pub fn step(state: RuntimeState, input: StepInput) -> StepResult {
             graph.map(|boxed| *boxed),
             turn_budget,
         ),
-        StepInput::Completion { content, tokens } => completion_step(state, content, tokens),
+        StepInput::Completion { content, tokens } => complete(state, content, tokens, None),
+        StepInput::AuthorizedCompletion(content, tokens, authority) => {
+            complete(state, content, tokens, Some(authority))
+        }
         StepInput::TurnBudgetCheckpoint => budget::task_checkpoint_step(state),
-        StepInput::EndpointOversize { preview } => turn::endpoint_oversize_step(state, &preview),
+        StepInput::EndpointOversize { preview } => {
+            oversize_step::endpoint_oversize_step(state, &preview)
+        }
         StepInput::ProviderAnomaly(class, detail) => provider_anomaly_step(state, &class, &detail),
         StepInput::ToolOutput(output) => tool_output_step(state, output),
         StepInput::Compact {

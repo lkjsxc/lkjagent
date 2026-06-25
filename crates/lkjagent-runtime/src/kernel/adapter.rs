@@ -28,6 +28,8 @@ pub struct SnapshotAdapterInput {
     pub artifact_weak_paths: Vec<String>,
     pub latest_fault: Option<RuntimeFault>,
     pub retry_count: u32,
+    pub prior_action_fingerprint: Option<String>,
+    pub parameter_shape_fingerprint: Option<String>,
     pub recovery_route: Option<String>,
     pub context_hard_pressure: bool,
     pub compaction_head: Option<String>,
@@ -66,6 +68,8 @@ pub fn build_snapshot(
     });
     snapshot.latest_fault = input.latest_fault;
     snapshot.retry_count = input.retry_count;
+    snapshot.prior_action_fingerprint = input.prior_action_fingerprint;
+    snapshot.parameter_shape_fingerprint = input.parameter_shape_fingerprint;
     snapshot.recovery_route = input.recovery_route;
     snapshot.latest_decision_id = input.latest_decision_id;
     snapshot.prompt_frame_fingerprint = input.prompt_frame_fingerprint;

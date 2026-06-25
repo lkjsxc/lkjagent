@@ -37,7 +37,13 @@ fn staleness_parts(input: &SnapshotAdapterInput, owner_work_exists: bool) -> Vec
             "artifact={:?}:{:?}",
             input.artifact_root, input.artifact_cursor
         ),
-        format!("fault={:?}:{}", input.latest_fault, input.retry_count),
+        format!(
+            "fault={:?}:{}:{:?}:{:?}",
+            input.latest_fault,
+            input.retry_count,
+            input.prior_action_fingerprint,
+            input.parameter_shape_fingerprint
+        ),
         format!("missing={}", input.missing_evidence.join("|")),
         format!(
             "compaction={}:{}",

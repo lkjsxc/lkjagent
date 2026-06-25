@@ -7,6 +7,7 @@ use crate::kernel::effect::RuntimeEffectCommand;
 use crate::kernel::event::RuntimeEvent;
 use crate::kernel::fault::{FaultClass, RuntimeFault};
 use crate::kernel::render::{example_for, prompt_card_for};
+use crate::kernel::repeat_guard::repeat_guard;
 use crate::kernel::snapshot::{RuntimeEventId, RuntimeSnapshot, ToolName};
 
 pub fn select_mission(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> RuntimeMission {
@@ -52,13 +53,16 @@ pub fn reduce(
 ) -> Result<RuntimeDecision, DecisionInvariantError> {
     let mission = select_mission(snapshot, &event);
     let active_mode = mission.active_mode();
-    let admission_view = ToolAdmissionView::new(
-        active_mode,
-        admitted_tools_for(mission),
-        blocked_tools_for(mission),
-        snapshot.staleness_fingerprint.clone(),
-    )
-    .with_missing_evidence(snapshot.evidence.missing.clone());
+    let admission_view = repeat_guard(
+        ToolAdmissionView::new(
+            active_mode,
+            admitted_tools_for(mission),
+            blocked_tools_for(mission),
+            snapshot.staleness_fingerprint.clone(),
+        )
+        .with_missing_evidence(snapshot.evidence.missing.clone()),
+        snapshot,
+    );
     let input = RuntimeDecisionInput {
         decision_id: RuntimeDecisionId::Pending,
         snapshot_id: snapshot.snapshot_id,

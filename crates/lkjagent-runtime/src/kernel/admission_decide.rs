@@ -15,6 +15,7 @@ pub enum AdmissionRefusalKind {
     BlockedTool,
     ToolNotAdmitted,
     CompletionBlocked,
+    RepeatFingerprintExhausted,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -53,6 +54,22 @@ pub fn admit_requested_tool(
             request,
             AdmissionRefusalKind::StaleDecision,
             "stale decision",
+        );
+    }
+    if view
+        .refused_action_fingerprints
+        .iter()
+        .any(|fingerprint| fingerprint == &request.action_fingerprint)
+    {
+        let reason = view.exhausted_fault_class.map_or_else(
+            || "action fingerprint exhausted".to_string(),
+            |class| format!("action fingerprint exhausted for {class:?}"),
+        );
+        return refused(
+            view,
+            request,
+            AdmissionRefusalKind::RepeatFingerprintExhausted,
+            &reason,
         );
     }
     if view
