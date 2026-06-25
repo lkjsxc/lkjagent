@@ -34,3 +34,19 @@ fn batch_write_merges_repeated_files_wrappers() {
         ))
     );
 }
+
+#[test]
+fn multiline_parameter_may_close_at_end_of_value_line() {
+    let text = "<action>\n<tool>graph.plan</tool>\n<objective>Chronos bible</objective>\n<steps>1. Create structure.\n2. Keep Markdown files < 160 lines.</steps>\n<checks>Audit document.</checks>\n<paths>stories/chronos-fracture</paths>\n<reason>Owner requested a story bible.</reason>\n</action>";
+
+    let parsed = parse_completion(text);
+    assert!(matches!(
+        parsed.as_ref().map(|action| action.tool.as_str()),
+        Ok("graph.plan")
+    ));
+    assert!(parsed.is_ok_and(|action| {
+        action.params.iter().any(|param| {
+            param.name == "steps" && param.value.contains("Markdown files < 160 lines")
+        })
+    }));
+}

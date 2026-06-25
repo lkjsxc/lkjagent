@@ -126,7 +126,8 @@ Prompt hygiene, provider anomaly, and export-manifest focused gates:
 - `cargo test -p lkjagent-runtime --test provider_anomaly`: `PROVIDER_ANOMALY_EXIT=0`.
   Provider anomalies now set endpoint retry state without parse-fault increments.
   Protocol parsing now accepts opening parameter tags that start content on the
-  same line, such as `<content># Premise`, until the matching close tag. Adjacent
+  same line, such as `<content># Premise`, and multiline parameters whose final
+  value line ends with the close tag. Adjacent
   repeated `<files>...</files>` wrappers for `fs.batch_write` merge into one
   delimiter payload. `fs.mkdir` now refuses Markdown and TOML leaf paths so the
   daemon cannot create `README.md` or `catalog.toml` directories. Story artifact

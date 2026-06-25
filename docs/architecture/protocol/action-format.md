@@ -69,6 +69,8 @@ including blank lines, code fences, quotes, shell commands, and angle-bracket
 text that is not a structural line for the current parameter. An opening
 parameter tag may start the first content bytes on the same line, such as
 `<content># Premise`; the value then continues until the matching closing tag.
+For multiline values, the closing tag may appear alone on its own line or at the
+end of the final value line.
 
 ## Batch File Values
 
