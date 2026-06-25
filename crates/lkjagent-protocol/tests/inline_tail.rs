@@ -18,3 +18,19 @@ fn opening_parameter_tag_may_start_value_on_same_line() {
         ))
     );
 }
+
+#[test]
+fn batch_write_merges_repeated_files_wrappers() {
+    let text = "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: a.md\ncontent:\n# A\n</files>\n</files>\n<files>\npath: b.md\ncontent:\n# B\n</files>\n</files>\n</action>";
+
+    assert_eq!(
+        parse_completion(text),
+        Ok(Action::new(
+            "fs.batch_write",
+            vec![Param::new(
+                "files",
+                "path: a.md\ncontent:\n# A\n-- lkjagent-next-file --\npath: b.md\ncontent:\n# B"
+            )]
+        ))
+    );
+}
