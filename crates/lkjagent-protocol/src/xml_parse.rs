@@ -79,8 +79,15 @@ pub(super) fn parse_pair(lines: &[&str], index: usize) -> ParseResult<(String, S
     }
     let mut cursor = index + 1;
     while let Some(raw) = lines.get(cursor) {
-        if raw.trim_end() == close {
+        let trimmed = raw.trim_end();
+        if trimmed == close {
             return Ok((name, value_lines.join("\n"), cursor + 1));
+        }
+        if let Some(value) = trimmed.strip_suffix(&close) {
+            if !value.trim().is_empty() {
+                value_lines.push(value.to_string());
+                return Ok((name, value_lines.join("\n"), cursor + 1));
+            }
         }
         value_lines.push((*raw).to_string());
         cursor += 1;
