@@ -85,7 +85,7 @@ pub(crate) fn prompt_card_for(
 pub(crate) fn example_for(tool: &str, snapshot: &RuntimeSnapshot) -> String {
     match (tool, snapshot.artifact.root.as_deref()) {
         ("fs.batch_write", Some(root)) => format!(
-            "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: {root}/README.md\ncontent:\n# Title\n\nConcrete content.\n</files>\n</action>"
+            "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: {root}/README.md\ncontent:\n# Artifact Guide\n\n## Purpose\n\nNavigate the active artifact and list its audit evidence.\n</files>\n</action>"
         ),
         _ => format!("<action>\n<tool>{tool}</tool>\n</action>"),
     }

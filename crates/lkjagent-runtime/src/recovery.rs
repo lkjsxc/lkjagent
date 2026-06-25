@@ -166,8 +166,8 @@ fn valid_example(tool: &str) -> String {
 fn render_param_example(name: &str) -> String {
     let value = match name {
         "command" => "cargo test -p lkjagent-protocol",
-        "content" => "# Note\n\nConcrete content for the requested file.",
-        "files" => "path: notes/example.md\ncontent:\n# Example\n\nConcrete content.",
+        "content" => "# Runtime Note\n\n## Purpose\n\nRecord the observed state and the next admitted action.",
+        "files" => "path: notes/runtime-state.md\ncontent:\n# Runtime State\n\n## Purpose\n\nRecord the observed state and the next admitted action.",
         "find" => "old text",
         "gate" => "check-docs",
         "id" => "1",

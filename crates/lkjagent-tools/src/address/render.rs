@@ -10,7 +10,7 @@ pub fn render_document_refusal(tool: &str, address: &ArtifactAddress) -> String 
 
 pub fn render_markdown_root_refusal(tool: &str, root: &str) -> String {
     format!(
-        "{}\ntool={tool}\nrequested_root={root}\naddress_status=root_ends_with_markdown_suffix\ndetected_path_kind=missing\nnext_action=fs.write or fs.batch_write owns Markdown leaves\nvalid_example:\n<action>\n<tool>fs.batch_write</tool>\n<files>\npath: {root}\ncontent:\n# Content\n\nConcrete content under the byte limit.\n</files>\n</action>",
+        "{}\ntool={tool}\nrequested_root={root}\naddress_status=root_ends_with_markdown_suffix\ndetected_path_kind=missing\nnext_action=fs.write or fs.batch_write owns Markdown leaves\nvalid_example:\n<action>\n<tool>fs.batch_write</tool>\n<files>\npath: {root}\ncontent:\n# Markdown Leaf\n\n## Purpose\n\nRecord the requested leaf content under the byte limit.\n</files>\n</action>",
         if tool.starts_with("doc.") { "document address refused" } else { "artifact address refused" }
     )
 }
