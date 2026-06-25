@@ -160,7 +160,7 @@ fn artifact_audit_rejects_generic_project_docs_for_story() -> TestResult<()> {
         &action(
             "doc.scaffold",
             &[
-                ("root", "stories/not-a-story"),
+                ("root", "docs/not-a-story"),
                 ("title", "Project Documentation"),
                 ("kind", "documentation"),
             ],
@@ -173,7 +173,7 @@ fn artifact_audit_rejects_generic_project_docs_for_story() -> TestResult<()> {
     let output = dispatch(
         &action(
             "artifact.audit",
-            &[("root", "stories/not-a-story"), ("kind", "story")],
+            &[("root", "docs/not-a-story"), ("kind", "story")],
         ),
         &runtime,
         &mut conn,
@@ -181,7 +181,7 @@ fn artifact_audit_rejects_generic_project_docs_for_story() -> TestResult<()> {
     );
 
     assert!(output.content.contains("artifact_kind_mismatch"));
-    let catalog = fs::read_to_string(workspace.join("stories/not-a-story/catalog.toml"))?;
+    let catalog = fs::read_to_string(workspace.join("docs/not-a-story/catalog.toml"))?;
     assert!(catalog.contains("ProjectDocs"));
     Ok(())
 }

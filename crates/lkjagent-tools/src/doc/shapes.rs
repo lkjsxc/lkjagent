@@ -15,7 +15,7 @@ pub fn select_profile(input: &ScaffoldInput) -> ScaffoldProfile {
         ScaffoldProfile::BreadCookbook
     } else if text.contains("cookbook") || text.contains("recipe") {
         ScaffoldProfile::Cookbook
-    } else if creative_subject(&text, &input.kind) {
+    } else if story_root(&input.root) || creative_subject(&text, &input.kind) {
         ScaffoldProfile::NarrativeManuscript
     } else if text.contains("knowledge") || text.contains("encyclopedia") {
         ScaffoldProfile::KnowledgeBase
@@ -34,6 +34,10 @@ pub fn select_profile(input: &ScaffoldInput) -> ScaffoldProfile {
     } else {
         ScaffoldProfile::ProjectDocs
     }
+}
+
+fn story_root(root: &str) -> bool {
+    root.trim_start_matches("./").starts_with("stories/")
 }
 
 fn lkjagent_seed_subject(text: &str) -> bool {
