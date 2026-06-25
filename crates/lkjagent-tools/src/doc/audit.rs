@@ -153,7 +153,9 @@ fn count_check(
     let actual = markdown_count(root)?;
     let ok = match mode {
         ScaffoldMode::Exact => actual == target,
-        ScaffoldMode::Approx => actual.abs_diff(target) <= usize::max(1, target / 10),
+        ScaffoldMode::Approx => {
+            actual >= target || actual.abs_diff(target) <= usize::max(1, target / 10)
+        }
     };
     if !ok {
         failures.push(format!("count_mismatch: expected={target} actual={actual}"));

@@ -26,8 +26,9 @@ compact `catalog.toml` metadata for documentation roots.
 
 Audits a document root for README presence, local child links, forbidden
 sequence-only names, catalog metadata presence, line caps, and
-optional file-count target. Passing audits can satisfy document-structure
-evidence when the active graph gate accepts that evidence.
+optional file-count target. Approximate count targets accept extra Markdown
+files; exact mode requires the target count. Passing audits can satisfy
+document-structure evidence when the active graph gate accepts that evidence.
 
 ## artifact.plan
 
