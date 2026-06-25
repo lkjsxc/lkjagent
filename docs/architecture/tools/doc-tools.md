@@ -20,7 +20,9 @@ leaves.
 Creates a compact semantic tree under `root`. Parameters are `root`, optional
 `kind`, optional `count`, optional `mode` (`exact` or `approx`), required
 `title`, and optional newline sections. It generates README indexes and
-compact `catalog.toml` metadata for documentation roots.
+compact `catalog.toml` metadata for documentation roots. It refuses existing
+cataloged roots; repairs use `artifact.next`, `fs.batch_write`, or focused
+writes instead of re-scaffolding over content.
 
 ## doc.audit
 
