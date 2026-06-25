@@ -45,6 +45,9 @@ pub fn stale_action_refusal(
 ) -> Option<String> {
     let cached = cached?;
     let mut changed_fields = changed_fields(cached, current);
+    if compaction_only_cached_action(cached, current, &changed_fields) {
+        return None;
+    }
     let runtime_only = matches!(
         current.endpoint_decision,
         EndpointDecision::RuntimeCompact | EndpointDecision::ClosedIdle
@@ -63,6 +66,22 @@ pub fn stale_action_refusal(
         join_or_none(&current.effective_policy.allowed_tools),
         current.valid_example
     ))
+}
+
+fn compaction_only_cached_action(
+    cached: &TurnAuthority,
+    current: &TurnAuthority,
+    fields: &[&'static str],
+) -> bool {
+    current.endpoint_decision == EndpointDecision::RuntimeCompact
+        && fields
+            .iter()
+            .all(|field| matches!(*field, "compaction_pressure" | "prompt_frame_id"))
+        && (!fields.contains(&"prompt_frame_id")
+            || equivalent_after_runtime_compaction(
+                cached.input.staleness_fingerprint.as_deref(),
+                current.input.staleness_fingerprint.as_deref(),
+            ))
 }
 
 fn changed_fields(cached: &TurnAuthority, current: &TurnAuthority) -> Vec<&'static str> {

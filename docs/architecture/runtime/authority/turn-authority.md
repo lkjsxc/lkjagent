@@ -9,8 +9,9 @@ before tool dispatch.
 
 `lkjagent-runtime` owns `TurnAuthority`. The graph proposes phase and evidence.
 The model proposes an action. The dispatcher executes only after this object
-admits the action. A pending action generated before runtime compaction remains
-admissible when only compaction pressure and prompt-frame identity changed.
+admits the action. A pending or cached action generated before runtime
+compaction remains admissible when only compaction pressure and prompt-frame
+identity changed.
 
 ## Inputs
 
