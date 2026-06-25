@@ -140,6 +140,14 @@ Prompt hygiene, provider anomaly, and export-manifest focused gates:
 - `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
 - `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
 
+Full focused gate sweep also passed with exit 0 for `lkjagent-protocol`,
+`lkjagent-llm`, runtime `kernel_model`, `kernel_prompt_render`,
+`kernel_admission`, `authority_reducer`, `recovery_controller`,
+`recovery_shape_enforcement`, `authority_ledger_wiring`, tools
+`registry_examples`, `batch_write_formats`, `artifact_ledger_tools`,
+`artifact_tools`, `doc_tools`, CLI `model_log`, doc/style/line checks,
+benchmark corpus, quiet verify, and Docker verify.
+
 The live Chronos story smoke has not run in this slice.
 
 ## Out of Scope
