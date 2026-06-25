@@ -46,7 +46,7 @@ pub fn apply(request: ApplyRequest<'_>) -> ToolResult<String> {
         }
     }
     let title = title_or_root(request.title, request.root);
-    let output = crate::doc::scaffold(
+    let output = crate::doc::scaffold_allow_existing(
         request.workspace,
         request.root,
         kind_or_default(request.kind, request.root),

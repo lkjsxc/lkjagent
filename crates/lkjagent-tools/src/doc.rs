@@ -58,7 +58,37 @@ pub fn scaffold(
     title: &str,
     sections: &str,
 ) -> ToolResult<String> {
+    scaffold_inner((workspace, root, kind, count, mode, title, sections), true)
+}
+
+pub fn scaffold_allow_existing(
+    workspace: &Path,
+    root: &str,
+    kind: &str,
+    count: &str,
+    mode: &str,
+    title: &str,
+    sections: &str,
+) -> ToolResult<String> {
+    scaffold_inner((workspace, root, kind, count, mode, title, sections), false)
+}
+
+type ScaffoldArgs<'a> = (
+    &'a Path,
+    &'a str,
+    &'a str,
+    &'a str,
+    &'a str,
+    &'a str,
+    &'a str,
+);
+
+fn scaffold_inner(args: ScaffoldArgs<'_>, refuse_existing: bool) -> ToolResult<String> {
+    let (workspace, root, kind, count, mode, title, sections) = args;
     crate::artifact_address_support::ensure_document_root(workspace, "doc.scaffold", root)?;
+    if refuse_existing {
+        refuse_existing_catalog(workspace, root)?;
+    }
     let input = scaffold_input(root, kind, count, mode, title, sections)?;
     let plan = profile::semantic_doc_plan(&input)?;
     let files = plan.markdown_count();
@@ -70,6 +100,16 @@ pub fn scaffold(
         plan.profile,
         input.mode.as_str()
     ))
+}
+
+fn refuse_existing_catalog(workspace: &Path, root: &str) -> ToolResult<()> {
+    let full = crate::fs::workspace_path(workspace, root)?;
+    if full.join("catalog.toml").is_file() {
+        return Err(ToolError::invalid(
+            "doc.scaffold refuses existing cataloged roots; use artifact.next or fs.batch_write",
+        ));
+    }
+    Ok(())
 }
 
 fn scaffold_input(
