@@ -42,7 +42,7 @@ turn artifacts.
 | Placeholder and payload refusal | `fs.write`, `fs.batch_write`, content audit, and check-docs reject common scaffold phrases and oversized payloads before mutation. |
 | Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
 | Hard compaction mode | A runtime-owned `Compaction` active mode exists and does not render `memory.save` as a model action. |
-| Stale-action preemption seed | Cached actions are refused before dispatch when selected authority fields change. |
+| Stale-action preemption seed | Cached actions are refused before dispatch when selected authority fields change, except compaction-only prompt rotation with unchanged queue, graph, artifact, fault, and evidence authority. |
 | Baseline benchmarks | The corpus includes owner-reported recovery, artifact, memory, accounting, model-log, batch-schema, compaction, and repeated-recovery signatures. |
 
 ## Partially Implemented Behavior
