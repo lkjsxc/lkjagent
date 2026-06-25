@@ -35,6 +35,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [count_seed_root_contract.rs](count_seed_root_contract.rs): counted scaffold root contract fixtures.
 - [doc_boilerplate.rs](doc_boilerplate.rs): generated boilerplate rejection fixtures.
 - [doc_content_audit.rs](doc_content_audit.rs): content-artifact scaffold-only audit fixtures.
+- [doc_count_audit.rs](doc_count_audit.rs): audit count-target fixtures.
 - [doc_path_hygiene.rs](doc_path_hygiene.rs): bounded generated path fixtures.
 - [doc_tools.rs](doc_tools.rs): document scaffold and audit fixtures.
 - [dispatch_normalize.rs](dispatch_normalize.rs): safe parameter repair and schema example fixtures.
