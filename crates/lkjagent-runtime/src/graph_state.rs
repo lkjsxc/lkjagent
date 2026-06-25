@@ -47,15 +47,17 @@ pub fn open_owner_case_with_guard(
 }
 
 pub fn prefix_graph_state(conn: &Connection) -> RuntimeResult<String> {
+    let budget = prefix_body_budget();
     let graph = match lkjagent_store::graph::active_case(conn)? {
         Some(row) => {
             let evidence = lkjagent_store::graph::evidence_for_case(conn, row.id)?;
             let tracks = lkjagent_store::graph::state_tracks::state_tracks_for_case(conn, row.id)?;
-            render_state(&state_from_row(row, evidence, tracks))
+            render_state_budgeted(&state_from_row(row, evidence, tracks), budget)
         }
-        None => render_state(&idle_state()),
+        None => render_state_budgeted(&idle_state(), budget),
     };
-    graph_guard::append_store_guard(conn, graph)
+    let guarded = graph_guard::append_store_guard(conn, graph)?;
+    Ok(fit_prefix_body(&guarded, budget))
 }
 
 pub fn graph_notice_frame(state: &TaskGraphState) -> Frame {
@@ -68,7 +70,31 @@ pub fn graph_notice_frame(state: &TaskGraphState) -> Frame {
 }
 
 pub fn render_state(state: &TaskGraphState) -> String {
-    render_graph_slice(source_graph(), state, PREFIX_GRAPH_STATE)
+    render_state_budgeted(state, PREFIX_GRAPH_STATE)
+}
+
+fn render_state_budgeted(state: &TaskGraphState, budget: usize) -> String {
+    render_graph_slice(source_graph(), state, budget)
+}
+
+fn prefix_body_budget() -> usize {
+    PREFIX_GRAPH_STATE.saturating_sub(token_estimate("## graph state\n"))
+}
+
+fn fit_prefix_body(text: &str, budget: usize) -> String {
+    if token_estimate(text) <= budget {
+        return text.to_string();
+    }
+    let marker = "\n[graph prefix narrowed]";
+    let mut out = String::new();
+    for ch in text.chars() {
+        let candidate = format!("{out}{ch}{marker}");
+        if token_estimate(&candidate) > budget {
+            break;
+        }
+        out.push(ch);
+    }
+    format!("{out}{marker}")
 }
 
 pub fn evidence_record(

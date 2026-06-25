@@ -79,13 +79,12 @@ fn push_check(state: &mut TaskGraphState, check: &str) {
     }
 }
 
-fn append_guard(mut graph: String, guard: CompletionGuard) -> String {
+fn append_guard(graph: String, guard: CompletionGuard) -> String {
     if graph.contains("completion_guard=") {
         return graph;
     }
     if let Some(text) = guard_text(guard) {
-        graph.push('\n');
-        graph.push_str(&text);
+        return format!("{text}\n{graph}");
     }
     graph
 }
