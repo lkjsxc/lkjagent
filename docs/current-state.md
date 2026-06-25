@@ -119,11 +119,14 @@ Documentation reconciliation gates for this handoff slice:
 Prompt hygiene, provider anomaly, and export-manifest focused gates:
 
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
+- `cargo test -p lkjagent-protocol`: `PROTOCOL_EXIT=0`.
 - `cargo test -p lkjagent-llm`: `LLM_EXIT=0`.
 - `cargo test -p lkjagent-context --test assemble`: `CONTEXT_ASSEMBLE_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test prompt_hygiene`: `PROMPT_HYGIENE_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test provider_anomaly`: `PROVIDER_ANOMALY_EXIT=0`.
   Provider anomalies now set endpoint retry state without parse-fault increments.
+  Protocol parsing now accepts opening parameter tags that start content on the
+  same line, such as `<content># Premise`, until the matching close tag.
 - `cargo test -p lkjagent-runtime --test current_model_run_fixture`: `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test provider_exchange_log`: `PROVIDER_EXCHANGE_LOG_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test kernel_admission`: `KERNEL_ADMISSION_EXIT=0`.

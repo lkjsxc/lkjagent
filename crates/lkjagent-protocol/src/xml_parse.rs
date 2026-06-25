@@ -79,7 +79,7 @@ fn starts_pair(line: &str) -> bool {
     matches!(
         classify_tag_line(line),
         TagLineClass::InlineTag { .. } | TagLineClass::OpenTag { .. }
-    )
+    ) || open_name_and_tail(line).is_some()
 }
 
 fn non_pair_fault(tool: Option<&str>, params: &[Param], line: &str) -> ParseFault {
