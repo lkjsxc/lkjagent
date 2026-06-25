@@ -56,7 +56,9 @@ impl ResidentDaemon {
         match complete(&self.runtime.client, &messages, self.endpoint_attempt) {
             Ok(completion) => {
                 self.record_model_response(conn, provider_log.as_ref(), &completion, started)?;
-                self.record_model_parse(provider_log.as_ref(), &completion)?;
+                if completion.provider_anomaly.is_none() {
+                    self.record_model_parse(provider_log.as_ref(), &completion)?;
+                }
                 self.apply_completion(conn, now, completion)
             }
             Err(error) => {
@@ -95,13 +97,20 @@ impl ResidentDaemon {
             .usage
             .completion_tokens
             .unwrap_or_else(|| token_estimate(&completion.content) as u64);
-        let result = step(
-            self.state.clone(),
-            StepInput::Completion {
-                content: completion.content,
-                tokens: tokens as usize,
-            },
-        );
+        let result = if let Some(anomaly) = completion.provider_anomaly {
+            step(
+                self.state.clone(),
+                StepInput::ProviderAnomaly(anomaly.kind.as_str().to_string(), anomaly.detail),
+            )
+        } else {
+            step(
+                self.state.clone(),
+                StepInput::Completion {
+                    content: completion.content,
+                    tokens: tokens as usize,
+                },
+            )
+        };
         self.apply_step_result(conn, now, result, false)
     }
 

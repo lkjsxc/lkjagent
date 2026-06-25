@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use lkjagent_protocol::{parse_live_completion, Action, EnvelopeMode, ParseFault};
 use rusqlite::Connection;
 
-use super::{json_escape, ProviderLogHandle};
+use super::{export::refresh_export_files, json_escape, ProviderLogHandle};
 use crate::error::{RuntimeError, RuntimeResult};
 
 pub fn record_parsed_action(
@@ -15,7 +15,8 @@ pub fn record_parsed_action(
     atomic_write(
         &handle.dir.join("parsed-action.json"),
         &parse_json(content, closure_mode),
-    )
+    )?;
+    refresh_export_files(&handle.dir)
 }
 
 pub fn record_provider_admission(
@@ -35,14 +36,16 @@ pub fn record_provider_admission(
         json_escape(reason),
         json_escape(example)
     );
-    atomic_write(&dir.join("admission.json"), &json)
+    atomic_write(&dir.join("admission.json"), &json)?;
+    refresh_export_files(&dir)
 }
 
 pub fn record_provider_observation(conn: &Connection, observation: &str) -> RuntimeResult<()> {
     let Some(dir) = latest_dir(conn)? else {
         return Ok(());
     };
-    atomic_write(&dir.join("observation.txt"), observation)
+    atomic_write(&dir.join("observation.txt"), observation)?;
+    refresh_export_files(&dir)
 }
 
 fn parse_json(content: &str, closure_mode: &str) -> String {

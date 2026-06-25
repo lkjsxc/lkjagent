@@ -18,6 +18,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [audit_owned_evidence.rs](audit_owned_evidence.rs): audit-owned evidence cannot be graph-authored.
 - [budget_recovery.rs](budget_recovery.rs): exhausted task budget waiting and owner-send resume fixtures.
 - [compaction_snapshot.rs](compaction_snapshot.rs): structured runtime compaction resume fields.
+- [current_model_run_fixture.rs](current_model_run_fixture.rs): checked-in current model-run failure fixture.
 - [daemon_loop.rs](daemon_loop.rs): resident queue, endpoint, tool, ask, and error fixtures.
 - [document_completion.rs](document_completion.rs): document audit evidence completion fixtures.
 - [endpoint_retry.rs](endpoint_retry.rs): endpoint backoff deadline fixture.
@@ -28,6 +29,8 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [owner_guidance.rs](owner_guidance.rs): queued owner guidance guard persistence fixture.
 - [payload_risk.rs](payload_risk.rs): max-token write payload recovery fixture.
 - [prompt_daemon.rs](prompt_daemon.rs): prompt, startup, lock, and shutdown fixtures.
+- [prompt_hygiene.rs](prompt_hygiene.rs): live prompt hidden-reasoning hygiene fixture.
+- [provider_anomaly.rs](provider_anomaly.rs): provider anomaly recovery without parse-fault fixtures.
 - [recursive_guard.rs](recursive_guard.rs): guarded recursive-structure daemon fixture.
 - [recursive_scaffold.rs](recursive_scaffold.rs): docs auto-scaffold daemon fixture.
 - [recursive_structure.rs](recursive_structure.rs): recursive structure seed integration fixture.

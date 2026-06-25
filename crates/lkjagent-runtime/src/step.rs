@@ -26,6 +26,7 @@ mod graph_output_plan_helpers;
 mod graph_phase;
 mod output;
 mod oversize;
+mod provider_anomaly;
 mod recovery_select;
 mod turn;
 
@@ -35,6 +36,7 @@ pub use effects_model::{Effect, GraphPlanStepEffect, GraphStateTrackEffect};
 use fault_wait::{enter_recovery_route, record_recoverable_fault, RecoveryFault};
 use frames::{append_notice, result};
 use output::{append_output_frame, event_kind, handle_control_success, stop_for_output};
+use provider_anomaly::provider_anomaly_step;
 use turn::{completion_step, owner_step};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -53,6 +55,7 @@ pub enum StepInput {
     EndpointOversize {
         preview: String,
     },
+    ProviderAnomaly(String, String),
     ToolOutput(DispatchOutput),
     Compact {
         prefix: Vec<Frame>,
@@ -90,6 +93,7 @@ pub fn step(state: RuntimeState, input: StepInput) -> StepResult {
         StepInput::Completion { content, tokens } => completion_step(state, content, tokens),
         StepInput::TurnBudgetCheckpoint => budget::task_checkpoint_step(state),
         StepInput::EndpointOversize { preview } => turn::endpoint_oversize_step(state, &preview),
+        StepInput::ProviderAnomaly(class, detail) => provider_anomaly_step(state, &class, &detail),
         StepInput::ToolOutput(output) => tool_output_step(state, output),
         StepInput::Compact {
             prefix,

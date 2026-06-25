@@ -116,8 +116,23 @@ Documentation reconciliation gates for this handoff slice:
 - `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`, `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
 
-Focused code gates, quiet verify, and Docker Compose verification have not run
-for implementation changes in this slice yet.
+Prompt hygiene, provider anomaly, and export-manifest focused gates:
+
+- `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
+- `cargo test -p lkjagent-llm`: `LLM_EXIT=0`.
+- `cargo test -p lkjagent-context --test assemble`: `CONTEXT_ASSEMBLE_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test prompt_hygiene`: `PROMPT_HYGIENE_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test provider_anomaly`: `PROVIDER_ANOMALY_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test current_model_run_fixture`: `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test provider_exchange_log`: `PROVIDER_EXCHANGE_LOG_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`, `ok check-style`.
+- `cargo test -p lkjagent-runtime`: `RUNTIME_EXIT=0`.
+- `cargo test -p lkjagent-cli --test model_log`: `CLI_MODEL_LOG_EXIT=0`.
+- `cargo test -p lkjagent-cli --test model_log_archive`: `CLI_MODEL_LOG_ARCHIVE_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
+
+The live Chronos story smoke has not run in this slice.
 
 ## Out of Scope
 
