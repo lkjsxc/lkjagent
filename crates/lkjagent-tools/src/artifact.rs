@@ -25,6 +25,7 @@ pub fn plan(
     scale: &str,
     sections: &str,
 ) -> ToolResult<String> {
+    let kind = kind_or_default(kind, root);
     let output = crate::doc::plan(root, kind, scale_count(scale), "approx", title, sections)?;
     crate::artifact_ledger_support::record_plan(conn, root, kind, scale, now)?;
     Ok(output)
@@ -48,7 +49,7 @@ pub fn apply(request: ApplyRequest<'_>) -> ToolResult<String> {
     let output = crate::doc::scaffold(
         request.workspace,
         request.root,
-        kind_or_default(request.kind),
+        kind_or_default(request.kind, request.root),
         "",
         request.mode,
         &title,
@@ -57,7 +58,7 @@ pub fn apply(request: ApplyRequest<'_>) -> ToolResult<String> {
     crate::artifact_ledger_support::record_apply(
         request.conn,
         request.root,
-        request.kind,
+        kind_or_default(request.kind, request.root),
         request.now,
     )?;
     Ok(output)
@@ -140,13 +141,20 @@ fn scale_count(scale: &str) -> &str {
     }
 }
 
-fn kind_or_default(kind: &str) -> &str {
+fn kind_or_default<'a>(kind: &'a str, root: &str) -> &'a str {
     let trimmed = kind.trim();
+    if (trimmed.is_empty() || trimmed.eq_ignore_ascii_case("artifact")) && story_root(root) {
+        return "story";
+    }
     if trimmed.is_empty() {
         "artifact"
     } else {
         trimmed
     }
+}
+
+fn story_root(root: &str) -> bool {
+    root.trim_start_matches("./").starts_with("stories/")
 }
 
 fn title_or_root(title: &str, root: &str) -> String {

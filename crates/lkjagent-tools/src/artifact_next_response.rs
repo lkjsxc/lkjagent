@@ -6,7 +6,9 @@ use crate::error::ToolResult;
 
 pub fn missing_root_response(address: &ArtifactAddress) -> String {
     let root = root(address);
-    let kind = kind_from_action(&address.next_action).unwrap_or_else(|| "artifact".to_string());
+    let kind = kind_from_action(&address.next_action)
+        .map(|kind| kind_or_default_for_root(&kind, &root))
+        .unwrap_or_else(|| kind_or_default_for_root("", &root));
     format!(
         "artifact_next_result=root_missing\nroot={root}\nkind={kind}\nmissing=root\nruntime_event=ArtifactRootMissing\nnext_decision_required=true\ncandidate_action=artifact.apply\ncandidate_example:\n{}",
         artifact_apply_example(&root, &kind)
@@ -14,7 +16,7 @@ pub fn missing_root_response(address: &ArtifactAddress) -> String {
 }
 
 pub fn root_identity_response(root: &str, kind: &str) -> String {
-    let kind = kind_or_default(kind);
+    let kind = kind_or_default_for_root(kind, root);
     format!(
         "artifact_next_result=root_needs_identity\nroot={root}\nkind={kind}\nmissing=catalog,readme,semantic-leaf\nruntime_event=ArtifactRootIncomplete\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_example:\n{}",
         root_identity_example(root, &kind)
@@ -23,7 +25,9 @@ pub fn root_identity_response(root: &str, kind: &str) -> String {
 
 pub fn focused_response(address: &ArtifactAddress, kind: &str) -> String {
     let root = root(address);
-    let kind = kind_from_action(&address.next_action).unwrap_or_else(|| kind_or_default(kind));
+    let kind = kind_from_action(&address.next_action)
+        .map(|kind| kind_or_default_for_root(&kind, &root))
+        .unwrap_or_else(|| kind_or_default_for_root(kind, &root));
     let path = address.weak_path.clone().unwrap_or_default();
     let selected = vec![path.clone()];
     let valid_example = crate::artifact_next_example::batch_write(&root, &kind, &selected);
@@ -57,7 +61,7 @@ pub fn root(address: &ArtifactAddress) -> String {
 
 pub fn resolved_kind(kind: &str, root: &Path) -> String {
     let trimmed = kind.trim();
-    if !trimmed.is_empty() {
+    if !trimmed.is_empty() && !trimmed.eq_ignore_ascii_case("artifact") {
         return trimmed.to_string();
     }
     let text = optional_catalog(root);
@@ -66,7 +70,7 @@ pub fn resolved_kind(kind: &str, root: &Path) -> String {
     } else if story_catalog(&text) {
         "story".to_string()
     } else {
-        "artifact".to_string()
+        kind_or_default_for_root(trimmed, &root.to_string_lossy())
     }
 }
 
@@ -107,12 +111,21 @@ fn kind_from_action(action: &AddressNextAction) -> Option<String> {
     }
 }
 
-fn kind_or_default(kind: &str) -> String {
-    if kind.trim().is_empty() {
-        "artifact".to_string()
+fn kind_or_default_for_root(kind: &str, root: &str) -> String {
+    let trimmed = kind.trim();
+    if trimmed.is_empty() || trimmed.eq_ignore_ascii_case("artifact") {
+        if story_root(root) {
+            "story".to_string()
+        } else {
+            "artifact".to_string()
+        }
     } else {
-        kind.trim().to_string()
+        trimmed.to_string()
     }
+}
+
+fn story_root(root: &str) -> bool {
+    root.trim_start_matches("./").starts_with("stories/")
 }
 
 fn required_sections(kind: &str) -> &'static str {

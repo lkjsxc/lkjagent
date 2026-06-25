@@ -59,3 +59,33 @@ fn artifact_next_infers_story_from_handwritten_catalog() -> TestResult<()> {
     assert!(output.content.contains("kind=story"));
     Ok(())
 }
+
+#[test]
+fn stories_root_treats_generic_artifact_kind_as_story() -> TestResult<()> {
+    let workspace = temp_workspace("artifact-kind-stories-root")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+
+    let next = dispatch(
+        &action("artifact.next", &[("root", "stories/chronos-fracture")]),
+        &runtime,
+        &mut conn,
+        &mut state(),
+    );
+    assert!(next.content.contains("kind=story"));
+
+    let apply = dispatch(
+        &action(
+            "artifact.apply",
+            &[("root", "stories/chronos-fracture"), ("kind", "artifact")],
+        ),
+        &runtime,
+        &mut conn,
+        &mut state(),
+    );
+    assert!(apply.content.contains("profile=NarrativeManuscript"));
+    assert!(workspace
+        .join("stories/chronos-fracture/characters")
+        .is_dir());
+    Ok(())
+}
