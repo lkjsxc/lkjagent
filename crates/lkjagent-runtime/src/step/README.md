@@ -16,6 +16,7 @@ This directory holds helper modules for the pure runtime step transition.
 - [graph_phase.rs](graph_phase.rs): graph phase and evidence-kind helpers.
 - [input.rs](input.rs): pure step input enum.
 - [output.rs](output.rs): tool-output frame and control-action helpers.
+- [owner_guidance.rs](owner_guidance.rs): owner follow-up root and artifact guidance updates.
 - [oversize.rs](oversize.rs): endpoint oversize recovery messages.
 - [oversize_step.rs](oversize_step.rs): endpoint oversize recovery state transition.
 - [provider_anomaly.rs](provider_anomaly.rs): provider anomaly notice and recovery step.
