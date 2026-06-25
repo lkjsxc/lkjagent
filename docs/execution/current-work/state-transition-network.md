@@ -157,7 +157,8 @@ admission refuses stale cached maintenance actions, changed artifact-cursor
 writes, compaction pressure writes, blocked tools, completion requests, and
 retry-exhausted repeated action fingerprints before dispatch. Daemon
 model-completion handling can attach the persisted decision id, prompt frame id,
-and staleness fingerprint to pending actions before dispatch. Prompt history
+and staleness fingerprint to pending actions before dispatch, and persisted
+pending actions refuse when the full staleness fingerprint changes. Prompt history
 hygiene, provider empty-content anomaly handling, self-consistent export
 manifests, and current-run replay fixtures now have focused coverage. Daemon
 wiring through the new kernel, explicit triggering events on every path,

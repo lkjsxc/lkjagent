@@ -127,6 +127,7 @@ Prompt hygiene, provider anomaly, and export-manifest focused gates:
 - `cargo test -p lkjagent-runtime --test provider_exchange_log`: `PROVIDER_EXCHANGE_LOG_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test kernel_admission`: `KERNEL_ADMISSION_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test pending_action_authority`: `PENDING_ACTION_AUTHORITY_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test authority_ledger_wiring`: `AUTHORITY_LEDGER_WIRING_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`, `ok check-style`.
 - `cargo test -p lkjagent-runtime`: `RUNTIME_EXIT=0`.
 - `cargo test -p lkjagent-cli --test model_log`: `CLI_MODEL_LOG_EXIT=0`.

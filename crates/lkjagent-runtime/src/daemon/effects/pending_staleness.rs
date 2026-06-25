@@ -13,6 +13,12 @@ pub fn persisted_action_refusal(
     ) {
         changed_fields.push("prompt_frame_id");
     }
+    if changed(
+        pending.staleness_fingerprint.as_deref(),
+        current.input.staleness_fingerprint.as_deref(),
+    ) {
+        changed_fields.push("staleness_fingerprint");
+    }
     if changed_fields.is_empty() {
         return None;
     }

@@ -13,4 +13,6 @@ admission rows, and graph-policy synchronization.
 - [authority_ledger_support.rs](authority_ledger_support.rs): authority ledger helper fields and fingerprints.
 - [authority_store.rs](authority_store.rs): flat status-key authority snapshot writes.
 - [graph_policy.rs](graph_policy.rs): graph dispatch policy and ledger-aware completion helpers.
+- [graph_snapshot.rs](graph_snapshot.rs): graph fields used by runtime authority snapshots.
 - [graph_sync.rs](graph_sync.rs): graph policy synchronization for dispatch.
+- [kernel_shadow.rs](kernel_shadow.rs): transition-kernel shadow decision persistence while handover is incomplete.

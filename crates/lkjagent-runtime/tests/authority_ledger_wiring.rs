@@ -52,6 +52,37 @@ fn daemon_records_prompt_frame_and_effect_observation() -> TestResult<()> {
 }
 
 #[test]
+fn changed_staleness_fingerprint_refuses_persisted_pending_action() -> TestResult<()> {
+    let mut conn = store()?;
+    take_daemon_lock(&conn, "test", "100", "0")?;
+    state::set(&conn, "authority decision id", "1")?;
+    state::set(&conn, "authority prompt frame id", "frame-same")?;
+    state::set(&conn, "kernel staleness fingerprint", "stale-current")?;
+    let workspace = temp_workspace("authority-stale-fingerprint")?;
+    let server = serve_responses(Vec::new())?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+    let action = action("graph.state", &[]);
+    daemon.state.task = TaskState::Open { turns_remaining: 3 };
+    daemon.state.pending_action = Some(PendingAction {
+        action: action.clone(),
+        action_text: render_action(&action),
+        authority_decision_id: Some("1".to_string()),
+        prompt_frame_id: Some("frame-same".to_string()),
+        staleness_fingerprint: Some("stale-old".to_string()),
+    });
+    daemon.turn_authority = None;
+
+    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
+    server.join()?;
+
+    assert!(daemon.state.context.log.iter().any(|frame| {
+        frame.content.contains("reason=stale_decision")
+            && frame.content.contains("staleness_fingerprint")
+    }));
+    Ok(())
+}
+
+#[test]
 fn changed_prompt_frame_refuses_persisted_pending_action() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "100", "0")?;
