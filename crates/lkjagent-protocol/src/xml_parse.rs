@@ -1,3 +1,5 @@
+mod batch_files;
+
 use crate::error::ParseResult;
 use crate::model::{Action, MalformedTagReason, Param, ParseFault, ACTION_CLOSE, ACTION_OPEN};
 use crate::registry::{find_tool, missing_required, missing_required_any, unknown_params};
@@ -31,7 +33,7 @@ pub fn parse_tag_action(lines: &[&str], mut index: usize) -> ParseResult<(Action
             return Err(non_pair_fault(tool.as_deref(), &params, line));
         }
 
-        let (name, value, next) = parse_pair(lines, index)?;
+        let (name, value, next) = parse_tool_pair(lines, index, tool.as_deref())?;
         if seen.contains(&name) {
             return Err(ParseFault::DuplicateParam { name });
         }
@@ -51,7 +53,18 @@ pub fn parse_tag_action(lines: &[&str], mut index: usize) -> ParseResult<(Action
     }
 }
 
-fn parse_pair(lines: &[&str], index: usize) -> ParseResult<(String, String, usize)> {
+fn parse_tool_pair(
+    lines: &[&str],
+    index: usize,
+    tool: Option<&str>,
+) -> ParseResult<(String, String, usize)> {
+    if tool == Some("fs.batch_write") && batch_files::starts_files_pair(lines[index]) {
+        return batch_files::parse_batch_files_pair(lines, index);
+    }
+    parse_pair(lines, index)
+}
+
+pub(super) fn parse_pair(lines: &[&str], index: usize) -> ParseResult<(String, String, usize)> {
     let line = lines[index].trim_end();
     if let TagLineClass::InlineTag { name, value } = classify_tag_line(line) {
         return Ok((name, value, index + 1));
@@ -144,7 +157,7 @@ pub fn is_action_open(line: &str) -> bool {
     line.trim_end() == ACTION_OPEN
 }
 
-fn open_name_and_tail(line: &str) -> Option<(String, String)> {
+pub(super) fn open_name_and_tail(line: &str) -> Option<(String, String)> {
     let trimmed = line.trim_end();
     if !trimmed.starts_with('<') || trimmed.starts_with("</") {
         return None;

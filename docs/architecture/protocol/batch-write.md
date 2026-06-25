@@ -55,7 +55,10 @@ Track cause and effect for Chronos Fracture.
 ```
 
 Repeated `<file>` child tags are not valid in the paired-tag grammar because
-parameter names are unique inside one action.
+parameter names are unique inside one action. If the model repeats adjacent
+`<files>...</files>` wrappers for one `fs.batch_write`, the parser merges those
+chunks into the canonical delimiter payload before dispatch. No other repeated
+parameter name is normalized.
 
 ## JSON Inside Files Recovery
 

@@ -13,3 +13,6 @@ This directory holds the pure action parser, renderer, and registry table.
 - [registry.rs](registry.rs): tool parameter table.
 - [registry_spec.rs](registry_spec.rs): canonical tool list.
 - [render.rs](render.rs): action and context frame renderers.
+- [tag_line.rs](tag_line.rs): structural tag-line classifier.
+- [xml_parse.rs](xml_parse.rs): paired-tag action parser.
+- [xml_parse/](xml_parse): paired-tag parser helpers.
