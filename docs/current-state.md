@@ -128,7 +128,9 @@ Prompt hygiene, provider anomaly, and export-manifest focused gates:
   Protocol parsing now accepts opening parameter tags that start content on the
   same line, such as `<content># Premise`, until the matching close tag. Adjacent
   repeated `<files>...</files>` wrappers for `fs.batch_write` merge into one
-  delimiter payload. Startup graph-prefix rendering now keeps persisted
+  delimiter payload. `fs.mkdir` now refuses Markdown and TOML leaf paths so the
+  daemon cannot create `README.md` or `catalog.toml` directories. Startup
+  graph-prefix rendering now keeps persisted
   completion-guard lines inside the graph-state prefix budget instead of
   crashing during compaction restart.
 - `cargo test -p lkjagent-runtime --test current_model_run_fixture`: `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`.

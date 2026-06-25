@@ -100,6 +100,15 @@ fn fs_batch_write_rejects_duplicate_and_escape() -> TestResult<()> {
         &mut state,
     );
     assert!(is_error(&escaped));
+
+    let file_like = dispatch(
+        &action("fs.mkdir", &[("path", "docs/README.md")]),
+        &runtime,
+        &mut conn,
+        &mut state,
+    );
+    assert!(is_error(&file_like));
+    assert!(file_like.content.contains("looks like a file"));
     Ok(())
 }
 

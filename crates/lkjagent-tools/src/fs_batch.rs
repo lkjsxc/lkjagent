@@ -12,9 +12,20 @@ const MAX_FILE_BYTES: usize = crate::fs::MAX_INLINE_FILE_BYTES;
 const MAX_TOTAL_BYTES: usize = 6_000;
 
 pub fn mkdir(workspace: &Path, path: &str) -> ToolResult<String> {
+    reject_file_like_directory(path)?;
     let full = workspace_path(workspace, path)?;
     fs::create_dir_all(full)?;
     Ok(format!("directory created\npath={path}"))
+}
+
+fn reject_file_like_directory(path: &str) -> ToolResult<()> {
+    let lower = path.to_ascii_lowercase();
+    if lower.ends_with(".md") || lower.ends_with(".toml") {
+        return Err(ToolError::invalid(format!(
+            "directory path looks like a file: {path}; use fs.write or fs.batch_write"
+        )));
+    }
+    Ok(())
 }
 
 pub fn batch_write(workspace: &Path, files: &str, max_files: usize) -> ToolResult<String> {

@@ -22,7 +22,7 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | fs.tree | path opt .; depth opt 3; limit opt 200 | sorted bounded tree output | workspace escape; invalid depth or limit |
 | fs.search | query req; path opt .; include opt; case opt insensitive; context opt 1; limit opt 50 | bounded substring search | workspace escape; invalid limit |
 | fs.stat | path req | kind, bytes, lines, stable checksum | missing path; workspace escape |
-| fs.mkdir | path req | create a workspace directory | workspace escape; create failure |
+| fs.mkdir | path req | create a workspace directory; not `.md` or `.toml` leaf paths | workspace escape; file-like path; create failure |
 | fs.batch_write | files req | atomically validate and write several files from line protocol | duplicate path; empty path; workspace escape; scaffold phrase; size limit |
 | shell.run | command req; timeout opt 60, max 600 | escape hatch /bin/sh -lc in the workspace | graph policy refusal; non-zero exit; timeout |
 | queue.list | status opt all; limit opt 20 | list queue rows by id, status, source, and preview | unknown status |
