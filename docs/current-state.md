@@ -126,7 +126,9 @@ Prompt hygiene, provider anomaly, and export-manifest focused gates:
 - `cargo test -p lkjagent-runtime --test provider_anomaly`: `PROVIDER_ANOMALY_EXIT=0`.
   Provider anomalies now set endpoint retry state without parse-fault increments.
   Protocol parsing now accepts opening parameter tags that start content on the
-  same line, such as `<content># Premise`, until the matching close tag.
+  same line, such as `<content># Premise`, until the matching close tag. Startup
+  graph-prefix rendering now keeps persisted completion-guard lines inside the
+  graph-state prefix budget instead of crashing during compaction restart.
 - `cargo test -p lkjagent-runtime --test current_model_run_fixture`: `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test provider_exchange_log`: `PROVIDER_EXCHANGE_LOG_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test kernel_admission`: `KERNEL_ADMISSION_EXIT=0`.

@@ -26,6 +26,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [file_count_aggregate_daemon.rs](file_count_aggregate_daemon.rs): aggregate count auto-scaffold fixture.
 - [file_count_daemon.rs](file_count_daemon.rs): counted file daemon fixtures.
 - [graph_memory_links.rs](graph_memory_links.rs): graph case to task-summary memory links.
+- [graph_prefix_budget.rs](graph_prefix_budget.rs): startup graph guard prefix budget fixture.
 - [owner_guidance.rs](owner_guidance.rs): queued owner guidance guard persistence fixture.
 - [payload_risk.rs](payload_risk.rs): max-token write payload recovery fixture.
 - [pending_action_authority.rs](pending_action_authority.rs): pending action authority id propagation fixture.
