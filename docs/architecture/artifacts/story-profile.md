@@ -71,9 +71,11 @@ science fiction, unless the request is clearly for technical documentation.
 
 A story-bible audit requires premise, setting or world rules, timeline or
 continuity rules, cast, relationships or conflict, plot or act structure, style
-or tone, manuscript boundary, README links, and catalog metadata. It refuses a
-full manuscript when the owner asked for a bible only. Scaffold-only creative
-labels, README-only trees, and owner-term-only pages are not content evidence.
+or tone, manuscript boundary, README links, and catalog metadata. Catalog
+metadata may come from the story profile or from a handwritten catalog that
+states `kind = "story"` or describes a story bible. It refuses a full manuscript
+when the owner asked for a bible only. Scaffold-only creative labels,
+README-only trees, and owner-term-only pages are not content evidence.
 
 ## Status
 
