@@ -7,16 +7,22 @@ pub fn persisted_action_refusal(
     tool: &str,
 ) -> Option<String> {
     let mut changed_fields = Vec::new();
+    let equivalent_staleness = equivalent_after_runtime_compaction(
+        pending.staleness_fingerprint.as_deref(),
+        current.input.staleness_fingerprint.as_deref(),
+    );
     if changed(
         pending.prompt_frame_id.as_deref(),
         current.input.prompt_frame_id.as_deref(),
-    ) {
+    ) && !equivalent_staleness
+    {
         changed_fields.push("prompt_frame_id");
     }
     if changed(
         pending.staleness_fingerprint.as_deref(),
         current.input.staleness_fingerprint.as_deref(),
-    ) {
+    ) && !equivalent_staleness
+    {
         changed_fields.push("staleness_fingerprint");
     }
     if changed_fields.is_empty() {
@@ -128,6 +134,18 @@ fn changed(previous: Option<&str>, current: Option<&str>) -> bool {
     matches!((previous, current), (Some(old), Some(new)) if old != new)
 }
 
+fn equivalent_after_runtime_compaction(previous: Option<&str>, current: Option<&str>) -> bool {
+    matches!((previous, current), (Some(old), Some(new)) if old != new && staleness_core(old) == staleness_core(new))
+}
+
+fn staleness_core(value: &str) -> String {
+    value
+        .split(';')
+        .filter(|part| !part.starts_with("compaction=") && !part.starts_with("prompt="))
+        .collect::<Vec<_>>()
+        .join(";")
+}
+
 fn maintenance_state(authority: &TurnAuthority) -> (bool, bool) {
     let due = if authority.input.owner_work_exists() {
         false
@@ -150,3 +168,7 @@ fn join_or_none(values: &[&str]) -> String {
         values.join(",")
     }
 }
+
+#[cfg(test)]
+#[path = "pending_staleness_tests.rs"]
+mod pending_staleness_tests;
