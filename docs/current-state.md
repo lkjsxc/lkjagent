@@ -131,8 +131,9 @@ Prompt hygiene, provider anomaly, and export-manifest focused gates:
   repeated `<files>...</files>` wrappers for `fs.batch_write` merge into one
   delimiter payload. `fs.mkdir` now refuses Markdown and TOML leaf paths so the
   daemon cannot create `README.md` or `catalog.toml` directories. Story artifact
-  audit, `artifact.next`, and generic `artifact.apply` requests under `stories/`
-  now infer story kind instead of requiring the scaffold profile token. Story
+  audit, `artifact.next`, `doc.scaffold`, and generic `artifact.apply` requests
+  under `stories/` now infer story kind instead of requiring the scaffold
+  profile token. Story
   content audit accepts concise headed reference pages while still refusing
   scaffold markers and bracket placeholders. Approximate doc audit counts allow
   extra Markdown files instead of blocking readiness on self-imposed smaller

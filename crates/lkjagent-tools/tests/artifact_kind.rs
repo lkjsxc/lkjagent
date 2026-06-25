@@ -61,6 +61,33 @@ fn artifact_next_infers_story_from_handwritten_catalog() -> TestResult<()> {
 }
 
 #[test]
+fn doc_scaffold_treats_stories_root_as_story_profile() -> TestResult<()> {
+    let workspace = temp_workspace("doc-scaffold-stories-root")?;
+    let runtime = runtime(workspace.clone())?;
+    let mut conn = store()?;
+
+    let output = dispatch(
+        &action(
+            "doc.scaffold",
+            &[
+                ("root", "stories/chronos-fracture"),
+                ("kind", "documentation"),
+                ("title", "Chronos Fracture Story Bible"),
+            ],
+        ),
+        &runtime,
+        &mut conn,
+        &mut state(),
+    );
+
+    assert!(output.content.contains("profile=NarrativeManuscript"));
+    assert!(workspace
+        .join("stories/chronos-fracture/characters")
+        .is_dir());
+    Ok(())
+}
+
+#[test]
 fn stories_root_treats_generic_artifact_kind_as_story() -> TestResult<()> {
     let workspace = temp_workspace("artifact-kind-stories-root")?;
     let runtime = runtime(workspace.clone())?;
