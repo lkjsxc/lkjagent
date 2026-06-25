@@ -130,8 +130,9 @@ Prompt hygiene, provider anomaly, and export-manifest focused gates:
   repeated `<files>...</files>` wrappers for `fs.batch_write` merge into one
   delimiter payload. `fs.mkdir` now refuses Markdown and TOML leaf paths so the
   daemon cannot create `README.md` or `catalog.toml` directories. Story artifact
-  audit now accepts handwritten catalog metadata that identifies a story bible
-  instead of requiring the scaffold profile token. Startup graph-prefix
+  audit and `artifact.next` now accept handwritten catalog metadata that
+  identifies a story bible instead of requiring the scaffold profile token.
+  Startup graph-prefix
   rendering now keeps persisted
   completion-guard lines inside the graph-state prefix budget instead of
   crashing during compaction restart.
