@@ -133,6 +133,7 @@ Prompt hygiene, provider anomaly, and export-manifest focused gates:
   daemon cannot create `README.md` or `catalog.toml` directories. Story artifact
   audit and `artifact.next` now accept handwritten catalog metadata that
   identifies a story bible instead of requiring the scaffold profile token.
+  File-count guard detection now ignores line-limit numbers such as `160 lines`.
   Startup graph-prefix
   rendering now keeps persisted
   completion-guard lines inside the graph-state prefix budget instead of
