@@ -12,6 +12,7 @@ use crate::recovery::{parse_notice, parse_recovery_notice, should_escalate, stop
 use crate::step::budget::{budget_exhausted_step, spend_active_budget};
 use crate::step::fault_wait::{enter_recovery_route, record_recoverable_fault, RecoveryFault};
 use crate::step::frames::{append_notice, result};
+use crate::step::owner_guidance::apply_owner_guidance;
 use crate::step::{Effect, StepResult};
 use crate::task::{
     open_task_with_budget, PendingAction, PendingActionAuthority, RuntimeState, StopReason,
@@ -40,6 +41,7 @@ pub(super) fn owner_step(
         state.context = append_frame(&state.context, graph_notice_frame(&graph));
         state.graph = Some(graph);
     }
+    apply_owner_guidance(&mut state, &content);
     state.parse_faults = 0;
     state.repeat_faults = 0;
     state.tool_faults = 0;

@@ -6,6 +6,7 @@ use std::path::Path;
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
+use lkjagent_runtime::step::{step, StepInput};
 use lkjagent_store::{events, queue, state};
 use support::http::{completion, serve_responses};
 use support::{runtime_state, store, temp_workspace, TestResult};
@@ -37,6 +38,42 @@ const EVIDENCE_ACTION: &str = "<action>
 <summary>fs.read observed notes.md content</summary>
 <path>notes.md</path>
 </action>";
+
+#[test]
+fn owner_root_guidance_updates_open_graph_document_root() -> TestResult<()> {
+    let state = step(
+        runtime_state()?,
+        StepInput::Owner {
+            content: "Create a structured science-fiction story bible.".to_string(),
+            tokens: 8,
+            graph: Some(Box::new(lkjagent_graph::initial_state(
+                "Create a structured science-fiction story bible.",
+                Some(1),
+            ))),
+            turn_budget: 8,
+        },
+    )
+    .state;
+
+    let state = step(
+        state,
+        StepInput::Owner {
+            content: "Root directory: stories/chronos-fracture".to_string(),
+            tokens: 4,
+            graph: None,
+            turn_budget: 8,
+        },
+    )
+    .state;
+
+    let root = state
+        .graph
+        .as_ref()
+        .and_then(|graph| graph.document.as_ref())
+        .map(|document| document.root.as_str());
+    assert_eq!(root, Some("stories/chronos-fracture"));
+    Ok(())
+}
 
 #[test]
 fn owner_guidance_during_open_task_persists_count_guard() -> TestResult<()> {
