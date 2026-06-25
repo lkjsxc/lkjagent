@@ -114,6 +114,8 @@ fn non_file_unit_spans(lower: &str, content: &str) -> Vec<Span> {
         "paragraphs",
         "chapter",
         "chapters",
+        "child",
+        "children",
         "scene",
         "scenes",
     ] {

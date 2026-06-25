@@ -36,8 +36,9 @@ file wording activate general file-count guards; markdown and .md wording
 activate markdown-count guards. ASCII digits, full-width digits, and
 comma-like digit separators are accepted. When several numbers appear, the
 target is the number closest to the file or document wording, while numbers
-attached to non-file units such as words, pages, chapters, or lines are ignored,
-so line-limit and section-count instructions do not create file-count tasks.
+attached to non-file units such as words, pages, chapters, children, or lines
+are ignored, so line-limit, child-count, and section-count instructions do not
+create file-count tasks.
 Exact or approximate wording is scored near the chosen target, so
 direct exact wording requires one candidate tree to contain exactly that many
 files, while exact wording for a smaller subcount does not make an
