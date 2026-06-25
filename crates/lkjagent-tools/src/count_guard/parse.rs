@@ -33,6 +33,13 @@ fn target_number(lower: &str, content: &str, signals: &[Span]) -> Option<NumberS
                 .iter()
                 .map(|signal| span_distance(number.span, *signal))
                 .min();
+            let unit_score = non_file_units
+                .iter()
+                .map(|unit| span_distance(number.span, *unit))
+                .min();
+            if unit_score.is_some_and(|unit| file_score.is_none_or(|file| unit < file)) {
+                return None;
+            }
             let aggregate_score =
                 aggregate_signal_score(number.span, &aggregate_signals, &non_file_units);
             let score = match (file_score, aggregate_score) {
@@ -100,6 +107,7 @@ fn non_file_unit_spans(lower: &str, content: &str) -> Vec<Span> {
         "characters",
         "page",
         "pages",
+        "lines",
         "section",
         "sections",
         "paragraph",
@@ -111,7 +119,17 @@ fn non_file_unit_spans(lower: &str, content: &str) -> Vec<Span> {
     ] {
         spans.extend(span_matches(lower, needle));
     }
-    for needle in ["文字", "単語", "ページ", "頁", "節", "章", "場面", "シーン"] {
+    for needle in [
+        "文字",
+        "単語",
+        "ページ",
+        "頁",
+        "行",
+        "節",
+        "章",
+        "場面",
+        "シーン",
+    ] {
         spans.extend(span_matches(content, needle));
     }
     spans

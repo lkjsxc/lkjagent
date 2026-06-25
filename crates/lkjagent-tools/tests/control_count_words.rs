@@ -142,6 +142,15 @@ fn non_file_total_unit_does_not_beat_explicit_file_count() {
 }
 
 #[test]
+fn markdown_line_limit_does_not_create_file_count_guard() {
+    let mut state = ControlState::default();
+
+    state.start_task("Every Markdown file must stay under 160 lines.");
+
+    assert_eq!(state.guard, CompletionGuard::None);
+}
+
+#[test]
 fn english_or_so_file_count_request_adds_approximate_file_guard() {
     let mut state = ControlState::default();
 
