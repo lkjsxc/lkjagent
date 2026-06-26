@@ -1,6 +1,6 @@
 mod support;
 
-use std::path::Path;
+use std::{fs, path::Path};
 
 use lkjagent_protocol::render_action;
 use lkjagent_runtime::daemon::{
@@ -26,6 +26,10 @@ fn daemon_records_prompt_frame_and_effect_observation() -> TestResult<()> {
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     server.join()?;
+
+    let authority_log = find_authority_json(&workspace)?;
+    assert!(authority_log.contains("kernel_mission"));
+    assert!(authority_log.contains("kernel_staleness_fingerprint"));
 
     let prompt_frame_id = state::get(&conn, "authority prompt frame id")?
         .ok_or("missing authority prompt frame id")?
@@ -127,6 +131,18 @@ fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
         client_config(base_url, "local-model", None, 180, 2_048),
         workspace.to_path_buf(),
         "100",
-    );
+    )
+    .with_model_log_path(workspace.join("logs/current-model-run.md"));
     Ok(ResidentDaemon::new(runtime_state()?, runtime))
+}
+
+fn find_authority_json(workspace: &Path) -> TestResult<String> {
+    let model_dir = workspace.join("logs/model");
+    for epoch in fs::read_dir(model_dir)? {
+        let path = epoch?.path().join("case-1/turn-000000/authority.json");
+        if path.is_file() {
+            return Ok(fs::read_to_string(path)?);
+        }
+    }
+    Err("missing authority.json".into())
 }

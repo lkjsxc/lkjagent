@@ -103,7 +103,7 @@ impl ResidentDaemon {
             provider: "openai-compatible".to_string(),
             model: self.runtime.client.model.clone(),
             created_at: now.to_string(),
-            authority_json: self.authority_json(),
+            authority_json: self.authority_json(conn)?,
         })
     }
 
@@ -115,17 +115,23 @@ impl ResidentDaemon {
             .map_or_else(|| "none".to_string(), |id| id.to_string())
     }
 
-    fn authority_json(&self) -> String {
+    fn authority_json(&self, conn: &Connection) -> RuntimeResult<String> {
         let Some(authority) = &self.turn_authority else {
-            return "{}\n".to_string();
+            return Ok("{}\n".to_string());
         };
-        format!(
-            "{{\"active_mode\":\"{:?}\",\"mission\":\"{}\",\"admitted_tools\":\"{}\",\"blocked_tools\":\"{}\"}}\n",
+        let kernel_mission =
+            lkjagent_store::state::get(conn, "kernel mission")?.unwrap_or_default();
+        let kernel_stale =
+            lkjagent_store::state::get(conn, "kernel staleness fingerprint")?.unwrap_or_default();
+        Ok(format!(
+            "{{\"active_mode\":\"{:?}\",\"mission\":\"{}\",\"kernel_mission\":\"{}\",\"kernel_staleness_fingerprint\":\"{}\",\"admitted_tools\":\"{}\",\"blocked_tools\":\"{}\"}}\n",
             authority.mode,
             json_escape(authority.mission.as_str()),
+            json_escape(&kernel_mission),
+            json_escape(&kernel_stale),
             json_escape(&authority.effective_policy.allowed_tools.join(",")),
             json_escape(&authority.effective_policy.blocked_tools.join(",")),
-        )
+        ))
     }
 }
 
