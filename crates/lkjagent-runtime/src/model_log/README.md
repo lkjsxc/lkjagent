@@ -8,6 +8,7 @@ Markdown file.
 ## Table of Contents
 
 - [exchange.rs](exchange.rs): provider request, response, and error file writers.
+- [exchange_support.rs](exchange_support.rs): provider exchange hashing and write helpers.
 - [export.rs](export.rs): provider export manifest writer.
 - [export_json.rs](export_json.rs): export file-list and missing-file JSON helpers.
 - [index.rs](index.rs): provider exchange index writer.

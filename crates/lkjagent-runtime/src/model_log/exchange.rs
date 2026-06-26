@@ -1,4 +1,6 @@
-use std::fs;
+#[path = "exchange_support.rs"]
+mod exchange_support;
+
 use std::path::{Path, PathBuf};
 
 use lkjagent_store::provider_exchange::{
@@ -7,7 +9,10 @@ use lkjagent_store::provider_exchange::{
 };
 use rusqlite::Connection;
 
-use crate::error::{RuntimeError, RuntimeResult};
+use crate::error::RuntimeResult;
+use exchange_support::{atomic_write, sanitize_path_segment, stable_hash};
+
+pub use exchange_support::json_escape;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProviderLogContext {
@@ -67,6 +72,12 @@ pub fn record_provider_response(
     latency_ms: i64,
 ) -> RuntimeResult<()> {
     let response_hash = stable_hash(response_json);
+    let provider_anomaly = response_json.contains("\"provider_anomaly\":{");
+    let status = if provider_anomaly {
+        "provider_anomaly"
+    } else {
+        "succeeded"
+    };
     atomic_write(&handle.dir.join("response.json"), response_json)?;
     atomic_write(
         &handle.dir.join("timing.json"),
@@ -82,9 +93,10 @@ pub fn record_provider_response(
             usage_json,
             stats_json: None,
             latency_ms,
+            status,
         },
     )?;
-    if response_has_provider_anomaly(response_json) {
+    if provider_anomaly {
         super::export::record_provider_anomaly_export(
             &handle.dir,
             &handle.id,
@@ -125,10 +137,6 @@ pub fn record_provider_error(
     Ok(())
 }
 
-fn response_has_provider_anomaly(response_json: &str) -> bool {
-    response_json.contains("\"provider_anomaly\":{")
-}
-
 fn exchange_dir(root: &Path, context: &ProviderLogContext) -> PathBuf {
     root.join("model")
         .join(day_segment(&context.created_at))
@@ -145,54 +153,4 @@ fn exchange_id(context: &ProviderLogContext, request_hash: &str) -> String {
         "case-{}-turn-{}-{}",
         context.case_id, context.turn_id, request_hash
     )
-}
-
-fn atomic_write(path: &Path, content: &str) -> RuntimeResult<()> {
-    let parent = path
-        .parent()
-        .ok_or_else(|| RuntimeError::Store("provider log path has no parent".to_string()))?;
-    fs::create_dir_all(parent).map_err(io_error)?;
-    let tmp = path.with_extension(format!(
-        "{}.tmp",
-        path.extension()
-            .and_then(|ext| ext.to_str())
-            .unwrap_or("log")
-    ));
-    fs::write(&tmp, content).map_err(io_error)?;
-    fs::rename(&tmp, path).map_err(io_error)?;
-    Ok(())
-}
-
-fn stable_hash(value: &str) -> String {
-    let mut hash = 0xcbf29ce484222325u64;
-    for byte in value.as_bytes() {
-        hash ^= u64::from(*byte);
-        hash = hash.wrapping_mul(0x100000001b3);
-    }
-    format!("{hash:016x}")
-}
-
-fn sanitize_path_segment(value: &str) -> String {
-    value
-        .chars()
-        .map(|ch| if ch.is_ascii_alphanumeric() { ch } else { '-' })
-        .collect()
-}
-
-pub fn json_escape(value: &str) -> String {
-    value
-        .chars()
-        .flat_map(|ch| match ch {
-            '\\' => "\\\\".chars().collect::<Vec<_>>(),
-            '"' => "\\\"".chars().collect::<Vec<_>>(),
-            '\n' => "\\n".chars().collect::<Vec<_>>(),
-            '\r' => "\\r".chars().collect::<Vec<_>>(),
-            '\t' => "\\t".chars().collect::<Vec<_>>(),
-            other => vec![other],
-        })
-        .collect()
-}
-
-fn io_error(error: std::io::Error) -> RuntimeError {
-    RuntimeError::Store(error.to_string())
 }

@@ -138,6 +138,7 @@ fn model_log_lists_and_shows_provider_exchanges() -> TestResult<()> {
             usage_json: Some("{\"total_tokens\":4}"),
             stats_json: None,
             latency_ms: 5,
+            status: "succeeded",
         },
     )?;
 

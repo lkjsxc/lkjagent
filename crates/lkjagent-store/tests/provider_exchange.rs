@@ -36,6 +36,7 @@ fn provider_exchange_records_successful_model_turn() -> TestResult<()> {
             usage_json: Some("{\"total_tokens\":4}"),
             stats_json: None,
             latency_ms: 17,
+            status: "succeeded",
         },
     )?;
 

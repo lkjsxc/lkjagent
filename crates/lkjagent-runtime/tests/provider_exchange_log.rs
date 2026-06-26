@@ -119,6 +119,9 @@ fn provider_anomaly_export_uses_warning_status() -> TestResult<()> {
     let export = fs::read_to_string(handle.dir.join("export.json"))?;
     assert!(export.contains("\"status\":\"provider_anomaly\""));
     assert!(!export.contains("parsed-action.json"));
+    let row = lkjagent_store::provider_exchange::latest_for_case_turn(&conn, "9", 10)?
+        .ok_or("missing provider exchange row")?;
+    assert_eq!(row.status, "provider_anomaly");
     Ok(())
 }
 

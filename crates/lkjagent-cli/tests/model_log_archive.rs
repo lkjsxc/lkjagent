@@ -93,6 +93,7 @@ fn seed_exchange(data: &std::path::Path, case_id: &str, turn_id: i64, id: &str) 
             usage_json: Some("{\"total_tokens\":4}"),
             stats_json: None,
             latency_ms: 5,
+            status: "succeeded",
         },
     )?;
     Ok(())

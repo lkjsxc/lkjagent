@@ -27,6 +27,7 @@ pub struct ProviderExchangeCompletion<'a> {
     pub usage_json: Option<&'a str>,
     pub stats_json: Option<&'a str>,
     pub latency_ms: i64,
+    pub status: &'a str,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -94,7 +95,7 @@ pub fn complete_exchange(
     conn.execute(
         "UPDATE provider_exchange SET response_json = ?2, response_hash = ?3,
          finish_reason = ?4, usage_json = ?5, stats_json = ?6, latency_ms = ?7,
-         status = 'succeeded', error_class = NULL WHERE id = ?1",
+         status = ?8, error_class = NULL WHERE id = ?1",
         params![
             input.id,
             input.response_json,
@@ -103,6 +104,7 @@ pub fn complete_exchange(
             input.usage_json,
             input.stats_json,
             input.latency_ms,
+            input.status,
         ],
     )?;
     Ok(())
