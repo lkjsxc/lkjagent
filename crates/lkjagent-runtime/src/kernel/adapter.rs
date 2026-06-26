@@ -13,6 +13,7 @@ pub struct SnapshotAdapterInput {
     pub case_id: Option<String>,
     pub graph_node: Option<String>,
     pub graph_phase: Option<String>,
+    pub active_mode_hint: Option<String>,
     pub task_family: Option<String>,
     pub owner_objective: Option<String>,
     pub queue_head: Option<String>,

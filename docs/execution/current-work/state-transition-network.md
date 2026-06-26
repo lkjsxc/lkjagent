@@ -153,8 +153,8 @@ graphs now shadow as kernel completion events. Authority rows record kernel
 shadow mission fields from the persisted authority snapshot and event id, and
 stale cached actions refuse when their prompt-frame head changes. The
 snapshot adapter
-computes staleness fingerprints from queue head and count, case, graph,
-artifact cursor, fault, evidence, compaction, maintenance, and prompt facts;
+computes staleness fingerprints from queue head and count, case, active mode,
+graph, artifact cursor, fault, evidence, compaction, maintenance, and prompt facts;
 rejects synthetic
 active case ids; and ignores maintenance due state when owner work exists.
 Kernel prompt rendering requires persisted event and decision ids, cites

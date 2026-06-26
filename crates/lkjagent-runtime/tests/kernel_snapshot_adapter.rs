@@ -31,6 +31,16 @@ fn owner_queue_changes_staleness_fingerprint() -> Result<(), String> {
 }
 
 #[test]
+fn active_mode_hint_changes_staleness_fingerprint() -> Result<(), String> {
+    let first = build_snapshot(owner_input()).map_err(format_error)?;
+    let mut changed = owner_input();
+    changed.active_mode_hint = Some("Recovery".to_string());
+    let second = build_snapshot(changed).map_err(format_error)?;
+    assert_ne!(first.staleness_fingerprint, second.staleness_fingerprint);
+    Ok(())
+}
+
+#[test]
 fn artifact_cursor_changes_staleness_fingerprint() -> Result<(), String> {
     let first = build_snapshot(owner_input()).map_err(format_error)?;
     let mut changed = owner_input();

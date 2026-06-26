@@ -97,7 +97,6 @@ fn action_step(
         prompt_frame_id: authority.prompt_frame_id,
         staleness_fingerprint: authority.staleness_fingerprint,
     });
-    state.parse_faults = 0;
     let mut effects = Vec::new();
     if let Some(notice) = normalization {
         state = append_notice(state, NoticeKind::Error, &notice);

@@ -102,7 +102,10 @@ fn parse_faults_keep_task_open_and_recover_before_wait_threshold() -> TestResult
         },
     );
     assert_eq!(recovered.stop_reason, Some(StopReason::Acted));
-    assert_eq!(recovered.state.parse_faults, 0);
+    assert!(recovered.state.parse_faults > 0);
+    let output = ok_output("recovered");
+    let observed = step(recovered.state, StepInput::ToolOutput(output));
+    assert_eq!(observed.state.parse_faults, 0);
     Ok(())
 }
 

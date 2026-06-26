@@ -130,6 +130,7 @@ fn kernel_fingerprints(
     let snapshot = build_snapshot(SnapshotAdapterInput {
         case_id: case_id(graph.case_id),
         queue_head: queue_head.clone(),
+        active_mode_hint: Some(format!("{:?}", authority.mode)),
         graph_node: authority.input.graph_node.clone(),
         graph_phase: authority.input.graph_phase.clone(),
         pending_owner_count: authority.input.pending_owner_rows,
