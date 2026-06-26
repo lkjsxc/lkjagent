@@ -1,7 +1,11 @@
+#[path = "export_json.rs"]
+mod export_json;
+
 use std::fs;
 use std::path::Path;
 
 use crate::error::{RuntimeError, RuntimeResult};
+use export_json::{existing_files, json_escape, refresh_content};
 
 pub(super) fn record_success_export(
     dir: &Path,
@@ -69,94 +73,10 @@ pub(super) fn refresh_export_files(dir: &Path) -> RuntimeResult<()> {
         return Ok(());
     }
     let content = fs::read_to_string(&path).map_err(io_error)?;
-    let previous_files = listed_files(&content);
-    let stripped = remove_array_field(&content, "missing_files");
-    let Some((open, close)) = array_bounds(&stripped, "files") else {
+    let Some(next) = refresh_content(dir, &content, ALL_FILES) else {
         return Ok(());
     };
-    let next = format!(
-        "{}[{}]{}",
-        &stripped[..open],
-        existing_files(dir, ALL_FILES),
-        &stripped[close + 1..]
-    );
-    atomic_write(
-        &path,
-        &insert_missing_files(&next, &missing_files(dir, &previous_files)),
-    )
-}
-
-fn existing_files(dir: &Path, candidates: &[&str]) -> String {
-    candidates
-        .iter()
-        .filter(|file| dir.join(file).is_file())
-        .map(|file| format!("\"{}\"", json_escape(file)))
-        .collect::<Vec<_>>()
-        .join(",")
-}
-
-fn missing_files(dir: &Path, previous_files: &[String]) -> String {
-    previous_files
-        .iter()
-        .filter(|file| !dir.join(file).is_file())
-        .map(|file| {
-            format!(
-                "{{\"path\":\"{}\",\"reason\":\"listed_file_absent\"}}",
-                json_escape(file)
-            )
-        })
-        .collect::<Vec<_>>()
-        .join(",")
-}
-
-fn listed_files(content: &str) -> Vec<String> {
-    let Some((open, close)) = array_bounds(content, "files") else {
-        return Vec::new();
-    };
-    content[open + 1..close]
-        .split('"')
-        .enumerate()
-        .filter(|(index, _)| index % 2 == 1)
-        .map(|(_, value)| value.to_string())
-        .collect()
-}
-
-fn array_bounds(content: &str, field: &str) -> Option<(usize, usize)> {
-    let marker = format!("\"{field}\":");
-    let start = content.find(&marker)?;
-    let open = content[start..].find('[')? + start;
-    let close = content[open..].find(']')? + open;
-    Some((open, close))
-}
-
-fn remove_array_field(content: &str, field: &str) -> String {
-    let marker = format!(",\"{field}\":");
-    let Some(start) = content.find(&marker) else {
-        return content.to_string();
-    };
-    let Some((_, close)) = array_bounds(&content[start + 1..], field) else {
-        return content.to_string();
-    };
-    format!("{}{}", &content[..start], &content[start + close + 2..])
-}
-
-fn insert_missing_files(content: &str, missing_files: &str) -> String {
-    let newline = content.ends_with('\n');
-    let trimmed = content.trim_end_matches('\n');
-    let Some(end) = trimmed.rfind('}') else {
-        return content.to_string();
-    };
-    let inserted = format!(
-        "{},\"missing_files\":[{}]{}",
-        &trimmed[..end],
-        missing_files,
-        &trimmed[end..]
-    );
-    if newline {
-        format!("{inserted}\n")
-    } else {
-        inserted
-    }
+    atomic_write(&path, &next)
 }
 
 fn atomic_write(path: &Path, content: &str) -> RuntimeResult<()> {
@@ -168,20 +88,6 @@ fn atomic_write(path: &Path, content: &str) -> RuntimeResult<()> {
     fs::write(&tmp, content).map_err(io_error)?;
     fs::rename(&tmp, path).map_err(io_error)?;
     Ok(())
-}
-
-fn json_escape(value: &str) -> String {
-    value
-        .chars()
-        .flat_map(|ch| match ch {
-            '\\' => "\\\\".chars().collect::<Vec<_>>(),
-            '"' => "\\\"".chars().collect::<Vec<_>>(),
-            '\n' => "\\n".chars().collect::<Vec<_>>(),
-            '\r' => "\\r".chars().collect::<Vec<_>>(),
-            '\t' => "\\t".chars().collect::<Vec<_>>(),
-            other => vec![other],
-        })
-        .collect()
 }
 
 fn io_error(error: std::io::Error) -> RuntimeError {
