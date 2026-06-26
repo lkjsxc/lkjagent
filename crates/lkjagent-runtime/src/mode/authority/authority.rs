@@ -1,3 +1,6 @@
+#[path = "examples.rs"]
+mod examples;
+
 use super::completion::{completion_policy_for, CompletionPolicy};
 use super::decision::{endpoint_decision_for, EndpointDecision};
 use super::input::TurnAuthorityInput;
@@ -5,7 +8,7 @@ use super::mission::{select_runtime_mission, RuntimeMission};
 use super::model::{ActiveMode, ActiveModePolicy, RuntimeSnapshot};
 use super::policy::policy_for_mode;
 use super::render::render_mode_policy;
-use lkjagent_tools::dispatch::registry_valid_example;
+use examples::valid_example_for_mode;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TurnAuthority {
@@ -36,7 +39,7 @@ pub fn decide_turn_authority_for_snapshot(
     let effective_policy = policy_for_mode(mode);
     let completion_policy = completion_policy_for(mode);
     let endpoint_decision = endpoint_decision_for(mode, &input);
-    let valid_example = valid_example_for(mode, endpoint_decision);
+    let valid_example = valid_example_for_mode(mode, endpoint_decision, &snapshot);
     let prompt_card = prompt_card(
         mission,
         &effective_policy,
@@ -162,23 +165,4 @@ fn join_strings_or_none(values: &[String]) -> String {
     } else {
         values.join(",")
     }
-}
-
-fn valid_example_for(mode: ActiveMode, endpoint_decision: EndpointDecision) -> String {
-    if endpoint_decision != EndpointDecision::CallModel {
-        return "runtime action; no model action block".to_string();
-    }
-    match mode {
-        ActiveMode::OwnerTask => rendered_registry_example("graph.state"),
-        ActiveMode::Recovery => rendered_registry_example("graph.recover"),
-        ActiveMode::Maintenance => rendered_registry_example("memory.find"),
-        ActiveMode::Compaction | ActiveMode::ClosedIdle => {
-            "runtime action; no model action block".to_string()
-        }
-    }
-}
-
-fn rendered_registry_example(tool: &str) -> String {
-    registry_valid_example(tool)
-        .unwrap_or_else(|| format!("<action>\n<tool>{tool}</tool>\n</action>"))
 }
