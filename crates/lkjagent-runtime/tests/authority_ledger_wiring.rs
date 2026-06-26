@@ -30,7 +30,10 @@ fn daemon_records_prompt_frame_and_effect_observation() -> TestResult<()> {
     let authority_log = find_authority_json(&workspace)?;
     assert!(authority_log.contains("kernel_mission"));
     assert!(authority_log.contains("kernel_staleness_fingerprint"));
+    assert!(authority_log.contains("authority_fingerprint"));
 
+    assert!(!json_field(&authority_log, "decision_id")?.is_empty());
+    assert!(!json_field(&authority_log, "prompt_frame_id")?.is_empty());
     let prompt_frame_id = state::get(&conn, "authority prompt frame id")?
         .ok_or("missing authority prompt frame id")?
         .parse::<i64>()?;
@@ -134,6 +137,19 @@ fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
     )
     .with_model_log_path(workspace.join("logs/current-model-run.md"));
     Ok(ResidentDaemon::new(runtime_state()?, runtime))
+}
+
+fn json_field(content: &str, key: &str) -> TestResult<String> {
+    let marker = format!("\"{key}\":\"");
+    let start = content
+        .find(&marker)
+        .ok_or_else(|| format!("missing JSON field {key}"))?
+        + marker.len();
+    let rest = &content[start..];
+    let end = rest
+        .find('"')
+        .ok_or_else(|| format!("unterminated JSON field {key}"))?;
+    Ok(rest[..end].to_string())
 }
 
 fn find_authority_json(workspace: &Path) -> TestResult<String> {

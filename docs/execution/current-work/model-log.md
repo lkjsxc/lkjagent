@@ -56,12 +56,13 @@ Raw provider request and response evidence is recorded under the contract in
 ## Status
 
 partially implemented. The current Markdown handoff, provider exchange store
-rows, request files, authority files, response files, timing files, error files,
-per-turn export manifests, parsed-action, admission, observation, index files,
-prompt-frame ids on exchange rows, CLI list and show, raw-case inspection, and
-sanitized replay export commands with raw turn-file copying exist for daemon
-provider calls with a log root. The active current run proves two open gaps:
-empty content with nonzero completion tokens is still recorded as
-`MissingActionEnvelope`, and the latest export manifest names absent
-`admission.json` and `observation.txt` files while reporting success. Live
-replay proof is tracked by the verification plan.
+rows, request files, response files, timing files, error files, per-turn export
+manifests, parsed-action, admission, observation, index files, prompt-frame ids
+on exchange rows, CLI list and show, raw-case inspection, and sanitized replay
+export commands with raw turn-file copying exist for daemon provider calls with
+a log root. Provider anomalies are logged before parsing for new responses, and
+export manifests list only files present on disk. New authority files include
+persisted decision id, prompt frame id, authority fingerprint, kernel mission,
+and staleness fingerprint. Explicit `missing_files` records for expected but
+absent logical artifacts remain open. Live replay proof is tracked by the
+verification plan.

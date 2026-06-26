@@ -10,6 +10,8 @@ queue delivery, idle maintenance opening, and maintenance wait guard.
 - [runner.rs](runner.rs): resident poll loop and effect interpretation.
 - [startup.rs](startup.rs): seed copying and prefix input loading.
 - [endpoint.rs](endpoint.rs): endpoint completion and oversize handling.
+- [endpoint_log_json.rs](endpoint_log_json.rs): provider exchange JSON rendering helpers.
+- [endpoint_logging.rs](endpoint_logging.rs): provider exchange file and store writers.
 - [owner_delivery.rs](owner_delivery.rs): queue delivery and owner step opening.
 - [idle.rs](idle.rs): automatic idle maintenance cycle opening.
 - [maintenance_wait.rs](maintenance_wait.rs): maintenance ask auto-close guard.

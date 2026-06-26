@@ -21,10 +21,10 @@ maintenance boundary, and close path. Model text is intent or content. Runtime
 data must be authority.
 
 The active `data/logs/current-model-run.md` shows a Chronos Fracture story-bible
-run stuck in recovery. It does not prove file mutation. It proves repeated
-missing action envelopes, empty provider content with nonzero completion tokens,
-no touched paths, no useful evidence, and a replay manifest that lists missing
-turn artifacts.
+run stuck in recovery. It does not prove file mutation. It proves no touched
+paths, no useful evidence, earlier repeated parse faults, a provider anomaly
+that is now logged before parsing, and a latest request that no longer teaches
+`<think>` output.
 
 ## Implemented Behavior
 
@@ -60,37 +60,37 @@ turn artifacts.
 | Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, kernel authority fields in `authority.json`, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, and focused tests exist. Manifest refresh proof lists only existing files; explicit missing-file records remain open. |
 | Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Live endpoint smoke remains open. |
 
-## Active Failure Evidence
+## Active Data Log Evidence
 
-`data/logs/current-model-run.md` and the latest turn directory prove the next
-reliability gap:
+`data/logs/current-model-run.md`, `data/logs/index.ndjson`, and the latest turn
+directories prove these facts:
 
 - snapshot: `daemon_state=working`, `active_case=1`,
   `active_node=recover-by-smaller-scope`, and `active_phase=recovery`;
-- context: `19.36K/24.58K`, about 79 percent used;
+- context: `7.59K/24.58K`, about 31 percent used;
 - owner task: create a structured story bible at `stories/chronos-fracture`;
 - touched paths: `none`;
 - evidence ledger: `none`;
-- fault ledger: repeated `parse fault: missing action envelope` after earlier
-  `bad envelope prose before action envelope` faults;
-- latest request: the system prompt still allowed `<think>` tags and preserved
-  prior assistant turns shaped as `<think>...</think><action>...</action>`;
-- latest response: `content` is empty, `finish_reason=stop`,
-  `closure_mode=Unclosed`, and `completion_tokens=485`;
-- latest parse: `status=fault`, `content_bytes=0`, and
-  `error=MissingActionEnvelope`;
-- latest export manifest lists `admission.json` and `observation.txt`, but both
-  files are absent in the latest turn directory.
+- transcript: earlier `MissingActionEnvelope` faults, batch-write schema
+  errors, and repeated `graph.recover` refusal are present;
+- provider anomaly: turn `000078` records `reasoning_only_response` in
+  `response.json`; no parse, admission, or observation file is listed there;
+- latest completed tool turn: turn `000079` is a valid `graph.state` action with
+  parse, admission, observation, and a self-consistent export manifest;
+- latest indexed directory: turn `000080` contains only `request.json` and
+  `authority.json`, so it is request evidence, not a completed exchange;
+- latest requests contain no `<think>` permission and no invalid assistant
+  replay shaped as thinking before an action.
 
-The checked-in active log does not prove JSON-in-`files` refusal, oversized
-README refusal, or successful creation under the Chronos root. Those remain
-historical failure classes only when backed by separate fixtures or logs.
+The checked-in active log does not prove successful creation under the Chronos
+root. The old empty-content-with-usage turn at
+`data/logs/model/epoch-1782344195/case-1/turn-000019` remains a historical
+fixture for provider anomaly replay; it is not the latest exchange.
 
 ## Active Target
 
 The dependency queue is [execution/current-blockers.md](execution/current-blockers.md).
-The first open target is current-state reconciliation plus transition-kernel
-handover. The first implementation target after that is the persisted kernel:
+The active implementation target remains the persisted kernel:
 
 ```text
 DurableReadModel -> RuntimeSnapshot
@@ -103,79 +103,28 @@ EffectObservation -> RuntimeEvent
 ```
 
 The decision must be persisted before prompt rendering, endpoint calls,
-dispatch, recovery, compaction, maintenance, or close attempts. The protocol and
-LLM layers must prevent live prompts from teaching `<think>` output, must
-sanitize invalid assistant history before replay, and must classify empty
-content with nonzero completion tokens as a provider anomaly instead of an
-ordinary parse fault loop.
+dispatch, recovery, compaction, maintenance, or close attempts. The next narrow
+proof is that model-log authority artifacts expose the same persisted decision,
+prompt-frame, authority, and staleness identifiers that dispatch admission uses.
 
 ## Latest Local Evidence
 
-Documentation reconciliation gates for this handoff slice:
-
-- `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`, `ok check-docs`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
-
-Prompt hygiene, provider anomaly, and export-manifest focused gates:
+This slice updated the active-log ledger and model-log authority export:
 
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
-- `cargo test -p lkjagent-protocol`: `PROTOCOL_EXIT=0`.
-- `cargo test -p lkjagent-llm`: `LLM_EXIT=0`.
-- `cargo test -p lkjagent-context --test assemble`: `CONTEXT_ASSEMBLE_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test prompt_hygiene`: `PROMPT_HYGIENE_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test provider_anomaly`: `PROVIDER_ANOMALY_EXIT=0`.
-  Provider anomalies now set endpoint retry state without parse-fault increments.
-  Protocol parsing now accepts opening parameter tags that start content on the
-  same line, such as `<content># Premise`, and multiline parameters whose final
-  value line ends with the close tag. Adjacent
-  repeated `<files>...</files>` wrappers for `fs.batch_write` merge into one
-  delimiter payload. `fs.mkdir` now refuses Markdown and TOML leaf paths so the
-  daemon cannot create `README.md` or `catalog.toml` directories. Story artifact
-  audit, `artifact.next`, `doc.scaffold`, and generic `artifact.apply` requests
-  under `stories/` now infer story kind instead of requiring the scaffold
-  profile token. Story
-  content audit accepts concise headed reference pages while still refusing
-  scaffold markers and bracket placeholders. Approximate doc audit counts allow
-  extra Markdown files instead of blocking readiness on self-imposed smaller
-  counts. `doc.scaffold` refuses existing cataloged roots so later recovery
-  cannot overwrite story content with a fresh structure-only scaffold.
-  File-count guard detection now ignores child-count and line-limit numbers such
-  as `two children` and `160 lines`.
-  Startup graph-prefix
-  rendering now keeps persisted
-  completion-guard lines inside the graph-state prefix budget instead of
-  crashing during compaction restart.
-- `cargo test -p lkjagent-runtime --test current_model_run_fixture`: `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test provider_exchange_log`: `PROVIDER_EXCHANGE_LOG_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test kernel_admission`: `KERNEL_ADMISSION_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test pending_action_authority`: `PENDING_ACTION_AUTHORITY_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test authority_ledger_wiring`: `AUTHORITY_LEDGER_WIRING_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test kernel_prompt_render`: `KERNEL_PROMPT_RENDER_EXIT=0`.
-- `cargo test -p lkjagent-tools --test artifact_address`: `ARTIFACT_ADDRESS_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test owner_guidance`: `OWNER_GUIDANCE_EXIT=0`.
-- `cargo test -p lkjagent-benchmark --test corpus`: `BENCHMARK_CORPUS_TEST_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- benchmark check-corpus`: `BENCHMARK_EXIT=0`, `ok benchmark-corpus`.
-- `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`, `ok check-style`.
-- `cargo test -p lkjagent-runtime`: `RUNTIME_EXIT=0`.
-- `cargo test -p lkjagent-cli --test model_log`: `CLI_MODEL_LOG_EXIT=0`.
-- `cargo test -p lkjagent-cli --test model_log_archive`: `CLI_MODEL_LOG_ARCHIVE_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`, `ok verify`.
+- `cargo test -p lkjagent-runtime --test authority_ledger_wiring`:
+  `AUTHORITY_LEDGER_WIRING_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test provider_exchange_log`:
+  `PROVIDER_EXCHANGE_LOG_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`,
+  `ok check-docs`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`,
+  `ok check-lines`.
+- `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`,
+  `ok check-style`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`,
+  `ok verify`.
 - `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
-
-Full focused gate sweep also passed with exit 0 for `lkjagent-protocol`,
-`lkjagent-llm`, runtime `kernel_model`, `kernel_prompt_render`,
-`kernel_admission`, `authority_reducer`, `recovery_controller`,
-`recovery_shape_enforcement`, `authority_ledger_wiring`, tools
-`registry_examples`, `batch_write_formats`, `artifact_ledger_tools`,
-`artifact_tools`, `doc_tools`, CLI `model_log`, doc/style/line checks,
-benchmark corpus, quiet verify, and Docker verify.
-
-Live Chronos smoke `/tmp/lkjagent-smoke-data-19` completed the story task.
-Turn `000192` recorded `artifact audit passed` with
-`readiness=story-semantic-content`; SQLite graph evidence contains
-`document-structure` and `artifact-readiness` rows from that audit. Turn
-`000194` closed through `agent.done`, then maintenance opened only after owner
-work completed.
 
 ## Out of Scope
 

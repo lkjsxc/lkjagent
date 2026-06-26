@@ -75,7 +75,6 @@ mod task_summary;
 pub use persisted::restore_completion_guard;
 pub use runner::{DaemonTick, ResidentDaemon, ResidentRuntime};
 pub use startup::{build_prefix_from_store, startup_summary};
-
 pub type EndpointClientConfig = ClientConfig;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StartupLock {

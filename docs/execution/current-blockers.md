@@ -28,8 +28,8 @@ that ran.
 
 ## Current Evidence
 
-`data/logs/current-model-run.md` is active evidence. The checked-in run proves
-these facts:
+`data/logs/current-model-run.md` and `data/logs/index.ndjson` are active
+evidence. The checked-in run proves these facts:
 
 - active case `1` is working at `recover-by-smaller-scope` in recovery;
 - the owner task is the Chronos Fracture story bible rooted at
@@ -38,31 +38,32 @@ these facts:
   creation or any file mutation;
 - the evidence ledger has no useful evidence, including no
   `document-structure` or `artifact-readiness` evidence;
-- the fault ledger repeats `MissingActionEnvelope` after earlier
-  `bad envelope prose before action envelope` faults;
-- the latest request still permits `<think>` tags and replays invalid assistant
-  history shaped as prose or thinking before an `<action>` envelope;
-- the latest response has empty `content`, `finish_reason=stop`,
-  `closure_mode=Unclosed`, and nonzero completion tokens;
-- the latest parse records `status=fault`, `content_bytes=0`, and
-  `error=MissingActionEnvelope`;
-- the latest export manifest lists `admission.json` and `observation.txt`, but
-  both files are absent.
+- earlier turns include `MissingActionEnvelope`, `bad envelope prose before
+  action envelope`, batch-write schema errors, and repeated `graph.recover`
+  refusal;
+- turn `000078` records `provider_anomaly.reasoning_only_response` in
+  `response.json` and does not list parse, admission, or observation files;
+- turn `000079` records a valid `graph.state` action, parse, admission,
+  observation, and a self-consistent export manifest;
+- turn `000080` is the latest indexed directory but contains request and
+  authority evidence only;
+- latest request history contains no `<think>` permission and no invalid
+  assistant thinking replay.
 
-The active log does not contain the previously documented JSON-in-`files` or
-oversized README mutation attempts. Those failure classes remain valid design
-and benchmark targets only when supported by separate fixtures.
+The active log does not prove successful creation under the Chronos root. The
+old empty-content-with-usage turn remains a historical provider anomaly fixture,
+not the latest exchange.
 
 ## Ordering Notes
 
 - Documentation moves first, then code. Prompt guidance alone never closes an
   implementation row.
-- The first implementation slice must prevent live prompts from teaching
-  invalid `<think>` output and must sanitize invalid assistant history before it
-  re-enters a provider request.
-- Empty assistant content with nonzero completion tokens is a provider anomaly,
-  not an ordinary parse fault. It must route through endpoint or provider
-  recovery and must not loop forever as `MissingActionEnvelope`.
+- Prompt hygiene is implemented for the latest request history: live prompts do
+  not teach `<think>` output and invalid assistant history is not replayed as an
+  assistant exemplar.
+- Provider anomalies are classified before parsing for new endpoint responses.
+  Endpoint retry, provider failure notices, and blocked handoff policy still
+  need full kernel ownership.
 - The transition kernel remains the first authority target. Daemon wiring must
   use one snapshot, one explicit event, one persisted decision, one prompt
   frame, one admission view, one effect observation, and one next event.
@@ -73,7 +74,8 @@ and benchmark targets only when supported by separate fixtures.
   fault, missing evidence, compaction pressure, maintenance state, and prompt
   frame head.
 - Schema repair for `fs.batch_write` remains important, but the active checked-in
-  log now points first at provider anomaly handling and prompt hygiene.
+  log now points first at transition-kernel ownership and authority artifact
+  proof.
 - Recovery routes must change repeated action shape. Repeated `graph.recover`
   refusal must force `graph.state`, `artifact.next`, deterministic inspection,
   or blocked handoff.
@@ -114,7 +116,8 @@ and benchmark targets only when supported by separate fixtures.
   requirement, preferred alternate, and registry example.
 - Provider exchange logging has implemented store, atomic request, authority,
   response, parse, admission, observation, timing, error, index, and export file
-  writers, plus CLI list/show.
+  writers, plus CLI list/show. New authority files include persisted decision,
+  prompt-frame, authority, and staleness identifiers.
 - Live compose smoke `/tmp/lkjagent-smoke-data-19` closed the Chronos story
   task after `artifact.audit` reported `readiness=story-semantic-content` and
   graph evidence recorded audit-owned `document-structure` and
@@ -122,13 +125,10 @@ and benchmark targets only when supported by separate fixtures.
 
 ## Remaining Proof Gaps
 
-- The live prompt no longer permits `<think>` tags, and invalid assistant
-  history is summarized instead of replayed as assistant output.
-- Provider empty-content anomalies are separated from parse faults for new
-  endpoint responses, but endpoint retry and blocked-handoff policy still needs
+- Endpoint retry and blocked-handoff policy for provider anomalies still needs
   full kernel ownership.
-- Authority rows still need coverage for every dispatch, provider exchange,
-  recovery, compaction, maintenance, and close path.
+- Authority rows still need coverage for every dispatch, recovery, compaction,
+  maintenance, and close path.
 - Compaction snapshots need prompt-frame resume proof.
 - Stale-action contradiction repair is not covered for every mode.
 - Recovery shape-change enforcement is not proven for every live fault class.

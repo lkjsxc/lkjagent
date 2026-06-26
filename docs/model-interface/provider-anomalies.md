@@ -37,14 +37,19 @@ that survives this classifier can become `RawModelText` for the action parser.
 - A provider anomaly does not increment the parser repeat-fault budget.
 - The next runtime event is `provider_anomaly`, not `parse_fault`.
 
-## Current Fixture
+## Fixtures
 
-The active Chronos turn at
+The historical Chronos turn at
 `data/logs/model/epoch-1782344195/case-1/turn-000019` is an
-`empty_content_with_usage` fixture: `response.json` has empty `content`,
-`finish_reason=stop`, `closure_mode=Unclosed`, and `completion_tokens=485`.
-Its `parsed-action.json` currently records `MissingActionEnvelope`; that is the
-bug this contract corrects.
+`empty_content_with_usage` regression fixture: `response.json` has empty
+`content`, `finish_reason=stop`, `closure_mode=Unclosed`, and
+`completion_tokens=485`. It shows the old bug where the parser recorded
+`MissingActionEnvelope`.
+
+The active checked-in run also contains turn `000078` under
+`data/logs/model/epoch-1782440081/case-none/`. Its `response.json` records
+`provider_anomaly.kind=reasoning_only_response` and no `parsed-action.json`,
+`admission.json`, or `observation.txt` is listed in the export manifest.
 
 ## Verification
 
@@ -60,4 +65,8 @@ Focused tests must prove:
 
 ## Status
 
-open. The active log proves the contract is not yet implemented.
+partially implemented. `lkjagent-llm` classifies empty, missing, malformed,
+reasoning-only, and tool-call-only response shapes before action parsing.
+Runtime provider anomaly handling records endpoint retry state without
+incrementing parse-fault counters. Full kernel-owned retry exhaustion,
+provider-failure notices, and blocked handoff policy remain open.
