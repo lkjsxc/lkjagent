@@ -49,7 +49,7 @@ that is now logged before parsing, and a latest request that no longer teaches
 
 | Area | Current truth |
 | --- | --- |
-| Runtime authority | Pure active-mode selection, normalized authority snapshots, event and decision rows, adapter-valid kernel decision fingerprints, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, kernel `agent.done` admission/refusal, and daemon kernel completion-event shadowing exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. The daemon still has parallel authority paths that can disagree. |
+| Runtime authority | Pure active-mode selection, normalized authority snapshots, event and decision rows, adapter-valid kernel decision fingerprints, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, full-fact kernel stale refusal, kernel `agent.done` admission/refusal, and daemon kernel completion-event shadowing exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. The daemon still has parallel authority paths that can disagree. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Authority ledger events use canonical kernel event-kind strings. Full unified runtime wiring remains open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, and payload-overflow routing to `artifact.next` for known artifacts exist. Provider empty-content anomaly handling and every-route shape-change proof remain open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` normalizes selected safe payloads and refuses unsafe shapes before mutation. Runtime route changes after repeated schema faults remain open beyond covered classes. |
@@ -118,6 +118,9 @@ export-manifest missing-file records:
 - `cargo test -p lkjagent-runtime --test provider_exchange_log`:
   `PROVIDER_EXCHANGE_LOG_EXIT=0`; includes explicit `missing_files` export
   records.
+- `cargo test -p lkjagent-runtime --test kernel_admission`:
+  `KERNEL_ADMISSION_EXIT=0`; includes fault, evidence, maintenance, and
+  prompt-frame stale-action refusal.
 - `cargo test -p lkjagent-runtime --test current_model_run_fixture`:
   `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`; fixture reads checked-in log bytes
   deterministically.

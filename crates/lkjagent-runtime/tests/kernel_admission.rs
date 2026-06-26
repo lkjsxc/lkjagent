@@ -119,6 +119,25 @@ fn exhausted_fault_fingerprint_cannot_be_admitted_again() -> Result<(), String> 
 }
 
 #[test]
+fn changed_fault_evidence_or_prompt_refuses_cached_action() -> Result<(), String> {
+    assert_owner_stale_after("fault", |input| {
+        input.latest_fault = Some(RuntimeFault::ToolRuntime);
+    })?;
+    assert_owner_stale_after("evidence", |input| {
+        input
+            .missing_evidence
+            .push("document-structure".to_string());
+    })?;
+    assert_owner_stale_after("prompt", |input| {
+        input.prompt_frame_fingerprint = Some("frame-2".to_string());
+    })?;
+    assert_owner_stale_after("maintenance", |input| {
+        input.maintenance_cooldown = true;
+    })?;
+    Ok(())
+}
+
+#[test]
 fn completion_request_uses_completion_block() -> Result<(), String> {
     let snapshot = build_snapshot(owner_input()).map_err(format_error)?;
     let decision = reduce(&snapshot, RuntimeEvent::CompletionRequested).map_err(format_error)?;
@@ -129,6 +148,27 @@ fn completion_request_uses_completion_block() -> Result<(), String> {
     assert_eq!(
         admission.refusal_kind,
         Some(AdmissionRefusalKind::CompletionBlocked)
+    );
+    Ok(())
+}
+
+fn assert_owner_stale_after(
+    label: &str,
+    mutate: impl FnOnce(&mut SnapshotAdapterInput),
+) -> Result<(), String> {
+    let original = build_snapshot(owner_input()).map_err(format_error)?;
+    let decision = reduce(&original, RuntimeEvent::OwnerMessageReceived).map_err(format_error)?;
+    let mut changed_input = owner_input();
+    mutate(&mut changed_input);
+    let changed = build_snapshot(changed_input).map_err(format_error)?;
+    let admission = admit_requested_tool(
+        &decision.admission_view,
+        request("artifact.next", changed.staleness_fingerprint)?,
+    );
+    assert_eq!(
+        admission.refusal_kind,
+        Some(AdmissionRefusalKind::StaleDecision),
+        "{label} did not stale cached action"
     );
     Ok(())
 }
