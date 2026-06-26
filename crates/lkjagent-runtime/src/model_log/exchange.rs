@@ -84,7 +84,16 @@ pub fn record_provider_response(
             latency_ms,
         },
     )?;
-    super::export::record_success_export(&handle.dir, &handle.id, finish_reason, latency_ms)?;
+    if response_has_provider_anomaly(response_json) {
+        super::export::record_provider_anomaly_export(
+            &handle.dir,
+            &handle.id,
+            finish_reason,
+            latency_ms,
+        )?;
+    } else {
+        super::export::record_success_export(&handle.dir, &handle.id, finish_reason, latency_ms)?;
+    }
     Ok(())
 }
 
@@ -114,6 +123,10 @@ pub fn record_provider_error(
     )?;
     super::export::record_error_export(&handle.dir, &handle.id, error_class, latency_ms)?;
     Ok(())
+}
+
+fn response_has_provider_anomaly(response_json: &str) -> bool {
+    response_json.contains("\"provider_anomaly\":{")
 }
 
 fn exchange_dir(root: &Path, context: &ProviderLogContext) -> PathBuf {
