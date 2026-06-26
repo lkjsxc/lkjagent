@@ -1,8 +1,11 @@
+#[path = "endpoint_log_json.rs"]
+mod endpoint_log_json;
+
 use std::path::PathBuf;
 use std::time::Instant;
 
 use lkjagent_llm::error::ClientError;
-use lkjagent_llm::wire::{Completion, CompletionUsage, FinishReason};
+use lkjagent_llm::wire::Completion;
 use rusqlite::Connection;
 
 use super::runner::ResidentDaemon;
@@ -10,6 +13,9 @@ use crate::error::RuntimeResult;
 use crate::model_log::{
     json_escape, record_parsed_action, record_provider_error, record_provider_index,
     record_provider_request, record_provider_response, ProviderLogContext, ProviderLogHandle,
+};
+use endpoint_log_json::{
+    completion_response_json, error_class, finish_reason_name, latency_ms, usage_json,
 };
 
 impl ResidentDaemon {
@@ -119,15 +125,22 @@ impl ResidentDaemon {
         let Some(authority) = &self.turn_authority else {
             return Ok("{}\n".to_string());
         };
-        let kernel_mission =
-            lkjagent_store::state::get(conn, "kernel mission")?.unwrap_or_default();
-        let kernel_stale =
-            lkjagent_store::state::get(conn, "kernel staleness fingerprint")?.unwrap_or_default();
+        let decision_id = state_value(conn, "authority decision id")?;
+        let prompt_frame_id = state_value(conn, "authority prompt frame id")?;
+        let authority_fingerprint = state_value(conn, "authority fingerprint")?;
+        let kernel_mission = state_value(conn, "kernel mission")?;
+        let kernel_authority = state_value(conn, "kernel authority fingerprint")?;
+        let kernel_stale = state_value(conn, "kernel staleness fingerprint")?;
         Ok(format!(
-            "{{\"active_mode\":\"{:?}\",\"mission\":\"{}\",\"kernel_mission\":\"{}\",\"kernel_staleness_fingerprint\":\"{}\",\"admitted_tools\":\"{}\",\"blocked_tools\":\"{}\"}}\n",
+            "{{\"active_mode\":\"{:?}\",\"mission\":\"{}\",\"decision_id\":\"{}\",\"prompt_frame_id\":\"{}\",\"authority_fingerprint\":\"{}\",\"kernel_mission\":\"{}\",\"kernel_authority_fingerprint\":\"{}\",\"kernel_staleness_fingerprint\":\"{}\",\"staleness_fingerprint\":\"{}\",\"admitted_tools\":\"{}\",\"blocked_tools\":\"{}\"}}\n",
             authority.mode,
             json_escape(authority.mission.as_str()),
+            json_escape(&decision_id),
+            json_escape(&prompt_frame_id),
+            json_escape(&authority_fingerprint),
             json_escape(&kernel_mission),
+            json_escape(&kernel_authority),
+            json_escape(&kernel_stale),
             json_escape(&kernel_stale),
             json_escape(&authority.effective_policy.allowed_tools.join(",")),
             json_escape(&authority.effective_policy.blocked_tools.join(",")),
@@ -135,61 +148,6 @@ impl ResidentDaemon {
     }
 }
 
-fn completion_response_json(completion: &Completion) -> String {
-    format!(
-        "{{\"content\":\"{}\",\"provider_anomaly\":{},\"finish_reason\":\"{}\",\"closure_mode\":\"{}\",\"usage\":{}}}\n",
-        json_escape(&completion.content),
-        provider_anomaly_json(completion),
-        finish_reason_name(&completion.finish_reason),
-        completion.closure_mode.as_str(),
-        usage_json(&completion.usage)
-    )
-}
-
-fn provider_anomaly_json(completion: &Completion) -> String {
-    completion.provider_anomaly.as_ref().map_or_else(
-        || "null".to_string(),
-        |anomaly| {
-            format!(
-                "{{\"kind\":\"{}\",\"detail\":\"{}\"}}",
-                anomaly.kind.as_str(),
-                json_escape(&anomaly.detail)
-            )
-        },
-    )
-}
-
-fn usage_json(usage: &CompletionUsage) -> String {
-    format!(
-        "{{\"prompt_tokens\":{},\"completion_tokens\":{},\"cached_prompt_tokens\":{},\"total_tokens\":{}}}",
-        opt_u64(usage.prompt_tokens),
-        opt_u64(usage.completion_tokens),
-        opt_u64(usage.cached_prompt_tokens),
-        opt_u64(usage.total_tokens)
-    )
-}
-
-fn opt_u64(value: Option<u64>) -> String {
-    value.map_or_else(|| "null".to_string(), |value| value.to_string())
-}
-
-fn finish_reason_name(reason: &FinishReason) -> &str {
-    match reason {
-        FinishReason::Stop => "stop",
-        FinishReason::Length => "length",
-        FinishReason::Other(_) => "other",
-        FinishReason::Missing => "missing",
-    }
-}
-
-fn error_class(error: &ClientError) -> &str {
-    match error {
-        ClientError::Endpoint { .. } => "EndpointError",
-        ClientError::EndpointOverflow { .. } => "EndpointOverflow",
-        ClientError::Oversize { .. } => "CompletionOversize",
-    }
-}
-
-fn latency_ms(started: Instant) -> i64 {
-    i64::try_from(started.elapsed().as_millis()).unwrap_or(i64::MAX)
+fn state_value(conn: &Connection, key: &str) -> RuntimeResult<String> {
+    Ok(lkjagent_store::state::get(conn, key)?.unwrap_or_default())
 }
