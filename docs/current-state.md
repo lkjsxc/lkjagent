@@ -57,7 +57,7 @@ turn artifacts.
 | Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, current artifact, next action, valid example, blocked-handoff allowance, and status text. Every close path is not yet proven to call the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Prompt-frame resume proof remains open. |
 | Maintenance | Idle maintenance, owner queue preemption at turn boundaries, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Every dispatch and close path still needs unified kernel authority proof. |
-| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, and focused tests exist. Manifest integrity proof for missing per-turn files remains open. |
+| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, kernel authority fields in `authority.json`, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, and focused tests exist. Manifest integrity proof for missing per-turn files remains open. |
 | Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Live endpoint smoke remains open. |
 
 ## Active Failure Evidence

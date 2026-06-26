@@ -57,8 +57,9 @@ admission, graph state, or dispatch.
 
 ## Runtime Records
 
-`authority.json` stores active mode, mission, tool surface, preferred next
-action, recovery route, completion gate, invariants, and decision id.
+`authority.json` stores active mode, mission, kernel mission, kernel staleness
+fingerprint, tool surface, preferred next action, recovery route, completion
+gate, invariants, and decision id.
 
 `parsed-action.json` stores parse status, closure mode, envelope mode,
 normalized text hash, parse faults, tool name, parameters, and byte counts.
