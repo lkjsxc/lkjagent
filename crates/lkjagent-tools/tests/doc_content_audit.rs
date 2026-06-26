@@ -20,6 +20,7 @@ fn content_artifact_audit_rejects_scaffold_only_story() -> TestResult<()> {
     let audit = audit(&workspace, "stories/long-sf-story")?;
 
     assert!(audit.contains("document audit failed"));
+    assert!(audit.contains("failures_omitted="));
     assert!(audit.contains("content_readiness=failed"));
     assert!(audit.contains("structure_only_content: setting/cosmology.md"));
     assert!(audit.contains("structure_only_content: manuscript/draft-boundary.md"));

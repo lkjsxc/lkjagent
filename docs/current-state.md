@@ -38,7 +38,7 @@ that is now logged before parsing, and a latest request that no longer teaches
 | Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
 | Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current run snapshot and per-turn request, authority, response, parse, admission, observation, timing, error, index, and export files when present. |
 | Document scaffold seed | Deterministic scaffold paths, relation-first generic seeds, bounded slugs, compact `catalog.toml`, and creative writing profiles exist for covered artifact roots. |
-| Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, workspace briefs, structure-only pages, owner-term pages, and old generated boilerplate leaves. |
+| Document audit basics | Audit checks README topology, links, catalog coverage, path hygiene, line limits, workspace briefs, structure-only pages, owner-term pages, and old generated boilerplate leaves. Failed audits return bounded representative failure lists with omitted counts. |
 | Placeholder and payload refusal | `fs.write`, `fs.batch_write`, content audit, and check-docs reject common scaffold phrases and oversized payloads before mutation. |
 | Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
 | Hard compaction mode | A runtime-owned `Compaction` active mode exists and does not render `memory.save` as a model action. |
@@ -58,7 +58,7 @@ that is now logged before parsing, and a latest request that no longer teaches
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Prompt-frame resume proof remains open. |
 | Maintenance | Idle maintenance, owner queue preemption at turn boundaries, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Every dispatch and close path still needs unified kernel authority proof. |
 | Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, kernel authority fields in `authority.json`, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, self-consistent manifests, explicit missing-file records, and provider-anomaly store plus manifest status exist. |
-| Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Live endpoint smoke remains open. |
+| Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Live endpoint smoke remains open. A Chronos smoke at `/tmp/lkjagent-smoke-data-1782466597` reached 60 turns, created a partial story bible, and timed out with `plan`, `document-structure`, and `artifact-readiness` still missing. |
 
 ## Active Data Log Evidence
 
@@ -122,6 +122,9 @@ counter handling:
   kernel reducer.
 - `cargo test -p lkjagent-runtime --test authority_examples`:
   `AUTHORITY_EXAMPLES_EXIT=0`; includes audit-gap `artifact.audit` examples.
+- `cargo test -p lkjagent-tools --test doc_content_audit`:
+  `DOC_CONTENT_EXIT=0`; includes bounded audit failure report evidence.
+- `cargo test -p lkjagent-tools --test doc_tools`: `DOC_TOOLS_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test provider_exchange_log`:
   `PROVIDER_EXCHANGE_LOG_EXIT=0`; includes explicit `missing_files` export
   records and `provider_anomaly` store plus manifest status.

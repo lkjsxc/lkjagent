@@ -1,3 +1,6 @@
+const MAX_FAILURES_SHOWN: usize = 24;
+const FIRST_FAILURES_SHOWN: usize = 12;
+
 pub(super) fn report(root: &str, failures: Vec<String>, content_requested: bool) -> String {
     let lanes = lanes(&failures, content_requested);
     if failures.is_empty() {
@@ -5,12 +8,37 @@ pub(super) fn report(root: &str, failures: Vec<String>, content_requested: bool)
             "document audit passed\nroot={root}\n{lanes}\nchecks_run=topology,links,path_hygiene,content_readiness\nfailed=0\nnext_action=record document-structure evidence"
         );
     }
+    let shown = shown_failures(&failures);
     format!(
-        "document audit failed\nroot={root}\n{lanes}\nchecks_run=topology,links,path_hygiene,content_readiness\nfailed={}\nfailures:\n- {}\nnext_action={}",
+        "document audit failed\nroot={root}\n{lanes}\nchecks_run=topology,links,path_hygiene,content_readiness\nfailed={}\nfailures_shown={}\nfailures_omitted={}\nfailures:\n- {}\nnext_action={}",
         failures.len(),
-        failures.join("\n- "),
+        shown.len(),
+        failures.len().saturating_sub(shown.len()),
+        shown.join("\n- "),
         next_action(&failures)
     )
+}
+
+fn shown_failures(failures: &[String]) -> Vec<String> {
+    let mut shown = failures
+        .iter()
+        .take(FIRST_FAILURES_SHOWN)
+        .cloned()
+        .collect::<Vec<_>>();
+    extend_matching(&mut shown, failures, content_failure_prefix);
+    extend_matching(&mut shown, failures, |_| true);
+    shown
+}
+
+fn extend_matching(shown: &mut Vec<String>, failures: &[String], predicate: fn(&str) -> bool) {
+    for failure in failures {
+        if shown.len() >= MAX_FAILURES_SHOWN {
+            return;
+        }
+        if predicate(failure) && !shown.iter().any(|item| item == failure) {
+            shown.push(failure.clone());
+        }
+    }
 }
 
 fn lanes(failures: &[String], content_requested: bool) -> String {
