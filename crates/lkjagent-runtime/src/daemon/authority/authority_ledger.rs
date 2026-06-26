@@ -33,13 +33,14 @@ pub(super) fn persist_authority_ledger(
     let blocked_tools = strings(&authority.effective_policy.blocked_tools);
     let missing_evidence = missing_evidence(graph.evidence_gaps);
     let active_mode = format!("{:?}", authority.mode);
-    let fingerprints = kernel_fingerprints(authority, &graph, &missing_evidence);
+    let queue_head = pending_queue_head(conn)?;
+    let fingerprints = kernel_fingerprints(authority, &graph, &missing_evidence, &queue_head);
     let snapshot_id = record_snapshot(
         conn,
         &AuthoritySnapshotInput {
             case_scope: case_ref.scope,
             case_id: case_ref.id,
-            queue_head: None,
+            queue_head: queue_head.as_deref().and_then(|value| value.parse().ok()),
             queue_pending_count: authority.input.pending_owner_rows as i64,
             owner_objective: graph.node,
             active_mode: &active_mode,
@@ -124,9 +125,11 @@ fn kernel_fingerprints(
     authority: &TurnAuthority,
     graph: &AuthorityGraphView<'_>,
     missing_evidence: &[String],
+    queue_head: &Option<String>,
 ) -> KernelFingerprints {
     let snapshot = build_snapshot(SnapshotAdapterInput {
         case_id: case_id(graph.case_id),
+        queue_head: queue_head.clone(),
         graph_node: authority.input.graph_node.clone(),
         graph_phase: authority.input.graph_phase.clone(),
         pending_owner_count: authority.input.pending_owner_rows,
@@ -159,6 +162,13 @@ fn legacy_fingerprints(
         authority: fingerprint.clone(),
         staleness: fingerprint,
     }
+}
+
+fn pending_queue_head(conn: &Connection) -> RuntimeResult<Option<String>> {
+    Ok(lkjagent_store::queue::list(conn)?
+        .into_iter()
+        .find(|row| row.status == "pending")
+        .map(|row| row.id.to_string()))
 }
 
 fn case_id(case_id: &str) -> Option<String> {

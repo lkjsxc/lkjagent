@@ -101,9 +101,9 @@ not the latest exchange.
   runtime-only authority changes current decision fields. Pure kernel admission
   also refuses stale actions after fault, evidence, maintenance, prompt-frame,
   artifact cursor, or compaction facts change.
-- The daemon persists authority snapshot fields and CLI status prints active
-  mode, evidence gaps, artifact root, recovery route, failed action, admitted
-  tools, and next executable action.
+- The daemon persists authority snapshot fields, including pending queue head,
+  and CLI status prints active mode, evidence gaps, artifact root, recovery
+  route, failed action, admitted tools, and next executable action.
 - Recovery retry counts persist in SQLite by case, node, tool, parameter shape,
   and fault class.
 - Dispatchable registry examples parse, validate, and reach dispatcher routes

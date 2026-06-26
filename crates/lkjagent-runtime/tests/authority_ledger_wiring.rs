@@ -67,6 +67,36 @@ fn daemon_records_prompt_frame_and_effect_observation() -> TestResult<()> {
 }
 
 #[test]
+fn authority_snapshot_records_pending_queue_head() -> TestResult<()> {
+    let mut conn = store()?;
+    take_daemon_lock(&conn, "test", "100", "0")?;
+    let queued = queue::enqueue(&mut conn, "new owner work", "owner-send", "101")?;
+    let workspace = temp_workspace("authority-queue-head")?;
+    let server = serve_responses(Vec::new())?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+    let action = action("graph.state", &[]);
+    daemon.state.task = TaskState::Open { turns_remaining: 3 };
+    daemon.state.pending_action = Some(PendingAction {
+        action: action.clone(),
+        action_text: render_action(&action),
+        authority_decision_id: None,
+        prompt_frame_id: None,
+        staleness_fingerprint: None,
+    });
+
+    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
+    server.join()?;
+
+    let rows: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM runtime_snapshots WHERE queue_head = ?1",
+        [queued],
+        |row| row.get(0),
+    )?;
+    assert!(rows > 0);
+    Ok(())
+}
+
+#[test]
 fn changed_staleness_fingerprint_refuses_persisted_pending_action() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "100", "0")?;
