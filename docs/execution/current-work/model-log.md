@@ -63,7 +63,8 @@ export commands with raw turn-file copying exist for daemon provider calls with
 a log root. Provider anomalies are logged before parsing for new responses, and
 export manifests list only files present on disk. When a previously listed file
 is absent during manifest refresh, the export records it under `missing_files`
-with reason `listed_file_absent`. Provider anomaly exports use status
-`provider_anomaly` instead of `succeeded`. New authority files include persisted
-decision id, prompt frame id, authority fingerprint, kernel mission, and
-staleness fingerprint. Live replay proof is tracked by the verification plan.
+with reason `listed_file_absent`. Provider anomaly store rows and exports use
+status `provider_anomaly` instead of `succeeded`. New authority files include
+persisted decision id, prompt frame id, authority fingerprint, kernel mission,
+and staleness fingerprint. Live replay proof is tracked by the verification
+plan.

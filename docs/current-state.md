@@ -57,7 +57,7 @@ that is now logged before parsing, and a latest request that no longer teaches
 | Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, current artifact, next action, valid example, blocked-handoff allowance, and status text. Every close path is not yet proven to call the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Prompt-frame resume proof remains open. |
 | Maintenance | Idle maintenance, owner queue preemption at turn boundaries, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Every dispatch and close path still needs unified kernel authority proof. |
-| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, kernel authority fields in `authority.json`, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, self-consistent manifests, explicit missing-file records, and provider-anomaly manifest status exist. |
+| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, kernel authority fields in `authority.json`, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, self-consistent manifests, explicit missing-file records, and provider-anomaly store plus manifest status exist. |
 | Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Live endpoint smoke remains open. |
 
 ## Active Data Log Evidence
@@ -118,13 +118,18 @@ export-manifest missing-file records:
   proof.
 - `cargo test -p lkjagent-runtime --test provider_exchange_log`:
   `PROVIDER_EXCHANGE_LOG_EXIT=0`; includes explicit `missing_files` export
-  records and `provider_anomaly` manifest status.
+  records and `provider_anomaly` store plus manifest status.
+- `cargo test -p lkjagent-store --test provider_exchange`:
+  `STORE_PROVIDER_EXCHANGE_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test kernel_admission`:
   `KERNEL_ADMISSION_EXIT=0`; includes fault, evidence, maintenance, and
   prompt-frame stale-action refusal.
 - `cargo test -p lkjagent-runtime --test current_model_run_fixture`:
   `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`; fixture reads checked-in log bytes
   deterministically.
+- `cargo test -p lkjagent-cli --test model_log`: `CLI_MODEL_LOG_EXIT=0`.
+- `cargo test -p lkjagent-cli --test model_log_archive`:
+  `CLI_MODEL_LOG_ARCHIVE_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`,
   `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`,

@@ -79,7 +79,8 @@ The SQLite store has a `provider_exchange` table with identifiers, case id,
 turn id, prompt frame id, authority decision id, admission decision id,
 provider, model, created timestamp, redacted request and response JSON, hashes,
 finish reason, usage, stats, latency, status, error class, and redaction schema
-number. Indexes cover case plus turn and creation time.
+number. Provider anomalies use status `provider_anomaly`. Indexes cover case
+plus turn and creation time.
 
 ## Redaction
 
@@ -136,5 +137,5 @@ provider calls that have a log root. Parsed-action records include envelope
 mode and normalized text hash. The CLI lists and shows provider exchange rows.
 `index.ndjson` is written for exchange discovery. Export refresh tests prove
 `files` entries are limited to files present in the turn directory, missing
-previously listed files are recorded in `missing_files` with stable reasons, and
-provider anomaly manifests use `provider_anomaly` status.
+previously listed files are recorded in `missing_files` with stable reasons,
+and provider anomaly store rows plus manifests use `provider_anomaly` status.

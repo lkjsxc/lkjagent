@@ -118,8 +118,9 @@ not the latest exchange.
   requirement, preferred alternate, and registry example.
 - Provider exchange logging has implemented store, atomic request, authority,
   response, parse, admission, observation, timing, error, index, export file
-  writers, missing-file records, and CLI list/show. New authority files include
-  persisted decision, prompt-frame, authority, and staleness identifiers.
+  writers, missing-file records, provider-anomaly status, and CLI list/show. New
+  authority files include persisted decision, prompt-frame, authority, and
+  staleness identifiers.
 - Live compose smoke `/tmp/lkjagent-smoke-data-19` closed the Chronos story
   task after `artifact.audit` reported `readiness=story-semantic-content` and
   graph evidence recorded audit-owned `document-structure` and
