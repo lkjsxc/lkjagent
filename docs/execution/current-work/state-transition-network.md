@@ -143,10 +143,12 @@ exist. A standalone `kernel` module now defines pure snapshot, event, decision,
 admission, effect, render, fault, and reducer records with tests for mission
 priority and model-call admission invariants. Store ledgers include prompt
 frame and observation rows, reopen lookup proof, and foreign-key proof that an
-admission cannot exist without a decision. The daemon records authority prompt
-frames and effect observations for pending dispatches, records kernel shadow
-mission fields from the persisted authority snapshot and event id, and stale
-cached actions refuse when their prompt-frame head changes. The snapshot adapter
+admission cannot exist without a decision. Adapter-valid authority decision rows
+now store kernel-derived authority and staleness fingerprints. The daemon
+records authority prompt frames and effect observations for pending dispatches, records
+kernel shadow mission fields from the persisted authority snapshot and event id,
+and stale cached actions refuse when their prompt-frame head changes. The
+snapshot adapter
 computes staleness fingerprints from queue, case, graph, artifact cursor,
 fault, evidence, compaction, maintenance, and prompt facts; rejects synthetic
 active case ids; and ignores maintenance due state when owner work exists.

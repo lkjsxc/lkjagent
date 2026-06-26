@@ -43,6 +43,14 @@ fn daemon_records_prompt_frame_and_effect_observation() -> TestResult<()> {
     assert!(state::get(&conn, "kernel event id")?.is_some());
 
     let decision = runtime_authority::latest_decision(&conn, 1)?.ok_or("missing decision")?;
+    assert_eq!(
+        decision.authority_fingerprint,
+        state::get(&conn, "kernel authority fingerprint")?.ok_or("missing kernel authority")?
+    );
+    assert_eq!(
+        decision.staleness_fingerprint,
+        state::get(&conn, "kernel staleness fingerprint")?.ok_or("missing kernel stale")?
+    );
     let observation = runtime_authority::latest_observation_for_decision(&conn, decision.id)?
         .ok_or("missing runtime observation")?;
     assert!(observation.admission_id.is_some());
