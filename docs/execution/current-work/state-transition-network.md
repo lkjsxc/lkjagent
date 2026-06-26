@@ -160,10 +160,11 @@ Kernel prompt rendering requires persisted event and decision ids, cites
 authority and staleness fingerprints, preserves the admitted tool surface, and
 renders concrete path-scoped `fs.batch_write` examples that parse. Kernel
 admission refuses stale cached maintenance actions, changed artifact-cursor
-writes, compaction pressure writes, blocked tools, completion requests, and
-retry-exhausted repeated action fingerprints before dispatch. Daemon
-model-completion handling can attach the persisted decision id, prompt frame id,
-and staleness fingerprint to pending actions before dispatch, and persisted
+writes, compaction pressure writes, changed fault, evidence, maintenance, and
+prompt-frame facts, blocked tools, completion requests, and retry-exhausted
+repeated action fingerprints before dispatch. Daemon model-completion handling
+can attach the persisted decision id, prompt frame id, and staleness fingerprint
+to pending actions before dispatch, and persisted
 pending actions refuse when the full staleness fingerprint changes. Prompt history
 hygiene, provider empty-content anomaly handling, self-consistent export
 manifests, and current-run replay fixtures now have focused coverage. Daemon

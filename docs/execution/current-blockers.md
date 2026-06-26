@@ -98,7 +98,9 @@ not the latest exchange.
 - Recovery has a closed `FaultClass` enum, route metadata, escalation route
   text, and blocked-handoff behavior on each pure recovery plan.
 - Cached actions are refused before dispatch when queued owner work or
-  runtime-only authority changes current decision fields.
+  runtime-only authority changes current decision fields. Pure kernel admission
+  also refuses stale actions after fault, evidence, maintenance, prompt-frame,
+  artifact cursor, or compaction facts change.
 - The daemon persists authority snapshot fields and CLI status prints active
   mode, evidence gaps, artifact root, recovery route, failed action, admitted
   tools, and next executable action.
@@ -130,7 +132,7 @@ not the latest exchange.
 - Authority rows still need coverage for every dispatch, recovery, compaction,
   maintenance, and close path.
 - Compaction snapshots need prompt-frame resume proof.
-- Stale-action contradiction repair is not covered for every mode.
+- Stale-action contradiction repair is not covered for every daemon mode.
 - Recovery shape-change enforcement is not proven for every live fault class.
 - Rendered refusal examples need route-level proof across every policy path.
 - Artifact adoption, ledger-root repair, invalid-root completion markers, and
