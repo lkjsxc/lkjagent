@@ -2,6 +2,7 @@ const MAX_FAILURES_SHOWN: usize = 24;
 const FIRST_FAILURES_SHOWN: usize = 12;
 
 pub(super) fn report(root: &str, failures: Vec<String>, content_requested: bool) -> String {
+    let failures = applicable_failures(root, failures);
     let lanes = lanes(&failures, content_requested);
     if failures.is_empty() {
         return format!(
@@ -17,6 +18,20 @@ pub(super) fn report(root: &str, failures: Vec<String>, content_requested: bool)
         shown.join("\n- "),
         next_action(&failures)
     )
+}
+
+fn applicable_failures(root: &str, failures: Vec<String>) -> Vec<String> {
+    if story_artifact_root(root) {
+        return failures
+            .into_iter()
+            .filter(|failure| !failure.starts_with("missing_readme_link"))
+            .collect();
+    }
+    failures
+}
+
+fn story_artifact_root(root: &str) -> bool {
+    root.trim_start_matches("./").starts_with("stories/")
 }
 
 fn shown_failures(failures: &[String]) -> Vec<String> {

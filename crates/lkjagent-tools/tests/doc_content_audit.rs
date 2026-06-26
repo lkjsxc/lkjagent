@@ -67,6 +67,29 @@ fn content_artifact_audit_accepts_concise_reference_story_pages() -> TestResult<
 }
 
 #[test]
+fn story_artifact_audit_ignores_readme_link_topology() -> TestResult<()> {
+    let workspace = temp_workspace("doc-content-story-links")?;
+    let root = workspace.join("stories/story-links");
+    fs::create_dir_all(&root)?;
+    fs::write(
+        root.join("README.md"),
+        "# Story Links\n\n## Purpose\n\nRecord story facts without a required link index.\n",
+    )?;
+    for name in ["premise.md", "timeline.md"] {
+        fs::write(
+            root.join(name),
+            "# Story Fact\n\nConcrete story bible fact.\n",
+        )?;
+    }
+
+    let audit = audit(&workspace, "stories/story-links")?;
+
+    assert!(audit.contains("document audit passed"));
+    assert!(!audit.contains("missing_readme_link"));
+    Ok(())
+}
+
+#[test]
 fn project_doc_audit_rejects_generated_scaffold() -> TestResult<()> {
     let workspace = temp_workspace("doc-content-project")?;
     scaffold(&workspace, &[("root", "docs"), ("title", "Project Docs")])?;
