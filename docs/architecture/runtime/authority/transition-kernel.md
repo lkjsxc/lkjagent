@@ -112,8 +112,9 @@ inspection effects, and recovery escape-tool visibility.
 partially implemented. Snapshot, event, decision, transition, effect,
 admission, prompt-frame, and observation ledgers exist. Runtime turn authority
 writes normalized rows and prompt cards cite the decision id. Store tests prove
-latest snapshot and decision reopen lookup and admission-to-decision integrity.
-Snapshot adapter tests prove staleness changes for queue, artifact cursor, and
+latest snapshot and decision reopen lookup, admission-to-decision integrity, and
+kernel-derived authority and staleness fingerprints on adapter-valid decision
+rows. Snapshot adapter tests prove staleness changes for queue, artifact cursor, and
 compaction pressure, ignore maintenance due state during owner work, and reject
 synthetic active case ids. Kernel prompt rendering requires a persisted decision
 id, cites fingerprints, and renders concrete parseable batch-write examples.

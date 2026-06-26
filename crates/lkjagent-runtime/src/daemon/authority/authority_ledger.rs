@@ -11,6 +11,7 @@ use super::authority_ledger_support::{
 };
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
+use crate::kernel::{build_snapshot, SnapshotAdapterInput};
 use crate::mode::{ActiveMode, TurnAuthority};
 
 pub(super) struct AuthorityGraphView<'a> {
@@ -32,7 +33,7 @@ pub(super) fn persist_authority_ledger(
     let blocked_tools = strings(&authority.effective_policy.blocked_tools);
     let missing_evidence = missing_evidence(graph.evidence_gaps);
     let active_mode = format!("{:?}", authority.mode);
-    let fingerprint = authority_fingerprint(authority, &graph, &admitted_tools, &missing_evidence);
+    let fingerprints = kernel_fingerprints(authority, &graph, &missing_evidence);
     let snapshot_id = record_snapshot(
         conn,
         &AuthoritySnapshotInput {
@@ -50,7 +51,7 @@ pub(super) fn persist_authority_ledger(
             maintenance_state: maintenance_state(authority),
             prompt_frame_id: authority.input.prompt_frame_id.as_deref(),
             context_frame_id: None,
-            staleness_fingerprint: &fingerprint,
+            staleness_fingerprint: &fingerprints.staleness,
             created_at,
         },
     )?;
@@ -88,8 +89,8 @@ pub(super) fn persist_authority_ledger(
             recovery_route,
             compaction_required: authority.mode == ActiveMode::Compaction,
             maintenance_allowed: authority.mode == ActiveMode::Maintenance,
-            authority_fingerprint: &fingerprint,
-            staleness_fingerprint: &fingerprint,
+            authority_fingerprint: &fingerprints.authority,
+            staleness_fingerprint: &fingerprints.staleness,
             created_at,
         },
     )?;
@@ -110,6 +111,60 @@ pub(super) fn persist_authority_ledger(
     store_state::set(conn, "authority snapshot id", &snapshot_id.to_string())?;
     store_state::set(conn, "authority event id", &event_id.to_string())?;
     store_state::set(conn, "authority decision id", &decision_id.to_string())?;
-    store_state::set(conn, "authority fingerprint", &fingerprint)?;
+    store_state::set(conn, "authority fingerprint", &fingerprints.authority)?;
     Ok(())
+}
+
+struct KernelFingerprints {
+    authority: String,
+    staleness: String,
+}
+
+fn kernel_fingerprints(
+    authority: &TurnAuthority,
+    graph: &AuthorityGraphView<'_>,
+    missing_evidence: &[String],
+) -> KernelFingerprints {
+    let snapshot = build_snapshot(SnapshotAdapterInput {
+        case_id: case_id(graph.case_id),
+        graph_node: authority.input.graph_node.clone(),
+        graph_phase: authority.input.graph_phase.clone(),
+        pending_owner_count: authority.input.pending_owner_rows,
+        required_evidence: authority.input.required_evidence.clone(),
+        missing_evidence: missing_evidence.to_vec(),
+        artifact_root: authority.snapshot.active_artifact.clone(),
+        context_hard_pressure: authority.input.compaction_required,
+        maintenance_due: authority.input.maintenance_due,
+        maintenance_active: authority.input.maintenance_active,
+        latest_decision_id: authority.input.latest_decision_id.clone(),
+        prompt_frame_fingerprint: authority.input.prompt_frame_id.clone(),
+        ..SnapshotAdapterInput::default()
+    });
+    match snapshot {
+        Ok(snapshot) => KernelFingerprints {
+            authority: snapshot.authority_fingerprint.as_str().to_string(),
+            staleness: snapshot.staleness_fingerprint.as_str().to_string(),
+        },
+        Err(_) => legacy_fingerprints(authority, graph, missing_evidence),
+    }
+}
+
+fn legacy_fingerprints(
+    authority: &TurnAuthority,
+    graph: &AuthorityGraphView<'_>,
+    missing_evidence: &[String],
+) -> KernelFingerprints {
+    let fingerprint = authority_fingerprint(authority, graph, &[], missing_evidence);
+    KernelFingerprints {
+        authority: fingerprint.clone(),
+        staleness: fingerprint,
+    }
+}
+
+fn case_id(case_id: &str) -> Option<String> {
+    if case_id == "none" {
+        None
+    } else {
+        Some(case_id.to_string())
+    }
 }
