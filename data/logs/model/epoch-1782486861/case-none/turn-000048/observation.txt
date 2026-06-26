@@ -1,0 +1,11 @@
+<observation>
+<status>ok</status>
+<content>
+memory prune completed
+kept_duplicate_groups=0
+deleted_rows=0
+merged_rows=0
+rewritten_rows=0
+source_rows=none
+</content>
+</observation>

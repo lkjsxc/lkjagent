@@ -1,0 +1,4 @@
+<observation>
+<status>error</status>
+<content>invalid parameter: query has no searchable tokens</content>
+</observation>

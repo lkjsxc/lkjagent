@@ -1,0 +1,1 @@
+{"tool":"agent.done","admitted":true,"reason":"admitted","example":"<action>\n<tool>memory.find</tool>\n<query>README</query>\n</action>"}

@@ -1,0 +1,1 @@
+{"status":"ok","closure_mode":"StopSequenceClosed","envelope_mode":"Natural","normalized_text_hash":"b1e588936442cc0e","content_bytes":99,"tool":"workspace.summary","params":[{"name":"path","bytes":1},{"name":"depth","bytes":1},{"name":"limit","bytes":2}]}

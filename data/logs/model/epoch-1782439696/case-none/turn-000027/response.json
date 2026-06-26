@@ -1,1 +1,0 @@
-{"content":"<action>\n<tool>fs.mkdir</tool>\n<path>stories</path>\n</action>","provider_anomaly":null,"finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":3437,"completion_tokens":29,"cached_prompt_tokens":null,"total_tokens":3466}}
