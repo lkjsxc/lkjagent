@@ -24,10 +24,14 @@ fn applicable_failures(root: &str, failures: Vec<String>) -> Vec<String> {
     if story_artifact_root(root) {
         return failures
             .into_iter()
-            .filter(|failure| !failure.starts_with("missing_readme_link"))
+            .filter(|failure| story_failure_applies(failure))
             .collect();
     }
     failures
+}
+
+fn story_failure_applies(failure: &str) -> bool {
+    !failure.starts_with("missing_readme_link") && !failure.starts_with("missing_purpose")
 }
 
 fn story_artifact_root(root: &str) -> bool {
