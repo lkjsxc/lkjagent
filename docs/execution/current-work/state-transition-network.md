@@ -182,4 +182,6 @@ hygiene, provider empty-content anomaly handling, self-consistent export
 manifests, and current-run replay fixtures now have focused coverage. Daemon
 wiring through the new kernel, explicit triggering events on every path,
 prompt-frame resume proof, maintenance preemption proof, route-wide admission
-proof, and every close path remain open.
+proof, and every close path remain open. The latest live Chronos smoke proves
+plan evidence and deterministic story structure now advance, but closure still
+stalls during weak-content repair before document and artifact audit evidence.
