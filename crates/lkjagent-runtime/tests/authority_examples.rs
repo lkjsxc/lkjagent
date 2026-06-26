@@ -26,11 +26,27 @@ fn owner_missing_plan_prefers_graph_plan_example() {
 }
 
 #[test]
-fn owner_missing_audit_evidence_prefers_artifact_audit_example() {
+fn owner_missing_document_structure_prefers_artifact_apply_example() {
     let authority = decide_turn_authority(TurnAuthorityInput {
         active_owner_case: true,
         artifact_root: Some("stories/chronos-fracture".to_string()),
         missing_evidence: vec!["document-structure".to_string()],
+        ..TurnAuthorityInput::default()
+    });
+
+    assert!(authority
+        .valid_example
+        .contains("<tool>artifact.apply</tool>"));
+    assert!(authority.valid_example.contains("stories/chronos-fracture"));
+    assert!(parse_completion(&authority.valid_example).is_ok());
+}
+
+#[test]
+fn owner_missing_audit_evidence_prefers_artifact_audit_example() {
+    let authority = decide_turn_authority(TurnAuthorityInput {
+        active_owner_case: true,
+        artifact_root: Some("stories/chronos-fracture".to_string()),
+        missing_evidence: vec!["artifact-readiness".to_string()],
         ..TurnAuthorityInput::default()
     });
 

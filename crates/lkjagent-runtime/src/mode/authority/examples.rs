@@ -13,6 +13,9 @@ pub(super) fn valid_example_for_mode(
         ActiveMode::OwnerTask if plan_evidence_missing(snapshot) => {
             rendered_context_example("graph.plan", snapshot)
         }
+        ActiveMode::OwnerTask if document_structure_missing(snapshot) => {
+            rendered_context_example("artifact.apply", snapshot)
+        }
         ActiveMode::OwnerTask if audit_evidence_missing(snapshot) => {
             rendered_context_example("artifact.audit", snapshot)
         }
@@ -30,6 +33,14 @@ fn plan_evidence_missing(snapshot: &RuntimeSnapshot) -> bool {
         .missing_evidence
         .iter()
         .any(|evidence| evidence == "plan")
+}
+
+fn document_structure_missing(snapshot: &RuntimeSnapshot) -> bool {
+    snapshot.active_artifact.is_some()
+        && snapshot
+            .missing_evidence
+            .iter()
+            .any(|evidence| evidence == "document-structure")
 }
 
 fn audit_evidence_missing(snapshot: &RuntimeSnapshot) -> bool {
