@@ -57,7 +57,7 @@ that is now logged before parsing, and a latest request that no longer teaches
 | Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, current artifact, next action, valid example, blocked-handoff allowance, and status text. Every close path is not yet proven to call the same artifact-aware gate. |
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Prompt-frame resume proof remains open. |
 | Maintenance | Idle maintenance, owner queue preemption at turn boundaries, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Every dispatch and close path still needs unified kernel authority proof. |
-| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, kernel authority fields in `authority.json`, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, and focused tests exist. Manifest refresh proof lists only existing files; explicit missing-file records remain open. |
+| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, kernel authority fields in `authority.json`, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, self-consistent manifests, and explicit missing-file records exist. |
 | Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Live endpoint smoke remains open. |
 
 ## Active Data Log Evidence
@@ -109,13 +109,18 @@ prompt-frame, authority, and staleness identifiers that dispatch admission uses.
 
 ## Latest Local Evidence
 
-This slice updated the active-log ledger and model-log authority export:
+This slice updated the active-log ledger, model-log authority export, and
+export-manifest missing-file records:
 
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test authority_ledger_wiring`:
   `AUTHORITY_LEDGER_WIRING_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test provider_exchange_log`:
-  `PROVIDER_EXCHANGE_LOG_EXIT=0`.
+  `PROVIDER_EXCHANGE_LOG_EXIT=0`; includes explicit `missing_files` export
+  records.
+- `cargo test -p lkjagent-runtime --test current_model_run_fixture`:
+  `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`; fixture reads checked-in log bytes
+  deterministically.
 - `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`,
   `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`,

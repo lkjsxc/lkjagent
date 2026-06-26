@@ -84,8 +84,8 @@ not the latest exchange.
 - Maintenance can start only from closed idle with an empty owner queue and no
   recoverable owner task. Owner work preempts maintenance before endpoint and
   before dispatch.
-- Provider exchange manifests must list only files that exist or must record
-  missing artifacts as explicit export errors.
+- Provider exchange manifests list only files that exist and record previously
+  listed missing files as explicit `missing_files` entries.
 
 ## Current Narrowing Evidence
 
@@ -115,9 +115,9 @@ not the latest exchange.
 - Repeat refusals name the active mode, forbidden tool, shape-change
   requirement, preferred alternate, and registry example.
 - Provider exchange logging has implemented store, atomic request, authority,
-  response, parse, admission, observation, timing, error, index, and export file
-  writers, plus CLI list/show. New authority files include persisted decision,
-  prompt-frame, authority, and staleness identifiers.
+  response, parse, admission, observation, timing, error, index, export file
+  writers, missing-file records, and CLI list/show. New authority files include
+  persisted decision, prompt-frame, authority, and staleness identifiers.
 - Live compose smoke `/tmp/lkjagent-smoke-data-19` closed the Chronos story
   task after `artifact.audit` reported `readiness=story-semantic-content` and
   graph evidence recorded audit-owned `document-structure` and

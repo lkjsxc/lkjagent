@@ -135,5 +135,5 @@ parsed-action, admission, observation, timing, and error files for daemon
 provider calls that have a log root. Parsed-action records include envelope
 mode and normalized text hash. The CLI lists and shows provider exchange rows.
 `index.ndjson` is written for exchange discovery. Export refresh tests prove
-`files` entries are limited to files present in the turn directory. Explicit
-missing-file records remain open.
+`files` entries are limited to files present in the turn directory, and missing
+previously listed files are recorded in `missing_files` with stable reasons.
