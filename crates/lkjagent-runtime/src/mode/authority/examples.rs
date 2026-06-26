@@ -10,6 +10,9 @@ pub(super) fn valid_example_for_mode(
         return "runtime action; no model action block".to_string();
     }
     match mode {
+        ActiveMode::OwnerTask if plan_evidence_missing(snapshot) => {
+            rendered_context_example("graph.plan", snapshot)
+        }
         ActiveMode::OwnerTask if audit_evidence_missing(snapshot) => {
             rendered_context_example("artifact.audit", snapshot)
         }
@@ -20,6 +23,13 @@ pub(super) fn valid_example_for_mode(
             "runtime action; no model action block".to_string()
         }
     }
+}
+
+fn plan_evidence_missing(snapshot: &RuntimeSnapshot) -> bool {
+    snapshot
+        .missing_evidence
+        .iter()
+        .any(|evidence| evidence == "plan")
 }
 
 fn audit_evidence_missing(snapshot: &RuntimeSnapshot) -> bool {

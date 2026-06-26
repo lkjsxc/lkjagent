@@ -49,7 +49,7 @@ that is now logged before parsing, and a latest request that no longer teaches
 
 | Area | Current truth |
 | --- | --- |
-| Runtime authority | Pure active-mode selection through the kernel adapter, normalized authority snapshots with queue-head and active-mode facts, event and decision rows, adapter-valid kernel decision fingerprints, prompt-card decision ids, audit-gap prompt examples, graph-state authority overlays, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, full-fact kernel stale refusal, kernel `agent.done` admission/refusal, and daemon kernel completion-event shadowing exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. The daemon still has parallel authority paths that can disagree. |
+| Runtime authority | Pure active-mode selection through the kernel adapter, normalized authority snapshots with queue-head and active-mode facts, event and decision rows, adapter-valid kernel decision fingerprints, prompt-card decision ids, plan-first and audit-gap prompt examples, graph-state authority overlays, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, full-fact kernel stale refusal, kernel `agent.done` admission/refusal, and daemon kernel completion-event shadowing exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. The daemon still has parallel authority paths that can disagree. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Authority ledger events use canonical kernel event-kind strings. Full unified runtime wiring remains open. |
 | Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, payload-overflow routing to `artifact.next` for known artifacts, provider-anomaly retry-budget pause, and parse-fault retention until successful observation exist. Every-route shape-change proof remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` normalizes selected safe payloads and refuses unsafe shapes before mutation. Runtime route changes after repeated schema faults remain open beyond covered classes. |
@@ -121,7 +121,7 @@ counter handling:
   `TURN_AUTHORITY_EXIT=0`; includes shared-fact mission agreement with the
   kernel reducer.
 - `cargo test -p lkjagent-runtime --test authority_examples`:
-  `AUTHORITY_EXAMPLES_EXIT=0`; includes audit-gap `artifact.audit` examples.
+  `AUTHORITY_EXAMPLES_EXIT=0`; includes plan-first and audit-gap examples.
 - `cargo test -p lkjagent-tools --test doc_content_audit`:
   `DOC_CONTENT_EXIT=0`; includes bounded audit failure report evidence.
 - `cargo test -p lkjagent-tools --test doc_tools`: `DOC_TOOLS_EXIT=0`.
