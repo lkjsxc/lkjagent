@@ -1,0 +1,15 @@
+<notice>
+<kind>error</kind>
+<content>
+repeat action refused; see frame 32
+active_mode=OwnerTask
+next_action_must_change_shape=true
+forbidden_tool=fs.list
+preferred_next_action=fs.read
+valid_example:
+<action>
+<tool>fs.read</tool>
+<path>README.md</path>
+</action>
+</content>
+</notice>

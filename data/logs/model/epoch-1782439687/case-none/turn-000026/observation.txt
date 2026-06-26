@@ -1,0 +1,16 @@
+<notice>
+<kind>error</kind>
+<content>
+authority refused doc.scaffold
+decision_id=48
+mission=owner_execution
+node=none
+reason=tool is not admitted by authority decision
+admitted_tools=fs.read, fs.list, fs.stat, doc.audit, artifact.next, artifact.audit, fs.batch_write, workspace.summary, graph.state, graph.next, graph.plan, graph.transition
+missing_evidence=none
+valid_example:
+<action>
+<tool>graph.state</tool>
+</action>
+</content>
+</notice>
