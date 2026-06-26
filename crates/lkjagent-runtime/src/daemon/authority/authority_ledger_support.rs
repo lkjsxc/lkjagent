@@ -1,6 +1,7 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
+use crate::kernel::RuntimeEventKind;
 use crate::mode::{ActiveMode, EndpointDecision, TurnAuthority};
 
 use super::authority_ledger::AuthorityGraphView;
@@ -12,15 +13,15 @@ pub(super) struct CaseRef {
 
 pub(super) fn event_kind(authority: &TurnAuthority) -> &'static str {
     if authority.mode == ActiveMode::Compaction {
-        "context_pressure_detected"
-    } else if authority.input.pending_owner_rows > 0 || authority.input.active_owner_case {
-        "owner_message_received"
+        RuntimeEventKind::ContextPressureDetected.as_str()
     } else if authority.input.recoverable_owner_case {
-        "tool_error"
+        RuntimeEventKind::TurnBudgetExhausted.as_str()
+    } else if authority.input.pending_owner_rows > 0 || authority.input.active_owner_case {
+        RuntimeEventKind::OwnerMessageReceived.as_str()
     } else if authority.mode == ActiveMode::Maintenance {
-        "maintenance_tick"
+        RuntimeEventKind::MaintenanceTick.as_str()
     } else {
-        "turn_budget_checkpoint"
+        RuntimeEventKind::CaseResumed.as_str()
     }
 }
 

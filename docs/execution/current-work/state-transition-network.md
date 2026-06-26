@@ -144,8 +144,9 @@ admission, effect, render, fault, and reducer records with tests for mission
 priority and model-call admission invariants. Store ledgers include prompt
 frame and observation rows, reopen lookup proof, and foreign-key proof that an
 admission cannot exist without a decision. Adapter-valid authority decision rows
-now store kernel-derived authority and staleness fingerprints. The daemon
-records authority prompt frames and effect observations for pending dispatches, records
+now store kernel-derived authority and staleness fingerprints, and authority
+ledger events use the kernel event-kind taxonomy. The daemon records authority
+prompt frames and effect observations for pending dispatches, records
 kernel shadow mission fields from the persisted authority snapshot and event id,
 and stale cached actions refuse when their prompt-frame head changes. The
 snapshot adapter

@@ -2,8 +2,8 @@ use lkjagent_runtime::kernel::{
     reduce, reduce_with_event_id, select_mission, ActionTemplate, ArtifactFacts,
     AuthorityFingerprint, CaseFacts, ContextFacts, EvidenceFacts, GraphFacts, MaintenanceFacts,
     QueueFacts, RuntimeDecision, RuntimeDecisionId, RuntimeDecisionInput, RuntimeDecisionKind,
-    RuntimeEvent, RuntimeEventId, RuntimeMission, RuntimeSnapshot, RuntimeSnapshotId,
-    RuntimeSnapshotInput, StalenessFingerprint, ToolAdmissionView,
+    RuntimeEvent, RuntimeEventId, RuntimeEventKind, RuntimeMission, RuntimeSnapshot,
+    RuntimeSnapshotId, RuntimeSnapshotInput, StalenessFingerprint, ToolAdmissionView,
 };
 
 fn snapshot() -> Result<RuntimeSnapshot, String> {
@@ -56,6 +56,19 @@ fn mission_priority_table_matches_contract() {
             "idle_maintenance",
             "closed_idle",
         ]
+    );
+}
+
+#[test]
+fn event_kind_strings_are_canonical_snake_case() {
+    assert_eq!(RuntimeEventKind::CaseResumed.as_str(), "case_resumed");
+    assert_eq!(
+        RuntimeEventKind::TurnBudgetExhausted.as_str(),
+        "turn_budget_exhausted"
+    );
+    assert_eq!(
+        RuntimeEventKind::ContextPressureDetected.as_str(),
+        "context_pressure_detected"
     );
 }
 
