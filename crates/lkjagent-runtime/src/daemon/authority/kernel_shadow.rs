@@ -35,6 +35,7 @@ fn adapter_input(
         case_id: snapshot.case_id.map(|id| id.to_string()),
         graph_node: snapshot.graph_node.clone(),
         graph_phase: snapshot.graph_phase.clone(),
+        queue_head: pending_queue_head(conn)?,
         pending_owner_count: snapshot.pending_owner_rows,
         required_evidence: snapshot.required_evidence.clone(),
         missing_evidence: snapshot.missing_evidence.clone(),
@@ -62,6 +63,13 @@ fn event_for(snapshot: &RuntimeAuthoritySnapshot) -> RuntimeEvent {
     } else {
         RuntimeEvent::CaseResumed
     }
+}
+
+fn pending_queue_head(conn: &Connection) -> RuntimeResult<Option<String>> {
+    Ok(lkjagent_store::queue::list(conn)?
+        .into_iter()
+        .find(|row| row.status == "pending")
+        .map(|row| row.id.to_string()))
 }
 
 fn completion_ready(snapshot: &RuntimeAuthoritySnapshot) -> bool {
