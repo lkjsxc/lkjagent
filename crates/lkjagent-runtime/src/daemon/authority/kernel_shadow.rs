@@ -35,6 +35,7 @@ fn adapter_input(
         case_id: snapshot.case_id.map(|id| id.to_string()),
         graph_node: snapshot.graph_node.clone(),
         graph_phase: snapshot.graph_phase.clone(),
+        active_mode_hint: store_state::get(conn, "authority active mode")?,
         queue_head: pending_queue_head(conn)?,
         pending_owner_count: snapshot.pending_owner_rows,
         required_evidence: snapshot.required_evidence.clone(),

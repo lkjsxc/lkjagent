@@ -96,7 +96,8 @@ not the latest exchange.
 - Runtime authority examples for model-call modes come from the dispatcher
   registry renderer.
 - Recovery has a closed `FaultClass` enum, route metadata, escalation route
-  text, and blocked-handoff behavior on each pure recovery plan.
+  text, blocked-handoff behavior on each pure recovery plan, and parse-fault
+  counters that clear only after successful observation.
 - Cached actions are refused before dispatch when queued owner work or
   runtime-only authority changes current decision fields. Pure kernel admission
   also refuses stale actions after fault, evidence, maintenance, prompt-frame,

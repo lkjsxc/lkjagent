@@ -32,6 +32,7 @@ fn staleness_parts(input: &SnapshotAdapterInput, owner_work_exists: bool) -> Vec
     vec![
         format!("queue={:?}:{}", input.queue_head, input.pending_owner_count),
         format!("case={:?}", input.case_id),
+        format!("active_mode={:?}", input.active_mode_hint),
         format!("graph={:?}:{:?}", input.graph_node, input.graph_phase),
         format!(
             "artifact={:?}:{:?}",

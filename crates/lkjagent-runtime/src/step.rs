@@ -156,6 +156,9 @@ fn tool_output_step(mut state: RuntimeState, output: DispatchOutput) -> StepResu
     {
         stop = control_stop;
     }
+    if !matches!(stop, StopReason::RepeatAction | StopReason::ToolError) {
+        state.parse_faults = 0;
+    }
     result(state, effects, Some(stop))
 }
 

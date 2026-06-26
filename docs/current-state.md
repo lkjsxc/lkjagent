@@ -49,9 +49,9 @@ that is now logged before parsing, and a latest request that no longer teaches
 
 | Area | Current truth |
 | --- | --- |
-| Runtime authority | Pure active-mode selection, normalized authority snapshots with queue-head facts, event and decision rows, adapter-valid kernel decision fingerprints, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, full-fact kernel stale refusal, kernel `agent.done` admission/refusal, and daemon kernel completion-event shadowing exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. The daemon still has parallel authority paths that can disagree. |
+| Runtime authority | Pure active-mode selection, normalized authority snapshots with queue-head and active-mode facts, event and decision rows, adapter-valid kernel decision fingerprints, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, full-fact kernel stale refusal, kernel `agent.done` admission/refusal, and daemon kernel completion-event shadowing exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. The daemon still has parallel authority paths that can disagree. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Authority ledger events use canonical kernel event-kind strings. Full unified runtime wiring remains open. |
-| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, payload-overflow routing to `artifact.next` for known artifacts, and provider-anomaly retry-budget pause exist. Every-route shape-change proof remains open. |
+| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, payload-overflow routing to `artifact.next` for known artifacts, provider-anomaly retry-budget pause, and parse-fault retention until successful observation exist. Every-route shape-change proof remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` normalizes selected safe payloads and refuses unsafe shapes before mutation. Runtime route changes after repeated schema faults remain open beyond covered classes. |
 | Artifact lifecycle | Scaffold, audit, fact-only `artifact.next`, empty-root identity batches, story semantic readiness checks, bounded write examples, root-scoped cursors, root/path address refusals, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
 | Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, current artifact, next action, valid example, blocked-handoff allowance, and status text. Every close path is not yet proven to call the same artifact-aware gate. |
@@ -109,8 +109,9 @@ prompt-frame, authority, and staleness identifiers that dispatch admission uses.
 
 ## Latest Local Evidence
 
-This slice updated the active-log ledger, model-log authority export, and
-export-manifest missing-file records:
+This slice updated the active-log ledger, model-log authority export,
+export-manifest missing-file records, authority staleness facts, and recovery
+counter handling:
 
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test authority_ledger_wiring`:
@@ -127,6 +128,13 @@ export-manifest missing-file records:
 - `cargo test -p lkjagent-runtime --test kernel_admission`:
   `KERNEL_ADMISSION_EXIT=0`; includes fault, evidence, maintenance, and
   prompt-frame stale-action refusal.
+- `cargo test -p lkjagent-runtime --test kernel_snapshot_adapter`:
+  `KERNEL_SNAPSHOT_ADAPTER_EXIT=0`; includes active-mode staleness
+  fingerprinting.
+- `cargo test -p lkjagent-runtime --test step`: `STEP_EXIT=0`; parse faults
+  clear after successful observation, not merely after parsing a new action.
+- `cargo test -p lkjagent-runtime --test recovery_loop`:
+  `RECOVERY_LOOP_EXIT=0`; repeated transient errors recover across tasks.
 - `cargo test -p lkjagent-runtime --test current_model_run_fixture`:
   `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`; fixture reads checked-in log bytes
   deterministically.
