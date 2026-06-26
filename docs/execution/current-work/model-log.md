@@ -61,8 +61,8 @@ manifests, parsed-action, admission, observation, index files, prompt-frame ids
 on exchange rows, CLI list and show, raw-case inspection, and sanitized replay
 export commands with raw turn-file copying exist for daemon provider calls with
 a log root. Provider anomalies are logged before parsing for new responses, and
-export manifests list only files present on disk. New authority files include
-persisted decision id, prompt frame id, authority fingerprint, kernel mission,
-and staleness fingerprint. Explicit `missing_files` records for expected but
-absent logical artifacts remain open. Live replay proof is tracked by the
-verification plan.
+export manifests list only files present on disk. When a previously listed file
+is absent during manifest refresh, the export records it under `missing_files`
+with reason `listed_file_absent`. New authority files include persisted decision
+id, prompt frame id, authority fingerprint, kernel mission, and staleness
+fingerprint. Live replay proof is tracked by the verification plan.

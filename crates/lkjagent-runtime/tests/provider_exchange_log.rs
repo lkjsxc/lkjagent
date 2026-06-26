@@ -88,8 +88,10 @@ fn provider_export_refresh_lists_only_existing_files() -> TestResult<()> {
     record_provider_admission(&conn, "graph.state", true, "admitted", "<action />")?;
 
     let export = fs::read_to_string(handle.dir.join("export.json"))?;
-    assert!(!export.contains("parsed-action.json"));
-    assert!(export.contains("admission.json"));
+    assert!(!files_array(&export)?.contains(&"parsed-action.json".to_string()));
+    assert!(files_array(&export)?.contains(&"admission.json".to_string()));
+    assert!(export.contains("missing_files"));
+    assert!(export.contains("listed_file_absent"));
     Ok(())
 }
 
@@ -112,6 +114,19 @@ fn provider_exchange_writer_records_errors_ndjson() -> TestResult<()> {
     assert_eq!(row.status, "failed");
     assert_eq!(row.error_class.as_deref(), Some("EndpointError"));
     Ok(())
+}
+
+fn files_array(content: &str) -> TestResult<Vec<String>> {
+    let marker = "\"files\":";
+    let start = content.find(marker).ok_or("missing files field")?;
+    let open = content[start..].find('[').ok_or("missing files open")? + start;
+    let close = content[open..].find(']').ok_or("missing files close")? + open;
+    Ok(content[open + 1..close]
+        .split('"')
+        .enumerate()
+        .filter(|(index, _)| index % 2 == 1)
+        .map(|(_, value)| value.to_string())
+        .collect())
 }
 
 fn context(case_id: &str, turn_id: i64) -> ProviderLogContext {

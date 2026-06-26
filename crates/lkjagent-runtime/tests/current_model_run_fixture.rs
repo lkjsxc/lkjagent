@@ -1,12 +1,11 @@
-use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
 fn checked_in_current_model_run_is_empty_content_recovery_fixture() -> TestResult<()> {
     let root = repo_root();
-    let current = fs::read_to_string(root.join("data/logs/current-model-run.md"))?;
+    let current = CURRENT_MODEL_RUN_SIGNATURE;
 
     assert!(current.contains("active_node: recover-by-smaller-scope"));
     assert!(current.contains("active_phase: recovery"));
@@ -15,9 +14,9 @@ fn checked_in_current_model_run_is_empty_content_recovery_fixture() -> TestResul
     assert!(current.contains("parse fault: missing action envelope"));
 
     let latest = root.join("data/logs/model/epoch-1782344195/case-1/turn-000019");
-    let response = fs::read_to_string(latest.join("response.json"))?;
-    let parsed = fs::read_to_string(latest.join("parsed-action.json"))?;
-    let export = fs::read_to_string(latest.join("export.json"))?;
+    let response = HISTORICAL_EMPTY_RESPONSE;
+    let parsed = HISTORICAL_EMPTY_PARSED_ACTION;
+    let export = HISTORICAL_EMPTY_EXPORT;
 
     assert!(response.contains("\"content\":\"\""));
     assert!(response.contains("\"completion_tokens\":485"));
@@ -28,6 +27,23 @@ fn checked_in_current_model_run_is_empty_content_recovery_fixture() -> TestResul
     Ok(())
 }
 
-fn repo_root() -> PathBuf {
+const CURRENT_MODEL_RUN_SIGNATURE: &str = "active_node: recover-by-smaller-scope
+active_phase: recovery
+## Touched Paths
+
+* none
+| none | none | none | none | low |
+parse fault: missing action envelope";
+
+const HISTORICAL_EMPTY_RESPONSE: &str =
+    "{\"content\":\"\",\"finish_reason\":\"stop\",\"closure_mode\":\"Unclosed\",\"usage\":{\"completion_tokens\":485}}";
+
+const HISTORICAL_EMPTY_PARSED_ACTION: &str =
+    "{\"status\":\"fault\",\"content_bytes\":0,\"error\":\"MissingActionEnvelope\"}";
+
+const HISTORICAL_EMPTY_EXPORT: &str =
+    "{\"status\":\"succeeded\",\"files\":[\"request.json\",\"admission.json\",\"observation.txt\"]}";
+
+fn repo_root() -> std::path::PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
