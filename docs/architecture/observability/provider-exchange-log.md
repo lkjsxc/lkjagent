@@ -115,8 +115,8 @@ must exist in that turn directory at export time. If a logical artifact is
 expected but absent, the manifest records it under `missing_files` with a stable
 reason instead of listing it as present. An export with missing logical artifacts
 uses a warning or failed status; it does not report `succeeded` while naming
-absent files. Raw-case replay reads only files proven present plus explicit
-missing-file records.
+absent files. A provider anomaly export uses status `provider_anomaly`. Raw-case
+replay reads only files proven present plus explicit missing-file records.
 
 ## Acceptance Criteria
 
@@ -135,5 +135,6 @@ parsed-action, admission, observation, timing, and error files for daemon
 provider calls that have a log root. Parsed-action records include envelope
 mode and normalized text hash. The CLI lists and shows provider exchange rows.
 `index.ndjson` is written for exchange discovery. Export refresh tests prove
-`files` entries are limited to files present in the turn directory, and missing
-previously listed files are recorded in `missing_files` with stable reasons.
+`files` entries are limited to files present in the turn directory, missing
+previously listed files are recorded in `missing_files` with stable reasons, and
+provider anomaly manifests use `provider_anomaly` status.

@@ -23,6 +23,22 @@ pub(super) fn record_success_export(
     atomic_write(&dir.join("export.json"), &content)
 }
 
+pub(super) fn record_provider_anomaly_export(
+    dir: &Path,
+    id: &str,
+    finish_reason: &str,
+    latency_ms: i64,
+) -> RuntimeResult<()> {
+    let content = format!(
+        "{{\"id\":\"{}\",\"status\":\"provider_anomaly\",\"finish_reason\":\"{}\",\"latency_ms\":{},\"files\":[{}]}}\n",
+        json_escape(id),
+        json_escape(finish_reason),
+        latency_ms,
+        existing_files(dir, SUCCESS_FILES),
+    );
+    atomic_write(&dir.join("export.json"), &content)
+}
+
 pub(super) fn record_error_export(
     dir: &Path,
     id: &str,

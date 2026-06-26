@@ -102,6 +102,27 @@ fn provider_export_refresh_lists_only_existing_files() -> TestResult<()> {
 }
 
 #[test]
+fn provider_anomaly_export_uses_warning_status() -> TestResult<()> {
+    let root = temp_root("anomaly")?;
+    let conn = memory_store()?;
+    let context = context("9", 10);
+    let handle = record_provider_request(&conn, &root, &context, "{\"messages\":[]}")?;
+    record_provider_response(
+        &conn,
+        &handle,
+        "{\"content\":\"\",\"provider_anomaly\":{\"kind\":\"reasoning_only_response\"}}",
+        "stop",
+        None,
+        7,
+    )?;
+
+    let export = fs::read_to_string(handle.dir.join("export.json"))?;
+    assert!(export.contains("\"status\":\"provider_anomaly\""));
+    assert!(!export.contains("parsed-action.json"));
+    Ok(())
+}
+
+#[test]
 fn provider_exchange_writer_records_errors_ndjson() -> TestResult<()> {
     let root = temp_root("error")?;
     let conn = memory_store()?;
