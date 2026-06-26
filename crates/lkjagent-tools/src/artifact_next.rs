@@ -1,4 +1,3 @@
-use std::fs;
 use std::path::Path;
 
 use crate::address::{
@@ -12,6 +11,8 @@ use crate::artifact_next_response::{
 use crate::error::ToolResult;
 use crate::fs::workspace_path;
 use rusqlite::Connection;
+
+const WEAK_PATH_BATCH_SIZE: usize = 6;
 
 pub fn next(workspace: &Path, root: &str, path: &str, kind: &str) -> ToolResult<String> {
     crate::artifact::reject_empty_root(root)?;
@@ -87,7 +88,7 @@ fn root_next(workspace: &Path, address: &ArtifactAddress, kind: &str) -> ToolRes
     let root = root(address);
     let full = workspace_path(workspace, &root)?;
     let kind = resolved_kind(kind, &full);
-    if root_needs_identity(&full)? {
+    if crate::artifact_next_identity::root_needs_identity(&full)? {
         return Ok(root_identity_response(&root, &kind));
     }
     if let Some(report) = crate::artifact_drift::japanese_cookbook(&full)? {
@@ -99,7 +100,10 @@ fn root_next(workspace: &Path, address: &ArtifactAddress, kind: &str) -> ToolRes
     if weak.is_empty() {
         return audit_response(&root, &kind, "missing=0");
     }
-    let selected = weak.into_iter().take(3).collect::<Vec<_>>();
+    let selected = weak
+        .into_iter()
+        .take(WEAK_PATH_BATCH_SIZE)
+        .collect::<Vec<_>>();
     let valid_example = crate::artifact_next_example::batch_write(&root, &kind, &selected);
     Ok(batch_response(&root, &kind, &selected, &valid_example))
 }
@@ -114,7 +118,7 @@ fn root_next_with_cursor(
     let root = root(address);
     let full = workspace_path(workspace, &root)?;
     let kind = resolved_kind(kind, &full);
-    if root_needs_identity(&full)? {
+    if crate::artifact_next_identity::root_needs_identity(&full)? {
         lkjagent_store::state::delete(conn, &cursor_key(&root))?;
         return Ok(root_identity_response(&root, &kind));
     }
@@ -144,7 +148,11 @@ fn cursor_batch(
         return audit_response(root, kind, &format!("missing={}", weak.len()));
     }
     let weak_count = weak.len();
-    let selected = weak.into_iter().skip(start).take(3).collect::<Vec<_>>();
+    let selected = weak
+        .into_iter()
+        .skip(start)
+        .take(WEAK_PATH_BATCH_SIZE)
+        .collect::<Vec<_>>();
     let valid_example = crate::artifact_next_example::batch_write(root, kind, &selected);
     crate::artifact_cursor_support::record_next_batch(
         crate::artifact_cursor_support::NextBatchRecord {
@@ -162,28 +170,6 @@ fn cursor_batch(
         lkjagent_store::state::set(conn, &cursor_key(root), last)?;
     }
     Ok(batch_response(root, kind, &selected, &valid_example))
-}
-
-fn root_needs_identity(root: &Path) -> ToolResult<bool> {
-    if !root.join("catalog.toml").is_file() || !root.join("README.md").is_file() {
-        return Ok(true);
-    }
-    Ok(!has_markdown_leaf(root)?)
-}
-
-fn has_markdown_leaf(dir: &Path) -> ToolResult<bool> {
-    for entry in fs::read_dir(dir)? {
-        let path = entry?.path();
-        if path.is_dir() && has_markdown_leaf(&path)? {
-            return Ok(true);
-        }
-        if path.extension().is_some_and(|ext| ext == "md")
-            && path.file_name().and_then(|name| name.to_str()) != Some("README.md")
-        {
-            return Ok(true);
-        }
-    }
-    Ok(false)
 }
 
 fn next_start(conn: &Connection, root: &str, weak: &[String]) -> ToolResult<usize> {
