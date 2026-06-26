@@ -121,7 +121,8 @@ synthetic active case ids. Kernel prompt rendering requires a persisted decision
 id, cites fingerprints, and renders concrete parseable batch-write examples.
 Kernel admission admits `agent.done` only when no evidence is missing and refuses
 stale, blocked, not-admitted, completion-blocked, and retry-exhausted repeated
-action fingerprints before dispatch in pure tests.
+action fingerprints before dispatch in pure tests. Daemon shadow wiring maps a
+completion-ready active graph to the kernel completion event.
 Daemon model-completion handling can pass decision id, prompt frame id, and
 staleness fingerprint into pending actions before dispatch. Full kernel wiring
 for every dispatch, provider exchange, recovery, compaction, maintenance, and
