@@ -134,4 +134,6 @@ SQLite `provider_exchange` rows, and atomic request, authority, response,
 parsed-action, admission, observation, timing, and error files for daemon
 provider calls that have a log root. Parsed-action records include envelope
 mode and normalized text hash. The CLI lists and shows provider exchange rows.
-`index.ndjson` is written for exchange discovery. Export records remain open.
+`index.ndjson` is written for exchange discovery. Export refresh tests prove
+`files` entries are limited to files present in the turn directory. Explicit
+missing-file records remain open.
