@@ -159,8 +159,10 @@ rejects synthetic
 active case ids; and ignores maintenance due state when owner work exists.
 Kernel prompt rendering requires persisted event and decision ids, cites
 authority and staleness fingerprints, preserves the admitted tool surface, and
-renders concrete path-scoped `fs.batch_write` examples that parse. The old
-turn-authority mission selector delegates shared facts to the kernel adapter.
+renders concrete path-scoped `fs.batch_write` examples that parse. Owner prompt
+cards with missing audit-owned evidence render a concrete `artifact.audit`
+example for the active root. The old turn-authority mission selector delegates
+shared facts to the kernel adapter.
 Kernel
 admission refuses stale cached maintenance actions, changed artifact-cursor
 writes, compaction pressure writes, changed fault, evidence, maintenance, and
