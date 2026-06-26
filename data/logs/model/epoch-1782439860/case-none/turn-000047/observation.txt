@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-graph transition admitted
-target=structuring
-</content>
-</observation>

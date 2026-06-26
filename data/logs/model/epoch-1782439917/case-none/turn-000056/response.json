@@ -1,1 +1,0 @@
-{"content":"<action>\n<tool>fs.list</tool>\n<path>.</path>\n</action>","provider_anomaly":null,"finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":6246,"completion_tokens":27,"cached_prompt_tokens":null,"total_tokens":6273}}

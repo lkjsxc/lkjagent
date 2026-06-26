@@ -1,0 +1,1 @@
+{"status":"fault","closure_mode":"StopSequenceClosed","envelope_mode":"Unclosed","normalized_text_hash":"b5fa97a20cb22af5","content_bytes":59,"error":"UnclosedTag { tag: \"query\" }"}

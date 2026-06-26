@@ -1,0 +1,13 @@
+<observation>
+<status>ok</status>
+<content>
+document scaffold created
+root=stories/long-novel-with-detailed-settings
+kind=novel
+profile=NarrativeManuscript
+mode=approx
+files=39
+readme=present
+catalog=catalog.toml
+</content>
+</observation>

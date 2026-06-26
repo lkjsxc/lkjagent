@@ -1,4 +1,0 @@
-<observation>
-<status>ok</status>
-<content>dir . bytes=2 lines=0</content>
-</observation>

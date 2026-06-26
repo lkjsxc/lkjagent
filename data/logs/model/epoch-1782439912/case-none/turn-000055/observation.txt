@@ -1,4 +1,0 @@
-<observation>
-<status>ok</status>
-<content>no active graph case</content>
-</observation>
