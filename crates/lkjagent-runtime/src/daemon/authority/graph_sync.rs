@@ -53,6 +53,7 @@ impl ResidentDaemon {
         self.dispatch_state.effective_policy = Some(effective_policy(
             mode_policy,
             self.dispatch_state.graph_policy.as_ref(),
+            &self.dispatch_state.graph_missing,
         ));
     }
 }

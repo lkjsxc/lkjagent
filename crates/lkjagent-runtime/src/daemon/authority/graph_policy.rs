@@ -17,10 +17,11 @@ pub(super) fn completion_decision(conn: &Connection, graph: &TaskGraphState) -> 
 pub(super) fn effective_policy(
     mode_policy: &ActiveModePolicy,
     graph_policy: Option<&GraphDispatchPolicy>,
+    missing: &[String],
 ) -> EffectivePolicy {
     if mode_policy.graph_policy_applies {
         if let Some(graph) = graph_policy {
-            let allowed_tools = effective_allowed_tools(mode_policy, graph);
+            let allowed_tools = effective_allowed_tools(mode_policy, graph, missing);
             let blocked_tools = effective_blocked_tools(graph, &allowed_tools);
             return EffectivePolicy {
                 mode: format!("{:?}", mode_policy.mode),
@@ -115,14 +116,36 @@ fn unresolved_artifact_ledger(conn: &Connection, graph: &TaskGraphState) -> bool
 fn effective_allowed_tools(
     mode_policy: &ActiveModePolicy,
     graph: &GraphDispatchPolicy,
+    missing: &[String],
 ) -> Vec<String> {
-    let mut allowed = graph.allowed_tools.clone();
+    let mut allowed = graph_allowed_tools(mode_policy, graph, missing);
     for tool in authority_escape_tools(mode_policy.mode, graph) {
         if !allowed.iter().any(|existing| existing == tool) {
             allowed.push((*tool).to_string());
         }
     }
     allowed
+}
+
+fn graph_allowed_tools(
+    mode_policy: &ActiveModePolicy,
+    graph: &GraphDispatchPolicy,
+    missing: &[String],
+) -> Vec<String> {
+    if mode_policy.mode != ActiveMode::OwnerTask || !audit_gap(missing) {
+        return graph.allowed_tools.clone();
+    }
+    let mut allowed_tools = Vec::new();
+    for tool in &graph.allowed_tools {
+        if mode_policy.allowed_tools.contains(&tool.as_str()) {
+            allowed_tools.push(tool.clone());
+        }
+    }
+    allowed_tools
+}
+
+fn audit_gap(missing: &[String]) -> bool {
+    missing.iter().any(|item| item == "artifact-readiness")
 }
 
 fn effective_blocked_tools(graph: &GraphDispatchPolicy, allowed: &[String]) -> Vec<String> {

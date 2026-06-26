@@ -160,8 +160,9 @@ active case ids; and ignores maintenance due state when owner work exists.
 Kernel prompt rendering requires persisted event and decision ids, cites
 authority and staleness fingerprints, preserves the admitted tool surface, and
 renders concrete path-scoped `fs.batch_write` examples that parse. Owner prompt
-cards render `graph.plan` first while plan evidence is missing, then admit and
-render `artifact.apply` for missing document structure, then a concrete
+cards render `graph.plan` first while plan evidence is missing, intersect
+artifact-readiness graph tools with the mode surface, then admit and render `artifact.apply` for
+missing document structure, then a concrete
 `artifact.audit` example for audit-owned readiness gaps at the active root. Story artifact
 audits do not require README link indexes or `Purpose` sections, and audit
 failures now return bounded representative failure lists so recovery prompts do not replay every
