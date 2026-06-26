@@ -1,3 +1,7 @@
+use lkjagent_runtime::kernel::{
+    build_snapshot, select_mission, RuntimeEvent, RuntimeMission as KernelMission,
+    SnapshotAdapterInput,
+};
 use lkjagent_runtime::mode::{
     decide_turn_authority, render_turn_authority, ActiveMode, CompletionPolicy, EndpointDecision,
     RuntimeMission, TurnAuthorityInput,
@@ -80,6 +84,26 @@ fn hard_compaction_is_single_active_mode_before_owner_work() {
         compaction.endpoint_decision,
         EndpointDecision::RuntimeCompact
     );
+}
+
+#[test]
+fn mode_mission_matches_kernel_for_shared_facts() -> Result<(), String> {
+    let authority = decide_turn_authority(TurnAuthorityInput {
+        case_id: Some(7),
+        active_owner_case: true,
+        ..TurnAuthorityInput::default()
+    });
+    let snapshot = build_snapshot(SnapshotAdapterInput {
+        case_id: Some("7".to_string()),
+        ..SnapshotAdapterInput::default()
+    })
+    .map_err(|error| format!("{error:?}"))?;
+    assert_eq!(
+        select_mission(&snapshot, &RuntimeEvent::CaseResumed),
+        KernelMission::OwnerExecution
+    );
+    assert_eq!(authority.mission, RuntimeMission::OwnerExecution);
+    Ok(())
 }
 
 #[test]

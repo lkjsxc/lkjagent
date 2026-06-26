@@ -2,8 +2,9 @@
 
 ## Purpose
 
-This directory owns pure turn authority inputs, runtime mission selection,
-snapshot and event reduction, and active-mode selection.
+This directory is the compatibility adapter for turn authority inputs, runtime
+mission selection, snapshot and event reduction, and active-mode selection.
+Mission selection delegates shared facts to the transition kernel.
 
 ## Table of Contents
 
