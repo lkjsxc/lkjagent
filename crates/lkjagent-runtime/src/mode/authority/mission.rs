@@ -1,4 +1,8 @@
 use super::model::{ActiveMode, RuntimeSnapshot};
+use crate::kernel::{
+    build_snapshot, RuntimeEvent, RuntimeFault as KernelFault, RuntimeMission as KernelMission,
+    SnapshotAdapterInput,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum RuntimeMission {
@@ -27,6 +31,21 @@ impl RuntimeMission {
             }
             Self::IdleMaintenance => ActiveMode::Maintenance,
             Self::ClosedIdle => ActiveMode::ClosedIdle,
+        }
+    }
+
+    pub fn from_kernel(value: KernelMission) -> Self {
+        match value {
+            KernelMission::HardRuntimeCompaction => Self::HardRuntimeCompaction,
+            KernelMission::OwnerRecovery => Self::OwnerRecovery,
+            KernelMission::SchemaRepair => Self::SchemaRepair,
+            KernelMission::ArtifactRepair => Self::ArtifactRepair,
+            KernelMission::VerificationRepair => Self::VerificationRepair,
+            KernelMission::OwnerExecution => Self::OwnerExecution,
+            KernelMission::OwnerVerification => Self::OwnerVerification,
+            KernelMission::OwnerCompletion => Self::OwnerCompletion,
+            KernelMission::IdleMaintenance => Self::IdleMaintenance,
+            KernelMission::ClosedIdle => Self::ClosedIdle,
         }
     }
 
@@ -65,6 +84,44 @@ impl From<ActiveMode> for RuntimeMission {
 }
 
 pub fn select_runtime_mission(snapshot: &RuntimeSnapshot) -> RuntimeMission {
+    kernel_mission(snapshot).map_or_else(|| legacy_mission(snapshot), RuntimeMission::from_kernel)
+}
+
+fn kernel_mission(snapshot: &RuntimeSnapshot) -> Option<KernelMission> {
+    let input = SnapshotAdapterInput {
+        case_id: adapter_case_id(snapshot),
+        graph_node: snapshot.graph_node.clone(),
+        graph_phase: snapshot.graph_phase.clone(),
+        pending_owner_count: usize::from(snapshot.owner_work_exists),
+        required_evidence: snapshot.required_evidence.clone(),
+        missing_evidence: snapshot.missing_evidence.clone(),
+        artifact_root: snapshot.active_artifact.clone(),
+        context_hard_pressure: snapshot.context_pressure_active,
+        maintenance_due: snapshot.maintenance_eligible,
+        latest_fault: snapshot
+            .recovery_ladder_active
+            .then_some(KernelFault::TurnBudgetExhausted),
+        ..SnapshotAdapterInput::default()
+    };
+    let event = if snapshot.recovery_ladder_active {
+        RuntimeEvent::TurnBudgetExhausted
+    } else {
+        RuntimeEvent::CaseResumed
+    };
+    build_snapshot(input)
+        .ok()
+        .map(|built| crate::kernel::select_mission(&built, &event))
+}
+
+fn adapter_case_id(snapshot: &RuntimeSnapshot) -> Option<String> {
+    snapshot.case_id.clone().or_else(|| {
+        snapshot
+            .owner_work_exists
+            .then(|| "mode-adapter".to_string())
+    })
+}
+
+fn legacy_mission(snapshot: &RuntimeSnapshot) -> RuntimeMission {
     if snapshot.context_pressure_active {
         return RuntimeMission::HardRuntimeCompaction;
     }
