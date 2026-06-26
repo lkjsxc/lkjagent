@@ -92,6 +92,12 @@ fn provider_export_refresh_lists_only_existing_files() -> TestResult<()> {
     assert!(files_array(&export)?.contains(&"admission.json".to_string()));
     assert!(export.contains("missing_files"));
     assert!(export.contains("listed_file_absent"));
+
+    record_provider_observation(&conn, "<observation>ok</observation>")?;
+    let refreshed = fs::read_to_string(handle.dir.join("export.json"))?;
+    assert!(!files_array(&refreshed)?.contains(&"parsed-action.json".to_string()));
+    assert!(refreshed.contains("parsed-action.json"));
+    assert!(refreshed.contains("listed_file_absent"));
     Ok(())
 }
 
