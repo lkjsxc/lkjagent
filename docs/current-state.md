@@ -170,7 +170,12 @@ Full focused gate sweep also passed with exit 0 for `lkjagent-protocol`,
 `artifact_tools`, `doc_tools`, CLI `model_log`, doc/style/line checks,
 benchmark corpus, quiet verify, and Docker verify.
 
-The live Chronos story smoke has not run in this slice.
+Live Chronos smoke `/tmp/lkjagent-smoke-data-19` completed the story task.
+Turn `000192` recorded `artifact audit passed` with
+`readiness=story-semantic-content`; SQLite graph evidence contains
+`document-structure` and `artifact-readiness` rows from that audit. Turn
+`000194` closed through `agent.done`, then maintenance opened only after owner
+work completed.
 
 ## Out of Scope
 

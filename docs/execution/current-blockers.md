@@ -23,7 +23,7 @@ that ran.
 | 11 | Idle-only maintenance and owner preemption proof | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | partially implemented |
 | 12 | Provider exchange export and raw-case inspection | [current-work/model-log.md](current-work/model-log.md) | partially implemented |
 | 13 | Replay benchmarks from current model run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | partially implemented |
-| 14 | Final live Docker story run and compose verification | [current-work/verification-plan.md](current-work/verification-plan.md) | open |
+| 14 | Final live Docker story run and compose verification | [current-work/verification-plan.md](current-work/verification-plan.md) | implemented |
 | 15 | Personal diary, schedule, and TODO records | [current-work/personal-records.md](current-work/personal-records.md) | open |
 
 ## Current Evidence
@@ -115,6 +115,10 @@ and benchmark targets only when supported by separate fixtures.
 - Provider exchange logging has implemented store, atomic request, authority,
   response, parse, admission, observation, timing, error, index, and export file
   writers, plus CLI list/show.
+- Live compose smoke `/tmp/lkjagent-smoke-data-19` closed the Chronos story
+  task after `artifact.audit` reported `readiness=story-semantic-content` and
+  graph evidence recorded audit-owned `document-structure` and
+  `artifact-readiness` rows.
 
 ## Remaining Proof Gaps
 
@@ -132,4 +136,4 @@ and benchmark targets only when supported by separate fixtures.
 - Artifact adoption, ledger-root repair, invalid-root completion markers, and
   semantic readiness remain incomplete.
 - Parser-level and runtime-level replay fixtures must cover the active current
-  data-log failure. Live compose smoke remains open.
+  data-log failure.

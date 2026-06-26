@@ -35,4 +35,6 @@ including provider exchange parsed-action, admission, observation,
 prompt-frame-id, and replay-export requirements. A Chronos-style daemon replay
 proves story artifact close after plan, semantic audit, verification evidence,
 catalog presence, no part files, and printable model-log output. Live compose
-story smoke remains open.
+smoke `/tmp/lkjagent-smoke-data-19` closed the Chronos story task after
+`artifact.audit` reported `readiness=story-semantic-content` and graph evidence
+recorded audit-owned `document-structure` and `artifact-readiness` rows.
