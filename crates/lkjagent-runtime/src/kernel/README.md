@@ -19,9 +19,9 @@ effects stay in daemon, store, tool, or CLI adapters.
 - [decision.rs](decision.rs): missions, decisions, templates, and invariants.
 - [admission.rs](admission.rs): immutable dispatch admission views.
 - [fault.rs](fault.rs): fault classes and retry keys.
-- [effect.rs](effect.rs): deterministic runtime-owned effects.
+- [effect.rs](effect.rs): deterministic runtime-owned effects and runtime-effect attachment.
 - [render.rs](render.rs): prompt-card data.
-- [reduce.rs](reduce.rs): pure mission selection and decision reduction.
+- [reduce.rs](reduce.rs): pure mission selection, close-case completion, and decision reduction.
 
 ## Ownership
 

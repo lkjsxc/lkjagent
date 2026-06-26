@@ -3,7 +3,7 @@ use crate::kernel::decision::{
     ActionTemplate, DecisionInvariantError, RuntimeDecision, RuntimeDecisionId,
     RuntimeDecisionInput, RuntimeDecisionKind, RuntimeMission,
 };
-use crate::kernel::effect::RuntimeEffectCommand;
+use crate::kernel::effect::attach_runtime_effect;
 use crate::kernel::event::RuntimeEvent;
 use crate::kernel::fault::{FaultClass, RuntimeFault};
 use crate::kernel::render::{example_for, prompt_card_for};
@@ -53,7 +53,7 @@ pub fn reduce(
 ) -> Result<RuntimeDecision, DecisionInvariantError> {
     let mission = select_mission(snapshot, &event);
     let active_mode = mission.active_mode();
-    let admission_view = repeat_guard(
+    let mut admission_view = repeat_guard(
         ToolAdmissionView::new(
             active_mode,
             admitted_tools_for(mission),
@@ -63,12 +63,20 @@ pub fn reduce(
         .with_missing_evidence(snapshot.evidence.missing.clone()),
         snapshot,
     );
+    let close_case =
+        mission == RuntimeMission::OwnerCompletion && snapshot.evidence.missing.is_empty();
+    if close_case {
+        admission_view.completion_allowed = true;
+        admission_view
+            .admitted_tools
+            .push(ToolName::from_static("agent.done"));
+    }
     let input = RuntimeDecisionInput {
         decision_id: RuntimeDecisionId::Pending,
         snapshot_id: snapshot.snapshot_id,
         event_id: RuntimeEventId(0),
         mission,
-        kind: decision_kind_for(mission),
+        kind: decision_kind_for(mission, close_case),
         admission_view,
         authority_fingerprint: snapshot.authority_fingerprint.clone(),
         staleness_fingerprint: snapshot.staleness_fingerprint.clone(),
@@ -78,13 +86,16 @@ pub fn reduce(
     decision.graph_phase = snapshot.graph.phase.clone();
     decision.missing_evidence = snapshot.evidence.missing.clone();
     decision.existing_evidence = snapshot.evidence.existing.clone();
+    decision.completion_allowed = close_case;
+    decision.completion_refusal = (mission == RuntimeMission::OwnerCompletion && !close_case)
+        .then(|| snapshot.evidence.missing.join(","));
     decision.context_package_ids = snapshot.graph.context_package_ids.clone();
     decision.forced_next_action = next_action_for(mission, snapshot);
     if let Some(ActionTemplate::ExactTool { body, .. }) = &decision.forced_next_action {
         decision.admission_view.exact_next_action = Some(body.clone());
     }
     decision.prompt_card = prompt_card_for(snapshot, mission, active_mode, &decision);
-    with_runtime_effect(decision, mission)
+    attach_runtime_effect(decision, mission)
 }
 
 fn is_schema_repair(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> bool {
@@ -146,8 +157,9 @@ fn is_owner_recovery_fault(fault: RuntimeFault) -> bool {
     )
 }
 
-fn decision_kind_for(mission: RuntimeMission) -> RuntimeDecisionKind {
+fn decision_kind_for(mission: RuntimeMission, close_case: bool) -> RuntimeDecisionKind {
     match mission {
+        RuntimeMission::OwnerCompletion if close_case => RuntimeDecisionKind::CloseCase,
         RuntimeMission::HardRuntimeCompaction | RuntimeMission::ClosedIdle => {
             RuntimeDecisionKind::RuntimeEffect
         }
@@ -173,19 +185,4 @@ fn next_action_for(mission: RuntimeMission, snapshot: &RuntimeSnapshot) -> Optio
         tool: ToolName::from_static(tool),
         body: example_for(tool, snapshot),
     })
-}
-
-fn with_runtime_effect(
-    decision: RuntimeDecision,
-    mission: RuntimeMission,
-) -> Result<RuntimeDecision, DecisionInvariantError> {
-    match mission {
-        RuntimeMission::HardRuntimeCompaction => {
-            decision.with_runtime_effect(RuntimeEffectCommand::CompactNow)
-        }
-        RuntimeMission::ClosedIdle => {
-            decision.with_runtime_effect(RuntimeEffectCommand::WaitClosedIdle)
-        }
-        _ => Ok(decision),
-    }
 }
