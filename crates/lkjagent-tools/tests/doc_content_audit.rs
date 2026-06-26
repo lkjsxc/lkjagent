@@ -67,13 +67,13 @@ fn content_artifact_audit_accepts_concise_reference_story_pages() -> TestResult<
 }
 
 #[test]
-fn story_artifact_audit_ignores_readme_link_topology() -> TestResult<()> {
+fn story_artifact_audit_ignores_readme_link_and_purpose_topology() -> TestResult<()> {
     let workspace = temp_workspace("doc-content-story-links")?;
     let root = workspace.join("stories/story-links");
     fs::create_dir_all(&root)?;
     fs::write(
         root.join("README.md"),
-        "# Story Links\n\n## Purpose\n\nRecord story facts without a required link index.\n",
+        "# Story Links\n\nRecord story facts without a required link index.\n",
     )?;
     for name in ["premise.md", "timeline.md"] {
         fs::write(
@@ -86,6 +86,7 @@ fn story_artifact_audit_ignores_readme_link_topology() -> TestResult<()> {
 
     assert!(audit.contains("document audit passed"));
     assert!(!audit.contains("missing_readme_link"));
+    assert!(!audit.contains("missing_purpose"));
     Ok(())
 }
 

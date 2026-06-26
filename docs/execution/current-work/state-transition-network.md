@@ -162,8 +162,8 @@ authority and staleness fingerprints, preserves the admitted tool surface, and
 renders concrete path-scoped `fs.batch_write` examples that parse. Owner prompt
 cards render `graph.plan` first while plan evidence is missing, then a concrete
 `artifact.audit` example for audit-owned gaps at the active root. Story artifact
-audits do not require README link indexes, and audit failures now return
-bounded representative failure lists so recovery prompts do not replay every
+audits do not require README link indexes or `Purpose` sections, and audit
+failures now return bounded representative failure lists so recovery prompts do not replay every
 missing path. `graph.state` observations append the effective runtime authority
 overlay when graph fallback text differs from the current admission surface. The
 old turn-authority mission selector delegates shared facts to the kernel
