@@ -163,8 +163,10 @@ renders concrete path-scoped `fs.batch_write` examples that parse. Owner prompt
 cards with missing audit-owned evidence render a concrete `artifact.audit`
 example for the active root. Document and artifact audit failures now return
 bounded representative failure lists so recovery prompts do not replay every
-missing path. The old turn-authority mission selector delegates shared facts to
-the kernel adapter.
+missing path. `graph.state` observations append the effective runtime authority
+overlay when graph fallback text differs from the current admission surface. The
+old turn-authority mission selector delegates shared facts to the kernel
+adapter.
 Kernel
 admission refuses stale cached maintenance actions, changed artifact-cursor
 writes, compaction pressure writes, changed fault, evidence, maintenance, and

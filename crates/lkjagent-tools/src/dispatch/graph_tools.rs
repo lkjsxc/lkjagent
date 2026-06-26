@@ -1,7 +1,9 @@
 use std::collections::BTreeMap;
 
 use crate::dispatch::params::param;
-use crate::dispatch::{finish, observe_error, DispatchOutput, DispatchState, ToolRuntime};
+use crate::dispatch::{
+    finish, observe_error, DispatchOutput, DispatchState, EffectivePolicy, ToolRuntime,
+};
 use crate::error::ToolError;
 use crate::observe;
 
@@ -14,6 +16,7 @@ pub fn dispatch_graph_state(
         .graph_state
         .clone()
         .unwrap_or_else(|| "no active graph case".to_string());
+    let content = with_authority_overlay(content, state.effective_policy.as_ref());
     finish(
         state,
         action_text,
@@ -125,6 +128,31 @@ pub fn dispatch_graph_context(
             "continue graph transition",
         ),
     )
+}
+
+fn with_authority_overlay(content: String, policy: Option<&EffectivePolicy>) -> String {
+    let Some(policy) = policy else {
+        return content;
+    };
+    format!(
+        "{content}\nRuntime authority overlay:\nauthority_allowed_tools={}\nauthority_blocked_tools={}\nauthority_preferred_next_action={}\nauthority_note=follow this overlay when graph fallback text differs",
+        join_policy_values(&policy.allowed_tools),
+        join_policy_values(&policy.blocked_tools),
+        policy.preferred_next_action
+    )
+}
+
+fn join_policy_values(values: &[String]) -> String {
+    if values.is_empty() {
+        "none".to_string()
+    } else {
+        values
+            .iter()
+            .take(16)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join(", ")
+    }
 }
 
 fn useful_lines(value: &str) -> usize {

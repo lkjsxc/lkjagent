@@ -1,7 +1,7 @@
 mod support;
 
 use lkjagent_protocol::{Action, Param};
-use lkjagent_tools::dispatch::{dispatch, dispatch_with_text};
+use lkjagent_tools::dispatch::{dispatch, dispatch_with_text, EffectivePolicy};
 use lkjagent_tools::observe::OutputKind;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
@@ -33,6 +33,29 @@ fn graph_tools_report_state_and_record_evidence() -> TestResult<()> {
     assert!(recorded.content.contains("graph evidence recorded"));
     assert_eq!(state.graph_evidence.len(), 1);
     assert_eq!(state.graph_evidence[0].path.as_deref(), Some("README.md"));
+    Ok(())
+}
+
+#[test]
+fn graph_state_shows_runtime_authority_overlay() -> TestResult<()> {
+    let workspace = temp_workspace("graph-authority-overlay")?;
+    let runtime = runtime(workspace)?;
+    let mut conn = store()?;
+    let mut state = state();
+    state.graph_state = Some("Allowed tools now: fs.write".to_string());
+    state.effective_policy = Some(owner_policy(vec![
+        "graph.state",
+        "graph.plan",
+        "fs.batch_write",
+    ]));
+
+    let shown = dispatch(&action("graph.state", &[]), &runtime, &mut conn, &mut state);
+
+    assert!(shown.content.contains("Runtime authority overlay:"));
+    assert!(shown
+        .content
+        .contains("authority_allowed_tools=graph.state, graph.plan"));
+    assert!(shown.content.contains("follow this overlay"));
     Ok(())
 }
 
@@ -128,6 +151,18 @@ fn dispatcher_reports_validation_and_repeat_notices() -> TestResult<()> {
     assert!(matches!(second.kind, OutputKind::Notice { .. }));
     assert!(second.content.contains("repeat action refused"));
     Ok(())
+}
+
+fn owner_policy(allowed: Vec<&str>) -> EffectivePolicy {
+    EffectivePolicy {
+        mode: "OwnerTask".to_string(),
+        allowed_tools: allowed.into_iter().map(str::to_string).collect(),
+        blocked_tools: vec!["memory.save".to_string()],
+        shell_allowed: false,
+        completion_allowed: false,
+        reason: "runtime authority".to_string(),
+        preferred_next_action: "record graph.plan".to_string(),
+    }
 }
 
 fn is_error(output: &lkjagent_tools::dispatch::DispatchOutput) -> bool {
