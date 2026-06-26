@@ -9,6 +9,7 @@ pub fn policy_for_mode(mode: ActiveMode) -> ActiveModePolicy {
                 "fs.list",
                 "fs.stat",
                 "doc.audit",
+                "artifact.apply",
                 "artifact.next",
                 "artifact.audit",
                 "fs.batch_write",

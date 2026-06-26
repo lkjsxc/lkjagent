@@ -26,6 +26,7 @@ fn tool_requiring_prompt_never_has_empty_tool_surface() {
     assert_ne!(owner.effective_policy.allowed_tools, Vec::<&str>::new());
     assert!(!owner.prompt_card.contains("allowed_tools=none"));
     assert!(owner.prompt_card.contains("allowed_tools=fs.read"));
+    assert!(owner.prompt_card.contains("artifact.apply"));
     assert!(owner.prompt_card.contains("graph.state"));
 }
 
