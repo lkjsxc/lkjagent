@@ -66,6 +66,34 @@ fn provider_exchange_writer_persists_files_and_store_rows() -> TestResult<()> {
 }
 
 #[test]
+fn provider_export_refresh_lists_only_existing_files() -> TestResult<()> {
+    let root = temp_root("refresh")?;
+    let conn = memory_store()?;
+    let context = context("8", 9);
+    let handle = record_provider_request(&conn, &root, &context, "{\"messages\":[]}")?;
+    record_provider_response(&conn, &handle, "{\"content\":\"ok\"}", "stop", None, 4)?;
+    record_parsed_action(
+        &handle,
+        "<action>\n<tool>graph.state</tool>\n</action>",
+        "Natural",
+    )?;
+    assert!(fs::read_to_string(handle.dir.join("export.json"))?.contains("parsed-action.json"));
+
+    fs::remove_file(handle.dir.join("parsed-action.json"))?;
+    lkjagent_store::state::set(
+        &conn,
+        "provider exchange dir",
+        &handle.dir.to_string_lossy(),
+    )?;
+    record_provider_admission(&conn, "graph.state", true, "admitted", "<action />")?;
+
+    let export = fs::read_to_string(handle.dir.join("export.json"))?;
+    assert!(!export.contains("parsed-action.json"));
+    assert!(export.contains("admission.json"));
+    Ok(())
+}
+
+#[test]
 fn provider_exchange_writer_records_errors_ndjson() -> TestResult<()> {
     let root = temp_root("error")?;
     let conn = memory_store()?;
