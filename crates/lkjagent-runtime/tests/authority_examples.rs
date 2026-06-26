@@ -12,6 +12,20 @@ fn rendered_model_examples_parse_for_call_model_modes() {
 }
 
 #[test]
+fn owner_missing_plan_prefers_graph_plan_example() {
+    let authority = decide_turn_authority(TurnAuthorityInput {
+        active_owner_case: true,
+        artifact_root: Some("stories/chronos-fracture".to_string()),
+        missing_evidence: vec!["plan".to_string(), "document-structure".to_string()],
+        ..TurnAuthorityInput::default()
+    });
+
+    assert!(authority.valid_example.contains("<tool>graph.plan</tool>"));
+    assert!(authority.valid_example.contains("stories/chronos-fracture"));
+    assert!(parse_completion(&authority.valid_example).is_ok());
+}
+
+#[test]
 fn owner_missing_audit_evidence_prefers_artifact_audit_example() {
     let authority = decide_turn_authority(TurnAuthorityInput {
         active_owner_case: true,

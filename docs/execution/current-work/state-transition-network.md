@@ -160,10 +160,10 @@ active case ids; and ignores maintenance due state when owner work exists.
 Kernel prompt rendering requires persisted event and decision ids, cites
 authority and staleness fingerprints, preserves the admitted tool surface, and
 renders concrete path-scoped `fs.batch_write` examples that parse. Owner prompt
-cards with missing audit-owned evidence render a concrete `artifact.audit`
-example for the active root. Document and artifact audit failures now return
-bounded representative failure lists so recovery prompts do not replay every
-missing path. `graph.state` observations append the effective runtime authority
+cards render `graph.plan` first while plan evidence is missing, then a concrete
+`artifact.audit` example for audit-owned gaps at the active root. Document and
+artifact audit failures now return bounded representative failure lists so
+recovery prompts do not replay every missing path. `graph.state` observations append the effective runtime authority
 overlay when graph fallback text differs from the current admission surface. The
 old turn-authority mission selector delegates shared facts to the kernel
 adapter.
