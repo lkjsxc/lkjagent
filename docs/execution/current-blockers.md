@@ -62,8 +62,8 @@ not the latest exchange.
   not teach `<think>` output and invalid assistant history is not replayed as an
   assistant exemplar.
 - Provider anomalies are classified before parsing for new endpoint responses.
-  Endpoint retry, provider failure notices, and blocked handoff policy still
-  need full kernel ownership.
+  Endpoint retry has a bounded provider-failure pause. Blocked handoff policy
+  still needs full kernel ownership.
 - The transition kernel remains the first authority target. Daemon wiring must
   use one snapshot, one explicit event, one persisted decision, one prompt
   frame, one admission view, one effect observation, and one next event.
@@ -128,8 +128,8 @@ not the latest exchange.
 
 ## Remaining Proof Gaps
 
-- Endpoint retry and blocked-handoff policy for provider anomalies still needs
-  full kernel ownership.
+- Blocked-handoff policy for provider anomalies still needs full kernel
+  ownership.
 - Authority rows still need coverage for every dispatch, recovery, compaction,
   maintenance, and close path.
 - Compaction snapshots need prompt-frame resume proof.

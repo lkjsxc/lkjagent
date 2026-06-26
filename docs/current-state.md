@@ -51,7 +51,7 @@ that is now logged before parsing, and a latest request that no longer teaches
 | --- | --- |
 | Runtime authority | Pure active-mode selection, normalized authority snapshots with queue-head facts, event and decision rows, adapter-valid kernel decision fingerprints, prompt-card decision ids, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, full-fact kernel stale refusal, kernel `agent.done` admission/refusal, and daemon kernel completion-event shadowing exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. The daemon still has parallel authority paths that can disagree. |
 | State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Authority ledger events use canonical kernel event-kind strings. Full unified runtime wiring remains open. |
-| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, and payload-overflow routing to `artifact.next` for known artifacts exist. Provider empty-content anomaly handling and every-route shape-change proof remain open. |
+| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, payload-overflow routing to `artifact.next` for known artifacts, and provider-anomaly retry-budget pause exist. Every-route shape-change proof remains open. |
 | Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` normalizes selected safe payloads and refuses unsafe shapes before mutation. Runtime route changes after repeated schema faults remain open beyond covered classes. |
 | Artifact lifecycle | Scaffold, audit, fact-only `artifact.next`, empty-root identity batches, story semantic readiness checks, bounded write examples, root-scoped cursors, root/path address refusals, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
 | Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, current artifact, next action, valid example, blocked-handoff allowance, and status text. Every close path is not yet proven to call the same artifact-aware gate. |
@@ -119,6 +119,9 @@ export-manifest missing-file records:
 - `cargo test -p lkjagent-runtime --test provider_exchange_log`:
   `PROVIDER_EXCHANGE_LOG_EXIT=0`; includes explicit `missing_files` export
   records and `provider_anomaly` store plus manifest status.
+- `cargo test -p lkjagent-runtime --test provider_anomaly`:
+  `PROVIDER_ANOMALY_EXIT=0`; includes retry-budget pause without parse-fault
+  increments.
 - `cargo test -p lkjagent-store --test provider_exchange`:
   `STORE_PROVIDER_EXCHANGE_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test kernel_admission`:

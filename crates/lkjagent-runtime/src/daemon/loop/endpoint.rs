@@ -8,8 +8,10 @@ use super::runner::{DaemonTick, ResidentDaemon};
 use crate::error::{RuntimeError, RuntimeResult};
 use crate::mode::EndpointDecision;
 use crate::prompt::token_estimate;
-use crate::step::{step, StepInput};
+use crate::step::{step, Effect, StepInput};
 use crate::task::{PendingActionAuthority, TaskState};
+
+const PROVIDER_ANOMALY_RETRY_LIMIT: u32 = 3;
 
 impl ResidentDaemon {
     pub(super) fn endpoint_turn(
@@ -107,10 +109,22 @@ impl ResidentDaemon {
             .completion_tokens
             .unwrap_or_else(|| token_estimate(&completion.content) as u64);
         let result = if let Some(anomaly) = provider_anomaly {
-            step(
+            let mut result = step(
                 self.state.clone(),
                 StepInput::ProviderAnomaly(anomaly.kind.as_str().to_string(), anomaly.detail),
-            )
+            );
+            if self.endpoint_attempt >= PROVIDER_ANOMALY_RETRY_LIMIT {
+                let reason = format!(
+                    "provider anomaly retry budget exhausted; class={}",
+                    anomaly.kind.as_str()
+                );
+                result.state.task = TaskState::Paused {
+                    reason: reason.clone(),
+                };
+                result.effects.push(Effect::Pause { reason });
+                self.endpoint_retry_at = None;
+            }
+            result
         } else {
             step(
                 self.state.clone(),

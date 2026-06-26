@@ -32,7 +32,8 @@ that survives this classifier can become `RawModelText` for the action parser.
 - Provider-native tool call fields are never converted into product actions.
 - `empty_content_with_usage` is not `MissingActionEnvelope`.
 - Endpoint recovery may retry the exact same request only under the endpoint
-  retry budget. After the budget, the runtime records a blocked handoff or
+  retry budget. After three consecutive provider anomalies, the daemon stops
+  retrying, clears the retry deadline, pauses the active task, and records a
   provider failure notice with the current case, turn, and prompt frame ids.
 - A provider anomaly does not increment the parser repeat-fault budget.
 - The next runtime event is `provider_anomaly`, not `parse_fault`.
@@ -68,5 +69,5 @@ Focused tests must prove:
 partially implemented. `lkjagent-llm` classifies empty, missing, malformed,
 reasoning-only, and tool-call-only response shapes before action parsing.
 Runtime provider anomaly handling records endpoint retry state without
-incrementing parse-fault counters. Full kernel-owned retry exhaustion,
-provider-failure notices, and blocked handoff policy remain open.
+incrementing parse-fault counters and pauses after the provider anomaly retry
+budget is exhausted. Full kernel-owned blocked handoff policy remains open.

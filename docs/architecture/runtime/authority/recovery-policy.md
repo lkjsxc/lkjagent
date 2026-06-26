@@ -41,8 +41,9 @@ turn-budget exhaustion.
 ## Required Ladders
 
 - Parse faults simplify the prompt to exactly one action.
-- Provider empty-content anomalies route through endpoint recovery or provider
-  failure notice and do not increment parser repeat-fault counters.
+- Provider empty-content anomalies route through endpoint recovery, then a
+  provider failure pause after the anomaly retry budget, and do not increment
+  parser repeat-fault counters.
 - Parameter faults render one schema-derived example for the failed tool.
 - Payload overflow blocks raw large `fs.write` and moves to batch repair.
 - Invalid batch syntax retries once with the canonical example, then switches
