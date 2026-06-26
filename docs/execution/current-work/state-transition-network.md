@@ -148,9 +148,10 @@ now store kernel-derived authority and staleness fingerprints, and authority
 ledger events use the kernel event-kind taxonomy. The daemon records authority
 prompt frames and effect observations for pending dispatches, writes kernel
 mission and staleness fields into provider `authority.json`, and the kernel
-admits `agent.done` only after evidence gaps are empty. Authority rows record
-kernel shadow mission fields from the persisted authority snapshot and event id,
-and stale cached actions refuse when their prompt-frame head changes. The
+admits `agent.done` only after evidence gaps are empty. Completion-ready active
+graphs now shadow as kernel completion events. Authority rows record kernel
+shadow mission fields from the persisted authority snapshot and event id, and
+stale cached actions refuse when their prompt-frame head changes. The
 snapshot adapter
 computes staleness fingerprints from queue, case, graph, artifact cursor,
 fault, evidence, compaction, maintenance, and prompt facts; rejects synthetic

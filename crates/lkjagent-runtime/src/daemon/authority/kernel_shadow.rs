@@ -53,6 +53,8 @@ fn event_for(snapshot: &RuntimeAuthoritySnapshot) -> RuntimeEvent {
         RuntimeEvent::ContextPressureDetected
     } else if snapshot.recoverable_owner_case {
         RuntimeEvent::TurnBudgetExhausted
+    } else if completion_ready(snapshot) {
+        RuntimeEvent::CompletionRequested
     } else if snapshot.pending_owner_rows > 0 || snapshot.active_owner_case {
         RuntimeEvent::OwnerMessageReceived
     } else if snapshot.maintenance_due || snapshot.maintenance_active {
@@ -60,6 +62,12 @@ fn event_for(snapshot: &RuntimeAuthoritySnapshot) -> RuntimeEvent {
     } else {
         RuntimeEvent::CaseResumed
     }
+}
+
+fn completion_ready(snapshot: &RuntimeAuthoritySnapshot) -> bool {
+    snapshot.active_owner_case
+        && snapshot.graph_node.is_some()
+        && snapshot.missing_evidence.is_empty()
 }
 
 fn persist_decision_fields(
