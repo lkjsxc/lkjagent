@@ -55,7 +55,9 @@ fn owner_prompt_cites_decision_id_and_fingerprints() -> Result<(), String> {
     assert!(frame.contains("event_id=9"));
     assert!(frame.contains("authority_fingerprint=authority:"));
     assert!(frame.contains("staleness_fingerprint=stale:"));
-    assert!(frame.contains("admitted_tools=graph.state,artifact.next,fs.batch_write"));
+    assert!(
+        frame.contains("admitted_tools=graph.state,artifact.apply,artifact.next,fs.batch_write")
+    );
     Ok(())
 }
 

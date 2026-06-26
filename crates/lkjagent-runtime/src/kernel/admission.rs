@@ -85,9 +85,12 @@ pub(crate) fn admitted_tools_for(mission: RuntimeMission) -> Vec<ToolName> {
         RuntimeMission::VerificationRepair => {
             tools(&["artifact.audit", "doc.audit", "graph.state"])
         }
-        RuntimeMission::OwnerExecution => {
-            tools(&["graph.state", "artifact.next", "fs.batch_write"])
-        }
+        RuntimeMission::OwnerExecution => tools(&[
+            "graph.state",
+            "artifact.apply",
+            "artifact.next",
+            "fs.batch_write",
+        ]),
         RuntimeMission::OwnerVerification => tools(&["artifact.audit", "doc.audit"]),
         RuntimeMission::OwnerCompletion => tools(&[
             "artifact.audit",
