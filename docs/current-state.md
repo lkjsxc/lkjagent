@@ -58,7 +58,7 @@ that is now logged before parsing, and a latest request that no longer teaches
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Prompt-frame resume proof remains open. |
 | Maintenance | Idle maintenance, owner queue preemption at turn boundaries, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Every dispatch and close path still needs unified kernel authority proof. |
 | Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, kernel authority fields in `authority.json`, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, self-consistent manifests, explicit missing-file records, and provider-anomaly store plus manifest status exist. |
-| Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Live endpoint smoke remains open. A Chronos smoke at `/tmp/lkjagent-smoke-data-1782466597` reached 60 turns, created a partial story bible, and timed out with `plan`, `document-structure`, and `artifact-readiness` still missing. |
+| Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Live endpoint smoke remains open. The latest Chronos smoke at `/tmp/lkjagent-smoke-data-1782483148` created the required story-bible directory shape and satisfied plan evidence, then timed out during weak-content repair with `document-structure` and `artifact-readiness` still missing. |
 
 ## Active Data Log Evidence
 
