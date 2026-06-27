@@ -127,12 +127,11 @@ prompt-frame, authority, and staleness identifiers.
 
 ## Latest Recorded Verification Evidence
 
-This provider-anomaly slice has focused evidence:
+This completion-gate slice has focused evidence:
 
-- `cargo test -p lkjagent-llm --test wire`: `WIRE_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test provider_anomaly`: `PROVIDER_ANOMALY_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test provider_exchange_log`: `PROVIDER_EXCHANGE_LOG_EXIT=0`.
-- `cargo test -p lkjagent-store --test provider_exchange`: `STORE_PROVIDER_EXCHANGE_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test artifact_ledger_completion`: `ARTIFACT_LEDGER_COMPLETION_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test authority_completion`: `AUTHORITY_COMPLETION_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test kernel_close_paths`: `KERNEL_CLOSE_PATHS_EXIT=0`.
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 
 Before this reconciliation, the latest recorded full verification covered

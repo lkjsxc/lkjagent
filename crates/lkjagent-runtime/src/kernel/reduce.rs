@@ -129,13 +129,24 @@ fn is_verification_repair(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> b
 }
 
 fn owner_mission(event: &RuntimeEvent) -> RuntimeMission {
-    if matches!(event, RuntimeEvent::CompletionRequested) {
+    if is_completion_event(event) {
         RuntimeMission::OwnerCompletion
     } else if matches!(event, RuntimeEvent::VerificationRequested) {
         RuntimeMission::OwnerVerification
     } else {
         RuntimeMission::OwnerExecution
     }
+}
+
+fn is_completion_event(event: &RuntimeEvent) -> bool {
+    matches!(
+        event,
+        RuntimeEvent::CompletionRequested
+            | RuntimeEvent::CompletionAccepted
+            | RuntimeEvent::CompletionRefused
+            | RuntimeEvent::CompletionBlocked
+            | RuntimeEvent::CaseClosed
+    )
 }
 
 fn is_owner_recovery_event(event: &RuntimeEvent) -> bool {
