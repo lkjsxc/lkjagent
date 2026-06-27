@@ -69,5 +69,7 @@ Focused tests must prove:
 partially implemented. `lkjagent-llm` classifies empty, missing, malformed,
 reasoning-only, and tool-call-only response shapes before action parsing.
 Runtime provider anomaly handling records endpoint retry state without
-incrementing parse-fault counters and pauses after the provider anomaly retry
-budget is exhausted. Full kernel-owned blocked handoff policy remains open.
+incrementing parse-fault counters, converts classifier output into a kernel
+`provider_anomaly` event in focused coverage, and pauses after the provider
+anomaly retry budget is exhausted. Full kernel-owned blocked handoff policy
+remains open.

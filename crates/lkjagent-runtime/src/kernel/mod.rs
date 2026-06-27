@@ -10,6 +10,7 @@ pub mod event_kind;
 pub mod facts;
 pub mod fault;
 mod next_action;
+pub mod provider;
 pub mod reduce;
 pub mod render;
 mod repeat_guard;
@@ -33,6 +34,7 @@ pub use facts::{
     ObservationFacts, ProviderFacts, QueueFacts,
 };
 pub use fault::{FaultClass, FaultKey, RuntimeFault};
+pub use provider::provider_anomaly_event;
 pub use reduce::{reduce, reduce_with_event_id, select_mission};
 pub use render::{render_prompt_frame, PromptCardData, PromptRenderError};
 pub use snapshot::{
