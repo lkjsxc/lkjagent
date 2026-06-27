@@ -12,4 +12,5 @@ effect boundary and status surface.
 - [context/](context/README.md): context budget, compaction, persisted guard, and pressure helpers.
 - [effects/](effects/README.md): effect persistence, pending dispatch, graph effects, and transcript records.
 - [artifacts/](artifacts/README.md): scaffold, counted scaffold, and artifact evidence helpers.
+- [shutdown.rs](shutdown.rs): signal-to-shutdown decision helpers.
 - [status/](status/README.md): status fields and task summary rendering.

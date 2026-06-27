@@ -30,6 +30,7 @@ pub struct ActiveModePolicy {
     pub blocked_tools: Vec<&'static str>,
     pub preferred_next_action: &'static str,
     pub completion_condition: &'static str,
+    pub completion_allowed: bool,
     pub graph_policy_applies: bool,
     pub maintenance_policy_applies: bool,
     pub compaction_policy_applies: bool,

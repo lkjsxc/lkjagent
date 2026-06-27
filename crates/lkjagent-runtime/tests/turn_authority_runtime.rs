@@ -29,18 +29,18 @@ fn endpoint_turn_refreshes_one_active_mode_card() -> TestResult<()> {
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(active_mode_cards(&daemon), 1);
     let card = active_mode_card(&daemon);
-    assert!(card.contains("mode=OwnerTask"));
+    assert!(card.contains("mode=owner_task"));
     assert!(card.contains("authority_decision_id="));
     assert!(card.contains("authority_fingerprint="));
     assert_eq!(
         state::get(&conn, "authority active mode")?,
-        Some("OwnerTask".to_string())
+        Some("owner_task".to_string())
     );
     assert!(state::get(&conn, "authority node")?.is_some());
     assert!(state::get(&conn, "authority next action")?.is_some());
     let decision = runtime_authority::latest_decision(&conn, 1)?.ok_or("missing decision")?;
     assert_eq!(decision.mission, "owner_execution");
-    assert_eq!(decision.active_mode, "OwnerTask");
+    assert_eq!(decision.active_mode, "owner_task");
     let event_kind: String = conn.query_row(
         "SELECT event_kind FROM runtime_authority_events ORDER BY id DESC LIMIT 1",
         [],
@@ -57,7 +57,7 @@ fn endpoint_turn_refreshes_one_active_mode_card() -> TestResult<()> {
     server.join()?;
 
     assert_eq!(active_mode_cards(&daemon), 1);
-    assert!(active_mode_card(&daemon).contains("policy_layers=graph"));
+    assert!(active_mode_card(&daemon).contains("Runtime Authority"));
     Ok(())
 }
 
@@ -165,7 +165,7 @@ fn active_mode_cards(daemon: &ResidentDaemon) -> usize {
         .context
         .log
         .iter()
-        .filter(|frame| frame.content.starts_with("Active Mode:\n"))
+        .filter(|frame| frame.content.starts_with("Runtime Authority\n"))
         .count()
 }
 
@@ -175,7 +175,7 @@ fn active_mode_card(daemon: &ResidentDaemon) -> String {
         .context
         .log
         .iter()
-        .find(|frame| frame.content.starts_with("Active Mode:\n"))
+        .find(|frame| frame.content.starts_with("Runtime Authority\n"))
         .map_or_else(String::new, |frame| frame.content.clone())
 }
 

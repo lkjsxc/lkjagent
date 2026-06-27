@@ -105,7 +105,20 @@ fn daemon_recovers_from_repeated_transient_errors_across_tasks() -> TestResult<(
     assert_eq!(daemon.poll_once(&mut conn, "110")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "111")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "112")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "113")?, DaemonTick::Done);
+    let final_tick = daemon.poll_once(&mut conn, "113")?;
+    assert_eq!(
+        final_tick,
+        DaemonTick::Done,
+        "log={}",
+        daemon
+            .state
+            .context
+            .log
+            .iter()
+            .map(|frame| frame.content.as_str())
+            .collect::<Vec<_>>()
+            .join("\n-- frame --\n")
+    );
     server.join()?;
 
     assert_eq!(fs::read_to_string(workspace.join("one.txt"))?, "one");

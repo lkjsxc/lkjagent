@@ -75,5 +75,8 @@ surfaces, recovery routes, or close outcomes.
 
 ## Status
 
-specified. Implementation remains incomplete until every daemon path is routed
-through this driver and tests reconstruct each turn chain from store rows.
+implemented for focused daemon tests, pending final gates. The runtime driver
+persists snapshot, event, decision, prompt frame or runtime effect, admission,
+effect, and observation rows before the next effectful step. The daemon uses
+this driver for endpoint turns and pending dispatch. Final verification must
+prove the same path across the full workspace and Docker gate.

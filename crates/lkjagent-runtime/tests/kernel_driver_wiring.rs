@@ -12,16 +12,18 @@ use lkjagent_runtime::daemon::{
 };
 use lkjagent_runtime::task::{PendingAction, TaskState};
 use lkjagent_store::artifact_ledger::{upsert_artifact, ArtifactLedgerInput};
+use lkjagent_store::graph::{open_case, OpenCase};
 use lkjagent_store::state;
 use support::http::serve_responses;
 use support::{action, runtime_state, store, temp_workspace, TestResult};
 
 #[test]
-fn complete_graph_authority_uses_kernel_completion_event() -> TestResult<()> {
+fn complete_graph_authority_closes_through_kernel_completion_event() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "100", "0")?;
+    open_case(&conn, stored_case(), "2026-01-01T00:00:00Z")?;
     upsert_artifact(&conn, &passed_artifact(), "2026-01-01T00:00:00Z")?;
-    let workspace = temp_workspace("kernel-shadow-completion")?;
+    let workspace = temp_workspace("kernel-driver-completion")?;
     let server = serve_responses(Vec::new())?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
     daemon.state.task = TaskState::Open { turns_remaining: 4 };
@@ -35,7 +37,7 @@ fn complete_graph_authority_uses_kernel_completion_event() -> TestResult<()> {
         staleness_fingerprint: None,
     });
 
-    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Done);
     server.join()?;
 
     assert_eq!(
@@ -69,6 +71,25 @@ fn complete_graph() -> lkjagent_graph::TaskGraphState {
     graph.evidence.pending_checks.clear();
     refresh_completion_state(&mut graph);
     graph
+}
+
+fn stored_case() -> OpenCase {
+    OpenCase {
+        objective: "Finish the story artifact.".to_string(),
+        raw_owner_text: "Finish the story artifact.".to_string(),
+        objective_version: 1,
+        family: "documentation".to_string(),
+        subroute: "story".to_string(),
+        route_reason: "test".to_string(),
+        phase: "execution".to_string(),
+        active_node: "document".to_string(),
+        plan: "test plan".to_string(),
+        evidence_requirements: vec!["artifact-readiness".to_string()],
+        selected_packages: Vec::new(),
+        pending_checks: Vec::new(),
+        next_action_class: "agent.done".to_string(),
+        context_pressure: "green".to_string(),
+    }
 }
 
 fn passed_artifact() -> ArtifactLedgerInput<'static> {

@@ -1,18 +1,13 @@
 #[path = "graph_snapshot.rs"]
 mod graph_snapshot;
-#[path = "kernel_shadow.rs"]
-mod kernel_shadow;
-
 use lkjagent_context::budget::{ContextPressure, LOG_OBSERVATION};
 use lkjagent_context::model::{Frame, FrameKind};
 use rusqlite::Connection;
 
-use super::authority_store::{persist_authority_prompt_frame, persist_authority_snapshot};
+use super::kernel_turn::decide_kernel_authority;
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
-use crate::mode::{
-    decide_turn_authority, render_turn_authority, TurnAuthority, TurnAuthorityInput,
-};
+use crate::mode::{render_turn_authority, TurnAuthority, TurnAuthorityInput};
 use crate::prompt::token_estimate;
 use crate::task::TaskState;
 use graph_snapshot::graph_snapshot;
@@ -44,14 +39,7 @@ impl ResidentDaemon {
         endpoint_retry_pending: bool,
     ) -> RuntimeResult<TurnAuthority> {
         let snapshot = self.authority_snapshot(conn, now, endpoint_retry_pending)?;
-        let mut authority = decide_turn_authority(snapshot.clone().into());
-        persist_authority_snapshot(self, conn, &authority)?;
-        kernel_shadow::persist_kernel_shadow(conn, &snapshot)?;
-        authority.input.latest_decision_id =
-            lkjagent_store::state::get(conn, "authority decision id")?;
-        authority.input.staleness_fingerprint =
-            lkjagent_store::state::get(conn, "kernel staleness fingerprint")?;
-        Ok(authority)
+        decide_kernel_authority(conn, &snapshot, now, endpoint_retry_pending)
     }
 
     pub(super) fn refresh_authority_card(
@@ -59,24 +47,15 @@ impl ResidentDaemon {
         conn: &Connection,
         authority: &TurnAuthority,
     ) -> RuntimeResult<()> {
-        self.state
-            .context
-            .log
-            .retain(|frame| !frame.content.starts_with("Active Mode:\n"));
+        self.state.context.log.retain(|frame| {
+            !frame.content.starts_with("Active Mode:\n")
+                && !frame.content.starts_with("Runtime Authority\n")
+        });
         let rendered = persisted_authority_card(conn, authority)?;
-        persist_authority_prompt_frame(conn, &self.runtime.tools.now, &rendered)?;
         let prompt_frame_id = lkjagent_store::state::get(conn, "authority prompt frame id")?;
-        if let Some(cached) = self.turn_authority.as_mut() {
-            cached.input.prompt_frame_id = prompt_frame_id;
-        }
-        let snapshot = self.authority_snapshot(
-            conn,
-            &self.runtime.tools.now,
-            authority.input.endpoint_retry_pending,
-        )?;
-        kernel_shadow::persist_kernel_shadow(conn, &snapshot)?;
         let staleness = lkjagent_store::state::get(conn, "kernel staleness fingerprint")?;
         if let Some(cached) = self.turn_authority.as_mut() {
+            cached.input.prompt_frame_id = prompt_frame_id;
             cached.input.staleness_fingerprint = staleness;
         }
         self.state.context.log.push(Frame::new(

@@ -86,7 +86,23 @@ impl ToolAdmissionView {
 pub(crate) fn admitted_tools_for(mission: RuntimeMission) -> Vec<ToolName> {
     match mission {
         RuntimeMission::HardRuntimeCompaction | RuntimeMission::ClosedIdle => Vec::new(),
-        RuntimeMission::OwnerRecovery => tools(&["graph.state", "artifact.next", "fs.list"]),
+        RuntimeMission::OwnerRecovery => tools(&[
+            "graph.state",
+            "graph.recover",
+            "graph.plan",
+            "graph.evidence",
+            "graph.transition",
+            "artifact.next",
+            "artifact.audit",
+            "artifact.apply",
+            "doc.audit",
+            "fs.read",
+            "fs.list",
+            "fs.stat",
+            "fs.write",
+            "fs.batch_write",
+            "workspace.summary",
+        ]),
         RuntimeMission::SchemaRepair => tools(&["fs.batch_write", "artifact.next", "graph.state"]),
         RuntimeMission::ArtifactRepair => tools(&[
             "artifact.next",
@@ -101,9 +117,20 @@ pub(crate) fn admitted_tools_for(mission: RuntimeMission) -> Vec<ToolName> {
         }
         RuntimeMission::OwnerExecution => tools(&[
             "graph.state",
+            "graph.plan",
+            "graph.evidence",
+            "graph.note",
+            "agent.ask",
             "artifact.apply",
             "artifact.next",
+            "artifact.audit",
+            "doc.audit",
+            "fs.read",
+            "fs.list",
+            "fs.stat",
+            "fs.write",
             "fs.batch_write",
+            "workspace.summary",
         ]),
         RuntimeMission::OwnerVerification => tools(&["artifact.audit", "doc.audit"]),
         RuntimeMission::OwnerCompletion => tools(&[
@@ -112,7 +139,13 @@ pub(crate) fn admitted_tools_for(mission: RuntimeMission) -> Vec<ToolName> {
             "artifact.next",
             "fs.batch_write",
         ]),
-        RuntimeMission::IdleMaintenance => tools(&["memory.find", "memory.prune"]),
+        RuntimeMission::IdleMaintenance => tools(&[
+            "memory.find",
+            "memory.prune",
+            "memory.save",
+            "agent.done",
+            "agent.ask",
+        ]),
     }
 }
 
@@ -121,7 +154,7 @@ pub(crate) fn blocked_tools_for(mission: RuntimeMission) -> Vec<ToolName> {
         ActiveMode::OwnerTask | ActiveMode::Recovery | ActiveMode::Compaction => {
             tools(&["memory.find", "memory.save"])
         }
-        ActiveMode::Maintenance => tools(&["agent.done", "fs.batch_write"]),
+        ActiveMode::Maintenance => tools(&["fs.batch_write"]),
         ActiveMode::ClosedIdle => Vec::new(),
     }
 }

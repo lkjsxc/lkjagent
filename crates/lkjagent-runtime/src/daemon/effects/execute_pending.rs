@@ -1,9 +1,7 @@
-use lkjagent_store::runtime_authority::{
-    record_effect, record_runtime_observation, RuntimeEffectInput, RuntimeObservationInput,
-};
-use lkjagent_store::state as store_state;
+#[path = "pending_observation.rs"]
+mod pending_observation;
+
 use lkjagent_tools::dispatch::{dispatch_with_text, DispatchOutput};
-use lkjagent_tools::observe::{self, OutputKind};
 use rusqlite::Connection;
 
 use super::authority_admission::{
@@ -11,9 +9,10 @@ use super::authority_admission::{
 };
 use super::pending_staleness::{persisted_action_refusal, stale_action_refusal};
 use super::runner::{DaemonTick, ResidentDaemon};
-use crate::error::RuntimeResult;
+use crate::error::{RuntimeError, RuntimeResult};
 use crate::mode::EndpointDecision;
 use crate::step::{step, StepInput};
+use pending_observation::{notice_output, record_authority_observation};
 
 impl ResidentDaemon {
     pub(super) fn execute_pending(
@@ -26,7 +25,16 @@ impl ResidentDaemon {
             return Ok(None);
         };
         let cached = self.turn_authority.clone();
-        let current = self.decide_authority(conn, now, false)?;
+        let current = if cached
+            .as_ref()
+            .is_some_and(|authority| pending_matches_authority(&pending, authority))
+        {
+            cached
+                .clone()
+                .ok_or_else(|| RuntimeError::Store("cached authority disappeared".to_string()))?
+        } else {
+            self.decide_authority(conn, now, false)?
+        };
         if let Some(message) = persisted_action_refusal(&pending, &current, &pending.action.tool)
             .or_else(|| stale_action_refusal(cached.as_ref(), &current, &pending.action.tool))
         {
@@ -105,88 +113,15 @@ impl ResidentDaemon {
     }
 }
 
-fn record_authority_observation(
-    conn: &Connection,
-    now: &str,
-    admission_id: Option<i64>,
-    output: &DispatchOutput,
-) -> RuntimeResult<()> {
-    let Some(decision_id) = numeric_state(conn, "authority decision id")? else {
-        return Ok(());
-    };
-    let summary = one_line(&output.rendered);
-    let effect_id = record_effect(
-        conn,
-        &RuntimeEffectInput {
-            decision_id,
-            admission_id,
-            effect_kind: effect_kind(&output.kind),
-            effect_summary: &summary,
-            observation_event_id: None,
-            created_at: now,
-        },
-    )?;
-    let (observation_kind, status) = observation_shape(&output.kind);
-    record_runtime_observation(
-        conn,
-        &RuntimeObservationInput {
-            decision_id,
-            admission_id,
-            effect_id: Some(effect_id),
-            observation_event_id: None,
-            observation_kind,
-            status,
-            summary: &summary,
-            created_at: now,
-        },
-    )?;
-    Ok(())
-}
-
-fn effect_kind(kind: &OutputKind) -> &'static str {
-    match kind {
-        OutputKind::Observation { .. } => "tool.dispatch",
-        OutputKind::Notice { .. } => "tool.refusal",
-    }
-}
-
-fn observation_shape(kind: &OutputKind) -> (&'static str, &str) {
-    match kind {
-        OutputKind::Observation { status } => ("observation", status.as_str()),
-        OutputKind::Notice { kind } => ("notice", kind.as_str()),
-    }
-}
-
-fn numeric_state(conn: &Connection, key: &str) -> RuntimeResult<Option<i64>> {
-    let Some(value) = store_state::get(conn, key)? else {
-        return Ok(None);
-    };
-    Ok(value.parse::<i64>().ok())
-}
-
-fn one_line(value: &str) -> String {
-    value
-        .lines()
-        .find(|line| !line.trim().is_empty())
-        .map(|line| line.chars().take(160).collect())
-        .unwrap_or_else(|| "none".to_string())
-}
-
-fn notice_output(
-    state: &mut lkjagent_tools::dispatch::DispatchState,
-    action_text: &str,
-    message: String,
-) -> DispatchOutput {
-    let frame = observe::notice("error", message);
-    let frame_ref = state.next_frame_ref;
-    state.next_frame_ref = state.next_frame_ref.saturating_add(1);
-    state.last_action_text = Some(action_text.to_string());
-    state.last_frame_ref = Some(frame_ref);
-    state.last_output_kind = Some(frame.kind.clone());
-    DispatchOutput {
-        frame_ref,
-        kind: frame.kind,
-        content: frame.content,
-        rendered: frame.rendered,
-    }
+fn pending_matches_authority(
+    pending: &crate::task::PendingAction,
+    authority: &crate::mode::TurnAuthority,
+) -> bool {
+    let persisted = pending.authority_decision_id.is_some()
+        || pending.prompt_frame_id.is_some()
+        || pending.staleness_fingerprint.is_some();
+    persisted
+        && pending.authority_decision_id == authority.input.latest_decision_id
+        && pending.prompt_frame_id == authority.input.prompt_frame_id
+        && pending.staleness_fingerprint == authority.input.staleness_fingerprint
 }

@@ -42,7 +42,7 @@ fn daemon_records_prompt_frame_and_effect_observation() -> TestResult<()> {
         [prompt_frame_id],
         |row| row.get(0),
     )?;
-    assert_eq!(prompt_kind, "authority");
+    assert_eq!(prompt_kind, "model-call");
     assert_eq!(
         state::get(&conn, "kernel mission")?,
         Some("owner_execution".to_string())

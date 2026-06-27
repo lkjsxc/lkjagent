@@ -25,6 +25,7 @@ pub struct KernelTurnRecord {
     pub prompt_frame_id: Option<i64>,
     pub effect_id: Option<i64>,
     pub stage: KernelTurnStage,
+    pub decision: crate::kernel::RuntimeDecision,
 }
 
 #[derive(Debug)]
@@ -67,12 +68,16 @@ pub fn run_kernel_turn(
                 prompt_frame_id: None,
                 effect_id: Some(effect_id),
                 stage: KernelTurnStage::RuntimeEffect,
+                decision,
             })
         }
         _ => {
             let rendered = render_prompt_frame(&decision).map_err(KernelTurnError::Prompt)?;
             let prompt_frame_id = persist_prompt_frame(conn, &input, decision_id, &rendered)
                 .map_err(KernelTurnError::Store)?;
+            decision.admission_view = decision
+                .admission_view
+                .with_current_ids(decision_id.to_string(), prompt_frame_id.to_string());
             Ok(KernelTurnRecord {
                 snapshot_id,
                 event_id,
@@ -80,6 +85,7 @@ pub fn run_kernel_turn(
                 prompt_frame_id: Some(prompt_frame_id),
                 effect_id: None,
                 stage: KernelTurnStage::PromptFrame,
+                decision,
             })
         }
     }
