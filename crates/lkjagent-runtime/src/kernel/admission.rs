@@ -5,6 +5,8 @@ use crate::kernel::snapshot::{StalenessFingerprint, ToolName};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ToolAdmissionView {
+    pub decision_id: Option<String>,
+    pub prompt_frame_id: Option<String>,
     pub active_mode: ActiveMode,
     pub admitted_tools: Vec<ToolName>,
     pub blocked_tools: Vec<ToolName>,
@@ -25,6 +27,8 @@ impl ToolAdmissionView {
         staleness_fingerprint: StalenessFingerprint,
     ) -> Self {
         Self {
+            decision_id: None,
+            prompt_frame_id: None,
             active_mode,
             admitted_tools,
             blocked_tools,
@@ -40,6 +44,16 @@ impl ToolAdmissionView {
 
     pub fn admits(&self, tool: &ToolName) -> bool {
         self.admitted_tools.iter().any(|admitted| admitted == tool)
+    }
+
+    pub fn with_current_ids(
+        mut self,
+        decision_id: impl Into<String>,
+        prompt_frame_id: impl Into<String>,
+    ) -> Self {
+        self.decision_id = Some(decision_id.into());
+        self.prompt_frame_id = Some(prompt_frame_id.into());
+        self
     }
 
     pub fn with_missing_evidence(mut self, missing_evidence: Vec<String>) -> Self {

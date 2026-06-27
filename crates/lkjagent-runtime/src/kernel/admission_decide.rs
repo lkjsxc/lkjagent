@@ -5,6 +5,8 @@ use crate::kernel::snapshot::{StalenessFingerprint, ToolName};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AdmissionRequest {
     pub requested_tool: ToolName,
+    pub decision_id: Option<String>,
+    pub prompt_frame_id: Option<String>,
     pub staleness_fingerprint: StalenessFingerprint,
     pub action_fingerprint: String,
 }
@@ -16,6 +18,8 @@ pub enum AdmissionRefusalKind {
     ToolNotAdmitted,
     CompletionBlocked,
     RepeatFingerprintExhausted,
+    DecisionNotCurrent,
+    PromptFrameNotCurrent,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -38,9 +42,21 @@ impl AdmissionRequest {
     ) -> Self {
         Self {
             requested_tool,
+            decision_id: None,
+            prompt_frame_id: None,
             staleness_fingerprint,
             action_fingerprint: action_fingerprint.into(),
         }
+    }
+
+    pub fn with_current_ids(
+        mut self,
+        decision_id: impl Into<String>,
+        prompt_frame_id: impl Into<String>,
+    ) -> Self {
+        self.decision_id = Some(decision_id.into());
+        self.prompt_frame_id = Some(prompt_frame_id.into());
+        self
     }
 }
 
@@ -48,6 +64,22 @@ pub fn admit_requested_tool(
     view: &ToolAdmissionView,
     request: AdmissionRequest,
 ) -> AdmissionDecision {
+    if view.decision_id.is_some() && request.decision_id != view.decision_id {
+        return refused(
+            view,
+            request,
+            AdmissionRefusalKind::DecisionNotCurrent,
+            "decision id is not current",
+        );
+    }
+    if view.prompt_frame_id.is_some() && request.prompt_frame_id != view.prompt_frame_id {
+        return refused(
+            view,
+            request,
+            AdmissionRefusalKind::PromptFrameNotCurrent,
+            "prompt frame id is not current",
+        );
+    }
     if request.staleness_fingerprint != view.staleness_fingerprint {
         return refused(
             view,

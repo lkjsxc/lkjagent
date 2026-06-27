@@ -173,10 +173,11 @@ overlay when graph fallback text differs from the current admission surface. The
 old turn-authority mission selector delegates shared facts to the kernel
 adapter.
 Kernel
-admission refuses stale cached maintenance actions, changed artifact-cursor
-writes, compaction pressure writes, changed fault, evidence, maintenance, and
-prompt-frame facts, blocked tools, completion requests, and retry-exhausted
-repeated action fingerprints before dispatch. Daemon model-completion handling
+admission refuses stale cached maintenance actions, non-current decision ids,
+non-current prompt frame ids, changed artifact-cursor writes, compaction
+pressure writes, changed fault, evidence, maintenance, and prompt-frame facts,
+blocked tools, completion requests, and retry-exhausted repeated action
+fingerprints before dispatch. Daemon model-completion handling
 can attach the persisted decision id, prompt frame id, and staleness fingerprint
 to pending actions before dispatch, and persisted
 pending actions refuse when the full staleness fingerprint changes. Prompt history
