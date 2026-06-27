@@ -61,17 +61,23 @@ pub fn root(address: &ArtifactAddress) -> String {
 
 pub fn resolved_kind(kind: &str, root: &Path) -> String {
     let trimmed = kind.trim();
-    if !trimmed.is_empty() && !trimmed.eq_ignore_ascii_case("artifact") {
-        return trimmed.to_string();
-    }
     let text = optional_catalog(root);
-    if text.contains("Cookbook") {
-        "cookbook".to_string()
-    } else if story_catalog(&text) {
+    if story_catalog(&text) || story_kind(trimmed) {
         "story".to_string()
+    } else if text.contains("Cookbook") {
+        "cookbook".to_string()
+    } else if !trimmed.is_empty() && !trimmed.eq_ignore_ascii_case("artifact") {
+        trimmed.to_string()
     } else {
         kind_or_default_for_root(trimmed, &root.to_string_lossy())
     }
+}
+
+fn story_kind(kind: &str) -> bool {
+    matches!(
+        kind.to_ascii_lowercase().as_str(),
+        "story" | "novel" | "manuscript"
+    )
 }
 
 fn story_catalog(catalog: &str) -> bool {

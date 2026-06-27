@@ -1,6 +1,5 @@
 mod support;
 
-use std::fs;
 use std::path::Path;
 
 use lkjagent_tools::dispatch::dispatch;
@@ -137,6 +136,19 @@ fn batch_write_empty_path_param_content_refuses_before_mutation() -> TestResult<
 }
 
 #[test]
+fn batch_write_child_file_tags_fail_before_mutation() -> TestResult<()> {
+    let workspace = temp_workspace("batch-child-file-tags")?;
+    let files = "<file>\n<path>stories/long-novel/project/premise.md</path>\n<content># Premise\n\nConcrete content.</content>\n</file>";
+    let output = run_batch(&workspace, files)?;
+
+    assert!(output.contains("schema fault: unsupported <file> child tags"));
+    assert!(!workspace
+        .join("stories/long-novel/project/premise.md")
+        .exists());
+    Ok(())
+}
+
+#[test]
 fn batch_write_json_missing_path_fails_before_mutation() -> TestResult<()> {
     let workspace = temp_workspace("batch-json-missing-path")?;
     let output = run_batch(
@@ -182,9 +194,4 @@ fn run_batch(workspace: &Path, files: &str) -> TestResult<String> {
         &mut dispatch_state,
     )
     .content)
-}
-
-#[allow(dead_code)]
-fn read(path: &Path) -> TestResult<String> {
-    Ok(fs::read_to_string(path)?)
 }

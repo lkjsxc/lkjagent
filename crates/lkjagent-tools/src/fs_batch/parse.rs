@@ -31,10 +31,19 @@ impl InputFormat {
 
 pub fn parse_files(input: &str) -> ToolResult<ParsedBatch> {
     let trimmed = input.trim();
+    if has_child_file_tags(trimmed) {
+        return Err(ToolError::invalid(
+            "schema fault: unsupported <file> child tags in fs.batch_write files; use path: and content: line protocol",
+        ));
+    }
     if trimmed.starts_with('[') || trimmed.starts_with('{') {
         return parse_json_files(trimmed);
     }
     parse_line_protocol(input)
+}
+
+fn has_child_file_tags(input: &str) -> bool {
+    input.contains("<file>") || input.contains("</file>")
 }
 
 fn parse_json_files(input: &str) -> ToolResult<ParsedBatch> {
