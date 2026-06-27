@@ -6,7 +6,7 @@ use crate::dispatch::{
     finish, observe_error, DispatchOutput, DispatchState, GraphEvidenceRecord, ToolRuntime,
 };
 use crate::error::ToolError;
-use crate::observe;
+use crate::observe::{self, OutputKind};
 
 pub fn dispatch_graph_evidence(
     params: &BTreeMap<String, String>,
@@ -42,6 +42,9 @@ pub fn dispatch_graph_evidence(
             runtime,
             state,
         );
+    }
+    if let Some(message) = latest_output_refusal(&kind, state) {
+        return observe_error(ToolError::invalid(message), action_text, runtime, state);
     }
     let summary = param(params, "summary");
     let path = params
@@ -83,6 +86,28 @@ fn known_requirements(state: &DispatchState) -> Vec<String> {
         .into_iter()
         .filter(|item| audit_owned_requirement(item).is_none())
         .collect()
+}
+
+fn latest_output_refusal(kind: &str, state: &DispatchState) -> Option<String> {
+    let output = state.last_output_kind.as_ref()?;
+    if matches!(output, OutputKind::Observation { status } if status == "ok") {
+        return None;
+    }
+    let tool = previous_tool(state)?;
+    let status = match output {
+        OutputKind::Observation { status } => format!("observation:{status}"),
+        OutputKind::Notice { kind } => format!("notice:{kind}"),
+    };
+    Some(format!(
+        "latest tool output cannot support graph evidence; kind={kind}\nprevious_tool={tool}\nprevious_status={status}\nnext=inspect or rerun a successful tool before recording evidence"
+    ))
+}
+
+fn previous_tool(state: &DispatchState) -> Option<String> {
+    let text = state.last_action_text.as_deref()?;
+    let (_, rest) = text.split_once("<tool>")?;
+    let (tool, _) = rest.split_once("</tool>")?;
+    Some(tool.trim().to_string())
 }
 
 fn audit_owned_requirement(kind: &str) -> Option<(&'static str, &'static str)> {

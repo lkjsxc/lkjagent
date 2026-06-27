@@ -93,7 +93,9 @@ after such a question exists and remains open.
 
 Records explicit evidence against a known requirement when the harness cannot
 infer it from a tool output. The runtime links evidence to the active case.
-Known requirements include `plan`, `observation`, `verification`, and
+Evidence cannot immediately follow a refused or failed tool output; the model
+must inspect or rerun a successful tool before recording evidence. Known
+requirements include `plan`, `observation`, `verification`, and
 `document-structure`, plus dynamically registered requirements. Note-like
 kinds such as decision, risk, planning, and recovery are rejected.
 

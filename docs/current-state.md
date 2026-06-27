@@ -44,6 +44,7 @@ no-op maintenance churn, and stale touched-path reporting.
 | Model log | Status, console, `model-log`, exchange exports, raw-case inspection, replay export, and touched paths read durable authority rows. |
 | Artifact lifecycle | Artifact plan, apply, audit, next, cursors, weak paths, invalid roots, story readiness, and completion refusals are ledger-backed. |
 | Recovery | Fault classes, route metadata, retry counters, changed-shape repeat routing, blocked handoff, and canonical examples are covered. |
+| Graph evidence | Direct graph evidence refuses audit-owned requirements and immediate claims after refused or failed tool output. |
 | Compaction | Hard compaction writes resumable pre and post snapshots and resumes through prompt-frame authority. |
 | Maintenance | Maintenance runs only from closed idle, yields to owner work, cools down no-op cycles, and avoids endpoint churn. |
 | Completion | `agent.done` closes only through the artifact-aware completion reducer with evidence and readiness gates satisfied. |
