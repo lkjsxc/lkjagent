@@ -127,11 +127,12 @@ prompt-frame, authority, and staleness identifiers.
 
 ## Latest Recorded Verification Evidence
 
-This kernel-driver slice has focused evidence:
+This admission-gateway slice has focused evidence:
 
-- `cargo test -p lkjagent-runtime --test kernel_turn_driver`: `KERNEL_TURN_DRIVER_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test step`: `STEP_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test turn_authority`: `TURN_AUTHORITY_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test kernel_admission`: `KERNEL_ADMISSION_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test authority_policy`: `AUTHORITY_POLICY_EXIT=0`.
+- `cargo test -p lkjagent-tools --test registry_examples`: `REGISTRY_EXAMPLES_EXIT=0`.
+- `cargo test -p lkjagent-tools --test graph_control_dispatch`: `GRAPH_CONTROL_DISPATCH_EXIT=0`.
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 
 Before this reconciliation, the latest recorded full verification covered
