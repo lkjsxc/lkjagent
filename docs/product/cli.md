@@ -12,7 +12,7 @@ no IPC protocol.
 | --- | --- |
 | `lkjagent run` | Start the daemon in the foreground. Exactly one per store. |
 | `lkjagent send <text>` | Append a user message through lkjagent-store; print its queue id. |
-| `lkjagent status` | Print daemon state, queue depth, open task, question, error, context usage, token usage, and model log path. |
+| `lkjagent status` | Print daemon state, queue depth, open task, authority ids, artifact state, question, error, context usage, token usage, and model log path. |
 | `lkjagent log` | Print transcript events; `--limit N` keeps the newest N and `--follow` tails new ones. |
 | `lkjagent console` | Open an interactive owner console with transcript, bottom status deck, and send prompt. |
 | `lkjagent memory <query>` | Search distilled memory through the full-text index. |
@@ -22,6 +22,10 @@ no IPC protocol.
 All commands accept `--data <dir>` to locate the store and default to the
 container data directory defined in [../operations/running.md](../operations/running.md).
 The graph command reads source graph definitions and active case state.
+`lkjagent status` derives current artifact root, weak cursor, latest decision
+id, prompt frame id, mission, active mode, missing evidence, provider anomaly
+retry state, and next executable action from authority rows when those rows
+exist.
 
 ## Conversation Shape
 

@@ -58,8 +58,9 @@ admission, graph state, or dispatch.
 ## Runtime Records
 
 `authority.json` stores active mode, mission, kernel mission, kernel staleness
-fingerprint, tool surface, preferred next action, recovery route, completion
-gate, invariants, and decision id.
+fingerprint, authority fingerprint, tool surface, preferred next action,
+recovery route, completion gate, invariants, decision id, prompt frame id,
+artifact root, weak cursor, missing evidence, and provider anomaly retry state.
 
 `parsed-action.json` stores parse status, closure mode, envelope mode,
 normalized text hash, parse faults, tool name, parameters, and byte counts.
@@ -68,10 +69,27 @@ normalized text hash, parse faults, tool name, parameters, and byte counts.
 repeat fingerprint, staleness fingerprint, and dispatch plan when accepted.
 
 `observation.txt` stores the tool result or runtime observation shown to the
-model. Redaction markers remain visible.
+model. Redaction markers remain visible. Touched-path synthesis reads this file,
+write observations, artifact ledger rows, and workspace events.
 
 `errors.ndjson` stores one fault per line with class, message, route, retry
 count, and prior action hash.
+
+## Synthesized Run Summary
+
+`data/logs/current-model-run.md` derives active case status from authority rows.
+The active section includes current artifact root, weak cursor, latest decision
+id, prompt frame id, mission, active mode, missing evidence, provider anomaly
+retry state, and next executable action.
+
+Touched paths are derived from artifact ledger rows, successful write
+observations, scaffold observations, and workspace events. Direct graph evidence
+is not the only source. A scaffolded root or successful batch write must appear
+in touched paths even when no direct `graph.evidence` row names it.
+
+Provider anomaly turns are represented as provider anomalies. They do not
+create fake parse, admission, or observation success records. Export manifests
+list present files only plus explicit missing-file records.
 
 ## Store Record
 

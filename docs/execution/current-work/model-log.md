@@ -31,7 +31,9 @@ Raw provider request and response evidence is recorded under the contract in
 ## Inputs
 
 - provider request and response wire structs.
-- runtime authority decision ids and prompt frame fingerprints.
+- runtime authority decision ids, prompt frame ids, and fingerprints.
+- artifact ledger rows, write observations, scaffold observations, and workspace
+  events for touched-path synthesis.
 - parser result or parse fault.
 - admission result.
 - tool observation or runtime error observation.
@@ -44,6 +46,8 @@ Raw provider request and response evidence is recorded under the contract in
 - atomic parsed-action, admission, observation, and index files.
 - atomic export files.
 - `provider_exchange` store rows with hashes and status.
+- active status fields for artifact root, weak cursor, latest decision id,
+  prompt frame id, provider anomaly retry state, and next executable action.
 - sanitized reproduction archive.
 - focused tests for empty content with usage, interrupted output, stop closure,
   admission before dispatch, export manifest integrity, and CLI inspection.
@@ -70,5 +74,7 @@ status `provider_anomaly` instead of `succeeded`. New authority files include
 persisted decision id, prompt frame id, authority fingerprint, kernel mission,
 and staleness fingerprint. The active long-novel log exposes a stale touched-path
 summary: `artifact.apply` and later workspace observation touched the root while
-the synthesized top section says `none`. Live replay proof is tracked by the
-verification plan.
+the synthesized top section says `none`. Provider anomaly turns already avoid
+fake parse, admission, and observation success records; active status still must
+show the same authority ids and next action as dispatch. Live replay proof is
+tracked by the verification plan.
