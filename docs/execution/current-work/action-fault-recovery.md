@@ -20,6 +20,8 @@ produce deterministic normalization or actionable refusal.
   before registry validation and change the recovery route on repeated faults.
 - Classify nested `<file>` child tags inside `fs.batch_write` `<files>` as a
   schema fault before registry validation.
+- Render only line-protocol `fs.batch_write` examples in prompt-facing recovery
+  text.
 
 ## Batch-Write Recovery Contract
 
@@ -35,7 +37,7 @@ controller must classify these parameter shapes:
 - oversized batch;
 - top-level JSON action rejection;
 - JSON-in-files recovery;
-- unsupported child tags.
+- unsupported child tags such as `<file><path>...` inside `<files>`.
 
 Safe normalization may convert path-shaped unknown parameters into the
 canonical `files` payload only when every unknown parameter name is a relative
@@ -111,6 +113,7 @@ refuses before dispatch; and attribute-like tag output now gets a dedicated
 parse fault plus concrete `<paths>` graph-plan repair before registry validation.
 Repeated attribute-like parser faults now switch to `graph.state` inspection
 before a third-fault blocked-handoff notice. The active long-novel child-tag
-batch fault still needs route proof that the second same shape changes to
+batch fault still needs route proof that `artifact.next` returns facts with
+`next_decision_required=true` and that the second same shape changes to
 `artifact.next`, `graph.state`, deterministic inspection, or blocked handoff.
 Route-level proof across every policy path remains open.

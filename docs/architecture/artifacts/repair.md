@@ -11,7 +11,18 @@ fix local links, write a missing manifest, split sequence-only files into
 semantic files, or request a bounded content batch for weak leaves.
 
 Repair never invents a completion claim. It records changed paths and then
-requires a new audit before completion evidence can pass.
+requires a new audit before completion evidence can pass. `artifact.next`
+returns facts and a candidate only; the runtime must create a new decision
+before any candidate write executes.
+
+## Regression Signature
+
+The active long-novel run is the repair regression signature. `artifact.apply`
+created `stories/long-novel-with-detailed-settings` with
+`profile=NarrativeManuscript`, then `doc.audit` found 28 structure-only pages.
+Two `fs.batch_write` attempts used `<file>` child tags inside `<files>` and
+both refused with `invalid parameter: each block must start with path:`. The
+second same fault must not route to another free batch write.
 
 ## Repair Card
 
@@ -31,10 +42,12 @@ blocked_completion: missing evidence and audit blockers
 ## Next Action
 
 The next action must be admitted by the same active policy, usually
-`artifact.next`, `fs.batch_write`, `doc.audit`, or `artifact.audit`.
-`graph.recover` guidance is derived from the currently admitted tools and plan
-state; it does not name `graph.plan` after the plan is ready or when that tool
-is blocked.
+`artifact.next`, canonical line-protocol `fs.batch_write`, `doc.audit`, or
+`artifact.audit`. `graph.recover` guidance is derived from the currently
+admitted tools and plan state; it does not name `graph.plan` after the plan is
+ready or when that tool is blocked. After a repeated child-tag batch fault, the
+next action changes to `artifact.next`, `graph.state`, deterministic
+inspection, or blocked handoff with exact weak paths.
 
 ## Invariants
 

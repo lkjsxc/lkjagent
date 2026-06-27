@@ -8,7 +8,9 @@ singular `<action>` envelope.
 ## Canonical Action Form
 
 The canonical prompt example uses paired tags with the dispatcher line protocol.
-No top-level JSON action output appears in model-facing prompt cards:
+This line protocol is the only prompt-facing batch form. No top-level JSON
+action output and no nested `<file>` child blocks appear in model-facing prompt
+cards:
 
 ```text
 <action>
@@ -55,7 +57,9 @@ Track cause and effect for Chronos Fracture.
 ```
 
 Repeated `<file>` child tags are not valid in the paired-tag grammar because
-parameter names are unique inside one action. If the model repeats adjacent
+parameter names are unique inside one action. A payload such as
+`<files><file><path>...</path><content>...</content></file></files>` is a schema
+fault and is refused before mutation. If the model repeats adjacent
 `<files>...</files>` wrappers for one `fs.batch_write`, the parser merges those
 chunks into the canonical delimiter payload before dispatch. No other repeated
 parameter name is normalized.
@@ -87,7 +91,9 @@ convert that shape into a `files` payload only when all conditions are true:
 
 Unsafe shapes are refused before mutation. The refusal example must be concrete
 and path-scoped. When the current artifact root or weak path is known, the
-example uses that path instead of a placeholder.
+example uses that path instead of a placeholder. After a second equivalent
+child-tag batch fault, recovery changes action class to `artifact.next`,
+`graph.state`, deterministic inspection, or blocked handoff.
 
 ## Limits
 
@@ -111,6 +117,7 @@ Artifact audit records unexpected paths as weak paths under the active root.
   when authority admits `fs.batch_write`.
 - Path-shaped unknown parameters normalize only under the safe recovery rules in
   this contract.
+- Nested `<file>` child tags inside `<files>` refuse as a schema fault.
 - Missing `content:` in any line-protocol block refuses the whole action.
 - Duplicate paths refuse the whole action.
 - Oversized file or batch payloads refuse the whole action before mutation.

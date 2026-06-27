@@ -36,11 +36,14 @@ BatchCursor
   is predictable.
 - Payload overflow moves to `BatchWriteRecovery`.
 - `artifact.next` emits bounded batches and persists the cursor.
-- `fs.batch_write` parser accepts the documented canonical format and normalizes
-  allowed variants.
+- `fs.batch_write` parser accepts the documented canonical line protocol and
+  normalizes allowed variants.
+- Child `<file>` tags inside `<files>` are a schema fault and do not advance the
+  cursor.
 - Schema repair examples are generated from the same schema as dispatch.
-- Repeated batch syntax failure switches to one-file `fs.write` or a native
-  deterministic writer.
+- Repeated child-tag or batch syntax failure switches to `artifact.next`,
+  `graph.state`, deterministic inspection, one-file `fs.write`, or blocked
+  handoff with exact weak paths.
 
 ## Canonical Batch Format
 
@@ -64,7 +67,8 @@ Time lenses expose causality debt instead of changing the past directly.
 </action>
 ```
 
-Rendered examples always use this shape. Normalization may accept `path:foo`,
+Rendered examples always use this shape. Prompt-facing examples never use
+nested `<file>` child tags. Normalization may accept `path:foo`,
 `<path>foo</path>`, tag-like accidental path wrappers, and extra blank lines
 before `path:` when the result is unambiguous.
 
@@ -74,6 +78,7 @@ before `path:` when the result is unambiguous.
 - Compaction resumes at the same path and section.
 - Batch content is rendered through protocol schemas.
 - Cursor progress is stored before the next endpoint turn can lose it.
+- Failed `fs.batch_write` observations leave the cursor on the same weak path.
 - No repeated invalid `fs.batch_write` example is emitted twice as the only
   recovery path.
 
