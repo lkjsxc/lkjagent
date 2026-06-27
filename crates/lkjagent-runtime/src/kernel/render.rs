@@ -83,8 +83,30 @@ pub(crate) fn prompt_card_for(
 }
 
 pub(crate) fn example_for(tool: &str, snapshot: &RuntimeSnapshot) -> String {
-    match (tool, snapshot.artifact.root.as_deref()) {
-        ("fs.batch_write", Some(root)) => format!(
+    let root = snapshot
+        .artifact
+        .root
+        .as_deref()
+        .unwrap_or("stories/active-artifact");
+    match tool {
+        "graph.plan" => format!(
+            "<action>\n<tool>graph.plan</tool>\n<objective>{}</objective>\n</action>",
+            snapshot
+                .case
+                .owner_objective
+                .as_deref()
+                .unwrap_or("record the owner task plan")
+        ),
+        "artifact.apply" => {
+            format!("<action>\n<tool>artifact.apply</tool>\n<root>{root}</root>\n</action>")
+        }
+        "artifact.next" => {
+            format!("<action>\n<tool>artifact.next</tool>\n<root>{root}</root>\n</action>")
+        }
+        "artifact.audit" => {
+            format!("<action>\n<tool>artifact.audit</tool>\n<root>{root}</root>\n</action>")
+        }
+        "fs.batch_write" => format!(
             "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: {root}/README.md\ncontent:\n# Artifact Guide\n\n## Purpose\n\nNavigate the active artifact and list its audit evidence.\n</files>\n</action>"
         ),
         _ => format!("<action>\n<tool>{tool}</tool>\n</action>"),

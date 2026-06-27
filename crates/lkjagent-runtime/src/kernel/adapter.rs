@@ -1,7 +1,8 @@
 use crate::kernel::adapter_fingerprint::fingerprints;
 use crate::kernel::event::RuntimeEvent;
 use crate::kernel::facts::{
-    ArtifactFacts, CaseFacts, ContextFacts, EvidenceFacts, GraphFacts, MaintenanceFacts, QueueFacts,
+    ArtifactFacts, CaseFacts, ContextFacts, EvidenceFacts, GraphFacts, MaintenanceFacts,
+    ProviderFacts, QueueFacts,
 };
 use crate::kernel::fault::RuntimeFault;
 use crate::kernel::reduce::select_mission;
@@ -37,6 +38,10 @@ pub struct SnapshotAdapterInput {
     pub maintenance_due: bool,
     pub maintenance_active: bool,
     pub maintenance_cooldown: bool,
+    pub provider_exchange_id: Option<String>,
+    pub provider_anomaly_class: Option<String>,
+    pub provider_retry_count: u32,
+    pub provider_pause_deadline: Option<String>,
     pub latest_decision_id: Option<String>,
     pub prompt_frame_fingerprint: Option<String>,
 }
@@ -64,6 +69,7 @@ pub fn build_snapshot(
         artifact: artifact_facts(&input),
         context: context_facts(&input),
         maintenance,
+        provider: provider_facts(&input),
         authority_fingerprint,
         staleness_fingerprint,
     });
@@ -153,6 +159,15 @@ fn artifact_facts(input: &SnapshotAdapterInput) -> ArtifactFacts {
         cursor: input.artifact_cursor.clone(),
         batch_cursor: input.artifact_batch_cursor.clone(),
         ..ArtifactFacts::default()
+    }
+}
+
+fn provider_facts(input: &SnapshotAdapterInput) -> ProviderFacts {
+    ProviderFacts {
+        latest_exchange_id: input.provider_exchange_id.clone(),
+        anomaly_class: input.provider_anomaly_class.clone(),
+        retry_count: input.provider_retry_count,
+        pause_deadline: input.provider_pause_deadline.clone(),
     }
 }
 

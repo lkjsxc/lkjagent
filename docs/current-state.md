@@ -127,12 +127,12 @@ prompt-frame, authority, and staleness identifiers.
 
 ## Latest Recorded Verification Evidence
 
-This authority-store slice has focused evidence:
+This kernel reducer slice has focused evidence:
 
-- `cargo test -p lkjagent-store --test authority_ledger`:
-  `AUTHORITY_LEDGER_EXIT=0`.
-- `cargo test -p lkjagent-store --test provider_exchange`:
-  `PROVIDER_EXCHANGE_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test kernel_model`: `KERNEL_MODEL_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test kernel_admission`: `KERNEL_ADMISSION_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test kernel_prompt_render`: `KERNEL_PROMPT_RENDER_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test kernel_mission_matrix`: `KERNEL_MISSION_MATRIX_EXIT=0`.
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 
 Before this reconciliation, the latest recorded full verification covered

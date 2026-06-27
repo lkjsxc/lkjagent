@@ -1,9 +1,10 @@
 use lkjagent_runtime::kernel::{
     reduce, reduce_with_event_id, select_mission, ActionTemplate, ArtifactFacts,
     AuthorityFingerprint, CaseFacts, ContextFacts, EvidenceFacts, GraphFacts, MaintenanceFacts,
-    QueueFacts, RuntimeDecision, RuntimeDecisionId, RuntimeDecisionInput, RuntimeDecisionKind,
-    RuntimeEvent, RuntimeEventId, RuntimeEventKind, RuntimeMission, RuntimeSnapshot,
-    RuntimeSnapshotId, RuntimeSnapshotInput, StalenessFingerprint, ToolAdmissionView,
+    ProviderFacts, QueueFacts, RuntimeDecision, RuntimeDecisionId, RuntimeDecisionInput,
+    RuntimeDecisionKind, RuntimeEvent, RuntimeEventId, RuntimeEventKind, RuntimeMission,
+    RuntimeSnapshot, RuntimeSnapshotId, RuntimeSnapshotInput, StalenessFingerprint,
+    ToolAdmissionView,
 };
 
 fn snapshot() -> Result<RuntimeSnapshot, String> {
@@ -18,6 +19,7 @@ fn snapshot() -> Result<RuntimeSnapshot, String> {
         artifact: ArtifactFacts::default(),
         context: ContextFacts::default(),
         maintenance: MaintenanceFacts::default(),
+        provider: ProviderFacts::default(),
         authority_fingerprint,
         staleness_fingerprint,
     }))
@@ -189,5 +191,5 @@ fn one_event_emits_one_decision_with_event_and_snapshot_ids() -> Result<(), Stri
 
 #[test]
 fn event_catalog_contains_expected_closed_size() {
-    assert_eq!(lkjagent_runtime::kernel::RuntimeEventKind::ALL.len(), 40);
+    assert_eq!(lkjagent_runtime::kernel::RuntimeEventKind::ALL.len(), 56);
 }

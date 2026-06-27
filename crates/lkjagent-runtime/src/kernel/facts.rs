@@ -85,3 +85,11 @@ pub struct MaintenanceFacts {
     pub active: bool,
     pub cooldown_active: bool,
 }
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ProviderFacts {
+    pub latest_exchange_id: Option<String>,
+    pub anomaly_class: Option<String>,
+    pub retry_count: u32,
+    pub pause_deadline: Option<String>,
+}

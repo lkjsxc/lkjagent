@@ -6,7 +6,8 @@ use crate::kernel::decision::{
 use crate::kernel::effect::attach_runtime_effect;
 use crate::kernel::event::RuntimeEvent;
 use crate::kernel::fault::{FaultClass, RuntimeFault};
-use crate::kernel::render::{example_for, prompt_card_for};
+use crate::kernel::next_action::next_action_for;
+use crate::kernel::render::prompt_card_for;
 use crate::kernel::repeat_guard::repeat_guard;
 use crate::kernel::snapshot::{RuntimeEventId, RuntimeSnapshot, ToolName};
 
@@ -20,7 +21,12 @@ pub fn select_mission(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> Runti
     if is_owner_recovery(snapshot, event) {
         return RuntimeMission::OwnerRecovery;
     }
-    if snapshot.artifact.needs_repair() || matches!(event, RuntimeEvent::ArtifactWeakPathFound) {
+    if snapshot.artifact.needs_repair()
+        || matches!(
+            event,
+            RuntimeEvent::ArtifactWeakPathFound | RuntimeEvent::ArtifactAuditFailed
+        )
+    {
         return RuntimeMission::ArtifactRepair;
     }
     if is_verification_repair(snapshot, event) {
@@ -91,7 +97,10 @@ pub fn reduce(
         .then(|| snapshot.evidence.missing.join(","));
     decision.context_package_ids = snapshot.graph.context_package_ids.clone();
     decision.forced_next_action = next_action_for(mission, snapshot);
-    if let Some(ActionTemplate::ExactTool { body, .. }) = &decision.forced_next_action {
+    if let Some(ActionTemplate::ExactTool { body, tool }) = &decision.forced_next_action {
+        if !decision.admission_view.admits(tool) {
+            decision.admission_view.admitted_tools.push(tool.clone());
+        }
         decision.admission_view.exact_next_action = Some(body.clone());
     }
     decision.prompt_card = prompt_card_for(snapshot, mission, active_mode, &decision);
@@ -107,6 +116,7 @@ fn is_schema_repair(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> bool {
 
 fn is_owner_recovery(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> bool {
     is_owner_recovery_event(event)
+        || snapshot.provider.anomaly_class.is_some()
         || snapshot.latest_fault.is_some_and(is_owner_recovery_fault)
         || snapshot.recovery_route.is_some()
 }
@@ -133,7 +143,10 @@ fn is_owner_recovery_event(event: &RuntimeEvent) -> bool {
         event,
         RuntimeEvent::ParseFault { .. }
             | RuntimeEvent::EndpointFault { .. }
+            | RuntimeEvent::ProviderAnomaly { .. }
             | RuntimeEvent::AdmissionRefused { .. }
+            | RuntimeEvent::StaleActionRefused { .. }
+            | RuntimeEvent::RepeatedActionRefused { .. }
             | RuntimeEvent::RepeatActionDetected { .. }
             | RuntimeEvent::PayloadOverflowDetected { .. }
             | RuntimeEvent::ToolFailed { .. }
@@ -166,23 +179,4 @@ fn decision_kind_for(mission: RuntimeMission, close_case: bool) -> RuntimeDecisi
         RuntimeMission::OwnerCompletion => RuntimeDecisionKind::BlockCompletion,
         _ => RuntimeDecisionKind::ModelCall,
     }
-}
-
-fn next_action_for(mission: RuntimeMission, snapshot: &RuntimeSnapshot) -> Option<ActionTemplate> {
-    let tool = match mission {
-        RuntimeMission::HardRuntimeCompaction => return None,
-        RuntimeMission::OwnerRecovery => "graph.state",
-        RuntimeMission::SchemaRepair => "fs.batch_write",
-        RuntimeMission::ArtifactRepair => "artifact.next",
-        RuntimeMission::VerificationRepair => "artifact.audit",
-        RuntimeMission::OwnerExecution => "artifact.next",
-        RuntimeMission::OwnerVerification => "artifact.audit",
-        RuntimeMission::OwnerCompletion => "agent.done",
-        RuntimeMission::IdleMaintenance => "memory.find",
-        RuntimeMission::ClosedIdle => return None,
-    };
-    Some(ActionTemplate::ExactTool {
-        tool: ToolName::from_static(tool),
-        body: example_for(tool, snapshot),
-    })
 }

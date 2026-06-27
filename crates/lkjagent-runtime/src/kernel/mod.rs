@@ -9,6 +9,7 @@ pub mod event;
 pub mod event_kind;
 pub mod facts;
 pub mod fault;
+mod next_action;
 pub mod reduce;
 pub mod render;
 mod repeat_guard;
@@ -29,7 +30,7 @@ pub use event::RuntimeEvent;
 pub use event_kind::RuntimeEventKind;
 pub use facts::{
     ArtifactFacts, CaseFacts, ContextFacts, EvidenceFacts, GraphFacts, MaintenanceFacts,
-    ObservationFacts, QueueFacts,
+    ObservationFacts, ProviderFacts, QueueFacts,
 };
 pub use fault::{FaultClass, FaultKey, RuntimeFault};
 pub use reduce::{reduce, reduce_with_event_id, select_mission};
