@@ -86,6 +86,9 @@ quality.
   post-compaction check, and preserves missing evidence plus refused actions.
 - `repeated-recovery-action`: a refused recovery action signature is blocked
   and the next action uses a different action class.
+- `long-novel-active-run`: the active novel run keeps weak-content repair,
+  child `<file>` tag refusal, provider anomaly retry, artifact-derived touched
+  paths, and maintenance cooldown under one authority decision stream.
 
 ## Verification
 

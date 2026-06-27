@@ -65,6 +65,7 @@ pub enum JudgeKind {
     BreadCookbookArtifact,
     TurnBudgetContinuation,
     UploadedRunFixtures,
+    LongNovelFailure,
     ArtifactAddressController,
     StatusAccounting,
     ModelHandoffLog,

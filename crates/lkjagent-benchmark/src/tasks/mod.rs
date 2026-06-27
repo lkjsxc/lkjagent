@@ -7,6 +7,7 @@ pub mod owner_address;
 pub mod owner_doc_topics;
 pub mod owner_docs;
 pub mod owner_faults;
+pub mod owner_long_novel;
 pub mod owner_loop_content;
 pub mod owner_loop_continuation;
 pub mod owner_loop_regressions;
@@ -42,6 +43,7 @@ pub const TINY: &[BenchmarkTask] = &[
     owner_loop_content::NOTE_TASK,
     owner_loop_content::BREAD_TASK,
     owner_uploaded::TASK,
+    owner_long_novel::TASK,
     owner_address::TASK,
     owner_observability::STATUS_TASK,
     owner_observability::LOG_TASK,
