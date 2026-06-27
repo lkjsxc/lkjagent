@@ -48,7 +48,11 @@ asked to preserve deterministic state.
 
 ## Status
 
-partially implemented. Runtime hard compaction writes pre and post rows to the graph compaction snapshot table,
-including summary fields for recovery, artifact cursor, missing evidence, exact next action, and last successful
-observation. Store reopen coverage for latest snapshot history exists. CLI status renders the active case's latest
-snapshot fields. Prompt-frame resume proof remains open.
+partially implemented. Runtime hard compaction writes pre and post rows to the
+graph compaction snapshot table, including summary fields for recovery,
+artifact cursor, missing evidence, exact next action, and last successful
+observation. Store reopen coverage for latest snapshot history exists. CLI
+status renders the active case's latest snapshot fields. Focused kernel coverage
+proves hard compaction emits a runtime effect and the post-compaction decision
+resumes the same artifact repair action when no stronger facts changed.
+Daemon-wide prompt-frame resume proof remains open.

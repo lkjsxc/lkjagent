@@ -127,13 +127,12 @@ prompt-frame, authority, and staleness identifiers.
 
 ## Latest Recorded Verification Evidence
 
-This maintenance-cooldown slice has focused evidence:
+This compaction-resume slice has focused evidence:
 
-- `cargo test -p lkjagent-runtime --test automatic_maintenance`: `AUTOMATIC_MAINTENANCE_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test kernel_maintenance`: `KERNEL_MAINTENANCE_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test recovery_loop`: `RECOVERY_LOOP_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test compaction_snapshot`: `COMPACTION_SNAPSHOT_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test compaction_prompt_resume`: `COMPACTION_PROMPT_RESUME_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test recursive_guard`: `RECURSIVE_GUARD_EXIT=0`.
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`, `ok check-lines`.
 
 Before this reconciliation, the latest recorded full verification covered
 active-log ledger, model-log authority export, export-manifest missing-file
