@@ -20,11 +20,12 @@ admission, dispatch, observation, recovery route, compaction interrupt,
 maintenance boundary, and close path. Model text is intent or content. Runtime
 data must be authority.
 
-The active `data/logs/current-model-run.md` shows a Chronos Fracture story-bible
-run stuck in recovery. It does not prove file mutation. It proves no touched
-paths, no useful evidence, earlier repeated parse faults, a provider anomaly
-that is now logged before parsing, and a latest request that no longer teaches
-`<think>` output.
+The active `data/logs/current-model-run.md` shows a long-novel artifact run at
+`stories/long-novel-with-detailed-settings`. The scaffold was created, but the
+run is stuck in weak-content repair after `doc.audit` found structure-only
+pages. It also proves repeated invalid child-tag `fs.batch_write` payloads,
+reasoning-only provider anomalies, and stale touched-path reporting that says
+`none` even though artifact operations touched the workspace.
 
 ## Implemented Behavior
 
@@ -58,34 +59,50 @@ that is now logged before parsing, and a latest request that no longer teaches
 | Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Prompt-frame resume proof remains open. |
 | Maintenance | Idle maintenance, owner queue preemption at turn boundaries, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Every dispatch and close path still needs unified kernel authority proof. |
 | Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, kernel authority fields in `authority.json`, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, self-consistent manifests, explicit missing-file records, and provider-anomaly store plus manifest status exist. |
-| Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Live endpoint smoke remains open. The latest Chronos smoke at `/tmp/lkjagent-smoke-data-1782483148` created the required story-bible directory shape and satisfied plan evidence, then timed out during weak-content repair with `document-structure` and `artifact-readiness` still missing. |
+| Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Historical Chronos smoke evidence exists. The active checked-in long-novel log is now the primary replay target for weak-content repair, child-tag batch-write faults, provider anomalies, and touched-path mismatch. |
 
 ## Active Data Log Evidence
 
 `data/logs/current-model-run.md`, `data/logs/index.ndjson`, and the latest turn
 directories prove these facts:
 
-- snapshot: `daemon_state=working`, `active_case=1`,
-  `active_node=recover-by-smaller-scope`, and `active_phase=recovery`;
-- context: `7.59K/24.58K`, about 31 percent used;
-- owner task: create a structured story bible at `stories/chronos-fracture`;
-- touched paths: `none`;
-- evidence ledger: `none`;
-- transcript: earlier `MissingActionEnvelope` faults, batch-write schema
-  errors, and repeated `graph.recover` refusal are present;
-- provider anomaly: turn `000078` records `reasoning_only_response` in
-  `response.json`; no parse, admission, or observation file is listed there;
-- latest completed tool turn: turn `000079` is a valid `graph.state` action with
-  parse, admission, observation, and a self-consistent export manifest;
-- latest indexed directory: turn `000080` contains only `request.json` and
-  `authority.json`, so it is request evidence, not a completed exchange;
-- latest requests contain no `<think>` permission and no invalid assistant
-  replay shaped as thinking before an action.
+- snapshot: `daemon_state=working`, `active_case=1`, `active_node=document`,
+  and `active_phase=execution`;
+- context: `13.46K/24.58K`, about 55 percent used;
+- owner task: create a long novel with detailed settings;
+- maintenance prelude: many case-none idle maintenance cycles repeat no-result
+  memory searches, no-op pruning, and `agent.done` before owner work arrives;
+- artifact root: `stories/long-novel-with-detailed-settings`;
+- state tracks: `document-structure`, `action-param-reliability`, and
+  `observability-ledger`;
+- touched paths: the synthesized top section says `none`, but transcript
+  evidence shows `artifact.apply` created the scaffold and `fs.list` later
+  observed the root, so touched-path synthesis is stale;
+- evidence ledger: `plan` and `observation` only; audit-owned
+  `document-structure` and `artifact-readiness` remain missing;
+- artifact lifecycle: `artifact.apply` created a 39-file scaffold with
+  `profile=NarrativeManuscript` and `kind=novel`;
+- weak-content repair: `doc.audit` failed content readiness with 28
+  structure-only pages and requested `fs.batch_write` or `artifact.next`;
+- schema fault: `fs.batch_write` was attempted twice with `<file>` child tags
+  inside `<files>` and refused with `invalid parameter: each block must start
+  with path:`;
+- recovery defect: after the first schema fault, `graph.recover` allowed the
+  same invalid batch-write shape to repeat instead of forcing `artifact.next` or
+  a canonical line-protocol batch example;
+- provider anomalies: turns 59 and 62 record `reasoning_only_response` and keep
+  parser retry counts unchanged;
+- verification: document audit and artifact readiness audit remain pending.
 
-The checked-in active log does not prove successful creation under the Chronos
-root. The old empty-content-with-usage turn at
-`data/logs/model/epoch-1782344195/case-1/turn-000019` remains a historical
-fixture for provider anomaly replay; it is not the latest exchange.
+## Historical Live Smoke Evidence
+
+Chronos evidence remains historical, not active checked-in data. The recorded
+Chronos smoke at `/tmp/lkjagent-smoke-data-1782483148` created the story-bible
+directory shape and plan evidence, then timed out during weak-content repair
+with `document-structure` and `artifact-readiness` still missing. The older
+empty-content-with-usage turn at
+`data/logs/model/epoch-1782344195/case-1/turn-000019` remains a provider anomaly
+replay fixture, not the latest exchange.
 
 ## Active Target
 
@@ -104,14 +121,22 @@ EffectObservation -> RuntimeEvent
 
 The decision must be persisted before prompt rendering, endpoint calls,
 dispatch, recovery, compaction, maintenance, or close attempts. The next narrow
-proof is that model-log authority artifacts expose the same persisted decision,
-prompt-frame, authority, and staleness identifiers that dispatch admission uses.
+proof is that the long-novel weak-content repair, provider anomaly, touched-path
+summary, and dispatch admission all expose and use the same persisted decision,
+prompt-frame, authority, and staleness identifiers.
 
-## Latest Local Evidence
+## Latest Recorded Verification Evidence
 
-This slice updated the active-log ledger, model-log authority export,
-export-manifest missing-file records, authority staleness facts, and recovery
-counter handling:
+This active-state reconciliation has focused docs evidence:
+
+- `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`,
+  `ok check-docs`.
+- `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`,
+  `ok check-lines`.
+
+Before this reconciliation, the latest recorded full verification covered
+active-log ledger, model-log authority export, export-manifest missing-file
+records, authority staleness facts, and recovery counter handling:
 
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 - `cargo test -p lkjagent-runtime --test authority_ledger_wiring`:

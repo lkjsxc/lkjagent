@@ -10,49 +10,50 @@ that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Reconcile active data log and prompt anomaly contracts | [current-work/state-transition-network.md](current-work/state-transition-network.md) | implemented |
-| 2 | Complete transition-kernel contract and data model | [current-work/state-transition-network.md](current-work/state-transition-network.md) | active |
-| 3 | Store ledgers and snapshot adapter for kernel records | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
-| 4 | Prompt frame and dispatch admission through one decision id | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
-| 5 | Provider anomaly handling and endpoint recovery | [current-work/model-log.md](current-work/model-log.md) | partially implemented |
-| 6 | Schema and batch-write recovery | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | partially implemented |
-| 7 | Recovery shape enforcement for every fault class | [current-work/recovery-shape-enforcement.md](current-work/recovery-shape-enforcement.md) | partially implemented |
-| 8 | Artifact address adoption and invalid-root durability | [current-work/artifact-address-controller.md](current-work/artifact-address-controller.md) | partially implemented |
-| 9 | Artifact readiness and completion gate coverage | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | partially implemented |
-| 10 | Compaction resume proof and status rendering | [current-work/durable-compaction-history.md](current-work/durable-compaction-history.md) | partially implemented |
-| 11 | Idle-only maintenance and owner preemption proof | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | partially implemented |
-| 12 | Provider exchange export and raw-case inspection | [current-work/model-log.md](current-work/model-log.md) | partially implemented |
-| 13 | Replay benchmarks from current model run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | partially implemented |
-| 14 | Final live Docker story run and compose verification | [current-work/verification-plan.md](current-work/verification-plan.md) | implemented |
-| 15 | Personal diary, schedule, and TODO records | [current-work/personal-records.md](current-work/personal-records.md) | open |
+| 1 | Complete transition-kernel contract and long-novel authority wiring | [current-work/state-transition-network.md](current-work/state-transition-network.md) | active |
+| 2 | Store ledgers and snapshot adapter for kernel records | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
+| 3 | Prompt frame and dispatch admission through one decision id | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
+| 4 | Provider anomaly handling and endpoint recovery | [current-work/model-log.md](current-work/model-log.md) | partially implemented |
+| 5 | Schema and batch-write recovery | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | partially implemented |
+| 6 | Recovery shape enforcement for every fault class | [current-work/recovery-shape-enforcement.md](current-work/recovery-shape-enforcement.md) | partially implemented |
+| 7 | Artifact address adoption and invalid-root durability | [current-work/artifact-address-controller.md](current-work/artifact-address-controller.md) | partially implemented |
+| 8 | Artifact readiness and completion gate coverage | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | partially implemented |
+| 9 | Compaction resume proof and status rendering | [current-work/durable-compaction-history.md](current-work/durable-compaction-history.md) | partially implemented |
+| 10 | Idle-only maintenance and owner preemption proof | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | partially implemented |
+| 11 | Provider exchange export and raw-case inspection | [current-work/model-log.md](current-work/model-log.md) | partially implemented |
+| 12 | Replay benchmarks from current long-novel run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | partially implemented |
+| 13 | Final live Docker story run and compose verification | [current-work/verification-plan.md](current-work/verification-plan.md) | implemented |
+| 14 | Personal diary, schedule, and TODO records | [current-work/personal-records.md](current-work/personal-records.md) | open |
 
 ## Current Evidence
 
 `data/logs/current-model-run.md` and `data/logs/index.ndjson` are active
 evidence. The checked-in run proves these facts:
 
-- active case `1` is working at `recover-by-smaller-scope` in recovery;
-- the owner task is the Chronos Fracture story bible rooted at
-  `stories/chronos-fracture`;
-- touched paths are `none`, so the run does not prove successful artifact
-  creation or any file mutation;
-- the evidence ledger has no useful evidence, including no
-  `document-structure` or `artifact-readiness` evidence;
-- earlier turns include `MissingActionEnvelope`, `bad envelope prose before
-  action envelope`, batch-write schema errors, and repeated `graph.recover`
-  refusal;
-- turn `000078` records `provider_anomaly.reasoning_only_response` in
-  `response.json` and does not list parse, admission, or observation files;
-- turn `000079` records a valid `graph.state` action, parse, admission,
-  observation, and a self-consistent export manifest;
-- turn `000080` is the latest indexed directory but contains request and
-  authority evidence only;
-- latest request history contains no `<think>` permission and no invalid
-  assistant thinking replay.
+- active case `1` is at node `document` in phase `execution`;
+- the owner task is `Create a long novel. with detailed settings`;
+- before owner enqueue, case-none maintenance repeats empty memory searches,
+  no-op pruning, and `agent.done` instead of staying closed idle;
+- the artifact root is `stories/long-novel-with-detailed-settings`;
+- active tracks are `document-structure`, `action-param-reliability`, and
+  `observability-ledger`;
+- the evidence ledger has `plan` and `observation` only;
+- the top touched-paths section says `none`, but transcript evidence shows
+  `artifact.apply` created the scaffold and `fs.list` observed the root;
+- `doc.audit` failed content readiness with 28 weak structure-only pages;
+- two `fs.batch_write` attempts used invalid `<file>` child tags inside
+  `<files>` and both refused with `invalid parameter: each block must start
+  with path:`;
+- `graph.recover` did not force a changed action shape before the repeated
+  invalid batch write;
+- turns 59 and 62 record `provider_anomaly.reasoning_only_response`;
+- document audit and artifact readiness audit remain pending.
 
-The active log does not prove successful creation under the Chronos root. The
-old empty-content-with-usage turn remains a historical provider anomaly fixture,
-not the latest exchange.
+Historical Chronos evidence remains useful but is not the active checked-in
+run. Recorded Chronos smoke created story-bible structure and plan evidence,
+then timed out during weak-content repair with `document-structure` and
+`artifact-readiness` missing. The old empty-content-with-usage turn remains a
+historical provider anomaly fixture.
 
 ## Ordering Notes
 
@@ -73,12 +74,11 @@ not the latest exchange.
   case id, graph node and phase, active mode, artifact root and cursor, latest
   fault, missing evidence, compaction pressure, maintenance state, and prompt
   frame head.
-- Schema repair for `fs.batch_write` remains important, but the active checked-in
-  log now points first at transition-kernel ownership and authority artifact
-  proof.
+- Schema repair for `fs.batch_write` is active because the long-novel log
+  repeats invalid `<file>` child blocks after a schema refusal.
 - Recovery routes must change repeated action shape. Repeated `graph.recover`
-  refusal must force `graph.state`, `artifact.next`, deterministic inspection,
-  or blocked handoff.
+  or child-tag batch faults must force `graph.state`, `artifact.next`,
+  deterministic inspection, or blocked handoff.
 - Direct graph evidence, scaffold topology, README-only content, and
   owner-term-only pages do not satisfy artifact readiness.
 - Maintenance can start only from closed idle with an empty owner queue and no
@@ -122,10 +122,10 @@ not the latest exchange.
   writers, missing-file records, provider-anomaly status, and CLI list/show. New
   authority files include persisted decision, prompt-frame, authority, and
   staleness identifiers.
-- Live compose smoke `/tmp/lkjagent-smoke-data-19` closed the Chronos story
-  task after `artifact.audit` reported `readiness=story-semantic-content` and
-  graph evidence recorded audit-owned `document-structure` and
-  `artifact-readiness` rows.
+- Historical Chronos compose evidence includes a closed story task after
+  `artifact.audit` reported `readiness=story-semantic-content` and graph
+  evidence recorded audit-owned `document-structure` and `artifact-readiness`
+  rows; it is not the active checked-in run.
 
 ## Remaining Proof Gaps
 
@@ -139,5 +139,5 @@ not the latest exchange.
 - Rendered refusal examples need route-level proof across every policy path.
 - Artifact adoption, ledger-root repair, invalid-root completion markers, and
   semantic readiness remain incomplete.
-- Parser-level and runtime-level replay fixtures must cover the active current
-  data-log failure.
+- Parser-level and runtime-level replay fixtures must cover the active
+  long-novel data-log failure, including stale touched-path synthesis.

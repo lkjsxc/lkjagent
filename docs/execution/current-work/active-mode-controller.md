@@ -10,8 +10,9 @@ semantics at every endpoint turn.
 
 Uploaded run logs show maintenance and graph policy contradicting each other,
 compaction requiring `memory.save` while graph policy refuses it, recovery
-blocking the tool needed to escape, and completion closing without the
-requested artifact.
+blocking the tool needed to escape, completion closing without the requested
+artifact, and the active long-novel log churning through no-op maintenance
+cycles before owner work arrives.
 
 ## Failure Modes
 
@@ -107,6 +108,8 @@ authority, completion policy, mode rendering, dispatch-level effective policy,
 stale maintenance action refusal before dispatch, and effective `agent.done`
 completion refusal exist. Focused tests prove idle maintenance, owner queue
 preemption at turn boundaries, maintenance write-tool refusal, stale graph
-policy isolation, and closed-idle endpoint suppression. Broader stale-action
-contradiction repair, artifact-aware close gates, stronger per-case authority
-history, and richer compaction snapshots remain open.
+policy isolation, and closed-idle endpoint suppression. The active long-novel
+log still requires proof that empty maintenance records cooldown and returns to
+closed idle without endpoint churn. Broader stale-action contradiction repair,
+artifact-aware close gates, stronger per-case authority history, and richer
+compaction snapshots remain open.

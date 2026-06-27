@@ -18,12 +18,14 @@ produce deterministic normalization or actionable refusal.
   root or weak path is known.
 - Classify attribute-like tags such as `<path=stories/chronos-fracture</path>`
   before registry validation and change the recovery route on repeated faults.
+- Classify nested `<file>` child tags inside `fs.batch_write` `<files>` as a
+  schema fault before registry validation.
 
 ## Batch-Write Recovery Contract
 
-`fs.batch_write` has a special live failure class: missing `files` plus an
-unknown parameter whose name is a relative path. The recovery controller must
-classify these parameter shapes:
+`fs.batch_write` has live failure classes for missing `files` plus a relative
+path parameter, and for unsupported child tags inside `<files>`. The recovery
+controller must classify these parameter shapes:
 
 - missing `files`;
 - path-shaped unknown parameters;
@@ -91,6 +93,8 @@ class. Route selection is:
 - `doc.scaffold` receives `path` and fails instead of using `root`.
 - `fs.batch_write` receives `stories/chronos-fracture/catalog.toml` as an
   unknown parameter while `files` is missing.
+- The long-novel run repeats `<file><path>...` child blocks inside `<files>`
+  after the first schema refusal.
 - The same invalid action is retried without a new recovery strategy.
 - A refusal example parses but dispatch later rejects it.
 
@@ -106,5 +110,7 @@ path shape has focused tool coverage; `graph.plan` conditional `checks|paths`
 refuses before dispatch; and attribute-like tag output now gets a dedicated
 parse fault plus concrete `<paths>` graph-plan repair before registry validation.
 Repeated attribute-like parser faults now switch to `graph.state` inspection
-before a third-fault blocked-handoff notice. Route-level proof across every
-policy path remains open.
+before a third-fault blocked-handoff notice. The active long-novel child-tag
+batch fault still needs route proof that the second same shape changes to
+`artifact.next`, `graph.state`, deterministic inspection, or blocked handoff.
+Route-level proof across every policy path remains open.
