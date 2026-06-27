@@ -32,9 +32,8 @@ required before the reliability redesign can close.
 
 partially implemented. Benchmark fixtures cover uploaded owner failures,
 including provider exchange parsed-action, admission, observation,
-prompt-frame-id, and replay-export requirements. Historical Chronos replay and
-compose evidence prove story artifact close after plan, semantic audit,
-verification evidence, catalog presence, no part files, and printable model-log
-output. The active checked-in fixture is now the long-novel run: weak-content
-repair after scaffold, child-tag batch-write faults, provider anomalies,
-stale touched paths, and pending document plus artifact audits must be covered.
+prompt-frame-id, replay-export requirements, and the active long-novel failure
+signature. Historical Chronos replay and compose evidence prove story artifact
+close after plan, semantic audit, verification evidence, catalog presence, no
+part files, and printable model-log output. A fresh live Docker story run is
+still required before final runtime completion claims.
