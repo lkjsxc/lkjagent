@@ -66,4 +66,6 @@ readiness checks in `artifact.audit`, and completion refusal status with current
 artifact plus next audit action exist. The active long-novel log proves scaffold
 identity is not readiness evidence and weak story pages must drive
 `artifact.next`, canonical line-protocol `fs.batch_write`, and re-audit before
-close. Adoption repair flow and proof for every close path remain open.
+close. Kernel close-path coverage now routes case-close events through the
+completion gate and refuses unresolved weak paths. Adoption repair flow and
+full daemon proof for every close path remain open.
