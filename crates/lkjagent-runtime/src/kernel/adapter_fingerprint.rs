@@ -56,6 +56,17 @@ fn staleness_parts(input: &SnapshotAdapterInput, owner_work_exists: bool) -> Vec
             input.maintenance_cooldown
         ),
         format!(
+            "provider={:?}:{}:{}",
+            input.provider_anomaly_class,
+            input.provider_retry_count,
+            input.provider_pause_deadline.as_deref().unwrap_or("")
+        ),
+        format!(
+            "observation={}:{}",
+            input.latest_observation.as_deref().unwrap_or(""),
+            input.latest_successful_observation.as_deref().unwrap_or("")
+        ),
+        format!(
             "prompt={}",
             input.prompt_frame_fingerprint.as_deref().unwrap_or("")
         ),

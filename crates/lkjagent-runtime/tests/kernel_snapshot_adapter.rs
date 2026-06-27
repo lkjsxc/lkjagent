@@ -101,6 +101,28 @@ fn latest_fault_selects_recovery_mode() -> Result<(), String> {
     Ok(())
 }
 
+#[test]
+fn provider_anomaly_and_observation_change_staleness() -> Result<(), String> {
+    let first = build_snapshot(owner_input()).map_err(format_error)?;
+    let mut changed = owner_input();
+    changed.provider_anomaly_class = Some("reasoning_only_response".to_string());
+    changed.provider_retry_count = 1;
+    changed.latest_observation = Some("schema fault".to_string());
+    changed.latest_successful_observation = Some("artifact scaffolded".to_string());
+    let second = build_snapshot(changed).map_err(format_error)?;
+    assert_ne!(first.staleness_fingerprint, second.staleness_fingerprint);
+    assert_eq!(
+        second.provider.anomaly_class.as_deref(),
+        Some("reasoning_only_response")
+    );
+    assert_eq!(second.observation.latest.as_deref(), Some("schema fault"));
+    assert_eq!(
+        second.observation.latest_successful.as_deref(),
+        Some("artifact scaffolded")
+    );
+    Ok(())
+}
+
 fn format_error(error: SnapshotAdapterError) -> String {
     format!("{error:?}")
 }

@@ -127,12 +127,10 @@ prompt-frame, authority, and staleness identifiers.
 
 ## Latest Recorded Verification Evidence
 
-This kernel reducer slice has focused evidence:
+This snapshot-adapter slice has focused evidence:
 
-- `cargo test -p lkjagent-runtime --test kernel_model`: `KERNEL_MODEL_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test kernel_admission`: `KERNEL_ADMISSION_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test kernel_prompt_render`: `KERNEL_PROMPT_RENDER_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test kernel_mission_matrix`: `KERNEL_MISSION_MATRIX_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test kernel_snapshot_adapter`: `KERNEL_SNAPSHOT_ADAPTER_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test authority_ledger_wiring`: `AUTHORITY_LEDGER_WIRING_EXIT=0`.
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 
 Before this reconciliation, the latest recorded full verification covered
