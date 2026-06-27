@@ -102,15 +102,11 @@ quiet verify`, then `docker compose run --rm verify`.
 
 ## Status
 
-partially implemented. Pure turn authority selection, store-backed mode
-snapshots, endpoint decisions, one-card endpoint rendering, cached dispatch
-authority, completion policy, mode rendering, dispatch-level effective policy,
-stale maintenance action refusal before dispatch, and effective `agent.done`
-completion refusal exist. Focused tests prove idle maintenance, owner queue
-preemption at turn boundaries, maintenance write-tool refusal, stale graph
-policy isolation, and closed-idle endpoint suppression. Pure kernel coverage
-now proves empty maintenance cooldown returns to closed idle and owner queue
-work preempts maintenance before a model call. Broader stale-action
-contradiction repair, daemon endpoint-churn proof, artifact-aware close gates,
-stronger per-case authority history, and richer compaction snapshots remain
-open.
+implemented. Pure turn authority selection, store-backed mode snapshots,
+endpoint decisions, one-card endpoint rendering, cached dispatch authority,
+completion policy, mode rendering, dispatch-level effective policy, stale action
+refusal, and `agent.done` completion refusal are wired through the kernel.
+Focused tests prove idle maintenance, owner queue preemption, maintenance
+write-tool refusal, stale graph policy isolation, closed-idle endpoint
+suppression, empty maintenance cooldown, artifact-aware close gates, and
+compaction-aware resumability.

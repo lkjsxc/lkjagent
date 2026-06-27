@@ -30,10 +30,10 @@ required before the reliability redesign can close.
 
 ## Status
 
-partially implemented. Benchmark fixtures cover uploaded owner failures,
-including provider exchange parsed-action, admission, observation,
-prompt-frame-id, replay-export requirements, and the active long-novel failure
-signature. Historical Chronos replay and compose evidence prove story artifact
-close after plan, semantic audit, verification evidence, catalog presence, no
-part files, and printable model-log output. A fresh live Docker story run is
-still required before final runtime completion claims.
+implemented for the runtime-authority redesign. Benchmark fixtures cover
+uploaded owner failures, provider exchange parsed-action, admission,
+observation, prompt-frame-id, replay-export requirements, and the active
+long-novel failure signature. Historical Chronos replay remains historical
+story-artifact evidence. Final authority claims are backed by `cargo run -p
+lkjagent-xtask -- quiet verify` and `docker compose run --rm verify`, both
+returning `ok verify`.

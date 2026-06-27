@@ -26,4 +26,5 @@ until code and gates prove the behavior is repaired.
 
 ## Status
 
-partially implemented
+implemented for runtime-authority failures. Personal record projections remain
+tracked separately.

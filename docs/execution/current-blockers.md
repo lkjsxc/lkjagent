@@ -10,18 +10,18 @@ that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Complete transition-kernel contract and long-novel authority wiring | [current-work/state-transition-network.md](current-work/state-transition-network.md) | active |
-| 2 | Store ledgers and snapshot adapter for kernel records | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
-| 3 | Prompt frame and dispatch admission through one decision id | [current-work/state-transition-network.md](current-work/state-transition-network.md) | partially implemented |
-| 4 | Provider anomaly handling and endpoint recovery | [current-work/model-log.md](current-work/model-log.md) | partially implemented |
-| 5 | Schema and batch-write recovery | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | partially implemented |
-| 6 | Recovery shape enforcement for every fault class | [current-work/recovery-shape-enforcement.md](current-work/recovery-shape-enforcement.md) | partially implemented |
-| 7 | Artifact address adoption and invalid-root durability | [current-work/artifact-address-controller.md](current-work/artifact-address-controller.md) | partially implemented |
-| 8 | Artifact readiness and completion gate coverage | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | partially implemented |
-| 9 | Compaction resume proof and status rendering | [current-work/durable-compaction-history.md](current-work/durable-compaction-history.md) | partially implemented |
-| 10 | Idle-only maintenance and owner preemption proof | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | partially implemented |
-| 11 | Provider exchange export and raw-case inspection | [current-work/model-log.md](current-work/model-log.md) | partially implemented |
-| 12 | Replay benchmarks from current long-novel run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | partially implemented |
+| 1 | Complete transition-kernel contract and long-novel authority wiring | [current-work/state-transition-network.md](current-work/state-transition-network.md) | implemented |
+| 2 | Store ledgers and snapshot adapter for kernel records | [current-work/state-transition-network.md](current-work/state-transition-network.md) | implemented |
+| 3 | Prompt frame and dispatch admission through one decision id | [current-work/state-transition-network.md](current-work/state-transition-network.md) | implemented |
+| 4 | Provider anomaly handling and endpoint recovery | [current-work/model-log.md](current-work/model-log.md) | implemented |
+| 5 | Schema and batch-write recovery | [current-work/action-fault-recovery.md](current-work/action-fault-recovery.md) | implemented |
+| 6 | Recovery shape enforcement for every fault class | [current-work/recovery-shape-enforcement.md](current-work/recovery-shape-enforcement.md) | implemented |
+| 7 | Artifact address adoption and invalid-root durability | [current-work/artifact-address-controller.md](current-work/artifact-address-controller.md) | implemented |
+| 8 | Artifact readiness and completion gate coverage | [current-work/artifact-ledger-completion.md](current-work/artifact-ledger-completion.md) | implemented |
+| 9 | Compaction resume proof and status rendering | [current-work/durable-compaction-history.md](current-work/durable-compaction-history.md) | implemented |
+| 10 | Idle-only maintenance and owner preemption proof | [current-work/active-mode-controller.md](current-work/active-mode-controller.md) | implemented |
+| 11 | Provider exchange export and raw-case inspection | [current-work/model-log.md](current-work/model-log.md) | implemented |
+| 12 | Replay benchmarks from current long-novel run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | implemented |
 | 13 | Final live Docker story run and compose verification | [current-work/verification-plan.md](current-work/verification-plan.md) | implemented |
 | 14 | Personal diary, schedule, and TODO records | [current-work/personal-records.md](current-work/personal-records.md) | open |
 
@@ -63,11 +63,11 @@ historical provider anomaly fixture.
   not teach `<think>` output and invalid assistant history is not replayed as an
   assistant exemplar.
 - Provider anomalies are classified before parsing for new endpoint responses.
-  Endpoint retry has a bounded provider-failure pause. Blocked handoff policy
-  still needs full kernel ownership.
-- The transition kernel remains the first authority target. Daemon wiring must
-  use one snapshot, one explicit event, one persisted decision, one prompt
-  frame, one admission view, one effect observation, and one next event.
+  Endpoint retry has a bounded provider-failure pause and blocked handoff is a
+  kernel-owned route.
+- The transition kernel is the runtime authority. Daemon wiring uses one
+  snapshot, one explicit event, one persisted decision, one prompt frame, one
+  admission view, one effect observation, and one next event.
 - Graph policy is guidance for the snapshot. It is not fallback dispatch
   authority after runtime admission refuses a tool.
 - Stale-action refusal must use the full staleness fingerprint: queue head,
@@ -129,15 +129,7 @@ historical provider anomaly fixture.
 
 ## Remaining Proof Gaps
 
-- Blocked-handoff policy for provider anomalies still needs full kernel
-  ownership.
-- Authority rows still need coverage for every dispatch, recovery, compaction,
-  maintenance, and close path.
-- Compaction snapshots need prompt-frame resume proof.
-- Stale-action contradiction repair is not covered for every daemon mode.
-- Recovery shape-change enforcement is not proven for every live fault class.
-- Rendered refusal examples need route-level proof across every policy path.
-- Artifact adoption, ledger-root repair, invalid-root completion markers, and
-  semantic readiness remain incomplete.
-- Parser-level and runtime-level replay fixtures must cover the active
-  long-novel data-log failure, including stale touched-path synthesis.
+No runtime-authority proof gaps remain after focused tests, `quiet verify`, and
+the Docker Compose final gate. The open queue item is personal diary,
+schedule, and TODO projection work, which is outside the runtime-authority
+redesign.

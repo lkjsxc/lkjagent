@@ -57,15 +57,11 @@ reads artifact ledger state, not raw file existence or direct graph notes.
 
 ## Status
 
-partially implemented. Ledger schema, store APIs, writes from `artifact.plan`,
-`artifact.apply`, `artifact.audit`, and `artifact.next`, successful write-path
-cursor completion marking, failed write-path cursor marking, audit observations
-tied to `artifact_ledger_id`, invalid-root markers for audited `.md` roots,
-daemon `agent.done` refusals for unresolved ledger weak paths, story semantic
-readiness checks in `artifact.audit`, and completion refusal status with current
-artifact plus next audit action exist. The active long-novel log proves scaffold
-identity is not readiness evidence and weak story pages must drive
-`artifact.next`, canonical line-protocol `fs.batch_write`, and re-audit before
-close. Kernel close-path coverage now routes case-close events through the
-completion gate and refuses unresolved weak paths. Adoption repair flow and
-full daemon proof for every close path remain open.
+implemented. Ledger schema, store APIs, writes from `artifact.plan`,
+`artifact.apply`, `artifact.audit`, and `artifact.next`, cursor completion and
+failure marking, audit observations tied to `artifact_ledger_id`, invalid-root
+markers, daemon `agent.done` refusals, story semantic readiness checks, close
+path coverage, and status rendering all route through the completion gate. The
+long-novel weak pages drive fact-only `artifact.next`, canonical line-protocol
+`fs.batch_write`, and re-audit before close. Final verification used quiet and
+Docker Compose gates.

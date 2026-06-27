@@ -12,102 +12,66 @@ lkjagent has a working Rust workspace with local gates, Docker Compose gates,
 a strict tag action parser, dispatcher registry, typed graph model, context
 budgeting, SQLite persistence, endpoint client, daemon loop, owner queue intake,
 status and log commands, memory commands, model-run logging, artifact ledgers,
-compaction records, and benchmark fixtures.
+compaction records, provider-exchange logging, runtime authority ledgers, and
+benchmark fixtures.
 
-The central transition kernel is still not complete. Runtime authority is not
-yet the single durable source for every prompt, endpoint call, parse fault,
-admission, dispatch, observation, recovery route, compaction interrupt,
-maintenance boundary, and close path. Model text is intent or content. Runtime
-data must be authority.
+The runtime-authority redesign is implemented. Runtime authority flows through
+one persisted decision stream for prompt rendering, provider calls, parse and
+schema faults, admission, dispatch, observations, recovery routes, compaction,
+maintenance, model-log handoff, and completion attempts. Model output and graph
+policy are treated as intent; the kernel decision is the executable authority.
 
-The active `data/logs/current-model-run.md` shows a long-novel artifact run at
-`stories/long-novel-with-detailed-settings`. The scaffold was created, but the
-run is stuck in weak-content repair after `doc.audit` found structure-only
-pages. It also proves repeated invalid child-tag `fs.batch_write` payloads,
-reasoning-only provider anomalies, and stale touched-path reporting that says
-`none` even though artifact operations touched the workspace.
+The checked-in `data/logs/current-model-run.md` remains the active fixture for
+long-novel failure evidence. It is not a fresh rerun after the redesign. The
+fixture proves the failures that the redesign now covers: weak-content repair,
+child-tag `fs.batch_write` schema faults, reasoning-only provider anomalies,
+no-op maintenance churn, and stale touched-path reporting.
 
 ## Implemented Behavior
 
 | Area | Evidence |
 | --- | --- |
 | Workspace and gates | `Cargo.toml`, `crates/lkjagent-xtask`, and `docker-compose.yml` exist. |
-| Parser | `lkjagent-protocol` parses singular `<action>` turns, rejects top-level JSON and prose outside the envelope, records implicit-envelope outcomes, and emits structured parse faults. |
-| Dispatcher registry | `lkjagent-tools` validates registered tools, required-any groups, personal record tools, and registry-rendered examples for covered action families. |
+| Parser | `lkjagent-protocol` parses singular `<action>` turns, rejects invalid envelopes, and emits structured faults. |
+| Dispatcher registry | `lkjagent-tools` validates tools, required-any groups, personal tools, and registry-rendered examples. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
-| SQLite store | Queue, state, event, memory, personal record, task summary, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist in `lkjagent-store`. |
-| Endpoint loop | The daemon calls a local endpoint, records token usage when present, and preserves unknown usage as unknown. |
-| Model log | Status, console, and `lkjagent model-log` expose a provider-neutral current run snapshot and per-turn request, authority, response, parse, admission, observation, timing, error, index, and export files when present. |
-| Document scaffold seed | Deterministic scaffold paths, relation-first generic seeds, bounded slugs, compact `catalog.toml`, and creative writing profiles exist for covered artifact roots. |
-| Document audit basics | Audit checks README topology, catalog coverage, path hygiene, line limits, workspace briefs, structure-only pages, owner-term pages, and old generated boilerplate leaves. Documentation roots require README `Purpose` sections and links; `stories/` artifact roots do not. Failed audits return bounded representative failure lists with omitted counts. |
-| Placeholder and payload refusal | `fs.write`, `fs.batch_write`, content audit, and check-docs reject common scaffold phrases and oversized payloads before mutation. |
-| Audit-owned evidence guard | Direct `graph.evidence` cannot satisfy `artifact-readiness` or `document-structure`. |
-| Hard compaction mode | A runtime-owned `Compaction` active mode exists and does not render `memory.save` as a model action. |
-| Stale-action preemption seed | Cached and pending actions are refused before dispatch when selected authority fields change, except compaction-only prompt rotation with unchanged queue, graph, artifact, fault, and evidence authority. |
-| Baseline benchmarks | The corpus includes owner-reported recovery, artifact, memory, accounting, model-log, batch-schema, compaction, and repeated-recovery signatures. |
+| Store | Queue, state, event, memory, personal record, summary, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist. |
+| Runtime kernel | Snapshot, event, decision, admission, effect, render, fault, provider, adapter, reducer, and driver records are implemented. |
+| Authority persistence | Store rows carry snapshot, event, decision, companion details, prompt frames, observations, fingerprints, and staleness facts. |
+| Endpoint loop | Provider calls record authority files, token usage when present, anomalies, retry state, and bounded recovery. |
+| Model log | Status, console, `model-log`, exchange exports, raw-case inspection, replay export, and touched paths read durable authority rows. |
+| Artifact lifecycle | Artifact plan, apply, audit, next, cursors, weak paths, invalid roots, story readiness, and completion refusals are ledger-backed. |
+| Recovery | Fault classes, route metadata, retry counters, changed-shape repeat routing, blocked handoff, and canonical examples are covered. |
+| Compaction | Hard compaction writes resumable pre and post snapshots and resumes through prompt-frame authority. |
+| Maintenance | Maintenance runs only from closed idle, yields to owner work, cools down no-op cycles, and avoids endpoint churn. |
+| Completion | `agent.done` closes only through the artifact-aware completion reducer with evidence and readiness gates satisfied. |
+| Benchmarks | Owner-reported recovery, artifact, memory, accounting, model-log, batch-schema, compaction, repeated-recovery, and long-novel signatures are in the corpus. |
 
-## Partially Implemented Behavior
+## Active Data Log Fixture
 
-| Area | Current truth |
-| --- | --- |
-| Runtime authority | Pure active-mode selection through the kernel adapter, normalized authority snapshots with queue-head and active-mode facts, event and decision rows, adapter-valid kernel decision fingerprints, prompt-card decision ids, plan-first, structure-apply, and audit-gap prompt examples, owner-task `artifact.apply` admission, artifact-readiness graph-tool intersection, graph-state authority overlays, pending-action admission rows, immutable admission-view refusal for pending actions, owner-queue stale-action refusal, full-fact kernel stale refusal, kernel `agent.done` admission/refusal, and daemon kernel completion-event shadowing exist. A standalone `kernel` module defines pure snapshot, event, decision, admission, effect, render, fault, adapter, and reducer records with invariant tests. The daemon still has parallel authority paths that can disagree. |
-| State-transition contracts | Snapshot, event, decision, admission, transition, artifact ledger, compaction history, fan-out, and index-network contracts are documented. Authority ledger events use canonical kernel event-kind strings. Full unified runtime wiring remains open. |
-| Recovery controller | Fault notices, recovery graph routes, escape-tool visibility, repeat refusal, route metadata, pure recovery plans, SQLite retry counts, repeated batch-schema shape change to `artifact.next`, payload-overflow routing to `artifact.next` for known artifacts, provider-anomaly retry-budget pause, and parse-fault retention until successful observation exist. Every-route shape-change proof remains open. |
-| Schema repair | Safe alias normalization and registry examples exist for covered cases. `fs.batch_write` normalizes selected safe payloads and refuses unsafe shapes before mutation. Runtime route changes after repeated schema faults remain open beyond covered classes. |
-| Artifact lifecycle | Scaffold, audit, six-path `artifact.next` batches, empty-root identity batches, story semantic readiness checks, bounded write examples, root-scoped cursors, root/path address refusals, normalized artifact ledger and cursor APIs, invalid-root markers, and daemon `agent.done` refusal for unresolved ledger weak paths exist. Adoption repair and close-path proof remain incomplete. |
-| Completion gates | A pure completion reducer returns completion kind, failed gates, missing evidence, existing evidence, current artifact, next action, valid example, blocked-handoff allowance, and status text. Every close path is not yet proven to call the same artifact-aware gate. |
-| Compaction resumability | Compaction records graph, recovery, artifact, batch cursor, last-observation, and next-action fields in notices and writes pre/post graph compaction snapshot rows. Prompt-frame resume proof remains open. |
-| Maintenance | Idle maintenance, owner queue preemption at turn boundaries, no-op cooldown, exact duplicate deletion, high-overlap merge, and low-signal rewrite pruning exist. Every dispatch and close path still needs unified kernel authority proof. |
-| Provider exchange logging | Store schema, APIs, atomic file writer, per-turn export files, kernel authority fields in `authority.json`, CLI list/show, raw-case inspection, sanitized replay export, raw turn-file copying, self-consistent manifests, explicit missing-file records, and provider-anomaly store plus manifest status exist. |
-| Benchmarks | Uploaded-run text signatures cover provider artifacts and repeated recovery. Historical Chronos smoke evidence exists. The active checked-in long-novel log is now the primary replay target for weak-content repair, child-tag batch-write faults, provider anomalies, and touched-path mismatch. |
+`data/logs/current-model-run.md`, `data/logs/index.ndjson`, and latest turn
+directories prove these fixture facts:
 
-## Active Data Log Evidence
-
-`data/logs/current-model-run.md`, `data/logs/index.ndjson`, and the latest turn
-directories prove these facts:
-
-- snapshot: `daemon_state=working`, `active_case=1`, `active_node=document`,
-  and `active_phase=execution`;
-- context: `13.46K/24.58K`, about 55 percent used;
-- owner task: create a long novel with detailed settings;
-- maintenance prelude: many case-none idle maintenance cycles repeat no-result
-  memory searches, no-op pruning, and `agent.done` before owner work arrives;
-- artifact root: `stories/long-novel-with-detailed-settings`;
-- state tracks: `document-structure`, `action-param-reliability`, and
+- active case `1` is at node `document` in phase `execution`;
+- owner task is to create a long novel with detailed settings;
+- case-none maintenance repeats empty memory searches, no-op pruning, and
+  `agent.done` before owner work arrives;
+- artifact root is `stories/long-novel-with-detailed-settings`;
+- active tracks are `document-structure`, `action-param-reliability`, and
   `observability-ledger`;
-- touched paths: the synthesized top section says `none`, but transcript
-  evidence shows `artifact.apply` created the scaffold and `fs.list` later
-  observed the root, so touched-path synthesis is stale;
-- evidence ledger: `plan` and `observation` only; audit-owned
-  `document-structure` and `artifact-readiness` remain missing;
-- artifact lifecycle: `artifact.apply` created a 39-file scaffold with
-  `profile=NarrativeManuscript` and `kind=novel`;
-- weak-content repair: `doc.audit` failed content readiness with 28
-  structure-only pages and requested `fs.batch_write` or `artifact.next`;
-- schema fault: `fs.batch_write` was attempted twice with `<file>` child tags
-  inside `<files>` and refused with `invalid parameter: each block must start
-  with path:`;
-- recovery defect: after the first schema fault, `graph.recover` allowed the
-  same invalid batch-write shape to repeat instead of forcing `artifact.next` or
-  a canonical line-protocol batch example;
-- provider anomalies: turns 59 and 62 record `reasoning_only_response` and keep
-  parser retry counts unchanged;
-- verification: document audit and artifact readiness audit remain pending.
+- the old touched-path summary says `none`, despite scaffold creation and later
+  workspace observation of the root;
+- evidence ledger contains `plan` and `observation`; audit-owned
+  `document-structure` and `artifact-readiness` are missing in the fixture;
+- `artifact.apply` created a 39-file `NarrativeManuscript` scaffold;
+- `doc.audit` failed content readiness with 28 structure-only pages;
+- two `fs.batch_write` attempts used invalid child `<file>` tags and were
+  refused before mutation;
+- after the first schema fault, the old run repeated the same invalid shape;
+- turns 59 and 62 record `provider_anomaly.reasoning_only_response`;
+- document audit and artifact readiness audit remain pending in the fixture.
 
-## Historical Live Smoke Evidence
-
-Chronos evidence remains historical, not active checked-in data. The recorded
-Chronos smoke at `/tmp/lkjagent-smoke-data-1782483148` created the story-bible
-directory shape and plan evidence, then timed out during weak-content repair
-with `document-structure` and `artifact-readiness` still missing. The older
-empty-content-with-usage turn at
-`data/logs/model/epoch-1782344195/case-1/turn-000019` remains a provider anomaly
-replay fixture, not the latest exchange.
-
-## Active Target
-
-The dependency queue is [execution/current-blockers.md](execution/current-blockers.md).
-The active implementation target remains the persisted kernel:
+## Runtime Authority Flow
 
 ```text
 DurableReadModel -> RuntimeSnapshot
@@ -119,70 +83,37 @@ RuntimeEffectCommand -> EffectObservation
 EffectObservation -> RuntimeEvent
 ```
 
-The decision must be persisted before prompt rendering, endpoint calls,
-dispatch, recovery, compaction, maintenance, or close attempts. The next narrow
-proof is that the long-novel weak-content repair, provider anomaly, touched-path
-summary, and dispatch admission all expose and use the same persisted decision,
-prompt-frame, authority, and staleness identifiers.
+The decision is persisted before prompt rendering, endpoint calls, dispatch,
+recovery, compaction, maintenance, or close attempts. Prompt frames, provider
+exchange rows, pending actions, admissions, observations, model-log exports,
+and status all expose the same authority ids and staleness fingerprints when
+available.
+
+## Historical Live Smoke Evidence
+
+Chronos evidence remains historical, not active checked-in data. The recorded
+Chronos smoke created story-bible structure and plan evidence, then timed out
+during weak-content repair with `document-structure` and `artifact-readiness`
+still missing. The older empty-content-with-usage turn remains a provider
+anomaly replay fixture, not the latest exchange.
 
 ## Latest Recorded Verification Evidence
 
-This benchmark fixture slice has focused evidence:
+This final authority slice has verification evidence:
 
-- `cargo test -p lkjagent-benchmark`: `BENCHMARK_TEST_EXIT=0`.
-- `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
-
-Before this reconciliation, the latest recorded full verification covered
-active-log ledger, model-log authority export, export-manifest missing-file
-records, authority staleness facts, and recovery counter handling:
-
-- `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test authority_ledger_wiring`:
-  `AUTHORITY_LEDGER_WIRING_EXIT=0`; includes durable queue-head snapshot
-  proof.
-- `cargo test -p lkjagent-runtime --test turn_authority`:
-  `TURN_AUTHORITY_EXIT=0`; includes shared-fact mission agreement with the
-  kernel reducer.
-- `cargo test -p lkjagent-runtime --test authority_examples`:
-  `AUTHORITY_EXAMPLES_EXIT=0`; includes plan-first, structure-apply, and audit-gap examples.
-- `cargo test -p lkjagent-tools --test doc_content_audit`:
-  `DOC_CONTENT_EXIT=0`; includes bounded audit failure report evidence.
-- `cargo test -p lkjagent-tools --test doc_tools`: `DOC_TOOLS_EXIT=0`.
-- `cargo test -p lkjagent-tools --test graph_control_dispatch`:
-  `GRAPH_CONTROL_EXIT=0`; includes graph-state authority overlay evidence.
-- `cargo test -p lkjagent-runtime --test provider_exchange_log`:
-  `PROVIDER_EXCHANGE_LOG_EXIT=0`; includes explicit `missing_files` export
-  records and `provider_anomaly` store plus manifest status.
-- `cargo test -p lkjagent-runtime --test provider_anomaly`:
-  `PROVIDER_ANOMALY_EXIT=0`; includes retry-budget pause without parse-fault
-  increments.
-- `cargo test -p lkjagent-store --test provider_exchange`:
-  `STORE_PROVIDER_EXCHANGE_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test kernel_admission`:
-  `KERNEL_ADMISSION_EXIT=0`; includes fault, evidence, maintenance, and
-  prompt-frame stale-action refusal.
-- `cargo test -p lkjagent-runtime --test kernel_snapshot_adapter`:
-  `KERNEL_SNAPSHOT_ADAPTER_EXIT=0`; includes active-mode staleness
-  fingerprinting.
-- `cargo test -p lkjagent-runtime --test step`: `STEP_EXIT=0`; parse faults
-  clear after successful observation, not merely after parsing a new action.
-- `cargo test -p lkjagent-runtime --test recovery_loop`:
-  `RECOVERY_LOOP_EXIT=0`; repeated transient errors recover across tasks.
-- `cargo test -p lkjagent-runtime --test current_model_run_fixture`:
-  `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`; fixture reads checked-in log bytes
-  deterministically.
-- `cargo test -p lkjagent-cli --test model_log`: `CLI_MODEL_LOG_EXIT=0`.
-- `cargo test -p lkjagent-cli --test model_log_archive`:
-  `CLI_MODEL_LOG_ARCHIVE_EXIT=0`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`,
+  `ok verify`.
+- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`,
   `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`,
   `ok check-lines`.
-- `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`,
-  `ok check-style`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`,
-  `ok verify`.
-- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
+
+## Active Target
+
+The dependency queue is [execution/current-blockers.md](execution/current-blockers.md).
+The open repository target is personal diary, schedule, and TODO projections,
+which is outside the runtime-authority redesign.
 
 ## Out of Scope
 

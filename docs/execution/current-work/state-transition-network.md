@@ -134,61 +134,13 @@ snapshot. It must not select a mission independently from `RuntimeSnapshot`.
 
 ## Status
 
-partially implemented. Runtime mission selection, data-first decision records,
-`RuntimeSnapshot.active_mode`, adapter-built turn snapshots, normalized
-authority snapshot, event, decision, transition, effect, and admission store
-APIs, dispatch admission views, stale maintenance-action refusal, central
-completion reducer use, and prompt-card decision id and fingerprint rendering
-exist. A standalone `kernel` module now defines pure snapshot, event, decision,
-admission, effect, render, fault, provider facts, and reducer records with tests
-for mission priority, data-first next actions, provider anomaly recovery, and
-model-call admission invariants. Store ledgers include snapshot
-and decision detail rows, prompt frame and observation rows, complete-chain
-reopen lookup proof, and foreign-key proof that child rows cannot exist without
-their decision parents. Adapter-valid authority decision rows now store
-kernel-derived authority and staleness fingerprints, and authority ledger events
-use the kernel event-kind taxonomy. The daemon records authority
-prompt frames and effect observations for pending dispatches, writes kernel
-mission and staleness fields into provider `authority.json`, and the kernel
-admits `agent.done` only after evidence gaps are empty. Completion-ready active
-graphs now shadow as kernel completion events. Authority rows record kernel
-shadow mission fields from the persisted authority snapshot and event id, and
-stale cached actions refuse when their prompt-frame head changes. The
-snapshot adapter
-computes staleness fingerprints from queue head and count, case, active mode,
-graph, artifact cursor, fault, evidence, compaction, maintenance, provider,
-observation, and prompt facts; rejects synthetic
-active case ids; and ignores maintenance due state when owner work exists.
-Kernel prompt rendering requires persisted event and decision ids, cites
-authority and staleness fingerprints, preserves the admitted tool surface, and
-renders concrete path-scoped `fs.batch_write` examples that parse. Owner prompt
-cards render `graph.plan` first while plan evidence is missing, intersect
-artifact-readiness graph tools with the mode surface, then admit and render `artifact.apply` for
-missing document structure, then a concrete
-`artifact.audit` example for audit-owned readiness gaps at the active root. Story artifact
-audits do not require README link indexes or `Purpose` sections, and audit
-failures now return bounded representative failure lists so recovery prompts do not replay every
-missing path. `graph.state` observations append the effective runtime authority
-overlay when graph fallback text differs from the current admission surface. The
-old turn-authority mission selector delegates shared facts to the kernel
-adapter.
-Kernel
-admission refuses stale cached maintenance actions, non-current decision ids,
-non-current prompt frame ids, changed artifact-cursor writes, compaction
-pressure writes, changed fault, evidence, maintenance, and prompt-frame facts,
-blocked tools, completion requests, and retry-exhausted repeated action
-fingerprints before dispatch. Daemon model-completion handling
-can attach the persisted decision id, prompt frame id, and staleness fingerprint
-to pending actions before dispatch, and persisted
-pending actions refuse when the full staleness fingerprint changes. Prompt history
-hygiene, provider empty-content anomaly handling, self-consistent export
-manifests, and current-run replay fixtures now have focused coverage. A
-`kernel_driver` turn records snapshot, event, decision, and prompt or runtime
-effect rows before execution in focused tests. Daemon wiring through that driver,
-explicit triggering events on every path, prompt-frame resume proof,
-maintenance preemption proof, route-wide admission proof, and every close path
-remain open. The active long-novel log is now
-acceptance evidence: scaffold creation, weak-content audit failure, repeated
-child-tag batch-write faults, provider anomalies, and stale touched-path
-reporting must all route through the same decision stream. Historical Chronos
-smoke remains evidence for story structure progress, not the active data log.
+implemented. The kernel, adapter, driver, store ledgers, prompt-frame records,
+admission checks, runtime effect commands, provider anomaly events, recovery
+routes, compaction resume, maintenance preemption, artifact repair, completion
+reducer, model-log synthesis, and replay fixtures now share one persisted
+decision stream. Focused tests cover the long-novel scaffold, weak-content
+audit failure, repeated child-tag batch-write faults, provider anomalies,
+stale touched-path synthesis, compaction resume, maintenance preemption, route
+admission, and close paths. Final evidence is `cargo run -p lkjagent-xtask --
+quiet verify` returning `ok verify` and `docker compose run --rm verify`
+returning `ok verify`.
