@@ -45,6 +45,7 @@ This directory holds integration tests for dispatch and every tool adapter.
 - [fs_placeholder.rs](fs_placeholder.rs): write placeholder and atomic batch fixtures.
 - [knowledge_path_guard.rs](knowledge_path_guard.rs): recursive knowledge write fences.
 - [graph_control_dispatch.rs](graph_control_dispatch.rs): graph, control, and dispatcher notice fixtures.
+- [graph_evidence_guard.rs](graph_evidence_guard.rs): graph evidence honesty guard fixtures.
 - [graph_policy.rs](graph_policy.rs): graph dispatch policy refusal fixtures.
 - [graph_recover.rs](graph_recover.rs): admitted recovery guidance fixtures.
 - [memory_tools.rs](memory_tools.rs): memory dedupe and punctuation search fixtures.

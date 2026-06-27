@@ -164,6 +164,7 @@ pub(crate) fn finish(
     state.next_frame_ref = state.next_frame_ref.saturating_add(1);
     state.last_action_text = Some(action_text.to_string());
     state.last_frame_ref = Some(frame_ref);
+    state.last_output_kind = Some(frame.kind.clone());
     DispatchOutput {
         frame_ref,
         kind: frame.kind,

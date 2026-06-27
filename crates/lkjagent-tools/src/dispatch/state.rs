@@ -28,6 +28,7 @@ impl ToolRuntime {
 pub struct DispatchState {
     pub last_action_text: Option<String>,
     pub last_frame_ref: Option<usize>,
+    pub last_output_kind: Option<OutputKind>,
     pub next_frame_ref: usize,
     pub repeat_count: usize,
     pub reads: Vec<ReadRecord>,
@@ -46,6 +47,7 @@ impl Default for DispatchState {
         Self {
             last_action_text: None,
             last_frame_ref: None,
+            last_output_kind: None,
             next_frame_ref: 1,
             repeat_count: 0,
             reads: Vec::new(),
@@ -107,6 +109,7 @@ impl DispatchState {
     pub fn reset_repeat_tracking(&mut self) {
         self.last_action_text = None;
         self.last_frame_ref = None;
+        self.last_output_kind = None;
         self.repeat_count = 0;
     }
 }
