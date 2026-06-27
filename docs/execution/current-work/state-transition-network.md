@@ -181,10 +181,12 @@ can attach the persisted decision id, prompt frame id, and staleness fingerprint
 to pending actions before dispatch, and persisted
 pending actions refuse when the full staleness fingerprint changes. Prompt history
 hygiene, provider empty-content anomaly handling, self-consistent export
-manifests, and current-run replay fixtures now have focused coverage. Daemon
-wiring through the new kernel, explicit triggering events on every path,
-prompt-frame resume proof, maintenance preemption proof, route-wide admission
-proof, and every close path remain open. The active long-novel log is now
+manifests, and current-run replay fixtures now have focused coverage. A
+`kernel_driver` turn records snapshot, event, decision, and prompt or runtime
+effect rows before execution in focused tests. Daemon wiring through that driver,
+explicit triggering events on every path, prompt-frame resume proof,
+maintenance preemption proof, route-wide admission proof, and every close path
+remain open. The active long-novel log is now
 acceptance evidence: scaffold creation, weak-content audit failure, repeated
 child-tag batch-write faults, provider anomalies, and stale touched-path
 reporting must all route through the same decision stream. Historical Chronos

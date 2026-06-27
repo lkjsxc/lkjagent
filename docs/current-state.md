@@ -127,10 +127,11 @@ prompt-frame, authority, and staleness identifiers.
 
 ## Latest Recorded Verification Evidence
 
-This snapshot-adapter slice has focused evidence:
+This kernel-driver slice has focused evidence:
 
-- `cargo test -p lkjagent-runtime --test kernel_snapshot_adapter`: `KERNEL_SNAPSHOT_ADAPTER_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test authority_ledger_wiring`: `AUTHORITY_LEDGER_WIRING_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test kernel_turn_driver`: `KERNEL_TURN_DRIVER_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test step`: `STEP_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test turn_authority`: `TURN_AUTHORITY_EXIT=0`.
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 
 Before this reconciliation, the latest recorded full verification covered

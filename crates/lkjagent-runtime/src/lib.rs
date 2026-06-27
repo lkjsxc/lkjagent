@@ -7,6 +7,7 @@ mod graph_state_row;
 pub mod graph_state_tracks;
 pub mod intake;
 pub mod kernel;
+pub mod kernel_driver;
 pub mod maintenance;
 pub mod mode;
 pub mod model_log;
