@@ -10,27 +10,27 @@ that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Repair current-state and authority status truth | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 2 | Reopen executable blocker queue and task contract | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 3 | Specify one effectful kernel driver contract | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 4 | Complete runtime authority store-chain reads | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 5 | Build durable snapshot adapter from store facts | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 6 | Close the runtime event catalog | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 7 | Cover reducer decisions for every mission | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 8 | Route daemon turns through the kernel driver | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 9 | Enforce decision-derived admission and staleness | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 10 | Render prompt frames from persisted decisions | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 11 | Persist provider anomalies as kernel events | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 12 | Canonicalize `fs.batch_write` schema repair | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 13 | Centralize semantic artifact lifecycle | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 14 | Strengthen story and long-novel readiness | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 15 | Centralize every completion attempt | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 16 | Restrict maintenance to closed idle | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 17 | Make compaction a resumable runtime effect | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 18 | Derive status, logs, and touched paths from authority | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 19 | Promote the active run into benchmark fixtures | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 20 | Delete or quarantine split authority policy paths | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
-| 21 | Run final local and Docker gates | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | open |
+| 1 | Repair current-state and authority status truth | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 2 | Reopen executable blocker queue and task contract | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 3 | Specify one effectful kernel driver contract | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 4 | Complete runtime authority store-chain reads | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 5 | Build durable snapshot adapter from store facts | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 6 | Close the runtime event catalog | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 7 | Cover reducer decisions for every mission | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 8 | Route daemon turns through the kernel driver | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 9 | Enforce decision-derived admission and staleness | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 10 | Render prompt frames from persisted decisions | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 11 | Persist provider anomalies as kernel events | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 12 | Canonicalize `fs.batch_write` schema repair | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 13 | Centralize semantic artifact lifecycle | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 14 | Strengthen story and long-novel readiness | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 15 | Centralize every completion attempt | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 16 | Restrict maintenance to closed idle | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 17 | Make compaction a resumable runtime effect | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 18 | Derive status, logs, and touched paths from authority | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 19 | Promote the active run into benchmark fixtures | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 20 | Delete or quarantine split authority policy paths | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 21 | Run final local and Docker gates | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
 
 ## Active Data Fixture
 
@@ -71,10 +71,5 @@ evidence. The checked-in run proves these facts:
 
 ## Remaining Proof Gaps
 
-- Product daemon paths still need proof that no old mode authority chooses
-  mission, tool surface, prompt, recovery, compaction, maintenance, or close.
-- Store-chain reconstruction by decision id and case id needs full coverage.
-- The active long-novel fixture needs deterministic benchmark expectations for
-  maintenance preemption, weak-content repair, child-tag refusal, provider
-  anomalies, touched paths, and completion refusal.
-- Final `quiet verify` and Docker Compose verify must run after code cutover.
+No current blocker proof gaps remain after focused tests, `quiet verify`, and
+Docker Compose verify.

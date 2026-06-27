@@ -68,4 +68,4 @@ Focused slices name their crate tests in the blocker queue. The final proof is
 
 ## Status
 
-open.
+implemented.
