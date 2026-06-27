@@ -7,6 +7,7 @@ This directory holds CLI argument dispatch and one module per command.
 ## Table of Contents
 
 - [args.rs](args.rs): argument parser for the documented commands.
+- [args_help.rs](args_help.rs): usage text for the binary entrypoint.
 - [accounting.rs](accounting.rs): shared context and token accounting display.
 - [config.rs](config.rs): runtime config loading and first-start default writing.
 - [config/json.rs](config/json.rs): JSON config parsing and rendering.

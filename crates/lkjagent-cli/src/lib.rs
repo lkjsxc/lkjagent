@@ -50,6 +50,10 @@ where
     I: IntoIterator<Item = S>,
     S: Into<String>,
 {
+    let args = args.into_iter().map(Into::into).collect::<Vec<String>>();
+    if args::is_help_invocation(&args) {
+        return run_cli(args);
+    }
     match env_file::load(Path::new(".env")) {
         Ok(()) => run_cli(args),
         Err(error) => CliOutcome {
@@ -67,6 +71,7 @@ where
 {
     let invocation = parse_args(args)?;
     match invocation.command {
+        Command::Help => Ok(args::help_text().to_string()),
         Command::Run => run::run(&invocation.data_dir),
         Command::Send { text } => send::send(&invocation.data_dir, &text),
         Command::Status => status::status(&invocation.data_dir),
