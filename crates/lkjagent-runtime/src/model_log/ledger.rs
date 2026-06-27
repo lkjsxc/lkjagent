@@ -28,6 +28,7 @@ pub fn touched_paths(
                 paths.insert(path);
             }
         }
+        add_artifact_paths(conn, case.id, &mut paths)?;
     }
     if paths.is_empty() {
         out.push_str("* none\n\n");
@@ -38,6 +39,33 @@ pub fn touched_paths(
     }
     out.push('\n');
     Ok(())
+}
+
+fn add_artifact_paths(
+    conn: &Connection,
+    case_id: i64,
+    paths: &mut BTreeSet<String>,
+) -> RuntimeResult<()> {
+    let Some(artifact) = lkjagent_store::artifact_ledger::latest_for_case(conn, case_id)? else {
+        return Ok(());
+    };
+    paths.insert(artifact.root.clone());
+    if let Some(cursor) = lkjagent_store::artifact_cursor::latest_batch_cursor(conn, artifact.id)? {
+        for path in split_paths(&cursor.completed_paths) {
+            paths.insert(format!("{}/{}", artifact.root, path));
+        }
+        for path in split_paths(&cursor.failed_paths) {
+            paths.insert(format!("{}/{}", artifact.root, path));
+        }
+    }
+    Ok(())
+}
+
+fn split_paths(value: &str) -> impl Iterator<Item = &str> {
+    value
+        .split(',')
+        .map(str::trim)
+        .filter(|path| !path.is_empty())
 }
 
 pub fn evidence(out: &mut String, conn: &Connection, case: Option<&CaseRow>) -> RuntimeResult<()> {

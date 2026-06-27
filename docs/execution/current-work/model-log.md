@@ -74,7 +74,8 @@ status `provider_anomaly` instead of `succeeded`. New authority files include
 persisted decision id, prompt frame id, authority fingerprint, kernel mission,
 and staleness fingerprint. The active long-novel log exposes a stale touched-path
 summary: `artifact.apply` and later workspace observation touched the root while
-the synthesized top section says `none`. Provider anomaly turns already avoid
-fake parse, admission, and observation success records; active status still must
-show the same authority ids and next action as dispatch. Live replay proof is
-tracked by the verification plan.
+the synthesized top section says `none`. Touched-path synthesis now reads the
+artifact ledger and batch cursor rows in focused coverage. Provider anomaly
+turns already avoid fake parse, admission, and observation success records;
+active status still must show the same authority ids and next action as
+dispatch. Live replay proof is tracked by the verification plan.
