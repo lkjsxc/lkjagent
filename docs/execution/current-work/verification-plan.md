@@ -32,9 +32,9 @@ required before the reliability redesign can close.
 
 partially implemented. Benchmark fixtures cover uploaded owner failures,
 including provider exchange parsed-action, admission, observation,
-prompt-frame-id, and replay-export requirements. A Chronos-style daemon replay
-proves story artifact close after plan, semantic audit, verification evidence,
-catalog presence, no part files, and printable model-log output. Live compose
-smoke `/tmp/lkjagent-smoke-data-19` closed the Chronos story task after
-`artifact.audit` reported `readiness=story-semantic-content` and graph evidence
-recorded audit-owned `document-structure` and `artifact-readiness` rows.
+prompt-frame-id, and replay-export requirements. Historical Chronos replay and
+compose evidence prove story artifact close after plan, semantic audit,
+verification evidence, catalog presence, no part files, and printable model-log
+output. The active checked-in fixture is now the long-novel run: weak-content
+repair after scaffold, child-tag batch-write faults, provider anomalies,
+stale touched paths, and pending document plus artifact audits must be covered.

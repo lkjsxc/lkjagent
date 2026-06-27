@@ -25,6 +25,8 @@ Raw provider request and response evidence is recorded under the contract in
   records with reasons.
 - Keep CLI list and show inspection commands.
 - Add export and raw-case inspection commands.
+- Derive touched paths from artifact ledgers, write observations, and workspace
+  events, not only direct graph evidence.
 
 ## Inputs
 
@@ -66,5 +68,7 @@ is absent during manifest refresh, the export records it under `missing_files`
 with reason `listed_file_absent`. Provider anomaly store rows and exports use
 status `provider_anomaly` instead of `succeeded`. New authority files include
 persisted decision id, prompt frame id, authority fingerprint, kernel mission,
-and staleness fingerprint. Live replay proof is tracked by the verification
-plan.
+and staleness fingerprint. The active long-novel log exposes a stale touched-path
+summary: `artifact.apply` and later workspace observation touched the root while
+the synthesized top section says `none`. Live replay proof is tracked by the
+verification plan.
