@@ -11,22 +11,22 @@ tests, quiet gates, and required Docker gates prove it.
 lkjagent has a working Rust workspace with local gates, Docker Compose gates,
 a strict tag action parser, dispatcher registry, typed graph model, context
 budgeting, SQLite persistence, endpoint client, daemon loop, owner queue intake,
-status and log commands, config-independent CLI help, memory commands,
-model-run logging, artifact ledgers, compaction records, provider-exchange
-logging, runtime authority ledgers, personal-record projections, and benchmark
-fixtures.
+status and log commands, memory commands, model-run logging, artifact ledgers,
+compaction records, provider-exchange logging, runtime authority ledgers,
+personal-record projections, and benchmark fixtures.
 
-The runtime-authority redesign is implemented. Runtime authority flows through
-one persisted decision stream for prompt rendering, provider calls, parse and
-schema faults, admission, dispatch, observations, recovery routes, compaction,
-maintenance, model-log handoff, and completion attempts. Model output and graph
-policy are treated as intent; the kernel decision is the executable authority.
+The runtime-authority kernel model and ledgers exist, but full daemon cutover is
+open. Product paths still need proof that one persisted transition kernel owns
+prompt rendering, provider calls, parse and schema faults, admission, dispatch,
+observations, recovery routes, compaction, maintenance, model-log handoff, and
+completion attempts. Model output and graph policy are intent inputs; the
+runtime decision must become the executable authority before this row closes.
 
 The checked-in `data/logs/current-model-run.md` remains the active fixture for
-long-novel failure evidence. It is not a fresh rerun after the redesign. The
-fixture proves the failures that the redesign now covers: weak-content repair,
+long-novel failure evidence. It is not a fresh proof after the redesign. The
+fixture proves the failures that the cutover must cover: weak-content repair,
 child-tag `fs.batch_write` schema faults, reasoning-only provider anomalies,
-no-op maintenance churn, and stale touched-path reporting.
+no-op maintenance churn, stale touched-path reporting, and false completion.
 
 ## Implemented Behavior
 
@@ -37,17 +37,17 @@ no-op maintenance churn, and stale touched-path reporting.
 | Dispatcher registry | `lkjagent-tools` validates tools, required-any groups, personal tools, and registry-rendered examples. |
 | Graph model | `lkjagent-graph` stores typed cases, evidence requirements, ranked tracks, transitions, and completion decisions. |
 | Store | Queue, state, event, memory, personal record, summary, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist. |
-| Runtime kernel | Snapshot, event, decision, admission, effect, render, fault, provider, adapter, reducer, and driver records are implemented. |
+| Runtime kernel core | Snapshot, event, decision, admission, effect, render, fault, provider, adapter, reducer, and driver records exist. |
 | Authority persistence | Store rows carry snapshot, event, decision, companion details, prompt frames, observations, fingerprints, and staleness facts. |
-| Endpoint loop | Provider calls record authority files, token usage when present, anomalies, retry state, and bounded recovery. |
+| Endpoint loop | Provider calls record model-log files, token usage when present, anomalies, retry state, and bounded recovery facts. |
 | CLI entrypoint | `lkjagent --help` and `lkjagent help` print usage before config loading, and `--data` is accepted before or after the command. |
-| Model log | Status, console, `model-log`, exchange exports, raw-case inspection, replay export, and touched paths read durable authority rows. |
+| Model log | Status, console, `model-log`, exchange exports, raw-case inspection, replay export, and touched paths have durable readers. |
 | Artifact lifecycle | Artifact plan, apply, audit, next, cursors, weak paths, invalid roots, story readiness, and completion refusals are ledger-backed. |
 | Recovery | Fault classes, route metadata, retry counters, changed-shape repeat routing, blocked handoff, and canonical examples are covered. |
 | Graph evidence | Direct graph evidence refuses audit-owned requirements and immediate claims after refused or failed tool output. |
-| Compaction | Hard compaction writes resumable pre and post snapshots and resumes through prompt-frame authority. |
-| Maintenance | Maintenance runs only from closed idle, yields to owner work, cools down no-op cycles, and avoids endpoint churn. |
-| Completion | `agent.done` closes only through the artifact-aware completion reducer with evidence and readiness gates satisfied. |
+| Compaction | Hard compaction writes resumable pre and post snapshots and resumes through prompt-frame authority records. |
+| Maintenance | Maintenance gates, owner preemption checks, no-op cooldown facts, and closed-idle rules have focused coverage. |
+| Completion | `agent.done` has artifact-aware completion refusal coverage with evidence and readiness gates. |
 | Personal records | Diary, schedule, and TODO records are store-backed; CLI inspection and bounded Markdown projections are implemented. |
 | Benchmarks | Owner-reported recovery, artifact, memory, accounting, model-log, batch-schema, compaction, repeated-recovery, and long-novel signatures are in the corpus. |
 
@@ -63,7 +63,7 @@ directories prove these fixture facts:
 - artifact root is `stories/long-novel-with-detailed-settings`;
 - active tracks are `document-structure`, `action-param-reliability`, and
   `observability-ledger`;
-- the old touched-path summary says `none`, despite scaffold creation and later
+- old touched-path summary says `none`, despite scaffold creation and later
   workspace observation of the root;
 - evidence ledger contains `plan` and `observation`; audit-owned
   `document-structure` and `artifact-readiness` are missing in the fixture;
@@ -75,7 +75,7 @@ directories prove these fixture facts:
 - turns 59 and 62 record `provider_anomaly.reasoning_only_response`;
 - document audit and artifact readiness audit remain pending in the fixture.
 
-## Runtime Authority Flow
+## Runtime Authority Target Flow
 
 ```text
 DurableReadModel -> RuntimeSnapshot
@@ -90,8 +90,8 @@ EffectObservation -> RuntimeEvent
 The decision is persisted before prompt rendering, endpoint calls, dispatch,
 recovery, compaction, maintenance, or close attempts. Prompt frames, provider
 exchange rows, pending actions, admissions, observations, model-log exports,
-and status all expose the same authority ids and staleness fingerprints when
-available.
+and status expose the same authority ids and staleness fingerprints when the
+cutover path is used.
 
 ## Historical Live Smoke Evidence
 
@@ -103,25 +103,31 @@ anomaly replay fixture, not the latest exchange.
 
 ## Latest Recorded Verification Evidence
 
-This final authority slice has verification evidence:
+This documentation truth slice has verification evidence:
 
-- `cargo test -p lkjagent-store --test personal_records`:
-  `STORE_PERSONAL_EXIT=0`.
-- `cargo test -p lkjagent-cli --test personal`: `CLI_PERSONAL_EXIT=0`.
-- `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`,
   `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`,
   `ok check-lines`.
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`,
-  `ok verify`.
-- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
+
+The latest recorded final gate evidence predates this reopened cutover. New
+implementation proof must be recorded only after commands run in this worktree.
 
 ## Active Target
 
 The dependency queue is [execution/current-blockers.md](execution/current-blockers.md).
-No current blocker is open. New work starts from a new owner request or a new
-blocker row.
+The first open work is the kernel cutover documentation and driver path.
+
+## Remaining Proof Gaps
+
+- One daemon driver must own snapshot, event, decision, prompt or effect,
+  provider or dispatch, admission, observation, and next event.
+- `kernel_shadow` and policy-bearing mode authority must stop choosing product
+  behavior after the driver cutover.
+- The active data fixture must become deterministic benchmark evidence for idle
+  maintenance churn, weak-content repair, child-tag batch faults, provider
+  anomalies, stale touched paths, and false completion.
+- Final local gates and Docker Compose verify must run after implementation.
 
 ## Out of Scope
 
