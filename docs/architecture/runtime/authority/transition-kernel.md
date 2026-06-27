@@ -109,7 +109,7 @@ runtime-owned compaction or inspection effects, and recovery escape-tool visibil
 
 ## Status
 
-implemented for the daemon turn path, pending final gates. Snapshot, event,
+implemented for the daemon turn path. Snapshot, event,
 decision, transition, effect, admission, prompt-frame, and observation ledgers
 exist. Runtime turn authority writes normalized rows and prompt cards cite the
 decision id. Store tests prove latest snapshot and decision reopen lookup,
@@ -119,5 +119,5 @@ fingerprints, and canonical event-kind strings.
 The daemon authority adapter now runs the persisted kernel driver instead of a
 shadow decision path. Prompt rendering, pending-action admission, dispatch
 observations, maintenance, compaction, and completion use the same decision id
-and staleness fingerprint in focused runtime tests. Final local and Docker gates
-remain the proof needed before current-state marks the cutover closed.
+and staleness fingerprint in focused runtime tests, quiet verify, and Docker
+Compose verify.

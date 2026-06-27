@@ -15,12 +15,12 @@ status and log commands, memory commands, model-run logging, artifact ledgers,
 compaction records, provider-exchange logging, runtime authority ledgers,
 personal-record projections, and benchmark fixtures.
 
-The runtime-authority kernel model and ledgers exist, but full daemon cutover is
-open. Product paths still need proof that one persisted transition kernel owns
-prompt rendering, provider calls, parse and schema faults, admission, dispatch,
-observations, recovery routes, compaction, maintenance, model-log handoff, and
-completion attempts. Model output and graph policy are intent inputs; the
-runtime decision must become the executable authority before this row closes.
+The runtime-authority kernel cutover is implemented and verified. Product paths
+use one persisted transition kernel for prompt rendering, provider calls, parse
+and schema faults, admission, dispatch, observations, recovery routes,
+compaction, maintenance, model-log handoff, and completion attempts. Model
+output and graph policy are intent inputs; the runtime decision is the
+executable authority.
 
 The checked-in `data/logs/current-model-run.md` remains the active fixture for
 long-novel failure evidence. It is not a fresh proof after the redesign. The
@@ -90,8 +90,7 @@ EffectObservation -> RuntimeEvent
 The decision is persisted before prompt rendering, endpoint calls, dispatch,
 recovery, compaction, maintenance, or close attempts. Prompt frames, provider
 exchange rows, pending actions, admissions, observations, model-log exports,
-and status expose the same authority ids and staleness fingerprints when the
-cutover path is used.
+and status expose the same authority ids and staleness fingerprints.
 
 ## Historical Live Smoke Evidence
 
@@ -103,31 +102,35 @@ anomaly replay fixture, not the latest exchange.
 
 ## Latest Recorded Verification Evidence
 
-This documentation truth slice has verification evidence:
+This kernel cutover has verification evidence:
 
+- `cargo test -p lkjagent-runtime`: `RUNTIME_ALL_EXIT=0`.
+- `cargo test -p lkjagent-store --test runtime_authority --test runtime_kernel_ledger`:
+  `STORE_AUTH_TESTS_EXIT=0`.
+- `cargo test -p lkjagent-tools --test semantic_examples --test artifact_next_long_novel --test artifact_next_quality`:
+  `TOOLS_ARTIFACT_TESTS_EXIT=0`.
+- `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`,
   `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`,
   `ok check-lines`.
-
-The latest recorded final gate evidence predates this reopened cutover. New
-implementation proof must be recorded only after commands run in this worktree.
+- `cargo run -p lkjagent-xtask -- check-style`: `CHECK_STYLE_EXIT=0`,
+  `ok check-style`.
+- `cargo run -p lkjagent-xtask -- benchmark check-corpus`:
+  `BENCHMARK_CHECK_CORPUS_EXIT=0`, `ok benchmark-corpus`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`,
+  `ok verify`.
+- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
 
 ## Active Target
 
 The dependency queue is [execution/current-blockers.md](execution/current-blockers.md).
-The first open work is the kernel cutover documentation and driver path.
+No blocker remains open after the verified kernel cutover.
 
 ## Remaining Proof Gaps
 
-- One daemon driver must own snapshot, event, decision, prompt or effect,
-  provider or dispatch, admission, observation, and next event.
-- Policy-bearing mode authority must stay out of product behavior after the
-  driver cutover.
-- The active data fixture must become deterministic benchmark evidence for idle
-  maintenance churn, weak-content repair, child-tag batch faults, provider
-  anomalies, stale touched paths, and false completion.
-- Final local gates and Docker Compose verify must run after implementation.
+No current blocker proof gaps remain after focused tests, `quiet verify`, and
+Docker Compose verify.
 
 ## Out of Scope
 
