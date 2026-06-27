@@ -2,9 +2,12 @@ use std::path::PathBuf;
 
 #[path = "args_model_log.rs"]
 mod args_model_log;
+#[path = "args_personal.rs"]
+mod args_personal;
 
 use crate::error::CliError;
 use args_model_log::parse_model_log;
+use args_personal::parse_personal;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Invocation {
@@ -30,6 +33,7 @@ pub enum Command {
     },
     Graph,
     ModelLog(ModelLogCommand),
+    Personal(PersonalCommand),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -39,6 +43,17 @@ pub enum ModelLogCommand {
     Show { case_id: String, turn_id: i64 },
     Export { case_id: String, turn_id: i64 },
     RawCase { case_id: String, limit: usize },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PersonalCommand {
+    List {
+        kind: Option<String>,
+        status: Option<String>,
+        project: Option<String>,
+        limit: usize,
+    },
+    Render,
 }
 
 pub fn parse_args<I, S>(args: I) -> Result<Invocation, CliError>
@@ -81,6 +96,7 @@ fn parse_command(command: &str, args: Vec<String>) -> Result<Command, CliError> 
         "memory" => parse_memory(args),
         "graph" => parse_no_args(args, "graph").map(|()| Command::Graph),
         "model-log" => parse_model_log(args),
+        "personal" => parse_personal(args),
         other => Err(CliError::usage(format!("unknown command: {other}"))),
     }
 }

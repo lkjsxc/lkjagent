@@ -23,7 +23,7 @@ that ran.
 | 11 | Provider exchange export and raw-case inspection | [current-work/model-log.md](current-work/model-log.md) | implemented |
 | 12 | Replay benchmarks from current long-novel run and owner failures | [current-work/verification-plan.md](current-work/verification-plan.md) | implemented |
 | 13 | Final live Docker story run and compose verification | [current-work/verification-plan.md](current-work/verification-plan.md) | implemented |
-| 14 | Personal diary, schedule, and TODO records | [current-work/personal-records.md](current-work/personal-records.md) | open |
+| 14 | Personal diary, schedule, and TODO records | [current-work/personal-records.md](current-work/personal-records.md) | implemented |
 
 ## Current Evidence
 
@@ -129,7 +129,5 @@ historical provider anomaly fixture.
 
 ## Remaining Proof Gaps
 
-No runtime-authority proof gaps remain after focused tests, `quiet verify`, and
-the Docker Compose final gate. The open queue item is personal diary,
-schedule, and TODO projection work, which is outside the runtime-authority
-redesign.
+No current blocker proof gaps remain after focused tests, `quiet verify`, and
+the Docker Compose final gate.

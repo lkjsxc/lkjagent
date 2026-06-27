@@ -18,6 +18,8 @@ no IPC protocol.
 | `lkjagent memory <query>` | Search distilled memory through the full-text index. |
 | `lkjagent graph` | Print the active graph case and source graph summary. |
 | `lkjagent model-log [--print]` | Write the current model Markdown handoff log and print its path or content. |
+| `lkjagent personal list [--kind K] [--status S] [--project P] [--limit N]` | Inspect store-backed personal records. |
+| `lkjagent personal render` | Regenerate bounded personal Markdown projections under the data directory. |
 
 All commands accept `--data <dir>` to locate the store and default to the
 container data directory defined in [../operations/running.md](../operations/running.md).

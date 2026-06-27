@@ -9,6 +9,7 @@ pub mod log;
 pub mod memory;
 pub mod model_log;
 pub mod paths;
+pub mod personal;
 pub mod run;
 pub mod send;
 pub mod status;
@@ -78,5 +79,6 @@ where
         Command::Memory { query } => memory::memory(&invocation.data_dir, &query),
         Command::Graph => graph::graph(&invocation.data_dir),
         Command::ModelLog(command) => model_log::model_log(&invocation.data_dir, command),
+        Command::Personal(command) => personal::personal(&invocation.data_dir, command),
     }
 }

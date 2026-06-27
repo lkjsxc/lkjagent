@@ -38,9 +38,24 @@ pub fn list(
             params![kind, status],
             scan_limit,
         )?,
+        (Some(kind), None, Some(project)) => query(
+            conn,
+            "WHERE kind = ?1 AND project = ?2",
+            params![kind, project],
+            scan_limit,
+        )?,
         (Some(kind), None, None) => query(conn, "WHERE kind = ?1", params![kind], scan_limit)?,
+        (None, Some(status), Some(project)) => query(
+            conn,
+            "WHERE status = ?1 AND project = ?2",
+            params![status, project],
+            scan_limit,
+        )?,
         (None, Some(status), None) => {
             query(conn, "WHERE status = ?1", params![status], scan_limit)?
+        }
+        (None, None, Some(project)) => {
+            query(conn, "WHERE project = ?1", params![project], scan_limit)?
         }
         _ => query(conn, "", params![], scan_limit)?,
     };
