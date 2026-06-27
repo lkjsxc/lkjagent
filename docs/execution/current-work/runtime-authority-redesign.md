@@ -69,11 +69,12 @@ was inside the repository and violated markdown shape and line limits.
 
 ## Status
 
-open. The documentation contract states that authority is computed before
-endpoint calls and before dispatch, and that stale maintenance, compaction, or
-idle actions must be refused when stronger runtime facts appear. Current code
-has pure selection, endpoint authority cards, cached dispatch authority,
-store-backed authority snapshot fields, stale maintenance-action refusal when
-queued owner work appears before dispatch, and many completion refusals.
-Stronger per-case authority history, broader stale-action refusal, and full
-close-path proof remain open.
+implemented. The runtime kernel now owns one snapshot, closed event, persisted
+decision, prompt frame, admission view, runtime effect command, observation,
+and next event for provider calls, dispatch, recovery, compaction, maintenance,
+model-log handoff, and close paths. Store-backed authority rows carry companion
+details, provider exchange ids, prompt-frame ids, staleness fingerprints,
+artifact roots, recovery routes, and next executable actions. Focused coverage
+and final gates have run: `cargo run -p lkjagent-xtask -- quiet verify`
+returned `ok verify`, and `docker compose run --rm verify` returned
+`ok verify`.

@@ -61,21 +61,13 @@ Raw provider request and response evidence is recorded under the contract in
 
 ## Status
 
-partially implemented. The current Markdown handoff, provider exchange store
-rows, request files, response files, timing files, error files, per-turn export
-manifests, parsed-action, admission, observation, index files, prompt-frame ids
-on exchange rows, CLI list and show, raw-case inspection, and sanitized replay
-export commands with raw turn-file copying exist for daemon provider calls with
-a log root. Provider anomalies are logged before parsing for new responses, and
-export manifests list only files present on disk. When a previously listed file
-is absent during manifest refresh, the export records it under `missing_files`
-with reason `listed_file_absent`. Provider anomaly store rows and exports use
-status `provider_anomaly` instead of `succeeded`. New authority files include
-persisted decision id, prompt frame id, authority fingerprint, kernel mission,
-and staleness fingerprint. The active long-novel log exposes a stale touched-path
-summary: `artifact.apply` and later workspace observation touched the root while
-the synthesized top section says `none`. Touched-path synthesis now reads the
-artifact ledger and batch cursor rows in focused coverage. Provider anomaly
-turns already avoid fake parse, admission, and observation success records;
-active status still must show the same authority ids and next action as
-dispatch. Live replay proof is tracked by the verification plan.
+implemented. The current Markdown handoff, provider exchange rows, request and
+response files, timing and error files, parsed-action, admission, observation,
+index files, prompt-frame ids, raw-case inspection, sanitized replay exports,
+and missing-file manifest records are store-backed. Provider anomalies are
+logged before parsing, use status `provider_anomaly`, and avoid fake parse,
+admission, or observation success records. Authority files include persisted
+decision id, prompt frame id, authority fingerprint, kernel mission, and
+staleness fingerprint. Touched-path synthesis reads graph evidence, artifact
+ledger roots, and batch cursor write outcomes. Final evidence is the quiet
+verify and Docker Compose final gate.

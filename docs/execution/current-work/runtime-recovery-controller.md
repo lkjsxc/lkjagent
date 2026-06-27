@@ -109,11 +109,8 @@ docker compose run --rm verify
 
 ## Status
 
-open for full loop enforcement. Implemented recovery pieces include graph
-selector integration, escape-tool visibility, internal-question refusal,
-batch-oriented examples, the closed `FaultClass` model, recovery route
-metadata, a pure recovery plan table, and benchmark fixtures named above. The
-remaining controller work is blocked handoff writes, endpoint-loop integration
-for every fault class, and proof that repeated invalid actions always change
-shape in live dispatch. Focused tests and Docker Compose verification are
-required before this blocker can close.
+implemented. Recovery pieces include graph selector integration, escape-tool
+visibility, internal-question refusal, batch-oriented examples, the closed
+`FaultClass` model, route metadata, pure recovery plan table, blocked handoff
+writes, endpoint-loop integration, changed-shape repeat handling, benchmark
+fixtures, focused tests, quiet verify, and Docker Compose verification.

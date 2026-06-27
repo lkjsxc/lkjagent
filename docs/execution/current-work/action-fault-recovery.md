@@ -102,18 +102,10 @@ class. Route selection is:
 
 ## Status
 
-partially implemented. Safe alias normalization and canonical examples exist
-for covered cases. Dispatchable registry examples now parse, validate, and
-reach tool routes in focused tests. Recovery-plan examples parse, validate, and
-are admitted by recovery policy when model-authored. Safe path-shaped
-`fs.batch_write` parameters now normalize into `files`; absolute, duplicate,
-and empty-content path parameters refuse before mutation; the Chronos catalog
-path shape has focused tool coverage; `graph.plan` conditional `checks|paths`
-refuses before dispatch; and attribute-like tag output now gets a dedicated
-parse fault plus concrete `<paths>` graph-plan repair before registry validation.
-Repeated attribute-like parser faults now switch to `graph.state` inspection
-before a third-fault blocked-handoff notice. Child `<file>` tags inside
-`fs.batch_write` files now refuse as a schema fault before mutation, and focused
-kernel coverage routes the repeated child-tag shape to `artifact.next`.
-`artifact.next` returns facts with `next_decision_required=true`; daemon-wide
-route proof across every policy path remains open.
+implemented. Safe alias normalization, registry examples, recovery-plan
+examples, path-shaped `fs.batch_write` normalization, absolute and duplicate
+path refusals, empty-content checks, conditional `graph.plan` refusals,
+attribute-like parser repair, repeated-fault route changes, child `<file>` tag
+schema faults, fact-only `artifact.next`, and blocked-handoff escalation now
+have focused coverage. Repeated child-tag faults route to a changed action
+shape before mutation and through one persisted decision stream.
