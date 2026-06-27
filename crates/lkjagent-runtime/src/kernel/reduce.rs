@@ -35,6 +35,14 @@ pub fn select_mission(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> Runti
     if snapshot.owner_work_exists() {
         return owner_mission(event);
     }
+    if matches!(
+        event,
+        RuntimeEvent::MaintenanceNoop
+            | RuntimeEvent::MaintenanceNoopCooldownRecorded
+            | RuntimeEvent::MaintenanceDeferred
+    ) {
+        return RuntimeMission::ClosedIdle;
+    }
     if (snapshot.maintenance.due || snapshot.maintenance.active)
         && !snapshot.maintenance.cooldown_active
     {
@@ -42,7 +50,6 @@ pub fn select_mission(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> Runti
     }
     RuntimeMission::ClosedIdle
 }
-
 pub fn reduce_with_event_id(
     snapshot: &RuntimeSnapshot,
     event_id: RuntimeEventId,

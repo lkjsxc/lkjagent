@@ -108,8 +108,9 @@ authority, completion policy, mode rendering, dispatch-level effective policy,
 stale maintenance action refusal before dispatch, and effective `agent.done`
 completion refusal exist. Focused tests prove idle maintenance, owner queue
 preemption at turn boundaries, maintenance write-tool refusal, stale graph
-policy isolation, and closed-idle endpoint suppression. The active long-novel
-log still requires proof that empty maintenance records cooldown and returns to
-closed idle without endpoint churn. Broader stale-action contradiction repair,
-artifact-aware close gates, stronger per-case authority history, and richer
-compaction snapshots remain open.
+policy isolation, and closed-idle endpoint suppression. Pure kernel coverage
+now proves empty maintenance cooldown returns to closed idle and owner queue
+work preempts maintenance before a model call. Broader stale-action
+contradiction repair, daemon endpoint-churn proof, artifact-aware close gates,
+stronger per-case authority history, and richer compaction snapshots remain
+open.
