@@ -127,12 +127,13 @@ prompt-frame, authority, and staleness identifiers.
 
 ## Latest Recorded Verification Evidence
 
-This admission-gateway slice has focused evidence:
+This artifact-repair slice has focused evidence:
 
-- `cargo test -p lkjagent-runtime --test kernel_admission`: `KERNEL_ADMISSION_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test authority_policy`: `AUTHORITY_POLICY_EXIT=0`.
-- `cargo test -p lkjagent-tools --test registry_examples`: `REGISTRY_EXAMPLES_EXIT=0`.
-- `cargo test -p lkjagent-tools --test graph_control_dispatch`: `GRAPH_CONTROL_DISPATCH_EXIT=0`.
+- `cargo test -p lkjagent-tools --test artifact_next`: `ARTIFACT_NEXT_EXIT=0`.
+- `cargo test -p lkjagent-tools --test artifact_next_long_novel`: `ARTIFACT_NEXT_LONG_NOVEL_EXIT=0`.
+- `cargo test -p lkjagent-tools --test batch_write_formats`: `BATCH_WRITE_FORMATS_EXIT=0`.
+- `cargo test -p lkjagent-tools --test dispatch_normalize`: `DISPATCH_NORMALIZE_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test current_model_run_fixture`: `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`.
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 
 Before this reconciliation, the latest recorded full verification covered

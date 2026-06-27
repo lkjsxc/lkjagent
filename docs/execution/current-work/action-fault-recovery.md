@@ -112,8 +112,8 @@ path shape has focused tool coverage; `graph.plan` conditional `checks|paths`
 refuses before dispatch; and attribute-like tag output now gets a dedicated
 parse fault plus concrete `<paths>` graph-plan repair before registry validation.
 Repeated attribute-like parser faults now switch to `graph.state` inspection
-before a third-fault blocked-handoff notice. The active long-novel child-tag
-batch fault still needs route proof that `artifact.next` returns facts with
-`next_decision_required=true` and that the second same shape changes to
-`artifact.next`, `graph.state`, deterministic inspection, or blocked handoff.
-Route-level proof across every policy path remains open.
+before a third-fault blocked-handoff notice. Child `<file>` tags inside
+`fs.batch_write` files now refuse as a schema fault before mutation, and focused
+kernel coverage routes the repeated child-tag shape to `artifact.next`.
+`artifact.next` returns facts with `next_decision_required=true`; daemon-wide
+route proof across every policy path remains open.

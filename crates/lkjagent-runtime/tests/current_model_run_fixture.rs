@@ -3,17 +3,27 @@ use std::path::Path;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn checked_in_current_model_run_is_empty_content_recovery_fixture() -> TestResult<()> {
-    let root = repo_root();
-    let current = CURRENT_MODEL_RUN_SIGNATURE;
+fn checked_in_current_model_run_is_long_novel_repair_fixture() -> TestResult<()> {
+    let current = include_str!("../../../data/logs/current-model-run.md");
 
-    assert!(current.contains("active_node: recover-by-smaller-scope"));
-    assert!(current.contains("active_phase: recovery"));
-    assert!(current.contains("## Touched Paths\n\n* none"));
-    assert!(current.contains("| none | none | none | none | low |"));
-    assert!(current.contains("parse fault: missing action envelope"));
+    assert!(current.contains("active_node: document"));
+    assert!(current.contains("active_phase: execution"));
+    assert!(current.contains("Create a long novel. with detailed settings"));
+    assert!(current.contains("stories/long-novel-with-detailed-settings"));
+    assert!(current.contains("document scaffold created"));
+    assert!(current.contains("profile=NarrativeManuscript"));
+    assert!(current.contains("document audit failed"));
+    assert!(current.contains("structure_only_content: project/premise.md"));
+    assert!(current.contains("invalid parameter: each block must start with path:"));
+    assert!(current.contains("provider anomaly: reasoning_only_response"));
+    assert!(current.contains("| document audit | pending | graph case check |"));
+    assert!(current.contains("| artifact readiness audit | pending | graph case check |"));
+    Ok(())
+}
 
-    let latest = root.join("data/logs/model/epoch-1782344195/case-1/turn-000019");
+#[test]
+fn historical_empty_content_turn_remains_provider_fixture() -> TestResult<()> {
+    let latest = repo_root().join("data/logs/model/epoch-1782344195/case-1/turn-000019");
     let response = HISTORICAL_EMPTY_RESPONSE;
     let parsed = HISTORICAL_EMPTY_PARSED_ACTION;
     let export = HISTORICAL_EMPTY_EXPORT;
@@ -26,14 +36,6 @@ fn checked_in_current_model_run_is_empty_content_recovery_fixture() -> TestResul
     assert!(!latest.join("observation.txt").exists());
     Ok(())
 }
-
-const CURRENT_MODEL_RUN_SIGNATURE: &str = "active_node: recover-by-smaller-scope
-active_phase: recovery
-## Touched Paths
-
-* none
-| none | none | none | none | low |
-parse fault: missing action envelope";
 
 const HISTORICAL_EMPTY_RESPONSE: &str =
     "{\"content\":\"\",\"finish_reason\":\"stop\",\"closure_mode\":\"Unclosed\",\"usage\":{\"completion_tokens\":485}}";
