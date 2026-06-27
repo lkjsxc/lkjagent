@@ -17,6 +17,6 @@ not the source of truth for status, dates, recurrence, or IDs.
 
 ## Status
 
-This is an implementation contract. The store schema, tools, CLI inspection,
-and projection writers are open until [../../current-state.md](../../current-state.md)
-names passing evidence.
+implemented. The store schema, tools, CLI inspection, and projection writers
+are covered by focused tests and the final gates named in
+[../../current-state.md](../../current-state.md).

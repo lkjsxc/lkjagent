@@ -82,6 +82,32 @@ fn todo_field_update_changes_body_and_search_index() -> TestResult<()> {
 }
 
 #[test]
+fn project_filter_limits_personal_lists() -> TestResult<()> {
+    let conn = memory_store()?;
+    create(&conn, &todo_input())?;
+    let mut other = todo_input();
+    other.title = "Other project";
+    other.project = Some("other");
+    create(&conn, &other)?;
+
+    let records = list(
+        &conn,
+        &PersonalListFilter {
+            kind: Some("todo"),
+            status: None,
+            project: Some("lkjagent"),
+            start: None,
+            end: None,
+            limit: 10,
+        },
+    )?;
+
+    assert_eq!(records.len(), 1);
+    assert_eq!(records[0].project.as_deref(), Some("lkjagent"));
+    Ok(())
+}
+
+#[test]
 fn todo_status_update_closes_record_and_appends_event() -> TestResult<()> {
     let conn = memory_store()?;
     let id = create(&conn, &todo_input())?;

@@ -12,8 +12,8 @@ lkjagent has a working Rust workspace with local gates, Docker Compose gates,
 a strict tag action parser, dispatcher registry, typed graph model, context
 budgeting, SQLite persistence, endpoint client, daemon loop, owner queue intake,
 status and log commands, memory commands, model-run logging, artifact ledgers,
-compaction records, provider-exchange logging, runtime authority ledgers, and
-benchmark fixtures.
+compaction records, provider-exchange logging, runtime authority ledgers, personal-record
+projections, and benchmark fixtures.
 
 The runtime-authority redesign is implemented. Runtime authority flows through
 one persisted decision stream for prompt rendering, provider calls, parse and
@@ -45,6 +45,7 @@ no-op maintenance churn, and stale touched-path reporting.
 | Compaction | Hard compaction writes resumable pre and post snapshots and resumes through prompt-frame authority. |
 | Maintenance | Maintenance runs only from closed idle, yields to owner work, cools down no-op cycles, and avoids endpoint churn. |
 | Completion | `agent.done` closes only through the artifact-aware completion reducer with evidence and readiness gates satisfied. |
+| Personal records | Diary, schedule, and TODO records are store-backed; CLI inspection and bounded Markdown projections are implemented. |
 | Benchmarks | Owner-reported recovery, artifact, memory, accounting, model-log, batch-schema, compaction, repeated-recovery, and long-novel signatures are in the corpus. |
 
 ## Active Data Log Fixture
@@ -101,19 +102,23 @@ anomaly replay fixture, not the latest exchange.
 
 This final authority slice has verification evidence:
 
-- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`,
-  `ok verify`.
-- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
+- `cargo test -p lkjagent-store --test personal_records`:
+  `STORE_PERSONAL_EXIT=0`.
+- `cargo test -p lkjagent-cli --test personal`: `CLI_PERSONAL_EXIT=0`.
+- `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 - `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`,
   `ok check-docs`.
 - `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`,
   `ok check-lines`.
+- `cargo run -p lkjagent-xtask -- quiet verify`: `QUIET_VERIFY_EXIT=0`,
+  `ok verify`.
+- `docker compose run --rm verify`: `DOCKER_VERIFY_EXIT=0`, `ok verify`.
 
 ## Active Target
 
 The dependency queue is [execution/current-blockers.md](execution/current-blockers.md).
-The open repository target is personal diary, schedule, and TODO projections,
-which is outside the runtime-authority redesign.
+No current blocker is open. New work starts from a new owner request or a new
+blocker row.
 
 ## Out of Scope
 
