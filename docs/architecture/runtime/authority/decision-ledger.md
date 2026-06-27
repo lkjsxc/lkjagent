@@ -20,17 +20,34 @@ and close behavior.
 
 ## Outputs
 
-- decision id, case id, and event id.
-- mission, active mode category, and active node.
-- admitted tools, blocked tools, forced next action, and recommended next actions.
-- exact valid example and missing evidence.
-- completion decision, recovery plan, compaction requirement, and maintenance allowance.
-- prompt card, persistence writes, and authority fingerprint.
+Every decision records:
+
+- decision id, snapshot id, event id, case id, and prompt frame head;
+- mission, active mode, decision kind, graph node, and graph phase;
+- admitted tools, blocked tools, exact next tool class, and valid example;
+- runtime effect command when no model-authored content is needed;
+- missing evidence, existing evidence, and audit-owned evidence gaps;
+- artifact root, artifact kind, profile, weak cursor, batch cursor, and current
+  weak path set;
+- latest observation, latest successful observation, fault class, recovery
+  route, repeat count, and next route;
+- compaction plan, pre and post snapshot ids, and resume target;
+- maintenance plan, cooldown outcome, and no-op reason;
+- completion state, failed gates, close allowance, and refusal text;
+- provider anomaly state, retry count, exchange id, and pause target;
+- prompt card data, context package ids, authority fingerprint, and staleness
+  fingerprint;
+- persistence plan for model-log, status, admission, effect, and observation
+  rows.
 
 ## Invariants
 
 - One event produces one persisted decision.
-- Prompt and dispatch use the same decision id or an immutable view derived from it.
+- Prompt, model-log, status, admission, dispatch, compaction, maintenance, and
+  close paths cite the same decision id.
+- Model-call decisions have a non-empty admitted tool set.
+- Empty admitted tool sets are limited to deterministic runtime effects, owner
+  wait, accepted close, and closed idle.
 - Completion refusal includes one next admitted audit or repair tool.
 - Recovery decisions shrink or change the action surface after repeated faults.
 - Decisions record enough fields to explain why a requested tool was refused.

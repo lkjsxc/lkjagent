@@ -14,48 +14,96 @@ event emits one persisted decision.
 
 ## Event Set
 
-The runtime event set is closed and table-tested:
+The runtime event set is closed and table-tested. String names exist only at the
+store and log boundary.
 
-- owner message received;
-- queue changed;
-- case opened;
-- case resumed;
+Owner queue events:
+
+- owner message queued;
+- owner message delivered;
+- owner message redelivered;
+- owner message edited;
+- owner message deleted.
+
+Prompt and provider events:
+
 - prompt frame rendered;
-- endpoint call requested;
-- endpoint response received;
-- endpoint fault;
+- prompt frame skipped by runtime effect;
+- provider response received;
+- provider endpoint error;
+- provider anomaly.
+
+Parser and admission events:
+
 - model action parsed;
 - parse fault;
-- schema fault;
-- admission requested;
+- implicit envelope normalized;
+- admission accepted;
 - admission refused;
-- tool started;
-- tool succeeded;
-- tool failed;
-- repeat action detected;
-- payload overflow detected;
-- evidence added;
-- artifact planned;
-- artifact applied;
-- artifact audited;
-- artifact weak path found;
+- stale action refused;
+- repeated action refused.
+
+Tool and graph events:
+
+- effect started;
+- observation ok;
+- observation error;
+- graph plan recorded;
+- graph transition accepted;
+- graph transition refused;
+- graph evidence recorded.
+
+Artifact and verification events:
+
+- artifact root missing;
+- artifact scaffold applied;
+- artifact weak paths found;
+- artifact batch cursor advanced;
+- artifact audit passed;
+- artifact audit failed;
+- artifact drift found;
+- artifact invalid root found;
 - verification requested;
 - verification passed;
-- verification failed;
+- verification failed.
+
+Completion, compaction, maintenance, and wait events:
+
 - completion requested;
-- completion blocked;
-- case closed;
-- context pressure detected;
-- compaction started;
+- completion accepted;
+- completion refused;
+- blocked handoff recorded;
+- compaction pressure detected;
+- compaction pre snapshot recorded;
 - compaction completed;
-- maintenance tick;
+- compaction post snapshot recorded;
+- compaction resume requested;
+- maintenance due;
 - maintenance started;
-- maintenance no-op;
+- maintenance deferred;
+- maintenance no-op cooldown recorded;
 - maintenance completed;
-- turn-budget checkpoint;
-- turn-budget exhausted;
-- owner input required;
-- blocked handoff recorded.
+- external owner question admitted;
+- external owner answer delivered;
+- closed idle selected.
+
+## Source Adapters
+
+| Adapter | Event category |
+| --- | --- |
+| owner queue | queued, delivered, redelivered, edited, deleted |
+| prompt renderer | rendered or skipped frame |
+| provider client | response, endpoint error, provider anomaly |
+| parser | parsed action, parse fault, normalization |
+| admission gate | accepted, refused, stale, repeated |
+| dispatcher | effect started, observation ok, observation error |
+| graph | plan, transition, evidence |
+| artifact | root, scaffold, weak path, cursor, audit, drift |
+| verifier | requested, passed, failed |
+| completion reducer | requested, accepted, refused, blocked handoff |
+| compaction | pressure, pre snapshot, completed, post snapshot, resume |
+| maintenance | due, started, deferred, no-op cooldown, completed |
+| owner wait | external question or answer |
 
 ## Inputs
 
