@@ -1,7 +1,7 @@
 use crate::kernel::active_mode::ActiveMode;
 use crate::kernel::facts::{
     ArtifactFacts, CaseFacts, ContextFacts, EvidenceFacts, GraphFacts, MaintenanceFacts,
-    ObservationFacts, QueueFacts,
+    ObservationFacts, ProviderFacts, QueueFacts,
 };
 use crate::kernel::fault::RuntimeFault;
 
@@ -82,6 +82,7 @@ pub struct RuntimeSnapshot {
     pub observation: ObservationFacts,
     pub context: ContextFacts,
     pub maintenance: MaintenanceFacts,
+    pub provider: ProviderFacts,
     pub latest_decision_id: Option<String>,
     pub prompt_frame_fingerprint: Option<String>,
     pub authority_fingerprint: AuthorityFingerprint,
@@ -98,6 +99,7 @@ pub struct RuntimeSnapshotInput {
     pub artifact: ArtifactFacts,
     pub context: ContextFacts,
     pub maintenance: MaintenanceFacts,
+    pub provider: ProviderFacts,
     pub authority_fingerprint: AuthorityFingerprint,
     pub staleness_fingerprint: StalenessFingerprint,
 }
@@ -120,6 +122,7 @@ impl RuntimeSnapshot {
             observation: ObservationFacts::default(),
             context: input.context,
             maintenance: input.maintenance,
+            provider: input.provider,
             latest_decision_id: None,
             prompt_frame_fingerprint: None,
             authority_fingerprint: input.authority_fingerprint,

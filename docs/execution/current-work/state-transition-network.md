@@ -140,8 +140,9 @@ authority snapshot, event, decision, transition, effect, and admission store
 APIs, dispatch admission views, stale maintenance-action refusal, central
 completion reducer use, and prompt-card decision id and fingerprint rendering
 exist. A standalone `kernel` module now defines pure snapshot, event, decision,
-admission, effect, render, fault, and reducer records with tests for mission
-priority and model-call admission invariants. Store ledgers include snapshot
+admission, effect, render, fault, provider facts, and reducer records with tests
+for mission priority, data-first next actions, provider anomaly recovery, and
+model-call admission invariants. Store ledgers include snapshot
 and decision detail rows, prompt frame and observation rows, complete-chain
 reopen lookup proof, and foreign-key proof that child rows cannot exist without
 their decision parents. Adapter-valid authority decision rows now store

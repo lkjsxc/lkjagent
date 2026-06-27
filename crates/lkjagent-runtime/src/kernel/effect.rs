@@ -6,8 +6,12 @@ pub enum RuntimeEffectCommand {
     CompactNow,
     WaitClosedIdle,
     DeferMaintenance,
+    RecordMaintenanceCooldown,
     RecordBlockedHandoff,
     RefreshStatus,
+    ExportModelLog,
+    PauseProvider,
+    CloseCase,
     DeterministicInspection { tool: ToolName },
 }
 
@@ -37,8 +41,12 @@ impl RuntimeEffectCommand {
             Self::CompactNow
             | Self::WaitClosedIdle
             | Self::DeferMaintenance
+            | Self::RecordMaintenanceCooldown
             | Self::RecordBlockedHandoff
-            | Self::RefreshStatus => None,
+            | Self::RefreshStatus
+            | Self::ExportModelLog
+            | Self::PauseProvider
+            | Self::CloseCase => None,
         }
     }
 }
