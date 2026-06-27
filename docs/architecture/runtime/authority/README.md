@@ -86,10 +86,13 @@ benchmark fixtures.
 
 - [reducer.md](reducer.md): pure snapshot, event, and decision contract.
 - [transition-kernel.md](transition-kernel.md): durable turn sequence around the reducer.
+- [kernel-driver.md](kernel-driver.md): effectful driver sequence and persistence order.
 - [snapshot-ledger.md](snapshot-ledger.md): durable read-side snapshot fields.
 - [event-catalog.md](event-catalog.md): closed event set that drives decisions.
 - [decision-ledger.md](decision-ledger.md): persisted decision record and invariants.
+- [effect-commands.md](effect-commands.md): runtime-owned effect commands.
 - [admission-view.md](admission-view.md): immutable dispatch admission view.
+- [admission-flow.md](admission-flow.md): accepted and refused dispatch path.
 - [wiring-map.md](wiring-map.md): reducer and admission ownership for runtime paths.
 - [missions.md](missions.md): owner, recovery, verification, maintenance, compaction, and idle rules.
 - [turn-authority.md](turn-authority.md): single turn decision object.

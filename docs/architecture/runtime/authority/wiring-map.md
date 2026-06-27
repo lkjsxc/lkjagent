@@ -11,6 +11,29 @@ A path may collect facts, but it may not decide mission, permission, or closure.
 Each path builds or refreshes `RuntimeSnapshot`, emits one `RuntimeEvent`, and
 uses the resulting `RuntimeDecision` for prompt rendering and dispatch.
 
+## Source And Consumer Map
+
+| Runtime path | Event source | Decision consumer |
+| --- | --- | --- |
+| owner queue intake | owner message queued or delivered | snapshot adapter |
+| prompt rendering | prompt frame rendered or skipped | prompt adapter |
+| provider call | provider response, endpoint error, anomaly | provider adapter |
+| parser | parsed action, parse fault, normalization | admission gateway |
+| dispatch admission | accepted, refused, stale, repeated | dispatcher adapter |
+| tool dispatch | effect started, observation ok, observation error | next-event adapter |
+| graph route | plan, transition, evidence | snapshot adapter only |
+| artifact route | scaffold, weak path, cursor, audit, drift | artifact repair reducer |
+| verification | requested, passed, failed | verification reducer |
+| completion | requested, accepted, refused | completion effect |
+| compaction | pressure, pre snapshot, post snapshot, resume | compaction effect |
+| maintenance | due, started, deferred, cooldown, completed | maintenance effect |
+| status | status refresh observation | status renderer |
+| model log | model-log export observation | model-log renderer |
+| console close | completion requested | completion reducer |
+
+Every row emits one event and consumes the resulting decision id. No row may
+read graph policy as fallback admission after authority refuses an action.
+
 ## Turn Path
 
 ```text
