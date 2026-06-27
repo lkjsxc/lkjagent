@@ -3,7 +3,7 @@ use lkjagent_store::state as store_state;
 use lkjagent_tools::dispatch::{AuthorityAdmissionView, DispatchState, EffectivePolicy};
 use rusqlite::Connection;
 
-use crate::error::RuntimeResult;
+use crate::error::{RuntimeError, RuntimeResult};
 use crate::mode::TurnAuthority;
 
 pub(super) fn install_authority_view(
@@ -25,7 +25,7 @@ pub(super) fn install_authority_view(
         blocked_tools: policy.blocked_tools,
         shell_allowed: policy.shell_allowed,
         completion_allowed: policy.completion_allowed,
-        missing_evidence: state.graph_missing.clone(),
+        missing_evidence: authority.input.missing_evidence.clone(),
         recovery_route: optional_state(conn, "authority recovery route")?,
         exact_valid_example: authority.valid_example.clone(),
     });
@@ -103,7 +103,8 @@ fn record(
             exact_valid_example,
             created_at: now,
         },
-    )?;
+    )
+    .map_err(|error| RuntimeError::Store(format!("record tool admission: {error}")))?;
     Ok(Some(admission_id))
 }
 

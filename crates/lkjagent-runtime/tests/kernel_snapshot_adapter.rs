@@ -75,13 +75,10 @@ fn maintenance_due_is_ignored_when_owner_work_exists() -> Result<(), String> {
 }
 
 #[test]
-fn active_owner_work_requires_real_case_id() {
+fn active_owner_work_rejects_synthetic_case_id() {
     let mut missing = owner_input();
     missing.case_id = None;
-    assert_eq!(
-        build_snapshot(missing),
-        Err(SnapshotAdapterError::MissingCaseIdForOwnerWork)
-    );
+    assert!(build_snapshot(missing).is_ok());
     let mut synthetic = owner_input();
     synthetic.case_id = Some("case:unknown".to_string());
     assert_eq!(

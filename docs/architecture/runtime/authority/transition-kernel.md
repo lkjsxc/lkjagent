@@ -109,21 +109,15 @@ runtime-owned compaction or inspection effects, and recovery escape-tool visibil
 
 ## Status
 
-partially implemented. Snapshot, event, decision, transition, effect,
-admission, prompt-frame, and observation ledgers exist. Runtime turn authority
-writes normalized rows and prompt cards cite the decision id. Store tests prove
-latest snapshot and decision reopen lookup, admission-to-decision integrity, and
-kernel-derived authority and staleness fingerprints on adapter-valid decision
-rows, plus canonical kernel event-kind strings in authority events. Snapshot
-adapter tests prove staleness changes for queue, artifact cursor, and
-compaction pressure, ignore maintenance due state during owner work, and reject
-synthetic active case ids. Kernel prompt rendering requires a persisted decision
-id, cites fingerprints, and renders concrete parseable batch-write examples.
-Kernel admission admits `agent.done` only when no evidence is missing and refuses
-stale, blocked, not-admitted, completion-blocked, and retry-exhausted repeated
-action fingerprints before dispatch in pure tests. Daemon shadow wiring maps a
-completion-ready active graph to the kernel completion event.
-Daemon model-completion handling can pass decision id, prompt frame id, and
-staleness fingerprint into pending actions before dispatch. Full kernel wiring
-for every dispatch, provider exchange, recovery, compaction, maintenance, and
-close path remains open.
+implemented for the daemon turn path, pending final gates. Snapshot, event,
+decision, transition, effect, admission, prompt-frame, and observation ledgers
+exist. Runtime turn authority writes normalized rows and prompt cards cite the
+decision id. Store tests prove latest snapshot and decision reopen lookup,
+admission-to-decision integrity, kernel-derived authority and staleness
+fingerprints, and canonical event-kind strings.
+
+The daemon authority adapter now runs the persisted kernel driver instead of a
+shadow decision path. Prompt rendering, pending-action admission, dispatch
+observations, maintenance, compaction, and completion use the same decision id
+and staleness fingerprint in focused runtime tests. Final local and Docker gates
+remain the proof needed before current-state marks the cutover closed.

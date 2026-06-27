@@ -35,7 +35,7 @@ fn tool_requiring_prompt_never_has_empty_tool_surface() {
 }
 
 #[test]
-fn kernel_owner_execution_does_not_admit_broad_log_surface() -> Result<(), String> {
+fn kernel_owner_execution_admits_owner_inspection_and_evidence() -> Result<(), String> {
     let snapshot = build_snapshot(SnapshotAdapterInput {
         snapshot_id: 1,
         case_id: Some("case-1".to_string()),
@@ -53,9 +53,9 @@ fn kernel_owner_execution_does_not_admit_broad_log_surface() -> Result<(), Strin
         .iter()
         .map(|tool| tool.as_str())
         .collect();
-    assert!(!tools.contains(&"workspace.summary"));
+    assert!(tools.contains(&"workspace.summary"));
     assert!(!tools.contains(&"graph.transition"));
-    assert!(!tools.contains(&"graph.evidence"));
+    assert!(tools.contains(&"graph.evidence"));
     Ok(())
 }
 
@@ -77,7 +77,7 @@ fn kernel_maintenance_excludes_owner_close_tools() -> Result<(), String> {
     let admission = admit_requested_tool(&decision.admission_view, request);
     assert_eq!(
         admission.refusal_kind,
-        Some(AdmissionRefusalKind::BlockedTool)
+        Some(AdmissionRefusalKind::CompletionBlocked)
     );
     Ok(())
 }

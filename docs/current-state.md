@@ -122,8 +122,8 @@ The first open work is the kernel cutover documentation and driver path.
 
 - One daemon driver must own snapshot, event, decision, prompt or effect,
   provider or dispatch, admission, observation, and next event.
-- `kernel_shadow` and policy-bearing mode authority must stop choosing product
-  behavior after the driver cutover.
+- Policy-bearing mode authority must stay out of product behavior after the
+  driver cutover.
 - The active data fixture must become deterministic benchmark evidence for idle
   maintenance churn, weak-content repair, child-tag batch faults, provider
   anomalies, stale touched paths, and false completion.

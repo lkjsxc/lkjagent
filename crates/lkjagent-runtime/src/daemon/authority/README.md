@@ -9,10 +9,10 @@ admission rows, and graph-policy synchronization.
 
 - [authority.rs](authority.rs): store-backed turn authority snapshots.
 - [authority_admission.rs](authority_admission.rs): normalized dispatch admission writes.
-- [authority_ledger.rs](authority_ledger.rs): normalized authority snapshot, event, decision, and transition writes.
-- [authority_ledger_support.rs](authority_ledger_support.rs): authority ledger helper fields and fingerprints.
-- [authority_store.rs](authority_store.rs): flat status-key authority snapshot writes.
 - [graph_policy.rs](graph_policy.rs): graph dispatch policy and ledger-aware completion helpers.
 - [graph_snapshot.rs](graph_snapshot.rs): graph fields used by runtime authority snapshots.
 - [graph_sync.rs](graph_sync.rs): graph policy synchronization for dispatch.
-- [kernel_shadow.rs](kernel_shadow.rs): transition-kernel shadow decision persistence while handover is incomplete.
+- [kernel_turn.rs](kernel_turn.rs): daemon adapter for persisted kernel turn decisions.
+- [kernel_turn_input.rs](kernel_turn_input.rs): snapshot and event input mapping for kernel turns.
+- [kernel_turn_persist.rs](kernel_turn_persist.rs): status-key projection from kernel turn records.
+- [kernel_turn_policy.rs](kernel_turn_policy.rs): dispatch policy projection from kernel decisions.

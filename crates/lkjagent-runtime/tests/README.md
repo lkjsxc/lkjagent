@@ -28,7 +28,7 @@ This directory holds pure runtime-step and thin daemon adapter tests.
 - [graph_memory_links.rs](graph_memory_links.rs): graph case to task-summary memory links.
 - [graph_prefix_budget.rs](graph_prefix_budget.rs): startup graph guard prefix budget fixture.
 - [kernel_completion.rs](kernel_completion.rs): kernel close-case and completion-block fixtures.
-- [kernel_shadow_wiring.rs](kernel_shadow_wiring.rs): daemon authority shadow completion-event fixture.
+- [kernel_driver_wiring.rs](kernel_driver_wiring.rs): daemon authority driver completion-event fixture.
 - [owner_guidance.rs](owner_guidance.rs): queued owner guidance guard persistence fixture.
 - [payload_risk.rs](payload_risk.rs): max-token write payload recovery fixture.
 - [pending_action_authority.rs](pending_action_authority.rs): pending action authority id propagation fixture.

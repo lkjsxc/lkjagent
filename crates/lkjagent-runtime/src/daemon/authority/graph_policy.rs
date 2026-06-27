@@ -28,7 +28,7 @@ pub(super) fn effective_policy(
                 allowed_tools,
                 blocked_tools,
                 shell_allowed: graph.shell_allowed,
-                completion_allowed: graph.completion_ready,
+                completion_allowed: mode_policy.completion_allowed && graph.completion_ready,
                 reason: graph
                     .blocked_reason
                     .clone()
@@ -42,7 +42,7 @@ pub(super) fn effective_policy(
         allowed_tools: strings(&mode_policy.allowed_tools),
         blocked_tools: strings(&mode_policy.blocked_tools),
         shell_allowed: mode_policy.allowed_tools.contains(&"shell.run"),
-        completion_allowed: mode_policy.mode.allows_completion(),
+        completion_allowed: mode_policy.completion_allowed,
         reason: format!("tool is not admitted by {:?} active mode", mode_policy.mode),
         preferred_next_action: mode_policy.preferred_next_action.to_string(),
     }

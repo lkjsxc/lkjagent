@@ -16,12 +16,6 @@ use std::time::Duration;
 mod authority;
 #[path = "daemon/authority/authority_admission.rs"]
 mod authority_admission;
-#[path = "daemon/authority/authority_ledger.rs"]
-mod authority_ledger;
-#[path = "daemon/authority/authority_ledger_support.rs"]
-mod authority_ledger_support;
-#[path = "daemon/authority/authority_store.rs"]
-mod authority_store;
 #[path = "daemon/context/compaction.rs"]
 mod compaction;
 #[path = "daemon/context/compaction_support.rs"]
@@ -48,6 +42,8 @@ mod graph_policy;
 mod graph_sync;
 #[path = "daemon/loop/idle.rs"]
 mod idle;
+#[path = "daemon/authority/kernel_turn.rs"]
+mod kernel_turn;
 #[path = "daemon/loop/maintenance_wait.rs"]
 mod maintenance_wait;
 #[path = "daemon/loop/owner_delivery.rs"]
@@ -66,6 +62,8 @@ mod runner;
 mod scaffold;
 #[path = "daemon/artifacts/scaffold_evidence.rs"]
 mod scaffold_evidence;
+#[path = "daemon/shutdown.rs"]
+mod shutdown;
 #[path = "daemon/loop/startup.rs"]
 mod startup;
 #[path = "daemon/status/status.rs"]
@@ -74,6 +72,7 @@ mod status;
 mod task_summary;
 pub use persisted::restore_completion_guard;
 pub use runner::{DaemonTick, ResidentDaemon, ResidentRuntime};
+pub use shutdown::{request_shutdown, ShutdownDecision, ShutdownState, Signal};
 pub use startup::{build_prefix_from_store, startup_summary};
 pub type EndpointClientConfig = ClientConfig;
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -82,26 +81,6 @@ pub enum StartupLock {
     Refused { holder: String },
     Reclaimed { previous: String },
 }
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Signal {
-    Interrupt,
-    Terminate,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub struct ShutdownState {
-    pub stop_requested: bool,
-    pub in_flight: bool,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ShutdownDecision {
-    Continue,
-    FinishTurnThenExit,
-    ExitNow,
-}
-
 pub fn take_daemon_lock(
     conn: &Connection,
     holder: &str,
@@ -148,22 +127,6 @@ pub fn startup_state_with_budget(
         };
     }
     state
-}
-
-pub fn request_shutdown(
-    state: ShutdownState,
-    _signal: Signal,
-) -> (ShutdownState, ShutdownDecision) {
-    let next = ShutdownState {
-        stop_requested: true,
-        in_flight: state.in_flight,
-    };
-    let decision = if state.in_flight {
-        ShutdownDecision::FinishTurnThenExit
-    } else {
-        ShutdownDecision::ExitNow
-    };
-    (next, decision)
 }
 
 pub fn endpoint_complete(

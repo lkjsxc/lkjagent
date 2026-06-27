@@ -89,7 +89,7 @@ pub fn build_snapshot(
 }
 
 fn validate_case_id(input: &SnapshotAdapterInput) -> Result<(), SnapshotAdapterError> {
-    if !owner_work_exists(input) {
+    if !case_bound_work_exists(input) {
         return Ok(());
     }
     match input.case_id.as_deref() {
@@ -98,12 +98,16 @@ fn validate_case_id(input: &SnapshotAdapterInput) -> Result<(), SnapshotAdapterE
         )),
         Some(value) if !value.trim().is_empty() => Ok(()),
         Some(value) => Err(SnapshotAdapterError::SyntheticCaseId(value.to_string())),
-        None => Err(SnapshotAdapterError::MissingCaseIdForOwnerWork),
+        None => Ok(()),
     }
 }
 
 fn owner_work_exists(input: &SnapshotAdapterInput) -> bool {
     input.pending_owner_count > 0 || input.queue_head.is_some() || input.case_id.is_some()
+}
+
+fn case_bound_work_exists(input: &SnapshotAdapterInput) -> bool {
+    input.case_id.is_some() || input.graph_node.is_some() || input.graph_phase.is_some()
 }
 
 fn maintenance_facts(input: &SnapshotAdapterInput, owner_work_exists: bool) -> MaintenanceFacts {
