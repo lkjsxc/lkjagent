@@ -1,11 +1,14 @@
 use std::path::PathBuf;
 
+#[path = "args_help.rs"]
+mod args_help;
 #[path = "args_model_log.rs"]
 mod args_model_log;
 #[path = "args_personal.rs"]
 mod args_personal;
 
 use crate::error::CliError;
+pub use args_help::{help_text, is_help_arg, is_help_invocation};
 use args_model_log::parse_model_log;
 use args_personal::parse_personal;
 
@@ -17,6 +20,7 @@ pub struct Invocation {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Command {
+    Help,
     Run,
     Send {
         text: String,
@@ -64,13 +68,22 @@ where
     let mut data_dir = PathBuf::from("/data");
     let mut command: Option<String> = None;
     let mut command_args = Vec::new();
-    let mut iter = args.into_iter().map(Into::into).peekable();
+    let mut positional = false;
+    let mut iter = args.into_iter().map(Into::into);
     while let Some(arg) = iter.next() {
-        if arg == "--data" {
+        if !positional && is_help_arg(&arg) {
+            return Ok(Invocation {
+                data_dir,
+                command: Command::Help,
+            });
+        }
+        if !positional && arg == "--data" {
             let Some(path) = iter.next() else {
                 return Err(CliError::usage("--data requires a directory"));
             };
             data_dir = PathBuf::from(path);
+        } else if !positional && arg == "--" {
+            positional = true;
         } else if command.is_none() {
             command = Some(arg);
         } else {
@@ -88,9 +101,10 @@ where
 
 fn parse_command(command: &str, args: Vec<String>) -> Result<Command, CliError> {
     match command {
-        "run" => Ok(Command::Run),
+        "help" => parse_no_args(args, "help").map(|()| Command::Help),
+        "run" => parse_no_args(args, "run").map(|()| Command::Run),
         "send" => parse_send(args),
-        "status" => Ok(Command::Status),
+        "status" => parse_no_args(args, "status").map(|()| Command::Status),
         "log" => parse_log(args),
         "console" => parse_no_args(args, "console").map(|()| Command::Console),
         "memory" => parse_memory(args),

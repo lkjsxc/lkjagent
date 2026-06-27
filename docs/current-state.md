@@ -11,9 +11,10 @@ tests, quiet gates, and required Docker gates prove it.
 lkjagent has a working Rust workspace with local gates, Docker Compose gates,
 a strict tag action parser, dispatcher registry, typed graph model, context
 budgeting, SQLite persistence, endpoint client, daemon loop, owner queue intake,
-status and log commands, memory commands, model-run logging, artifact ledgers,
-compaction records, provider-exchange logging, runtime authority ledgers, personal-record
-projections, and benchmark fixtures.
+status and log commands, config-independent CLI help, memory commands,
+model-run logging, artifact ledgers, compaction records, provider-exchange
+logging, runtime authority ledgers, personal-record projections, and benchmark
+fixtures.
 
 The runtime-authority redesign is implemented. Runtime authority flows through
 one persisted decision stream for prompt rendering, provider calls, parse and
@@ -39,6 +40,7 @@ no-op maintenance churn, and stale touched-path reporting.
 | Runtime kernel | Snapshot, event, decision, admission, effect, render, fault, provider, adapter, reducer, and driver records are implemented. |
 | Authority persistence | Store rows carry snapshot, event, decision, companion details, prompt frames, observations, fingerprints, and staleness facts. |
 | Endpoint loop | Provider calls record authority files, token usage when present, anomalies, retry state, and bounded recovery. |
+| CLI entrypoint | `lkjagent --help` and `lkjagent help` print usage before config loading, and `--data` is accepted before or after the command. |
 | Model log | Status, console, `model-log`, exchange exports, raw-case inspection, replay export, and touched paths read durable authority rows. |
 | Artifact lifecycle | Artifact plan, apply, audit, next, cursors, weak paths, invalid roots, story readiness, and completion refusals are ledger-backed. |
 | Recovery | Fault classes, route metadata, retry counters, changed-shape repeat routing, blocked handoff, and canonical examples are covered. |

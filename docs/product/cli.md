@@ -10,6 +10,7 @@ no IPC protocol.
 
 | Command | Behavior |
 | --- | --- |
+| `lkjagent --help` or `lkjagent help` | Print the command summary without needing runtime config. |
 | `lkjagent run` | Start the daemon in the foreground. Exactly one per store. |
 | `lkjagent send <text>` | Append a user message through lkjagent-store; print its queue id. |
 | `lkjagent status` | Print daemon state, queue depth, open task, authority ids, artifact state, question, error, context usage, token usage, and model log path. |
@@ -21,9 +22,11 @@ no IPC protocol.
 | `lkjagent personal list [--kind K] [--status S] [--project P] [--limit N]` | Inspect store-backed personal records. |
 | `lkjagent personal render` | Regenerate bounded personal Markdown projections under the data directory. |
 
-All commands accept `--data <dir>` to locate the store and default to the
-container data directory defined in [../operations/running.md](../operations/running.md).
-The graph command reads source graph definitions and active case state.
+All commands accept `--data <dir>` before or after the command to locate the
+store and default to the container data directory defined in
+[../operations/running.md](../operations/running.md). Use `--` after a command
+when a command argument must start with `--`. The graph command reads source
+graph definitions and active case state.
 `lkjagent status` derives current artifact root, weak cursor, latest decision
 id, prompt frame id, mission, active mode, missing evidence, provider anomaly
 retry state, and next executable action from authority rows when those rows
