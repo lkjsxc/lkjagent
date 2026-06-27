@@ -22,6 +22,7 @@ reads artifact ledger state, not raw file existence or direct graph notes.
 - artifact ledger records.
 - weak path records with missing requirement labels.
 - current batch cursor references.
+- `artifact.next` candidate facts that require a new decision before dispatch.
 - audit evidence tied to current artifact id.
 - completion refusals that name the next admitted audit or repair action.
 
@@ -63,5 +64,6 @@ tied to `artifact_ledger_id`, invalid-root markers for audited `.md` roots,
 daemon `agent.done` refusals for unresolved ledger weak paths, story semantic
 readiness checks in `artifact.audit`, and completion refusal status with current
 artifact plus next audit action exist. The active long-novel log proves scaffold
-identity is not readiness evidence and weak story pages must drive repair before
+identity is not readiness evidence and weak story pages must drive
+`artifact.next`, canonical line-protocol `fs.batch_write`, and re-audit before
 close. Adoption repair flow and proof for every close path remain open.

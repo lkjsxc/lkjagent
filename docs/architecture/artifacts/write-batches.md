@@ -16,10 +16,13 @@ admissible and complete.
 ## Next Batch
 
 `artifact.next` returns the next bounded batch from audit gaps. It walks weak
-semantic leaves through a durable root cursor, names exact paths, and produces
-an admitted `fs.batch_write` example only when that example contains
-profile-specific content.
+semantic leaves through a durable root cursor, names exact paths, and produces a
+candidate `fs.batch_write` line-protocol payload only when the candidate
+contains profile-specific content.
 
+`artifact.next` is fact-only: `next_decision_required=true` means the candidate
+cannot dispatch directly. The observation creates a runtime event, then the next
+decision may force the canonical `fs.batch_write` action for those weak paths.
 If the current cursor has no next weak path, `artifact.next` requests
 `artifact.audit` or focused reads instead of repeating a placeholder write.
 Successful `fs.write` and `fs.batch_write` calls mark matching planned cursor
@@ -35,8 +38,8 @@ story bible never recovers from an empty root by writing one monolithic README.
 
 ## Payload Faults
 
-After invalid JSON-in-`files`, max-token truncation, unclosed content tags, or a
-payload-limit refusal, recovery blocks another large raw write and routes to
-`artifact.next`, `artifact.audit`, or a concrete bounded `fs.batch_write` under
-the current root. The next example must be parseable, registry-valid, and below
-the existing limits.
+After invalid JSON-in-`files`, child `<file>` tags inside `<files>`, max-token
+truncation, unclosed content tags, or a payload-limit refusal, recovery blocks
+another large raw write and routes to `artifact.next`, `artifact.audit`, or a
+concrete bounded line-protocol `fs.batch_write` under the current root. The
+next example must be parseable, registry-valid, and below the existing limits.
