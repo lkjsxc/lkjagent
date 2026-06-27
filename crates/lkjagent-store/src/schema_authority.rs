@@ -24,6 +24,16 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             staleness_fingerprint TEXT NOT NULL,
             created_at TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS runtime_snapshot_details (
+            snapshot_id INTEGER PRIMARY KEY,
+            graph_phase TEXT NOT NULL,
+            artifact_root TEXT,
+            weak_cursor INTEGER,
+            latest_observation TEXT,
+            prompt_frame_head TEXT,
+            authority_fingerprint TEXT NOT NULL,
+            FOREIGN KEY(snapshot_id) REFERENCES runtime_snapshots(id)
+        );
         CREATE TABLE IF NOT EXISTS runtime_authority_events (
             id INTEGER PRIMARY KEY,
             snapshot_id INTEGER,
@@ -58,6 +68,20 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             created_at TEXT NOT NULL,
             FOREIGN KEY(snapshot_id) REFERENCES runtime_snapshots(id),
             FOREIGN KEY(event_id) REFERENCES runtime_authority_events(id)
+        );
+        CREATE TABLE IF NOT EXISTS runtime_decision_details (
+            decision_id INTEGER PRIMARY KEY,
+            decision_kind TEXT NOT NULL,
+            graph_phase TEXT NOT NULL,
+            exact_next_action_class TEXT NOT NULL,
+            runtime_effect_kind TEXT,
+            artifact_root TEXT,
+            weak_cursor INTEGER,
+            latest_observation TEXT,
+            prompt_frame_head TEXT,
+            authority_fingerprint TEXT NOT NULL,
+            staleness_fingerprint TEXT NOT NULL,
+            FOREIGN KEY(decision_id) REFERENCES runtime_authority_decisions(id)
         );
         CREATE TABLE IF NOT EXISTS runtime_tool_admissions (
             id INTEGER PRIMARY KEY,
@@ -129,8 +153,12 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             ON runtime_snapshots(case_scope, case_id, id);
         CREATE INDEX IF NOT EXISTS runtime_events_case_idx
             ON runtime_authority_events(case_scope, case_id, id);
+        CREATE INDEX IF NOT EXISTS runtime_snapshot_details_phase_idx
+            ON runtime_snapshot_details(graph_phase);
         CREATE INDEX IF NOT EXISTS runtime_decisions_case_idx
             ON runtime_authority_decisions(case_scope, case_id, id);
+        CREATE INDEX IF NOT EXISTS runtime_decision_details_kind_idx
+            ON runtime_decision_details(decision_kind, exact_next_action_class);
         CREATE INDEX IF NOT EXISTS runtime_admissions_decision_tool_idx
             ON runtime_tool_admissions(decision_id, requested_tool);
         CREATE INDEX IF NOT EXISTS runtime_transitions_case_idx

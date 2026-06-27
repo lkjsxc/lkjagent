@@ -141,11 +141,12 @@ APIs, dispatch admission views, stale maintenance-action refusal, central
 completion reducer use, and prompt-card decision id and fingerprint rendering
 exist. A standalone `kernel` module now defines pure snapshot, event, decision,
 admission, effect, render, fault, and reducer records with tests for mission
-priority and model-call admission invariants. Store ledgers include prompt
-frame and observation rows, reopen lookup proof, and foreign-key proof that an
-admission cannot exist without a decision. Adapter-valid authority decision rows
-now store kernel-derived authority and staleness fingerprints, and authority
-ledger events use the kernel event-kind taxonomy. The daemon records authority
+priority and model-call admission invariants. Store ledgers include snapshot
+and decision detail rows, prompt frame and observation rows, complete-chain
+reopen lookup proof, and foreign-key proof that child rows cannot exist without
+their decision parents. Adapter-valid authority decision rows now store
+kernel-derived authority and staleness fingerprints, and authority ledger events
+use the kernel event-kind taxonomy. The daemon records authority
 prompt frames and effect observations for pending dispatches, writes kernel
 mission and staleness fields into provider `authority.json`, and the kernel
 admits `agent.done` only after evidence gaps are empty. Completion-ready active

@@ -127,12 +127,13 @@ prompt-frame, authority, and staleness identifiers.
 
 ## Latest Recorded Verification Evidence
 
-This active-state reconciliation has focused docs evidence:
+This authority-store slice has focused evidence:
 
-- `cargo run -p lkjagent-xtask -- check-docs`: `CHECK_DOCS_EXIT=0`,
-  `ok check-docs`.
-- `cargo run -p lkjagent-xtask -- check-lines`: `CHECK_LINES_EXIT=0`,
-  `ok check-lines`.
+- `cargo test -p lkjagent-store --test authority_ledger`:
+  `AUTHORITY_LEDGER_EXIT=0`.
+- `cargo test -p lkjagent-store --test provider_exchange`:
+  `PROVIDER_EXCHANGE_EXIT=0`.
+- `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 
 Before this reconciliation, the latest recorded full verification covered
 active-log ledger, model-log authority export, export-manifest missing-file
