@@ -127,13 +127,9 @@ prompt-frame, authority, and staleness identifiers.
 
 ## Latest Recorded Verification Evidence
 
-This model-log slice has focused evidence:
+This benchmark fixture slice has focused evidence:
 
-- `cargo test -p lkjagent-runtime --test provider_exchange_log`: `PROVIDER_EXCHANGE_LOG_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test current_model_run_fixture`: `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test model_log_touched_paths`: `MODEL_LOG_TOUCHED_PATHS_EXIT=0`.
-- `cargo test -p lkjagent-cli --test model_log`: `CLI_MODEL_LOG_EXIT=0`.
-- `cargo test -p lkjagent-cli --test model_log_archive`: `CLI_MODEL_LOG_ARCHIVE_EXIT=0`.
+- `cargo test -p lkjagent-benchmark`: `BENCHMARK_TEST_EXIT=0`.
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 
 Before this reconciliation, the latest recorded full verification covered
