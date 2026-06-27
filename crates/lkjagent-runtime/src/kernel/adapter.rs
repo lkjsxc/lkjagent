@@ -42,6 +42,8 @@ pub struct SnapshotAdapterInput {
     pub provider_anomaly_class: Option<String>,
     pub provider_retry_count: u32,
     pub provider_pause_deadline: Option<String>,
+    pub latest_observation: Option<String>,
+    pub latest_successful_observation: Option<String>,
     pub latest_decision_id: Option<String>,
     pub prompt_frame_fingerprint: Option<String>,
 }
@@ -60,6 +62,7 @@ pub fn build_snapshot(
     let owner_work_exists = owner_work_exists(&input);
     let maintenance = maintenance_facts(&input, owner_work_exists);
     let (authority_fingerprint, staleness_fingerprint) = fingerprints(&input, owner_work_exists)?;
+    let observation = observation_facts(&input);
     let mut snapshot = RuntimeSnapshot::new(RuntimeSnapshotInput {
         snapshot_id: RuntimeSnapshotId(input.snapshot_id),
         case: case_facts(&input),
@@ -78,6 +81,7 @@ pub fn build_snapshot(
     snapshot.prior_action_fingerprint = input.prior_action_fingerprint;
     snapshot.parameter_shape_fingerprint = input.parameter_shape_fingerprint;
     snapshot.recovery_route = input.recovery_route;
+    snapshot.observation = observation;
     snapshot.latest_decision_id = input.latest_decision_id;
     snapshot.prompt_frame_fingerprint = input.prompt_frame_fingerprint;
     snapshot.active_mode = select_mission(&snapshot, &RuntimeEvent::CaseResumed).active_mode();
@@ -159,6 +163,13 @@ fn artifact_facts(input: &SnapshotAdapterInput) -> ArtifactFacts {
         cursor: input.artifact_cursor.clone(),
         batch_cursor: input.artifact_batch_cursor.clone(),
         ..ArtifactFacts::default()
+    }
+}
+
+fn observation_facts(input: &SnapshotAdapterInput) -> crate::kernel::facts::ObservationFacts {
+    crate::kernel::facts::ObservationFacts {
+        latest: input.latest_observation.clone(),
+        latest_successful: input.latest_successful_observation.clone(),
     }
 }
 

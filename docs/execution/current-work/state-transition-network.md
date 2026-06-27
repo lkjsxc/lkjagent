@@ -156,8 +156,8 @@ shadow mission fields from the persisted authority snapshot and event id, and
 stale cached actions refuse when their prompt-frame head changes. The
 snapshot adapter
 computes staleness fingerprints from queue head and count, case, active mode,
-graph, artifact cursor, fault, evidence, compaction, maintenance, and prompt facts;
-rejects synthetic
+graph, artifact cursor, fault, evidence, compaction, maintenance, provider,
+observation, and prompt facts; rejects synthetic
 active case ids; and ignores maintenance due state when owner work exists.
 Kernel prompt rendering requires persisted event and decision ids, cites
 authority and staleness fingerprints, preserves the admitted tool surface, and
