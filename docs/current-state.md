@@ -127,13 +127,12 @@ prompt-frame, authority, and staleness identifiers.
 
 ## Latest Recorded Verification Evidence
 
-This artifact-repair slice has focused evidence:
+This provider-anomaly slice has focused evidence:
 
-- `cargo test -p lkjagent-tools --test artifact_next`: `ARTIFACT_NEXT_EXIT=0`.
-- `cargo test -p lkjagent-tools --test artifact_next_long_novel`: `ARTIFACT_NEXT_LONG_NOVEL_EXIT=0`.
-- `cargo test -p lkjagent-tools --test batch_write_formats`: `BATCH_WRITE_FORMATS_EXIT=0`.
-- `cargo test -p lkjagent-tools --test dispatch_normalize`: `DISPATCH_NORMALIZE_EXIT=0`.
-- `cargo test -p lkjagent-runtime --test current_model_run_fixture`: `CURRENT_MODEL_RUN_FIXTURE_EXIT=0`.
+- `cargo test -p lkjagent-llm --test wire`: `WIRE_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test provider_anomaly`: `PROVIDER_ANOMALY_EXIT=0`.
+- `cargo test -p lkjagent-runtime --test provider_exchange_log`: `PROVIDER_EXCHANGE_LOG_EXIT=0`.
+- `cargo test -p lkjagent-store --test provider_exchange`: `STORE_PROVIDER_EXCHANGE_EXIT=0`.
 - `cargo fmt --check`: `FMT_CHECK_EXIT=0`.
 
 Before this reconciliation, the latest recorded full verification covered
