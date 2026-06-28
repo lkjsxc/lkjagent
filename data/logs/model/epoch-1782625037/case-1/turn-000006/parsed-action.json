@@ -1,1 +1,0 @@
-{"status":"ok","closure_mode":"StopSequenceClosed","envelope_mode":"Natural","normalized_text_hash":"46912d682884cb7e","content_bytes":813,"tool":"graph.plan","params":[{"name":"objective","bytes":73},{"name":"steps","bytes":382},{"name":"reason","bytes":179},{"name":"checks","bytes":30},{"name":"paths","bytes":13}]}

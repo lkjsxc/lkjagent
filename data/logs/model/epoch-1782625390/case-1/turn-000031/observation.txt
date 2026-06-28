@@ -1,4 +1,0 @@
-<observation>
-<status>ok</status>
-<content>graph plan recorded</content>
-</observation>

@@ -1,0 +1,1 @@
+{"status":"ok","closure_mode":"StopSequenceClosed","envelope_mode":"Natural","normalized_text_hash":"3cbdce03aeb1a4de","content_bytes":73,"tool":"fs.mkdir","params":[{"name":"path","bytes":19}]}

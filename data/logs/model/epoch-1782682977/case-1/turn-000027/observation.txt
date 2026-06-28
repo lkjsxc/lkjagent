@@ -1,0 +1,19 @@
+<observation>
+<status>ok</status>
+<content>
+document audit failed
+root=stories/novel-named
+topology=failed
+links=passed
+path_hygiene=passed
+content_readiness=not-requested
+artifact_readiness=not-owner
+checks_run=topology,links,path_hygiene,content_readiness
+failed=1
+failures_shown=1
+failures_omitted=0
+failures:
+- missing_root: stories/novel-named
+next_action=artifact.next or fs.batch_write exact failed topology
+</content>
+</observation>

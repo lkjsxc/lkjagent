@@ -1,0 +1,14 @@
+<notice>
+<kind>error</kind>
+<content>
+repeat action refused; see frame 23
+active_mode=Recovery
+next_action_must_change_shape=true
+forbidden_tool=doc.audit
+preferred_next_action=graph.state
+valid_example:
+<action>
+<tool>graph.state</tool>
+</action>
+</content>
+</notice>
