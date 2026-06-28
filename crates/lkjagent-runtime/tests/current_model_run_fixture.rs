@@ -8,13 +8,13 @@ fn checked_in_current_model_run_is_long_novel_repair_fixture() -> TestResult<()>
 
     assert!(current.contains("active_node: document"));
     assert!(current.contains("active_phase: execution"));
-    assert!(current.contains("Create a long novel. with detailed settings"));
-    assert!(current.contains("stories/long-novel-with-detailed-settings"));
+    assert!(current.contains("Create a long novel. with structured settings."));
+    assert!(current.contains("stories/long-novel-with-structured-settings"));
     assert!(current.contains("document scaffold created"));
     assert!(current.contains("profile=NarrativeManuscript"));
     assert!(current.contains("document audit failed"));
     assert!(current.contains("structure_only_content: project/premise.md"));
-    assert!(current.contains("invalid parameter: each block must start with path:"));
+    assert!(current.contains("invalid parameter: too many files; max=20"));
     assert!(current.contains("provider anomaly: reasoning_only_response"));
     assert!(current.contains("| document audit | pending | graph case check |"));
     assert!(current.contains("| artifact readiness audit | pending | graph case check |"));

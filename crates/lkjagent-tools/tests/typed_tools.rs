@@ -56,24 +56,20 @@ fn fs_list_search_stat_and_batch_write_are_bounded() -> TestResult<()> {
 }
 
 #[test]
-fn fs_batch_write_normalizes_common_path_variants() -> TestResult<()> {
+fn fs_batch_write_accepts_line_protocol_path_header() -> TestResult<()> {
     let workspace = temp_workspace("typed-fs-normalize")?;
     let runtime = runtime(workspace.clone())?;
     let mut conn = store()?;
     let mut state = state();
-    let files = "\n\npath:out/no-space.md\ncontent:\n# No Space\n\
--- lkjagent-next-file --\n<path>out/xml.md</path>\ncontent:\n# Xml\n\
--- lkjagent-next-file --\n<path:out/angled.md>\ncontent:\n# Angled\n";
+    let files = "\n\npath:out/no-space.md\ncontent:\n# No Space\n";
     let batch = dispatch(
         &action("fs.batch_write", &[("files", files)]),
         &runtime,
         &mut conn,
         &mut state,
     );
-    assert!(batch.content.contains("files_written=3"));
+    assert!(batch.content.contains("files_written=1"));
     assert!(workspace.join("out/no-space.md").is_file());
-    assert!(workspace.join("out/xml.md").is_file());
-    assert!(workspace.join("out/angled.md").is_file());
     Ok(())
 }
 

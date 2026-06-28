@@ -31,6 +31,7 @@ cookbooks, guides, encyclopedias, and other large content deliverables.
 - [readiness-evidence.md](readiness-evidence.md): evidence that can satisfy readiness.
 - [false-completion.md](false-completion.md): scaffold-only and weak-content close refusal.
 - [objective-drift.md](objective-drift.md): objective-match drift audit and guard behavior.
+- [path-aliases.md](path-aliases.md): short semantic roots and artifact cards.
 
 ## Contract
 

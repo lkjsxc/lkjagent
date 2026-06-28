@@ -11,7 +11,7 @@ and leaving a smaller live log.
 
 | Region | Cap (tokens) | Owner | On overflow |
 | --- | --- | --- | --- |
-| generation reserve | 2,048 | harness | never occupied; subtracted first |
+| generation reserve | 512 | harness | compact model output cap; subtracted first |
 | prefix: identity and rules | 768 | [../protocol/system-prompt.md](../protocol/system-prompt.md) | build-time check fails |
 | prefix: grammar and tool registry | 1,024 | [../protocol/system-prompt.md](../protocol/system-prompt.md) | build-time check fails |
 | prefix: graph state | 512 | [../state-graph/context-packages.md](../state-graph/context-packages.md) | package text and completion-guard lines narrow within cap |
@@ -32,10 +32,10 @@ and leaving a smaller live log.
   retrieve the rest (a ranged fs.read, a narrower shell command, a
   memory.find query).
 - The prefix total is 5,376 tokens. With the default 24,576-token window and
-  2,048-token reserve, 17,152 tokens remain for the live log.
-- With a 16,384-token window and 2,048-token reserve, 8,960 tokens remain
-  for the live log. The derived policy is soft trigger 12,288, hard trigger
-  13,312, and post-compaction target 7,424.
+  512-token reserve, 18,688 tokens remain for the live log.
+- With a 16,384-token window and 512-token reserve, 10,496 tokens remain
+  for the live log. The derived policy is computed from the selected window
+  and compact reserve.
 - `context.trigger` is accepted only when it is below `window - reserve`
   and above the post-compaction target. Omitted or stale trigger values are
   derived from the selected window instead of preserving larger-window

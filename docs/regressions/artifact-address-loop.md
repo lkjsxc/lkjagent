@@ -7,13 +7,13 @@ leaf paths with artifact roots.
 
 ## Input Signature
 
-The owner asked for a SF novel with detailed settings. The model selected a
+The owner asked for a SF novel with structured settings. The model selected a
 Markdown leaf as an artifact root, then targeted a file under that leaf:
 
 ```text
-artifact.apply root=stories/sf-novel-with-detailed-settings/02-characters.md
-artifact.next root=stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md
-artifact.audit root=stories/sf-novel-with-detailed-settings/02-characters.md/topics/background.md
+artifact.apply root=stories/sf-novel-with-structured-settings/02-characters.md
+artifact.next root=stories/sf-novel-with-structured-settings/02-characters.md/topics/background.md
+artifact.audit root=stories/sf-novel-with-structured-settings/02-characters.md/topics/background.md
 ```
 
 ## Forbidden Behavior

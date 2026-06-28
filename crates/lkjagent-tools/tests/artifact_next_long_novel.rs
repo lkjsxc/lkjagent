@@ -7,7 +7,7 @@ use support::{action, runtime, state, store, temp_workspace, TestResult};
 #[test]
 fn long_novel_profile_uses_story_repair_sections() -> TestResult<()> {
     let workspace = temp_workspace("artifact-next-long-novel")?;
-    let root = "stories/long-novel-with-detailed-settings";
+    let root = "stories/novel";
     let runtime = runtime(workspace)?;
     let mut conn = store()?;
     let mut dispatch_state = state();

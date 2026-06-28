@@ -1,5 +1,4 @@
 pub mod error;
-mod line_parse;
 pub mod model;
 pub mod parse;
 pub mod registry;

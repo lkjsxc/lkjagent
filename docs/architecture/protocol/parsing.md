@@ -30,8 +30,7 @@ wire step documented in [stop-token-policy.md](stop-token-policy.md).
 
 1. The first recognized field is the tool.
 2. Canonical model output uses `<tool>known.tool</tool>`.
-3. The bounded line body `tool: known.tool` exists only for strict implicit
-   envelope normalization and parser fixtures.
+3. Top-level line bodies such as `tool: graph.state` are not live actions.
 4. The tool must name one registry entry.
 5. Each parameter name must be unique.
 6. Parameter sets are validated against [../tools/registry.md](../tools/registry.md).
@@ -64,29 +63,14 @@ invalid tag name, a value hint when one is recoverable, and the parameters that
 were recognized before the malformed line. It must not report already parsed
 required fields as missing.
 
-## Implicit Envelope Normalization
+## Missing Envelope Faults
 
-A missing opening envelope can normalize only when all conditions hold:
+A missing opening envelope is a fault. The parser does not normalize bare
+`<tool>...</tool>` bodies or top-level `tool:` bodies for live dispatch.
+Historical fixture text may mention implicit envelopes, but model-facing prompt
+examples must not present them as legal output.
 
-- the response has no natural `<action>` envelope;
-- the response contains exactly one complete action body starting with
-  `<tool>known.tool</tool>` or `tool: known.tool`;
-- no prose exists outside recognized fields;
-- registry validation passes;
-- runtime admission for the persisted decision passes before dispatch;
-- parse and provider exchange logs record `ImplicitActionEnvelope`.
-
-These bodies can normalize:
-
-```text
-<tool>graph.state</tool>
-```
-
-```text
-tool: graph.state
-```
-
-These bodies remain faults:
+These bodies are faults:
 
 ```text
 I will inspect the graph state next.
@@ -94,7 +78,10 @@ I will inspect the graph state next.
 
 ```text
 <tool>graph.state</tool>
-<tool>fs.list</tool>
+```
+
+```text
+tool: graph.state
 ```
 
 ```text
@@ -105,8 +92,8 @@ I will inspect the graph state next.
 ## JSON
 
 Top-level JSON action output is `JsonActionRejected` in the live parser. JSON
-inside a parameter remains tool-specific payload text and is validated by that
-tool contract.
+inside `<files>` for `fs.batch_write` is a tool schema fault and must not mutate
+files.
 
 ## Non-Goals
 
@@ -117,13 +104,11 @@ tool contract.
 ## Testing
 
 The parser table covers clean turns, every fault variant, provider-stop closure,
-implicit envelope normalization, attribute-like tags, duplicate parameters,
-conditional requirements, giant lines, and abrupt cutoffs. Tests assert exact
-parse outcomes and grow when live operation produces a new shape.
+missing envelope faults, attribute-like tags, duplicate parameters, conditional
+requirements, giant lines, and abrupt cutoffs. Tests assert exact parse outcomes
+and grow when live operation produces a new shape.
 
 ## Status
 
-partially implemented. The live parser now rejects top-level JSON, uses the
-singular action envelope, records strict implicit-envelope outcomes, and emits
-dedicated attribute-like tag faults. Admission-backed implicit normalization,
-conditional registry faults, and route-wide recovery proof remain open.
+open for this redesign. The target live parser rejects implicit envelopes,
+top-level line actions, and object-literal batch payloads.

@@ -11,7 +11,7 @@ fn chronos_invalid_json_files_refuses_before_mutation() -> TestResult<()> {
         r##"[{"path":"stories/chronos-fracture/README.md","content":"# Chronos"}"##,
     )?;
 
-    assert!(output.contains("invalid JSON fs.batch_write files payload"));
+    assert!(output.contains("object-literal fs.batch_write files are not live output"));
     assert!(!workspace
         .join("stories/chronos-fracture/README.md")
         .exists());

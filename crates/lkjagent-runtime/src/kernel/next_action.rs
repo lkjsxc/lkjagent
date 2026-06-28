@@ -28,8 +28,11 @@ pub(crate) fn owner_execution_tool(snapshot: &RuntimeSnapshot) -> &'static str {
     if plan_missing(snapshot) {
         return "graph.plan";
     }
-    if snapshot.artifact.root.is_none() || evidence_missing(snapshot, "document-structure") {
+    if snapshot.artifact.root.is_none() {
         return "artifact.apply";
+    }
+    if evidence_missing(snapshot, "document-structure") {
+        return "doc.audit";
     }
     if artifact_next_candidate(snapshot) {
         return "fs.batch_write";

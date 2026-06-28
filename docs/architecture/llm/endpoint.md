@@ -29,7 +29,7 @@ The harness sends exactly these fields and no others:
 | --- | --- | --- |
 | model | configured model name | selects the model on a server that may host several |
 | messages | system, user, assistant; plain-string content | frame mapping per [layout.md](../context/layout.md) |
-| max_tokens | context.reserve, default 2048 | the generation reserve in [layout.md](../context/layout.md) |
+| max_tokens | context.reserve, default 512 | compact output budget in [output-budget.md](output-budget.md) |
 | temperature | 0.3 | precision over creativity, per [sampling.md](sampling.md) |
 | top_p | 0.9 | per [sampling.md](sampling.md) |
 | stop | `</action>` | stops generation after one action envelope |
@@ -93,7 +93,7 @@ Every failure classifies onto the taxonomy in
 | missing or malformed message content | provider anomaly | provider failure notice or endpoint recovery |
 | empty content with nonzero completion tokens | provider anomaly | provider recovery; no parse-fault retry |
 | reasoning-only response | provider anomaly | log reasoning evidence only; no dispatch |
-| finish_reason length without closed act | completion oversize | error with preview plus recovery notice; next turn asks for one short action |
+| finish_reason length without closed act | completion oversize | error with preview plus recovery notice; next turn changes to a smaller action |
 | HTTP 4xx on context overflow | endpoint overflow | error event, forced compaction, incident memory row |
 
 A context overflow surfacing as 4xx is treated as a harness bug, not an

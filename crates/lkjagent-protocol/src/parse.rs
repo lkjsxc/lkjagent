@@ -1,5 +1,4 @@
 use crate::error::ParseResult;
-use crate::line_parse::{parse_line_action, starts_line_action};
 use crate::model::{
     Action, EnvelopeMode, ParseFault, ParseOutcome, ParseSettings, ACTION_CLOSE, ACTION_OPEN,
 };
@@ -42,11 +41,7 @@ fn parse_natural(text: &str) -> ParseResult<(Action, EnvelopeMode)> {
     let start = find_action_start(&lines)?;
     reject_prefix(&lines, start)?;
     let body = start + 1;
-    let (action, next) = if starts_line_action(&lines, body) {
-        parse_line_action(&lines, body)?
-    } else {
-        parse_tag_action(&lines, body)?
-    };
+    let (action, next) = parse_tag_action(&lines, body)?;
     reject_suffix(&lines, next)?;
     Ok((action, EnvelopeMode::Natural))
 }
@@ -108,7 +103,7 @@ fn starts_implicit_body(text: &str) -> bool {
         .find(|line| !line.trim().is_empty())
         .is_some_and(|line| {
             let trimmed = line.trim_start();
-            trimmed.starts_with("<tool>") || trimmed.starts_with("tool:")
+            trimmed.starts_with("<tool>")
         })
 }
 

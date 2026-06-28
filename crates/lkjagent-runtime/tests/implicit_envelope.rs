@@ -5,7 +5,7 @@ use lkjagent_runtime::task::StopReason;
 use support::{runtime_state, TestResult};
 
 #[test]
-fn implicit_envelope_completion_records_normalization_notice() -> TestResult<()> {
+fn implicit_envelope_completion_is_parse_fault() -> TestResult<()> {
     let owner = step(
         runtime_state()?,
         StepInput::Owner {
@@ -23,16 +23,16 @@ fn implicit_envelope_completion_records_normalization_notice() -> TestResult<()>
         },
     );
 
-    assert_eq!(result.stop_reason, Some(StopReason::Acted));
-    assert!(result.effects.iter().any(|effect| {
+    assert_eq!(result.stop_reason, Some(StopReason::InvalidAction));
+    assert!(!result.effects.iter().any(|effect| {
         matches!(effect, Effect::RecordEvent { content, .. }
-            if content.contains("envelope_mode=ImplicitActionEnvelope"))
+            if content.contains("ImplicitActionEnvelope"))
     }));
     assert!(result
         .state
         .context
         .log
         .iter()
-        .any(|frame| { frame.content.contains("parse normalization recorded") }));
+        .any(|frame| frame.content.contains("missing action envelope")));
     Ok(())
 }

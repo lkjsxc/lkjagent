@@ -1,6 +1,6 @@
 use lkjagent_protocol::{
     parse_completion, parse_live_completion, render_action, render_graph, render_notice,
-    render_observation, render_owner, Action, EnvelopeMode, Param, ParseFault,
+    render_observation, render_owner, Action, Param, ParseFault,
 };
 
 #[test]
@@ -114,36 +114,25 @@ fn graph_plan_missing_paths_or_checks_is_bad_params() {
 }
 
 #[test]
-fn parses_line_action_grammar_and_file_blocks() {
+fn rejects_top_level_line_action_grammar() {
     assert_eq!(
         parse_completion("<action>\ntool: doc.audit\nroot: docs\n</action>"),
-        Ok(Action::new("doc.audit", vec![Param::new("root", "docs")]))
+        Err(ParseFault::MissingTool)
     );
 
-    let batch = "<action>\ntool: fs.batch_write\ncase: current\nfiles:\n-- file --\npath: notes/food.md\ncontent:\n# Food\n\nRice notes.\n-- end-file --\n-- file --\npath: notes/code.md\ncontent:\n```text\n<action>literal</action>\n```\n-- end-file --\n</action>";
-    assert_eq!(
-        parse_completion(batch),
-        Ok(Action::new(
-            "fs.batch_write",
-            vec![Param::new(
-                "files",
-                "path: notes/food.md\ncontent:\n# Food\n\nRice notes.\n-- lkjagent-next-file --\npath: notes/code.md\ncontent:\n```text\n<action>literal</action>\n```"
-            )]
-        ))
-    );
+    let batch = "<action>\ntool: fs.batch_write\ncase: current\nfiles:\npath: notes/food.md\ncontent:\n# Food\n</action>";
+    assert_eq!(parse_completion(batch), Err(ParseFault::MissingTool));
 }
 
 #[test]
-fn implicit_envelope_accepts_exact_tool_body() {
-    let outcome = parse_live_completion("<tool>graph.state</tool>", Default::default());
-
-    assert_eq!(outcome.action, Some(Action::new("graph.state", Vec::new())));
-    assert_eq!(outcome.fault, None);
-    assert_eq!(outcome.envelope_mode, EnvelopeMode::Implicit);
+fn implicit_envelope_is_not_live_output() {
+    let tag = parse_live_completion("<tool>graph.state</tool>", Default::default());
+    assert_eq!(tag.action, None);
+    assert_eq!(tag.fault, Some(ParseFault::MissingActionEnvelope));
 
     let line = parse_live_completion("tool: graph.state", Default::default());
-    assert_eq!(line.action, Some(Action::new("graph.state", Vec::new())));
-    assert_eq!(line.envelope_mode, EnvelopeMode::Implicit);
+    assert_eq!(line.action, None);
+    assert_eq!(line.fault, Some(ParseFault::MissingActionEnvelope));
 }
 
 #[test]

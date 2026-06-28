@@ -76,8 +76,8 @@ quality.
   ciabatta or focaccia paths absent unless explicitly requested.
 - `document-structure-graph-evidence-bypass`: direct `graph.evidence` for
   `document-structure` is refused and the next action is `doc.audit`.
-- `batch-write-payload-schema-fault`: JSON-like `fs.batch_write` payloads are
-  refused or losslessly normalized before mutation; partial writes are absent.
+- `batch-write-payload-schema-fault`: JSON-like `fs.batch_write` payloads and
+  child `<file>` blocks are refused before mutation; partial writes are absent.
 - `shell-parameter-missing-command`: `shell.run` without `command` is refused
   with a canonical command-required repair and no timeout retry loop.
 - `queue-story-interrupt`: cookbook and Japanese story owner tasks remain
@@ -87,8 +87,9 @@ quality.
 - `repeated-recovery-action`: a refused recovery action signature is blocked
   and the next action uses a different action class.
 - `long-novel-active-run`: the active novel run keeps weak-content repair,
-  child `<file>` tag refusal, provider anomaly retry, artifact-derived touched
-  paths, and maintenance cooldown under one authority decision stream.
+  batch-limit refusal, provider anomaly retry, short-root expectation,
+  artifact-derived touched paths, and maintenance cooldown under one authority
+  decision stream. The fixture checks behavior instead of one stale long root.
 
 ## Verification
 

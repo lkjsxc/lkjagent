@@ -29,7 +29,7 @@ fn endpoint_turn_refreshes_one_active_mode_card() -> TestResult<()> {
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(active_mode_cards(&daemon), 1);
     let card = active_mode_card(&daemon);
-    assert!(card.contains("mode=owner_task"));
+    assert!(card.contains("<mode>owner_task</mode>"));
     assert!(card.contains("authority_decision_id="));
     assert!(card.contains("authority_fingerprint="));
     assert_eq!(

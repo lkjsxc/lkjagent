@@ -100,23 +100,60 @@ fn artifact_root(kind: &str, objective: &str) -> String {
         "story" => "stories",
         _ => "artifacts",
     };
-    format!("{parent}/{}", artifact_slug(objective))
+    format!("{parent}/{}", artifact_alias(kind, objective))
 }
 
-fn artifact_slug(objective: &str) -> String {
-    let words = objective
-        .split(|ch: char| !ch.is_ascii_alphanumeric())
-        .map(str::to_ascii_lowercase)
-        .filter(|word| !word.is_empty() && !STOP_WORDS.contains(&word.as_str()))
-        .take(6)
-        .collect::<Vec<_>>();
-    if words.is_empty() {
-        "content-artifact".to_string()
-    } else {
-        words.join("-")
+fn artifact_alias(kind: &str, objective: &str) -> String {
+    let base = base_alias(kind, objective);
+    let Some(qualifier) = first_qualifier(base, objective) else {
+        return base.to_string();
+    };
+    if matches!(kind, "cookbook" | "dictionary") {
+        return format!("{qualifier}-{base}");
+    }
+    format!("{base}-{qualifier}")
+}
+
+fn base_alias<'a>(kind: &str, objective: &'a str) -> &'a str {
+    let lower = objective.to_ascii_lowercase();
+    match kind {
+        "dictionary" => "dictionary",
+        "cookbook" => "cookbook",
+        "story" if lower.contains("novel") => "novel",
+        "story" => "story",
+        _ => "artifact",
     }
 }
 
+fn first_qualifier(base: &str, objective: &str) -> Option<String> {
+    objective
+        .split(|ch: char| !ch.is_ascii_alphanumeric())
+        .map(str::to_ascii_lowercase)
+        .find(|word| qualifies(word, base))
+}
+
+fn qualifies(word: &str, base: &str) -> bool {
+    !word.is_empty() && word != base && !STOP_WORDS.contains(&word)
+}
+
 const STOP_WORDS: &[&str] = &[
-    "a", "an", "the", "create", "write", "make", "generate", "produce", "big", "large", "very",
+    "a",
+    "an",
+    "the",
+    "create",
+    "write",
+    "make",
+    "generate",
+    "produce",
+    "big",
+    "large",
+    "very",
+    "long",
+    "structured",
+    "settings",
+    "setting",
+    "with",
+    "detailed",
+    "sf",
+    "story",
 ];

@@ -11,7 +11,7 @@ rationale for each, and the rule that they stay constant within a session.
 | --- | --- |
 | temperature | 0.3 |
 | top_p | 0.9 |
-| max_tokens | 2048 |
+| max_tokens | 512 default |
 | stop | `</action>` |
 
 ## Rationale
@@ -21,8 +21,8 @@ rationale for each, and the rule that they stay constant within a session.
   here costs a turn.
 - top_p 0.9: trims the improbable tail without narrowing ordinary word
   choice; it backstops the low temperature rather than competing with it.
-- max_tokens: `context.reserve`, default 2048, from
-  [layout.md](../context/layout.md). One action envelope fits; a completion
+- max_tokens: `context.reserve`, default 512, from
+  [output-budget.md](output-budget.md). One action envelope fits; a completion
   that hits this limit is the oversize case in
   [../protocol/recovery.md](../protocol/recovery.md).
 - stop `</action>`: generation ends after one action envelope instead of

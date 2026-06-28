@@ -77,7 +77,7 @@ fn artifact_next_advances_cursor_then_requests_audit() -> TestResult<()> {
     );
     let mut seen = BTreeSet::new();
     let mut requested_audit = false;
-    for _ in 0..10 {
+    for _ in 0..80 {
         dispatch_state.reset_repeat_tracking();
         let output = dispatch(
             &action("artifact.next", &[("root", root)]),
@@ -123,7 +123,7 @@ fn artifact_audit_passes_meaningful_cookbook() -> TestResult<()> {
     )?;
     let next = run(&workspace, action("artifact.next", &[("root", root)]))?;
 
-    assert!(audit.contains("artifact audit passed"));
+    assert!(audit.contains("artifact audit passed"), "{audit}");
     assert!(next.contains("missing=0"));
     assert!(next.contains("candidate_action=artifact.audit"));
     Ok(())

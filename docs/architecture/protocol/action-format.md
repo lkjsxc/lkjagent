@@ -124,6 +124,8 @@ These shapes are faults, not partial actions:
 - more than one action envelope.
 - `<actions>`, `<act>`, or any other top-level envelope.
 - top-level JSON action output.
+- top-level line-action output such as `tool: graph.state`.
+- JSON or object-literal file batches inside `<files>`.
 - tag attributes or attribute-like tags such as `<path=stories/chronos-fracture</path>`.
 - repeated parameter tags for unique parameters.
 - parameters absent from the active tool schema.
@@ -139,12 +141,12 @@ any parse fault shape. The summary is a user-visible notice or runtime fact, not
 an assistant exemplar. Live prompt text must not grant permission to use
 `<think>` tags.
 
-## Implicit Envelope Normalization
+## No Implicit Live Envelope
 
-A missing opening envelope is accepted only by the strict implicit-envelope path
-in [parsing.md](parsing.md). The body must contain exactly one complete,
-schema-valid, authority-admitted action body and no prose outside recognized
-fields. The parse and provider exchange logs record the normalization.
+The live parser requires `<action>` and `</action>`. Missing envelopes,
+top-level line-action bodies, and object-literal action bodies are faults.
+Historical recovery fixtures may mention normalization, but prompt-facing
+examples must not teach it as valid output.
 
 ## Design Properties
 
@@ -155,7 +157,5 @@ fields. The parse and provider exchange logs record the normalization.
 
 ## Status
 
-partially implemented. The protocol and LLM crates now use `<action>` and
-`</action>` for live parsing, rendering, stop sequences, closure repair, and
-oversize detection. Runtime prompt authority, recovery routes, and daemon
-admission still need full decision-ledger wiring.
+open for this redesign. The target live grammar is singular tag envelopes only,
+with line protocol allowed only as the value inside `<files>`.

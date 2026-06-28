@@ -48,12 +48,14 @@ pub const TASK: BenchmarkTask = BenchmarkTask {
 
 const GOOD_TRANSCRIPT: &str = r#"
 fixture=long-novel-active-run
-root=stories/long-novel-with-detailed-settings
+root_alias=short-semantic
+root_segment_max=24
+stale_objective_root=absent
 profile=NarrativeManuscript
 doc.audit content_readiness=failed
 weak_paths=28
-child_file_tags=refused
-schema_fault=unsupported child tags
+batch_limit=refused
+schema_fault=too many files
 second_same_shape=artifact.next
 next_decision_required=true
 provider_anomaly=reasoning_only_response
@@ -63,13 +65,15 @@ maintenance_noop=cooldown
 
 const BAD_SCHEMA_TRANSCRIPT: &str = r#"
 fixture=long-novel-active-run
-root=stories/long-novel-with-detailed-settings
+root_alias=short-semantic
+root_segment_max=24
+stale_objective_root=absent
 profile=NarrativeManuscript
 doc.audit content_readiness=failed
 weak_paths=28
-child_file_tags=refused
-schema_fault=unsupported child tags
-repeat child_file_tags
+batch_limit=refused
+schema_fault=too many files
+repeat oversized_batch
 provider_anomaly=reasoning_only_response
 touched_paths=artifact-ledger-derived
 maintenance_noop=cooldown
@@ -77,12 +81,14 @@ maintenance_noop=cooldown
 
 const BAD_STATUS_TRANSCRIPT: &str = r#"
 fixture=long-novel-active-run
-root=stories/long-novel-with-detailed-settings
+root=stories/long-novel-with-structured-settings
+root_alias=missing
+stale_objective_root=present
 profile=NarrativeManuscript
 doc.audit content_readiness=failed
 weak_paths=28
-child_file_tags=refused
-schema_fault=unsupported child tags
+batch_limit=refused
+schema_fault=too many files
 second_same_shape=artifact.next
 next_decision_required=true
 provider_anomaly=reasoning_only_response

@@ -29,7 +29,7 @@ fn cookbook_content(title: &str) -> String {
 
 fn story_content(title: &str) -> String {
     format!(
-        "# {title}\n\n## Scene Content\n\nA named protagonist enters {title} with a concrete want, an obstacle, sensory pressure, and a visible consequence. The scene names the location, the object under dispute, the decision made on page, and the cost that carries into the following beat.\n\n## Continuity Notes\n\nContinuity notes track intent, unresolved tension, changed relationships, setting details, and revision evidence for the manuscript.\n"
+        "# {title}\n\n## Scene Content\n\nArchivist Mara Venn reaches the glass transit hall beneath the storm-lit city of Ilyr with one want: recover the brass star-map before the Council seals the lower archives. The obstacle is Captain Oren Vale, who needs the same map to prove the moon engines are poisoning the harbor. Rain ticks on the roof, blue signal lamps fail in sequence, and Mara chooses to split the map key with Oren instead of escaping alone. The cost is immediate: the archive doors lock behind them and the next chapter must open with both fugitives blamed for sabotage.\n\n## Continuity Notes\n\nMara trusts records more than people; Oren trusts witnesses more than orders. Ilyr runs on moon-tide engines, brass keys, public curfews, and archive seals. The shared key, false sabotage charge, and failing blue lamps must recur in later setting and plot files.\n"
     )
 }
 

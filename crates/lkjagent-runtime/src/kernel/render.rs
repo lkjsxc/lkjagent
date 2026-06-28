@@ -1,6 +1,8 @@
 use crate::kernel::active_mode::ActiveMode;
 use crate::kernel::decision::{ActionTemplate, RuntimeDecision, RuntimeDecisionId, RuntimeMission};
 use crate::kernel::snapshot::{RuntimeEventId, RuntimeSnapshot, ToolName};
+use lkjagent_llm::wire::MAX_TOKENS;
+use lkjagent_tools::dispatch::{valid_example_for, ExampleContext};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PromptCardData {
@@ -10,6 +12,8 @@ pub struct PromptCardData {
     pub graph_node: Option<String>,
     pub graph_phase: Option<String>,
     pub missing_evidence: Vec<String>,
+    pub artifact_root: Option<String>,
+    pub owner_objective: Option<String>,
     pub admitted_tools: Vec<ToolName>,
     pub blocked_tools: Vec<ToolName>,
     pub next_action: Option<String>,
@@ -42,16 +46,19 @@ pub fn render_prompt_frame(decision: &RuntimeDecision) -> Result<String, PromptR
     if !decision.active_mode.allows_model_call() {
         return Err(PromptRenderError::RuntimeEffectHasNoPrompt);
     }
+    let card = decision.prompt_card.as_ref();
     let next_action = render_next_action(decision);
     Ok(format!(
-        "Runtime Authority\ndecision_id={decision_id}\nevent_id={event_id}\nmission={}\nmode={}\ngraph_node={}\ngraph_phase={}\nmissing_evidence={}\nadmitted_tools={}\nblocked_tools={}\nauthority_fingerprint={}\nstaleness_fingerprint={}\nnext_action:\n{}",
+        "Runtime Authority\n<runtime-card>\n<decision>{decision_id}</decision>\n<event>{event_id}</event>\n<mission>{}</mission>\n<mode>{}</mode>\n<case>{}</case>\n<node>{}</node>\n<phase>{}</phase>\n<root>{}</root>\n<missing>{}</missing>\n<must-use>{}</must-use>\n<blocked>{}</blocked>\n<budget>{MAX_TOKENS} output tokens</budget>\n<authority>{}</authority>\n<staleness>{}</staleness>\n<reason>runtime decision selected one legal next action</reason>\n</runtime-card>\n<next-action>\n{}\n</next-action>",
         decision.mission.as_str(),
         decision.active_mode.as_str(),
+        optional(card.and_then(|data| data.case_id.as_deref())),
         optional(decision.graph_node.as_deref()),
         optional(decision.graph_phase.as_deref()),
+        optional(card.and_then(|data| data.artifact_root.as_deref())),
         list_or_none(&decision.missing_evidence),
-        tool_list(&decision.admission_view.admitted_tools),
-        tool_list(&decision.admission_view.blocked_tools),
+        must_use(decision),
+        spaced_tool_list(&decision.admission_view.blocked_tools),
         decision.authority_fingerprint.as_str(),
         decision.staleness_fingerprint.as_str(),
         next_action,
@@ -74,6 +81,8 @@ pub(crate) fn prompt_card_for(
         graph_node: snapshot.graph.node.clone(),
         graph_phase: snapshot.graph.phase.clone(),
         missing_evidence: snapshot.evidence.missing.clone(),
+        artifact_root: snapshot.artifact.root.clone(),
+        owner_objective: snapshot.case.owner_objective.clone(),
         admitted_tools: decision.admission_view.admitted_tools.clone(),
         blocked_tools: decision.admission_view.blocked_tools.clone(),
         next_action: decision.admission_view.exact_next_action.clone(),
@@ -88,29 +97,15 @@ pub(crate) fn example_for(tool: &str, snapshot: &RuntimeSnapshot) -> String {
         .root
         .as_deref()
         .unwrap_or("stories/active-artifact");
-    match tool {
-        "graph.plan" => format!(
-            "<action>\n<tool>graph.plan</tool>\n<objective>{}</objective>\n</action>",
-            snapshot
-                .case
-                .owner_objective
-                .as_deref()
-                .unwrap_or("record the owner task plan")
-        ),
-        "artifact.apply" => {
-            format!("<action>\n<tool>artifact.apply</tool>\n<root>{root}</root>\n</action>")
-        }
-        "artifact.next" => {
-            format!("<action>\n<tool>artifact.next</tool>\n<root>{root}</root>\n</action>")
-        }
-        "artifact.audit" => {
-            format!("<action>\n<tool>artifact.audit</tool>\n<root>{root}</root>\n</action>")
-        }
-        "fs.batch_write" => format!(
-            "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: {root}/README.md\ncontent:\n# Artifact Guide\n\n## Purpose\n\nNavigate the active artifact and list its audit evidence.\n</files>\n</action>"
-        ),
-        _ => format!("<action>\n<tool>{tool}</tool>\n</action>"),
-    }
+    let context = ExampleContext {
+        artifact_root: Some(root.to_string()),
+        owner_objective: snapshot.case.owner_objective.clone(),
+        missing_evidence: snapshot.evidence.missing.clone(),
+        ..ExampleContext::default()
+    };
+    valid_example_for(tool, context)
+        .map(|example| example.render())
+        .unwrap_or_else(|_| format!("<action>\n<tool>{tool}</tool>\n</action>"))
 }
 
 fn render_next_action(decision: &RuntimeDecision) -> String {
@@ -122,12 +117,19 @@ fn render_next_action(decision: &RuntimeDecision) -> String {
     }
 }
 
-fn tool_list(tools: &[ToolName]) -> String {
+fn must_use(decision: &RuntimeDecision) -> &str {
+    match decision.forced_next_action.as_ref() {
+        Some(ActionTemplate::ExactTool { tool, .. }) => tool.as_str(),
+        _ => "none",
+    }
+}
+
+fn spaced_tool_list(tools: &[ToolName]) -> String {
     let names: Vec<&str> = tools.iter().map(ToolName::as_str).collect();
     if names.is_empty() {
         "none".to_string()
     } else {
-        names.join(",")
+        names.join(" ")
     }
 }
 

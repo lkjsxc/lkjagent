@@ -28,6 +28,7 @@ fn env_model_initializes_first_config() -> TestResult<()> {
     assert!(text.contains("\"api-key-env\": \"LKJAGENT_API_KEY\""));
     assert!(text.contains("\"timeout-seconds\": 180"));
     assert!(text.contains("\"window\": 24576"));
+    assert!(text.contains("\"reserve\": 512"));
     assert!(text.contains("\"trigger\": 21504"));
     Ok(())
 }
@@ -44,11 +45,11 @@ fn context_length_env_overrides_default_window() -> TestResult<()> {
         return Err("env context config did not load".into());
     };
     assert_eq!(config.context_policy.window, 16_384);
-    assert_eq!(config.context_policy.hard_trigger, 13_312);
+    assert_eq!(config.context_policy.hard_trigger, 14_336);
 
     let text = fs::read_to_string(data.join("lkjagent.json"))?;
     assert!(text.contains("\"window\": 16384"));
-    assert!(text.contains("\"trigger\": 13312"));
+    assert!(text.contains("\"trigger\": 14336"));
     Ok(())
 }
 

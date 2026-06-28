@@ -9,6 +9,7 @@ pub struct ExampleContext {
     pub allowed_packages: Vec<String>,
     pub legal_transitions: Vec<String>,
     pub artifact_root: Option<String>,
+    pub owner_objective: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -103,6 +104,7 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
         || (tool, name) == ("artifact.apply", "root")
         || (tool, name) == ("artifact.audit", "root")
         || (tool, name) == ("artifact.next", "root")
+        || (tool, name) == ("doc.audit", "root")
     {
         return context
             .artifact_root
@@ -121,14 +123,17 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
         ("fs.edit", "find") => "Example",
         ("fs.edit", "replace") => "Updated",
         ("fs.patch", "patch") => "*** Begin Patch\n*** End Patch",
-        ("fs.batch_write", "files") => {
-            "path: docs/example.md\ncontent:\n# Example\n\nConcrete example content."
-        }
+        ("fs.batch_write", "files") => return batch_files_value(context),
         ("fs.search", "query") | ("memory.find", "query") => "README",
         ("graph.note", "kind") => "decision",
         ("graph.evidence", "summary") => "Read README.md",
         ("graph.note", "summary") => "Chose smaller recovery action",
-        ("graph.plan", "objective") => "Complete the owner task",
+        ("graph.plan", "objective") => {
+            return context
+                .owner_objective
+                .clone()
+                .unwrap_or_else(|| "Complete the owner task".to_string())
+        }
         ("graph.plan", "steps") => "Inspect state\nAct in one bounded step",
         ("graph.plan", "reason") => "Graph planning requirement",
         ("graph.transition", "reason") => "Best legal next node",
@@ -159,4 +164,14 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
         _ => "value",
     }
     .to_string()
+}
+
+fn batch_files_value(context: &ExampleContext) -> String {
+    let root = context
+        .artifact_root
+        .clone()
+        .unwrap_or_else(|| "docs".to_string());
+    format!(
+        "path: {root}/README.md\ncontent:\n# Artifact Guide\n\nConcrete content tied to the active artifact."
+    )
 }

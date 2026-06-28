@@ -12,7 +12,7 @@ fn model_log_touched_paths_include_artifact_and_write_ledgers() -> TestResult<()
     lkjagent_store::schema::setup(&conn)?;
     lkjagent_runtime::graph_state::open_owner_case(
         &conn,
-        "Create a long novel with detailed settings.",
+        "Create a long novel. with structured settings.",
         "2026-01-01T00:00:00Z",
     )?;
     let artifact_id = upsert_artifact(&conn, &artifact(), "2026-01-01T00:00:01Z")?;
@@ -24,8 +24,8 @@ fn model_log_touched_paths_include_artifact_and_write_ledgers() -> TestResult<()
         ContextBudgetPolicy::default(),
     )?;
 
-    assert!(rendered.contains("* `stories/long-novel-with-detailed-settings`"));
-    assert!(rendered.contains("* `stories/long-novel-with-detailed-settings/project/premise.md`"));
+    assert!(rendered.contains("* `stories/novel`"));
+    assert!(rendered.contains("* `stories/novel/project/premise.md`"));
     assert!(!rendered.contains("## Touched Paths\n\n* none"));
     Ok(())
 }
@@ -37,7 +37,7 @@ fn record_cursor(conn: &Connection, artifact_ledger_id: i64) -> TestResult<()> {
         conn,
         &BatchCursorInput {
             artifact_ledger_id,
-            root: "stories/long-novel-with-detailed-settings",
+            root: "stories/novel",
             planned_paths: &planned,
             completed_paths: &completed,
             failed_paths: &[],
@@ -55,7 +55,7 @@ fn artifact() -> ArtifactLedgerInput<'static> {
     ArtifactLedgerInput {
         case_id: 1,
         artifact_id: "1:novel:long-novel:unspecified",
-        root: "stories/long-novel-with-detailed-settings",
+        root: "stories/novel",
         kind: "novel",
         normalized_topic: "long-novel",
         requested_scale: "unspecified",

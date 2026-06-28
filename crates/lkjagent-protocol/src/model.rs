@@ -31,17 +31,9 @@ impl Param {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ParseSettings {
     pub allow_implicit_envelope: bool,
-}
-
-impl Default for ParseSettings {
-    fn default() -> Self {
-        Self {
-            allow_implicit_envelope: true,
-        }
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
