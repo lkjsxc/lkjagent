@@ -10,6 +10,8 @@ mod artifact_next_example;
 mod artifact_next_identity;
 mod artifact_next_response;
 mod artifact_readiness;
+mod artifact_readiness_story;
+mod artifact_readiness_story_req;
 mod artifact_write_support;
 pub mod benchmark_seed;
 pub mod control;

@@ -21,7 +21,25 @@ use support::{action, runtime_state, store, temp_workspace, TestResult};
 fn complete_graph_authority_closes_through_kernel_completion_event() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "100", "0")?;
-    open_case(&conn, stored_case(), "2026-01-01T00:00:00Z")?;
+    let case_id = open_case(&conn, stored_case(), "2026-01-01T00:00:00Z")?;
+    for requirement in [
+        "plan",
+        "observation",
+        "document-structure",
+        "artifact-readiness",
+    ] {
+        lkjagent_store::graph::record_evidence(
+            &conn,
+            case_id,
+            &lkjagent_store::graph::GraphEvidenceRow {
+                requirement: requirement.to_string(),
+                kind: evidence_kind(requirement).as_str().to_string(),
+                summary: format!("{requirement} satisfied"),
+                path: Some("stories/chronos-fracture".to_string()),
+            },
+            "2026-01-01T00:00:00Z",
+        )?;
+    }
     upsert_artifact(&conn, &passed_artifact(), "2026-01-01T00:00:00Z")?;
     let workspace = temp_workspace("kernel-driver-completion")?;
     let server = serve_responses(Vec::new())?;
@@ -84,7 +102,12 @@ fn stored_case() -> OpenCase {
         phase: "execution".to_string(),
         active_node: "document".to_string(),
         plan: "test plan".to_string(),
-        evidence_requirements: vec!["artifact-readiness".to_string()],
+        evidence_requirements: vec![
+            "plan".to_string(),
+            "observation".to_string(),
+            "document-structure".to_string(),
+            "artifact-readiness".to_string(),
+        ],
         selected_packages: Vec::new(),
         pending_checks: Vec::new(),
         next_action_class: "agent.done".to_string(),

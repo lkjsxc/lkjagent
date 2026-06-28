@@ -73,7 +73,7 @@ impl ResidentDaemon {
         endpoint_retry_pending: bool,
     ) -> RuntimeResult<RuntimeAuthoritySnapshot> {
         let active_owner_case = self.active_owner_case();
-        let graph = graph_snapshot(conn, self.state.graph.as_ref());
+        let graph = graph_snapshot(conn)?;
         Ok(RuntimeAuthoritySnapshot {
             pending_owner_rows: lkjagent_store::queue::pending_count(conn)?,
             active_owner_case,

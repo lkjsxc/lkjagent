@@ -10,6 +10,7 @@ pub(super) fn adapter_input(
     conn: &Connection,
     snapshot: &RuntimeAuthoritySnapshot,
 ) -> RuntimeResult<SnapshotAdapterInput> {
+    let artifact = artifact_fields(conn, snapshot)?;
     Ok(SnapshotAdapterInput {
         snapshot_id: next_snapshot_id(conn)?,
         case_id: snapshot.case_id.map(|id| id.to_string()),
@@ -21,7 +22,10 @@ pub(super) fn adapter_input(
         required_evidence: snapshot.required_evidence.clone(),
         missing_evidence: snapshot.missing_evidence.clone(),
         existing_evidence: existing_evidence(snapshot),
-        artifact_root: snapshot.artifact_root.clone(),
+        artifact_id: artifact.artifact_id,
+        artifact_root: artifact.root.or_else(|| snapshot.artifact_root.clone()),
+        artifact_kind: artifact.kind,
+        artifact_weak_paths: artifact.weak_paths,
         context_hard_pressure: snapshot.compaction_required,
         maintenance_due: snapshot.maintenance_due,
         maintenance_active: snapshot.maintenance_active,
@@ -71,6 +75,41 @@ pub(super) fn mode_snapshot(
         latest_fault: None,
         repeated_action: false,
         external_owner_input_required: false,
+    }
+}
+
+struct ArtifactSnapshotFields {
+    artifact_id: Option<String>,
+    root: Option<String>,
+    kind: Option<String>,
+    weak_paths: Vec<String>,
+}
+
+fn artifact_fields(
+    conn: &Connection,
+    snapshot: &RuntimeAuthoritySnapshot,
+) -> RuntimeResult<ArtifactSnapshotFields> {
+    let Some(case_id) = snapshot.case_id else {
+        return Ok(empty_artifact_fields());
+    };
+    let Some(row) = lkjagent_store::artifact_ledger::latest_for_case(conn, case_id)? else {
+        return Ok(empty_artifact_fields());
+    };
+    let weak = lkjagent_store::artifact_ledger::weak_paths(conn, row.id)?;
+    Ok(ArtifactSnapshotFields {
+        artifact_id: Some(row.artifact_id),
+        root: Some(row.root),
+        kind: Some(row.kind),
+        weak_paths: weak.into_iter().map(|path| path.path).collect(),
+    })
+}
+
+fn empty_artifact_fields() -> ArtifactSnapshotFields {
+    ArtifactSnapshotFields {
+        artifact_id: None,
+        root: None,
+        kind: None,
+        weak_paths: Vec::new(),
     }
 }
 

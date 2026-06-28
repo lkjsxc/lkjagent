@@ -128,13 +128,16 @@ fn benchmark_docs_task_auto_scaffolds_exact_markdown_count() -> TestResult<()> {
     let server = serve_responses(vec![completion(DONE_ACTION)])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
-    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     server.join()?;
 
     let root = workspace.join("docs/benchmark-corpus");
     assert_eq!(markdown_count(&root)?, 12);
     assert_eq!(other_count(&root)?, 0);
-    assert_eq!(state::get(&conn, "completion guard")?, None);
+    assert_eq!(
+        state::get(&conn, "completion guard")?,
+        Some("markdown-count:12".to_string())
+    );
     Ok(())
 }
 

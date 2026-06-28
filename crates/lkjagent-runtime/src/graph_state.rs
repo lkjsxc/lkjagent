@@ -46,14 +46,19 @@ pub fn open_owner_case_with_guard(
     Ok(state)
 }
 
+pub fn active_state(conn: &Connection) -> RuntimeResult<Option<TaskGraphState>> {
+    let Some(row) = lkjagent_store::graph::active_case(conn)? else {
+        return Ok(None);
+    };
+    let evidence = lkjagent_store::graph::evidence_for_case(conn, row.id)?;
+    let tracks = lkjagent_store::graph::state_tracks::state_tracks_for_case(conn, row.id)?;
+    Ok(Some(state_from_row(row, evidence, tracks)))
+}
+
 pub fn prefix_graph_state(conn: &Connection) -> RuntimeResult<String> {
     let budget = prefix_body_budget();
-    let graph = match lkjagent_store::graph::active_case(conn)? {
-        Some(row) => {
-            let evidence = lkjagent_store::graph::evidence_for_case(conn, row.id)?;
-            let tracks = lkjagent_store::graph::state_tracks::state_tracks_for_case(conn, row.id)?;
-            render_state_budgeted(&state_from_row(row, evidence, tracks), budget)
-        }
+    let graph = match active_state(conn)? {
+        Some(state) => render_state_budgeted(&state, budget),
         None => render_state_budgeted(&idle_state(), budget),
     };
     let guarded = graph_guard::append_store_guard(conn, graph)?;

@@ -7,7 +7,7 @@ use lkjagent_context::model::FrameKind;
 use lkjagent_runtime::daemon::{
     client_config, take_daemon_lock, DaemonTick, ResidentDaemon, ResidentRuntime,
 };
-use lkjagent_store::{memory, queue, state};
+use lkjagent_store::{queue, state};
 use lkjagent_tools::structure::verify_recursive_tree;
 use lkjagent_tools::structure_network::verify_knowledge_network;
 use support::http::{completion, serve_responses};
@@ -32,7 +32,7 @@ fn recursive_docs_task_auto_scaffolds_before_done() -> TestResult<()> {
     let server = serve_responses(vec![completion(DONE)])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
-    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert!(daemon
         .state
         .context
@@ -45,10 +45,10 @@ fn recursive_docs_task_auto_scaffolds_before_done() -> TestResult<()> {
     verify_recursive_tree(&workspace)?;
 
     server.join()?;
-    assert_eq!(state::get(&conn, "completion guard")?, None);
-    assert!(memory::find(&conn, "recursive docs scaffold complete", 5)?
-        .iter()
-        .any(|row| row.kind == "task-summary"));
+    assert_eq!(
+        state::get(&conn, "completion guard")?,
+        Some("recursive-structure".to_string())
+    );
     assert!(workspace
         .join("docs/contracts/actions/graph/README.md")
         .exists());
@@ -65,7 +65,7 @@ fn encyclopedia_task_auto_scaffolds_knowledge_network_before_done() -> TestResul
     let server = serve_responses(vec![completion(DONE)])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
-    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert!(daemon.state.context.log.iter().any(|frame| {
         frame.content.contains("knowledge nucleus")
             && frame.content.contains("growth=incremental")
@@ -74,7 +74,10 @@ fn encyclopedia_task_auto_scaffolds_knowledge_network_before_done() -> TestResul
     verify_knowledge_network(&workspace)?;
 
     server.join()?;
-    assert_eq!(state::get(&conn, "completion guard")?, None);
+    assert_eq!(
+        state::get(&conn, "completion guard")?,
+        Some("recursive-knowledge".to_string())
+    );
     assert!(workspace.join("docs/maps/concept-network.md").exists());
     assert!(workspace.join("docs/execution/expansion-queue.md").exists());
     assert!(workspace.join("docs/execution/rebalance-plan.md").exists());

@@ -39,6 +39,7 @@ pub fn reduce(
         .with_missing_evidence(snapshot.evidence.missing.clone()),
         snapshot,
     );
+    block_direct_audit_owned_evidence(snapshot, &mut admission_view);
     let close_case = mission == RuntimeMission::OwnerCompletion && close_allowed(snapshot);
     if close_case {
         admission_view.completion_allowed = true;
@@ -95,6 +96,36 @@ fn populate_decision(
     apply_forced_action(snapshot, decision);
     decision.prompt_card =
         prompt_card_for(snapshot, decision.mission, decision.active_mode, decision);
+}
+
+fn block_direct_audit_owned_evidence(
+    snapshot: &RuntimeSnapshot,
+    admission_view: &mut ToolAdmissionView,
+) {
+    if !only_audit_owned_gaps(snapshot) {
+        return;
+    }
+    admission_view
+        .admitted_tools
+        .retain(|tool| tool.as_str() != "graph.evidence");
+    if !admission_view
+        .blocked_tools
+        .iter()
+        .any(|tool| tool.as_str() == "graph.evidence")
+    {
+        admission_view
+            .blocked_tools
+            .push(ToolName::from_static("graph.evidence"));
+    }
+}
+
+fn only_audit_owned_gaps(snapshot: &RuntimeSnapshot) -> bool {
+    !snapshot.evidence.missing.is_empty()
+        && snapshot
+            .evidence
+            .missing
+            .iter()
+            .all(|item| matches!(item.as_str(), "document-structure" | "artifact-readiness"))
 }
 
 fn apply_forced_action(snapshot: &RuntimeSnapshot, decision: &mut RuntimeDecision) {
