@@ -77,10 +77,11 @@ count, and prior action hash.
 
 ## Synthesized Run Summary
 
-`data/logs/current-model-run.md` derives active case status from authority rows.
-The active section includes current artifact root, weak cursor, latest decision
-id, prompt frame id, mission, active mode, missing evidence, provider anomaly
-retry state, and next executable action.
+`data/logs/current-model-run.md` is a checked-in failure fixture until a fresh
+smoke replaces it. It derives active case status from authority rows. The active
+section includes current artifact root, weak cursor, latest decision id, prompt
+frame id, mission, active mode, missing evidence, provider anomaly retry state,
+and next executable action.
 
 Touched paths are derived from artifact ledger rows, successful write
 observations, scaffold observations, and workspace events. Direct graph evidence
@@ -89,7 +90,9 @@ in touched paths even when no direct `graph.evidence` row names it.
 
 Provider anomaly turns are represented as provider anomalies. They do not
 create fake parse, admission, or observation success records. Export manifests
-list present files only plus explicit missing-file records.
+list present files only plus explicit missing-file records. `index.ndjson`
+entries point at turn directories. A leading `/data/logs/` segment is a
+repository-relative log root, not the host filesystem root.
 
 ## Store Record
 
@@ -130,12 +133,14 @@ and redacted configuration.
 ## Export Manifest Integrity
 
 A turn export manifest must be self-consistent. Each file named in `files`
-must exist in that turn directory at export time. If a logical artifact is
-expected but absent, the manifest records it under `missing_files` with a stable
-reason instead of listing it as present. An export with missing logical artifacts
-uses a warning or failed status; it does not report `succeeded` while naming
-absent files. A provider anomaly export uses status `provider_anomaly`. Raw-case
-replay reads only files proven present plus explicit missing-file records.
+must exist in that turn directory at export time. `index.ndjson` must not point
+at absent turn directories after repository-relative normalization. If a logical
+artifact is expected but absent, the manifest records it under `missing_files`
+with a stable reason instead of listing it as present. An export with missing
+logical artifacts uses a warning or failed status; it does not report
+`succeeded` while naming absent files. A provider anomaly export uses status
+`provider_anomaly`. Raw-case replay reads only files proven present plus
+explicit missing-file records.
 
 ## Acceptance Criteria
 

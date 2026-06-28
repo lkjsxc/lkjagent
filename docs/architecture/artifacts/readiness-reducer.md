@@ -6,9 +6,9 @@ This file owns profile-specific content readiness decisions for artifact leaf fi
 
 ## Contract
 
-Readiness is a reducer over artifact identity, profile, path role, objective, file content, and audit context. It
-returns named missing requirements and weak signals. Keyword matches can support evidence, but they cannot prove
-readiness alone.
+Readiness is a reducer over artifact identity, profile, path role, objective, file content, ledger state, and audit
+context. It returns named missing requirements and weak signals. Keyword matches can support evidence, but they
+cannot prove readiness alone.
 
 ## Inputs
 
@@ -38,6 +38,8 @@ readiness alone.
 - Documentation leaves include owned topic, contract, inputs or dependencies, outputs or effects, transitions or
   relations, and verification or audit links.
 - Unsupported verification claims fail readiness.
+- Story-wide readiness requires role-specific files or equivalent role-marked
+  leaves with concrete facts for each required story system.
 
 ## Failure Cases
 
@@ -45,6 +47,7 @@ readiness alone.
 - A README-only artifact satisfies content readiness.
 - Generic scaffold prose passes because it contains domain keywords.
 - Direct `graph.evidence` satisfies audit-owned readiness.
+- A single shallow story page lists all role labels and passes readiness.
 
 ## Verification
 
@@ -54,5 +57,5 @@ readiness alone.
 
 ## Status
 
-partially implemented for scaffold phrase refusal, selected profile checks, and story-wide semantic requirement
-checks during `artifact.audit`; ledger-backed reducer work remains open.
+implemented for scaffold phrase refusal, selected profile checks, story-wide semantic requirements, ledger-backed
+weak-path repair, and artifact-aware completion; deeper profile-specific scoring remains incremental work.
