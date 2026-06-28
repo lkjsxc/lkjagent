@@ -14,7 +14,7 @@ pub(super) fn valid_example_for_mode(
             rendered_context_example("graph.plan", snapshot)
         }
         ActiveMode::OwnerTask if document_structure_missing(snapshot) => {
-            rendered_context_example("artifact.apply", snapshot)
+            rendered_context_example("doc.audit", snapshot)
         }
         ActiveMode::OwnerTask if audit_evidence_missing(snapshot) => {
             rendered_context_example("artifact.audit", snapshot)

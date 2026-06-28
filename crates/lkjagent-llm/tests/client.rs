@@ -9,6 +9,13 @@ use lkjagent_llm::error::{ClientError, EndpointFailure};
 use support::{serve_once, TestResult};
 
 #[test]
+fn default_client_config_uses_compact_output_budget() {
+    let config = ClientConfig::new("http://127.0.0.1:1", "local-model");
+
+    assert_eq!(config.max_tokens, 512);
+}
+
+#[test]
 fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()> {
     let body = r#"{"choices":[{"message":{"content":"<action></action>"},"finish_reason":"stop"}],"usage":{"prompt_tokens":5,"completion_tokens":3},"prompt_cache_hit_tokens":4}"#;
     let server = serve_once(200, body)?;

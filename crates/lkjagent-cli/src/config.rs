@@ -23,7 +23,7 @@ pub const DEFAULT_CONFIG: &str = r#"{
   },
   "context": {
     "window": 24576,
-    "reserve": 2048,
+    "reserve": 512,
     "trigger": 21504
   },
   "sampling": {

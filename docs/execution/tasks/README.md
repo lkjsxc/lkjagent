@@ -47,3 +47,16 @@ Every task file uses exactly these headings:
 - [queue-cli.md](queue-cli.md): the lkjagent binary and its commands.
 - [self-maintenance.md](self-maintenance.md): explicit maintenance directives and their bounds.
 - [compose-final-gate.md](compose-final-gate.md): Dockerfile, compose services, CI.
+- [deep-redesign-truth-sweep.md](deep-redesign-truth-sweep.md): reconcile active failure evidence and stale roots.
+- [deep-redesign-compact-context.md](deep-redesign-compact-context.md): compact
+  prompt context and line-protocol-only batches.
+- [deep-redesign-output-budget.md](deep-redesign-output-budget.md): compact max output budget and oversize recovery.
+- [deep-redesign-short-paths.md](deep-redesign-short-paths.md): short semantic artifact aliases.
+- [deep-redesign-exact-examples.md](deep-redesign-exact-examples.md): registry-derived exact action examples.
+- [deep-redesign-runtime-authority.md](deep-redesign-runtime-authority.md): persisted
+  decision prompt cards and admission.
+- [deep-redesign-artifact-batches.md](deep-redesign-artifact-batches.md): path-specific artifact micro-batches.
+- [deep-redesign-completion-maintenance.md](deep-redesign-completion-maintenance.md):
+  completion and no-op maintenance reducers.
+- [deep-redesign-provider-handoff.md](deep-redesign-provider-handoff.md): provider anomaly retry and blocked handoff.
+- [deep-redesign-gates.md](deep-redesign-gates.md): benchmark corpus and final verification gates.

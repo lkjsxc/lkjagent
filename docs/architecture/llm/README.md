@@ -15,3 +15,4 @@ Decision:
 - [endpoint.md](endpoint.md): the wire contract, request and response subsets, and error mapping.
 - [model-target.md](model-target.md): the reference deployment and the five properties the harness requires.
 - [sampling.md](sampling.md): the sampling values, their rationale, and the constancy-within-session rule.
+- [output-budget.md](output-budget.md): the compact default output cap and oversize recovery route.

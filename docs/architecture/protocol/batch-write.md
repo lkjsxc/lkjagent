@@ -64,16 +64,15 @@ fault and is refused before mutation. If the model repeats adjacent
 chunks into the canonical delimiter payload before dispatch. No other repeated
 parameter name is normalized.
 
-## JSON Inside Files Recovery
+## Object-Literal Refusal
 
-The model protocol is not top-level JSON. `fs.batch_write` may still accept JSON
-text inside `<files>` when recovery receives a single parameter payload. The
-accepted payload is either a JSON array of objects with `path` and `content`, or
-a JSON object with a `files` array of the same objects. Objects without both
-fields are refused before mutation.
+The model protocol is not top-level JSON, and JSON text inside `<files>` is not
+a live `fs.batch_write` payload. Object-literal file arrays, object wrappers,
+and provider-native tool calls are refused before mutation. Recovery records a
+compact schema fault and renders a line-protocol example for the current root or
+weak path.
 
-The observation records the normalized input format as `line-protocol`,
-`json-array`, or `json-object-files`.
+The observation records the accepted input format as `line-protocol` only.
 
 ## Path-Shaped Parameter Recovery
 
@@ -126,14 +125,12 @@ Artifact audit records unexpected paths as weak paths under the active root.
 
 ## Verification
 
-Tests cover the canonical delimiter example, paired-tag `<files>` payloads, JSON
-text inside `<files>`, missing content, duplicate paths, oversized payloads, and
-artifact-ledger recording.
+Tests cover the canonical delimiter example, paired-tag `<files>` payloads,
+object-literal refusal, missing content, duplicate paths, oversized payloads,
+and artifact-ledger recording.
 
 ## Status
 
-partially implemented for parser normalization, JSON-in-files recovery,
-dispatcher limits, duplicate-path refusal, placeholder refusal, artifact
-write-path recording, and safe path-shaped unknown parameter normalization.
-Top-level JSON action parsing is no longer part of live dispatch. Route-level
-recovery for every batch schema fault remains open.
+open for this redesign. The target prompt-facing and dispatcher contract is
+line protocol only; any object-literal recovery path must stay outside prompt
+context and must not mutate files.

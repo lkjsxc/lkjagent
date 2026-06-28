@@ -20,6 +20,7 @@ pub(super) fn adapter_input(
         pending_owner_count: pending_owner_count(snapshot),
         required_evidence: snapshot.required_evidence.clone(),
         missing_evidence: snapshot.missing_evidence.clone(),
+        existing_evidence: existing_evidence(snapshot),
         artifact_root: snapshot.artifact_root.clone(),
         context_hard_pressure: snapshot.compaction_required,
         maintenance_due: snapshot.maintenance_due,
@@ -71,6 +72,15 @@ pub(super) fn mode_snapshot(
         repeated_action: false,
         external_owner_input_required: false,
     }
+}
+
+fn existing_evidence(snapshot: &RuntimeAuthoritySnapshot) -> Vec<String> {
+    snapshot
+        .required_evidence
+        .iter()
+        .filter(|item| !snapshot.missing_evidence.contains(item))
+        .cloned()
+        .collect()
 }
 
 fn maintenance_eligible(snapshot: &RuntimeAuthoritySnapshot) -> bool {

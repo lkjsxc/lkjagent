@@ -1,6 +1,7 @@
 pub mod address;
 pub mod artifact;
 mod artifact_address_support;
+mod artifact_card;
 mod artifact_cursor_support;
 mod artifact_drift;
 mod artifact_ledger_state;

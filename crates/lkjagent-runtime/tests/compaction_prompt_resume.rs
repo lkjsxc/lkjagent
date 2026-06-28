@@ -31,7 +31,7 @@ fn owner_repair_input(hard_pressure: bool) -> SnapshotAdapterInput {
         case_id: Some("case-9".to_string()),
         queue_head: Some("queue-9".to_string()),
         pending_owner_count: 1,
-        artifact_root: Some("stories/long-novel-with-detailed-settings".to_string()),
+        artifact_root: Some("stories/novel".to_string()),
         artifact_cursor: Some("project/premise.md".to_string()),
         artifact_weak_paths: vec!["project/premise.md".to_string()],
         latest_observation: Some("doc.audit found weak paths".to_string()),

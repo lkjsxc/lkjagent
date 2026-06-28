@@ -7,7 +7,7 @@ use lkjagent_tools::observe::OutputKind;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
 #[test]
-fn fs_batch_write_accepts_json_payload_inside_files() -> TestResult<()> {
+fn fs_batch_write_rejects_json_payload_inside_files() -> TestResult<()> {
     let workspace = temp_workspace("batch-json-fault")?;
     let runtime = runtime(workspace.clone())?;
     let mut conn = store()?;
@@ -21,9 +21,11 @@ fn fs_batch_write_accepts_json_payload_inside_files() -> TestResult<()> {
         &mut state,
     );
 
-    assert!(matches!(output.kind, OutputKind::Observation { status } if status == "ok"));
-    assert!(output.content.contains("input_format=json-array"));
-    assert!(workspace.join("out/one.md").is_file());
+    assert!(is_error(&output));
+    assert!(output
+        .content
+        .contains("object-literal fs.batch_write files"));
+    assert!(!workspace.join("out/one.md").exists());
     Ok(())
 }
 

@@ -1,6 +1,8 @@
 use lkjagent_context::model::{Message, Role};
 use lkjagent_llm::closure::ClosureMode;
-use lkjagent_llm::wire::{build_request, decode_completion, FinishReason, ProviderAnomalyKind};
+use lkjagent_llm::wire::{
+    build_request, decode_completion, FinishReason, ProviderAnomalyKind, MAX_TOKENS,
+};
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
@@ -16,6 +18,16 @@ fn request_serializes_exact_documented_fields() -> TestResult<()> {
         body,
         "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system prefix\"},{\"role\":\"user\",\"content\":\"<owner>hello</owner>\"}],\"max_tokens\":2048,\"temperature\":0.3,\"top_p\":0.9,\"stop\":[\"</action>\"],\"stream\":false}"
     );
+    Ok(())
+}
+
+#[test]
+fn compact_default_max_tokens_is_512() -> TestResult<()> {
+    let messages = vec![Message::new(Role::System, "system prefix")];
+    let request = build_request("local-model", &messages, MAX_TOKENS);
+    let body = serde_json::to_string(&request)?;
+
+    assert!(body.contains("\"max_tokens\":512"));
     Ok(())
 }
 

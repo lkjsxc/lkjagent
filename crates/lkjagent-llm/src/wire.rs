@@ -10,7 +10,7 @@ use lkjagent_protocol::ACTION_CLOSE;
 use crate::closure::{restore_stop_suffix, ClosureMode};
 use metrics::collect_cache_metrics;
 
-pub const MAX_TOKENS: u16 = 2048;
+pub const MAX_TOKENS: u16 = 512;
 pub const TEMPERATURE: f32 = 0.3;
 pub const TOP_P: f32 = 0.9;
 

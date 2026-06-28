@@ -46,21 +46,18 @@ pub fn apply(request: ApplyRequest<'_>) -> ToolResult<String> {
         }
     }
     let title = title_or_root(request.title, request.root);
+    let kind = kind_or_default(request.kind, request.root);
     let output = crate::doc::scaffold_allow_existing(
         request.workspace,
         request.root,
-        kind_or_default(request.kind, request.root),
+        kind,
         "",
         request.mode,
         &title,
         request.sections,
     )?;
-    crate::artifact_ledger_support::record_apply(
-        request.conn,
-        request.root,
-        kind_or_default(request.kind, request.root),
-        request.now,
-    )?;
+    crate::artifact_card::write(request.workspace, request.root, &title, kind)?;
+    crate::artifact_ledger_support::record_apply(request.conn, request.root, kind, request.now)?;
     Ok(output)
 }
 

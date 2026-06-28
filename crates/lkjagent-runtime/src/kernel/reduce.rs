@@ -1,4 +1,5 @@
 use crate::kernel::admission::{admitted_tools_for, blocked_tools_for, ToolAdmissionView};
+use crate::kernel::completion::close_allowed;
 use crate::kernel::decision::{
     ActionTemplate, DecisionInvariantError, RuntimeDecision, RuntimeDecisionId,
     RuntimeDecisionInput, RuntimeDecisionKind, RuntimeMission,
@@ -15,11 +16,11 @@ pub fn select_mission(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> Runti
     if snapshot.context.hard_pressure || matches!(event, RuntimeEvent::ContextPressureDetected) {
         return RuntimeMission::HardRuntimeCompaction;
     }
-    if is_schema_repair(snapshot, event) {
-        return RuntimeMission::SchemaRepair;
-    }
     if is_owner_recovery(snapshot, event) {
         return RuntimeMission::OwnerRecovery;
+    }
+    if is_schema_repair(snapshot, event) {
+        return RuntimeMission::SchemaRepair;
     }
     if snapshot.artifact.needs_repair()
         || matches!(
@@ -76,8 +77,7 @@ pub fn reduce(
         .with_missing_evidence(snapshot.evidence.missing.clone()),
         snapshot,
     );
-    let close_case =
-        mission == RuntimeMission::OwnerCompletion && snapshot.evidence.missing.is_empty();
+    let close_case = mission == RuntimeMission::OwnerCompletion && close_allowed(snapshot);
     if close_case {
         admission_view.completion_allowed = true;
         admission_view

@@ -20,28 +20,28 @@ fn batch_write_line_protocol_still_works() -> TestResult<()> {
 }
 
 #[test]
-fn batch_write_json_array_inside_files_works() -> TestResult<()> {
+fn batch_write_json_array_inside_files_refuses_before_mutation() -> TestResult<()> {
     let workspace = temp_workspace("batch-json-array")?;
     let output = run_batch(
         &workspace,
         r##"[{"path":"docs/a.md","content":"# A\n\nConcrete content."}]"##,
     )?;
 
-    assert!(output.contains("input_format=json-array"));
-    assert!(workspace.join("docs/a.md").is_file());
+    assert!(output.contains("object-literal fs.batch_write files are not live output"));
+    assert!(!workspace.join("docs/a.md").exists());
     Ok(())
 }
 
 #[test]
-fn batch_write_json_object_files_array_works() -> TestResult<()> {
+fn batch_write_json_object_files_refuses_before_mutation() -> TestResult<()> {
     let workspace = temp_workspace("batch-json-object")?;
     let output = run_batch(
         &workspace,
         r##"{"files":[{"path":"docs/a.md","content":"# A\n\nConcrete content."}]}"##,
     )?;
 
-    assert!(output.contains("input_format=json-object-files"));
-    assert!(workspace.join("docs/a.md").is_file());
+    assert!(output.contains("object-literal fs.batch_write files are not live output"));
+    assert!(!workspace.join("docs/a.md").exists());
     Ok(())
 }
 
@@ -149,14 +149,14 @@ fn batch_write_child_file_tags_fail_before_mutation() -> TestResult<()> {
 }
 
 #[test]
-fn batch_write_json_missing_path_fails_before_mutation() -> TestResult<()> {
+fn batch_write_json_missing_path_refuses_as_object_literal() -> TestResult<()> {
     let workspace = temp_workspace("batch-json-missing-path")?;
     let output = run_batch(
         &workspace,
         r##"[{"title":"A","content":"# A\n\nConcrete content."}]"##,
     )?;
 
-    assert!(output.contains("each JSON file needs path and content"));
+    assert!(output.contains("object-literal fs.batch_write files are not live output"));
     assert!(!workspace.join("docs/a.md").exists());
     Ok(())
 }

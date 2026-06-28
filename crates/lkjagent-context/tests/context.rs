@@ -18,7 +18,7 @@ fn budget_constants_match_the_doc_table() {
         );
     }
     assert_eq!(budget::prefix_cap_total(), 5_376);
-    assert_eq!(budget::initial_log_space(), 17_152);
+    assert_eq!(budget::initial_log_space(), 18_688);
     assert_eq!(policy.window, 24_576);
     assert_eq!(policy.soft_trigger, 18_432);
     assert_eq!(policy.hard_trigger, 21_504);
@@ -51,7 +51,7 @@ fn sixteen_k_policy_derives_earlier_compaction() {
     assert_eq!(policy.available_log_space(), 8_960);
     assert_eq!(policy.soft_trigger, 12_288);
     assert_eq!(policy.hard_trigger, 13_312);
-    assert_eq!(policy.post_compaction_target, 7_424);
+    assert_eq!(policy.post_compaction_target, 5_888);
     assert!(policy.hard_trigger < policy.window - policy.reserve);
     assert!(policy.post_compaction_target < policy.hard_trigger);
 }
@@ -78,7 +78,7 @@ fn pressure_model_predicts_before_hard_limit() {
     assert_eq!(policy.pressure(17_800, 800), ContextPressure::Yellow);
     assert_eq!(policy.pressure(18_500, 1_000), ContextPressure::Orange);
     assert_eq!(policy.pressure(20_000, 2_000), ContextPressure::Red);
-    assert_eq!(policy.pressure(23_000, 0), ContextPressure::BlackInvalid);
+    assert_eq!(policy.pressure(24_100, 0), ContextPressure::BlackInvalid);
 }
 
 #[test]

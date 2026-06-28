@@ -12,7 +12,7 @@ use crate::error::ToolResult;
 use crate::fs::workspace_path;
 use rusqlite::Connection;
 
-const WEAK_PATH_BATCH_SIZE: usize = 6;
+const WEAK_PATH_BATCH_SIZE: usize = 1;
 
 pub fn next(workspace: &Path, root: &str, path: &str, kind: &str) -> ToolResult<String> {
     crate::artifact::reject_empty_root(root)?;

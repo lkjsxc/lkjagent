@@ -20,7 +20,7 @@ Uploaded run-log fixtures are specified in
 [uploaded-run-fixtures.md](uploaded-run-fixtures.md). They cover recovery
 loops, content readiness, blocked mutation, large payload risk, maintenance
 preemption, false scaffold completion, and the active long-novel failure
-signature from `stories/long-novel-with-detailed-settings`.
+signature from the active structured-settings long-novel fixture.
 
 Mechanical benchmarks are not a replacement for owner judgment. They are the
 repeatable loop that shows whether changes to tools, prompts, memory,

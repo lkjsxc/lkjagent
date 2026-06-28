@@ -10,27 +10,16 @@ that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Repair current-state and authority status truth | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 2 | Reopen executable blocker queue and task contract | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 3 | Specify one effectful kernel driver contract | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 4 | Complete runtime authority store-chain reads | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 5 | Build durable snapshot adapter from store facts | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 6 | Close the runtime event catalog | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 7 | Cover reducer decisions for every mission | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 8 | Route daemon turns through the kernel driver | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 9 | Enforce decision-derived admission and staleness | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 10 | Render prompt frames from persisted decisions | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 11 | Persist provider anomalies as kernel events | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 12 | Canonicalize `fs.batch_write` schema repair | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 13 | Centralize semantic artifact lifecycle | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 14 | Strengthen story and long-novel readiness | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 15 | Centralize every completion attempt | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 16 | Restrict maintenance to closed idle | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 17 | Make compaction a resumable runtime effect | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 18 | Derive status, logs, and touched paths from authority | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 19 | Promote the active run into benchmark fixtures | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 20 | Delete or quarantine split authority policy paths | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
-| 21 | Run final local and Docker gates | [current-work/kernel-cutover-plan.md](current-work/kernel-cutover-plan.md) | implemented |
+| 1 | Truth sweep and fixture root reconciliation | [tasks/deep-redesign-truth-sweep.md](tasks/deep-redesign-truth-sweep.md) | open |
+| 2 | Compact context and no object-literal model context | [tasks/deep-redesign-compact-context.md](tasks/deep-redesign-compact-context.md) | open |
+| 3 | Output budget contract and endpoint config | [tasks/deep-redesign-output-budget.md](tasks/deep-redesign-output-budget.md) | open |
+| 4 | Short artifact path aliases and planner | [tasks/deep-redesign-short-paths.md](tasks/deep-redesign-short-paths.md) | open |
+| 5 | Registry-derived exact action examples | [tasks/deep-redesign-exact-examples.md](tasks/deep-redesign-exact-examples.md) | open |
+| 6 | Narrow runtime authority prompt cards | [tasks/deep-redesign-runtime-authority.md](tasks/deep-redesign-runtime-authority.md) | open |
+| 7 | Artifact cursor micro-batches | [tasks/deep-redesign-artifact-batches.md](tasks/deep-redesign-artifact-batches.md) | open |
+| 8 | Completion and maintenance reducers | [tasks/deep-redesign-completion-maintenance.md](tasks/deep-redesign-completion-maintenance.md) | open |
+| 9 | Provider anomaly blocked handoff | [tasks/deep-redesign-provider-handoff.md](tasks/deep-redesign-provider-handoff.md) | open |
+| 10 | Benchmark corpus and final gates | [tasks/deep-redesign-gates.md](tasks/deep-redesign-gates.md) | open |
 
 ## Active Data Fixture
 
@@ -38,19 +27,20 @@ that ran.
 evidence. The checked-in run proves these facts:
 
 - active case `1` is at node `document` in phase `execution`;
-- owner task is `Create a long novel. with detailed settings`;
+- owner task is `Create a long novel. with structured settings.`;
 - pre-owner maintenance repeats empty memory searches, no-op pruning, and
-  `agent.done` instead of staying closed idle;
-- artifact root is `stories/long-novel-with-detailed-settings`;
+  close attempts instead of staying closed idle;
+- the active run uses `stories/long-novel-with-structured-settings`, while the
+  target path planner must choose a short semantic alias such as
+  `stories/novel` for the same objective;
 - active tracks are `document-structure`, `action-param-reliability`, and
   `observability-ledger`;
 - evidence ledger has `plan` and `observation` only;
-- touched-path summary says `none`, despite scaffold creation and root listing;
-- `doc.audit` failed readiness with 28 weak structure-only pages;
-- two `fs.batch_write` attempts used child `<file>` tags inside `<files>` and
-  both failed with `invalid parameter: each block must start with path:`;
-- recovery repeated the invalid child-tag shape before changing route;
-- turns 59 and 62 record `provider_anomaly.reasoning_only_response`;
+- `doc.audit` failed readiness with weak structure-only story pages;
+- an attempted batch exceeded the file-count limit and was refused before
+  mutation;
+- recovery needed to change shape instead of repeating an oversized batch;
+- reasoning-only provider responses were recorded as provider anomalies;
 - document audit and artifact readiness audit remain pending.
 
 ## Ordering Notes
@@ -58,18 +48,21 @@ evidence. The checked-in run proves these facts:
 - Documentation moves first, then code. Prompt guidance alone never closes a row.
 - The transition kernel is the target runtime authority. Graph policy is
   snapshot guidance, not fallback dispatch authority after runtime refusal.
-- Stale-action refusal uses queue head, case id, graph node and phase, active
-  mode, artifact root and cursor, latest fault, missing evidence, compaction
-  pressure, maintenance state, and prompt-frame head.
-- Schema repair for `fs.batch_write` is active because the fixture repeats
-  child `<file>` blocks after a schema refusal.
+- Runtime mission priority is hard compaction, owner recovery, schema repair,
+  artifact repair, verification repair, owner execution, owner verification,
+  owner completion, idle maintenance, then closed idle.
+- Live model output uses one singular tag action. `fs.batch_write` uses only
+  the line protocol inside `<files>`.
+- `artifact.apply` creates structure once. If a root exists and weak content is
+  the problem, the next action is audit, `artifact.next`, or a path-specific
+  `fs.batch_write`.
 - Direct graph evidence, scaffold topology, README-only content, and
   owner-term-only pages do not satisfy artifact readiness.
 - Maintenance can start only from closed idle with an empty owner queue and no
-  recoverable owner task. Owner work preempts maintenance before endpoint and
-  before dispatch.
+  recoverable owner task. No-op maintenance records cooldown instead of
+  endpoint churn.
 
 ## Remaining Proof Gaps
 
-No current blocker proof gaps remain after focused tests, `quiet verify`, and
-Docker Compose verify.
+Every blocker in the queue remains open until focused tests, corpus checks,
+`quiet verify`, and Docker Compose verify run after the implementation changes.

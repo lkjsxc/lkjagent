@@ -3,6 +3,7 @@ use lkjagent_runtime::kernel::{
     build_snapshot, reduce, render_prompt_frame, PromptRenderError, RuntimeDecisionId,
     RuntimeEvent, RuntimeEventId, SnapshotAdapterInput,
 };
+use lkjagent_tools::dispatch::validate_action;
 
 fn owner_input() -> SnapshotAdapterInput {
     SnapshotAdapterInput {
@@ -51,13 +52,14 @@ fn owner_prompt_cites_decision_id_and_fingerprints() -> Result<(), String> {
     decision.decision_id = RuntimeDecisionId::Stored(42);
     decision.event_id = RuntimeEventId(9);
     let frame = render_prompt_frame(&decision).map_err(format_error)?;
-    assert!(frame.contains("decision_id=42"));
-    assert!(frame.contains("event_id=9"));
-    assert!(frame.contains("authority_fingerprint=authority:"));
-    assert!(frame.contains("staleness_fingerprint=stale:"));
-    assert!(frame.contains("admitted_tools=graph.state,graph.plan,graph.evidence"));
-    assert!(frame.contains("artifact.apply"));
-    assert!(frame.contains("fs.batch_write"));
+    assert!(frame.contains("<runtime-card>"));
+    assert!(frame.contains("<decision>42</decision>"));
+    assert!(frame.contains("<event>9</event>"));
+    assert!(frame.contains("<authority>authority:"));
+    assert!(frame.contains("<staleness>stale:"));
+    assert!(frame.contains("<budget>512 output tokens</budget>"));
+    assert!(frame.contains("<must-use>artifact.audit</must-use>"));
+    assert!(!frame.contains("admitted_tools="));
     Ok(())
 }
 
@@ -70,8 +72,10 @@ fn schema_repair_batch_example_is_concrete_and_parseable() -> Result<(), String>
     decision.event_id = RuntimeEventId(10);
     let frame = render_prompt_frame(&decision).map_err(format_error)?;
     assert!(frame.contains("path: stories/chronos-fracture/README.md"));
+    assert!(!frame.contains("[{\"path\""));
     let action_text = exact_action(&frame).ok_or_else(|| "missing action".to_string())?;
     let action = parse_completion(action_text).map_err(format_error)?;
+    validate_action(&action).map_err(format_error)?;
     assert_eq!(action.tool, "fs.batch_write");
     assert!(action.params.iter().any(|param| param.name == "files"));
     Ok(())

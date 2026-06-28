@@ -18,11 +18,11 @@ before any candidate write executes.
 ## Regression Signature
 
 The active long-novel run is the repair regression signature. `artifact.apply`
-created `stories/long-novel-with-detailed-settings` with
-`profile=NarrativeManuscript`, then `doc.audit` found 28 structure-only pages.
-Two `fs.batch_write` attempts used `<file>` child tags inside `<files>` and
-both refused with `invalid parameter: each block must start with path:`. The
-second same fault must not route to another free batch write.
+created a long objective-shaped structured-settings story root with
+`profile=NarrativeManuscript`, then `doc.audit` found structure-only pages.
+A broad `fs.batch_write` attempt exceeded the file-count limit and refused
+before mutation. The next decision must shrink the batch or route through
+`artifact.next`, not repeat the same broad write shape.
 
 ## Repair Card
 

@@ -8,7 +8,7 @@ fn owner_input() -> SnapshotAdapterInput {
         case_id: Some("case-1".to_string()),
         queue_head: Some("queue-1".to_string()),
         pending_owner_count: 1,
-        artifact_root: Some("stories/long-novel-with-detailed-settings".to_string()),
+        artifact_root: Some("stories/novel".to_string()),
         ..SnapshotAdapterInput::default()
     }
 }
@@ -30,12 +30,12 @@ fn missing_plan_forces_graph_plan() -> Result<(), String> {
 }
 
 #[test]
-fn missing_structure_forces_artifact_apply() -> Result<(), String> {
+fn missing_structure_with_existing_root_forces_doc_audit() -> Result<(), String> {
     let mut input = owner_input();
     input.missing_evidence = vec!["document-structure".to_string()];
     let snapshot = build_snapshot(input).map_err(format_error)?;
     let decision = reduce(&snapshot, RuntimeEvent::OwnerMessageReceived).map_err(format_error)?;
-    assert_eq!(next_tool(&decision)?, "artifact.apply");
+    assert_eq!(next_tool(&decision)?, "doc.audit");
     Ok(())
 }
 

@@ -3,6 +3,7 @@ pub mod adapter;
 mod adapter_fingerprint;
 pub mod admission;
 pub mod admission_decide;
+mod completion;
 pub mod decision;
 pub mod effect;
 pub mod event;

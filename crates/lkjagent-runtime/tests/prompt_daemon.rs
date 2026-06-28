@@ -29,30 +29,18 @@ fn prompt_is_deterministic_and_within_section_budgets() -> TestResult<()> {
     let first = build_prefix(&inputs)?;
     let second = build_prefix(&inputs)?;
     assert_eq!(first, second);
+    assert!(first
+        .iter()
+        .any(|frame| frame.content.contains("persisted\nruntime decision owns")));
     assert!(first.iter().any(|frame| frame
         .content
-        .contains("Do not\nact directly from the first owner message")));
+        .contains("Do not ask the owner for creative details")));
+    assert!(first.iter().any(|frame| frame
+        .content
+        .contains("no JSON or object-literal tool calls")));
     assert!(first
         .iter()
-        .any(|frame| frame.content.contains("bounded graph-maintenance work")));
-    assert!(first
-        .iter()
-        .any(|frame| frame.content.contains("fs.list, fs.search, fs.stat")));
-    assert!(first
-        .iter()
-        .any(|frame| frame.content.contains("doc tools, not shell loops")));
-    assert!(first
-        .iter()
-        .any(|frame| frame.content.contains("shell.run is an")));
-    assert!(first
-        .iter()
-        .any(|frame| frame.content.contains("doc.audit")));
-    assert!(first
-        .iter()
-        .any(|frame| frame.content.contains("root means a directory")));
-    assert!(first
-        .iter()
-        .any(|frame| frame.content.contains("line protocol is canonical")));
+        .any(|frame| frame.content.contains("only live payload is line protocol")));
     for frame in first {
         let cap = match frame.kind {
             FrameKind::Prefix(PrefixSection::Identity) => PREFIX_IDENTITY,

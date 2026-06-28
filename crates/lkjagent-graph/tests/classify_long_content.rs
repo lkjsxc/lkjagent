@@ -13,7 +13,7 @@ fn long_sf_story_routes_to_content_artifact() {
     assert!(state.evidence.knows_requirement("document-structure"));
     assert!(state.evidence.knows_requirement("artifact-readiness"));
     assert!(state.document.as_ref().is_some_and(|document| {
-        document.root == "stories/long-sf-story" && document.kind == "content-artifact"
+        document.root == "stories/story" && document.kind == "content-artifact"
     }));
 }
 
@@ -27,6 +27,14 @@ fn very_long_story_structured_followup_routes_to_content_artifact() {
         .context
         .selected_packages
         .contains(&"doc-construction".to_string()));
+}
+
+#[test]
+fn long_novel_structured_settings_uses_short_alias() {
+    let state = initial_state("Create a long novel. with structured settings.", Some(6));
+    assert!(state.document.as_ref().is_some_and(|document| {
+        document.root == "stories/novel" && document.root.split('/').all(|s| s.len() <= 24)
+    }));
 }
 
 #[test]
@@ -51,9 +59,7 @@ fn detailed_bread_dictionary_routes_to_dictionary_artifact() {
     assert_eq!(state.subroute, "content-artifact");
     assert!(state.evidence.knows_requirement("artifact-readiness"));
     assert!(state.document.as_ref().is_some_and(|document| {
-        document.root.starts_with("dictionaries/")
-            && document.root.contains("bread-dictionary")
-            && document.kind == "content-artifact"
+        document.root == "dictionaries/bread-dictionary" && document.kind == "content-artifact"
     }));
 }
 
