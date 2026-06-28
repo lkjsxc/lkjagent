@@ -25,6 +25,9 @@ Observation tools include `fs.read`, `fs.stat`, `fs.list`, `doc.audit`, and
 `artifact.audit`. Repair tools include `fs.write`, `fs.batch_write`,
 `artifact.next`, `artifact.plan`, graph evidence tools for non-audit-owned
 requirements, and structured handoff tools when repair cannot safely continue.
+`artifact.plan` is admitted for semantic artifact work only. A code-change task
+that names one target file can receive an exact `fs.write` surface after plan
+evidence instead of being routed into artifact identity.
 
 ## Prohibited States
 
@@ -49,4 +52,5 @@ Run `cargo test -p lkjagent-runtime tool_admission`,
 
 ## Status
 
-partially implemented.
+implemented for kernel-derived admission views, artifact work, non-artifact
+single-file writes, recovery escape tools, and completion refusal paths.

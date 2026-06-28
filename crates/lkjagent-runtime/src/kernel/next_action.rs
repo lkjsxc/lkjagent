@@ -1,4 +1,7 @@
 use crate::kernel::decision::{ActionTemplate, RuntimeMission};
+use crate::kernel::next_action_simple::{
+    artifact_work_required, simple_write_body, simple_write_path,
+};
 use crate::kernel::render::example_for;
 use crate::kernel::snapshot::{RuntimeSnapshot, ToolName};
 
@@ -12,7 +15,7 @@ pub(crate) fn next_action_for(
         RuntimeMission::SchemaRepair => schema_tool(snapshot),
         RuntimeMission::ArtifactRepair => artifact_tool(snapshot),
         RuntimeMission::VerificationRepair => "artifact.audit",
-        RuntimeMission::OwnerExecution => owner_execution_tool(snapshot),
+        RuntimeMission::OwnerExecution => return Some(owner_execution_action(snapshot)),
         RuntimeMission::OwnerVerification => "artifact.audit",
         RuntimeMission::OwnerCompletion if snapshot.evidence.missing.is_empty() => "agent.done",
         RuntimeMission::OwnerCompletion => "artifact.audit",
@@ -24,9 +27,34 @@ pub(crate) fn next_action_for(
     })
 }
 
+fn owner_execution_action(snapshot: &RuntimeSnapshot) -> ActionTemplate {
+    let tool = owner_execution_tool(snapshot);
+    if tool == "fs.write" {
+        if let Some(path) = simple_write_path(snapshot) {
+            return ActionTemplate::ExactTool {
+                tool: ToolName::from_static("fs.write"),
+                body: simple_write_body(&path, snapshot),
+            };
+        }
+    }
+    ActionTemplate::ExactTool {
+        tool: ToolName::from_static(tool),
+        body: example_for(tool, snapshot),
+    }
+}
+
 pub(crate) fn owner_execution_tool(snapshot: &RuntimeSnapshot) -> &'static str {
     if plan_missing(snapshot) {
         return "graph.plan";
+    }
+    if !artifact_work_required(snapshot) {
+        if evidence_missing(snapshot, "observation") {
+            return "fs.write";
+        }
+        if evidence_missing(snapshot, "verification") {
+            return "graph.evidence";
+        }
+        return "workspace.summary";
     }
     if snapshot.artifact.root.is_none() {
         return "artifact.plan";

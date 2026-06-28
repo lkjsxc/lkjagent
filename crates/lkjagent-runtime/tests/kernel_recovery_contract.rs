@@ -23,6 +23,27 @@ fn snapshot() -> Result<RuntimeSnapshot, String> {
 }
 
 #[test]
+fn code_change_file_task_forces_direct_write_after_plan() -> Result<(), String> {
+    let mut state = snapshot()?;
+    state.case.case_id = Some("case-1".to_string());
+    state.case.task_family = Some("code-change".to_string());
+    state.case.owner_objective = Some("Create hello.md with one hello sentence.".to_string());
+    state.evidence.existing = vec!["plan".to_string()];
+    state.evidence.missing = vec!["observation".to_string(), "verification".to_string()];
+    let decision = reduce(&state, RuntimeEvent::OwnerMessageReceived).map_err(format_error)?;
+
+    match decision.forced_next_action {
+        Some(ActionTemplate::ExactTool { tool, body }) => {
+            assert_eq!(tool.as_str(), "fs.write");
+            assert!(body.contains("<path>hello.md</path>"));
+            assert!(body.contains("Hello."));
+            Ok(())
+        }
+        _ => Err("expected direct write action".to_string()),
+    }
+}
+
+#[test]
 fn audit_owned_gap_blocks_direct_graph_evidence() -> Result<(), String> {
     let mut state = snapshot()?;
     state.case.case_id = Some("case-1".to_string());

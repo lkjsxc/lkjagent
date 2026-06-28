@@ -23,9 +23,9 @@ that ran.
 
 ## Active Data Fixture
 
-`data/logs/current-model-run.md` and `data/logs/index.ndjson` are failure
-evidence. `index.ndjson` paths are normalized from `/data/logs/...` to the
-repository `data/logs/...` tree before integrity checks. The checked-in run
+`data/logs/current-model-run.md` and `data/logs/index.ndjson` are historical
+failure evidence. `index.ndjson` paths are normalized from `/data/logs/...` to
+the repository `data/logs/...` tree before integrity checks. The checked-in run
 proves these facts:
 
 - active case `1` is at node `document` in phase `execution`;
@@ -39,8 +39,11 @@ proves these facts:
 - `artifact.audit` and `graph.state` repeated instead of changing shape;
 - direct `graph.evidence` for audit-owned evidence was refused;
 - reasoning-only provider responses were recorded as provider anomalies;
-- final verification remained pending;
-- no fresh successful live smoke run is checked in.
+- final verification remained pending.
+
+A fresh clean-data endpoint smoke after the repair created
+`tmp/live-direct-data-3/workspace/hello.md` and reached `open_task=none`. The
+checked-in generated log fixture remains historical failure evidence.
 
 ## Ordering Notes
 
@@ -69,6 +72,6 @@ proves these facts:
 ## Completion Evidence
 
 The redesign is closed by focused crate tests, workspace tests, corpus checks,
-`quiet verify`, and `docker compose run --rm verify` after the implementation
-changes. The checked-in data log remains failure evidence until a fresh model
-smoke run replaces it.
+`quiet verify`, `docker compose run --rm verify`, and a fresh clean-data
+endpoint smoke after the implementation changes. The checked-in data log remains
+historical failure evidence.

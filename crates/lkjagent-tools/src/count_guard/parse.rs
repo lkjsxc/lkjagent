@@ -118,6 +118,8 @@ fn non_file_unit_spans(lower: &str, content: &str) -> Vec<Span> {
         "children",
         "scene",
         "scenes",
+        "sentence",
+        "sentences",
     ] {
         spans.extend(span_matches(lower, needle));
     }
