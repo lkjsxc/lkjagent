@@ -1,1 +1,0 @@
-{"content":"<action>\n<tool>memory.find</tool>\n<query>lesson</query>\n<limit>10</limit>\n</action>","provider_anomaly":null,"finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":3932,"completion_tokens":38,"cached_prompt_tokens":null,"total_tokens":3970}}

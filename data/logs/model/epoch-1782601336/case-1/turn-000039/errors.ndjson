@@ -1,0 +1,1 @@
+{"error_class":"CompletionOversize","message":"endpoint completion hit max tokens; preview=<action>\\n<tool>fs.batch_write</tool>\\n<files>\\n[\\n  {\\n    \"path\": \"characters/antagonist.md\",\\n    \"content\": \"# Antagonist\\n\\n[Detailed description of the antagonist's motivations, history, and role in the story.]\"\\n  },\\n  {\\n    \"path\": \"charac"}

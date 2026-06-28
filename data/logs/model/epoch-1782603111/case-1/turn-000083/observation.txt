@@ -1,0 +1,13 @@
+<observation>
+<status>ok</status>
+<content>
+files_written=6
+input_format=line-protocol
+stories/long-novel-with-structured-settings/plot/chapter-spine.md bytes=446
+stories/long-novel-with-structured-settings/plot/conflict-lattice.md bytes=452
+stories/long-novel-with-structured-settings/project/premise.md bytes=434
+stories/long-novel-with-structured-settings/project/themes.md bytes=432
+stories/long-novel-with-structured-settings/relations/character-plot.md bytes=448
+stories/long-novel-with-structured-settings/relations/setting-plot.md bytes=443
+</content>
+</observation>

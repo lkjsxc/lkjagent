@@ -1,0 +1,4 @@
+<observation>
+<status>ok</status>
+<content>query_normalized=refine graph policy</content>
+</observation>

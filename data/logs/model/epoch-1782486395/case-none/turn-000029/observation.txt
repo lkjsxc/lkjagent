@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-done
-summary=Maintenance cycle: No relevant memory or queue items found. Memory pruning completed with no changes. Maintenance cycle ended.
-</content>
-</observation>

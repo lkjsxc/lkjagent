@@ -1,0 +1,16 @@
+<notice>
+<kind>error</kind>
+<content>
+authority refused diary.find
+decision_id=2
+mission=idle_maintenance
+node=none
+reason=tool is not admitted by authority decision
+admitted_tools=memory.find, memory.prune, memory.save, agent.done, agent.ask
+missing_evidence=none
+valid_example:
+<action>
+<tool>memory.find</tool>
+</action>
+</content>
+</notice>

@@ -1,0 +1,13 @@
+<observation>
+<status>ok</status>
+<content>
+files_written=6
+input_format=line-protocol
+stories/long-novel-with-structured-settings/continuity/glossary.md bytes=436
+stories/long-novel-with-structured-settings/continuity/open-questions.md bytes=448
+stories/long-novel-with-structured-settings/continuity/rules.md bytes=430
+stories/long-novel-with-structured-settings/manuscript/draft-boundary.md bytes=448
+stories/long-novel-with-structured-settings/manuscript/scene-seeds.md bytes=442
+stories/long-novel-with-structured-settings/plot/act-structure.md bytes=445
+</content>
+</observation>

@@ -1,0 +1,1 @@
+{"content":"<action>\n<tool>fs.read</tool>\n<path>stories/long-novel-with-structured-settings/project/README.md</path>\n</action>","provider_anomaly":null,"finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":8326,"completion_tokens":45,"cached_prompt_tokens":null,"total_tokens":8371}}

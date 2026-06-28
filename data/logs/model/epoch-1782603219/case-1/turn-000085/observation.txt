@@ -1,0 +1,13 @@
+<observation>
+<status>ok</status>
+<content>
+files_written=6
+input_format=line-protocol
+stories/long-novel-with-structured-settings/request/constraints.md bytes=442
+stories/long-novel-with-structured-settings/request/objective.md bytes=438
+stories/long-novel-with-structured-settings/setting/cosmology.md bytes=438
+stories/long-novel-with-structured-settings/setting/factions.md bytes=436
+stories/long-novel-with-structured-settings/setting/locations.md bytes=438
+stories/long-novel-with-structured-settings/setting/society.md bytes=432
+</content>
+</observation>

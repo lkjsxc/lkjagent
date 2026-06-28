@@ -1,1 +1,0 @@
-{"tool":"fs.batch_write","admitted":true,"reason":"admitted","example":"<action>\n<tool>artifact.apply</tool>\n<root>stories/long-novel-with-detailed-settings</root>\n</action>"}
