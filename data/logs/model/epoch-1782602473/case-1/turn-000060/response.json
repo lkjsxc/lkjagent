@@ -1,0 +1,1 @@
+{"content":"<action>\n<tool>artifact.apply</tool>\n<root>stories/long-novel-with-structured-settings</root>\n</action>","provider_anomaly":null,"finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":7088,"completion_tokens":39,"cached_prompt_tokens":null,"total_tokens":7127}}

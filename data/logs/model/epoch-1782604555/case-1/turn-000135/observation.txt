@@ -1,0 +1,14 @@
+<notice>
+<kind>error</kind>
+<content>
+repeat action refused; see frame 122
+active_mode=OwnerTask
+next_action_must_change_shape=true
+forbidden_tool=fs.read
+preferred_next_action=graph.state
+valid_example:
+<action>
+<tool>graph.state</tool>
+</action>
+</content>
+</notice>

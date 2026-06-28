@@ -1,0 +1,9 @@
+<observation>
+<status>ok</status>
+<content>
+dir stories/long-novel-with-structured-settings/project bytes=5 lines=0
+file stories/long-novel-with-structured-settings/project/README.md bytes=390 lines=23
+file stories/long-novel-with-structured-settings/project/premise.md bytes=552 lines=24
+file stories/long-novel-with-structured-settings/project/themes.md bytes=549 lines=24
+</content>
+</observation>

@@ -1,0 +1,17 @@
+<notice>
+<kind>error</kind>
+<content>
+authority refused artifact.plan
+decision_id=32
+mission=owner_execution
+node=none
+reason=tool is not admitted by authority decision
+admitted_tools=graph.state, graph.plan, graph.evidence, graph.note, agent.ask, artifact.apply, artifact.next, artifact.audit, doc.audit, fs.read, fs.list, fs.stat, fs.write, fs.batch_write, workspace.summary
+missing_evidence=observation, document-structure, artifact-readiness
+valid_example:
+<action>
+<tool>artifact.apply</tool>
+<root>stories/long-novel-with-structured-settings</root>
+</action>
+</content>
+</notice>

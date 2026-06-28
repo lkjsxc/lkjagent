@@ -1,0 +1,27 @@
+<observation>
+<status>ok</status>
+<content>
+files_written=20
+input_format=json-array
+stories/long-novel-with-structured-settings/project/premise.md bytes=161
+stories/long-novel-with-structured-settings/project/themes.md bytes=101
+stories/long-novel-with-structured-settings/request/objective.md bytes=105
+stories/long-novel-with-structured-settings/request/constraints.md bytes=158
+stories/long-novel-with-structured-settings/relations/character-plot.md bytes=67
+stories/long-novel-with-structured-settings/relations/setting-plot.md bytes=87
+stories/long-novel-with-structured-settings/plot/act-structure.md bytes=119
+stories/long-novel-with-structured-settings/plot/chapter-spine.md bytes=70
+stories/long-novel-with-structured-settings/plot/conflict-lattice.md bytes=93
+stories/long-novel-with-structured-settings/characters/protagonist.md bytes=84
+stories/long-novel-with-structured-settings/characters/antagonist.md bytes=92
+stories/long-novel-with-structured-settings/characters/supporting-cast.md bytes=73
+stories/long-novel-with-structured-settings/characters/relationships.md bytes=82
+stories/long-novel-with-structured-settings/continuity/glossary.md bytes=84
+stories/long-novel-with-structured-settings/continuity/rules.md bytes=94
+stories/long-novel-with-structured-settings/continuity/open-questions.md bytes=97
+stories/long-novel-with-structured-settings/manuscript/draft-boundary.md bytes=68
+stories/long-novel-with-structured-settings/manuscript/scene-seeds.md bytes=99
+stories/long-novel-with-structured-settings/checks/structure-audit.md bytes=70
+stories/long-novel-with-structured-settings/checks/readiness-audit.md bytes=74
+</content>
+</observation>

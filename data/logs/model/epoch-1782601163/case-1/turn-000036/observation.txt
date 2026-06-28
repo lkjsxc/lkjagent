@@ -1,0 +1,27 @@
+<observation>
+<status>ok</status>
+<content>
+files_written=20
+input_format=json-array
+stories/long-novel-with-structured-settings/characters/antagonist.md bytes=46
+stories/long-novel-with-structured-settings/characters/protagonist.md bytes=48
+stories/long-novel-with-structured-settings/characters/relationships.md bytes=61
+stories/long-novel-with-structured-settings/characters/supporting-cast.md bytes=56
+stories/long-novel-with-structured-settings/checks/readiness-audit.md bytes=56
+stories/long-novel-with-structured-settings/checks/structure-audit.md bytes=56
+stories/long-novel-with-structured-settings/continuity/glossary.md bytes=40
+stories/long-novel-with-structured-settings/continuity/open-questions.md bytes=46
+stories/long-novel-with-structured-settings/continuity/rules.md bytes=33
+stories/long-novel-with-structured-settings/manuscript/draft-boundary.md bytes=60
+stories/long-novel-with-structured-settings/manuscript/scene-seeds.md bytes=40
+stories/long-novel-with-structured-settings/plot/act-structure.md bytes=52
+stories/long-novel-with-structured-settings/plot/chapter-spine.md bytes=52
+stories/long-novel-with-structured-settings/plot/conflict-lattice.md bytes=58
+stories/long-novel-with-structured-settings/project/premise.md bytes=54
+stories/long-novel-with-structured-settings/project/themes.md bytes=42
+stories/long-novel-with-structured-settings/relations/character-plot.md bytes=54
+stories/long-novel-with-structured-settings/relations/setting-plot.md bytes=50
+stories/long-novel-with-structured-settings/request/constraints.md bytes=40
+stories/long-novel-with-structured-settings/request/objective.md bytes=40
+</content>
+</observation>

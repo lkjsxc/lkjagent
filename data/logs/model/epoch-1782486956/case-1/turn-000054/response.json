@@ -1,1 +1,0 @@
-{"content":"<action>\n<tool>doc.audit</tool>\n<root>stories/long-novel-with-detailed-settings</root>\n</action>","provider_anomaly":null,"finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":10092,"completion_tokens":262,"cached_prompt_tokens":null,"total_tokens":10354}}

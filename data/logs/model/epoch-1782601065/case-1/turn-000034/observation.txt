@@ -1,0 +1,4 @@
+<observation>
+<status>error</status>
+<content>invalid parameter: too many files; max=20</content>
+</observation>

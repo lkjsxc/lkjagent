@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-done
-summary=Maintenance cycle: No relevant transcript, lessons, or queue items found. No maintenance work possible with current constraints. Ending maintenance cycle.
-</content>
-</observation>

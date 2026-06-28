@@ -1,0 +1,108 @@
+<observation>
+<status>ok</status>
+<content>
+artifact_next_result=weak_path_batch_ready
+root=stories/long-novel-with-structured-settings
+kind=story
+missing=6
+next_paths:
+- characters/antagonist.md
+- characters/protagonist.md
+- characters/relationships.md
+- characters/supporting-cast.md
+- checks/readiness-audit.md
+- checks/structure-audit.md
+required_sections:
+- title
+- purpose
+- scene content or reference detail
+- continuity notes
+- verification notes
+runtime_event=ArtifactWeakPathFound
+next_decision_required=true
+candidate_action=fs.batch_write
+candidate_example:
+<action>
+<tool>fs.batch_write</tool>
+<files>
+path: stories/long-novel-with-structured-settings/characters/antagonist.md
+content:
+# Antagonist
+
+## Scene Content
+
+A named protagonist enters Antagonist with a concrete want, an obstacle, sensory pressure, and a visible consequence. The scene names the location, the object under dispute, the decision made on page, and the cost that carries into the following beat.
+
+## Continuity Notes
+
+Continuity notes track intent, unresolved tension, changed relationships, setting details, and revision evidence for the manuscript.
+
+-- lkjagent-next-file --
+path: stories/long-novel-with-structured-settings/characters/protagonist.md
+content:
+# Protagonist
+
+## Scene Content
+
+A named protagonist enters Protagonist with a concrete want, an obstacle, sensory pressure, and a visible consequence. The scene names the location, the object under dispute, the decision made on page, and the cost that carries into the following beat.
+
+## Continuity Notes
+
+Continuity notes track intent, unresolved tension, changed relationships, setting details, and revision evidence for the manuscript.
+
+-- lkjagent-next-file --
+path: stories/long-novel-with-structured-settings/characters/relationships.md
+content:
+# Relationships
+
+## Scene Content
+
+A named protagonist enters Relationships with a concrete want, an obstacle, sensory pressure, and a visible consequence. The scene names the location, the object under dispute, the decision made on page, and the cost that carries into the following beat.
+
+## Continuity Notes
+
+Continuity notes track intent, unresolved tension, changed relationships, setting details, and revision evidence for the manuscript.
+
+-- lkjagent-next-file --
+path: stories/long-novel-with-structured-settings/characters/supporting-cast.md
+content:
+# Supporting Cast
+
+## Scene Content
+
+A named protagonist enters Supporting Cast with a concrete want, an obstacle, sensory pressure, and a visible consequence. The scene names the location, the object under dispute, the decision made on page, and the cost that carries into the following beat.
+
+## Continuity Notes
+
+Continuity notes track intent, unresolved tension, changed relationships, setting details, and revision evidence for the manuscript.
+
+-- lkjagent-next-file --
+path: stories/long-novel-with-structured-settings/checks/readiness-audit.md
+content:
+# Readiness Audit
+
+## Scene Content
+
+A named protagonist enters Readiness Audit with a concrete want, an obstacle, sensory pressure, and a visible consequence. The scene names the location, the object under dispute, the decision made on page, and the cost that carries into the following beat.
+
+## Continuity Notes
+
+Continuity notes track intent, unresolved tension, changed relationships, setting details, and revision evidence for the manuscript.
+
+-- lkjagent-next-file --
+path: stories/long-novel-with-structured-settings/checks/structure-audit.md
+content:
+# Structure Audit
+
+## Scene Content
+
+A named protagonist enters Structure Audit with a concrete want, an obstacle, sensory pressure, and a visible consequence. The scene names the location, the object under dispute, the decision made on page, and the cost that carries into the following beat.
+
+## Continuity Notes
+
+Continuity notes track intent, unresolved tension, changed relationships, setting details, and revision evidence for the manuscript.
+
+</files>
+</action>
+</content>
+</observation>

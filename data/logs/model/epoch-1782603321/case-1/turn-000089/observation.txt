@@ -1,0 +1,11 @@
+<observation>
+<status>ok</status>
+<content>
+files_written=4
+input_format=line-protocol
+stories/long-novel-with-structured-settings/setting/technology.md bytes=440
+stories/long-novel-with-structured-settings/setting/timeline.md bytes=436
+stories/long-novel-with-structured-settings/style/motifs.md bytes=432
+stories/long-novel-with-structured-settings/style/tone.md bytes=426
+</content>
+</observation>

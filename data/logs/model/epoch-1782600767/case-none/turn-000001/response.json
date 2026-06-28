@@ -1,0 +1,1 @@
+{"content":"<action>\n<tool>diary.find</tool>\n<query>recent transcript spans</query>\n</action>","provider_anomaly":null,"finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":2273,"completion_tokens":31,"cached_prompt_tokens":null,"total_tokens":2304}}

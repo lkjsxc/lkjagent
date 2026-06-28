@@ -1,1 +1,0 @@
-{"tool":"graph.plan","admitted":true,"reason":"admitted","example":"<action>\n<tool>graph.plan</tool>\n<objective>Complete the owner task</objective>\n<steps>\nInspect state\nAct in one bounded step\n</steps>\n<reason>Graph planning requirement</reason>\n<checks>dispatch accepts semantic plan</checks>\n<paths>stories/long-novel-with-detailed-settings</paths>\n</action>"}
