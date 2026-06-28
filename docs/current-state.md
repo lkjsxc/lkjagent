@@ -47,9 +47,10 @@ semantic intent or bounded file content inside that selected surface.
 ## Active Data Log Fixture
 
 `data/logs/current-model-run.md`, `data/logs/index.ndjson`, and latest turn
-directories prove checked-in failure facts until a fresh smoke run proves
-repair. `index.ndjson` uses `/data/logs/...` as a repository-relative log root
-and must resolve to present turn directories after that normalization:
+directories remain checked-in historical failure fixtures. Fresh smoke evidence
+is separate until an owner chooses to replace the fixture. `index.ndjson` uses
+`/data/logs/...` as a repository-relative log root and must resolve to present
+turn directories after that normalization:
 
 - active case `1` is at node `document` in phase `execution`;
 - owner task is `Create a long novel. with detailed structured settings.`;
@@ -62,8 +63,11 @@ and must resolve to present turn directories after that normalization:
 - `artifact.audit` and `graph.state` then repeated in a loop;
 - direct `graph.evidence` for audit-owned evidence was correctly refused;
 - reasoning-only provider responses were classified as provider anomalies;
-- final verification remained pending;
-- no fresh successful live smoke run is checked in.
+- final verification remained pending.
+
+A fresh clean-data endpoint smoke run after the repair created
+`tmp/live-direct-data-3/workspace/hello.md` and reached `open_task=none`. The
+checked-in generated log fixture remains historical failure evidence.
 
 ## Runtime Authority Target Flow
 
@@ -102,14 +106,14 @@ next action surface.
 ## Verification Evidence
 
 The redesign success claim is backed by focused tests, full workspace tests,
-corpus checks, `quiet verify`, and `docker compose run --rm verify` after the
-implementation changes. The generated data log fixture is not success evidence.
+corpus checks, `quiet verify`, `docker compose run --rm verify`, and a fresh
+clean-data endpoint smoke after the implementation changes. The checked-in
+generated data log fixture is not success evidence.
 
 ## Active Target
 
 The dependency queue in [execution/current-blockers.md](execution/current-blockers.md)
-is closed for this redesign. The next executable step is a fresh local model
-smoke run that replaces the checked-in failure fixture with success evidence.
+is closed for this redesign. Next executable step: none.
 
 ## Out of Scope
 

@@ -13,6 +13,7 @@ pub mod fault;
 pub mod mission;
 pub mod mission_select;
 mod next_action;
+mod next_action_simple;
 pub mod provider;
 pub mod reduce;
 pub mod render;
