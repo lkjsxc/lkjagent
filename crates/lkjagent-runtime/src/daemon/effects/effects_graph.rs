@@ -1,9 +1,13 @@
+#[path = "effects_graph_evidence.rs"]
+mod effects_graph_evidence;
+
 use rusqlite::Connection;
 
 use super::runner::ResidentDaemon;
 use crate::error::RuntimeResult;
 use crate::graph_state_tracks::store_track_rows;
 use crate::step::Effect;
+use effects_graph_evidence::record_evidence;
 
 impl ResidentDaemon {
     pub(super) fn apply_graph_effect(
@@ -166,24 +170,5 @@ fn record_fault(conn: &Connection, now: &str, effect: GraphFaultEffect) -> Runti
         effect.count,
         now,
     )?;
-    Ok(())
-}
-
-fn record_evidence(
-    conn: &Connection,
-    now: &str,
-    case_id: i64,
-    requirement: String,
-    kind: String,
-    summary: String,
-    path: Option<String>,
-) -> RuntimeResult<()> {
-    let evidence = lkjagent_store::graph::GraphEvidenceRow {
-        requirement,
-        kind,
-        summary,
-        path,
-    };
-    lkjagent_store::graph::record_evidence(conn, case_id, &evidence, now)?;
     Ok(())
 }

@@ -8,7 +8,7 @@ pub(crate) fn next_action_for(
 ) -> Option<ActionTemplate> {
     let tool = match mission {
         RuntimeMission::HardRuntimeCompaction | RuntimeMission::ClosedIdle => return None,
-        RuntimeMission::OwnerRecovery => "graph.state",
+        RuntimeMission::OwnerRecovery => recovery_tool(snapshot),
         RuntimeMission::SchemaRepair => schema_tool(snapshot),
         RuntimeMission::ArtifactRepair => artifact_tool(snapshot),
         RuntimeMission::VerificationRepair => "artifact.audit",
@@ -44,6 +44,25 @@ pub(crate) fn owner_execution_tool(snapshot: &RuntimeSnapshot) -> &'static str {
         return "artifact.audit";
     }
     "artifact.audit"
+}
+
+fn recovery_tool(snapshot: &RuntimeSnapshot) -> &'static str {
+    if evidence_missing(snapshot, "document-structure") {
+        return "doc.audit";
+    }
+    if evidence_missing(snapshot, "artifact-readiness") {
+        return artifact_tool(snapshot);
+    }
+    if snapshot.retry_count > 0 {
+        if !snapshot.artifact.weak_paths.is_empty() {
+            return "artifact.next";
+        }
+        if snapshot.artifact.root.is_some() {
+            return "artifact.audit";
+        }
+        return "workspace.summary";
+    }
+    "graph.state"
 }
 
 fn schema_tool(snapshot: &RuntimeSnapshot) -> &'static str {

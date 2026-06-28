@@ -34,29 +34,29 @@ pub fn audit(
             workspace, conn, root, kind, &report, now,
         );
     }
-    if kind.trim().eq_ignore_ascii_case("dictionary") {
+    let kind = audit_kind(workspace, conn, root, kind)?;
+    if kind.eq_ignore_ascii_case("dictionary") {
         let report = crate::dictionary_audit::audit(workspace, root)?;
         let report = crate::artifact_ledger_support::record_audit(
-            workspace, conn, root, kind, &report, now,
+            workspace, conn, root, &kind, &report, now,
         )?;
         return Ok(report);
     }
     let report = crate::doc::audit(workspace, root, count, mode)?;
-    let kind = kind.trim();
     let full = workspace_path(workspace, root)?;
     let catalog = optional_catalog(&full);
-    if !kind.is_empty() && !catalog.is_empty() && kind_mismatch(kind, &catalog) {
+    if !catalog.is_empty() && kind_mismatch(&kind, &catalog) {
         let report = format!(
             "document audit failed\nroot={root}\nchecks=15\npassed=14\nfailed=1\nfailures:\n- artifact_kind_mismatch: expected={kind}\nnext_action=artifact.next identity contract for matching artifact kind"
         );
         let report = crate::artifact_ledger_support::record_audit(
-            workspace, conn, root, kind, &report, now,
+            workspace, conn, root, &kind, &report, now,
         )?;
         return Ok(report);
     }
-    if kind.is_empty() || !report.starts_with("document audit passed") {
+    if !report.starts_with("document audit passed") {
         let report = crate::artifact_ledger_support::record_audit(
-            workspace, conn, root, kind, &report, now,
+            workspace, conn, root, &kind, &report, now,
         )?;
         return Ok(report);
     }
@@ -64,13 +64,13 @@ pub fn audit(
         if !drift.is_empty() {
             let report = drift.observation(root);
             let report = crate::artifact_ledger_support::record_audit(
-                workspace, conn, root, kind, &report, now,
+                workspace, conn, root, &kind, &report, now,
             )?;
             return Ok(report);
         }
     }
-    let report = crate::artifact_readiness::readiness_report(kind, root, &full, &report)?;
-    crate::artifact_ledger_support::record_audit(workspace, conn, root, kind, &report, now)
+    let report = crate::artifact_readiness::readiness_report(&kind, root, &full, &report)?;
+    crate::artifact_ledger_support::record_audit(workspace, conn, root, &kind, &report, now)
 }
 
 pub fn next(workspace: &Path, root: &str, path: &str, kind: &str) -> ToolResult<String> {
@@ -86,6 +86,38 @@ pub fn next_with_cursor(
     kind: &str,
 ) -> ToolResult<String> {
     crate::artifact_next::next_with_cursor(workspace, conn, now, root, path, kind)
+}
+
+fn audit_kind(
+    workspace: &Path,
+    conn: &Connection,
+    root: &str,
+    requested: &str,
+) -> ToolResult<String> {
+    let trimmed = requested.trim();
+    if !trimmed.is_empty() && !trimmed.eq_ignore_ascii_case("artifact") {
+        return Ok(trimmed.to_ascii_lowercase());
+    }
+    if let Some(kind) = ledger_kind(conn, root)? {
+        return Ok(kind);
+    }
+    let full = workspace_path(workspace, root)?;
+    let catalog = optional_catalog(&full);
+    if story_catalog(&catalog) || story_root(root) {
+        return Ok("story".to_string());
+    }
+    if catalog.to_ascii_lowercase().contains("cookbook") {
+        return Ok("cookbook".to_string());
+    }
+    Ok("artifact".to_string())
+}
+
+fn ledger_kind(conn: &Connection, root: &str) -> ToolResult<Option<String>> {
+    let case_id = crate::artifact_ledger_state::case_id(conn)?;
+    let Some(row) = lkjagent_store::artifact_ledger::latest_for_case(conn, case_id)? else {
+        return Ok(None);
+    };
+    Ok((row.root == root).then_some(row.kind))
 }
 
 fn scale_count(scale: &str) -> &str {

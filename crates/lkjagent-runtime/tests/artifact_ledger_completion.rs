@@ -19,6 +19,15 @@ use support::{action, runtime_state, store, temp_workspace, TestResult};
 fn agent_done_refuses_when_artifact_ledger_has_weak_paths() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "100", "0")?;
+    let graph =
+        lkjagent_runtime::graph_state::open_owner_case(&conn, "Finish cookbook artifact.", "100")?;
+    let case_id = graph.case_id.ok_or("missing case id")?;
+    let ids = artifact_evidence_ids(&graph.evidence.requirement_ids());
+    record_all_evidence(&conn, case_id, &ids)?;
+    conn.execute(
+        "UPDATE graph_cases SET evidence_requirements = ?2, pending_checks = '' WHERE id = ?1",
+        (case_id, ids.join("\n")),
+    )?;
     upsert_artifact(&conn, &weak_artifact(), "2026-01-01T00:00:00Z")?;
     let workspace = temp_workspace("artifact-ledger-completion")?;
     let server = serve_responses(Vec::new())?;
@@ -51,6 +60,35 @@ fn agent_done_refuses_when_artifact_ledger_has_weak_paths() -> TestResult<()> {
         log.contains("authority refused agent.done") && log.contains("artifact-readiness"),
         "log was:\n{log}"
     );
+    Ok(())
+}
+
+fn artifact_evidence_ids(ids: &[String]) -> Vec<String> {
+    let mut values = ids.to_vec();
+    if !values.iter().any(|id| id == "artifact-readiness") {
+        values.push("artifact-readiness".to_string());
+    }
+    values
+}
+
+fn record_all_evidence(
+    conn: &rusqlite::Connection,
+    case_id: i64,
+    ids: &[String],
+) -> TestResult<()> {
+    for id in ids {
+        lkjagent_store::graph::record_evidence(
+            conn,
+            case_id,
+            &lkjagent_store::graph::GraphEvidenceRow {
+                requirement: id.clone(),
+                kind: evidence_kind(id).as_str().to_string(),
+                summary: format!("{id} satisfied"),
+                path: Some("cookbooks/bread".to_string()),
+            },
+            "100",
+        )?;
+    }
     Ok(())
 }
 

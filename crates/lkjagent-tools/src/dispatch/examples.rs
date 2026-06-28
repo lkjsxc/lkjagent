@@ -82,8 +82,10 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
     if (tool, name) == ("graph.evidence", "kind") {
         return context
             .evidence_requirement
-            .clone()
-            .or_else(|| context.missing_evidence.first().cloned())
+            .as_deref()
+            .filter(|kind| !audit_owned_requirement(kind))
+            .map(str::to_string)
+            .or_else(|| first_direct_evidence_requirement(&context.missing_evidence))
             .unwrap_or_else(|| "observation".to_string());
     }
     if (tool, name) == ("graph.transition", "target") {
@@ -162,6 +164,17 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
         _ => "value",
     }
     .to_string()
+}
+
+fn first_direct_evidence_requirement(values: &[String]) -> Option<String> {
+    values
+        .iter()
+        .find(|value| !audit_owned_requirement(value))
+        .cloned()
+}
+
+fn audit_owned_requirement(kind: &str) -> bool {
+    matches!(kind, "document-structure" | "artifact-readiness")
 }
 
 fn batch_files_value(context: &ExampleContext) -> String {

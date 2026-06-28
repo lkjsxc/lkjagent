@@ -43,8 +43,7 @@ pub fn record_audit(
     now: &str,
 ) -> ToolResult<String> {
     let passed = report.starts_with("artifact audit passed")
-        || report.starts_with("dictionary audit passed")
-        || report.starts_with("document audit passed");
+        || report.starts_with("dictionary audit passed");
     let weak_paths = weak_paths(workspace, root)?;
     let weak_count = if passed {
         0

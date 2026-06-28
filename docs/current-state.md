@@ -52,13 +52,13 @@ repair. `index.ndjson` uses `/data/logs/...` as a repository-relative log root
 and must resolve to present turn directories after that normalization:
 
 - active case `1` is at node `document` in phase `execution`;
-- owner task is `Create a SF novel. with detailed structured settings.`;
-- observed root is `stories/novel` and stale long sentence-like roots are a
-  truth-sweep failure;
-- a schema-invalid `doc.scaffold` with a `structure` parameter was attempted;
-- schema-valid `doc.scaffold` was later refused by authority;
+- owner task is `Create a long novel. with detailed structured settings.`;
+- observed root is `stories/novel`;
+- `graph.state` repeatedly reported `no active graph case` while authority and
+  the log snapshot named active case `1`;
+- authority refused a local `fs.mkdir` path that was not admitted;
 - the model wrote a small novel tree with `fs.batch_write`;
-- `doc.audit` passed structure;
+- `doc.audit` first failed and later passed structure;
 - `artifact.audit` and `graph.state` then repeated in a loop;
 - direct `graph.evidence` for audit-owned evidence was correctly refused;
 - reasoning-only provider responses were classified as provider anomalies;

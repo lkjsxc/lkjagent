@@ -29,14 +29,13 @@ repository `data/logs/...` tree before integrity checks. The checked-in run
 proves these facts:
 
 - active case `1` is at node `document` in phase `execution`;
-- owner task is `Create a SF novel. with detailed structured settings.`;
+- owner task is `Create a long novel. with detailed structured settings.`;
 - observed root is `stories/novel`;
-- stale docs or fixtures that name a long-novel objective or long sentence-like
-  root are truth-sweep failures;
-- schema-invalid `doc.scaffold` with `structure` was attempted;
-- schema-valid `doc.scaffold` was refused by authority;
+- `graph.state` repeatedly reported `no active graph case` while authority and
+  the log snapshot named active case `1`;
+- authority refused a local `fs.mkdir` path that was not admitted;
 - `fs.batch_write` wrote a small novel tree;
-- `doc.audit` passed structure;
+- `doc.audit` first failed and later passed structure;
 - `artifact.audit` and `graph.state` repeated instead of changing shape;
 - direct `graph.evidence` for audit-owned evidence was refused;
 - reasoning-only provider responses were recorded as provider anomalies;

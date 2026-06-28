@@ -86,8 +86,8 @@ quality.
   post-compaction check, and preserves missing evidence plus refused actions.
 - `repeated-recovery-action`: a refused recovery action signature is blocked
   and the next action uses a different action class.
-- `sf-novel-active-run`: the active novel run uses owner text
-  `Create a SF novel. with detailed structured settings.` and root
+- `long-novel-active-run`: the active novel run uses owner text
+  `Create a long novel. with detailed structured settings.` and root
   `stories/novel`. It keeps weak-content repair, batch-limit refusal,
   provider anomaly retry, audit-owned evidence refusal, and final verification
   pending under one authority decision stream. The fixture checks behavior and

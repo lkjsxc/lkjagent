@@ -10,7 +10,9 @@ pub mod snapshots;
 pub mod state_tracks;
 pub mod transitions;
 
-pub use cases::{active_case, open_case, update_case, GraphCaseRow, OpenCase};
+pub use cases::{
+    active_case, open_case, update_case, update_pending_checks, GraphCaseRow, OpenCase,
+};
 pub use links::{link_memory, memory_links_for_case, GraphMemoryLinkRow};
 
 use rusqlite::{params, Connection};

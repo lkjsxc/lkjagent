@@ -105,6 +105,19 @@ pub fn update_case(
     Ok(())
 }
 
+pub fn update_pending_checks(
+    conn: &Connection,
+    id: i64,
+    pending_checks: &[String],
+    now: &str,
+) -> StoreResult<()> {
+    conn.execute(
+        "UPDATE graph_cases SET pending_checks = ?2, updated_at = ?3 WHERE id = ?1",
+        params![id, join(pending_checks), now],
+    )?;
+    Ok(())
+}
+
 fn read_case_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<GraphCaseRow> {
     Ok(GraphCaseRow {
         id: row.get(0)?,
