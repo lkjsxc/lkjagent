@@ -2,14 +2,14 @@
 
 ## Snapshot
 
-- created_at: 1782605085
+- created_at: 1782605098
 - daemon_state: working
 - queue_depth: 0
 - active_case: 1
 - active_node: document
 - active_phase: execution
-- context: 12.82K/24.58K 52.16% prefix=5.38K log=17.15K reserve=2.05K headroom=11.76K
-- token_usage: in=12.77K out=46 cache=unknown total=12.82K
+- context: 12.92K/24.58K 52.56% prefix=5.38K log=17.15K reserve=2.05K headroom=11.66K
+- token_usage: in=12.85K out=39 cache=unknown total=12.89K
 
 ## Owner Objective
 
@@ -467,6 +467,8 @@ stories/long-novel-with-structured-settings/style/tone.md`
 | 382 | 174 | observation | <observation><br><status>ok</status><br><content><br>document scaffold created<br>root=stories/long-novel-with-structured-settings<br>kind=story<br>profile=NarrativeManuscript<br>mode=approx<br>files=39<br>readme=present<br>catalog=catalog.toml<br></content><br></observation> |
 | 383 | 175 | action | <action><br><tool>fs.read</tool><br><path>stories/long-novel-with-structured-settings/project/premise.md</path><br></action> |
 | 384 | 175 | notice | <notice><br><kind>error</kind><br><content>duplicate read refused; see frame 50</content><br></notice> |
+| 385 | 176 | action | <action><br><tool>artifact.apply</tool><br><root>stories/long-novel-with-structured-settings</root><br></action> |
+| 386 | 176 | observation | <observation><br><status>ok</status><br><content><br>document scaffold created<br>root=stories/long-novel-with-structured-settings<br>kind=story<br>profile=NarrativeManuscript<br>mode=approx<br>files=39<br>readme=present<br>catalog=catalog.toml<br></content><br></observation> |
 
 ## Verification
 
