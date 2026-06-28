@@ -24,7 +24,9 @@ that ran.
 ## Active Data Fixture
 
 `data/logs/current-model-run.md` and `data/logs/index.ndjson` are failure
-evidence. The checked-in run proves these facts:
+evidence. `index.ndjson` paths are normalized from `/data/logs/...` to the
+repository `data/logs/...` tree before integrity checks. The checked-in run
+proves these facts:
 
 - active case `1` is at node `document` in phase `execution`;
 - owner task is `Create a SF novel. with detailed structured settings.`;
@@ -38,7 +40,8 @@ evidence. The checked-in run proves these facts:
 - `artifact.audit` and `graph.state` repeated instead of changing shape;
 - direct `graph.evidence` for audit-owned evidence was refused;
 - reasoning-only provider responses were recorded as provider anomalies;
-- final verification remained pending.
+- final verification remained pending;
+- no fresh successful live smoke run is checked in.
 
 ## Ordering Notes
 

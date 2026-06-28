@@ -10,14 +10,17 @@ any prompt rendering, provider call, tool dispatch, or completion closure.
 One kernel owns the turn sequence:
 
 ```text
-snapshot -> event -> decision -> prompt frame or runtime effect
-provider exchange -> parse -> admission -> effect -> observation -> next event
+RuntimeSnapshot -> RuntimeEvent -> RuntimeDecision
+RuntimeDecision -> PromptFrame | RuntimeEffectCommand
+RuntimeDecision + ModelAction -> ToolAdmission
+ToolAdmission -> EffectObservation -> RuntimeEvent
 ```
 
 The model proposes intent inside the provider exchange. The runtime decision is
 the source of active mode, admitted tools, recovery route, completion gate,
 runtime-owned deterministic effects, and prompt text. Graph policy is input to
-the snapshot, not a fallback authority.
+the snapshot, not a fallback authority. The reducer emits one decision object;
+all other turn surfaces are views of that object.
 
 The old `mode` tree in the runtime crate is not a second authority system. Until
 it is removed, it may only act as a thin adapter that fills snapshot fields or
@@ -32,11 +35,13 @@ The snapshot adapter collects these facts before the reducer runs:
 - queue head and owner message count.
 - actual case id, graph node id, graph phase, objective, constraints,
   assumptions, and risks; synthetic case ids such as `case:unknown` are invalid.
-- graph policy, ranked tracks, missing evidence, existing evidence, and legal
-  transitions as inputs only, never as fallback dispatch authority.
+- store-backed active case projection, graph policy, ranked tracks, missing
+  evidence, existing evidence, and legal transitions as inputs only, never as
+  fallback dispatch authority.
 - artifact root, artifact head, weak paths, weak-path cursor, write batch
   cursor, audit id, audit status, and drift state.
 - latest fault, retry counters, failed action fingerprint, and recovery route.
+- provider anomaly class and retry budget before any action parser is invoked.
 - latest observation and latest successful observation.
 - compaction pressure, compaction head, and maintenance state.
 - latest decision id, prompt frame fingerprint, and staleness fingerprint.
@@ -54,9 +59,10 @@ The pure reducer emits one persisted decision for one event. The decision names:
 - recovery, compaction, maintenance, blocked-handoff, and completion data.
 - authority fingerprint and staleness fingerprint.
 
-Prompt frames render only from this persisted decision. Dispatch receives an
-immutable admission view derived from the same decision id. Deterministic
-runtime effects such as compaction, closed-idle wait, maintenance defer,
+Prompt frames render only from this persisted decision. Dispatch receives one
+immutable admission view derived from the same decision id. Completion reads one
+central completion gate derived from the same snapshot and decision. Runtime
+effects such as compaction, closed-idle wait, maintenance defer,
 blocked-handoff recording, status refresh, or zero-content inspection tools are
 also emitted from the persisted decision and do not require a model-authored
 `<action>`.
@@ -93,12 +99,16 @@ The runtime writes records in this order:
 
 - One event emits one decision.
 - One prompt frame cites one decision id.
+- `graph.state` reads the same store-backed active case projection as the
+  runtime snapshot.
 - A tool-requiring next action always has a non-empty admitted tool set.
 - Empty tool sets pair only with runtime compaction, admitted completion,
   external owner wait, or idle.
 - Maintenance is never active during owner work, recovery, verification, or compaction.
 - Completion uses the central completion reducer on every close path.
 - Recovery keeps the read, audit, repair, and batch tools needed to escape.
+- Recovery examples are generated from the current decision and never tell the
+  model to direct-write audit-owned evidence.
 
 ## Verification
 

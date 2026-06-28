@@ -48,7 +48,8 @@ semantic intent or bounded file content inside that selected surface.
 
 `data/logs/current-model-run.md`, `data/logs/index.ndjson`, and latest turn
 directories prove checked-in failure facts until a fresh smoke run proves
-repair:
+repair. `index.ndjson` uses `/data/logs/...` as a repository-relative log root
+and must resolve to present turn directories after that normalization:
 
 - active case `1` is at node `document` in phase `execution`;
 - owner task is `Create a SF novel. with detailed structured settings.`;
@@ -61,7 +62,8 @@ repair:
 - `artifact.audit` and `graph.state` then repeated in a loop;
 - direct `graph.evidence` for audit-owned evidence was correctly refused;
 - reasoning-only provider responses were classified as provider anomalies;
-- final verification remained pending.
+- final verification remained pending;
+- no fresh successful live smoke run is checked in.
 
 ## Runtime Authority Target Flow
 

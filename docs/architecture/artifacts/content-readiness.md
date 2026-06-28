@@ -11,10 +11,10 @@ manifest shape, README links, and scaffold topology can satisfy structural
 audit only. They cannot satisfy readiness by themselves.
 
 Content-bearing files must contain domain-specific sections, concrete facts,
-and enough non-boilerplate prose to satisfy the artifact kind. Scaffold
-phrases, status-only files, empty headings, and generic "this file records"
-language fail readiness. The same normalized scaffold-phrase detector gates
-content audit, `fs.write`, and `fs.batch_write`.
+and enough non-boilerplate prose to satisfy the artifact kind and path role.
+Scaffold phrases, status-only files, empty headings, owner-term-only pages, and
+generic "this file records" language fail readiness. The same normalized
+scaffold-phrase detector gates content audit, `fs.write`, and `fs.batch_write`.
 
 ## Records
 
@@ -56,6 +56,16 @@ unless the owner explicitly asks for Japanese bread and the content is
 semantically Japanese. Bread-like leaves in a Japanese cookbook fail readiness
 with `semantic_mismatch` and their missing cookbook requirements.
 
+## Story Rules
+
+A story bible requires role-specific content for premise, timeline, cosmology,
+technology rules, locations, society, factions, protagonist, antagonist,
+supporting cast, relationships, logline, themes, conflict lattice, act
+structure, chapter spine, continuity rules, and completion evidence. A single
+page that only lists those labels fails. Each role needs concrete story facts,
+constraints, causality, verification notes, or cross references appropriate to
+that role.
+
 ## Dictionary Rules
 
 A dictionary entry needs a term, part of speech or term class, non-trivial
@@ -69,6 +79,7 @@ detailed dictionary request even when it has many entries.
 - A 100-file cookbook scaffold is accepted without recipe content.
 - Bread categories are accepted for a Japanese cookbook without Japanese food
   semantics.
+- A shallow story page is accepted because it contains every required label.
 - A verification note claims IPA, etymology, or examples that are absent.
 
 ## Evidence
