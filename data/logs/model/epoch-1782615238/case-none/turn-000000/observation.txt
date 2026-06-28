@@ -1,0 +1,4 @@
+<observation>
+<status>ok</status>
+<content>query_normalized=readme</content>
+</observation>

@@ -1,0 +1,8 @@
+<observation>
+<status>ok</status>
+<content>
+files_written=1
+input_format=line-protocol
+stories/novel/README.md bytes=228
+</content>
+</observation>

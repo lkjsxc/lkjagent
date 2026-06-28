@@ -1,1 +1,0 @@
-{"status":"ok","closure_mode":"StopSequenceClosed","envelope_mode":"Natural","normalized_text_hash":"ab89565c3126f363","content_bytes":106,"tool":"fs.read","params":[{"name":"path","bytes":53}]}

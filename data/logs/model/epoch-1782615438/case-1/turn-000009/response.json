@@ -1,0 +1,1 @@
+{"content":"<action>\n<tool>doc.scaffold</tool>\n<root>stories/novel</root>\n<title>The Singularity Echo</title>\n</action>","provider_anomaly":null,"finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":4328,"completion_tokens":43,"cached_prompt_tokens":null,"total_tokens":4371}}

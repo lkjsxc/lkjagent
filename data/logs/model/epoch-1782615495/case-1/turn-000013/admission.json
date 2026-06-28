@@ -1,0 +1,1 @@
+{"tool":"fs.batch_write","admitted":true,"reason":"admitted","example":"<action>\n<tool>doc.audit</tool>\n<root>stories/novel</root>\n</action>"}

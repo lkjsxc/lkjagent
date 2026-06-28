@@ -1,1 +1,0 @@
-{"content":"<action>\n<tool>memory.find</tool>\n<query>refine-graph-policy</query>\n</action>","provider_anomaly":null,"finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":3412,"completion_tokens":34,"cached_prompt_tokens":null,"total_tokens":3446}}

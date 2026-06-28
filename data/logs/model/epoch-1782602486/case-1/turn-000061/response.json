@@ -1,1 +1,0 @@
-{"content":"<action>\n<tool>workspace.summary</tool>\n<path>stories/long-novel-with-structured-settings</path>\n</action>","provider_anomaly":null,"finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":7210,"completion_tokens":573,"cached_prompt_tokens":null,"total_tokens":7783}}
