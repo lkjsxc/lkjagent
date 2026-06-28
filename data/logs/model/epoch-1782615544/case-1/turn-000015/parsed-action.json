@@ -1,0 +1,1 @@
+{"status":"ok","closure_mode":"StopSequenceClosed","envelope_mode":"Natural","normalized_text_hash":"4780e45f29ac95a7","content_bytes":331,"tool":"fs.batch_write","params":[{"name":"files","bytes":267}]}

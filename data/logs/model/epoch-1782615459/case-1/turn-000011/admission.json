@@ -1,0 +1,1 @@
+{"tool":"fs.mkdir","admitted":true,"reason":"admitted","example":"<action>\n<tool>doc.audit</tool>\n<root>stories/novel</root>\n</action>"}

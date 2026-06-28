@@ -1,1 +1,0 @@
-{"status":"fault","closure_mode":"StopSequenceClosed","envelope_mode":"Natural","normalized_text_hash":"367d3a555cdee1c6","content_bytes":600,"error":"BadParams { tool: \"graph.plan\", missing: [\"checks|paths\"], unknown: [\"</graph.plan>\"] }"}

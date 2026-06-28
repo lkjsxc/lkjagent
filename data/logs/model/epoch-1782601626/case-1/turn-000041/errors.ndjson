@@ -1,1 +1,0 @@
-{"error_class":"CompletionOversize","message":"endpoint completion hit max tokens; preview=<action>\\n<tool>fs.batch_write</tool>\\n<files>\\n[\\n  {\\n    \"path\": \"stories/long-novel-with-structured-settings/project/premise.md\",\\n    \"content\": \"# Premise\\n\\nA sprawling epic set in a world where magic is tied to the celestial alignment of "}

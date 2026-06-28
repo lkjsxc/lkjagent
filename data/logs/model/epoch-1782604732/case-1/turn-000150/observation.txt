@@ -1,4 +1,0 @@
-<notice>
-<kind>error</kind>
-<content>duplicate read refused; see frame 50</content>
-</notice>
