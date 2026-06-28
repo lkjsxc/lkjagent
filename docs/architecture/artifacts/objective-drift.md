@@ -47,7 +47,7 @@ When drift is detected:
 
 - artifact-drift rises to guard strength.
 - artifact-readiness drops sharply.
-- artifact.next and artifact.apply are blocked for that root.
+- artifact.next is blocked for that root until audit or repair changes shape.
 - The next safe action is objective-match audit and drift repair.
 - Drifted paths are deleted or replaced because no stale compatibility promise
   exists.

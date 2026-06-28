@@ -54,9 +54,7 @@ fn apply_weighted_guards(state: &CaseState, intent: &ToolIntent, blocked_by: &mu
     if weight(vector, TrackLabel::ParseRecovery) >= 0.80 && is_large_payload(intent) {
         blocked_by.push(TrackLabel::ParseRecovery);
     }
-    if weight(vector, TrackLabel::ArtifactDrift) >= 0.75
-        && matches!(intent.name.as_str(), "artifact.next" | "artifact.apply")
-    {
+    if weight(vector, TrackLabel::ArtifactDrift) >= 0.75 && intent.name == "artifact.next" {
         blocked_by.push(TrackLabel::ArtifactDrift);
     }
     if weight(vector, TrackLabel::ContextPressure) >= 0.85 && is_mutating(intent) {
@@ -110,13 +108,13 @@ fn hard_allows(hard: &HardState, intent: &ToolIntent) -> bool {
 }
 
 fn is_large_payload(intent: &ToolIntent) -> bool {
-    matches!(intent.name.as_str(), "fs.batch_write" | "artifact.apply") && intent.payload_size > 1
+    intent.name == "fs.batch_write" && intent.payload_size > 1
 }
 
 fn is_mutating(intent: &ToolIntent) -> bool {
     matches!(
         intent.name.as_str(),
-        "fs.write" | "fs.batch_write" | "fs.edit" | "artifact.apply"
+        "fs.write" | "fs.batch_write" | "fs.edit"
     )
 }
 

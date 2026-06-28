@@ -1,0 +1,22 @@
+<notice>
+<kind>error</kind>
+<content>
+repeat action refused; see frame 25
+active_mode=OwnerTask
+next_action_must_change_shape=true
+forbidden_tool=graph.state
+preferred_next_action=graph.plan
+valid_example:
+<action>
+<tool>graph.plan</tool>
+<objective>Complete the owner task</objective>
+<steps>
+Inspect state
+Act in one bounded step
+</steps>
+<reason>Graph planning requirement</reason>
+<checks>dispatch accepts semantic plan</checks>
+<paths>.</paths>
+</action>
+</content>
+</notice>

@@ -49,13 +49,15 @@ pub fn render_prompt_frame(decision: &RuntimeDecision) -> Result<String, PromptR
     let card = decision.prompt_card.as_ref();
     let next_action = render_next_action(decision);
     Ok(format!(
-        "Runtime Authority\n<runtime-card>\n<decision>{decision_id}</decision>\n<event>{event_id}</event>\n<mission>{}</mission>\n<mode>{}</mode>\n<case>{}</case>\n<node>{}</node>\n<phase>{}</phase>\n<root>{}</root>\n<missing>{}</missing>\n<must-use>{}</must-use>\n<blocked>{}</blocked>\n<budget>{MAX_TOKENS} output tokens</budget>\n<authority>{}</authority>\n<staleness>{}</staleness>\n<reason>runtime decision selected one legal next action</reason>\n</runtime-card>\n<next-action>\n{}\n</next-action>",
+        "Runtime Authority\n<runtime-card>\n<decision>{decision_id}</decision>\n<event>{event_id}</event>\n<mission>{}</mission>\n<mode>{}</mode>\n<case>{}</case>\n<node>{}</node>\n<phase>{}</phase>\n<root>{}</root>\n<artifact>{}</artifact>\n<cursor>{}</cursor>\n<missing>{}</missing>\n<must-use>{}</must-use>\n<blocked>{}</blocked>\n<budget>{MAX_TOKENS} output tokens</budget>\n<authority>{}</authority>\n<staleness>{}</staleness>\n<reason>runtime decision selected one legal next action</reason>\n</runtime-card>\n<next-action>\n{}\n</next-action>",
         decision.mission.as_str(),
         decision.active_mode.as_str(),
         optional(card.and_then(|data| data.case_id.as_deref())),
         optional(decision.graph_node.as_deref()),
         optional(decision.graph_phase.as_deref()),
         optional(card.and_then(|data| data.artifact_root.as_deref())),
+        optional(decision.artifact_id.as_deref()),
+        optional(decision.cursor.as_deref()),
         list_or_none(&decision.missing_evidence),
         must_use(decision),
         spaced_tool_list(&decision.admission_view.blocked_tools),
@@ -109,12 +111,36 @@ pub(crate) fn example_for(tool: &str, snapshot: &RuntimeSnapshot) -> String {
 }
 
 fn render_next_action(decision: &RuntimeDecision) -> String {
+    if let Some(contract) = &decision.content_write_contract {
+        return render_content_contract(contract);
+    }
     match decision.forced_next_action.as_ref() {
         Some(ActionTemplate::ExactTool { body, .. }) => body.clone(),
         Some(ActionTemplate::RuntimeEffect(_)) => "runtime effect".to_string(),
         Some(ActionTemplate::ExternalOwnerWait) => "wait for owner input".to_string(),
         Some(ActionTemplate::ClosedIdle) | None => "none".to_string(),
     }
+}
+
+fn render_content_contract(contract: &crate::kernel::ContentWriteContract) -> String {
+    format!(
+        "<write-contract>\n<tool>fs.batch_write</tool>\n<root>{}</root>\n<paths>\n{}\n</paths>\n<limits>max_files={} max_file_bytes={} max_batch_bytes={}</limits>\n<required-sections>\n{}\n</required-sections>\n<forbidden-weak-phrases>\n{}\n</forbidden-weak-phrases>\n<instruction>author exactly one fs.batch_write action using line protocol inside files; do not prefill prose from the prompt</instruction>\n</write-contract>",
+        contract.root,
+        bullet_list(&contract.paths),
+        contract.max_files,
+        contract.max_file_bytes,
+        contract.max_batch_bytes,
+        bullet_list(&contract.required_sections),
+        bullet_list(&contract.forbidden_weak_phrase_classes),
+    )
+}
+
+fn bullet_list(values: &[String]) -> String {
+    values
+        .iter()
+        .map(|value| format!("- {value}"))
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 fn must_use(decision: &RuntimeDecision) -> &str {

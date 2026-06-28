@@ -14,7 +14,7 @@ reads artifact ledger state, not raw file existence or direct graph notes.
 
 - artifact contracts under `docs/architecture/artifacts/`.
 - store schema for graph and artifact data.
-- `artifact.plan`, `artifact.apply`, `artifact.next`, `artifact.audit`, `fs.write`, and `fs.batch_write` routes.
+- `artifact.plan`, `artifact.next`, `artifact.audit`, `fs.write`, and `fs.batch_write` routes.
 - completion policy in runtime authority.
 
 ## Outputs
@@ -58,7 +58,7 @@ reads artifact ledger state, not raw file existence or direct graph notes.
 ## Status
 
 implemented. Ledger schema, store APIs, writes from `artifact.plan`,
-`artifact.apply`, `artifact.audit`, and `artifact.next`, cursor completion and
+`artifact.audit` and `artifact.next`, cursor completion and
 failure marking, audit observations tied to `artifact_ledger_id`, invalid-root
 markers, daemon `agent.done` refusals, story semantic readiness checks, close
 path coverage, and status rendering all route through the completion gate. The

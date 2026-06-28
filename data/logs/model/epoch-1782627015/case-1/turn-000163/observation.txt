@@ -1,0 +1,16 @@
+<observation>
+<status>ok</status>
+<content>
+document audit passed
+root=stories/novel
+topology=passed
+links=passed
+path_hygiene=passed
+content_readiness=not-requested
+artifact_readiness=not-owner
+checks_run=topology,links,path_hygiene,content_readiness
+failed=0
+next_action=record document-structure evidence
+artifact_ledger_id=1
+</content>
+</observation>

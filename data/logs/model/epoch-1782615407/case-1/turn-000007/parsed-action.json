@@ -1,1 +1,0 @@
-{"status":"fault","closure_mode":"StopSequenceClosed","envelope_mode":"Natural","normalized_text_hash":"4e36a337578ba88f","content_bytes":571,"error":"BadParams { tool: \"doc.scaffold\", missing: [\"title\"], unknown: [\"structure\"] }"}

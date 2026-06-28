@@ -55,12 +55,10 @@ Parameters are marked req or opt; a default follows opt where one exists.
 | workspace.index | path opt .; depth opt 3; limit opt 200 | compact repository index with readmes and manifests | workspace escape; invalid limit |
 | verify.cargo | gate req; package opt; timeout opt 120 | run direct cargo gate | unknown gate; timeout; command failure |
 | verify.xtask | gate req; timeout opt 120 | run direct xtask gate | unknown gate; timeout; command failure |
-| doc.scaffold | root req; kind opt documentation; count opt; mode opt approx; title req; sections opt | create compact README-indexed document tree | workspace escape; invalid root |
 | doc.audit | root req; count opt; mode opt approx | audit README and document topology | missing README; count mismatch |
-| artifact.plan | root req; title req; kind req; scale opt; sections opt | plan semantic content artifact without writes | invalid root |
-| artifact.apply | root req; title opt; kind opt artifact; mode opt approx; sections opt | write semantic artifact scaffold | workspace escape; invalid root |
+| artifact.plan | root req; title req; kind req; scale opt; sections opt | record semantic content artifact identity without writes | invalid root |
 | artifact.audit | root req; kind opt; count opt; mode opt approx | audit semantic artifact readiness | missing root; scaffold-only content |
-| artifact.next | root req; kind opt | plan next bounded artifact write batch | missing root; no weak content paths |
+| artifact.next | root req; path opt; kind opt | return next bounded artifact write contract without prose | missing root; no weak content paths |
 | agent.done | summary req | close the task or maintenance cycle | no open task or cycle |
 | agent.ask | question req | ask the owner; task enters waiting | a question is already outstanding |
 
@@ -122,9 +120,11 @@ a narrower shell command, a memory.find query).
 
 ## Single Source Rule
 
-The table above is the only definition of the toolset. Validation in the
+The table above is the only live toolset. Prompt-visible scaffold writers are
+absent from it; artifact roots and repair paths move through `artifact.plan`,
+`artifact.next`, audits, and `fs.batch_write` contracts. Validation in the
 dispatcher and the registry section of the system prompt are both generated
-from it; there is no second copy to fall out of step.
+from this table; there is no second copy to fall out of step.
 
 ## Status
 

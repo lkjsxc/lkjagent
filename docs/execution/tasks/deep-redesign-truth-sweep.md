@@ -6,7 +6,7 @@ Reconcile the contract with checked-in failure evidence before code changes.
 
 ## Status
 
-open
+done
 
 ## Depends On
 

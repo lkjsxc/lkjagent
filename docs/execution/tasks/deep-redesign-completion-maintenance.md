@@ -6,7 +6,7 @@ Centralize completion and no-op maintenance in the kernel.
 
 ## Status
 
-open
+done
 
 ## Depends On
 

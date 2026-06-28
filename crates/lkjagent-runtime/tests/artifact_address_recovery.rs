@@ -100,7 +100,7 @@ fn stale_cached_action_after_address_change_refused() -> TestResult<()> {
     assert!(output.contains("address_status=root_is_file"));
     assert!(output.contains("normalized_root=stories/root"));
     assert!(!output.contains("next_action=artifact.audit"));
-    validate_example(&output)?;
+    assert!(output.contains("candidate_contract:"));
     Ok(())
 }
 

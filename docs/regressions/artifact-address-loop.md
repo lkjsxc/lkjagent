@@ -11,14 +11,14 @@ The owner asked for a SF novel with structured settings. The model selected a
 Markdown leaf as an artifact root, then targeted a file under that leaf:
 
 ```text
-artifact.apply root=stories/sf-novel-with-structured-settings/02-characters.md
+removed artifact writer root=stories/novel/02-characters.md
 artifact.next root=stories/sf-novel-with-structured-settings/02-characters.md/topics/background.md
 artifact.audit root=stories/sf-novel-with-structured-settings/02-characters.md/topics/background.md
 ```
 
 ## Forbidden Behavior
 
-- artifact.apply creates a directory ending in `.md`.
+- Removed artifact writer creates a directory ending in `.md`.
 - artifact.next reports `missing=0` for a file root.
 - artifact.next renders artifact.audit for a Markdown file path.
 - doc.audit or artifact.audit surfaces `Not a directory` for known file-root misuse.

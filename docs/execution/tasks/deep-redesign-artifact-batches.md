@@ -6,7 +6,7 @@ Repair large artifacts through small path-specific cursor batches.
 
 ## Status
 
-open
+done
 
 ## Depends On
 

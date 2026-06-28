@@ -157,9 +157,7 @@ fn hint(spec: &ToolSpec, unknown: &[String]) -> String {
             spec.name
         );
     }
-    if matches!(spec.name, "doc.scaffold" | "doc.audit")
-        && unknown.iter().any(|name| name == "path")
-    {
+    if spec.name == "doc.audit" && unknown.iter().any(|name| name == "path") {
         return format!("{} uses root, not path", spec.name);
     }
     "emit the valid_example exactly, or choose a tool whose schema names the received parameter"

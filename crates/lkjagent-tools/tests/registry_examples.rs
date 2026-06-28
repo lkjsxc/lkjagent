@@ -79,11 +79,8 @@ fn fs_batch_write_example_dispatches() -> TestResult<()> {
 }
 
 #[test]
-fn doc_scaffold_example_dispatches() -> TestResult<()> {
-    let output = dispatch_example(parse_example(&example_for("doc.scaffold")?)?)?;
-    assert!(output.content.contains("document scaffold created"));
-    assert!(output.content.contains("root=docs"));
-    Ok(())
+fn live_registry_omits_doc_scaffold_example() {
+    assert!(registry_valid_example("doc.scaffold").is_none());
 }
 
 #[test]

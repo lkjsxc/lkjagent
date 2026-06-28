@@ -61,7 +61,7 @@ fn artifact_next_infers_story_from_handwritten_catalog() -> TestResult<()> {
 }
 
 #[test]
-fn doc_scaffold_treats_stories_root_as_story_profile() -> TestResult<()> {
+fn removed_doc_scaffold_does_not_create_story_profile() -> TestResult<()> {
     let workspace = temp_workspace("doc-scaffold-stories-root")?;
     let runtime = runtime(workspace.clone())?;
     let mut conn = store()?;
@@ -80,15 +80,13 @@ fn doc_scaffold_treats_stories_root_as_story_profile() -> TestResult<()> {
         &mut state(),
     );
 
-    assert!(output.content.contains("profile=NarrativeManuscript"));
-    assert!(workspace
-        .join("stories/chronos-fracture/characters")
-        .is_dir());
+    assert!(output.content.contains("unknown tool: doc.scaffold"));
+    assert!(!workspace.join("stories/chronos-fracture").exists());
     Ok(())
 }
 
 #[test]
-fn stories_root_treats_generic_artifact_kind_as_story() -> TestResult<()> {
+fn stories_root_treats_generic_kind_as_story_contract() -> TestResult<()> {
     let workspace = temp_workspace("artifact-kind-stories-root")?;
     let runtime = runtime(workspace.clone())?;
     let mut conn = store()?;
@@ -101,6 +99,9 @@ fn stories_root_treats_generic_artifact_kind_as_story() -> TestResult<()> {
     );
     assert!(next.content.contains("kind=story"));
 
+    assert!(next.content.contains("candidate_action=fs.batch_write"));
+    assert!(next.content.contains("candidate_contract:"));
+    assert!(!workspace.join("stories/chronos-fracture").exists());
     let apply = dispatch(
         &action(
             "artifact.apply",
@@ -110,9 +111,6 @@ fn stories_root_treats_generic_artifact_kind_as_story() -> TestResult<()> {
         &mut conn,
         &mut state(),
     );
-    assert!(apply.content.contains("profile=NarrativeManuscript"));
-    assert!(workspace
-        .join("stories/chronos-fracture/characters")
-        .is_dir());
+    assert!(apply.content.contains("unknown tool: artifact.apply"));
     Ok(())
 }

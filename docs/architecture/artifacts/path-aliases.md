@@ -22,7 +22,7 @@ owner sentences.
 
 | Owner objective | Root |
 | --- | --- |
-| `Create a long novel. with structured settings.` | `stories/novel` |
+| `Create a SF novel. with detailed structured settings.` | `stories/novel` |
 | `Write a big bread cookbook.` | `cookbooks/bread-cookbook` |
 | `Create a detailed bread dictionary.` | `dictionaries/bread-dictionary` |
 | `Write a moon colony novel.` | `stories/novel-moon` |
@@ -34,7 +34,7 @@ The root stores the full request in a small card:
 ```text
 <artifact-card>
 <root>stories/novel</root>
-<label>Create a long novel. with structured settings.</label>
+<label>Create a SF novel. with detailed structured settings.</label>
 <kind>story</kind>
 <scale>long</scale>
 <semantic-id>story:novel</semantic-id>
@@ -52,7 +52,7 @@ not fall back to the full owner sentence.
 
 ## Verification
 
-Tests assert that the long-novel objective maps to `stories/novel`, path
+Tests assert that the observed SF-novel objective maps to `stories/novel`, path
 segments stay short, collisions use short qualifiers, and the full owner
 objective remains present in artifact metadata.
 

@@ -5,7 +5,7 @@ use lkjagent_tools::dispatch::dispatch;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
 #[test]
-fn artifact_plan_and_apply_write_ledger_identity() -> TestResult<()> {
+fn artifact_plan_and_next_write_ledger_identity() -> TestResult<()> {
     let workspace = temp_workspace("artifact-ledger-plan-apply")?;
     let runtime = runtime(workspace)?;
     let mut conn = store()?;
@@ -32,21 +32,17 @@ fn artifact_plan_and_apply_write_ledger_identity() -> TestResult<()> {
     dispatch_state.reset_repeat_tracking();
     dispatch(
         &action(
-            "artifact.apply",
-            &[
-                ("root", "cookbooks/japanese-home"),
-                ("title", "Japanese Home"),
-                ("kind", "cookbook"),
-            ],
+            "artifact.next",
+            &[("root", "cookbooks/japanese-home"), ("kind", "cookbook")],
         ),
         &runtime,
         &mut conn,
         &mut dispatch_state,
     );
-    let applied = latest_for_case(&conn, 0)?.ok_or("missing applied artifact")?;
-    assert_eq!(applied.id, planned.id);
-    assert_eq!(applied.lifecycle_state, "adopted-or-scaffolded");
-    assert_eq!(applied.readiness_status, "needs-audit");
+    let next = latest_for_case(&conn, 0)?.ok_or("missing next artifact")?;
+    assert_eq!(next.id, planned.id);
+    assert_eq!(next.lifecycle_state, "repair-planned");
+    assert_eq!(next.readiness_status, "failed");
     Ok(())
 }
 
@@ -58,12 +54,11 @@ fn artifact_audit_records_failed_readiness_and_weak_paths() -> TestResult<()> {
     let mut dispatch_state = state();
     dispatch(
         &action(
-            "artifact.apply",
-            &[
-                ("root", "cookbooks/bread"),
-                ("title", "Bread"),
-                ("kind", "cookbook"),
-            ],
+            "fs.batch_write",
+            &[(
+                "files",
+                "path: cookbooks/bread/catalog.toml\ncontent:\nkind = \"cookbook\"\n\n-- lkjagent-next-file --\npath: cookbooks/bread/README.md\ncontent:\n# Bread\n\n## Purpose\n\nNavigate bread notes.\n\n-- lkjagent-next-file --\npath: cookbooks/bread/recipes/loaf.md\ncontent:\n# Loaf\n\n## Purpose\n\ncontent_state=structure-only\n",
+            )],
         ),
         &runtime,
         &mut conn,

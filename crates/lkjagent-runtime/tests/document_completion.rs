@@ -7,7 +7,7 @@ use lkjagent_runtime::task::{RuntimeState, StopReason, TaskState};
 use support::{action, ok_output, runtime_state, TestResult};
 
 #[test]
-fn content_artifact_scaffold_only_does_not_satisfy_structure() -> TestResult<()> {
+fn removed_doc_scaffold_does_not_satisfy_structure() -> TestResult<()> {
     let state = apply_tool(
         open_doc_task()?,
         "doc.scaffold",
@@ -16,13 +16,9 @@ fn content_artifact_scaffold_only_does_not_satisfy_structure() -> TestResult<()>
             ("title", "Long SF Story"),
             ("kind", "content-artifact"),
         ],
-        "document scaffold created\nroot=stories/long-sf-story",
+        "unknown tool: doc.scaffold",
     );
 
-    assert!(state
-        .graph
-        .as_ref()
-        .is_some_and(|graph| graph.evidence.has("observation")));
     assert!(state.graph.as_ref().is_some_and(|graph| {
         !graph.evidence.has("document-structure") && !graph.completion.ready
     }));
@@ -82,7 +78,7 @@ fn passed_artifact_audit_satisfies_structure() -> TestResult<()> {
 }
 
 #[test]
-fn agent_done_refuses_scaffold_only_artifact() -> TestResult<()> {
+fn agent_done_refuses_removed_scaffold_tool_output() -> TestResult<()> {
     let state = apply_tool(
         open_doc_task()?,
         "doc.scaffold",
@@ -91,7 +87,7 @@ fn agent_done_refuses_scaffold_only_artifact() -> TestResult<()> {
             ("title", "Long SF Story"),
             ("kind", "content-artifact"),
         ],
-        "document scaffold created\nroot=stories/long-sf-story",
+        "unknown tool: doc.scaffold",
     );
 
     let result = attempt_done(state);

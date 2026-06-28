@@ -1,17 +1,15 @@
 mod support;
 
-use std::fs;
-
 use lkjagent_tools::dispatch::dispatch;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
 #[test]
-fn artifact_apply_writes_card_with_full_owner_objective() -> TestResult<()> {
+fn removed_artifact_apply_does_not_write_sentence_root_card() -> TestResult<()> {
     let workspace = temp_workspace("artifact-card-long-novel")?;
     let runtime = runtime(workspace.clone())?;
     let mut conn = store()?;
     let mut dispatch_state = state();
-    let objective = "Create a long novel. with structured settings.";
+    let objective = "Create a SF novel. with detailed structured settings.";
 
     let output = dispatch(
         &action(
@@ -27,10 +25,10 @@ fn artifact_apply_writes_card_with_full_owner_objective() -> TestResult<()> {
         &mut dispatch_state,
     );
 
-    let card = fs::read_to_string(workspace.join("stories/novel/artifact-card.txt"))?;
-    assert!(output.content.contains("document scaffold created"));
-    assert!(card.contains("<root>stories/novel</root>"));
-    assert!(card.contains("<label>Create a long novel. with structured settings.</label>"));
-    assert!(card.contains("<semantic-id>story:novel</semantic-id>"));
+    assert!(output.content.contains("unknown tool: artifact.apply"));
+    assert!(!workspace.join("stories/novel/artifact-card.txt").exists());
+    assert!(!workspace
+        .join("stories/create-a-sf-novel-with-detailed-structured-settings")
+        .exists());
     Ok(())
 }

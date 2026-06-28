@@ -23,8 +23,8 @@ policy contradiction if any, and one next executable action.
 
 Observation tools include `fs.read`, `fs.stat`, `fs.list`, `doc.audit`, and
 `artifact.audit`. Repair tools include `fs.write`, `fs.batch_write`,
-`artifact.next`, `artifact.apply`, graph evidence tools, and structured
-handoff tools when repair cannot safely continue.
+`artifact.next`, `artifact.plan`, graph evidence tools for non-audit-owned
+requirements, and structured handoff tools when repair cannot safely continue.
 
 ## Prohibited States
 

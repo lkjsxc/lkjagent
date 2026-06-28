@@ -4,12 +4,11 @@ use std::collections::BTreeSet;
 use std::fs;
 use std::path::Path;
 
-use lkjagent_protocol::parse_completion;
-use lkjagent_tools::dispatch::{dispatch, validate_action};
+use lkjagent_tools::dispatch::dispatch;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
 #[test]
-fn artifact_next_missing_root_suggests_apply() -> TestResult<()> {
+fn artifact_next_missing_root_returns_write_contract() -> TestResult<()> {
     let workspace = temp_workspace("artifact-next-missing-root")?;
     let output = run(
         &workspace,
@@ -18,9 +17,9 @@ fn artifact_next_missing_root_suggests_apply() -> TestResult<()> {
 
     assert!(output.contains("missing=root"));
     assert!(output.contains("next_decision_required=true"));
-    assert!(output.contains("candidate_action=artifact.apply"));
-    assert!(!output.contains("next_action=artifact.apply"));
-    assert!(output.contains("<tool>artifact.apply</tool>"));
+    assert!(output.contains("candidate_action=fs.batch_write"));
+    assert!(output.contains("candidate_contract:"));
+    assert!(!output.contains("artifact.apply"));
     Ok(())
 }
 
@@ -28,30 +27,17 @@ fn artifact_next_missing_root_suggests_apply() -> TestResult<()> {
 fn artifact_next_for_scaffolded_cookbook_returns_batch_write() -> TestResult<()> {
     let workspace = temp_workspace("artifact-next-cookbook")?;
     let root = "cookbooks/bread-cookbook";
-    run(
-        &workspace,
-        action(
-            "artifact.apply",
-            &[
-                ("root", root),
-                ("title", "Bread Cookbook"),
-                ("kind", "cookbook"),
-            ],
-        ),
-    )?;
+    seed_cookbook_root(&workspace, root)?;
 
     let output = run(&workspace, action("artifact.next", &[("root", root)]))?;
-    let example = valid_example_from(&output)?;
-    let parsed = parse_completion(example).map_err(|err| format!("parse failed: {err:?}"))?;
-
-    validate_action(&parsed).map_err(|err| format!("validation failed: {err}"))?;
+    let contract = valid_contract_from(&output)?;
     assert!(output.contains("kind=cookbook"));
     assert!(output.contains("runtime_event=ArtifactWeakPathFound"));
     assert!(output.contains("candidate_action=fs.batch_write"));
     assert!(!output.contains("next_action=fs.batch_write"));
     assert!(output.contains("- foundations/"));
     assert_no_scaffold_phrases(&output);
-    assert_eq!(parsed.tool, "fs.batch_write");
+    assert!(contract.contains("tool=fs.batch_write"));
     Ok(())
 }
 
@@ -62,19 +48,7 @@ fn artifact_next_advances_cursor_then_requests_audit() -> TestResult<()> {
     let runtime = runtime(workspace.clone())?;
     let mut conn = store()?;
     let mut dispatch_state = state();
-    dispatch(
-        &action(
-            "artifact.apply",
-            &[
-                ("root", root),
-                ("title", "Bread Cookbook"),
-                ("kind", "cookbook"),
-            ],
-        ),
-        &runtime,
-        &mut conn,
-        &mut dispatch_state,
-    );
+    seed_cookbook_root(&workspace, root)?;
     let mut seen = BTreeSet::new();
     let mut requested_audit = false;
     for _ in 0..80 {
@@ -104,17 +78,7 @@ fn artifact_next_advances_cursor_then_requests_audit() -> TestResult<()> {
 fn artifact_audit_passes_meaningful_cookbook() -> TestResult<()> {
     let workspace = temp_workspace("artifact-next-cookbook-pass")?;
     let root = "cookbooks/bread-cookbook";
-    run(
-        &workspace,
-        action(
-            "artifact.apply",
-            &[
-                ("root", root),
-                ("title", "Bread Cookbook"),
-                ("kind", "cookbook"),
-            ],
-        ),
-    )?;
+    seed_cookbook_root(&workspace, root)?;
     replace_leaves(&workspace.join(root))?;
 
     let audit = run(
@@ -136,11 +100,11 @@ fn run(workspace: &Path, action: lkjagent_protocol::Action) -> TestResult<String
     Ok(dispatch(&action, &runtime, &mut conn, &mut dispatch_state).content)
 }
 
-fn valid_example_from(output: &str) -> TestResult<&str> {
+fn valid_contract_from(output: &str) -> TestResult<&str> {
     output
-        .split_once("candidate_example:\n")
-        .map(|(_, example)| example)
-        .ok_or_else(|| "missing valid example".into())
+        .split_once("candidate_contract:\n")
+        .map(|(_, contract)| contract)
+        .ok_or_else(|| "missing valid contract".into())
 }
 
 fn assert_no_scaffold_phrases(text: &str) {
@@ -151,6 +115,44 @@ fn assert_no_scaffold_phrases(text: &str) {
     ] {
         assert!(!text.contains(phrase), "scaffold phrase found: {phrase}");
     }
+}
+
+fn seed_cookbook_root(workspace: &Path, root: &str) -> TestResult<()> {
+    fs::create_dir_all(workspace.join(root).join("foundations"))?;
+    fs::create_dir_all(workspace.join(root).join("recipes"))?;
+    fs::write(
+        workspace.join(root).join("catalog.toml"),
+        "kind = \"cookbook\"\n",
+    )?;
+    fs::write(
+        workspace.join(root).join("README.md"),
+        "# Bread Cookbook\n\n## Purpose\n\nNavigate the cookbook.\n\n## Contents\n\n- [Catalog](catalog.toml)\n- [Foundations](foundations/README.md)\n- [Recipes](recipes/README.md)\n",
+    )?;
+    fs::write(
+        workspace.join(root).join("foundations/README.md"),
+        "# Foundations\n\n## Purpose\n\nNavigate foundations.\n\n## Contents\n\n- [Flour](flour.md)\n- [Water](water.md)\n",
+    )?;
+    fs::write(
+        workspace.join(root).join("recipes/README.md"),
+        "# Recipes\n\n## Purpose\n\nNavigate recipes.\n\n## Contents\n\n- [Loaf](loaf.md)\n- [Flatbread](flatbread.md)\n",
+    )?;
+    fs::write(
+        workspace.join(root).join("foundations/flour.md"),
+        "# Flour\n\n## Purpose\n\ncontent_state=structure-only\n",
+    )?;
+    fs::write(
+        workspace.join(root).join("foundations/water.md"),
+        "# Water\n\n## Purpose\n\ncontent_state=structure-only\n",
+    )?;
+    fs::write(
+        workspace.join(root).join("recipes/loaf.md"),
+        "# Loaf\n\n## Purpose\n\ncontent_state=structure-only\n",
+    )?;
+    fs::write(
+        workspace.join(root).join("recipes/flatbread.md"),
+        "# Flatbread\n\n## Purpose\n\ncontent_state=structure-only\n",
+    )?;
+    Ok(())
 }
 
 fn next_paths(output: &str) -> Vec<String> {

@@ -16,21 +16,19 @@ pub fn graph_state_recovery(workspace: &Path) -> Result<(), String> {
     forbid(&text, "<path>.</path>\n</action>")
 }
 
-pub fn doc_scaffold_recovery(workspace: &Path) -> Result<(), String> {
+pub fn batch_write_recovery(workspace: &Path) -> Result<(), String> {
     let text = read_any(workspace, &["transcript.md", "run.log"])?;
-    if text.contains("action params normalized") {
-        require_all(&text, &["tool=doc.scaffold", "path->root"])?;
-    } else {
-        require_all(
-            &text,
-            &[
-                "action params refused",
-                "tool=doc.scaffold",
-                "<root>VALUE</root>",
-            ],
-        )?;
-    }
-    forbid(&text, "<path>docs</path>\n</action>")
+    require_all(
+        &text,
+        &[
+            "object-literal fs.batch_write files are not live output",
+            "tool=fs.batch_write",
+            "canonical_grammar=line-protocol",
+            "path:",
+            "content:",
+        ],
+    )?;
+    forbid_any(&text, &["[{\"path\"", "<file>", "</file>"])
 }
 
 pub fn recovery_loop_long_story(workspace: &Path) -> Result<(), String> {

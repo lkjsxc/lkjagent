@@ -24,10 +24,11 @@ fn audit_reports_markdown_suffix_directory() -> TestResult<()> {
 }
 
 #[test]
-fn scaffold_does_not_create_combined_multi_topic_filename() -> TestResult<()> {
+fn removed_scaffold_does_not_create_combined_multi_topic_filename() -> TestResult<()> {
     let workspace = temp_workspace("doc-root-topic-combined")?;
-    scaffold_multi_topic(&workspace)?;
+    let output = scaffold_multi_topic(&workspace)?;
 
+    assert!(output.contains("unknown tool: doc.scaffold"));
     assert!(!workspace
         .join("docs/model-endpoint-minecraft-windows-japan-united-states.md")
         .exists());
@@ -41,46 +42,35 @@ fn scaffold_does_not_create_combined_multi_topic_filename() -> TestResult<()> {
 fn slug_truncation_keeps_stem_under_limit() -> TestResult<()> {
     let workspace = temp_workspace("doc-root-slug-limit")?;
     let title = "Alpha Beta Gamma Delta Epsilon Zeta Eta Theta Iota Kappa Lambda Mu";
-    run_tool(
+    let output = run_tool(
         &workspace,
         "doc.scaffold",
         &[("root", "docs"), ("title", title)],
     )?;
 
-    for stem in markdown_stems(&workspace.join("docs"))? {
-        assert!(stem.len() <= 48, "long stem {stem}");
-    }
+    assert!(output.contains("unknown tool: doc.scaffold"));
+    assert!(!workspace.join("docs").exists());
     Ok(())
 }
 
 #[test]
-fn generic_seed_topics_are_separate_pages() -> TestResult<()> {
+fn removed_scaffold_creates_no_topic_pages() -> TestResult<()> {
     let workspace = temp_workspace("doc-root-topic-pages")?;
-    scaffold_multi_topic(&workspace)?;
+    let output = scaffold_multi_topic(&workspace)?;
 
-    for path in [
-        "topics/model-endpoint.md",
-        "topics/minecraft.md",
-        "topics/windows.md",
-        "topics/japan.md",
-        "topics/united-states.md",
-    ] {
-        assert!(
-            workspace.join("docs").join(path).is_file(),
-            "missing {path}"
-        );
-    }
+    assert!(output.contains("unknown tool: doc.scaffold"));
+    assert!(!workspace.join("docs/topics/model-endpoint.md").exists());
     Ok(())
 }
 
 #[test]
 fn structure_only_pages_fail_content_readiness() -> TestResult<()> {
     let workspace = temp_workspace("doc-root-structure-only")?;
-    run_tool(
-        &workspace,
-        "doc.scaffold",
-        &[("root", "guide"), ("title", "Guide"), ("count", "3")],
-    )?;
+    let root = workspace.join("guide");
+    fs::create_dir_all(&root)?;
+    fs::write(root.join("catalog.toml"), "kind = \"documentation\"\n")?;
+    fs::write(root.join("README.md"), readme("Guide", "a.md"))?;
+    fs::write(root.join("a.md"), structure_only("A"))?;
 
     let audit = run_tool(
         &workspace,
@@ -115,21 +105,6 @@ fn readme(title: &str, child: &str) -> String {
 
 fn structure_only(title: &str) -> String {
     format!("# {title}\n\n## Purpose\n\ncontent_state=structure-only\n")
-}
-
-fn markdown_stems(root: &Path) -> TestResult<Vec<String>> {
-    let mut stems = Vec::new();
-    for entry in fs::read_dir(root)? {
-        let path = entry?.path();
-        if path.is_dir() {
-            stems.extend(markdown_stems(&path)?);
-        } else if path.extension().is_some_and(|ext| ext == "md") {
-            if let Some(stem) = path.file_stem().and_then(|stem| stem.to_str()) {
-                stems.push(stem.to_string());
-            }
-        }
-    }
-    Ok(stems)
 }
 
 fn run_tool(workspace: &Path, tool: &str, params: &[(&str, &str)]) -> TestResult<String> {

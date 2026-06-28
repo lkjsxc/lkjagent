@@ -3,18 +3,17 @@ use std::path::Path;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn checked_in_current_model_run_is_long_novel_repair_fixture() -> TestResult<()> {
+fn checked_in_current_model_run_is_sf_novel_failure_fixture() -> TestResult<()> {
     let current = include_str!("../../../data/logs/current-model-run.md");
 
     assert!(current.contains("active_node: document"));
     assert!(current.contains("active_phase: execution"));
-    assert!(current.contains("Create a long novel. with structured settings."));
-    assert!(current.contains("stories/long-novel-with-structured-settings"));
-    assert!(current.contains("document scaffold created"));
-    assert!(current.contains("profile=NarrativeManuscript"));
-    assert!(current.contains("document audit failed"));
-    assert!(current.contains("structure_only_content: project/premise.md"));
-    assert!(current.contains("invalid parameter: too many files; max=20"));
+    assert!(current.contains("Create a SF novel. with detailed structured settings."));
+    assert!(current.contains("stories/novel"));
+    assert!(current.contains("authority refused doc.scaffold"));
+    assert!(current.contains("fs.batch_write"));
+    assert!(current.contains("document audit passed"));
+    assert!(current.contains("invalid parameter: audit-owned graph evidence requirement"));
     assert!(current.contains("provider anomaly: reasoning_only_response"));
     assert!(current.contains("| document audit | pending | graph case check |"));
     assert!(current.contains("| artifact readiness audit | pending | graph case check |"));

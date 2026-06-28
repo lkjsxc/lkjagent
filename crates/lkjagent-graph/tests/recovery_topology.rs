@@ -112,13 +112,14 @@ fn artifact_recovery_admits_bounded_artifact_tools() {
     if let Some(node) = node {
         for tool in [
             "artifact.plan",
-            "artifact.apply",
             "artifact.next",
-            "doc.scaffold",
+            "doc.audit",
             "fs.batch_write",
         ] {
             assert!(node.allowed_actions.contains(&tool), "missing {tool}");
         }
+        assert!(!node.allowed_actions.contains(&"artifact.apply"));
+        assert!(!node.allowed_actions.contains(&"doc.scaffold"));
         assert!(!node.allowed_actions.contains(&"fs.write"));
     }
 }

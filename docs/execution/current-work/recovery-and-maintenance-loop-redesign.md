@@ -10,7 +10,7 @@ Rust data selecting allowed tools, next action classes, and completion gates.
 
 Uploaded model run logs show repeated parse faults, invalid parameter loops,
 invalid `graph.note` kinds, invalid `memory.save` kinds, duplicate memory
-entries, blocked `memory.save` during maintenance, blocked `doc.scaffold`
+entries, blocked `memory.save` during maintenance, blocked scaffold-writer
 during recovery, repeated `graph.next`, premature `agent.done`, and completed
 tasks that did not create the requested long story or cookbook.
 

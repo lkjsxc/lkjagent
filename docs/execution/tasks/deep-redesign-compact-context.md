@@ -6,7 +6,7 @@ Make model-facing context small, authority-owned, and free of object-literal bat
 
 ## Status
 
-open
+done
 
 ## Depends On
 

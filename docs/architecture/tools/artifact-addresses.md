@@ -17,8 +17,7 @@ This file owns the model-facing tool address contract for artifact tools.
 | Tool | Accepts root | Accepts path | Result |
 | --- | --- | --- | --- |
 | artifact.plan | missing or existing directory identity | no | creates ledger identity only for directory-shaped roots. |
-| artifact.apply | missing or existing directory | no | writes or repairs a root; `.md` roots are refused before mutation. |
-| artifact.next | directory or known Markdown leaf | yes | normalizes to root plus weak path, then emits repair, apply, or audit. |
+| artifact.next | missing directory, existing directory, or known Markdown leaf | yes | normalizes to root plus weak path, then emits write contract or audit route. |
 | artifact.audit | existing directory | no | audits root readiness and records ledger evidence. |
 | fs.write | Markdown file path | no | writes one leaf; never owns artifact root identity. |
 | fs.batch_write | Markdown file paths | no | writes leaves; never owns artifact root identity. |
@@ -26,9 +25,10 @@ This file owns the model-facing tool address contract for artifact tools.
 
 ## Tool Behavior
 
-artifact.next returns apply-root when the root is missing, repair-paths when
-weak paths exist, audit-root when root content has no weak paths, or a semantic
-address refusal when the request is a file or invalid root.
+artifact.next returns a root identity contract when the root is missing,
+repair-path contracts when weak paths exist, audit-root when root content has
+no weak paths, or a semantic address refusal when the request is a file or
+invalid root.
 
 ## File Roots
 
@@ -39,9 +39,9 @@ Neither case may render artifact.audit for the file path.
 
 ## Invalid Roots
 
-A root ending in `.md` is a Markdown leaf shape. artifact.apply and doc.scaffold
-refuse it before mutation. artifact.next and artifact.audit report a semantic
-address refusal or a focused repair action instead of an OS directory error.
+A root ending in `.md` is a Markdown leaf shape. artifact.next and
+artifact.audit report a semantic address refusal or a focused repair action
+instead of an OS directory error.
 
 ## Status
 

@@ -85,7 +85,7 @@ type ScaffoldArgs<'a> = (
 
 fn scaffold_inner(args: ScaffoldArgs<'_>, refuse_existing: bool) -> ToolResult<String> {
     let (workspace, root, kind, count, mode, title, sections) = args;
-    crate::artifact_address_support::ensure_document_root(workspace, "doc.scaffold", root)?;
+    crate::artifact_address_support::ensure_document_root(workspace, "internal.scaffold", root)?;
     if refuse_existing {
         refuse_existing_catalog(workspace, root)?;
     }
@@ -106,7 +106,7 @@ fn refuse_existing_catalog(workspace: &Path, root: &str) -> ToolResult<()> {
     let full = crate::fs::workspace_path(workspace, root)?;
     if full.join("catalog.toml").is_file() {
         return Err(ToolError::invalid(
-            "doc.scaffold refuses existing cataloged roots; use artifact.next or fs.batch_write",
+            "internal scaffold refuses existing cataloged roots; use artifact.next or fs.batch_write",
         ));
     }
     Ok(())
@@ -129,15 +129,19 @@ fn scaffold_input(
         sections: lines(sections),
     };
     if input.root.is_empty() {
-        return Err(ToolError::invalid("doc.scaffold root must not be empty"));
+        return Err(ToolError::invalid(
+            "internal scaffold root must not be empty",
+        ));
     }
     if crate::address::root_looks_like_markdown_file(&input.root) {
         return Err(ToolError::invalid(
-            crate::address::render_markdown_root_refusal("doc.scaffold", &input.root),
+            crate::address::render_markdown_root_refusal("internal.scaffold", &input.root),
         ));
     }
     if input.title.is_empty() {
-        return Err(ToolError::invalid("doc.scaffold title must not be empty"));
+        return Err(ToolError::invalid(
+            "internal scaffold title must not be empty",
+        ));
     }
     Ok(input)
 }

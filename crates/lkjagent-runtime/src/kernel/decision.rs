@@ -1,6 +1,8 @@
 use crate::kernel::active_mode::ActiveMode;
 use crate::kernel::admission::ToolAdmissionView;
 use crate::kernel::effect::RuntimeEffectCommand;
+use crate::kernel::fault::FaultClass;
+pub use crate::kernel::mission::RuntimeMission;
 use crate::kernel::render::PromptCardData;
 use crate::kernel::snapshot::{
     AuthorityFingerprint, RuntimeEventId, RuntimeSnapshotId, StalenessFingerprint, ToolName,
@@ -10,65 +12,6 @@ use crate::kernel::snapshot::{
 pub enum RuntimeDecisionId {
     Pending,
     Stored(u64),
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum RuntimeMission {
-    HardRuntimeCompaction,
-    OwnerRecovery,
-    SchemaRepair,
-    ArtifactRepair,
-    VerificationRepair,
-    OwnerExecution,
-    OwnerVerification,
-    OwnerCompletion,
-    IdleMaintenance,
-    ClosedIdle,
-}
-
-impl RuntimeMission {
-    pub const PRIORITY: [Self; 10] = [
-        Self::HardRuntimeCompaction,
-        Self::OwnerRecovery,
-        Self::SchemaRepair,
-        Self::ArtifactRepair,
-        Self::VerificationRepair,
-        Self::OwnerExecution,
-        Self::OwnerVerification,
-        Self::OwnerCompletion,
-        Self::IdleMaintenance,
-        Self::ClosedIdle,
-    ];
-
-    pub fn active_mode(self) -> ActiveMode {
-        match self {
-            Self::HardRuntimeCompaction => ActiveMode::Compaction,
-            Self::OwnerRecovery
-            | Self::SchemaRepair
-            | Self::ArtifactRepair
-            | Self::VerificationRepair => ActiveMode::Recovery,
-            Self::OwnerExecution | Self::OwnerVerification | Self::OwnerCompletion => {
-                ActiveMode::OwnerTask
-            }
-            Self::IdleMaintenance => ActiveMode::Maintenance,
-            Self::ClosedIdle => ActiveMode::ClosedIdle,
-        }
-    }
-
-    pub fn as_str(self) -> &'static str {
-        match self {
-            Self::HardRuntimeCompaction => "hard_runtime_compaction",
-            Self::OwnerRecovery => "owner_recovery",
-            Self::SchemaRepair => "schema_repair",
-            Self::ArtifactRepair => "artifact_repair",
-            Self::VerificationRepair => "verification_repair",
-            Self::OwnerExecution => "owner_execution",
-            Self::OwnerVerification => "owner_verification",
-            Self::OwnerCompletion => "owner_completion",
-            Self::IdleMaintenance => "idle_maintenance",
-            Self::ClosedIdle => "closed_idle",
-        }
-    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -98,6 +41,17 @@ pub enum ActionTemplate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ContentWriteContract {
+    pub root: String,
+    pub paths: Vec<String>,
+    pub max_files: usize,
+    pub max_file_bytes: usize,
+    pub max_batch_bytes: usize,
+    pub required_sections: Vec<String>,
+    pub forbidden_weak_phrase_classes: Vec<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DecisionInvariantError {
     ModelCallWithoutAdmittedTools,
     RuntimeEffectWithoutCommand,
@@ -120,6 +74,7 @@ pub struct RuntimeDecision {
     pub decision_id: RuntimeDecisionId,
     pub snapshot_id: RuntimeSnapshotId,
     pub event_id: RuntimeEventId,
+    pub case_id: Option<String>,
     pub mission: RuntimeMission,
     pub active_mode: ActiveMode,
     pub graph_node: Option<String>,
@@ -127,10 +82,22 @@ pub struct RuntimeDecision {
     pub kind: RuntimeDecisionKind,
     pub admission_view: ToolAdmissionView,
     pub forced_next_action: Option<ActionTemplate>,
+    pub content_write_contract: Option<ContentWriteContract>,
     pub recommended_next_actions: Vec<ActionTemplate>,
     pub missing_evidence: Vec<String>,
     pub existing_evidence: Vec<String>,
+    pub artifact_id: Option<String>,
+    pub root: Option<String>,
+    pub artifact_kind: Option<String>,
+    pub artifact_profile: Option<String>,
+    pub weak_paths: Vec<String>,
+    pub cursor: Option<String>,
+    pub fault_class: Option<FaultClass>,
+    pub retry_count: u32,
+    pub provider_anomaly_budget: u32,
+    pub compaction_policy: Option<String>,
     pub completion_allowed: bool,
+    pub completion_blockers: Vec<String>,
     pub completion_refusal: Option<String>,
     pub recovery_plan: Option<String>,
     pub compaction_plan: Option<String>,
@@ -142,6 +109,7 @@ pub struct RuntimeDecision {
     pub authority_fingerprint: AuthorityFingerprint,
     pub staleness_fingerprint: StalenessFingerprint,
     pub runtime_effect: Option<RuntimeEffectCommand>,
+    pub rule_explanation: String,
 }
 
 impl RuntimeDecision {
@@ -155,6 +123,7 @@ impl RuntimeDecision {
             decision_id: input.decision_id,
             snapshot_id: input.snapshot_id,
             event_id: input.event_id,
+            case_id: None,
             mission: input.mission,
             active_mode: input.mission.active_mode(),
             graph_node: None,
@@ -162,10 +131,22 @@ impl RuntimeDecision {
             kind: input.kind,
             admission_view: input.admission_view,
             forced_next_action: None,
+            content_write_contract: None,
             recommended_next_actions: Vec::new(),
             missing_evidence: Vec::new(),
             existing_evidence: Vec::new(),
+            artifact_id: None,
+            root: None,
+            artifact_kind: None,
+            artifact_profile: None,
+            weak_paths: Vec::new(),
+            cursor: None,
+            fault_class: None,
+            retry_count: 0,
+            provider_anomaly_budget: 0,
+            compaction_policy: None,
             completion_allowed: false,
+            completion_blockers: Vec::new(),
             completion_refusal: None,
             recovery_plan: None,
             compaction_plan: None,
@@ -177,6 +158,7 @@ impl RuntimeDecision {
             authority_fingerprint: input.authority_fingerprint,
             staleness_fingerprint: input.staleness_fingerprint,
             runtime_effect: None,
+            rule_explanation: input.mission.as_str().to_string(),
         })
     }
 

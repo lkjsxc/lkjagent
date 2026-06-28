@@ -101,7 +101,6 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
             .unwrap_or_else(|| "planning-checklist".to_string());
     }
     if (tool, name) == ("artifact.plan", "root")
-        || (tool, name) == ("artifact.apply", "root")
         || (tool, name) == ("artifact.audit", "root")
         || (tool, name) == ("artifact.next", "root")
         || (tool, name) == ("doc.audit", "root")
@@ -112,8 +111,7 @@ fn example_value(tool: &str, name: &str, context: &ExampleContext) -> String {
             .unwrap_or_else(|| "stories/example-story".to_string());
     }
     match (tool, name) {
-        ("doc.scaffold", "root") | ("doc.audit", "root") => "docs",
-        ("doc.scaffold", "title") => "Project Documentation",
+        ("doc.audit", "root") => "docs",
         ("artifact.plan", "title") => "Example Story",
         ("artifact.plan", "kind") => "story",
         ("fs.read", "path") | ("fs.stat", "path") | ("fs.mkdir", "path") => "README.md",
@@ -171,7 +169,5 @@ fn batch_files_value(context: &ExampleContext) -> String {
         .artifact_root
         .clone()
         .unwrap_or_else(|| "docs".to_string());
-    format!(
-        "path: {root}/README.md\ncontent:\n# Artifact Guide\n\nConcrete content tied to the active artifact."
-    )
+    format!("path: {root}/README.md\ncontent:\n")
 }

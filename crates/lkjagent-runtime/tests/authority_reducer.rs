@@ -75,7 +75,6 @@ fn recovery_keeps_artifact_escape_tools_admitted() {
         "artifact.next",
         "artifact.audit",
         "doc.audit",
-        "doc.scaffold",
         "fs.read",
         "fs.tree",
         "fs.write",

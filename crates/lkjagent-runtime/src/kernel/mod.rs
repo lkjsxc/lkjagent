@@ -10,12 +10,15 @@ pub mod event;
 pub mod event_kind;
 pub mod facts;
 pub mod fault;
+pub mod mission;
+pub mod mission_select;
 mod next_action;
 pub mod provider;
 pub mod reduce;
 pub mod render;
 mod repeat_guard;
 pub mod snapshot;
+mod write_contract;
 
 pub use active_mode::ActiveMode;
 pub use adapter::{build_snapshot, SnapshotAdapterError, SnapshotAdapterInput};
@@ -24,8 +27,8 @@ pub use admission_decide::{
     admit_requested_tool, AdmissionDecision, AdmissionRefusalKind, AdmissionRequest,
 };
 pub use decision::{
-    ActionTemplate, DecisionInvariantError, RuntimeDecision, RuntimeDecisionId,
-    RuntimeDecisionInput, RuntimeDecisionKind, RuntimeMission,
+    ActionTemplate, ContentWriteContract, DecisionInvariantError, RuntimeDecision,
+    RuntimeDecisionId, RuntimeDecisionInput, RuntimeDecisionKind, RuntimeMission,
 };
 pub use effect::RuntimeEffectCommand;
 pub use event::RuntimeEvent;
@@ -35,8 +38,9 @@ pub use facts::{
     ObservationFacts, ProviderFacts, QueueFacts,
 };
 pub use fault::{FaultClass, FaultKey, RuntimeFault};
+pub use mission_select::select_mission;
 pub use provider::provider_anomaly_event;
-pub use reduce::{reduce, reduce_with_event_id, select_mission};
+pub use reduce::{reduce, reduce_with_event_id};
 pub use render::{render_prompt_frame, PromptCardData, PromptRenderError};
 pub use snapshot::{
     AuthorityFingerprint, RuntimeEventId, RuntimeSnapshot, RuntimeSnapshotId, RuntimeSnapshotInput,

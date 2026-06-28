@@ -1,7 +1,6 @@
 mod support;
 
-use lkjagent_protocol::parse_completion;
-use lkjagent_tools::dispatch::{dispatch, validate_action};
+use lkjagent_tools::dispatch::dispatch;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
 #[test]
@@ -23,25 +22,23 @@ fn artifact_next_empty_story_root_returns_identity_batch() -> TestResult<()> {
 
     assert!(output.contains("artifact_next_result=root_needs_identity"));
     assert!(output.contains("candidate_action=fs.batch_write"));
-    assert!(output.contains("path: stories/chronos-fracture/catalog.toml"));
-    assert!(output.contains("path: stories/chronos-fracture/README.md"));
-    assert!(output.contains("path: stories/chronos-fracture/request/objective.md"));
-    let example = candidate_example(&output)?;
-    let parsed = parse_completion(example).map_err(|err| format!("parse failed: {err:?}"))?;
-    validate_action(&parsed).map_err(|err| format!("validation failed: {err}"))?;
+    assert!(output.contains("- stories/chronos-fracture/catalog.toml"));
+    assert!(output.contains("- stories/chronos-fracture/README.md"));
+    assert!(output.contains("- stories/chronos-fracture/request/objective.md"));
+    assert!(output.contains("candidate_contract:"));
     dispatch_state.reset_repeat_tracking();
-    let write = dispatch(&parsed, &runtime, &mut conn, &mut dispatch_state).content;
+    let files = "path: stories/chronos-fracture/catalog.toml\ncontent:\nkind = \"story\"\n\n-- lkjagent-next-file --\npath: stories/chronos-fracture/README.md\ncontent:\n# Chronos Fracture\n\n## Purpose\n\nNavigate the story artifact.\n\n-- lkjagent-next-file --\npath: stories/chronos-fracture/request/objective.md\ncontent:\n# Objective\n\n## Purpose\n\nCreate the requested SF novel settings artifact.\n";
+    let write = dispatch(
+        &action("fs.batch_write", &[("files", files)]),
+        &runtime,
+        &mut conn,
+        &mut dispatch_state,
+    )
+    .content;
 
     assert!(write.contains("files_written=3"));
     assert!(workspace.join(root).join("catalog.toml").is_file());
     assert!(workspace.join(root).join("README.md").is_file());
     assert!(workspace.join(root).join("request/objective.md").is_file());
     Ok(())
-}
-
-fn candidate_example(output: &str) -> TestResult<&str> {
-    output
-        .split_once("candidate_example:\n")
-        .map(|(_, example)| example)
-        .ok_or_else(|| "missing candidate example".into())
 }

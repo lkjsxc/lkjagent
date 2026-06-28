@@ -144,6 +144,18 @@ fn prose_outside_action_is_bad_envelope() {
         })
     );
     assert_eq!(
+        parse_completion("<think>hidden</think>\n<action>\n<tool>graph.state</tool>\n</action>"),
+        Err(ParseFault::BadEnvelope {
+            reason: "prose before action envelope".to_string(),
+        })
+    );
+    assert_eq!(
+        parse_completion("<actions>\n<action>\n<tool>graph.state</tool>\n</action>\n</actions>"),
+        Err(ParseFault::BadEnvelope {
+            reason: "prose before action envelope".to_string(),
+        })
+    );
+    assert_eq!(
         parse_completion("<action>\n<tool>graph.state</tool>\n</action>\ntrailing"),
         Err(ParseFault::BadEnvelope {
             reason: "prose after action envelope".to_string(),

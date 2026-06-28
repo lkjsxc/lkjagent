@@ -14,7 +14,7 @@ pub fn artifact_address_controller(workspace: &Path) -> Result<(), String> {
             "fixture=artifact-next-file-root-missing-zero-false",
             "file_root_audit_example=absent",
             "missing=not-zero",
-            "fixture=markdown-suffix-directory-created-by-artifact-apply",
+            "fixture=markdown-suffix-removed-writer",
             "address_status=root_ends_with_markdown_suffix",
             "directory_created=false",
             "fixture=batch-write-json-in-files",

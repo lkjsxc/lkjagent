@@ -35,12 +35,10 @@ Rules:
 For fs.batch_write, the only live payload is line protocol inside <files>:
 path: root/file.md
 content:
-# Concrete Content
 
 -- lkjagent-next-file --
 path: root/other.md
-content:
-# Concrete Content";
+content:";
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PromptInputs {

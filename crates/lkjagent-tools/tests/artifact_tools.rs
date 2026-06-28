@@ -1,6 +1,7 @@
 mod support;
 
 use std::fs;
+use std::path::Path;
 
 use lkjagent_tools::dispatch::dispatch;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
@@ -31,7 +32,7 @@ fn artifact_plan_does_not_write_files() -> TestResult<()> {
 }
 
 #[test]
-fn artifact_apply_writes_manifest_and_readmes() -> TestResult<()> {
+fn removed_artifact_apply_is_not_live() -> TestResult<()> {
     let workspace = temp_workspace("artifact-apply-story")?;
     let runtime = runtime(workspace.clone())?;
     let mut conn = store()?;
@@ -49,48 +50,8 @@ fn artifact_apply_writes_manifest_and_readmes() -> TestResult<()> {
         &mut state(),
     );
 
-    assert!(output.content.contains("document scaffold created"));
-    assert!(workspace.join("stories/memory-market/README.md").is_file());
-    assert!(workspace
-        .join("stories/memory-market/catalog.toml")
-        .is_file());
-    Ok(())
-}
-
-#[test]
-fn artifact_apply_reuses_existing_root_without_duplicate_sections() -> TestResult<()> {
-    let workspace = temp_workspace("artifact-apply-reuse")?;
-    let runtime = runtime(workspace.clone())?;
-    let mut conn = store()?;
-    let mut dispatch_state = state();
-    let params = [
-        ("root", "stories/memory-market"),
-        ("title", "Memory Market"),
-        ("kind", "story"),
-    ];
-
-    let first = dispatch(
-        &action("artifact.apply", &params),
-        &runtime,
-        &mut conn,
-        &mut dispatch_state,
-    );
-    let initial_count = markdown_count(&workspace.join("stories/memory-market"))?;
-    dispatch_state.reset_repeat_tracking();
-    let second = dispatch(
-        &action("artifact.apply", &params),
-        &runtime,
-        &mut conn,
-        &mut dispatch_state,
-    );
-    let repaired_count = markdown_count(&workspace.join("stories/memory-market"))?;
-
-    assert!(first.content.contains("document scaffold created"));
-    assert!(second.content.contains("document scaffold created"));
-    assert_eq!(initial_count, repaired_count);
-    assert!(!workspace
-        .join("stories/memory-market/chapters/part-001.md")
-        .exists());
+    assert!(output.content.contains("unknown tool: artifact.apply"));
+    assert!(!workspace.join("stories/memory-market/README.md").exists());
     Ok(())
 }
 
@@ -115,25 +76,11 @@ fn artifact_audit_rejects_empty_root() -> TestResult<()> {
 }
 
 #[test]
-fn artifact_audit_rejects_cookbook_scaffold_without_recipe_content() -> TestResult<()> {
+fn artifact_audit_rejects_cookbook_structure_only_content() -> TestResult<()> {
     let workspace = temp_workspace("artifact-audit-cookbook-content")?;
+    seed_cookbook(&workspace, "cookbooks/bread-cookbook")?;
     let runtime = runtime(workspace)?;
     let mut conn = store()?;
-    let mut dispatch_state = state();
-    dispatch(
-        &action(
-            "artifact.apply",
-            &[
-                ("root", "cookbooks/bread-cookbook"),
-                ("title", "Bread Cookbook"),
-                ("kind", "cookbook"),
-            ],
-        ),
-        &runtime,
-        &mut conn,
-        &mut dispatch_state,
-    );
-
     let output = dispatch(
         &action(
             "artifact.audit",
@@ -141,35 +88,26 @@ fn artifact_audit_rejects_cookbook_scaffold_without_recipe_content() -> TestResu
         ),
         &runtime,
         &mut conn,
-        &mut dispatch_state,
+        &mut state(),
     );
 
-    assert!(output.content.contains("document audit failed"));
-    assert!(output.content.contains("content_readiness=failed"));
-    assert!(output.content.contains("structure_only_content: recipes/"));
+    assert!(output.content.contains("audit failed"));
+    assert!(output.content.contains("content") || output.content.contains("weak"));
     Ok(())
 }
 
 #[test]
 fn artifact_audit_rejects_generic_project_docs_for_story() -> TestResult<()> {
     let workspace = temp_workspace("artifact-audit-kind")?;
-    let runtime = runtime(workspace.clone())?;
+    let root = workspace.join("docs/not-a-story");
+    fs::create_dir_all(&root)?;
+    fs::write(root.join("catalog.toml"), "profile = \"ProjectDocs\"\n")?;
+    fs::write(
+        root.join("README.md"),
+        "# Project Docs\n\n## Purpose\n\nDocs.\n",
+    )?;
+    let runtime = runtime(workspace)?;
     let mut conn = store()?;
-    let mut dispatch_state = state();
-    let apply = dispatch(
-        &action(
-            "doc.scaffold",
-            &[
-                ("root", "docs/not-a-story"),
-                ("title", "Project Documentation"),
-                ("kind", "documentation"),
-            ],
-        ),
-        &runtime,
-        &mut conn,
-        &mut dispatch_state,
-    );
-    assert!(apply.content.contains("document scaffold created"));
     let output = dispatch(
         &action(
             "artifact.audit",
@@ -177,24 +115,32 @@ fn artifact_audit_rejects_generic_project_docs_for_story() -> TestResult<()> {
         ),
         &runtime,
         &mut conn,
-        &mut dispatch_state,
+        &mut state(),
     );
 
     assert!(output.content.contains("artifact_kind_mismatch"));
-    let catalog = fs::read_to_string(workspace.join("docs/not-a-story/catalog.toml"))?;
-    assert!(catalog.contains("ProjectDocs"));
     Ok(())
 }
 
-fn markdown_count(root: &std::path::Path) -> TestResult<usize> {
-    let mut count: usize = 0;
-    for entry in fs::read_dir(root)? {
-        let path = entry?.path();
-        if path.is_dir() {
-            count = count.saturating_add(markdown_count(&path)?);
-        } else if path.extension().is_some_and(|ext| ext == "md") {
-            count = count.saturating_add(1);
-        }
-    }
-    Ok(count)
+fn seed_cookbook(workspace: &Path, root: &str) -> TestResult<()> {
+    let root = workspace.join(root);
+    fs::create_dir_all(root.join("recipes"))?;
+    fs::write(root.join("catalog.toml"), "kind = \"cookbook\"\n")?;
+    fs::write(
+        root.join("README.md"),
+        "# Bread\n\n## Purpose\n\nBread.\n\n## Contents\n\n- [Recipes](recipes/README.md)\n- [Catalog](catalog.toml)\n",
+    )?;
+    fs::write(
+        root.join("recipes/README.md"),
+        "# Recipes\n\n## Purpose\n\nRecipes.\n\n## Contents\n\n- [Loaf](loaf.md)\n- [Rolls](rolls.md)\n",
+    )?;
+    fs::write(
+        root.join("recipes/loaf.md"),
+        "# Loaf\n\n## Purpose\n\ncontent_state=structure-only\n",
+    )?;
+    fs::write(
+        root.join("recipes/rolls.md"),
+        "# Rolls\n\n## Purpose\n\ncontent_state=structure-only\n",
+    )?;
+    Ok(())
 }

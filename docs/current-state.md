@@ -10,15 +10,23 @@ tests, quiet gates, and required Docker gates prove it.
 
 lkjagent has a working Rust workspace with parser, protocol registry, graph,
 context, store, LLM, tools, runtime, CLI, benchmark, and xtask crates. The
-runtime-authority kernel exists and has local verification evidence from the
-previous cutover, but the checked-in active model run is failure evidence, not a
-fresh success proof for the current redesign.
+deterministic persisted-decision runtime is implemented. The checked-in active
+model run remains failure evidence until a fresh model smoke run replaces it.
 
-The durable target is stricter than the checked-in run: one persisted runtime
-decision must govern each endpoint turn, prompts must render one compact
-authority card and one exact next action, live model output must use only the
-singular tag action format, long artifacts must advance by audited
-micro-batches, and completion must require current audit-owned readiness.
+The durable target is a deterministic state-transition runtime for a weak local
+LLM:
+
+```text
+DurableReadModel -> RuntimeSnapshot -> RuntimeEvent -> RuntimeDecision
+RuntimeDecision -> PromptFrame | RuntimeEffectCommand
+RuntimeDecision + ModelAction -> ToolAdmission
+ToolAdmission -> EffectObservation -> RuntimeEvent
+```
+
+The persisted runtime decision is the sole authority for mission, mode,
+admitted tools, blocked tools, context policy, compaction, recovery,
+completion, and the next action surface. Model output supplies only bounded
+semantic intent or bounded file content inside that selected surface.
 
 ## Implemented Surfaces
 
@@ -26,15 +34,15 @@ micro-batches, and completion must require current audit-owned readiness.
 | --- | --- |
 | Workspace and gates | `Cargo.toml`, `crates/lkjagent-xtask`, and `docker-compose.yml` exist. |
 | Parser | `lkjagent-protocol` parses singular action turns and emits structured faults. |
-| Registry | `lkjagent-tools` validates tools, required parameters, and required-any groups. |
+| Registry | `lkjagent-tools` validates tools, parameters, and required-any groups. |
 | Graph | `lkjagent-graph` stores typed cases, evidence requirements, tracks, and transitions. |
 | Store | Queue, state, event, memory, authority, prompt-frame, observation, artifact, compaction, and provider-exchange surfaces exist. |
 | Runtime kernel | Snapshot, event, decision, admission, effect, render, fault, provider, adapter, reducer, and driver records exist. |
 | Endpoint loop | Provider calls record model-log files, token usage when present, anomalies, and bounded retry facts. |
 | CLI | `lkjagent --help` and `lkjagent help` print usage before config loading, and `--data` is accepted before or after the command. |
-| Artifact lifecycle | Artifact plan, apply, audit, next, cursors, weak paths, invalid roots, story readiness, and completion refusals are ledger-backed. |
+| Artifact lifecycle | Artifact plan, audit, next, cursors, weak paths, invalid roots, story readiness, and completion refusals are ledger-backed. |
 | Maintenance | Maintenance gates, owner preemption checks, no-op cooldown facts, and closed-idle rules have focused coverage. |
-| Benchmarks | Owner-reported recovery, artifact, memory, accounting, model-log, batch-schema, compaction, repeated-recovery, and long-novel signatures are in the corpus. |
+| Benchmarks | Owner recovery, artifact, memory, accounting, model-log, batch-schema, compaction, repeated-recovery, and novel signatures are in the corpus. |
 
 ## Active Data Log Fixture
 
@@ -43,58 +51,63 @@ directories prove checked-in failure facts until a fresh smoke run proves
 repair:
 
 - active case `1` is at node `document` in phase `execution`;
-- owner task is `Create a long novel. with structured settings.`;
-- pre-owner maintenance repeats empty memory searches, no-op pruning, and
-  maintenance close attempts instead of staying closed idle;
-- the active run root is the long objective slug
-  `stories/long-novel-with-structured-settings`, which the redesign replaces
-  with a short semantic alias such as `stories/novel`;
-- active tracks are `document-structure`, `action-param-reliability`, and
-  `observability-ledger`;
-- evidence ledger contains `plan` and `observation`; audit-owned
-  `document-structure` and `artifact-readiness` remain missing;
-- `artifact.apply` created a `NarrativeManuscript` scaffold and was repeated
-  after the root already existed;
-- `doc.audit` failed content readiness with structure-only story pages;
-- an attempted batch exceeded the file-count limit and was refused before
-  mutation;
-- reasoning-only provider responses were recorded as provider anomalies;
-- document audit and artifact readiness audit remain pending in the fixture.
+- owner task is `Create a SF novel. with detailed structured settings.`;
+- observed root is `stories/novel` and stale long sentence-like roots are a
+  truth-sweep failure;
+- a schema-invalid `doc.scaffold` with a `structure` parameter was attempted;
+- schema-valid `doc.scaffold` was later refused by authority;
+- the model wrote a small novel tree with `fs.batch_write`;
+- `doc.audit` passed structure;
+- `artifact.audit` and `graph.state` then repeated in a loop;
+- direct `graph.evidence` for audit-owned evidence was correctly refused;
+- reasoning-only provider responses were classified as provider anomalies;
+- final verification remained pending.
 
 ## Runtime Authority Target Flow
-
-```text
-DurableReadModel -> RuntimeSnapshot
-RuntimeSnapshot + RuntimeEvent -> RuntimeDecision
-RuntimeDecision -> PromptFrame or RuntimeEffectCommand
-RuntimeDecision + ModelAction -> ToolAdmission
-ToolAdmission -> RuntimeEffectCommand
-RuntimeEffectCommand -> EffectObservation
-EffectObservation -> RuntimeEvent
-```
 
 The decision is persisted before prompt rendering, endpoint calls, dispatch,
 recovery, compaction, maintenance, or close attempts. Prompt frames, provider
 exchange rows, pending actions, admissions, observations, model-log exports,
 and status expose the same authority ids and staleness fingerprints.
 
+Live output is one singular tag action only. Top-level JSON, top-level
+line-action syntax, nested file objects, object-literal batches, `<actions>`,
+and `<think>` output are refused. `fs.batch_write` accepts line protocol only
+inside `<files>`.
+
+## Artifact Contract
+
+The artifact lifecycle is:
+
+```text
+OwnerObjective -> ArtifactIdentity -> ArtifactPlan -> WriteContract
+-> ModelAuthoredBatch -> DocumentAudit -> ArtifactAudit
+-> WeakPathCursor -> MoreWriteContracts -> Verification -> CompletionGate
+```
+
+Prompt-visible scaffold writers are not live tools. `artifact.next` is
+non-mutating and returns write contracts, not body prose. `fs.batch_write`
+mutates only after contract validation. Audit-owned evidence comes from
+`doc.audit` and `artifact.audit`, not direct `graph.evidence`.
+
+## Compaction Contract
+
+Context compaction can happen at state boundaries, not only at token thresholds.
+A compaction snapshot preserves mission, artifact id, root, weak cursor, latest
+audit, recovery route, provider anomaly budget, completion blockers, and the
+next action surface.
+
 ## Verification Evidence
 
-The previous kernel cutover recorded passing local and Docker gates in this
-file before this redesign reopened work. That historical evidence proves only
-that the old cutover was internally consistent at that time. It does not prove
-that the active long-novel fixture is repaired, that prompts are compact, that
-object-literal batch formats are absent from model-facing context, or that short
-artifact aliases are implemented.
-
-New success claims for this redesign require the focused tests named in
-[execution/current-blockers.md](execution/current-blockers.md), `quiet verify`,
-and `docker compose run --rm verify`.
+The redesign success claim is backed by focused tests, full workspace tests,
+corpus checks, `quiet verify`, and `docker compose run --rm verify` after the
+implementation changes. The generated data log fixture is not success evidence.
 
 ## Active Target
 
-The dependency queue is [execution/current-blockers.md](execution/current-blockers.md).
-The first open blocker is the truth sweep and fixture root reconciliation.
+The dependency queue in [execution/current-blockers.md](execution/current-blockers.md)
+is closed for this redesign. The next executable step is a fresh local model
+smoke run that replaces the checked-in failure fixture with success evidence.
 
 ## Out of Scope
 

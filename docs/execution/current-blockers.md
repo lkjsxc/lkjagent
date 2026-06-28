@@ -10,16 +10,16 @@ that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Truth sweep and fixture root reconciliation | [tasks/deep-redesign-truth-sweep.md](tasks/deep-redesign-truth-sweep.md) | open |
-| 2 | Compact context and no object-literal model context | [tasks/deep-redesign-compact-context.md](tasks/deep-redesign-compact-context.md) | open |
-| 3 | Output budget contract and endpoint config | [tasks/deep-redesign-output-budget.md](tasks/deep-redesign-output-budget.md) | open |
-| 4 | Short artifact path aliases and planner | [tasks/deep-redesign-short-paths.md](tasks/deep-redesign-short-paths.md) | open |
-| 5 | Registry-derived exact action examples | [tasks/deep-redesign-exact-examples.md](tasks/deep-redesign-exact-examples.md) | open |
-| 6 | Narrow runtime authority prompt cards | [tasks/deep-redesign-runtime-authority.md](tasks/deep-redesign-runtime-authority.md) | open |
-| 7 | Artifact cursor micro-batches | [tasks/deep-redesign-artifact-batches.md](tasks/deep-redesign-artifact-batches.md) | open |
-| 8 | Completion and maintenance reducers | [tasks/deep-redesign-completion-maintenance.md](tasks/deep-redesign-completion-maintenance.md) | open |
-| 9 | Provider anomaly blocked handoff | [tasks/deep-redesign-provider-handoff.md](tasks/deep-redesign-provider-handoff.md) | open |
-| 10 | Benchmark corpus and final gates | [tasks/deep-redesign-gates.md](tasks/deep-redesign-gates.md) | open |
+| 1 | Truth sweep and fixture root reconciliation | [tasks/deep-redesign-truth-sweep.md](tasks/deep-redesign-truth-sweep.md) | done |
+| 2 | Compact context and no object-literal model context | [tasks/deep-redesign-compact-context.md](tasks/deep-redesign-compact-context.md) | done |
+| 3 | Output budget contract and endpoint config | [tasks/deep-redesign-output-budget.md](tasks/deep-redesign-output-budget.md) | done |
+| 4 | Short artifact path aliases and planner | [tasks/deep-redesign-short-paths.md](tasks/deep-redesign-short-paths.md) | done |
+| 5 | Registry-derived exact action examples | [tasks/deep-redesign-exact-examples.md](tasks/deep-redesign-exact-examples.md) | done |
+| 6 | Narrow runtime authority prompt cards | [tasks/deep-redesign-runtime-authority.md](tasks/deep-redesign-runtime-authority.md) | done |
+| 7 | Artifact cursor micro-batches | [tasks/deep-redesign-artifact-batches.md](tasks/deep-redesign-artifact-batches.md) | done |
+| 8 | Completion and maintenance reducers | [tasks/deep-redesign-completion-maintenance.md](tasks/deep-redesign-completion-maintenance.md) | done |
+| 9 | Provider anomaly blocked handoff | [tasks/deep-redesign-provider-handoff.md](tasks/deep-redesign-provider-handoff.md) | done |
+| 10 | Benchmark corpus and final gates | [tasks/deep-redesign-gates.md](tasks/deep-redesign-gates.md) | done |
 
 ## Active Data Fixture
 
@@ -27,42 +27,46 @@ that ran.
 evidence. The checked-in run proves these facts:
 
 - active case `1` is at node `document` in phase `execution`;
-- owner task is `Create a long novel. with structured settings.`;
-- pre-owner maintenance repeats empty memory searches, no-op pruning, and
-  close attempts instead of staying closed idle;
-- the active run uses `stories/long-novel-with-structured-settings`, while the
-  target path planner must choose a short semantic alias such as
-  `stories/novel` for the same objective;
-- active tracks are `document-structure`, `action-param-reliability`, and
-  `observability-ledger`;
-- evidence ledger has `plan` and `observation` only;
-- `doc.audit` failed readiness with weak structure-only story pages;
-- an attempted batch exceeded the file-count limit and was refused before
-  mutation;
-- recovery needed to change shape instead of repeating an oversized batch;
+- owner task is `Create a SF novel. with detailed structured settings.`;
+- observed root is `stories/novel`;
+- stale docs or fixtures that name a long-novel objective or long sentence-like
+  root are truth-sweep failures;
+- schema-invalid `doc.scaffold` with `structure` was attempted;
+- schema-valid `doc.scaffold` was refused by authority;
+- `fs.batch_write` wrote a small novel tree;
+- `doc.audit` passed structure;
+- `artifact.audit` and `graph.state` repeated instead of changing shape;
+- direct `graph.evidence` for audit-owned evidence was refused;
 - reasoning-only provider responses were recorded as provider anomalies;
-- document audit and artifact readiness audit remain pending.
+- final verification remained pending.
 
 ## Ordering Notes
 
 - Documentation moves first, then code. Prompt guidance alone never closes a row.
-- The transition kernel is the target runtime authority. Graph policy is
-  snapshot guidance, not fallback dispatch authority after runtime refusal.
+- The transition kernel is the runtime authority. Graph policy is snapshot
+  guidance, not fallback dispatch authority after runtime refusal.
 - Runtime mission priority is hard compaction, owner recovery, schema repair,
   artifact repair, verification repair, owner execution, owner verification,
   owner completion, idle maintenance, then closed idle.
-- Live model output uses one singular tag action. `fs.batch_write` uses only
-  the line protocol inside `<files>`.
-- `artifact.apply` creates structure once. If a root exists and weak content is
-  the problem, the next action is audit, `artifact.next`, or a path-specific
-  `fs.batch_write`.
+- Live model output uses one singular tag action. `fs.batch_write` uses only the
+  line protocol inside `<files>`.
+- Prompt-visible scaffold writers are removed from live registry, prompts,
+  admission, recovery text, docs, and tests.
+- `artifact.next` is non-mutating and returns write contracts rather than body
+  content; the next persisted decision chooses whether to render a content write
+  surface.
 - Direct graph evidence, scaffold topology, README-only content, and
   owner-term-only pages do not satisfy artifact readiness.
+- Audit-owned evidence comes from `doc.audit` and `artifact.audit` observations.
 - Maintenance can start only from closed idle with an empty owner queue and no
-  recoverable owner task. No-op maintenance records cooldown instead of
-  endpoint churn.
+  recoverable owner task. No-op maintenance records cooldown instead of endpoint
+  churn.
+- Context compaction can run at state boundaries and must preserve cursor,
+  mission, recovery route, blockers, and next action surface.
 
-## Remaining Proof Gaps
+## Completion Evidence
 
-Every blocker in the queue remains open until focused tests, corpus checks,
-`quiet verify`, and Docker Compose verify run after the implementation changes.
+The redesign is closed by focused crate tests, workspace tests, corpus checks,
+`quiet verify`, and `docker compose run --rm verify` after the implementation
+changes. The checked-in data log remains failure evidence until a fresh model
+smoke run replaces it.

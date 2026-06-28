@@ -12,14 +12,14 @@ semantic files, or request a bounded content batch for weak leaves.
 
 Repair never invents a completion claim. It records changed paths and then
 requires a new audit before completion evidence can pass. `artifact.next`
-returns facts and a candidate only; the runtime must create a new decision
-before any candidate write executes.
+returns write contracts only; the runtime must create a new decision before
+any candidate write executes.
 
 ## Regression Signature
 
-The active long-novel run is the repair regression signature. `artifact.apply`
-created a long objective-shaped structured-settings story root with
-`profile=NarrativeManuscript`, then `doc.audit` found structure-only pages.
+The active SF-novel run is the repair regression signature. A prompt-visible
+scaffold writer was attempted and refused, then `fs.batch_write` created a
+small `stories/novel` tree and `doc.audit` found structure-only pages.
 A broad `fs.batch_write` attempt exceeded the file-count limit and refused
 before mutation. The next decision must shrink the batch or route through
 `artifact.next`, not repeat the same broad write shape.

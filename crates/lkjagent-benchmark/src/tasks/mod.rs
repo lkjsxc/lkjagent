@@ -32,7 +32,7 @@ pub const TINY: &[BenchmarkTask] = &[
     owner_doc_topics::TASK,
     owner_thirty::TASK,
     owner_faults::GRAPH_TASK,
-    owner_faults::SCAFFOLD_TASK,
+    owner_faults::BATCH_TASK,
     owner_faults::STORY_TASK,
     owner_loop_regressions::GRAPH_PLAN_TASK,
     owner_loop_regressions::TRANSITION_TASK,

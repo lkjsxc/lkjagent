@@ -2,30 +2,30 @@
 
 ## Purpose
 
-Define how artifact scaffolding creates or repairs a semantic tree.
+Define the non-live scaffold concept that artifact contracts replaced.
 
 ## Behavior
 
-Before writing, the runtime scans the target root, known related roots, and
-existing manifests. It adopts an equivalent root, repairs missing files, and
-rejects a generic scaffold when an artifact-specific profile exists.
+Prompt-visible scaffold writers are not live tools. The runtime can reason
+about identity, required files, and weak paths, but the model must author
+content through contract-bound `fs.batch_write` actions.
 
 ## Writes
 
-Scaffold writes directories, README files, manifest files, semantic section
-files, and audit placeholders only when the profile requires them. It does not
-count empty placeholders as completed content.
+Structure writes happen only when a stored write contract admits exact paths.
+The contract may include root identity files, README navigation, manifest data,
+and semantic leaves. Empty placeholders never count as completed content.
 
-For content artifacts, scaffold output must be followed by bounded content
-write batches and a new audit before completion. See
+For content artifacts, any identity or navigation batch must be followed by
+bounded content batches and a new audit before completion. See
 [write-batches.md](write-batches.md) and [repair.md](repair.md).
 
 ## Duplicate Prevention
 
-Duplicate detection uses artifact kind, normalized title, owner objective
-hash, root role, README title, manifest artifact key, and section role.
+Duplicate detection uses artifact kind, normalized title, owner objective hash,
+root role, README title, manifest artifact key, and section role.
 
 ## Status
 
-partially implemented for story and cookbook profile paths and `artifact.apply`.
-Root adoption and repair planning remain open.
+open for this redesign. Scaffold is an internal planning concept, not a live
+model-facing writer.

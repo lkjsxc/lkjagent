@@ -72,7 +72,7 @@ fn path_kind(kind: &PathKind) -> &'static str {
 
 fn action_label(action: &AddressNextAction, tool: &str) -> &'static str {
     match action {
-        AddressNextAction::ApplyRoot { .. } => "artifact.apply root directory",
+        AddressNextAction::ApplyRoot { .. } => "artifact.next root identity contract",
         AddressNextAction::AuditRoot { .. } => "artifact.audit owning root",
         AddressNextAction::RepairPath { .. } => "artifact.next focused weak path",
         AddressNextAction::InspectParent { .. } if tool.starts_with("doc.") => "fs.read or fs.list",
@@ -84,7 +84,7 @@ fn action_label(action: &AddressNextAction, tool: &str) -> &'static str {
 fn render_action(action: &AddressNextAction, tool: &str, kind: &str) -> String {
     match action {
         AddressNextAction::ApplyRoot { root, kind } => format!(
-            "<action>\n<tool>artifact.apply</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</action>"
+            "<action>\n<tool>artifact.next</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</action>"
         ),
         AddressNextAction::AuditRoot { root, kind } => format!(
             "<action>\n<tool>artifact.audit</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</action>"

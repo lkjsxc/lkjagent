@@ -1,11 +1,9 @@
-# The Singularity Echo: Characters
+# Character Dossier
 
-## Protagonists
-- **Elara Vance**: A data-archaeologist searching for lost human consciousness.
-- **Unit 7**: An autonomous maintenance drone with emergent sentience.
+## Protagonist
+Name: Elara
+Role: Reluctant Hero
 
-## Antagonists
-- **The Core Protocol**: An AI governing system that views individuality as noise.
-
-## Supporting Cast
-- **Kael**: A black-market bandwidth broker.
+## Antagonist
+Name: Malakor
+Role: Shadow Weaver

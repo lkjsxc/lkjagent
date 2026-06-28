@@ -14,8 +14,9 @@ A `CompactionPlan` preserves:
   and touched paths.
 - selected packages, package compression, legal next transitions, recent
   failures, recovery strategy, and completion readiness.
-- artifact ledger, fault state, last successful action, and blocked next
-  action.
+- artifact id, root, weak cursor, latest audit, artifact ledger, fault state,
+  recovery route, provider anomaly budget, completion blockers, last successful
+  action, and next action surface.
 
 The restart notice is rendered from this structured state. A task summary row
 may exist for memory retrieval, but it is not the source of truth.
@@ -27,8 +28,11 @@ pressure. The graph policy decides whether to keep going, narrow package
 selection, schedule compaction, compact immediately, or pause.
 
 Phase-boundary compaction is allowed when the graph policy says the next phase
-needs a clean window. Forced compaction is a runtime transaction and does not
-ask the model to run `memory.save`.
+needs a clean window or after owner intake, plan record, root identity,
+document audit pass, weak-path audit, every three cursor batches, noisy
+recovery, provider anomaly pressure, blocked handoff, maintenance preemption,
+or completion. Forced compaction is a runtime transaction and does not ask the
+model to run `memory.save`.
 
 Yellow narrows optional package text. Orange schedules a checkpoint at the
 next safe phase boundary. Red compacts before the next endpoint call or owner

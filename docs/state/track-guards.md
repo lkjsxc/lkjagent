@@ -12,8 +12,8 @@ The dispatcher must check hard state first, then guard tracks.
 | mock content risk | 0.70 | `agent.done` |
 | model-specific naming | 0.60 | `memory.save`, `agent.done` |
 | structure connectivity | 0.60 | `agent.done` |
-| parse recovery | 0.80 | large `fs.batch_write` and `artifact.apply` |
-| artifact drift | 0.75 | `artifact.next` and `artifact.apply` |
+| parse recovery | 0.80 | large `fs.batch_write` batches |
+| artifact drift | 0.75 | `artifact.next` |
 | repeated action risk | 0.60 | identical action signature |
 | context pressure | 0.85 | mutating tools before snapshot check |
 | queue interruption | 0.70 | mutating tools before classification |

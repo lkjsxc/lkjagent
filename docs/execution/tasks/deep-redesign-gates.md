@@ -6,7 +6,7 @@ Prove the redesign through focused tests, corpus checks, quiet verify, and Docke
 
 ## Status
 
-open
+done
 
 ## Depends On
 

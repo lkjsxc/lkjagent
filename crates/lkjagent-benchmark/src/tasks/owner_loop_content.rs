@@ -109,12 +109,12 @@ const BREAD_BAD_GENERIC: &[FileSpec] = &[FileSpec {
 
 const BREAD_BAD_SCAFFOLD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "profile=GenericProjectDocs\ndoc.scaffold root=docs/bread\ndocument=root=structured-output audit=Missing\nagent.done scaffold only\n",
+    content: "profile=GenericProjectDocs\nremoved writer root=docs/bread\ndocument=root=structured-output audit=Missing\nagent.done scaffold only\n",
 }];
 
 const BREAD_BAD_EMPTY_ROOT: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "root=cookbooks/cookbook-about-bread\nempty artifact root after many turns\nrecover-by-smaller-scope blocked doc.scaffold\nagent.done claimed progress\n",
+    content: "root=cookbooks/cookbook-about-bread\nempty artifact root after many turns\nrecover-by-contract blocked removed writer\nagent.done claimed progress\n",
 }];
 
 const BREAD_BAD_BLOCKED_NEXT: &[FileSpec] = &[FileSpec {

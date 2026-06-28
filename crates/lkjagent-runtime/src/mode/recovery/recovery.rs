@@ -126,12 +126,9 @@ fn observation_tools(class: RecoveryClass) -> Vec<String> {
 fn repair_tools(class: RecoveryClass) -> Vec<String> {
     match class {
         RecoveryClass::PayloadOverflow => tools(&["artifact.next", "fs.batch_write"]),
-        RecoveryClass::ArtifactAuditFailure | RecoveryClass::WeakArtifactContent => tools(&[
-            "artifact.next",
-            "artifact.apply",
-            "fs.write",
-            "fs.batch_write",
-        ]),
+        RecoveryClass::ArtifactAuditFailure | RecoveryClass::WeakArtifactContent => {
+            tools(&["artifact.next", "fs.write", "fs.batch_write"])
+        }
         RecoveryClass::FalseCompletion => tools(&["artifact.audit", "doc.audit"]),
         RecoveryClass::ParameterFault | RecoveryClass::SchemaFault => {
             tools(&["graph.recover", "artifact.next", "fs.batch_write"])

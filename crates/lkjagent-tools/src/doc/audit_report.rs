@@ -135,6 +135,6 @@ fn next_action(failures: &[String]) -> &'static str {
     } else if failures.iter().any(|failure| path_failure(failure)) {
         "rename paths then update README and catalog links"
     } else {
-        "doc.scaffold or fs.batch_write exact failed topology"
+        "artifact.next or fs.batch_write exact failed topology"
     }
 }

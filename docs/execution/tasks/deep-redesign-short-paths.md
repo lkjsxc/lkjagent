@@ -6,7 +6,7 @@ Replace owner-sentence root slugs with short semantic artifact aliases.
 
 ## Status
 
-open
+done
 
 ## Depends On
 

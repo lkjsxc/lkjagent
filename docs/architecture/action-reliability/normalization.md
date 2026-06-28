@@ -6,7 +6,7 @@ This file defines deterministic action parameter normalization.
 
 ## Contract
 
-- `doc.scaffold` and `doc.audit` rename `path` to `root` when `root` is absent.
+- `doc.audit` renames `path` to `root` when `root` is absent.
 - `workspace.summary` and `fs.list` rename `root` to `path` when `path` is absent.
 - No-param graph inspection tools drop harmless location params only when the
   value is empty, `.`, `./`, `workspace`, or `/workspace`.
@@ -21,7 +21,7 @@ This file defines deterministic action parameter normalization.
 
 ## Failure Modes
 
-- `doc.scaffold` with `path` fails instead of normalizing to `root`.
+- Removed scaffold-writer calls are treated as unknown tools, not normalized.
 - `graph.state` with `path=.` loops instead of producing a safe correction.
 - A semantic field such as `content` is silently discarded.
 

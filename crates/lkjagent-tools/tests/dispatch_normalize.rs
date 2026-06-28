@@ -28,7 +28,7 @@ fn graph_state_with_safe_path_is_normalized() -> TestResult<()> {
 }
 
 #[test]
-fn doc_scaffold_path_is_renamed_to_root() -> TestResult<()> {
+fn removed_doc_scaffold_path_is_not_normalized() -> TestResult<()> {
     let workspace = temp_workspace("normalize-scaffold")?;
     let runtime = runtime(workspace.clone())?;
     let mut conn = store()?;
@@ -41,9 +41,9 @@ fn doc_scaffold_path_is_renamed_to_root() -> TestResult<()> {
         &mut state,
     );
 
-    assert!(output.content.contains("renamed=path->root"));
-    assert!(output.content.contains("root=docs"));
-    assert!(workspace.join("docs/catalog.toml").is_file());
+    assert!(output.content.contains("unknown tool: doc.scaffold"));
+    assert!(!output.content.contains("renamed=path->root"));
+    assert!(!workspace.join("docs/catalog.toml").is_file());
     Ok(())
 }
 
@@ -85,30 +85,31 @@ fn unknown_param_error_prints_valid_example() -> TestResult<()> {
 }
 
 #[test]
-fn artifact_apply_unknown_scale_prints_one_canonical_example() -> TestResult<()> {
+fn artifact_plan_unknown_mode_prints_one_canonical_example() -> TestResult<()> {
     let workspace = temp_workspace("normalize-artifact-scale")?;
     let runtime = runtime(workspace)?;
     let mut conn = store()?;
     let mut state = state();
     let bad = Action::new(
-        "artifact.apply",
+        "artifact.plan",
         vec![
             Param::new("root", "dictionary"),
+            Param::new("title", "Dictionary"),
             Param::new("kind", "dictionary"),
-            Param::new("scale", "large"),
+            Param::new("mode", "large"),
         ],
     );
 
     let output = dispatch(&bad, &runtime, &mut conn, &mut state);
 
     assert!(matches!(output.kind, OutputKind::Notice { .. }));
-    assert!(output.content.contains("unknown=scale"));
+    assert!(output.content.contains("unknown=mode"));
     assert_eq!(output.content.matches("valid_example:").count(), 1);
     let Some((_, example)) = output.content.split_once("valid_example:\n") else {
         return Ok(());
     };
-    assert!(example.contains("<tool>artifact.apply</tool>"));
-    assert!(!example.contains("<scale>"));
+    assert!(example.contains("<tool>artifact.plan</tool>"));
+    assert!(!example.contains("<mode>"));
     Ok(())
 }
 

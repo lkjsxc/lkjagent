@@ -92,7 +92,7 @@ class. Route selection is:
 ## Failure Modes
 
 - `graph.state` with a harmless location parameter loops on a parse notice.
-- `doc.scaffold` receives `path` and fails instead of using `root`.
+- Removed scaffold-writer syntax is refused instead of normalized.
 - `fs.batch_write` receives `stories/chronos-fracture/catalog.toml` as an
   unknown parameter while `files` is missing.
 - The long-novel run repeats `<file><path>...` child blocks inside `<files>`

@@ -34,7 +34,9 @@ Navigate the story bible for Chronos Fracture.
 </action>
 ```
 
-The dispatcher receives blocks separated by `-- lkjagent-next-file --`.
+The dispatcher receives blocks separated by `-- lkjagent-next-file --`. Prompt
+contracts may name paths and sections before this action, but they do not
+prefill body prose.
 
 ## Paired-Tag Form
 
@@ -101,8 +103,9 @@ child-tag batch fault, recovery changes action class to `artifact.next`,
 - Maximum bytes per batch: 6,000.
 - Duplicate paths are refused.
 - Append mode is not part of `fs.batch_write`.
-- Validation runs before file mutation; a later filesystem error can still leave
-  earlier writes in place and is reported as a tool error.
+- Validation runs before file mutation, including stored write-contract path
+  checks when an artifact cursor is active; a later filesystem error can still
+  leave earlier writes in place and is reported as a tool error.
 
 ## Artifact Scope
 
@@ -122,6 +125,8 @@ Artifact audit records unexpected paths as weak paths under the active root.
 - Oversized file or batch payloads refuse the whole action before mutation.
 - A batch write can move an artifact to content-written evidence only after the
   artifact ledger records the written paths.
+- Content artifact writes under an active cursor must match stored contract
+  paths before any file is mutated.
 
 ## Verification
 

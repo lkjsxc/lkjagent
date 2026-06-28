@@ -124,21 +124,19 @@ fn workspace_doc_and_verify_tools_route_without_shell() -> TestResult<()> {
     );
     assert!(summary.content.contains("cargo_workspace=present"));
 
-    let scaffold = dispatch(
-        &action(
-            "doc.scaffold",
-            &[
-                ("root", "guide"),
-                ("title", "Guide"),
-                ("count", "3"),
-                ("mode", "exact"),
-            ],
-        ),
-        &runtime,
-        &mut conn,
-        &mut state,
-    );
-    assert!(scaffold.content.contains("files=3"));
+    fs::create_dir_all(workspace.join("guide"))?;
+    fs::write(
+        workspace.join("guide/catalog.toml"),
+        "kind = \"documentation\"\n",
+    )?;
+    fs::write(
+        workspace.join("guide/README.md"),
+        "# Guide\n\n## Purpose\n\nGuide.\n\n## Table of Contents\n\n- [a.md](a.md)\n- [catalog.toml](catalog.toml)\n",
+    )?;
+    fs::write(
+        workspace.join("guide/a.md"),
+        "# A\n\n## Purpose\n\ncontent_state=structure-only\n",
+    )?;
 
     let audit = dispatch(
         &action(

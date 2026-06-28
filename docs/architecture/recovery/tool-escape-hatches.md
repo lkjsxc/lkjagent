@@ -18,7 +18,7 @@ escape the current fault.
 
 ## Repair Tools
 
-`fs.write`, `fs.batch_write`, `artifact.next`, `artifact.apply`,
+`fs.write`, `fs.batch_write`, `artifact.next`, `artifact.plan`,
 `graph.transition`, graph evidence tools, and `agent.done` with blocked
 handoff shape are repair or handoff tools when admitted by authority.
 

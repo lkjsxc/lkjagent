@@ -41,7 +41,6 @@ impl NormalizationNote {
 
 fn apply_aliases(action: &mut Action, notes: &mut Vec<NormalizationNote>) {
     for (tool, from, to) in [
-        ("doc.scaffold", "path", "root"),
         ("doc.audit", "path", "root"),
         ("workspace.summary", "root", "path"),
         ("fs.list", "root", "path"),

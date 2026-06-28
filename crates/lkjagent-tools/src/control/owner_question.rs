@@ -39,7 +39,7 @@ fn internal_question(lower: &str) -> Option<(&'static str, &'static str)> {
     if mentions_recovery_how_to(lower) {
         return Some((
             "tool recovery must choose a smaller valid action",
-            "doc.scaffold",
+            "artifact.next",
         ));
     }
     if mentions_internal_recovery(lower) {
@@ -88,7 +88,7 @@ fn mentions_recovery_how_to(lower: &str) -> bool {
         || lower.contains("how to use")
         || lower.contains("how to proceed"))
         && (lower.contains("fs.write")
-            || lower.contains("doc.scaffold")
+            || lower.contains("scaffold writer")
             || lower.contains("blocked")
             || lower.contains("unclosed")
             || lower.contains("parse fault"))

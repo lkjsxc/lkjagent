@@ -10,29 +10,38 @@ moves an artifact between states.
 An artifact moves through these states in order:
 
 ```text
-Planned -> Scaffolded -> ContentWritten -> LocallyAudited -> Verified -> Complete
+OwnerObjective -> ArtifactIdentity -> ArtifactPlan -> WriteContract
+-> ModelAuthoredBatch -> DocumentAudit -> ArtifactAudit
+-> WeakPathCursor -> MoreWriteContracts -> Verification -> CompletionGate
 ```
 
 ## State Meaning
 
-- `Planned`: durable artifact identity, root, kind, and intended sections exist.
-- `Scaffolded`: README indexes, manifest, and initial path structure exist.
-- `ContentWritten`: meaningful leaf content was written under planned paths.
-- `LocallyAudited`: artifact audit passed topology, manifest, line, drift, and
-  semantic-readiness checks that apply to the artifact kind.
-- `Verified`: required verification gates passed and named the artifact or root.
-- `Complete`: the completion gate accepted the verified evidence.
+- `ArtifactIdentity`: durable artifact id, short root, kind, and full owner
+  wording exist.
+- `ArtifactPlan`: intended sections, scale, assumptions, and risks exist.
+- `WriteContract`: exact paths, limits, required sections, and forbidden weak
+  phrase classes are recorded.
+- `ModelAuthoredBatch`: the model authored a line-protocol `fs.batch_write`
+  action that matched the stored contract.
+- `DocumentAudit`: document topology passed from `doc.audit`.
+- `ArtifactAudit`: semantic readiness passed from `artifact.audit`.
+- `WeakPathCursor`: weak paths remain and cursor state names the next contract.
+- `Verification`: required verification gates passed and named the artifact or
+  root.
+- `CompletionGate`: the central runtime gate accepted the evidence.
 
 Scaffold is never content evidence for cookbooks, stories, guides, knowledge
-bases, or long reports. A write can move a planned or scaffolded artifact to
-`ContentWritten`; only audit can move it to `LocallyAudited`; only verification
-can move it to `Verified`.
+bases, or long reports. Prompt-visible scaffold writers are not live tools.
+Only audits move audit-owned evidence, and only contract-matching writes move
+cursor paths to written.
 
 ## Evidence Owners
 
 - `artifact.plan` owns planned identity.
-- `artifact.apply` and `doc.scaffold` own scaffold evidence.
-- `fs.write` and `fs.batch_write` own written-path evidence.
+- `artifact.next` owns write-contract and cursor facts.
+- `fs.write` and `fs.batch_write` own written-path observations after contract
+  validation.
 - `artifact.audit` and `doc.audit` own local audit evidence.
 - `verify.cargo`, `verify.xtask`, and Docker Compose gates own verification
   evidence.

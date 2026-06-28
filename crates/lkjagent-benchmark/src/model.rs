@@ -54,7 +54,7 @@ pub enum JudgeKind {
     ThirtySemanticDocs,
     MultiTopicDocumentation,
     GraphStateParamRecovery,
-    DocScaffoldParamRecovery,
+    BatchWriteProtocolRecovery,
     RecoveryLoopLongStory,
     GraphPlanExample,
     GraphTransitionTarget,
