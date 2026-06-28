@@ -5,7 +5,7 @@ use std::fs;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
 #[test]
-fn doc_scaffold_refuses_existing_cataloged_root() -> TestResult<()> {
+fn removed_doc_scaffold_is_unknown_for_existing_cataloged_root() -> TestResult<()> {
     let workspace = temp_workspace("doc-scaffold-existing-catalog")?;
     let root = workspace.join("stories/chronos-fracture");
     fs::create_dir_all(&root)?;
@@ -28,8 +28,6 @@ fn doc_scaffold_refuses_existing_cataloged_root() -> TestResult<()> {
         &mut state(),
     );
 
-    assert!(output
-        .content
-        .contains("doc.scaffold refuses existing cataloged roots"));
+    assert!(output.content.contains("unknown tool: doc.scaffold"));
     Ok(())
 }

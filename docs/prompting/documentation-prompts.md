@@ -34,8 +34,8 @@ README, and relation pages in the same batch. It does not fan out generic
 
 When document or artifact tools are available, prompt text states that `root` is
 a directory path and `path` is a Markdown file path under a root. A `.md` file
-must not be passed as root to doc.audit, artifact.audit, doc.scaffold, or
-artifact.apply. Markdown content goes through fs.write or fs.batch_write.
+must not be passed as root to doc.audit or artifact.audit. Markdown content
+goes through contract-bound fs.write or fs.batch_write.
 
 ## Batch Write Grammar
 

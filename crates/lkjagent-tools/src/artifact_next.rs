@@ -67,7 +67,11 @@ fn next_for_address_with_cursor(
     match address.kind {
         ArtifactAddressKind::MissingRoot => {
             if let Some(root) = address.root.as_deref() {
-                lkjagent_store::state::delete(conn, &cursor_key(root))?;
+                let kind = resolved_kind(kind, &workspace_path(workspace, root)?);
+                let contract = crate::artifact_next_example::root_identity_contract(root, &kind);
+                crate::artifact_cursor_support::record_identity_contract(
+                    conn, root, &kind, &contract, now,
+                )?;
             }
             Ok(missing_root_response(&address))
         }
@@ -104,7 +108,7 @@ fn root_next(workspace: &Path, address: &ArtifactAddress, kind: &str) -> ToolRes
         .into_iter()
         .take(WEAK_PATH_BATCH_SIZE)
         .collect::<Vec<_>>();
-    let valid_example = crate::artifact_next_example::batch_write(&root, &kind, &selected);
+    let valid_example = crate::artifact_next_example::batch_write_contract(&root, &kind, &selected);
     Ok(batch_response(&root, &kind, &selected, &valid_example))
 }
 
@@ -119,7 +123,10 @@ fn root_next_with_cursor(
     let full = workspace_path(workspace, &root)?;
     let kind = resolved_kind(kind, &full);
     if crate::artifact_next_identity::root_needs_identity(&full)? {
-        lkjagent_store::state::delete(conn, &cursor_key(&root))?;
+        let contract = crate::artifact_next_example::root_identity_contract(&root, &kind);
+        crate::artifact_cursor_support::record_identity_contract(
+            conn, &root, &kind, &contract, now,
+        )?;
         return Ok(root_identity_response(&root, &kind));
     }
     if let Some(report) = crate::artifact_drift::japanese_cookbook(&full)? {
@@ -153,7 +160,7 @@ fn cursor_batch(
         .skip(start)
         .take(WEAK_PATH_BATCH_SIZE)
         .collect::<Vec<_>>();
-    let valid_example = crate::artifact_next_example::batch_write(root, kind, &selected);
+    let valid_example = crate::artifact_next_example::batch_write_contract(root, kind, &selected);
     crate::artifact_cursor_support::record_next_batch(
         crate::artifact_cursor_support::NextBatchRecord {
             conn,

@@ -6,7 +6,7 @@ Classify reasoning-only provider output before parsing and stop repeated same-pr
 
 ## Status
 
-open
+done
 
 ## Depends On
 

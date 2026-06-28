@@ -5,7 +5,7 @@ use crate::kernel::facts::{
     ProviderFacts, QueueFacts,
 };
 use crate::kernel::fault::RuntimeFault;
-use crate::kernel::reduce::select_mission;
+use crate::kernel::mission_select::select_mission;
 use crate::kernel::snapshot::{RuntimeSnapshot, RuntimeSnapshotId, RuntimeSnapshotInput};
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]

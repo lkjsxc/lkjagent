@@ -8,8 +8,11 @@ and restart the log. Compaction is the only moment the window shrinks.
 
 ## Trigger
 
-The engine checks pressure at safe turn boundaries: before owner delivery,
-before endpoint calls, at continuation checkpoints, and after an
+The engine checks pressure and state transitions at safe turn boundaries:
+after owner intake, plan record, root identity, document audit pass, weak-path
+audit, every three cursor batches, noisy recovery, provider anomaly budget
+pressure, blocked handoff, maintenance preemption, completion, before owner
+delivery, before endpoint calls, at continuation checkpoints, and after an
 action/observation pair completes. The trigger is harness-owned; the model
 neither requests nor refuses compaction.
 
@@ -32,8 +35,10 @@ at the next boundary.
 ## Procedure
 
 1. Runtime snapshot. The harness writes a typed `CompactionPlan` that
-   preserves graph state, recovery state, artifact ledger, fault ledger,
-   missing evidence, blocked next action, and the active task summary.
+   preserves mission, graph state, recovery route, artifact id, root, weak
+   cursor, latest audit, provider anomaly budget, completion blockers, next
+   action surface, missing evidence, blocked next action, and the active task
+   summary.
 2. Optional maintenance distillation. Reusable lessons may be written through
    internal store APIs or through model-authored maintenance only when the
    active mode admits it. Forced compaction never waits for a model action.
@@ -58,11 +63,11 @@ forbidden by [../../agent/honest-state.md](../../agent/honest-state.md).
 | Content | Survives as |
 | --- | --- |
 | task state and open threads | graph case, graph evidence, and log-head notice |
-| artifact ledger and blockers | graph artifact state plus compaction snapshot |
+| artifact ledger, root, cursor, latest audit, and blockers | graph artifact state plus compaction snapshot |
 | lessons and discoveries | memory rows, retrievable by memory.find |
 | selected context packages | package identities in graph state; text reselected after rebuild |
 | legal next transitions | graph case plus compaction snapshot |
-| recovery ladder | fault rows and graph recovery state |
+| recovery ladder and provider anomaly budget | fault rows, provider facts, and graph recovery state |
 | raw turn history | transcript only, never back into the window |
 
 ## Cost Model

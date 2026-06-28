@@ -32,7 +32,7 @@ pub fn judge_task(task: &BenchmarkTask, workspace: &Path) -> BenchResult<JudgeOu
         JudgeKind::ThirtySemanticDocs => owner_docs::thirty_docs(workspace),
         JudgeKind::MultiTopicDocumentation => owner_doc_topics::multi_topic_docs(workspace),
         JudgeKind::GraphStateParamRecovery => owner_ops::graph_state_recovery(workspace),
-        JudgeKind::DocScaffoldParamRecovery => owner_ops::doc_scaffold_recovery(workspace),
+        JudgeKind::BatchWriteProtocolRecovery => owner_ops::batch_write_recovery(workspace),
         JudgeKind::RecoveryLoopLongStory => owner_ops::recovery_loop_long_story(workspace),
         JudgeKind::GraphPlanExample => owner_loop_ops::graph_plan_example(workspace),
         JudgeKind::GraphTransitionTarget => owner_loop_ops::graph_transition_target(workspace),

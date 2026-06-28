@@ -66,8 +66,8 @@ quality.
   active and must not create a memory loop.
 - `cookbook-scaffold-false-ready`: scaffold-only cookbook output may pass
   structure but must fail content readiness and refuse `agent.done`.
-- `cookbook-placeholder-batch`: `artifact.next` examples and direct write tools
-  must reject scaffold phrases before overwriting richer content.
+- `cookbook-placeholder-batch`: `artifact.next` write contracts and direct
+  write tools must reject scaffold phrases before overwriting richer content.
 
 ## Agent-Facing Report Matrix
 
@@ -86,10 +86,12 @@ quality.
   post-compaction check, and preserves missing evidence plus refused actions.
 - `repeated-recovery-action`: a refused recovery action signature is blocked
   and the next action uses a different action class.
-- `long-novel-active-run`: the active novel run keeps weak-content repair,
-  batch-limit refusal, provider anomaly retry, short-root expectation,
-  artifact-derived touched paths, and maintenance cooldown under one authority
-  decision stream. The fixture checks behavior instead of one stale long root.
+- `sf-novel-active-run`: the active novel run uses owner text
+  `Create a SF novel. with detailed structured settings.` and root
+  `stories/novel`. It keeps weak-content repair, batch-limit refusal,
+  provider anomaly retry, audit-owned evidence refusal, and final verification
+  pending under one authority decision stream. The fixture checks behavior and
+  fails stale long-novel wording or sentence-like roots.
 
 ## Verification
 

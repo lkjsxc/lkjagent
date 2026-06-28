@@ -1,1 +1,0 @@
-{"status":"fault","closure_mode":"StopSequenceClosed","envelope_mode":"Natural","normalized_text_hash":"ee36cd30068df4cc","content_bytes":293,"error":"BadParams { tool: \"graph.evidence\", missing: [\"kind\", \"summary\"], unknown: [\"type\", \"content\", \"reason\"] }"}

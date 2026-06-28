@@ -22,7 +22,7 @@ pub(crate) fn report_failure(
     let without_toc = sample_readmes_without_toc(&path, workspace)?;
     let weak = sample_weak_markdown(&path, workspace)?;
     Ok(format!(
-        "{minimum}; next action should use doc.scaffold, doc.audit, fs.mkdir, or fs.batch_write to repair README-indexed structure; best={shown} directories={} markdown_files={} depth={} missing_readmes={} readmes_without_toc={} weak_markdown_files={} missing_readme_paths={} readmes_without_toc_paths={} weak_markdown_paths={}",
+        "{minimum}; next action should use doc.audit, artifact.next, fs.mkdir, or fs.batch_write to repair README-indexed structure; best={shown} directories={} markdown_files={} depth={} missing_readmes={} readmes_without_toc={} weak_markdown_files={} missing_readme_paths={} readmes_without_toc_paths={} weak_markdown_paths={}",
         evidence.directories,
         evidence.markdown_files,
         evidence.max_depth,

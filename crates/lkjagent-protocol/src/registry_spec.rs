@@ -84,14 +84,6 @@ const VERIFY_XTASK: &[ParamSpec] = &[
     ParamSpec::req("gate"),
     ParamSpec::opt("timeout", Some("120")),
 ];
-const DOC_SCAFFOLD: &[ParamSpec] = &[
-    ParamSpec::req("root"),
-    ParamSpec::opt("kind", Some("documentation")),
-    ParamSpec::opt("count", None),
-    ParamSpec::opt("mode", Some("approx")),
-    ParamSpec::req("title"),
-    ParamSpec::opt("sections", None),
-];
 const DOC_AUDIT: &[ParamSpec] = &[
     ParamSpec::req("root"),
     ParamSpec::opt("count", None),
@@ -102,13 +94,6 @@ const ARTIFACT_PLAN: &[ParamSpec] = &[
     ParamSpec::req("title"),
     ParamSpec::req("kind"),
     ParamSpec::opt("scale", None),
-    ParamSpec::opt("sections", None),
-];
-const ARTIFACT_APPLY: &[ParamSpec] = &[
-    ParamSpec::req("root"),
-    ParamSpec::opt("title", None),
-    ParamSpec::opt("kind", Some("artifact")),
-    ParamSpec::opt("mode", Some("approx")),
     ParamSpec::opt("sections", None),
 ];
 const ARTIFACT_AUDIT: &[ParamSpec] = &[
@@ -166,10 +151,8 @@ pub const TOOLS: &[ToolSpec] = &[
     tool("workspace.index", WORKSPACE_SUMMARY, "compact repository index"),
     tool("verify.cargo", VERIFY_CARGO, "run a direct cargo gate"),
     tool("verify.xtask", VERIFY_XTASK, "run a direct xtask gate"),
-    tool("doc.scaffold", DOC_SCAFFOLD, "create compact README-indexed document tree"),
     tool("doc.audit", DOC_AUDIT, "audit document topology"),
-    tool("artifact.plan", ARTIFACT_PLAN, "plan semantic content artifact without writes"),
-    tool("artifact.apply", ARTIFACT_APPLY, "write semantic artifact scaffold"),
+    tool("artifact.plan", ARTIFACT_PLAN, "record semantic artifact identity without writes"),
     tool("artifact.audit", ARTIFACT_AUDIT, "audit semantic artifact readiness"),
     tool("artifact.next", ARTIFACT_NEXT, "plan next bounded artifact write batch"),
     tool("agent.done", AGENT_DONE, "close the task or cycle"),

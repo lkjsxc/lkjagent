@@ -57,7 +57,7 @@ Track updates are pure event reducers. The model never sets weights directly.
 - A doc.audit pass lowers document-structure and may create audit-owned
   document-structure evidence.
 - Artifact objective mismatch raises artifact-drift sharply, lowers
-  artifact-readiness sharply, and blocks artifact.next plus artifact.apply.
+  artifact-readiness sharply, and blocks artifact.next until repair changes shape.
 - Artifact audit pass lowers artifact-drift and raises artifact-readiness.
 - Context soft pressure raises context-pressure; hard pressure promotes to
   compaction and blocks mutation until snapshot checks pass.
@@ -69,9 +69,9 @@ Track updates are pure event reducers. The model never sets weights directly.
 ## Guard Effects
 
 - parse-recovery at or above `0.80` blocks large fs.batch_write and large
-  artifact.apply batches, prefers graph.state, doc.audit, fs.list, fs.tree, and
+  large mutation batches, prefers graph.state, doc.audit, fs.list, fs.tree, and
   one small fs.write, and renders canonical grammar examples.
-- artifact-drift at or above `0.75` blocks artifact.next and artifact.apply
+- artifact-drift at or above `0.75` blocks artifact.next
   until objective-match audit and repair pass.
 - context-pressure at or above `0.85` blocks mutation and requires snapshot,
   compaction, and post-compaction consistency checks.

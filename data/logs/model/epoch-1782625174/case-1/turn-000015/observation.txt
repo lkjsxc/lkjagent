@@ -1,0 +1,20 @@
+<observation>
+<status>ok</status>
+<content>
+document audit failed
+root=stories/novel
+topology=failed
+links=passed
+path_hygiene=passed
+content_readiness=not-requested
+artifact_readiness=not-owner
+checks_run=topology,links,path_hygiene,content_readiness
+failed=2
+failures_shown=2
+failures_omitted=0
+failures:
+- missing_readme: /data/workspace/stories/novel
+- too_few_children: /data/workspace/stories/novel
+next_action=artifact.next or fs.batch_write exact failed topology
+</content>
+</observation>

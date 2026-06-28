@@ -54,21 +54,6 @@ fn artifact_readiness_passed(content: &str) -> bool {
         || content.contains("readiness=story-semantic-content")
 }
 
-pub(super) fn add_document_scaffold_observation(
-    graph: &mut TaskGraphState,
-    output: &DispatchOutput,
-    effects: &mut Vec<Effect>,
-) -> bool {
-    ensure_evidence(
-        graph,
-        "observation",
-        EvidenceKind::Observation,
-        output,
-        None,
-        effects,
-    )
-}
-
 pub(super) fn add_shell_evidence(
     graph: &mut TaskGraphState,
     output: &DispatchOutput,

@@ -53,54 +53,55 @@ pub const GRAPH_TASK: BenchmarkTask = BenchmarkTask {
     timeout_seconds: 120,
 };
 
-const SCAFFOLD_PROMPT: &str = "\
-Recover from a model output that calls doc.scaffold with path instead of
-root. Normalize it or show a valid root-based action example.
+const BATCH_PROMPT: &str = "\
+Recover from a model output that sends object JSON to fs.batch_write.
+The next visible notice must require line protocol with path/content blocks.
 ";
 
-const SCAFFOLD_GOOD: &[FileSpec] = &[FileSpec {
+const BATCH_GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "action params normalized\ntool=doc.scaffold\nrenamed=path->root\nreason=doc.scaffold uses root, not path\n",
+    content: "schema fault: object-literal fs.batch_write files are not live output\ntool=fs.batch_write\ncanonical_grammar=line-protocol\npath: docs/README.md\ncontent:\n# Docs\n",
 }];
 
-const SCAFFOLD_BAD_OLD: &[FileSpec] = &[FileSpec {
+const BATCH_BAD_JSON: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "parse fault: missing params [root]; unknown params [path]\n",
+    content: "<tool>fs.batch_write</tool>\n<files>[{\"path\":\"docs/README.md\",\"content\":\"# Docs\"}]</files>\n",
 }];
 
-const SCAFFOLD_BAD_PATH: &[FileSpec] = &[FileSpec {
+const BATCH_BAD_CHILD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "action params refused\ntool=doc.scaffold\nvalid_example:\n<action>\n<tool>doc.scaffold</tool>\n<path>docs</path>\n</action>\n",
+    content:
+        "<tool>fs.batch_write</tool>\n<files><file><path>docs/README.md</path></file></files>\n",
 }];
 
-const SCAFFOLD_GOOD_FIXTURES: &[Fixture] = &[Fixture {
-    name: "path-renamed",
-    files: SCAFFOLD_GOOD,
+const BATCH_GOOD_FIXTURES: &[Fixture] = &[Fixture {
+    name: "line-protocol-required",
+    files: BATCH_GOOD,
 }];
 
-const SCAFFOLD_BAD_FIXTURES: &[Fixture] = &[
+const BATCH_BAD_FIXTURES: &[Fixture] = &[
     Fixture {
-        name: "old-unknown-param",
-        files: SCAFFOLD_BAD_OLD,
+        name: "json-files-payload",
+        files: BATCH_BAD_JSON,
     },
     Fixture {
-        name: "path-example",
-        files: SCAFFOLD_BAD_PATH,
+        name: "child-file-tags",
+        files: BATCH_BAD_CHILD,
     },
 ];
 
-pub const SCAFFOLD_TASK: BenchmarkTask = BenchmarkTask {
-    id: "owner-param-doc-scaffold-001",
+pub const BATCH_TASK: BenchmarkTask = BenchmarkTask {
+    id: "owner-param-batch-write-001",
     suite: "tiny",
     family: TaskFamily::OwnerReliability,
     difficulty: Difficulty::Tiny,
-    tags: &["owner-failure", "params", "doc-scaffold"],
-    prompt: SCAFFOLD_PROMPT,
+    tags: &["owner-failure", "params", "batch-write"],
+    prompt: BATCH_PROMPT,
     follow_up: None,
     starter_files: &[],
-    good: SCAFFOLD_GOOD_FIXTURES,
-    bad: SCAFFOLD_BAD_FIXTURES,
-    judge: JudgeKind::DocScaffoldParamRecovery,
+    good: BATCH_GOOD_FIXTURES,
+    bad: BATCH_BAD_FIXTURES,
+    judge: JudgeKind::BatchWriteProtocolRecovery,
     seed: 8102,
     points: 1,
     timeout_seconds: 120,

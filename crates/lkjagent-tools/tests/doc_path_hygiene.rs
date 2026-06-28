@@ -7,7 +7,7 @@ use lkjagent_tools::dispatch::dispatch;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
 #[test]
-fn multi_topic_request_creates_topic_pages_not_combined_slug() -> TestResult<()> {
+fn removed_scaffold_does_not_create_combined_slug() -> TestResult<()> {
     let workspace = temp_workspace("doc-path-topics")?;
     let output = scaffold(
         &workspace,
@@ -20,19 +20,7 @@ fn multi_topic_request_creates_topic_pages_not_combined_slug() -> TestResult<()>
         ],
     )?;
 
-    assert!(output.contains("profile=GenericStructuredDocs"));
-    for path in [
-        "topics/model-endpoint.md",
-        "topics/minecraft.md",
-        "topics/windows.md",
-        "topics/japan.md",
-        "topics/united-states.md",
-    ] {
-        assert!(
-            workspace.join("docs").join(path).is_file(),
-            "missing {path}"
-        );
-    }
+    assert!(output.contains("unknown tool: doc.scaffold"));
     assert!(!workspace
         .join("docs/model-endpoint-minecraft-windows-japan-united-states.md")
         .exists());

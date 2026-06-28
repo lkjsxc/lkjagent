@@ -10,17 +10,15 @@ paths, and Markdown leaves.
 - document root: a workspace directory that contains README.md and may contain catalog.toml.
 - artifact root: a workspace directory with catalog.toml or an artifact ledger record.
 - weak path: a relative path under an artifact root that needs content repair.
-- Markdown leaf: a `.md` file, never a root for doc.audit, artifact.audit, doc.scaffold, or artifact.apply.
+- Markdown leaf: a `.md` file, never a root for doc.audit or artifact.audit.
 
 ## Root And Path Table
 
 | Tool | Root input | Path input | Reducer result |
 | --- | --- | --- | --- |
 | artifact.plan | directory identity | none | records identity only when the root is not a Markdown leaf. |
-| artifact.apply | directory root | none | creates or repairs the directory; refuses `.md` roots before mutation. |
-| artifact.next | root or known leaf | optional weak path | normalizes to owning root and weak path before choosing repair or audit. |
+| artifact.next | root or known leaf | optional weak path | normalizes to owning root and weak path before returning a write contract or audit route. |
 | artifact.audit | directory root | none | audits directories only; file roots get a semantic refusal. |
-| doc.scaffold | directory root | none | creates README, catalog, and child files; refuses `.md` roots. |
 | doc.audit | directory root | none | audits directories only; file roots get a semantic refusal or read action. |
 | fs.write | workspace file | none | writes Markdown leaves and never creates artifact roots. |
 | fs.batch_write | workspace files | none | writes Markdown leaves and never creates artifact roots. |

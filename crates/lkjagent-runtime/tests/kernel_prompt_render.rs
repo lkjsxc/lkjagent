@@ -1,9 +1,7 @@
-use lkjagent_protocol::parse_completion;
 use lkjagent_runtime::kernel::{
     build_snapshot, reduce, render_prompt_frame, PromptRenderError, RuntimeDecisionId,
     RuntimeEvent, RuntimeEventId, SnapshotAdapterInput,
 };
-use lkjagent_tools::dispatch::validate_action;
 
 fn owner_input() -> SnapshotAdapterInput {
     SnapshotAdapterInput {
@@ -64,20 +62,19 @@ fn owner_prompt_cites_decision_id_and_fingerprints() -> Result<(), String> {
 }
 
 #[test]
-fn schema_repair_batch_example_is_concrete_and_parseable() -> Result<(), String> {
+fn schema_repair_renders_write_contract_not_prefilled_batch() -> Result<(), String> {
     let snapshot = build_snapshot(owner_input()).map_err(format_error)?;
     let mut decision =
         reduce(&snapshot, RuntimeEvent::SchemaFault { fault_key: None }).map_err(format_error)?;
     decision.decision_id = RuntimeDecisionId::Stored(77);
     decision.event_id = RuntimeEventId(10);
     let frame = render_prompt_frame(&decision).map_err(format_error)?;
-    assert!(frame.contains("path: stories/chronos-fracture/README.md"));
+    assert!(frame.contains("<write-contract>"));
+    assert!(frame.contains("<tool>fs.batch_write</tool>"));
+    assert!(frame.contains("<root>stories/chronos-fracture</root>"));
+    assert!(frame.contains("author exactly one fs.batch_write action"));
     assert!(!frame.contains("[{\"path\""));
-    let action_text = exact_action(&frame).ok_or_else(|| "missing action".to_string())?;
-    let action = parse_completion(action_text).map_err(format_error)?;
-    validate_action(&action).map_err(format_error)?;
-    assert_eq!(action.tool, "fs.batch_write");
-    assert!(action.params.iter().any(|param| param.name == "files"));
+    assert!(!frame.contains("path: stories/chronos-fracture/README.md"));
     Ok(())
 }
 
@@ -92,15 +89,6 @@ fn runtime_effect_decision_produces_no_prompt() -> Result<(), String> {
         Err(PromptRenderError::RuntimeEffectHasNoPrompt)
     );
     Ok(())
-}
-
-fn exact_action(text: &str) -> Option<&str> {
-    let start = text.find("<action>")?;
-    let end = text[start..]
-        .find("</action>")?
-        .saturating_add(start)
-        .saturating_add("</action>".len());
-    text.get(start..end)
 }
 
 fn format_error(error: impl std::fmt::Debug) -> String {

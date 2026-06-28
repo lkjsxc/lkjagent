@@ -33,8 +33,8 @@ has a current decision.
 
 ## Invariants
 
-- roots for doc.audit, artifact.audit, doc.scaffold, artifact.plan, and
-  artifact.apply are directory identities.
+- roots for doc.audit, artifact.audit, artifact.plan, and artifact.next are
+  directory identities.
 - a root ending in `.md` is refused or repaired before write, never silently
   created as a directory or ledger identity.
 - artifact.next may accept a Markdown file only as a weak path under a known
@@ -55,7 +55,7 @@ has a current decision.
 
 Focused tests prove current refusals for artifact.plan `.md` roots before
 ledger identity, artifact.next on file roots, artifact.audit on file roots,
-doc.audit on file roots, artifact.apply `.md` roots, doc.scaffold `.md` roots,
+doc.audit on file roots and removed writer `.md` roots,
 existing `.md` directories, and missing directory roots. Covered refusal
 examples now parse, validate, and dispatch to a route. `artifact.next` now
 reports candidate actions as facts with `next_decision_required=true` instead

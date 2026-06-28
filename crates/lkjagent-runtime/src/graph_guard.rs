@@ -92,7 +92,7 @@ fn append_guard(graph: String, guard: CompletionGuard) -> String {
 fn guard_text(guard: CompletionGuard) -> Option<String> {
     if guard.is_recursive() {
         return Some(format!(
-            "completion_guard={}\nrecursive_guard_instruction=README-indexed recursive tree required; prefer doc.scaffold, doc.audit, fs.batch_write, and verification evidence before agent.done",
+            "completion_guard={}\nrecursive_guard_instruction=README-indexed recursive tree required; prefer artifact.next, doc.audit, fs.batch_write, and verification evidence before agent.done",
             guard.as_state_value()
         ));
     }
@@ -107,16 +107,16 @@ fn guard_text(guard: CompletionGuard) -> Option<String> {
 fn count_instruction(kind: CountKind, mode: CountMode) -> &'static str {
     match (kind, mode) {
         (CountKind::File, CountMode::Exact) => {
-            "exact file count active; prefer doc.scaffold, fs.list, fs.stat, doc.audit, or fs.batch_write; shell.run is an escape hatch only when graph policy admits it"
+            "exact file count active; prefer fs.list, fs.stat, doc.audit, artifact.next, or fs.batch_write; shell.run is an escape hatch only when graph policy admits it"
         }
         (CountKind::File, CountMode::Approximate) => {
-            "approximate file scale active; treat the number as a size hint and prefer doc.scaffold plus doc.audit; shell.run is an escape hatch only when graph policy admits it"
+            "approximate file scale active; treat the number as a size hint and prefer artifact.next plus doc.audit; shell.run is an escape hatch only when graph policy admits it"
         }
         (CountKind::Markdown, CountMode::Exact) => {
-            "exact markdown count active; prefer doc.scaffold, fs.list, fs.stat, doc.audit, or fs.batch_write; shell.run is an escape hatch only when graph policy admits it"
+            "exact markdown count active; prefer fs.list, fs.stat, doc.audit, artifact.next, or fs.batch_write; shell.run is an escape hatch only when graph policy admits it"
         }
         (CountKind::Markdown, CountMode::Approximate) => {
-            "approximate markdown count active; prefer doc.scaffold plus doc.audit within tolerance; shell.run is an escape hatch only when graph policy admits it"
+            "approximate markdown count active; prefer artifact.next plus doc.audit within tolerance; shell.run is an escape hatch only when graph policy admits it"
         }
     }
 }

@@ -30,7 +30,7 @@ fn tool_requiring_prompt_never_has_empty_tool_surface() {
     assert_ne!(owner.effective_policy.allowed_tools, Vec::<&str>::new());
     assert!(!owner.prompt_card.contains("allowed_tools=none"));
     assert!(owner.prompt_card.contains("allowed_tools=fs.read"));
-    assert!(owner.prompt_card.contains("artifact.apply"));
+    assert!(owner.prompt_card.contains("fs.batch_write"));
     assert!(owner.prompt_card.contains("graph.state"));
 }
 
@@ -98,7 +98,7 @@ fn admission_refuses_non_current_decision_or_prompt_ids() -> Result<(), String> 
         .admission_view
         .with_current_ids("decision-3", "frame-3");
     let stale_decision = AdmissionRequest::new(
-        ToolName::new("artifact.apply").map_err(format_error)?,
+        ToolName::new("fs.batch_write").map_err(format_error)?,
         snapshot.staleness_fingerprint.clone(),
         "action-fp",
     )
@@ -108,7 +108,7 @@ fn admission_refuses_non_current_decision_or_prompt_ids() -> Result<(), String> 
         Some(AdmissionRefusalKind::DecisionNotCurrent)
     );
     let stale_prompt = AdmissionRequest::new(
-        ToolName::new("artifact.apply").map_err(format_error)?,
+        ToolName::new("fs.batch_write").map_err(format_error)?,
         snapshot.staleness_fingerprint,
         "action-fp",
     )

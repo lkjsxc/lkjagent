@@ -10,10 +10,6 @@ pub fn ensure_plan_root(workspace: &Path, root: &str, kind: &str) -> ToolResult<
     ensure_artifact_directory_root("artifact.plan", workspace, root, kind)
 }
 
-pub fn ensure_apply_root(workspace: &Path, root: &str, kind: &str) -> ToolResult<()> {
-    ensure_artifact_directory_root("artifact.apply", workspace, root, kind)
-}
-
 pub fn ensure_document_root(workspace: &Path, tool: &str, root: &str) -> ToolResult<()> {
     let address = resolve_artifact_address(ResolveInput {
         workspace,

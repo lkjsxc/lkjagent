@@ -93,7 +93,7 @@ fn route_notice(fault: RecoveryFault, count: u8) -> String {
     };
     if matches!(fault, RecoveryFault::Payload) {
         return format!(
-            "{prefix} reached count={count}; graph recovery is active. Use artifact.plan, artifact.apply, doc.scaffold, or fs.batch_write. Raw fs.write remains blocked while payload risk is active."
+            "{prefix} reached count={count}; graph recovery is active. Use artifact.plan, artifact.next, doc.audit, or fs.batch_write. Raw fs.write remains blocked while payload risk is active."
         );
     }
     format!(

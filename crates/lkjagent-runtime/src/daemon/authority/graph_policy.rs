@@ -179,7 +179,6 @@ fn authority_escape_tools(
             "fs.read",
             "fs.list",
             "fs.stat",
-            "artifact.apply",
             "artifact.audit",
             "artifact.next",
             "doc.audit",

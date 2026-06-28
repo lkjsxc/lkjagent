@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-done
-summary=Completed with evidence
-</content>
-</observation>

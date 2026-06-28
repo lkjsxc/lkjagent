@@ -1,5 +1,7 @@
 mod support;
 
+use std::fs;
+
 use lkjagent_store::artifact_cursor::latest_batch_cursor;
 use lkjagent_store::artifact_ledger::latest_for_case;
 use lkjagent_tools::dispatch::dispatch;
@@ -12,15 +14,16 @@ fn artifact_next_records_normalized_batch_cursor() -> TestResult<()> {
     let mut conn = store()?;
     let mut dispatch_state = state();
     let root = "cookbooks/bread";
-    dispatch(
-        &action(
-            "artifact.apply",
-            &[("root", root), ("title", "Bread"), ("kind", "cookbook")],
-        ),
-        &runtime,
-        &mut conn,
-        &mut dispatch_state,
-    );
+    fs::create_dir_all(runtime.workspace.join(root).join("foundations"))?;
+    fs::write(
+        runtime.workspace.join(root).join("catalog.toml"),
+        "kind = \"cookbook\"\n",
+    )?;
+    fs::write(runtime.workspace.join(root).join("README.md"), "# Bread\n")?;
+    fs::write(
+        runtime.workspace.join(root).join("foundations/flour.md"),
+        "# Flour\n\n## Purpose\n\ncontent_state=structure-only\n",
+    )?;
     dispatch_state.reset_repeat_tracking();
     let output = dispatch(
         &action("artifact.next", &[("root", root), ("kind", "cookbook")]),
@@ -36,9 +39,7 @@ fn artifact_next_records_normalized_batch_cursor() -> TestResult<()> {
     let cursor = latest_batch_cursor(&conn, artifact.id)?.ok_or("missing cursor")?;
     assert_eq!(cursor.root, root);
     assert!(cursor.planned_paths.contains("foundations/"));
-    assert!(cursor
-        .last_valid_example
-        .contains("<tool>fs.batch_write</tool>"));
+    assert!(cursor.last_valid_example.contains("tool=fs.batch_write"));
     assert_eq!(cursor.fallback_mode, "batch-write");
     Ok(())
 }

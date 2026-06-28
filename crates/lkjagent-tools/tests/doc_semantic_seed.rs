@@ -5,7 +5,7 @@ use std::path::Path;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
 #[test]
-fn lkjagent_model_rust_request_creates_connected_seed() -> TestResult<()> {
+fn removed_scaffold_creates_no_lkjagent_seed() -> TestResult<()> {
     let workspace = temp_workspace("doc-lkjagent-seed")?;
     let output = scaffold(
         &workspace,
@@ -16,24 +16,14 @@ fn lkjagent_model_rust_request_creates_connected_seed() -> TestResult<()> {
         ],
     )?;
 
-    assert!(output.contains("profile=LkjagentSemanticSeed"));
-    assert!(workspace.join("docs/project/purpose.md").is_file());
-    assert!(workspace.join("docs/model-interface/contract.md").is_file());
-    assert!(workspace.join("docs/implementation/rust.md").is_file());
-    assert!(workspace
-        .join("docs/relations/project-model-implementation.md")
-        .is_file());
+    assert!(output.contains("unknown tool: doc.scaffold"));
+    assert!(!workspace.join("docs/project/purpose.md").exists());
     assert!(!workspace.join("docs/lkjagent.md").exists());
-    let catalog = std::fs::read_to_string(workspace.join("docs/catalog.toml"))?;
-    assert!(!catalog.contains("qwen"));
-
-    let audit = audit(&workspace, "docs")?;
-    assert!(audit.contains("document audit passed"), "{audit}");
     Ok(())
 }
 
 #[test]
-fn multi_topic_request_preserves_domain_seed() -> TestResult<()> {
+fn removed_scaffold_creates_no_multi_topic_seed() -> TestResult<()> {
     let workspace = temp_workspace("doc-multi-topic-seed")?;
     let output = scaffold(
         &workspace,
@@ -47,26 +37,9 @@ fn multi_topic_request_preserves_domain_seed() -> TestResult<()> {
         ],
     )?;
 
-    assert!(output.contains("profile=LkjagentSemanticSeed"));
-    assert!(workspace.join("docs/project/lkjagent.md").is_file());
-    assert!(workspace
-        .join("docs/model-interface/model-endpoint.md")
-        .is_file());
-    assert!(workspace
-        .join("docs/domain-examples/asia-foods.md")
-        .is_file());
-    assert!(workspace
-        .join("docs/domain-examples/minecraft.md")
-        .is_file());
-    assert!(workspace.join("docs/domain-examples/factorio.md").is_file());
-    assert!(workspace
-        .join("docs/relations/project-model-domain-examples.md")
-        .is_file());
-    assert!(!workspace.join("docs/architecture/README.md").exists());
-    assert!(!workspace.join("docs/guides/README.md").exists());
-
-    let audit = audit(&workspace, "docs")?;
-    assert!(audit.contains("document audit passed"), "{audit}");
+    assert!(output.contains("unknown tool: doc.scaffold"));
+    assert!(!workspace.join("docs/project/lkjagent.md").exists());
+    assert!(!workspace.join("docs/domain-examples/minecraft.md").exists());
     Ok(())
 }
 

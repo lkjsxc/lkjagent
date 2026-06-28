@@ -3,7 +3,7 @@ use crate::registry::{ToolSpec, TOOLS};
 
 pub fn render_registry_section() -> String {
     let mut lines = TOOLS.iter().map(render_tool).collect::<Vec<_>>();
-    lines.push("doc.scaffold/doc.audit/artifact.*: do not use path; use root".to_string());
+    lines.push("doc.audit/artifact.*: use root for artifact directories".to_string());
     lines.push(format!(
         "example graph.state: {ACTION_OPEN}<tool>graph.state</tool>{ACTION_CLOSE}"
     ));
@@ -52,8 +52,8 @@ mod tests {
     #[test]
     fn renders_root_hint_for_doc_tools() {
         let rendered = render_registry_section();
-        assert!(rendered.contains("doc.scaffold"));
-        assert!(rendered.contains("do not use path; use root"));
+        assert!(!rendered.contains("doc.scaffold"));
+        assert!(rendered.contains("use root for artifact directories"));
         assert!(rendered.contains("<root>docs</root>"));
     }
 }

@@ -1,9 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-files_written=2
-input_format=line-protocol
-stories/novel/settings.md bytes=364
-stories/novel/characters.md bytes=366
-</content>
-</observation>

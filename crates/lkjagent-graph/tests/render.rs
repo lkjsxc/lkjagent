@@ -10,7 +10,8 @@ fn render_graph_slice_names_allowed_and_blocked_tools() {
     assert!(rendered.contains("Allowed tools now:"));
     assert!(rendered.contains("Blocked tools now:"));
     assert!(rendered.contains("graph.plan"));
-    assert!(rendered.contains("doc.scaffold"));
+    assert!(rendered.contains("fs.list"));
+    assert!(!rendered.contains("doc.scaffold"));
     assert!(rendered.contains("Legal transitions:"));
 }
 

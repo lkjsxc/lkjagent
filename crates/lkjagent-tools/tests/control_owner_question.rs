@@ -40,17 +40,17 @@ fn agent_ask_refuses_recovery_how_to_use_tool_question() -> TestResult<()> {
 
     assert!(is_error(&output));
     assert!(output.content.contains("tool recovery must choose"));
-    assert!(output.content.contains("<tool>doc.scaffold</tool>"));
+    assert!(output.content.contains("<tool>artifact.next</tool>"));
     Ok(())
 }
 
 #[test]
-fn agent_ask_refuses_doc_scaffold_usage_question() -> TestResult<()> {
-    let output = ask("How do I use doc.scaffold when the recovery node blocks writes?")?;
+fn agent_ask_refuses_removed_scaffold_usage_question() -> TestResult<()> {
+    let output = ask("How do I use the removed scaffold writer when recovery blocks writes?")?;
 
     assert!(is_error(&output));
     assert!(output.content.contains("tool recovery must choose"));
-    assert!(output.content.contains("<tool>doc.scaffold</tool>"));
+    assert!(output.content.contains("<tool>artifact.next</tool>"));
     Ok(())
 }
 

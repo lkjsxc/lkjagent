@@ -29,10 +29,8 @@ fn artifact_drift_blocks_artifact_continuation() {
         },
     );
     let next = authorize_tool_intent(&state, &intent("artifact.next", "next", 0));
-    let apply = authorize_tool_intent(&state, &intent("artifact.apply", "apply", 1));
 
     assert!(!next.allowed);
-    assert!(!apply.allowed);
     assert!(next.blocked_by.contains(&TrackLabel::ArtifactDrift));
 }
 
@@ -142,7 +140,7 @@ fn case() -> CaseState {
                 "fs.write".to_string(),
                 "fs.batch_write".to_string(),
                 "artifact.next".to_string(),
-                "artifact.apply".to_string(),
+                "artifact.audit".to_string(),
                 "memory.save".to_string(),
                 "agent.done".to_string(),
             ],

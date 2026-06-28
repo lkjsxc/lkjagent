@@ -3,8 +3,8 @@
 ## Purpose
 
 Define the model-facing prompt frame for a weak local model. The runtime owns
-the next step; the model sees one compact authority card and one exact valid
-action, not a broad tool manual.
+the next step; the model sees one compact authority card and one decision-
+selected action surface, not a broad tool manual.
 
 ## Runtime Card
 
@@ -29,9 +29,10 @@ Fields are deterministic data from the persisted `RuntimeDecision`. The card
 must not include hidden reasoning, object-literal tool calls, raw provider
 reasoning, invalid action examples, or raw parse-fault assistant text.
 
-## Exact Next Action
+## Action Surface
 
-The card is followed by exactly one valid action example:
+The card is followed by exactly one action surface. For non-content actions it
+is a full exact tag action rendered from the registry and current authority:
 
 ```text
 <next-action>
@@ -42,8 +43,10 @@ The card is followed by exactly one valid action example:
 </next-action>
 ```
 
-The example is rendered from the registry and current authority, then
-round-tripped through parse, schema validation, and admission in tests.
+For content writes it is a write contract, not prefilled body text. The surface
+names `fs.batch_write`, root, exact paths, size limits, required sections, and
+forbidden weak phrase classes. The model must author the singular
+`fs.batch_write` action using line protocol inside `<files>`.
 
 ## Escape Surface
 
@@ -66,7 +69,9 @@ Tests must prove rendered prompt frames:
 - contain one `runtime-card` and one `next-action`;
 - include the output budget;
 - contain no object-literal `fs.batch_write` payloads;
-- show an action that parses, validates, and is admitted by the decision.
+- show a non-content action that parses, validates, and is admitted by the
+  decision;
+- show content writes as contracts with no generated body prose.
 
 ## Status
 

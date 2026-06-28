@@ -42,7 +42,7 @@ impl DriftReport {
 
     pub fn block_message(&self, root: &str) -> String {
         format!(
-            "artifact drift guard active\nroot={root}\nblocked=artifact.next,artifact.apply\nfailures={}\nnext_action=artifact.audit after repair",
+            "artifact drift guard active\nroot={root}\nblocked=artifact.next\nfailures={}\nnext_action=artifact.audit after repair",
             self.failures.join("; ")
         )
     }

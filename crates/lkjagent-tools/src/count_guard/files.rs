@@ -47,7 +47,7 @@ pub fn report(workspace: &Path, guard: CountGuard, best: Option<(PathBuf, usize)
     let base = requirement(guard, label);
     match best {
         Some((path, count)) => format!(
-            "{base}; next action should repair the count with doc.scaffold, doc.audit, fs.list, fs.stat, or fs.batch_write; best={} {}={count}",
+            "{base}; next action should repair the count with doc.audit, artifact.next, fs.list, fs.stat, or fs.batch_write; best={} {}={count}",
             relative(&path, workspace),
             label.replace(' ', "_")
         ),

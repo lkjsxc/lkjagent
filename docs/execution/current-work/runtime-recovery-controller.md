@@ -39,7 +39,7 @@ fault, the next route must be `graph.recover`, a legal transition, an unused
 non-mutating native inspection tool, or a smaller plan step.
 
 Mutation blocking must have an escape. If recovery blocks `fs.write`,
-`fs.batch_write`, or `doc.scaffold`, the controller must route to restored
+`fs.batch_write`, or removed scaffold-writer syntax, the controller must route to restored
 planning, document topology, alternate inspection, or a smaller step rather
 than leaving mutation as the only productive action.
 
@@ -65,7 +65,7 @@ after native inspection, alternate native tools, and smaller scope have failed.
 - The model uses `graph.note` with an invalid kind after a refusal.
 - Compaction demands `memory.save` while graph policy blocks `memory.save`.
 - A recovery node blocks the only productive tool class.
-- The model attempts `fs.write` or `doc.scaffold` while recovery blocks mutation.
+- The model attempts `fs.write` or removed scaffold-writer syntax while recovery blocks mutation.
 - Parse faults continue past escalation without a forced smaller-scope route.
 - Tool faults continue past escalation without alternate native tool routing.
 - A document task uses a giant `fs.write` instead of document construction.

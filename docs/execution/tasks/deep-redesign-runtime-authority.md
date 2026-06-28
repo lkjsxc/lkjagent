@@ -6,7 +6,7 @@ Make one persisted runtime decision the authority for prompt rendering and dispa
 
 ## Status
 
-open
+done
 
 ## Depends On
 

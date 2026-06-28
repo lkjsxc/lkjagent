@@ -132,7 +132,7 @@ pub(crate) const PACKAGES: &[ContextPackage] = &[
     package(
         "doc-construction",
         "Document construction",
-        "Use doc.scaffold/doc.audit or bounded batch writes; keep README indexes, topology, coverage, and counts auditable.",
+        "Use doc.audit, artifact.next contracts, or bounded batch writes; keep README indexes, topology, coverage, and counts auditable.",
         DOC_NODES,
         DOC_FAMILIES,
         PackagePriority::Core,

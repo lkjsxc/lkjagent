@@ -2,67 +2,58 @@
 
 ## Purpose
 
-Define graph-native document construction helpers for structured artifacts.
-The semantic tree and graph contract lives in
+Define live document and artifact tools for structured artifacts. The semantic
+tree and graph contract lives in
 [../document-structure/](../document-structure/README.md).
 
 ## Address Reducer Contract
 
-artifact.plan, artifact.apply, artifact.next, artifact.audit, doc.scaffold,
-and doc.audit call the shared address reducer before any filesystem, audit, or
-ledger effect. The reducer owns root versus weak path classification, Markdown
-leaf refusals, old `.md` directory refusals, normalized roots, and copyable
-examples. fs.write and fs.batch_write remain the only tools that write Markdown
-leaves.
+`artifact.plan`, `artifact.next`, `artifact.audit`, and `doc.audit` call the
+shared address reducer before any filesystem, audit, or ledger effect. The
+reducer owns root versus weak path classification, Markdown leaf refusals,
+old `.md` directory refusals, normalized roots, and copyable non-content
+action surfaces. `fs.write` and `fs.batch_write` remain the only tools that
+write Markdown leaves.
 
-## doc.scaffold
+## Removed Live Scaffold Writers
 
-Creates a compact semantic tree under `root`. Parameters are `root`, optional
-`kind`, optional `count`, optional `mode` (`exact` or `approx`), required
-`title`, and optional newline sections. It generates README indexes and
-compact `catalog.toml` metadata for documentation roots. It refuses existing
-cataloged roots; repairs use `artifact.next`, `fs.batch_write`, or focused
-writes instead of re-scaffolding over content.
+Prompt-visible scaffold writers are not live tools. The former document and
+artifact scaffold writers are absent from the executable registry, prompts,
+admission, recovery examples, and tests. Structure and identity are created by model-
+authored `fs.batch_write` actions that pass stored write contracts.
 
 ## doc.audit
 
 Audits a document root for README presence, local child links, forbidden
-sequence-only names, catalog metadata presence, line caps, and
-optional file-count target. Approximate count targets accept extra Markdown
-files; exact mode requires the target count. Passing audits can satisfy
-document-structure evidence when the active graph gate accepts that evidence.
+sequence-only names, catalog metadata presence, line caps, and optional
+file-count target. Approximate count targets accept extra Markdown files; exact
+mode requires the target count. Passing audits can satisfy document-structure
+evidence when the active graph gate accepts that audit-owned evidence.
 
 ## artifact.plan
 
-Plans a semantic content artifact without writing files. Parameters are
-`root`, `title`, `kind`, optional `scale`, and optional `sections`.
-
-## artifact.apply
-
-Writes a semantic artifact scaffold by reusing the document planner and writer.
-Parameters are `root`, optional `title`, optional `kind`, optional `mode`, and
-optional `sections`. The output includes README files and `catalog.toml`
-as the current manifest. `root` is a directory address and `.md` roots are
-refused before mutation.
+Records a semantic content artifact identity without writing files. Parameters
+are `root`, `title`, `kind`, optional `scale`, and optional `sections`. It
+preserves full owner wording in metadata while short path aliases, such as
+`stories/novel`, remain the filesystem root.
 
 ## artifact.audit
 
 Audits a semantic artifact root. Parameters are `root`, optional `kind`,
-optional `count`, and optional `mode`. When `kind` is story or cookbook, audit
-rejects a generic project-doc manifest for that artifact request. Passing
-artifact audit is the only audit-owned readiness proof for artifact-readiness
-evidence. If `root` resolves to a file, artifact.audit reports `root_is_file`
-and renders a root-directory next action instead of surfacing an OS error.
-Graph notes and raw file existence do not satisfy artifact readiness.
+optional `count`, and optional `mode`. Passing artifact audit is the only
+audit-owned readiness proof for artifact-readiness evidence. If `root` resolves
+to a file, artifact.audit reports `root_is_file` and renders a root-directory
+next action instead of surfacing an OS error. Graph notes and raw file existence
+do not satisfy artifact readiness.
 
 ## artifact.next
 
-Plans the next bounded artifact write batch from readiness gaps. Parameters
-are `root`, optional `path`, and optional `kind`. It returns exact weak paths,
-required sections, and a copyable `fs.batch_write` example only when the
-example already contains profile-specific content. When no current weak path
-remains in the durable cursor window, it requests audit or focused reads
-instead of rendering a placeholder write.
+Plans the next bounded artifact write batch from readiness gaps. Parameters are
+`root`, optional `path`, and optional `kind`. It returns exact paths, limits,
+required sections, forbidden weak phrase classes, and
+`next_decision_required=true`. It never writes files and never returns generated
+body prose. The next persisted decision may render a content-write surface that
+requires the model to author a singular `fs.batch_write` action.
 
 If `root` resolves to a file, artifact.next must not claim missing=0 or render
 artifact.audit for that file. It resolves the owning artifact root or asks for a
@@ -76,7 +67,5 @@ The documentation root contract is
 
 ## Status
 
-partially implemented; doc tools, artifact wrappers, bounded next-batch
-planning, scaffold-only rejection, focused address refusals, artifact.plan
-root admission, and doc route reducer checks exist. Root adoption and repair
-planning remain open.
+open for this redesign. Live tools use audits, plans, contracts, and
+model-authored line-protocol writes; scaffold writers are not prompt-visible.

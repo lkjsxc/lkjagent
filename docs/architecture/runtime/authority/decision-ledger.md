@@ -24,21 +24,23 @@ Every decision records:
 
 - decision id, snapshot id, event id, case id, and prompt frame head;
 - mission, active mode, decision kind, graph node, and graph phase;
-- admitted tools, blocked tools, exact next tool class, and valid example;
+- admitted tools, blocked tools, exact next tool class, and either a valid
+  non-content example or a content write contract;
 - runtime effect command when no model-authored content is needed;
 - missing evidence, existing evidence, and audit-owned evidence gaps;
 - artifact root, artifact kind, profile, weak cursor, batch cursor, and current
   weak path set;
 - latest observation, latest successful observation, fault class, recovery
   route, repeat count, and next route;
-- compaction plan, pre and post snapshot ids, and resume target;
+- compaction policy, trigger reason, pre and post snapshot ids, and resume target;
 - maintenance plan, cooldown outcome, and no-op reason;
 - completion state, failed gates, close allowance, and refusal text;
 - provider anomaly state, retry count, exchange id, and pause target;
 - prompt card data, context package ids, authority fingerprint, and staleness
   fingerprint;
 - persistence plan for model-log, status, admission, effect, and observation
-  rows.
+  rows;
+- rule explanation naming the first matching mission-priority rule.
 
 ## Invariants
 
@@ -49,6 +51,7 @@ Every decision records:
 - Empty admitted tool sets are limited to deterministic runtime effects, owner
   wait, accepted close, and closed idle.
 - Completion refusal includes one next admitted audit or repair tool.
+- Content-write prompts render contracts and never prefill body prose.
 - Recovery decisions shrink or change the action surface after repeated faults.
 - Decisions record enough fields to explain why a requested tool was refused.
 

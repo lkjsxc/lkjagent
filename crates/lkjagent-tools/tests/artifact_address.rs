@@ -26,7 +26,8 @@ fn artifact_next_on_file_root_does_not_render_file_audit() -> TestResult<()> {
     assert!(output.contains("candidate_action=fs.batch_write"));
     assert!(!output
         .contains("<tool>artifact.audit</tool>\n<root>stories/root/topics/background.md</root>"));
-    validate_example(&workspace, &output)?;
+    assert!(output.contains("candidate_contract:"));
+    assert!(!output.contains("candidate_example:"));
     Ok(())
 }
 
@@ -75,7 +76,7 @@ fn doc_audit_on_file_root_returns_semantic_refusal() -> TestResult<()> {
 }
 
 #[test]
-fn artifact_apply_refuses_missing_markdown_root() -> TestResult<()> {
+fn removed_artifact_apply_is_not_live() -> TestResult<()> {
     let workspace = temp_workspace("artifact-address-apply-md")?;
     let output = run(
         &workspace,
@@ -89,14 +90,13 @@ fn artifact_apply_refuses_missing_markdown_root() -> TestResult<()> {
         ),
     )?;
 
-    assert!(output.contains("root_ends_with_markdown_suffix"));
+    assert!(output.contains("unknown tool: artifact.apply"));
     assert!(!workspace.join("stories/x/characters.md").exists());
-    validate_example(&workspace, &output)?;
     Ok(())
 }
 
 #[test]
-fn doc_scaffold_refuses_markdown_suffix_root() -> TestResult<()> {
+fn removed_doc_scaffold_is_not_live() -> TestResult<()> {
     let workspace = temp_workspace("artifact-address-doc-scaffold-md")?;
     let output = run(
         &workspace,
@@ -106,14 +106,13 @@ fn doc_scaffold_refuses_markdown_suffix_root() -> TestResult<()> {
         ),
     )?;
 
-    assert!(output.contains("root_ends_with_markdown_suffix"));
+    assert!(output.contains("unknown tool: doc.scaffold"));
     assert!(!workspace.join("docs/page.md").exists());
-    validate_example(&workspace, &output)?;
     Ok(())
 }
 
 #[test]
-fn artifact_next_missing_directory_root_still_suggests_artifact_apply() -> TestResult<()> {
+fn artifact_next_missing_directory_root_returns_write_contract() -> TestResult<()> {
     let workspace = temp_workspace("artifact-address-missing-root")?;
     let output = run(
         &workspace,
@@ -121,9 +120,10 @@ fn artifact_next_missing_directory_root_still_suggests_artifact_apply() -> TestR
     )?;
 
     assert!(output.contains("missing=root"));
-    assert!(output.contains("candidate_action=artifact.apply"));
-    assert!(output.contains("<root>stories/new</root>"));
-    validate_example(&workspace, &output)?;
+    assert!(output.contains("candidate_action=fs.batch_write"));
+    assert!(output.contains("candidate_contract:"));
+    assert!(output.contains("root=stories/new"));
+    assert!(!output.contains("artifact.apply"));
     Ok(())
 }
 

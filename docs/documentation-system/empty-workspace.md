@@ -32,7 +32,7 @@ but topology never proves artifact readiness.
 
 ## Verification
 
-- `doc.scaffold` tests prove the first tree has README coverage and no generic project forest.
+- Write-contract tests prove the first tree has README coverage and no generic project forest.
 - `doc.audit` reports topology separately from content readiness.
 - Artifact completion reads audit-owned readiness, not README presence.
 

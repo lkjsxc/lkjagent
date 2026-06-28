@@ -34,24 +34,6 @@ pub fn record_plan(
     Ok(())
 }
 
-pub fn record_apply(conn: &Connection, root: &str, kind: &str, now: &str) -> ToolResult<()> {
-    let scale = stored_scale(conn, root)?;
-    record_state(
-        conn,
-        &LedgerStateChange {
-            root,
-            kind,
-            scale: &scale,
-            lifecycle: "adopted-or-scaffolded",
-            readiness: "needs-audit",
-            objective_match: "unknown",
-            weak_path_count: 0,
-        },
-        now,
-    )?;
-    Ok(())
-}
-
 pub fn record_audit(
     workspace: &Path,
     conn: &Connection,

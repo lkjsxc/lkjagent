@@ -43,7 +43,8 @@ for the failed tool.
   `fs.read`, `fs.read_many`, `artifact.audit`, and `doc.audit`.
 - `BatchWriteRecovery` admits `artifact.next`, `fs.batch_write`, `fs.write`,
   `fs.read`, and `artifact.audit`.
-- `ProtocolRecovery` preserves the previous mission escape tools.
+- `ProtocolRecovery` preserves the previous mission escape tools, excluding
+  removed scaffold writers.
 - `IdleMaintenance` admits only maintenance effects and is preempted by any
   owner case, recovery fault, verification gap, or hard compaction.
 
@@ -64,16 +65,17 @@ for the failed tool.
 
 - Early `agent.done` after planning is refused with missing structure and
   readiness evidence.
-- Recovery from scaffold-only content admits batch and single-file writes.
+- Recovery from weak or scaffold-only content admits contract planning plus
+  batch and single-file writes.
 - Invalid `fs.batch_write` syntax gets one canonical example, then fallback
   instead of the same invalid loop.
 - Maintenance `memory.save` during owner work is refused and writes no row.
 
 ## Verification
 
-Admission tests cover completion-node audit tools, recovery escape tools,
-payload-too-large batch planning, parameter examples, repeated-action
-suppression, and maintenance preemption.
+Admission tests cover live registry omission for scaffold writers, completion-
+node audit tools, recovery escape tools, payload-too-large batch planning,
+parameter examples, repeated-action suppression, and maintenance preemption.
 
 ## Related Files
 

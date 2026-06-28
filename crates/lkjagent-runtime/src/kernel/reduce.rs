@@ -6,51 +6,13 @@ use crate::kernel::decision::{
 };
 use crate::kernel::effect::attach_runtime_effect;
 use crate::kernel::event::RuntimeEvent;
-use crate::kernel::fault::{FaultClass, RuntimeFault};
+use crate::kernel::mission_select::select_mission;
 use crate::kernel::next_action::next_action_for;
 use crate::kernel::render::prompt_card_for;
 use crate::kernel::repeat_guard::repeat_guard;
 use crate::kernel::snapshot::{RuntimeEventId, RuntimeSnapshot, ToolName};
+use crate::kernel::write_contract::content_contract_for;
 
-pub fn select_mission(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> RuntimeMission {
-    if snapshot.context.hard_pressure || matches!(event, RuntimeEvent::ContextPressureDetected) {
-        return RuntimeMission::HardRuntimeCompaction;
-    }
-    if is_owner_recovery(snapshot, event) {
-        return RuntimeMission::OwnerRecovery;
-    }
-    if is_schema_repair(snapshot, event) {
-        return RuntimeMission::SchemaRepair;
-    }
-    if snapshot.artifact.needs_repair()
-        || matches!(
-            event,
-            RuntimeEvent::ArtifactWeakPathFound | RuntimeEvent::ArtifactAuditFailed
-        )
-    {
-        return RuntimeMission::ArtifactRepair;
-    }
-    if is_verification_repair(snapshot, event) {
-        return RuntimeMission::VerificationRepair;
-    }
-    if snapshot.owner_work_exists() {
-        return owner_mission(event);
-    }
-    if matches!(
-        event,
-        RuntimeEvent::MaintenanceNoop
-            | RuntimeEvent::MaintenanceNoopCooldownRecorded
-            | RuntimeEvent::MaintenanceDeferred
-    ) {
-        return RuntimeMission::ClosedIdle;
-    }
-    if (snapshot.maintenance.due || snapshot.maintenance.active)
-        && !snapshot.maintenance.cooldown_active
-    {
-        return RuntimeMission::IdleMaintenance;
-    }
-    RuntimeMission::ClosedIdle
-}
 pub fn reduce_with_event_id(
     snapshot: &RuntimeSnapshot,
     event_id: RuntimeEventId,
@@ -95,96 +57,78 @@ pub fn reduce(
         staleness_fingerprint: snapshot.staleness_fingerprint.clone(),
     };
     let mut decision = RuntimeDecision::new(input)?;
+    populate_decision(snapshot, &event, &mut decision, close_case);
+    attach_runtime_effect(decision, mission)
+}
+
+fn populate_decision(
+    snapshot: &RuntimeSnapshot,
+    event: &RuntimeEvent,
+    decision: &mut RuntimeDecision,
+    close_case: bool,
+) {
+    decision.case_id = snapshot.case.case_id.clone();
     decision.graph_node = snapshot.graph.node.clone();
     decision.graph_phase = snapshot.graph.phase.clone();
     decision.missing_evidence = snapshot.evidence.missing.clone();
     decision.existing_evidence = snapshot.evidence.existing.clone();
+    decision.artifact_id = snapshot.artifact.artifact_id.clone();
+    decision.root = snapshot.artifact.root.clone();
+    decision.artifact_kind = snapshot.artifact.kind.clone();
+    decision.artifact_profile = snapshot.artifact.profile.clone();
+    decision.weak_paths = snapshot.artifact.weak_paths.clone();
+    decision.cursor = snapshot
+        .artifact
+        .cursor
+        .clone()
+        .or(snapshot.artifact.batch_cursor.clone());
+    decision.fault_class = snapshot.latest_fault.map(|fault| fault.class());
+    decision.retry_count = snapshot.retry_count;
+    decision.provider_anomaly_budget = 3_u32.saturating_sub(snapshot.provider.retry_count);
+    decision.compaction_policy = compaction_policy(snapshot);
     decision.completion_allowed = close_case;
-    decision.completion_refusal = (mission == RuntimeMission::OwnerCompletion && !close_case)
-        .then(|| snapshot.evidence.missing.join(","));
+    decision.completion_blockers = snapshot.evidence.missing.clone();
+    decision.completion_refusal = completion_refusal(decision, close_case);
     decision.context_package_ids = snapshot.graph.context_package_ids.clone();
-    decision.forced_next_action = next_action_for(mission, snapshot);
-    if let Some(ActionTemplate::ExactTool { body, tool }) = &decision.forced_next_action {
-        if !decision.admission_view.admits(tool) {
-            decision.admission_view.admitted_tools.push(tool.clone());
-        }
+    decision.rule_explanation = rule_explanation(decision.mission, event);
+    decision.forced_next_action = next_action_for(decision.mission, snapshot);
+    apply_forced_action(snapshot, decision);
+    decision.prompt_card =
+        prompt_card_for(snapshot, decision.mission, decision.active_mode, decision);
+}
+
+fn apply_forced_action(snapshot: &RuntimeSnapshot, decision: &mut RuntimeDecision) {
+    let Some(ActionTemplate::ExactTool { body, tool }) = &decision.forced_next_action else {
+        return;
+    };
+    if !decision.admission_view.admits(tool) {
+        decision.admission_view.admitted_tools.push(tool.clone());
+    }
+    if tool.as_str() == "fs.batch_write" {
+        decision.content_write_contract = content_contract_for(snapshot);
+    } else {
         decision.admission_view.exact_next_action = Some(body.clone());
     }
-    decision.prompt_card = prompt_card_for(snapshot, mission, active_mode, &decision);
-    attach_runtime_effect(decision, mission)
 }
 
-fn is_schema_repair(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> bool {
-    matches!(event, RuntimeEvent::SchemaFault { .. })
-        || snapshot
-            .latest_fault
-            .is_some_and(|fault| fault.class() == FaultClass::Schema)
-}
-
-fn is_owner_recovery(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> bool {
-    is_owner_recovery_event(event)
-        || snapshot.provider.anomaly_class.is_some()
-        || snapshot.latest_fault.is_some_and(is_owner_recovery_fault)
-        || snapshot.recovery_route.is_some()
-}
-
-fn is_verification_repair(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> bool {
-    matches!(event, RuntimeEvent::VerificationFailed)
-        || snapshot
-            .latest_fault
-            .is_some_and(|fault| fault.class() == FaultClass::Verification)
-}
-
-fn owner_mission(event: &RuntimeEvent) -> RuntimeMission {
-    if is_completion_event(event) {
-        RuntimeMission::OwnerCompletion
-    } else if matches!(event, RuntimeEvent::VerificationRequested) {
-        RuntimeMission::OwnerVerification
+fn compaction_policy(snapshot: &RuntimeSnapshot) -> Option<String> {
+    if snapshot.context.hard_pressure {
+        Some("hard_runtime_compaction".to_string())
     } else {
-        RuntimeMission::OwnerExecution
+        snapshot.context.compaction_head.clone()
     }
 }
 
-fn is_completion_event(event: &RuntimeEvent) -> bool {
-    matches!(
-        event,
-        RuntimeEvent::CompletionRequested
-            | RuntimeEvent::CompletionAccepted
-            | RuntimeEvent::CompletionRefused
-            | RuntimeEvent::CompletionBlocked
-            | RuntimeEvent::CaseClosed
-    )
+fn completion_refusal(decision: &RuntimeDecision, close_case: bool) -> Option<String> {
+    (decision.mission == RuntimeMission::OwnerCompletion && !close_case)
+        .then(|| decision.completion_blockers.join(","))
 }
 
-fn is_owner_recovery_event(event: &RuntimeEvent) -> bool {
-    matches!(
-        event,
-        RuntimeEvent::ParseFault { .. }
-            | RuntimeEvent::EndpointFault { .. }
-            | RuntimeEvent::ProviderAnomaly { .. }
-            | RuntimeEvent::AdmissionRefused { .. }
-            | RuntimeEvent::StaleActionRefused { .. }
-            | RuntimeEvent::RepeatedActionRefused { .. }
-            | RuntimeEvent::RepeatActionDetected { .. }
-            | RuntimeEvent::PayloadOverflowDetected { .. }
-            | RuntimeEvent::ToolFailed { .. }
-            | RuntimeEvent::TurnBudgetExhausted
-    )
-}
-
-fn is_owner_recovery_fault(fault: RuntimeFault) -> bool {
-    matches!(
-        fault.class(),
-        FaultClass::Parse
-            | FaultClass::Parameter
-            | FaultClass::Tool
-            | FaultClass::Repeat
-            | FaultClass::Endpoint
-            | FaultClass::Budget
-            | FaultClass::Context
-            | FaultClass::Payload
-            | FaultClass::Completion
-            | FaultClass::MaintenanceConflict
+fn rule_explanation(mission: RuntimeMission, event: &RuntimeEvent) -> String {
+    format!(
+        "first_matching_rule={} event={}",
+        mission.as_str(),
+        event.kind().as_str()
     )
 }
 

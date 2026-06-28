@@ -16,9 +16,10 @@ Verification nodes allow verify.cargo, verify.xtask, doc.audit, bounded read,
 multi-file read, search tools, graph evidence, and shell.run only as an
 escape hatch.
 
-Document construction nodes allow scaffold, audit, mkdir, batch writes, and
-bounded single-file writes for semantic indexes or sections. Payload-risk
-recovery still redirects large raw writes to scaffold or smaller sections.
+Document construction nodes allow planning, audit, contract selection, batch
+writes, and bounded single-file writes for semantic indexes or sections.
+Payload-risk recovery redirects large raw writes to `artifact.next`, audit, or
+smaller contract-bound sections.
 
 Completion nodes allow agent.done only after `CompletionState` is ready.
 Recovery nodes expose the smallest useful action surface for the active fault.
@@ -30,13 +31,14 @@ only from `recover-by-shell-escape`.
 
 `recover-by-smaller-scope` must admit `graph.plan` or transition to a
 planning node that admits it. `recover-by-artifact-plan` admits artifact
-planning, next-batch planning, or document scaffold for content tasks.
+planning, next-batch contracts, audits, or contract-bound writes for content
+tasks.
 `recover-by-bounded-write` admits batch writes or next-batch planning and
 blocks another raw large write after payload risk.
 
-`recover-by-artifact-plan` admits `artifact.plan`, `artifact.apply`,
-`artifact.audit`, `artifact.next`, `doc.scaffold`, `doc.audit`,
-`fs.batch_write`, `fs.mkdir`, `fs.list`, `fs.tree`, and `fs.stat`.
+`recover-by-artifact-plan` admits `artifact.plan`, `artifact.audit`,
+`artifact.next`, `doc.audit`, `fs.batch_write`, `fs.mkdir`, `fs.list`,
+`fs.tree`, and `fs.stat`.
 `recover-by-bounded-write` admits `artifact.next`, bounded `fs.batch_write`,
 and audit tools.
 `recover-by-alternate-tool` must not leave an owner task with only diagnostic

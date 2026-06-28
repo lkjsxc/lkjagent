@@ -10,16 +10,16 @@ pub fn missing_root_response(address: &ArtifactAddress) -> String {
         .map(|kind| kind_or_default_for_root(&kind, &root))
         .unwrap_or_else(|| kind_or_default_for_root("", &root));
     format!(
-        "artifact_next_result=root_missing\nroot={root}\nkind={kind}\nmissing=root\nruntime_event=ArtifactRootMissing\nnext_decision_required=true\ncandidate_action=artifact.apply\ncandidate_example:\n{}",
-        artifact_apply_example(&root, &kind)
+        "artifact_next_result=root_missing\nroot={root}\nkind={kind}\nmissing=root\nruntime_event=ArtifactRootMissing\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_contract:\n{}",
+        crate::artifact_next_example::root_identity_contract(&root, &kind)
     )
 }
 
 pub fn root_identity_response(root: &str, kind: &str) -> String {
     let kind = kind_or_default_for_root(kind, root);
     format!(
-        "artifact_next_result=root_needs_identity\nroot={root}\nkind={kind}\nmissing=catalog,readme,semantic-leaf\nruntime_event=ArtifactRootIncomplete\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_example:\n{}",
-        root_identity_example(root, &kind)
+        "artifact_next_result=root_needs_identity\nroot={root}\nkind={kind}\nmissing=catalog,readme,semantic-leaf\nruntime_event=ArtifactRootIncomplete\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_contract:\n{}",
+        crate::artifact_next_example::root_identity_contract(root, &kind)
     )
 }
 
@@ -30,7 +30,7 @@ pub fn focused_response(address: &ArtifactAddress, kind: &str) -> String {
         .unwrap_or_else(|| kind_or_default_for_root(kind, &root));
     let path = address.weak_path.clone().unwrap_or_default();
     let selected = vec![path.clone()];
-    let valid_example = crate::artifact_next_example::batch_write(&root, &kind, &selected);
+    let valid_example = crate::artifact_next_example::batch_write_contract(&root, &kind, &selected);
     format!(
         "artifact address normalized\nrequested_root={}\naddress_status={}\nnormalized_root={root}\nweak_path={path}\n{}",
         address.requested,
@@ -64,7 +64,7 @@ pub fn resolved_kind(kind: &str, root: &Path) -> String {
     let text = optional_catalog(root);
     if story_catalog(&text) || story_kind(trimmed) {
         "story".to_string()
-    } else if text.contains("Cookbook") {
+    } else if text.to_ascii_lowercase().contains("cookbook") {
         "cookbook".to_string()
     } else if !trimmed.is_empty() && !trimmed.eq_ignore_ascii_case("artifact") {
         trimmed.to_string()
@@ -89,7 +89,7 @@ fn story_catalog(catalog: &str) -> bool {
 
 pub fn batch_response(root: &str, kind: &str, selected: &[String], valid_example: &str) -> String {
     format!(
-        "artifact_next_result=weak_path_batch_ready\nroot={root}\nkind={kind}\nmissing={}\nnext_paths:\n{}\nrequired_sections:\n{}\nruntime_event=ArtifactWeakPathFound\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_example:\n{}",
+        "artifact_next_result=weak_path_batch_ready\nroot={root}\nkind={kind}\nmissing={}\nnext_paths:\n{}\nrequired_sections:\n{}\nforbidden_weak_phrase_classes:\n- scaffold-only\n- placeholder\n- owner-terms-only\n- generic-example\nruntime_event=ArtifactWeakPathFound\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_contract:\n{}",
         selected.len(),
         selected.iter().map(|path| format!("- {path}")).collect::<Vec<_>>().join("\n"),
         required_sections(kind),
@@ -99,8 +99,8 @@ pub fn batch_response(root: &str, kind: &str, selected: &[String], valid_example
 
 pub fn audit_response(root: &str, kind: &str, missing: &str) -> ToolResult<String> {
     Ok(format!(
-        "artifact_next_result=ready_for_audit\nroot={root}\nkind={kind}\n{missing}\nruntime_event=ArtifactWeakPathsExhausted\nnext_decision_required=true\ncandidate_action=artifact.audit\ncandidate_example:\n{}",
-        artifact_audit_example(root, kind)
+        "artifact_next_result=ready_for_audit\nroot={root}\nkind={kind}\n{missing}\nruntime_event=ArtifactWeakPathsExhausted\nnext_decision_required=true\ncandidate_action=artifact.audit\ncandidate_contract:\n{}",
+        audit_contract(root, kind)
     ))
 }
 
@@ -150,36 +150,8 @@ fn optional_catalog(root: &Path) -> String {
     }
 }
 
-fn root_identity_example(root: &str, kind: &str) -> String {
-    let title = title_from_root(root);
+fn audit_contract(root: &str, kind: &str) -> String {
     format!(
-        "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: {root}/catalog.toml\ncontent:\n[artifact]\nroot = \"{root}\"\nkind = \"{kind}\"\ntitle = \"{title}\"\n\n-- lkjagent-next-file --\npath: {root}/README.md\ncontent:\n# {title}\n\n## Purpose\n\nNavigate the {kind} artifact and keep large content in semantic child files.\n\n## Start Here\n\n- Request scope lives in request/objective.md.\n- Continue with bounded batches before audit.\n\n-- lkjagent-next-file --\npath: {root}/request/objective.md\ncontent:\n# Objective\n\n## Purpose\n\nRecord the owner scope and the first semantic content leaf for this artifact.\n\nThe artifact is rooted at {root} and must grow through small, concrete batches.\n</files>\n</action>"
+        "tool=artifact.audit\nroot={root}\nkind={kind}\nwrite_required=false\ninstruction=run audit after contracted writes; do not author content here"
     )
-}
-
-fn title_from_root(root: &str) -> String {
-    root.rsplit('/')
-        .next()
-        .unwrap_or("Artifact")
-        .split('-')
-        .filter(|part| !part.is_empty())
-        .map(capitalize)
-        .collect::<Vec<_>>()
-        .join(" ")
-}
-
-fn capitalize(part: &str) -> String {
-    let mut chars = part.chars();
-    let Some(first) = chars.next() else {
-        return String::new();
-    };
-    format!("{}{}", first.to_ascii_uppercase(), chars.as_str())
-}
-
-fn artifact_apply_example(root: &str, kind: &str) -> String {
-    format!("<action>\n<tool>artifact.apply</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</action>")
-}
-
-fn artifact_audit_example(root: &str, kind: &str) -> String {
-    format!("<action>\n<tool>artifact.audit</tool>\n<root>{root}</root>\n<kind>{kind}</kind>\n</action>")
 }

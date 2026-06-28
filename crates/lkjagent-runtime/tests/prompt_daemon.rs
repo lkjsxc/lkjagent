@@ -97,7 +97,6 @@ fn startup_prefix_renders_count_guard_batch_instruction() -> TestResult<()> {
         .content
         .contains("completion_guard=file-count-about:100"));
     assert!(graph.content.contains("shell.run is an escape hatch"));
-    assert!(graph.content.contains("doc.scaffold"));
     assert!(graph.content.contains("fs.list"));
     assert!(graph.content.contains("fs.stat"));
     assert!(graph.content.contains("doc.audit"));
@@ -122,7 +121,6 @@ fn owner_graph_notice_renders_count_guard_batch_instruction() -> TestResult<()> 
 
     assert!(rendered.contains("completion_guard=file-count-about:100"));
     assert!(rendered.contains("shell.run is an escape hatch"));
-    assert!(rendered.contains("doc.scaffold"));
     assert!(rendered.contains("fs.list"));
     assert!(rendered.contains("fs.stat"));
     assert!(rendered.contains("doc.audit"));

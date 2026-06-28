@@ -6,7 +6,7 @@ Render every model-facing example from registry-backed data and prove it round-t
 
 ## Status
 
-open
+done
 
 ## Depends On
 

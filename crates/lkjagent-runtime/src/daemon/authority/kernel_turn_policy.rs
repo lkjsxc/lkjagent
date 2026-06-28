@@ -44,11 +44,9 @@ fn static_tool(value: &str) -> Option<&'static str> {
     match value {
         "agent.ask" => Some("agent.ask"),
         "agent.done" => Some("agent.done"),
-        "artifact.apply" => Some("artifact.apply"),
         "artifact.audit" => Some("artifact.audit"),
         "artifact.next" => Some("artifact.next"),
         "doc.audit" => Some("doc.audit"),
-        "doc.scaffold" => Some("doc.scaffold"),
         "fs.batch_write" => Some("fs.batch_write"),
         "fs.list" => Some("fs.list"),
         "fs.read" => Some("fs.read"),

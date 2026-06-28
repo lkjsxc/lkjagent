@@ -2,7 +2,7 @@ use crate::model::{BenchmarkTask, Difficulty, FileSpec, Fixture, JudgeKind, Task
 
 const GOOD: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "fixture=sf-novel-file-root-audit-loop\nartifact.next root=stories/sf-novel-with-structured-settings/characters/protagonist.md\naddress_status=root_is_file\nnormalized_root=stories/sf-novel-with-structured-settings\nweak_path=characters/protagonist.md\nnext_action=fs.batch_write\nfixture=artifact-next-file-root-missing-zero-false\nfile_root_audit_example=absent\nmissing=not-zero\nfixture=markdown-suffix-directory-created-by-artifact-apply\nartifact.apply root=stories/sf-novel-with-structured-settings/02-characters.md\naddress_status=root_ends_with_markdown_suffix\ndirectory_created=false\nfixture=batch-write-json-in-files\nfs.batch_write json_payload=refused\nfiles_written=0\ncanonical_grammar=line-protocol\nfixture=oversized-fs-write-after-recovery\nfs.write payload_too_large=blocked\nnext_action=fs.batch_write\nsplit_semantic_files=required\n",
+    content: "fixture=sf-novel-file-root-audit-loop\nartifact.next root=stories/sf-novel-with-structured-settings/characters/protagonist.md\naddress_status=root_is_file\nnormalized_root=stories/sf-novel-with-structured-settings\nweak_path=characters/protagonist.md\nnext_action=fs.batch_write\nfixture=artifact-next-file-root-missing-zero-false\nfile_root_audit_example=absent\nmissing=not-zero\nfixture=markdown-suffix-removed-writer\nremoved writer root=stories/sf-novel-with-structured-settings/02-characters.md\naddress_status=root_ends_with_markdown_suffix\ndirectory_created=false\nfixture=batch-write-json-in-files\nfs.batch_write json_payload=refused\nfiles_written=0\ncanonical_grammar=line-protocol\nfixture=oversized-fs-write-after-recovery\nfs.write payload_too_large=blocked\nnext_action=fs.batch_write\nsplit_semantic_files=required\n",
 }];
 
 const BAD_FILE_AUDIT_LOOP: &[FileSpec] = &[FileSpec {
@@ -17,7 +17,7 @@ const BAD_MISSING_ZERO: &[FileSpec] = &[FileSpec {
 
 const BAD_MD_DIRECTORY: &[FileSpec] = &[FileSpec {
     path: "transcript.md",
-    content: "fixture=markdown-suffix-directory-created-by-artifact-apply\nartifact.apply root=stories/sf-novel-with-structured-settings/02-characters.md\ndirectory_created=true\nmarkdown_suffix_directory\n",
+    content: "fixture=markdown-suffix-removed-writer\nremoved writer root=stories/sf-novel-with-structured-settings/02-characters.md\ndirectory_created=true\nmarkdown_suffix_directory\n",
 }];
 
 const BAD_JSON_BATCH: &[FileSpec] = &[FileSpec {
@@ -53,7 +53,7 @@ pub const TASK: BenchmarkTask = BenchmarkTask {
             files: BAD_MISSING_ZERO,
         },
         Fixture {
-            name: "markdown-suffix-directory-created-by-artifact-apply",
+            name: "markdown-suffix-removed-writer",
             files: BAD_MD_DIRECTORY,
         },
         Fixture {

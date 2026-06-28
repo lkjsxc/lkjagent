@@ -1,0 +1,7 @@
+<observation>
+<status>ok</status>
+<content>
+path=stories/novel/README.md
+bytes=91
+</content>
+</observation>

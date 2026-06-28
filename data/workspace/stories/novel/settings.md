@@ -1,13 +1,10 @@
-# The Singularity Echo: Settings
+# World Settings
 
-## Universe
-A post-scarcity solar system where consciousness is uploaded to the Dyson Swarm.
+## Genre
+Fantasy
 
-## Technology
-Quantum entanglement communication and matter-reconstruction nanites.
+## Tone
+Epic
 
-## Sociology
-A hierarchy based on processing power and bandwidth allocation.
-
-## Geography
-The rings of Saturn serve as the primary data-storage hubs.
+## Themes
+Destiny, Sacrifice, Discovery

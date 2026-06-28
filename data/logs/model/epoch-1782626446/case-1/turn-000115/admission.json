@@ -1,0 +1,1 @@
+{"tool":"artifact.audit","admitted":true,"reason":"admitted","example":"<action>\n<tool>artifact.audit</tool>\n<root>stories/novel</root>\n</action>"}

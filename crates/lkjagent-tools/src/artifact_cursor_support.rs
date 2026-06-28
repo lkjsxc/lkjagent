@@ -16,6 +16,37 @@ pub struct NextBatchRecord<'a> {
 }
 
 pub fn record_next_batch(record: NextBatchRecord<'_>) -> ToolResult<()> {
+    record_contract(record, true)
+}
+
+pub fn record_identity_contract(
+    conn: &Connection,
+    root: &str,
+    kind: &str,
+    contract: &str,
+    now: &str,
+) -> ToolResult<()> {
+    let selected = vec![
+        "catalog.toml".to_string(),
+        "README.md".to_string(),
+        "request/objective.md".to_string(),
+    ];
+    record_contract(
+        NextBatchRecord {
+            conn,
+            root,
+            kind,
+            weak_count: selected.len(),
+            selected: &selected,
+            valid_example: contract,
+            current_index: selected.len(),
+            now,
+        },
+        true,
+    )
+}
+
+fn record_contract(record: NextBatchRecord<'_>, relative_paths: bool) -> ToolResult<()> {
     let ledger_id = upsert_repair_artifact(
         record.conn,
         record.root,
@@ -23,7 +54,11 @@ pub fn record_next_batch(record: NextBatchRecord<'_>) -> ToolResult<()> {
         record.weak_count,
         record.now,
     )?;
-    let planned_paths = full_paths(record.root, record.selected);
+    let planned_paths = if relative_paths {
+        full_paths(record.root, record.selected)
+    } else {
+        record.selected.to_vec()
+    };
     upsert_batch_cursor(
         record.conn,
         &BatchCursorInput {

@@ -59,7 +59,7 @@ normalized parse, one-file fallback, deterministic writer, or blocked handoff.
 - A refusal shows exactly one canonical valid action example.
 - The example must parse, validate, and pass the same dispatcher admission.
 - Invalid `graph.evidence` kinds list allowed evidence requirements.
-- Unknown `scale` in `artifact.apply` names accepted parameters.
+- Unknown parameters on `artifact.plan` name accepted parameters.
 - Repeated invalid `graph.state` must select a different next action.
 - Nested `<path>` child parameters are valid for `fs.read` and `fs.stat`.
 - Large payload recovery never suggests another raw large write.
@@ -67,7 +67,7 @@ normalized parse, one-file fallback, deterministic writer, or blocked handoff.
 ## Failure Cases
 
 - Invalid `graph.evidence kind=evidence` loops into generic graph state.
-- Unknown `scale` in `artifact.apply` renders multiple conflicting examples.
+- Unknown parameters on `artifact.plan` render multiple conflicting examples.
 - Repeated `graph.state` survives repeat protection unchanged.
 - `fs.read` or `fs.stat` rejects a child `<path>` parameter.
 - Large payload recovery suggests another raw large write.

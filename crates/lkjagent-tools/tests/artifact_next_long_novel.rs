@@ -1,7 +1,8 @@
 mod support;
 
-use lkjagent_protocol::parse_completion;
-use lkjagent_tools::dispatch::{dispatch, validate_action};
+use std::fs;
+
+use lkjagent_tools::dispatch::dispatch;
 use support::{action, runtime, state, store, temp_workspace, TestResult};
 
 #[test]
@@ -11,15 +12,16 @@ fn long_novel_profile_uses_story_repair_sections() -> TestResult<()> {
     let runtime = runtime(workspace)?;
     let mut conn = store()?;
     let mut dispatch_state = state();
-    dispatch(
-        &action(
-            "artifact.apply",
-            &[("root", root), ("kind", "novel"), ("title", "Long Novel")],
-        ),
-        &runtime,
-        &mut conn,
-        &mut dispatch_state,
-    );
+    fs::create_dir_all(runtime.workspace.join(root).join("setting"))?;
+    fs::write(
+        runtime.workspace.join(root).join("catalog.toml"),
+        "kind = \"story\"\n",
+    )?;
+    fs::write(runtime.workspace.join(root).join("README.md"), "# Novel\n")?;
+    fs::write(
+        runtime.workspace.join(root).join("setting/world.md"),
+        "# World\n\n## Purpose\n\ncontent_state=structure-only\n",
+    )?;
 
     let output = dispatch(
         &action("artifact.next", &[("root", root), ("kind", "novel")]),
@@ -28,17 +30,15 @@ fn long_novel_profile_uses_story_repair_sections() -> TestResult<()> {
         &mut dispatch_state,
     )
     .content;
-    let example = output
-        .split_once("candidate_example:\n")
-        .map(|(_, example)| example)
-        .ok_or("missing candidate example")?;
-    let parsed = parse_completion(example).map_err(|err| format!("parse failed: {err:?}"))?;
-    validate_action(&parsed).map_err(|err| format!("validation failed: {err}"))?;
+    let contract = output
+        .split_once("candidate_contract:\n")
+        .map(|(_, contract)| contract)
+        .ok_or("missing candidate contract")?;
 
     assert!(output.contains("kind=story"));
     assert!(output.contains("scene content or reference detail"));
     assert!(output.contains("continuity notes"));
     assert!(output.contains("next_decision_required=true"));
-    assert_eq!(parsed.tool, "fs.batch_write");
+    assert!(contract.contains("tool=fs.batch_write"));
     Ok(())
 }

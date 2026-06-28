@@ -52,7 +52,9 @@ readiness repair, audit, and completion update the ledger.
 
 ## Status
 
-partially implemented. SQLite schema and store APIs persist artifact identity, lifecycle status, readiness status,
-weak path counts, weak path requirement labels, and batch cursor rows. `artifact.plan`, `artifact.apply`,
-`artifact.audit`, and `artifact.next` write ledger state. `fs.write` and `fs.batch_write` mark planned cursor paths
-completed after successful writes. Audit-owned evidence and artifact-aware completion do not yet read ledger rows.
+partially implemented. SQLite schema and store APIs persist artifact identity,
+lifecycle status, readiness status, weak path counts, weak path requirement
+labels, and batch cursor rows. `artifact.plan`, `artifact.audit`, and
+`artifact.next` write ledger state. `fs.write` and `fs.batch_write` mark
+planned cursor paths completed after successful contract-matching writes.
+Audit-owned evidence and artifact-aware completion do not yet read ledger rows.

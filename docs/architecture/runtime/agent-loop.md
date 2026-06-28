@@ -66,7 +66,7 @@ target, so direct exact wording is strict while exact wording attached to a
 smaller subcount does not make an approximate total strict. Approximate
 wording is a scale hint and accepts the documented tolerance. Active count
 guards are rendered in the graph-state prefix with an instruction to use
-recursive directories for large outputs, prefer `doc.scaffold`, `doc.audit`,
+recursive directories for large outputs, prefer `artifact.next`, `doc.audit`,
 `fs.read_many`, `fs.tree`, `workspace.index`, `fs.batch_write`, and `fs.patch`,
 keep the action payload bounded, and avoid shell unless graph policy admits a
 shell escape after native tools are insufficient.
