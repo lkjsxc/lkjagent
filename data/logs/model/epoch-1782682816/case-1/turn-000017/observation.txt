@@ -1,0 +1,4 @@
+<observation>
+<status>error</status>
+<content>invalid parameter: duplicate path: stories/novel-named/settings.md</content>
+</observation>

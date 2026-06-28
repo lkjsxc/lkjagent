@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-path=stories/novel/settings.md
-bytes=89
-</content>
-</observation>

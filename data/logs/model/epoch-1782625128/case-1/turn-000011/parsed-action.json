@@ -1,1 +1,0 @@
-{"status":"fault","closure_mode":"StopSequenceClosed","envelope_mode":"Natural","normalized_text_hash":"a5106428aeb87a37","content_bytes":190,"error":"MalformedTag { line: \"<content:\", reason: BadAngleSyntax }"}

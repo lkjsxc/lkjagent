@@ -1,1 +1,0 @@
-{"content":"","provider_anomaly":{"kind":"reasoning_only_response","detail":"reasoning-only response"},"finish_reason":"stop","closure_mode":"Unclosed","usage":{"prompt_tokens":12128,"completion_tokens":57,"cached_prompt_tokens":null,"total_tokens":12185}}

@@ -1,7 +1,0 @@
-<observation>
-<status>ok</status>
-<content>
-path=stories/novel/characters.md
-bytes=117
-</content>
-</observation>
