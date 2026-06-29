@@ -27,6 +27,7 @@ pub struct ArtifactLedgerRow {
     pub root: String,
     pub kind: String,
     pub lifecycle_state: String,
+    pub topology_status: String,
     pub readiness_status: String,
     pub weak_path_count: i64,
 }
@@ -116,7 +117,7 @@ pub fn record_weak_path(conn: &Connection, input: &WeakPathInput<'_>) -> StoreRe
 pub fn latest_for_case(conn: &Connection, case_id: i64) -> StoreResult<Option<ArtifactLedgerRow>> {
     let mut statement = conn.prepare(
         "SELECT id, case_id, artifact_id, root, kind, lifecycle_state,
-         readiness_status, weak_path_count FROM artifact_ledger
+         topology_status, readiness_status, weak_path_count FROM artifact_ledger
          WHERE case_id = ?1 ORDER BY updated_at DESC, id DESC LIMIT 1",
     )?;
     let mut rows = statement.query(params![case_id])?;
@@ -130,8 +131,9 @@ pub fn latest_for_case(conn: &Connection, case_id: i64) -> StoreResult<Option<Ar
         root: row.get(3)?,
         kind: row.get(4)?,
         lifecycle_state: row.get(5)?,
-        readiness_status: row.get(6)?,
-        weak_path_count: row.get(7)?,
+        topology_status: row.get(6)?,
+        readiness_status: row.get(7)?,
+        weak_path_count: row.get(8)?,
     }))
 }
 

@@ -19,6 +19,39 @@ fn missing_root_audit_forces_root_identity_batch_write() -> Result<(), String> {
     );
     assert!(blocked(&decision, "doc.audit"));
     assert!(!admitted(&decision, "doc.audit"));
+    assert_eq!(admitted_tools(&decision), vec!["fs.batch_write"]);
+    Ok(())
+}
+
+#[test]
+fn missing_root_survives_provider_anomaly_observation() -> Result<(), String> {
+    let mut input = owner_input();
+    input.missing_evidence = vec!["document-structure".to_string()];
+    input.latest_successful_observation = Some(missing_root_observation("stories/novel"));
+    input.latest_observation = Some("provider anomaly: reasoning_only_response".to_string());
+    let decision = decision(
+        input,
+        RuntimeEvent::ProviderAnomaly {
+            class: "reasoning_only_response".to_string(),
+        },
+    )?;
+
+    assert_eq!(next_tool(&decision)?, "fs.batch_write");
+    assert!(blocked(&decision, "doc.audit"));
+    Ok(())
+}
+
+#[test]
+fn artifact_next_ready_for_audit_is_not_converted_to_batch_write() -> Result<(), String> {
+    let mut input = owner_input();
+    input.missing_evidence = vec!["artifact-readiness".to_string()];
+    input.latest_observation = Some(
+        "artifact_next_result=ready_for_audit\nroot=stories/novel\nkind=story\nmissing=0\nnext_decision_required=true\ncandidate_action=artifact.audit"
+            .to_string(),
+    );
+    let decision = decision(input, RuntimeEvent::ArtifactWeakPathFound)?;
+
+    assert_eq!(next_tool(&decision)?, "artifact.audit");
     Ok(())
 }
 
@@ -135,6 +168,15 @@ fn completion_waits_for_audit_and_verification_facts() -> Result<(), String> {
     assert!(decision.completion_refusal.is_some());
     assert_ne!(next_tool(&decision)?, "agent.done");
     Ok(())
+}
+
+fn admitted_tools(decision: &lkjagent_runtime::kernel::RuntimeDecision) -> Vec<&str> {
+    decision
+        .admission_view
+        .admitted_tools
+        .iter()
+        .map(|tool| tool.as_str())
+        .collect()
 }
 
 fn missing_root_row(line: &&str) -> bool {

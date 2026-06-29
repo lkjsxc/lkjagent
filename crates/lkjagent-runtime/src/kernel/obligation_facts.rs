@@ -118,6 +118,13 @@ fn latest_audit(snapshot: &RuntimeSnapshot) -> Option<DocumentAuditFacts> {
         .latest
         .as_deref()
         .and_then(document_audit_facts)
+        .or_else(|| {
+            snapshot
+                .observation
+                .latest_successful
+                .as_deref()
+                .and_then(document_audit_facts)
+        })
 }
 
 fn fact_root(snapshot: &RuntimeSnapshot, audit: Option<&DocumentAuditFacts>) -> Option<String> {

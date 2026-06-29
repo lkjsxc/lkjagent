@@ -16,6 +16,8 @@ fn story_audit_requires_named_semantic_content() -> TestResult<()> {
     assert!(output.contains("artifact audit failed"));
     assert!(output.contains("readiness=missing-semantic-content"));
     assert!(output.contains("story_semantic_missing"));
+    assert!(output.contains("story_scale_missing"));
+    assert!(output.contains("profile-scale-content-groups"));
     assert!(output.contains("premise"));
     assert!(output.contains("candidate_action=artifact.next"));
     Ok(())

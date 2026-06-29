@@ -25,5 +25,5 @@ fn limit_for(_file: &RepoFile) -> usize {
 }
 
 fn is_runtime_log(file: &RepoFile) -> bool {
-    file.path.starts_with("data/logs/")
+    file.path.starts_with("data/logs/") || file.path.starts_with("tmp/")
 }

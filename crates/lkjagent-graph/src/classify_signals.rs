@@ -30,6 +30,48 @@ pub(crate) fn content_artifact_request(lower: &str, content: &str) -> bool {
         && !counted_content_request(lower, content)
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct IntentFacts {
+    pub content_creation: bool,
+    pub operational_compaction: bool,
+}
+
+pub(crate) fn intent_facts(lower: &str, content: &str) -> IntentFacts {
+    let content_creation = priority_counted_content_request(lower, content)
+        || priority_long_content_request(lower, content);
+    let unquoted = unquoted_lower(content);
+    IntentFacts {
+        content_creation,
+        operational_compaction: operational_compaction_request(&unquoted),
+    }
+}
+
+fn operational_compaction_request(unquoted: &str) -> bool {
+    unquoted.contains("context pressure")
+        || unquoted.contains("compaction")
+        || (unquoted.contains("compact")
+            && contains_any(unquoted, &["context", "prompt", "token", "memory"]))
+}
+
+fn unquoted_lower(content: &str) -> String {
+    let mut quote = None;
+    let mut out = String::with_capacity(content.len());
+    for ch in content.chars() {
+        if quote == Some(ch) {
+            quote = None;
+            out.push(' ');
+        } else if quote.is_none() && matches!(ch, '"' | '\'') {
+            quote = Some(ch);
+            out.push(' ');
+        } else if quote.is_none() {
+            out.push(ch.to_ascii_lowercase());
+        } else {
+            out.push(' ');
+        }
+    }
+    out
+}
+
 fn counted_content_request(lower: &str, content: &str) -> bool {
     file_signal(lower, content)
         && content_signal(lower, content)

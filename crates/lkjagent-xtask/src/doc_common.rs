@@ -16,7 +16,9 @@ pub fn check_markdown_basics(files: &[RepoFile]) -> Vec<Violation> {
 }
 
 fn is_runtime_output(file: &RepoFile) -> bool {
-    file.path.starts_with("data/logs/") || file.path.starts_with("data/workspace/")
+    file.path.starts_with("data/logs/")
+        || file.path.starts_with("data/workspace/")
+        || file.path.starts_with("tmp/")
 }
 
 fn check_shape(file: &RepoFile) -> Vec<Violation> {

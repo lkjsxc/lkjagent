@@ -24,6 +24,7 @@ pub fn record_plan(
             kind,
             scale: &selected_scale,
             lifecycle: "identity-ready",
+            topology: "identity-ready",
             readiness: "not-audited",
             objective_match: "unknown",
             weak_path_count: 0,
@@ -60,6 +61,7 @@ pub fn record_audit(
             kind,
             scale: &scale,
             lifecycle,
+            topology: topology_for_report(report),
             readiness,
             objective_match: objective_match(report),
             weak_path_count: weak_count,
@@ -117,6 +119,18 @@ fn readiness_for_report(passed: bool, report: &str) -> &'static str {
         "invalid"
     } else {
         "failed"
+    }
+}
+
+fn topology_for_report(report: &str) -> &'static str {
+    if report.contains("missing_root") || report.contains("root_missing") {
+        "missing"
+    } else if report.starts_with("artifact audit passed") {
+        "passed"
+    } else if report.starts_with("artifact audit failed") {
+        "failed"
+    } else {
+        "unknown"
     }
 }
 

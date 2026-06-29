@@ -10,7 +10,8 @@ tests, quiet gates, and required Docker gates prove it.
 
 lkjagent has a working Rust workspace with parser, protocol registry, graph,
 context, store, LLM, tools, runtime, CLI, benchmark, and xtask crates. The
-deterministic persisted-decision runtime is implemented. The checked-in active
+deterministic persisted-decision runtime is implemented. The runtime smoke
+problem sweep now has implementation changes under test. The checked-in active
 model run remains failure evidence until a fresh model smoke run replaces it.
 
 The durable target is a deterministic state-transition runtime for a weak local
@@ -111,13 +112,17 @@ next action surface.
 
 ## Verification Evidence
 
-The obligation network success claim is backed by focused tests, full workspace
-tests, corpus checks, `quiet verify`, `docker compose run --rm verify`, and a
-fresh clean-data endpoint smoke. The latest smoke transcript at
-`tmp/user-story-smoke-data-fix/logs/current-model-run.md` reached
-`open_task=none` and showed `artifact.next -> fs.batch_write -> doc.audit ->
-fs.batch_write -> doc.audit -> artifact.audit -> agent.done` after root and
-structure repair.
+Fresh pre-change ground truth is committed under
+`tmp/runtime-smoke-ground-truth-20260629T051817Z/` and summarized in
+[execution/current-work/runtime-smoke-ground-truth.md](execution/current-work/runtime-smoke-ground-truth.md).
+It proves that `Compact Compass` still false-closed before the sweep and that
+`iwanna` still degraded to `stories/novel-named` with noisy recovery.
+
+The current implementation has focused tests for compact-title classification,
+owner-title roots, durable missing-root repair, `candidate_action=artifact.audit`,
+exact root-repair admission, and story scale-readiness refusal. A fresh
+post-change live smoke is still required before replacing historical failure
+evidence.
 
 ## Active Target
 

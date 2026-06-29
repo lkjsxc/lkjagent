@@ -7,7 +7,7 @@ Fix the live-smoke problems recorded in
 
 ## Status
 
-open
+in progress: focused tests pass; fresh post-change Docker smoke is pending
 
 ## Depends On
 
@@ -44,6 +44,7 @@ cargo fmt --check
 cargo test -p lkjagent-graph compact
 cargo test -p lkjagent-runtime obligation_network
 cargo test -p lkjagent-runtime artifact_completion_gate
+cargo test -p lkjagent-tools artifact_readiness
 cargo run -p lkjagent-xtask -- benchmark check-corpus
 ```
 

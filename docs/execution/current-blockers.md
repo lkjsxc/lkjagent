@@ -75,6 +75,9 @@ The checked-in generated log fixture remains historical failure evidence.
 
 ## Open Smoke Findings
 
+Fresh pre-change smoke evidence is committed under
+`tmp/runtime-smoke-ground-truth-20260629T051817Z/` and summarized in
+[current-work/runtime-smoke-ground-truth.md](current-work/runtime-smoke-ground-truth.md).
 Live smoke runs after root repair found remaining problems:
 
 - titles containing `Compact` can be classified as compaction work and close
@@ -83,5 +86,9 @@ Live smoke runs after root repair found remaining problems:
 - missing-root repair is escapable but still spends noisy turns on repeated
   audit, refused mkdir, and placeholder-root examples;
 - long-novel completion can pass with a small story-bible seed.
+
+The implementation sweep now has focused tests and benchmark fixture updates
+for these findings. A fresh post-change Docker smoke is still required before
+this blocker can close.
 
 Details live in [current-work/runtime-smoke-problems.md](current-work/runtime-smoke-problems.md).

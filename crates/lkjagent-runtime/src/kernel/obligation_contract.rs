@@ -1,7 +1,7 @@
 use crate::kernel::obligation_facts::{
     ArtifactRootStatus, DocumentAuditFacts, WriteContractFacts, WriteContractStatus,
 };
-use crate::kernel::obligation_parse::{inferred_kind, root_identity_status};
+use crate::kernel::obligation_parse::{inferred_kind, root_identity_status, status_from_snapshot};
 use crate::kernel::obligation_paths::{
     contract_paths, identity_paths, required_sections, weak_phrase_classes,
 };
@@ -13,7 +13,9 @@ pub(crate) fn write_contract_for(
     root: Option<&str>,
 ) -> Option<WriteContractFacts> {
     let root = root?;
-    if audit.is_some_and(|facts| root_identity_status(facts.status)) {
+    if audit.is_some_and(|facts| root_identity_status(facts.status))
+        || root_identity_status(status_from_snapshot(snapshot))
+    {
         return Some(root_identity(root, &contract_kind(snapshot, audit, root)));
     }
     if let Some(contract) = structure_repair_contract(snapshot, audit, root) {

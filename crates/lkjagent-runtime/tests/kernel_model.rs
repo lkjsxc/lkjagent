@@ -116,9 +116,7 @@ fn schema_repair_admits_batch_and_escape_tools() -> Result<(), String> {
         reduce(&state, RuntimeEvent::SchemaFault { fault_key: None }).map_err(format_error)?;
     let tools = tool_names(&decision);
     assert_eq!(decision.mission, RuntimeMission::SchemaRepair);
-    assert!(tools.contains(&"fs.batch_write"));
-    assert!(tools.contains(&"artifact.next"));
-    assert!(tools.contains(&"graph.state"));
+    assert_eq!(tools, vec!["fs.batch_write"]);
     match decision.forced_next_action {
         Some(ActionTemplate::ExactTool { body, .. }) => {
             assert!(body.contains("stories/chronos-fracture/README.md"));
@@ -171,8 +169,7 @@ fn completion_with_missing_artifact_readiness_is_blocked() -> Result<(), String>
     let tools = tool_names(&decision);
     assert_eq!(decision.mission, RuntimeMission::OwnerCompletion);
     assert_eq!(decision.kind, RuntimeDecisionKind::BlockCompletion);
-    assert!(tools.contains(&"artifact.audit"));
-    assert!(tools.contains(&"doc.audit"));
+    assert_eq!(tools, vec!["artifact.plan"]);
     assert!(!tools.contains(&"agent.done"));
     Ok(())
 }

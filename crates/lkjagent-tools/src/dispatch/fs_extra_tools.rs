@@ -104,6 +104,7 @@ pub fn dispatch_fs_batch_write(
         match crate::fs_batch::batch_write(&runtime.workspace, &files, 20) {
             Ok(output) => {
                 crate::artifact_write_support::record_written_paths(conn, &paths, &runtime.now)?;
+                crate::artifact_ledger_state::record_write_progress(conn, &paths, &runtime.now)?;
                 Ok(output)
             }
             Err(error) => {

@@ -9,6 +9,7 @@ pub mod case_recovery;
 pub mod classify;
 mod classify_artifact;
 mod classify_signals;
+mod classify_title;
 pub mod compaction;
 pub mod completion;
 pub mod context_selection;

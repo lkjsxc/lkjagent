@@ -35,13 +35,14 @@ fn tool_requiring_prompt_never_has_empty_tool_surface() {
 }
 
 #[test]
-fn kernel_owner_execution_admits_owner_inspection_and_evidence() -> Result<(), String> {
+fn kernel_owner_execution_admits_only_forced_owner_action() -> Result<(), String> {
     let snapshot = build_snapshot(SnapshotAdapterInput {
         snapshot_id: 1,
         case_id: Some("case-1".to_string()),
         queue_head: Some("queue-1".to_string()),
         pending_owner_count: 1,
         artifact_root: Some("stories/long-novel".to_string()),
+        missing_evidence: vec!["observation".to_string()],
         ..SnapshotAdapterInput::default()
     })
     .map_err(format_error)?;
@@ -53,9 +54,9 @@ fn kernel_owner_execution_admits_owner_inspection_and_evidence() -> Result<(), S
         .iter()
         .map(|tool| tool.as_str())
         .collect();
-    assert!(tools.contains(&"workspace.summary"));
+    assert_eq!(tools, vec!["artifact.audit"]);
     assert!(!tools.contains(&"graph.transition"));
-    assert!(tools.contains(&"graph.evidence"));
+    assert!(!tools.contains(&"graph.evidence"));
     Ok(())
 }
 

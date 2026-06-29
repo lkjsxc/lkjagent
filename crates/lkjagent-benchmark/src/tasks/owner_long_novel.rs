@@ -60,6 +60,12 @@ second_same_shape=artifact.next
 next_decision_required=true
 provider_anomaly=reasoning_only_response
 touched_paths=artifact-ledger-derived
+compact_title_route=content-artifact
+owner_title_root=stories/compact-compass
+iwanna_root=stories/iwanna
+generic_root=absent
+candidate_action_artifact_audit=respected
+story_scale_missing=profile-scale-content-groups
 maintenance_noop=cooldown
 "#;
 
@@ -76,6 +82,11 @@ schema_fault=too many files
 repeat oversized_batch
 provider_anomaly=reasoning_only_response
 touched_paths=artifact-ledger-derived
+compact_title_route=compaction
+owner_title_root=stories/novel-named
+iwanna_root=stories/novel-named
+generic_root=stories/example-story
+candidate_action_artifact_audit=converted-to-batch
 maintenance_noop=cooldown
 "#;
 
@@ -93,5 +104,10 @@ second_same_shape=artifact.next
 next_decision_required=true
 provider_anomaly=reasoning_only_response
 touched_paths=none
+compact_title_route=compaction
+owner_title_root=stories/novel-named
+iwanna_root=stories/novel-named
+generic_root=stories/example-story
+candidate_action_artifact_audit=converted-to-batch
 maintenance_noop=endpoint_churn
 "#;

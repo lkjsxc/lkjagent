@@ -66,7 +66,9 @@ fn first_obligation_plan(
             return Some(plan);
         }
     }
-    None
+    (!obligations.is_empty()).then(|| ResolverPlan::BlockedHandoff {
+        reason: "no resolver route remains".to_string(),
+    })
 }
 
 fn obligation_plan(
@@ -136,9 +138,8 @@ fn exact(tool: &'static str, snapshot: &RuntimeSnapshot) -> Option<ActionTemplat
 }
 
 fn artifact_next_candidate(snapshot: &RuntimeSnapshot) -> bool {
-    snapshot
-        .observation
-        .latest
-        .as_deref()
-        .is_some_and(|value| value.contains("next_decision_required=true"))
+    snapshot.observation.latest.as_deref().is_some_and(|value| {
+        value.contains("next_decision_required=true")
+            && value.contains("candidate_action=fs.batch_write")
+    })
 }
