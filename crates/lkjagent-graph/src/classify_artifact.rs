@@ -1,6 +1,7 @@
 use crate::case_document::DocumentState;
+use crate::classify_profile::intent_facts;
 use crate::classify_signals::content_artifact_request;
-use crate::classify_title::owner_title_alias;
+use crate::classify_title::{owner_title, owner_title_alias};
 use crate::model::TaskFamily;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -33,11 +34,16 @@ fn document_state_for(
         return None;
     }
     if content_artifact {
-        let kind = artifact_kind(lower);
-        return Some(DocumentState::planned(
-            artifact_root(kind, objective),
-            "content-artifact",
-        ));
+        let profile = intent_facts(lower, objective);
+        let kind = profile.artifact_kind.as_deref().unwrap_or("artifact");
+        return Some(
+            DocumentState::planned(artifact_root(kind, objective), "content-artifact")
+                .with_identity(
+                    owner_title(objective),
+                    Some(kind.to_string()),
+                    profile.requested_scale,
+                ),
+        );
     }
     Some(DocumentState::planned("structured-output", "document"))
 }
@@ -75,22 +81,6 @@ fn route_reason_for(family: TaskFamily, content_artifact: bool) -> &'static str 
         TaskFamily::Benchmark => "benchmark wording",
         TaskFamily::IdleMaintenance => "empty-queue maintenance",
         TaskFamily::Maintenance => "maintenance or cleanup wording",
-    }
-}
-
-fn artifact_kind(lower: &str) -> &'static str {
-    if lower.contains("dictionary") || lower.contains("glossary") || lower.contains("lexicon") {
-        "dictionary"
-    } else if lower.contains("cookbook") || lower.contains("recipe") || lower.contains("bread") {
-        "cookbook"
-    } else if lower.contains("story")
-        || lower.contains("novel")
-        || lower.contains("manuscript")
-        || lower.contains("narrative")
-    {
-        "story"
-    } else {
-        "artifact"
     }
 }
 

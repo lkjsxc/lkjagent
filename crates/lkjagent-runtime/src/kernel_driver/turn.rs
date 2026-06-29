@@ -95,6 +95,10 @@ fn effect_summary(decision: &crate::kernel::RuntimeDecision) -> &str {
     match decision.runtime_effect.as_ref() {
         Some(crate::kernel::RuntimeEffectCommand::CompactNow) => "hard_compaction",
         Some(crate::kernel::RuntimeEffectCommand::WaitClosedIdle) => "closed_idle_wait",
+        Some(crate::kernel::RuntimeEffectCommand::DeterministicInspection { .. }) => {
+            "deterministic_inspection"
+        }
+        Some(crate::kernel::RuntimeEffectCommand::RecordBlockedHandoff) => "blocked_handoff",
         Some(_) => "runtime_effect",
         None => "runtime_effect",
     }

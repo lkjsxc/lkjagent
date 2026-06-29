@@ -25,35 +25,18 @@ pub(crate) fn priority_long_content_request(lower: &str, content: &str) -> bool 
 }
 
 pub(crate) fn content_artifact_request(lower: &str, content: &str) -> bool {
-    long_content_request(lower, content)
+    (long_content_request(lower, content) || counted_story_request(lower))
         && creation_request(lower, content)
-        && !counted_content_request(lower, content)
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct IntentFacts {
-    pub content_creation: bool,
-    pub operational_compaction: bool,
-}
-
-pub(crate) fn intent_facts(lower: &str, content: &str) -> IntentFacts {
-    let content_creation = priority_counted_content_request(lower, content)
-        || priority_long_content_request(lower, content);
-    let unquoted = unquoted_lower(content);
-    IntentFacts {
-        content_creation,
-        operational_compaction: operational_compaction_request(&unquoted),
-    }
-}
-
-fn operational_compaction_request(unquoted: &str) -> bool {
+pub(crate) fn operational_compaction_request(unquoted: &str) -> bool {
     unquoted.contains("context pressure")
         || unquoted.contains("compaction")
         || (unquoted.contains("compact")
             && contains_any(unquoted, &["context", "prompt", "token", "memory"]))
 }
 
-fn unquoted_lower(content: &str) -> String {
+pub(crate) fn unquoted_lower(content: &str) -> String {
     let mut quote = None;
     let mut out = String::with_capacity(content.len());
     for ch in content.chars() {
@@ -82,6 +65,13 @@ fn long_content_request(lower: &str, content: &str) -> bool {
     large_content_signal(lower, content)
         && content_signal(lower, content)
         && !code_change_action(lower, content)
+}
+
+pub(crate) fn counted_story_request(lower: &str) -> bool {
+    lower
+        .split(|ch: char| !ch.is_ascii_alphanumeric())
+        .any(|word| matches!(word, "chapter" | "chapters" | "scene" | "scenes"))
+        && lower.chars().any(|ch| ch.is_ascii_digit())
 }
 
 fn creation_request(lower: &str, content: &str) -> bool {
@@ -168,7 +158,7 @@ fn content_signal(lower: &str, content: &str) -> bool {
     )
 }
 
-fn large_content_signal(lower: &str, content: &str) -> bool {
+pub(crate) fn large_content_signal(lower: &str, content: &str) -> bool {
     contains_any(
         lower,
         &[
@@ -185,6 +175,6 @@ fn large_content_signal(lower: &str, content: &str) -> bool {
     ) || contains_any(content, &["長編", "大規模", "構造化"])
 }
 
-fn contains_any(text: &str, needles: &[&str]) -> bool {
+pub(crate) fn contains_any(text: &str, needles: &[&str]) -> bool {
     needles.iter().any(|needle| text.contains(needle))
 }

@@ -36,7 +36,8 @@ impl ResidentDaemon {
             pending.authority_decision_id = store_state::get(conn, "authority decision id")?;
         }
         if pending.prompt_frame_id.is_none() {
-            pending.prompt_frame_id = store_state::get(conn, "authority prompt frame id")?;
+            pending.prompt_frame_id =
+                none_string_to_none(store_state::get(conn, "authority prompt frame id")?);
         }
         if pending.staleness_fingerprint.is_none() {
             pending.staleness_fingerprint = store_state::get(conn, "kernel staleness fingerprint")?;
@@ -116,6 +117,10 @@ impl ResidentDaemon {
             }
         }
     }
+}
+
+fn none_string_to_none(value: Option<String>) -> Option<String> {
+    value.filter(|text| text != "none")
 }
 
 fn tick_for_stop(stop: Option<StopReason>) -> DaemonTick {

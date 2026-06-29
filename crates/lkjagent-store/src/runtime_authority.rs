@@ -1,5 +1,11 @@
 #[path = "runtime_authority/codec.rs"]
 mod codec;
+#[path = "runtime_authority/dense_model.rs"]
+mod dense_model;
+#[path = "runtime_authority/dense_read.rs"]
+mod dense_read;
+#[path = "runtime_authority/dense_write.rs"]
+mod dense_write;
 #[path = "runtime_authority/detail_model.rs"]
 mod detail_model;
 #[path = "runtime_authority/detail_read.rs"]
@@ -15,6 +21,9 @@ mod read;
 #[path = "runtime_authority/write.rs"]
 mod write;
 
+pub use dense_model::*;
+pub use dense_read::{dense_packet_for_decision, dense_rows_for_decision};
+pub use dense_write::{record_dense_runtime_row, record_dense_runtime_rows};
 pub use detail_model::*;
 pub use detail_read::{
     latest_admission_for_decision, latest_complete_chain_for_case, latest_decision_detail_for_case,

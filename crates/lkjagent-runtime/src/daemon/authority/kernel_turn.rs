@@ -92,6 +92,13 @@ fn endpoint_decision(
     ) {
         return EndpointDecision::RuntimeCompact;
     }
+    if matches!(
+        decision.runtime_effect,
+        Some(RuntimeEffectCommand::DeterministicInspection { .. })
+            | Some(RuntimeEffectCommand::RecordBlockedHandoff)
+    ) {
+        return EndpointDecision::RuntimeEffect;
+    }
     if snapshot.maintenance_active
         && (snapshot.active_owner_case || snapshot.pending_owner_rows > 0)
     {

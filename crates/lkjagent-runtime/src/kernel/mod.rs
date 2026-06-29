@@ -14,7 +14,6 @@ pub mod facts;
 pub mod fault;
 pub mod mission;
 pub mod mission_select;
-mod next_action;
 mod next_action_simple;
 pub mod obligation;
 mod obligation_contract;
@@ -36,6 +35,7 @@ pub use admission::ToolAdmissionView;
 pub use admission_decide::{
     admit_requested_tool, AdmissionDecision, AdmissionRefusalKind, AdmissionRequest,
 };
+pub use completion::{CompletionGateDecision, CompletionGateInput};
 pub use decision::{
     ActionTemplate, ContentWriteContract, DecisionInvariantError, RuntimeDecision,
     RuntimeDecisionId, RuntimeDecisionInput, RuntimeDecisionKind, RuntimeMission,
@@ -58,7 +58,7 @@ pub use progress::{progress_key_for_snapshot, ProgressKey};
 pub use provider::provider_anomaly_event;
 pub use reduce::{reduce, reduce_with_event_id};
 pub use render::{render_prompt_frame, PromptCardData, PromptRenderError};
-pub use resolver::ResolverPlan;
+pub use resolver::{ResolverPlan, TotalResolverPlan};
 pub use snapshot::{
     AuthorityFingerprint, RuntimeEventId, RuntimeSnapshot, RuntimeSnapshotId, RuntimeSnapshotInput,
     StalenessFingerprint, ToolName,

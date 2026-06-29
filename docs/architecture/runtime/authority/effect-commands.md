@@ -60,8 +60,8 @@ Every command records an `EffectObservation` with:
 
 ## Status
 
-specified. Runtime implementations route some maintenance, compaction,
-completion, and status work through persisted decisions. The active dense
-network task adds effect rows and no-provider routing for deterministic audits,
-inspections, artifact-next contracts, blocked handoffs, idle transitions, and
-close effects.
+specified. Runtime implementations route maintenance, compaction, completion,
+status work, and exact deterministic inspections through persisted decisions.
+The dense network task adds effect rows and no-provider routing for document and
+artifact audits, `artifact.next` contracts, blocked handoffs, idle transitions,
+and close effects.

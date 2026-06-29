@@ -1,3 +1,4 @@
+mod dense_rows;
 mod input;
 mod persist;
 mod persist_map;

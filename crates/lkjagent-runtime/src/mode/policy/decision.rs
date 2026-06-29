@@ -4,6 +4,7 @@ use super::model::ActiveMode;
 pub enum EndpointDecision {
     CallModel,
     RuntimeCompact,
+    RuntimeEffect,
     DeliverOwner,
     DeferMaintenance,
     ClosedIdle,

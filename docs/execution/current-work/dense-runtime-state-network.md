@@ -44,6 +44,14 @@ record requested scale, profile requirements, weak semantic groups, and the next
 bounded paths to write. A small identity seed is not sufficient for large story
 completion.
 
+## Implemented Slice
+
+Focused tests now cover typed intent profile routing, owner-title and non-ASCII
+artifact identity, counted story scale, persisted dense authority rows, total
+resolver labels, deterministic audit runtime effects, progress keys, and typed
+completion inputs. The blocker remains open until benchmark, Docker verify, and
+fresh smoke evidence prove the complete route.
+
 ## Acceptance
 
 - `Compact Compass` is story artifact work, not compaction.

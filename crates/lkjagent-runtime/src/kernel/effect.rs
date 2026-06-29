@@ -1,4 +1,6 @@
-use crate::kernel::decision::{DecisionInvariantError, RuntimeDecision, RuntimeMission};
+use crate::kernel::decision::{
+    ActionTemplate, DecisionInvariantError, RuntimeDecision, RuntimeDecisionKind, RuntimeMission,
+};
 use crate::kernel::snapshot::ToolName;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -16,17 +18,34 @@ pub enum RuntimeEffectCommand {
 }
 
 pub(crate) fn attach_runtime_effect(
-    decision: RuntimeDecision,
+    mut decision: RuntimeDecision,
     mission: RuntimeMission,
 ) -> Result<RuntimeDecision, DecisionInvariantError> {
     match mission {
         RuntimeMission::HardRuntimeCompaction => {
-            decision.with_runtime_effect(RuntimeEffectCommand::CompactNow)
+            return decision.with_runtime_effect(RuntimeEffectCommand::CompactNow);
         }
         RuntimeMission::ClosedIdle => {
-            decision.with_runtime_effect(RuntimeEffectCommand::WaitClosedIdle)
+            return decision.with_runtime_effect(RuntimeEffectCommand::WaitClosedIdle);
         }
-        _ => Ok(decision),
+        _ => {}
+    }
+    if decision.kind != RuntimeDecisionKind::RuntimeEffect {
+        return Ok(decision);
+    }
+    decision.runtime_effect = Some(runtime_effect_for_decision(&decision));
+    Ok(decision)
+}
+
+fn runtime_effect_for_decision(decision: &RuntimeDecision) -> RuntimeEffectCommand {
+    if decision.blocked_handoff_plan.is_some() {
+        return RuntimeEffectCommand::RecordBlockedHandoff;
+    }
+    match decision.forced_next_action.as_ref() {
+        Some(ActionTemplate::ExactTool { tool, .. }) => {
+            RuntimeEffectCommand::DeterministicInspection { tool: tool.clone() }
+        }
+        _ => RuntimeEffectCommand::RefreshStatus,
     }
 }
 
@@ -42,11 +61,11 @@ impl RuntimeEffectCommand {
             | Self::WaitClosedIdle
             | Self::DeferMaintenance
             | Self::RecordMaintenanceCooldown
-            | Self::RecordBlockedHandoff
             | Self::RefreshStatus
             | Self::ExportModelLog
             | Self::PauseProvider
-            | Self::CloseCase => None,
+            | Self::CloseCase
+            | Self::RecordBlockedHandoff => None,
         }
     }
 }

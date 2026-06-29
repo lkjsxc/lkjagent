@@ -1,3 +1,6 @@
+#[path = "endpoint_runtime_effect.rs"]
+mod endpoint_runtime_effect;
+
 use std::time::Instant;
 
 use lkjagent_context::assemble::assemble_messages;
@@ -30,6 +33,9 @@ impl ResidentDaemon {
                 }
                 self.write_observable(conn)?;
                 return Ok(DaemonTick::Working);
+            }
+            EndpointDecision::RuntimeEffect => {
+                return self.runtime_effect_turn(conn, now, &authority)
             }
             EndpointDecision::DeliverOwner => {
                 self.deliver_owner(conn, now)?;

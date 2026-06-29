@@ -32,9 +32,9 @@ ToolAdmission -> EffectObservation -> RuntimeEvent
 
 The persisted runtime decision is the sole authority for mission, mode,
 admitted tools, blocked tools, context policy, compaction, recovery,
-completion, write contracts, and the next action surface. Model output supplies
-only bounded semantic intent or bounded file content inside that selected
-surface.
+completion, write contracts, deterministic effects, and the next action surface.
+Model output supplies only bounded semantic intent or bounded file content
+inside that selected surface.
 
 ## Implemented Surfaces
 
@@ -122,9 +122,11 @@ It proves that `Compact Compass` still false-closed before the sweep and that
 `iwanna` still degraded to `stories/novel-named` with noisy recovery.
 
 The current implementation has focused tests for compact-title classification,
-owner-title roots, durable missing-root repair, `candidate_action=artifact.audit`,
-exact root-repair admission, story scale-readiness refusal, readiness repair
-routing, and line-protocol recovery. Final smoke at
+owner-title roots, non-ASCII title identity, counted story scale, dense runtime
+rows, total resolver plans, deterministic audit effects, typed completion input
+packets, durable missing-root repair, `candidate_action=artifact.audit`, exact
+root-repair admission, story scale-readiness refusal, readiness repair routing,
+and line-protocol recovery. Final smoke at
 `tmp/runtime-smoke-final-iwanna-20260629T131603Z/` and
 `tmp/runtime-smoke-final-compact-20260629T134111Z/` proves both named long-novel
 routes preserve owner roots, avoid generic roots, reach story-semantic readiness,

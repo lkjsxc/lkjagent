@@ -1,6 +1,9 @@
+pub(crate) fn owner_title(objective: &str) -> Option<String> {
+    quoted_title_after_marker(objective).or_else(|| unquoted_title_after_marker(objective))
+}
+
 pub(crate) fn owner_title_alias(objective: &str) -> Option<String> {
-    let title =
-        quoted_title_after_marker(objective).or_else(|| unquoted_title_after_marker(objective))?;
+    let title = owner_title(objective)?;
     slug(&title)
 }
 
@@ -52,11 +55,20 @@ fn slug(title: &str) -> Option<String> {
         .filter(|word| !word.is_empty() && !TITLE_STOP_WORDS.contains(&word.as_str()))
         .take(5)
         .collect::<Vec<_>>();
-    if words.is_empty() {
-        None
-    } else {
-        Some(words.join("-"))
+    if !words.is_empty() {
+        return Some(words.join("-"));
     }
+    let trimmed = title.trim();
+    (!trimmed.is_empty()).then(|| format!("title-{:x}", stable_hash(trimmed)))
+}
+
+fn stable_hash(value: &str) -> u64 {
+    value
+        .as_bytes()
+        .iter()
+        .fold(0xcbf29ce484222325, |hash, byte| {
+            hash.wrapping_mul(0x100000001b3) ^ u64::from(*byte)
+        })
 }
 
 const TITLE_MARKERS: &[&str] = &[" named", " titled", " called", " title"];
