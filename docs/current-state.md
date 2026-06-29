@@ -10,9 +10,12 @@ tests, quiet gates, and required Docker gates prove it.
 
 lkjagent has a working Rust workspace with parser, protocol registry, graph,
 context, store, LLM, tools, runtime, CLI, benchmark, and xtask crates. The
-deterministic persisted-decision runtime is implemented. The runtime smoke
-problem sweep now has implementation changes under test. The checked-in active
-model run remains failure evidence until a fresh model smoke run replaces it.
+persisted-decision daemon path is implemented and proved by focused tests and
+Docker verify. The active work is to make that authority denser and total:
+store facts, obligations, resolver plans, progress edges, deterministic effects,
+and typed completion gate inputs for every decision. The checked-in active
+model run remains historical failure evidence until an owner chooses to replace
+it.
 
 The durable target is a deterministic state-transition runtime for a weak local
 LLM:
@@ -130,8 +133,8 @@ and close through `agent.done` without the observed noisy loop.
 ## Active Target
 
 The active row in [execution/current-blockers.md](execution/current-blockers.md)
-is runtime smoke false close and noisy repair. Next executable step: follow
-[execution/tasks/runtime-smoke-problem-sweep.md](execution/tasks/runtime-smoke-problem-sweep.md).
+is dense deterministic runtime authority network. Next executable step: follow
+[execution/tasks/dense-runtime-state-network.md](execution/tasks/dense-runtime-state-network.md).
 
 ## Out of Scope
 

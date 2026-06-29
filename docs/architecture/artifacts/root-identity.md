@@ -16,7 +16,7 @@ that contains `iwanna`; a novel named `Compact Compass` uses a root that
 contains `compact-compass`. Generic roots such as `stories/novel-named` are not
 valid owner identity.
 
-For a story root, the initial exact paths are:
+For a story root, the identity set is:
 
 ```text
 {root}/catalog.toml
@@ -27,7 +27,10 @@ For a story root, the initial exact paths are:
 ```
 
 The paths are flat. They avoid single-child subdirectories and can satisfy the
-document topology check immediately when the README is a valid navigation page.
+document topology check when the README is a valid navigation page. Runtime
+write contracts may expose this set as bounded micro-batches, including one
+path at a time. Each emitted batch is still part of the same stored identity
+contract and does not weaken the required identity set.
 
 ## Story Content Rules
 

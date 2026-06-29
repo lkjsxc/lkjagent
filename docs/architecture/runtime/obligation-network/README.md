@@ -12,15 +12,18 @@ The runtime owns this pure algebra:
 ```text
 RuntimeSnapshot + RuntimeEvent -> RuntimeFacts
 RuntimeFacts -> Vec<Obligation>
-Vec<Obligation> + RuntimeFacts -> ResolverPlan
-ResolverPlan -> RuntimeDecision
+Vec<Obligation> + RuntimeFacts -> TotalResolverPlan
+TotalResolverPlan -> RuntimeDecision
 RuntimeDecision + ModelAction -> ToolAdmission
 Observation -> RuntimeEvent
 ```
 
 The graph may rank and suggest. It never admits a tool, repeats a fallback, or
-closes a case. The model may author semantic content only when the persisted
-runtime decision contains a write contract with exact paths and limits.
+closes a case. The resolver is total: every non-terminal owner case yields a
+runtime effect, exact inspection, semantic write contract, owner wait, blocked
+handoff, or completion decision. The model may author semantic content only
+when the persisted runtime decision contains a write contract with exact paths
+and limits.
 
 ## Root Repair Rule
 

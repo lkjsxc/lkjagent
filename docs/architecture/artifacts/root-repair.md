@@ -12,7 +12,7 @@ A missing root follows this route:
 doc.audit or artifact.next observes root missing
 -> RuntimeEvent::ArtifactRootMissing
 -> Obligation::RootIdentity
--> ResolverPlan::SemanticWriteContract
+-> TotalResolverPlan::SemanticWriteContract
 -> fs.batch_write
 -> doc.audit
 ```

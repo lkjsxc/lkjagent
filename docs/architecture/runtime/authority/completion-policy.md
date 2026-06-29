@@ -10,6 +10,21 @@ Define the authority-owned gate that every owner-task close path must use.
 and the model can request `agent.done`, but the reducer decides close
 eligibility.
 
+## Gate Inputs
+
+Every close path reads the same typed `CompletionGateInput` packet:
+
+- case id, objective, owner request, active mode, and active node;
+- intent kind, artifact root, artifact kind, profile, requested scale, and
+  lifecycle when artifact work exists;
+- required evidence ids and their owning audit or verification surface;
+- latest document audit status, artifact readiness status, weak paths, and
+  profile-scale facts;
+- verification command status or explicit not-applicable reason;
+- unresolved recovery faults, provider anomalies, blocked handoff status, and
+  progress key exhaustion;
+- current decision id, prompt frame id, and staleness fingerprint.
+
 ## Gate
 
 ```text
@@ -93,4 +108,6 @@ coverage, not proof that every close path is fully wired.
 
 ## Status
 
-partially implemented.
+partially implemented. Runtime admission uses the reducer for `agent.done`, and
+the active dense-network task wires every close path to the same typed input
+packet and persisted gate rows.

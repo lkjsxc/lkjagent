@@ -28,6 +28,7 @@ verification.
 - [model-log.md](model-log.md): single handoff-log work.
 - [runtime-smoke-problems.md](runtime-smoke-problems.md): live-smoke problems after root repair.
 - [runtime-smoke-ground-truth.md](runtime-smoke-ground-truth.md): fresh baseline command and smoke evidence.
+- [dense-runtime-state-network.md](dense-runtime-state-network.md): active dense authority network redesign.
 - [personal-records.md](personal-records.md): diary, schedule, and TODO record work.
 - [verification-plan.md](verification-plan.md): focused tests, benchmarks, and compose gates.
 
