@@ -12,8 +12,8 @@ One kernel owns the turn sequence:
 ```text
 RuntimeSnapshot + RuntimeEvent -> RuntimeFacts
 RuntimeFacts -> Vec<Obligation>
-Vec<Obligation> + RuntimeFacts -> ResolverPlan
-ResolverPlan -> RuntimeDecision
+Vec<Obligation> + RuntimeFacts -> TotalResolverPlan
+TotalResolverPlan -> RuntimeDecision
 RuntimeDecision -> PromptFrame | RuntimeEffectCommand
 RuntimeDecision + ModelAction -> ToolAdmission
 ToolAdmission -> EffectObservation -> RuntimeEvent
@@ -125,15 +125,16 @@ runtime-owned compaction or inspection effects, and recovery escape-tool visibil
 
 ## Status
 
-implemented for the daemon turn path. Snapshot, event,
-decision, transition, effect, admission, prompt-frame, and observation ledgers
-exist. Runtime turn authority writes normalized rows and prompt cards cite the
-decision id. Store tests prove latest snapshot and decision reopen lookup,
-admission-to-decision integrity, kernel-derived authority and staleness
-fingerprints, and canonical event-kind strings.
+implemented for the daemon turn path. Snapshot, event, decision, transition,
+effect, admission, prompt-frame, and observation ledgers exist. Runtime turn
+authority writes normalized rows and prompt cards cite the decision id. Store
+tests prove latest snapshot and decision reopen lookup, admission-to-decision
+integrity, kernel-derived authority and staleness fingerprints, and canonical
+event-kind strings.
 
-The daemon authority adapter now runs the persisted kernel driver instead of a
+The daemon authority adapter runs the persisted kernel driver instead of a
 shadow decision path. Prompt rendering, pending-action admission, dispatch
 observations, maintenance, compaction, and completion use the same decision id
 and staleness fingerprint in focused runtime tests, quiet verify, and Docker
-Compose verify.
+Compose verify. The active dense-network task extends the rows and totality
+proofs; it does not replace this driver.

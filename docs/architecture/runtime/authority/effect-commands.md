@@ -24,6 +24,10 @@ work starts.
 - `model_log_export`: synthesize model-log output from authority records.
 - `deterministic_inspection`: run a zero-content inspection selected by the
   decision, such as listing a known artifact root.
+- `deterministic_doc_audit`: run a document audit when all inputs are local and
+  the decision admits no semantic content.
+- `deterministic_artifact_next`: derive the next artifact write contract from
+  persisted facts and cursor state without asking the model to choose the tool.
 - `provider_pause`: pause or defer after provider anomaly retry budget.
 - `completion_close`: close only after the central completion reducer accepts.
 
@@ -56,5 +60,8 @@ Every command records an `EffectObservation` with:
 
 ## Status
 
-specified. Runtime implementations still need full routing through persisted
-effect command rows.
+specified. Runtime implementations route some maintenance, compaction,
+completion, and status work through persisted decisions. The active dense
+network task adds effect rows and no-provider routing for deterministic audits,
+inspections, artifact-next contracts, blocked handoffs, idle transitions, and
+close effects.

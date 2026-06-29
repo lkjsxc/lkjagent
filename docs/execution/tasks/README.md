@@ -65,3 +65,5 @@ Every task file uses exactly these headings:
   progress-key runtime redesign.
 - [runtime-smoke-problem-sweep.md](runtime-smoke-problem-sweep.md): live-smoke false-close and
   noisy-loop repairs.
+- [dense-runtime-state-network.md](dense-runtime-state-network.md): dense deterministic runtime
+  authority network.

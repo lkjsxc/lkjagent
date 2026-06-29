@@ -118,10 +118,11 @@ The run preserved the historical defects: the root lost the owner title, the
 runtime stayed in a noisy recovery loop, and a generic example root appeared
 while a current artifact root existed.
 
-## Post-Change Smoke Evidence
+## Intermediate Post-Change Smoke Evidence
 
-Fresh post-change smoke evidence is preserved under
-`tmp/runtime-smoke-final-20260629T071918Z/`.
+Intermediate post-change smoke evidence is preserved under
+`tmp/runtime-smoke-final-20260629T071918Z/`. It is chronology for the completed
+sweep, not the current active state.
 
 Compact Compass:
 

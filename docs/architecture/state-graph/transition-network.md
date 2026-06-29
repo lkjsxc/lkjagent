@@ -18,8 +18,8 @@ maintenance tick, and close path reads the same decision stream.
 DurableReadModel -> RuntimeSnapshot
 RuntimeSnapshot + RuntimeEvent -> RuntimeFacts
 RuntimeFacts -> Vec<Obligation>
-Vec<Obligation> + RuntimeFacts -> ResolverPlan
-ResolverPlan -> RuntimeDecision
+Vec<Obligation> + RuntimeFacts -> TotalResolverPlan
+TotalResolverPlan -> RuntimeDecision
 RuntimeDecision -> PromptFrame or RuntimeEffectCommand
 RuntimeDecision + ModelAction -> ToolAdmission
 ToolAdmission -> EffectCommand
@@ -74,9 +74,15 @@ content is needed.
 
 ## Status
 
-partially implemented. Runtime mission selection, decision records, event and
-admission persistence, prompt-card decision identifiers, and stale maintenance
-action refusal exist. The complete transition history, full snapshots,
-runtime-effect commands, prompt resume, full-fingerprint stale refusal,
-maintenance preemption proof, recovery shape coverage, and every close path
-still need to read the same persisted decision stream.
+implemented for the persisted daemon driver described by
+[../runtime/authority/transition-kernel.md](../runtime/authority/transition-kernel.md).
+Runtime mission selection, decision records, event and admission persistence,
+prompt-card decision identifiers, authority fingerprints, prompt rendering,
+provider exchange, dispatch observation, maintenance, compaction, and completion
+all run through the persisted decision id on the daemon path.
+
+Active work is density and totality, not a second driver. The next slice stores
+facts, obligations, resolver plans, progress edges, deterministic effect rows,
+and completion gate inputs as first-class records; removes any mission fallback
+branch after resolver planning; and proves prompt/admission staleness with a
+shared fingerprint.

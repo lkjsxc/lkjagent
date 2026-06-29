@@ -2,11 +2,11 @@
 
 ## Purpose
 
-Define resolver plans and how they become runtime decisions.
+Define total resolver plans and how they become runtime decisions.
 
 ## Resolver Plan Set
 
-`ResolverPlan` is one of:
+`TotalResolverPlan` is one of:
 
 - `RuntimeEffect`: compaction, idle, maintenance defer, or other deterministic
   runtime work that needs no model content.
@@ -22,10 +22,12 @@ Define resolver plans and how they become runtime decisions.
 
 ## Decision Mapping
 
-A resolver plan produces one `RuntimeDecision`. The decision names admitted
-and blocked tools, the forced tool or runtime effect, the content write
-contract, completion blockers, progress key, and the rule explanation. Prompt
-frames and admission views are rendered from the same decision id.
+A resolver plan always produces one `RuntimeDecision`; there is no mission
+fallback branch after resolver planning. The decision kind is derived from the
+plan variant. The decision names admitted and blocked tools, the forced tool or
+runtime effect, the content write contract, completion blockers, progress key,
+and the rule explanation. Prompt frames and admission views are rendered from
+the same decision id and staleness fingerprint.
 
 ## Root Missing Mapping
 

@@ -22,6 +22,7 @@ that ran.
 | 10 | Benchmark corpus and final gates | [tasks/deep-redesign-gates.md](tasks/deep-redesign-gates.md) | done |
 | 11 | Obligation network root repair | [tasks/obligation-network-redesign.md](tasks/obligation-network-redesign.md) | done |
 | 12 | Runtime smoke false close and noisy repair | [tasks/runtime-smoke-problem-sweep.md](tasks/runtime-smoke-problem-sweep.md) | done |
+| 13 | Dense deterministic runtime authority network | [tasks/dense-runtime-state-network.md](tasks/dense-runtime-state-network.md) | open |
 
 ## Active Data Fixture
 
@@ -73,24 +74,23 @@ The checked-in generated log fixture remains historical failure evidence.
 - Context compaction can run at state boundaries and must preserve cursor,
   mission, recovery route, blockers, and next action surface.
 
-## Open Smoke Findings
+## Historical Smoke Findings
 
 Fresh pre-change smoke evidence is committed under
 `tmp/runtime-smoke-ground-truth-20260629T051817Z/` and summarized in
 [current-work/runtime-smoke-ground-truth.md](current-work/runtime-smoke-ground-truth.md).
-Live smoke runs after root repair found remaining problems:
-
-- titles containing `Compact` can be classified as compaction work and close
-  without artifact audit;
-- named novel roots can degrade to `stories/novel-named`;
-- missing-root repair is escapable but still spends noisy turns on repeated
-  audit, refused mkdir, and placeholder-root examples;
-- long-novel completion can pass with a small story-bible seed.
+Those logs showed Compact-title false close, owner-title root drift,
+same-root missing-root audit loops, placeholder roots, and weak story-scale
+completion.
 
 The implementation sweep now has focused tests, benchmark fixture updates, and
 final Docker smoke evidence under `tmp/runtime-smoke-final-iwanna-20260629T131603Z/`
 and `tmp/runtime-smoke-final-compact-20260629T134111Z/`. The final smoke closes
 both named long-novel routes without the false close, generic root, or noisy
-repair loop.
+repair loop. The remaining active work is structural hardening, not reopening
+those historical defects.
 
-Details live in [current-work/runtime-smoke-problems.md](current-work/runtime-smoke-problems.md).
+Historical details live in
+[current-work/runtime-smoke-problems.md](current-work/runtime-smoke-problems.md).
+The active design slice lives in
+[current-work/dense-runtime-state-network.md](current-work/dense-runtime-state-network.md).
