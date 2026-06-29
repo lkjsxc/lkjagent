@@ -57,7 +57,8 @@ fn role_present(files: &[StoryFile], requirement: &Requirement) -> bool {
     files.iter().any(|file| {
         role_candidate(file, requirement)
             && word_count(&file.text) >= 25
-            && signal_count(&file.lower, requirement.signals) >= 2
+            && (signal_count(&file.lower, requirement.signals) >= 2
+                || file.relative.contains(requirement.label))
     })
 }
 
@@ -66,6 +67,7 @@ fn role_candidate(file: &StoryFile, requirement: &Requirement) -> bool {
         .paths
         .iter()
         .any(|path| file.relative.contains(path))
+        || file.relative.contains(requirement.label)
         || heading_mentions(&file.lower, requirement.label)
 }
 

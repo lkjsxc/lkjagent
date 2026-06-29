@@ -7,7 +7,7 @@ Fix the live-smoke problems recorded in
 
 ## Status
 
-in progress: focused tests pass; post-change smoke still shows readiness repair noise
+done: focused tests and final clean-data smoke close both named long-novel routes
 
 ## Depends On
 

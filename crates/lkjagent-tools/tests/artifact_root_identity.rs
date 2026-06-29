@@ -12,16 +12,7 @@ fn missing_story_root_returns_flat_identity_contract() -> TestResult<()> {
     let output = run(&workspace, "artifact.next", &[("root", "stories/novel")])?;
     let paths = contract_paths(&output);
 
-    assert_eq!(
-        paths,
-        vec![
-            "stories/novel/catalog.toml",
-            "stories/novel/README.md",
-            "stories/novel/objective.md",
-            "stories/novel/setting-overview.md",
-            "stories/novel/cast.md",
-        ]
-    );
+    assert_eq!(paths, vec!["stories/novel/catalog.toml"]);
     assert!(!output.contains("request/objective.md"));
     assert!(paths
         .iter()

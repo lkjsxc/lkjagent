@@ -69,8 +69,11 @@ pub(crate) fn owner_execution_tool(snapshot: &RuntimeSnapshot) -> &'static str {
     if snapshot.artifact.root.is_none() {
         return "artifact.plan";
     }
-    if root_identity_observation(snapshot) || artifact_next_candidate(snapshot) {
+    if root_identity_observation(snapshot) || batch_write_requested(snapshot) {
         return "fs.batch_write";
+    }
+    if artifact_next_requested(snapshot) {
+        return "artifact.next";
     }
     if evidence_missing(snapshot, "document-structure") {
         return "doc.audit";
@@ -85,8 +88,11 @@ pub(crate) fn owner_execution_tool(snapshot: &RuntimeSnapshot) -> &'static str {
 }
 
 fn recovery_tool(snapshot: &RuntimeSnapshot) -> &'static str {
-    if root_identity_observation(snapshot) || artifact_next_candidate(snapshot) {
+    if root_identity_observation(snapshot) || batch_write_requested(snapshot) {
         return "fs.batch_write";
+    }
+    if artifact_next_requested(snapshot) {
+        return "artifact.next";
     }
     if evidence_missing(snapshot, "document-structure") {
         return "doc.audit";
@@ -115,9 +121,9 @@ fn schema_tool(snapshot: &RuntimeSnapshot) -> &'static str {
 }
 
 fn artifact_tool(snapshot: &RuntimeSnapshot) -> &'static str {
-    if artifact_next_candidate(snapshot) {
+    if batch_write_requested(snapshot) {
         "fs.batch_write"
-    } else if !snapshot.artifact.weak_paths.is_empty() {
+    } else if artifact_next_requested(snapshot) || !snapshot.artifact.weak_paths.is_empty() {
         "artifact.next"
     } else {
         "artifact.audit"
@@ -129,11 +135,23 @@ fn plan_missing(snapshot: &RuntimeSnapshot) -> bool {
         && !snapshot.evidence.existing.iter().any(|item| item == "plan")
 }
 
-fn artifact_next_candidate(snapshot: &RuntimeSnapshot) -> bool {
-    snapshot.observation.latest.as_deref().is_some_and(|value| {
-        value.contains("next_decision_required=true")
-            && value.contains("candidate_action=fs.batch_write")
-    })
+fn batch_write_requested(snapshot: &RuntimeSnapshot) -> bool {
+    candidate_action(snapshot, "fs.batch_write")
+}
+
+fn artifact_next_requested(snapshot: &RuntimeSnapshot) -> bool {
+    candidate_action(snapshot, "artifact.next")
+}
+
+fn candidate_action(snapshot: &RuntimeSnapshot, action: &str) -> bool {
+    let needle = format!("candidate_action={action}");
+    [
+        snapshot.observation.latest.as_deref(),
+        snapshot.observation.latest_successful.as_deref(),
+    ]
+    .into_iter()
+    .flatten()
+    .any(|value| value.contains("next_decision_required=true") && value.contains(&needle))
 }
 
 fn root_identity_observation(snapshot: &RuntimeSnapshot) -> bool {

@@ -120,12 +120,12 @@ It proves that `Compact Compass` still false-closed before the sweep and that
 
 The current implementation has focused tests for compact-title classification,
 owner-title roots, durable missing-root repair, `candidate_action=artifact.audit`,
-exact root-repair admission, and story scale-readiness refusal. Fresh
-post-change smoke at `tmp/runtime-smoke-final-20260629T071918Z/` proves
-measurable improvement: `Compact Compass` routes through artifact writes,
-`iwanna` preserves its root, generic story roots are absent, and small story
-seed completion is refused with scale-readiness facts. Noisy recovery remains
-after story readiness fails.
+exact root-repair admission, story scale-readiness refusal, readiness repair
+routing, and line-protocol recovery. Final smoke at
+`tmp/runtime-smoke-final-iwanna-20260629T131603Z/` and
+`tmp/runtime-smoke-final-compact-20260629T134111Z/` proves both named long-novel
+routes preserve owner roots, avoid generic roots, reach story-semantic readiness,
+and close through `agent.done` without the observed noisy loop.
 
 ## Active Target
 

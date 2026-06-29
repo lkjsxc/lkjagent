@@ -1,6 +1,6 @@
 use crate::kernel::decision::{ActionTemplate, RuntimeMission};
 use crate::kernel::obligation::{root_identity_needed, Obligation};
-use crate::kernel::obligation_facts::{RuntimeFacts, WriteContractFacts};
+use crate::kernel::obligation_facts::{ArtifactRootStatus, RuntimeFacts, WriteContractFacts};
 use crate::kernel::render::example_for;
 use crate::kernel::snapshot::{RuntimeSnapshot, ToolName};
 
@@ -89,8 +89,9 @@ fn obligation_plan(
             .write_contract
             .clone()
             .map(|contract| ResolverPlan::SemanticWriteContract { contract }),
-        Obligation::DocumentStructure => Some(ResolverPlan::Audit { tool: "doc.audit" }),
-        Obligation::ArtifactReadiness | Obligation::Verification => Some(ResolverPlan::Audit {
+        Obligation::DocumentStructure => Some(document_structure_plan(facts)),
+        Obligation::ArtifactReadiness => Some(artifact_readiness_plan(snapshot, facts)),
+        Obligation::Verification => Some(ResolverPlan::Audit {
             tool: "artifact.audit",
         }),
         Obligation::Completion if mission == RuntimeMission::OwnerCompletion => {
@@ -109,7 +110,12 @@ fn recovery_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> Option<Res
     if let Some(plan) = root_repair_plan(facts) {
         return Some(plan);
     }
-    if facts.write_contract.is_some() && artifact_next_candidate(snapshot) {
+    if artifact_next_requested(snapshot) {
+        return Some(ResolverPlan::ExactInspection {
+            tool: "artifact.next",
+        });
+    }
+    if facts.write_contract.is_some() && batch_write_requested(snapshot) {
         return facts
             .write_contract
             .clone()
@@ -137,9 +143,43 @@ fn exact(tool: &'static str, snapshot: &RuntimeSnapshot) -> Option<ActionTemplat
     })
 }
 
-fn artifact_next_candidate(snapshot: &RuntimeSnapshot) -> bool {
-    snapshot.observation.latest.as_deref().is_some_and(|value| {
-        value.contains("next_decision_required=true")
-            && value.contains("candidate_action=fs.batch_write")
-    })
+fn document_structure_plan(facts: &RuntimeFacts) -> ResolverPlan {
+    if facts.root.is_some() && facts.root_status == ArtifactRootStatus::StructureFailed {
+        ResolverPlan::ExactInspection {
+            tool: "artifact.next",
+        }
+    } else {
+        ResolverPlan::Audit { tool: "doc.audit" }
+    }
+}
+
+fn artifact_readiness_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> ResolverPlan {
+    if artifact_next_requested(snapshot) || !facts.weak_paths.is_empty() {
+        ResolverPlan::ExactInspection {
+            tool: "artifact.next",
+        }
+    } else {
+        ResolverPlan::Audit {
+            tool: "artifact.audit",
+        }
+    }
+}
+
+fn batch_write_requested(snapshot: &RuntimeSnapshot) -> bool {
+    candidate_action(snapshot, "fs.batch_write")
+}
+
+fn artifact_next_requested(snapshot: &RuntimeSnapshot) -> bool {
+    candidate_action(snapshot, "artifact.next")
+}
+
+fn candidate_action(snapshot: &RuntimeSnapshot, action: &str) -> bool {
+    let needle = format!("candidate_action={action}");
+    [
+        snapshot.observation.latest.as_deref(),
+        snapshot.observation.latest_successful.as_deref(),
+    ]
+    .into_iter()
+    .flatten()
+    .any(|value| value.contains("next_decision_required=true") && value.contains(&needle))
 }

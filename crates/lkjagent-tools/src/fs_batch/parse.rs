@@ -56,6 +56,7 @@ fn parse_line_protocol(input: &str) -> ToolResult<ParsedBatch> {
         };
         files.push(file);
     }
+    let files = remove_empty_duplicate_stubs(files);
     if files.is_empty() {
         return Err(ToolError::invalid(
             "files must contain at least one file block",
@@ -106,7 +107,6 @@ fn parse_content(body: &str) -> ToolResult<&str> {
 fn reject_nested_path_headers(content: &str) -> ToolResult<()> {
     if content
         .lines()
-        .skip(1)
         .any(|line| line.trim_start().starts_with("path:"))
     {
         return Err(ToolError::invalid(
@@ -114,4 +114,19 @@ fn reject_nested_path_headers(content: &str) -> ToolResult<()> {
         ));
     }
     Ok(())
+}
+
+fn remove_empty_duplicate_stubs(files: Vec<BatchFile>) -> Vec<BatchFile> {
+    files
+        .iter()
+        .enumerate()
+        .filter(|(index, file)| {
+            !file.content.trim().is_empty()
+                || !files
+                    .iter()
+                    .skip(index + 1)
+                    .any(|later| later.path == file.path && !later.content.trim().is_empty())
+        })
+        .map(|(_, file)| file.clone())
+        .collect()
 }

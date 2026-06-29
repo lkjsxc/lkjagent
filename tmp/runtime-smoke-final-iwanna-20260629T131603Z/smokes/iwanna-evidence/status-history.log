@@ -1,0 +1,1836 @@
+
+===== POLL 1 UTC 2026-06-29T13:18:12Z =====
+ Container lkjagentfinaliwanna2-agent-run-3ae7d50ba68f Creating 
+ Container lkjagentfinaliwanna2-agent-run-3ae7d50ba68f Created 
+ctx=1.75K/24.58K 7.14% pressure=green
+in=1.35K out=29 cache=unknown total=1.38K
+prefix=5.38K log=18.69K reserve=512 headroom=22.82K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=3
+continuation_epoch=0
+continuation_turns=0
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=planning
+authority_node=plan
+evidence_gaps=plan,observation,document-structure,artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=graph.state,graph.plan,graph.evidence,graph.note,agent.ask,artifact.next,artifact.audit,doc.audit,fs.read,fs.list,fs.stat,fs.write,fs.batch_write,workspace.summary
+authority_blocked_tools=memory.find,memory.save
+next_executable_action=<action>
+<tool>graph.plan</tool>
+<objective>Complete the owner task</objective>
+<steps>
+Inspect state
+Act in one bounded step
+</steps>
+<reason>Graph planning requirement</reason>
+<checks>dispatch accepts semantic plan</checks>
+<paths>stories/iwanna</paths>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=1755
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 2 UTC 2026-06-29T13:18:38Z =====
+ Container lkjagentfinaliwanna2-agent-run-f725b588d4a8 Creating 
+ Container lkjagentfinaliwanna2-agent-run-f725b588d4a8 Created 
+ctx=2.65K/24.58K 10.80% pressure=green
+in=2.10K out=219 cache=unknown total=2.32K
+prefix=5.38K log=18.69K reserve=512 headroom=21.92K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=4
+continuation_epoch=0
+continuation_turns=1
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=observation,document-structure,artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=doc.audit
+authority_blocked_tools=memory.find,memory.save
+next_executable_action=<action>
+<tool>doc.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=2653
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 3 UTC 2026-06-29T13:19:13Z =====
+ Container lkjagentfinaliwanna2-agent-run-cf0dccf1b683 Creating 
+ Container lkjagentfinaliwanna2-agent-run-cf0dccf1b683 Created 
+ctx=4.29K/24.58K 17.48% pressure=green
+in=3.67K out=338 cache=unknown total=4.01K
+prefix=5.38K log=18.69K reserve=512 headroom=20.28K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=6
+continuation_epoch=0
+continuation_turns=3
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=document-structure,artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=doc.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>doc.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=4295
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 4 UTC 2026-06-29T13:19:49Z =====
+ Container lkjagentfinaliwanna2-agent-run-1e24615cc4ba Creating 
+ Container lkjagentfinaliwanna2-agent-run-1e24615cc4ba Created 
+ctx=5.37K/24.58K 21.84% pressure=green
+in=5.03K out=32 cache=unknown total=5.07K
+prefix=5.38K log=18.69K reserve=512 headroom=19.21K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=8
+continuation_epoch=0
+continuation_turns=5
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.next
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.next</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=5368
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 5 UTC 2026-06-29T13:20:20Z =====
+ Container lkjagentfinaliwanna2-agent-run-df3778d5d418 Creating 
+ Container lkjagentfinaliwanna2-agent-run-df3778d5d418 Created 
+ctx=5.92K/24.58K 24.07% pressure=green
+in=5.94K out=32 cache=unknown total=5.97K
+prefix=5.38K log=18.69K reserve=512 headroom=18.66K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=9
+continuation_epoch=0
+continuation_turns=6
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=5916
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 6 UTC 2026-06-29T13:20:39Z =====
+ Container lkjagentfinaliwanna2-agent-run-74358a569b15 Creating 
+ Container lkjagentfinaliwanna2-agent-run-74358a569b15 Created 
+ctx=6.39K/24.58K 26.01% pressure=green
+in=6.88K out=364 cache=unknown total=7.25K
+prefix=5.38K log=18.69K reserve=512 headroom=18.18K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=10
+continuation_epoch=0
+continuation_turns=7
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=6391
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 7 UTC 2026-06-29T13:21:15Z =====
+ Container lkjagentfinaliwanna2-agent-run-7e113abc6f9c Creating 
+ Container lkjagentfinaliwanna2-agent-run-7e113abc6f9c Created 
+ctx=7.08K/24.58K 28.79% pressure=green
+in=6.90K out=32 cache=unknown total=6.93K
+prefix=5.38K log=18.69K reserve=512 headroom=17.50K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=12
+continuation_epoch=0
+continuation_turns=9
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.next
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.next</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=7076
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 8 UTC 2026-06-29T13:21:48Z =====
+ Container lkjagentfinaliwanna2-agent-run-64991769a9a3 Creating 
+ Container lkjagentfinaliwanna2-agent-run-64991769a9a3 Created 
+ctx=7.63K/24.58K 31.04% pressure=green
+in=7.81K out=32 cache=unknown total=7.84K
+prefix=5.38K log=18.69K reserve=512 headroom=16.95K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=13
+continuation_epoch=0
+continuation_turns=10
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=7628
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 9 UTC 2026-06-29T13:22:26Z =====
+ Container lkjagentfinaliwanna2-agent-run-ec5ab27f1f68 Creating 
+ Container lkjagentfinaliwanna2-agent-run-ec5ab27f1f68 Created 
+ctx=8.79K/24.58K 35.77% pressure=green
+in=9.10K out=32 cache=unknown total=9.13K
+prefix=5.38K log=18.69K reserve=512 headroom=15.79K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=16
+continuation_epoch=0
+continuation_turns=13
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.next
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.next</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=8791
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 10 UTC 2026-06-29T13:23:22Z =====
+ Container lkjagentfinaliwanna2-agent-run-b68989060f0c Creating 
+ Container lkjagentfinaliwanna2-agent-run-b68989060f0c Created 
+ctx=8.93K/24.58K 36.34% pressure=green
+in=9.48K out=32 cache=unknown total=9.51K
+prefix=5.38K log=18.69K reserve=512 headroom=15.65K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=18
+continuation_epoch=0
+continuation_turns=15
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.next
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.next</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=8930
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 11 UTC 2026-06-29T13:24:03Z =====
+ Container lkjagentfinaliwanna2-agent-run-051676f7dd7c Creating 
+ Container lkjagentfinaliwanna2-agent-run-051676f7dd7c Created 
+ctx=10.05K/24.58K 40.91% pressure=green
+in=10.84K out=125 cache=unknown total=10.96K
+prefix=5.38K log=18.69K reserve=512 headroom=14.52K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=20
+continuation_epoch=0
+continuation_turns=17
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=10054
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 12 UTC 2026-06-29T13:24:29Z =====
+ Container lkjagentfinaliwanna2-agent-run-ba32bbe17b6a Creating 
+ Container lkjagentfinaliwanna2-agent-run-ba32bbe17b6a Created 
+ctx=10.15K/24.58K 41.31% pressure=green
+in=10.69K out=32 cache=unknown total=10.72K
+prefix=5.38K log=18.69K reserve=512 headroom=14.42K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=22
+continuation_epoch=0
+continuation_turns=19
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=10152
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 13 UTC 2026-06-29T13:25:03Z =====
+ Container lkjagentfinaliwanna2-agent-run-56f075b7c475 Creating 
+ Container lkjagentfinaliwanna2-agent-run-56f075b7c475 Created 
+ctx=10.27K/24.58K 41.81% pressure=green
+in=11.06K out=32 cache=unknown total=11.09K
+prefix=5.38K log=18.69K reserve=512 headroom=14.30K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=24
+continuation_epoch=0
+continuation_turns=21
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.next
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.next</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=10274
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 14 UTC 2026-06-29T13:25:44Z =====
+ Container lkjagentfinaliwanna2-agent-run-093e656605be Creating 
+ Container lkjagentfinaliwanna2-agent-run-093e656605be Created 
+ctx=10.81K/24.58K 44.00% pressure=green
+in=11.47K out=32 cache=unknown total=11.50K
+prefix=5.38K log=18.69K reserve=512 headroom=13.76K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=25
+continuation_epoch=0
+continuation_turns=22
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=10813
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 15 UTC 2026-06-29T13:26:25Z =====
+ Container lkjagentfinaliwanna2-agent-run-f742cc081bd2 Creating 
+ Container lkjagentfinaliwanna2-agent-run-f742cc081bd2 Created 
+ctx=10.93K/24.58K 44.45% pressure=green
+in=11.83K out=32 cache=unknown total=11.86K
+prefix=5.38K log=18.69K reserve=512 headroom=13.65K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=27
+continuation_epoch=0
+continuation_turns=24
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.next
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.next</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=10925
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 16 UTC 2026-06-29T13:26:50Z =====
+ Container lkjagentfinaliwanna2-agent-run-e8f6c71a63c7 Creating 
+ Container lkjagentfinaliwanna2-agent-run-e8f6c71a63c7 Created 
+ctx=12.02K/24.58K 48.89% pressure=green
+in=13.17K out=118 cache=unknown total=13.28K
+prefix=5.38K log=18.69K reserve=512 headroom=12.56K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=29
+continuation_epoch=0
+continuation_turns=26
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=12016
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 17 UTC 2026-06-29T13:27:26Z =====
+ Container lkjagentfinaliwanna2-agent-run-a32afb53ad56 Creating 
+ Container lkjagentfinaliwanna2-agent-run-a32afb53ad56 Created 
+ctx=12.10K/24.58K 49.23% pressure=green
+in=12.99K out=32 cache=unknown total=13.03K
+prefix=5.38K log=18.69K reserve=512 headroom=12.48K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=31
+continuation_epoch=0
+continuation_turns=28
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=12099
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 18 UTC 2026-06-29T13:27:52Z =====
+ Container lkjagentfinaliwanna2-agent-run-d54578670dc3 Creating 
+ Container lkjagentfinaliwanna2-agent-run-d54578670dc3 Created 
+ctx=12.10K/24.58K 49.23% pressure=green
+in=12.99K out=32 cache=unknown total=13.03K
+prefix=5.38K log=18.69K reserve=512 headroom=12.48K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=31
+continuation_epoch=0
+continuation_turns=28
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=12099
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 19 UTC 2026-06-29T13:28:06Z =====
+ Container lkjagentfinaliwanna2-agent-run-fbd89b0d90ba Creating 
+ Container lkjagentfinaliwanna2-agent-run-fbd89b0d90ba Created 
+ctx=12.66K/24.58K 51.50% pressure=green
+in=13.91K out=121 cache=unknown total=14.04K
+prefix=5.38K log=18.69K reserve=512 headroom=11.92K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=32
+continuation_epoch=0
+continuation_turns=29
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=12657
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 20 UTC 2026-06-29T13:28:29Z =====
+ Container lkjagentfinaliwanna2-agent-run-25aa94ed595b Creating 
+ Container lkjagentfinaliwanna2-agent-run-25aa94ed595b Created 
+ctx=12.74K/24.58K 51.86% pressure=green
+in=13.74K out=32 cache=unknown total=13.78K
+prefix=5.38K log=18.69K reserve=512 headroom=11.83K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=34
+continuation_epoch=0
+continuation_turns=31
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=12744
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 21 UTC 2026-06-29T13:29:07Z =====
+ Container lkjagentfinaliwanna2-agent-run-49b208efe428 Creating 
+ Container lkjagentfinaliwanna2-agent-run-49b208efe428 Created 
+ctx=12.85K/24.58K 52.29% pressure=green
+in=14.11K out=32 cache=unknown total=14.14K
+prefix=5.38K log=18.69K reserve=512 headroom=11.72K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=36
+continuation_epoch=0
+continuation_turns=33
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.next
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.next</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=12851
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 22 UTC 2026-06-29T13:29:48Z =====
+ Container lkjagentfinaliwanna2-agent-run-2e0ffdddf358 Creating 
+ Container lkjagentfinaliwanna2-agent-run-2e0ffdddf358 Created 
+ctx=13.96K/24.58K 56.79% pressure=green
+in=15.43K out=130 cache=unknown total=15.56K
+prefix=5.38K log=18.69K reserve=512 headroom=10.62K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=38
+continuation_epoch=0
+continuation_turns=35
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=13956
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 23 UTC 2026-06-29T13:30:29Z =====
+ Container lkjagentfinaliwanna2-agent-run-f70d92387904 Creating 
+ Container lkjagentfinaliwanna2-agent-run-f70d92387904 Created 
+ctx=14.04K/24.58K 57.14% pressure=green
+in=15.26K out=32 cache=unknown total=15.29K
+prefix=5.38K log=18.69K reserve=512 headroom=10.53K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=40
+continuation_epoch=0
+continuation_turns=37
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=14042
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 24 UTC 2026-06-29T13:31:10Z =====
+ Container lkjagentfinaliwanna2-agent-run-0da900240bfc Creating 
+ Container lkjagentfinaliwanna2-agent-run-0da900240bfc Created 
+ctx=14.13K/24.58K 57.51% pressure=green
+in=15.62K out=32 cache=unknown total=15.65K
+prefix=5.38K log=18.69K reserve=512 headroom=10.44K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=42
+continuation_epoch=0
+continuation_turns=39
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.next
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.next</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=14134
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 25 UTC 2026-06-29T13:31:35Z =====
+ Container lkjagentfinaliwanna2-agent-run-1edc4791462d Creating 
+ Container lkjagentfinaliwanna2-agent-run-1edc4791462d Created 
+ctx=14.68K/24.58K 59.75% pressure=green
+in=16.01K out=32 cache=unknown total=16.04K
+prefix=5.38K log=18.69K reserve=512 headroom=9.89K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=43
+continuation_epoch=0
+continuation_turns=40
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=14683
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 26 UTC 2026-06-29T13:32:00Z =====
+ Container lkjagentfinaliwanna2-agent-run-401e7c620340 Creating 
+ Container lkjagentfinaliwanna2-agent-run-401e7c620340 Created 
+ctx=14.78K/24.58K 60.15% pressure=green
+in=16.38K out=32 cache=unknown total=16.41K
+prefix=5.38K log=18.69K reserve=512 headroom=9.79K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=45
+continuation_epoch=0
+continuation_turns=42
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.next
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.next</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=14782
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 27 UTC 2026-06-29T13:32:41Z =====
+ Container lkjagentfinaliwanna2-agent-run-e429070b683a Creating 
+ Container lkjagentfinaliwanna2-agent-run-e429070b683a Created 
+ctx=15.33K/24.58K 62.37% pressure=green
+in=16.76K out=32 cache=unknown total=16.80K
+prefix=5.38K log=18.69K reserve=512 headroom=9.25K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=46
+continuation_epoch=0
+continuation_turns=43
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=15328
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 28 UTC 2026-06-29T13:33:22Z =====
+ Container lkjagentfinaliwanna2-agent-run-e357ded73ad7 Creating 
+ Container lkjagentfinaliwanna2-agent-run-e357ded73ad7 Created 
+ctx=15.33K/24.58K 62.37% pressure=green
+in=16.76K out=32 cache=unknown total=16.80K
+prefix=5.38K log=18.69K reserve=512 headroom=9.25K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=46
+continuation_epoch=0
+continuation_turns=43
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=15328
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 29 UTC 2026-06-29T13:33:42Z =====
+ Container lkjagentfinaliwanna2-agent-run-13467ba2df2d Creating 
+ Container lkjagentfinaliwanna2-agent-run-13467ba2df2d Created 
+ctx=15.79K/24.58K 64.26% pressure=green
+in=16.76K out=32 cache=unknown total=16.80K
+prefix=5.38K log=18.69K reserve=512 headroom=8.78K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=47
+continuation_epoch=0
+continuation_turns=44
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=15792
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 30 UTC 2026-06-29T13:34:09Z =====
+ Container lkjagentfinaliwanna2-agent-run-614e40eb0756 Creating 
+ Container lkjagentfinaliwanna2-agent-run-614e40eb0756 Created 
+ctx=15.48K/24.58K 63.00% pressure=green
+in=17.22K out=32 cache=unknown total=17.25K
+prefix=5.38K log=18.69K reserve=512 headroom=9.09K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=49
+continuation_epoch=0
+continuation_turns=46
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.next
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.next</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=15483
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 31 UTC 2026-06-29T13:35:03Z =====
+ Container lkjagentfinaliwanna2-agent-run-ea4b14e75318 Creating 
+ Container lkjagentfinaliwanna2-agent-run-ea4b14e75318 Created 
+ctx=16.57K/24.58K 67.44% pressure=green
+in=18.52K out=116 cache=unknown total=18.63K
+prefix=5.38K log=18.69K reserve=512 headroom=8.00K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=51
+continuation_epoch=0
+continuation_turns=48
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=16575
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 32 UTC 2026-06-29T13:35:43Z =====
+ Container lkjagentfinaliwanna2-agent-run-8f56aaed02aa Creating 
+ Container lkjagentfinaliwanna2-agent-run-8f56aaed02aa Created 
+ctx=16.64K/24.58K 67.69% pressure=green
+in=18.33K out=32 cache=unknown total=18.36K
+prefix=5.38K log=18.69K reserve=512 headroom=7.94K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=53
+continuation_epoch=0
+continuation_turns=50
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=16635
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 33 UTC 2026-06-29T13:36:12Z =====
+ Container lkjagentfinaliwanna2-agent-run-04efcda40c28 Creating 
+ Container lkjagentfinaliwanna2-agent-run-04efcda40c28 Created 
+ctx=17.21K/24.58K 70.03% pressure=green
+in=19.24K out=131 cache=unknown total=19.37K
+prefix=5.38K log=18.69K reserve=512 headroom=7.37K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=54
+continuation_epoch=0
+continuation_turns=51
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=17211
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 34 UTC 2026-06-29T13:36:43Z =====
+ Container lkjagentfinaliwanna2-agent-run-8ba84471918e Creating 
+ Container lkjagentfinaliwanna2-agent-run-8ba84471918e Created 
+ctx=17.24K/24.58K 70.15% pressure=green
+in=19.05K out=32 cache=unknown total=19.09K
+prefix=5.38K log=18.69K reserve=512 headroom=7.34K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=56
+continuation_epoch=0
+continuation_turns=53
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=17239
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 35 UTC 2026-06-29T13:37:06Z =====
+ Container lkjagentfinaliwanna2-agent-run-55348d73a36b Creating 
+ Container lkjagentfinaliwanna2-agent-run-55348d73a36b Created 
+ctx=17.80K/24.58K 72.42% pressure=green
+in=19.95K out=113 cache=unknown total=20.06K
+prefix=5.38K log=18.69K reserve=512 headroom=6.78K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=57
+continuation_epoch=0
+continuation_turns=54
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=17799
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 36 UTC 2026-06-29T13:37:43Z =====
+ Container lkjagentfinaliwanna2-agent-run-e8b25e8c22f2 Creating 
+ Container lkjagentfinaliwanna2-agent-run-e8b25e8c22f2 Created 
+ctx=17.81K/24.58K 72.46% pressure=green
+in=19.74K out=32 cache=unknown total=19.77K
+prefix=5.38K log=18.69K reserve=512 headroom=6.77K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=59
+continuation_epoch=0
+continuation_turns=56
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=17807
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 37 UTC 2026-06-29T13:38:09Z =====
+ Container lkjagentfinaliwanna2-agent-run-2d86e1f13874 Creating 
+ Container lkjagentfinaliwanna2-agent-run-2d86e1f13874 Created 
+ctx=18.35K/24.58K 74.65% pressure=green
+in=20.61K out=105 cache=unknown total=20.71K
+prefix=5.38K log=18.69K reserve=512 headroom=6.23K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=60
+continuation_epoch=0
+continuation_turns=57
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=18346
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 38 UTC 2026-06-29T13:38:45Z =====
+ Container lkjagentfinaliwanna2-agent-run-1f921970a423 Creating 
+ Container lkjagentfinaliwanna2-agent-run-1f921970a423 Created 
+ctx=18.35K/24.58K 74.68% pressure=green
+in=20.39K out=32 cache=unknown total=20.42K
+prefix=5.38K log=18.69K reserve=512 headroom=6.22K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=62
+continuation_epoch=0
+continuation_turns=59
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=18353
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 39 UTC 2026-06-29T13:39:16Z =====
+ Container lkjagentfinaliwanna2-agent-run-7183d9e6db0d Creating 
+ Container lkjagentfinaliwanna2-agent-run-7183d9e6db0d Created 
+ctx=1.40K/24.58K 5.68% pressure=green
+in=21.24K out=110 cache=unknown total=21.35K
+prefix=5.38K log=18.69K reserve=512 headroom=23.18K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=63
+continuation_epoch=0
+continuation_turns=60
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=1395
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=snapshot:1782740319 phase=execution node=document fields=stage=post;compaction resume;reason=observation append;open_task=Create a long novel named "iwanna" with detailed and structured settings.;before_tokens=18900;last_successful_observation=<observation>;graph_case=1;active_mission=OwnerWork;phase=execution;active_node=document;objective=Resolve the owner task through planning, evidence capture, execution, and verification: Create a long novel named "iwanna" with detailed and structured settings.;required_evidence=plan,observation,document-structure,artifact-readiness;missing_evidence=artifact-readiness;touched_paths=none;selected_packages=planning-checklist,context-slice,doc-construction;recovery=parse:0 params:0 tool:0 repeat:0;recovery_ladder_step=0;last_failed_action=none;admitted_next_tools=graph.state,graph.next,graph.audit,graph.evidence,graph.note,graph.transition,fs.list,fs.tree;exact_next_valid_action=<action><tool>artifact.next</tool><root>stories/iwanna</root></action>;completion_ready=false;completion_blocked_reasons=artifact-readiness;legal_next=document-audit,document-profile;active_artifact_id=stories/iwanna;document_root=stories/iwanna;document_kind=content-artifact;document_audit=Missing;write_batch_cursor=none
+POLL_EXIT_STATUS=0
+
+===== POLL 40 UTC 2026-06-29T13:39:43Z =====
+ Container lkjagentfinaliwanna2-agent-run-e569a0c71bec Creating 
+ Container lkjagentfinaliwanna2-agent-run-e569a0c71bec Created 
+ctx=2.38K/24.58K 9.70% pressure=green
+in=2.04K out=32 cache=unknown total=2.07K
+prefix=5.38K log=18.69K reserve=512 headroom=22.19K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=64
+continuation_epoch=0
+continuation_turns=61
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=completion
+authority_node=complete
+evidence_gaps=none
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=agent.done
+authority_blocked_tools=memory.find,memory.save
+next_executable_action=<action>
+<tool>agent.done</tool>
+<summary>Completed with evidence</summary>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=2384
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=snapshot:1782740319 phase=execution node=document fields=stage=post;compaction resume;reason=observation append;open_task=Create a long novel named "iwanna" with detailed and structured settings.;before_tokens=18900;last_successful_observation=<observation>;graph_case=1;active_mission=OwnerWork;phase=execution;active_node=document;objective=Resolve the owner task through planning, evidence capture, execution, and verification: Create a long novel named "iwanna" with detailed and structured settings.;required_evidence=plan,observation,document-structure,artifact-readiness;missing_evidence=artifact-readiness;touched_paths=none;selected_packages=planning-checklist,context-slice,doc-construction;recovery=parse:0 params:0 tool:0 repeat:0;recovery_ladder_step=0;last_failed_action=none;admitted_next_tools=graph.state,graph.next,graph.audit,graph.evidence,graph.note,graph.transition,fs.list,fs.tree;exact_next_valid_action=<action><tool>artifact.next</tool><root>stories/iwanna</root></action>;completion_ready=false;completion_blocked_reasons=artifact-readiness;legal_next=document-audit,document-profile;active_artifact_id=stories/iwanna;document_root=stories/iwanna;document_kind=content-artifact;document_audit=Missing;write_batch_cursor=none
+POLL_EXIT_STATUS=0

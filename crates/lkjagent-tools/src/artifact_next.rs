@@ -6,13 +6,11 @@ use crate::address::{
 };
 use crate::artifact_next_response::{
     audit_response, batch_response, can_repair_file, cursor_key, focused_response,
-    missing_root_response, path_param, resolved_kind, root, root_identity_response,
+    missing_root_response, path_param, resolved_kind, root,
 };
 use crate::error::ToolResult;
 use crate::fs::workspace_path;
 use rusqlite::Connection;
-
-const WEAK_PATH_BATCH_SIZE: usize = 1;
 
 pub fn next(workspace: &Path, root: &str, path: &str, kind: &str) -> ToolResult<String> {
     crate::artifact::reject_empty_root(root)?;
@@ -93,21 +91,26 @@ fn root_next(workspace: &Path, address: &ArtifactAddress, kind: &str) -> ToolRes
     let full = workspace_path(workspace, &root)?;
     let kind = resolved_kind(kind, &full);
     if crate::artifact_next_identity::root_needs_identity(&full)? {
-        return Ok(root_identity_response(&root, &kind));
+        return Ok(
+            crate::artifact_next_identity_contract::identity_contract_for(&root, &kind, &full)
+                .response,
+        );
     }
     if let Some(report) = crate::artifact_drift::japanese_cookbook(&full)? {
         if !report.is_empty() {
             return Ok(report.block_message(&root));
         }
     }
+    if let Some(contract) =
+        crate::artifact_next_story::story_contract_if_missing(&root, &kind, &full)?
+    {
+        return Ok(contract.response);
+    }
     let weak = crate::doc::weak_content_paths(&full)?;
     if weak.is_empty() {
         return audit_response(&root, &kind, "missing=0");
     }
-    let selected = weak
-        .into_iter()
-        .take(WEAK_PATH_BATCH_SIZE)
-        .collect::<Vec<_>>();
+    let selected = weak.into_iter().take(1).collect::<Vec<_>>();
     let valid_example = crate::artifact_next_example::batch_write_contract(&root, &kind, &selected);
     Ok(batch_response(&root, &kind, &selected, &valid_example))
 }
@@ -123,11 +126,17 @@ fn root_next_with_cursor(
     let full = workspace_path(workspace, &root)?;
     let kind = resolved_kind(kind, &full);
     if crate::artifact_next_identity::root_needs_identity(&full)? {
-        let contract = crate::artifact_next_example::root_identity_contract(&root, &kind);
-        crate::artifact_cursor_support::record_identity_contract(
-            conn, &root, &kind, &contract, now,
+        let contract =
+            crate::artifact_next_identity_contract::identity_contract_for(&root, &kind, &full);
+        crate::artifact_next_cursor::record_story_batch(
+            conn,
+            now,
+            &root,
+            &kind,
+            &contract.selected,
+            &contract.valid_example,
         )?;
-        return Ok(root_identity_response(&root, &kind));
+        return Ok(contract.response);
     }
     if let Some(report) = crate::artifact_drift::japanese_cookbook(&full)? {
         if !report.is_empty() {
@@ -135,56 +144,23 @@ fn root_next_with_cursor(
             return Ok(report.block_message(&root));
         }
     }
+    if let Some(contract) =
+        crate::artifact_next_story::story_contract_if_missing(&root, &kind, &full)?
+    {
+        crate::artifact_next_cursor::record_story_batch(
+            conn,
+            now,
+            &root,
+            &kind,
+            &contract.selected,
+            &contract.valid_example,
+        )?;
+        return Ok(contract.response);
+    }
     let weak = crate::doc::weak_content_paths(&full)?;
     if weak.is_empty() {
         lkjagent_store::state::delete(conn, &cursor_key(&root))?;
         return audit_response(&root, &kind, "missing=0");
     }
-    cursor_batch(conn, now, &root, &kind, weak)
-}
-
-fn cursor_batch(
-    conn: &Connection,
-    now: &str,
-    root: &str,
-    kind: &str,
-    weak: Vec<String>,
-) -> ToolResult<String> {
-    let start = next_start(conn, root, &weak)?;
-    if start >= weak.len() {
-        return audit_response(root, kind, &format!("missing={}", weak.len()));
-    }
-    let weak_count = weak.len();
-    let selected = weak
-        .into_iter()
-        .skip(start)
-        .take(WEAK_PATH_BATCH_SIZE)
-        .collect::<Vec<_>>();
-    let valid_example = crate::artifact_next_example::batch_write_contract(root, kind, &selected);
-    crate::artifact_cursor_support::record_next_batch(
-        crate::artifact_cursor_support::NextBatchRecord {
-            conn,
-            root,
-            kind,
-            weak_count,
-            selected: &selected,
-            valid_example: &valid_example,
-            current_index: start.saturating_add(selected.len()),
-            now,
-        },
-    )?;
-    if let Some(last) = selected.last() {
-        lkjagent_store::state::set(conn, &cursor_key(root), last)?;
-    }
-    Ok(batch_response(root, kind, &selected, &valid_example))
-}
-
-fn next_start(conn: &Connection, root: &str, weak: &[String]) -> ToolResult<usize> {
-    let Some(cursor) = lkjagent_store::state::get(conn, &cursor_key(root))? else {
-        return Ok(0);
-    };
-    Ok(weak
-        .iter()
-        .position(|path| path > &cursor)
-        .unwrap_or(weak.len()))
+    crate::artifact_next_cursor::cursor_batch(conn, now, &root, &kind, weak)
 }

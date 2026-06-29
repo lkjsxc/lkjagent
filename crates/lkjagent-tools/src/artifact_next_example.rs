@@ -11,8 +11,9 @@ pub fn batch_write_contract(root: &str, kind: &str, paths: &[String]) -> String 
         .collect::<Vec<_>>()
         .join("\n");
     format!(
-        "tool=fs.batch_write\nroot={root}\nkind={kind}\npaths:\n{joined}\nlimits:\n- max_files=20\n- max_file_bytes=1800\n- max_batch_bytes=6000\nrequired_sections:\n{}\nforbidden_weak_phrase_classes:\n- scaffold-only\n- placeholder\n- owner-terms-only\n- generic-example\nmodel_instruction=author the singular fs.batch_write action with line protocol; do not copy body prose from a tool",
-        required_sections(kind)
+        "tool=fs.batch_write\nroot={root}\nkind={kind}\npaths:\n{joined}\nlimits:\n- max_files=20\n- max_file_bytes=1800\n- max_batch_bytes=6000\nrequired_sections:\n{}\nforbidden_weak_phrase_classes:\n- scaffold-only\n- placeholder\n- owner-terms-only\n- generic-example\nmodel_instruction={}",
+        required_sections(kind),
+        instruction(kind)
     )
 }
 
@@ -39,6 +40,14 @@ pub fn root_identity_contract(root: &str, kind: &str) -> String {
 
 fn story_root(root: &str) -> bool {
     root.trim_start_matches("./").starts_with("stories/")
+}
+
+fn instruction(kind: &str) -> &'static str {
+    if kind.eq_ignore_ascii_case("story") || kind.eq_ignore_ascii_case("novel") {
+        "author one concise file per listed path; each file needs at least 25 words, two concrete signals from its path label, continuity notes, and verification notes"
+    } else {
+        "author the singular fs.batch_write action with line protocol; do not copy body prose from a tool"
+    }
 }
 
 fn required_sections(kind: &str) -> &'static str {

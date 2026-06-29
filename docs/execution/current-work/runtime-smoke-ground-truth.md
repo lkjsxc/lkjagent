@@ -174,10 +174,23 @@ the small seed artifact. The run still shows repeated artifact-audit recovery
 after scale-readiness refusal, so follow-up work should improve post-readiness
 repair planning.
 
+## Final Closure Smoke Evidence
+
+Final clean-data smoke evidence is preserved under
+`tmp/runtime-smoke-final-iwanna-20260629T131603Z/` and
+`tmp/runtime-smoke-final-compact-20260629T134111Z/`.
+
+`iwanna` reached `open_task=none`, wrote 23 unique story paths, kept
+`stories/iwanna`, avoided generic roots, recorded
+`readiness=story-semantic-content`, emitted `agent.done`, and had no authority
+refusals or repeat-action refusals. Compact Compass wrote 22 unique story paths,
+kept `stories/compact-compass`, avoided generic roots, recorded
+`readiness=story-semantic-content`, emitted `agent.done`, and reached
+`open_task=none` on continuation before maintenance opened.
+
 ## Interpretation
 
 The pre-change ground truth confirms that the open blocker was current. The
-post-change smoke proves measurable improvement for compact-title routing,
-owner-title roots, root identity writes, generic-root suppression, and long
-novel seed refusal. The remaining live weakness is noisy recovery after story
-readiness fails.
+final smoke proves compact-title routing, owner-title roots, root identity
+writes, generic-root suppression, story-scale readiness, and owner-task closure
+without the observed false close or noisy recovery loop.

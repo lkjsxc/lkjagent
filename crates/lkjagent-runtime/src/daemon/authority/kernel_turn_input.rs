@@ -2,6 +2,7 @@ use lkjagent_store::state as store_state;
 use rusqlite::Connection;
 
 use super::super::authority::RuntimeAuthoritySnapshot;
+use super::artifact::{artifact_fields, next_snapshot_id};
 use crate::error::RuntimeResult;
 use crate::kernel::{RuntimeEvent, SnapshotAdapterInput};
 use crate::mode::{ActiveMode, RuntimeSnapshot};
@@ -81,81 +82,6 @@ pub(super) fn mode_snapshot(
     }
 }
 
-struct ArtifactSnapshotFields {
-    artifact_id: Option<String>,
-    root: Option<String>,
-    kind: Option<String>,
-    weak_paths: Vec<String>,
-    audit_status: Option<String>,
-    batch_cursor: Option<String>,
-    latest_observation: Option<String>,
-}
-
-fn artifact_fields(
-    conn: &Connection,
-    snapshot: &RuntimeAuthoritySnapshot,
-) -> RuntimeResult<ArtifactSnapshotFields> {
-    let Some(case_id) = snapshot.case_id else {
-        return Ok(empty_artifact_fields());
-    };
-    let Some(row) = lkjagent_store::artifact_ledger::latest_for_case(conn, case_id)? else {
-        return Ok(empty_artifact_fields());
-    };
-    let weak = lkjagent_store::artifact_ledger::weak_paths(conn, row.id)?;
-    let cursor = lkjagent_store::artifact_cursor::latest_batch_cursor(conn, row.id)?;
-    let latest_observation = cursor
-        .as_ref()
-        .and_then(|cursor| cursor_observation(cursor, &row.kind));
-    let batch_cursor = cursor.as_ref().map(|cursor| cursor.root.clone());
-    let audit_status = audit_status(&row.topology_status, &row.readiness_status);
-    Ok(ArtifactSnapshotFields {
-        artifact_id: Some(row.artifact_id),
-        root: Some(row.root),
-        kind: Some(row.kind),
-        weak_paths: weak.into_iter().map(|path| path.path).collect(),
-        audit_status,
-        batch_cursor,
-        latest_observation,
-    })
-}
-
-fn empty_artifact_fields() -> ArtifactSnapshotFields {
-    ArtifactSnapshotFields {
-        artifact_id: None,
-        root: None,
-        kind: None,
-        weak_paths: Vec::new(),
-        audit_status: None,
-        batch_cursor: None,
-        latest_observation: None,
-    }
-}
-
-fn cursor_observation(
-    cursor: &lkjagent_store::artifact_cursor::BatchCursorRow,
-    kind: &str,
-) -> Option<String> {
-    if !cursor.completed_paths.trim().is_empty() || !cursor.failed_paths.trim().is_empty() {
-        return None;
-    }
-    Some(format!(
-        "artifact_next_result=root_missing\nroot={}\nkind={kind}\nmissing=root\nruntime_event=ArtifactRootMissing\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_contract:\n{}",
-        cursor.root, cursor.last_valid_example
-    ))
-}
-
-fn audit_status(topology: &str, readiness: &str) -> Option<String> {
-    match (topology, readiness) {
-        ("missing", _) => Some("missing".to_string()),
-        ("failed", _) => Some("failed".to_string()),
-        ("passed", "passed") => Some("ready".to_string()),
-        ("passed", _) => Some("passed".to_string()),
-        (_, "failed") => Some("failed".to_string()),
-        (_, "passed") => Some("ready".to_string()),
-        _ => None,
-    }
-}
-
 fn existing_evidence(snapshot: &RuntimeAuthoritySnapshot) -> Vec<String> {
     snapshot
         .required_evidence
@@ -169,13 +95,6 @@ fn maintenance_eligible(snapshot: &RuntimeAuthoritySnapshot) -> bool {
     !snapshot.active_owner_case
         && snapshot.pending_owner_rows == 0
         && (snapshot.maintenance_due || snapshot.maintenance_active)
-}
-
-fn next_snapshot_id(conn: &Connection) -> RuntimeResult<u64> {
-    Ok(store_state::get(conn, "authority snapshot id")?
-        .and_then(|value| value.parse::<u64>().ok())
-        .unwrap_or(0)
-        .saturating_add(1))
 }
 
 fn pending_owner_count(snapshot: &RuntimeAuthoritySnapshot) -> usize {

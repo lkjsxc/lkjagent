@@ -40,5 +40,8 @@ fn long_novel_profile_uses_story_repair_sections() -> TestResult<()> {
     assert!(output.contains("continuity notes"));
     assert!(output.contains("next_decision_required=true"));
     assert!(contract.contains("tool=fs.batch_write"));
+    assert!(contract.contains("stories/novel/act-structure.md"));
+    assert!(contract.contains("stories/novel/antagonist.md"));
+    assert!(contract.contains("stories/novel/completion-evidence.md"));
     Ok(())
 }
