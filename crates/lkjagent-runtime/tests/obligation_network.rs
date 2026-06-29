@@ -38,6 +38,21 @@ fn missing_root_recovery_never_forces_same_root_doc_audit() -> Result<(), String
 }
 
 #[test]
+fn structure_failed_audit_forces_repair_batch_write() -> Result<(), String> {
+    let mut input = owner_input();
+    input.missing_evidence = vec!["document-structure".to_string()];
+    input.latest_observation = Some(
+        "document audit failed\nroot=stories/novel\ntopology=failed\ncontent_readiness=not-requested\nfailures:\n- h1_count: README.md"
+            .to_string(),
+    );
+    let decision = decision(input, RuntimeEvent::ArtifactAuditFailed)?;
+
+    assert_eq!(next_tool(&decision)?, "fs.batch_write");
+    assert_eq!(identity_paths(&decision)?, vec!["stories/novel/README.md"]);
+    Ok(())
+}
+
+#[test]
 fn artifact_next_root_missing_produces_same_identity_contract() -> Result<(), String> {
     let mut input = owner_input();
     input.latest_observation = Some(artifact_next_missing_root("stories/novel"));

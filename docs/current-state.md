@@ -113,10 +113,11 @@ next action surface.
 
 The obligation network success claim is backed by focused tests, full workspace
 tests, corpus checks, `quiet verify`, `docker compose run --rm verify`, and a
-fresh clean-data endpoint smoke. The smoke transcript at
-`tmp/obligation-smoke-data-2/logs/current-model-run.md` reached
+fresh clean-data endpoint smoke. The latest smoke transcript at
+`tmp/user-story-smoke-data-fix/logs/current-model-run.md` reached
 `open_task=none` and showed `artifact.next -> fs.batch_write -> doc.audit ->
-artifact.audit -> agent.done` after root repair.
+fs.batch_write -> doc.audit -> artifact.audit -> agent.done` after root and
+structure repair.
 
 ## Active Target
 
