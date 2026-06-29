@@ -29,6 +29,9 @@ sequence-only names, catalog metadata presence, line caps, and optional
 file-count target. Approximate count targets accept extra Markdown files; exact
 mode requires the target count. Passing audits can satisfy document-structure
 evidence when the active graph gate accepts that audit-owned evidence.
+`missing_root` is a failed audit fact that maps to a root identity write
+contract; it must not be routed to another same-root `doc.audit` before write
+progress.
 
 ## artifact.plan
 
@@ -52,8 +55,9 @@ Plans the next bounded artifact write batch from readiness gaps. Parameters are
 `root`, optional `path`, and optional `kind`. It returns exact paths, limits,
 required sections, forbidden weak phrase classes, and
 `next_decision_required=true`. It never writes files and never returns generated
-body prose. The next persisted decision may render a content-write surface that
-requires the model to author a singular `fs.batch_write` action.
+body prose. Missing roots return a root identity contract. The next persisted
+decision may render a content-write surface that requires the model to author a
+singular `fs.batch_write` action.
 
 If `root` resolves to a file, artifact.next must not claim missing=0 or render
 artifact.audit for that file. It resolves the owning artifact root or asks for a

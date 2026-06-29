@@ -10,7 +10,10 @@ any prompt rendering, provider call, tool dispatch, or completion closure.
 One kernel owns the turn sequence:
 
 ```text
-RuntimeSnapshot -> RuntimeEvent -> RuntimeDecision
+RuntimeSnapshot + RuntimeEvent -> RuntimeFacts
+RuntimeFacts -> Vec<Obligation>
+Vec<Obligation> + RuntimeFacts -> ResolverPlan
+ResolverPlan -> RuntimeDecision
 RuntimeDecision -> PromptFrame | RuntimeEffectCommand
 RuntimeDecision + ModelAction -> ToolAdmission
 ToolAdmission -> EffectObservation -> RuntimeEvent
@@ -50,7 +53,8 @@ The snapshot adapter collects these facts before the reducer runs:
 
 ## Decision Data
 
-The pure reducer emits one persisted decision for one event. The decision names:
+The pure reducer emits one persisted decision for one event. It derives facts,
+selects obligations, resolves one plan, and persists a decision that names:
 
 - active mission and active mode.
 - admitted tools and blocked tools.
@@ -107,6 +111,8 @@ The runtime writes records in this order:
 - Maintenance is never active during owner work, recovery, verification, or compaction.
 - Completion uses the central completion reducer on every close path.
 - Recovery keeps the read, audit, repair, and batch tools needed to escape.
+- Missing-root facts force a root identity `fs.batch_write` decision and block
+  same-root audit until write progress or handoff.
 - Recovery examples are generated from the current decision and never tell the
   model to direct-write audit-owned evidence.
 

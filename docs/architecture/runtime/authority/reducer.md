@@ -10,7 +10,10 @@ one explainable runtime decision.
 The reducer owns mission selection and returns data only:
 
 ```text
-RuntimeSnapshot + RuntimeEvent -> RuntimeDecision
+RuntimeSnapshot + RuntimeEvent -> RuntimeFacts
+RuntimeFacts -> Vec<Obligation>
+Vec<Obligation> + RuntimeFacts -> ResolverPlan
+ResolverPlan -> RuntimeDecision
 ```
 
 It must not read files, SQLite, endpoint state, shell state, wall-clock time,
@@ -27,8 +30,8 @@ A `RuntimeSnapshot` contains only durable read-model facts:
   source graph policy facts;
 - required evidence, missing evidence, existing evidence, evidence owners, and
   touched paths;
-- artifact id, root, kind, profile, weak paths, weak cursor, batch cursor,
-  latest audit, and drift state;
+- artifact id, root, kind, profile, root status, weak paths, weak cursor,
+  batch cursor, latest audit, and drift state;
 - verification state, completion blockers, latest observation, latest
   successful observation, last action, and action fingerprints;
 - fault class, retry count, recovery route, blocked handoff, provider anomaly
@@ -50,7 +53,8 @@ checkpoint, owner-input requirement, blocked handoff, or closed-idle selection.
 
 Every `RuntimeDecision` records:
 
-- case id, graph node, graph phase, mission, active mode, and decision kind;
+- case id, graph node, graph phase, mission, active mode, resolver plan, and
+  decision kind;
 - admitted tools, blocked tools, forced tool or runtime effect, and
   non-content exact action when applicable;
 - content write contract when the model must author `fs.batch_write`;
@@ -92,6 +96,8 @@ verification, and compaction missions are absent.
 - Recovery evidence is required when any unresolved recovery fault exists.
 - Missing evidence always yields one exact next executable action, content
   write contract, or deterministic runtime effect command.
+- `missing_root` and `root_missing` facts yield a root identity write contract,
+  not another same-root audit.
 
 ## Mechanical Tests Required
 
@@ -110,8 +116,8 @@ verification, and compaction missions are absent.
 
 - Reducer logic calls an effect or consults current time directly.
 - Two decisions are emitted for one event.
-- A decision omits missing evidence, next valid action, write contract, or
-  runtime effect when one is required.
+- A decision omits missing evidence, progress key, next valid action, write
+  contract, or runtime effect when one is required.
 - Completion and dispatch use different admission gates.
 
 ## Verification

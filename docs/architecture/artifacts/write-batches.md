@@ -36,6 +36,11 @@ identity contract for `catalog.toml`, a bounded navigation README, and the
 smallest meaningful semantic leaves for the profile. A story bible never
 recovers from an empty root by writing one monolithic README.
 
+The default story identity paths are flat: `catalog.toml`, `README.md`,
+`objective.md`, `setting-overview.md`, and `cast.md`. Flat identity avoids
+single-child subdirectories and can satisfy topology and story content checks
+with the first contracted batch.
+
 ## Payload Faults
 
 After invalid JSON-in-`files`, child `<file>` tags inside `<files>`, max-token

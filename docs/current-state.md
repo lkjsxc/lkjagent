@@ -17,7 +17,10 @@ The durable target is a deterministic state-transition runtime for a weak local
 LLM:
 
 ```text
-DurableReadModel -> RuntimeSnapshot -> RuntimeEvent -> RuntimeDecision
+RuntimeSnapshot + RuntimeEvent -> RuntimeFacts
+RuntimeFacts -> Vec<Obligation>
+Vec<Obligation> + RuntimeFacts -> ResolverPlan
+ResolverPlan -> RuntimeDecision
 RuntimeDecision -> PromptFrame | RuntimeEffectCommand
 RuntimeDecision + ModelAction -> ToolAdmission
 ToolAdmission -> EffectObservation -> RuntimeEvent
@@ -25,8 +28,9 @@ ToolAdmission -> EffectObservation -> RuntimeEvent
 
 The persisted runtime decision is the sole authority for mission, mode,
 admitted tools, blocked tools, context policy, compaction, recovery,
-completion, and the next action surface. Model output supplies only bounded
-semantic intent or bounded file content inside that selected surface.
+completion, write contracts, and the next action surface. Model output supplies
+only bounded semantic intent or bounded file content inside that selected
+surface.
 
 ## Implemented Surfaces
 
@@ -92,9 +96,11 @@ OwnerObjective -> ArtifactIdentity -> ArtifactPlan -> WriteContract
 ```
 
 Prompt-visible scaffold writers are not live tools. `artifact.next` is
-non-mutating and returns write contracts, not body prose. `fs.batch_write`
-mutates only after contract validation. Audit-owned evidence comes from
-`doc.audit` and `artifact.audit`, not direct `graph.evidence`.
+non-mutating and returns write contracts, not body prose. Missing roots become
+root identity write contracts and force `fs.batch_write`; they do not repeat
+same-root `doc.audit` before write progress. `fs.batch_write` mutates only
+after contract validation. Audit-owned evidence comes from `doc.audit` and
+`artifact.audit`, not direct `graph.evidence`.
 
 ## Compaction Contract
 
@@ -105,15 +111,16 @@ next action surface.
 
 ## Verification Evidence
 
-The redesign success claim is backed by focused tests, full workspace tests,
-corpus checks, `quiet verify`, `docker compose run --rm verify`, and a fresh
-clean-data endpoint smoke after the implementation changes. The checked-in
-generated data log fixture is not success evidence.
+The obligation network success claim requires focused tests, full workspace
+tests, corpus checks, `quiet verify`, `docker compose run --rm verify`, and a
+fresh clean-data endpoint smoke after implementation. The checked-in generated
+data log fixture is not success evidence.
 
 ## Active Target
 
-The dependency queue in [execution/current-blockers.md](execution/current-blockers.md)
-is closed for this redesign. Next executable step: none.
+The active row in [execution/current-blockers.md](execution/current-blockers.md)
+is obligation network root repair. Next executable step: implement the typed
+facts, obligations, resolver, root identity contract, and focused tests.
 
 ## Out of Scope
 
