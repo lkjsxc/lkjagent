@@ -39,6 +39,34 @@ fn content_artifact_done_refuses_structure_without_readiness() -> TestResult<()>
 }
 
 #[test]
+fn content_readiness_passed_artifact_audit_records_readiness() -> TestResult<()> {
+    let planned = apply_tool(
+        open_content_task()?,
+        "graph.plan",
+        &[
+            ("objective", "Finish long SF story artifact"),
+            ("steps", "audit story tree; confirm content readiness"),
+            ("checks", "artifact audit passed with readiness"),
+            ("paths", "stories/long-sf-story"),
+            ("reason", "content artifacts need readiness evidence"),
+        ],
+        "graph plan recorded",
+    );
+    let state = apply_tool(
+        planned,
+        "artifact.audit",
+        &[("root", "stories/long-sf-story"), ("kind", "story")],
+        "artifact audit passed\nroot=stories/long-sf-story\ncontent_readiness=passed\nfailed=0",
+    );
+
+    assert!(state
+        .graph
+        .as_ref()
+        .is_some_and(|graph| graph.evidence.has("artifact-readiness")));
+    Ok(())
+}
+
+#[test]
 fn explicit_artifact_readiness_evidence_does_not_bypass_audit() -> TestResult<()> {
     let planned = apply_tool(
         open_content_task()?,

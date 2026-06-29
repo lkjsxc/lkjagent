@@ -55,7 +55,10 @@ fn artifact_next_candidate_forces_batch_write() -> Result<(), String> {
     let input = owner_input();
     let mut snapshot = build_snapshot(input).map_err(format_error)?;
     snapshot.artifact.weak_paths = vec!["project/premise.md".to_string()];
-    snapshot.observation.latest = Some("next_decision_required=true".to_string());
+    snapshot.observation.latest = Some(
+        "next_decision_required=true\ncandidate_action=fs.batch_write\nnext_paths:\n- project/premise.md"
+            .to_string(),
+    );
     let decision = reduce(&snapshot, RuntimeEvent::ArtifactWeakPathFound).map_err(format_error)?;
     assert_eq!(next_tool(&decision)?, "fs.batch_write");
     Ok(())

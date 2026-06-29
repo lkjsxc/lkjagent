@@ -1,0 +1,1 @@
+{"content":"<action>\n<tool>doc.audit</tool>\n<root>stories/novel-named</root>\n</action>","provider_anomaly":null,"finish_reason":"stop","closure_mode":"StopSequenceClosed","usage":{"prompt_tokens":13657,"completion_tokens":33,"cached_prompt_tokens":null,"total_tokens":13690}}

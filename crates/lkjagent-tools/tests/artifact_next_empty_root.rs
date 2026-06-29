@@ -22,23 +22,61 @@ fn artifact_next_empty_story_root_returns_identity_batch() -> TestResult<()> {
 
     assert!(output.contains("artifact_next_result=root_needs_identity"));
     assert!(output.contains("candidate_action=fs.batch_write"));
-    assert!(output.contains("- stories/chronos-fracture/catalog.toml"));
-    assert!(output.contains("- stories/chronos-fracture/README.md"));
-    assert!(output.contains("- stories/chronos-fracture/request/objective.md"));
+    for path in [
+        "catalog.toml",
+        "README.md",
+        "objective.md",
+        "setting-overview.md",
+        "cast.md",
+    ] {
+        assert!(output.contains(&format!("- {root}/{path}")));
+    }
+    assert!(!output.contains("request/objective.md"));
     assert!(output.contains("candidate_contract:"));
+
     dispatch_state.reset_repeat_tracking();
-    let files = "path: stories/chronos-fracture/catalog.toml\ncontent:\nkind = \"story\"\n\n-- lkjagent-next-file --\npath: stories/chronos-fracture/README.md\ncontent:\n# Chronos Fracture\n\n## Purpose\n\nNavigate the story artifact.\n\n-- lkjagent-next-file --\npath: stories/chronos-fracture/request/objective.md\ncontent:\n# Objective\n\n## Purpose\n\nCreate the requested SF novel settings artifact.\n";
     let write = dispatch(
-        &action("fs.batch_write", &[("files", files)]),
+        &action("fs.batch_write", &[("files", &identity_files(root))]),
         &runtime,
         &mut conn,
         &mut dispatch_state,
     )
     .content;
 
-    assert!(write.contains("files_written=3"));
-    assert!(workspace.join(root).join("catalog.toml").is_file());
-    assert!(workspace.join(root).join("README.md").is_file());
-    assert!(workspace.join(root).join("request/objective.md").is_file());
+    assert!(write.contains("files_written=5"), "{write}");
+    for path in [
+        "catalog.toml",
+        "README.md",
+        "objective.md",
+        "setting-overview.md",
+        "cast.md",
+    ] {
+        assert!(workspace.join(root).join(path).is_file());
+    }
     Ok(())
+}
+
+fn identity_files(root: &str) -> String {
+    [
+        file(root, "catalog.toml", "kind = \"story\"\n"),
+        file(root, "README.md", readme()),
+        file(root, "objective.md", leaf("Objective")),
+        file(root, "setting-overview.md", leaf("Setting Overview")),
+        file(root, "cast.md", leaf("Cast")),
+    ]
+    .join("\n-- lkjagent-next-file --\n")
+}
+
+fn file(root: &str, path: &str, content: impl AsRef<str>) -> String {
+    format!("path: {root}/{path}\ncontent:\n{}", content.as_ref())
+}
+
+fn readme() -> &'static str {
+    "# Chronos Fracture\n\n## Purpose\n\nNavigate the story artifact.\n"
+}
+
+fn leaf(title: &str) -> String {
+    format!(
+        "# {title}\n\n## Purpose\n\nThis story bible reference detail records continuity note anchors, verification note checks, setting constraints, cast motives, and narrative context for the requested SF novel settings artifact.\n"
+    )
 }

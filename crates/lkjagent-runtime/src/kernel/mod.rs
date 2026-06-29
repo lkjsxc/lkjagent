@@ -14,10 +14,17 @@ pub mod mission;
 pub mod mission_select;
 mod next_action;
 mod next_action_simple;
+pub mod obligation;
+mod obligation_contract;
+pub mod obligation_facts;
+mod obligation_parse;
+mod obligation_paths;
+pub mod progress;
 pub mod provider;
 pub mod reduce;
 pub mod render;
 mod repeat_guard;
+mod resolver;
 pub mod snapshot;
 mod write_contract;
 
@@ -40,9 +47,16 @@ pub use facts::{
 };
 pub use fault::{FaultClass, FaultKey, RuntimeFault};
 pub use mission_select::select_mission;
+pub use obligation::{obligations_for, Obligation};
+pub use obligation_facts::{
+    root_identity_contract, runtime_facts, ArtifactRootStatus, DocumentAuditFacts, RuntimeFacts,
+    WriteContractFacts, WriteContractStatus,
+};
+pub use progress::{progress_key_for_snapshot, ProgressKey};
 pub use provider::provider_anomaly_event;
 pub use reduce::{reduce, reduce_with_event_id};
 pub use render::{render_prompt_frame, PromptCardData, PromptRenderError};
+pub use resolver::ResolverPlan;
 pub use snapshot::{
     AuthorityFingerprint, RuntimeEventId, RuntimeSnapshot, RuntimeSnapshotId, RuntimeSnapshotInput,
     StalenessFingerprint, ToolName,

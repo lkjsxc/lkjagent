@@ -8,6 +8,7 @@ use crate::kernel::effect::attach_runtime_effect;
 use crate::kernel::event::RuntimeEvent;
 use crate::kernel::mission_select::select_mission;
 use crate::kernel::next_action::next_action_for;
+use crate::kernel::obligation_facts::root_identity_required;
 use crate::kernel::render::prompt_card_for;
 use crate::kernel::repeat_guard::repeat_guard;
 use crate::kernel::snapshot::{RuntimeEventId, RuntimeSnapshot, ToolName};
@@ -92,7 +93,7 @@ fn populate_decision(
     decision.completion_refusal = completion_refusal(decision, close_case);
     decision.context_package_ids = snapshot.graph.context_package_ids.clone();
     decision.rule_explanation = rule_explanation(decision.mission, event);
-    decision.forced_next_action = next_action_for(decision.mission, snapshot);
+    decision.forced_next_action = next_action_for(decision.mission, snapshot, event);
     apply_forced_action(snapshot, decision);
     decision.prompt_card =
         prompt_card_for(snapshot, decision.mission, decision.active_mode, decision);
@@ -137,8 +138,29 @@ fn apply_forced_action(snapshot: &RuntimeSnapshot, decision: &mut RuntimeDecisio
     }
     if tool.as_str() == "fs.batch_write" {
         decision.content_write_contract = content_contract_for(snapshot);
+        if root_identity_required(snapshot) {
+            block_tool(decision, "doc.audit");
+        }
     } else {
         decision.admission_view.exact_next_action = Some(body.clone());
+    }
+}
+
+fn block_tool(decision: &mut RuntimeDecision, name: &'static str) {
+    decision
+        .admission_view
+        .admitted_tools
+        .retain(|tool| tool.as_str() != name);
+    if !decision
+        .admission_view
+        .blocked_tools
+        .iter()
+        .any(|tool| tool.as_str() == name)
+    {
+        decision
+            .admission_view
+            .blocked_tools
+            .push(ToolName::from_static(name));
     }
 }
 

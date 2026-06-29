@@ -63,7 +63,13 @@ fn owner_prompt_cites_decision_id_and_fingerprints() -> Result<(), String> {
 
 #[test]
 fn schema_repair_renders_write_contract_not_prefilled_batch() -> Result<(), String> {
-    let snapshot = build_snapshot(owner_input()).map_err(format_error)?;
+    let mut input = owner_input();
+    input.artifact_kind = Some("story".to_string());
+    input.latest_observation = Some(
+        "next_decision_required=true\ncandidate_action=fs.batch_write\npaths:\n- stories/chronos-fracture/objective.md"
+            .to_string(),
+    );
+    let snapshot = build_snapshot(input).map_err(format_error)?;
     let mut decision =
         reduce(&snapshot, RuntimeEvent::SchemaFault { fault_key: None }).map_err(format_error)?;
     decision.decision_id = RuntimeDecisionId::Stored(77);

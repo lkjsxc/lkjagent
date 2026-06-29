@@ -56,22 +56,22 @@ is separate until an owner chooses to replace the fixture. `index.ndjson` uses
 `/data/logs/...` as a repository-relative log root and must resolve to present
 turn directories after that normalization:
 
-- active case `1` is at node `document` in phase `execution`;
-- owner task is `Create a long novel. with detailed structured settings.`;
-- observed root is `stories/novel`;
-- `graph.state` repeatedly reported `no active graph case` while authority and
-  the log snapshot named active case `1`;
+- active case `1` is at node `evidence-plan` in phase `recovery`;
+- owner task is `Create a long novel. named "iwanna". with detailed and
+  structured settings.`;
+- observed root is `stories/novel-named`;
+- `doc.audit` repeatedly reported `missing_root` for that root;
 - authority refused a local `fs.mkdir` path that was not admitted;
-- the model wrote a small novel tree with `fs.batch_write`;
-- `doc.audit` first failed and later passed structure;
-- `artifact.audit` and `graph.state` then repeated in a loop;
-- direct `graph.evidence` for audit-owned evidence was correctly refused;
+- the model attempted duplicate `settings.md` `fs.batch_write` batches that did
+  not create root identity;
+- repeat recovery and `graph.recover` changed shape but routed back to
+  same-root `doc.audit`;
+- `graph.state` showed active case `1` while the runtime remained in recovery;
 - reasoning-only provider responses were classified as provider anomalies;
-- final verification remained pending.
+- document audit, artifact readiness audit, and final verification remained
+  pending.
 
-A fresh clean-data endpoint smoke run after the repair created
-`tmp/live-direct-data-3/workspace/hello.md` and reached `open_task=none`. The
-checked-in generated log fixture remains historical failure evidence.
+The checked-in generated log fixture remains historical failure evidence.
 
 ## Runtime Authority Target Flow
 
@@ -111,16 +111,17 @@ next action surface.
 
 ## Verification Evidence
 
-The obligation network success claim requires focused tests, full workspace
+The obligation network success claim is backed by focused tests, full workspace
 tests, corpus checks, `quiet verify`, `docker compose run --rm verify`, and a
-fresh clean-data endpoint smoke after implementation. The checked-in generated
-data log fixture is not success evidence.
+fresh clean-data endpoint smoke. The smoke transcript at
+`tmp/obligation-smoke-data-2/logs/current-model-run.md` reached
+`open_task=none` and showed `artifact.next -> fs.batch_write -> doc.audit ->
+artifact.audit -> agent.done` after root repair.
 
 ## Active Target
 
-The active row in [execution/current-blockers.md](execution/current-blockers.md)
-is obligation network root repair. Next executable step: implement the typed
-facts, obligations, resolver, root identity contract, and focused tests.
+The dependency queue in [execution/current-blockers.md](execution/current-blockers.md)
+is closed for this redesign. Next executable step: none.
 
 ## Out of Scope
 

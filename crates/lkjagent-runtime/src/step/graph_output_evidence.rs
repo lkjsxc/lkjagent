@@ -52,6 +52,8 @@ pub(super) fn add_document_evidence(
 fn artifact_readiness_passed(content: &str) -> bool {
     content.contains("readiness=content-bearing")
         || content.contains("readiness=story-semantic-content")
+        || (content.contains("artifact audit passed")
+            && content.contains("content_readiness=passed"))
 }
 
 pub(super) fn add_shell_evidence(

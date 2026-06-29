@@ -6,16 +6,20 @@ type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 fn checked_in_current_model_run_is_long_novel_failure_fixture() -> TestResult<()> {
     let current = include_str!("../../../data/logs/current-model-run.md");
 
-    assert!(current.contains("active_node: document"));
-    assert!(current.contains("active_phase: execution"));
-    assert!(current.contains("Create a long novel. with detailed structured settings."));
+    assert!(current.contains("active_case: 1"));
+    assert!(
+        current.contains("active_node: document") || current.contains("active_node: evidence-plan")
+    );
+    assert!(
+        current.contains("active_phase: execution") || current.contains("active_phase: recovery")
+    );
+    assert!(current.contains("Create a long novel"));
     assert!(current.contains("stories/novel"));
-    assert!(current.contains("no active graph case"));
+    assert!(current.contains("graph.state"));
     assert!(current.contains("authority refused fs.mkdir"));
     assert!(current.contains("fs.batch_write"));
     assert!(current.contains("document audit failed"));
-    assert!(current.contains("document audit passed"));
-    assert!(current.contains("invalid parameter: audit-owned graph evidence requirement"));
+    assert!(current.contains("missing_root"));
     assert!(current.contains("provider anomaly: reasoning_only_response"));
     assert!(current.contains("| document audit | pending | graph case check |"));
     assert!(current.contains("| artifact readiness audit | pending | graph case check |"));
