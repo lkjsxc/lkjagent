@@ -109,5 +109,6 @@ coverage, not proof that every close path is fully wired.
 ## Status
 
 partially implemented. Runtime admission uses the reducer for `agent.done`, and
-the active dense-network task wires every close path to the same typed input
-packet and persisted gate rows.
+the dense-network implementation records typed completion input packets and
+persists them as dense authority rows. The remaining work is proving every
+non-daemon close path reads the same packet.

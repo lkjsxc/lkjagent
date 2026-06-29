@@ -7,6 +7,7 @@ use lkjagent_store::runtime_authority::{
 use rusqlite::Connection;
 
 use crate::kernel::{RuntimeDecision, RuntimeSnapshot};
+use crate::kernel_driver::dense_rows::persist_dense_rows;
 use crate::kernel_driver::input::KernelTurnInput;
 use crate::kernel_driver::persist_map::{
     decision_detail, maintenance_state, next_action_class, queue_head_i64, snapshot_detail,
@@ -98,6 +99,7 @@ pub fn persist_decision(
         },
     )?;
     record_decision_detail(conn, &decision_detail(decision_id, snapshot, decision))?;
+    persist_dense_rows(conn, decision_id, snapshot, decision, &input.created_at)?;
     Ok(decision_id)
 }
 

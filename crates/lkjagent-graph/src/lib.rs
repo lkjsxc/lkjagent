@@ -8,6 +8,7 @@ pub mod case_plan;
 pub mod case_recovery;
 pub mod classify;
 mod classify_artifact;
+mod classify_profile;
 mod classify_signals;
 mod classify_title;
 pub mod compaction;
@@ -59,6 +60,7 @@ pub mod validate;
 mod validate_tools;
 
 pub use classify::{classify_intent, initial_state};
+pub use classify_profile::IntentProfile;
 pub use compaction::compaction_plan;
 pub use completion::{completion_decision, missing_requirements};
 pub use context_selection::select_context_packages;

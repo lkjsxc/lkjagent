@@ -6,8 +6,9 @@ use crate::case_objective::ObjectiveState;
 use crate::case_plan::PlanState;
 use crate::case_recovery::RecoveryState;
 use crate::classify_artifact::route_spec;
+use crate::classify_profile::intent_facts;
 use crate::classify_signals::{
-    documentation_request, intent_facts, knowledge_request, priority_counted_content_request,
+    documentation_request, knowledge_request, priority_counted_content_request,
     priority_long_content_request,
 };
 use crate::initial_state_tracks;

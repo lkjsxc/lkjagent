@@ -81,8 +81,8 @@ prompt-card decision identifiers, authority fingerprints, prompt rendering,
 provider exchange, dispatch observation, maintenance, compaction, and completion
 all run through the persisted decision id on the daemon path.
 
-Active work is density and totality, not a second driver. The next slice stores
-facts, obligations, resolver plans, progress edges, deterministic effect rows,
-and completion gate inputs as first-class records; removes any mission fallback
-branch after resolver planning; and proves prompt/admission staleness with a
-shared fingerprint.
+Active work is density and totality, not a second driver. The current slice
+stores facts, obligations, resolver plans, progress edges, deterministic effect
+rows, and completion gate inputs as first-class records; removes the mission
+fallback branch after resolver planning; and proves prompt/admission staleness
+with a shared fingerprint.

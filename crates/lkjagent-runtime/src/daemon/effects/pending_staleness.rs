@@ -50,7 +50,9 @@ pub fn stale_action_refusal(
     }
     let runtime_only = matches!(
         current.endpoint_decision,
-        EndpointDecision::RuntimeCompact | EndpointDecision::ClosedIdle
+        EndpointDecision::RuntimeCompact
+            | EndpointDecision::RuntimeEffect
+            | EndpointDecision::ClosedIdle
     );
     if runtime_only && !changed_fields.contains(&"endpoint_decision") {
         changed_fields.push("endpoint_decision");

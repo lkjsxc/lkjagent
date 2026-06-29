@@ -1,3 +1,4 @@
+use crate::kernel::completion::completion_gate;
 use crate::kernel::decision::RuntimeDecision;
 use crate::kernel::event::RuntimeEvent;
 use crate::kernel::obligation::{obligations_for, Obligation};
@@ -13,11 +14,18 @@ pub(crate) fn authority_ledger_entries(
 ) -> Vec<String> {
     let facts = runtime_facts(snapshot, event);
     let obligations = obligations_for(&facts);
-    let resolver = resolve_obligations(decision.mission, snapshot, &facts, &obligations);
+    let completion = completion_gate(snapshot);
+    let resolver = resolve_obligations(
+        decision.mission,
+        snapshot,
+        &facts,
+        &obligations,
+        completion.allowed,
+    );
     vec![
         format!("root_status={}", root_status(facts.root_status)),
         format!("obligation_set={}", obligation_set(&obligations)),
-        format!("resolver_plan={}", resolver_plan(resolver.as_ref())),
+        format!("resolver_plan={}", resolver_plan(Some(&resolver))),
         format!(
             "write_contract={}",
             write_contract(facts.write_contract.as_ref())

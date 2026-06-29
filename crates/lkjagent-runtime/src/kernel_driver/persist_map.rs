@@ -51,6 +51,10 @@ pub fn runtime_effect_kind(decision: &RuntimeDecision) -> Option<&str> {
     decision.runtime_effect.as_ref().map(|effect| match effect {
         crate::kernel::RuntimeEffectCommand::CompactNow => "hard_compaction",
         crate::kernel::RuntimeEffectCommand::WaitClosedIdle => "closed_idle_wait",
+        crate::kernel::RuntimeEffectCommand::DeterministicInspection { .. } => {
+            "deterministic_inspection"
+        }
+        crate::kernel::RuntimeEffectCommand::RecordBlockedHandoff => "blocked_handoff",
         _ => "runtime_effect",
     })
 }

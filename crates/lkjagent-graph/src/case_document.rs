@@ -10,6 +10,9 @@ pub struct DocumentState {
     pub sequence_ledger_status: TopologyStatus,
     pub audit_status: TopologyStatus,
     pub file_budget: Option<usize>,
+    pub exact_title: Option<String>,
+    pub profile: Option<String>,
+    pub requested_scale: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -40,6 +43,21 @@ impl DocumentState {
             sequence_ledger_status: TopologyStatus::Missing,
             audit_status: TopologyStatus::Missing,
             file_budget: None,
+            exact_title: None,
+            profile: None,
+            requested_scale: None,
         }
+    }
+
+    pub fn with_identity(
+        mut self,
+        title: Option<String>,
+        profile: Option<String>,
+        scale: Option<String>,
+    ) -> Self {
+        self.exact_title = title;
+        self.profile = profile;
+        self.requested_scale = scale;
+        self
     }
 }

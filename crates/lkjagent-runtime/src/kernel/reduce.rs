@@ -1,6 +1,6 @@
 use crate::kernel::admission::{admitted_tools_for, blocked_tools_for, ToolAdmissionView};
 use crate::kernel::authority_ledger::authority_ledger_entries;
-use crate::kernel::completion::close_allowed;
+use crate::kernel::completion::{completion_gate, CompletionGateDecision};
 use crate::kernel::decision::{
     DecisionInvariantError, RuntimeDecision, RuntimeDecisionId, RuntimeDecisionInput,
     RuntimeDecisionKind, RuntimeMission,
@@ -9,11 +9,12 @@ use crate::kernel::decision_apply::apply_forced_action;
 use crate::kernel::effect::attach_runtime_effect;
 use crate::kernel::event::RuntimeEvent;
 use crate::kernel::mission_select::select_mission;
-use crate::kernel::next_action::next_action_for;
+use crate::kernel::obligation::obligations_for;
+use crate::kernel::obligation_facts::runtime_facts;
 use crate::kernel::render::prompt_card_for;
 use crate::kernel::repeat_guard::repeat_guard;
+use crate::kernel::resolver::{action_for_plan, resolve_obligations, resolver_label, ResolverPlan};
 use crate::kernel::snapshot::{RuntimeEventId, RuntimeSnapshot, ToolName};
-
 pub fn reduce_with_event_id(
     snapshot: &RuntimeSnapshot,
     event_id: RuntimeEventId,
@@ -29,6 +30,10 @@ pub fn reduce(
     event: RuntimeEvent,
 ) -> Result<RuntimeDecision, DecisionInvariantError> {
     let mission = select_mission(snapshot, &event);
+    let facts = runtime_facts(snapshot, &event);
+    let obligations = obligations_for(&facts);
+    let completion = completion_gate(snapshot);
+    let plan = resolve_obligations(mission, snapshot, &facts, &obligations, completion.allowed);
     let active_mode = mission.active_mode();
     let mut admission_view = repeat_guard(
         ToolAdmissionView::new(
@@ -41,8 +46,7 @@ pub fn reduce(
         snapshot,
     );
     block_direct_audit_owned_evidence(snapshot, &mut admission_view);
-    let close_case = mission == RuntimeMission::OwnerCompletion && close_allowed(snapshot);
-    if close_case {
+    if matches!(plan, ResolverPlan::CloseCase) {
         admission_view.completion_allowed = true;
         admission_view
             .admitted_tools
@@ -53,21 +57,21 @@ pub fn reduce(
         snapshot_id: snapshot.snapshot_id,
         event_id: RuntimeEventId(0),
         mission,
-        kind: decision_kind_for(mission, close_case),
+        kind: decision_kind_for(mission, &plan),
         admission_view,
         authority_fingerprint: snapshot.authority_fingerprint.clone(),
         staleness_fingerprint: snapshot.staleness_fingerprint.clone(),
     };
     let mut decision = RuntimeDecision::new(input)?;
-    populate_decision(snapshot, &event, &mut decision, close_case);
+    populate_decision(snapshot, &event, &mut decision, &plan, &completion);
     attach_runtime_effect(decision, mission)
 }
-
 fn populate_decision(
     snapshot: &RuntimeSnapshot,
     event: &RuntimeEvent,
     decision: &mut RuntimeDecision,
-    close_case: bool,
+    plan: &ResolverPlan,
+    completion: &CompletionGateDecision,
 ) {
     decision.case_id = snapshot.case.case_id.clone();
     decision.graph_node = snapshot.graph.node.clone();
@@ -88,18 +92,23 @@ fn populate_decision(
     decision.retry_count = snapshot.retry_count;
     decision.provider_anomaly_budget = 3_u32.saturating_sub(snapshot.provider.retry_count);
     decision.compaction_policy = compaction_policy(snapshot);
-    decision.completion_allowed = close_case;
-    decision.completion_blockers = snapshot.evidence.missing.clone();
-    decision.completion_refusal = completion_refusal(decision, close_case);
+    decision.completion_allowed = completion.allowed;
+    decision.completion_blockers = completion.missing_inputs.clone();
+    decision.completion_gate_inputs = completion_inputs(completion);
+    decision.completion_refusal = completion_refusal(decision);
     decision.context_package_ids = snapshot.graph.context_package_ids.clone();
-    decision.rule_explanation = rule_explanation(decision.mission, event);
-    decision.forced_next_action = next_action_for(decision.mission, snapshot, event);
+    decision.resolver_plan = Some(resolver_label(plan));
+    if let ResolverPlan::BlockedHandoff { reason } = plan {
+        decision.blocked_handoff_plan = Some(reason.clone());
+    }
+    decision.progress_key = Some(progress_key(decision, plan));
+    decision.rule_explanation = rule_explanation(decision.mission, event, plan);
+    decision.forced_next_action = action_for_plan(plan, snapshot);
     apply_forced_action(snapshot, decision);
     decision.persistence_plan = authority_ledger_entries(snapshot, event, decision);
     decision.prompt_card =
         prompt_card_for(snapshot, decision.mission, decision.active_mode, decision);
 }
-
 fn block_direct_audit_owned_evidence(
     snapshot: &RuntimeSnapshot,
     admission_view: &mut ToolAdmissionView,
@@ -120,7 +129,6 @@ fn block_direct_audit_owned_evidence(
             .push(ToolName::from_static("graph.evidence"));
     }
 }
-
 fn only_audit_owned_gaps(snapshot: &RuntimeSnapshot) -> bool {
     !snapshot.evidence.missing.is_empty()
         && snapshot
@@ -137,27 +145,54 @@ fn compaction_policy(snapshot: &RuntimeSnapshot) -> Option<String> {
         snapshot.context.compaction_head.clone()
     }
 }
-
-fn completion_refusal(decision: &RuntimeDecision, close_case: bool) -> Option<String> {
-    (decision.mission == RuntimeMission::OwnerCompletion && !close_case)
+fn completion_refusal(decision: &RuntimeDecision) -> Option<String> {
+    (decision.mission == RuntimeMission::OwnerCompletion && !decision.completion_allowed)
         .then(|| decision.completion_blockers.join(","))
 }
 
-fn rule_explanation(mission: RuntimeMission, event: &RuntimeEvent) -> String {
+fn completion_inputs(completion: &CompletionGateDecision) -> Vec<String> {
+    vec![
+        format!("objective_present={}", completion.input.objective_present),
+        format!("artifact_required={}", completion.input.artifact_required),
+        format!("artifact_ready={}", completion.input.artifact_ready),
+        format!("weak_paths={}", completion.input.weak_paths.join("|")),
+        format!("fingerprint={}", completion.input.decision_fingerprint),
+    ]
+}
+
+fn progress_key(decision: &RuntimeDecision, plan: &ResolverPlan) -> String {
     format!(
-        "first_matching_rule={} event={}",
+        "mission={} plan={} root={} cursor={}",
+        decision.mission.as_str(),
+        resolver_label(plan),
+        decision.root.as_deref().unwrap_or("none"),
+        decision.cursor.as_deref().unwrap_or("none")
+    )
+}
+fn rule_explanation(mission: RuntimeMission, event: &RuntimeEvent, plan: &ResolverPlan) -> String {
+    format!(
+        "first_matching_rule={} resolver_plan={} event={}",
         mission.as_str(),
+        resolver_label(plan),
         event.kind().as_str()
     )
 }
 
-fn decision_kind_for(mission: RuntimeMission, close_case: bool) -> RuntimeDecisionKind {
-    match mission {
-        RuntimeMission::OwnerCompletion if close_case => RuntimeDecisionKind::CloseCase,
-        RuntimeMission::HardRuntimeCompaction | RuntimeMission::ClosedIdle => {
+fn decision_kind_for(mission: RuntimeMission, plan: &ResolverPlan) -> RuntimeDecisionKind {
+    match plan {
+        ResolverPlan::CloseCase => RuntimeDecisionKind::CloseCase,
+        ResolverPlan::RuntimeEffect => RuntimeDecisionKind::RuntimeEffect,
+        ResolverPlan::OwnerWait => RuntimeDecisionKind::WaitForOwner,
+        ResolverPlan::BlockedHandoff { .. } => RuntimeDecisionKind::RuntimeEffect,
+        ResolverPlan::ExactInspection { .. } | ResolverPlan::Audit { .. } => {
             RuntimeDecisionKind::RuntimeEffect
         }
-        RuntimeMission::OwnerCompletion => RuntimeDecisionKind::BlockCompletion,
-        _ => RuntimeDecisionKind::ModelCall,
+        ResolverPlan::SemanticWriteContract { .. } | ResolverPlan::EvidenceRecording { .. } => {
+            if mission == RuntimeMission::OwnerCompletion {
+                RuntimeDecisionKind::BlockCompletion
+            } else {
+                RuntimeDecisionKind::ModelCall
+            }
+        }
     }
 }

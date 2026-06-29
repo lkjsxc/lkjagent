@@ -83,6 +83,16 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             staleness_fingerprint TEXT NOT NULL,
             FOREIGN KEY(decision_id) REFERENCES runtime_authority_decisions(id)
         );
+        CREATE TABLE IF NOT EXISTS runtime_dense_rows (
+            id INTEGER PRIMARY KEY,
+            decision_id INTEGER NOT NULL,
+            row_kind TEXT NOT NULL,
+            subject TEXT NOT NULL,
+            predicate TEXT NOT NULL,
+            object TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(decision_id) REFERENCES runtime_authority_decisions(id)
+        );
         CREATE TABLE IF NOT EXISTS runtime_tool_admissions (
             id INTEGER PRIMARY KEY,
             decision_id INTEGER NOT NULL,
@@ -159,6 +169,8 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             ON runtime_authority_decisions(case_scope, case_id, id);
         CREATE INDEX IF NOT EXISTS runtime_decision_details_kind_idx
             ON runtime_decision_details(decision_kind, exact_next_action_class);
+        CREATE INDEX IF NOT EXISTS runtime_dense_rows_decision_idx
+            ON runtime_dense_rows(decision_id, row_kind);
         CREATE INDEX IF NOT EXISTS runtime_admissions_decision_tool_idx
             ON runtime_tool_admissions(decision_id, requested_tool);
         CREATE INDEX IF NOT EXISTS runtime_transitions_case_idx

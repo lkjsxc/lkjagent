@@ -1,11 +1,16 @@
+#[path = "resolver_fallback.rs"]
+mod resolver_fallback;
+
 use crate::kernel::decision::{ActionTemplate, RuntimeMission};
+use crate::kernel::next_action_simple::{simple_write_body, simple_write_path};
 use crate::kernel::obligation::{root_identity_needed, Obligation};
 use crate::kernel::obligation_facts::{ArtifactRootStatus, RuntimeFacts, WriteContractFacts};
 use crate::kernel::render::example_for;
 use crate::kernel::snapshot::{RuntimeSnapshot, ToolName};
+use resolver_fallback::fallback_plan;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ResolverPlan {
+pub enum TotalResolverPlan {
     RuntimeEffect,
     ExactInspection { tool: &'static str },
     SemanticWriteContract { contract: WriteContractFacts },
@@ -16,43 +21,74 @@ pub enum ResolverPlan {
     CloseCase,
 }
 
+pub type ResolverPlan = TotalResolverPlan;
+
 pub fn resolve_obligations(
     mission: RuntimeMission,
     snapshot: &RuntimeSnapshot,
     facts: &RuntimeFacts,
     obligations: &[Obligation],
-) -> Option<ResolverPlan> {
-    if matches!(
-        mission,
-        RuntimeMission::HardRuntimeCompaction | RuntimeMission::ClosedIdle
-    ) {
-        return Some(ResolverPlan::RuntimeEffect);
+    completion_allowed: bool,
+) -> TotalResolverPlan {
+    if matches!(mission, RuntimeMission::HardRuntimeCompaction) {
+        return TotalResolverPlan::RuntimeEffect;
     }
-    if mission == RuntimeMission::OwnerCompletion && facts.missing_evidence.is_empty() {
-        return Some(ResolverPlan::CloseCase);
+    if matches!(mission, RuntimeMission::ClosedIdle) {
+        return TotalResolverPlan::RuntimeEffect;
     }
-    root_repair_plan(facts).or_else(|| first_obligation_plan(mission, snapshot, facts, obligations))
+    if mission == RuntimeMission::OwnerCompletion && completion_allowed {
+        return TotalResolverPlan::CloseCase;
+    }
+    if let Some(plan) = root_repair_plan(facts) {
+        return plan;
+    }
+    first_obligation_plan(mission, snapshot, facts, obligations)
+        .unwrap_or_else(|| fallback_plan(mission, snapshot, facts))
 }
 
-pub fn action_for_plan(plan: &ResolverPlan, snapshot: &RuntimeSnapshot) -> Option<ActionTemplate> {
+pub fn action_for_plan(
+    plan: &TotalResolverPlan,
+    snapshot: &RuntimeSnapshot,
+) -> Option<ActionTemplate> {
     match plan {
-        ResolverPlan::RuntimeEffect
-        | ResolverPlan::OwnerWait
-        | ResolverPlan::BlockedHandoff { .. } => None,
-        ResolverPlan::CloseCase => exact("agent.done", snapshot),
-        ResolverPlan::ExactInspection { tool }
-        | ResolverPlan::Audit { tool }
-        | ResolverPlan::EvidenceRecording { tool } => exact(tool, snapshot),
-        ResolverPlan::SemanticWriteContract { .. } => exact("fs.batch_write", snapshot),
+        TotalResolverPlan::RuntimeEffect
+        | TotalResolverPlan::OwnerWait
+        | TotalResolverPlan::BlockedHandoff { .. } => None,
+        TotalResolverPlan::CloseCase => exact("agent.done", snapshot),
+        TotalResolverPlan::ExactInspection { tool } | TotalResolverPlan::Audit { tool } => {
+            exact(tool, snapshot)
+        }
+        TotalResolverPlan::EvidenceRecording { tool } if *tool == "fs.write" => fs_write(snapshot),
+        TotalResolverPlan::EvidenceRecording { tool } => exact(tool, snapshot),
+        TotalResolverPlan::SemanticWriteContract { .. } => exact("fs.batch_write", snapshot),
     }
 }
 
-fn root_repair_plan(facts: &RuntimeFacts) -> Option<ResolverPlan> {
+pub fn resolver_label(plan: &TotalResolverPlan) -> String {
+    match plan {
+        TotalResolverPlan::RuntimeEffect => "runtime-effect".to_string(),
+        TotalResolverPlan::ExactInspection { tool } => format!("exact-inspection:{tool}"),
+        TotalResolverPlan::SemanticWriteContract { contract } => {
+            format!(
+                "semantic-write:{}:{}",
+                contract.root,
+                contract.exact_paths.join("|")
+            )
+        }
+        TotalResolverPlan::Audit { tool } => format!("audit:{tool}"),
+        TotalResolverPlan::EvidenceRecording { tool } => format!("evidence:{tool}"),
+        TotalResolverPlan::OwnerWait => "owner-wait".to_string(),
+        TotalResolverPlan::BlockedHandoff { reason } => format!("blocked-handoff:{reason}"),
+        TotalResolverPlan::CloseCase => "close-case".to_string(),
+    }
+}
+
+pub(super) fn root_repair_plan(facts: &RuntimeFacts) -> Option<TotalResolverPlan> {
     if !root_identity_needed(facts.root_status) {
         return None;
     }
     let contract = facts.write_contract.clone()?;
-    Some(ResolverPlan::SemanticWriteContract { contract })
+    Some(TotalResolverPlan::SemanticWriteContract { contract })
 }
 
 fn first_obligation_plan(
@@ -60,15 +96,10 @@ fn first_obligation_plan(
     snapshot: &RuntimeSnapshot,
     facts: &RuntimeFacts,
     obligations: &[Obligation],
-) -> Option<ResolverPlan> {
-    for obligation in obligations {
-        if let Some(plan) = obligation_plan(*obligation, mission, snapshot, facts) {
-            return Some(plan);
-        }
-    }
-    (!obligations.is_empty()).then(|| ResolverPlan::BlockedHandoff {
-        reason: "no resolver route remains".to_string(),
-    })
+) -> Option<TotalResolverPlan> {
+    obligations
+        .iter()
+        .find_map(|obligation| obligation_plan(*obligation, mission, snapshot, facts))
 }
 
 fn obligation_plan(
@@ -76,64 +107,32 @@ fn obligation_plan(
     mission: RuntimeMission,
     snapshot: &RuntimeSnapshot,
     facts: &RuntimeFacts,
-) -> Option<ResolverPlan> {
+) -> Option<TotalResolverPlan> {
     match obligation {
-        Obligation::Compaction => Some(ResolverPlan::RuntimeEffect),
-        Obligation::Recovery => recovery_plan(snapshot, facts),
-        Obligation::Plan => Some(ResolverPlan::ExactInspection { tool: "graph.plan" }),
-        Obligation::ArtifactIdentity => Some(ResolverPlan::ExactInspection {
+        Obligation::Compaction => Some(TotalResolverPlan::RuntimeEffect),
+        Obligation::Recovery => Some(fallback_plan(mission, snapshot, facts)),
+        Obligation::Plan => Some(TotalResolverPlan::ExactInspection { tool: "graph.plan" }),
+        Obligation::ArtifactIdentity => Some(TotalResolverPlan::ExactInspection {
             tool: "artifact.plan",
         }),
         Obligation::RootIdentity => root_repair_plan(facts),
         Obligation::ContentBatch => facts
             .write_contract
             .clone()
-            .map(|contract| ResolverPlan::SemanticWriteContract { contract }),
+            .map(|contract| TotalResolverPlan::SemanticWriteContract { contract }),
         Obligation::DocumentStructure => Some(document_structure_plan(facts)),
         Obligation::ArtifactReadiness => Some(artifact_readiness_plan(snapshot, facts)),
-        Obligation::Verification => Some(ResolverPlan::Audit {
+        Obligation::Verification => Some(TotalResolverPlan::Audit {
             tool: "artifact.audit",
         }),
         Obligation::Completion if mission == RuntimeMission::OwnerCompletion => {
-            Some(ResolverPlan::Audit {
+            Some(TotalResolverPlan::Audit {
                 tool: "artifact.audit",
             })
         }
-        Obligation::BlockedHandoff => Some(ResolverPlan::BlockedHandoff {
-            reason: "no resolver route remains".to_string(),
-        }),
+        Obligation::BlockedHandoff => Some(blocked("no resolver route remains")),
         Obligation::Completion => None,
     }
-}
-
-fn recovery_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> Option<ResolverPlan> {
-    if let Some(plan) = root_repair_plan(facts) {
-        return Some(plan);
-    }
-    if artifact_next_requested(snapshot) {
-        return Some(ResolverPlan::ExactInspection {
-            tool: "artifact.next",
-        });
-    }
-    if facts.write_contract.is_some() && batch_write_requested(snapshot) {
-        return facts
-            .write_contract
-            .clone()
-            .map(|contract| ResolverPlan::SemanticWriteContract { contract });
-    }
-    if !facts.weak_paths.is_empty() {
-        return Some(ResolverPlan::ExactInspection {
-            tool: "artifact.next",
-        });
-    }
-    if facts.root.is_some() {
-        return Some(ResolverPlan::Audit {
-            tool: "artifact.audit",
-        });
-    }
-    Some(ResolverPlan::ExactInspection {
-        tool: "workspace.summary",
-    })
 }
 
 fn exact(tool: &'static str, snapshot: &RuntimeSnapshot) -> Option<ActionTemplate> {
@@ -143,33 +142,41 @@ fn exact(tool: &'static str, snapshot: &RuntimeSnapshot) -> Option<ActionTemplat
     })
 }
 
-fn document_structure_plan(facts: &RuntimeFacts) -> ResolverPlan {
+fn fs_write(snapshot: &RuntimeSnapshot) -> Option<ActionTemplate> {
+    let path = simple_write_path(snapshot)?;
+    Some(ActionTemplate::ExactTool {
+        tool: ToolName::from_static("fs.write"),
+        body: simple_write_body(&path, snapshot),
+    })
+}
+
+fn document_structure_plan(facts: &RuntimeFacts) -> TotalResolverPlan {
     if facts.root.is_some() && facts.root_status == ArtifactRootStatus::StructureFailed {
-        ResolverPlan::ExactInspection {
+        TotalResolverPlan::ExactInspection {
             tool: "artifact.next",
         }
     } else {
-        ResolverPlan::Audit { tool: "doc.audit" }
+        TotalResolverPlan::Audit { tool: "doc.audit" }
     }
 }
 
-fn artifact_readiness_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> ResolverPlan {
+fn artifact_readiness_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> TotalResolverPlan {
     if artifact_next_requested(snapshot) || !facts.weak_paths.is_empty() {
-        ResolverPlan::ExactInspection {
+        TotalResolverPlan::ExactInspection {
             tool: "artifact.next",
         }
     } else {
-        ResolverPlan::Audit {
+        TotalResolverPlan::Audit {
             tool: "artifact.audit",
         }
     }
 }
 
-fn batch_write_requested(snapshot: &RuntimeSnapshot) -> bool {
+pub(super) fn batch_write_requested(snapshot: &RuntimeSnapshot) -> bool {
     candidate_action(snapshot, "fs.batch_write")
 }
 
-fn artifact_next_requested(snapshot: &RuntimeSnapshot) -> bool {
+pub(super) fn artifact_next_requested(snapshot: &RuntimeSnapshot) -> bool {
     candidate_action(snapshot, "artifact.next")
 }
 
@@ -182,4 +189,10 @@ fn candidate_action(snapshot: &RuntimeSnapshot, action: &str) -> bool {
     .into_iter()
     .flatten()
     .any(|value| value.contains("next_decision_required=true") && value.contains(&needle))
+}
+
+pub(super) fn blocked(reason: &str) -> TotalResolverPlan {
+    TotalResolverPlan::BlockedHandoff {
+        reason: reason.to_string(),
+    }
 }
