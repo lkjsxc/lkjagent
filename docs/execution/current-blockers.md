@@ -21,6 +21,7 @@ that ran.
 | 9 | Provider anomaly blocked handoff | [tasks/deep-redesign-provider-handoff.md](tasks/deep-redesign-provider-handoff.md) | done |
 | 10 | Benchmark corpus and final gates | [tasks/deep-redesign-gates.md](tasks/deep-redesign-gates.md) | done |
 | 11 | Obligation network root repair | [tasks/obligation-network-redesign.md](tasks/obligation-network-redesign.md) | done |
+| 12 | Runtime smoke false close and noisy repair | [tasks/runtime-smoke-problem-sweep.md](tasks/runtime-smoke-problem-sweep.md) | open |
 
 ## Active Data Fixture
 
@@ -72,11 +73,15 @@ The checked-in generated log fixture remains historical failure evidence.
 - Context compaction can run at state boundaries and must preserve cursor,
   mission, recovery route, blockers, and next action surface.
 
-## Completion Evidence
+## Open Smoke Findings
 
-The obligation network row is closed by focused crate tests, workspace tests,
-corpus checks, `quiet verify`, `docker compose run --rm verify`, and a fresh
-clean-data endpoint smoke. The latest smoke transcript at
-`tmp/user-story-smoke-data-fix/logs/current-model-run.md` reached
-`open_task=none` after root repair, structure repair, and artifact audit. The
-checked-in data log remains historical failure evidence.
+Live smoke runs after root repair found remaining problems:
+
+- titles containing `Compact` can be classified as compaction work and close
+  without artifact audit;
+- named novel roots can degrade to `stories/novel-named`;
+- missing-root repair is escapable but still spends noisy turns on repeated
+  audit, refused mkdir, and placeholder-root examples;
+- long-novel completion can pass with a small story-bible seed.
+
+Details live in [current-work/runtime-smoke-problems.md](current-work/runtime-smoke-problems.md).

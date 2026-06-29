@@ -63,3 +63,5 @@ Every task file uses exactly these headings:
 - [deep-redesign-gates.md](deep-redesign-gates.md): benchmark corpus and final verification gates.
 - [obligation-network-redesign.md](obligation-network-redesign.md): fact, obligation, resolver, and
   progress-key runtime redesign.
+- [runtime-smoke-problem-sweep.md](runtime-smoke-problem-sweep.md): live-smoke false-close and
+  noisy-loop repairs.

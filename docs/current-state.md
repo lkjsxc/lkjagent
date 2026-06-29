@@ -121,8 +121,9 @@ structure repair.
 
 ## Active Target
 
-The dependency queue in [execution/current-blockers.md](execution/current-blockers.md)
-is closed for this redesign. Next executable step: none.
+The active row in [execution/current-blockers.md](execution/current-blockers.md)
+is runtime smoke false close and noisy repair. Next executable step: follow
+[execution/tasks/runtime-smoke-problem-sweep.md](execution/tasks/runtime-smoke-problem-sweep.md).
 
 ## Out of Scope
 
