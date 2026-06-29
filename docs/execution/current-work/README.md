@@ -26,6 +26,7 @@ verification.
 - [durable-compaction-history.md](durable-compaction-history.md): rich compaction snapshots and resume history.
 - [workspace-structure-controller.md](workspace-structure-controller.md): recursive workspace and docs rebalancer.
 - [model-log.md](model-log.md): single handoff-log work.
+- [runtime-smoke-problems.md](runtime-smoke-problems.md): live-smoke problems after root repair.
 - [personal-records.md](personal-records.md): diary, schedule, and TODO record work.
 - [verification-plan.md](verification-plan.md): focused tests, benchmarks, and compose gates.
 
