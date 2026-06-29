@@ -1,14 +1,26 @@
 use crate::kernel::decision::{ActionTemplate, RuntimeMission};
+use crate::kernel::event::RuntimeEvent;
 use crate::kernel::next_action_simple::{
     artifact_work_required, simple_write_body, simple_write_path,
 };
+use crate::kernel::obligation::obligations_for;
+use crate::kernel::obligation_facts::runtime_facts;
 use crate::kernel::render::example_for;
+use crate::kernel::resolver::{action_for_plan, resolve_obligations};
 use crate::kernel::snapshot::{RuntimeSnapshot, ToolName};
 
 pub(crate) fn next_action_for(
     mission: RuntimeMission,
     snapshot: &RuntimeSnapshot,
+    event: &RuntimeEvent,
 ) -> Option<ActionTemplate> {
+    let facts = runtime_facts(snapshot, event);
+    let obligations = obligations_for(&facts);
+    if let Some(plan) = resolve_obligations(mission, snapshot, &facts, &obligations) {
+        if let Some(action) = action_for_plan(&plan, snapshot) {
+            return Some(action);
+        }
+    }
     let tool = match mission {
         RuntimeMission::HardRuntimeCompaction | RuntimeMission::ClosedIdle => return None,
         RuntimeMission::OwnerRecovery => recovery_tool(snapshot),
@@ -59,11 +71,11 @@ pub(crate) fn owner_execution_tool(snapshot: &RuntimeSnapshot) -> &'static str {
     if snapshot.artifact.root.is_none() {
         return "artifact.plan";
     }
+    if root_identity_observation(snapshot) || artifact_next_candidate(snapshot) {
+        return "fs.batch_write";
+    }
     if evidence_missing(snapshot, "document-structure") {
         return "doc.audit";
-    }
-    if artifact_next_candidate(snapshot) {
-        return "fs.batch_write";
     }
     if !snapshot.artifact.weak_paths.is_empty() {
         return "artifact.next";
@@ -75,6 +87,9 @@ pub(crate) fn owner_execution_tool(snapshot: &RuntimeSnapshot) -> &'static str {
 }
 
 fn recovery_tool(snapshot: &RuntimeSnapshot) -> &'static str {
+    if root_identity_observation(snapshot) || artifact_next_candidate(snapshot) {
+        return "fs.batch_write";
+    }
     if evidence_missing(snapshot, "document-structure") {
         return "doc.audit";
     }
@@ -117,11 +132,18 @@ fn plan_missing(snapshot: &RuntimeSnapshot) -> bool {
 }
 
 fn artifact_next_candidate(snapshot: &RuntimeSnapshot) -> bool {
+    snapshot.observation.latest.as_deref().is_some_and(|value| {
+        value.contains("next_decision_required=true")
+            && value.contains("candidate_action=fs.batch_write")
+    })
+}
+
+fn root_identity_observation(snapshot: &RuntimeSnapshot) -> bool {
     snapshot
         .observation
         .latest
         .as_deref()
-        .is_some_and(|value| value.contains("next_decision_required=true"))
+        .is_some_and(|value| value.contains("missing_root") || value.contains("root_missing"))
 }
 
 fn repeated_child_tag_batch_fault(snapshot: &RuntimeSnapshot) -> bool {

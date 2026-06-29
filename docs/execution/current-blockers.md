@@ -20,7 +20,7 @@ that ran.
 | 8 | Completion and maintenance reducers | [tasks/deep-redesign-completion-maintenance.md](tasks/deep-redesign-completion-maintenance.md) | done |
 | 9 | Provider anomaly blocked handoff | [tasks/deep-redesign-provider-handoff.md](tasks/deep-redesign-provider-handoff.md) | done |
 | 10 | Benchmark corpus and final gates | [tasks/deep-redesign-gates.md](tasks/deep-redesign-gates.md) | done |
-| 11 | Obligation network root repair | [tasks/obligation-network-redesign.md](tasks/obligation-network-redesign.md) | open |
+| 11 | Obligation network root repair | [tasks/obligation-network-redesign.md](tasks/obligation-network-redesign.md) | done |
 
 ## Active Data Fixture
 
@@ -29,22 +29,22 @@ failure evidence. `index.ndjson` paths are normalized from `/data/logs/...` to
 the repository `data/logs/...` tree before integrity checks. The checked-in run
 proves these facts:
 
-- active case `1` is at node `document` in phase `execution`;
-- owner task is `Create a long novel. with detailed structured settings.`;
-- observed root is `stories/novel`;
-- `graph.state` repeatedly reported `no active graph case` while authority and
-  the log snapshot named active case `1`;
+- active case `1` is at node `evidence-plan` in phase `recovery`;
+- owner task is `Create a long novel. named "iwanna". with detailed and
+  structured settings.`;
+- observed root is `stories/novel-named`;
+- `doc.audit` repeatedly reported `missing_root` for that root;
 - authority refused a local `fs.mkdir` path that was not admitted;
-- `fs.batch_write` wrote a small novel tree;
-- `doc.audit` first failed and later passed structure;
-- `artifact.audit` and `graph.state` repeated instead of changing shape;
-- direct `graph.evidence` for audit-owned evidence was refused;
+- duplicate `settings.md` `fs.batch_write` attempts did not create root
+  identity;
+- repeat recovery and `graph.recover` changed shape but routed back to
+  same-root `doc.audit`;
+- `graph.state` showed active case `1` while recovery remained open;
 - reasoning-only provider responses were recorded as provider anomalies;
-- final verification remained pending.
+- document audit, artifact readiness audit, and final verification remained
+  pending.
 
-A fresh clean-data endpoint smoke after the repair created
-`tmp/live-direct-data-3/workspace/hello.md` and reached `open_task=none`. The
-checked-in generated log fixture remains historical failure evidence.
+The checked-in generated log fixture remains historical failure evidence.
 
 ## Ordering Notes
 
@@ -74,7 +74,9 @@ checked-in generated log fixture remains historical failure evidence.
 
 ## Completion Evidence
 
-The obligation network row closes only after focused crate tests, workspace
-tests, corpus checks, `quiet verify`, `docker compose run --rm verify`, and a
-fresh clean-data endpoint smoke prove root repair avoids the checked-in loop.
-The checked-in data log remains historical failure evidence.
+The obligation network row is closed by focused crate tests, workspace tests,
+corpus checks, `quiet verify`, `docker compose run --rm verify`, and a fresh
+clean-data endpoint smoke. The smoke transcript at
+`tmp/obligation-smoke-data-2/logs/current-model-run.md` reached
+`open_task=none` after root repair and artifact audit. The checked-in data log
+remains historical failure evidence.

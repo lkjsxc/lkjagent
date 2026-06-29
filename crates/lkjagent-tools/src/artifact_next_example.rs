@@ -17,12 +17,28 @@ pub fn batch_write_contract(root: &str, kind: &str, paths: &[String]) -> String 
 }
 
 pub fn root_identity_contract(root: &str, kind: &str) -> String {
-    let paths = vec![
-        "catalog.toml".to_string(),
-        "README.md".to_string(),
-        "request/objective.md".to_string(),
-    ];
+    let paths = if kind.eq_ignore_ascii_case("story") || story_root(root) {
+        vec![
+            "catalog.toml".to_string(),
+            "README.md".to_string(),
+            "objective.md".to_string(),
+            "setting-overview.md".to_string(),
+            "cast.md".to_string(),
+        ]
+    } else {
+        vec![
+            "catalog.toml".to_string(),
+            "README.md".to_string(),
+            "objective.md".to_string(),
+            "overview.md".to_string(),
+            "verification-notes.md".to_string(),
+        ]
+    };
     batch_write_contract(root, kind, &paths)
+}
+
+fn story_root(root: &str) -> bool {
+    root.trim_start_matches("./").starts_with("stories/")
 }
 
 fn required_sections(kind: &str) -> &'static str {

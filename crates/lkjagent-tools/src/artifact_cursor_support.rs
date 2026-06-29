@@ -26,11 +26,23 @@ pub fn record_identity_contract(
     contract: &str,
     now: &str,
 ) -> ToolResult<()> {
-    let selected = vec![
-        "catalog.toml".to_string(),
-        "README.md".to_string(),
-        "request/objective.md".to_string(),
-    ];
+    let selected = if kind.eq_ignore_ascii_case("story") || story_root(root) {
+        vec![
+            "catalog.toml".to_string(),
+            "README.md".to_string(),
+            "objective.md".to_string(),
+            "setting-overview.md".to_string(),
+            "cast.md".to_string(),
+        ]
+    } else {
+        vec![
+            "catalog.toml".to_string(),
+            "README.md".to_string(),
+            "objective.md".to_string(),
+            "overview.md".to_string(),
+            "verification-notes.md".to_string(),
+        ]
+    };
     record_contract(
         NextBatchRecord {
             conn,
@@ -109,6 +121,10 @@ fn upsert_repair_artifact(
         now,
     )
     .map_err(Into::into)
+}
+
+fn story_root(root: &str) -> bool {
+    root.trim_start_matches("./").starts_with("stories/")
 }
 
 fn full_paths(root: &str, selected: &[String]) -> Vec<String> {

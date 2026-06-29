@@ -7,7 +7,7 @@ obligations, resolver plans, write contracts, and progress keys.
 
 ## Status
 
-open
+done
 
 ## Depends On
 

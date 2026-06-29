@@ -2,14 +2,14 @@
 
 ## Snapshot
 
-- created_at: 1782683022
+- created_at: 1782683191
 - daemon_state: working
 - queue_depth: 0
 - active_case: 1
-- active_node: document-completion-check
+- active_node: evidence-plan
 - active_phase: recovery
-- context: 11.56K/24.58K 47.05% prefix=5.38K log=18.69K reserve=512 headroom=13.01K
-- token_usage: in=11.91K out=33 cache=unknown total=11.94K
+- context: 15.69K/24.58K 63.85% prefix=5.38K log=18.69K reserve=512 headroom=8.88K
+- token_usage: in=16.44K out=33 cache=unknown total=16.47K
 
 ## Owner Objective
 
@@ -50,7 +50,7 @@ Resolve the owner task through planning, evidence capture, execution, and verifi
 
 | step | status | target paths | evidence | checks |
 | --- | --- | --- | --- | --- |
-| active | active | document-completion-check | pending | document audit; artifact readiness audit |
+| active | active | evidence-plan | pending | document audit; artifact readiness audit |
 
 ## Touched Paths
 
@@ -67,14 +67,14 @@ Resolve the owner task through planning, evidence capture, execution, and verifi
 
 | turn | kind | message | recovery |
 | --- | --- | --- | --- |
-| 6 | notice | recovery: parameter fault recorded; use the valid_example exactly or choose a tool whose schema accepts the parameter | document-completion-check |
-| 12 | error | endpoint completion hit max tokens | document-completion-check |
-| 13 | error | parse fault: malformed tag <content: | document-completion-check |
-| 15 | observation | <observation><br><status>ok</status><br><content><br>Graph state:<br>case: 1<br>family: documentation/content-artifact<br>phase: execution<br>node: document<br>confidence: 70<br>Current state: active<br>Active states: 1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence<br>Objective: Resolve the owner task through planning, evidenc... | document-completion-check |
-| 16 | error | parse fault: malformed tag <content: | document-completion-check |
-| 22 | error | endpoint completion hit max tokens | document-completion-check |
-| 23 | error | provider anomaly: reasoning_only_response | document-completion-check |
-| 23 | notice | provider response had no usable assistant action; class=reasoning_only_response; detail=reasoning-only response; route=endpoint-recovery; parse_fault_counter=unchanged | document-completion-check |
+| 13 | error | parse fault: malformed tag <content: | evidence-plan |
+| 15 | observation | <observation><br><status>ok</status><br><content><br>Graph state:<br>case: 1<br>family: documentation/content-artifact<br>phase: execution<br>node: document<br>confidence: 70<br>Current state: active<br>Active states: 1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence<br>Objective: Resolve the owner task through planning, evidenc... | evidence-plan |
+| 16 | error | parse fault: malformed tag <content: | evidence-plan |
+| 22 | error | endpoint completion hit max tokens | evidence-plan |
+| 23 | error | provider anomaly: reasoning_only_response | evidence-plan |
+| 23 | notice | provider response had no usable assistant action; class=reasoning_only_response; detail=reasoning-only response; route=endpoint-recovery; parse_fault_counter=unchanged | evidence-plan |
+| 35 | error | provider anomaly: reasoning_only_response | evidence-plan |
+| 35 | notice | provider response had no usable assistant action; class=reasoning_only_response; detail=reasoning-only response; route=endpoint-recovery; parse_fault_counter=unchanged | evidence-plan |
 
 ## Recent Transcript
 
@@ -160,6 +160,39 @@ Resolve the owner task through planning, evidence capture, execution, and verifi
 | 78 | 32 | notice | <notice><br><kind>error</kind><br><content><br>repeat action refused; see frame 25<br>active_mode=Recovery<br>next_action_must_change_shape=true<br>forbidden_tool=doc.audit<br>preferred_next_action=graph.state<br>valid_example:<br><action><br><tool>graph.state</tool><br></action><br></content><br></notice> |
 | 79 | 32 | notice | recovery: repeat actions are consecutive count=4; choose a different tool action, inspect state, or switch to typed batch/doc tools |
 | 80 | 32 | notice | Consecutive repeated actions reached count=4; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. |
+| 81 | 33 | action | <action><br><tool>doc.audit</tool><br><root>stories/novel-named</root><br></action> |
+| 82 | 33 | notice | <notice><br><kind>error</kind><br><content><br>repeat action refused; see frame 26<br>active_mode=Recovery<br>next_action_must_change_shape=true<br>forbidden_tool=doc.audit<br>preferred_next_action=graph.state<br>valid_example:<br><action><br><tool>graph.state</tool><br></action><br></content><br></notice> |
+| 83 | 33 | notice | recovery: repeat actions are consecutive count=5; choose a different tool action, inspect state, or switch to typed batch/doc tools |
+| 84 | 33 | notice | Consecutive repeated actions reached count=5; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. |
+| 85 | 34 | action | <action><br><tool>fs.list</tool><br><path>stories/novel-named</path><br></action> |
+| 86 | 34 | observation | <observation><br><status>error</status><br><content>io error: No such file or directory (os error 2)</content><br></observation> |
+| 87 | 34 | notice | recovery: tool error recorded (io error: No such file or directory (os error 2)); inspect the observation, adjust the path/command/params, and continue with a narrower action |
+| 88 | 35 | error | provider anomaly: reasoning_only_response |
+| 89 | 35 | notice | provider response had no usable assistant action; class=reasoning_only_response; detail=reasoning-only response; route=endpoint-recovery; parse_fault_counter=unchanged |
+| 90 | 36 | action | <action><br><tool>doc.audit</tool><br><root>stories/novel-named</root><br></action> |
+| 91 | 36 | observation | <observation><br><status>ok</status><br><content><br>document audit failed<br>root=stories/novel-named<br>topology=failed<br>links=passed<br>path_hygiene=passed<br>content_readiness=not-requested<br>artifact_readiness=not-owner<br>checks_run=topology,links,path_hygiene,content_readiness<br>failed=1<br>failures_shown=1<br>failures_omitted=0<br>failures:<br>- missing_root: stories/novel-named<br>next_action=artifact.next or fs.batch_write exact failed topology<br></content><br></observation> |
+| 92 | 37 | action | <action><br><tool>doc.audit</tool><br><root>stories/novel-named</root><br></action> |
+| 93 | 37 | notice | <notice><br><kind>error</kind><br><content><br>repeat action refused; see frame 29<br>active_mode=OwnerTask<br>next_action_must_change_shape=true<br>forbidden_tool=doc.audit<br>preferred_next_action=graph.state<br>valid_example:<br><action><br><tool>graph.state</tool><br></action><br></content><br></notice> |
+| 94 | 37 | notice | recovery: repeated action was refused; change the next action instead of resending it |
+| 95 | 38 | action | <action><br><tool>doc.audit</tool><br><root>stories/novel-named</root><br></action> |
+| 96 | 38 | notice | <notice><br><kind>error</kind><br><content><br>repeat action refused; see frame 30<br>active_mode=Recovery<br>next_action_must_change_shape=true<br>forbidden_tool=doc.audit<br>preferred_next_action=graph.state<br>valid_example:<br><action><br><tool>graph.state</tool><br></action><br></content><br></notice> |
+| 97 | 38 | notice | recovery: repeated action was refused; change the next action instead of resending it |
+| 98 | 39 | action | <action><br><tool>doc.audit</tool><br><root>stories/novel-named</root><br></action> |
+| 99 | 39 | notice | <notice><br><kind>error</kind><br><content><br>repeat action refused; see frame 31<br>active_mode=Recovery<br>next_action_must_change_shape=true<br>forbidden_tool=doc.audit<br>preferred_next_action=graph.state<br>valid_example:<br><action><br><tool>graph.state</tool><br></action><br></content><br></notice> |
+| 100 | 39 | notice | recovery: repeat actions are consecutive count=3; choose a different tool action, inspect state, or switch to typed batch/doc tools |
+| 101 | 39 | notice | Consecutive repeated actions reached count=3; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. |
+| 102 | 40 | action | <action><br><tool>doc.audit</tool><br><root>stories/novel-named</root><br></action> |
+| 103 | 40 | notice | <notice><br><kind>error</kind><br><content><br>repeat action refused; see frame 32<br>active_mode=Recovery<br>next_action_must_change_shape=true<br>forbidden_tool=doc.audit<br>preferred_next_action=graph.state<br>valid_example:<br><action><br><tool>graph.state</tool><br></action><br></content><br></notice> |
+| 104 | 40 | notice | recovery: repeat actions are consecutive count=4; choose a different tool action, inspect state, or switch to typed batch/doc tools |
+| 105 | 40 | notice | Consecutive repeated actions reached count=4; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. |
+| 106 | 41 | action | <action><br><tool>doc.audit</tool><br><root>stories/novel-named</root><br></action> |
+| 107 | 41 | notice | <notice><br><kind>error</kind><br><content><br>repeat action refused; see frame 33<br>active_mode=Recovery<br>next_action_must_change_shape=true<br>forbidden_tool=doc.audit<br>preferred_next_action=graph.state<br>valid_example:<br><action><br><tool>graph.state</tool><br></action><br></content><br></notice> |
+| 108 | 41 | notice | recovery: repeat actions are consecutive count=5; choose a different tool action, inspect state, or switch to typed batch/doc tools |
+| 109 | 41 | notice | Consecutive repeated actions reached count=5; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. |
+| 110 | 42 | action | <action><br><tool>doc.audit</tool><br><root>stories/novel-named</root><br></action> |
+| 111 | 42 | notice | <notice><br><kind>error</kind><br><content><br>repeat action refused; see frame 34<br>active_mode=Recovery<br>next_action_must_change_shape=true<br>forbidden_tool=doc.audit<br>preferred_next_action=graph.state<br>valid_example:<br><action><br><tool>graph.state</tool><br></action><br></content><br></notice> |
+| 112 | 42 | notice | recovery: repeat actions are consecutive count=6; choose a different tool action, inspect state, or switch to typed batch/doc tools |
+| 113 | 42 | notice | Consecutive repeated actions reached count=6; graph recovery is active. Use graph.recover, reduce scope, choose an alternate native tool, or replan around the blocked step. |
 
 ## Verification
 
