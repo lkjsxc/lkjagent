@@ -1,0 +1,8 @@
+$ cargo run -p lkjagent-xtask -- check-docs
+
+START_UTC=2026-06-29T05:19:57Z
+
+ok check-docs
+
+END_UTC=2026-06-29T05:19:57Z
+EXIT_STATUS=0

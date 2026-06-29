@@ -1,0 +1,13 @@
+$ docker compose down --remove-orphans
+
+START_UTC=2026-06-29T05:25:35Z
+
+ Container lkjagentgtcompact-agent-1 Stopping 
+ Container lkjagentgtcompact-agent-1 Stopped 
+ Container lkjagentgtcompact-agent-1 Removing 
+ Container lkjagentgtcompact-agent-1 Removed 
+ Network lkjagentgtcompact_default Removing 
+ Network lkjagentgtcompact_default Removed 
+
+END_UTC=2026-06-29T05:25:40Z
+EXIT_STATUS=0
