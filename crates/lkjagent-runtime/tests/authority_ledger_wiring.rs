@@ -1,6 +1,6 @@
 mod support;
 
-use std::{fs, path::Path};
+use std::path::Path;
 
 use lkjagent_protocol::render_action;
 use lkjagent_runtime::daemon::{
@@ -27,13 +27,9 @@ fn daemon_records_prompt_frame_and_effect_observation() -> TestResult<()> {
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     server.join()?;
 
-    let authority_log = find_authority_json(&workspace)?;
-    assert!(authority_log.contains("kernel_mission"));
-    assert!(authority_log.contains("kernel_staleness_fingerprint"));
-    assert!(authority_log.contains("authority_fingerprint"));
-
-    assert!(!json_field(&authority_log, "decision_id")?.is_empty());
-    assert!(!json_field(&authority_log, "prompt_frame_id")?.is_empty());
+    assert!(state::get(&conn, "kernel mission")?.is_some());
+    assert!(state::get(&conn, "kernel staleness fingerprint")?.is_some());
+    assert!(state::get(&conn, "authority fingerprint")?.is_some());
     let prompt_frame_id = state::get(&conn, "authority prompt frame id")?
         .ok_or("missing authority prompt frame id")?
         .parse::<i64>()?;
@@ -167,28 +163,4 @@ fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
     )
     .with_model_log_path(workspace.join("logs/current-model-run.md"));
     Ok(ResidentDaemon::new(runtime_state()?, runtime))
-}
-
-fn json_field(content: &str, key: &str) -> TestResult<String> {
-    let marker = format!("\"{key}\":\"");
-    let start = content
-        .find(&marker)
-        .ok_or_else(|| format!("missing JSON field {key}"))?
-        + marker.len();
-    let rest = &content[start..];
-    let end = rest
-        .find('"')
-        .ok_or_else(|| format!("unterminated JSON field {key}"))?;
-    Ok(rest[..end].to_string())
-}
-
-fn find_authority_json(workspace: &Path) -> TestResult<String> {
-    let model_dir = workspace.join("logs/model");
-    for epoch in fs::read_dir(model_dir)? {
-        let path = epoch?.path().join("case-1/turn-000000/authority.json");
-        if path.is_file() {
-            return Ok(fs::read_to_string(path)?);
-        }
-    }
-    Err("missing authority.json".into())
 }

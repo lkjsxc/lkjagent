@@ -18,40 +18,19 @@ const PLAN: &str = "<action>
 <paths>stories/chronos-fracture</paths>
 <reason>story completion requires artifact readiness evidence</reason>
 </action>";
-const AUDIT: &str = "<action>
-<tool>artifact.audit</tool>
-<root>stories/chronos-fracture</root>
-<kind>story</kind>
-</action>";
-const EVIDENCE: &str = "<action>
-<tool>graph.evidence</tool>
-<kind>verification</kind>
-<summary>artifact.audit passed semantic readiness for Chronos Fracture</summary>
-<path>stories/chronos-fracture</path>
-</action>";
-const DONE: &str = "<action>
-<tool>agent.done</tool>
-<summary>Chronos Fracture story bible passed artifact readiness</summary>
-</action>";
-
 #[test]
-fn chronos_story_replay_records_artifact_readiness_done_action() -> TestResult<()> {
+fn chronos_story_replay_records_deterministic_artifact_repair() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "100", "0")?;
     queue::enqueue(
         &mut conn,
-        "create Chronos Fracture story bible",
+        "create story bible named \"Chronos Fracture\"",
         "owner",
         "101",
     )?;
     let workspace = temp_workspace("chronos-story-replay")?;
     seed_story(&workspace)?;
-    let server = serve_responses(vec![
-        completion(PLAN),
-        completion(AUDIT),
-        completion(EVIDENCE),
-        completion(DONE),
-    ])?;
+    let server = serve_responses(vec![completion(PLAN)])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
     daemon.runtime.model_log_path = Some(workspace.join("current-model-run.md"));
 
@@ -63,7 +42,7 @@ fn chronos_story_replay_records_artifact_readiness_done_action() -> TestResult<(
 
     assert_eq!(
         state::get(&conn, "open task")?,
-        Some("create Chronos Fracture story bible".to_string())
+        Some("create story bible named \"Chronos Fracture\"".to_string())
     );
     assert!(workspace
         .join("stories/chronos-fracture/catalog.toml")
@@ -71,8 +50,9 @@ fn chronos_story_replay_records_artifact_readiness_done_action() -> TestResult<(
     assert!(!has_part_file(&workspace.join("stories/chronos-fracture"))?);
     let log = fs::read_to_string(workspace.join("current-model-run.md"))?;
     assert!(log.contains("Model Run Log"));
-    assert!(log.contains("readiness=story-semantic-content"));
-    assert!(log.contains("<tool>agent.done</tool>"));
+    assert!(log.contains("<tool>artifact.audit</tool>"));
+    assert!(log.contains("<tool>artifact.next</tool>"));
+    assert!(log.contains("missing_root"));
     Ok(())
 }
 

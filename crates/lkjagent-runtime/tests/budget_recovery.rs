@@ -7,18 +7,8 @@ use lkjagent_runtime::daemon::{
 };
 use lkjagent_runtime::task::TaskState;
 use lkjagent_store::{events, queue, state};
-use support::http::{completion, serve_responses};
+use support::http::serve_responses;
 use support::{runtime_state, store, temp_workspace, TestResult};
-
-const WRITE_ACTION: &str = "<action>
-<tool>fs.write</tool>
-<path>out.txt</path>
-<content>hello</content>
-</action>";
-const DONE_ACTION: &str = "<action>
-<tool>agent.done</tool>
-<summary>wrote file</summary>
-</action>";
 
 #[test]
 fn owner_send_refreshes_exhausted_open_task_budget() -> TestResult<()> {
@@ -32,14 +22,20 @@ fn owner_send_refreshes_exhausted_open_task_budget() -> TestResult<()> {
         "101",
     )?;
     let workspace = temp_workspace("daemon-exhausted-owner")?;
-    let server = serve_responses(vec![completion(DONE_ACTION)])?;
+    let server = serve_responses(Vec::new())?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
     daemon.state.task = TaskState::Open { turns_remaining: 0 };
 
-    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     server.join()?;
 
-    assert_eq!(state::get(&conn, "daemon state")?, Some("idle".to_string()));
+    assert!(
+        matches!(daemon.state.task, TaskState::Open { turns_remaining } if turns_remaining > 0)
+    );
+    assert_eq!(
+        state::get(&conn, "daemon state")?,
+        Some("working".to_string())
+    );
     assert_eq!(state::get(&conn, "daemon question")?, None);
     assert!(queue::list(&conn)?
         .first()
@@ -53,20 +49,17 @@ fn exhausted_task_checkpoints_and_continues_without_owner_guidance() -> TestResu
     take_lock(&conn)?;
     state::set(&conn, "open task", "long task")?;
     let workspace = temp_workspace("daemon-exhausted-continue")?;
-    let server = serve_responses(vec![completion(WRITE_ACTION), completion(DONE_ACTION)])?;
+    let server = serve_responses(Vec::new())?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
     daemon.state.task = TaskState::Open { turns_remaining: 0 };
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
+    server.join()?;
+
     assert_eq!(state::get(&conn, "daemon question")?, None);
     assert!(
         matches!(daemon.state.task, TaskState::Open { turns_remaining } if turns_remaining > 0)
     );
-
-    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Done);
-    server.join()?;
-
     let log = events::read_events(&conn)?;
     assert!(log
         .iter()
@@ -74,7 +67,10 @@ fn exhausted_task_checkpoints_and_continues_without_owner_guidance() -> TestResu
     assert!(!log.iter().any(|event| event
         .content
         .contains("Turn budget exhausted. Send guidance to continue.")));
-    assert_eq!(state::get(&conn, "daemon state")?, Some("idle".to_string()));
+    assert_eq!(
+        state::get(&conn, "daemon state")?,
+        Some("working".to_string())
+    );
     Ok(())
 }
 

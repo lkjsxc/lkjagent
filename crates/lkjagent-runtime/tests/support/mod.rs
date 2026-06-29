@@ -13,6 +13,8 @@ use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 pub mod http;
+pub mod maintenance_actions;
+pub mod maintenance_poll;
 
 pub type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 

@@ -22,7 +22,7 @@ that ran.
 | 10 | Benchmark corpus and final gates | [tasks/deep-redesign-gates.md](tasks/deep-redesign-gates.md) | done |
 | 11 | Obligation network root repair | [tasks/obligation-network-redesign.md](tasks/obligation-network-redesign.md) | done |
 | 12 | Runtime smoke false close and noisy repair | [tasks/runtime-smoke-problem-sweep.md](tasks/runtime-smoke-problem-sweep.md) | done |
-| 13 | Dense deterministic runtime authority network | [tasks/dense-runtime-state-network.md](tasks/dense-runtime-state-network.md) | open |
+| 13 | Dense deterministic runtime authority network | [tasks/dense-runtime-state-network.md](tasks/dense-runtime-state-network.md) | done |
 
 ## Active Data Fixture
 
@@ -92,5 +92,5 @@ those historical defects.
 
 Historical details live in
 [current-work/runtime-smoke-problems.md](current-work/runtime-smoke-problems.md).
-The active design slice lives in
-[current-work/dense-runtime-state-network.md](current-work/dense-runtime-state-network.md).
+The dense runtime authority slice is implemented and proved by the focused,
+workspace, quiet verify, and Docker gates named in its task file.

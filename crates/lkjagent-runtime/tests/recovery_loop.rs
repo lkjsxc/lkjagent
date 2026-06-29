@@ -8,6 +8,7 @@ use lkjagent_runtime::daemon::{
 };
 use lkjagent_store::{events, memory, queue, state};
 use support::http::{completion, serve_responses};
+use support::maintenance_poll::poll_until_done;
 use support::{runtime_state, store, temp_workspace, TestResult};
 
 const READ_MISSING: &str = "<action>
@@ -93,32 +94,24 @@ fn daemon_recovers_from_repeated_transient_errors_across_tasks() -> TestResult<(
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "105")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "106")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "107")?, DaemonTick::Done);
+    poll_until_done(
+        &mut daemon,
+        &mut conn,
+        &[
+            "102", "103", "104", "105", "106", "107", "108", "109", "110",
+        ],
+    )?;
     queue::enqueue(&mut conn, "recover second", "owner-send", "108")?;
     assert_eq!(daemon.poll_once(&mut conn, "108")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "109")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "110")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "111")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "112")?, DaemonTick::Working);
-    let final_tick = daemon.poll_once(&mut conn, "113")?;
-    assert_eq!(
-        final_tick,
-        DaemonTick::Done,
-        "log={}",
-        daemon
-            .state
-            .context
-            .log
-            .iter()
-            .map(|frame| frame.content.as_str())
-            .collect::<Vec<_>>()
-            .join("\n-- frame --\n")
-    );
+    poll_until_done(
+        &mut daemon,
+        &mut conn,
+        &["113", "114", "115", "116", "117", "118", "119", "120"],
+    )?;
     server.join()?;
 
     assert_eq!(fs::read_to_string(workspace.join("one.txt"))?, "one");

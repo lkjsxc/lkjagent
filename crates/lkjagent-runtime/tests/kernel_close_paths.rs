@@ -45,6 +45,7 @@ fn complete_input() -> SnapshotAdapterInput {
         case_id: Some("case-17".to_string()),
         queue_head: Some("queue-17".to_string()),
         pending_owner_count: 1,
+        owner_objective: Some("finish Chronos Fracture story bible".to_string()),
         artifact_root: Some("stories/chronos-fracture".to_string()),
         existing_evidence: vec![
             "plan".to_string(),

@@ -88,6 +88,7 @@ fn structure_failed_audit_forces_repair_batch_write() -> Result<(), String> {
 #[test]
 fn artifact_next_root_missing_produces_same_identity_contract() -> Result<(), String> {
     let mut input = owner_input();
+    input.missing_evidence = vec!["artifact-readiness".to_string()];
     input.latest_observation = Some(artifact_next_missing_root("stories/novel"));
     let decision = decision(input, RuntimeEvent::ArtifactRootMissing)?;
 

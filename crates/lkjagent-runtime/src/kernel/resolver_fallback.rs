@@ -22,7 +22,7 @@ pub(super) fn fallback_plan(
         }
         RuntimeMission::OwnerExecution => owner_execution_plan(snapshot, facts),
         RuntimeMission::OwnerCompletion => completion_repair_plan(snapshot),
-        RuntimeMission::IdleMaintenance => TotalResolverPlan::ExactInspection {
+        RuntimeMission::IdleMaintenance => TotalResolverPlan::EvidenceRecording {
             tool: "memory.find",
         },
         RuntimeMission::HardRuntimeCompaction | RuntimeMission::ClosedIdle => {

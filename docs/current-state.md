@@ -11,11 +11,10 @@ tests, quiet gates, and required Docker gates prove it.
 lkjagent has a working Rust workspace with parser, protocol registry, graph,
 context, store, LLM, tools, runtime, CLI, benchmark, and xtask crates. The
 persisted-decision daemon path is implemented and proved by focused tests and
-Docker verify. The active work is to make that authority denser and total:
-store facts, obligations, resolver plans, progress edges, deterministic effects,
-and typed completion gate inputs for every decision. The checked-in active
-model run remains historical failure evidence until an owner chooses to replace
-it.
+Docker verify. Runtime authority now records dense facts, obligations, resolver
+plans, progress edges, deterministic effects, and typed completion gate inputs
+for decisions. The checked-in active model run remains historical failure
+evidence until an owner chooses to replace it.
 
 The durable target is a deterministic state-transition runtime for a weak local
 LLM:
@@ -123,10 +122,11 @@ It proves that `Compact Compass` still false-closed before the sweep and that
 
 The current implementation has focused tests for compact-title classification,
 owner-title roots, non-ASCII title identity, counted story scale, dense runtime
-rows, total resolver plans, deterministic audit effects, typed completion input
-packets, durable missing-root repair, `candidate_action=artifact.audit`, exact
-root-repair admission, story scale-readiness refusal, readiness repair routing,
-and line-protocol recovery. Final smoke at
+rows, total resolver plans, deterministic audit effects, prompt/admission
+fingerprints, typed completion input packets, durable missing-root repair,
+`candidate_action=artifact.audit`, exact root-repair admission, story
+scale-readiness refusal, readiness repair routing, and line-protocol recovery.
+Workspace tests, benchmark, quiet verify, and Docker verify pass. Final smoke at
 `tmp/runtime-smoke-final-iwanna-20260629T131603Z/` and
 `tmp/runtime-smoke-final-compact-20260629T134111Z/` proves both named long-novel
 routes preserve owner roots, avoid generic roots, reach story-semantic readiness,
@@ -134,9 +134,10 @@ and close through `agent.done` without the observed noisy loop.
 
 ## Active Target
 
-The active row in [execution/current-blockers.md](execution/current-blockers.md)
-is dense deterministic runtime authority network. Next executable step: follow
-[execution/tasks/dense-runtime-state-network.md](execution/tasks/dense-runtime-state-network.md).
+No blocker row is open in
+[execution/current-blockers.md](execution/current-blockers.md). The next
+executable step is to open a new task only when a new defect or requirement is
+observed.
 
 ## Out of Scope
 

@@ -36,7 +36,7 @@ pub fn resolve_obligations(
     if matches!(mission, RuntimeMission::ClosedIdle) {
         return TotalResolverPlan::RuntimeEffect;
     }
-    if mission == RuntimeMission::OwnerCompletion && completion_allowed {
+    if facts.owner_work_exists && completion_allowed && facts.missing_evidence.is_empty() {
         return TotalResolverPlan::CloseCase;
     }
     if let Some(plan) = root_repair_plan(facts) {
@@ -111,7 +111,7 @@ fn obligation_plan(
     match obligation {
         Obligation::Compaction => Some(TotalResolverPlan::RuntimeEffect),
         Obligation::Recovery => Some(fallback_plan(mission, snapshot, facts)),
-        Obligation::Plan => Some(TotalResolverPlan::ExactInspection { tool: "graph.plan" }),
+        Obligation::Plan => Some(TotalResolverPlan::EvidenceRecording { tool: "graph.plan" }),
         Obligation::ArtifactIdentity => Some(TotalResolverPlan::ExactInspection {
             tool: "artifact.plan",
         }),

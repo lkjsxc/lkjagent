@@ -18,6 +18,7 @@ pub(super) fn adapter_input(
         graph_node: snapshot.graph_node.clone(),
         graph_phase: snapshot.graph_phase.clone(),
         active_mode_hint: store_state::get(conn, "authority active mode")?,
+        owner_objective: snapshot.owner_objective.clone(),
         queue_head: pending_queue_head(conn)?,
         pending_owner_count: pending_owner_count(snapshot),
         required_evidence: snapshot.required_evidence.clone(),

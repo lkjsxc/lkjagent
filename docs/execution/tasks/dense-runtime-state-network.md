@@ -7,7 +7,9 @@ and deterministic before asking the model for semantic content.
 
 ## Status
 
-in progress: typed intent, dense rows, total resolver, runtime effects, and completion inputs pass; smoke pending
+done: typed intent, dense rows, total resolver, runtime effects, prompt
+admission consistency, completion inputs, workspace tests, quiet verify, and
+Docker verify pass
 
 ## Depends On
 

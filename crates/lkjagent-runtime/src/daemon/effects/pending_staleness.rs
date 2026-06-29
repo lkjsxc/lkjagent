@@ -50,9 +50,7 @@ pub fn stale_action_refusal(
     }
     let runtime_only = matches!(
         current.endpoint_decision,
-        EndpointDecision::RuntimeCompact
-            | EndpointDecision::RuntimeEffect
-            | EndpointDecision::ClosedIdle
+        EndpointDecision::RuntimeCompact | EndpointDecision::ClosedIdle
     );
     if runtime_only && !changed_fields.contains(&"endpoint_decision") {
         changed_fields.push("endpoint_decision");
@@ -152,7 +150,10 @@ fn changed_fields(cached: &TurnAuthority, current: &TurnAuthority) -> Vec<&'stat
 }
 
 fn changed(previous: Option<&str>, current: Option<&str>) -> bool {
-    matches!((previous, current), (Some(old), Some(new)) if old != new)
+    matches!(
+        (previous, current),
+        (Some(old), Some(new)) if old != new
+    ) || matches!((previous, current), (Some(_), None))
 }
 
 fn equivalent_after_runtime_compaction(previous: Option<&str>, current: Option<&str>) -> bool {

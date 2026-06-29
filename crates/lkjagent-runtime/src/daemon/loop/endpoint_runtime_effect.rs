@@ -13,6 +13,10 @@ impl ResidentDaemon {
         now: &str,
         authority: &TurnAuthority,
     ) -> RuntimeResult<DaemonTick> {
+        if self.task_checkpoint_due() && !close_action_ready(authority) {
+            let result = step(self.state.clone(), StepInput::TurnBudgetCheckpoint);
+            return self.apply_step_result(conn, now, result, false);
+        }
         if authority.valid_example == "none" {
             self.write_observable(conn)?;
             return Ok(DaemonTick::Working);
@@ -31,4 +35,8 @@ impl ResidentDaemon {
         );
         self.apply_step_result(conn, now, result, false)
     }
+}
+
+fn close_action_ready(authority: &TurnAuthority) -> bool {
+    authority.valid_example.contains("<tool>agent.done</tool>")
 }

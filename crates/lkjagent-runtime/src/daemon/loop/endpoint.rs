@@ -51,7 +51,7 @@ impl ResidentDaemon {
             }
             EndpointDecision::CallModel => {}
         }
-        if self.task_checkpoint_due() {
+        if self.task_checkpoint_due() && !close_action_ready(&authority) {
             self.state.continuation_epoch.checkpoint_turns = self.runtime.task_turn_budget.max(1);
             let result = step(self.state.clone(), StepInput::TurnBudgetCheckpoint);
             return self.apply_step_result(conn, now, result, false);
@@ -171,6 +171,10 @@ impl ResidentDaemon {
         self.endpoint_retry_at = None;
         false
     }
+}
+
+fn close_action_ready(authority: &crate::mode::TurnAuthority) -> bool {
+    authority.valid_example.contains("<tool>agent.done</tool>")
 }
 
 fn pending_authority(conn: &Connection) -> RuntimeResult<PendingActionAuthority> {

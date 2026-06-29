@@ -122,6 +122,14 @@ fn pending_matches_authority(
         || pending.staleness_fingerprint.is_some();
     persisted
         && pending.authority_decision_id == authority.input.latest_decision_id
-        && pending.prompt_frame_id == authority.input.prompt_frame_id
+        && optional_id_eq(&pending.prompt_frame_id, &authority.input.prompt_frame_id)
         && pending.staleness_fingerprint == authority.input.staleness_fingerprint
+}
+
+fn optional_id_eq(left: &Option<String>, right: &Option<String>) -> bool {
+    normalize_optional_id(left) == normalize_optional_id(right)
+}
+
+fn normalize_optional_id(value: &Option<String>) -> Option<&str> {
+    value.as_deref().filter(|text| *text != "none")
 }

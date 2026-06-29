@@ -48,9 +48,9 @@ completion.
 
 Focused tests now cover typed intent profile routing, owner-title and non-ASCII
 artifact identity, counted story scale, persisted dense authority rows, total
-resolver labels, deterministic audit runtime effects, progress keys, and typed
-completion inputs. The blocker remains open until benchmark, Docker verify, and
-fresh smoke evidence prove the complete route.
+resolver labels, deterministic audit runtime effects, progress keys, prompt and
+admission fingerprints, and typed completion inputs. Workspace tests, benchmark,
+quiet verify, and Docker verify prove the complete route.
 
 ## Acceptance
 

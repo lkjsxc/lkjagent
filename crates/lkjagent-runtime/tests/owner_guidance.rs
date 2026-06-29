@@ -125,7 +125,7 @@ fn benchmark_docs_task_auto_scaffolds_exact_markdown_count() -> TestResult<()> {
         "101",
     )?;
     let workspace = temp_workspace("benchmark-guidance")?;
-    let server = serve_responses(vec![completion(DONE_ACTION)])?;
+    let server = serve_responses(vec![])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
