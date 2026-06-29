@@ -1,0 +1,2 @@
+LKJAGENT_DATA_DIR=/home/lkjsxc/workspace/lkjagent/tmp/runtime-smoke-ground-truth-20260629T051817Z/smokes/iwanna-data
+COMPOSE_PROJECT_NAME=lkjagentgtiwanna

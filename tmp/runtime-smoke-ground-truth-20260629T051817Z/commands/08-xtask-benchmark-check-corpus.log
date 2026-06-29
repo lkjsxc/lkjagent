@@ -1,0 +1,8 @@
+$ cargo run -p lkjagent-xtask -- benchmark check-corpus
+
+START_UTC=2026-06-29T05:19:57Z
+
+ok benchmark-corpus
+
+END_UTC=2026-06-29T05:19:58Z
+EXIT_STATUS=0

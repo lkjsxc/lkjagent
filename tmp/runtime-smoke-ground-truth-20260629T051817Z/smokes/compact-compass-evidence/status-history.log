@@ -1,0 +1,190 @@
+
+===== POLL 1 UTC 2026-06-29T05:23:06Z =====
+ Container lkjagentgtcompact-agent-run-182af1602a36 Creating 
+ Container lkjagentgtcompact-agent-run-182af1602a36 Created 
+ctx=756/24.58K 3.08% pressure=green
+in=unknown out=unknown cache=unknown total=unknown
+prefix=5.38K log=18.69K reserve=512 headroom=23.82K
+daemon_state=working
+queue_depth=1
+open_task=maintenance: distill
+daemon_question=none
+daemon_error=none
+turns=0
+continuation_epoch=0
+continuation_turns=0
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=none
+active_mode=maintenance
+authority_case=none
+authority_phase=none
+authority_node=none
+evidence_gaps=none
+active_artifact_root=none
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=memory.find,memory.prune,memory.save,agent.done,agent.ask
+authority_blocked_tools=fs.batch_write
+next_executable_action=<action>
+<tool>memory.find</tool>
+<query>README</query>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=756
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 2 UTC 2026-06-29T05:23:36Z =====
+ Container lkjagentgtcompact-agent-run-4c9b38660eb7 Creating 
+ Container lkjagentgtcompact-agent-run-4c9b38660eb7 Created 
+ctx=2.39K/24.58K 9.74% pressure=green
+in=1.88K out=189 cache=unknown total=2.07K
+prefix=5.38K log=18.69K reserve=512 headroom=22.18K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "Compact Compass" with detailed and structured setting
+daemon_question=none
+daemon_error=none
+turns=2
+continuation_epoch=0
+continuation_turns=1
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Implementing 0.56 implementation phase=planning gap=plan evidence; 2. Verifying 0.50 verification-gates phase=verification gap=test evidence; 3. Recovering 0.43 action-recovery phase=recovery gap=fault evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=execute
+evidence_gaps=observation,verification
+active_artifact_root=none
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=graph.state,graph.plan,graph.evidence,graph.note,agent.ask,artifact.next,artifact.audit,doc.audit,fs.read,fs.list,fs.stat,fs.write,fs.batch_write,workspace.summary
+authority_blocked_tools=memory.find,memory.save
+next_executable_action=<action>
+<tool>fs.write</tool>
+<path>README.md</path>
+<content>Example content</content>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=2393
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 3 UTC 2026-06-29T05:24:12Z =====
+ Container lkjagentgtcompact-agent-run-2a5b3fe29a76 Creating 
+ Container lkjagentgtcompact-agent-run-2a5b3fe29a76 Created 
+ctx=3.25K/24.58K 13.21% pressure=green
+in=2.51K out=422 cache=unknown total=2.94K
+prefix=5.38K log=18.69K reserve=512 headroom=21.33K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "Compact Compass" with detailed and structured setting
+daemon_question=none
+daemon_error=none
+turns=3
+continuation_epoch=0
+continuation_turns=2
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Implementing 0.56 implementation phase=planning gap=plan evidence; 2. Verifying 0.50 verification-gates phase=verification gap=test evidence; 3. Recovering 0.43 action-recovery phase=recovery gap=fault evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=verify
+evidence_gaps=verification
+active_artifact_root=none
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=graph.state,graph.plan,graph.evidence,graph.note,agent.ask,artifact.next,artifact.audit,doc.audit,fs.read,fs.list,fs.stat,fs.write,fs.batch_write,workspace.summary
+authority_blocked_tools=memory.find,memory.save
+next_executable_action=<action>
+<tool>graph.evidence</tool>
+<kind>verification</kind>
+<summary>Read README.md</summary>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=3246
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 4 UTC 2026-06-29T05:24:43Z =====
+ Container lkjagentgtcompact-agent-run-fc96f2b6a25b Creating 
+ Container lkjagentgtcompact-agent-run-fc96f2b6a25b Created 
+ctx=4.04K/24.58K 16.44% pressure=green
+in=3.94K out=86 cache=unknown total=4.03K
+prefix=5.38K log=18.69K reserve=512 headroom=20.54K
+daemon_state=idle
+queue_depth=0
+open_task=none
+daemon_question=none
+daemon_error=none
+turns=5
+continuation_epoch=0
+continuation_turns=4
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=none
+active_mode=owner_task
+authority_case=1
+authority_phase=completion
+authority_node=complete
+evidence_gaps=none
+active_artifact_root=none
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit,doc.audit,artifact.next,fs.batch_write,agent.done
+authority_blocked_tools=memory.find,memory.save
+next_executable_action=<action>
+<tool>agent.done</tool>
+<summary>Completed with evidence</summary>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=4041
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
