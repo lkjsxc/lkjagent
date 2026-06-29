@@ -21,7 +21,7 @@ that ran.
 | 9 | Provider anomaly blocked handoff | [tasks/deep-redesign-provider-handoff.md](tasks/deep-redesign-provider-handoff.md) | done |
 | 10 | Benchmark corpus and final gates | [tasks/deep-redesign-gates.md](tasks/deep-redesign-gates.md) | done |
 | 11 | Obligation network root repair | [tasks/obligation-network-redesign.md](tasks/obligation-network-redesign.md) | done |
-| 12 | Runtime smoke false close and noisy repair | [tasks/runtime-smoke-problem-sweep.md](tasks/runtime-smoke-problem-sweep.md) | open |
+| 12 | Runtime smoke false close and noisy repair | [tasks/runtime-smoke-problem-sweep.md](tasks/runtime-smoke-problem-sweep.md) | done |
 
 ## Active Data Fixture
 
@@ -88,8 +88,9 @@ Live smoke runs after root repair found remaining problems:
 - long-novel completion can pass with a small story-bible seed.
 
 The implementation sweep now has focused tests, benchmark fixture updates, and
-fresh post-change Docker smoke evidence under
-`tmp/runtime-smoke-final-20260629T071918Z/`. The smoke improves routing and root
-repair but still shows noisy recovery after story scale-readiness refusal.
+final Docker smoke evidence under `tmp/runtime-smoke-final-iwanna-20260629T131603Z/`
+and `tmp/runtime-smoke-final-compact-20260629T134111Z/`. The final smoke closes
+both named long-novel routes without the false close, generic root, or noisy
+repair loop.
 
 Details live in [current-work/runtime-smoke-problems.md](current-work/runtime-smoke-problems.md).

@@ -9,17 +9,10 @@ pub fn missing_root_response(address: &ArtifactAddress) -> String {
     let kind = kind_from_action(&address.next_action)
         .map(|kind| kind_or_default_for_root(&kind, &root))
         .unwrap_or_else(|| kind_or_default_for_root("", &root));
+    let selected = vec!["catalog.toml".to_string()];
     format!(
         "artifact_next_result=root_missing\nroot={root}\nkind={kind}\nmissing=root\nruntime_event=ArtifactRootMissing\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_contract:\n{}",
-        crate::artifact_next_example::root_identity_contract(&root, &kind)
-    )
-}
-
-pub fn root_identity_response(root: &str, kind: &str) -> String {
-    let kind = kind_or_default_for_root(kind, root);
-    format!(
-        "artifact_next_result=root_needs_identity\nroot={root}\nkind={kind}\nmissing=catalog,readme,semantic-leaf\nruntime_event=ArtifactRootIncomplete\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_contract:\n{}",
-        crate::artifact_next_example::root_identity_contract(root, &kind)
+        crate::artifact_next_example::batch_write_contract(&root, &kind, &selected)
     )
 }
 

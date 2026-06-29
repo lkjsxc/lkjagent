@@ -1,0 +1,10 @@
+$ docker compose run --rm agent send 'Create a long novel named "iwanna" with detailed and structured settings.'
+
+START_UTC=2026-06-29T13:17:56Z
+
+ Container lkjagentfinaliwanna2-agent-run-6c7526e8cd61 Creating 
+ Container lkjagentfinaliwanna2-agent-run-6c7526e8cd61 Created 
+queue_id=1
+
+END_UTC=2026-06-29T13:18:12Z
+EXIT_STATUS=0

@@ -36,8 +36,11 @@ BatchCursor
   is predictable.
 - Payload overflow moves to `BatchWriteRecovery`.
 - `artifact.next` emits bounded batches and persists the cursor.
-- `fs.batch_write` parser accepts the documented canonical line protocol and
-  normalizes allowed variants.
+- Runtime decisions expose one remaining cursor path at a time as the active
+  write contract to avoid endpoint overrun.
+- `fs.batch_write` parser accepts the documented canonical line protocol,
+  drops an empty duplicate stub before the real content block, and normalizes
+  allowed variants.
 - Child `<file>` tags inside `<files>` are a schema fault and do not advance the
   cursor.
 - Schema repair examples are generated from the same schema as dispatch.
@@ -98,6 +101,6 @@ Run `cargo test -p lkjagent-store --test artifact_cursor`,
 
 ## Status
 
-partially implemented for root-scoped `artifact.next` cursors, normalized
-batch cursor rows, and successful write completion marking. Failed write paths
-are not yet recorded as failed cursor paths.
+implemented for root-scoped `artifact.next` cursors, normalized batch cursor
+rows, one-path runtime contracts, and successful write completion marking.
+Failed write paths are not yet recorded as failed cursor paths.

@@ -83,9 +83,11 @@ pages are not content evidence.
 Long-novel readiness also requires profile-scale content groups. A compact seed
 page is refused with `story_scale_missing` facts such as
 `profile-scale-content-groups` or `profile-scale-word-count` until enough
-separate story-bible groups exist.
+separate story-bible groups exist. Live repair uses bounded flat files such as
+`act-structure.md`, `cosmology.md`, and `completion-evidence.md`; the path label
+counts as the semantic role when the file has enough concrete words.
 
 ## Status
 
-partially implemented through story scaffold selection, structure-only content
-checks, and artifact audit readiness.
+implemented through story root selection, bounded story repair batches,
+structure-only content checks, and artifact audit readiness.

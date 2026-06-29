@@ -1,3 +1,5 @@
+#[path = "kernel_turn_artifact.rs"]
+mod artifact;
 #[path = "kernel_turn_input.rs"]
 mod input;
 #[path = "kernel_turn_persist.rs"]
