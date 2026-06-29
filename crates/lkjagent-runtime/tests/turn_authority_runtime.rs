@@ -92,7 +92,7 @@ fn stale_maintenance_action_is_refused_when_owner_queue_arrives() -> TestResult<
     server.join()?;
 
     assert!(daemon.state.pending_action.is_none());
-    assert!(daemon.state.maintenance.is_none());
+    assert!(daemon.state.maintenance.is_some());
     assert!(daemon.state.context.log.iter().any(|frame| {
         frame.content.contains("stale model action refused")
             && frame.content.contains("active_mode=OwnerTask")

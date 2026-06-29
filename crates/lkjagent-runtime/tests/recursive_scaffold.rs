@@ -10,13 +10,8 @@ use lkjagent_runtime::daemon::{
 use lkjagent_store::{queue, state};
 use lkjagent_tools::structure::verify_recursive_tree;
 use lkjagent_tools::structure_network::verify_knowledge_network;
-use support::http::{completion, serve_responses};
+use support::http::serve_responses;
 use support::{store, temp_workspace, TestResult};
-
-const DONE: &str = "<action>
-<tool>agent.done</tool>
-<summary>recursive docs scaffold complete</summary>
-</action>";
 
 #[test]
 fn recursive_docs_task_auto_scaffolds_before_done() -> TestResult<()> {
@@ -29,7 +24,7 @@ fn recursive_docs_task_auto_scaffolds_before_done() -> TestResult<()> {
         "101",
     )?;
     let workspace = temp_workspace("recursive-scaffold")?;
-    let server = serve_responses(vec![completion(DONE)])?;
+    let server = serve_responses(vec![])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
@@ -62,7 +57,7 @@ fn encyclopedia_task_auto_scaffolds_knowledge_network_before_done() -> TestResul
     take_daemon_lock(&conn, "test", "100", "0")?;
     queue::enqueue(&mut conn, "百科事典を作ってください。", "owner-send", "101")?;
     let workspace = temp_workspace("knowledge-scaffold")?;
-    let server = serve_responses(vec![completion(DONE)])?;
+    let server = serve_responses(vec![])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);

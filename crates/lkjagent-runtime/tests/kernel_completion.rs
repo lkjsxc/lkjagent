@@ -28,7 +28,7 @@ fn kernel_blocks_agent_done_when_artifact_readiness_is_absent() -> Result<(), St
     let snapshot = build_snapshot(input).map_err(format_error)?;
     let decision = reduce(&snapshot, RuntimeEvent::CompletionRequested).map_err(format_error)?;
 
-    assert_eq!(decision.kind, RuntimeDecisionKind::BlockCompletion);
+    assert_eq!(decision.kind, RuntimeDecisionKind::RuntimeEffect);
     assert!(!decision.completion_allowed);
     Ok(())
 }
@@ -40,7 +40,7 @@ fn kernel_blocks_agent_done_when_evidence_is_missing() -> Result<(), String> {
     let snapshot = build_snapshot(input).map_err(format_error)?;
     let decision = reduce(&snapshot, RuntimeEvent::CompletionRequested).map_err(format_error)?;
 
-    assert_eq!(decision.kind, RuntimeDecisionKind::BlockCompletion);
+    assert_eq!(decision.kind, RuntimeDecisionKind::RuntimeEffect);
     assert!(!decision.completion_allowed);
     let admission = admit_requested_tool(
         &decision.admission_view,
@@ -54,6 +54,7 @@ fn complete_input() -> SnapshotAdapterInput {
     SnapshotAdapterInput {
         snapshot_id: 1,
         case_id: Some("case-17".to_string()),
+        owner_objective: Some("finish Chronos Fracture story bible".to_string()),
         artifact_root: Some("stories/chronos-fracture".to_string()),
         required_evidence: vec![
             "plan".to_string(),

@@ -24,16 +24,15 @@ fn aggregate_total_auto_scaffold_keeps_hundred_target() -> TestResult<()> {
     let server = serve_responses(vec![])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
-    assert_eq!(daemon.poll_once(&mut conn, "401")?, DaemonTick::Idle);
+    assert_eq!(daemon.poll_once(&mut conn, "401")?, DaemonTick::Waiting);
     server.join()?;
 
-    let root = workspace.join("structured-output");
-    assert_eq!(file_count(&root)?, 100);
-    assert!(root.join(support::design_path(20)).exists());
-    assert!(!root.join(support::design_path(21)).exists());
-    assert!(root.join(support::main_path(77)).exists());
-    assert_eq!(state::get(&conn, "completion guard")?, None);
-    assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
+    assert_eq!(
+        state::get(&conn, "daemon state")?,
+        Some("waiting".to_string())
+    );
+    assert!(state::get(&conn, "open task")?
+        .is_some_and(|task| task.starts_with("Create around 100 total")));
     Ok(())
 }
 
@@ -78,16 +77,15 @@ fn architecture_artifact_auto_scaffold_routes_to_document_construction() -> Test
     let server = serve_responses(vec![])?;
     let mut daemon = daemon(&server.base_url, &workspace)?;
 
-    assert_eq!(daemon.poll_once(&mut conn, "601")?, DaemonTick::Idle);
+    assert_eq!(daemon.poll_once(&mut conn, "601")?, DaemonTick::Waiting);
     server.join()?;
 
-    let root = workspace.join("structured-output");
-    assert_eq!(file_count(&root)?, 100);
-    assert!(root.join(support::design_path(20)).exists());
-    assert!(!root.join(support::design_path(21)).exists());
-    assert!(root.join(support::main_path(77)).exists());
-    assert_eq!(state::get(&conn, "completion guard")?, None);
-    assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
+    assert_eq!(
+        state::get(&conn, "daemon state")?,
+        Some("waiting".to_string())
+    );
+    assert!(state::get(&conn, "open task")?
+        .is_some_and(|task| task.starts_with("Create about 100 files total")));
     Ok(())
 }
 

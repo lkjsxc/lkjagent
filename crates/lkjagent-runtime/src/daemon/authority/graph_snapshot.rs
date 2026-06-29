@@ -10,6 +10,7 @@ pub(super) struct GraphSnapshotFields {
     pub node: Option<String>,
     pub phase: Option<String>,
     pub artifact_root: Option<String>,
+    pub owner_objective: Option<String>,
     pub required_evidence: Vec<String>,
     pub missing_evidence: Vec<String>,
 }
@@ -21,6 +22,7 @@ pub(super) fn graph_snapshot(conn: &Connection) -> RuntimeResult<GraphSnapshotFi
             node: None,
             phase: None,
             artifact_root: None,
+            owner_objective: None,
             required_evidence: Vec::new(),
             missing_evidence: Vec::new(),
         });
@@ -30,6 +32,7 @@ pub(super) fn graph_snapshot(conn: &Connection) -> RuntimeResult<GraphSnapshotFi
         node: Some(graph.active_node.0.to_string()),
         phase: Some(graph.phase.as_str().to_string()),
         artifact_root: graph.document.as_ref().map(|doc| doc.root.clone()),
+        owner_objective: Some(graph.objective.raw_owner_message.clone()),
         required_evidence: graph.evidence.requirement_ids(),
         missing_evidence: graph_missing_evidence(conn, &graph),
     })

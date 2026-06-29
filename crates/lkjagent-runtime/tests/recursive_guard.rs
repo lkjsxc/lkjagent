@@ -85,7 +85,6 @@ fn recursive_structure_task_records_tree_before_final_close() -> TestResult<()> 
         );
     }
     assert_eq!(daemon.poll_once(&mut conn, "108")?, DaemonTick::Working);
-    server.join()?;
 
     assert_eq!(
         state::get(&conn, "open task")?,

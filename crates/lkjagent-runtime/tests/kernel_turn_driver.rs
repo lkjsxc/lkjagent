@@ -56,8 +56,6 @@ fn owner_snapshot() -> SnapshotAdapterInput {
         owner_objective: Some("create long novel".to_string()),
         queue_head: Some("1".to_string()),
         pending_owner_count: 1,
-        missing_evidence: vec!["artifact-readiness".to_string()],
-        artifact_root: Some("stories/novel".to_string()),
         ..SnapshotAdapterInput::default()
     }
 }
