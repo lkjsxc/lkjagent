@@ -7,7 +7,7 @@ Fix the live-smoke problems recorded in
 
 ## Status
 
-in progress: focused tests pass; fresh post-change Docker smoke is pending
+in progress: focused tests pass; post-change smoke still shows readiness repair noise
 
 ## Depends On
 

@@ -1,0 +1,10 @@
+$ docker compose run --rm agent send 'Create a long novel named "Compact Compass" with detailed and structured settings.'
+
+START_UTC=2026-06-29T07:20:52Z
+
+ Container lkjagentfinalcompact-agent-run-baaab627c990 Creating 
+ Container lkjagentfinalcompact-agent-run-baaab627c990 Created 
+queue_id=1
+
+END_UTC=2026-06-29T07:20:57Z
+EXIT_STATUS=0

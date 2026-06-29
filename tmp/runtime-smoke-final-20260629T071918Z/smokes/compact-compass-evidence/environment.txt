@@ -1,0 +1,2 @@
+LKJAGENT_DATA_DIR=/home/lkjsxc/workspace/lkjagent/tmp/runtime-smoke-final-20260629T071918Z/smokes/compact-compass-data
+COMPOSE_PROJECT_NAME=lkjagentfinalcompact

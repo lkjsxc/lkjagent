@@ -118,9 +118,66 @@ The run preserved the historical defects: the root lost the owner title, the
 runtime stayed in a noisy recovery loop, and a generic example root appeared
 while a current artifact root existed.
 
+## Post-Change Smoke Evidence
+
+Fresh post-change smoke evidence is preserved under
+`tmp/runtime-smoke-final-20260629T071918Z/`.
+
+Compact Compass:
+
+```text
+final_reason=route_evidence_observed
+current_model_run_lines=105
+index_lines=11
+stories/compact-compass=24
+stories/novel-named=0
+stories/example-story=0
+fs.batch_write=2
+files_written=5=1
+doc.audit=2
+artifact.audit=6
+graph.evidence=0
+agent.done=0
+fs.mkdir=0
+fs.write=0
+```
+
+The action route was `memory.find -> graph.plan -> doc.audit ->
+fs.batch_write -> doc.audit -> artifact.audit -> artifact.next ->
+artifact.audit`. The task no longer false-closed as compaction work.
+
+`iwanna`:
+
+```text
+final_reason=route_evidence_observed
+current_model_run_lines=123
+index_lines=17
+stories/iwanna=34
+stories/novel-named=0
+stories/example-story=0
+fs.batch_write=4
+files_written=5=1
+doc.audit=2
+artifact.audit=15
+graph.evidence=0
+agent.done=0
+fs.mkdir=0
+fs.write=0
+missing_root=1
+story_scale_missing=3
+story_semantic_missing=3
+```
+
+The root preserved `iwanna`, missing-root repair reached a contracted
+`fs.batch_write` before another same-root audit, and completion did not close
+the small seed artifact. The run still shows repeated artifact-audit recovery
+after scale-readiness refusal, so follow-up work should improve post-readiness
+repair planning.
+
 ## Interpretation
 
-The fresh ground truth confirms that the open blocker is current. Compact title
-work can still close without artifact audit, named novel roots still degrade to
-generic roots, missing-root repair is still noisy, and the live route has not
-proven scale-appropriate long-novel completion.
+The pre-change ground truth confirms that the open blocker was current. The
+post-change smoke proves measurable improvement for compact-title routing,
+owner-title roots, root identity writes, generic-root suppression, and long
+novel seed refusal. The remaining live weakness is noisy recovery after story
+readiness fails.

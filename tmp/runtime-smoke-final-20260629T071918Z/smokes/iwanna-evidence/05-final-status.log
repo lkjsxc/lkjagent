@@ -1,0 +1,51 @@
+$ docker compose run --rm agent status
+
+START_UTC=2026-06-29T07:28:58Z
+
+ Container lkjagentfinaliwanna-agent-run-26e4687b4743 Creating 
+ Container lkjagentfinaliwanna-agent-run-26e4687b4743 Created 
+ctx=8.37K/24.58K 34.07% pressure=green
+in=8.28K out=32 cache=unknown total=8.31K
+prefix=5.38K log=18.69K reserve=512 headroom=16.20K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "iwanna" with detailed and structured settings.
+daemon_question=none
+daemon_error=none
+turns=15
+continuation_epoch=0
+continuation_turns=12
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Recovering 0.62 repeat-recovery phase=recovery gap=recovery evidence; 2. Structuring 0.61 document-structure phase=planning gap=document audit; 3. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests
+active_mode=recovery
+authority_case=1
+authority_phase=recovery
+authority_node=document-audit
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/iwanna
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/iwanna</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=8373
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+
+END_UTC=2026-06-29T07:29:13Z
+EXIT_STATUS=0

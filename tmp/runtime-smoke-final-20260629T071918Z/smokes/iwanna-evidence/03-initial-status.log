@@ -1,0 +1,51 @@
+$ docker compose run --rm agent status
+
+START_UTC=2026-06-29T07:25:29Z
+
+ Container lkjagentfinaliwanna-agent-run-77fef4a600bb Creating 
+ Container lkjagentfinaliwanna-agent-run-77fef4a600bb Created 
+ctx=1.23K/24.58K 5.02% pressure=green
+in=1.22K out=31 cache=unknown total=1.25K
+prefix=5.38K log=18.69K reserve=512 headroom=23.34K
+daemon_state=working
+queue_depth=0
+open_task=maintenance: distill
+daemon_question=none
+daemon_error=none
+turns=1
+continuation_epoch=0
+continuation_turns=0
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=none
+active_mode=maintenance
+authority_case=none
+authority_phase=none
+authority_node=none
+evidence_gaps=none
+active_artifact_root=none
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=memory.find,memory.prune,memory.save,agent.done,agent.ask
+authority_blocked_tools=fs.batch_write
+next_executable_action=<action>
+<tool>memory.find</tool>
+<query>README</query>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=1234
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+
+END_UTC=2026-06-29T07:25:44Z
+EXIT_STATUS=0
