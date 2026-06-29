@@ -1,0 +1,84 @@
+$ docker compose up -d --build agent
+
+START_UTC=2026-06-29T07:19:18Z
+
+ Image lkjagentfinalcompact-agent Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 563B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.42kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/debian:bookworm-slim
+#3 DONE 0.0s
+
+#4 [internal] load metadata for docker.io/library/rust:bookworm
+#4 DONE 1.5s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 139B done
+#5 DONE 0.0s
+
+#6 [internal] load build context
+#6 DONE 0.0s
+
+#7 [build 1/6] FROM docker.io/library/rust:bookworm@sha256:5e2214abe154fe26e39f64488952e5c991eeed1d6d6da7cc8381ae83927f0cfc
+#7 resolve docker.io/library/rust:bookworm@sha256:5e2214abe154fe26e39f64488952e5c991eeed1d6d6da7cc8381ae83927f0cfc 0.1s done
+#7 DONE 0.1s
+
+#8 [runtime 1/4] FROM docker.io/library/debian:bookworm-slim@sha256:96e378d7e6531ac9a15ad505478fcc2e69f371b10f5cdf87857c4b8188404716
+#8 resolve docker.io/library/debian:bookworm-slim@sha256:96e378d7e6531ac9a15ad505478fcc2e69f371b10f5cdf87857c4b8188404716 0.1s done
+#8 DONE 0.1s
+
+#6 [internal] load build context
+#6 transferring context: 8.55MB 0.2s done
+#6 DONE 0.2s
+
+#9 [build 2/6] WORKDIR /src
+#9 CACHED
+
+#10 [build 3/6] RUN apt-get update     && apt-get install -y --no-install-recommends         curl         git         ripgrep     && rm -rf /var/lib/apt/lists/*
+#10 CACHED
+
+#11 [build 4/6] RUN rustup component add rustfmt clippy
+#11 CACHED
+
+#12 [build 5/6] COPY . .
+#12 DONE 4.7s
+
+#13 [build 6/6] RUN cargo build --release -p lkjagent-cli
+#13 DONE 66.5s
+
+#14 [runtime 2/4] RUN apt-get update     && apt-get install -y --no-install-recommends         busybox         ca-certificates         curl         git         ripgrep     && rm -rf /var/lib/apt/lists/*     && useradd --create-home --home-dir /home/agent --shell /usr/sbin/nologin agent     && mkdir -p /data/workspace /usr/local/share/lkjagent/skills     && chown -R agent:agent /data     && printf '%s\n'         '#!/bin/sh'         'set -eu'         'mkdir -p /data/workspace'         'chown -R agent:agent /data'         'cd /data/workspace'         'case "${1:-}" in'         '  ""|run|send|status|log|console|memory|skills|gpt-log)'         '    set -- /usr/local/bin/lkjagent "$@"'         '    ;;'         'esac'         'exec setpriv --reuid=1000 --regid=1000 --init-groups -- "$@"'         > /usr/local/bin/lkjagent-entrypoint     && chmod +x /usr/local/bin/lkjagent-entrypoint
+#14 CACHED
+
+#15 [runtime 3/4] COPY --from=build /src/target/release/lkjagent /usr/local/bin/lkjagent
+#15 DONE 0.1s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 0.4s done
+#16 exporting manifest sha256:63a8dc0b7542d380de5d7003b750eb98bbe11950b96b3b4af87d1e61e9703541 0.0s done
+#16 exporting config sha256:f12fe4408eb0663c498f2406c44d96f5394ed514591b3f6b91595efab789da1d 0.0s done
+#16 exporting attestation manifest sha256:5c2a968d397327c30fcdddd6e9318f4db635e6406da5d7b5ba06c5a8b60d4eca 0.0s done
+#16 exporting manifest list sha256:2e16ae14cacf478248fecd79e417574ef0b3e2969fd24a34abe7c79004142751
+#16 exporting manifest list sha256:2e16ae14cacf478248fecd79e417574ef0b3e2969fd24a34abe7c79004142751 0.0s done
+#16 naming to docker.io/library/lkjagentfinalcompact-agent:latest done
+#16 unpacking to docker.io/library/lkjagentfinalcompact-agent:latest
+#16 unpacking to docker.io/library/lkjagentfinalcompact-agent:latest 4.5s done
+#16 DONE 5.0s
+
+#17 resolving provenance for metadata file
+#17 DONE 0.0s
+ Image lkjagentfinalcompact-agent Built 
+ Network lkjagentfinalcompact_default Creating 
+ Network lkjagentfinalcompact_default Created 
+ Container lkjagentfinalcompact-agent-1 Creating 
+ Container lkjagentfinalcompact-agent-1 Created 
+ Container lkjagentfinalcompact-agent-1 Starting 
+ Container lkjagentfinalcompact-agent-1 Started 
+
+END_UTC=2026-06-29T07:20:37Z
+EXIT_STATUS=0

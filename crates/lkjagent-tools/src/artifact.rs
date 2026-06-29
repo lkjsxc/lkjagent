@@ -45,7 +45,7 @@ pub fn audit(
     let report = crate::doc::audit(workspace, root, count, mode)?;
     let full = workspace_path(workspace, root)?;
     let catalog = optional_catalog(&full);
-    if !catalog.is_empty() && kind_mismatch(&kind, &catalog) {
+    if !catalog.is_empty() && kind_mismatch(root, &kind, &catalog) {
         let report = format!(
             "document audit failed\nroot={root}\nchecks=15\npassed=14\nfailed=1\nfailures:\n- artifact_kind_mismatch: expected={kind}\nnext_action=artifact.next identity contract for matching artifact kind"
         );
@@ -145,8 +145,9 @@ fn story_root(root: &str) -> bool {
     root.trim_start_matches("./").starts_with("stories/")
 }
 
-fn kind_mismatch(kind: &str, catalog: &str) -> bool {
+fn kind_mismatch(root: &str, kind: &str, catalog: &str) -> bool {
     match kind.trim().to_ascii_lowercase().as_str() {
+        "story" if story_root(root) => false,
         "story" => !story_catalog(catalog),
         "cookbook" => !catalog.to_ascii_lowercase().contains("cookbook"),
         _ => false,

@@ -4,7 +4,9 @@
 .lkjagent-workspace
 .omx
 Cargo.lock
-data
+data/*
+!data/logs/
+!data/logs/**
 target
 *.db
 *.sqlite

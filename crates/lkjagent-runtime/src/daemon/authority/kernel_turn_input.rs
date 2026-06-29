@@ -25,8 +25,10 @@ pub(super) fn adapter_input(
         artifact_id: artifact.artifact_id,
         artifact_root: artifact.root.or_else(|| snapshot.artifact_root.clone()),
         artifact_kind: artifact.kind,
+        artifact_batch_cursor: artifact.batch_cursor,
         artifact_weak_paths: artifact.weak_paths,
         artifact_audit_status: artifact.audit_status,
+        latest_observation: artifact.latest_observation,
         context_hard_pressure: snapshot.compaction_required,
         maintenance_due: snapshot.maintenance_due,
         maintenance_active: snapshot.maintenance_active,
@@ -85,6 +87,8 @@ struct ArtifactSnapshotFields {
     kind: Option<String>,
     weak_paths: Vec<String>,
     audit_status: Option<String>,
+    batch_cursor: Option<String>,
+    latest_observation: Option<String>,
 }
 
 fn artifact_fields(
@@ -98,6 +102,11 @@ fn artifact_fields(
         return Ok(empty_artifact_fields());
     };
     let weak = lkjagent_store::artifact_ledger::weak_paths(conn, row.id)?;
+    let cursor = lkjagent_store::artifact_cursor::latest_batch_cursor(conn, row.id)?;
+    let latest_observation = cursor
+        .as_ref()
+        .and_then(|cursor| cursor_observation(cursor, &row.kind));
+    let batch_cursor = cursor.as_ref().map(|cursor| cursor.root.clone());
     let audit_status = audit_status(&row.topology_status, &row.readiness_status);
     Ok(ArtifactSnapshotFields {
         artifact_id: Some(row.artifact_id),
@@ -105,6 +114,8 @@ fn artifact_fields(
         kind: Some(row.kind),
         weak_paths: weak.into_iter().map(|path| path.path).collect(),
         audit_status,
+        batch_cursor,
+        latest_observation,
     })
 }
 
@@ -115,7 +126,22 @@ fn empty_artifact_fields() -> ArtifactSnapshotFields {
         kind: None,
         weak_paths: Vec::new(),
         audit_status: None,
+        batch_cursor: None,
+        latest_observation: None,
     }
+}
+
+fn cursor_observation(
+    cursor: &lkjagent_store::artifact_cursor::BatchCursorRow,
+    kind: &str,
+) -> Option<String> {
+    if !cursor.completed_paths.trim().is_empty() || !cursor.failed_paths.trim().is_empty() {
+        return None;
+    }
+    Some(format!(
+        "artifact_next_result=root_missing\nroot={}\nkind={kind}\nmissing=root\nruntime_event=ArtifactRootMissing\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_contract:\n{}",
+        cursor.root, cursor.last_valid_example
+    ))
 }
 
 fn audit_status(topology: &str, readiness: &str) -> Option<String> {

@@ -1,0 +1,286 @@
+
+===== POLL 1 UTC 2026-06-29T07:20:57Z =====
+ Container lkjagentfinalcompact-agent-run-038aed67e8c8 Creating 
+ Container lkjagentfinalcompact-agent-run-038aed67e8c8 Created 
+ctx=1.65K/24.58K 6.70% pressure=green
+in=1.22K out=29 cache=unknown total=1.25K
+prefix=5.38K log=18.69K reserve=512 headroom=22.93K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "Compact Compass" with detailed and structured setting
+daemon_question=none
+daemon_error=none
+turns=1
+continuation_epoch=0
+continuation_turns=0
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=planning
+authority_node=plan
+evidence_gaps=plan,observation,document-structure,artifact-readiness
+active_artifact_root=stories/compact-compass
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=graph.state,graph.plan,graph.evidence,graph.note,agent.ask,artifact.next,artifact.audit,doc.audit,fs.read,fs.list,fs.stat,fs.write,fs.batch_write,workspace.summary
+authority_blocked_tools=memory.find,memory.save
+next_executable_action=<action>
+<tool>graph.plan</tool>
+<objective>Complete the owner task</objective>
+<steps>
+Inspect state
+Act in one bounded step
+</steps>
+<reason>Graph planning requirement</reason>
+<checks>dispatch accepts semantic plan</checks>
+<paths>stories/compact-compass</paths>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=1647
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 2 UTC 2026-06-29T07:21:32Z =====
+ Container lkjagentfinalcompact-agent-run-b0d82f774c0d Creating 
+ Container lkjagentfinalcompact-agent-run-b0d82f774c0d Created 
+ctx=3.18K/24.58K 12.94% pressure=green
+in=2.71K out=33 cache=unknown total=2.74K
+prefix=5.38K log=18.69K reserve=512 headroom=21.40K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "Compact Compass" with detailed and structured setting
+daemon_question=none
+daemon_error=none
+turns=3
+continuation_epoch=0
+continuation_turns=2
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=document-structure,artifact-readiness
+active_artifact_root=stories/compact-compass
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=fs.batch_write
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=none
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=3179
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 3 UTC 2026-06-29T07:22:03Z =====
+ Container lkjagentfinalcompact-agent-run-70b3014af2e4 Creating 
+ Container lkjagentfinalcompact-agent-run-70b3014af2e4 Created 
+ctx=4.30K/24.58K 17.50% pressure=green
+in=3.59K out=361 cache=unknown total=3.95K
+prefix=5.38K log=18.69K reserve=512 headroom=20.27K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "Compact Compass" with detailed and structured setting
+daemon_question=none
+daemon_error=none
+turns=4
+continuation_epoch=0
+continuation_turns=3
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=owner_task
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=document-structure,artifact-readiness
+active_artifact_root=stories/compact-compass
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=doc.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>doc.audit</tool>
+<root>stories/compact-compass</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=4302
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 4 UTC 2026-06-29T07:22:39Z =====
+ Container lkjagentfinalcompact-agent-run-c463ff4e5d09 Creating 
+ Container lkjagentfinalcompact-agent-run-c463ff4e5d09 Created 
+ctx=5.38K/24.58K 21.91% pressure=green
+in=4.98K out=33 cache=unknown total=5.01K
+prefix=5.38K log=18.69K reserve=512 headroom=19.19K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "Compact Compass" with detailed and structured setting
+daemon_question=none
+daemon_error=none
+turns=6
+continuation_epoch=0
+continuation_turns=5
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/compact-compass
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/compact-compass</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=5384
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 5 UTC 2026-06-29T07:23:10Z =====
+ Container lkjagentfinalcompact-agent-run-1f7b5c5f5ee3 Creating 
+ Container lkjagentfinalcompact-agent-run-1f7b5c5f5ee3 Created 
+ctx=6.51K/24.58K 26.49% pressure=green
+in=5.81K out=33 cache=unknown total=5.84K
+prefix=5.38K log=18.69K reserve=512 headroom=18.07K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "Compact Compass" with detailed and structured setting
+daemon_question=none
+daemon_error=none
+turns=8
+continuation_epoch=0
+continuation_turns=7
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/compact-compass
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/compact-compass</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=6510
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0
+
+===== POLL 6 UTC 2026-06-29T07:23:56Z =====
+ Container lkjagentfinalcompact-agent-run-a02931a45e14 Creating 
+ Container lkjagentfinalcompact-agent-run-a02931a45e14 Created 
+ctx=6.68K/24.58K 27.20% pressure=green
+in=6.50K out=33 cache=unknown total=6.53K
+prefix=5.38K log=18.69K reserve=512 headroom=17.89K
+daemon_state=working
+queue_depth=0
+open_task=Create a long novel named "Compact Compass" with detailed and structured setting
+daemon_question=none
+daemon_error=none
+turns=10
+continuation_epoch=0
+continuation_turns=9
+checkpoint_turns=64
+last_checkpoint_reason=none
+continuation_decision=none
+active_states=1. Structuring 0.61 document-structure phase=planning gap=document audit; 2. Recovering 0.50 action-param-reliability phase=recovery gap=normalizer tests; 3. Exploring 0.44 observability-ledger phase=planning gap=status evidence
+active_mode=recovery
+authority_case=1
+authority_phase=execution
+authority_node=document
+evidence_gaps=artifact-readiness
+active_artifact_root=stories/compact-compass
+recovery_route=none
+last_failed_action=none
+last_successful_observation=none
+authority_allowed_tools=artifact.audit
+authority_blocked_tools=memory.find,memory.save,graph.evidence
+next_executable_action=<action>
+<tool>artifact.audit</tool>
+<root>stories/compact-compass</root>
+</action>
+model_log=/data/logs/current-model-run.md
+context_window=24576
+context_reserve=512
+context_used_tokens=6684
+context_prefix_cap=5376
+context_log_space=18688
+context_soft_trigger=18432
+context_hard_trigger=21504
+context_post_compaction_target=8192
+context_pressure=green
+context_compaction_trigger=21504
+last_compaction=none
+POLL_EXIT_STATUS=0

@@ -87,8 +87,9 @@ Live smoke runs after root repair found remaining problems:
   audit, refused mkdir, and placeholder-root examples;
 - long-novel completion can pass with a small story-bible seed.
 
-The implementation sweep now has focused tests and benchmark fixture updates
-for these findings. A fresh post-change Docker smoke is still required before
-this blocker can close.
+The implementation sweep now has focused tests, benchmark fixture updates, and
+fresh post-change Docker smoke evidence under
+`tmp/runtime-smoke-final-20260629T071918Z/`. The smoke improves routing and root
+repair but still shows noisy recovery after story scale-readiness refusal.
 
 Details live in [current-work/runtime-smoke-problems.md](current-work/runtime-smoke-problems.md).

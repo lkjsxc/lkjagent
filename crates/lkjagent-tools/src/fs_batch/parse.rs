@@ -77,6 +77,7 @@ fn parse_block(block: &str) -> ToolResult<Option<BatchFile>> {
     };
     let path = parse_path_header(header)?;
     let content = parse_content(body)?;
+    reject_nested_path_headers(content)?;
     Ok(Some(BatchFile {
         path,
         content: content.to_string(),
@@ -100,4 +101,17 @@ fn parse_content(body: &str) -> ToolResult<&str> {
         return Ok(content);
     }
     Err(ToolError::invalid("each block needs content:"))
+}
+
+fn reject_nested_path_headers(content: &str) -> ToolResult<()> {
+    if content
+        .lines()
+        .skip(1)
+        .any(|line| line.trim_start().starts_with("path:"))
+    {
+        return Err(ToolError::invalid(
+            "line protocol requires -- lkjagent-next-file -- before each path header",
+        ));
+    }
+    Ok(())
 }
