@@ -23,6 +23,8 @@ cookbooks, guides, encyclopedias, and other large content deliverables.
 - [adoption.md](adoption.md): existing root adoption.
 - [repair.md](repair.md): bounded repair after failed audit.
 - [write-batches.md](write-batches.md): bounded content write loop.
+- [root-identity.md](root-identity.md): initial identity contract for missing roots.
+- [root-repair.md](root-repair.md): missing-root repair route and admission.
 - [semantic-identity.md](semantic-identity.md): artifact identity fields.
 - [adoption-and-repair.md](adoption-and-repair.md): adoption followed by readiness repair.
 - [adoption-controller.md](adoption-controller.md): runtime adoption route and audit outputs.

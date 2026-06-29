@@ -20,6 +20,7 @@ that ran.
 | 8 | Completion and maintenance reducers | [tasks/deep-redesign-completion-maintenance.md](tasks/deep-redesign-completion-maintenance.md) | done |
 | 9 | Provider anomaly blocked handoff | [tasks/deep-redesign-provider-handoff.md](tasks/deep-redesign-provider-handoff.md) | done |
 | 10 | Benchmark corpus and final gates | [tasks/deep-redesign-gates.md](tasks/deep-redesign-gates.md) | done |
+| 11 | Obligation network root repair | [tasks/obligation-network-redesign.md](tasks/obligation-network-redesign.md) | open |
 
 ## Active Data Fixture
 
@@ -60,6 +61,8 @@ checked-in generated log fixture remains historical failure evidence.
 - `artifact.next` is non-mutating and returns write contracts rather than body
   content; the next persisted decision chooses whether to render a content write
   surface.
+- Missing-root observations create root identity obligations; they do not route
+  to another same-root `doc.audit` before write progress.
 - Direct graph evidence, scaffold topology, README-only content, and
   owner-term-only pages do not satisfy artifact readiness.
 - Audit-owned evidence comes from `doc.audit` and `artifact.audit` observations.
@@ -71,7 +74,7 @@ checked-in generated log fixture remains historical failure evidence.
 
 ## Completion Evidence
 
-The redesign is closed by focused crate tests, workspace tests, corpus checks,
-`quiet verify`, `docker compose run --rm verify`, and a fresh clean-data
-endpoint smoke after the implementation changes. The checked-in data log remains
-historical failure evidence.
+The obligation network row closes only after focused crate tests, workspace
+tests, corpus checks, `quiet verify`, `docker compose run --rm verify`, and a
+fresh clean-data endpoint smoke prove root repair avoids the checked-in loop.
+The checked-in data log remains historical failure evidence.

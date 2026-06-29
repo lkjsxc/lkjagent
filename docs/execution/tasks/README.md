@@ -58,5 +58,8 @@ Every task file uses exactly these headings:
 - [deep-redesign-artifact-batches.md](deep-redesign-artifact-batches.md): path-specific artifact micro-batches.
 - [deep-redesign-completion-maintenance.md](deep-redesign-completion-maintenance.md):
   completion and no-op maintenance reducers.
-- [deep-redesign-provider-handoff.md](deep-redesign-provider-handoff.md): provider anomaly retry and blocked handoff.
+- [deep-redesign-provider-handoff.md](deep-redesign-provider-handoff.md): provider anomaly retry and
+  blocked handoff.
 - [deep-redesign-gates.md](deep-redesign-gates.md): benchmark corpus and final verification gates.
+- [obligation-network-redesign.md](obligation-network-redesign.md): fact, obligation, resolver, and
+  progress-key runtime redesign.

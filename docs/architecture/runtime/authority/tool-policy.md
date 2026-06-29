@@ -11,8 +11,9 @@ policy and refuses any action outside it.
 
 ## Inputs
 
-The policy reads active mission, evidence gaps, recovery class, artifact gaps,
-last refused action, verification state, and compaction state.
+The policy reads active mission, evidence gaps, recovery class, artifact root
+status, artifact gaps, last refused progress key, verification state, and
+compaction state.
 
 ## Output
 
@@ -37,6 +38,8 @@ evidence instead of being routed into artifact identity.
 - Verification-only mode hides artifact creation or repair tools.
 - Preferred next action names a blocked tool.
 - The exact valid example uses a blocked tool.
+- A same-root `doc.audit` is admitted while the latest fact digest still says
+  root missing and no write progress or handoff exists.
 
 ## Fixture
 

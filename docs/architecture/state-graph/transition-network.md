@@ -16,7 +16,10 @@ maintenance tick, and close path reads the same decision stream.
 
 ```text
 DurableReadModel -> RuntimeSnapshot
-RuntimeSnapshot + RuntimeEvent -> RuntimeDecision
+RuntimeSnapshot + RuntimeEvent -> RuntimeFacts
+RuntimeFacts -> Vec<Obligation>
+Vec<Obligation> + RuntimeFacts -> ResolverPlan
+ResolverPlan -> RuntimeDecision
 RuntimeDecision -> PromptFrame or RuntimeEffectCommand
 RuntimeDecision + ModelAction -> ToolAdmission
 ToolAdmission -> EffectCommand
@@ -34,7 +37,7 @@ content is needed.
 
 - case envelope and active graph state.
 - source graph node and edge guidance.
-- runtime events and decisions.
+- runtime events, facts, obligations, resolver plans, and decisions.
 - artifact, evidence, fault, verification, maintenance, and compaction ledgers.
 - prompt frame and context snapshot identifiers.
 
@@ -57,6 +60,7 @@ content is needed.
 
 - Graph transition and runtime mission disagree about the legal tool.
 - Recovery repeats the same invalid action class.
+- Graph guidance routes a `missing_root` fact back to same-root `doc.audit`.
 - Maintenance renders owner graph policy.
 - Completion closes after planning or scaffold-only evidence.
 
@@ -65,8 +69,8 @@ content is needed.
 - reducer tests for mission priority and event classes.
 - graph transition tests for legal movement.
 - dispatch tests proving graph policy is guidance, not a fallback authority.
-- replay tests proving the Chronos story schema loop changes route instead of
-  repeating the same invalid action class.
+- replay tests proving story root repair and schema loops change route instead
+  of repeating the same invalid action class.
 
 ## Status
 

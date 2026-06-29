@@ -12,11 +12,14 @@ Runtime authority is the only source of action truth. Model output is intent.
 Graph transitions are guidance. The old runtime `mode` tree is an adapter only,
 not a parallel source of action truth. Context pressure, maintenance ticks,
 verifier results, tool observations, parser faults, provider anomalies, and
-completion requests are events. The pure reducer turns one snapshot plus one
-event into one decision before any effect runs.
+completion requests are events. The pure reducer derives facts, obligations,
+and a resolver plan before emitting one decision.
 
 ```text
-RuntimeSnapshot + RuntimeEvent -> RuntimeDecision
+RuntimeSnapshot + RuntimeEvent -> RuntimeFacts
+RuntimeFacts -> Vec<Obligation>
+Vec<Obligation> + RuntimeFacts -> ResolverPlan
+ResolverPlan -> RuntimeDecision
 RuntimeDecision + requested_tool -> ToolAdmission
 ```
 
@@ -54,12 +57,14 @@ recovery, verification, and compaction mission.
 - The reducer has no I/O, clock reads, filesystem reads, SQLite reads, or
   endpoint calls.
 - Every decision names active mission, admitted tools, blocked tools, missing
-  evidence, completion state, and next valid action.
+  evidence, completion state, write contract state, and next valid action.
 - Completion must pass the same gate on every close path.
 - Turn-budget checkpoints are continuation decisions, not owner-permission
   prompts.
 - Recovery must preserve the read, audit, repair, and batch tools needed by the
   mission that failed.
+- Missing-root audit facts create root identity write obligations; they do not
+  route to another same-root `doc.audit` before write progress.
 - Compaction is runtime-owned and persists resume data without a model-authored
   memory action.
 - Maintenance is strictly idle-only and must be preempted by owner work.
@@ -112,6 +117,7 @@ benchmark fixtures.
 
 ## Related Files
 
+- [../obligation-network/README.md](../obligation-network/README.md)
 - [../active-mode/README.md](../active-mode/README.md)
 - [../../state-graph/README.md](../../state-graph/README.md)
 - [../../artifacts/README.md](../../artifacts/README.md)

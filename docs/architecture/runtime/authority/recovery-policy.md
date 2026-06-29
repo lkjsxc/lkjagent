@@ -50,6 +50,8 @@ turn-budget exhaustion.
   to normalized parse, one-file fallback, or partial handoff.
 - Audit failures preserve `artifact.next`, `artifact.audit`, `doc.audit`,
   `fs.read`, `fs.tree`, `fs.write`, and `fs.batch_write` when relevant.
+- Missing-root audit failures force a root identity `fs.batch_write` contract
+  and block another same-root `doc.audit` until write progress or handoff.
 - Repeat faults force a different action shape.
 - Turn-budget checkpoints during active faults enter the selected recovery
   class instead of asking the owner to continue.
@@ -57,6 +59,7 @@ turn-budget exhaustion.
 ## Prohibited States
 
 - The same invalid action repeats after budget is exhausted.
+- `missing_root` or `root_missing` routes to another same-root `doc.audit`.
 - Recovery blocks every read, audit, or repair tool that can escape.
 - Parameter recovery renders an example dispatch later rejects.
 - Recovery enters completion without a repair or structured handoff.
