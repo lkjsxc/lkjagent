@@ -76,7 +76,7 @@ The checked-in generated log fixture remains historical failure evidence.
 
 The obligation network row is closed by focused crate tests, workspace tests,
 corpus checks, `quiet verify`, `docker compose run --rm verify`, and a fresh
-clean-data endpoint smoke. The smoke transcript at
-`tmp/obligation-smoke-data-2/logs/current-model-run.md` reached
-`open_task=none` after root repair and artifact audit. The checked-in data log
-remains historical failure evidence.
+clean-data endpoint smoke. The latest smoke transcript at
+`tmp/user-story-smoke-data-fix/logs/current-model-run.md` reached
+`open_task=none` after root repair, structure repair, and artifact audit. The
+checked-in data log remains historical failure evidence.

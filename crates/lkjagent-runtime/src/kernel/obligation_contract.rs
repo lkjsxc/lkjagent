@@ -1,5 +1,5 @@
 use crate::kernel::obligation_facts::{
-    DocumentAuditFacts, WriteContractFacts, WriteContractStatus,
+    ArtifactRootStatus, DocumentAuditFacts, WriteContractFacts, WriteContractStatus,
 };
 use crate::kernel::obligation_parse::{inferred_kind, root_identity_status};
 use crate::kernel::obligation_paths::{
@@ -15,6 +15,9 @@ pub(crate) fn write_contract_for(
     let root = root?;
     if audit.is_some_and(|facts| root_identity_status(facts.status)) {
         return Some(root_identity(root, &contract_kind(snapshot, audit, root)));
+    }
+    if let Some(contract) = structure_repair_contract(snapshot, audit, root) {
+        return Some(contract);
     }
     let text = snapshot.observation.latest.as_deref()?;
     if !text.contains("candidate_action=fs.batch_write") {
@@ -51,6 +54,32 @@ fn contract_kind(
         .or_else(|| snapshot.artifact.kind.clone())
         .or_else(|| inferred_kind(root))
         .unwrap_or_else(|| "artifact".to_string())
+}
+
+fn structure_repair_contract(
+    snapshot: &RuntimeSnapshot,
+    audit: Option<&DocumentAuditFacts>,
+    root: &str,
+) -> Option<WriteContractFacts> {
+    let audit = audit?;
+    if audit.status != ArtifactRootStatus::StructureFailed {
+        return None;
+    }
+    let paths = audit
+        .failures
+        .iter()
+        .filter_map(|failure| failure_path(root, failure))
+        .collect::<Vec<_>>();
+    (!paths.is_empty()).then(|| batch_contract(snapshot, root, paths))
+}
+
+fn failure_path(root: &str, failure: &str) -> Option<String> {
+    let (_, path) = failure.split_once(':')?;
+    let relative = path.trim();
+    if relative.is_empty() || relative.starts_with('/') {
+        return None;
+    }
+    Some(crate::kernel::obligation_paths::full_path(root, relative))
 }
 
 fn batch_contract(
