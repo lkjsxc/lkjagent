@@ -1,18 +1,18 @@
 use crate::kernel::admission::{admitted_tools_for, blocked_tools_for, ToolAdmissionView};
+use crate::kernel::authority_ledger::authority_ledger_entries;
 use crate::kernel::completion::close_allowed;
 use crate::kernel::decision::{
-    ActionTemplate, DecisionInvariantError, RuntimeDecision, RuntimeDecisionId,
-    RuntimeDecisionInput, RuntimeDecisionKind, RuntimeMission,
+    DecisionInvariantError, RuntimeDecision, RuntimeDecisionId, RuntimeDecisionInput,
+    RuntimeDecisionKind, RuntimeMission,
 };
+use crate::kernel::decision_apply::apply_forced_action;
 use crate::kernel::effect::attach_runtime_effect;
 use crate::kernel::event::RuntimeEvent;
 use crate::kernel::mission_select::select_mission;
 use crate::kernel::next_action::next_action_for;
-use crate::kernel::obligation_facts::root_identity_required;
 use crate::kernel::render::prompt_card_for;
 use crate::kernel::repeat_guard::repeat_guard;
 use crate::kernel::snapshot::{RuntimeEventId, RuntimeSnapshot, ToolName};
-use crate::kernel::write_contract::content_contract_for;
 
 pub fn reduce_with_event_id(
     snapshot: &RuntimeSnapshot,
@@ -95,6 +95,7 @@ fn populate_decision(
     decision.rule_explanation = rule_explanation(decision.mission, event);
     decision.forced_next_action = next_action_for(decision.mission, snapshot, event);
     apply_forced_action(snapshot, decision);
+    decision.persistence_plan = authority_ledger_entries(snapshot, event, decision);
     decision.prompt_card =
         prompt_card_for(snapshot, decision.mission, decision.active_mode, decision);
 }
@@ -127,41 +128,6 @@ fn only_audit_owned_gaps(snapshot: &RuntimeSnapshot) -> bool {
             .missing
             .iter()
             .all(|item| matches!(item.as_str(), "document-structure" | "artifact-readiness"))
-}
-
-fn apply_forced_action(snapshot: &RuntimeSnapshot, decision: &mut RuntimeDecision) {
-    let Some(ActionTemplate::ExactTool { body, tool }) = &decision.forced_next_action else {
-        return;
-    };
-    if !decision.admission_view.admits(tool) {
-        decision.admission_view.admitted_tools.push(tool.clone());
-    }
-    if tool.as_str() == "fs.batch_write" {
-        decision.content_write_contract = content_contract_for(snapshot);
-        if root_identity_required(snapshot) {
-            block_tool(decision, "doc.audit");
-        }
-    } else {
-        decision.admission_view.exact_next_action = Some(body.clone());
-    }
-}
-
-fn block_tool(decision: &mut RuntimeDecision, name: &'static str) {
-    decision
-        .admission_view
-        .admitted_tools
-        .retain(|tool| tool.as_str() != name);
-    if !decision
-        .admission_view
-        .blocked_tools
-        .iter()
-        .any(|tool| tool.as_str() == name)
-    {
-        decision
-            .admission_view
-            .blocked_tools
-            .push(ToolName::from_static(name));
-    }
 }
 
 fn compaction_policy(snapshot: &RuntimeSnapshot) -> Option<String> {

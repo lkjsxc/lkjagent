@@ -26,6 +26,7 @@ pub(super) fn adapter_input(
         artifact_root: artifact.root.or_else(|| snapshot.artifact_root.clone()),
         artifact_kind: artifact.kind,
         artifact_weak_paths: artifact.weak_paths,
+        artifact_audit_status: artifact.audit_status,
         context_hard_pressure: snapshot.compaction_required,
         maintenance_due: snapshot.maintenance_due,
         maintenance_active: snapshot.maintenance_active,
@@ -83,6 +84,7 @@ struct ArtifactSnapshotFields {
     root: Option<String>,
     kind: Option<String>,
     weak_paths: Vec<String>,
+    audit_status: Option<String>,
 }
 
 fn artifact_fields(
@@ -96,11 +98,13 @@ fn artifact_fields(
         return Ok(empty_artifact_fields());
     };
     let weak = lkjagent_store::artifact_ledger::weak_paths(conn, row.id)?;
+    let audit_status = audit_status(&row.topology_status, &row.readiness_status);
     Ok(ArtifactSnapshotFields {
         artifact_id: Some(row.artifact_id),
         root: Some(row.root),
         kind: Some(row.kind),
         weak_paths: weak.into_iter().map(|path| path.path).collect(),
+        audit_status,
     })
 }
 
@@ -110,6 +114,19 @@ fn empty_artifact_fields() -> ArtifactSnapshotFields {
         root: None,
         kind: None,
         weak_paths: Vec::new(),
+        audit_status: None,
+    }
+}
+
+fn audit_status(topology: &str, readiness: &str) -> Option<String> {
+    match (topology, readiness) {
+        ("missing", _) => Some("missing".to_string()),
+        ("failed", _) => Some("failed".to_string()),
+        ("passed", "passed") => Some("ready".to_string()),
+        ("passed", _) => Some("passed".to_string()),
+        (_, "failed") => Some("failed".to_string()),
+        (_, "passed") => Some("ready".to_string()),
+        _ => None,
     }
 }
 

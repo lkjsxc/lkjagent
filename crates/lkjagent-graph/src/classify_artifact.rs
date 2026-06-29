@@ -1,5 +1,6 @@
 use crate::case_document::DocumentState;
 use crate::classify_signals::content_artifact_request;
+use crate::classify_title::owner_title_alias;
 use crate::model::TaskFamily;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -104,6 +105,9 @@ fn artifact_root(kind: &str, objective: &str) -> String {
 }
 
 fn artifact_alias(kind: &str, objective: &str) -> String {
+    if let Some(alias) = owner_title_alias(objective) {
+        return alias;
+    }
     let base = base_alias(kind, objective);
     let Some(qualifier) = first_qualifier(base, objective) else {
         return base.to_string();
@@ -156,4 +160,7 @@ const STOP_WORDS: &[&str] = &[
     "detailed",
     "sf",
     "story",
+    "named",
+    "called",
+    "titled",
 ];

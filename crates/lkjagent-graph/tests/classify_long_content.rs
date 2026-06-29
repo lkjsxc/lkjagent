@@ -38,6 +38,39 @@ fn long_novel_structured_settings_uses_short_alias() {
 }
 
 #[test]
+fn compact_title_long_novel_stays_content_artifact() {
+    let state = initial_state(
+        "Create a long novel named \"Compact Compass\" with structured settings.",
+        Some(7),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert_eq!(state.subroute, "content-artifact");
+    assert!(state.document.as_ref().is_some_and(|document| {
+        document.root == "stories/compact-compass" && document.kind == "content-artifact"
+    }));
+}
+
+#[test]
+fn named_novel_root_preserves_owner_title() {
+    let state = initial_state(
+        "Create a long novel named \"iwanna\" with detailed structured settings.",
+        Some(8),
+    );
+
+    assert!(state.document.as_ref().is_some_and(|document| {
+        document.root == "stories/iwanna" && document.kind == "content-artifact"
+    }));
+}
+
+#[test]
+fn explicit_context_compaction_stays_compaction() {
+    let state = initial_state("Compact the context after token pressure.", Some(9));
+
+    assert_eq!(state.family, TaskFamily::Compaction);
+}
+
+#[test]
 fn big_bread_cookbook_routes_to_content_artifact() {
     let state = initial_state("Write a big bread cookbook.", Some(4));
 

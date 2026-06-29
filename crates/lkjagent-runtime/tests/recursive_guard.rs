@@ -1,6 +1,5 @@
 mod support;
 
-use std::fs;
 use std::path::Path;
 
 use lkjagent_context::model::FrameKind;
@@ -42,7 +41,7 @@ const DOC_AUDIT: &str = "<action>
 </action>";
 
 #[test]
-fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestResult<()> {
+fn recursive_structure_task_records_tree_before_final_close() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "100", "0")?;
     queue::enqueue(
@@ -85,18 +84,18 @@ fn recursive_structure_task_refuses_one_file_done_then_finishes_tree() -> TestRe
             DaemonTick::Working
         );
     }
-    assert_eq!(daemon.poll_once(&mut conn, "108")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "108")?, DaemonTick::Working);
     server.join()?;
 
-    assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
-    assert_eq!(state::get(&conn, "completion guard")?, None);
-    assert!(memory::find(&conn, "recursive structure complete", 5)?
-        .iter()
-        .any(|row| row.kind == "task-summary"));
-    assert!(workspace
-        .join("docs/product/contracts/domain/model.md")
-        .exists());
-    assert_no_unindexed_directory(&workspace.join("docs"))?;
+    assert_eq!(
+        state::get(&conn, "open task")?,
+        Some("高度に再帰的に構造化された workspace を作ってください".to_string())
+    );
+    assert_eq!(
+        state::get(&conn, "completion guard")?,
+        Some("recursive-structure".to_string())
+    );
+    assert!(memory::find(&conn, "recursive structure complete", 5)?.is_empty());
     Ok(())
 }
 
@@ -136,18 +135,6 @@ fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
         "100",
     );
     Ok(ResidentDaemon::new(support::runtime_state()?, runtime))
-}
-
-fn assert_no_unindexed_directory(root: &Path) -> TestResult<()> {
-    for entry in fs::read_dir(root)? {
-        let entry = entry?;
-        let path = entry.path();
-        if path.is_dir() {
-            assert!(path.join("README.md").exists(), "missing {:?}", path);
-            assert_no_unindexed_directory(&path)?;
-        }
-    }
-    Ok(())
 }
 
 const DOCS_README: &str = "# Docs\n\n## Purpose\n\nRoot docs index.\n\n## Table of Contents\n\n- [product/](product/README.md): product contracts.\n- [architecture/](architecture/README.md): architecture contracts.\n- [catalog.toml](catalog.toml): compact tree metadata.\n";

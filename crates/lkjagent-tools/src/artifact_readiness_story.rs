@@ -7,15 +7,17 @@ use crate::error::ToolResult;
 pub(crate) fn story_report(root: &str, full: &Path, report: String) -> ToolResult<String> {
     let files = markdown_files(full)?;
     let missing = story_missing(&files);
-    if missing.is_empty() {
+    let scale_missing = story_scale_missing(&files);
+    if missing.is_empty() && scale_missing.is_empty() {
         return Ok(crate::artifact_readiness::content_bearing(report).replace(
             "readiness=content-bearing",
             "readiness=story-semantic-content",
         ));
     }
     Ok(format!(
-        "artifact audit failed\nroot={root}\nreadiness=missing-semantic-content\nfailed=1\nfailures:\n- story_semantic_missing: {}\nnext_decision_required=true\ncandidate_action=artifact.next",
-        missing.join(",")
+        "artifact audit failed\nroot={root}\nreadiness=missing-semantic-content\nfailed=1\nfailures:\n- story_semantic_missing: {}\n- story_scale_missing: {}\nnext_decision_required=true\ncandidate_action=artifact.next",
+        join_or_none(&missing),
+        join_or_none(&scale_missing)
     ))
 }
 
@@ -25,6 +27,30 @@ fn story_missing(files: &[StoryFile]) -> Vec<&'static str> {
         .filter(|requirement| !role_present(files, requirement))
         .map(|requirement| requirement.label)
         .collect()
+}
+
+fn story_scale_missing(files: &[StoryFile]) -> Vec<&'static str> {
+    let mut missing = Vec::new();
+    if files.len() < STORY_REQUIREMENTS.len() {
+        missing.push("profile-scale-content-groups");
+    }
+    if files
+        .iter()
+        .map(|file| word_count(&file.text))
+        .sum::<usize>()
+        < 400
+    {
+        missing.push("profile-scale-word-count");
+    }
+    missing
+}
+
+fn join_or_none(values: &[&'static str]) -> String {
+    if values.is_empty() {
+        "none".to_string()
+    } else {
+        values.join(",")
+    }
 }
 
 fn role_present(files: &[StoryFile], requirement: &Requirement) -> bool {

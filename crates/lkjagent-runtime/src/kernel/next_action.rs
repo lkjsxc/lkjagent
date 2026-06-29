@@ -17,9 +17,7 @@ pub(crate) fn next_action_for(
     let facts = runtime_facts(snapshot, event);
     let obligations = obligations_for(&facts);
     if let Some(plan) = resolve_obligations(mission, snapshot, &facts, &obligations) {
-        if let Some(action) = action_for_plan(&plan, snapshot) {
-            return Some(action);
-        }
+        return action_for_plan(&plan, snapshot);
     }
     let tool = match mission {
         RuntimeMission::HardRuntimeCompaction | RuntimeMission::ClosedIdle => return None,

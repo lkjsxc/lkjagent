@@ -28,6 +28,7 @@ pub struct SnapshotAdapterInput {
     pub artifact_cursor: Option<String>,
     pub artifact_batch_cursor: Option<String>,
     pub artifact_weak_paths: Vec<String>,
+    pub artifact_audit_status: Option<String>,
     pub latest_fault: Option<RuntimeFault>,
     pub retry_count: u32,
     pub prior_action_fingerprint: Option<String>,
@@ -164,6 +165,7 @@ fn artifact_facts(input: &SnapshotAdapterInput) -> ArtifactFacts {
         root: input.artifact_root.clone(),
         kind: input.artifact_kind.clone(),
         weak_paths: input.artifact_weak_paths.clone(),
+        audit_status: input.artifact_audit_status.clone(),
         cursor: input.artifact_cursor.clone(),
         batch_cursor: input.artifact_batch_cursor.clone(),
         ..ArtifactFacts::default()

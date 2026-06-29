@@ -17,7 +17,7 @@ None.
 - [../../current-state.md](../../current-state.md)
 - [../current-blockers.md](../current-blockers.md)
 - [../../evaluation/uploaded-run-fixtures.md](../../evaluation/uploaded-run-fixtures.md)
-- [../../../data/logs/current-model-run.md](../../../data/logs/current-model-run.md)
+- `../../../data/logs/current-model-run.md`
 
 ## Files To Touch
 

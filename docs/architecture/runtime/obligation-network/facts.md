@@ -54,3 +54,8 @@ runtime decision.
 Tool observations are converted into runtime events before the next decision.
 Audit text is not merely prompt guidance. It changes facts, facts create
 obligations, and obligations drive the next resolver plan.
+
+Root status is durable. A missing-root audit or root-missing `artifact.next`
+result is copied into the artifact ledger and remains a fact across parse
+faults, provider anomalies, tool errors, and graph inspections until a
+contracted write records progress or a later audit changes the status.

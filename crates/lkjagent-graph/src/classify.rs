@@ -7,7 +7,7 @@ use crate::case_plan::PlanState;
 use crate::case_recovery::RecoveryState;
 use crate::classify_artifact::route_spec;
 use crate::classify_signals::{
-    documentation_request, knowledge_request, priority_counted_content_request,
+    documentation_request, intent_facts, knowledge_request, priority_counted_content_request,
     priority_long_content_request,
 };
 use crate::initial_state_tracks;
@@ -16,7 +16,10 @@ use crate::state::TaskGraphState;
 
 pub fn classify_intent(content: &str) -> TaskFamily {
     let lower = content.to_ascii_lowercase();
-    if lower.contains("compact") || lower.contains("context pressure") {
+    let facts = intent_facts(&lower, content);
+    if facts.content_creation {
+        TaskFamily::Documentation
+    } else if facts.operational_compaction {
         TaskFamily::Compaction
     } else if lower.contains("recover") || lower.contains("failure") {
         TaskFamily::Recovery

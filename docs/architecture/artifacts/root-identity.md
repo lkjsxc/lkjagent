@@ -11,6 +11,11 @@ Root identity is created by a model-authored `fs.batch_write` action that is
 validated against a stored runtime contract. No scaffold writer creates the
 root. No one-file README seed satisfies identity.
 
+Named owner titles define the root slug. A novel named `iwanna` uses a root
+that contains `iwanna`; a novel named `Compact Compass` uses a root that
+contains `compact-compass`. Generic roots such as `stories/novel-named` are not
+valid owner identity.
+
 For a story root, the initial exact paths are:
 
 ```text

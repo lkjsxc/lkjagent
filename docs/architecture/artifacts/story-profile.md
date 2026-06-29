@@ -80,6 +80,11 @@ when they carry headed story facts and verification notes. Scaffold-only
 creative labels, bracket placeholders, README-only trees, and owner-term-only
 pages are not content evidence.
 
+Long-novel readiness also requires profile-scale content groups. A compact seed
+page is refused with `story_scale_missing` facts such as
+`profile-scale-content-groups` or `profile-scale-word-count` until enough
+separate story-bible groups exist.
+
 ## Status
 
 partially implemented through story scaffold selection, structure-only content

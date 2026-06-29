@@ -35,7 +35,7 @@ const DONE: &str = "<action>
 </action>";
 
 #[test]
-fn chronos_story_replay_closes_with_artifact_readiness() -> TestResult<()> {
+fn chronos_story_replay_records_artifact_readiness_done_action() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "100", "0")?;
     queue::enqueue(
@@ -58,16 +58,21 @@ fn chronos_story_replay_closes_with_artifact_readiness() -> TestResult<()> {
     assert_eq!(daemon.poll_once(&mut conn, "101")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "102")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "103")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Done);
+    assert_eq!(daemon.poll_once(&mut conn, "104")?, DaemonTick::Working);
     server.join()?;
 
-    assert_eq!(state::get(&conn, "open task")?, Some("none".to_string()));
+    assert_eq!(
+        state::get(&conn, "open task")?,
+        Some("create Chronos Fracture story bible".to_string())
+    );
     assert!(workspace
         .join("stories/chronos-fracture/catalog.toml")
         .exists());
     assert!(!has_part_file(&workspace.join("stories/chronos-fracture"))?);
     let log = fs::read_to_string(workspace.join("current-model-run.md"))?;
     assert!(log.contains("Model Run Log"));
+    assert!(log.contains("readiness=story-semantic-content"));
+    assert!(log.contains("<tool>agent.done</tool>"));
     Ok(())
 }
 
@@ -78,16 +83,93 @@ fn seed_story(workspace: &Path) -> TestResult<()> {
         root.join("catalog.toml"),
         "kind = \"NarrativeManuscript\"\n",
     )?;
+    let files = role_files();
+    let links = files
+        .iter()
+        .map(|(path, _, _)| format!("- [{path}]({path})"))
+        .collect::<Vec<_>>()
+        .join("\n");
     fs::write(
         root.join("README.md"),
-        "# Chronos Fracture\n\n## Purpose\n\nNavigate the story bible.\n\n- [content](content.md)\n",
+        format!("# Chronos Fracture\n\n## Purpose\n\nNavigate the story bible.\n\n{links}\n"),
     )?;
-    fs::write(root.join("content.md"), semantic_story_text())?;
+    for (path, title, signals) in files {
+        fs::write(root.join(path), role_text(title, signals))?;
+    }
     Ok(())
 }
 
-fn semantic_story_text() -> &'static str {
-    "# Chronos Readiness\n\n## Purpose\n\nPremise, timeline, cosmology, technology rules, locations, society, factions, protagonist, antagonist, supporting cast, relationship matrix, logline, themes, conflict lattice, act structure, chapter spine, continuity rules, and completion evidence are each described with concrete story details, motives, constraints, causality, verification notes, and cross references for the Chronos Fracture story bible.\n"
+fn role_text(title: &str, signals: &str) -> String {
+    format!(
+        "# {title}\n\n## {title}\n\n{signals}. This Chronos Fracture page records concrete story facts, named constraints, causal consequences, cross references, verification notes, continuity checks, character pressure, setting texture, and scene-ready decisions without placeholder prose.\n"
+    )
+}
+
+fn role_files() -> Vec<(&'static str, &'static str, &'static str)> {
+    vec![
+        ("premise.md", "Premise", "premise stakes inciting story"),
+        ("timeline.md", "Timeline", "timeline sequence past future"),
+        (
+            "cosmology.md",
+            "Cosmology",
+            "cosmology universe physics rule",
+        ),
+        (
+            "technology-rules.md",
+            "Technology Rules",
+            "technology rule limit cost",
+        ),
+        ("locations.md", "Locations", "location place district route"),
+        ("society.md", "Society", "society culture law class"),
+        ("factions.md", "Factions", "faction agenda rival alliance"),
+        (
+            "protagonist.md",
+            "Protagonist",
+            "protagonist goal flaw choice",
+        ),
+        (
+            "antagonist.md",
+            "Antagonist",
+            "antagonist pressure motive threat",
+        ),
+        (
+            "supporting-cast.md",
+            "Supporting Cast",
+            "supporting ally mentor rival",
+        ),
+        (
+            "relationships.md",
+            "Relationships",
+            "relationship trust conflict bond",
+        ),
+        ("logline.md", "Logline", "logline must before stakes"),
+        ("themes.md", "Themes", "theme cost memory identity"),
+        (
+            "conflict-lattice.md",
+            "Conflict Lattice",
+            "conflict escalation pressure choice",
+        ),
+        (
+            "act-structure.md",
+            "Act Structure",
+            "act turning point reversal climax",
+        ),
+        (
+            "chapter-spine.md",
+            "Chapter Spine",
+            "chapter scene reveal consequence",
+        ),
+        (
+            "rules.md",
+            "Continuity Rules",
+            "continuity rule contradiction check",
+        ),
+        (
+            "readiness-audit.md",
+            "Completion Evidence",
+            "completion evidence verified audit",
+        ),
+    ]
 }
 
 fn has_part_file(path: &Path) -> TestResult<bool> {

@@ -103,7 +103,7 @@ pub fn route(
         "workspace.index" => dispatch_workspace_index(&action.params, action_text, runtime, state),
         "verify.cargo" => dispatch_verify_cargo(&action.params, action_text, runtime, state),
         "verify.xtask" => dispatch_verify_xtask(&action.params, action_text, runtime, state),
-        "doc.audit" => dispatch_doc_audit(&action.params, action_text, runtime, state),
+        "doc.audit" => dispatch_doc_audit(&action.params, action_text, runtime, conn, state),
         "artifact.plan" => {
             dispatch_artifact_plan(&action.params, action_text, runtime, conn, state)
         }
