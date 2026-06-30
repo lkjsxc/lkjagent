@@ -106,6 +106,10 @@ fn root_next(workspace: &Path, address: &ArtifactAddress, kind: &str) -> ToolRes
     {
         return Ok(contract.response);
     }
+    if let Some(contract) = crate::artifact_content_atom::contract_if_missing(&root, &kind, &full)?
+    {
+        return Ok(contract.response);
+    }
     let weak = crate::doc::weak_content_paths(&full)?;
     if weak.is_empty() {
         return audit_response(&root, &kind, "missing=0");
@@ -148,6 +152,18 @@ fn root_next_with_cursor(
         .unwrap_or_else(|| "unspecified".to_string());
     if let Some(contract) =
         crate::artifact_next_story::story_contract_if_missing(&root, &kind, &scale, &full)?
+    {
+        crate::artifact_next_cursor::record_story_batch(
+            conn,
+            now,
+            &root,
+            &kind,
+            &contract.selected,
+            &contract.valid_example,
+        )?;
+        return Ok(contract.response);
+    }
+    if let Some(contract) = crate::artifact_content_atom::contract_if_missing(&root, &kind, &full)?
     {
         crate::artifact_next_cursor::record_story_batch(
             conn,

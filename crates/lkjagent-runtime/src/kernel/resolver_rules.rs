@@ -32,6 +32,11 @@ pub(super) fn mission_rule_plan(
 }
 
 fn owner_execution_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> TotalResolverPlan {
+    if let Some(conflict) = facts.generic_root_conflict.as_deref() {
+        return blocked(&format!(
+            "generic artifact root conflicts with owner target: {conflict}"
+        ));
+    }
     if !artifact_work_required(snapshot) {
         if evidence_missing(snapshot, "observation") {
             return TotalResolverPlan::EvidenceRecording { tool: "fs.write" };
@@ -69,6 +74,11 @@ fn completion_repair_plan(snapshot: &RuntimeSnapshot) -> TotalResolverPlan {
 fn recovery_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> TotalResolverPlan {
     if let Some(plan) = root_repair_plan(facts) {
         return plan;
+    }
+    if let Some(conflict) = facts.generic_root_conflict.as_deref() {
+        return blocked(&format!(
+            "generic artifact root conflicts with owner target: {conflict}"
+        ));
     }
     if let Some(manuscript) = facts.manuscript.as_ref() {
         if manuscript.anomaly_shrink_level >= 2 {
@@ -109,10 +119,18 @@ fn schema_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> TotalResolve
 }
 
 fn artifact_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> TotalResolverPlan {
+    if let Some(conflict) = facts.generic_root_conflict.as_deref() {
+        return blocked(&format!(
+            "generic artifact root conflicts with owner target: {conflict}"
+        ));
+    }
     if batch_write_requested(snapshot) {
         return write_contract_plan(facts, "artifact write contract missing");
     }
-    if artifact_next_requested(snapshot) || !snapshot.artifact.weak_paths.is_empty() {
+    if artifact_next_requested(snapshot)
+        || !snapshot.artifact.weak_paths.is_empty()
+        || facts.content_atoms.missing_count > 0
+    {
         TotalResolverPlan::ExactInspection {
             tool: "artifact.next",
         }

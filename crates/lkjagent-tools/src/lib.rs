@@ -1,6 +1,8 @@
 pub mod address;
 pub mod artifact;
 mod artifact_address_support;
+mod artifact_content_atom;
+mod artifact_content_atom_profile;
 mod artifact_cursor_support;
 mod artifact_drift;
 mod artifact_ledger_state;

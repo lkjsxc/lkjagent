@@ -12,9 +12,9 @@ contains a README, manifest, semantic child files, audit evidence, and
 completion evidence.
 
 Artifact states are defined in [lifecycle.md](lifecycle.md). Scaffold creates
-topology only. Content pass writes meaningful leaves. Audit proves topology
-and content readiness. Completion requires graph evidence plus artifact
-readiness.
+topology only. Content pass writes meaningful leaves through bounded
+[content-atoms.md](content-atoms.md). Audit proves topology, atom status, and
+content readiness. Completion requires graph evidence plus artifact readiness.
 
 ## Payload Safety
 
@@ -31,5 +31,5 @@ for project documentation.
 
 ## Status
 
-partially implemented; classification and scaffold profiles exist. Explicit
-artifact planning, bounded write batches, and root adoption remain open.
+partially implemented; classification, scaffold profiles, bounded write
+batches, and shared content atoms exist. Root adoption remains open.

@@ -6,7 +6,9 @@ Introduce general content atoms for long and structured work products.
 
 ## Status
 
-open
+done: shared content atom profiles, atom audit facts, generic-root conflict
+blocking, completion refusals, focused tests, benchmark corpus, quiet verify,
+and Docker verify passed
 
 ## Depends On
 

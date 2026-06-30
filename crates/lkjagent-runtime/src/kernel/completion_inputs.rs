@@ -35,6 +35,15 @@ pub(crate) fn completion_inputs(completion: &CompletionGateDecision) -> Vec<Stri
             "next_manuscript_path={}",
             input.next_manuscript_path.as_deref().unwrap_or("none")
         ),
+        format!("content_atom_active={}", input.content_atom_active),
+        format!(
+            "content_atom_missing_count={}",
+            input.content_atom_missing_count
+        ),
+        format!(
+            "next_content_atom={}",
+            input.next_content_atom.as_deref().unwrap_or("none")
+        ),
         format!("fingerprint={}", input.decision_fingerprint),
     ]
 }

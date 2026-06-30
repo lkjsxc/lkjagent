@@ -59,7 +59,7 @@ content inside that selected surface.
 | Area | Current boundary |
 | --- | --- |
 | CLI UX | The parser, command tree, and shared status-console deck are implemented. Further UX hardening follows resolver and content evidence needs. |
-| Content atoms | Artifacts have cursors and profile readiness, but a general atom graph for long deliverables is not implemented. |
+| Content atoms | Report, documentation, generic, and story audit facts use bounded atom profiles; completion refuses while required atoms remain missing. |
 | Manuscript completion | Story manuscript classification and refusal gates exist, but daemon-owned full manuscript completion is not proved. |
 | Smoke harness | Historical and endpoint smoke artifacts exist, but reproducible replay and bounded live smoke commands are still open. |
 

@@ -1,3 +1,4 @@
+use crate::kernel::content_atom::facts_from_snapshot as content_atom_facts;
 use crate::kernel::manuscript::facts_from_snapshot;
 use crate::kernel::snapshot::RuntimeSnapshot;
 
@@ -16,6 +17,9 @@ pub struct CompletionGateInput {
     pub manuscript_chapter_count: Option<usize>,
     pub missing_manuscript_paths: Vec<String>,
     pub next_manuscript_path: Option<String>,
+    pub content_atom_active: bool,
+    pub content_atom_missing_count: usize,
+    pub next_content_atom: Option<String>,
     pub decision_fingerprint: String,
 }
 
@@ -28,6 +32,7 @@ pub struct CompletionGateDecision {
 
 pub(crate) fn completion_gate(snapshot: &RuntimeSnapshot) -> CompletionGateDecision {
     let manuscript = facts_from_snapshot(snapshot);
+    let atoms = content_atom_facts(snapshot);
     let input = CompletionGateInput {
         objective_present: snapshot.case.owner_objective.is_some(),
         missing_evidence: snapshot.evidence.missing.clone(),
@@ -51,6 +56,9 @@ pub(crate) fn completion_gate(snapshot: &RuntimeSnapshot) -> CompletionGateDecis
             .map(|facts| facts.missing_paths.clone())
             .unwrap_or_default(),
         next_manuscript_path: manuscript.and_then(|facts| facts.next_path),
+        content_atom_active: atoms.active,
+        content_atom_missing_count: atoms.missing_count,
+        next_content_atom: atoms.next_atom,
         decision_fingerprint: snapshot.staleness_fingerprint.as_str().to_string(),
     };
     let missing_inputs = missing_inputs(&input);
@@ -86,6 +94,13 @@ fn missing_inputs(input: &CompletionGateInput) -> Vec<String> {
         missing.push(format!(
             "manuscript-word-count:{}/{}",
             input.manuscript_words_written, input.manuscript_word_floor
+        ));
+    }
+    if input.content_atom_active && input.content_atom_missing_count > 0 {
+        missing.push(format!(
+            "content-atoms:{}:{}",
+            input.content_atom_missing_count,
+            input.next_content_atom.as_deref().unwrap_or("unknown")
         ));
     }
     dedup(missing)

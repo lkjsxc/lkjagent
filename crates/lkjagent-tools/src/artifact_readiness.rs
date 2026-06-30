@@ -16,7 +16,7 @@ pub fn readiness_report(
     match kind.trim().to_ascii_lowercase().as_str() {
         "cookbook" => Ok(content_bearing(converted)),
         "story" => crate::artifact_readiness_story::story_report(root, full, scale, converted),
-        _ => Ok(converted),
+        _ => crate::artifact_content_atom::readiness_report(root, kind, full, converted),
     }
 }
 
