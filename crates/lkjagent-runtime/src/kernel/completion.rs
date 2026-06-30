@@ -12,6 +12,7 @@ pub struct CompletionGateInput {
     pub manuscript_active: bool,
     pub manuscript_words_written: usize,
     pub manuscript_word_floor: usize,
+    pub manuscript_target_words: Option<usize>,
     pub manuscript_chapter_count: Option<usize>,
     pub missing_manuscript_paths: Vec<String>,
     pub next_manuscript_path: Option<String>,
@@ -43,6 +44,7 @@ pub(crate) fn completion_gate(snapshot: &RuntimeSnapshot) -> CompletionGateDecis
             .as_ref()
             .map(|facts| facts.target_word_floor)
             .unwrap_or(0),
+        manuscript_target_words: manuscript.as_ref().and_then(|facts| facts.target_words),
         manuscript_chapter_count: manuscript.as_ref().and_then(|facts| facts.chapter_count),
         missing_manuscript_paths: manuscript
             .as_ref()
