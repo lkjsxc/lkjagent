@@ -6,7 +6,9 @@ Add reproducible smoke and replay harnesses for runtime claims.
 
 ## Status
 
-open
+done: deterministic smoke replay, explicit live smoke skip status, bounded
+`tmp/` summaries, Docker replay wiring, focused tests, benchmark corpus, quiet
+verify, and Docker verify passed
 
 ## Depends On
 

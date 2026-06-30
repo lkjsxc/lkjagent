@@ -18,5 +18,6 @@ mechanically judged math and computer-science tasks.
 - [false-completion.md](false-completion.md): premature close fixture expectations.
 - [metrics-reports.md](metrics-reports.md): correctness, operational metrics, and report files.
 - [running.md](running.md): local corpus checks and real agent benchmark commands.
+- [runtime-smoke.md](runtime-smoke.md): deterministic and live smoke evidence.
 - [improvement-loop.md](improvement-loop.md): how failures drive durable harness changes.
 - [overfitting.md](overfitting.md): rules that keep benchmark work general.

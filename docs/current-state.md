@@ -61,7 +61,7 @@ content inside that selected surface.
 | CLI UX | The parser, command tree, and shared status-console deck are implemented. Further UX hardening follows resolver and content evidence needs. |
 | Content atoms | Report, documentation, generic, and story audit facts use bounded atom profiles; completion refuses while required atoms remain missing. |
 | Manuscript completion | Exact chapter routing, manuscript word-count refusal, provider shrink/block recovery, and deterministic scene-to-chapter assembly exist; full live 10,000-word daemon completion is not proved. |
-| Smoke harness | Historical and endpoint smoke artifacts exist, but reproducible replay and bounded live smoke commands are still open. |
+| Smoke harness | Deterministic replay and explicit live smoke skip commands exist; fresh live endpoint completion remains operator-driven evidence. |
 
 ## Active Data Log Fixture
 
