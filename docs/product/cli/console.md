@@ -46,8 +46,8 @@ Each redraw reads terminal rows and columns, falls back to `LINES` and
 width. Mixed-width text stays inside the terminal. The bottom deck is anchored
 above `send>` and never overlaps the prompt.
 
-## Current Baseline
+## Accepted Names
 
-The current binary opens this screen through `lkjagent console`. The redesign
-contract uses `watch` as the target command name. The implementation task must
-make the accepted command names explicit in [commands.md](commands.md).
+The current binary opens this screen through both `lkjagent watch` and the
+explicit `lkjagent console` command name. There are no hidden terminal-console
+command names.

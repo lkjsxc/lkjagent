@@ -8,11 +8,10 @@ SQLite store directly; there is no socket, HTTP server, web UI, or product MCP.
 
 ## Status
 
-This directory is the target contract for the CLI redesign queue. The current
-binary already supports the baseline `run`, `send`, `status`, `log`, `console`,
-`memory`, `graph`, `model-log`, and `personal` commands named in older docs.
-The active implementation tasks must move the binary to this grouped contract
-and update [../../current-state.md](../../current-state.md) when behavior lands.
+The command tree, metadata-rendered help, `watch` terminal command, explicit
+`console` command, task inspection, and queue inspection are implemented. The
+remaining active CLI work is the shared status, log, and console deck rewrite
+tracked in [../../execution/current-blockers.md](../../execution/current-blockers.md).
 
 ## Table of Contents
 

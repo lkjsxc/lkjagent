@@ -10,10 +10,12 @@ pub mod memory;
 pub mod model_log;
 pub mod paths;
 pub mod personal;
+pub mod queue;
 pub mod run;
 pub mod send;
 pub mod status;
 pub mod store;
+pub mod task;
 
 use args::{parse_args, Command};
 use error::CliError;
@@ -71,7 +73,7 @@ where
 {
     let invocation = parse_args(args)?;
     match invocation.command {
-        Command::Help => Ok(args::help_text().to_string()),
+        Command::Help { topic } => args::help_text(topic.as_deref()),
         Command::Run => run::run(&invocation.data_dir),
         Command::Send { text } => send::send(&invocation.data_dir, &text),
         Command::Status => status::status(&invocation.data_dir),
@@ -81,6 +83,8 @@ where
             limit,
         } => log::log(&invocation.data_dir, follow, full, limit),
         Command::Console => console::console(&invocation.data_dir),
+        Command::Queue(command) => queue::queue(&invocation.data_dir, command),
+        Command::Task(command) => task::task(&invocation.data_dir, command),
         Command::Memory { query } => memory::memory(&invocation.data_dir, &query),
         Command::Graph => graph::graph(&invocation.data_dir),
         Command::ModelLog(command) => model_log::model_log(&invocation.data_dir, command),

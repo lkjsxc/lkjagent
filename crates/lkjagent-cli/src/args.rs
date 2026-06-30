@@ -1,16 +1,27 @@
 use std::path::PathBuf;
 
+#[path = "args_catalog.rs"]
+mod args_catalog;
 #[path = "args_help.rs"]
 mod args_help;
+#[path = "args_log.rs"]
+mod args_log;
 #[path = "args_model_log.rs"]
 mod args_model_log;
 #[path = "args_personal.rs"]
 mod args_personal;
+#[path = "args_queue.rs"]
+mod args_queue;
+#[path = "args_task.rs"]
+mod args_task;
 
 use crate::error::CliError;
 pub use args_help::{help_text, is_help_arg, is_help_invocation};
+use args_log::parse_log;
 use args_model_log::parse_model_log;
 use args_personal::parse_personal;
+use args_queue::parse_queue;
+use args_task::parse_task;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Invocation {
@@ -20,7 +31,9 @@ pub struct Invocation {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Command {
-    Help,
+    Help {
+        topic: Option<String>,
+    },
     Run,
     Send {
         text: String,
@@ -32,6 +45,8 @@ pub enum Command {
         limit: Option<usize>,
     },
     Console,
+    Queue(QueueCommand),
+    Task(TaskCommand),
     Memory {
         query: String,
     },
@@ -60,6 +75,23 @@ pub enum PersonalCommand {
     Render,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum QueueCommand {
+    List { limit: Option<usize> },
+    Show { id: i64 },
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TaskCommand {
+    List {
+        status: Option<String>,
+        limit: Option<usize>,
+    },
+    Show {
+        id: i64,
+    },
+}
+
 pub fn parse_args<I, S>(args: I) -> Result<Invocation, CliError>
 where
     I: IntoIterator<Item = S>,
@@ -74,7 +106,7 @@ where
         if !positional && is_help_arg(&arg) {
             return Ok(Invocation {
                 data_dir,
-                command: Command::Help,
+                command: Command::Help { topic: None },
             });
         }
         if !positional && arg == "--data" {
@@ -101,17 +133,29 @@ where
 
 fn parse_command(command: &str, args: Vec<String>) -> Result<Command, CliError> {
     match command {
-        "help" => parse_no_args(args, "help").map(|()| Command::Help),
+        "help" => parse_help(args),
         "run" => parse_no_args(args, "run").map(|()| Command::Run),
         "send" => parse_send(args),
         "status" => parse_no_args(args, "status").map(|()| Command::Status),
         "log" => parse_log(args),
-        "console" => parse_no_args(args, "console").map(|()| Command::Console),
+        "watch" | "console" => parse_no_args(args, command).map(|()| Command::Console),
         "memory" => parse_memory(args),
+        "queue" => parse_queue(args),
+        "task" => parse_task(args),
         "graph" => parse_no_args(args, "graph").map(|()| Command::Graph),
         "model-log" => parse_model_log(args),
         "personal" => parse_personal(args),
         other => Err(CliError::usage(format!("unknown command: {other}"))),
+    }
+}
+
+fn parse_help(args: Vec<String>) -> Result<Command, CliError> {
+    match args.as_slice() {
+        [] => Ok(Command::Help { topic: None }),
+        [topic] => Ok(Command::Help {
+            topic: Some(topic.to_string()),
+        }),
+        _ => Err(CliError::usage("help accepts at most one topic")),
     }
 }
 
@@ -122,37 +166,6 @@ fn parse_send(args: Vec<String>) -> Result<Command, CliError> {
     } else {
         Ok(Command::Send { text })
     }
-}
-
-fn parse_log(args: Vec<String>) -> Result<Command, CliError> {
-    let mut follow = false;
-    let mut full = false;
-    let mut limit = None;
-    let mut iter = args.into_iter();
-    while let Some(arg) = iter.next() {
-        match arg.as_str() {
-            "--follow" => follow = true,
-            "--full" => full = true,
-            "--limit" => {
-                let Some(value) = iter.next() else {
-                    return Err(CliError::usage("--limit requires a number"));
-                };
-                limit = Some(parse_limit(&value)?);
-            }
-            other => return Err(CliError::usage(format!("unknown log option: {other}"))),
-        }
-    }
-    Ok(Command::Log {
-        follow,
-        full,
-        limit,
-    })
-}
-
-fn parse_limit(value: &str) -> Result<usize, CliError> {
-    value
-        .parse()
-        .map_err(|_| CliError::usage(format!("invalid --limit: {value}")))
 }
 
 fn parse_no_args(args: Vec<String>, command: &str) -> Result<(), CliError> {
