@@ -110,5 +110,5 @@ and grow when live operation produces a new shape.
 
 ## Status
 
-open for this redesign. The target live parser rejects implicit envelopes,
-top-level line actions, and object-literal batch payloads.
+implemented for the current live parser. Implicit envelopes, top-level line
+actions, and object-literal batch payloads are rejected before dispatch.

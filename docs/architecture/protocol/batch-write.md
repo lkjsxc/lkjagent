@@ -136,6 +136,8 @@ and artifact-ledger recording.
 
 ## Status
 
-open for this redesign. The target prompt-facing and dispatcher contract is
-line protocol only; any object-literal recovery path must stay outside prompt
-context and must not mutate files.
+implemented for the current prompt-facing and dispatcher contract: live
+`fs.batch_write` uses line protocol only, and object-literal payloads are
+refused before mutation. Open prose-scale work belongs to the content atom and
+manuscript assembly tasks, where stored write contracts can name safe limits for
+larger exact-path units.

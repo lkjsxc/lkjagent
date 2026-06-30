@@ -44,4 +44,6 @@ fixture routes to a smaller next action.
 
 ## Status
 
-open for this redesign.
+implemented for the compact default, request construction, token recording, and
+oversize recovery classification. Open long-prose work must not raise the global
+default; it belongs to exact content atom or manuscript write contracts.

@@ -6,11 +6,15 @@ This file defines compact token usage accounting.
 
 ## Contract
 
-- Record input, output, cached input, total, context window, and used estimate.
+- Record per-exchange input, output, cached input, total, context window, and
+  used estimate.
 - Unknown endpoint fields stay unknown, not zero.
 - Format counts with decimal suffixes: `999`, `1.00K`, `1.23M`, `2.00B`.
 - Format ratios with two decimal places.
 - Status and console show context fraction and pressure.
+- Aggregate APIs must report latest, task, session, and all-time scopes with
+  known sums plus unknown-field counts; this aggregate layer is queued in
+  [../../execution/tasks/token-aggregate-ledger.md](../../execution/tasks/token-aggregate-ledger.md).
 
 ## Implementation Hooks
 
@@ -30,4 +34,5 @@ This file defines compact token usage accounting.
 
 ## Status
 
-implemented
+partially implemented. Per-exchange usage capture and latest rendering exist;
+cumulative aggregate scopes with explicit unknown counts remain open.

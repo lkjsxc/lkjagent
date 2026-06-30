@@ -27,5 +27,5 @@ root role, README title, manifest artifact key, and section role.
 
 ## Status
 
-open for this redesign. Scaffold is an internal planning concept, not a live
-model-facing writer.
+implemented for the current runtime. Scaffold is an internal planning concept,
+not a live model-facing writer.
