@@ -70,6 +70,17 @@ fn recovery_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> TotalResol
     if let Some(plan) = root_repair_plan(facts) {
         return plan;
     }
+    if let Some(manuscript) = facts.manuscript.as_ref() {
+        if manuscript.anomaly_shrink_level >= 3 {
+            return blocked(&format!(
+                "manuscript provider anomaly blocked next_path={}",
+                manuscript.next_path.as_deref().unwrap_or("unknown")
+            ));
+        }
+        if facts.write_contract.is_some() {
+            return write_contract_plan(facts, "manuscript write contract missing");
+        }
+    }
     if artifact_next_requested(snapshot) || !facts.weak_paths.is_empty() {
         return TotalResolverPlan::ExactInspection {
             tool: "artifact.next",

@@ -79,6 +79,7 @@ impl ResidentDaemon {
             (starting_task
                 && benchmark_target.is_none()
                 && graph.family == TaskFamily::Documentation
+                && !manuscript_scaffold_veto(&owner.content, graph.document.as_ref())
                 && !guard.is_recursive())
             .then(|| guard.count_guard())
             .flatten()
@@ -129,4 +130,19 @@ fn update_guard(daemon: &mut ResidentDaemon, starting_task: bool, content: &str)
     } else {
         daemon.dispatch_state.control.resume_task_with(content);
     }
+}
+
+fn manuscript_scaffold_veto(
+    content: &str,
+    document: Option<&lkjagent_graph::case_document::DocumentState>,
+) -> bool {
+    let lower = content.to_ascii_lowercase();
+    let story_root = document
+        .map(|doc| doc.root.trim_start_matches("./").starts_with("stories/"))
+        .unwrap_or(false);
+    lower.contains("do not create structured-output")
+        || lower.contains("no structured-output")
+        || lower.contains("/manuscript/")
+        || (story_root && lower.contains("manuscript"))
+        || (story_root && lower.contains("chapter") && lower.contains("word"))
 }

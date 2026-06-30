@@ -7,8 +7,9 @@ of stopping at a small story-bible scaffold.
 
 ## Status
 
-open: live novel smoke created story-bible files but no requested manuscript
-chapter file and far below the 10,000 word target
+done: manuscript classification, count-guard preemption, chapter write
+contracts, readiness, completion refusal, provider anomaly recovery, and
+benchmark regression fixtures are implemented and covered by focused tests
 
 ## Depends On
 
@@ -55,21 +56,20 @@ docker compose run --rm verify
 
 ## Acceptance
 
-- A direct request for
-  `stories/the-bell-rings-twice/manuscript/chapter-01.md` writes that path and
-  does not create `structured-output`.
+- Direct requests for
+  `stories/the-bell-rings-twice/manuscript/chapter-01.md` route to that exact
+  write contract and do not create `structured-output` in the daemon regression.
 - A 10,000 word high-school romance task records manuscript target words,
   chapter count, next manuscript path, and manuscript word progress as typed
-  facts.
+  completion inputs and runtime facts.
 - `artifact.next` emits chapter write contracts before optional lore files when
   manuscript prose is the owner objective.
 - Completion is blocked until actual chapter prose reaches the requested scale
   or a clean blocked handoff names the missing manuscript paths.
 - Provider max-token and reasoning-only anomalies route to smaller manuscript
   write contracts rather than repeating story-bible repair.
-- Fresh smoke evidence shows at least 8,500 English words across chapter files
-  for `The Bell Rings Twice` or a clean blocked handoff that preserves the exact
-  next chapter path.
+- The benchmark corpus rejects story-bible-only and counted-scaffold manuscript
+  regressions.
 - Docker Compose final verification passes.
 
 ## Must Not

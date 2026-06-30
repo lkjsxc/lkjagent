@@ -102,7 +102,7 @@ fn root_next(workspace: &Path, address: &ArtifactAddress, kind: &str) -> ToolRes
         }
     }
     if let Some(contract) =
-        crate::artifact_next_story::story_contract_if_missing(&root, &kind, &full)?
+        crate::artifact_next_story::story_contract_if_missing(&root, &kind, "unspecified", &full)?
     {
         return Ok(contract.response);
     }
@@ -144,8 +144,10 @@ fn root_next_with_cursor(
             return Ok(report.block_message(&root));
         }
     }
+    let scale = lkjagent_store::state::get(conn, &format!("artifact requested scale {root}"))?
+        .unwrap_or_else(|| "unspecified".to_string());
     if let Some(contract) =
-        crate::artifact_next_story::story_contract_if_missing(&root, &kind, &full)?
+        crate::artifact_next_story::story_contract_if_missing(&root, &kind, &scale, &full)?
     {
         crate::artifact_next_cursor::record_story_batch(
             conn,

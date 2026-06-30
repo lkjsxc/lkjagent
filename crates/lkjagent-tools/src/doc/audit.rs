@@ -68,15 +68,15 @@ fn file_root_report(root: &str) -> String {
         "document audit failed\nroot={root}\npath_kind=file\naddress_status=root_is_file\nfailed=1\nfailures:\n- root_is_file: {root}\nnext_action=fs.read file\nvalid_example:\n<action>\n<tool>fs.read</tool>\n<path>{root}</path>\n</action>"
     )
 }
-
 fn collect_dir_checks(root: &Path, dir: &Path, failures: &mut Vec<String>) -> ToolResult<()> {
     if dir_name_ends_md(dir) {
         failures.push(format!("markdown_suffix_directory: {}", rel(root, dir)));
     }
+    let manuscript_dir = rel(root, dir) == "manuscript";
     let readme = dir.join("README.md");
-    if !readme.is_file() {
+    if !manuscript_dir && !readme.is_file() {
         failures.push(format!("missing_readme: {}", rel(root, dir)));
-    } else {
+    } else if readme.is_file() {
         readme_checks(root, dir, &readme, failures)?;
     }
     let children = immediate_children(dir)?;
@@ -84,7 +84,7 @@ fn collect_dir_checks(root: &Path, dir: &Path, failures: &mut Vec<String>) -> To
         .iter()
         .filter(|child| child.file_name().and_then(|name| name.to_str()) != Some("README.md"))
         .count();
-    if child_count < 2 {
+    if !manuscript_dir && child_count < 2 {
         failures.push(format!("too_few_children: {}", rel(root, dir)));
     }
     for child in children {
@@ -131,7 +131,7 @@ fn file_checks(root: &Path, file: &Path, failures: &mut Vec<String>) -> ToolResu
     if text.lines().count() > 200 {
         failures.push(format!("line_limit: {relative}"));
     }
-    if forbidden_serial_name(&relative) {
+    if !relative.starts_with("manuscript/") && forbidden_serial_name(&relative) {
         failures.push(format!("serial_filename: {relative}"));
     }
     failures.extend(path_hygiene_failures(&relative));

@@ -69,7 +69,8 @@ pub fn audit(
             return Ok(report);
         }
     }
-    let report = crate::artifact_readiness::readiness_report(&kind, root, &full, &report)?;
+    let scale = crate::artifact_ledger_state::stored_scale(conn, root)?;
+    let report = crate::artifact_readiness::readiness_report(&kind, root, &full, &report, &scale)?;
     crate::artifact_ledger_support::record_audit(workspace, conn, root, &kind, &report, now)
 }
 

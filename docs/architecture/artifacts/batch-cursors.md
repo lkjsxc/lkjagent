@@ -38,6 +38,10 @@ BatchCursor
 - `artifact.next` emits bounded batches and persists the cursor.
 - Runtime decisions expose one remaining cursor path at a time as the active
   write contract to avoid endpoint overrun.
+- Manuscript cursors preserve the exact next chapter path across parse faults,
+  provider anomalies, compaction, and retries; recovery can shrink the prose
+  range but cannot switch to optional story-bible paths while chapter prose is
+  missing.
 - `fs.batch_write` parser accepts the documented canonical line protocol,
   drops an empty duplicate stub before the real content block, and normalizes
   allowed variants.

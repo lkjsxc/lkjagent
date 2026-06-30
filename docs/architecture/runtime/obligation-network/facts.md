@@ -47,7 +47,20 @@ inspection or blocked handoff, not blind directory creation.
 - `status`: pending, satisfied, failed, or blocked.
 
 A content write is admissible only when these facts are stored in the current
-runtime decision.
+runtime decision. Manuscript contracts use chapter-prose sections and the
+exact next `manuscript/` path, not the short story-bible reference-file
+contract.
+
+## Manuscript Facts
+
+`ManuscriptObjectiveFacts` contains lifecycle, target words, target word floor,
+chapter count, per-chapter word range, exact requested paths, inferred path
+pattern, forbidden roots, and whether an exact path is required.
+
+`ManuscriptProgressFacts` contains root, chapter paths, complete chapter paths,
+missing chapter paths, next chapter path, manuscript words written, target
+words, remaining words, and anomaly shrink level. Only `manuscript/` chapter or
+scene prose contributes to the word total.
 
 ## Observation Conversion
 

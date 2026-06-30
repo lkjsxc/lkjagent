@@ -1,5 +1,6 @@
 use crate::kernel::decision::ContentWriteContract;
 use crate::kernel::event::RuntimeEvent;
+use crate::kernel::manuscript::{facts_from_snapshot, ManuscriptFacts};
 use crate::kernel::obligation_contract::{root_identity, write_contract_for};
 use crate::kernel::obligation_parse::{
     audit_or_contract_text, candidate_event, failure_lines, inferred_kind, line_value,
@@ -59,6 +60,7 @@ pub struct RuntimeFacts {
     pub write_contract: Option<WriteContractFacts>,
     pub missing_evidence: Vec<String>,
     pub weak_paths: Vec<String>,
+    pub(crate) manuscript: Option<ManuscriptFacts>,
     pub owner_work_exists: bool,
     pub recovery_required: bool,
     pub hard_compaction: bool,
@@ -71,11 +73,13 @@ pub fn runtime_facts(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> Runtim
         .as_ref()
         .map(|facts| facts.status)
         .unwrap_or_else(|| status_from_snapshot(snapshot));
+    let manuscript = facts_from_snapshot(snapshot);
     RuntimeFacts {
         write_contract: write_contract_for(snapshot, audit.as_ref(), root.as_deref()),
         root,
         root_status,
         document_audit: audit,
+        manuscript,
         missing_evidence: snapshot.evidence.missing.clone(),
         weak_paths: snapshot.artifact.weak_paths.clone(),
         owner_work_exists: snapshot.owner_work_exists(),

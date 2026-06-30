@@ -23,7 +23,7 @@ that ran.
 | 11 | Obligation network root repair | [tasks/obligation-network-redesign.md](tasks/obligation-network-redesign.md) | done |
 | 12 | Runtime smoke false close and noisy repair | [tasks/runtime-smoke-problem-sweep.md](tasks/runtime-smoke-problem-sweep.md) | done |
 | 13 | Dense deterministic runtime authority network | [tasks/dense-runtime-state-network.md](tasks/dense-runtime-state-network.md) | done |
-| 14 | Story manuscript generation gap | [tasks/story-manuscript-generation-gap.md](tasks/story-manuscript-generation-gap.md) | open |
+| 14 | Story manuscript generation gap | [tasks/story-manuscript-generation-gap.md](tasks/story-manuscript-generation-gap.md) | done |
 
 ## Active Data Fixture
 
@@ -96,12 +96,10 @@ Historical details live in
 The dense runtime authority slice is implemented and proved by the focused,
 workspace, quiet verify, and Docker gates named in its task file.
 
-## Active Manuscript Gap
+## Story Manuscript Generation
 
-Live owner-requested novel generation on 2026-06-30 created the stable story
-root `stories/bell-rings-twice` and story-bible files, but it did not create the
-requested manuscript chapter files or approach the 10,000 word target. Evidence
-is summarized in
+The manuscript gap is implemented through typed manuscript classification,
+count-guard vetoes, chapter write contracts, manuscript readiness, completion
+refusals, provider anomaly recovery, and benchmark fixtures. Evidence is
+summarized in
 [current-work/story-manuscript-generation-gap.md](current-work/story-manuscript-generation-gap.md).
-The active task is
-[tasks/story-manuscript-generation-gap.md](tasks/story-manuscript-generation-gap.md).

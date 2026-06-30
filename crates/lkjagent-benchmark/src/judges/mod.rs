@@ -12,6 +12,7 @@ pub mod owner_loop_ops;
 pub mod owner_ops;
 pub mod owner_uploaded;
 pub mod program;
+pub mod story_manuscript;
 
 use std::path::Path;
 
@@ -46,6 +47,7 @@ pub fn judge_task(task: &BenchmarkTask, workspace: &Path) -> BenchResult<JudgeOu
         JudgeKind::TurnBudgetContinuation => owner_continuation::turn_budget_checkpoint(workspace),
         JudgeKind::UploadedRunFixtures => owner_uploaded::uploaded_run_fixtures(workspace),
         JudgeKind::LongNovelFailure => long_novel::long_novel_failure(workspace),
+        JudgeKind::StoryManuscript => story_manuscript::story_manuscript(workspace),
         JudgeKind::ArtifactAddressController => {
             owner_address::artifact_address_controller(workspace)
         }

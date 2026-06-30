@@ -5,6 +5,9 @@ const MAX_SIGNAL_DISTANCE: usize = 80;
 const MAX_AGGREGATE_SIGNAL_DISTANCE: usize = 32;
 
 pub(super) fn count_target(lower: &str, content: &str) -> Option<CountGuard> {
+    if manuscript_veto(lower) {
+        return None;
+    }
     let signals = signal_spans(lower, content);
     if signals.is_empty() {
         return None;
@@ -29,6 +32,9 @@ fn target_number(lower: &str, content: &str, signals: &[Span]) -> Option<NumberS
     number_spans(content)
         .into_iter()
         .filter_map(|number| {
+            if path_ordinal(content, number.span) {
+                return None;
+            }
             let file_score = signals
                 .iter()
                 .map(|signal| span_distance(number.span, *signal))
@@ -144,4 +150,28 @@ fn markdown_signal(lower: &str, content: &str) -> bool {
         || lower.contains(".md")
         || content.contains("マークダウン")
         || content.contains("ドキュメント")
+}
+
+fn manuscript_veto(lower: &str) -> bool {
+    (lower.contains("stories/") && lower.contains("/manuscript/"))
+        || lower.contains("do not create structured-output")
+        || lower.contains("no structured-output")
+}
+
+fn path_ordinal(content: &str, span: Span) -> bool {
+    let bytes = content.as_bytes();
+    let mut start = span.start.min(bytes.len());
+    let mut end = span.end.min(bytes.len());
+    while start > 0 && path_byte(bytes[start - 1]) {
+        start -= 1;
+    }
+    while end < bytes.len() && path_byte(bytes[end]) {
+        end += 1;
+    }
+    let token = &content[start..end].to_ascii_lowercase();
+    token.contains('/') || token.contains(".md") || token.contains("chapter-")
+}
+
+fn path_byte(byte: u8) -> bool {
+    byte.is_ascii_alphanumeric() || matches!(byte, b'/' | b'-' | b'_' | b'.')
 }

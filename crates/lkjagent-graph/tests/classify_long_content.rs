@@ -97,6 +97,36 @@ fn detailed_bread_dictionary_routes_to_dictionary_artifact() {
 }
 
 #[test]
+fn exact_manuscript_path_routes_to_story_artifact() {
+    let state = initial_state(
+        "Write one 700 to 900 word chapter at stories/the-bell-rings-twice/manuscript/chapter-01.md.",
+        Some(10),
+    );
+
+    assert_eq!(state.family, TaskFamily::Documentation);
+    assert_eq!(state.subroute, "content-artifact");
+    assert!(state.document.as_ref().is_some_and(|document| {
+        document.root == "stories/the-bell-rings-twice"
+            && document.profile.as_deref() == Some("story")
+            && document.requested_scale.as_deref() == Some("full-draft")
+    }));
+}
+
+#[test]
+fn ten_thousand_word_novel_records_full_draft_scale() {
+    let state = initial_state(
+        "Create a 10,000 word high-school romance novel named \"The Bell Rings Twice\" in ten chapters.",
+        Some(11),
+    );
+
+    assert_eq!(state.subroute, "content-artifact");
+    assert!(state.document.as_ref().is_some_and(|document| {
+        document.root == "stories/bell-rings-twice"
+            && document.requested_scale.as_deref() == Some("full-draft")
+    }));
+}
+
+#[test]
 fn long_story_bug_fix_stays_bug_fix() {
     let state = initial_state("Fix the bug in the long story generator.", Some(3));
 

@@ -85,6 +85,11 @@ fn route_reason_for(family: TaskFamily, content_artifact: bool) -> &'static str 
 }
 
 fn artifact_root(kind: &str, objective: &str) -> String {
+    if kind == "story" {
+        if let Some(root) = story_root_from_path(objective) {
+            return root;
+        }
+    }
     let parent = match kind {
         "dictionary" => "dictionaries",
         "cookbook" => "cookbooks",
@@ -92,6 +97,26 @@ fn artifact_root(kind: &str, objective: &str) -> String {
         _ => "artifacts",
     };
     format!("{parent}/{}", artifact_alias(kind, objective))
+}
+
+fn story_root_from_path(objective: &str) -> Option<String> {
+    let lower = objective.to_ascii_lowercase();
+    let start = lower.find("stories/")?;
+    let token = lower[start..]
+        .split(|ch: char| !path_char(ch))
+        .next()
+        .unwrap_or("")
+        .trim_end_matches(|ch: char| !ch.is_ascii_alphanumeric());
+    let mut parts = token.split('/');
+    if parts.next()? != "stories" {
+        return None;
+    }
+    let slug = parts.next()?.trim_matches('-');
+    (!slug.is_empty()).then(|| format!("stories/{slug}"))
+}
+
+fn path_char(ch: char) -> bool {
+    ch.is_ascii_alphanumeric() || matches!(ch, '/' | '-' | '_' | '.')
 }
 
 fn artifact_alias(kind: &str, objective: &str) -> String {

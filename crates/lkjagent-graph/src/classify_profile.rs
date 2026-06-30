@@ -1,6 +1,7 @@
 use crate::classify_signals::{
-    contains_any, counted_story_request, large_content_signal, operational_compaction_request,
-    priority_counted_content_request, priority_long_content_request, unquoted_lower,
+    contains_any, counted_story_request, large_content_signal, manuscript_request,
+    operational_compaction_request, priority_counted_content_request,
+    priority_long_content_request, unquoted_lower,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -49,7 +50,11 @@ fn artifact_kind(lower: &str, content: &str) -> &'static str {
 }
 
 fn requested_scale(lower: &str) -> Option<&'static str> {
-    if contains_any(lower, &["full draft", "manuscript", "20 chapters"]) {
+    if contains_any(
+        lower,
+        &["full draft", "complete draft", "manuscript", "20 chapters"],
+    ) || manuscript_request(lower) && contains_any(lower, &["word", "chapter", "scene"])
+    {
         Some("full-draft")
     } else if large_content_signal(lower, lower) || counted_story_request(lower) {
         Some("large-story")
