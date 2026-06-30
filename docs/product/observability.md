@@ -34,11 +34,13 @@ and `--full` prints whole payloads.
 
 `lkjagent status` reports prefix size, log size, remaining headroom, and the
 compaction threshold from [../architecture/context/budgets.md](../architecture/context/budgets.md).
-`lkjagent status` and `lkjagent console` render the compact accounting deck:
-`ctx=used/window percent pressure=color`, token scopes for latest, task,
-session, and all-time usage, and `prefix/log/reserve/headroom`. Missing
-endpoint usage fields render as `unknown`, not zero. Status and console also
-expose the current model handoff path tracked in
+`lkjagent status` and `lkjagent console` render one shared status deck with
+runtime, queue, task, authority, artifact, context, token, model-log, next, and
+diagnostic facts. The compact accounting deck includes `ctx=used/window percent
+pressure=color`, token scopes for latest, task, session, and all-time usage,
+and `prefix/log/reserve/headroom`. Missing endpoint usage fields render as
+`unknown`, not zero. Status and console also expose the current model handoff
+path tracked in
 [../architecture/observability/model-log.md](../architecture/observability/model-log.md),
 and `lkjagent model-log --print` prints the synthesized Markdown snapshot.
 Status also exposes continuation epoch, turns used, checkpoint interval, last
@@ -55,5 +57,6 @@ Anything fancier is graph-guided shell work the agent can build on demand.
 ## Status
 
 partially implemented. Status, log, console, memory, graph, and model-log
-surfaces exist. Cumulative token scopes now render in status and console, while
-shared status/log/console deck restructuring remains active redesign work.
+surfaces exist. Status and console now share a prefixed deck with cumulative
+token scopes. Remaining observability work belongs to later resolver, content,
+and smoke tasks rather than a separate display deck rewrite.

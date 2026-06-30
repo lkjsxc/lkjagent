@@ -51,9 +51,9 @@ fn data_option_is_global_after_command() -> TestResult<()> {
 
     let status = run_cli(["status", "--data", path.as_ref()]);
     assert_eq!(status.code, 0);
-    assert!(status.stdout.contains("queue_depth=1"));
+    assert!(status.stdout.contains("queue.pending=1"));
     assert!(status.stdout.contains(&format!(
-        "model_log={}",
+        "model.log={}",
         data.join("logs/current-model-run.md").to_string_lossy()
     )));
     Ok(())

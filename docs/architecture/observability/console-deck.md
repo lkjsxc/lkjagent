@@ -6,9 +6,9 @@ This file defines the compact bottom deck in the interactive console.
 
 ## Contract
 
-- Show daemon state, queue depth, active case, top state tracks, context
-  fraction, token usage, last fault, last action, pending owner question, and
-  model log path.
+- Use the same status deck facts as `lkjagent status` for daemon state, queue
+  depth, active case, top state tracks, context fraction, token usage, last
+  fault, next action, pending owner question, and model log path.
 - Keep the deck compact enough for narrow terminals.
 - Unknown values render as `unknown`.
 - The console remains read-only until the owner sends input.
@@ -28,4 +28,5 @@ This file defines the compact bottom deck in the interactive console.
 
 ## Status
 
-partially implemented
+implemented for the current shared status deck, compact wrapping, prompt
+anchoring, and next-action display.

@@ -30,10 +30,10 @@ fn send_persists_and_status_log_render_store_facts() -> TestResult<()> {
         .any(|event| event.content.contains("reason=owner-send")));
 
     let status = run_cli(["--data", data.to_string_lossy().as_ref(), "status"]);
-    assert!(status.stdout.contains("queue_depth=1"));
-    assert!(status.stdout.contains("context_window=24576"));
-    assert!(status.stdout.contains("context_hard_trigger=21504"));
-    assert!(status.stdout.contains("context_compaction_trigger=21504"));
+    assert!(status.stdout.contains("queue.pending=1"));
+    assert!(status.stdout.contains("context.window=24576"));
+    assert!(status.stdout.contains("context.hard_trigger=21504"));
+    assert!(status.stdout.contains("context.pressure=green"));
 
     let log = run_cli(["--data", data.to_string_lossy().as_ref(), "log"]);
     assert!(log.stdout.contains("kind=queue_mutation"));

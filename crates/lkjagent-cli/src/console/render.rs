@@ -2,8 +2,9 @@ use std::path::Path;
 
 pub use super::size::ScreenSize;
 use super::{display, event_view, style};
-use crate::accounting;
 use crate::error::CliError;
+use crate::status_deck;
+use crate::status_deck::StatusDeck;
 use crate::store::open_store;
 
 pub struct ConsoleScreen {
@@ -29,8 +30,8 @@ pub fn render_screen_for_size(
         .filter(|row| row.status == "pending")
         .collect::<Vec<_>>();
     let events = lkjagent_store::events::read_events(&conn)?;
-    let state = state_value(&conn, "daemon state", "stopped")?;
-    let bottom = bottom_deck(data_dir, &conn, &state, notice, pending.len(), size.columns)?;
+    let deck = status_deck::load(data_dir, &conn)?;
+    let bottom = bottom_deck(&deck, notice, size.columns);
     let body_limit = size.rows.saturating_sub(1);
     let body_budget = body_limit.saturating_sub(bottom.len());
     let mut lines = top_pane(&events, &pending, body_budget, size.columns);
@@ -43,7 +44,7 @@ pub fn render_screen_for_size(
     }
     Ok(ConsoleScreen {
         body: lines.join("\n"),
-        prompt: style::prompt(&state),
+        prompt: style::prompt(&deck.daemon_state),
         columns: size.columns,
     })
 }
@@ -66,86 +67,48 @@ fn top_pane(
     tail(lines, budget)
 }
 
-fn bottom_deck(
-    data_dir: &Path,
-    conn: &rusqlite::Connection,
-    state: &str,
-    notice: &str,
-    pending: usize,
-    width: usize,
-) -> Result<Vec<String>, CliError> {
+fn bottom_deck(deck: &StatusDeck, notice: &str, width: usize) -> Vec<String> {
     let mut lines = vec![style::muted(&rule(width))];
-    let states = active_states(conn)?;
     let mut state_line = format!(
-        "state {} | pending {pending} | task {} | turns {}",
-        state_label(state),
-        state_value(conn, "open task", "none")?,
-        state_value(conn, "turn", "0")?
+        "state {} | pending {} | task {} | turns {}",
+        deck.state_label, deck.pending, deck.open_task, deck.turns
     );
-    if states != "none" {
-        state_line.push_str(&format!(" | states {states}"));
+    if deck.active_states != "none" {
+        state_line.push_str(&format!(" | states {}", deck.active_states));
     }
-    let accounting = accounting::deck_for_data(data_dir, conn)?;
     lines.extend(wrap_limited(&state_line, width, 2));
-    lines.extend(wrap_limited(&accounting.context_line, width, 1));
-    lines.extend(wrap_limited(&accounting.token_line, width, 1));
-    lines.extend(wrap_limited(&accounting.prefix_line, width, 1));
+    lines.extend(wrap_limited(&deck.accounting.context_line, width, 1));
+    lines.extend(wrap_limited(&deck.accounting.token_line, width, 1));
+    lines.extend(wrap_limited(&deck.accounting.prefix_line, width, 1));
     lines.extend(wrap_limited(
-        &format!(
-            "model_log {}",
-            lkjagent_runtime::model_log::current_log_path(data_dir).to_string_lossy()
-        ),
+        &format!("model_log {}", deck.model_log),
         width,
         1,
     ));
-    lines.extend(optional_row(conn, "question", "daemon question", width, 2)?);
-    lines.extend(optional_row(conn, "error", "daemon error", width, 1)?);
+    lines.extend(optional_value("question", &deck.question, width, 2));
+    lines.extend(optional_value("error", &deck.error, width, 1));
+    lines.extend(optional_value("next", &deck.next_action, width, 1));
     lines.extend(wrap_limited(&format!("notice {notice}"), width, 1));
-    lines.extend(wrap_limited(&hint(state, pending), width, 1));
-    Ok(lines)
+    lines.extend(wrap_limited(
+        &hint(&deck.daemon_state, deck.pending),
+        width,
+        1,
+    ));
+    lines
 }
 
-fn active_states(conn: &rusqlite::Connection) -> Result<String, CliError> {
-    let Some(case) = lkjagent_store::graph::active_case(conn)? else {
-        return Ok("none".to_string());
-    };
-    let rows = lkjagent_store::graph::state_tracks::state_tracks_for_case(conn, case.id)?;
-    if rows.is_empty() {
-        return Ok("none".to_string());
-    }
-    Ok(rows
-        .iter()
-        .take(3)
-        .enumerate()
-        .map(|(index, row)| {
-            lkjagent_runtime::graph_state_tracks::format_state_track_row(index + 1, row)
-        })
-        .collect::<Vec<_>>()
-        .join("; "))
-}
-
-fn optional_row(
-    conn: &rusqlite::Connection,
-    label: &str,
-    key: &str,
-    width: usize,
-    max_lines: usize,
-) -> Result<Vec<String>, CliError> {
-    let value = state_value(conn, key, "none")?;
+fn optional_value(label: &str, value: &str, width: usize, max_lines: usize) -> Vec<String> {
     if value == "none" {
-        return Ok(Vec::new());
+        Vec::new()
+    } else {
+        wrap_limited(&format!("{label} {value}"), width, max_lines)
     }
-    Ok(wrap_limited(&format!("{label} {value}"), width, max_lines))
 }
 
 fn wrap_limited(text: &str, width: usize, max_lines: usize) -> Vec<String> {
     let mut lines = display::wrap(text, "", width);
     lines.truncate(max_lines);
     lines
-}
-
-fn state_value(conn: &rusqlite::Connection, key: &str, default: &str) -> Result<String, CliError> {
-    Ok(lkjagent_store::state::get(conn, key)?.unwrap_or_else(|| default.to_string()))
 }
 
 fn tail(lines: Vec<String>, budget: usize) -> Vec<String> {
@@ -170,15 +133,4 @@ fn hint(state: &str, pending: usize) -> String {
         (_, 0) => "send work | /refresh /help /quit".to_string(),
         _ => "queued work pending | /refresh /help /quit".to_string(),
     }
-}
-
-fn state_label(state: &str) -> String {
-    match state {
-        "idle" => "IDLE",
-        "working" => "WORKING",
-        "waiting" => "WAITING",
-        "error" => "ERROR",
-        _ => "STOPPED",
-    }
-    .to_string()
 }

@@ -17,10 +17,10 @@ fn status_prints_ranked_active_state_tracks() -> TestResult<()> {
 
     let status = run_cli(["--data", data.to_string_lossy().as_ref(), "status"]);
 
-    assert!(status.stdout.contains("active_states=1."));
+    assert!(status.stdout.contains("task.states=1."));
     assert!(status.stdout.contains("document-structure"));
-    assert!(status.stdout.contains("phase=planning"));
-    assert!(status.stdout.contains("model_log="));
+    assert!(status.stdout.contains("task.phase=planning"));
+    assert!(status.stdout.contains("model.log="));
     Ok(())
 }
 
@@ -135,13 +135,13 @@ fn status_prints_authority_snapshot_fields() -> TestResult<()> {
 
     let status = run_cli(["--data", data.to_string_lossy().as_ref(), "status"]);
 
-    assert!(status.stdout.contains("active_mode=Recovery"));
-    assert!(status.stdout.contains("authority_phase=recovery"));
-    assert!(status.stdout.contains("authority_node=recover-repeat"));
-    assert!(status.stdout.contains("evidence_gaps=artifact-readiness"));
+    assert!(status.stdout.contains("authority.active_mode=Recovery"));
+    assert!(status.stdout.contains("authority.phase=recovery"));
+    assert!(status.stdout.contains("authority.node=recover-repeat"));
+    assert!(status.stdout.contains("next.missing=artifact-readiness"));
     assert!(status
         .stdout
-        .contains("next_executable_action=<action><tool>artifact.next</tool></action>"));
+        .contains("next.action=<action><tool>artifact.next</tool></action>"));
     Ok(())
 }
 
@@ -171,7 +171,7 @@ fn status_prints_latest_compaction_snapshot_fields() -> TestResult<()> {
 
     assert!(status
         .stdout
-        .contains("last_compaction=snapshot:2026-06-20T00:00:01Z"));
+        .contains("runtime.last_compaction=snapshot:2026-06-20T00:00:01Z"));
     assert!(status.stdout.contains("phase=recovery"));
     assert!(status.stdout.contains("node=recover-by-artifact-plan"));
     assert!(status.stdout.contains("write_batch_cursor=docs/a.md"));
@@ -189,11 +189,11 @@ fn status_prints_continuation_checkpoint_state() -> TestResult<()> {
 
     let status = run_cli(["--data", data.to_string_lossy().as_ref(), "status"]);
 
-    assert!(status.stdout.contains("continuation_epoch=2"));
-    assert!(status.stdout.contains("continuation_turns=5"));
-    assert!(status.stdout.contains("checkpoint_turns=8"));
+    assert!(status.stdout.contains("runtime.continuation_epoch=2"));
+    assert!(status.stdout.contains("runtime.continuation_turns=5"));
+    assert!(status.stdout.contains("runtime.checkpoint_turns=8"));
     assert!(status
         .stdout
-        .contains("continuation_decision=continue-owner-execution"));
+        .contains("runtime.continuation_decision=continue-owner-execution"));
     Ok(())
 }

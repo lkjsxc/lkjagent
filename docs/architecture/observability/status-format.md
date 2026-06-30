@@ -6,11 +6,13 @@ This file defines plain text `lkjagent status` output.
 
 ## Contract
 
-- Include daemon state, queue depth, active case, top state tracks, context
-  fraction, token usage, last fault, last action, owner question, and model log path.
-- Use stable key-value lines for machine and human scanning.
+- Include runtime, queue, task, authority, artifact, context, token, model-log,
+  next-action, and diagnostic sections.
+- Use stable prefixed key-value lines for machine and human scanning, such as
+  `runtime.daemon_state`, `queue.pending`, `task.active_case`,
+  `artifact.root`, `tokens.usage`, and `next.action`.
 - Render unknown token values as `unknown`.
-- Keep counts compact with the same formatter as the console.
+- Keep counts compact with the same formatter and deck as the console.
 
 ## Implementation Hooks
 
@@ -27,4 +29,4 @@ This file defines plain text `lkjagent status` output.
 
 ## Status
 
-partially implemented
+implemented for the current prefixed status deck shared with the console.
