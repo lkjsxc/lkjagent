@@ -1,22 +1,11 @@
-pub fn help_text() -> &'static str {
-    "usage: lkjagent [--data DIR] <command> [args]\n\
-\n\
-commands:\n\
-  run                         start the daemon in the foreground\n\
-  send <text>                 enqueue an owner message\n\
-  status                      print daemon and task status\n\
-  log [--limit N] [--follow]  print transcript events\n\
-  console                     open the owner console\n\
-  memory <query>              search distilled memory\n\
-  graph                       print graph state\n\
-  model-log [command]         inspect model exchange logs\n\
-  personal <command>          inspect personal records\n\
-\n\
-global options:\n\
-  --data DIR                  runtime data directory, accepted before or after command\n\
-  -h, --help                  print this help\n\
-\n\
-Use -- after a command when the command argument must start with --."
+use super::args_catalog::{CommandDoc, GROUPS};
+use crate::error::CliError;
+
+pub fn help_text(topic: Option<&str>) -> Result<String, CliError> {
+    match topic {
+        Some(topic) => group_help(topic),
+        None => Ok(root_help()),
+    }
 }
 
 pub fn is_help_arg(arg: &str) -> bool {
@@ -37,4 +26,36 @@ pub fn is_help_invocation(args: &[String]) -> bool {
         }
     }
     false
+}
+
+fn root_help() -> String {
+    let mut out = String::from("usage: lkjagent [--data DIR] <command> [args]\n\ncommands:\n");
+    for group in GROUPS {
+        out.push_str(&format!("  {:<10} {}\n", group.name, group.summary));
+        for command in group.commands {
+            out.push_str(&command_line(command));
+        }
+    }
+    out.push_str(
+        "\nglobal options:\n  --data DIR  runtime data directory, accepted before or after command\n  -h, --help  print this help\n\nUse 'lkjagent help <group>' for group help. Use -- when text starts with --.",
+    );
+    out
+}
+
+fn group_help(topic: &str) -> Result<String, CliError> {
+    let Some(group) = GROUPS.iter().find(|group| group.name == topic) else {
+        return Err(CliError::usage(format!("unknown help topic: {topic}")));
+    };
+    let mut out = format!(
+        "usage: lkjagent {topic} <command> [args]\n\n{}:\n",
+        group.summary
+    );
+    for command in group.commands {
+        out.push_str(&command_line(command));
+    }
+    Ok(out)
+}
+
+fn command_line(command: &CommandDoc) -> String {
+    format!("  {:<42} {}\n", command.usage, command.summary)
 }

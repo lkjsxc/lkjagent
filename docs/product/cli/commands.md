@@ -32,9 +32,8 @@ configuration so a broken config cannot hide usage text.
 | `lkjagent log [--limit N] [--full] [--follow]` | Print transcript events. |
 | `lkjagent watch` | Open the interactive terminal screen in [console.md](console.md). |
 
-The current binary uses `console` for the interactive screen. The CLI core task
-must either move the parser to `watch` or list `console` as an explicit accepted
-name in this file before claiming the command tree implemented.
+`watch` and `console` are both explicit accepted names for the interactive
+screen. There are no hidden console command names.
 
 ## Work Inspection
 

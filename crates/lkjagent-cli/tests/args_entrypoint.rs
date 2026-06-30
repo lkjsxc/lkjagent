@@ -1,5 +1,6 @@
 mod support;
 
+use lkjagent_cli::args::{parse_args, Command};
 use lkjagent_cli::run_cli;
 use support::{temp_data, TestResult};
 
@@ -11,6 +12,32 @@ fn help_prints_command_summary() {
     assert!(help.stderr.is_empty());
     assert!(help.stdout.contains("usage: lkjagent"));
     assert!(help.stdout.contains("send <text>"));
+}
+
+#[test]
+fn group_help_prints_without_runtime_config() {
+    let help = run_cli(["help", "work"]);
+
+    assert_eq!(help.code, 0);
+    assert!(help.stderr.is_empty());
+    assert!(help.stdout.contains("usage: lkjagent work"));
+    assert!(help.stdout.contains("task list"));
+}
+
+#[test]
+fn unknown_help_topic_is_usage_error() {
+    let help = run_cli(["help", "missing"]);
+
+    assert_eq!(help.code, 2);
+    assert_eq!(help.stderr, "unknown help topic: missing");
+}
+
+#[test]
+fn watch_parses_as_console_command() -> TestResult<()> {
+    let invocation = parse_args(["--data", "/tmp/lkjagent-test", "watch"])?;
+
+    assert_eq!(invocation.command, Command::Console);
+    Ok(())
 }
 
 #[test]

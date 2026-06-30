@@ -6,7 +6,8 @@ Implement the documented command tree, help text, parsing, and dispatch shape.
 
 ## Status
 
-open
+done: metadata help, group parsing, watch, task and queue inspection, focused
+CLI tests, quiet verify, and Docker verify passed
 
 ## Depends On
 
