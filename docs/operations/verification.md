@@ -27,6 +27,8 @@ all run as `cargo run -p lkjagent-xtask -- <gate>`:
 | docs-check | alias for check-docs |
 | hygiene-check | check-lines plus check-style |
 | benchmark check-corpus | deterministic benchmark task, fixture, and judge validity |
+| smoke replay | deterministic runtime smoke replay with bounded `tmp/` summary output |
+| smoke live | explicit live smoke status; skips honestly when endpoint config is absent |
 | quiet test | cargo fmt --check, clippy with warnings denied for all targets, all workspace tests |
 | quiet verify | check-docs, check-lines, check-style, benchmark check-corpus, then quiet test |
 
@@ -43,7 +45,8 @@ docker compose run --rm replay
 `verify` is the final gate. It builds the image from a clean context and runs
 quiet verify inside it; no source bind mounts, so the gate proves the
 repository as committed, not the working tree. `test`, `lint`, `bench`, and
-`replay` expose narrower Docker Compose gates for focused diagnosis. Service
+`replay` expose narrower Docker Compose gates for focused diagnosis. `replay`
+runs `smoke replay` and does not contact an endpoint. Service
 design is in [compose.md](compose.md). Any claim that a runtime behavior is
 implemented requires the final gate in the same handoff.
 

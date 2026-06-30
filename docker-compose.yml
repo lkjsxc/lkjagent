@@ -85,7 +85,7 @@ services:
     build:
       context: .
       target: build
-    command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "benchmark", "check-corpus"]
+    command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "smoke", "replay"]
 
   endpoint-example:
     profiles: ["endpoint"]
