@@ -3,7 +3,7 @@
 ## Purpose
 
 This crate owns the lkjagent binary entrypoint.
-Doc contract: [../../docs/product/cli.md](../../docs/product/cli.md).
+Doc contract: [../../docs/product/cli/](../../docs/product/cli/README.md).
 
 ## Table of Contents
 

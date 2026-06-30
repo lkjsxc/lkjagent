@@ -36,7 +36,7 @@ adding a top-level path means adding a row in the same commit.
 | crates/lkjagent-graph | state graph, task cases, transitions, evidence gates | [../architecture/state-graph/](../architecture/state-graph/README.md) |
 | crates/lkjagent-tools | tool execution adapters | [../architecture/tools/](../architecture/tools/README.md) |
 | crates/lkjagent-runtime | daemon, loop, intake, maintenance | [../architecture/runtime/](../architecture/runtime/README.md) |
-| crates/lkjagent-cli | the lkjagent binary | [../product/cli.md](../product/cli.md) |
+| crates/lkjagent-cli | the lkjagent binary | [../product/cli/](../product/cli/README.md) |
 | crates/lkjagent-benchmark | benchmark tasks, judges, corpus checks, reports | [../evaluation/](../evaluation/README.md) |
 | crates/lkjagent-xtask | repository checks and quiet gates | [../operations/verification.md](../operations/verification.md) |
 

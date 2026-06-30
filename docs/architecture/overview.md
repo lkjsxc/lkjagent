@@ -34,7 +34,7 @@ graph state and rebuilds the prefix.
 | lkjagent-llm | endpoint HTTP client | [llm/](llm/README.md) |
 | lkjagent-tools | tool execution adapters | [tools/](tools/README.md) |
 | lkjagent-runtime | daemon, loop composition, intake, maintenance helpers | [runtime/](runtime/README.md) |
-| lkjagent-cli | the lkjagent binary | [../product/cli.md](../product/cli.md) |
+| lkjagent-cli | the lkjagent binary | [../product/cli/](../product/cli/README.md) |
 | lkjagent-xtask | repository checks and quiet gates | [../operations/verification.md](../operations/verification.md) |
 
 The workspace layout is owned by [../repository/layout.md](../repository/layout.md).
