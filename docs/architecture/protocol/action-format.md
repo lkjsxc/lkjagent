@@ -157,5 +157,6 @@ examples must not teach it as valid output.
 
 ## Status
 
-open for this redesign. The target live grammar is singular tag envelopes only,
-with line protocol allowed only as the value inside `<files>`.
+implemented for the current runtime. The live grammar is singular tag envelopes
+only, with line protocol allowed only as the value inside `<files>`. Future
+prompt examples and recovery cards must stay inside this grammar.

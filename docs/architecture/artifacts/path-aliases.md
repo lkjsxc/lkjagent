@@ -58,4 +58,6 @@ objective remains present in artifact metadata.
 
 ## Status
 
-open for this redesign.
+implemented for current artifact root planning and short semantic aliases. Open
+profile-generalization work belongs to
+[../../execution/tasks/content-atom-graph.md](../../execution/tasks/content-atom-graph.md).

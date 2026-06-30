@@ -35,6 +35,21 @@ Every task file uses exactly these headings:
 
 ## Table of Contents
 
+### Active Redesign Queue
+
+- [structural-truth-sweep.md](structural-truth-sweep.md): reconcile documentation status.
+- [cli-contract-redesign.md](cli-contract-redesign.md): design the CLI contract.
+- [token-aggregate-ledger.md](token-aggregate-ledger.md): implement cumulative token usage.
+- [cli-core-redesign.md](cli-core-redesign.md): implement parser, help, and dispatch shape.
+- [observability-render-redesign.md](observability-render-redesign.md): share status, log, and console decks.
+- [resolver-table-totality.md](resolver-table-totality.md): remove fallback-shaped resolver logic.
+- [content-atom-graph.md](content-atom-graph.md): add general work-product atoms.
+- [manuscript-compose.md](manuscript-compose.md): implement staged manuscript assembly.
+- [smoke-harness.md](smoke-harness.md): add replay and smoke harnesses.
+- [final-redesign-gates.md](final-redesign-gates.md): run final gates and handoff.
+
+### Historical Task Contracts
+
 - [bootstrap-workspace.md](bootstrap-workspace.md): create the cargo workspace and image skeleton.
 - [xtask-checks.md](xtask-checks.md): build the gates that enforce the repository rules.
 - [protocol-parser.md](protocol-parser.md): the action grammar parser and renderer.
@@ -45,27 +60,32 @@ Every task file uses exactly these headings:
 - [tool-runtime.md](tool-runtime.md): dispatch and the registry-backed tool adapters.
 - [agent-loop.md](agent-loop.md): the turn loop composing every crate.
 - [queue-cli.md](queue-cli.md): the lkjagent binary and its commands.
-- [self-maintenance.md](self-maintenance.md): explicit maintenance directives and their bounds.
+- [self-maintenance.md](self-maintenance.md): explicit maintenance directives and
+  their bounds.
 - [compose-final-gate.md](compose-final-gate.md): Dockerfile, compose services, CI.
-- [deep-redesign-truth-sweep.md](deep-redesign-truth-sweep.md): reconcile active failure evidence and stale roots.
+- [deep-redesign-truth-sweep.md](deep-redesign-truth-sweep.md): reconcile active
+  failure evidence and stale roots.
 - [deep-redesign-compact-context.md](deep-redesign-compact-context.md): compact
   prompt context and line-protocol-only batches.
-- [deep-redesign-output-budget.md](deep-redesign-output-budget.md): compact max output budget and oversize recovery.
-- [deep-redesign-short-paths.md](deep-redesign-short-paths.md): short semantic artifact aliases.
-- [deep-redesign-exact-examples.md](deep-redesign-exact-examples.md): registry-derived exact action examples.
-- [deep-redesign-runtime-authority.md](deep-redesign-runtime-authority.md): persisted
-  decision prompt cards and admission.
-- [deep-redesign-artifact-batches.md](deep-redesign-artifact-batches.md): path-specific artifact micro-batches.
+- [deep-redesign-output-budget.md](deep-redesign-output-budget.md): compact max
+  output budget and oversize recovery.
+- [deep-redesign-short-paths.md](deep-redesign-short-paths.md): short semantic
+  artifact aliases.
+- [deep-redesign-exact-examples.md](deep-redesign-exact-examples.md):
+  registry-derived exact action examples.
+- [deep-redesign-runtime-authority.md](deep-redesign-runtime-authority.md):
+  persisted decision prompt cards and admission.
+- [deep-redesign-artifact-batches.md](deep-redesign-artifact-batches.md):
+  path-specific artifact micro-batches.
 - [deep-redesign-completion-maintenance.md](deep-redesign-completion-maintenance.md):
   completion and no-op maintenance reducers.
-- [deep-redesign-provider-handoff.md](deep-redesign-provider-handoff.md): provider anomaly retry and
-  blocked handoff.
-- [deep-redesign-gates.md](deep-redesign-gates.md): benchmark corpus and final verification gates.
-- [obligation-network-redesign.md](obligation-network-redesign.md): fact, obligation, resolver, and
-  progress-key runtime redesign.
-- [runtime-smoke-problem-sweep.md](runtime-smoke-problem-sweep.md): live-smoke false-close and
-  noisy-loop repairs.
-- [dense-runtime-state-network.md](dense-runtime-state-network.md): dense deterministic runtime
-  authority network.
-- [story-manuscript-generation-gap.md](story-manuscript-generation-gap.md): manuscript-scale story
-  generation gap.
+- [deep-redesign-provider-handoff.md](deep-redesign-provider-handoff.md): provider
+  anomaly retry and blocked handoff.
+- [deep-redesign-gates.md](deep-redesign-gates.md): benchmark corpus and final
+  verification gates.
+- [obligation-network-redesign.md](obligation-network-redesign.md): fact,
+  obligation, resolver, and progress-key runtime redesign.
+- [runtime-smoke-problem-sweep.md](runtime-smoke-problem-sweep.md): live-smoke
+  false-close and noisy-loop repairs.
+- [dense-runtime-state-network.md](dense-runtime-state-network.md): dense deterministic runtime authority network.
+- [story-manuscript-generation-gap.md](story-manuscript-generation-gap.md): manuscript-scale story generation gap.

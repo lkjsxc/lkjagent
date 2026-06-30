@@ -21,4 +21,5 @@ protocol.
 
 ## Status
 
-open for this redesign.
+implemented for internal document structure profiles. Open profile
+broadening belongs to the content atom and artifact profile redesign queue.

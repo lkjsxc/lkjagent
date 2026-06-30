@@ -75,4 +75,6 @@ Tests must prove rendered prompt frames:
 
 ## Status
 
-open for this redesign.
+implemented for the current runtime cards and decision-selected action
+surfaces. Open work is to reuse the compact surface for content atom and
+manuscript assembly contracts without broadening the prompt manual.

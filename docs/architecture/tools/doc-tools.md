@@ -71,5 +71,5 @@ The documentation root contract is
 
 ## Status
 
-open for this redesign. Live tools use audits, plans, contracts, and
+implemented for the current live tools. They use audits, plans, contracts, and
 model-authored line-protocol writes; scaffold writers are not prompt-visible.

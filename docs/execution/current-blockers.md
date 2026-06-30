@@ -6,24 +6,40 @@ This file is the dependency-ordered implementation queue. Rows move to done
 only when the linked task contract names focused evidence and the actual gates
 that ran.
 
-## Queue
+## Active Queue
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Truth sweep and fixture root reconciliation | [tasks/deep-redesign-truth-sweep.md](tasks/deep-redesign-truth-sweep.md) | done |
-| 2 | Compact context and no object-literal model context | [tasks/deep-redesign-compact-context.md](tasks/deep-redesign-compact-context.md) | done |
-| 3 | Output budget contract and endpoint config | [tasks/deep-redesign-output-budget.md](tasks/deep-redesign-output-budget.md) | done |
-| 4 | Short artifact path aliases and planner | [tasks/deep-redesign-short-paths.md](tasks/deep-redesign-short-paths.md) | done |
-| 5 | Registry-derived exact action examples | [tasks/deep-redesign-exact-examples.md](tasks/deep-redesign-exact-examples.md) | done |
-| 6 | Narrow runtime authority prompt cards | [tasks/deep-redesign-runtime-authority.md](tasks/deep-redesign-runtime-authority.md) | done |
-| 7 | Artifact cursor micro-batches | [tasks/deep-redesign-artifact-batches.md](tasks/deep-redesign-artifact-batches.md) | done |
-| 8 | Completion and maintenance reducers | [tasks/deep-redesign-completion-maintenance.md](tasks/deep-redesign-completion-maintenance.md) | done |
-| 9 | Provider anomaly blocked handoff | [tasks/deep-redesign-provider-handoff.md](tasks/deep-redesign-provider-handoff.md) | done |
-| 10 | Benchmark corpus and final gates | [tasks/deep-redesign-gates.md](tasks/deep-redesign-gates.md) | done |
-| 11 | Obligation network root repair | [tasks/obligation-network-redesign.md](tasks/obligation-network-redesign.md) | done |
-| 12 | Runtime smoke false close and noisy repair | [tasks/runtime-smoke-problem-sweep.md](tasks/runtime-smoke-problem-sweep.md) | done |
-| 13 | Dense deterministic runtime authority network | [tasks/dense-runtime-state-network.md](tasks/dense-runtime-state-network.md) | done |
-| 14 | Story manuscript generation gap | [tasks/story-manuscript-generation-gap.md](tasks/story-manuscript-generation-gap.md) | done |
+| 1 | Documentation truth sweep | [tasks/structural-truth-sweep.md](tasks/structural-truth-sweep.md) | done: docs reconciled; `check-docs` and `check-lines` passed |
+| 2 | CLI contract rewrite | [tasks/cli-contract-redesign.md](tasks/cli-contract-redesign.md) | open |
+| 3 | Token ledger contract and aggregate store API | [tasks/token-aggregate-ledger.md](tasks/token-aggregate-ledger.md) | open |
+| 4 | CLI parser and output core rewrite | [tasks/cli-core-redesign.md](tasks/cli-core-redesign.md) | open |
+| 5 | Status, log, and console render rewrite | [tasks/observability-render-redesign.md](tasks/observability-render-redesign.md) | open |
+| 6 | Runtime resolver totality cleanup | [tasks/resolver-table-totality.md](tasks/resolver-table-totality.md) | open |
+| 7 | Content atom graph and artifact profile generalization | [tasks/content-atom-graph.md](tasks/content-atom-graph.md) | open |
+| 8 | Manuscript staged prose and deterministic assembly | [tasks/manuscript-compose.md](tasks/manuscript-compose.md) | open |
+| 9 | Smoke harness and benchmark expansion | [tasks/smoke-harness.md](tasks/smoke-harness.md) | open |
+| 10 | Final gates and handoff | [tasks/final-redesign-gates.md](tasks/final-redesign-gates.md) | open |
+
+## Historical Closed Queue
+
+The prior blocker sequence is closed. Its task files remain under
+[tasks/](tasks/README.md) as evidence and regression context:
+
+- deep redesign truth sweep;
+- compact context and line-protocol batches;
+- compact output budget and endpoint config;
+- short artifact path aliases and planner;
+- registry-derived exact action examples;
+- narrow runtime authority prompt cards;
+- artifact cursor micro-batches;
+- completion and maintenance reducers;
+- provider anomaly blocked handoff;
+- benchmark corpus and gates;
+- obligation network root repair;
+- runtime smoke false close and noisy repair;
+- dense deterministic runtime authority network;
+- story manuscript generation gap.
 
 ## Active Data Fixture
 
@@ -75,31 +91,16 @@ The checked-in generated log fixture remains historical failure evidence.
 - Context compaction can run at state boundaries and must preserve cursor,
   mission, recovery route, blockers, and next action surface.
 
-## Historical Smoke Findings
+## Manuscript Boundary
 
-Fresh pre-change smoke evidence is committed under
-`tmp/runtime-smoke-ground-truth-20260629T051817Z/` and summarized in
-[current-work/runtime-smoke-ground-truth.md](current-work/runtime-smoke-ground-truth.md).
-Those logs showed Compact-title false close, owner-title root drift,
-same-root missing-root audit loops, placeholder roots, and weak story-scale
-completion.
-
-The implementation sweep now has focused tests, benchmark fixture updates, and
-final Docker smoke evidence under `tmp/runtime-smoke-final-iwanna-20260629T131603Z/`
-and `tmp/runtime-smoke-final-compact-20260629T134111Z/`. The final smoke closes
-both named long-novel routes without the false close, generic root, or noisy
-repair loop. The remaining active work is structural hardening, not reopening
-those historical defects.
+The story manuscript generation gap row in the historical queue is closed for
+root identity, exact manuscript classification, chapter-priority contracts,
+readiness refusals, and provider anomaly recovery. It is not proof that the
+daemon can finish a complete 10,000-word manuscript. The active queue now
+continues that work through content atoms, deterministic assembly, exact
+remaining-path recovery, real manuscript word counts, and a reproducible smoke
+harness.
 
 Historical details live in
-[current-work/runtime-smoke-problems.md](current-work/runtime-smoke-problems.md).
-The dense runtime authority slice is implemented and proved by the focused,
-workspace, quiet verify, and Docker gates named in its task file.
-
-## Story Manuscript Generation
-
-The manuscript gap is implemented through typed manuscript classification,
-count-guard vetoes, chapter write contracts, manuscript readiness, completion
-refusals, provider anomaly recovery, and benchmark fixtures. Evidence is
-summarized in
-[current-work/story-manuscript-generation-gap.md](current-work/story-manuscript-generation-gap.md).
+[current-work/story-manuscript-generation-gap.md](current-work/story-manuscript-generation-gap.md)
+and [current-work/runtime-smoke-problems.md](current-work/runtime-smoke-problems.md).
