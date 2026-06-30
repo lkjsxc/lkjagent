@@ -154,6 +154,18 @@ exact remaining manuscript path when the configured endpoint cannot fit the
 requested prose in the output budget. The benchmark corpus contains
 story-bible-only and counted-scaffold manuscript regressions.
 
+A follow-up live owner request for `Second Period, First Love` showed the
+current boundary. Before `reasoning_effort=none`, the endpoint returned hidden
+reasoning without action content and the daemon exhausted the provider anomaly
+budget. After the request field was added, the daemon created the exact root,
+README, and story-bible files without `structured-output`, but timed out in
+recovery after only two short chapter files and 508 manuscript words. A direct
+per-chapter endpoint fallback generated ten chapters and 11,456 manuscript
+words at `/tmp/lkjagent-user-romance-complete-20260630T122402Z`; that artifact
+proves the model can write the prose, not that the daemon can complete the
+task. The next design target is a daemon-owned, resumable, one-chapter write
+surface with exact remaining-path recovery and manuscript word-count evidence.
+
 ## Active Target
 
 The story manuscript generation gap row in
