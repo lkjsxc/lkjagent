@@ -1,7 +1,8 @@
 use std::path::Path;
 
 use lkjagent_context::budget::{prefix_cap_total, ContextBudgetPolicy, ContextPressure};
-use lkjagent_context::format::{optional_count, ratio_percent, short_count};
+use lkjagent_context::format::{ratio_percent, short_count};
+use lkjagent_store::token_usage::{TokenUsageAggregate, TokenUsageFieldAggregate};
 use rusqlite::Connection;
 
 use crate::config::load_context_policy_for_status;
@@ -25,7 +26,6 @@ pub fn deck(conn: &Connection, policy: ContextBudgetPolicy) -> Result<Accounting
         "context pressure",
         pressure_name(policy.pressure(used as usize, 0)),
     )?;
-    let usage = lkjagent_store::token_usage::latest(conn)?;
     Ok(AccountingDeck {
         context_line: format!(
             "ctx={}/{} {} pressure={pressure}",
@@ -33,18 +33,65 @@ pub fn deck(conn: &Connection, policy: ContextBudgetPolicy) -> Result<Accounting
             short_count(policy.window as u64),
             ratio_percent(used, policy.window as u64)
         ),
-        token_line: token_line(usage.as_ref()),
+        token_line: token_line(conn)?,
         prefix_line: prefix_line(policy, used),
     })
 }
 
-fn token_line(usage: Option<&lkjagent_store::token_usage::TokenUsageEvent>) -> String {
+fn token_line(conn: &Connection) -> Result<String, CliError> {
+    let latest = lkjagent_store::token_usage::aggregate_latest(conn)?;
+    let task = active_task_aggregate(conn)?;
+    let session = lkjagent_store::token_usage::aggregate_session(conn)?;
+    let all = lkjagent_store::token_usage::aggregate_all(conn)?;
+    Ok(format!(
+        "tokens latest={} task={} session={} all={}",
+        format_aggregate(latest),
+        format_aggregate(task),
+        format_aggregate(session),
+        format_aggregate(all)
+    ))
+}
+
+fn active_task_aggregate(conn: &Connection) -> Result<TokenUsageAggregate, CliError> {
+    let Some(case) = lkjagent_store::graph::active_case(conn)? else {
+        return Ok(TokenUsageAggregate::default());
+    };
+    Ok(lkjagent_store::token_usage::aggregate_task(conn, case.id)?)
+}
+
+fn format_aggregate(aggregate: TokenUsageAggregate) -> String {
+    if aggregate.rows == 0 {
+        return "none".to_string();
+    }
     format!(
-        "in={} out={} cache={} total={}",
-        optional_count(usage.and_then(|row| row.input_tokens)),
-        optional_count(usage.and_then(|row| row.output_tokens)),
-        optional_count(usage.and_then(|row| row.cached_input_tokens)),
-        optional_count(usage.and_then(|row| row.total_tokens))
+        "in:{} out:{} cache:{} total:{} unknown:{} cache_ratio:{}",
+        format_field(aggregate.input_tokens),
+        format_field(aggregate.output_tokens),
+        format_field(aggregate.cached_input_tokens),
+        format_field(aggregate.total_tokens),
+        aggregate.rows_with_unknown,
+        cache_ratio(aggregate)
+    )
+}
+
+fn format_field(field: TokenUsageFieldAggregate) -> String {
+    if field.known == 0 && field.unknown > 0 {
+        "unknown".to_string()
+    } else {
+        short_count(field.sum)
+    }
+}
+
+fn cache_ratio(aggregate: TokenUsageAggregate) -> String {
+    if aggregate.input_tokens.unknown > 0
+        || aggregate.cached_input_tokens.unknown > 0
+        || aggregate.input_tokens.sum == 0
+    {
+        return "unknown".to_string();
+    }
+    format!(
+        "{:.2}",
+        aggregate.cached_input_tokens.sum as f64 / aggregate.input_tokens.sum as f64
     )
 }
 

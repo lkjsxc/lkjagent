@@ -12,7 +12,7 @@ that ran.
 | --- | --- | --- | --- |
 | 1 | Documentation truth sweep | [tasks/structural-truth-sweep.md](tasks/structural-truth-sweep.md) | done: docs reconciled; `check-docs` and `check-lines` passed |
 | 2 | CLI contract rewrite | [tasks/cli-contract-redesign.md](tasks/cli-contract-redesign.md) | done: target CLI docs written; `check-docs` and `check-lines` passed |
-| 3 | Token ledger contract and aggregate store API | [tasks/token-aggregate-ledger.md](tasks/token-aggregate-ledger.md) | open |
+| 3 | Token ledger contract and aggregate store API | [tasks/token-aggregate-ledger.md](tasks/token-aggregate-ledger.md) | done: aggregate APIs, status-console rendering, focused tests, quiet verify, and Docker verify passed |
 | 4 | CLI parser and output core rewrite | [tasks/cli-core-redesign.md](tasks/cli-core-redesign.md) | open |
 | 5 | Status, log, and console render rewrite | [tasks/observability-render-redesign.md](tasks/observability-render-redesign.md) | open |
 | 6 | Runtime resolver totality cleanup | [tasks/resolver-table-totality.md](tasks/resolver-table-totality.md) | open |

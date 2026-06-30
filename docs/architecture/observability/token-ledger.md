@@ -12,9 +12,9 @@ This file defines compact token usage accounting.
 - Format counts with decimal suffixes: `999`, `1.00K`, `1.23M`, `2.00B`.
 - Format ratios with two decimal places.
 - Status and console show context fraction and pressure.
-- Aggregate APIs must report latest, task, session, and all-time scopes with
-  known sums plus unknown-field counts; this aggregate layer is queued in
-  [../../execution/tasks/token-aggregate-ledger.md](../../execution/tasks/token-aggregate-ledger.md).
+- Aggregate APIs report latest, task, session, and all-time scopes with known
+  sums plus unknown-field counts.
+- Status and console render the same aggregate facts from the same deck.
 
 ## Implementation Hooks
 
@@ -34,5 +34,6 @@ This file defines compact token usage accounting.
 
 ## Status
 
-partially implemented. Per-exchange usage capture and latest rendering exist;
-cumulative aggregate scopes with explicit unknown counts remain open.
+implemented for per-exchange usage capture, aggregate store APIs, and status
+plus console rendering. Model-log output still names individual exchange usage
+rather than the full aggregate deck.
