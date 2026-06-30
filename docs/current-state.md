@@ -161,13 +161,12 @@ routes preserve owner roots, avoid generic roots, reach story-semantic
 readiness, and close through `agent.done` without the observed noisy loop. That
 evidence does not prove full 10,000-word daemon manuscript completion.
 
-## Active Target
+## Redesign Queue Status
 
-The active queue is the redesign sequence in
-[execution/current-blockers.md](execution/current-blockers.md): documentation
-truth sweep, CLI contract, token aggregates, CLI core, observability renders,
-resolver table cleanup, content atoms, manuscript assembly, smoke harness, and
-final gates.
+The executable redesign queue in
+[execution/current-blockers.md](execution/current-blockers.md) is closed through
+final repository gates. Remaining product risk is live endpoint completion of a
+full 10,000-word daemon manuscript, which is not claimed here.
 
 ## Out of Scope
 
