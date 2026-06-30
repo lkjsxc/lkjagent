@@ -1,4 +1,12 @@
+#[path = "token_usage_aggregate.rs"]
+mod aggregate;
+
 use rusqlite::{params, Connection, OptionalExtension};
+
+pub use aggregate::{
+    aggregate, aggregate_all, aggregate_latest, aggregate_session, aggregate_task,
+    TokenUsageAggregate, TokenUsageFieldAggregate, TokenUsageScope,
+};
 
 use crate::error::StoreResult;
 

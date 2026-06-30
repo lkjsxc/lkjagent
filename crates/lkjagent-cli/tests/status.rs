@@ -48,9 +48,61 @@ fn status_prints_compact_context_and_token_usage() -> TestResult<()> {
     let status = run_cli(["--data", data.to_string_lossy().as_ref(), "status"]);
 
     assert!(status.stdout.contains("ctx=1.23K/24.58K 5.02%"));
+    assert!(status.stdout.contains(
+        "tokens latest=in:8.12K out:1.04K cache:6.88K total:9.16K unknown:0 cache_ratio:0.85"
+    ));
+    assert!(status.stdout.contains("task=none"));
     assert!(status
         .stdout
-        .contains("in=8.12K out=1.04K cache=6.88K total=9.16K"));
+        .contains("session=in:8.12K out:1.04K cache:6.88K total:9.16K unknown:0 cache_ratio:0.85"));
+    Ok(())
+}
+
+#[test]
+fn status_prints_active_task_token_aggregate() -> TestResult<()> {
+    let data = temp_data("status-task-usage")?;
+    let conn = open_store(&data)?;
+    let case = lkjagent_runtime::graph_state::open_owner_case(
+        &conn,
+        "Write a short report.",
+        "2026-06-20T00:00:00Z",
+    )?;
+    record(
+        &conn,
+        &TokenUsageEvent {
+            task_id: case.case_id,
+            turn: 1,
+            input_tokens: Some(1_000),
+            output_tokens: Some(250),
+            cached_input_tokens: Some(500),
+            total_tokens: Some(1_250),
+            context_window: Some(24_576),
+            context_used_estimate: Some(1_234),
+            source: "endpoint".to_string(),
+        },
+        "2026-06-20T00:00:00Z",
+    )?;
+    record(
+        &conn,
+        &TokenUsageEvent {
+            task_id: case.case_id,
+            turn: 2,
+            input_tokens: None,
+            output_tokens: Some(100),
+            cached_input_tokens: None,
+            total_tokens: None,
+            context_window: Some(24_576),
+            context_used_estimate: Some(1_334),
+            source: "endpoint".to_string(),
+        },
+        "2026-06-20T00:00:01Z",
+    )?;
+
+    let status = run_cli(["--data", data.to_string_lossy().as_ref(), "status"]);
+
+    assert!(status
+        .stdout
+        .contains("task=in:1.00K out:350 cache:500 total:1.25K unknown:1 cache_ratio:unknown"));
     Ok(())
 }
 
@@ -63,7 +115,7 @@ fn status_prints_unknown_token_usage_as_unknown() -> TestResult<()> {
 
     assert!(status
         .stdout
-        .contains("in=unknown out=unknown cache=unknown total=unknown"));
+        .contains("tokens latest=none task=none session=none all=none"));
     Ok(())
 }
 

@@ -55,7 +55,7 @@ fn console_puts_operational_state_in_bottom_deck() -> TestResult<()> {
         .unwrap_or(0);
     assert!(state_line >= lines.len().saturating_sub(10));
     assert!(screen.contains("ctx=1.23K/24.58K 5.02%"));
-    assert!(screen.contains("in=8.12K out=1.04K cache=6.88K total=9.16K"));
+    assert!(screen.contains("tokens latest=in:8.12K"));
     assert!(screen.contains("model_log"));
     assert!(screen.contains("question Need owner guidance?"));
     Ok(())

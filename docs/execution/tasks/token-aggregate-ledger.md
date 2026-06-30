@@ -6,7 +6,8 @@ Implement cumulative token usage for latest, task, session, and all-time scopes.
 
 ## Status
 
-open
+done: aggregate store APIs and status-console token rendering implemented;
+focused tests, quiet verify, and Docker verify passed
 
 ## Depends On
 
