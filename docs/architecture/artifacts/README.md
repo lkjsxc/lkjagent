@@ -10,6 +10,8 @@ cookbooks, guides, encyclopedias, and other large content deliverables.
 - [lifecycle.md](lifecycle.md): scaffold, content pass, audit pass, and completion.
 - [artifact-ledger.md](artifact-ledger.md): durable artifact identity, weak paths, and audit state.
 - [content-artifacts.md](content-artifacts.md): general large-content contract.
+- [content-atoms.md](content-atoms.md): bounded semantic units for large artifacts.
+- [deterministic-assembly.md](deterministic-assembly.md): daemon-owned assembly from approved atoms.
 - [content-readiness.md](content-readiness.md): meaningful leaf-file checks.
 - [readiness-reducer.md](readiness-reducer.md): profile-specific content readiness decisions.
 - [dictionary-profile.md](dictionary-profile.md): dictionary artifact profile.
@@ -46,5 +48,5 @@ are separate states.
 ## Status
 
 partially implemented through document scaffold profiles, artifact tool
-wrappers, bounded next-batch planning, dictionary file readiness, and audit
-checks. Manifest adoption and full repair remain open.
+wrappers, bounded next-batch planning, content atoms, dictionary file
+readiness, and audit checks. Manifest adoption and full repair remain open.

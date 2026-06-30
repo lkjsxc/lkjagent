@@ -6,6 +6,7 @@ pub mod admission_decide;
 mod authority_ledger;
 mod completion;
 mod completion_inputs;
+mod content_atom;
 pub mod decision;
 mod decision_apply;
 pub mod effect;

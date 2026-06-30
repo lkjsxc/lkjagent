@@ -1,3 +1,6 @@
+use crate::kernel::content_atom::{
+    facts_from_snapshot as content_atom_facts, generic_root_conflict, ContentAtomFacts,
+};
 use crate::kernel::decision::ContentWriteContract;
 use crate::kernel::event::RuntimeEvent;
 use crate::kernel::manuscript::{facts_from_snapshot, ManuscriptFacts};
@@ -61,6 +64,8 @@ pub struct RuntimeFacts {
     pub missing_evidence: Vec<String>,
     pub weak_paths: Vec<String>,
     pub(crate) manuscript: Option<ManuscriptFacts>,
+    pub(crate) content_atoms: ContentAtomFacts,
+    pub(crate) generic_root_conflict: Option<String>,
     pub owner_work_exists: bool,
     pub recovery_required: bool,
     pub hard_compaction: bool,
@@ -74,12 +79,15 @@ pub fn runtime_facts(snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> Runtim
         .map(|facts| facts.status)
         .unwrap_or_else(|| status_from_snapshot(snapshot));
     let manuscript = facts_from_snapshot(snapshot);
+    let content_atoms = content_atom_facts(snapshot);
     RuntimeFacts {
         write_contract: write_contract_for(snapshot, audit.as_ref(), root.as_deref()),
         root,
         root_status,
         document_audit: audit,
         manuscript,
+        content_atoms,
+        generic_root_conflict: generic_root_conflict(snapshot),
         missing_evidence: snapshot.evidence.missing.clone(),
         weak_paths: snapshot.artifact.weak_paths.clone(),
         owner_work_exists: snapshot.owner_work_exists(),

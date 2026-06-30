@@ -39,6 +39,11 @@ pub fn resolve_obligations(
     if matches!(mission, RuntimeMission::ClosedIdle) {
         return TotalResolverPlan::RuntimeEffect;
     }
+    if let Some(conflict) = facts.generic_root_conflict.as_deref() {
+        return blocked(&format!(
+            "generic artifact root conflicts with owner target: {conflict}"
+        ));
+    }
     if facts.owner_work_exists && completion_allowed && facts.missing_evidence.is_empty() {
         return TotalResolverPlan::CloseCase;
     }
@@ -145,7 +150,10 @@ fn document_structure_plan(facts: &RuntimeFacts) -> TotalResolverPlan {
 }
 
 fn artifact_readiness_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> TotalResolverPlan {
-    if artifact_next_requested(snapshot) || !facts.weak_paths.is_empty() {
+    if artifact_next_requested(snapshot)
+        || !facts.weak_paths.is_empty()
+        || facts.content_atoms.missing_count > 0
+    {
         TotalResolverPlan::ExactInspection {
             tool: "artifact.next",
         }

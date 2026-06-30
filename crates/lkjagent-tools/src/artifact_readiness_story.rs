@@ -26,13 +26,24 @@ pub(crate) fn story_report(
     let missing = story_missing(&files);
     let scale_missing = story_scale_missing(&files);
     if missing.is_empty() && scale_missing.is_empty() {
-        return Ok(crate::artifact_readiness::content_bearing(report).replace(
+        let passed = crate::artifact_readiness::content_bearing(report).replace(
             "readiness=content-bearing",
             "readiness=story-semantic-content",
-        ));
+        );
+        let atoms =
+            crate::artifact_content_atom::status_lines_for_profile("story", "ready", 0, None);
+        return Ok(format!("{passed}\nartifact_atom_profile=story\n{atoms}"));
     }
+    let next_atom = missing.first().map(|label| format!("{label}.md"));
+    let atom_count = missing.len() + scale_missing.len();
+    let atoms = crate::artifact_content_atom::status_lines_for_profile(
+        "story",
+        "missing",
+        atom_count,
+        next_atom.as_ref(),
+    );
     Ok(format!(
-        "artifact audit failed\nroot={root}\nreadiness=missing-semantic-content\nfailed=1\nfailures:\n- story_semantic_missing: {}\n- story_scale_missing: {}\nnext_decision_required=true\ncandidate_action=artifact.next",
+        "artifact audit failed\nroot={root}\nreadiness=missing-semantic-content\nartifact_atom_profile=story\n{atoms}\nfailed=1\nfailures:\n- story_semantic_missing: {}\n- story_scale_missing: {}\nnext_decision_required=true\ncandidate_action=artifact.next",
         join_or_none(&missing),
         join_or_none(&scale_missing)
     ))
