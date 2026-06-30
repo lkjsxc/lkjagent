@@ -15,6 +15,8 @@ mod artifact_next_story;
 mod artifact_readiness;
 mod artifact_readiness_story;
 mod artifact_readiness_story_req;
+mod artifact_story_manuscript;
+mod artifact_story_text;
 mod artifact_write_support;
 pub mod benchmark_seed;
 pub mod control;

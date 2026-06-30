@@ -15,6 +15,7 @@ pub mod owner_observability;
 pub mod owner_thirty;
 pub mod owner_uploaded;
 pub mod repair;
+pub mod story_manuscript;
 pub mod synthesis;
 
 use crate::model::BenchmarkTask;
@@ -44,6 +45,7 @@ pub const TINY: &[BenchmarkTask] = &[
     owner_loop_content::BREAD_TASK,
     owner_uploaded::TASK,
     owner_long_novel::TASK,
+    story_manuscript::TASK,
     owner_address::TASK,
     owner_observability::STATUS_TASK,
     owner_observability::LOG_TASK,

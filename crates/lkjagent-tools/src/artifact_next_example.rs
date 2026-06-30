@@ -17,6 +17,23 @@ pub fn batch_write_contract(root: &str, kind: &str, paths: &[String]) -> String 
     )
 }
 
+pub fn manuscript_batch_write_contract(root: &str, paths: &[String]) -> String {
+    let joined = paths
+        .iter()
+        .map(|path| {
+            format!(
+                "- {}/{}",
+                root.trim_end_matches('/'),
+                path.trim_start_matches('/')
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    format!(
+        "tool=fs.batch_write\nroot={root}\nkind=story\npaths:\n{joined}\nlimits:\n- max_files=1\n- max_file_bytes=12000\n- max_batch_bytes=12000\nrequired_sections:\n- finished chapter prose\n- scene action and dialogue or interiority\n- continuity with prior facts\nforbidden_weak_phrase_classes:\n- scaffold-only\n- outline-only\n- story-bible-only\n- placeholder\n- owner-terms-only\n- generic-example\nmodel_instruction=author finished manuscript prose for only the listed chapter path using fs.batch_write line protocol"
+    )
+}
+
 pub fn root_identity_contract(root: &str, kind: &str) -> String {
     let paths = if kind.eq_ignore_ascii_case("story") || story_root(root) {
         vec![

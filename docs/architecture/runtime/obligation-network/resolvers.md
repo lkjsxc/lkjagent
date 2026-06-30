@@ -37,6 +37,15 @@ flat root identity paths that can pass topology and content checks. Same-root
 `doc.audit` is blocked until the progress key changes through a write success
 or blocked handoff.
 
+## Manuscript Mapping
+
+After root identity exists, manuscript write contracts outrank optional
+story-bible enrichment. If manuscript facts name an exact next chapter path, the
+resolver emits `SemanticWriteContract` for that path before document structure
+or artifact readiness repair can choose lore files. Provider anomaly recovery
+uses the same path with a smaller prose contract, or emits a blocked handoff
+that names the exact remaining manuscript paths.
+
 ## Artifact Next Mapping
 
 `artifact.next` observations are candidate facts, not dispatch authority. When

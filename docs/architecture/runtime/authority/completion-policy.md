@@ -17,9 +17,12 @@ Every close path reads the same typed `CompletionGateInput` packet:
 - case id, objective, owner request, active mode, and active node;
 - intent kind, artifact root, artifact kind, profile, requested scale, and
   lifecycle when artifact work exists;
+- story manuscript lifecycle, target words, word floor, chapter count, exact
+  requested manuscript paths, missing manuscript paths, next manuscript path,
+  and manuscript words written;
 - required evidence ids and their owning audit or verification surface;
-- latest document audit status, artifact readiness status, weak paths, and
-  profile-scale facts;
+- latest document audit status, artifact readiness status, weak paths,
+  profile-scale facts, and manuscript progress facts;
 - verification command status or explicit not-applicable reason;
 - unresolved recovery faults, provider anomalies, blocked handoff status, and
   progress key exhaustion;
@@ -64,8 +67,9 @@ admitted.
 
 Close requires resolved or explicitly blocked owner objective, present required
 evidence, passing document or artifact audit when relevant, no scaffold-only
-or weak leaves, no active recovery fault, observed verification result, and no
-unsupported verification claim.
+or weak leaves, requested manuscript prose paths and word floor when the
+manuscript lifecycle is active, no active recovery fault, observed verification
+result, and no unsupported verification claim.
 
 ## Prohibited States
 
@@ -80,6 +84,7 @@ unsupported verification claim.
 - `agent.done` after artifact planning is refused.
 - `agent.done` after scaffold-only output is refused.
 - Structure pass plus readiness failure is refused.
+- Story-bible-only output is refused for manuscript lifecycle work.
 - Verification pending is refused when the task kind requires verification.
 - Turn-budget exhaustion writes a blocked partial handoff.
 - The refusal next action parses and dispatches.

@@ -25,8 +25,11 @@ pub(crate) fn priority_long_content_request(lower: &str, content: &str) -> bool 
 }
 
 pub(crate) fn content_artifact_request(lower: &str, content: &str) -> bool {
-    (long_content_request(lower, content) || counted_story_request(lower))
+    (long_content_request(lower, content)
+        || counted_story_request(lower)
+        || manuscript_request(lower))
         && creation_request(lower, content)
+        && !code_change_action(lower, content)
 }
 
 pub(crate) fn operational_compaction_request(unquoted: &str) -> bool {
@@ -72,6 +75,18 @@ pub(crate) fn counted_story_request(lower: &str) -> bool {
         .split(|ch: char| !ch.is_ascii_alphanumeric())
         .any(|word| matches!(word, "chapter" | "chapters" | "scene" | "scenes"))
         && lower.chars().any(|ch| ch.is_ascii_digit())
+}
+
+pub(crate) fn manuscript_request(lower: &str) -> bool {
+    exact_manuscript_path(lower)
+        || lower.contains("manuscript")
+        || contains_any(lower, &["chapter prose", "scene prose", "chapter draft"])
+        || (contains_any(lower, &["story", "novel", "chapter", "scene"])
+            && contains_any(lower, &[" word", " words", "-word"]))
+}
+
+pub(crate) fn exact_manuscript_path(lower: &str) -> bool {
+    lower.contains("stories/") && lower.contains("/manuscript/") && lower.contains(".md")
 }
 
 fn creation_request(lower: &str, content: &str) -> bool {

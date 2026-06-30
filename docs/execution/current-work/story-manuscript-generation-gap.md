@@ -90,9 +90,21 @@ prompt-only guidance:
 - add a focused live smoke that proves at least one requested chapter path is
   written before attempting the full 10,000 word route.
 
+## Resolution
+
+The implementation adds manuscript lifecycle facts, exact manuscript root and
+path classification, counted-scaffold vetoes, chapter-priority `artifact.next`,
+manuscript-only readiness word counts, completion refusal fields, provider
+anomaly path preservation, and benchmark fixtures for story-bible-only and
+counted-scaffold regressions.
+
+Focused tests cover direct chapter routing, 10,000 word target facts,
+count-guard non-regression, chapter-priority `artifact.next`, readiness refusal
+and pass cases, completion refusal, provider anomaly shrink and blocked handoff,
+and daemon absence of `structured-output` for the direct manuscript request.
+
 ## Handoff Notes
 
-Do not reopen the completed root-identity or dense-authority work. The new gap
-is manuscript scale and task classification. The next implementation should
-start with a failing focused test for the single-chapter request, then add a
-longer smoke that reaches at least 8,500 English words across chapter files.
+Do not reopen the completed root-identity or dense-authority work. Future smoke
+can replace the historical failure evidence only when an endpoint is configured
+and the owner chooses to archive new live logs.

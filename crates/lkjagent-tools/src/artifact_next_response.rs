@@ -85,7 +85,7 @@ pub fn batch_response(root: &str, kind: &str, selected: &[String], valid_example
         "artifact_next_result=weak_path_batch_ready\nroot={root}\nkind={kind}\nmissing={}\nnext_paths:\n{}\nrequired_sections:\n{}\nforbidden_weak_phrase_classes:\n- scaffold-only\n- placeholder\n- owner-terms-only\n- generic-example\nruntime_event=ArtifactWeakPathFound\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_contract:\n{}",
         selected.len(),
         selected.iter().map(|path| format!("- {path}")).collect::<Vec<_>>().join("\n"),
-        required_sections(kind),
+        required_sections(kind, selected),
         valid_example
     )
 }
@@ -127,7 +127,10 @@ fn story_root(root: &str) -> bool {
     root.trim_start_matches("./").starts_with("stories/")
 }
 
-fn required_sections(kind: &str) -> &'static str {
+fn required_sections(kind: &str, selected: &[String]) -> &'static str {
+    if selected.iter().any(|path| path.starts_with("manuscript/")) {
+        return "- title\n- finished chapter prose\n- scene action and dialogue or interiority\n- continuity with prior facts";
+    }
     match kind.to_ascii_lowercase().as_str() {
         "cookbook" => "- title\n- purpose\n- ingredients or concept\n- method or procedure\n- timing, signals, and fixes\n- verification notes",
         "story" => "- title\n- purpose\n- scene content or reference detail\n- continuity notes\n- verification notes",

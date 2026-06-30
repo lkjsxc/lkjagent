@@ -134,24 +134,26 @@ Workspace tests, benchmark, quiet verify, and Docker verify pass. Final smoke at
 routes preserve owner roots, avoid generic roots, reach story-semantic readiness,
 and close through `agent.done` without the observed noisy loop.
 
-## Known Story Manuscript Gap
+## Story Manuscript Generation
 
-Live runs for an English high-school romance novella named `The Bell Rings
-Twice` created `stories/bell-rings-twice` and story-bible files, but not the
-requested chapter manuscript files. The strongest run under
-`/tmp/lkjagent-high-school-romance-long-20260630T072532Z` reached only
-`english_word_count 741` after continuation guidance and still reported
-`check stories/bell-rings-twice/manuscript/chapter-one.md False`. Direct
-single-chapter requests under `/tmp/lkjagent-romance-chapter-test-20260630T073614Z`
-and `/tmp/lkjagent-romance-chapter-prequeued-20260630T074037Z` created
-`structured-output/README.md` instead of the requested story path. The gap is
-manuscript-scale classification, cursoring, and readiness, not root identity.
+Story manuscript work now has a typed chapter-prose lifecycle separate from
+story-bible reference files. Exact `stories/.../manuscript/*.md` requests route
+to story content artifacts, counted-document scaffolding is vetoed for
+manuscript prose requests, runtime facts carry manuscript target words, chapter
+counts, missing paths, next path, progress words, and provider anomaly shrink
+state, and `artifact.next` chooses manuscript chapter contracts before optional
+story-bible repair after identity exists.
+
+Readiness and completion reject story-bible-only output for manuscript tasks.
+Provider anomaly recovery preserves the exact next manuscript path, shrinks the
+write contract, or blocks with the remaining path. The benchmark corpus contains
+story-bible-only and counted-scaffold manuscript regressions.
 
 ## Active Target
 
-The active row in [execution/current-blockers.md](execution/current-blockers.md)
-is story manuscript generation gap. Next executable step: follow
-[execution/tasks/story-manuscript-generation-gap.md](execution/tasks/story-manuscript-generation-gap.md).
+The story manuscript generation gap row in
+[execution/current-blockers.md](execution/current-blockers.md) is implemented in
+code and focused tests. Docker verification is the final proof before handoff.
 
 ## Out of Scope
 

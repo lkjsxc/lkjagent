@@ -4,8 +4,25 @@ use std::path::{Path, PathBuf};
 use crate::artifact_readiness_story_req::{Requirement, STORY_REQUIREMENTS};
 use crate::error::ToolResult;
 
-pub(crate) fn story_report(root: &str, full: &Path, report: String) -> ToolResult<String> {
+pub(crate) fn story_report(
+    root: &str,
+    full: &Path,
+    scale: &str,
+    report: String,
+) -> ToolResult<String> {
     let files = markdown_files(full)?;
+    let manuscript_files = files
+        .iter()
+        .map(|file| crate::artifact_story_manuscript::ManuscriptFile {
+            relative: &file.relative,
+            lower: &file.lower,
+            text: &file.text,
+        })
+        .collect::<Vec<_>>();
+    let manuscript = crate::artifact_story_manuscript::facts(root, scale, &manuscript_files);
+    if let Some(failure) = crate::artifact_story_manuscript::readiness_failure(root, &manuscript) {
+        return Ok(failure);
+    }
     let missing = story_missing(&files);
     let scale_missing = story_scale_missing(&files);
     if missing.is_empty() && scale_missing.is_empty() {

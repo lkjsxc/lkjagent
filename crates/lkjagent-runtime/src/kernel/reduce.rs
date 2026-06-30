@@ -1,6 +1,7 @@
 use crate::kernel::admission::{admitted_tools_for, blocked_tools_for, ToolAdmissionView};
 use crate::kernel::authority_ledger::authority_ledger_entries;
 use crate::kernel::completion::{completion_gate, CompletionGateDecision};
+use crate::kernel::completion_inputs::completion_inputs;
 use crate::kernel::decision::{
     DecisionInvariantError, RuntimeDecision, RuntimeDecisionId, RuntimeDecisionInput,
     RuntimeDecisionKind, RuntimeMission,
@@ -148,16 +149,6 @@ fn compaction_policy(snapshot: &RuntimeSnapshot) -> Option<String> {
 fn completion_refusal(decision: &RuntimeDecision) -> Option<String> {
     (decision.mission == RuntimeMission::OwnerCompletion && !decision.completion_allowed)
         .then(|| decision.completion_blockers.join(","))
-}
-
-fn completion_inputs(completion: &CompletionGateDecision) -> Vec<String> {
-    vec![
-        format!("objective_present={}", completion.input.objective_present),
-        format!("artifact_required={}", completion.input.artifact_required),
-        format!("artifact_ready={}", completion.input.artifact_ready),
-        format!("weak_paths={}", completion.input.weak_paths.join("|")),
-        format!("fingerprint={}", completion.input.decision_fingerprint),
-    ]
 }
 
 fn progress_key(decision: &RuntimeDecision, plan: &ResolverPlan) -> String {

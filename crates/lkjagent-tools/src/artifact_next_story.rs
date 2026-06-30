@@ -14,18 +14,35 @@ pub(crate) struct StoryNextContract {
 pub(crate) fn story_contract_if_missing(
     root: &str,
     kind: &str,
+    scale: &str,
     full: &Path,
 ) -> ToolResult<Option<StoryNextContract>> {
     if !story_kind(kind) && !story_root(root) {
         return Ok(None);
     }
     let files = markdown_files(full)?;
-    let selected = selected_paths(&files);
+    let manuscript_files = files
+        .iter()
+        .map(|file| crate::artifact_story_manuscript::ManuscriptFile {
+            relative: &file.relative,
+            lower: &file.lower,
+            text: &file.text,
+        })
+        .collect::<Vec<_>>();
+    let manuscript = crate::artifact_story_manuscript::facts(root, scale, &manuscript_files);
+    let selected = if manuscript.active && !manuscript.missing_paths.is_empty() {
+        manuscript.missing_paths.into_iter().take(1).collect()
+    } else {
+        selected_paths(&files)
+    };
     if selected.is_empty() {
         return Ok(None);
     }
-    let valid_example =
-        crate::artifact_next_example::batch_write_contract(root, "story", &selected);
+    let valid_example = if selected.iter().any(|path| path.starts_with("manuscript/")) {
+        crate::artifact_next_example::manuscript_batch_write_contract(root, &selected)
+    } else {
+        crate::artifact_next_example::batch_write_contract(root, "story", &selected)
+    };
     let response =
         crate::artifact_next_response::batch_response(root, "story", &selected, &valid_example);
     Ok(Some(StoryNextContract {

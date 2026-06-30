@@ -68,6 +68,20 @@ root names story, novel, manuscript, fiction, character-profile, setting,
 outline, scene, SF, sci-fi, or science fiction, unless the request is clearly
 for technical documentation.
 
+## Lifecycles
+
+Story work uses the lifecycle contract in
+[manuscript-lifecycle.md](manuscript-lifecycle.md). `story-bible` files are
+reference material. `manuscript` files are finished chapter or scene prose under
+`manuscript/`. `story-bible-then-manuscript` allows identity and reference seed
+files, but requested manuscript paths outrank optional lore after root identity
+exists.
+
+Exact `stories/.../manuscript/*.md` paths are preserved as owner targets. Word
+counts next to `word` or `words` are prose targets, not file-count requests.
+Chapter ordinals such as `chapter-01.md` are path ordinals, not counted-document
+scaffold signals.
+
 ## Audit
 
 A story-bible audit requires premise, setting or world rules, timeline or
@@ -80,12 +94,17 @@ when they carry headed story facts and verification notes. Scaffold-only
 creative labels, bracket placeholders, README-only trees, and owner-term-only
 pages are not content evidence.
 
-Long-novel readiness also requires profile-scale content groups. A compact seed
-page is refused with `story_scale_missing` facts such as
+Long-novel story-bible readiness also requires profile-scale content groups. A
+compact seed page is refused with `story_scale_missing` facts such as
 `profile-scale-content-groups` or `profile-scale-word-count` until enough
 separate story-bible groups exist. Live repair uses bounded flat files such as
 `act-structure.md`, `cosmology.md`, and `completion-evidence.md`; the path label
 counts as the semantic role when the file has enough concrete words.
+
+Manuscript readiness counts only finished prose under `manuscript/`. It reports
+`manuscript_word_count`, `manuscript_target_words`,
+`missing_manuscript_paths`, and `next_manuscript_path`; story-bible files do not
+satisfy those facts.
 
 ## Status
 

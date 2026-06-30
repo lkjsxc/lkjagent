@@ -66,6 +66,7 @@ pub enum JudgeKind {
     TurnBudgetContinuation,
     UploadedRunFixtures,
     LongNovelFailure,
+    StoryManuscript,
     ArtifactAddressController,
     StatusAccounting,
     ModelHandoffLog,

@@ -15,6 +15,7 @@ cookbooks, guides, encyclopedias, and other large content deliverables.
 - [dictionary-profile.md](dictionary-profile.md): dictionary artifact profile.
 - [cookbook-profile.md](cookbook-profile.md): cookbook profile example.
 - [story-profile.md](story-profile.md): story profile example.
+- [manuscript-lifecycle.md](manuscript-lifecycle.md): chapter-prose lifecycle for story manuscripts.
 - [manifest.md](manifest.md): artifact manifest fields and identity.
 - [scaffold.md](scaffold.md): scaffold and apply behavior.
 - [audit.md](audit.md): semantic artifact audit checks.

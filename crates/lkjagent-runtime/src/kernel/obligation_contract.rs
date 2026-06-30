@@ -1,3 +1,4 @@
+use crate::kernel::manuscript::{facts_from_snapshot, ManuscriptFacts};
 use crate::kernel::obligation_facts::{
     ArtifactRootStatus, DocumentAuditFacts, WriteContractFacts, WriteContractStatus,
 };
@@ -17,6 +18,11 @@ pub(crate) fn write_contract_for(
         || root_identity_status(status_from_snapshot(snapshot))
     {
         return Some(root_identity(root, &contract_kind(snapshot, audit, root)));
+    }
+    if let Some(facts) = facts_from_snapshot(snapshot) {
+        if let Some(contract) = manuscript_contract(root, &facts) {
+            return Some(contract);
+        }
     }
     if let Some(contract) = structure_repair_contract(snapshot, audit, root) {
         return Some(contract);
@@ -82,6 +88,43 @@ fn failure_path(root: &str, failure: &str) -> Option<String> {
         return None;
     }
     Some(crate::kernel::obligation_paths::full_path(root, relative))
+}
+
+fn manuscript_contract(root: &str, facts: &ManuscriptFacts) -> Option<WriteContractFacts> {
+    let path = facts.next_path.clone()?;
+    let max_file_bytes = match facts.anomaly_shrink_level {
+        0 => 12_000,
+        1 => 6_000,
+        _ => 3_000,
+    };
+    Some(WriteContractFacts {
+        root: root.to_string(),
+        exact_paths: vec![path],
+        max_files: 1,
+        max_file_bytes,
+        max_batch_bytes: max_file_bytes,
+        required_sections: vec![
+            "finished chapter prose".to_string(),
+            "scene action and dialogue or interiority".to_string(),
+            "continuity with prior facts".to_string(),
+        ],
+        forbidden_weak_phrase_classes: manuscript_weak_classes(),
+        status: WriteContractStatus::Pending,
+    })
+}
+
+fn manuscript_weak_classes() -> Vec<String> {
+    [
+        "scaffold-only",
+        "outline-only",
+        "story-bible-only",
+        "placeholder",
+        "owner-terms-only",
+        "generic-example",
+    ]
+    .into_iter()
+    .map(str::to_string)
+    .collect()
 }
 
 fn batch_contract(
