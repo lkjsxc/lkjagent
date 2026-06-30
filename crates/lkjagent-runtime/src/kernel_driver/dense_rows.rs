@@ -62,6 +62,9 @@ fn dense_rows(
     );
     if let Some(plan) = &decision.resolver_plan {
         rows.push(row("resolver_plan", "selected", "label", plan));
+        if let Some(rule) = resolver_rule(plan) {
+            rows.push(row("resolver_rule", "selected", "id", rule));
+        }
     }
     if let Some(progress) = &decision.progress_key {
         rows.push(row("progress", "selected", "key", progress));
@@ -78,6 +81,12 @@ fn dense_rows(
             row
         })
         .collect()
+}
+
+fn resolver_rule(plan: &str) -> Option<&str> {
+    plan.strip_prefix("rule=")
+        .and_then(|value| value.split_once(' '))
+        .map(|parts| parts.0)
 }
 
 fn row(kind: &str, subject: &str, predicate: &str, object: &str) -> OwnedDenseRow {

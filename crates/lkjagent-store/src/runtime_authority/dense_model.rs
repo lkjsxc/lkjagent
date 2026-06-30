@@ -24,6 +24,7 @@ pub struct DenseRuntimePacket {
     pub facts: Vec<DenseRuntimeRow>,
     pub obligations: Vec<DenseRuntimeRow>,
     pub resolver_plans: Vec<DenseRuntimeRow>,
+    pub resolver_rules: Vec<DenseRuntimeRow>,
     pub progress: Vec<DenseRuntimeRow>,
     pub completion_inputs: Vec<DenseRuntimeRow>,
 }

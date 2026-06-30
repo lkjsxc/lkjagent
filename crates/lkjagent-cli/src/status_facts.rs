@@ -114,6 +114,8 @@ fn push_authority(conn: &Connection, out: &mut Vec<StatusFact>) -> Result<(), Cl
         ("authority.node", "authority node"),
         ("authority.allowed_tools", "authority allowed tools"),
         ("authority.blocked_tools", "authority blocked tools"),
+        ("authority.resolver_plan", "authority resolver plan"),
+        ("authority.progress_key", "authority progress key"),
     ] {
         out.push(fact(key, state_value(conn, state_key, "none")?));
     }

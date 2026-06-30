@@ -6,7 +6,8 @@ Convert fallback-shaped runtime resolver logic into named total resolver rules.
 
 ## Status
 
-open
+done: resolver rules are named, rule ids and progress keys persist, focused
+runtime and store tests, quiet verify, and Docker verify passed
 
 ## Depends On
 
@@ -19,7 +20,7 @@ open
 3. [Obligation network](../../architecture/runtime/obligation-network/README.md)
 4. [Runtime authority](../../architecture/runtime/authority/README.md)
 5. `crates/lkjagent-runtime/src/kernel/resolver.rs`
-6. `crates/lkjagent-runtime/src/kernel/resolver_fallback.rs`
+6. `crates/lkjagent-runtime/src/kernel/resolver_rules.rs`
 7. `crates/lkjagent-store/src/schema_authority.rs`
 
 ## Files To Touch

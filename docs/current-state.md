@@ -49,6 +49,7 @@ content inside that selected surface.
 | Endpoint loop | Provider calls record model-log files, token usage when present, anomalies, and bounded retry facts. |
 | Token accounting | Endpoint usage rows aggregate into latest, task, session, and all-time scopes with unknown counts for status and console. |
 | CLI core | Metadata-rendered help, group help, `--data` before or after commands, `watch` and `console`, task inspection, queue inspection, and shared status-console decks are implemented. |
+| Resolver table | Named total resolver rules select rule ids, plans, blocked handoffs, and progress keys without a resolver fallback module. |
 | Artifact lifecycle | Artifact plan, audit, next, cursors, weak paths, invalid roots, story readiness, and completion refusals are ledger-backed. |
 | Maintenance | Maintenance gates, owner preemption checks, no-op cooldown facts, and closed-idle rules have focused coverage. |
 | Benchmarks | Owner recovery, artifact, memory, accounting, model-log, batch-schema, compaction, repeated-recovery, and novel signatures are in the corpus. |
@@ -58,7 +59,6 @@ content inside that selected surface.
 | Area | Current boundary |
 | --- | --- |
 | CLI UX | The parser, command tree, and shared status-console deck are implemented. Further UX hardening follows resolver and content evidence needs. |
-| Resolver totality | Dense decisions exist, but fallback-shaped resolver logic still needs conversion into named total resolver rules. |
 | Content atoms | Artifacts have cursors and profile readiness, but a general atom graph for long deliverables is not implemented. |
 | Manuscript completion | Story manuscript classification and refusal gates exist, but daemon-owned full manuscript completion is not proved. |
 | Smoke harness | Historical and endpoint smoke artifacts exist, but reproducible replay and bounded live smoke commands are still open. |

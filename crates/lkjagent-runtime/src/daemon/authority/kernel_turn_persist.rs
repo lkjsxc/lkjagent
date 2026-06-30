@@ -64,6 +64,16 @@ pub(super) fn persist_state(
     )?;
     store_state::set(
         conn,
+        "authority resolver plan",
+        optional(decision.resolver_plan.as_deref()),
+    )?;
+    store_state::set(
+        conn,
+        "authority progress key",
+        optional(decision.progress_key.as_deref()),
+    )?;
+    store_state::set(
+        conn,
         "authority allowed tools",
         &join_tools(&decision.admission_view.admitted_tools),
     )?;
