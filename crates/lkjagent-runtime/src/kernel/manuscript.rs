@@ -170,10 +170,12 @@ fn forbidden_roots(text: &str) -> Vec<String> {
 }
 
 fn anomaly_level(snapshot: &RuntimeSnapshot) -> u32 {
-    snapshot
-        .provider
-        .retry_count
-        .saturating_add(u32::from(snapshot.provider.anomaly_class.is_some()))
+    snapshot.retry_count.max(
+        snapshot
+            .provider
+            .retry_count
+            .saturating_add(u32::from(snapshot.provider.anomaly_class.is_some())),
+    )
 }
 
 fn push_unique(out: &mut Vec<String>, value: String) {

@@ -145,8 +145,12 @@ state, and `artifact.next` chooses manuscript chapter contracts before optional
 story-bible repair after identity exists.
 
 Readiness and completion reject story-bible-only output for manuscript tasks.
-Provider anomaly recovery preserves the exact next manuscript path, shrinks the
-write contract, or blocks with the remaining path. The benchmark corpus contains
+Provider anomaly and endpoint max-token recovery preserve the exact next
+manuscript path, shrink the write contract, or block with the remaining path.
+Fresh endpoint smoke at `/tmp/lkjagent-manuscript-direct-20260630T095705Z`
+proved the direct chapter route avoids `structured-output` and blocks with the
+exact remaining manuscript path when the configured endpoint cannot fit the
+requested prose in the output budget. The benchmark corpus contains
 story-bible-only and counted-scaffold manuscript regressions.
 
 ## Active Target

@@ -101,7 +101,14 @@ counted-scaffold regressions.
 Focused tests cover direct chapter routing, 10,000 word target facts,
 count-guard non-regression, chapter-priority `artifact.next`, readiness refusal
 and pass cases, completion refusal, provider anomaly shrink and blocked handoff,
-and daemon absence of `structured-output` for the direct manuscript request.
+endpoint max-token handoff, and daemon absence of `structured-output` for the
+direct manuscript request.
+
+Fresh endpoint smoke at `/tmp/lkjagent-manuscript-direct-20260630T095705Z`
+asked for the exact chapter path. The model repeatedly hit max tokens while
+trying to write that path. The daemon did not create `structured-output`,
+preserved `stories/the-bell-rings-twice/manuscript/chapter-01.md`, and entered
+waiting with `remaining_path=stories/the-bell-rings-twice/manuscript/chapter-01.md`.
 
 ## Handoff Notes
 
