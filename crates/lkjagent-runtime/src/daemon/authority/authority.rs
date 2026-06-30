@@ -30,6 +30,7 @@ pub struct RuntimeAuthoritySnapshot {
     pub missing_evidence: Vec<String>,
     pub latest_decision_id: Option<String>,
     pub prompt_frame_id: Option<String>,
+    pub fault_retry_count: u32,
 }
 
 impl ResidentDaemon {
@@ -92,6 +93,7 @@ impl ResidentDaemon {
             missing_evidence: graph.missing_evidence,
             latest_decision_id: lkjagent_store::state::get(conn, "authority decision id")?,
             prompt_frame_id: lkjagent_store::state::get(conn, "authority prompt frame id")?,
+            fault_retry_count: self.fault_retry_count(),
         })
     }
 
@@ -103,7 +105,16 @@ impl ResidentDaemon {
     }
 
     fn recoverable_fault_active(&self) -> bool {
-        self.state.parse_faults > 0 || self.state.repeat_faults > 0 || self.state.tool_faults > 0
+        self.fault_retry_count() > 0
+    }
+
+    fn fault_retry_count(&self) -> u32 {
+        u32::from(
+            self.state
+                .parse_faults
+                .max(self.state.repeat_faults)
+                .max(self.state.tool_faults),
+        )
     }
 
     fn compaction_required(&self) -> bool {

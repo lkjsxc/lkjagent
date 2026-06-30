@@ -85,6 +85,47 @@ fn provider_anomaly_preserves_and_shrinks_manuscript_path() -> Result<(), String
 }
 
 #[test]
+fn endpoint_oversize_retry_shrinks_manuscript_path() -> Result<(), String> {
+    let mut input = owner_input();
+    input.owner_objective = Some(direct_objective());
+    input.artifact_root = Some("stories/the-bell-rings-twice".to_string());
+    input.retry_count = 1;
+
+    let decision = decision(
+        input,
+        RuntimeEvent::PayloadOverflowDetected { fault_key: None },
+    )?;
+    let contract = decision.content_write_contract.as_ref().ok_or("contract")?;
+
+    assert_eq!(next_tool(&decision)?, "fs.batch_write");
+    assert_eq!(
+        contract.paths[0],
+        "stories/the-bell-rings-twice/manuscript/chapter-01.md"
+    );
+    assert_eq!(contract.max_file_bytes, 6_000);
+    Ok(())
+}
+
+#[test]
+fn repeated_endpoint_oversize_blocks_with_exact_path() -> Result<(), String> {
+    let mut input = owner_input();
+    input.owner_objective = Some(direct_objective());
+    input.artifact_root = Some("stories/the-bell-rings-twice".to_string());
+    input.retry_count = 2;
+
+    let decision = decision(
+        input,
+        RuntimeEvent::PayloadOverflowDetected { fault_key: None },
+    )?;
+
+    assert!(decision
+        .blocked_handoff_plan
+        .as_deref()
+        .is_some_and(|text| { text.contains("manuscript") && text.contains("chapter-01.md") }));
+    Ok(())
+}
+
+#[test]
 fn repeated_provider_anomaly_blocks_with_exact_path() -> Result<(), String> {
     let mut input = owner_input();
     input.owner_objective = Some(direct_objective());

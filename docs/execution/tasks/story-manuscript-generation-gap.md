@@ -67,7 +67,11 @@ docker compose run --rm verify
 - Completion is blocked until actual chapter prose reaches the requested scale
   or a clean blocked handoff names the missing manuscript paths.
 - Provider max-token and reasoning-only anomalies route to smaller manuscript
-  write contracts rather than repeating story-bible repair.
+  write contracts or a clean remaining-path handoff rather than repeating
+  story-bible repair.
+- Fresh endpoint smoke for the direct chapter route blocked cleanly with the
+  exact remaining manuscript path and no `structured-output` when the endpoint
+  could not fit the requested prose.
 - The benchmark corpus rejects story-bible-only and counted-scaffold manuscript
   regressions.
 - Docker Compose final verification passes.

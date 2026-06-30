@@ -34,6 +34,7 @@ pub(super) fn adapter_input(
         context_hard_pressure: snapshot.compaction_required,
         maintenance_due: snapshot.maintenance_due,
         maintenance_active: snapshot.maintenance_active,
+        retry_count: snapshot.fault_retry_count,
         provider_retry_count: u32::from(snapshot.endpoint_retry_pending),
         latest_decision_id: store_state::get(conn, "authority decision id")?,
         prompt_frame_fingerprint: store_state::get(conn, "authority prompt frame id")?,

@@ -71,7 +71,7 @@ fn recovery_plan(snapshot: &RuntimeSnapshot, facts: &RuntimeFacts) -> TotalResol
         return plan;
     }
     if let Some(manuscript) = facts.manuscript.as_ref() {
-        if manuscript.anomaly_shrink_level >= 3 {
+        if manuscript.anomaly_shrink_level >= 2 {
             return blocked(&format!(
                 "manuscript provider anomaly blocked next_path={}",
                 manuscript.next_path.as_deref().unwrap_or("unknown")
