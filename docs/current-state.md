@@ -85,10 +85,11 @@ recovery, compaction, maintenance, or close attempts. Prompt frames, provider
 exchange rows, pending actions, admissions, observations, model-log exports,
 and status expose the same authority ids and staleness fingerprints.
 
-Live output is one singular tag action only. Top-level JSON, top-level
-line-action syntax, nested file objects, object-literal batches, `<actions>`,
-and `<think>` output are refused. `fs.batch_write` accepts line protocol only
-inside `<files>`.
+Live output is one singular tag action only. Endpoint requests set
+`reasoning_effort=none` so the provider spends output budget on final action
+text, not hidden thinking tokens. Top-level JSON, top-level line-action syntax,
+nested file objects, object-literal batches, `<actions>`, and `<think>` output
+are refused. `fs.batch_write` accepts line protocol only inside `<files>`.
 
 ## Artifact Contract
 
