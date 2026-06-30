@@ -21,6 +21,7 @@ pub struct ChatRequest {
     pub max_tokens: u16,
     pub temperature: f32,
     pub top_p: f32,
+    pub reasoning_effort: &'static str,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub stop: Vec<String>,
     pub stream: bool,
@@ -93,6 +94,7 @@ pub fn build_request(model: &str, messages: &[Message], max_tokens: u16) -> Chat
         max_tokens,
         temperature: TEMPERATURE,
         top_p: TOP_P,
+        reasoning_effort: "none",
         stop: vec![ACTION_CLOSE.to_string()],
         stream: false,
     }

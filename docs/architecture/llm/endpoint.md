@@ -32,6 +32,7 @@ The harness sends exactly these fields and no others:
 | max_tokens | context.reserve, default 512 | compact output budget in [output-budget.md](output-budget.md) |
 | temperature | 0.3 | precision over creativity, per [sampling.md](sampling.md) |
 | top_p | 0.9 | per [sampling.md](sampling.md) |
+| reasoning_effort | none | final action text, not hidden thinking tokens |
 | stop | `</action>` | stops generation after one action envelope |
 | stream | false | whole completions only, see below |
 
@@ -73,6 +74,10 @@ the daemon accepts it and lets the action parser own validation. Cache metrics
 means server-side data such as llama.cpp timings and prompt cache hit counts;
 the daemon records them into the transcript so cache health is visible as
 numbers, and their absence is tolerated.
+
+`reasoning_effort=none` is sent because reasoning-token responses are provider
+metadata, not product action text. If a provider still returns hidden reasoning
+without content, the daemon records a provider anomaly and does not dispatch it.
 
 Empty assistant content with nonzero completion tokens is
 `empty_content_with_usage` in
