@@ -1,5 +1,6 @@
 mod support;
 
+use std::fs;
 use std::path::Path;
 
 use lkjagent_runtime::daemon::{
@@ -27,6 +28,26 @@ fn direct_manuscript_request_does_not_auto_scaffold_structured_output() -> TestR
     server.join()?;
 
     assert_ne!(tick, DaemonTick::Idle);
+    assert!(!workspace.join("structured-output").exists());
+    Ok(())
+}
+
+#[test]
+fn direct_manuscript_request_writes_exact_path_from_valid_batch() -> TestResult<()> {
+    let mut conn = store()?;
+    take_daemon_lock(&conn, "test", "150", "0")?;
+    queue::enqueue(&mut conn, OWNER_TASK, "owner-send", "151")?;
+    let workspace = temp_workspace("story-manuscript-exact-write")?;
+    let server = serve_responses(vec![completion(PLAN_ACTION), completion(BATCH_ACTION)])?;
+    let mut daemon = daemon(&server.base_url, &workspace)?;
+
+    assert_eq!(daemon.poll_once(&mut conn, "151")?, DaemonTick::Working);
+    assert_eq!(daemon.poll_once(&mut conn, "152")?, DaemonTick::Working);
+    server.join()?;
+
+    let chapter = workspace.join("stories/the-bell-rings-twice/manuscript/chapter-01.md");
+    let text = fs::read_to_string(&chapter)?;
+    assert!(text.contains("# Chapter One"));
     assert!(!workspace.join("structured-output").exists());
     Ok(())
 }
@@ -60,6 +81,8 @@ fn repeated_oversize_manuscript_write_waits_with_exact_path() -> TestResult<()> 
 const OWNER_TASK: &str = "Write one 700 to 900 word finished high-school romance chapter at stories/the-bell-rings-twice/manuscript/chapter-01.md. Do not create structured-output.";
 
 const PLAN_ACTION: &str = "<action>\n<tool>graph.plan</tool>\n<objective>Write the requested manuscript chapter.</objective>\n<steps>write exact chapter path</steps>\n<checks>chapter path exists</checks>\n<paths>stories/the-bell-rings-twice</paths>\n<reason>Graph planning requirement</reason>\n</action>";
+
+const BATCH_ACTION: &str = "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: stories/the-bell-rings-twice/manuscript/chapter-01.md\ncontent:\n# Chapter One\n\nThe bell rang twice and the chapter kept going.\n</files>\n</action>";
 
 const BATCH_PREVIEW: &str = "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: stories/the-bell-rings-twice/manuscript/chapter-01.md\\ncontent:\n# Chapter One\n\nThe bell rang twice and the chapter kept going";
 
