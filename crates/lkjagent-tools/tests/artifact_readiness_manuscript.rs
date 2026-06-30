@@ -64,10 +64,7 @@ fn manuscript_readiness_passes_with_chapter_prose_floor() -> TestResult<()> {
     .content;
 
     assert!(output.contains("artifact audit passed"), "{output}");
-    assert!(
-        output.contains("readiness=story-semantic-content"),
-        "{output}"
-    );
+    assert!(output.contains("readiness=manuscript-content"), "{output}");
     assert!(!output.contains("missing-manuscript-content"), "{output}");
     Ok(())
 }

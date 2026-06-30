@@ -23,6 +23,11 @@ pub(crate) fn story_report(
     if let Some(failure) = crate::artifact_story_manuscript::readiness_failure(root, &manuscript) {
         return Ok(failure);
     }
+    if manuscript.active {
+        let passed = crate::artifact_readiness::content_bearing(report)
+            .replace("readiness=content-bearing", "readiness=manuscript-content");
+        return Ok(passed);
+    }
     let missing = story_missing(&files);
     let scale_missing = story_scale_missing(&files);
     if missing.is_empty() && scale_missing.is_empty() {

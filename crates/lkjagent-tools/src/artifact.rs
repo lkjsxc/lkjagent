@@ -42,8 +42,13 @@ pub fn audit(
         )?;
         return Ok(report);
     }
-    let report = crate::doc::audit(workspace, root, count, mode)?;
     let full = workspace_path(workspace, root)?;
+    let assembly = crate::artifact_manuscript_assembly::assemble_scene_atoms(&full, &kind)?;
+    let assembly_report = crate::artifact_manuscript_assembly::render_reports(&assembly);
+    let report = append_if_present(
+        crate::doc::audit(workspace, root, count, mode)?,
+        &assembly_report,
+    );
     let catalog = optional_catalog(&full);
     if !catalog.is_empty() && kind_mismatch(root, &kind, &catalog) {
         let report = format!(
@@ -160,6 +165,14 @@ fn story_catalog(catalog: &str) -> bool {
     catalog.contains("NarrativeManuscript")
         || lower.contains("kind = \"story\"")
         || lower.contains("story bible")
+}
+
+fn append_if_present(report: String, appendix: &str) -> String {
+    if appendix.is_empty() {
+        report
+    } else {
+        format!("{report}\n{appendix}")
+    }
 }
 
 #[allow(clippy::manual_unwrap_or_default)]

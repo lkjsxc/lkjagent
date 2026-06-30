@@ -17,7 +17,7 @@ that ran.
 | 5 | Status, log, and console render rewrite | [tasks/observability-render-redesign.md](tasks/observability-render-redesign.md) | done: shared status-console deck, prefixed status keys, focused tests, quiet verify, and Docker verify passed |
 | 6 | Runtime resolver totality cleanup | [tasks/resolver-table-totality.md](tasks/resolver-table-totality.md) | done: named resolver rules, persisted rule ids and progress keys, focused tests, quiet verify, and Docker verify passed |
 | 7 | Content atom graph and artifact profile generalization | [tasks/content-atom-graph.md](tasks/content-atom-graph.md) | done: shared atom profiles, atom audit facts, generic-root blocking, focused tests, benchmark corpus, quiet verify, and Docker verify passed |
-| 8 | Manuscript staged prose and deterministic assembly | [tasks/manuscript-compose.md](tasks/manuscript-compose.md) | open |
+| 8 | Manuscript staged prose and deterministic assembly | [tasks/manuscript-compose.md](tasks/manuscript-compose.md) | done: scene atoms assemble to exact chapter paths, manuscript readiness uses final prose counts, focused tests, benchmark corpus, quiet verify, and Docker verify passed |
 | 9 | Smoke harness and benchmark expansion | [tasks/smoke-harness.md](tasks/smoke-harness.md) | open |
 | 10 | Final gates and handoff | [tasks/final-redesign-gates.md](tasks/final-redesign-gates.md) | open |
 

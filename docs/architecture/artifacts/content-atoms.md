@@ -21,8 +21,9 @@ The shared atom profiles are:
 | generic | `objective.md`, `structure.md`, `content.md`, `evidence.md`, `completion-evidence.md` |
 
 Story manuscript chapter prose is a manuscript atom family described by
-[manuscript-lifecycle.md](manuscript-lifecycle.md). It does not replace the
-story-bible atoms above.
+[manuscript-lifecycle.md](manuscript-lifecycle.md). Scene atoms are draft units
+until deterministic assembly creates the exact chapter path; they do not replace
+the story-bible atoms above.
 
 ## Selection
 

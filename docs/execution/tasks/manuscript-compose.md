@@ -7,7 +7,9 @@ deterministic assembly.
 
 ## Status
 
-open
+done: manuscript scene atoms assemble to exact chapter paths, manuscript
+readiness accepts final chapter prose without optional story-bible gating,
+focused tests, benchmark corpus, quiet verify, and Docker verify passed
 
 ## Depends On
 
