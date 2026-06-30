@@ -4,7 +4,7 @@ use crate::kernel::event::RuntimeEvent;
 use crate::kernel::obligation::{obligations_for, Obligation};
 use crate::kernel::obligation_facts::{runtime_facts, ArtifactRootStatus, RuntimeFacts};
 use crate::kernel::progress::progress_key_for_snapshot;
-use crate::kernel::resolver::{resolve_obligations, ResolverPlan};
+use crate::kernel::resolver::{resolve_obligations, resolver_label, ResolverPlan};
 use crate::kernel::snapshot::RuntimeSnapshot;
 
 pub(crate) fn authority_ledger_entries(
@@ -67,19 +67,7 @@ fn obligation_set(obligations: &[Obligation]) -> String {
 }
 
 fn resolver_plan(plan: Option<&ResolverPlan>) -> String {
-    match plan {
-        Some(ResolverPlan::SemanticWriteContract { contract }) => {
-            format!("semantic-write:{}", contract.root)
-        }
-        Some(ResolverPlan::ExactInspection { tool }) => format!("inspect:{tool}"),
-        Some(ResolverPlan::Audit { tool }) => format!("audit:{tool}"),
-        Some(ResolverPlan::EvidenceRecording { tool }) => format!("evidence:{tool}"),
-        Some(ResolverPlan::BlockedHandoff { reason }) => format!("blocked:{reason}"),
-        Some(ResolverPlan::RuntimeEffect) => "runtime-effect".to_string(),
-        Some(ResolverPlan::OwnerWait) => "owner-wait".to_string(),
-        Some(ResolverPlan::CloseCase) => "close-case".to_string(),
-        None => "none".to_string(),
-    }
+    plan.map_or_else(|| "none".to_string(), resolver_label)
 }
 
 fn write_contract(contract: Option<&crate::kernel::WriteContractFacts>) -> String {

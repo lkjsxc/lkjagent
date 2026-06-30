@@ -14,6 +14,7 @@ pub fn dense_packet_for_decision(
         facts: filter(&rows, "fact"),
         obligations: filter(&rows, "obligation"),
         resolver_plans: filter(&rows, "resolver_plan"),
+        resolver_rules: filter(&rows, "resolver_rule"),
         progress: filter(&rows, "progress"),
         completion_inputs: filter(&rows, "completion_input"),
     })

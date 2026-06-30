@@ -99,6 +99,7 @@ benchmark fixtures.
 - [admission-view.md](admission-view.md): immutable dispatch admission view.
 - [admission-flow.md](admission-flow.md): accepted and refused dispatch path.
 - [wiring-map.md](wiring-map.md): reducer and admission ownership for runtime paths.
+- [resolver-table.md](resolver-table.md): named total resolver rules.
 - [missions.md](missions.md): owner, recovery, verification, maintenance, compaction, and idle rules.
 - [turn-authority.md](turn-authority.md): single turn decision object.
 - [mode-priority.md](mode-priority.md): deterministic mission priority order.

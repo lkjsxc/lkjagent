@@ -6,7 +6,7 @@ use crate::kernel::next_action_simple::artifact_work_required;
 use crate::kernel::obligation_facts::RuntimeFacts;
 use crate::kernel::snapshot::RuntimeSnapshot;
 
-pub(super) fn fallback_plan(
+pub(super) fn mission_rule_plan(
     mission: RuntimeMission,
     snapshot: &RuntimeSnapshot,
     facts: &RuntimeFacts,

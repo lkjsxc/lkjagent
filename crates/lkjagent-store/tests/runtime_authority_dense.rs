@@ -18,7 +18,13 @@ fn dense_runtime_packet_reopens_for_decision() -> TestResult<()> {
     for (kind, subject, predicate, object) in [
         ("fact", "root", "status", "stories/iwanna"),
         ("obligation", "artifact-readiness", "required_by", "audit"),
-        ("resolver_plan", "selected", "label", "audit:artifact.audit"),
+        (
+            "resolver_plan",
+            "selected",
+            "label",
+            "rule=audit-artifact-audit plan=audit:artifact.audit",
+        ),
+        ("resolver_rule", "selected", "id", "audit-artifact-audit"),
         ("progress", "selected", "key", "root=stories/iwanna"),
         (
             "completion_input",
@@ -44,7 +50,11 @@ fn dense_runtime_packet_reopens_for_decision() -> TestResult<()> {
 
     assert_eq!(packet.facts.len(), 1);
     assert_eq!(packet.obligations[0].subject, "artifact-readiness");
-    assert_eq!(packet.resolver_plans[0].object, "audit:artifact.audit");
+    assert_eq!(
+        packet.resolver_plans[0].object,
+        "rule=audit-artifact-audit plan=audit:artifact.audit"
+    );
+    assert_eq!(packet.resolver_rules[0].object, "audit-artifact-audit");
     assert_eq!(packet.progress[0].object, "root=stories/iwanna");
     assert_eq!(packet.completion_inputs[0].object, "artifact_ready=false");
     Ok(())

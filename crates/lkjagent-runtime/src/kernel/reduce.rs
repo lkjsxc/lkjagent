@@ -14,7 +14,9 @@ use crate::kernel::obligation::obligations_for;
 use crate::kernel::obligation_facts::runtime_facts;
 use crate::kernel::render::prompt_card_for;
 use crate::kernel::repeat_guard::repeat_guard;
-use crate::kernel::resolver::{action_for_plan, resolve_obligations, resolver_label, ResolverPlan};
+use crate::kernel::resolver::{
+    action_for_plan, resolve_obligations, resolver_label, resolver_rule_id, ResolverPlan,
+};
 use crate::kernel::snapshot::{RuntimeEventId, RuntimeSnapshot, ToolName};
 pub fn reduce_with_event_id(
     snapshot: &RuntimeSnapshot,
@@ -162,7 +164,8 @@ fn progress_key(decision: &RuntimeDecision, plan: &ResolverPlan) -> String {
 }
 fn rule_explanation(mission: RuntimeMission, event: &RuntimeEvent, plan: &ResolverPlan) -> String {
     format!(
-        "first_matching_rule={} resolver_plan={} event={}",
+        "selected_rule={} mission={} resolver_plan={} event={}",
+        resolver_rule_id(plan),
         mission.as_str(),
         resolver_label(plan),
         event.kind().as_str()

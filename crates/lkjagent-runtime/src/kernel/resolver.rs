@@ -1,5 +1,7 @@
-#[path = "resolver_fallback.rs"]
-mod resolver_fallback;
+#[path = "resolver_label.rs"]
+mod resolver_label;
+#[path = "resolver_rules.rs"]
+mod resolver_rules;
 
 use crate::kernel::decision::{ActionTemplate, RuntimeMission};
 use crate::kernel::next_action_simple::{simple_write_body, simple_write_path};
@@ -7,7 +9,8 @@ use crate::kernel::obligation::{root_identity_needed, Obligation};
 use crate::kernel::obligation_facts::{ArtifactRootStatus, RuntimeFacts, WriteContractFacts};
 use crate::kernel::render::example_for;
 use crate::kernel::snapshot::{RuntimeSnapshot, ToolName};
-use resolver_fallback::fallback_plan;
+pub use resolver_label::{resolver_label, resolver_rule_id};
+use resolver_rules::mission_rule_plan;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TotalResolverPlan {
@@ -43,7 +46,7 @@ pub fn resolve_obligations(
         return plan;
     }
     first_obligation_plan(mission, snapshot, facts, obligations)
-        .unwrap_or_else(|| fallback_plan(mission, snapshot, facts))
+        .unwrap_or_else(|| mission_rule_plan(mission, snapshot, facts))
 }
 
 pub fn action_for_plan(
@@ -61,25 +64,6 @@ pub fn action_for_plan(
         TotalResolverPlan::EvidenceRecording { tool } if *tool == "fs.write" => fs_write(snapshot),
         TotalResolverPlan::EvidenceRecording { tool } => exact(tool, snapshot),
         TotalResolverPlan::SemanticWriteContract { .. } => exact("fs.batch_write", snapshot),
-    }
-}
-
-pub fn resolver_label(plan: &TotalResolverPlan) -> String {
-    match plan {
-        TotalResolverPlan::RuntimeEffect => "runtime-effect".to_string(),
-        TotalResolverPlan::ExactInspection { tool } => format!("exact-inspection:{tool}"),
-        TotalResolverPlan::SemanticWriteContract { contract } => {
-            format!(
-                "semantic-write:{}:{}",
-                contract.root,
-                contract.exact_paths.join("|")
-            )
-        }
-        TotalResolverPlan::Audit { tool } => format!("audit:{tool}"),
-        TotalResolverPlan::EvidenceRecording { tool } => format!("evidence:{tool}"),
-        TotalResolverPlan::OwnerWait => "owner-wait".to_string(),
-        TotalResolverPlan::BlockedHandoff { reason } => format!("blocked-handoff:{reason}"),
-        TotalResolverPlan::CloseCase => "close-case".to_string(),
     }
 }
 
@@ -110,7 +94,7 @@ fn obligation_plan(
 ) -> Option<TotalResolverPlan> {
     match obligation {
         Obligation::Compaction => Some(TotalResolverPlan::RuntimeEffect),
-        Obligation::Recovery => Some(fallback_plan(mission, snapshot, facts)),
+        Obligation::Recovery => Some(mission_rule_plan(mission, snapshot, facts)),
         Obligation::Plan => Some(TotalResolverPlan::EvidenceRecording { tool: "graph.plan" }),
         Obligation::ArtifactIdentity => Some(TotalResolverPlan::ExactInspection {
             tool: "artifact.plan",
