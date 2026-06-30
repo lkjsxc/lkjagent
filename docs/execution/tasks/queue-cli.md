@@ -15,7 +15,7 @@ done
 
 ## Files To Read
 
-- [../../product/cli.md](../../product/cli.md)
+- [../../product/cli/](../../product/cli/README.md)
 - [../../product/queue.md](../../product/queue.md)
 - [../../product/observability.md](../../product/observability.md)
 - [../../operations/running.md](../../operations/running.md)

@@ -72,7 +72,7 @@ docker compose run --rm agent log
 find data/workspace -maxdepth 2 -type f -print
 ```
 
-The full contract lives in [docs/product/cli.md](docs/product/cli.md) and
+The full contract lives in [docs/product/cli/](docs/product/cli/README.md) and
 [docs/operations/running.md](docs/operations/running.md).
 
 ## Verification Design

@@ -7,7 +7,8 @@ changes.
 
 ## Status
 
-open
+done: CLI contract tree written; `check-docs` and `check-lines` passed in this
+session
 
 ## Depends On
 
@@ -15,7 +16,7 @@ open
 
 ## Files To Read
 
-1. [Product CLI](../../product/cli.md)
+1. [Product CLI](../../product/cli/README.md)
 2. [Product observability](../../product/observability.md)
 3. [Running](../../operations/running.md)
 4. [Token ledger](../../architecture/observability/token-ledger.md)
@@ -25,7 +26,7 @@ open
 
 ## Files To Touch
 
-- `docs/product/cli.md` or new `docs/product/cli/` tree
+- `docs/product/cli/` tree
 - `docs/product/README.md`
 - `docs/product/observability.md`
 - `docs/architecture/observability/README.md`
