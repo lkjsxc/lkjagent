@@ -34,11 +34,12 @@ requested total. Exact lower-bound wording uses the stated lower bound.
 
 ## Progress Facts
 
-Manuscript progress counts finished prose only under `manuscript/` chapter or
-scene paths. README, catalog, cast, setting, outline, lore, and audit files do
-not count. The progress projection records total manuscript words, complete
-chapter paths, missing chapter paths, the next chapter path, and remaining
-words.
+Manuscript progress counts finished prose only under `manuscript/` chapter
+paths. Scene atoms under `manuscript/scenes/<chapter>/` are draft units until
+deterministic assembly writes the chapter path. README, catalog, cast, setting,
+outline, lore, scene atoms, and audit files do not count as final manuscript
+words. The progress projection records total manuscript words, complete chapter
+paths, missing chapter paths, the next chapter path, and remaining words.
 
 ## Write Contracts
 
@@ -50,6 +51,18 @@ story-bible-only, placeholder, owner-terms-only, and generic-example.
 Provider anomalies preserve the same next manuscript path. Recovery may shrink
 the requested chunk to a scene section or block with an exact handoff, but it
 must not reroute missing chapter prose to optional story-bible repair.
+
+## Assembly
+
+Scene atoms are stored under `manuscript/scenes/<chapter>/`. When every scene
+atom in a chapter directory is strong enough, `artifact.audit` deterministically
+assembles them in lexical path order into `manuscript/<chapter>.md` before the
+readiness check. The audit output records `manuscript_assembly=assembled`,
+`assembled_target`, `assembled_word_count`, and `source_atom_paths`.
+
+Assembly is not completion. Completion still requires the chapter file to exist,
+real manuscript word counts to meet the floor, artifact readiness evidence, and
+the central completion gate.
 
 ## Readiness
 

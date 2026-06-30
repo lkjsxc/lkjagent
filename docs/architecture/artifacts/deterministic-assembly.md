@@ -23,10 +23,10 @@ Assembly records evidence that names:
 
 ## Manuscript Chapters
 
-For manuscripts, scene atoms may be assembled into chapter paths under
-`manuscript/`. The chapter file is the readiness evidence. Scene-only output is
-not completion evidence until the chapter path exists and the manuscript audit
-counts its real prose words.
+For manuscripts, scene atoms under `manuscript/scenes/<chapter>/` are assembled
+in lexical path order into `manuscript/<chapter>.md`. The chapter file is the
+readiness evidence. Scene-only output is not completion evidence until the
+chapter path exists and the manuscript audit counts its real prose words.
 
 ## Restrictions
 
@@ -37,5 +37,4 @@ counts its real prose words.
 
 ## Status
 
-contract active; manuscript scene assembly is implemented in the daemon path
-when scene atoms are used.
+implemented for manuscript scene atoms during `artifact.audit`.
