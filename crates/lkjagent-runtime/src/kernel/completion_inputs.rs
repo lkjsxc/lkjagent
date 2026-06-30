@@ -14,6 +14,13 @@ pub(crate) fn completion_inputs(completion: &CompletionGateDecision) -> Vec<Stri
         ),
         format!("manuscript_word_floor={}", input.manuscript_word_floor),
         format!(
+            "manuscript_chapter_count={}",
+            input
+                .manuscript_chapter_count
+                .map(|count| count.to_string())
+                .unwrap_or_else(|| "none".to_string())
+        ),
+        format!(
             "missing_manuscript_paths={}",
             input.missing_manuscript_paths.join("|")
         ),

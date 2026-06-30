@@ -48,6 +48,10 @@ fn completion_refuses_story_bible_only_manuscript() -> Result<(), String> {
         .completion_gate_inputs
         .iter()
         .any(|line| line == "manuscript_words_written=0"));
+    assert!(decision
+        .completion_gate_inputs
+        .iter()
+        .any(|line| line == "manuscript_chapter_count=10"));
     Ok(())
 }
 
