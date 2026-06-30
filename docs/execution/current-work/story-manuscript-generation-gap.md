@@ -110,6 +110,48 @@ trying to write that path. The daemon did not create `structured-output`,
 preserved `stories/the-bell-rings-twice/manuscript/chapter-01.md`, and entered
 waiting with `remaining_path=stories/the-bell-rings-twice/manuscript/chapter-01.md`.
 
+## Live Novel Generation Follow-Up
+
+A later owner asked for an English high-school romance novella of about 10,000
+words, with planning/reference material before manuscript prose. The first live
+run at `/tmp/lkjagent-user-romance-20260630T103900Z` created no artifact root
+and ended in `daemon_state=error` because the configured Gemma endpoint spent
+completion budget on hidden reasoning and exhausted the provider anomaly budget
+with `reasoning_only_response`.
+
+The endpoint request now sends `reasoning_effort=none`. This is a current wire
+contract, not only a prompt hint. Focused llm tests assert the serialized
+request includes the field. After that change, the patched daemon smoke at
+`/tmp/lkjagent-user-romance-patched-20260630T114100Z` created the exact root,
+README, four story-bible files, and no `structured-output`. It did not complete
+the manuscript: after the continued run it had two short chapter files, 508
+manuscript words, 28 turns, `active_mode=recovery`, four duplicate-parameter
+parse faults, no reasoning-only anomalies, and no endpoint max-token faults.
+The smoke timeout, not successful completion, stopped that run.
+
+A direct endpoint fallback then reused the generated story-bible files and
+asked the same local model for one chapter at a time with `reasoning_effort=none`.
+That produced `/tmp/lkjagent-user-romance-complete-20260630T122402Z` with ten
+chapter files and 11,456 manuscript words; the archive is
+`/tmp/lkjagent-user-romance-complete-20260630T122402Z/second-period-first-love.tar.gz`.
+This proves the endpoint can write the requested English romance manuscript
+when driven with bounded per-chapter prompts. It does not prove the daemon can
+finish the same owner task, because the fallback bypassed runtime authority,
+tool admission, artifact cursors, completion gates, and ledger persistence.
+
+Preferable follow-up design should therefore focus on the daemon path:
+
+- model a deterministic chapter writer surface that admits one exact manuscript
+  file with enough bytes and output budget for finished prose;
+- keep story-bible planning as a useful phase but prevent it from satisfying
+  manuscript readiness;
+- make recovery leave `next_executable_action` with the exact remaining chapter
+  path instead of broad tool admission and repeated duplicate-parameter faults;
+- decide whether `reasoning_effort=none` remains a universal request field or
+  becomes an endpoint capability in configuration;
+- add a live smoke harness that can resume chapter by chapter, archive the
+  generated artifact, and report manuscript word counts from the workspace.
+
 ## Handoff Notes
 
 Do not reopen the completed root-identity or dense-authority work. Future smoke

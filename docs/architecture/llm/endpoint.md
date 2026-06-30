@@ -76,8 +76,14 @@ the daemon records them into the transcript so cache health is visible as
 numbers, and their absence is tolerated.
 
 `reasoning_effort=none` is sent because reasoning-token responses are provider
-metadata, not product action text. If a provider still returns hidden reasoning
-without content, the daemon records a provider anomaly and does not dispatch it.
+metadata, not product action text. The field was added after the configured
+Gemma endpoint returned only `reasoning_content` for a live novella task until
+the provider anomaly budget was exhausted. The current implementation sends the
+field unconditionally and tests assert that wire shape. If a future endpoint
+rejects the field, the preferred change is an explicit endpoint capability or
+configuration contract, not silent removal. If a provider still returns hidden
+reasoning without content, the daemon records a provider anomaly and does not
+dispatch it.
 
 Empty assistant content with nonzero completion tokens is
 `empty_content_with_usage` in
