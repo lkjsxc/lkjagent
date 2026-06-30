@@ -14,6 +14,7 @@ pub mod queue;
 pub mod run;
 pub mod send;
 pub mod status;
+pub mod status_deck;
 pub mod store;
 pub mod task;
 

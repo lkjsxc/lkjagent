@@ -7,7 +7,8 @@ state clearly.
 
 ## Status
 
-open
+done: shared status-console deck, prefixed status keys, render tests, quiet
+verify, and Docker verify passed
 
 ## Depends On
 
