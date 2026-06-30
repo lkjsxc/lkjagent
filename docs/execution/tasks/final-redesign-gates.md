@@ -6,7 +6,7 @@ Finish the redesign with repository-level proof and an honest handoff.
 
 ## Status
 
-open
+done: final focused gates and Docker verify passed; handoff evidence is ready
 
 ## Depends On
 
