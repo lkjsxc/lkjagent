@@ -13,7 +13,9 @@ context, store, LLM, tools, runtime, CLI, benchmark, and xtask crates. The
 persisted-decision daemon path is implemented and proved by focused tests and
 Docker verify. Runtime authority now records dense facts, obligations, resolver
 plans, progress edges, deterministic effects, and typed completion gate inputs
-for decisions. The checked-in active model run remains historical failure
+for decisions. A live high-school romance request proves a remaining gap:
+story-bible scaffolds are produced, but manuscript-scale chapter prose is not
+reliably written. The checked-in active model run remains historical failure
 evidence until an owner chooses to replace it.
 
 The durable target is a deterministic state-transition runtime for a weak local
@@ -132,12 +134,24 @@ Workspace tests, benchmark, quiet verify, and Docker verify pass. Final smoke at
 routes preserve owner roots, avoid generic roots, reach story-semantic readiness,
 and close through `agent.done` without the observed noisy loop.
 
+## Known Story Manuscript Gap
+
+Live runs for an English high-school romance novella named `The Bell Rings
+Twice` created `stories/bell-rings-twice` and story-bible files, but not the
+requested chapter manuscript files. The strongest run under
+`/tmp/lkjagent-high-school-romance-long-20260630T072532Z` reached only
+`english_word_count 741` after continuation guidance and still reported
+`check stories/bell-rings-twice/manuscript/chapter-one.md False`. Direct
+single-chapter requests under `/tmp/lkjagent-romance-chapter-test-20260630T073614Z`
+and `/tmp/lkjagent-romance-chapter-prequeued-20260630T074037Z` created
+`structured-output/README.md` instead of the requested story path. The gap is
+manuscript-scale classification, cursoring, and readiness, not root identity.
+
 ## Active Target
 
-No blocker row is open in
-[execution/current-blockers.md](execution/current-blockers.md). The next
-executable step is to open a new task only when a new defect or requirement is
-observed.
+The active row in [execution/current-blockers.md](execution/current-blockers.md)
+is story manuscript generation gap. Next executable step: follow
+[execution/tasks/story-manuscript-generation-gap.md](execution/tasks/story-manuscript-generation-gap.md).
 
 ## Out of Scope
 

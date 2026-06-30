@@ -67,3 +67,5 @@ Every task file uses exactly these headings:
   noisy-loop repairs.
 - [dense-runtime-state-network.md](dense-runtime-state-network.md): dense deterministic runtime
   authority network.
+- [story-manuscript-generation-gap.md](story-manuscript-generation-gap.md): manuscript-scale story
+  generation gap.
