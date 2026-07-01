@@ -41,7 +41,9 @@ unsupported verification claims never close an owner task.
 
 ## Status
 
-partially implemented. Audit-owned evidence guards, artifact audit ledger ids,
-and daemon `agent.done` refusals for unresolved artifact ledger weak paths exist.
-Every close path still needs proof that it uses the same artifact-aware runtime
-gate.
+implemented for the central runtime completion gate. The gate refuses missing
+objectives, missing evidence, latest recovery faults, weak artifact paths,
+missing artifact readiness, missing content atoms, missing manuscript paths, and
+manuscript word counts below the floor. It allows completion only from ready
+artifact projections with blockers cleared. Live endpoint completion proof
+remains a separate operator-run blocker.

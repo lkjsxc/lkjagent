@@ -40,7 +40,9 @@ deterministic assembly writes the chapter path. README, catalog, cast, setting,
 outline, lore, scene atoms, and audit files do not count as final manuscript
 words. The progress projection records total manuscript words, complete chapter
 paths, missing chapter paths, unassembled scene atoms, the next exact write
-path, and remaining words.
+path, and remaining words. An observed `manuscript_missing_paths=none` means the
+completion gate has no remaining path blocker; absence of the field keeps the
+requested-path fallback active.
 
 ## Write Contracts
 
@@ -64,8 +66,8 @@ output records `manuscript_assembly=assembled`, `assembled_target`,
 `assembled_word_count`, and `source_atom_paths`.
 
 Assembly is not completion. Completion still requires the chapter file to exist,
-real manuscript word counts to meet the floor, artifact readiness evidence, and
-the central completion gate.
+real manuscript word counts to meet the floor, artifact readiness evidence, no
+remaining manuscript path blocker, and the central completion gate.
 
 ## Readiness
 

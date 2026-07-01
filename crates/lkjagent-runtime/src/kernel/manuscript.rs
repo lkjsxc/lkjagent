@@ -44,8 +44,12 @@ pub(crate) fn facts_from_snapshot(snapshot: &RuntimeSnapshot) -> Option<Manuscri
     if matches!(task_kind, ManuscriptTaskKind::StoryBible) {
         return None;
     }
-    let mut missing_paths = observed_paths(snapshot, "manuscript_missing_paths");
-    if missing_paths.is_empty() {
+    let observed_missing = observed_value(snapshot, "manuscript_missing_paths");
+    let mut missing_paths = observed_missing
+        .as_deref()
+        .map(split_paths)
+        .unwrap_or_default();
+    if observed_missing.is_none() && missing_paths.is_empty() {
         missing_paths = requested_paths.clone();
     }
     let final_path = missing_paths
@@ -61,7 +65,7 @@ pub(crate) fn facts_from_snapshot(snapshot: &RuntimeSnapshot) -> Option<Manuscri
             .map(|path| write_path_for(&path))
             .unwrap_or_else(|| write_path_for(&final_path)),
     );
-    if missing_paths.is_empty() {
+    if observed_missing.is_none() && missing_paths.is_empty() {
         missing_paths.push(final_path);
     }
     let floor = target_words
@@ -139,15 +143,17 @@ fn observed_number(snapshot: &RuntimeSnapshot, key: &str) -> Option<usize> {
 
 fn observed_paths(snapshot: &RuntimeSnapshot, key: &str) -> Vec<String> {
     observed_value(snapshot, key)
-        .map(|value| {
-            value
-                .split(',')
-                .map(str::trim)
-                .filter(|item| !item.is_empty() && *item != "none")
-                .map(str::to_string)
-                .collect()
-        })
+        .map(|value| split_paths(&value))
         .unwrap_or_default()
+}
+
+fn split_paths(value: &str) -> Vec<String> {
+    value
+        .split(',')
+        .map(str::trim)
+        .filter(|item| !item.is_empty() && *item != "none")
+        .map(str::to_string)
+        .collect()
 }
 
 fn observed_write_path(root: &str, snapshot: &RuntimeSnapshot) -> Option<String> {

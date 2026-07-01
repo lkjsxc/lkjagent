@@ -62,8 +62,19 @@ fn assemble_chapter(
     }
     let target = format!("manuscript/{chapter}.md");
     let target_path = root.join(&target);
-    if target_path.is_file() && prose_words(&fs::read_to_string(&target_path)?) >= floor {
-        return Ok(None);
+    let sources = atoms
+        .iter()
+        .map(|(relative, _)| relative.clone())
+        .collect::<Vec<_>>();
+    if target_path.is_file() {
+        let words = prose_words(&fs::read_to_string(&target_path)?);
+        if words >= floor {
+            return Ok(Some(AssemblyReport {
+                target,
+                sources,
+                words,
+            }));
+        }
     }
     let mut body = format!("# {}\n\n", chapter_title(chapter));
     let mut sources = Vec::new();
