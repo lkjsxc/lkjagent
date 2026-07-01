@@ -128,4 +128,3 @@ fn boilerplate_allowlist(path: &str) -> bool {
             | "crates/lkjagent-xtask/src/doc_special.rs"
     )
 }
-

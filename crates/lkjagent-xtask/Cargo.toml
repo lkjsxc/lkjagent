@@ -10,3 +10,5 @@ workspace = true
 
 [dependencies]
 lkjagent-benchmark = { path = "../lkjagent-benchmark" }
+lkjagent-store = { path = "../lkjagent-store" }
+rusqlite = { version = "0.40.1", features = ["bundled"] }

@@ -49,6 +49,7 @@ Every task file uses exactly these headings:
 - [final-redesign-gates.md](final-redesign-gates.md): run final gates and handoff.
 - [large-artifact-engine.md](large-artifact-engine.md): durable atom graph engine for long artifacts.
 - [live-manuscript-proof.md](live-manuscript-proof.md): live daemon proof boundary for a 10,000-word manuscript.
+- [proof-bundle.md](proof-bundle.md): deterministic Markdown evidence collector for runtime proof.
 
 ### Historical Task Contracts
 
