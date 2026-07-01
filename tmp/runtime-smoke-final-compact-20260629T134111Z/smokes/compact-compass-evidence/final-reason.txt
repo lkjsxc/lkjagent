@@ -1,1 +1,0 @@
-FINAL_REASON=close_evidence_observed

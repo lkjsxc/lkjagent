@@ -1,8 +1,0 @@
-$ cargo run -p lkjagent-xtask -- check-lines
-
-START_UTC=2026-06-29T05:19:57Z
-
-ok check-lines
-
-END_UTC=2026-06-29T05:19:57Z
-EXIT_STATUS=0

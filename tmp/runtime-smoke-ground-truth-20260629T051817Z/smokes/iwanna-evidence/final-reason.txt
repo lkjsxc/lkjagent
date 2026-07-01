@@ -1,1 +1,0 @@
-FINAL_REASON=manual_stop_after_poll_timeout
