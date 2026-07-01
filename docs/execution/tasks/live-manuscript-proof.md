@@ -9,8 +9,11 @@ claiming completion.
 ## Status
 
 open: deterministic artifact planning, contracts, audit, readiness, replay,
-quiet verify, and Docker verify are implemented; full live daemon manuscript
-completion is not yet proved in this checkout.
+quiet verify, and Docker verify are implemented. The Aurora Ledger live proof
+at `tmp/live-proof-20260701T100958Z/` exhausted the observation loop in recovery
+with 26 scene files, 6,230 scene words, zero assembled chapter files, zero final
+manuscript words, no artifact readiness rows, and repeated `fs.batch_write`
+recovery notices.
 
 ## Depends On
 
@@ -53,7 +56,8 @@ docker compose run --rm verify
   artifact contract, root `stories/aurora-ledger`, ten requested chapter files,
   real manuscript prose, and at least 10,000 measured manuscript words.
 - Any wait, loop, early close, generic root, story-bible-only close, endpoint
-  failure, or word-count shortfall becomes a focused blocker or regression test.
+  failure, or word-count shortfall keeps this blocker open and adds focused
+  regression coverage before the next completion claim.
 
 ## Must Not
 

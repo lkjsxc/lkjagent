@@ -148,10 +148,14 @@ in recovery after only two short chapter files and 508 manuscript words. A
 direct per-chapter endpoint fallback generated ten chapters and 11,456
 manuscript words at `/tmp/lkjagent-user-romance-complete-20260630T122402Z`.
 That artifact proves the model can write the prose, not that the daemon can
-complete the task. The open target is live proof that the daemon-owned,
-resumable scene and chapter write surface can finish the full manuscript with
-real word-count evidence, deterministic assembly where needed, and central
-completion closure.
+complete the task. A later Aurora Ledger live proof at
+`tmp/live-proof-20260701T100958Z/` kept the requested root and wrote 26 scene
+files with 6,230 scene words, but it exhausted the observation loop in active
+recovery with zero assembled chapter files, zero final manuscript words, no
+artifact readiness rows, and repeated `fs.batch_write` recovery notices. The
+open target is live proof that the daemon-owned, resumable scene and chapter
+write surface can finish the full manuscript with real word-count evidence,
+deterministic assembly where needed, and central completion closure.
 
 ## Verification Evidence
 
