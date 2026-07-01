@@ -56,7 +56,9 @@ Anything fancier is graph-guided shell work the agent can build on demand.
 
 ## Status
 
-partially implemented. Status, log, console, memory, graph, and model-log
-surfaces exist. Status and console now share a prefixed deck with cumulative
-token scopes. Remaining observability work belongs to later resolver, content,
-and smoke tasks rather than a separate display deck rewrite.
+Implemented for the local CLI surfaces listed above. Status and console share a
+prefixed deck with cumulative token scopes, model-log handoff paths, authority
+facts, artifact facts, and continuation facts. The remaining open evidence is
+not a display rewrite: live endpoint proof for a full daemon-owned manuscript is
+tracked in the
+[story gap](../execution/current-work/story-manuscript-generation-gap.md).

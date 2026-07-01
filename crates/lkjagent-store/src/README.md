@@ -28,3 +28,6 @@ This directory holds schema setup and typed SQLite store APIs.
 - [schema_personal.rs](schema_personal.rs): personal record SQLite schema setup.
 - [state.rs](state.rs): key-value state and daemon lock decisions.
 - [token_usage.rs](token_usage.rs): normalized token usage event ledger.
+- [provider_exchange.rs](provider_exchange.rs): provider exchange source module.
+- [schema_provider_exchange.rs](schema_provider_exchange.rs): schema provider exchange source module.
+- [token_usage_aggregate.rs](token_usage_aggregate.rs): token usage aggregate source module.

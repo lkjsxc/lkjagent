@@ -30,3 +30,7 @@ This directory splits dispatcher state, validation, and route helpers.
 - [routes_workspace.rs](routes_workspace.rs): workspace summary routing.
 - [state.rs](state.rs): dispatcher runtime and state structs.
 - [validate.rs](validate.rs): registry validation with defaults.
+- [batch_write_normalize.rs](batch_write_normalize.rs): batch write normalize source module.
+- [completion.rs](completion.rs): completion source module.
+- [personal_tools/](personal_tools/README.md): personal tools helper modules.
+- [personal_tools.rs](personal_tools.rs): personal tools source module.

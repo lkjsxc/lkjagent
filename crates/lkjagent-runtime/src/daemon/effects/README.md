@@ -14,3 +14,4 @@ graph effect writes, and compaction transcript records.
 - [pending_staleness.rs](pending_staleness.rs): stale pending action checks.
 - [pending_staleness_tests.rs](pending_staleness_tests.rs): pending staleness tests.
 - [record.rs](record.rs): compaction transcript recording.
+- [effects_graph_evidence.rs](effects_graph_evidence.rs): effects graph evidence source module.

@@ -15,3 +15,4 @@ queue delivery, idle maintenance opening, and maintenance wait guard.
 - [owner_delivery.rs](owner_delivery.rs): queue delivery and owner step opening.
 - [idle.rs](idle.rs): automatic idle maintenance cycle opening.
 - [maintenance_wait.rs](maintenance_wait.rs): maintenance ask auto-close guard.
+- [endpoint_runtime_effect.rs](endpoint_runtime_effect.rs): endpoint runtime effect source module.

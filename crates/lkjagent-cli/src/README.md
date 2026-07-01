@@ -31,3 +31,20 @@ This directory holds CLI argument dispatch and one module per command.
 - [send.rs](send.rs): queue append command.
 - [status.rs](status.rs): daemon and store status command.
 - [store.rs](store.rs): store path and connection helpers.
+- [args_catalog.rs](args_catalog.rs): args catalog source module.
+- [args_log.rs](args_log.rs): args log source module.
+- [args_model_log.rs](args_model_log.rs): args model log source module.
+- [args_personal.rs](args_personal.rs): args personal source module.
+- [args_queue.rs](args_queue.rs): args queue source module.
+- [args_task.rs](args_task.rs): args task source module.
+- [config/](config/README.md): config helper modules.
+- [console/](console/README.md): console helper modules.
+- [model_log_export.rs](model_log_export.rs): model log export source module.
+- [personal.rs](personal.rs): personal source module.
+- [personal_projection.rs](personal_projection.rs): personal projection source module.
+- [personal_projection_text.rs](personal_projection_text.rs): personal projection text source module.
+- [queue.rs](queue.rs): queue source module.
+- [status_context.rs](status_context.rs): status context source module.
+- [status_deck.rs](status_deck.rs): status deck source module.
+- [status_facts.rs](status_facts.rs): status facts source module.
+- [task.rs](task.rs): task source module.
