@@ -11,6 +11,7 @@ daemon, store, tool, or CLI adapters.
 
 - [active_mode.rs](active_mode.rs): runtime active modes.
 - [adapter.rs](adapter.rs): snapshot adapter input and normalization.
+- [adapter_facts.rs](adapter_facts.rs): adapter fact parsing and projection helpers.
 - [adapter_fingerprint.rs](adapter_fingerprint.rs): authority and staleness fingerprints.
 - [admission.rs](admission.rs): immutable dispatch admission views.
 - [admission_decide.rs](admission_decide.rs): admitted-tool decision helpers.

@@ -23,6 +23,8 @@ files, and good and bad fixtures.
 - [owner-uploaded.rs](owner_uploaded.rs): uploaded run-log fixture matrix task.
 - [repair.rs](repair.rs): shell program repair task.
 - [synthesis.rs](synthesis.rs): shell program synthesis task.
+- [large_artifact.rs](large_artifact.rs): durable large-artifact task fixtures.
+- [large_artifact_fixtures.rs](large_artifact_fixtures.rs): large-artifact good and bad fixture text.
 - [owner_doc_topics.rs](owner_doc_topics.rs): owner doc topics source module.
 - [owner_long_novel.rs](owner_long_novel.rs): owner long novel source module.
 - [owner_loop_continuation.rs](owner_loop_continuation.rs): owner loop continuation source module.

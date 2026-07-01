@@ -8,7 +8,8 @@ runner.
 ## Table of Contents
 
 - [doc-common.rs](doc_common.rs): shared Markdown shape checks.
-- [doc-special.rs](doc_special.rs): task and crate README checks.
+- [doc-crate-readmes.rs](doc_crate_readmes.rs): crate and source README coverage checks.
+- [doc-special.rs](doc_special.rs): task shape and generated-boilerplate checks.
 - [doc-topology.rs](doc_topology.rs): docs README topology and All Files checks.
 - [benchmark/](benchmark/README.md): benchmark commands and Docker runner.
 - [docs.rs](docs.rs): check-docs composition.

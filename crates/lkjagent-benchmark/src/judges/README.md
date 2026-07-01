@@ -20,6 +20,7 @@ this crate.
 - [owner-ops.rs](owner_ops.rs): action recovery, status, and model log judges.
 - [owner-uploaded.rs](owner_uploaded.rs): uploaded run-log fixture matrix judge.
 - [program.rs](program.rs): bounded shell program judges.
+- [large_artifact.rs](large_artifact.rs): durable large-artifact judge helpers.
 - [long_novel.rs](long_novel.rs): long novel source module.
 - [owner_continuation.rs](owner_continuation.rs): owner continuation source module.
 - [owner_doc_topics.rs](owner_doc_topics.rs): owner doc topics source module.
