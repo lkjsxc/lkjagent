@@ -112,6 +112,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [artifact_readiness.rs](artifact_readiness.rs): artifact readiness source module.
 - [artifact_readiness_story.rs](artifact_readiness_story.rs): artifact readiness story source module.
 - [artifact_readiness_story_req.rs](artifact_readiness_story_req.rs): artifact readiness story req source module.
+- [artifact_runtime_contract.rs](artifact_runtime_contract.rs): runtime prompt-frame write contract admission.
 - [artifact_story_manuscript.rs](artifact_story_manuscript.rs): artifact story manuscript source module.
 - [artifact_story_manuscript_paths.rs](artifact_story_manuscript_paths.rs): manuscript path and
   scene selection helpers.

@@ -8,8 +8,10 @@ use crate::fs_batch::BatchFileInfo;
 
 pub fn validate_batch_against_contract(
     conn: &Connection,
+    decision_id: Option<&str>,
     files: &[BatchFileInfo],
 ) -> ToolResult<()> {
+    crate::artifact_runtime_contract::validate(conn, decision_id, files)?;
     crate::artifact_contract_budget::validate_active_contracts(conn, files)?;
     let paths = files
         .iter()

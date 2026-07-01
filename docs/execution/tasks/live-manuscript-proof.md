@@ -13,7 +13,8 @@ quiet verify, and Docker verify are implemented. The Aurora Ledger live proof
 at `tmp/live-proof-20260701T100958Z/` exhausted the observation loop in recovery
 with 26 scene files, 6,230 scene words, zero assembled chapter files, zero final
 manuscript words, no artifact readiness rows, and repeated `fs.batch_write`
-recovery notices.
+recovery notices. Runtime contract admission now has regression coverage for
+sibling scene-path drift before the next live proof.
 
 ## Depends On
 

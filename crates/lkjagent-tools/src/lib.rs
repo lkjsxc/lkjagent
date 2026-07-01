@@ -31,6 +31,7 @@ mod artifact_profile_more;
 mod artifact_readiness;
 mod artifact_readiness_story;
 mod artifact_readiness_story_req;
+mod artifact_runtime_contract;
 mod artifact_story_manuscript;
 mod artifact_story_manuscript_paths;
 mod artifact_story_text;
