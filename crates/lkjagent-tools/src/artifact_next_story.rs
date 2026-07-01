@@ -31,7 +31,11 @@ pub(crate) fn story_contract_if_missing(
         .collect::<Vec<_>>();
     let manuscript = crate::artifact_story_manuscript::facts(root, scale, &manuscript_files);
     let selected = if manuscript.active && !manuscript.missing_paths.is_empty() {
-        manuscript.missing_paths.into_iter().take(1).collect()
+        manuscript
+            .next_path
+            .or_else(|| manuscript.missing_paths.first().cloned())
+            .into_iter()
+            .collect()
     } else {
         selected_paths(&files)
     };

@@ -17,9 +17,10 @@ pub(crate) fn assemble_scene_atoms(root: &Path, kind: &str) -> ToolResult<Vec<As
         return Ok(Vec::new());
     }
     let scenes = scene_atoms(root)?;
+    let floor = crate::artifact_manuscript_floor::chapter_floor(root)?;
     let mut reports = Vec::new();
     for (chapter, atoms) in scenes {
-        let Some(report) = assemble_chapter(root, &chapter, atoms)? else {
+        let Some(report) = assemble_chapter(root, &chapter, atoms, floor)? else {
             continue;
         };
         reports.push(report);
@@ -49,8 +50,9 @@ fn assemble_chapter(
     root: &Path,
     chapter: &str,
     atoms: Vec<(String, PathBuf)>,
+    floor: usize,
 ) -> ToolResult<Option<AssemblyReport>> {
-    if atoms.is_empty() {
+    if atoms.is_empty() || scene_words(&atoms)? < floor {
         return Ok(None);
     }
     for (_, path) in &atoms {
@@ -60,7 +62,7 @@ fn assemble_chapter(
     }
     let target = format!("manuscript/{chapter}.md");
     let target_path = root.join(&target);
-    if target_path.is_file() && prose_words(&fs::read_to_string(&target_path)?) > 0 {
+    if target_path.is_file() && prose_words(&fs::read_to_string(&target_path)?) >= floor {
         return Ok(None);
     }
     let mut body = format!("# {}\n\n", chapter_title(chapter));
@@ -128,6 +130,14 @@ fn weak_scene(path: &Path) -> ToolResult<bool> {
         || lower.contains("content_state=structure-only")
         || lower.contains("placeholder")
         || lower.contains("todo"))
+}
+
+fn scene_words(atoms: &[(String, PathBuf)]) -> ToolResult<usize> {
+    let mut words = 0usize;
+    for (_, path) in atoms {
+        words = words.saturating_add(prose_words(&fs::read_to_string(path)?));
+    }
+    Ok(words)
 }
 
 fn trim_heading(text: &str) -> String {

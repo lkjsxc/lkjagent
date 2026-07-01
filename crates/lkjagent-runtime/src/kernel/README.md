@@ -27,6 +27,7 @@ daemon, store, tool, or CLI adapters.
   observation, provider, and maintenance facts.
 - [fault.rs](fault.rs): fault classes and retry keys.
 - [manuscript.rs](manuscript.rs): manuscript plan, progress, and shrink facts.
+- [manuscript_path.rs](manuscript_path.rs): manuscript path parsing and scene write selection.
 - [mission.rs](mission.rs): runtime mission enum and labels.
 - [mission_select.rs](mission_select.rs): deterministic mission selection.
 - [mod.rs](mod.rs): module exports.

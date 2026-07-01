@@ -46,7 +46,7 @@ fn resolver_table_names_primary_rules() -> Result<(), String> {
 }
 
 #[test]
-fn recovery_blocked_handoff_has_exact_rule_and_missing_path() -> Result<(), String> {
+fn recovery_shrink_has_exact_rule_and_missing_path() -> Result<(), String> {
     let mut input = owner_input();
     input.retry_count = 2;
     input.latest_observation = Some(
@@ -61,22 +61,26 @@ fn recovery_blocked_handoff_has_exact_rule_and_missing_path() -> Result<(), Stri
     )?;
 
     assert_eq!(decision.mission, RuntimeMission::OwnerRecovery);
+    assert!(decision.blocked_handoff_plan.is_none());
+    assert_eq!(next_tool(&decision)?, "fs.batch_write");
     assert_eq!(
-        decision.blocked_handoff_plan.as_deref(),
-        Some(
-            "manuscript provider anomaly blocked next_path=stories/novel/manuscript/chapter-01.md"
-        )
+        decision
+            .content_write_contract
+            .as_ref()
+            .ok_or("missing contract")?
+            .paths[0],
+        "stories/novel/manuscript/scenes/chapter-01/scene-01.md"
     );
     assert!(decision
         .resolver_plan
         .as_deref()
         .unwrap_or("")
-        .contains("rule=blocked-handoff"));
+        .contains("rule=semantic-write-contract"));
     assert!(decision
         .progress_key
         .as_deref()
         .unwrap_or("")
-        .contains("plan=rule=blocked-handoff"));
+        .contains("plan=rule=semantic-write-contract"));
     Ok(())
 }
 

@@ -5,7 +5,7 @@ use lkjagent_runtime::kernel::{RuntimeEvent, RuntimeMission};
 use obligation_network_support::*;
 
 #[test]
-fn direct_chapter_request_forces_exact_manuscript_write() -> Result<(), String> {
+fn direct_chapter_request_forces_exact_scene_atom_write() -> Result<(), String> {
     let mut input = owner_input();
     input.owner_objective = Some(direct_objective());
     input.artifact_root = Some("stories/the-bell-rings-twice".to_string());
@@ -20,12 +20,12 @@ fn direct_chapter_request_forces_exact_manuscript_write() -> Result<(), String> 
     assert_eq!(next_tool(&decision)?, "fs.batch_write");
     assert_eq!(
         contract.paths,
-        vec!["stories/the-bell-rings-twice/manuscript/chapter-01.md"]
+        vec!["stories/the-bell-rings-twice/manuscript/scenes/chapter-01/scene-01.md"]
     );
     assert!(contract
         .required_sections
-        .contains(&"finished chapter prose".to_string()));
-    assert!(contract.max_file_bytes >= 12_000);
+        .contains(&"finished scene prose".to_string()));
+    assert_eq!(contract.max_file_bytes, 1_800);
     Ok(())
 }
 
@@ -42,7 +42,7 @@ fn completion_refuses_story_bible_only_manuscript() -> Result<(), String> {
     assert_eq!(decision.mission, RuntimeMission::OwnerCompletion);
     assert!(!decision.completion_allowed);
     assert!(decision.completion_refusal.as_deref().is_some_and(|text| {
-        text.contains("manuscript-word-count") && text.contains("chapter-01.md")
+        text.contains("manuscript-word-count") && text.contains("scene-01.md")
     }));
     assert!(decision
         .completion_gate_inputs
@@ -78,9 +78,9 @@ fn provider_anomaly_preserves_and_shrinks_manuscript_path() -> Result<(), String
     assert_eq!(next_tool(&decision)?, "fs.batch_write");
     assert_eq!(
         contract.paths[0],
-        "stories/the-bell-rings-twice/manuscript/chapter-01.md"
+        "stories/the-bell-rings-twice/manuscript/scenes/chapter-01/scene-01.md"
     );
-    assert_eq!(contract.max_file_bytes, 6_000);
+    assert_eq!(contract.max_file_bytes, 1_200);
     Ok(())
 }
 
@@ -100,14 +100,14 @@ fn endpoint_oversize_retry_shrinks_manuscript_path() -> Result<(), String> {
     assert_eq!(next_tool(&decision)?, "fs.batch_write");
     assert_eq!(
         contract.paths[0],
-        "stories/the-bell-rings-twice/manuscript/chapter-01.md"
+        "stories/the-bell-rings-twice/manuscript/scenes/chapter-01/scene-01.md"
     );
-    assert_eq!(contract.max_file_bytes, 6_000);
+    assert_eq!(contract.max_file_bytes, 1_200);
     Ok(())
 }
 
 #[test]
-fn repeated_endpoint_oversize_blocks_with_exact_path() -> Result<(), String> {
+fn repeated_endpoint_oversize_keeps_smaller_exact_path() -> Result<(), String> {
     let mut input = owner_input();
     input.owner_objective = Some(direct_objective());
     input.artifact_root = Some("stories/the-bell-rings-twice".to_string());
@@ -117,16 +117,19 @@ fn repeated_endpoint_oversize_blocks_with_exact_path() -> Result<(), String> {
         input,
         RuntimeEvent::PayloadOverflowDetected { fault_key: None },
     )?;
+    let contract = decision.content_write_contract.as_ref().ok_or("contract")?;
 
-    assert!(decision
-        .blocked_handoff_plan
-        .as_deref()
-        .is_some_and(|text| { text.contains("manuscript") && text.contains("chapter-01.md") }));
+    assert!(decision.blocked_handoff_plan.is_none());
+    assert_eq!(
+        contract.paths[0],
+        "stories/the-bell-rings-twice/manuscript/scenes/chapter-01/scene-01.md"
+    );
+    assert_eq!(contract.max_file_bytes, 800);
     Ok(())
 }
 
 #[test]
-fn repeated_provider_anomaly_blocks_with_exact_path() -> Result<(), String> {
+fn repeated_provider_anomaly_keeps_smaller_exact_path() -> Result<(), String> {
     let mut input = owner_input();
     input.owner_objective = Some(direct_objective());
     input.artifact_root = Some("stories/the-bell-rings-twice".to_string());
@@ -139,11 +142,14 @@ fn repeated_provider_anomaly_blocks_with_exact_path() -> Result<(), String> {
             class: "reasoning_only_response".to_string(),
         },
     )?;
+    let contract = decision.content_write_contract.as_ref().ok_or("contract")?;
 
-    assert!(decision
-        .blocked_handoff_plan
-        .as_deref()
-        .is_some_and(|text| { text.contains("manuscript") && text.contains("chapter-01.md") }));
+    assert!(decision.blocked_handoff_plan.is_none());
+    assert_eq!(
+        contract.paths[0],
+        "stories/the-bell-rings-twice/manuscript/scenes/chapter-01/scene-01.md"
+    );
+    assert_eq!(contract.max_file_bytes, 800);
     Ok(())
 }
 
@@ -157,9 +163,9 @@ fn long_objective() -> String {
 }
 
 fn manuscript_failure() -> String {
-    "artifact audit failed\nroot=stories/bell-rings-twice\nreadiness=missing-manuscript-content\nfailures:\n- manuscript_missing_paths: stories/bell-rings-twice/manuscript/chapter-01.md\n- manuscript_word_count: 0\n- manuscript_target_words: 10000\n- next_manuscript_path: stories/bell-rings-twice/manuscript/chapter-01.md\nnext_decision_required=true\ncandidate_action=artifact.next".to_string()
+    "artifact audit failed\nroot=stories/bell-rings-twice\nreadiness=missing-manuscript-content\nfailures:\n- manuscript_missing_paths: stories/bell-rings-twice/manuscript/chapter-01.md\n- manuscript_word_count: 0\n- manuscript_target_words: 10000\n- next_manuscript_path: stories/bell-rings-twice/manuscript/scenes/chapter-01/scene-01.md\nnext_decision_required=true\ncandidate_action=artifact.next".to_string()
 }
 
 fn write_candidate() -> String {
-    "next_decision_required=true\ncandidate_action=fs.batch_write\nnext_paths:\n- stories/the-bell-rings-twice/manuscript/chapter-01.md".to_string()
+    "next_decision_required=true\ncandidate_action=fs.batch_write\nnext_paths:\n- stories/the-bell-rings-twice/manuscript/scenes/chapter-01/scene-01.md".to_string()
 }

@@ -15,6 +15,7 @@ pub mod event_kind;
 pub mod facts;
 pub mod fault;
 mod manuscript;
+mod manuscript_path;
 pub mod mission;
 pub mod mission_select;
 mod next_action_simple;

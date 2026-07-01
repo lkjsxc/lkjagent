@@ -32,10 +32,10 @@ fn manuscript_next_prefers_chapter_after_identity() -> TestResult<()> {
     .content;
 
     assert!(
-        output.contains("next_paths:\n- manuscript/chapter-01.md"),
+        output.contains("next_paths:\n- manuscript/scenes/chapter-01/scene-01.md"),
         "{output}"
     );
-    assert!(output.contains("finished chapter prose"), "{output}");
+    assert!(output.contains("finished scene prose"), "{output}");
     assert!(!output.contains("act-structure.md"), "{output}");
     Ok(())
 }

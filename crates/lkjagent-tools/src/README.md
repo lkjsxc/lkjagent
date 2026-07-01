@@ -89,6 +89,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [artifact_content_atom_profile.rs](artifact_content_atom_profile.rs): artifact content atom profile source module.
 - [artifact_drift.rs](artifact_drift.rs): artifact drift source module.
 - [artifact_ledger_state.rs](artifact_ledger_state.rs): artifact ledger state source module.
+- [artifact_manuscript_floor.rs](artifact_manuscript_floor.rs): manuscript floor calculation helpers.
 - [artifact_manuscript_assembly.rs](artifact_manuscript_assembly.rs): artifact manuscript assembly source module.
 - [artifact_next_cursor.rs](artifact_next_cursor.rs): artifact next cursor source module.
 - [artifact_next_identity.rs](artifact_next_identity.rs): artifact next identity source module.
@@ -100,6 +101,8 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [artifact_readiness_story.rs](artifact_readiness_story.rs): artifact readiness story source module.
 - [artifact_readiness_story_req.rs](artifact_readiness_story_req.rs): artifact readiness story req source module.
 - [artifact_story_manuscript.rs](artifact_story_manuscript.rs): artifact story manuscript source module.
+- [artifact_story_manuscript_paths.rs](artifact_story_manuscript_paths.rs): manuscript path and
+  scene selection helpers.
 - [artifact_story_text.rs](artifact_story_text.rs): artifact story text source module.
 - [count_profile_paths.rs](count_profile_paths.rs): count profile paths source module.
 - [fs_batch/](fs_batch/README.md): fs batch helper modules.

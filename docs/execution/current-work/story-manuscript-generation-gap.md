@@ -64,9 +64,10 @@ The evidence below lives in `/tmp` and is not a checked-in fixture.
   signals.
 - Negative owner instructions such as `Do not create structured-output` are not
   represented as typed constraints that can block generic counted scaffolds.
-- Provider anomalies, especially `reasoning_only_response` and max-token
-  completions, are recorded, but the recovery route does not force a smaller
-  manuscript chunk such as one scene or one chapter subsection.
+- Historical provider anomalies, especially `reasoning_only_response` and
+  max-token completions, were recorded without a forced smaller manuscript
+  chunk. The current contract preserves the exact path and shrinks to a bounded
+  scene or subsection write.
 - Owner work can coexist with an already opened maintenance cycle, leaving a
   visible owner task while `active_mode=maintenance` until the next safe turn.
 
@@ -98,11 +99,11 @@ manuscript-only readiness word counts, completion refusal fields, provider
 anomaly path preservation, and benchmark fixtures for story-bible-only and
 counted-scaffold regressions.
 
-Focused tests cover direct chapter routing, 10,000 word target facts,
-count-guard non-regression, chapter-priority `artifact.next`, readiness refusal
-and pass cases, completion refusal, provider anomaly shrink and blocked handoff,
-endpoint max-token handoff, and daemon absence of `structured-output` for the
-direct manuscript request.
+Focused tests cover direct scene-atom routing for chapter requests, 10,000 word
+target facts, count-guard non-regression, manuscript-priority `artifact.next`,
+readiness refusal and pass cases, completion refusal, provider anomaly shrink,
+endpoint max-token shrink, deterministic assembly floor checks, and daemon
+absence of `structured-output` for the direct manuscript request.
 
 Fresh endpoint smoke at `/tmp/lkjagent-manuscript-direct-20260630T095705Z`
 asked for the exact chapter path. The model repeatedly hit max tokens while
@@ -146,7 +147,8 @@ Preferable follow-up design should therefore focus on the daemon path:
 - keep story-bible planning as a useful phase but prevent it from satisfying
   manuscript readiness;
 - make recovery leave `next_executable_action` with the exact remaining chapter
-  path instead of broad tool admission and repeated duplicate-parameter faults;
+  or scene path instead of broad tool admission and repeated duplicate-parameter
+  faults;
 - decide whether `reasoning_effort=none` remains a universal request field or
   becomes an endpoint capability in configuration;
 - add a live smoke harness that can resume chapter by chapter, archive the

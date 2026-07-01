@@ -33,7 +33,7 @@ fn direct_manuscript_request_does_not_auto_scaffold_structured_output() -> TestR
 }
 
 #[test]
-fn direct_manuscript_request_writes_exact_path_from_valid_batch() -> TestResult<()> {
+fn direct_manuscript_request_writes_exact_scene_path_from_valid_batch() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "150", "0")?;
     queue::enqueue(&mut conn, OWNER_TASK, "owner-send", "151")?;
@@ -45,19 +45,20 @@ fn direct_manuscript_request_writes_exact_path_from_valid_batch() -> TestResult<
     assert_eq!(daemon.poll_once(&mut conn, "152")?, DaemonTick::Working);
     server.join()?;
 
-    let chapter = workspace.join("stories/the-bell-rings-twice/manuscript/chapter-01.md");
-    let text = fs::read_to_string(&chapter)?;
-    assert!(text.contains("# Chapter One"));
+    let scene =
+        workspace.join("stories/the-bell-rings-twice/manuscript/scenes/chapter-01/scene-01.md");
+    let text = fs::read_to_string(&scene)?;
+    assert!(text.contains("# Scene One"));
     assert!(!workspace.join("structured-output").exists());
     Ok(())
 }
 
 #[test]
-fn repeated_oversize_manuscript_write_waits_with_exact_path() -> TestResult<()> {
+fn repeated_oversize_manuscript_write_keeps_working_with_exact_path() -> TestResult<()> {
     let mut conn = store()?;
     take_daemon_lock(&conn, "test", "200", "0")?;
     queue::enqueue(&mut conn, OWNER_TASK, "owner-send", "201")?;
-    let workspace = temp_workspace("story-manuscript-oversize-handoff")?;
+    let workspace = temp_workspace("story-manuscript-oversize-shrink")?;
     let server = serve_responses(vec![
         completion(PLAN_ACTION),
         length_completion(BATCH_PREVIEW),
@@ -67,13 +68,11 @@ fn repeated_oversize_manuscript_write_waits_with_exact_path() -> TestResult<()> 
 
     assert_eq!(daemon.poll_once(&mut conn, "201")?, DaemonTick::Working);
     assert_eq!(daemon.poll_once(&mut conn, "202")?, DaemonTick::Working);
-    assert_eq!(daemon.poll_once(&mut conn, "203")?, DaemonTick::Waiting);
+    assert_eq!(daemon.poll_once(&mut conn, "203")?, DaemonTick::Working);
     server.join()?;
 
     let question = lkjagent_store::state::get(&conn, "daemon question")?.unwrap_or_default();
-    assert!(
-        question.contains("remaining_path=stories/the-bell-rings-twice/manuscript/chapter-01.md")
-    );
+    assert!(question.is_empty(), "{question}");
     assert!(!workspace.join("structured-output").exists());
     Ok(())
 }
@@ -82,9 +81,9 @@ const OWNER_TASK: &str = "Write one 700 to 900 word finished high-school romance
 
 const PLAN_ACTION: &str = "<action>\n<tool>graph.plan</tool>\n<objective>Write the requested manuscript chapter.</objective>\n<steps>write exact chapter path</steps>\n<checks>chapter path exists</checks>\n<paths>stories/the-bell-rings-twice</paths>\n<reason>Graph planning requirement</reason>\n</action>";
 
-const BATCH_ACTION: &str = "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: stories/the-bell-rings-twice/manuscript/chapter-01.md\ncontent:\n# Chapter One\n\nThe bell rang twice and the chapter kept going.\n</files>\n</action>";
+const BATCH_ACTION: &str = "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: stories/the-bell-rings-twice/manuscript/scenes/chapter-01/scene-01.md\ncontent:\n# Scene One\n\nThe bell rang twice and the scene kept going.\n</files>\n</action>";
 
-const BATCH_PREVIEW: &str = "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: stories/the-bell-rings-twice/manuscript/chapter-01.md\\ncontent:\n# Chapter One\n\nThe bell rang twice and the chapter kept going";
+const BATCH_PREVIEW: &str = "<action>\n<tool>fs.batch_write</tool>\n<files>\npath: stories/the-bell-rings-twice/manuscript/scenes/chapter-01/scene-01.md\\ncontent:\n# Scene One\n\nThe bell rang twice and the scene kept going";
 
 fn daemon(base_url: &str, workspace: &Path) -> TestResult<ResidentDaemon> {
     let runtime = ResidentRuntime::new(
