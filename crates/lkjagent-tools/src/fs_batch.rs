@@ -11,6 +11,12 @@ use parse::{parse_files, BatchFile};
 const MAX_FILE_BYTES: usize = crate::fs::MAX_INLINE_FILE_BYTES;
 const MAX_TOTAL_BYTES: usize = 6_000;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BatchFileInfo {
+    pub path: String,
+    pub bytes: usize,
+}
+
 pub fn mkdir(workspace: &Path, path: &str) -> ToolResult<String> {
     reject_file_like_directory(path)?;
     let full = workspace_path(workspace, path)?;
@@ -45,10 +51,20 @@ pub fn batch_write(workspace: &Path, files: &str, max_files: usize) -> ToolResul
 }
 
 pub fn paths(files: &str) -> ToolResult<Vec<String>> {
+    Ok(file_infos(files)?
+        .into_iter()
+        .map(|file| file.path)
+        .collect())
+}
+
+pub fn file_infos(files: &str) -> ToolResult<Vec<BatchFileInfo>> {
     Ok(parse_files(files)?
         .files
         .into_iter()
-        .map(|file| file.path)
+        .map(|file| BatchFileInfo {
+            path: file.path,
+            bytes: file.content.len(),
+        })
         .collect())
 }
 

@@ -89,6 +89,7 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [artifact_card.rs](artifact_card.rs): artifact card source module.
 - [artifact_content_atom.rs](artifact_content_atom.rs): artifact content atom source module.
 - [artifact_content_atom_profile.rs](artifact_content_atom_profile.rs): artifact content atom profile source module.
+- [artifact_contract_budget.rs](artifact_contract_budget.rs): active artifact contract budget admission.
 - [artifact_contract_render.rs](artifact_contract_render.rs): active artifact contract rendering helpers.
 - [artifact_drift.rs](artifact_drift.rs): artifact drift source module.
 - [artifact_kind.rs](artifact_kind.rs): artifact kind classification helpers.

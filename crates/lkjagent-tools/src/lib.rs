@@ -5,6 +5,7 @@ mod artifact_atom_audit;
 mod artifact_atom_measure;
 mod artifact_content_atom;
 mod artifact_content_atom_profile;
+mod artifact_contract_budget;
 mod artifact_contract_render;
 mod artifact_cursor_support;
 mod artifact_drift;

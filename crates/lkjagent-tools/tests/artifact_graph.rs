@@ -100,6 +100,19 @@ fn active_contract_refuses_other_batch_path() -> TestResult<()> {
         &mut conn,
         &mut dispatch_state,
     );
+    fs::create_dir_all(runtime.workspace.join("reports/refusal"))?;
+    fs::write(
+        runtime.workspace.join("reports/refusal/catalog.toml"),
+        "kind = \"report\"\n",
+    )?;
+    fs::write(
+        runtime.workspace.join("reports/refusal/README.md"),
+        "# Refusal\n\n## Purpose\n\nNavigate the report.\n",
+    )?;
+    fs::write(
+        runtime.workspace.join("reports/refusal/objective.md"),
+        "# Objective\n\n## Purpose\n\nDefine the report objective.\n",
+    )?;
     dispatch_state.reset_repeat_tracking();
     dispatch(
         &action(

@@ -30,9 +30,11 @@ order. If no writable atom remains, it returns assembly or readiness candidates.
 ## Admission
 
 `fs.batch_write` validates every path against the active contract before any
-mutation. A path outside the contract, a completed contract path, or a batch that
-exceeds file or byte budgets is refused. The prompt example names exact paths
-and the line protocol; it never prefills body prose.
+mutation. A path under a known artifact root is refused when no active contract
+matches it. A path outside the contract, a completed contract path, a file count
+above `max_files`, a file above `max_file_bytes`, or a batch above
+`max_batch_bytes` is refused. The prompt example names exact paths and the line
+protocol; it never prefills body prose.
 
 ## Status
 

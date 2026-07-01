@@ -117,8 +117,11 @@ Prompt-visible scaffold writers are not live tools. `artifact.next` is
 non-mutating and returns atom write contracts, not body prose. Missing roots
 become root identity write contracts and force `fs.batch_write`; they do not
 repeat same-root `doc.audit` before write progress. `fs.batch_write` mutates
-artifact paths only after active contract validation. Audit-owned evidence
-comes from `doc.audit` and `artifact.audit`, not direct `graph.evidence`.
+artifact paths only after active contract validation. Validation refuses known
+artifact-root writes with no active contract, paths outside the active contract,
+completed cursor paths, and active-contract `max_files`, `max_file_bytes`, or
+`max_batch_bytes` overflows. Audit-owned evidence comes from `doc.audit` and
+`artifact.audit`, not direct `graph.evidence`.
 
 ## Story Manuscript Evidence
 
