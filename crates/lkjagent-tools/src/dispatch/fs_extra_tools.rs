@@ -99,8 +99,12 @@ pub fn dispatch_fs_batch_write(
 ) -> DispatchOutput {
     let files = param(params, "files");
     let result = (|| {
-        let paths = crate::fs_batch::paths(&files)?;
-        crate::artifact_write_support::validate_paths_against_contract(conn, &paths)?;
+        let file_infos = crate::fs_batch::file_infos(&files)?;
+        let paths = file_infos
+            .iter()
+            .map(|file| file.path.clone())
+            .collect::<Vec<_>>();
+        crate::artifact_write_support::validate_batch_against_contract(conn, &file_infos)?;
         match crate::fs_batch::batch_write(&runtime.workspace, &files, 20) {
             Ok(output) => {
                 crate::artifact_write_support::record_written_paths(conn, &paths, &runtime.now)?;

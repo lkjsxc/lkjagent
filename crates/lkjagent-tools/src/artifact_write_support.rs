@@ -4,9 +4,17 @@ use lkjagent_store::artifact_cursor::{mark_paths_completed, mark_paths_failed};
 use rusqlite::Connection;
 
 use crate::error::{ToolError, ToolResult};
+use crate::fs_batch::BatchFileInfo;
 
-pub fn validate_paths_against_contract(conn: &Connection, paths: &[String]) -> ToolResult<()> {
-    validate_active_atom_contracts(conn, paths)?;
+pub fn validate_batch_against_contract(
+    conn: &Connection,
+    files: &[BatchFileInfo],
+) -> ToolResult<()> {
+    crate::artifact_contract_budget::validate_active_contracts(conn, files)?;
+    let paths = files
+        .iter()
+        .map(|file| file.path.clone())
+        .collect::<Vec<_>>();
     for row in cursor_rows(conn)? {
         let planned = split(&row.planned_paths)
             .into_iter()
@@ -46,25 +54,6 @@ pub fn record_written_paths(conn: &Connection, paths: &[String], now: &str) -> T
 pub fn record_failed_paths(conn: &Connection, paths: &[String], now: &str) -> ToolResult<()> {
     mark_paths_failed(conn, paths, now)?;
     update_active_contracts(conn, paths, now, "blocked", "failed")?;
-    Ok(())
-}
-
-fn validate_active_atom_contracts(conn: &Connection, paths: &[String]) -> ToolResult<()> {
-    let contracts = lkjagent_store::artifact_graph::active_contracts(conn)?;
-    if contracts.is_empty() {
-        return Ok(());
-    }
-    let admitted = contracts
-        .iter()
-        .flat_map(|contract| split_owned(&contract.exact_paths))
-        .collect::<BTreeSet<_>>();
-    for path in paths {
-        if !admitted.contains(path) {
-            return Err(ToolError::invalid(format!(
-                "fs.batch_write path outside active artifact contract: {path}"
-            )));
-        }
-    }
     Ok(())
 }
 
