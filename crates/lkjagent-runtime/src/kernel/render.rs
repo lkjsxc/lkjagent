@@ -124,14 +124,20 @@ fn render_next_action(decision: &RuntimeDecision) -> String {
 
 fn render_content_contract(contract: &crate::kernel::ContentWriteContract) -> String {
     format!(
-        "<write-contract>\n<tool>fs.batch_write</tool>\n<root>{}</root>\n<paths>\n{}\n</paths>\n<limits>max_files={} max_file_bytes={} max_batch_bytes={}</limits>\n<required-sections>\n{}\n</required-sections>\n<forbidden-weak-phrases>\n{}\n</forbidden-weak-phrases>\n<instruction>author exactly one fs.batch_write action using line protocol inside files; do not prefill prose from the prompt</instruction>\n</write-contract>",
+        "<write-contract>\n<tool>fs.batch_write</tool>\n<contract>{}</contract>\n<atoms>{}</atoms>\n<root>{}</root>\n<paths>\n{}\n</paths>\n<count-floor>{}</count-floor>\n<target-count>{}</target-count>\n<limits>max_files={} max_file_bytes={} max_batch_bytes={}</limits>\n<continuity>{}</continuity>\n<required-sections>\n{}\n</required-sections>\n<forbidden-weak-phrases>\n{}\n</forbidden-weak-phrases>\n<line-protocol-example>path: {}\ncontent:</line-protocol-example>\n<instruction>author exactly one fs.batch_write action using line protocol inside files; do not prefill prose from the prompt</instruction>\n</write-contract>",
+        contract.contract_id.as_deref().unwrap_or("none"),
+        list_or_none(&contract.atom_ids),
         contract.root,
         bullet_list(&contract.paths),
+        contract.count_floor,
+        contract.target_count,
         contract.max_files,
         contract.max_file_bytes,
         contract.max_batch_bytes,
+        contract.continuity_digest.as_deref().unwrap_or("none"),
         bullet_list(&contract.required_sections),
         bullet_list(&contract.forbidden_weak_phrase_classes),
+        contract.paths.first().map(String::as_str).unwrap_or("none"),
     )
 }
 

@@ -49,6 +49,11 @@ pub struct ContentWriteContract {
     pub max_batch_bytes: usize,
     pub required_sections: Vec<String>,
     pub forbidden_weak_phrase_classes: Vec<String>,
+    pub contract_id: Option<String>,
+    pub atom_ids: Vec<String>,
+    pub target_count: usize,
+    pub count_floor: usize,
+    pub continuity_digest: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

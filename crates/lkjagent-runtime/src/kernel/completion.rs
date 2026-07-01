@@ -147,6 +147,9 @@ fn artifact_required(snapshot: &RuntimeSnapshot) -> bool {
 }
 
 fn artifact_ready_if_present(snapshot: &RuntimeSnapshot) -> bool {
+    if snapshot.artifact.progress.readiness.as_deref() == Some("ready") {
+        return true;
+    }
     !artifact_required(snapshot)
         || snapshot
             .evidence

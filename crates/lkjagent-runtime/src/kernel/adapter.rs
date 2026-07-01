@@ -1,9 +1,9 @@
+#[path = "adapter_facts.rs"]
+mod adapter_facts;
+
 use crate::kernel::adapter_fingerprint::fingerprints;
 use crate::kernel::event::RuntimeEvent;
-use crate::kernel::facts::{
-    ArtifactFacts, CaseFacts, ContextFacts, EvidenceFacts, GraphFacts, MaintenanceFacts,
-    ProviderFacts, QueueFacts,
-};
+use crate::kernel::facts::MaintenanceFacts;
 use crate::kernel::fault::RuntimeFault;
 use crate::kernel::mission_select::select_mission;
 use crate::kernel::snapshot::{RuntimeSnapshot, RuntimeSnapshotId, RuntimeSnapshotInput};
@@ -29,6 +29,18 @@ pub struct SnapshotAdapterInput {
     pub artifact_batch_cursor: Option<String>,
     pub artifact_weak_paths: Vec<String>,
     pub artifact_audit_status: Option<String>,
+    pub artifact_plan_status: Option<String>,
+    pub artifact_atom_total: usize,
+    pub artifact_atom_ready: usize,
+    pub artifact_atom_missing: usize,
+    pub artifact_next_atom: Option<String>,
+    pub artifact_next_path: Option<String>,
+    pub artifact_active_contract: Option<String>,
+    pub artifact_measured_total: usize,
+    pub artifact_accepted_floor: usize,
+    pub artifact_assembly_pending: bool,
+    pub artifact_readiness: Option<String>,
+    pub artifact_completion_blockers: Vec<String>,
     pub latest_fault: Option<RuntimeFault>,
     pub retry_count: u32,
     pub prior_action_fingerprint: Option<String>,
@@ -63,17 +75,17 @@ pub fn build_snapshot(
     let owner_work_exists = owner_work_exists(&input);
     let maintenance = maintenance_facts(&input, owner_work_exists);
     let (authority_fingerprint, staleness_fingerprint) = fingerprints(&input, owner_work_exists)?;
-    let observation = observation_facts(&input);
+    let observation = adapter_facts::observation_facts(&input);
     let mut snapshot = RuntimeSnapshot::new(RuntimeSnapshotInput {
         snapshot_id: RuntimeSnapshotId(input.snapshot_id),
-        case: case_facts(&input),
-        graph: graph_facts(&input),
-        queue: queue_facts(&input),
-        evidence: evidence_facts(&input),
-        artifact: artifact_facts(&input),
-        context: context_facts(&input),
+        case: adapter_facts::case_facts(&input),
+        graph: adapter_facts::graph_facts(&input),
+        queue: adapter_facts::queue_facts(&input),
+        evidence: adapter_facts::evidence_facts(&input),
+        artifact: adapter_facts::artifact_facts(&input),
+        context: adapter_facts::context_facts(&input),
         maintenance,
-        provider: provider_facts(&input),
+        provider: adapter_facts::provider_facts(&input),
         authority_fingerprint,
         staleness_fingerprint,
     });
@@ -123,74 +135,5 @@ fn maintenance_facts(input: &SnapshotAdapterInput, owner_work_exists: bool) -> M
         due: input.maintenance_due,
         active: input.maintenance_active,
         cooldown_active: input.maintenance_cooldown,
-    }
-}
-
-fn case_facts(input: &SnapshotAdapterInput) -> CaseFacts {
-    CaseFacts {
-        case_id: input.case_id.clone(),
-        owner_objective: input.owner_objective.clone(),
-        task_family: input.task_family.clone(),
-        ..CaseFacts::default()
-    }
-}
-
-fn graph_facts(input: &SnapshotAdapterInput) -> GraphFacts {
-    GraphFacts {
-        node: input.graph_node.clone(),
-        phase: input.graph_phase.clone(),
-        ..GraphFacts::default()
-    }
-}
-
-fn queue_facts(input: &SnapshotAdapterInput) -> QueueFacts {
-    QueueFacts {
-        head_id: input.queue_head.clone(),
-        pending_owner_count: input.pending_owner_count,
-    }
-}
-
-fn evidence_facts(input: &SnapshotAdapterInput) -> EvidenceFacts {
-    EvidenceFacts {
-        required: input.required_evidence.clone(),
-        missing: input.missing_evidence.clone(),
-        existing: input.existing_evidence.clone(),
-        owners: Vec::new(),
-    }
-}
-
-fn artifact_facts(input: &SnapshotAdapterInput) -> ArtifactFacts {
-    ArtifactFacts {
-        artifact_id: input.artifact_id.clone(),
-        root: input.artifact_root.clone(),
-        kind: input.artifact_kind.clone(),
-        weak_paths: input.artifact_weak_paths.clone(),
-        audit_status: input.artifact_audit_status.clone(),
-        cursor: input.artifact_cursor.clone(),
-        batch_cursor: input.artifact_batch_cursor.clone(),
-        ..ArtifactFacts::default()
-    }
-}
-
-fn observation_facts(input: &SnapshotAdapterInput) -> crate::kernel::facts::ObservationFacts {
-    crate::kernel::facts::ObservationFacts {
-        latest: input.latest_observation.clone(),
-        latest_successful: input.latest_successful_observation.clone(),
-    }
-}
-
-fn provider_facts(input: &SnapshotAdapterInput) -> ProviderFacts {
-    ProviderFacts {
-        latest_exchange_id: input.provider_exchange_id.clone(),
-        anomaly_class: input.provider_anomaly_class.clone(),
-        retry_count: input.provider_retry_count,
-        pause_deadline: input.provider_pause_deadline.clone(),
-    }
-}
-
-fn context_facts(input: &SnapshotAdapterInput) -> ContextFacts {
-    ContextFacts {
-        hard_pressure: input.context_hard_pressure,
-        compaction_head: input.compaction_head.clone(),
     }
 }

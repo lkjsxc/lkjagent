@@ -47,6 +47,7 @@ Every task file uses exactly these headings:
 - [manuscript-compose.md](manuscript-compose.md): implement staged manuscript assembly.
 - [smoke-harness.md](smoke-harness.md): add replay and smoke harnesses.
 - [final-redesign-gates.md](final-redesign-gates.md): run final gates and handoff.
+- [large-artifact-engine.md](large-artifact-engine.md): durable atom graph engine for long artifacts.
 
 ### Historical Task Contracts
 

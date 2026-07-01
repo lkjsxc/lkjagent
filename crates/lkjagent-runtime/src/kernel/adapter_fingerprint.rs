@@ -35,8 +35,15 @@ fn staleness_parts(input: &SnapshotAdapterInput, owner_work_exists: bool) -> Vec
         format!("active_mode={:?}", input.active_mode_hint),
         format!("graph={:?}:{:?}", input.graph_node, input.graph_phase),
         format!(
-            "artifact={:?}:{:?}",
-            input.artifact_root, input.artifact_cursor
+            "artifact={:?}:{:?}:{:?}:{}:{}:{}:{:?}:{:?}",
+            input.artifact_root,
+            input.artifact_cursor,
+            input.artifact_plan_status,
+            input.artifact_atom_total,
+            input.artifact_atom_ready,
+            input.artifact_atom_missing,
+            input.artifact_active_contract,
+            input.artifact_readiness
         ),
         format!(
             "fault={:?}:{}:{:?}:{:?}",

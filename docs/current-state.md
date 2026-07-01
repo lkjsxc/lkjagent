@@ -13,10 +13,10 @@ context, store, LLM, tools, runtime, CLI, benchmark, and xtask crates. The
 persisted-decision daemon path records dense facts, obligations, resolver
 plans, progress edges, deterministic effects, and typed completion gate inputs.
 
-The current redesign target is broader than story generation: make lkjagent a
-general structural agent harness with clear CLI operations, cumulative token
-accounting, total resolver rules, content atoms, deterministic assembly, and
-smoke evidence for long work products.
+The current redesign target is a generic large-artifact engine: a single owner
+objective becomes durable plans, atom graphs, exact-path write contracts,
+real-file audit, deterministic assembly, readiness projection, and completion
+gates for long structured work products.
 
 The durable runtime shape remains:
 
@@ -50,7 +50,7 @@ content inside that selected surface.
 | Token accounting | Endpoint usage rows aggregate into latest, task, session, and all-time scopes with unknown counts for status and console. |
 | CLI core | Metadata-rendered help, group help, `--data` before or after commands, `watch` and `console`, task inspection, queue inspection, and shared status-console decks are implemented. |
 | Resolver table | Named total resolver rules select rule ids, plans, blocked handoffs, and progress keys without a resolver fallback module. |
-| Artifact lifecycle | Artifact plan, audit, next, cursors, weak paths, invalid roots, story readiness, and completion refusals are ledger-backed. |
+| Artifact lifecycle | Artifact plan, audit, next, cursors, weak paths, invalid roots, durable atom graphs, write contracts, readiness projection, story readiness, and completion refusals are ledger-backed. |
 | Maintenance | Maintenance gates, owner preemption checks, no-op cooldown facts, and closed-idle rules have focused coverage. |
 | Benchmarks | Owner recovery, artifact, memory, accounting, model-log, batch-schema, compaction, repeated-recovery, and novel signatures are in the corpus. |
 
@@ -59,8 +59,7 @@ content inside that selected surface.
 | Area | Current boundary |
 | --- | --- |
 | CLI UX | The parser, command tree, and shared status-console deck are implemented. Further UX hardening follows resolver and content evidence needs. |
-| Content atoms | Report, documentation, generic, and story audit facts use bounded atom profiles; completion refuses while required atoms remain missing. |
-| Manuscript completion | Exact chapter routing, manuscript word-count refusal, provider shrink/block recovery, and deterministic scene-to-chapter assembly exist; full live 10,000-word daemon completion is not proved. |
+| Live endpoint proof | Full live 10,000-word daemon completion remains operator-driven evidence. Store-backed planning, atom selection, audit, assembly, and completion refusal are implemented. |
 | Smoke harness | Deterministic replay and explicit live smoke skip commands exist; fresh live endpoint completion remains operator-driven evidence. |
 
 ## Active Data Log Fixture
@@ -106,17 +105,18 @@ are refused. `fs.batch_write` accepts line protocol only inside `<files>`.
 The artifact lifecycle is:
 
 ```text
-OwnerObjective -> ArtifactIdentity -> ArtifactPlan -> WriteContract
--> ModelAuthoredBatch -> DocumentAudit -> ArtifactAudit
--> WeakPathCursor -> MoreWriteContracts -> Verification -> CompletionGate
+OwnerObjective -> ObjectiveFrame -> ArtifactPlan -> ArtifactAtomGraph
+-> NextAtomSelection -> WriteContract -> ModelAuthoredContent
+-> ContractValidation -> AtomAudit -> DeterministicAssembly
+-> ReadinessProjection -> CompletionGate
 ```
 
 Prompt-visible scaffold writers are not live tools. `artifact.next` is
-non-mutating and returns write contracts, not body prose. Missing roots become
-root identity write contracts and force `fs.batch_write`; they do not repeat
-same-root `doc.audit` before write progress. `fs.batch_write` mutates only
-after contract validation. Audit-owned evidence comes from `doc.audit` and
-`artifact.audit`, not direct `graph.evidence`.
+non-mutating and returns atom write contracts, not body prose. Missing roots
+become root identity write contracts and force `fs.batch_write`; they do not
+repeat same-root `doc.audit` before write progress. `fs.batch_write` mutates
+artifact paths only after active contract validation. Audit-owned evidence
+comes from `doc.audit` and `artifact.audit`, not direct `graph.evidence`.
 
 ## Story Manuscript Evidence
 
@@ -165,9 +165,9 @@ evidence does not prove full 10,000-word daemon manuscript completion.
 ## Redesign Queue Status
 
 The executable redesign queue in
-[execution/current-blockers.md](execution/current-blockers.md) is closed through
-final repository gates. Remaining product risk is live endpoint completion of a
-full 10,000-word daemon manuscript, which is not claimed here.
+[execution/current-blockers.md](execution/current-blockers.md) tracks the
+large-artifact engine work. Remaining product risk is live endpoint completion
+of a full 10,000-word daemon manuscript, which is not claimed here.
 
 ## Out of Scope
 

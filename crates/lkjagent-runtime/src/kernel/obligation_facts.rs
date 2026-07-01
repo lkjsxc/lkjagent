@@ -53,6 +53,11 @@ pub struct WriteContractFacts {
     pub required_sections: Vec<String>,
     pub forbidden_weak_phrase_classes: Vec<String>,
     pub status: WriteContractStatus,
+    pub contract_id: Option<String>,
+    pub atom_ids: Vec<String>,
+    pub target_count: usize,
+    pub count_floor: usize,
+    pub continuity_digest: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -120,6 +125,11 @@ impl WriteContractFacts {
             max_batch_bytes: self.max_batch_bytes,
             required_sections: self.required_sections.clone(),
             forbidden_weak_phrase_classes: self.forbidden_weak_phrase_classes.clone(),
+            contract_id: self.contract_id.clone(),
+            atom_ids: self.atom_ids.clone(),
+            target_count: self.target_count,
+            count_floor: self.count_floor,
+            continuity_digest: self.continuity_digest.clone(),
         }
     }
 }

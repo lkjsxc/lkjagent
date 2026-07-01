@@ -3,6 +3,7 @@ pub mod automata;
 pub mod bundle;
 pub mod correction;
 pub mod graph;
+pub mod large_artifact;
 pub mod long_novel;
 pub mod owner_address;
 pub mod owner_continuation;
@@ -53,6 +54,13 @@ pub fn judge_task(task: &BenchmarkTask, workspace: &Path) -> BenchResult<JudgeOu
         }
         JudgeKind::StatusAccounting => owner_ops::status_accounting(workspace),
         JudgeKind::ModelHandoffLog => owner_ops::model_handoff_log(workspace),
+        JudgeKind::LargeArtifactManuscript => large_artifact::manuscript(workspace),
+        JudgeKind::LargeArtifactReport => large_artifact::report(workspace),
+        JudgeKind::LargeArtifactStudySet => large_artifact::study_set(workspace),
+        JudgeKind::LargeArtifactDocumentation => large_artifact::documentation(workspace),
+        JudgeKind::LargeArtifactGenericRoot => large_artifact::generic_root(workspace),
+        JudgeKind::LargeArtifactAtomRetry => large_artifact::atom_retry(workspace),
+        JudgeKind::LargeArtifactAssembly => large_artifact::assembly(workspace),
     };
     Ok(match result {
         Ok(()) => JudgeOutcome::pass(task.points),

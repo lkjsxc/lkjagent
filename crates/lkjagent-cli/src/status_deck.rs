@@ -1,3 +1,5 @@
+#[path = "status_artifact.rs"]
+mod status_artifact;
 #[path = "status_context.rs"]
 mod status_context;
 #[path = "status_facts.rs"]

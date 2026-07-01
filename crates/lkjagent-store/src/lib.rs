@@ -1,4 +1,5 @@
 pub mod artifact_cursor;
+pub mod artifact_graph;
 pub mod artifact_ledger;
 pub mod error;
 pub mod events;

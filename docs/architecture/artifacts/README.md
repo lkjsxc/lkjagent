@@ -10,6 +10,7 @@ cookbooks, guides, encyclopedias, and other large content deliverables.
 - [lifecycle.md](lifecycle.md): scaffold, content pass, audit pass, and completion.
 - [artifact-ledger.md](artifact-ledger.md): durable artifact identity, weak paths, and audit state.
 - [content-artifacts.md](content-artifacts.md): general large-content contract.
+- [large-artifact/](large-artifact/README.md): durable atom graph engine for long structured works.
 - [content-atoms.md](content-atoms.md): bounded semantic units for large artifacts.
 - [deterministic-assembly.md](deterministic-assembly.md): daemon-owned assembly from approved atoms.
 - [content-readiness.md](content-readiness.md): meaningful leaf-file checks.
@@ -48,8 +49,9 @@ are separate states.
 ## Status
 
 Implemented for scaffold profiles, artifact tool wrappers, ledger-backed
-identity, bounded next-batch planning, content atoms, deterministic scene
-assembly, dictionary readiness, adoption, repair routing, and audit-owned
-readiness checks. The open product risk is live endpoint proof of a full
-10,000-word daemon-owned manuscript, tracked in the
+identity, durable atom graph plans, exact-path write contracts, content atom
+audit, deterministic scene assembly, dictionary readiness, adoption, repair
+routing, store-projected readiness, and audit-owned completion checks. Live
+endpoint proof of a complete 10,000-word daemon manuscript remains operator
+smoke evidence, tracked in the
 [story gap](../../execution/current-work/story-manuscript-generation-gap.md).

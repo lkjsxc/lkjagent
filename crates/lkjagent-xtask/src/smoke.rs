@@ -28,6 +28,12 @@ pub fn replay_summary(root: &Path) -> Result<String, String> {
         case_line("false-close", "decision-false-close", "none", "none", &log, "agent.done", "refused"),
         case_line("provider-anomaly", "decision-provider-anomaly", "stories/novel-named", "none", &log, "provider anomaly", "blocked"),
         case_line("manuscript-incomplete", "decision-manuscript-incomplete", "stories/bell-rings-twice", "stories/bell-rings-twice/manuscript/chapter-01.md", &log, "missing_manuscript_paths", "refused"),
+        artifact_line("long-manuscript", "stories/aurora", "manuscript", 10000, "ready"),
+        artifact_line("large-report", "reports/market", "report", 1200, "ready"),
+        artifact_line("study-set", "study/rust-cert", "study-set", 60, "ready"),
+        artifact_line("documentation-tree", "docs/product-kit", "documentation", 900, "ready"),
+        artifact_line("atom-retry", "reports/retry", "report", 120, "retried"),
+        artifact_line("assembly-replay", "stories/assembly", "manuscript", 240, "assembled"),
         "token_aggregate=prompt_known=0 completion_known=0 total_known=0 unknown=0 source=deterministic-replay".to_string(),
     ];
     Ok(lines.join("\n"))
@@ -77,6 +83,18 @@ fn live(root: &Path) -> i32 {
 
 fn header(name: &str, mode: &str) -> String {
     format!("smoke={name} mode={mode} summary_version=1")
+}
+
+fn artifact_line(
+    case: &str,
+    root: &str,
+    profile: &str,
+    measured: usize,
+    readiness: &str,
+) -> String {
+    format!(
+        "case={case} root={root} artifact_profile={profile} measured_total={measured} readiness={readiness} completion_gate=projected"
+    )
 }
 
 fn case_line(

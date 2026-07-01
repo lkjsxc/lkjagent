@@ -6,6 +6,7 @@ use rusqlite::Connection;
 use crate::error::{ToolError, ToolResult};
 
 pub fn validate_paths_against_contract(conn: &Connection, paths: &[String]) -> ToolResult<()> {
+    validate_active_atom_contracts(conn, paths)?;
     for row in cursor_rows(conn)? {
         let planned = split(&row.planned_paths)
             .into_iter()
@@ -38,11 +39,66 @@ pub fn validate_paths_against_contract(conn: &Connection, paths: &[String]) -> T
 
 pub fn record_written_paths(conn: &Connection, paths: &[String], now: &str) -> ToolResult<()> {
     mark_paths_completed(conn, paths, now)?;
+    update_active_contracts(conn, paths, now, "written", "satisfied")?;
     Ok(())
 }
 
 pub fn record_failed_paths(conn: &Connection, paths: &[String], now: &str) -> ToolResult<()> {
     mark_paths_failed(conn, paths, now)?;
+    update_active_contracts(conn, paths, now, "blocked", "failed")?;
+    Ok(())
+}
+
+fn validate_active_atom_contracts(conn: &Connection, paths: &[String]) -> ToolResult<()> {
+    let contracts = lkjagent_store::artifact_graph::active_contracts(conn)?;
+    if contracts.is_empty() {
+        return Ok(());
+    }
+    let admitted = contracts
+        .iter()
+        .flat_map(|contract| split_owned(&contract.exact_paths))
+        .collect::<BTreeSet<_>>();
+    for path in paths {
+        if !admitted.contains(path) {
+            return Err(ToolError::invalid(format!(
+                "fs.batch_write path outside active artifact contract: {path}"
+            )));
+        }
+    }
+    Ok(())
+}
+
+fn update_active_contracts(
+    conn: &Connection,
+    paths: &[String],
+    now: &str,
+    atom_status: &str,
+    contract_status: &str,
+) -> ToolResult<()> {
+    let touched = paths.iter().cloned().collect::<BTreeSet<_>>();
+    for contract in lkjagent_store::artifact_graph::active_contracts(conn)? {
+        let exact = split_owned(&contract.exact_paths);
+        if !exact.iter().any(|path| touched.contains(path)) {
+            continue;
+        }
+        let weak = split_owned(&contract.forbidden_weak_classes);
+        for atom_id in split_owned(&contract.atom_ids) {
+            lkjagent_store::artifact_graph::update_atom_status(
+                conn,
+                &atom_id,
+                atom_status,
+                0,
+                &weak,
+                now,
+            )?;
+        }
+        lkjagent_store::artifact_graph::set_contract_status(
+            conn,
+            &contract.contract_id,
+            contract_status,
+            now,
+        )?;
+    }
     Ok(())
 }
 
@@ -81,4 +137,13 @@ fn in_root(path: &str, root: &str) -> bool {
 
 fn split(values: &str) -> Vec<&str> {
     values.lines().filter(|value| !value.is_empty()).collect()
+}
+
+fn split_owned(values: &str) -> Vec<String> {
+    values
+        .lines()
+        .map(str::trim)
+        .filter(|value| !value.is_empty())
+        .map(str::to_string)
+        .collect()
 }

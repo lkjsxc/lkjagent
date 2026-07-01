@@ -52,7 +52,7 @@ fn render_show(conn: &rusqlite::Connection, id: i64) -> Result<String, CliError>
     let Some(row) = row_by_id(conn, id)? else {
         return Err(CliError::failure(format!("task_not_found={id}")));
     };
-    Ok([
+    let mut lines = vec![
         format!("task_id={}", row.id),
         format!("status={}", row.status),
         format!("family={}", row.family),
@@ -65,8 +65,9 @@ fn render_show(conn: &rusqlite::Connection, id: i64) -> Result<String, CliError>
         ),
         format!("pending_checks={}", list_text(&row.pending_checks)),
         format!("objective={}", row.objective),
-    ]
-    .join("\n"))
+    ];
+    lines.extend(artifact_progress(conn, id)?);
+    Ok(lines.join("\n"))
 }
 
 fn list_rows(
@@ -122,6 +123,31 @@ fn preview(value: &str) -> String {
         out.push_str("...");
     }
     out.replace('\n', " ")
+}
+
+fn artifact_progress(conn: &rusqlite::Connection, id: i64) -> Result<Vec<String>, CliError> {
+    let Some(row) = lkjagent_store::artifact_graph::readiness_for_case(conn, id)? else {
+        return Ok(vec!["artifact.progress=none".to_string()]);
+    };
+    Ok(vec![
+        format!("artifact.root={}", row.root),
+        format!("artifact.profile={}", row.profile),
+        format!("artifact.plan_status={}", row.plan_status),
+        format!("artifact.atom_total={}", row.atom_total),
+        format!("artifact.atom_ready={}", row.atom_ready),
+        format!("artifact.atom_missing={}", row.atom_missing),
+        format!("artifact.next_atom={}", row.next_atom_id),
+        format!("artifact.next_path={}", row.next_path),
+        format!("artifact.active_contract={}", row.active_contract_id),
+        format!("artifact.measured_total={}", row.measured_total),
+        format!("artifact.accepted_floor={}", row.accepted_floor),
+        format!("artifact.assembly_pending={}", row.assembly_pending),
+        format!("artifact.readiness={}", row.status),
+        format!(
+            "artifact.completion_blockers={}",
+            row.completion_blockers.replace('\n', ";")
+        ),
+    ])
 }
 
 fn list_text(value: &str) -> String {

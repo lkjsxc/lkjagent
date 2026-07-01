@@ -1,4 +1,6 @@
-use lkjagent_store::artifact_cursor::BatchCursorRow;
+#[path = "kernel_turn_artifact_render.rs"]
+mod render;
+
 use lkjagent_store::artifact_ledger::{ArtifactLedgerRow, WeakPathRow};
 use lkjagent_store::state as store_state;
 use rusqlite::Connection;
@@ -14,6 +16,18 @@ pub(super) struct ArtifactSnapshotFields {
     pub audit_status: Option<String>,
     pub batch_cursor: Option<String>,
     pub latest_observation: Option<String>,
+    pub plan_status: Option<String>,
+    pub atom_total: usize,
+    pub atom_ready: usize,
+    pub atom_missing: usize,
+    pub next_atom: Option<String>,
+    pub next_path: Option<String>,
+    pub active_contract: Option<String>,
+    pub measured_total: usize,
+    pub accepted_floor: usize,
+    pub assembly_pending: bool,
+    pub readiness: Option<String>,
+    pub completion_blockers: Vec<String>,
 }
 
 pub(super) fn artifact_fields(
@@ -28,9 +42,24 @@ pub(super) fn artifact_fields(
     };
     let weak = lkjagent_store::artifact_ledger::weak_paths(conn, row.id)?;
     let cursor = lkjagent_store::artifact_cursor::latest_batch_cursor(conn, row.id)?;
-    let latest_observation = cursor
+    let readiness = lkjagent_store::artifact_graph::readiness_for_case(conn, case_id)?;
+    let plan = lkjagent_store::artifact_graph::plan_for_root(conn, &row.root)?;
+    let active = match plan.as_ref() {
+        Some(plan) => lkjagent_store::artifact_graph::active_contract_for_plan(conn, plan.id)?,
+        None => None,
+    };
+    let latest_observation = active
         .as_ref()
-        .and_then(|cursor| cursor_observation(cursor, &row.kind))
+        .and_then(|contract| {
+            plan.as_ref()
+                .map(|plan| render::contract_observation(plan, contract))
+        })
+        .or_else(|| readiness.as_ref().map(render::readiness_observation))
+        .or_else(|| {
+            cursor
+                .as_ref()
+                .and_then(|cursor| render::cursor_observation(cursor, &row.kind))
+        })
         .or_else(|| ledger_observation(&row, &weak));
     let batch_cursor = cursor.as_ref().map(|cursor| cursor.root.clone());
     let audit_status = audit_status(&row.topology_status, &row.readiness_status);
@@ -42,6 +71,35 @@ pub(super) fn artifact_fields(
         audit_status,
         batch_cursor,
         latest_observation,
+        plan_status: readiness.as_ref().map(|row| row.plan_status.clone()),
+        atom_total: readiness.as_ref().map_or(0, |row| row.atom_total as usize),
+        atom_ready: readiness.as_ref().map_or(0, |row| row.atom_ready as usize),
+        atom_missing: readiness
+            .as_ref()
+            .map_or(0, |row| row.atom_missing as usize),
+        next_atom: readiness
+            .as_ref()
+            .and_then(|row| none_to_option(&row.next_atom_id)),
+        next_path: readiness
+            .as_ref()
+            .and_then(|row| none_to_option(&row.next_path)),
+        active_contract: readiness
+            .as_ref()
+            .and_then(|row| none_to_option(&row.active_contract_id)),
+        measured_total: readiness
+            .as_ref()
+            .map_or(0, |row| row.measured_total as usize),
+        accepted_floor: readiness
+            .as_ref()
+            .map_or(0, |row| row.accepted_floor as usize),
+        assembly_pending: readiness
+            .as_ref()
+            .is_some_and(|row| row.assembly_pending == "true"),
+        readiness: readiness.as_ref().map(|row| row.status.clone()),
+        completion_blockers: readiness
+            .as_ref()
+            .map(|row| lkjagent_store::artifact_graph::split_lines(&row.completion_blockers))
+            .unwrap_or_default(),
     })
 }
 
@@ -54,63 +112,23 @@ fn empty_artifact_fields() -> ArtifactSnapshotFields {
         audit_status: None,
         batch_cursor: None,
         latest_observation: None,
+        plan_status: None,
+        atom_total: 0,
+        atom_ready: 0,
+        atom_missing: 0,
+        next_atom: None,
+        next_path: None,
+        active_contract: None,
+        measured_total: 0,
+        accepted_floor: 0,
+        assembly_pending: false,
+        readiness: None,
+        completion_blockers: Vec::new(),
     }
 }
 
-fn cursor_observation(cursor: &BatchCursorRow, kind: &str) -> Option<String> {
-    let planned = split_paths(&cursor.planned_paths);
-    if planned.is_empty() {
-        return None;
-    }
-    let completed = split_paths(&cursor.completed_paths);
-    let failed = split_paths(&cursor.failed_paths);
-    let remaining = planned
-        .iter()
-        .filter(|path| !completed.contains(path) && !failed.contains(path))
-        .cloned()
-        .collect::<Vec<_>>();
-    if remaining.is_empty() {
-        return Some(format!(
-            "artifact_next_result=ready_for_audit\nroot={}\nkind={kind}\nmissing=0\nnext_decision_required=true\ncandidate_action=artifact.audit",
-            cursor.root
-        ));
-    }
-    let contract = single_path_contract(&cursor.root, kind, &remaining[0]);
-    Some(format!(
-        "artifact_next_result=write_contract_pending\nroot={}\nkind={kind}\nmissing={}\nnext_decision_required=true\ncandidate_action=fs.batch_write\ncandidate_contract:\n{}",
-        cursor.root,
-        remaining.len(),
-        contract
-    ))
-}
-
-fn split_paths(value: &str) -> Vec<String> {
-    value
-        .lines()
-        .map(str::trim)
-        .filter(|line| !line.is_empty())
-        .map(str::to_string)
-        .collect()
-}
-
-fn single_path_contract(root: &str, kind: &str, path: &str) -> String {
-    if path.contains("/manuscript/") || path.starts_with("manuscript/") {
-        let unit = manuscript_unit(path);
-        return format!(
-            "tool=fs.batch_write\nroot={root}\nkind=story\npaths:\n- {path}\nlimits:\n- max_files=1\n- max_file_bytes=1800\n- max_batch_bytes=1800\nrequired_sections:\n- finished {unit} prose\n- scene action and dialogue or interiority\n- continuity with prior facts\nforbidden_weak_phrase_classes:\n- scaffold-only\n- outline-only\n- story-bible-only\n- placeholder\n- owner-terms-only\n- generic-example\nmodel_instruction=author finished manuscript {unit} prose for only this path with the line protocol"
-        );
-    }
-    format!(
-        "tool=fs.batch_write\nroot={root}\nkind={kind}\npaths:\n- {path}\nlimits:\n- max_files=1\n- max_file_bytes=1800\n- max_batch_bytes=1800\nrequired_sections:\n- title\n- purpose\n- scene content or reference detail\n- continuity notes\n- verification notes\nforbidden_weak_phrase_classes:\n- scaffold-only\n- placeholder\n- owner-terms-only\n- generic-example\nmodel_instruction=author only this one listed path with 25 to 45 words and the line protocol"
-    )
-}
-
-fn manuscript_unit(path: &str) -> &'static str {
-    if path.contains("manuscript/scenes/") {
-        "scene"
-    } else {
-        "chapter"
-    }
+fn none_to_option(value: &str) -> Option<String> {
+    (value != "none" && !value.trim().is_empty()).then(|| value.to_string())
 }
 
 fn ledger_observation(row: &ArtifactLedgerRow, weak: &[WeakPathRow]) -> Option<String> {

@@ -46,6 +46,22 @@ pub struct EvidenceFacts {
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct ArtifactProgressFacts {
+    pub plan_status: Option<String>,
+    pub atom_total: usize,
+    pub atom_ready: usize,
+    pub atom_missing: usize,
+    pub next_atom: Option<String>,
+    pub next_path: Option<String>,
+    pub active_contract: Option<String>,
+    pub measured_total: usize,
+    pub accepted_floor: usize,
+    pub assembly_pending: bool,
+    pub readiness: Option<String>,
+    pub completion_blockers: Vec<String>,
+}
+
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ArtifactFacts {
     pub artifact_id: Option<String>,
     pub root: Option<String>,
@@ -57,6 +73,7 @@ pub struct ArtifactFacts {
     pub batch_cursor: Option<String>,
     pub audit_status: Option<String>,
     pub drift_state: Option<String>,
+    pub progress: ArtifactProgressFacts,
 }
 
 impl ArtifactFacts {
