@@ -1,7 +1,7 @@
 mod support;
 
 use std::fs;
-use std::io::{Error, ErrorKind};
+use std::io::Error;
 
 use lkjagent_store::artifact_graph::{
     replace_atoms, replace_edges, upsert_plan, AtomInput, EdgeInput, PlanInput,
@@ -38,7 +38,7 @@ fn audit_assembles_scene_and_marks_projection_ready() -> TestResult<()> {
 
     let Some(readiness) = lkjagent_store::artifact_graph::readiness_for_plan(&conn, plan_id)?
     else {
-        return Err(Box::new(Error::new(ErrorKind::Other, "missing readiness")));
+        return Err(Box::new(Error::other("missing readiness")));
     };
     let assembly_runs: i64 = conn.query_row(
         "SELECT COUNT(*) FROM artifact_assembly_runs WHERE plan_id = ?1 AND status = 'assembled'",
