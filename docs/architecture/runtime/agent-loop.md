@@ -70,33 +70,20 @@ recursive directories for large outputs, prefer `artifact.next`, `doc.audit`,
 `fs.read_many`, `fs.tree`, `workspace.index`, `fs.batch_write`, and `fs.patch`,
 keep the action payload bounded, and avoid shell unless graph policy admits a
 shell escape after native tools are insufficient.
-For counted documentation tasks without recursive or benchmark scaffolds, the
-daemon writes a generic `structured-output/` tree before the first endpoint
-turn. The scaffold profiles the owner's objective by detected language and
-priority deliverable kind, stores design files under `docs/designs/set-*` and
-main files under `main/arcs/arc-*`, gives each main file a kind-aware segment
-brief, adds a root machine-readable audit manifest, a root acceptance-audit
-section, and a root reading path, adds a per-part role ledger to the main
-index, gives each main file a design-owner link, content-bearing objective
-anchor, local verification checklist, and sequence path ledger, verifies the
-requested exact count or approximate scale, root index, root file budget or
-scale plan, audit manifest, acceptance audit, optional directory indexes, docs
-coverage map, all design memo sections, all main-file sections, design-owner links,
-local verification checklists, sequence paths, required content blocks
-including per-part specific detail markers, and part ledger, records graph
-evidence, saves the same verification evidence in the task summary, and closes
-the task only after the graph completion gate admits that evidence, without
-asking the endpoint to repeat the same bulk generation. If the graph gate is
-not admitted, the daemon waits with the missing gate reason instead. The
-recorded evidence includes the `structured-output`
-path, target or scale file count, index file count, design memo count, main file count,
-file-budget status, audit-manifest status, restart-guide status,
-acceptance-audit status, coverage-map status,
-`index_scope=all`, `section_scope=all`, content-block status, required
-design-section status, required main-section status, first and last main
-status, part ledger status, design-owner-link status, local-verification
-status, root reading-path status, sequence-path status, deterministic scaffold
-closure reason, and `verification=ok`.
+Generic counted scaffolds are allowed only for explicitly generic counted
+documentation tasks that name no semantic root, no exact target path, and no
+large-artifact profile. That route may create `structured-output/` with design
+files, main files, audit manifests, coverage maps, reading paths, per-part
+ledgers, and count evidence, then close only after the graph completion gate
+admits the deterministic evidence.
+
+Named roots, exact paths, manuscripts, reports, study sets, dictionaries,
+cookbooks, documentation artifacts, and other long structured work products use
+the large-artifact engine instead. When the owner names a concrete root or
+target path, generic roots such as `structured-output`, `output`, `artifact`,
+and `work-product` are forbidden roots, not repair candidates. If either route
+lacks its required evidence, the daemon waits or repairs with the missing gate
+reason instead of closing.
 
 When no task is open and the queue is empty, the daemon opens a bounded
 graph maintenance case only after a directive is due, records
