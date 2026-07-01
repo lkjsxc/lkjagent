@@ -56,3 +56,16 @@ workspace dependencies.
 - [state_track_seed.rs](state_track_seed.rs): initial track seeds by task family.
 - [validate.rs](validate.rs): source graph validation.
 - [validate_tools.rs](validate_tools.rs): validation allowlist for registry tool ids.
+- [case_completion.rs](case_completion.rs): case completion source module.
+- [case_fields.rs](case_fields.rs): case fields source module.
+- [classify_artifact.rs](classify_artifact.rs): classify artifact source module.
+- [classify_profile.rs](classify_profile.rs): classify profile source module.
+- [classify_title.rs](classify_title.rs): classify title source module.
+- [kernel_context.rs](kernel_context.rs): kernel context source module.
+- [kernel_context_select.rs](kernel_context_select.rs): kernel context select source module.
+- [kernel_prompt.rs](kernel_prompt.rs): kernel prompt source module.
+- [kernel_recovery.rs](kernel_recovery.rs): kernel recovery source module.
+- [kernel_reducers.rs](kernel_reducers.rs): kernel reducers source module.
+- [policy.rs](policy.rs): policy source module.
+- [source_core.rs](source_core.rs): source core source module.
+- [transition_history.rs](transition_history.rs): transition history source module.

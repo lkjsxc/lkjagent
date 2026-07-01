@@ -20,3 +20,6 @@ runner.
 - [runner.rs](runner.rs): quiet command execution.
 - [structure/](structure/README.md): structure audit and plan commands.
 - [style.rs](style.rs): check-style implementation.
+- [doc_catalog.rs](doc_catalog.rs): doc catalog source module.
+- [doc_links.rs](doc_links.rs): doc links source module.
+- [smoke.rs](smoke.rs): smoke source module.

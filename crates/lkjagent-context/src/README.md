@@ -14,3 +14,4 @@ compaction decisions.
 - [format.rs](format.rs): compact token and percentage display helpers.
 - [lib.rs](lib.rs): library root.
 - [model.rs](model.rs): frame, message, and ledger data.
+- [budget_policy.rs](budget_policy.rs): budget policy source module.

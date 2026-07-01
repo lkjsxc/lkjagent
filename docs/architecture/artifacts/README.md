@@ -47,6 +47,9 @@ are separate states.
 
 ## Status
 
-partially implemented through document scaffold profiles, artifact tool
-wrappers, bounded next-batch planning, content atoms, dictionary file
-readiness, and audit checks. Manifest adoption and full repair remain open.
+Implemented for scaffold profiles, artifact tool wrappers, ledger-backed
+identity, bounded next-batch planning, content atoms, deterministic scene
+assembly, dictionary readiness, adoption, repair routing, and audit-owned
+readiness checks. The open product risk is live endpoint proof of a full
+10,000-word daemon-owned manuscript, tracked in the
+[story gap](../../execution/current-work/story-manuscript-generation-gap.md).

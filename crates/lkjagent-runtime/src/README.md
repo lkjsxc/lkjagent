@@ -26,3 +26,6 @@ This directory holds the runtime state machine and thin daemon adapters.
 - [step.rs](step.rs): pure turn transition function.
 - [task.rs](task.rs): task, pending action, and stop reason model.
 - [token_usage.rs](token_usage.rs): endpoint token usage persistence helpers.
+- [graph_parse.rs](graph_parse.rs): graph parse source module.
+- [kernel/](kernel/README.md): kernel helper modules.
+- [kernel_driver/](kernel_driver/README.md): kernel driver helper modules.

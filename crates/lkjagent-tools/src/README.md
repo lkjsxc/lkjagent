@@ -81,3 +81,27 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [structure_network.rs](structure_network.rs): knowledge network completion checks.
 - [structure_seed/](structure_seed/README.md): deterministic docs scaffold profiles.
 - [structure_seed.rs](structure_seed.rs): scaffold profile entrypoint.
+- [address/](address/README.md): address helper modules.
+- [address.rs](address.rs): address source module.
+- [artifact_address_support.rs](artifact_address_support.rs): artifact address support source module.
+- [artifact_card.rs](artifact_card.rs): artifact card source module.
+- [artifact_content_atom.rs](artifact_content_atom.rs): artifact content atom source module.
+- [artifact_content_atom_profile.rs](artifact_content_atom_profile.rs): artifact content atom profile source module.
+- [artifact_drift.rs](artifact_drift.rs): artifact drift source module.
+- [artifact_ledger_state.rs](artifact_ledger_state.rs): artifact ledger state source module.
+- [artifact_manuscript_assembly.rs](artifact_manuscript_assembly.rs): artifact manuscript assembly source module.
+- [artifact_next_cursor.rs](artifact_next_cursor.rs): artifact next cursor source module.
+- [artifact_next_identity.rs](artifact_next_identity.rs): artifact next identity source module.
+- [artifact_next_identity_contract.rs](artifact_next_identity_contract.rs): artifact next identity
+  contract source module.
+- [artifact_next_response.rs](artifact_next_response.rs): artifact next response source module.
+- [artifact_next_story.rs](artifact_next_story.rs): artifact next story source module.
+- [artifact_readiness.rs](artifact_readiness.rs): artifact readiness source module.
+- [artifact_readiness_story.rs](artifact_readiness_story.rs): artifact readiness story source module.
+- [artifact_readiness_story_req.rs](artifact_readiness_story_req.rs): artifact readiness story req source module.
+- [artifact_story_manuscript.rs](artifact_story_manuscript.rs): artifact story manuscript source module.
+- [artifact_story_text.rs](artifact_story_text.rs): artifact story text source module.
+- [count_profile_paths.rs](count_profile_paths.rs): count profile paths source module.
+- [fs_batch/](fs_batch/README.md): fs batch helper modules.
+- [fs_patch.rs](fs_patch.rs): fs patch source module.
+- [model_names.rs](model_names.rs): model names source module.

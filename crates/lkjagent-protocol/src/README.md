@@ -16,3 +16,7 @@ This directory holds the pure action parser, renderer, and registry table.
 - [tag_line.rs](tag_line.rs): structural tag-line classifier.
 - [xml_parse.rs](xml_parse.rs): paired-tag action parser.
 - [xml_parse/](xml_parse): paired-tag parser helpers.
+- [registry_graph.rs](registry_graph.rs): registry graph source module.
+- [registry_personal.rs](registry_personal.rs): registry personal source module.
+- [registry_render.rs](registry_render.rs): registry render source module.
+- [xml_parse/](xml_parse/README.md): xml parse helper modules.

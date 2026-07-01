@@ -22,3 +22,10 @@ This directory holds helper modules for the pure runtime step transition.
 - [provider_anomaly.rs](provider_anomaly.rs): provider anomaly notice and recovery step.
 - [recovery_select.rs](recovery_select.rs): graph selector bridge for recovery routes.
 - [turn.rs](turn.rs): owner and model completion step helpers.
+- [action_params.rs](action_params.rs): action params source module.
+- [budget_render.rs](budget_render.rs): budget render source module.
+- [effects_model.rs](effects_model.rs): effects model source module.
+- [fault_key.rs](fault_key.rs): fault key source module.
+- [graph_output_evidence.rs](graph_output_evidence.rs): graph output evidence source module.
+- [graph_output_plan.rs](graph_output_plan.rs): graph output plan source module.
+- [graph_output_plan_helpers.rs](graph_output_plan_helpers.rs): graph output plan helpers source module.

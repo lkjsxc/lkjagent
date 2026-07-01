@@ -9,9 +9,10 @@ SQLite store directly; there is no socket, HTTP server, web UI, or product MCP.
 ## Status
 
 The command tree, metadata-rendered help, `watch` terminal command, explicit
-`console` command, task inspection, and queue inspection are implemented. The
-remaining active CLI work is the shared status, log, and console deck rewrite
-tracked in [../../execution/current-blockers.md](../../execution/current-blockers.md).
+`console` command, task inspection, queue inspection, shared status deck,
+prefixed status facts, model-log display, and cumulative token accounting are
+implemented. The current blocker ledger is closed; later CLI work must be
+attached to a new current-work page before code changes.
 
 ## Table of Contents
 

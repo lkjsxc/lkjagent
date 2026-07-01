@@ -12,3 +12,4 @@ This directory holds the endpoint client, wire model, and retry schedule.
 - [lib.rs](lib.rs): library root.
 - [wire.rs](wire.rs): request and response wire subset.
 - [wire/](wire/README.md): wire helper modules.
+- [closure.rs](closure.rs): closure source module.

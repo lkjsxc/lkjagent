@@ -11,3 +11,5 @@ This directory holds private helpers for the memory store API.
 - [prune_rewrite.rs](prune_rewrite.rs): low-signal maintenance rewrite pruning.
 - [row.rs](row.rs): memory row struct, required-row lookup, and query mapping.
 - [search.rs](search.rs): FTS query normalization and ranked search.
+- [digest.rs](digest.rs): digest source module.
+- [duplicate.rs](duplicate.rs): duplicate source module.
