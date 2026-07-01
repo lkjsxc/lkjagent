@@ -29,12 +29,15 @@ order. If no writable atom remains, it returns assembly or readiness candidates.
 
 ## Admission
 
-`fs.batch_write` validates every path against the active contract before any
-mutation. A path under a known artifact root is refused when no active contract
-matches it. A path outside the contract, a completed contract path, a file count
-above `max_files`, a file above `max_file_bytes`, or a batch above
-`max_batch_bytes` is refused. The prompt example names exact paths and the line
-protocol; it never prefills body prose.
+`fs.batch_write` validates every path against the runtime write contract and any
+active artifact graph contract before mutation. A path under a known artifact
+root is refused when no active contract matches it. A path outside the contract,
+a completed contract path, a file count above `max_files`, a file above
+`max_file_bytes`, or a batch above `max_batch_bytes` is refused. Runtime
+prompt-frame contracts are enforced from the persisted decision id, so recovery
+cannot drift from `scene-01.md` to sibling scene paths while the same exact
+contract is active. The prompt example names exact paths and the line protocol;
+it never prefills body prose.
 
 ## Status
 

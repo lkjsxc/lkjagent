@@ -104,7 +104,15 @@ pub fn dispatch_fs_batch_write(
             .iter()
             .map(|file| file.path.clone())
             .collect::<Vec<_>>();
-        crate::artifact_write_support::validate_batch_against_contract(conn, &file_infos)?;
+        let decision_id = state
+            .authority_view
+            .as_ref()
+            .map(|view| view.decision_id.as_str());
+        crate::artifact_write_support::validate_batch_against_contract(
+            conn,
+            decision_id,
+            &file_infos,
+        )?;
         match crate::fs_batch::batch_write(&runtime.workspace, &files, 20) {
             Ok(output) => {
                 crate::artifact_write_support::record_written_paths(conn, &paths, &runtime.now)?;
