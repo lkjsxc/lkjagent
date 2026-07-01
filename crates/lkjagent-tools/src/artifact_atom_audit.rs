@@ -101,9 +101,9 @@ impl Projection {
 
 fn project(rows: &[(AtomRow, Measurement)], accepted_floor: usize) -> Projection {
     let atom_total = rows.len();
-    let atom_ready = rows.iter().filter(|(_, m)| m.status == "ready").count();
+    let atom_ready = rows.iter().filter(|(atom, m)| satisfies(atom, m)).count();
     let measured_total = rows.iter().map(|(_, m)| m.count).sum();
-    let next = rows.iter().find(|(_, m)| m.status != "ready");
+    let next = rows.iter().find(|(atom, m)| !satisfies(atom, m));
     let blockers = blockers(next, measured_total, accepted_floor);
     Projection {
         status: if blockers.is_empty() {
@@ -123,11 +123,26 @@ fn project(rows: &[(AtomRow, Measurement)], accepted_floor: usize) -> Projection
             .to_string(),
         measured_total,
         accepted_floor,
-        assembly_pending: rows
-            .iter()
-            .any(|(atom, m)| !atom.assembly_target.is_empty() && m.status == "ready"),
+        assembly_pending: assembly_pending(rows),
         blockers,
     }
+}
+
+fn satisfies(atom: &AtomRow, measured: &Measurement) -> bool {
+    measured.status == "ready" || atom.status == "assembled"
+}
+
+fn assembly_pending(rows: &[(AtomRow, Measurement)]) -> bool {
+    rows.iter().any(|(atom, measured)| {
+        !atom.assembly_target.is_empty()
+            && measured.status == "ready"
+            && !target_ready(rows, &atom.assembly_target)
+    })
+}
+
+fn target_ready(rows: &[(AtomRow, Measurement)], target: &str) -> bool {
+    rows.iter()
+        .any(|(atom, measured)| atom.path == target && satisfies(atom, measured))
 }
 
 fn blockers(next: Option<&(AtomRow, Measurement)>, measured: usize, floor: usize) -> Vec<String> {

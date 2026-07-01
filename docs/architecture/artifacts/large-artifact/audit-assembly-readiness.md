@@ -18,14 +18,18 @@ generic-example content never satisfies manuscript or large-artifact floors.
 When source atoms for an assembled target are ready, the daemon assembles the
 final target deterministically. Manuscript scenes assemble into chapter files;
 other profiles may assemble indexes or completion evidence. Every run records
-source atom ids, target paths, measured count, status, and summary.
+source atom ids, target paths, measured count, status, and summary. If a target
+already exists with enough measured prose, audit records the same assembled
+truth instead of leaving a pending assembly blocker.
 
 ## Readiness
 
 The readiness projection is ready only when required atoms are ready or
 assembled, measured totals meet the accepted floor, no active contract remains,
-and no weak blockers remain. Completion gates read this projection together
-with graph evidence and runtime faults.
+and no weak blockers remain. Scene atoms with assembled targets do not keep
+`assembly_pending` true after the target atom is ready or represented as
+assembled. Completion gates read this projection together with graph evidence
+and runtime faults.
 
 ## Status
 
