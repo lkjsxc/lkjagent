@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use super::db::load_store;
 use super::files::load_files;
@@ -13,7 +13,7 @@ pub fn collect(options: &CollectOptions) -> Result<PathBuf, String> {
     write_bundle(&bundle, &options.out_dir)
 }
 
-fn write_bundle(bundle: &ProofBundle, out_dir: &PathBuf) -> Result<PathBuf, String> {
+fn write_bundle(bundle: &ProofBundle, out_dir: &Path) -> Result<PathBuf, String> {
     fs::create_dir_all(out_dir).map_err(|error| format!("create proof dir: {error}"))?;
     write(out_dir, "summary.md", &render::summary(bundle))?;
     write(out_dir, "status.md", &render::status(bundle))?;
@@ -36,7 +36,7 @@ fn write_bundle(bundle: &ProofBundle, out_dir: &PathBuf) -> Result<PathBuf, Stri
     Ok(out_dir.join("summary.md"))
 }
 
-fn write(out_dir: &PathBuf, name: &str, content: &str) -> Result<(), String> {
+fn write(out_dir: &Path, name: &str, content: &str) -> Result<(), String> {
     fs::write(out_dir.join(name), format!("{content}\n"))
         .map_err(|error| format!("write {name}: {error}"))
 }
