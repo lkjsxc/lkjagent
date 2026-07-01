@@ -112,7 +112,7 @@ fn special_docs_report_task_and_crate_readme_violations() {
             "crates/lkjagent-bad/README.md: crate readme: add a Table of Contents",
             "crates/lkjagent-bad/src/README.md: crate readme: add a Table of Contents",
             "crates/lkjagent-demo: crate readme: add README.md for this crate directory",
-            "crates/lkjagent-demo/src: crate readme: add README.md for this crate directory",
+            "crates/lkjagent-demo/src: crate readme: add README.md for this source directory",
         ]
     );
 }
