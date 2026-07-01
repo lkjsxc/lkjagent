@@ -1,9 +1,0 @@
-$ docker compose ps
-
-START_UTC=2026-06-29T07:29:29Z
-
-NAME                          IMAGE                       COMMAND                  SERVICE   CREATED         STATUS                   PORTS
-lkjagentfinaliwanna-agent-1   lkjagentfinaliwanna-agent   "/usr/local/bin/lkja…"   agent     4 minutes ago   Up 4 minutes (healthy)   
-
-END_UTC=2026-06-29T07:29:29Z
-EXIT_STATUS=0
