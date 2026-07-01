@@ -10,7 +10,7 @@ that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Large-artifact durable completion | [tasks/large-artifact-engine.md](tasks/large-artifact-engine.md) | done: durable store rows, plan compiler, contracts, audit, projections, CLI progress, benchmarks, smoke replay, and quiet verify are implemented; final handoff records Docker verify |
+| 1 | Live manuscript proof boundary | [tasks/live-manuscript-proof.md](tasks/live-manuscript-proof.md) | open: durable artifact engine gates pass, but a full live daemon-owned 10,000-word manuscript completion is not yet proved |
 
 ## Historical Closed Queue
 
@@ -30,7 +30,8 @@ The prior blocker sequence is closed. Its task files remain under
 - obligation network root repair;
 - runtime smoke false close and noisy repair;
 - dense deterministic runtime authority network;
-- story manuscript generation gap.
+- story manuscript generation gap;
+- large-artifact durable completion.
 
 ## Active Data Fixture
 
@@ -86,11 +87,12 @@ The checked-in generated log fixture remains historical failure evidence.
 
 The story manuscript generation gap row in the historical queue is closed for
 root identity, exact manuscript classification, chapter-priority contracts,
-readiness refusals, and provider anomaly recovery. It is not proof that the
-daemon can finish a complete 10,000-word manuscript. The active queue now
-continues that work through content atoms, deterministic assembly, exact
-remaining-path recovery, real manuscript word counts, and a reproducible smoke
-harness.
+readiness refusals, and provider anomaly recovery. The large-artifact durable
+completion row is closed for store-backed content atoms, write contracts,
+deterministic assembly, readiness projection, replay, quiet verify, and Docker
+verify evidence. Neither row proves that the daemon can finish a complete
+10,000-word manuscript against a live endpoint. The active queue owns that
+operator-run proof boundary.
 
 Historical details live in
 [current-work/story-manuscript-generation-gap.md](current-work/story-manuscript-generation-gap.md)
