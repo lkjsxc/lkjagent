@@ -14,7 +14,10 @@ at `tmp/live-proof-20260701T100958Z/` exhausted the observation loop in recovery
 with 26 scene files, 6,230 scene words, zero assembled chapter files, zero final
 manuscript words, no artifact readiness rows, and repeated `fs.batch_write`
 recovery notices. Runtime contract admission now has regression coverage for
-sibling scene-path drift before the next live proof.
+sibling scene-path drift, and the follow-up proof at
+`tmp/live-proof-20260701T113018Z/` confirmed drift stopped but repeat recovery
+still exhausted the loop with one scene file, zero chapter files, and no
+artifact readiness rows.
 
 ## Depends On
 

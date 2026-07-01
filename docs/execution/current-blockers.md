@@ -10,7 +10,7 @@ that ran.
 
 | # | Blocker | Task | Status |
 | --- | --- | --- | --- |
-| 1 | Live manuscript proof boundary | [tasks/live-manuscript-proof.md](tasks/live-manuscript-proof.md) | open: latest Aurora Ledger live proof exhausted the loop in recovery with 26 scene files, zero chapter files, zero final manuscript words, and no artifact readiness rows |
+| 1 | Live manuscript proof boundary | [tasks/live-manuscript-proof.md](tasks/live-manuscript-proof.md) | open: latest Aurora Ledger live proof exhausted the loop in repeat recovery with one scene file, zero chapter files, zero final manuscript words, and no artifact readiness rows |
 
 ## Historical Closed Queue
 

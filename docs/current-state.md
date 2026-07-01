@@ -153,10 +153,14 @@ complete the task. A later Aurora Ledger live proof at
 `tmp/live-proof-20260701T100958Z/` kept the requested root and wrote 26 scene
 files with 6,230 scene words, but it exhausted the observation loop in active
 recovery with zero assembled chapter files, zero final manuscript words, no
-artifact readiness rows, and repeated `fs.batch_write` recovery notices. The
-open target is live proof that the daemon-owned, resumable scene and chapter
-write surface can finish the full manuscript with real word-count evidence,
-deterministic assembly where needed, and central completion closure.
+artifact readiness rows, and repeated `fs.batch_write` recovery notices. After
+runtime prompt-frame contract admission was added, the proof at
+`tmp/live-proof-20260701T113018Z/` stopped sibling scene drift but still
+exhausted the loop with one scene file, 134 scene words, zero chapter files, and
+no artifact readiness rows. The open target is live proof that the daemon-owned,
+resumable scene and chapter write surface can finish the full manuscript with
+real word-count evidence, deterministic assembly where needed, and central
+completion closure.
 
 ## Verification Evidence
 
