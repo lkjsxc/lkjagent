@@ -32,6 +32,20 @@ all run as `cargo run -p lkjagent-xtask -- <gate>`:
 | quiet test | cargo fmt --check, clippy with warnings denied for all targets, all workspace tests |
 | quiet verify | check-docs, check-lines, check-style, benchmark check-corpus, then quiet test |
 
+## Evidence Bundles
+
+`proof collect` is not a pass/fail gate. It captures bounded Markdown evidence
+for live and smoke runs without endpoint access:
+
+```sh
+cargo run -p lkjagent-xtask -- proof collect --data data --out tmp/proof-current
+```
+
+The bundle contains store metadata, queue counts, artifact readiness rows,
+authority summaries, model-log file indexes, workspace file trees, word-count
+reports, and warnings. It does not copy SQLite files, model-log bodies,
+transcript bodies, or workspace file contents.
+
 ## Compose Gates
 
 ```sh

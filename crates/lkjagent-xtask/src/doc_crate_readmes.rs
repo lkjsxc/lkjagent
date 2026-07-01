@@ -181,8 +181,14 @@ mod tests {
     fn source_readme_must_link_direct_rs_child() {
         let files = vec![
             RepoFile::new("crates/demo/Cargo.toml", ""),
-            RepoFile::new("crates/demo/README.md", "# Demo\n\nDoc contract:\n\n## Table of Contents\n"),
-            RepoFile::new("crates/demo/src/README.md", "# Source\n\n## Table of Contents\n\n- [lib.rs](lib.rs): root."),
+            RepoFile::new(
+                "crates/demo/README.md",
+                "# Demo\n\nDoc contract:\n\n## Table of Contents\n",
+            ),
+            RepoFile::new(
+                "crates/demo/src/README.md",
+                "# Source\n\n## Table of Contents\n\n- [lib.rs](lib.rs): root.",
+            ),
             RepoFile::new("crates/demo/src/lib.rs", ""),
             RepoFile::new("crates/demo/src/new.rs", ""),
         ];

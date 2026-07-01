@@ -54,6 +54,7 @@ content inside that selected surface.
 | Maintenance | Maintenance gates, owner preemption checks, no-op cooldown facts, and closed-idle rules have focused coverage. |
 | Benchmarks | Owner recovery, artifact, memory, accounting, model-log, batch-schema, compaction, repeated-recovery, and novel signatures are in the corpus. |
 | Repository checks | `check-docs` enforces docs topology, catalog entries, task shape, crate README presence, and direct source README child coverage. |
+| Proof bundle | `proof collect` writes bounded Markdown evidence from store metadata, model-log file indexes, workspace trees, artifact word counts, and warnings without endpoint access. |
 
 ## Partial Or Open Surfaces
 
