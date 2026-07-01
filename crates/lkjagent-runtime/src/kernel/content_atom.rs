@@ -11,6 +11,15 @@ pub(crate) struct ContentAtomFacts {
 }
 
 pub(crate) fn facts_from_snapshot(snapshot: &RuntimeSnapshot) -> ContentAtomFacts {
+    if snapshot.artifact.progress.atom_total > 0 {
+        return ContentAtomFacts {
+            active: true,
+            status: snapshot.artifact.progress.readiness.clone(),
+            missing_count: snapshot.artifact.progress.atom_missing,
+            next_atom: snapshot.artifact.progress.next_atom.clone(),
+            required_atoms: Vec::new(),
+        };
+    }
     let Some(text) = latest_text(snapshot) else {
         return ContentAtomFacts::default();
     };

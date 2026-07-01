@@ -49,6 +49,11 @@ pub(crate) fn root_identity(root: &str, kind: &str) -> WriteContractFacts {
         required_sections: required_sections(kind),
         forbidden_weak_phrase_classes: weak_phrase_classes(),
         status: WriteContractStatus::Pending,
+        contract_id: None,
+        atom_ids: Vec::new(),
+        target_count: 0,
+        count_floor: 0,
+        continuity_digest: None,
     }
 }
 
@@ -110,6 +115,11 @@ fn manuscript_contract(root: &str, facts: &ManuscriptFacts) -> Option<WriteContr
         ],
         forbidden_weak_phrase_classes: manuscript_weak_classes(),
         status: WriteContractStatus::Pending,
+        contract_id: None,
+        atom_ids: Vec::new(),
+        target_count: facts.target_word_floor,
+        count_floor: facts.target_word_floor,
+        continuity_digest: Some("manuscript continuity facts only".to_string()),
     })
 }
 
@@ -143,5 +153,33 @@ fn batch_contract(
         ),
         forbidden_weak_phrase_classes: weak_phrase_classes(),
         status: WriteContractStatus::Pending,
+        contract_id: contract_line(snapshot, "contract_id"),
+        atom_ids: contract_line(snapshot, "atom_ids").map_or_else(Vec::new, split_csv),
+        target_count: contract_usize(snapshot, "target_count"),
+        count_floor: contract_usize(snapshot, "count_floor"),
+        continuity_digest: contract_line(snapshot, "continuity_digest"),
     }
+}
+
+fn contract_line(snapshot: &RuntimeSnapshot, key: &str) -> Option<String> {
+    snapshot
+        .observation
+        .latest
+        .as_deref()
+        .and_then(|text| crate::kernel::obligation_parse::line_value(text, key))
+}
+
+fn contract_usize(snapshot: &RuntimeSnapshot, key: &str) -> usize {
+    contract_line(snapshot, key)
+        .and_then(|value| value.parse::<usize>().ok())
+        .unwrap_or(0)
+}
+
+fn split_csv(value: String) -> Vec<String> {
+    value
+        .split(',')
+        .map(str::trim)
+        .filter(|item| !item.is_empty())
+        .map(str::to_string)
+        .collect()
 }

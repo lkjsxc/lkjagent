@@ -137,6 +137,7 @@ fn push_artifact(conn: &Connection, out: &mut Vec<StatusFact>) -> Result<(), Cli
     ] {
         out.push(fact(key, state_value(conn, state_key, "none")?));
     }
+    super::status_artifact::push_progress(conn, out)?;
     Ok(())
 }
 

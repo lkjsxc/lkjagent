@@ -18,7 +18,11 @@ The replay covers these historical failure classes:
 - generic roots;
 - false closes;
 - provider anomalies;
-- incomplete manuscript paths.
+- incomplete manuscript paths;
+- report and study-set atom progress;
+- documentation tree readiness;
+- weak atom retry;
+- deterministic assembly.
 
 ## Live Smoke
 

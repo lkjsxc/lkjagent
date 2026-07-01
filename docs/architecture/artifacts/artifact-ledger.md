@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This file owns durable artifact identity, lifecycle, weak paths, audit status, and batch cursor references.
+This file owns durable artifact identity, lifecycle, weak paths, audit status, atom graph rows, and write contracts.
 
 ## Contract
 
@@ -11,9 +11,9 @@ scale. Completion reads the artifact ledger, not raw file existence or raw audit
 attachment, content planning, readiness repair, audit, and completion update the ledger.
 
 The ledger stores document topology and artifact readiness as separate fields. Topology records whether the root,
-README files, manifest, links, and path shape are coherent. Readiness records whether semantic content satisfies the
-artifact kind, role, owner objective, weak-path repair contract, and latest audit. A `document audit passed` string can
-only update topology. It can never set readiness to `passed`.
+README files, manifest, links, and path shape are coherent. Readiness records whether atom rows satisfy the artifact
+kind, role, owner objective, weak-path repair contract, count floors, and latest audit. A `document audit passed` string
+can only update topology. It can never set readiness to `passed`.
 
 ## Inputs
 
@@ -21,7 +21,7 @@ only update topology. It can never set readiness to `passed`.
 - artifact kind, requested scale, profile, and candidate root.
 - manifest, README topology, content readiness, objective match, and audit results.
 - changed paths from `fs.write` and `fs.batch_write`.
-- batch cursor and weak path records.
+- batch cursor, weak path, atom, edge, contract, event, assembly, and readiness records.
 
 ## Outputs
 
@@ -30,6 +30,7 @@ only update topology. It can never set readiness to `passed`.
 - weak path records with role, missing requirements, weak signals, semantic mismatch, repair contract id, and retry
   counts.
 - readiness evidence tied to current artifact id and the audit that created it.
+- atom graph projection with next atom, next path, active contract, measured total, and completion blockers.
 
 ## Invariants
 
@@ -61,10 +62,11 @@ only update topology. It can never set readiness to `passed`.
 
 ## Status
 
-partially implemented. SQLite schema and store APIs persist artifact identity,
-lifecycle status, readiness status, weak path counts, weak path requirement
-labels, and batch cursor rows. `artifact.plan`, `artifact.audit`, and
-`artifact.next` write ledger state. `fs.write` and `fs.batch_write` mark
-planned cursor paths completed after successful contract-matching writes.
-Audit-owned evidence and artifact-aware completion read ledger rows on the daemon path; remaining work is deeper
-profile coverage beyond the implemented story, cookbook, dictionary, and documentation reducers.
+implemented. SQLite schema and store APIs persist artifact identity, lifecycle
+status, readiness status, weak path counts, weak path requirement labels, batch
+cursor rows, durable plans, atoms, atom edges, write contracts, atom events,
+assembly runs, and readiness projections. `artifact.plan`, `artifact.audit`,
+and `artifact.next` update both the identity ledger projection and the atom graph.
+`fs.write` and `fs.batch_write` mark planned cursor paths and active contracts
+after successful contract-matching writes. Audit-owned evidence and
+artifact-aware completion read ledger rows on the daemon path.

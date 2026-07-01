@@ -18,7 +18,7 @@ human-only headings so scripts and tests can compare exact output.
 | `queue.` | pending count, blocked count, newest queue id |
 | `task.` | active case id, objective preview, phase, node, owner question |
 | `authority.` | decision id, prompt frame id, mission, admitted tools, blocked tools |
-| `artifact.` | root, kind, readiness state, weak cursor, next path |
+| `artifact.` | root, kind, profile, plan status, atom counts, next path, active contract, measured total, readiness, blockers |
 | `context.` | used, window, percent, pressure, prefix, log, reserve, headroom |
 | `tokens.` | fields from [token-output.md](token-output.md) |
 | `model.` | current handoff path and latest provider anomaly |
@@ -39,6 +39,11 @@ task.phase=execution
 authority.decision_id=42
 authority.mission=owner_execution
 artifact.root=stories/second-period-first-love
+artifact.profile=manuscript
+artifact.atom_total=30
+artifact.atom_ready=12
+artifact.next_path=stories/second-period-first-love/manuscript/scenes/chapter-07/scene-01.md
+artifact.active_contract=contract-7
 context.used=12.34K
 context.window=24.58K
 context.pressure=green
@@ -51,12 +56,13 @@ next.action=fs.batch_write
 next.missing=manuscript-word-count
 ```
 
-## Current Baseline
+## Artifact Progress
 
-The current implementation already prints daemon, queue, task, authority,
-context, latest token, and model-log facts. The redesign task replaces the flat
-snapshot with the prefixed contract above and adds exact task, queue, and token
-aggregate fields.
+The artifact progress lines are store projections, not parsed transcript text.
+When no active artifact exists, each optional artifact fact renders `none`. When
+a plan exists, status and watch show atom totals, ready atoms, missing atoms,
+next atom, exact next path, active contract id, measured total, accepted floor,
+assembly pending state, readiness, and completion blockers.
 
 ## Tests
 

@@ -40,11 +40,12 @@ screen. There are no hidden console command names.
 | Command | Behavior |
 | --- | --- |
 | `lkjagent task list [--status S] [--limit N]` | Print durable task cases. |
-| `lkjagent task show <id>` | Print one task case, authority ids, and evidence gaps. |
+| `lkjagent task show <id>` | Print one task case, authority ids, evidence gaps, and artifact progress. |
 | `lkjagent graph` | Print the active graph case and source graph summary. |
 | `lkjagent memory <query>` | Search distilled memory entries. |
 
-Task and queue inspection commands are read-only store queries.
+Task and queue inspection commands are read-only store queries. Task show reads
+artifact readiness projection rows when the task owns an active artifact plan.
 
 ## Model Logs
 

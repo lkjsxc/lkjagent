@@ -3,6 +3,7 @@ pub mod automata;
 pub mod bundle;
 pub mod correction;
 pub mod graph;
+pub mod large_artifact;
 pub mod owner_address;
 pub mod owner_doc_topics;
 pub mod owner_docs;
@@ -49,4 +50,11 @@ pub const TINY: &[BenchmarkTask] = &[
     owner_address::TASK,
     owner_observability::STATUS_TASK,
     owner_observability::LOG_TASK,
+    large_artifact::MANUSCRIPT,
+    large_artifact::REPORT,
+    large_artifact::STUDY,
+    large_artifact::DOCS,
+    large_artifact::GENERIC_ROOT,
+    large_artifact::ATOM_RETRY,
+    large_artifact::ASSEMBLY,
 ];

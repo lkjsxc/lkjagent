@@ -148,6 +148,9 @@ fn root_next_with_cursor(
             return Ok(report.block_message(&root));
         }
     }
+    if let Some(response) = crate::artifact_next_select::next_for_plan(conn, now, &root)? {
+        return Ok(response);
+    }
     let scale = lkjagent_store::state::get(conn, &format!("artifact requested scale {root}"))?
         .unwrap_or_else(|| "unspecified".to_string());
     if let Some(contract) =

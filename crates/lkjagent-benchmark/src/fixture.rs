@@ -23,9 +23,23 @@ fn materialize_files(files: &[FileSpec], workspace: &Path) -> BenchResult<()> {
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)?;
         }
-        fs::write(path, file.content)?;
+        fs::write(path, expand_content(file.content))?;
     }
     Ok(())
+}
+
+fn expand_content(content: &str) -> String {
+    let Some(rest) = content.strip_prefix("@repeat_word ") else {
+        return content.to_string();
+    };
+    let parts = rest.split_whitespace().collect::<Vec<_>>();
+    if parts.len() != 2 {
+        return content.to_string();
+    }
+    let count = parts[1].parse::<usize>().ok().unwrap_or(1);
+    std::iter::repeat_n(parts[0], count)
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 pub fn validate_relative_path(path: &str) -> BenchResult<()> {

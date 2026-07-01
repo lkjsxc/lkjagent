@@ -70,6 +70,13 @@ pub enum JudgeKind {
     ArtifactAddressController,
     StatusAccounting,
     ModelHandoffLog,
+    LargeArtifactManuscript,
+    LargeArtifactReport,
+    LargeArtifactStudySet,
+    LargeArtifactDocumentation,
+    LargeArtifactGenericRoot,
+    LargeArtifactAtomRetry,
+    LargeArtifactAssembly,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
