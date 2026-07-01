@@ -53,6 +53,7 @@ content inside that selected surface.
 | Artifact lifecycle | Artifact plan, audit, next, cursors, weak paths, invalid roots, durable atom graphs, write contracts, readiness projection, story readiness, and completion refusals are ledger-backed. |
 | Maintenance | Maintenance gates, owner preemption checks, no-op cooldown facts, and closed-idle rules have focused coverage. |
 | Benchmarks | Owner recovery, artifact, memory, accounting, model-log, batch-schema, compaction, repeated-recovery, and novel signatures are in the corpus. |
+| Repository checks | `check-docs` enforces docs topology, catalog entries, task shape, crate README presence, and direct source README child coverage. |
 
 ## Partial Or Open Surfaces
 
@@ -165,9 +166,10 @@ evidence does not prove full 10,000-word daemon manuscript completion.
 ## Redesign Queue Status
 
 The executable redesign queue in
-[execution/current-blockers.md](execution/current-blockers.md) tracks the
-large-artifact engine work. Remaining product risk is live endpoint completion
-of a full 10,000-word daemon manuscript, which is not claimed here.
+[execution/current-blockers.md](execution/current-blockers.md) tracks the live
+manuscript proof boundary. The deterministic large-artifact engine work is
+closed by local gates; remaining product risk is live endpoint completion of a
+full 10,000-word daemon manuscript, which is not claimed here.
 
 ## Out of Scope
 
