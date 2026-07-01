@@ -84,10 +84,14 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [address/](address/README.md): address helper modules.
 - [address.rs](address.rs): address source module.
 - [artifact_address_support.rs](artifact_address_support.rs): artifact address support source module.
+- [artifact_atom_audit.rs](artifact_atom_audit.rs): durable atom audit and measurement decisions.
+- [artifact_atom_measure.rs](artifact_atom_measure.rs): atom file measurement helpers.
 - [artifact_card.rs](artifact_card.rs): artifact card source module.
 - [artifact_content_atom.rs](artifact_content_atom.rs): artifact content atom source module.
 - [artifact_content_atom_profile.rs](artifact_content_atom_profile.rs): artifact content atom profile source module.
+- [artifact_contract_render.rs](artifact_contract_render.rs): active artifact contract rendering helpers.
 - [artifact_drift.rs](artifact_drift.rs): artifact drift source module.
+- [artifact_kind.rs](artifact_kind.rs): artifact kind classification helpers.
 - [artifact_ledger_state.rs](artifact_ledger_state.rs): artifact ledger state source module.
 - [artifact_manuscript_floor.rs](artifact_manuscript_floor.rs): manuscript floor calculation helpers.
 - [artifact_manuscript_assembly.rs](artifact_manuscript_assembly.rs): artifact manuscript assembly source module.
@@ -96,7 +100,14 @@ This directory holds tool dispatcher, adapter, and observation code.
 - [artifact_next_identity_contract.rs](artifact_next_identity_contract.rs): artifact next identity
   contract source module.
 - [artifact_next_response.rs](artifact_next_response.rs): artifact next response source module.
+- [artifact_next_select.rs](artifact_next_select.rs): next atom selection helpers.
 - [artifact_next_story.rs](artifact_next_story.rs): artifact next story source module.
+- [artifact_objective.rs](artifact_objective.rs): owner objective frame construction.
+- [artifact_objective_parse.rs](artifact_objective_parse.rs): owner objective parsing helpers.
+- [artifact_plan_compile.rs](artifact_plan_compile.rs): artifact plan to atom graph compiler.
+- [artifact_profile.rs](artifact_profile.rs): large-artifact profile data.
+- [artifact_profile_atoms.rs](artifact_profile_atoms.rs): profile atom templates.
+- [artifact_profile_more.rs](artifact_profile_more.rs): extended profile templates.
 - [artifact_readiness.rs](artifact_readiness.rs): artifact readiness source module.
 - [artifact_readiness_story.rs](artifact_readiness_story.rs): artifact readiness story source module.
 - [artifact_readiness_story_req.rs](artifact_readiness_story_req.rs): artifact readiness story req source module.

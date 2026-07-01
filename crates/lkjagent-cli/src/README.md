@@ -44,6 +44,7 @@ This directory holds CLI argument dispatch and one module per command.
 - [personal_projection.rs](personal_projection.rs): personal projection source module.
 - [personal_projection_text.rs](personal_projection_text.rs): personal projection text source module.
 - [queue.rs](queue.rs): queue source module.
+- [status_artifact.rs](status_artifact.rs): artifact status projection source module.
 - [status_context.rs](status_context.rs): status context source module.
 - [status_deck.rs](status_deck.rs): status deck source module.
 - [status_facts.rs](status_facts.rs): status facts source module.

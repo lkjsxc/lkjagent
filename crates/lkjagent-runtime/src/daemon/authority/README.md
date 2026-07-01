@@ -17,3 +17,4 @@ admission rows, and graph-policy synchronization.
 - [kernel_turn_persist.rs](kernel_turn_persist.rs): status-key projection from kernel turn records.
 - [kernel_turn_policy.rs](kernel_turn_policy.rs): dispatch policy projection from kernel decisions.
 - [kernel_turn_artifact.rs](kernel_turn_artifact.rs): kernel turn artifact source module.
+- [kernel_turn_artifact_render.rs](kernel_turn_artifact_render.rs): artifact write-contract render helpers.

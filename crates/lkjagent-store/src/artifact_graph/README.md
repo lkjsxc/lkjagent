@@ -8,6 +8,7 @@ projection rows.
 
 ## Table of Contents
 
+- [mod.rs](mod.rs): artifact graph store module exports.
 - [model.rs](model.rs): plan, atom, edge, and contract row data.
 - [projection.rs](projection.rs): event, assembly, and readiness data.
 - [read.rs](read.rs): query adapters for plans, atoms, contracts, and readiness.
