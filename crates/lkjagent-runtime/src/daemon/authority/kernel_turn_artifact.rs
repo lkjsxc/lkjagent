@@ -95,13 +95,22 @@ fn split_paths(value: &str) -> Vec<String> {
 
 fn single_path_contract(root: &str, kind: &str, path: &str) -> String {
     if path.contains("/manuscript/") || path.starts_with("manuscript/") {
+        let unit = manuscript_unit(path);
         return format!(
-            "tool=fs.batch_write\nroot={root}\nkind=story\npaths:\n- {path}\nlimits:\n- max_files=1\n- max_file_bytes=12000\n- max_batch_bytes=12000\nrequired_sections:\n- finished chapter prose\n- scene action and dialogue or interiority\n- continuity with prior facts\nforbidden_weak_phrase_classes:\n- scaffold-only\n- outline-only\n- story-bible-only\n- placeholder\n- owner-terms-only\n- generic-example\nmodel_instruction=author finished manuscript prose for only this chapter path with the line protocol"
+            "tool=fs.batch_write\nroot={root}\nkind=story\npaths:\n- {path}\nlimits:\n- max_files=1\n- max_file_bytes=1800\n- max_batch_bytes=1800\nrequired_sections:\n- finished {unit} prose\n- scene action and dialogue or interiority\n- continuity with prior facts\nforbidden_weak_phrase_classes:\n- scaffold-only\n- outline-only\n- story-bible-only\n- placeholder\n- owner-terms-only\n- generic-example\nmodel_instruction=author finished manuscript {unit} prose for only this path with the line protocol"
         );
     }
     format!(
         "tool=fs.batch_write\nroot={root}\nkind={kind}\npaths:\n- {path}\nlimits:\n- max_files=1\n- max_file_bytes=1800\n- max_batch_bytes=1800\nrequired_sections:\n- title\n- purpose\n- scene content or reference detail\n- continuity notes\n- verification notes\nforbidden_weak_phrase_classes:\n- scaffold-only\n- placeholder\n- owner-terms-only\n- generic-example\nmodel_instruction=author only this one listed path with 25 to 45 words and the line protocol"
     )
+}
+
+fn manuscript_unit(path: &str) -> &'static str {
+    if path.contains("manuscript/scenes/") {
+        "scene"
+    } else {
+        "chapter"
+    }
 }
 
 fn ledger_observation(row: &ArtifactLedgerRow, weak: &[WeakPathRow]) -> Option<String> {

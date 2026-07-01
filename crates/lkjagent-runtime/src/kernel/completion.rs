@@ -11,12 +11,19 @@ pub struct CompletionGateInput {
     pub artifact_required: bool,
     pub artifact_ready: bool,
     pub manuscript_active: bool,
+    pub manuscript_task_kind: Option<String>,
+    pub manuscript_allowed_root: Option<String>,
     pub manuscript_words_written: usize,
     pub manuscript_word_floor: usize,
     pub manuscript_target_words: Option<usize>,
     pub manuscript_chapter_count: Option<usize>,
+    pub requested_manuscript_paths: Vec<String>,
     pub missing_manuscript_paths: Vec<String>,
+    pub scene_atoms_unassembled: Vec<String>,
     pub next_manuscript_path: Option<String>,
+    pub manuscript_output_token_budget: usize,
+    pub manuscript_exact_path_required: bool,
+    pub forbidden_manuscript_roots: Vec<String>,
     pub content_atom_active: bool,
     pub content_atom_missing_count: usize,
     pub next_content_atom: Option<String>,
@@ -41,6 +48,10 @@ pub(crate) fn completion_gate(snapshot: &RuntimeSnapshot) -> CompletionGateDecis
         artifact_required: artifact_required(snapshot),
         artifact_ready: artifact_ready_if_present(snapshot),
         manuscript_active: manuscript.as_ref().is_some_and(|facts| facts.active),
+        manuscript_task_kind: manuscript
+            .as_ref()
+            .map(|facts| format!("{:?}", facts.task_kind)),
+        manuscript_allowed_root: manuscript.as_ref().map(|facts| facts.allowed_root.clone()),
         manuscript_words_written: manuscript
             .as_ref()
             .map(|facts| facts.words_written)
@@ -51,11 +62,32 @@ pub(crate) fn completion_gate(snapshot: &RuntimeSnapshot) -> CompletionGateDecis
             .unwrap_or(0),
         manuscript_target_words: manuscript.as_ref().and_then(|facts| facts.target_words),
         manuscript_chapter_count: manuscript.as_ref().and_then(|facts| facts.chapter_count),
+        requested_manuscript_paths: manuscript
+            .as_ref()
+            .map(|facts| facts.requested_paths.clone())
+            .unwrap_or_default(),
         missing_manuscript_paths: manuscript
             .as_ref()
             .map(|facts| facts.missing_paths.clone())
             .unwrap_or_default(),
-        next_manuscript_path: manuscript.and_then(|facts| facts.next_path),
+        scene_atoms_unassembled: manuscript
+            .as_ref()
+            .map(|facts| facts.scene_atoms_unassembled.clone())
+            .unwrap_or_default(),
+        next_manuscript_path: manuscript
+            .as_ref()
+            .and_then(|facts| facts.next_path.clone()),
+        manuscript_output_token_budget: manuscript
+            .as_ref()
+            .map(|facts| facts.output_token_budget)
+            .unwrap_or(0),
+        manuscript_exact_path_required: manuscript
+            .as_ref()
+            .is_some_and(|facts| facts.exact_path_required),
+        forbidden_manuscript_roots: manuscript
+            .as_ref()
+            .map(|facts| facts.forbidden_roots.clone())
+            .unwrap_or_default(),
         content_atom_active: atoms.active,
         content_atom_missing_count: atoms.missing_count,
         next_content_atom: atoms.next_atom,

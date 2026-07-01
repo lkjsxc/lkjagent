@@ -92,19 +92,19 @@ fn failure_path(root: &str, failure: &str) -> Option<String> {
 
 fn manuscript_contract(root: &str, facts: &ManuscriptFacts) -> Option<WriteContractFacts> {
     let path = facts.next_path.clone()?;
-    let max_file_bytes = match facts.anomaly_shrink_level {
-        0 => 12_000,
-        1 => 6_000,
-        _ => 3_000,
+    let unit = if path.contains("/manuscript/scenes/") {
+        "scene"
+    } else {
+        "chapter"
     };
     Some(WriteContractFacts {
         root: root.to_string(),
         exact_paths: vec![path],
         max_files: 1,
-        max_file_bytes,
-        max_batch_bytes: max_file_bytes,
+        max_file_bytes: facts.max_file_bytes,
+        max_batch_bytes: facts.max_file_bytes,
         required_sections: vec![
-            "finished chapter prose".to_string(),
+            format!("finished {unit} prose"),
             "scene action and dialogue or interiority".to_string(),
             "continuity with prior facts".to_string(),
         ],

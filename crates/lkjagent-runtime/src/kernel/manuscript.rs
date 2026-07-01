@@ -1,78 +1,113 @@
+use crate::kernel::manuscript_path::{
+    chapter_count, default_final_path, first_manuscript_path, requested_final_paths, target_words,
+    write_path_for,
+};
 use crate::kernel::obligation_parse::line_value;
 use crate::kernel::snapshot::RuntimeSnapshot;
 
-#[derive(Debug, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum ManuscriptTaskKind {
+    StoryBible,
+    Manuscript,
+    StoryBibleThenManuscript,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct ManuscriptFacts {
     pub active: bool,
+    pub task_kind: ManuscriptTaskKind,
+    pub allowed_root: String,
     pub target_words: Option<usize>,
     pub target_word_floor: usize,
     pub chapter_count: Option<usize>,
     pub requested_paths: Vec<String>,
     pub missing_paths: Vec<String>,
+    pub scene_atoms_unassembled: Vec<String>,
     pub next_path: Option<String>,
     pub words_written: usize,
     pub anomaly_shrink_level: u32,
     pub exact_path_required: bool,
     pub forbidden_roots: Vec<String>,
+    pub max_file_bytes: usize,
+    pub output_token_budget: usize,
 }
 
 pub(crate) fn facts_from_snapshot(snapshot: &RuntimeSnapshot) -> Option<ManuscriptFacts> {
     let root = snapshot.artifact.root.as_deref()?;
     let text = source_text(snapshot);
-    let requested_paths = requested_paths(root, &text);
+    let requested_paths = requested_final_paths(root, &text);
     let target_words =
         observed_number(snapshot, "manuscript_target_words").or_else(|| target_words(&text));
     let chapter_count = chapter_count(&text)
         .or_else(|| (!requested_paths.is_empty()).then_some(requested_paths.len()));
-    let active = manuscript_active(root, &text, snapshot, target_words, chapter_count);
-    if !active {
+    let task_kind = task_kind(root, &text, snapshot, target_words, chapter_count);
+    if matches!(task_kind, ManuscriptTaskKind::StoryBible) {
         return None;
     }
-    let mut missing_paths = observed_paths(snapshot, "missing_manuscript_paths");
+    let mut missing_paths = observed_paths(snapshot, "manuscript_missing_paths");
     if missing_paths.is_empty() {
         missing_paths = requested_paths.clone();
     }
-    let next_path = observed_value(snapshot, "next_manuscript_path")
+    let final_path = missing_paths
+        .first()
+        .cloned()
+        .or_else(|| requested_paths.first().cloned())
+        .unwrap_or_else(|| default_final_path(root, chapter_count));
+    let observed_next = observed_value(snapshot, "next_manuscript_path")
         .filter(|value| value != "none")
-        .or_else(|| missing_paths.first().cloned())
-        .or_else(|| default_path(root, chapter_count));
+        .or_else(|| observed_write_path(root, snapshot));
+    let next_path = Some(
+        observed_next
+            .map(|path| write_path_for(&path))
+            .unwrap_or_else(|| write_path_for(&final_path)),
+    );
     if missing_paths.is_empty() {
-        if let Some(path) = next_path.clone() {
-            missing_paths.push(path);
-        }
+        missing_paths.push(final_path);
     }
     let floor = target_words
         .map(|words| words.saturating_mul(85) / 100)
         .unwrap_or(600);
-    let words_written = observed_number(snapshot, "manuscript_word_count").unwrap_or(0);
+    let shrink = anomaly_level(snapshot);
+    let max_file_bytes = max_file_bytes(shrink);
     Some(ManuscriptFacts {
-        active,
+        active: true,
+        task_kind,
+        allowed_root: root.to_string(),
         target_words,
         target_word_floor: floor,
         chapter_count,
         requested_paths,
         missing_paths,
+        scene_atoms_unassembled: observed_paths(snapshot, "scene_atoms_unassembled"),
         next_path,
-        words_written,
-        anomaly_shrink_level: anomaly_level(snapshot),
+        words_written: observed_number(snapshot, "manuscript_word_count").unwrap_or(0),
+        anomaly_shrink_level: shrink,
         exact_path_required: text.contains("stories/") && text.contains("/manuscript/"),
         forbidden_roots: forbidden_roots(&text),
+        max_file_bytes,
+        output_token_budget: max_file_bytes / 4,
     })
 }
 
-fn manuscript_active(
+fn task_kind(
     root: &str,
     text: &str,
     snapshot: &RuntimeSnapshot,
     target_words: Option<usize>,
     chapter_count: Option<usize>,
-) -> bool {
-    root.trim_start_matches("./").starts_with("stories/")
+) -> ManuscriptTaskKind {
+    let manuscript = root.trim_start_matches("./").starts_with("stories/")
         && (text.contains("/manuscript/")
             || text.contains("manuscript")
             || target_words.is_some()
             || chapter_count.is_some()
-            || snapshot.artifact.kind.as_deref() == Some("manuscript"))
+            || snapshot.artifact.kind.as_deref() == Some("manuscript"));
+    let bible = text.contains("story bible") || text.contains("reference");
+    match (bible, manuscript) {
+        (true, true) => ManuscriptTaskKind::StoryBibleThenManuscript,
+        (false, true) => ManuscriptTaskKind::Manuscript,
+        _ => ManuscriptTaskKind::StoryBible,
+    }
 }
 
 fn source_text(snapshot: &RuntimeSnapshot) -> String {
@@ -108,65 +143,29 @@ fn observed_paths(snapshot: &RuntimeSnapshot, key: &str) -> Vec<String> {
             value
                 .split(',')
                 .map(str::trim)
+                .filter(|item| !item.is_empty() && *item != "none")
                 .map(str::to_string)
                 .collect()
         })
         .unwrap_or_default()
 }
 
-fn requested_paths(root: &str, text: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    for token in text.split(|ch: char| !path_char(ch)) {
-        let path = token.trim_matches('.');
-        if path.starts_with(root) && path.contains("/manuscript/") && path.ends_with(".md") {
-            push_unique(&mut out, path.to_string());
-        }
-    }
-    out
-}
-
-fn default_path(root: &str, chapter_count: Option<usize>) -> Option<String> {
-    let index = chapter_count.filter(|count| *count == 1).map_or(1, |_| 1);
-    Some(format!(
-        "{}/manuscript/chapter-{index:02}.md",
-        root.trim_end_matches('/')
-    ))
-}
-
-fn target_words(text: &str) -> Option<usize> {
-    numbers_before(text, "word").into_iter().max()
-}
-
-fn chapter_count(text: &str) -> Option<usize> {
-    numbers_before(text, "chapter").into_iter().max()
-}
-
-fn numbers_before(text: &str, unit: &str) -> Vec<usize> {
-    text.split(|ch: char| !ch.is_ascii_alphanumeric() && ch != ',')
-        .collect::<Vec<_>>()
-        .windows(2)
-        .filter_map(|pair| {
-            (pair[1].starts_with(unit))
-                .then(|| parse_number(pair[0]))
-                .flatten()
-        })
-        .collect()
-}
-
-fn parse_number(value: &str) -> Option<usize> {
-    match value.trim_matches(',') {
-        "one" => Some(1),
-        "ten" => Some(10),
-        raw => raw.replace(',', "").parse().ok(),
-    }
+fn observed_write_path(root: &str, snapshot: &RuntimeSnapshot) -> Option<String> {
+    [
+        snapshot.observation.latest.as_deref(),
+        snapshot.observation.latest_successful.as_deref(),
+    ]
+    .into_iter()
+    .flatten()
+    .find_map(|text| first_manuscript_path(root, text))
 }
 
 fn forbidden_roots(text: &str) -> Vec<String> {
-    if text.contains("structured-output") {
-        vec!["structured-output".to_string()]
-    } else {
-        Vec::new()
-    }
+    ["structured-output", "output", "artifact", "work-product"]
+        .into_iter()
+        .filter(|root| text.contains(root))
+        .map(str::to_string)
+        .collect()
 }
 
 fn anomaly_level(snapshot: &RuntimeSnapshot) -> u32 {
@@ -178,12 +177,10 @@ fn anomaly_level(snapshot: &RuntimeSnapshot) -> u32 {
     )
 }
 
-fn push_unique(out: &mut Vec<String>, value: String) {
-    if !out.iter().any(|item| item == &value) {
-        out.push(value);
+fn max_file_bytes(shrink: u32) -> usize {
+    match shrink {
+        0 => 1_800,
+        1 => 1_200,
+        _ => 800,
     }
-}
-
-fn path_char(ch: char) -> bool {
-    ch.is_ascii_alphanumeric() || matches!(ch, '/' | '-' | '_' | '.')
 }

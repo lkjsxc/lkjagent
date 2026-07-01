@@ -124,17 +124,17 @@ Story manuscript work has typed chapter-prose facts separate from story-bible
 reference files. Exact `stories/.../manuscript/*.md` requests route to story
 content artifacts, counted-document scaffolding is vetoed for manuscript prose
 requests, runtime facts carry manuscript target words, chapter counts, missing
-paths, next path, progress words, and provider anomaly shrink state, and
-`artifact.next` chooses manuscript chapter contracts before optional story-bible
-repair after identity exists.
+paths, scene atom gaps, next write path, progress words, and provider anomaly
+shrink state, and `artifact.next` chooses manuscript scene or chapter contracts
+before optional story-bible repair after identity exists.
 
 Readiness and completion reject story-bible-only output for manuscript tasks.
 Provider anomaly and endpoint max-token recovery preserve the exact next
-manuscript path, shrink the write contract, or block with the remaining path.
-Fresh endpoint smoke at `/tmp/lkjagent-manuscript-direct-20260630T095705Z`
-proved the direct chapter route avoids `structured-output` and blocks with the
-exact remaining manuscript path when the configured endpoint cannot fit the
-requested prose in the output budget.
+manuscript path and shrink the write contract instead of broadening admission or
+blocking with a generic handoff. Historical endpoint smoke at
+`/tmp/lkjagent-manuscript-direct-20260630T095705Z` proved the direct chapter
+route avoided `structured-output` but stopped at a waiting handoff before the
+current shrink-only recovery rule.
 
 A follow-up live owner request for `Second Period, First Love` proved the
 current boundary. After `reasoning_effort=none`, the daemon created the exact
@@ -143,9 +143,10 @@ in recovery after only two short chapter files and 508 manuscript words. A
 direct per-chapter endpoint fallback generated ten chapters and 11,456
 manuscript words at `/tmp/lkjagent-user-romance-complete-20260630T122402Z`.
 That artifact proves the model can write the prose, not that the daemon can
-complete the task. The open target is a daemon-owned, resumable chapter or
-scene write surface with exact remaining-path recovery, real word-count
-evidence, deterministic assembly where needed, and central completion closure.
+complete the task. The open target is live proof that the daemon-owned,
+resumable scene and chapter write surface can finish the full manuscript with
+real word-count evidence, deterministic assembly where needed, and central
+completion closure.
 
 ## Verification Evidence
 

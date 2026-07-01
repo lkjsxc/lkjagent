@@ -29,9 +29,18 @@ pub fn manuscript_batch_write_contract(root: &str, paths: &[String]) -> String {
         })
         .collect::<Vec<_>>()
         .join("\n");
+    let unit = manuscript_unit(paths);
     format!(
-        "tool=fs.batch_write\nroot={root}\nkind=story\npaths:\n{joined}\nlimits:\n- max_files=1\n- max_file_bytes=12000\n- max_batch_bytes=12000\nrequired_sections:\n- finished chapter prose\n- scene action and dialogue or interiority\n- continuity with prior facts\nforbidden_weak_phrase_classes:\n- scaffold-only\n- outline-only\n- story-bible-only\n- placeholder\n- owner-terms-only\n- generic-example\nmodel_instruction=author finished manuscript prose for only the listed chapter path using fs.batch_write line protocol"
+        "tool=fs.batch_write\nroot={root}\nkind=story\npaths:\n{joined}\nlimits:\n- max_files=1\n- max_file_bytes=1800\n- max_batch_bytes=1800\nrequired_sections:\n- finished {unit} prose\n- scene action and dialogue or interiority\n- continuity with prior facts\nforbidden_weak_phrase_classes:\n- scaffold-only\n- outline-only\n- story-bible-only\n- placeholder\n- owner-terms-only\n- generic-example\nmodel_instruction=author finished manuscript {unit} prose for only the listed path using fs.batch_write line protocol"
     )
+}
+
+fn manuscript_unit(paths: &[String]) -> &'static str {
+    if paths.iter().any(|path| path.contains("manuscript/scenes/")) {
+        "scene"
+    } else {
+        "chapter"
+    }
 }
 
 pub fn root_identity_contract(root: &str, kind: &str) -> String {

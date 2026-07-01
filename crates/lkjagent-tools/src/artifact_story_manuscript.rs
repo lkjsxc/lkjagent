@@ -1,4 +1,8 @@
-use crate::artifact_story_text::{contains_any, full_path, numbers_before, path_char, prose_words};
+use crate::artifact_story_manuscript_paths::{
+    chapter_floor, manuscript_path_words, manuscript_words, next_scene_path, planned_paths,
+    requested_paths, scene_atoms_for_missing,
+};
+use crate::artifact_story_text::{contains_any, full_path, numbers_before};
 
 pub(crate) struct ManuscriptFile<'a> {
     pub relative: &'a str,
@@ -12,9 +16,11 @@ pub(crate) struct ManuscriptFacts {
     pub target_words: Option<usize>,
     pub word_floor: usize,
     pub chapter_count: Option<usize>,
+    pub required_paths: Vec<String>,
     pub missing_paths: Vec<String>,
     pub next_path: Option<String>,
     pub total_words: usize,
+    pub scene_atoms_unassembled: Vec<String>,
 }
 
 pub(crate) fn facts(root: &str, scale: &str, files: &[ManuscriptFile<'_>]) -> ManuscriptFacts {
@@ -29,24 +35,27 @@ pub(crate) fn facts(root: &str, scale: &str, files: &[ManuscriptFile<'_>]) -> Ma
     let word_floor = target_words
         .map(|words| words.saturating_mul(85) / 100)
         .unwrap_or(600);
-    let paths = planned_paths(root, files, &joined, chapter_count, target_words);
+    let required_paths = planned_paths(root, files, &joined, chapter_count, target_words);
     let total_words = manuscript_words(files);
-    let missing_paths = paths
-        .iter()
-        .filter(|path| manuscript_path_words(files, path) < chapter_floor(word_floor, paths.len()))
-        .cloned()
-        .collect::<Vec<_>>();
-    let next_path = missing_paths.first().cloned();
+    let per_chapter = chapter_floor(word_floor, required_paths.len());
+    let missing_paths = missing_paths(files, &required_paths, per_chapter);
+    let scene_atoms_unassembled = scene_atoms_for_missing(files, &missing_paths);
+    let next_path = missing_paths
+        .first()
+        .and_then(|path| next_scene_path(files, path, per_chapter));
     ManuscriptFacts {
         active,
         target_words,
         word_floor,
         chapter_count,
+        required_paths,
         missing_paths,
         next_path,
         total_words,
+        scene_atoms_unassembled,
     }
 }
+
 pub(crate) fn readiness_failure(root: &str, facts: &ManuscriptFacts) -> Option<String> {
     if !facts.active {
         return None;
@@ -54,21 +63,23 @@ pub(crate) fn readiness_failure(root: &str, facts: &ManuscriptFacts) -> Option<S
     if facts.missing_paths.is_empty() && facts.total_words >= facts.word_floor {
         return None;
     }
-    let missing = if facts.missing_paths.is_empty() {
-        "none".to_string()
-    } else {
-        facts
-            .missing_paths
-            .iter()
-            .map(|path| full_path(root, path))
-            .collect::<Vec<_>>()
-            .join(",")
-    };
+    let missing = full_paths(root, &facts.missing_paths);
+    let required = full_paths(root, &facts.required_paths);
+    let scenes = full_paths(root, &facts.scene_atoms_unassembled);
+    let next = facts
+        .next_path
+        .as_deref()
+        .map(|path| full_path(root, path))
+        .unwrap_or_else(|| "none".to_string());
     Some(format!(
-        "artifact audit failed\nroot={root}\nreadiness=missing-manuscript-content\nfailed=1\nfailures:\n- manuscript_missing_paths: {missing}\n- manuscript_word_count: {}\n- manuscript_target_words: {}\n- next_manuscript_path: {}\nnext_decision_required=true\ncandidate_action=artifact.next",
+        "artifact audit failed\nroot={root}\nreadiness=missing-manuscript-content\n\
+         failed=1\nfailures:\n- manuscript_missing_paths: {missing}\n\
+         - manuscript_word_count: {}\n- manuscript_target_words: {}\n\
+         - required_manuscript_paths: {required}\n\
+         - scene_atoms_unassembled: {scenes}\n- next_manuscript_path: {next}\n\
+         next_decision_required=true\ncandidate_action=artifact.next",
         facts.total_words,
         facts.target_words.unwrap_or(facts.word_floor),
-        facts.next_path.as_deref().map(|path| full_path(root, path)).unwrap_or_else(|| "none".to_string())
     ))
 }
 
@@ -78,83 +89,27 @@ fn active_manuscript(root: &str, scale: &str, files: &[ManuscriptFile<'_>], join
             || scale.contains("manuscript")
             || joined.contains("/manuscript/")
             || joined.contains("manuscript/")
-            || (contains_any(joined, &["novel", "story", "chapter", "scene"])
-                && contains_any(joined, &[" word", " words", "-word"]))
+            || prose_request(joined)
             || files
                 .iter()
                 .any(|file| file.relative.starts_with("manuscript/")))
 }
 
-fn planned_paths(
-    root: &str,
+fn prose_request(joined: &str) -> bool {
+    contains_any(joined, &["novel", "story", "chapter", "scene"])
+        && contains_any(joined, &[" word", " words", "-word"])
+}
+
+fn missing_paths(
     files: &[ManuscriptFile<'_>],
-    text: &str,
-    chapter_count: Option<usize>,
-    target_words: Option<usize>,
+    required_paths: &[String],
+    per_chapter: usize,
 ) -> Vec<String> {
-    let mut paths = requested_paths(root, text);
-    if paths.is_empty() {
-        let count = chapter_count
-            .or_else(|| target_words.map(|words| words.div_ceil(1_000).clamp(1, 20)))
-            .unwrap_or(1);
-        paths.extend((1..=count).map(|index| format!("manuscript/chapter-{index:02}.md")));
-    }
-    for file in files {
-        if file.relative.starts_with("manuscript/")
-            && !paths.iter().any(|path| path == file.relative)
-        {
-            paths.push(file.relative.to_string());
-        }
-    }
-    paths.sort();
-    paths.dedup();
-    paths
-}
-
-fn requested_paths(root: &str, text: &str) -> Vec<String> {
-    let mut out = Vec::new();
-    for token in text.split(|ch: char| !path_char(ch)) {
-        let trimmed = token.trim_matches('.');
-        if let Some(relative) = trimmed.strip_prefix(&format!("{}/", root.trim_end_matches('/'))) {
-            push_manuscript_path(&mut out, relative);
-        } else {
-            push_manuscript_path(&mut out, trimmed);
-        }
-    }
-    out
-}
-
-fn push_manuscript_path(out: &mut Vec<String>, path: &str) {
-    if path.starts_with("manuscript/")
-        && path.ends_with(".md")
-        && !out.iter().any(|item| item == path)
-    {
-        out.push(path.to_string());
-    }
-}
-
-fn manuscript_words(files: &[ManuscriptFile<'_>]) -> usize {
-    files
+    required_paths
         .iter()
-        .filter(|file| file.relative.starts_with("manuscript/"))
-        .map(|file| prose_words(file.text))
-        .sum()
-}
-
-fn manuscript_path_words(files: &[ManuscriptFile<'_>], path: &str) -> usize {
-    files
-        .iter()
-        .find(|file| file.relative == path)
-        .map(|file| prose_words(file.text))
-        .unwrap_or(0)
-}
-
-fn chapter_floor(total_floor: usize, count: usize) -> usize {
-    if count == 0 {
-        total_floor
-    } else {
-        total_floor.div_ceil(count).min(700)
-    }
+        .filter(|path| manuscript_path_words(files, path) < per_chapter)
+        .cloned()
+        .collect()
 }
 
 fn target_words(text: &str) -> Option<usize> {
@@ -172,4 +127,16 @@ fn joined_text(scale: &str, files: &[ManuscriptFile<'_>]) -> String {
         text.push_str(file.lower);
     }
     text
+}
+
+fn full_paths(root: &str, paths: &[String]) -> String {
+    if paths.is_empty() {
+        "none".to_string()
+    } else {
+        paths
+            .iter()
+            .map(|path| full_path(root, path))
+            .collect::<Vec<_>>()
+            .join(",")
+    }
 }

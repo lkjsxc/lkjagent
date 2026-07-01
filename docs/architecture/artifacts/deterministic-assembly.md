@@ -24,9 +24,11 @@ Assembly records evidence that names:
 ## Manuscript Chapters
 
 For manuscripts, scene atoms under `manuscript/scenes/<chapter>/` are assembled
-in lexical path order into `manuscript/<chapter>.md`. The chapter file is the
-readiness evidence. Scene-only output is not completion evidence until the
-chapter path exists and the manuscript audit counts its real prose words.
+in lexical path order into `manuscript/<chapter>.md` only after every selected
+scene is strong enough and their combined prose meets the chapter floor. The
+chapter file is the readiness evidence. Scene-only output is not completion
+evidence until the chapter path exists and the manuscript audit counts its real
+prose words.
 
 ## Restrictions
 
