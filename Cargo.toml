@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/lkjagent-core",
+    "crates/lkjagent-effects",
     "crates/lkjagent-cli",
     "crates/lkjagent-benchmark",
     "crates/lkjagent-context",
