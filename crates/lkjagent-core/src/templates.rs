@@ -8,6 +8,9 @@ pub fn instantiate(id: u64, objective: &str) -> TaskSnapshot {
     if template == TemplateId::Manuscript {
         return crate::manuscript::instantiate(id, objective);
     }
+    if template == TemplateId::DocsTree {
+        return crate::docs_tree::instantiate(id, objective);
+    }
     let mut task = task(id, objective, template);
     task.checks = task_checks(objective, template);
     let steps = match template {

@@ -24,9 +24,10 @@ now have classifier rules, pure snapshot shapes, app fake-endpoint coverage,
 workspace writes, and waiting-answer resume. The manuscript template now extracts objective fields,
 seeds chapter outlines, materializes chapter writes, appends section content,
 runs exact file-count and word-total checks, extends shortfalls, and splits
-after repeated write faults. Docs-tree still uses a thin generic shape. The
-existing runtime, graph, tools, CLI, benchmark, and store modules remain until
-cutover.
+after repeated write faults. The docs-tree template now extracts roots and page
+counts, validates README-covered plans, runs readme and link checks through the
+effects edge, and materializes link-repair revise steps. The existing runtime,
+graph, tools, CLI, benchmark, and store modules remain until cutover.
 
 The target product is one daemon, one owner queue, one SQLite store, one local
 LLM endpoint, and one deterministic plan ledger. The harness owns control flow;
@@ -58,7 +59,8 @@ log writing, and all deterministic catalog checks over a fixture tree.
 `crates/lkjagent-app/` tests cover the documented help tree, queue-backed fake
 endpoint execution, store-backed resume, simple-template end-to-end closure,
 waiting-answer resume, expected workspace files, manuscript ten-chapter closure,
-shortfall extension, write-fault splitting, and the status field set.
+shortfall extension, write-fault splitting, docs-tree closure, docs-tree link
+repair, and the status field set.
 
 The current Rust workspace still includes the existing parser, protocol
 registry, graph, context, store, LLM client, tools, runtime, CLI, benchmark, and
@@ -79,8 +81,7 @@ Stage 0 baseline evidence is recorded under
 
 ## Open Work
 
-- Docs-tree templates plus the production LLM adapter inside `lkjagent-app` are
-  not yet implemented.
+- The production LLM adapter inside `lkjagent-app` is not yet implemented.
 - The benchmark corpus and replay smoke still exercise the existing runtime.
 - The Aurora Ledger live proof remains open until the daemon produces ten
   requested chapter files totaling at least 10,000 measured manuscript words and

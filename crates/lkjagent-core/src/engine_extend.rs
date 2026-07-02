@@ -7,16 +7,40 @@ pub(crate) fn shortfall_steps(
     files: &[FileFact],
     results: &[CheckResult],
 ) -> Vec<Step> {
-    let Some(CheckSpec::MinWordsTotal { glob, n }) = step
-        .checks
-        .iter()
-        .find(|spec| matches!(spec, CheckSpec::MinWordsTotal { .. }))
-    else {
-        return Vec::new();
-    };
     if results.iter().all(|result| result.passed) {
         return Vec::new();
     }
+    if let Some(steps) = manuscript_shortfall(step, files, results) {
+        return steps;
+    }
+    if results
+        .iter()
+        .any(|result| result.name == "links_resolve" && !result.passed)
+    {
+        let path = files
+            .iter()
+            .find(|fact| fact.content.contains("missing.md"))
+            .or_else(|| files.iter().find(|fact| fact.content.contains("](")))
+            .or_else(|| files.first())
+            .map(|fact| fact.path.clone())
+            .unwrap_or_else(|| "README.md".to_string());
+        return vec![revise_step(step, &path), verify_step(step)];
+    }
+    Vec::new()
+}
+
+fn manuscript_shortfall(
+    step: &Step,
+    files: &[FileFact],
+    results: &[CheckResult],
+) -> Option<Vec<Step>> {
+    let CheckSpec::MinWordsTotal { glob, n } = step
+        .checks
+        .iter()
+        .find(|spec| matches!(spec, CheckSpec::MinWordsTotal { .. }))?
+    else {
+        return None;
+    };
     let measured = results
         .iter()
         .find(|result| result.name == "min_words_total")
@@ -24,7 +48,7 @@ pub(crate) fn shortfall_steps(
         .unwrap_or(0);
     let path = last_matching(files, glob).unwrap_or_else(|| fallback_path(glob));
     let missing = n.saturating_sub(measured).max(1);
-    vec![write_step(step, &path, missing), verify_step(step)]
+    Some(vec![write_step(step, &path, missing), verify_step(step)])
 }
 
 pub(crate) fn split_after_fault(step: &Step) -> Vec<Step> {
@@ -69,6 +93,19 @@ fn write_step(parent: &Step, path: &str, words: usize) -> Step {
     );
     step.title = "manuscript extension".to_string();
     step.instruction = format!("append at least {words} continuation words");
+    step.output_path = Some(path.to_string());
+    step.checks.clear();
+    step
+}
+
+fn revise_step(parent: &Step, path: &str) -> Step {
+    let mut step = clone_step(
+        parent,
+        parent.id.saturating_mul(10).saturating_add(3),
+        StepKind::Revise,
+    );
+    step.title = "docs link repair".to_string();
+    step.instruction = "repair links reported by verification".to_string();
     step.output_path = Some(path.to_string());
     step.checks.clear();
     step
