@@ -8,8 +8,8 @@ only when code, focused tests, quiet gates, and required Docker gates prove it.
 
 ## Summary
 
-The documentation contract is being rewritten to a plan-driven step engine. The
-engine is not yet built. The repository still contains the existing runtime,
+The documentation contract is being rewritten to a plan-driven step engine.
+The engine is not yet built. The repository still contains the existing runtime,
 graph, tools, CLI, benchmark, and store implementation until the cutover task
 removes them.
 
