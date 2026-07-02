@@ -1,16 +1,10 @@
-# Xtask Structure
+# Structure
 
 ## Purpose
 
-This directory owns non-mutating structure audits for documentation and
-workspace trees.
+Placeholder command module while the structure audit is rebuilt for the plan
+engine.
 
 ## Table of Contents
 
-- [mod.rs](mod.rs): public audit entrypoint and CLI adapter.
-- [brief.rs](brief.rs): workspace brief checks for generated workspace roots.
-- [catalog.rs](catalog.rs): catalog coverage and stale path checks.
-- [findings.rs](findings.rs): finding data and messages.
-- [plan.rs](plan.rs): pure structure plan builder.
-- [readme.rs](readme.rs): README topology and weak content checks.
-- [render.rs](render.rs): terminal rendering for audit and plan commands.
+- [mod.rs](mod.rs): command stub that fails honestly until rebuilt.
