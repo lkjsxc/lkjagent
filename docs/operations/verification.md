@@ -2,51 +2,30 @@
 
 ## Purpose
 
-The gate commands that decide whether work is done, and the output contract
-that keeps them readable to agents. A gate that did not run did not pass;
-claiming otherwise violates [../agent/honest-state.md](../agent/honest-state.md).
+Define gate commands and the quiet output contract.
 
-## The Quiet Contract
+## Quiet Contract
 
-Gates run quiet: a passing gate prints exactly one line, `ok ` followed by
-the gate name, and exits 0. A failing gate prints the failing step, the
-exit status, and a bounded tail of captured output, then exits nonzero.
-Quiet output is a context-hygiene rule as much as a CI rule: a passing gate
-costs an agent a handful of tokens.
+A passing gate prints exactly one line: `ok ` followed by the gate name. A
+failing gate prints the failing step, exit status, and bounded output tail. A
+gate that did not run did not pass.
 
 ## Gates
 
-Built by [../execution/tasks/xtask-checks.md](../execution/tasks/xtask-checks.md);
-all run as `cargo run -p lkjagent-xtask -- <gate>`:
+All local gates run as `cargo run -p lkjagent-xtask -- <gate>`.
 
 | Gate | Checks |
 | --- | --- |
-| check-docs | doc shape, topology, TOC completeness, internal links, ASCII, width, banned tokens, task format, README coverage |
-| check-lines | the 200-line cap on every tracked file |
-| check-style | panic-path scan and dependency allowlist on product crates |
-| docs-check | alias for check-docs |
-| hygiene-check | check-lines plus check-style |
-| benchmark check-corpus | deterministic benchmark task, fixture, and judge validity |
-| smoke replay | deterministic runtime smoke replay with bounded `tmp/` summary output |
-| smoke live | explicit live smoke status; skips honestly when endpoint config is absent |
-| quiet test | cargo fmt --check, clippy with warnings denied for all targets, all workspace tests |
-| quiet verify | check-docs, check-lines, check-style, benchmark check-corpus, then quiet test |
+| `check-docs` | docs shape, topology, links, ASCII, bans, docs count |
+| `check-lines` | per-file line cap |
+| `check-files` | product source and docs file-count budgets |
+| `check-style` | panic-path scan and dependency allowlist |
+| `bench check-corpus` | benchmark corpus structure and judges |
+| `smoke replay` | deterministic recorded-fixture replay |
+| `quiet test` | fmt, clippy, and workspace tests |
+| `quiet verify` | all deterministic gates in sequence |
 
-## Evidence Bundles
-
-`proof collect` is not a pass/fail gate. It captures bounded Markdown evidence
-for live and smoke runs without endpoint access:
-
-```sh
-cargo run -p lkjagent-xtask -- proof collect --data data --out tmp/proof-current
-```
-
-The bundle contains store metadata, queue counts, artifact readiness rows,
-authority summaries, model-log file indexes, workspace file trees, word-count
-reports, and warnings. It does not copy SQLite files, model-log bodies,
-transcript bodies, or workspace file contents.
-
-## Compose Gates
+## Docker Gates
 
 ```sh
 docker compose run --rm verify
@@ -56,23 +35,12 @@ docker compose run --rm bench
 docker compose run --rm replay
 ```
 
-`verify` is the final gate. It builds the image from a clean context and runs
-quiet verify inside it; no source bind mounts, so the gate proves the
-repository as committed, not the working tree. `test`, `lint`, `bench`, and
-`replay` expose narrower Docker Compose gates for focused diagnosis. `replay`
-runs `smoke replay` and does not contact an endpoint. Service
-design is in [compose.md](compose.md). Any claim that a runtime behavior is
-implemented requires the final gate in the same handoff.
+`docker compose run --rm verify` is the final deterministic gate. It builds the
+image from the committed checkout and runs `quiet verify` without source bind
+mounts.
 
-Real benchmark scoring is not part of CI because it needs an endpoint. The
-operator command is documented in [../evaluation/running.md](../evaluation/running.md).
+## Claims
 
-## CI
-
-CI runs the final gate and nothing else, so local and CI verdicts cannot
-diverge. The workflow file lands with
-[../execution/tasks/compose-final-gate.md](../execution/tasks/compose-final-gate.md).
-
-## Status
-
-implemented.
+Any claim that runtime behavior is implemented names the focused test, quiet
+gate, and Docker gate that ran. Unavailable live endpoints are recorded as an
+honest skip, not a pass.
