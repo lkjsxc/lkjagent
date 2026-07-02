@@ -24,10 +24,7 @@ pub(crate) fn handle_fault(
     commands.push(Command::RecordAttempt(attempt));
     if snapshot.steps[index].attempts_used >= 3 {
         snapshot.steps[index].state = StepState::Blocked;
-        commands.push(Command::RecordEvent(Event {
-            kind: EventKind::StepBlocked,
-            content: diagnosis,
-        }));
+        record_event(commands, EventKind::StepBlocked, diagnosis);
     }
 }
 
@@ -55,6 +52,7 @@ pub(crate) fn handle_model(
         ParsedOutput::Finish(summary) | ParsedOutput::Message(summary) => {
             finish_message(snapshot, commands, index, summary);
         }
+        ParsedOutput::Question(question) => wait_for_answer(snapshot, commands, index, question),
         ParsedOutput::Verdict(result) => finish_verdict(snapshot, commands, index, result),
     }
 }
@@ -79,10 +77,11 @@ pub(crate) fn handle_checks(
     commands.push(Command::RecordChecks(results));
     if passed {
         snapshot.steps[index].state = StepState::Done;
-        commands.push(Command::RecordEvent(Event {
-            kind: EventKind::StepDone,
-            content: snapshot.steps[index].title.clone(),
-        }));
+        record_event(
+            commands,
+            EventKind::StepDone,
+            snapshot.steps[index].title.clone(),
+        );
     } else {
         snapshot.steps[index].attempts_used += 1;
     }
@@ -92,10 +91,11 @@ pub(crate) fn close_task(snapshot: &mut TaskSnapshot, commands: &mut Vec<Command
     let passed = snapshot.check_results.iter().all(|result| result.passed);
     if passed {
         snapshot.task.state = TaskState::Closed;
-        commands.push(Command::RecordEvent(Event {
-            kind: EventKind::TaskClosed,
-            content: snapshot.task.summary.clone(),
-        }));
+        record_event(
+            commands,
+            EventKind::TaskClosed,
+            snapshot.task.summary.clone(),
+        );
     } else {
         block_task(snapshot, commands, "task checks failed");
     }
@@ -104,10 +104,7 @@ pub(crate) fn close_task(snapshot: &mut TaskSnapshot, commands: &mut Vec<Command
 pub(crate) fn block_task(snapshot: &mut TaskSnapshot, commands: &mut Vec<Command>, reason: &str) {
     snapshot.task.state = TaskState::Blocked;
     snapshot.task.summary = reason.to_string();
-    commands.push(Command::RecordEvent(Event {
-        kind: EventKind::TaskBlocked,
-        content: reason.to_string(),
-    }));
+    record_event(commands, EventKind::TaskBlocked, reason.to_string());
 }
 
 fn finish_content(step: &mut Step, commands: &mut Vec<Command>, content: String) {
@@ -118,10 +115,7 @@ fn finish_content(step: &mut Step, commands: &mut Vec<Command>, content: String)
         });
     }
     step.state = StepState::Done;
-    commands.push(Command::RecordEvent(Event {
-        kind: EventKind::StepDone,
-        content: step.title.clone(),
-    }));
+    record_event(commands, EventKind::StepDone, step.title.clone());
 }
 
 fn keep_exploring(step: &mut Step, commands: &mut Vec<Command>, action: Action) {
@@ -142,10 +136,18 @@ fn finish_message(
 ) {
     snapshot.steps[index].state = StepState::Done;
     snapshot.task.summary = summary.clone();
-    commands.push(Command::RecordEvent(Event {
-        kind: EventKind::StepDone,
-        content: summary,
-    }));
+    record_event(commands, EventKind::StepDone, summary);
+}
+
+fn wait_for_answer(
+    snapshot: &mut TaskSnapshot,
+    commands: &mut Vec<Command>,
+    index: usize,
+    question: String,
+) {
+    snapshot.task.state = TaskState::Waiting;
+    snapshot.steps[index].state = StepState::Active;
+    record_event(commands, EventKind::Question, question);
 }
 
 fn finish_verdict(
@@ -178,6 +180,10 @@ fn attempt(step: &Step, prompt: &Prompt, outcome: AttemptOutcome, diagnosis: &st
         tokens_in: 0,
         tokens_out: 0,
     }
+}
+
+fn record_event(commands: &mut Vec<Command>, kind: EventKind, content: String) {
+    commands.push(Command::RecordEvent(Event { kind, content }));
 }
 
 fn finish_plan(

@@ -7,6 +7,7 @@ pub enum ParsedOutput {
     Action(Action),
     Finish(String),
     Message(String),
+    Question(String),
     Verdict(CheckResult),
 }
 
@@ -45,7 +46,9 @@ pub enum ParseFault {
 pub fn parse_expected(kind: StepKind, raw: &str) -> Result<ParsedOutput, ParseFault> {
     match kind {
         StepKind::Write | StepKind::Revise => block(raw, "content").map(ParsedOutput::Content),
-        StepKind::Plan => parse_plan(&block(raw, "plan")?).map(ParsedOutput::Plan),
+        StepKind::Plan => {
+            crate::parse_plan::parse_plan(&block(raw, "plan")?).map(ParsedOutput::Plan)
+        }
         StepKind::Explore => parse_explore(raw),
         StepKind::Respond | StepKind::Ask => block(raw, "message").map(ParsedOutput::Message),
         StepKind::Verify => parse_verdict(&block(raw, "verdict")?).map(ParsedOutput::Verdict),
@@ -73,6 +76,9 @@ pub fn block(raw: &str, tag: &str) -> Result<String, ParseFault> {
 fn parse_explore(raw: &str) -> Result<ParsedOutput, ParseFault> {
     if raw.trim().starts_with("<finish>") {
         return block(raw, "finish").map(ParsedOutput::Finish);
+    }
+    if raw.trim().starts_with("<ask>") {
+        return block(raw, "ask").map(ParsedOutput::Question);
     }
     let body = block(raw, "action")?;
     let tool = tag_value(&body, "tool").ok_or(ParseFault::BadParams)?;
@@ -118,52 +124,6 @@ fn tag_value(body: &str, tag: &str) -> Option<String> {
         .map(|(_, value)| value)
 }
 
-pub fn parse_plan(body: &str) -> Result<Vec<PlanLine>, ParseFault> {
-    body.lines()
-        .filter(|line| !line.trim().is_empty())
-        .map(parse_plan_line)
-        .collect()
-}
-
-fn parse_plan_line(line: &str) -> Result<PlanLine, ParseFault> {
-    let parts = line.split(" | ").collect::<Vec<_>>();
-    match parts.as_slice() {
-        [left, title, words] if left.starts_with("write ") => {
-            let path = left.trim_start_matches("write ").to_string();
-            let Some(number) = words.strip_prefix("words=") else {
-                return Err(ParseFault::BadPlanLine(line.to_string()));
-            };
-            if path.starts_with('/') || path.contains("..") {
-                return Err(ParseFault::BadPlanLine(line.to_string()));
-            }
-            let Ok(words) = number.parse::<usize>() else {
-                return Err(ParseFault::BadPlanLine(line.to_string()));
-            };
-            Ok(PlanLine::Write {
-                path,
-                title: (*title).to_string(),
-                words,
-            })
-        }
-        ["explore", goal, budget] => {
-            let Some(number) = budget.strip_prefix("budget=") else {
-                return Err(ParseFault::BadPlanLine(line.to_string()));
-            };
-            let Ok(budget) = number.parse::<u32>() else {
-                return Err(ParseFault::BadPlanLine(line.to_string()));
-            };
-            Ok(PlanLine::Explore {
-                goal: (*goal).to_string(),
-                budget,
-            })
-        }
-        ["respond", summary] => Ok(PlanLine::Respond {
-            summary: (*summary).to_string(),
-        }),
-        _ => Err(ParseFault::BadPlanLine(line.to_string())),
-    }
-}
-
 fn parse_verdict(body: &str) -> Result<CheckResult, ParseFault> {
     let mut lines = body.lines();
     let Some(first) = lines.next().map(str::trim) else {
@@ -183,17 +143,17 @@ fn parse_verdict(body: &str) -> Result<CheckResult, ParseFault> {
 }
 
 fn legal_tool(tool: &str) -> bool {
-    matches!(
-        tool,
-        "fs.read"
-            | "fs.list"
-            | "fs.tree"
-            | "fs.search"
-            | "fs.write"
-            | "shell.run"
-            | "memory.find"
-            | "memory.save"
-            | "plan.note"
-            | "finish"
-    )
+    const TOOLS: &[&str] = &[
+        "fs.read",
+        "fs.list",
+        "fs.tree",
+        "fs.search",
+        "fs.write",
+        "shell.run",
+        "memory.find",
+        "memory.save",
+        "plan.note",
+        "finish",
+    ];
+    TOOLS.contains(&tool)
 }
