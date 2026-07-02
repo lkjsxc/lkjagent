@@ -2,11 +2,12 @@
 
 ## Purpose
 
-This crate owns SQLite queue, event, memory, and state code.
-Doc contract: [../../docs/architecture/memory/README.md](../../docs/architecture/memory/README.md).
+SQLite persistence crate for lkjagent. The plan-store modules implement the
+current ten-table contract while existing modules keep compiling until cutover.
+
+Doc contract: ../../docs/store/README.md
 
 ## Table of Contents
 
-- [Cargo.toml](Cargo.toml): package manifest.
-- [src/](src/README.md): source map.
-- [tests/](tests/README.md): SQLite store integration fixtures.
+- [src/](src/README.md): source modules.
+- [tests/](tests/README.md): integration tests.

@@ -10,9 +10,12 @@ only when code, focused tests, quiet gates, and required Docker gates prove it.
 
 The documentation contract now specifies the plan-driven step engine. The pure
 `lkjagent-core` crate exists with model, parser, renderer, checks, word
-counting, classification, and the `next_work` / `apply_turn` seam. The store,
-effects layer, rich templates, and app binary are not yet built. The existing
-runtime, graph, tools, CLI, benchmark, and store crates remain until cutover.
+counting, classification, and the `next_work` / `apply_turn` seam. The
+`lkjagent-store` crate now also has plan-store modules for the ten-table schema,
+queue intake, task and step writes, turn transactions, config heartbeat values,
+and orphan exchange detection. The effects layer, rich templates, and app
+binary are not yet built. The existing runtime, graph, tools, CLI, benchmark,
+and store modules remain until cutover.
 
 The target product is one daemon, one owner queue, one SQLite store, one local
 LLM endpoint, and one deterministic plan ledger. The harness owns control flow;
@@ -32,9 +35,11 @@ never a model assertion.
 
 ## Implemented Code Still Present
 
-`crates/lkjagent-core/` is the first target crate. Its tests cover envelope
-parsing, word counting, prompt fingerprint variation, and a generic task flow
-that reaches `closed` after injected parse faults.
+`crates/lkjagent-core/` tests cover envelope parsing, word counting, prompt
+fingerprint variation, and a generic task flow that reaches `closed` after
+injected parse faults. `crates/lkjagent-store/` tests cover the fresh schema,
+FIFO delivery, waiting-answer routing, turn transaction rollback, and orphan
+exchange detection.
 
 The current Rust workspace still includes the existing parser, protocol
 registry, graph, context, store, LLM client, tools, runtime, CLI, benchmark, and
@@ -55,8 +60,7 @@ Stage 0 baseline evidence is recorded under
 
 ## Open Work
 
-- Store schema, effects layer, rich templates, and app binary are not yet
-  implemented.
+- Effects layer, rich templates, and app binary are not yet implemented.
 - The benchmark corpus and replay smoke still exercise the existing runtime.
 - The Aurora Ledger live proof remains open until the daemon produces ten
   requested chapter files totaling at least 10,000 measured manuscript words and
