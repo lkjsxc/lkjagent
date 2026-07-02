@@ -19,7 +19,7 @@ asks, deterministic effects, and engine-computed completion checks.
 3. Docs use ASCII prose, kebab-case filenames, one H1, then a Purpose section.
 4. Every docs directory has one README table of contents and at least two
    children.
-5. No release shorthand, version words, or compatibility framing.
+5. No release shorthand, release labels, or migration framing.
 6. Functional style: pure core, effects at the edges, no panic paths in product
    crates.
 7. Honest state only: no fake success, placeholders, mocks as product behavior,

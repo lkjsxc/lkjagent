@@ -21,8 +21,8 @@ number      = 1*DIGIT
 text-char   = any non-LF character except "|"
 ```
 
-The grammar version key is `protocol.plan-line.grammar-id=plain-pipe`.
-The maximum materialized steps are capped by `engine.plan.max-steps=80`.
+The grammar id key is `protocol.plan-line.grammar-id=plain-pipe`. The maximum
+materialized steps are capped by `engine.plan.max-steps=80`.
 
 ## Valid Examples
 

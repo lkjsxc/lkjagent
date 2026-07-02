@@ -6,8 +6,8 @@ Record the decision to model personal records as workspace files.
 
 ## Context
 
-Journal, schedule, and todo work needs durable output but not dedicated tables or
-tools.
+Journal, schedule, and task-list work needs durable output but not dedicated
+tables or tools.
 
 ## Decision
 

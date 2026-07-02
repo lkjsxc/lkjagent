@@ -8,8 +8,7 @@ Define the Rust style contract for pure cores and effect adapters.
 
 - Business logic is pure functions over plain data.
 - Effects are returned as values or interpreted by adapters at crate edges.
-- Product crates contain no `unwrap`, `expect`, `panic`, `todo`, or
-  `unimplemented` paths.
+- Product crates contain no panic paths or placeholder macros.
 - Illegal states are represented with enums and validated constructors.
 - Plain structs and free functions beat trait hierarchies unless a seam is
   needed for real tests.

@@ -5,6 +5,7 @@ pub fn check_markdown_basics(files: &[RepoFile]) -> Vec<Violation> {
     for file in files
         .iter()
         .filter(|file| file.path.ends_with(".md"))
+        .filter(|file| is_checked_markdown(&file.path))
         .filter(|file| !is_runtime_output(file))
     {
         violations.extend(check_shape(file));
@@ -14,6 +15,10 @@ pub fn check_markdown_basics(files: &[RepoFile]) -> Vec<Violation> {
         violations.extend(check_status_section(file));
     }
     violations
+}
+
+fn is_checked_markdown(path: &str) -> bool {
+    path.starts_with("docs/") || matches!(path, "README.md" | "AGENTS.md")
 }
 
 fn is_runtime_output(file: &RepoFile) -> bool {

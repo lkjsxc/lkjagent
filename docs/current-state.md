@@ -8,8 +8,8 @@ only when code, focused tests, quiet gates, and required Docker gates prove it.
 
 ## Summary
 
-The documentation contract is being rewritten to a plan-driven step engine.
-The engine is not yet built. The repository still contains the existing runtime,
+The documentation contract now specifies the plan-driven step engine. The
+engine is not yet built. The repository still contains the existing runtime,
 graph, tools, CLI, benchmark, and store implementation until the cutover task
 removes them.
 
@@ -25,8 +25,9 @@ never a model assertion.
 - The product pages define daemon lifecycle, queue semantics, CLI commands,
   status output, and console surfaces.
 - Engine, context, protocol, tools, checks, memory, store, LLM, operations,
-  evaluation, repository, agent, and decision pages land during the current
-  documentation stage.
+  evaluation, repository, agent, and decision pages specify the target tree.
+- The docs gate is retargeted to README topology, link resolution, format bans,
+  `check-files`, and the docs file-count budget.
 
 ## Implemented Code Still Present
 
@@ -51,9 +52,7 @@ Stage 0 baseline evidence is recorded under
 
 - The plan-driven engine, store schema, effects layer, templates, and app binary
   are not yet implemented.
-- The documentation gate still accepts the pre-cutover tree until the docs gate
-  retarget task lands.
-- The benchmark corpus and replay smoke still exercise the pre-cutover runtime.
+- The benchmark corpus and replay smoke still exercise the existing runtime.
 - The Aurora Ledger live proof remains open until the daemon produces ten
   requested chapter files totaling at least 10,000 measured manuscript words and
   closes the task through engine-computed checks, or records an honest blocked

@@ -23,8 +23,8 @@ is reachable from [../README.md](../README.md) within
 ## Content Rules
 
 State the current contract directly. Do not preserve reference copies, history
-narration, release shorthand, compatibility framing, TODO markers, or dead
-links. Examples must be real paths, commands, fixtures, or protocol blocks.
+narration, release shorthand, migration framing, open markers, or dead links.
+Examples must be real paths, commands, fixtures, or protocol blocks.
 
 ## Ownership
 

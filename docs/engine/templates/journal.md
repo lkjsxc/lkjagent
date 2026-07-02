@@ -6,15 +6,15 @@ Define personal record tasks as plain workspace file writes.
 
 ## Selection
 
-The classifier selects this template for journal, schedule, todo, and similar
-personal-record objectives.
+The classifier selects this template for journal, schedule, task-list, and
+similar personal-record objectives.
 
 ## Plan
 
 - Journal entries append to `journal/<date>.md` using
   `template.journal.date-source=local-clock`.
 - Schedule entries write under `schedule/` when the objective names dates.
-- Todo entries write under `todos/` as Markdown.
+- Task-list entries write under `todos/` as Markdown.
 - Substantial entries may create a memory row capped by
   `memory.distill.words=120` after the respond step.
 
