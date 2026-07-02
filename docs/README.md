@@ -1,37 +1,29 @@
-# lkjagent Documentation
+# Documentation
 
 ## Purpose
 
-This tree is the implementation contract for lkjagent. Code follows docs.
-Start with [current-state.md](current-state.md), then follow the README for the
-area being changed. Navigation uses README, catalog, relation, and fan-out
-contracts. Machine-readable coverage lives in
-[_meta/catalog/](./_meta/catalog/README.md); README files are for human and LLM
-navigation.
+Map the lkjagent contract. Read these directories in order when changing the
+product.
 
-## Table of Contents
+## Read Order
 
-- [current-state.md](current-state.md): honest ledger of implemented behavior, partial behavior, and open evidence.
-- [vision/](vision/README.md): north star, principles, and scope boundaries.
-- [product/](product/README.md): observable behavior of the daemon, CLI, and queue.
-- [state/](state/README.md): hard state, weighted tracks, transitions, and guards.
-- [prompting/](prompting/README.md): state-derived prompt frames and prompt modes.
-- [documentation-system/](documentation-system/README.md): documentation contracts, growth, and audits.
-- [model-interface/](model-interface/README.md): provider-neutral model boundary and terms.
-- [implementation/](implementation/README.md): Rust substrate and functional core boundary.
-- [relations/](relations/README.md): cross-topic relation pages.
-- [maintenance/](maintenance/README.md): structural health, bias, commonality, and no-op policy.
-- [verification/](verification/README.md): semantic gates and regression fixture contracts.
-- [regressions/](regressions/README.md): owner-reported failure fixtures.
-- [architecture/](architecture/README.md): runtime, graph, context, protocol, tools, memory, LLM, and sandbox contracts.
-- [evaluation/](evaluation/README.md): mechanical benchmark tasks, judges, reports, and improvement loop.
-- [decisions/](decisions/README.md): durable decision records with rejected directions.
-- [repository/](repository/README.md): layout, line limits, doc standards, style, commits, workflow.
-- [operations/](operations/README.md): verification gates, Compose design, and running the harness.
-- [agent/](agent/README.md): manual for the coding agents that build lkjagent.
-- [execution/](execution/README.md): operating rules, blocker queue, and executable tasks.
-- [_meta/](_meta/README.md): catalog, graph rules, and observed documentation audit notes.
-
-## Checks
-
-- `cargo run -p lkjagent-xtask -- check-docs`
+1. [current-state.md](current-state.md): what is specified, implemented, and
+   open now.
+2. [vision/](vision/README.md): mission, invariants, and scope.
+3. [product/](product/README.md): daemon lifecycle, queue, CLI, status, and
+   console.
+4. [engine/](engine/README.md): task model, steps, turn cycle, retries, and
+   completion.
+5. [context/](context/README.md): prompt assembly, budgets, and task briefs.
+6. [protocol/](protocol/README.md): model output envelopes and faults.
+7. [tools/](tools/README.md): explore tools, observations, and guards.
+8. [checks/](checks/README.md): deterministic checks and word counting.
+9. [memory/](memory/README.md): memory rows and retrieval.
+10. [store/](store/README.md): SQLite schema, exchange logs, crash resume.
+11. [llm/](llm/README.md): endpoint client, sampling, and generation budgets.
+12. [operations/](operations/README.md): running, verification, and proof bundles.
+13. [evaluation/](evaluation/README.md): benchmarks, replay, and live proof.
+14. [repository/](repository/README.md): layout, file limits, docs rules, style,
+    and commits.
+15. [agent/](agent/README.md): instructions for coding agents.
+16. [decisions/](decisions/README.md): recorded design decisions.

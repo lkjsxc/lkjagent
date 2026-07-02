@@ -2,106 +2,47 @@
 
 ## Purpose
 
-lkjagent is a graph-governed, continuously running agent operating system
-for a weak local LLM. One daemon owns one agent loop. A persistent queue
-feeds it user messages. The runtime creates durable task cases, routes them
-through a typed state-transition graph, renders graph-selected context, acts
-through a small fixed toolset, and improves graph policy plus memory while
-idle.
+lkjagent is a continuously running personal agent for one owner, one local LLM,
+one workspace, and one SQLite store. The daemon turns owner messages into typed
+plans, executes steps, verifies results with deterministic checks, and reports
+honestly.
 
-This repository is read and written by LLM agents. The documentation tree
-under [docs/](docs/README.md) is the implementation contract: code follows docs.
+## Product Shape
 
-## Shape
+- The harness owns control flow, retries, paths, and completion checks.
+- The model authors bounded content inside a step-specific envelope.
+- Long artifacts are first-class: manuscripts, document trees, reports, and
+  other structured outputs.
+- The daemon runs inside Docker Compose; the container boundary is the safety
+  model.
 
-- Rust cargo workspace of small focused crates; functional core, effects at the edges.
-- Runs entirely inside a container; the host only runs docker compose.
-- YOLO only: no permission prompts; the sandbox boundary is the safety model.
-- Local model budget: about 16 GB of memory and a 32k token context window.
-- Append-only context with graph-aware compaction keeps the endpoint prefix cache hot.
-- The model speaks a tag-based action protocol, never JSON.
-- A typed state graph governs planning, context, evidence, recovery, and completion.
-- No MCP, no sub-agents, no plan mode, no web UI.
+## Common Commands
 
-## Status
+```sh
+cargo run -p lkjagent-app -- run
+cargo run -p lkjagent-app -- send "Create a document tree about ..."
+cargo run -p lkjagent-app -- status
+cargo run -p lkjagent-app -- task list
+cargo run -p lkjagent-app -- log --limit 20
+docker compose run --rm verify
+```
 
-The Cargo workspace, local verification gates, benchmark corpus, action
-parser, graph core, context engine, container wiring, resident daemon, tool
-loop, and queue intake are implemented.
-
-- [docs/current-state.md](docs/current-state.md) is the honest status ledger.
-- [docs/execution/current-blockers.md](docs/execution/current-blockers.md) is the implementation queue.
+During the staged cutover, some commands are still served by the existing
+workspace binary. [docs/current-state.md](docs/current-state.md) is the ledger
+for what is implemented now.
 
 ## Read Order
 
 1. [docs/current-state.md](docs/current-state.md)
-2. [docs/README.md](docs/README.md)
-3. [AGENTS.md](AGENTS.md) for automated coding agents
-4. The README of the area being changed
+2. [docs/vision/README.md](docs/vision/README.md)
+3. [docs/product/README.md](docs/product/README.md)
+4. [docs/agent/README.md](docs/agent/README.md)
+5. [docs/operations/verification.md](docs/operations/verification.md)
 
-## Repository Map
+## Repository Rules
 
-| Path | Role |
-| --- | --- |
-| [docs/](docs/README.md) | Implementation contract (canonical) |
-| [AGENTS.md](AGENTS.md) | Entry point for automated coding agents |
-| crates/ | Rust workspace; see [docs/repository/layout.md](docs/repository/layout.md) |
-| [LICENSE](LICENSE) | Apache License 2.0 |
-
-## Operation Design
-
-The harness is operated through one binary inside the container:
-
-```sh
-lkjagent run            # start the daemon (single agent loop)
-lkjagent send "text"    # enqueue a user message
-lkjagent status         # daemon state, queue depth, context usage
-lkjagent log            # tail recent transcript events
-```
-
-For a fresh Docker trial, start the daemon and then send work. The workspace is
-empty until the first task writes files.
-
-```sh
-rm -rf data
-mkdir -p data
-docker compose up -d --build agent
-docker compose run --rm agent status
-docker compose run --rm agent send "Create hello.md with a short hello."
-docker compose run --rm agent log
-find data/workspace -maxdepth 2 -type f -print
-```
-
-The full contract lives in [docs/product/cli/](docs/product/cli/README.md) and
-[docs/operations/running.md](docs/operations/running.md).
-
-## Verification Design
-
-Local gates are implemented in
-[docs/operations/verification.md](docs/operations/verification.md) and
-[crates/lkjagent-xtask/](crates/lkjagent-xtask/):
-
-```sh
-cargo run -p lkjagent-xtask -- check-docs    # doc shape, topology, links, banned tokens
-cargo run -p lkjagent-xtask -- check-lines   # 200-line cap on every file
-cargo run -p lkjagent-xtask -- check-style   # forbid panic paths in product crates
-cargo run -p lkjagent-xtask -- benchmark check-corpus
-cargo run -p lkjagent-xtask -- quiet verify  # all checks plus tests, prints: ok verify
-docker compose run --rm verify               # final gate, image build, no source mounts
-```
-
-## Evaluation Design
-
-The benchmark contract lives in [docs/evaluation/](docs/evaluation/README.md).
-The deterministic corpus runs without an endpoint:
-
-```sh
-cargo run -p lkjagent-xtask -- benchmark list
-cargo run -p lkjagent-xtask -- benchmark check-corpus
-```
-
-Real scoring is explicit and requires endpoint config:
-
-```sh
-cargo run -p lkjagent-xtask -- benchmark run --suite tiny --data data/benchmark
-```
+- Documentation is the implementation contract.
+- Every authored file stays at or below 200 lines.
+- Completion is checks-gated and engine-computed.
+- No fake success, placeholders, or unrun verification claims.
+- Commit small slices with honest `Tested` and `Not-tested` trailers.
