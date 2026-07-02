@@ -1,15 +1,19 @@
 use std::collections::BTreeSet;
 
+use crate::doc_reachability::check_reachability;
 use crate::model::{RepoFile, Violation};
+
+const DOC_FILE_LIMIT: usize = 90;
 
 pub fn check_doc_topology(files: &[RepoFile]) -> Vec<Violation> {
     let mut violations = Vec::new();
     let dirs = docs_dirs(files);
     for dir in &dirs {
-        violations.extend(check_markdown_suffix_dir(dir));
         violations.extend(check_dir(files, dir));
     }
     violations.extend(check_path_hygiene(files));
+    violations.extend(check_doc_file_budget(files));
+    violations.extend(check_reachability(files));
     violations
 }
 
@@ -31,22 +35,6 @@ fn docs_dirs(files: &[RepoFile]) -> BTreeSet<String> {
         }
     }
     dirs
-}
-
-fn check_markdown_suffix_dir(dir: &str) -> Vec<Violation> {
-    if dir
-        .rsplit('/')
-        .next()
-        .is_some_and(|name| name.ends_with(".md"))
-    {
-        vec![Violation::new(
-            dir,
-            "readme topology",
-            "directory name must not end with .md",
-        )]
-    } else {
-        Vec::new()
-    }
 }
 
 fn check_dir(files: &[RepoFile], dir: &str) -> Vec<Violation> {
@@ -104,44 +92,55 @@ fn immediate_children(files: &[RepoFile], dir: &str) -> BTreeSet<String> {
 }
 
 fn readme_links_child(text: &str, child: &str) -> bool {
-    if child.contains('.') {
+    if child.ends_with(".md") {
         text.contains(&format!("({child})"))
     } else {
-        text.contains(&format!("({child}/README.md)"))
+        text.contains(&format!("({child}/)")) || text.contains(&format!("({child}/README.md)"))
     }
 }
 
 fn check_path_hygiene(files: &[RepoFile]) -> Vec<Violation> {
     let mut violations = Vec::new();
     for file in files.iter().filter(|file| file.path.starts_with("docs/")) {
-        if file.path.contains(' ') {
-            violations.push(Violation::new(
-                &file.path,
-                "doc path",
-                "documentation paths must not contain spaces",
-            ));
-        }
-        if file.path.contains("mincraft") {
-            violations.push(Violation::new(
-                &file.path,
-                "doc path",
-                "use 'minecraft' for the domain name",
-            ));
-        }
-        if file.path.contains("-md-") {
-            violations.push(Violation::new(
-                &file.path,
-                "doc path",
-                "remove generated '-md-' path fragments",
-            ));
-        }
-        if let Some(segment) = file.path.split('/').find(|segment| segment.len() > 80) {
-            violations.push(Violation::new(
-                &file.path,
-                "doc path",
-                format!("path segment '{segment}' is too long"),
-            ));
+        for segment in file.path.split('/').skip(1) {
+            if segment == "README.md" {
+                continue;
+            }
+            let stem = segment.strip_suffix(".md").unwrap_or(segment);
+            if !is_kebab(stem) {
+                violations.push(Violation::new(
+                    &file.path,
+                    "doc path",
+                    format!("segment '{segment}' must be kebab-case"),
+                ));
+            }
         }
     }
     violations
+}
+
+fn is_kebab(value: &str) -> bool {
+    !value.is_empty()
+        && value
+            .chars()
+            .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+        && !value.contains("--")
+        && !value.starts_with('-')
+        && !value.ends_with('-')
+}
+
+fn check_doc_file_budget(files: &[RepoFile]) -> Vec<Violation> {
+    let count = files
+        .iter()
+        .filter(|file| file.path.starts_with("docs/") && file.path.ends_with(".md"))
+        .count();
+    if count > DOC_FILE_LIMIT {
+        vec![Violation::new(
+            "docs",
+            "doc file budget",
+            format!("has {count} markdown files, limit is {DOC_FILE_LIMIT}"),
+        )]
+    } else {
+        Vec::new()
+    }
 }

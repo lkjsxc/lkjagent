@@ -3,10 +3,12 @@ pub mod doc_catalog;
 pub mod doc_common;
 pub mod doc_crate_readmes;
 pub mod doc_links;
+pub mod doc_reachability;
 pub mod doc_special;
 pub mod doc_topology;
 pub mod docs;
 pub mod facts;
+pub mod file_counts;
 pub mod lines;
 pub mod model;
 pub mod proof;
@@ -19,6 +21,7 @@ use std::path::Path;
 
 use docs::check_docs;
 use facts::collect_files;
+use file_counts::check_files;
 use lines::check_lines;
 use lkjagent_benchmark::check_corpus;
 use runner::run_quiet_test;
@@ -28,6 +31,7 @@ pub fn run(args: &[String], root: &Path) -> i32 {
     match parse_gate(args) {
         Ok(Gate::CheckDocs) => run_static_gate(root, "check-docs", check_docs),
         Ok(Gate::CheckLines) => run_static_gate(root, "check-lines", check_lines),
+        Ok(Gate::CheckFiles) => run_static_gate(root, "check-files", check_files),
         Ok(Gate::CheckStyle) => run_static_gate(root, "check-style", check_style),
         Ok(Gate::HygieneCheck) => run_hygiene(root),
         Ok(Gate::QuietTest) => run_command_gate(root, "test"),
@@ -109,6 +113,7 @@ fn run_verify(root: &Path) -> i32 {
             check_docs as fn(&[model::RepoFile]) -> Vec<model::Violation>,
         ),
         ("check-lines", check_lines),
+        ("check-files", check_files),
         ("check-style", check_style),
     ] {
         let violations = check(&files);
@@ -118,7 +123,7 @@ fn run_verify(root: &Path) -> i32 {
     }
     if let Err(error) = check_corpus() {
         print_failure(&[
-            "benchmark check-corpus failed".to_string(),
+            "bench check-corpus failed".to_string(),
             "exit status: 1".to_string(),
             error.to_string(),
         ]);
@@ -147,6 +152,7 @@ fn print_failure(lines: &[String]) {
 enum Gate {
     CheckDocs,
     CheckLines,
+    CheckFiles,
     CheckStyle,
     QuietTest,
     QuietVerify,
@@ -161,18 +167,21 @@ fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
     match args {
         [one] if one == "check-docs" || one == "docs-check" => Ok(Gate::CheckDocs),
         [one] if one == "check-lines" => Ok(Gate::CheckLines),
+        [one] if one == "check-files" => Ok(Gate::CheckFiles),
         [one] if one == "check-style" => Ok(Gate::CheckStyle),
         [one] if one == "hygiene-check" => Ok(Gate::HygieneCheck),
         [first, second] if first == "quiet" && second == "test" => Ok(Gate::QuietTest),
         [first, second] if first == "quiet" && second == "verify" => Ok(Gate::QuietVerify),
-        [first, rest @ ..] if first == "benchmark" => Ok(Gate::Benchmark(rest.to_vec())),
+        [first, rest @ ..] if first == "benchmark" || first == "bench" => {
+            Ok(Gate::Benchmark(rest.to_vec()))
+        }
         [first, rest @ ..] if first == "proof" => Ok(Gate::Proof(rest.to_vec())),
         [first, rest @ ..] if first == "smoke" => Ok(Gate::Smoke(rest.to_vec())),
         [first, rest @ ..] if first == "structure" => Ok(Gate::Structure(rest.to_vec())),
         _ => Err(vec![
             "xtask failed".to_string(),
             "exit status: 2".to_string(),
-            "use: check-docs | docs-check | check-lines | check-style | hygiene-check | quiet test | quiet verify | benchmark ... | proof ... | smoke ... | structure ..."
+            "use: check-docs | docs-check | check-lines | check-files | check-style | hygiene-check | quiet test | quiet verify | bench ... | proof ... | smoke ... | structure ..."
                 .to_string(),
         ]),
     }

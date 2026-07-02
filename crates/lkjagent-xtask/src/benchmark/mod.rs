@@ -43,12 +43,12 @@ fn list() -> i32 {
 fn check() -> i32 {
     match check_corpus() {
         Ok(()) => {
-            println!("ok benchmark-corpus");
+            println!("ok bench-corpus");
             0
         }
         Err(error) => {
             print_failure(&[
-                "benchmark check-corpus failed".to_string(),
+                "bench check-corpus failed".to_string(),
                 "exit status: 1".to_string(),
                 error.to_string(),
             ]);

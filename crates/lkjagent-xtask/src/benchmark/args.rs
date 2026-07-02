@@ -102,7 +102,7 @@ fn usage() -> Vec<String> {
     vec![
         "benchmark failed".to_string(),
         "exit status: 2".to_string(),
-        "use: benchmark list | benchmark check-corpus | benchmark judge --task <id> --workspace <dir> | benchmark run --suite <name> --data <dir> | benchmark compare <old> <new>"
+        "use: bench list | bench check-corpus | bench judge --task <id> --workspace <dir> | bench run --suite <name> --data <dir> | bench compare <old> <new>"
             .to_string(),
     ]
 }

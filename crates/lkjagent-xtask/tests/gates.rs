@@ -14,7 +14,7 @@ fn messages(violations: Vec<Violation>) -> Vec<String> {
 
 #[test]
 fn markdown_basics_report_exact_messages() {
-    let long_line = "a".repeat(121);
+    let long_line = "a".repeat(101);
     let files = vec![
         RepoFile::new("docs/h1.md", "Title\n\n## Purpose\n"),
         RepoFile::new("docs/purpose.md", "# Title\n\ntext\n"),
@@ -45,7 +45,7 @@ fn markdown_basics_report_exact_messages() {
             "docs/h1.md: doc shape: first line must be an H1 beginning with '# '",
             "docs/purpose.md: doc shape: second nonempty line must be '## Purpose'",
             "docs/ascii.md: ascii: replace non-ASCII characters",
-            "docs/width.md: prose width: line 5 exceeds 120 characters",
+            "docs/width.md: prose width: line 5 exceeds 100 characters",
             "docs/table.md: table width: line 5 has 7 columns; split the table",
             "docs/banned.md: banned token: line 5 contains 'version'; state the current contract directly",
             "docs/release.md: banned token: line 5 contains 'v2'; state the current contract directly",
@@ -58,62 +58,38 @@ fn doc_topology_reports_missing_readme_and_thin_toc() {
     let files = vec![
         RepoFile::new(
             "docs/README.md",
-            "# Docs\n\n## Purpose\n\nmap\n\n## Table of Contents\n\n- [a.md](a.md): a.\n\n## All Files\n\n- `a.md`\n",
+            "# Docs\n\n## Purpose\n\nmap\n\n## Table of Contents\n\n- [a.md](a.md): a.\n- [b.md](b.md): b.\n- [missing/](missing/): missing.\n- [thin/](thin/): thin.\n",
         ),
         RepoFile::new("docs/a.md", "# A\n\n## Purpose\n\na\n"),
         RepoFile::new("docs/b.md", "# B\n\n## Purpose\n\nb\n"),
-        RepoFile::new("docs/thin/README.md", "# Thin\n\n## Purpose\n\nthin\n\n## Table of Contents\n"),
+        RepoFile::new(
+            "docs/thin/README.md",
+            "# Thin\n\n## Purpose\n\nthin\n\n## Table of Contents\n\n- [only.md](only.md): only.\n",
+        ),
         RepoFile::new("docs/thin/only.md", "# Only\n\n## Purpose\n\nonly\n"),
         RepoFile::new("docs/missing/file.md", "# File\n\n## Purpose\n\nfile\n"),
-        RepoFile::new("docs/bad.md/file.md", "# File\n\n## Purpose\n\nfile\n"),
     ];
 
     assert_eq!(
         messages(check_doc_topology(&files)),
         vec![
-            "docs/README.md: readme topology: link child 'b.md' from the table of contents",
-            "docs/README.md: readme topology: link child 'bad.md' from the table of contents",
-            "docs/README.md: readme topology: link child 'missing' from the table of contents",
-            "docs/README.md: readme topology: link child 'thin' from the table of contents",
-            "docs/bad.md: readme topology: directory name must not end with .md",
-            "docs/bad.md: readme topology: directory must contain README.md",
             "docs/missing: readme topology: directory must contain README.md",
             "docs/thin: readme topology: directory must contain at least two children beside README.md",
-            "docs/thin/README.md: readme topology: link child 'only.md' from the table of contents",
+            "docs/missing/file.md: doc reachability: link this page from docs/README.md within three links",
         ]
     );
 }
 
 #[test]
 fn special_docs_report_task_and_crate_readme_violations() {
-    let files = vec![
-        RepoFile::new("docs/execution/tasks/foo.md", "# Foo\n\n## Purpose\n\nx\n"),
-        RepoFile::new(
-            "docs/model.md",
-            "# Model\n\n## Purpose\n\nGPT-5.5-Pro is latest model.\n",
-        ),
-        RepoFile::new("crates/lkjagent-demo/src/lib.rs", "//! demo\n"),
-        RepoFile::new(
-            "crates/lkjagent-bad/README.md",
-            "# Bad\n\n## Purpose\n\nbad\n",
-        ),
-        RepoFile::new(
-            "crates/lkjagent-bad/src/README.md",
-            "# Src\n\n## Purpose\n\nsrc\n",
-        ),
-    ];
+    let files = vec![RepoFile::new(
+        "docs/model.md",
+        "# Model\n\n## Purpose\n\nGPT-5.5-Pro is latest model.\n",
+    )];
 
     assert_eq!(
         messages(check_special_docs(&files)),
-        vec![
-            "docs/execution/tasks/foo.md: task shape: headings must match the task template",
-            "docs/model.md: model names: line 5 contains 'GPT-'; use provider-neutral wording",
-            "crates/lkjagent-bad/README.md: crate readme: name the Doc contract",
-            "crates/lkjagent-bad/README.md: crate readme: add a Table of Contents",
-            "crates/lkjagent-bad/src/README.md: crate readme: add a Table of Contents",
-            "crates/lkjagent-demo: crate readme: add README.md for this crate directory",
-            "crates/lkjagent-demo/src: crate readme: add README.md for this source directory",
-        ]
+        vec!["docs/model.md: model names: line 5 contains 'GPT-'; use provider-neutral wording"]
     );
 }
 

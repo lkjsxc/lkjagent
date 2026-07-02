@@ -54,11 +54,7 @@ fn markdown_links(text: &str) -> Vec<String> {
 }
 
 fn skip_target(target: &str) -> bool {
-    target.is_empty()
-        || target.starts_with('#')
-        || target.starts_with("http://")
-        || target.starts_with("https://")
-        || target.starts_with("mailto:")
+    target.is_empty() || target.starts_with('#') || target.starts_with("mailto:")
 }
 
 fn resolve_link(path: &str, target: &str) -> Option<String> {
@@ -66,10 +62,11 @@ fn resolve_link(path: &str, target: &str) -> Option<String> {
     if target.is_empty() {
         return Some(path.to_string());
     }
+    if target.starts_with('/') || target.starts_with("http://") || target.starts_with("https://") {
+        return None;
+    }
     let base = path.rsplit_once('/').map_or("", |(dir, _)| dir);
-    let combined = if target.starts_with('/') {
-        target.trim_start_matches('/').to_string()
-    } else if base.is_empty() {
+    let combined = if base.is_empty() {
         target.to_string()
     } else {
         format!("{base}/{target}")
