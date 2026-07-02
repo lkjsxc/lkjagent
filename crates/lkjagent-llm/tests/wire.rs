@@ -1,5 +1,5 @@
-use lkjagent_context::model::{Message, Role};
 use lkjagent_llm::closure::ClosureMode;
+use lkjagent_llm::message::{Message, Role};
 use lkjagent_llm::wire::{
     build_request, decode_completion, CallSpec, FinishReason, ProviderAnomalyKind, MAX_TOKENS,
 };

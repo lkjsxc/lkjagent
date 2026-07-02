@@ -2,8 +2,7 @@
 
 ## Purpose
 
-Map lkjagent-store source modules. Existing runtime modules remain until the
-cutover task removes them.
+Map lkjagent-store source modules.
 
 ## Table of Contents
 

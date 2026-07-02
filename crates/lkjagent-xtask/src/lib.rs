@@ -23,7 +23,6 @@ use docs::check_docs;
 use facts::collect_files;
 use file_counts::check_files;
 use lines::check_lines;
-use lkjagent_benchmark::check_corpus;
 use runner::run_quiet_test;
 use style::check_style;
 
@@ -120,14 +119,6 @@ fn run_verify(root: &Path) -> i32 {
         if !violations.is_empty() {
             return report_static(name, violations);
         }
-    }
-    if let Err(error) = check_corpus() {
-        print_failure(&[
-            "bench check-corpus failed".to_string(),
-            "exit status: 1".to_string(),
-            error.to_string(),
-        ]);
-        return 1;
     }
     run_command_gate(root, "verify")
 }

@@ -2,7 +2,7 @@ mod metrics;
 mod response;
 mod spec;
 
-use lkjagent_context::model::{Message, Role};
+use crate::message::{Message, Role};
 use serde::Serialize;
 use serde_json::Value;
 

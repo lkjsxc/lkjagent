@@ -2,8 +2,7 @@
 
 ## Purpose
 
-SQLite persistence crate for lkjagent. The plan-store modules implement the
-current ten-table contract while existing modules keep compiling until cutover.
+SQLite persistence crate for the plan-driven lkjagent store.
 
 Doc contract: ../../docs/store/README.md
 

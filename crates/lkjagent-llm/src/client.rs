@@ -1,11 +1,11 @@
 use std::time::Duration;
 
-use lkjagent_context::model::Message;
 use reqwest::blocking::Client;
 use reqwest::header::CONTENT_TYPE;
 
 use crate::backoff::delay_for_attempt;
 use crate::error::{ClientError, ClientResult, EndpointFailure};
+use crate::message::Message;
 use crate::wire::{
     build_request, decode_completion, CallSpec, Completion, FinishReason, MAX_TOKENS,
 };

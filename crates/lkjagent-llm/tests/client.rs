@@ -3,9 +3,9 @@ mod support;
 use std::net::TcpListener;
 use std::time::Duration;
 
-use lkjagent_context::model::{Message, Role};
 use lkjagent_llm::client::{complete, ClientConfig};
 use lkjagent_llm::error::{ClientError, EndpointFailure};
+use lkjagent_llm::message::{Message, Role};
 use lkjagent_llm::wire::CallSpec;
 use support::{serve_once, TestResult};
 

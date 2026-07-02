@@ -1,6 +1,6 @@
-use lkjagent_protocol::ACTION_CLOSE;
-
 use super::{TEMPERATURE, TOP_P};
+
+const ACTION_CLOSE: &str = "</action>";
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CallSpec {

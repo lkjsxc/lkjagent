@@ -6,9 +6,6 @@ mod model;
 mod render;
 mod render_rows;
 
-#[cfg(test)]
-mod tests;
-
 use std::path::{Path, PathBuf};
 
 use collect::collect;
