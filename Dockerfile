@@ -9,7 +9,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 RUN rustup component add rustfmt clippy
 COPY . .
-RUN cargo build --release -p lkjagent-cli
+RUN cargo build --release -p lkjagent-app
 
 FROM debian:bookworm-slim AS runtime
 

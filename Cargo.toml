@@ -1,17 +1,10 @@
 [workspace]
 members = [
     "crates/lkjagent-core",
+    "crates/lkjagent-store",
+    "crates/lkjagent-llm",
     "crates/lkjagent-effects",
     "crates/lkjagent-app",
-    "crates/lkjagent-cli",
-    "crates/lkjagent-benchmark",
-    "crates/lkjagent-context",
-    "crates/lkjagent-graph",
-    "crates/lkjagent-llm",
-    "crates/lkjagent-protocol",
-    "crates/lkjagent-runtime",
-    "crates/lkjagent-store",
-    "crates/lkjagent-tools",
     "crates/lkjagent-xtask",
 ]
 resolver = "3"
