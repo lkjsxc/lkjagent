@@ -2,65 +2,55 @@
 
 ## Purpose
 
-Describe the observable lifecycle of the lkjagent daemon: one long-lived
-process that never needs an attending human.
+Define how the lkjagent daemon lives, works, waits, and stops.
 
-## Behavior
+## Lifecycle
 
-The daemon starts with `lkjagent run` inside the container and keeps running
-until stopped. It owns the single agent loop described in
-[../architecture/runtime/agent-loop.md](../architecture/runtime/agent-loop.md).
+`lkjagent run` starts one foreground daemon for one data directory. The daemon
+opens the SQLite store, claims the process lock through heartbeat config rows,
+loads configuration, and enters the turn cycle.
 
-While running, the daemon cycles through four observable states:
+Each cycle has one active concern:
 
-| State | Meaning |
-| --- | --- |
-| idle | No task or maintenance cycle is open between loop ticks |
-| working | A task or maintenance cycle is open; the loop is taking turns |
-| waiting | The agent asked the owner a question and no later send has arrived |
-| error | The endpoint or loop failed; details are visible in status and log |
+1. deliver due owner messages;
+2. select the next work item from the current task snapshot;
+3. render at most one prompt;
+4. call the endpoint when the selected work needs model output;
+5. apply the deterministic effect;
+6. evaluate checks;
+7. persist the attempt, events, checks, and state update in one transaction.
 
-State transitions are driven only by the queue and the loop, never by
-timers visible to the owner. With an empty queue, the next idle boundary
-opens bounded self-maintenance. A new queue message preempts maintenance or
-pulls the daemon out of idle or waiting at the next turn boundary.
+At most one endpoint call happens in a cycle. Verify-only work consumes no
+model call.
 
-## Startup
+## Task States
 
-On startup the daemon opens the store, replays nothing, and rebuilds its
-context prefix from durable state: system prompt, graph state, memory digest,
-and the workspace brief. If a task was open when the process stopped, the
-task resumes from graph case state and evidence, not from a raw replay.
-Startup is specified in
-[../architecture/runtime/daemon-process.md](../architecture/runtime/daemon-process.md).
+- `open`: the task has runnable steps or pending completion checks.
+- `waiting`: the task asked the owner one concrete question and waits for the
+  answer.
+- `blocked`: the task exhausted its ladder or budget and wrote an evidence
+  report.
+- `closed`: all task-level checks passed and the completion summary was
+  recorded.
 
-## Shutdown
+`blocked` and `closed` are terminal. A later owner message starts a separate
+task unless it answers a waiting task.
 
-Stopping the container ends the process. In-flight endpoint calls are not
-drained by a custom signal handler. Queue rows, transcript events, memory,
-graph cases, evidence, memory, and workspace state are durable in data. A
-restarted daemon reclaims a stale lock after the heartbeat
-exceeds the configured stale window.
+## Idle
 
-## Failure
+No open task and no pending queue item means idle. Idle updates heartbeat data
+needed for lock reclaim and then sleeps on the queue poll interval. It does not
+call the endpoint, rewrite memory, inspect files, or self-assign work.
 
-If the endpoint is unreachable, the daemon records an error event, sets
-`daemon_state=error`, and tries again only after the capped retry deadline;
-polls before that deadline do not hit the endpoint or add more error events.
-It never fabricates a model reply. Parser, repeat-action, and tool failures
-stay inside the task: the daemon records the failure and adds a recovery
-notice for the next model turn. Consecutive failures of the same class route
-to graph recovery nodes that inspect state, narrow scope, use alternate
-native tools, replan, or use shell only when graph policy admits it.
-Task budget exhaustion records a continuation checkpoint, refreshes runtime
-authority, opens the next epoch, and continues without owner guidance when
-admitted work remains. It asks the owner only for a concrete external blocker.
-When a user task closes, the task summary stamps maintenance directives so
-the daemon shows idle until the maintenance cooldown passes or owner work
-arrives. It then returns to due maintenance instead of stopping permanently.
-If the loop itself fails, stale lock reclaim lets a restarted process continue
-from durable state.
+## Waiting
 
-## Status
+A waiting task parks like idle, but status prints the pending question. The next
+owner message is attached as the answer and returns the task to `open`.
+`send --new` creates a separate task instead.
 
-implemented.
+## Crash Resume
+
+Every committed turn is durable in SQLite and exchange-log files. On boot the
+daemon reclaims the lock if needed, reads the first non-terminal task, and
+continues at selection. A crash mid-call can lose one uncommitted model call;
+it cannot create a false completion.

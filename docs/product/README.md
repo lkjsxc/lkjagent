@@ -2,17 +2,13 @@
 
 ## Purpose
 
-This directory states the observable behavior of lkjagent from its owner's
-point of view: what the daemon does, what the CLI offers, how the queue
-behaves, and what can be observed while the agent runs. Everything here is
-design-only until [../current-state.md](../current-state.md) says otherwise.
-Internal mechanics live under [../architecture/](../architecture/README.md).
+This directory defines the user-visible product: daemon lifecycle, owner queue,
+CLI commands, status, and console surfaces.
 
 ## Table of Contents
 
-- [daemon.md](daemon.md): the continuously running process and its lifecycle.
-- [yolo-mode.md](yolo-mode.md): decisive sandbox-first owner-task behavior.
-- [cli/](cli/README.md): command-line client contract and output surfaces.
-- [queue.md](queue.md): how user messages enter, wait, and resume tasks.
-- [observability.md](observability.md): status, transcript, and memory views.
-- [personal-operations.md](personal-operations.md): diary, schedule, and TODO behavior.
+- [daemon.md](daemon.md): task lifecycle, daemon loop, idle, and waiting.
+- [cli.md](cli.md): owner command surface and exit-code discipline.
+- [queue.md](queue.md): owner message intake, answer routing, and FIFO order.
+- [status-and-console.md](status-and-console.md): status fields, task display,
+  log output, proof visibility, and watch layout.
