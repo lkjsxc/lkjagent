@@ -1,14 +1,14 @@
 mod metrics;
 mod response;
+mod spec;
 
 use lkjagent_context::model::{Message, Role};
 use serde::Serialize;
 use serde_json::Value;
 
-use lkjagent_protocol::ACTION_CLOSE;
-
 use crate::closure::{restore_stop_suffix, ClosureMode};
 use metrics::collect_cache_metrics;
+pub use spec::CallSpec;
 
 pub const MAX_TOKENS: u16 = 512;
 pub const TEMPERATURE: f32 = 0.3;
@@ -87,25 +87,26 @@ pub enum WireError {
     Missing(&'static str),
 }
 
-pub fn build_request(model: &str, messages: &[Message], max_tokens: u16) -> ChatRequest {
+pub fn build_request(model: &str, messages: &[Message], spec: &CallSpec) -> ChatRequest {
     ChatRequest {
         model: model.to_string(),
         messages: messages.iter().map(ChatMessage::from_context).collect(),
-        max_tokens,
-        temperature: TEMPERATURE,
-        top_p: TOP_P,
+        max_tokens: spec.max_tokens,
+        temperature: spec.temperature,
+        top_p: spec.top_p,
         reasoning_effort: "none",
-        stop: vec![ACTION_CLOSE.to_string()],
+        stop: spec.stop.clone(),
         stream: false,
     }
 }
 
-pub fn decode_completion(text: &str) -> Result<Completion, WireError> {
+pub fn decode_completion(text: &str, spec: &CallSpec) -> Result<Completion, WireError> {
     let value: Value =
         serde_json::from_str(text).map_err(|error| WireError::Json(error.to_string()))?;
     let cache_metrics = collect_cache_metrics(&value);
     let parts = response::response_parts(value, &cache_metrics)?;
-    let (content, closure_mode) = restore_stop_suffix(parts.content, &parts.finish_reason);
+    let (content, closure_mode) =
+        restore_stop_suffix(parts.content, &parts.finish_reason, spec.primary_stop());
     Ok(Completion {
         content,
         finish_reason: parts.finish_reason,

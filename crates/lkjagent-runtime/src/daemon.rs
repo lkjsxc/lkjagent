@@ -4,6 +4,7 @@ use crate::task::{RuntimeState, TaskState};
 use lkjagent_context::assemble::assemble_messages;
 use lkjagent_context::model::{ContextState, Frame, FrameKind, NoticeKind};
 use lkjagent_llm::client::{complete, ClientConfig};
+use lkjagent_llm::wire::CallSpec;
 use lkjagent_llm::wire::Completion;
 use lkjagent_protocol::Action;
 use lkjagent_store::events::{append_event, EventKind};
@@ -135,7 +136,8 @@ pub fn endpoint_complete(
     attempt: u32,
 ) -> RuntimeResult<Completion> {
     let messages = assemble_messages(context);
-    Ok(complete(config, &messages, attempt)?)
+    let spec = CallSpec::action(config.max_tokens);
+    Ok(complete(config, &messages, &spec, attempt)?)
 }
 
 pub fn client_config(

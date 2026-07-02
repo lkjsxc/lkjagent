@@ -6,13 +6,15 @@ use std::time::Duration;
 use lkjagent_context::model::{Message, Role};
 use lkjagent_llm::client::{complete, ClientConfig};
 use lkjagent_llm::error::{ClientError, EndpointFailure};
+use lkjagent_llm::wire::CallSpec;
 use support::{serve_once, TestResult};
 
 #[test]
-fn default_client_config_uses_compact_output_budget() {
-    let config = ClientConfig::new("http://127.0.0.1:1", "local-model");
+fn action_call_spec_uses_compact_output_budget() {
+    let spec = CallSpec::action(512);
 
-    assert_eq!(config.max_tokens, 512);
+    assert_eq!(spec.max_tokens, 512);
+    assert_eq!(spec.stop, vec!["</action>".to_string()]);
 }
 
 #[test]
@@ -24,7 +26,8 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     config.max_tokens = 1_024;
     let messages = vec![Message::new(Role::System, "system")];
 
-    let completion = complete(&config, &messages, 0)?;
+    let spec = CallSpec::action(config.max_tokens);
+    let completion = complete(&config, &messages, &spec, 0)?;
     let request = server.recorded()?;
 
     assert_eq!(completion.content, "<action></action>");
@@ -47,7 +50,8 @@ fn length_finish_reason_maps_to_oversize() -> TestResult<()> {
     let body = r#"{"choices":[{"message":{"content":"partial"},"finish_reason":"length"}],"usage":{"prompt_tokens":5,"completion_tokens":2048},"prompt_cache_hit_tokens":4}"#;
     let server = serve_once(200, body)?;
     let config = ClientConfig::new(server.base_url.clone(), "local-model");
-    let result = complete(&config, &[Message::new(Role::System, "system")], 1);
+    let spec = CallSpec::action(config.max_tokens);
+    let result = complete(&config, &[Message::new(Role::System, "system")], &spec, 1);
     let _request = server.recorded()?;
 
     assert!(matches!(
@@ -68,7 +72,8 @@ fn length_with_closed_action_is_accepted() -> TestResult<()> {
     let server = serve_once(200, body)?;
     let config = ClientConfig::new(server.base_url.clone(), "local-model");
 
-    let completion = complete(&config, &[Message::new(Role::System, "system")], 1)?;
+    let spec = CallSpec::action(config.max_tokens);
+    let completion = complete(&config, &[Message::new(Role::System, "system")], &spec, 1)?;
     let _request = server.recorded()?;
 
     assert!(completion.content.contains("</action>"));
@@ -85,7 +90,8 @@ fn connection_failure_maps_to_attempt_backoff() -> TestResult<()> {
     let address = listener.local_addr()?;
     drop(listener);
     let config = ClientConfig::new(format!("http://{address}"), "local-model");
-    let result = complete(&config, &[Message::new(Role::System, "system")], 3);
+    let spec = CallSpec::action(config.max_tokens);
+    let result = complete(&config, &[Message::new(Role::System, "system")], &spec, 3);
 
     assert!(matches!(
         result,
@@ -101,7 +107,8 @@ fn connection_failure_maps_to_attempt_backoff() -> TestResult<()> {
 fn four_hundred_status_maps_to_endpoint_overflow() -> TestResult<()> {
     let server = serve_once(400, "{\"error\":\"context overflow\"}")?;
     let config = ClientConfig::new(server.base_url.clone(), "local-model");
-    let result = complete(&config, &[Message::new(Role::System, "system")], 0);
+    let spec = CallSpec::action(config.max_tokens);
+    let result = complete(&config, &[Message::new(Role::System, "system")], &spec, 0);
     let _request = server.recorded()?;
 
     assert!(matches!(

@@ -13,9 +13,10 @@ The documentation contract now specifies the plan-driven step engine. The pure
 counting, classification, and the `next_work` / `apply_turn` seam. The
 `lkjagent-store` crate now also has plan-store modules for the ten-table schema,
 queue intake, task and step writes, turn transactions, config heartbeat values,
-and orphan exchange detection. The effects layer, rich templates, and app
-binary are not yet built. The existing runtime, graph, tools, CLI, benchmark,
-and store modules remain until cutover.
+and orphan exchange detection. `lkjagent-llm` now accepts per-call max token
+budgets and stop sequences while keeping endpoint anomaly handling. The effects
+layer, rich templates, and app binary are not yet built. The existing runtime,
+graph, tools, CLI, benchmark, and store modules remain until cutover.
 
 The target product is one daemon, one owner queue, one SQLite store, one local
 LLM endpoint, and one deterministic plan ledger. The harness owns control flow;
@@ -39,7 +40,9 @@ never a model assertion.
 fingerprint variation, and a generic task flow that reaches `closed` after
 injected parse faults. `crates/lkjagent-store/` tests cover the fresh schema,
 FIFO delivery, waiting-answer routing, turn transaction rollback, and orphan
-exchange detection.
+exchange detection. `crates/lkjagent-llm/` tests cover write-step wire requests
+with `llm.max-tokens.write=1400`, configurable stop suffix repair, provider
+anomalies, and backoff.
 
 The current Rust workspace still includes the existing parser, protocol
 registry, graph, context, store, LLM client, tools, runtime, CLI, benchmark, and

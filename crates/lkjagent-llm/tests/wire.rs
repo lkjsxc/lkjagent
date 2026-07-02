@@ -1,7 +1,7 @@
 use lkjagent_context::model::{Message, Role};
 use lkjagent_llm::closure::ClosureMode;
 use lkjagent_llm::wire::{
-    build_request, decode_completion, FinishReason, ProviderAnomalyKind, MAX_TOKENS,
+    build_request, decode_completion, CallSpec, FinishReason, ProviderAnomalyKind, MAX_TOKENS,
 };
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -12,11 +12,12 @@ fn request_serializes_exact_documented_fields() -> TestResult<()> {
         Message::new(Role::System, "system prefix"),
         Message::new(Role::User, "<owner>hello</owner>"),
     ];
-    let request = build_request("local-model", &messages, 2_048);
+    let spec = CallSpec::with_stop(1_400, "</content>");
+    let request = build_request("local-model", &messages, &spec);
     let body = serde_json::to_string(&request)?;
     assert_eq!(
         body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system prefix\"},{\"role\":\"user\",\"content\":\"<owner>hello</owner>\"}],\"max_tokens\":2048,\"temperature\":0.3,\"top_p\":0.9,\"reasoning_effort\":\"none\",\"stop\":[\"</action>\"],\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system prefix\"},{\"role\":\"user\",\"content\":\"<owner>hello</owner>\"}],\"max_tokens\":1400,\"temperature\":0.3,\"top_p\":0.9,\"reasoning_effort\":\"none\",\"stop\":[\"</content>\"],\"stream\":false}"
     );
     Ok(())
 }
@@ -24,7 +25,8 @@ fn request_serializes_exact_documented_fields() -> TestResult<()> {
 #[test]
 fn compact_default_max_tokens_is_512() -> TestResult<()> {
     let messages = vec![Message::new(Role::System, "system prefix")];
-    let request = build_request("local-model", &messages, MAX_TOKENS);
+    let spec = CallSpec::action(MAX_TOKENS);
+    let request = build_request("local-model", &messages, &spec);
     let body = serde_json::to_string(&request)?;
 
     assert!(body.contains("\"max_tokens\":512"));
@@ -44,7 +46,7 @@ fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
         "prompt_cache_hit_tokens":9,
         "timings":{"prompt_ms":4.5}
     }"#;
-    let completion = decode_completion(response)?;
+    let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
     assert_eq!(completion.content, "<action></action>");
     assert_eq!(completion.finish_reason, FinishReason::Stop);
     assert_eq!(completion.closure_mode, ClosureMode::Natural);
@@ -70,7 +72,7 @@ fn response_preserves_missing_usage_as_unknown() -> TestResult<()> {
         "choices":[{"message":{"content":"<action></action>"},"finish_reason":"stop"}]
     }"#;
 
-    let completion = decode_completion(response)?;
+    let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
 
     assert_eq!(completion.usage.prompt_tokens, None);
     assert_eq!(completion.usage.completion_tokens, None);
@@ -86,7 +88,7 @@ fn empty_content_with_completion_tokens_is_provider_anomaly() -> TestResult<()> 
         "usage":{"prompt_tokens":10512,"completion_tokens":485,"total_tokens":10997}
     }"#;
 
-    let completion = decode_completion(response)?;
+    let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
 
     let anomaly = completion.provider_anomaly.ok_or("provider anomaly")?;
     assert_eq!(completion.content, "");
@@ -102,7 +104,7 @@ fn reasoning_only_response_is_not_action_text() -> TestResult<()> {
         "usage":{"completion_tokens":12}
     }"#;
 
-    let completion = decode_completion(response)?;
+    let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
 
     let anomaly = completion.provider_anomaly.ok_or("provider anomaly")?;
     assert_eq!(completion.content, "");
@@ -117,7 +119,7 @@ fn missing_content_field_is_provider_anomaly() -> TestResult<()> {
         "usage":{"completion_tokens":0}
     }"#;
 
-    let completion = decode_completion(response)?;
+    let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
 
     let anomaly = completion.provider_anomaly.ok_or("provider anomaly")?;
     assert_eq!(completion.content, "");
@@ -132,10 +134,28 @@ fn stop_stripped_action_close_is_restored() -> TestResult<()> {
         "usage":{"prompt_tokens":11,"completion_tokens":7}
     }"#;
 
-    let completion = decode_completion(response)?;
+    let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
 
     assert!(completion.content.ends_with("</action>"));
     assert_eq!(completion.finish_reason, FinishReason::Stop);
     assert_eq!(completion.closure_mode, ClosureMode::StopSequenceClosed);
+    Ok(())
+}
+
+#[test]
+fn stop_stripped_content_plan_and_message_closures_are_restored() -> TestResult<()> {
+    for (open, close) in [
+        ("<content>body", "</content>"),
+        ("<plan>respond | done", "</plan>"),
+        ("<message>done", "</message>"),
+    ] {
+        let response = format!(
+            "{{\"choices\":[{{\"message\":{{\"content\":{open:?}}},\"finish_reason\":\"stop\"}}]}}"
+        );
+        let spec = CallSpec::with_stop(MAX_TOKENS, close);
+        let completion = decode_completion(&response, &spec)?;
+        assert!(completion.content.ends_with(close));
+        assert_eq!(completion.closure_mode, ClosureMode::StopSequenceClosed);
+    }
     Ok(())
 }

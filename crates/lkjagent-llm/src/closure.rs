@@ -1,5 +1,3 @@
-use lkjagent_protocol::{ACTION_CLOSE, ACTION_OPEN};
-
 use crate::wire::FinishReason;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -19,15 +17,29 @@ impl ClosureMode {
     }
 }
 
-pub fn restore_stop_suffix(content: String, finish_reason: &FinishReason) -> (String, ClosureMode) {
-    if content.contains(ACTION_CLOSE) {
+pub fn restore_stop_suffix(
+    content: String,
+    finish_reason: &FinishReason,
+    closing_tag: &str,
+) -> (String, ClosureMode) {
+    if content.contains(closing_tag) {
         return (content, ClosureMode::Natural);
     }
-    if matches!(finish_reason, FinishReason::Stop) && content.contains(ACTION_OPEN) {
+    if matches!(finish_reason, FinishReason::Stop) && opening_seen(&content, closing_tag) {
         return (
-            format!("{content}{ACTION_CLOSE}"),
+            format!("{content}{closing_tag}"),
             ClosureMode::StopSequenceClosed,
         );
     }
     (content, ClosureMode::Unclosed)
+}
+
+fn opening_seen(content: &str, closing_tag: &str) -> bool {
+    let Some(name) = closing_tag
+        .strip_prefix("</")
+        .and_then(|value| value.strip_suffix('>'))
+    else {
+        return false;
+    };
+    content.contains(&format!("<{name}>"))
 }

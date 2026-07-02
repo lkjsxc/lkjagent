@@ -1,11 +1,15 @@
 #[path = "endpoint_runtime_effect.rs"]
 mod endpoint_runtime_effect;
+mod endpoint_time;
 
 use std::time::Instant;
 
 use lkjagent_context::assemble::assemble_messages;
 use lkjagent_llm::client::{complete, request_json};
+use lkjagent_llm::wire::CallSpec;
 use rusqlite::Connection;
+
+use endpoint_time::{retry_deadline, seconds_before};
 
 use super::runner::{DaemonTick, ResidentDaemon};
 use crate::error::{RuntimeError, RuntimeResult};
@@ -58,10 +62,16 @@ impl ResidentDaemon {
         }
         self.refresh_authority_card(conn, &authority)?;
         let messages = assemble_messages(&self.state.context);
-        let request = request_json(&self.runtime.client, &messages)?;
+        let spec = CallSpec::action(self.runtime.client.max_tokens);
+        let request = request_json(&self.runtime.client, &messages, &spec)?;
         let provider_log = self.record_model_request(conn, now, &request)?;
         let started = Instant::now();
-        match complete(&self.runtime.client, &messages, self.endpoint_attempt) {
+        match complete(
+            &self.runtime.client,
+            &messages,
+            &spec,
+            self.endpoint_attempt,
+        ) {
             Ok(completion) => {
                 self.record_model_response(conn, provider_log.as_ref(), &completion, started)?;
                 if completion.provider_anomaly.is_none() {
@@ -183,18 +193,4 @@ fn pending_authority(conn: &Connection) -> RuntimeResult<PendingActionAuthority>
         prompt_frame_id: lkjagent_store::state::get(conn, "authority prompt frame id")?,
         staleness_fingerprint: lkjagent_store::state::get(conn, "kernel staleness fingerprint")?,
     })
-}
-
-fn retry_deadline(now: &str, retry_after_secs: Option<u64>) -> Option<String> {
-    let delay = retry_after_secs?;
-    now.parse::<u64>()
-        .ok()
-        .map(|stamp| stamp.saturating_add(delay).to_string())
-}
-
-fn seconds_before(now: &str, deadline: &str) -> bool {
-    match (now.parse::<u64>(), deadline.parse::<u64>()) {
-        (Ok(now), Ok(deadline)) => now < deadline,
-        _ => false,
-    }
 }

@@ -1,13 +1,14 @@
 use std::time::Duration;
 
 use lkjagent_context::model::Message;
-use lkjagent_protocol::{ACTION_CLOSE, ACTION_OPEN};
 use reqwest::blocking::Client;
 use reqwest::header::CONTENT_TYPE;
 
 use crate::backoff::delay_for_attempt;
 use crate::error::{ClientError, ClientResult, EndpointFailure};
-use crate::wire::{build_request, decode_completion, Completion, FinishReason, MAX_TOKENS};
+use crate::wire::{
+    build_request, decode_completion, CallSpec, Completion, FinishReason, MAX_TOKENS,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ClientConfig {
@@ -30,18 +31,18 @@ impl ClientConfig {
     }
 }
 
-pub fn request_json(config: &ClientConfig, messages: &[Message]) -> ClientResult<String> {
-    request_body(
-        &config.model,
-        messages,
-        Duration::from_secs(0),
-        config.max_tokens,
-    )
+pub fn request_json(
+    config: &ClientConfig,
+    messages: &[Message],
+    spec: &CallSpec,
+) -> ClientResult<String> {
+    request_body(&config.model, messages, Duration::from_secs(0), spec)
 }
 
 pub fn complete(
     config: &ClientConfig,
     messages: &[Message],
+    spec: &CallSpec,
     attempt: u32,
 ) -> ClientResult<Completion> {
     let retry_after = delay_for_attempt(attempt);
@@ -51,7 +52,7 @@ pub fn complete(
         .map_err(|error| {
             endpoint_error(EndpointFailure::Connection(error.to_string()), retry_after)
         })?;
-    let body = request_body(&config.model, messages, retry_after, config.max_tokens)?;
+    let body = request_body(&config.model, messages, retry_after, spec)?;
     let response = send_request(&client, config, body, retry_after)?;
     let status = response.status();
     let text = response.text().map_err(|error| {
@@ -70,10 +71,12 @@ pub fn complete(
         };
         return Err(endpoint_error(failure, retry_after));
     }
-    let completion = decode_completion(&text).map_err(|error| {
+    let completion = decode_completion(&text, spec).map_err(|error| {
         endpoint_error(EndpointFailure::Malformed(error.to_string()), retry_after)
     })?;
-    if completion.finish_reason == FinishReason::Length && !has_closed_action(&completion.content) {
+    if completion.finish_reason == FinishReason::Length
+        && !has_closed_stop(&completion.content, spec)
+    {
         let preview = preview(&completion.content);
         return Err(ClientError::Oversize {
             usage: completion.usage,
@@ -88,9 +91,9 @@ fn request_body(
     model: &str,
     messages: &[Message],
     retry_after: Duration,
-    max_tokens: u16,
+    spec: &CallSpec,
 ) -> ClientResult<String> {
-    let request = build_request(model, messages, max_tokens);
+    let request = build_request(model, messages, spec);
     serde_json::to_string(&request)
         .map_err(|error| endpoint_error(EndpointFailure::Malformed(error.to_string()), retry_after))
 }
@@ -117,10 +120,8 @@ fn chat_url(base_url: &str) -> String {
     format!("{}/v1/chat/completions", base_url.trim_end_matches('/'))
 }
 
-fn has_closed_action(content: &str) -> bool {
-    content
-        .find(ACTION_OPEN)
-        .is_some_and(|start| content[start..].contains(ACTION_CLOSE))
+fn has_closed_stop(content: &str, spec: &CallSpec) -> bool {
+    spec.stop.iter().any(|stop| content.contains(stop))
 }
 
 fn preview(content: &str) -> String {
