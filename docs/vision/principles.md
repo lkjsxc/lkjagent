@@ -2,36 +2,36 @@
 
 ## Purpose
 
-These principles rank every design trade in lkjagent. When two contracts
-conflict, the higher principle wins. When a principle and convenience
-conflict, the principle wins.
+List the ranked invariants that every implementation and documentation change
+must preserve.
 
-## Ranked Principles
+## Ranked Invariants
 
-1. Honesty. The system never fakes success, never shows placeholder results,
-   and never claims verification that did not run.
-   Canonical rule: [../agent/honest-state.md](../agent/honest-state.md).
-2. Smallness. Fewer features, fewer crates, fewer lines. Every addition must
-   pay for itself; removal is always in season. Files stay at or below 200
-   lines per [../repository/line-limits.md](../repository/line-limits.md).
-3. Context is sacred. The runtime window is the scarcest resource. Nothing enters
-   it without a budget and an owner.
-   Canonical rule: [../architecture/context/hygiene.md](../architecture/context/hygiene.md).
-4. Cache discipline. The prompt prefix is append-only between compactions so
-   the endpoint prefix cache stays hot. Designs that mutate the prefix lose.
-5. Pure core, effectful edge. Decisions are pure functions over plain data;
-   IO lives in thin adapters. See
-   [../repository/functional-style.md](../repository/functional-style.md).
-6. One rule, one owner. Every contract lives in exactly one file; everything
-   else links to it. Duplication is drift waiting to happen.
-7. Self-improvement over feature growth. Maintenance work goes to
-   distilling memory and improving graph policy, not speculative features.
-8. The agent is the user. Docs, errors, and formats are optimized for LLM
-   reading first. Humans arrive through agents.
+1. Honesty. No fake success, no placeholder output presented as work, and no
+   claimed gate that did not run. A task closes only through passed checks.
+2. The harness directs; the model authors. Deterministic Rust owns control
+   flow, file paths, retry policy, and completion judgment. The model writes
+   bounded content inside the envelope chosen for the current step.
+3. Every turn changes something. A retry changes instruction, scope, or budget;
+   the engine never renders the same prompt twice for the same failed step.
+4. Smallness. Every authored file stays at or below 200 lines. Product crates
+   and docs also obey file-count budgets so splitting creates ownership rather
+   than sprawl.
+5. Context is engineered per turn. A prompt is a projection of durable state,
+   not a transcript dump. Each region has an owner and a token budget.
+6. Everything observable is durable. Tasks, steps, attempts, events, checks,
+   usage, and exchange logs survive crashes and support proof bundles.
+7. Pure core, effectful edge. Planning, rendering, parsing, checking, and
+   escalation are pure functions over plain data. File IO, SQLite, clocks, and
+   endpoint calls sit at the boundary.
+8. One rule, one owner. Each behavior is specified in one contract page and
+   implemented to that page.
+9. The container is the safety model. The daemon runs YOLO inside the container;
+   no permission prompt is part of the product.
 
-## Applying the Ranking
+## Enforcement
 
-- A feature that pollutes context loses to principle 3 even if useful.
-- A clever cache trick that hides failures loses to principle 1.
-- A convenience dependency that doubles build size loses to principle 2.
-- A duplicate explanation loses to principle 6; replace it with a link.
+Line limits, topology, file-count budgets, link resolution, and banned language
+are enforced by repository gates. Engine tests enforce prompt variation, finite
+retry ladders, deterministic completion, and crash resume. Commit trailers and
+handoffs name only commands that actually ran.

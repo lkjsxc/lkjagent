@@ -2,35 +2,44 @@
 
 ## Purpose
 
-This file describes the end state lkjagent moves toward. Every task should
-make the repository measurably closer to this state.
+State what lkjagent is for, who it serves, and how success is measured.
 
-## The End State
+## Product
 
-A single container runs forever. Inside it, one small Rust daemon drives one
-agent loop against a local configurable-context model. The owner talks to it by
-dropping messages into a queue from a thin CLI and reading results from the
-transcript. The agent never stops: when the queue is empty it maintains
-its daemon heartbeat and waits for more owner work.
+lkjagent is a continuously running personal agent for one owner, one local LLM,
+one workspace, and one SQLite store. The owner sends plain-language work to a
+thin CLI. The daemon turns each message into a durable task, executes a typed
+plan step by step, verifies results with deterministic checks, and reports the
+truth.
 
-The harness is so small that an agent can hold the entire design in one
-context window. Every behavior is written down in a file of at most 200
-lines, and every file is reachable from a README within three links. The
-documentation is the program; the Rust code is its faithful translation.
+The product serves these work types in priority order:
 
-## What Good Looks Like
+1. Long structured artifacts: manuscripts, document trees, reports, study
+   material, and other multi-file or multi-thousand-word outputs.
+2. Ordinary workspace file work: create, revise, organize, and summarize.
+3. Questions and small tasks answered directly into the transcript.
+4. Personal records as plain workspace files maintained by the same plan engine.
 
-- A new agent reads AGENTS.md, three contracts, and ships a correct change
-  without asking a human anything.
-- The model's prefix cache hits on every turn between compactions; turn
-  latency is dominated by generation, never by prompt re-evaluation.
-- The context window never contains a byte the contracts did not allow in.
-- A week of continuous operation leaves a durable transcript, clear task
-  summaries, and an inspectable queue with no fabricated outcomes.
-- The whole system rebuilds and verifies from a clean checkout with one
-  docker compose command.
+## Reader
 
-## What This Is Not
+This repository is read and written by LLM agents. Files are optimized for
+machine reading first: short pages, explicit ownership, table-of-contents
+READMEs, quiet gates, and direct contracts.
 
-Not a coding-agent product for many users. Not a framework. Not a gateway to
-messaging platforms. Not a model server. One owner, one brain, one box.
+## Weak Model Assumption
+
+The model may have a modest context window, no reliable JSON tool calling,
+imperfect instruction following, and a strong tendency to repeat patterns from
+its prompt. The harness carries control flow so the model can author bounded
+content instead of navigating policy.
+
+## Measured Success
+
+The product succeeds when a configured checkout can run the daemon, accept the
+Aurora Ledger manuscript request, and produce ten chapter files under the
+requested root with at least 10,000 measured manuscript words. The task closes
+only after engine-computed checks pass. A failed task ends as blocked with a
+bounded report and evidence.
+
+The same engine also handles a docs-tree request, a question, and a file-work
+request without task-family code paths outside templates and checks.

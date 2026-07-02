@@ -2,45 +2,40 @@
 
 ## Purpose
 
-This file draws the boundary of lkjagent. Work inside the boundary is
-welcome; work outside it is rejected regardless of quality.
+Define the product boundary so every feature has a clear place or no place.
 
 ## In Scope
 
-- One Rust daemon with one continuous agent loop.
-- A persistent user message queue written by a thin CLI.
-- An OpenAI-compatible HTTP client for one local endpoint at a time.
-- The tag-based action protocol and its strict parser.
-- The append-only context engine with explicit compaction.
-- A SQLite store for queue, transcripts, memory, and runtime state.
-- A typed state graph shared by runtime, context, memory, compaction, and
-  completion.
-- The fixed toolset: file read, write, edit, shell, queue ops, memory ops,
-  graph ops, and control actions. Everything else is graph guidance built on
-  shell and files.
-- Container-first operation via docker compose.
-- The xtask verification gates that keep this repository lawful.
+- One daemon process executing one owner queue sequentially.
+- One OpenAI-compatible chat-completions endpoint configured by the owner.
+- One SQLite store under `data/` with durable tasks, plans, attempts, checks,
+  events, memory, usage, and config.
+- Workspace file work inside the mounted repository or owner workspace.
+- Plan templates for manuscripts, docs trees, file work, questions, journal
+  entries, and generic exploration.
+- Ten explore tools for bounded discovery when a template cannot script the
+  whole job.
+- Deterministic checks for file existence, word counts, link resolution,
+  README coverage, command success, and sparse model judgment.
+- CLI status, logs, task inspection, queue inspection, memory search, and a
+  terminal watch surface.
+- Docker Compose gates and proof-bundle capture.
 
-## Builder Helpers
+## Out Of Scope
 
-Implementation-time helpers supplied by a coding harness are allowed for
-reading, planning, test design, or review. Product behavior may not depend on
-external subagents, MCP servers, or parallel worker sessions. Adding product
-subagents requires a deliberate scope change first.
+- Multi-user operation, remote hosting, web UI, messaging gateways, MCP, and
+  runtime sub-agents.
+- Permission prompts inside the daemon.
+- Idle self-maintenance. With no open task and no pending queue item, the daemon
+  waits.
+- Dedicated personal-records tables or tools. Personal records are workspace
+  files written by plan templates.
+- Model-selected completion. Completion is an engine state edge guarded by
+  passed checks.
+- A broad tool registry for scripted work. Scripted steps have fixed effects;
+  model-chosen tools exist only inside explore steps.
 
-## Out of Scope
+## Deletion Rule
 
-- MCP in any form. Capabilities arrive as graph policy, not servers.
-  Decision: [../decisions/no-mcp.md](../decisions/no-mcp.md).
-- Sub-agents, worker forks, parallel sessions.
-  Decision: [../decisions/no-subagents.md](../decisions/no-subagents.md).
-- Messaging channels (Telegram, Discord, mail) and any web UI.
-- Plan mode, permission prompts, or any non-YOLO interaction.
-- Automatic idle self-maintenance, heartbeat checklists, and cron schedules.
-  The daemon heartbeat exists only for lock reclaim.
-- Model training, fine-tuning, or serving. The endpoint is someone else's job.
-- Multi-user or multi-tenant operation. One owner, one store, one loop.
-
-## Open Questions
-
-None.
+Anything outside this scope is removed rather than hidden behind flags. Git
+history is the archive; the current tree states only the active contract.
