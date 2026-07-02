@@ -128,6 +128,14 @@ fn run_verify(root: &Path) -> i32 {
         ]);
         return 1;
     }
+    if let Err(error) = smoke::run_replay(root) {
+        print_failure(&[
+            "smoke replay failed".to_string(),
+            "exit status: 1".to_string(),
+            error,
+        ]);
+        return 1;
+    }
     run_command_gate(root, "verify")
 }
 

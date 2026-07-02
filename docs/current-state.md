@@ -59,9 +59,10 @@ waiting-answer resume, expected workspace files, manuscript ten-chapter closure,
 shortfall extension, write-fault splitting, docs-tree closure, docs-tree link
 repair, and the status field set.
 
-`crates/lkjagent-xtask/` now gates the cutover crate set and validates the tiny
-benchmark corpus. Smoke, proof, and structure commands intentionally fail with
-not-yet-rebuilt messages until later stages restore those surfaces.
+`crates/lkjagent-xtask/` now gates the cutover crate set, validates the tiny
+benchmark corpus, runs deterministic smoke replay, and collects bounded proof
+bundles from the new store and workspace. Structure audit intentionally fails
+with a not-yet-rebuilt message until a later stage restores that surface.
 
 ## Proven Baseline
 
@@ -78,8 +79,7 @@ Stage 0 baseline evidence is recorded under
 ## Open Work
 
 - The production LLM adapter inside `lkjagent-app` is not yet implemented.
-- Replay smoke, proof bundle, and structure audit are not yet rebuilt for the
-  plan engine.
+- Structure audit is not yet rebuilt for the plan engine.
 - The Aurora Ledger live proof remains open until the daemon produces ten
   requested chapter files totaling at least 10,000 measured manuscript words and
   closes the task through engine-computed checks, or records an honest blocked

@@ -21,7 +21,7 @@ All local gates run as `cargo run -p lkjagent-xtask -- <gate>`.
 | `check-files` | product source and docs file-count budgets |
 | `check-style` | panic-path scan and dependency allowlist |
 | `bench check-corpus` | deterministic corpus shape, fixtures, and check validation |
-| `smoke replay` | not yet rebuilt for the plan engine; fails honestly |
+| `smoke replay` | deterministic replay through store, effects, and checks |
 | `quiet test` | fmt, clippy, and workspace tests |
 | `quiet verify` | check-docs, check-lines, check-files, check-style, quiet test |
 
@@ -32,8 +32,7 @@ docker compose run --rm verify
 docker compose run --rm test
 docker compose run --rm lint
 docker compose run --rm bench
-# Rebuilt in the replay stage:
-# docker compose run --rm replay
+docker compose run --rm replay
 ```
 
 `docker compose run --rm verify` is the final deterministic gate. It builds the
