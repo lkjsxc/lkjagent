@@ -5,6 +5,9 @@ use crate::model::{
 
 pub fn instantiate(id: u64, objective: &str) -> TaskSnapshot {
     let template = classify(objective);
+    if template == TemplateId::Manuscript {
+        return crate::manuscript::instantiate(id, objective);
+    }
     let mut task = task(id, objective, template);
     task.checks = task_checks(objective, template);
     let steps = match template {

@@ -41,8 +41,14 @@ pub fn commit_commands(
                 for result in results {
                     tx.execute(
                         "INSERT INTO check_results (step_id, name, params_json, passed, measured,
-                         created_at) VALUES (0, ?1, '{}', ?2, ?3, ?4)",
-                        params![result.name, i64::from(result.passed), result.measured, now],
+                         created_at) VALUES (?1, ?2, '{}', ?3, ?4, ?5)",
+                        params![
+                            task_id,
+                            result.name,
+                            i64::from(result.passed),
+                            result.measured,
+                            now
+                        ],
                     )?;
                 }
             }

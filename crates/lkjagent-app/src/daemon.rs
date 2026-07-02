@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use lkjagent_core::classify::instantiate;
-use lkjagent_core::engine::{apply_turn, next_work, Command, TurnOutcome, Work};
+use lkjagent_core::engine::{apply_turn, next_work, TurnOutcome, Work};
 use lkjagent_core::model::{Event, EventKind, StepState, TaskSnapshot, TaskState};
 use lkjagent_core::parse::parse_expected;
 use lkjagent_store::plan_access::{deliver_next, insert_step_tx, insert_task};
@@ -10,6 +10,7 @@ use lkjagent_store::plan_turn::commit_commands;
 use rusqlite::Connection;
 
 use crate::state::{load_snapshot, save_snapshot};
+use crate::turn_effects::{dispatch_effects, gather_checks};
 
 pub trait Endpoint {
     fn complete(&mut self, prompt: &str) -> Result<String, String>;
@@ -100,9 +101,8 @@ fn run_turn<E: Endpoint>(
                 Err(fault) => TurnOutcome::ParseFault(fault),
             }
         }
-        Work::RunChecks { .. } | Work::CloseTask | Work::BlockTask(_) | Work::Wait => {
-            TurnOutcome::Noop
-        }
+        Work::RunChecks { step_id } => gather_checks(workspace, &snapshot, *step_id)?,
+        Work::CloseTask | Work::BlockTask(_) | Work::Wait => TurnOutcome::Noop,
     };
     let (mut next, commands) = apply_turn(&snapshot, &work, outcome);
     dispatch_effects(workspace, &mut next, &commands)?;
@@ -110,33 +110,6 @@ fn run_turn<E: Endpoint>(
         .map_err(|error| error.to_string())?;
     save_snapshot(conn, &next).map_err(|error| error.to_string())?;
     Ok(next)
-}
-
-fn dispatch_effects(
-    workspace: &Path,
-    snapshot: &mut TaskSnapshot,
-    commands: &[Command],
-) -> Result<(), String> {
-    for command in commands {
-        match command {
-            Command::WriteFile { path, content } => {
-                lkjagent_effects::workspace::write(workspace, path, content)
-                    .map_err(|error| error.to_string())?;
-            }
-            Command::RunExplore(_) => {
-                for step in &mut snapshot.steps {
-                    if step.state == StepState::Active {
-                        step.inputs.push_str(" observation=ok");
-                    }
-                }
-            }
-            Command::RecordAttempt(_)
-            | Command::RecordEvent(_)
-            | Command::RecordChecks(_)
-            | Command::AddSteps(_) => {}
-        }
-    }
-    Ok(())
 }
 
 #[derive(Debug, Clone)]

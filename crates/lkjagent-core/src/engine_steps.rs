@@ -1,5 +1,5 @@
-use crate::checks::{evaluate, CommandFact, FileFact};
 use crate::engine::Command;
+use crate::engine_extend::{add_steps, insert_after, split_after_fault};
 use crate::model::*;
 use crate::parse::{Action, ParseFault, ParsedOutput, PlanLine};
 use crate::plan::plan_steps;
@@ -25,6 +25,9 @@ pub(crate) fn handle_fault(
     if snapshot.steps[index].attempts_used >= 3 {
         snapshot.steps[index].state = StepState::Blocked;
         record_event(commands, EventKind::StepBlocked, diagnosis);
+        let additions = split_after_fault(&snapshot.steps[index]);
+        insert_after(snapshot, index, &additions);
+        add_steps(commands, additions, "split write after repeated faults");
     }
 }
 
@@ -54,36 +57,6 @@ pub(crate) fn handle_model(
         }
         ParsedOutput::Question(question) => wait_for_answer(snapshot, commands, index, question),
         ParsedOutput::Verdict(result) => finish_verdict(snapshot, commands, index, result),
-    }
-}
-
-pub(crate) fn handle_checks(
-    snapshot: &mut TaskSnapshot,
-    commands: &mut Vec<Command>,
-    step_id: u64,
-    files: &[FileFact],
-    command_facts: &[CommandFact],
-) {
-    let Some(index) = step_index(snapshot, step_id) else {
-        return;
-    };
-    let results = snapshot.steps[index]
-        .checks
-        .iter()
-        .map(|spec| evaluate(spec, files, command_facts))
-        .collect::<Vec<_>>();
-    let passed = results.iter().all(|result| result.passed);
-    snapshot.check_results.extend(results.clone());
-    commands.push(Command::RecordChecks(results));
-    if passed {
-        snapshot.steps[index].state = StepState::Done;
-        record_event(
-            commands,
-            EventKind::StepDone,
-            snapshot.steps[index].title.clone(),
-        );
-    } else {
-        snapshot.steps[index].attempts_used += 1;
     }
 }
 
@@ -182,18 +155,13 @@ fn attempt(step: &Step, prompt: &Prompt, outcome: AttemptOutcome, diagnosis: &st
     }
 }
 
-fn record_event(commands: &mut Vec<Command>, kind: EventKind, content: String) {
+pub(crate) fn record_event(commands: &mut Vec<Command>, kind: EventKind, content: String) {
     commands.push(Command::RecordEvent(Event { kind, content }));
 }
 
-fn finish_plan(
-    snapshot: &mut TaskSnapshot,
-    commands: &mut Vec<Command>,
-    index: usize,
-    lines: Vec<PlanLine>,
-) {
-    let additions = plan_steps(&snapshot.steps[index], lines);
-    snapshot.steps[index].state = StepState::Done;
-    snapshot.steps.extend(additions.clone());
-    commands.push(Command::AddSteps(additions));
+fn finish_plan(s: &mut TaskSnapshot, c: &mut Vec<Command>, index: usize, lines: Vec<PlanLine>) {
+    let additions = plan_steps(&s.steps[index], lines);
+    s.steps[index].state = StepState::Done;
+    insert_after(s, index, &additions);
+    c.push(Command::AddSteps(additions));
 }

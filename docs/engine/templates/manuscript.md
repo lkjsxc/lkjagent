@@ -2,36 +2,54 @@
 
 ## Purpose
 
-Define how lkjagent writes long prose manuscripts.
+Define how lkjagent writes long prose manuscripts through engine-owned paths,
+word checks, and recovery steps.
 
 ## Objective Fields
 
-The classifier extracts title, root, manuscript glob, requested chapter paths,
-objective word target, and chapter count. For Aurora Ledger the fields include
-`objective.root=stories/aurora-ledger`, `objective.chapter-count=10`, and
-`objective.total-words=10000`.
+The extractor reads title, root, chapter count, total word target, manuscript
+glob, and fallback notes. Explicit roots under `stories/` or `manuscripts/`
+win. Aurora Ledger resolves to `stories/aurora-ledger`, ten chapters, and
+10,000 words. Simple digits and limited kanji numerals for ten, thousand, two
+thousand, and ten thousand are recognized; unparsed word targets default to
+10,000 words with a note in the plan state.
 
 ## Initial Plan
 
-- A plan step asks for chapter titles, beats, and word targets.
-- A write step creates `settings.md` with premise, cast, and facts.
-- Chapter write steps are materialized from the validated plan. Large chapters
-  split into section writes sized by `template.manuscript.section-words-min=400`
-  and `template.manuscript.section-words-max=700`.
-- A verify step runs task checks from [../completion.md](../completion.md).
-- A respond step reports measured paths and word counts.
+The snapshot starts with these steps:
+
+- `plan` outline step seeded with one plan-line grammar write line per chapter;
+- `write` settings step for `<root>/settings.md`;
+- `verify` step carrying the task checks;
+- `respond` step for measured paths and word counts.
+
+A valid outline materializes chapter write steps immediately after the plan step.
+Each chapter path is `<root>/manuscript/chapter-NN.md`. The engine keeps the
+path in the step record before any model-authored content can be written.
 
 ## Assembly
 
-The engine owns chapter paths and appends section content to the planned file.
-Inputs for each section include the beat, named facts, and the continuity tail
-bounded by `context.write.continuity-tail-words=150`.
+Chapter content is written through the effects edge. When a later manuscript
+section targets an existing chapter file, the engine appends the new content to
+that file. Continuity comes from the existing file tail at the effects boundary,
+not from trusting conversational history.
 
 ## Checks
 
-The task checks include `file_count` over requested chapter files and
-`min_words_total` over the manuscript glob. Objective-specific absence checks
-remove scaffold phrases when requested.
+The verify step runs:
+
+- `file_count` for the manuscript glob with exact chapter count;
+- `min_words_total` for the manuscript glob and objective target;
+- `absent` checks for scaffold phrases and task-marker placeholders on every
+  planned chapter file.
+
+## Recovery
+
+A `min_words_total` shortfall skips the failed verify step, inserts an extension
+write step targeting the last matching chapter, then inserts a fresh verify step.
+A manuscript write step that faults three times is marked blocked and followed by
+a smaller continuation write for the same chapter path. Earlier failed check
+results do not block closure after the fresh verify passes.
 
 ## Failure This Prevents
 

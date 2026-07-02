@@ -1,8 +1,12 @@
 pub mod checks;
 pub mod classify;
 pub mod engine;
+mod engine_checks;
+mod engine_extend;
 mod engine_steps;
 
+pub mod manuscript;
+mod manuscript_extract;
 pub mod model;
 pub mod parse;
 mod parse_plan;

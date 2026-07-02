@@ -1,5 +1,6 @@
 use crate::checks::{CommandFact, FileFact};
-use crate::engine_steps::{block_task, close_task, handle_checks, handle_fault, handle_model};
+use crate::engine_checks::handle_checks;
+use crate::engine_steps::{block_task, close_task, handle_fault, handle_model};
 use crate::model::*;
 use crate::parse::{Action, ParseFault, ParsedOutput};
 use crate::render::{render_prompt, Prompt};
