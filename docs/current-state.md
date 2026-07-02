@@ -8,26 +8,19 @@ only when code, focused tests, quiet gates, and required Docker gates prove it.
 
 ## Summary
 
-The documentation contract now specifies the plan-driven step engine. The pure
-`lkjagent-core` crate exists with model, parser, renderer, checks, word
-counting, classification, and the `next_work` / `apply_turn` seam. The
-`lkjagent-store` crate now also has plan-store modules for the ten-table schema,
-queue intake, task and step writes, turn transactions, config heartbeat values,
-and orphan exchange detection. `lkjagent-llm` now accepts per-call max token
-budgets and stop sequences while keeping endpoint anomaly handling.
-`lkjagent-effects` now implements workspace path guards, bounded file tools,
-shell execution, check fact gathering, observation envelopes, and exchange-log
-writing. `lkjagent-app` now has a plan-driven daemon skeleton, fake endpoint
-seam, snapshot resume path, owner CLI parser, status/watch renderers, and
-scripted end-to-end tests. Generic, question, file-work, and journal templates
-now have classifier rules, pure snapshot shapes, app fake-endpoint coverage,
-workspace writes, and waiting-answer resume. The manuscript template now extracts objective fields,
-seeds chapter outlines, materializes chapter writes, appends section content,
-runs exact file-count and word-total checks, extends shortfalls, and splits
-after repeated write faults. The docs-tree template now extracts roots and page
-counts, validates README-covered plans, runs readme and link checks through the
-effects edge, and materializes link-repair revise steps. The existing runtime,
-graph, tools, CLI, benchmark, and store modules remain until cutover.
+The product binary is now `lkjagent-app` built as `lkjagent`. The remaining
+workspace crates are `lkjagent-core`, `lkjagent-store`, `lkjagent-llm`,
+`lkjagent-effects`, `lkjagent-app`, and `lkjagent-xtask`. The old runtime,
+graph, tools, CLI, context, protocol, benchmark crates, and old store modules
+are deleted.
+
+`lkjagent-core` owns the pure plan engine, parser, renderer, checks, word
+counting, classifier, simple templates, manuscript template, and docs-tree
+template. `lkjagent-store` owns the plan-store schema and transactions.
+`lkjagent-llm` owns the endpoint wire client. `lkjagent-effects` owns filesystem,
+shell, check gathering, observations, and exchange logs. `lkjagent-app` owns the
+daemon interpreter, queue-backed fake endpoint seam, CLI parser, status and watch
+renderers, store-backed resume, and template end-to-end coverage.
 
 The target product is one daemon, one owner queue, one SQLite store, one local
 LLM endpoint, and one deterministic plan ledger. The harness owns control flow;
@@ -45,27 +38,30 @@ never a model assertion.
 - The docs gate is retargeted to README topology, link resolution, format bans,
   `check-files`, and the docs file-count budget.
 
-## Implemented Code Still Present
+## Implemented Code
 
 `crates/lkjagent-core/` tests cover envelope parsing, word counting, prompt
-fingerprint variation, and a generic task flow that reaches `closed` after
-injected parse faults. `crates/lkjagent-store/` tests cover the fresh schema,
-FIFO delivery, waiting-answer routing, turn transaction rollback, and orphan
-exchange detection. `crates/lkjagent-llm/` tests cover write-step wire requests
-with `llm.max-tokens.write=1400`, configurable stop suffix repair, provider
-anomalies, and backoff. `crates/lkjagent-effects/` tests cover path escape and
-symlink guards, file operations, shell output, observation truncation, exchange
-log writing, and all deterministic catalog checks over a fixture tree.
+fingerprint variation, generic closure after injected parse faults, classifier
+fixtures, simple template shapes, manuscript extraction and checks, docs-tree
+plan validation, and recovery helpers.
+
+`crates/lkjagent-store/` tests cover the fresh schema, FIFO delivery,
+waiting-answer routing, turn transaction rollback, and orphan exchange
+detection. `crates/lkjagent-llm/` tests cover per-call token budgets,
+configurable stop suffix repair, provider anomalies, and backoff.
+`crates/lkjagent-effects/` tests cover path escape and symlink guards, file
+operations, shell output, observation truncation, exchange log writing, and all
+deterministic catalog checks over a fixture tree.
+
 `crates/lkjagent-app/` tests cover the documented help tree, queue-backed fake
 endpoint execution, store-backed resume, simple-template end-to-end closure,
 waiting-answer resume, expected workspace files, manuscript ten-chapter closure,
 shortfall extension, write-fault splitting, docs-tree closure, docs-tree link
 repair, and the status field set.
 
-The current Rust workspace still includes the existing parser, protocol
-registry, graph, context, store, LLM client, tools, runtime, CLI, benchmark, and
-xtask crates. These crates remain the shipping code until the application
-cutover and deletion tasks replace them.
+`crates/lkjagent-xtask/` now gates the cutover crate set. Benchmark, smoke,
+proof, and structure commands intentionally fail with not-yet-rebuilt messages
+until the next stage restores those surfaces.
 
 ## Proven Baseline
 
@@ -82,7 +78,8 @@ Stage 0 baseline evidence is recorded under
 ## Open Work
 
 - The production LLM adapter inside `lkjagent-app` is not yet implemented.
-- The benchmark corpus and replay smoke still exercise the existing runtime.
+- The benchmark corpus, replay smoke, proof bundle, and structure audit are not
+  yet rebuilt for the plan engine.
 - The Aurora Ledger live proof remains open until the daemon produces ten
   requested chapter files totaling at least 10,000 measured manuscript words and
   closes the task through engine-computed checks, or records an honest blocked
