@@ -80,10 +80,11 @@ Stage 0 baseline evidence is recorded under
 
 - The production LLM adapter inside `lkjagent-app` is not yet implemented.
 - Structure audit is not yet rebuilt for the plan engine.
-- The Aurora Ledger live proof remains open until the daemon produces ten
-  requested chapter files totaling at least 10,000 measured manuscript words and
-  closes the task through engine-computed checks, or records an honest blocked
-  result with fixtures and a concrete fix task.
+- The Aurora Ledger live proof is blocked before loop iteration one: the app
+  daemon can idle in the container and deterministic replay passes, but the
+  app daemon is not yet wired to call the configured endpoint. The next fix
+  task is to add the production endpoint adapter to `lkjagent-app`, then run
+  the task-17 proof loop from a fresh data directory.
 
 ## Honesty Rules
 
