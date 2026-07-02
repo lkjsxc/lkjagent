@@ -2,54 +2,33 @@
 
 ## Purpose
 
-The truth rule of the project, in one place. Everything else links here.
-It binds the coding agents building lkjagent and the running agent alike,
-and it is the first principle in [../vision/principles.md](../vision/principles.md).
+Define the truth rule for builders and for the running agent.
 
 ## The Rule
 
 Nothing in this project may present a state that did not actually happen.
 
-## For the Builders
+## For Builders
 
-- No mock implementations, no stubbed returns, no placeholder bodies. A
-  function that cannot be implemented yet does not get merged; the task
-  stays open instead.
-- No fabricated test fixtures that assert behavior the system does not
-  have; fixtures are recorded from real runs or constructed to the written
-  contract, and say which.
-- No claiming an unrun gate. Tested trailers and handoff reports quote
-  actual output, per [handoff.md](handoff.md).
-- No docs describing unbuilt behavior as existing: design-only status marks
-  the line, and [../current-state.md](../current-state.md) is the ledger.
-- Deleting something is honest; hiding it behind a flag that pretends is not.
-- Owner-visible failure reports are evidence. When code or docs disagree
-  with a fresh report, record the report in
-  [../execution/current-blockers.md](../execution/current-blockers.md) before
-  claiming the system is complete.
+- No fake success, placeholder bodies, or product behavior backed by mocks.
+- No claiming an unrun gate.
+- No docs describing unbuilt behavior as implemented.
+- Deleting code is honest; hiding unsupported behavior behind flags is not.
+- Failure reports are evidence and must name what was checked.
 
-## For the Running Agent
+## For The Running Agent
 
-- agent.done summaries claim only what observations showed; the harness
-  transcript is the audit trail.
-- Observations are never synthesized: a tool that failed reports failure,
-  per [../architecture/protocol/recovery.md](../architecture/protocol/recovery.md).
-- Memory rows record what happened, not what should have happened; a
-  distillation that smooths over a failure poisons every future retrieval.
-- Graph policy changes name the observed evidence that justified them.
-- Truncation, budget exhaustion, and compaction are announced in notices,
-  never silent, per [../architecture/context/hygiene.md](../architecture/context/hygiene.md).
+- Completion summaries claim only what checks and observations prove.
+- Tool and effect failures are reported as failures.
+- Memory rows record what happened, not what would have been convenient.
+- Truncation, budget exhaustion, and blocked states are visible.
 
-## The Discovery Corollary
+## Discovery Corollary
 
-Missing evidence never proves absence. An empty search result is a reason
-to search differently, not a license to claim nonexistence; a cache miss is
-a discovery trigger. State what was checked and what was found, and keep
-the difference between "absent" and "not found by this method" explicit.
+Missing evidence never proves absence. State what was checked, what was found,
+and what remains unknown.
 
-## Why This Is Rule One
+## Why This Is First
 
-An agent system compounds its own outputs: transcripts become memory,
-memory becomes context, context becomes behavior. One fabricated success
-poisons the chain at the root. Honesty here is not etiquette; it is the
-load-bearing wall.
+Agent systems reuse their own outputs. One fabricated success poisons future
+context, memory, and decisions.

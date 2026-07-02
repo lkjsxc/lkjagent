@@ -2,17 +2,15 @@
 
 ## Purpose
 
-This directory owns the rules that keep the repository itself lawful: where
-things live, how small files must stay, how docs are shaped, how Rust is
-written, how commits are made, and the order of work in every change. These
-rules apply to every file in the repository, including this one.
+Define repository layout, file budgets, documentation shape, Rust style, and
+commit protocol.
 
 ## Table of Contents
 
-- [layout.md](layout.md): path ownership map for the whole repository.
-- [line-limits.md](line-limits.md): the 200-line cap and how to split.
-- [documentation-standards.md](documentation-standards.md): doc shape, topology, and content rules.
-- [fan-out.md](fan-out.md): direct-child count target and root sentinel exceptions.
-- [functional-style.md](functional-style.md): the Rust style contract.
-- [commit-protocol.md](commit-protocol.md): commit message shape and cadence.
-- [workflow.md](workflow.md): the docs-first change loop and its gates.
+- [layout.md](layout.md): path ownership map.
+- [line-and-file-limits.md](line-and-file-limits.md): line cap and file-count
+  budgets.
+- [documentation-standards.md](documentation-standards.md): Markdown shape and
+  topology.
+- [functional-style.md](functional-style.md): pure core and effect edge rules.
+- [commit-protocol.md](commit-protocol.md): commit message and cadence.

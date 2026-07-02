@@ -2,65 +2,25 @@
 
 ## Purpose
 
-The path ownership map. Every tracked path belongs to exactly one row here;
-adding a top-level path means adding a row in the same commit.
+Define path ownership in the repository.
 
 ## Top Level
 
-| Path | Owns | Contract |
-| --- | --- | --- |
-| .cargo/ | local cargo command configuration | [../operations/verification.md](../operations/verification.md) |
-| .dockerignore | image build context exclusions | [../architecture/sandbox/container.md](../architecture/sandbox/container.md) |
-| .env.example | local deployment environment template | [../operations/running.md](../operations/running.md) |
-| .gitignore | local build and store ignore rules | this file, below |
-| README.md | project overview and read order | self-contained |
-| AGENTS.md | entry point for coding agents | self-contained |
-| Cargo.toml | cargo workspace manifest and shared lints | [../decisions/rust-workspace.md](../decisions/rust-workspace.md) |
-| docs/ | the implementation contract | [../README.md](../README.md) |
-| data/ | tracked diagnostic workspace and logs, ignored store files | [../architecture/sandbox/workspace.md](../architecture/sandbox/workspace.md) |
-| crates/ | the Rust workspace | this file, below |
-| docker-compose.yml | service wiring | [../operations/compose.md](../operations/compose.md) |
-| Dockerfile | the harness image | [../architecture/sandbox/container.md](../architecture/sandbox/container.md) |
-| .github/ | GitHub metadata, uses _README.md | [../../.github/_README.md](../../.github/_README.md) |
-| LICENSE | Apache License 2.0 text | self-contained |
-| rustfmt.toml | Rust formatting configuration | [functional-style.md](functional-style.md) |
+| Path | Owner |
+| --- | --- |
+| `crates/lkjagent-core/` | pure task, plan, prompt, parse, check, and ladder logic |
+| `crates/lkjagent-store/` | SQLite schema and access |
+| `crates/lkjagent-llm/` | endpoint client |
+| `crates/lkjagent-effects/` | filesystem, shell, checks, and exchange logs |
+| `crates/lkjagent-app/` | daemon loop and owner CLI |
+| `crates/lkjagent-xtask/` | repository gates, bench, replay, and proof |
+| `docs/` | implementation contract |
+| `data/` | runtime store, logs, and workspace |
+| `tmp/` | ignored scratch and proof capture |
 
-## Crates
+## Ownership Rule
 
-| Crate | Owns | Doc contract |
-| --- | --- | --- |
-| crates/lkjagent-protocol | action grammar parse and render | [../architecture/protocol/](../architecture/protocol/README.md) |
-| crates/lkjagent-context | window layout, budgets, compaction | [../architecture/context/](../architecture/context/README.md) |
-| crates/lkjagent-store | SQLite queue, events, memory, state | [../architecture/memory/](../architecture/memory/README.md) |
-| crates/lkjagent-llm | endpoint HTTP client | [../architecture/llm/](../architecture/llm/README.md) |
-| crates/lkjagent-graph | state graph, task cases, transitions, evidence gates | [../architecture/state-graph/](../architecture/state-graph/README.md) |
-| crates/lkjagent-tools | tool execution adapters | [../architecture/tools/](../architecture/tools/README.md) |
-| crates/lkjagent-runtime | daemon, loop, intake, maintenance | [../architecture/runtime/](../architecture/runtime/README.md) |
-| crates/lkjagent-cli | the lkjagent binary | [../product/cli/](../product/cli/README.md) |
-| crates/lkjagent-benchmark | benchmark tasks, judges, corpus checks, reports | [../evaluation/](../evaluation/README.md) |
-| crates/lkjagent-xtask | repository checks and quiet gates | [../operations/verification.md](../operations/verification.md) |
-
-Dependency direction flows toward purity: cli and runtime depend on the
-others; protocol, context, and graph depend on nothing in the workspace;
-nothing depends on cli or xtask.
-
-## README Coverage
-
-Every crate root and every source subdirectory carries a README.md with a
-Purpose section and a table of contents for its files, mirroring the docs
-convention in [documentation-standards.md](documentation-standards.md).
-The xtask check-docs gate enforces coverage once built.
-
-## Runtime Paths
-
-| Host path | Container path | Owns | Contract |
-| --- | --- | --- | --- |
-| ./data | /data | store, workspace, config | [../architecture/sandbox/workspace.md](../architecture/sandbox/workspace.md) |
-| ./data/workspace | /data/workspace | project directory the agent works on | [../architecture/sandbox/workspace.md](../architecture/sandbox/workspace.md) |
-| ./data/benchmark | not mounted by default | generated benchmark reports and task data | [../evaluation/](../evaluation/README.md) |
-
-Runtime store files remain ignored local state. The default compose bind mount
-maps repository ./data to container /data. The current diagnostic handoff tracks
-./data/workspace and ./data/logs while .gitignore still excludes store files,
-target directories, and local config. .dockerignore excludes /data from image
-build context.
+A source module links to its owning docs page in comments only when the link adds
+clarity. Behavior changes update the owning docs page and
+[../current-state.md](../current-state.md) in the same commit when the ledger
+truth changes.
