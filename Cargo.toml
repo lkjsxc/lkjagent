@@ -2,6 +2,7 @@
 members = [
     "crates/lkjagent-core",
     "crates/lkjagent-effects",
+    "crates/lkjagent-app",
     "crates/lkjagent-cli",
     "crates/lkjagent-benchmark",
     "crates/lkjagent-context",

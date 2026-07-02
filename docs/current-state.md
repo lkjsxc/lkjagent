@@ -17,7 +17,9 @@ and orphan exchange detection. `lkjagent-llm` now accepts per-call max token
 budgets and stop sequences while keeping endpoint anomaly handling.
 `lkjagent-effects` now implements workspace path guards, bounded file tools,
 shell execution, check fact gathering, observation envelopes, and exchange-log
-writing. Rich templates and the app binary are not yet built. The existing
+writing. `lkjagent-app` now has a plan-driven daemon skeleton, fake endpoint
+seam, snapshot resume path, owner CLI parser, status/watch renderers, and
+scripted end-to-end tests. Rich templates are not yet built. The existing
 runtime, graph, tools, CLI, benchmark, and store modules remain until cutover.
 
 The target product is one daemon, one owner queue, one SQLite store, one local
@@ -47,6 +49,8 @@ with `llm.max-tokens.write=1400`, configurable stop suffix repair, provider
 anomalies, and backoff. `crates/lkjagent-effects/` tests cover path escape and
 symlink guards, file operations, shell output, observation truncation, exchange
 log writing, and all deterministic catalog checks over a fixture tree.
+`crates/lkjagent-app/` tests cover the documented help tree, queue-backed fake
+endpoint execution, store-backed resume, and the status field set.
 
 The current Rust workspace still includes the existing parser, protocol
 registry, graph, context, store, LLM client, tools, runtime, CLI, benchmark, and
@@ -67,7 +71,7 @@ Stage 0 baseline evidence is recorded under
 
 ## Open Work
 
-- Rich templates and app binary are not yet implemented.
+- Rich templates and the production LLM adapter inside `lkjagent-app` are not yet implemented.
 - The benchmark corpus and replay smoke still exercise the existing runtime.
 - The Aurora Ledger live proof remains open until the daemon produces ten
   requested chapter files totaling at least 10,000 measured manuscript words and
