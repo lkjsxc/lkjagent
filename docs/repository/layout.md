@@ -15,6 +15,7 @@ Define path ownership in the repository.
 | `crates/lkjagent-app/` | daemon loop and owner CLI |
 | `crates/lkjagent-xtask/` | repository gates, bench, replay, and proof |
 | `docs/` | implementation contract |
+| `evaluation/corpus/` | deterministic benchmark corpus |
 | `data/` | runtime store, logs, and workspace |
 | `tmp/` | ignored scratch and proof capture |
 

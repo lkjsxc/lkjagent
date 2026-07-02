@@ -120,6 +120,14 @@ fn run_verify(root: &Path) -> i32 {
             return report_static(name, violations);
         }
     }
+    if let Err(error) = benchmark::validate_corpus(root) {
+        print_failure(&[
+            "bench check-corpus failed".to_string(),
+            "exit status: 1".to_string(),
+            error,
+        ]);
+        return 1;
+    }
     run_command_gate(root, "verify")
 }
 

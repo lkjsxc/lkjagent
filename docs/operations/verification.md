@@ -20,7 +20,7 @@ All local gates run as `cargo run -p lkjagent-xtask -- <gate>`.
 | `check-lines` | per-file line cap |
 | `check-files` | product source and docs file-count budgets |
 | `check-style` | panic-path scan and dependency allowlist |
-| `bench check-corpus` | not yet rebuilt for the plan engine; fails honestly |
+| `bench check-corpus` | deterministic corpus shape, fixtures, and check validation |
 | `smoke replay` | not yet rebuilt for the plan engine; fails honestly |
 | `quiet test` | fmt, clippy, and workspace tests |
 | `quiet verify` | check-docs, check-lines, check-files, check-style, quiet test |
@@ -31,8 +31,8 @@ All local gates run as `cargo run -p lkjagent-xtask -- <gate>`.
 docker compose run --rm verify
 docker compose run --rm test
 docker compose run --rm lint
-# Rebuilt in the benchmark and replay stage:
-# docker compose run --rm bench
+docker compose run --rm bench
+# Rebuilt in the replay stage:
 # docker compose run --rm replay
 ```
 

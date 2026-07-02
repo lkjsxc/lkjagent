@@ -1,0 +1,2 @@
+ok|Plan|<plan>write notes/tiny.md | summary | words=20\nrespond | report file</plan>
+ok|Write|<content># Tiny\n\nSummary.</content>
