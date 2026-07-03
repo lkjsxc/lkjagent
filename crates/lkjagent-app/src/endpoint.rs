@@ -1,4 +1,5 @@
 use std::path::{Path, PathBuf};
+use std::time::Duration;
 
 use lkjagent_core::render::Prompt;
 use lkjagent_llm::client::complete;
@@ -30,8 +31,16 @@ impl Endpoint for LlmEndpoint {
             Message::system(prompt.system.clone()),
             Message::user(prompt.user.clone()),
         ];
-        complete(&config, &messages, &spec, attempt)
-            .map(|completion| completion.content)
-            .map_err(|error| error.to_string())
+        let mut last_error = String::new();
+        for offset in 0..5 {
+            match complete(&config, &messages, &spec, attempt.saturating_add(offset)) {
+                Ok(completion) => return Ok(completion.content),
+                Err(error) => {
+                    last_error = error.to_string();
+                    std::thread::sleep(Duration::from_secs(3));
+                }
+            }
+        }
+        Err(last_error)
     }
 }

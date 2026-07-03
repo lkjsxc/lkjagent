@@ -1,6 +1,8 @@
 use crate::checks::{CommandFact, FileFact};
 use crate::engine_checks::handle_checks;
-use crate::engine_steps::{block_task, close_task, handle_fault, handle_model};
+use crate::engine_steps::{
+    block_task, close_task, handle_endpoint_error, handle_fault, handle_model,
+};
 use crate::model::*;
 use crate::parse::{Action, ParseFault, ParsedOutput};
 use crate::render::{render_prompt, Prompt};
@@ -18,6 +20,7 @@ pub enum Work {
 pub enum TurnOutcome {
     Model(ParsedOutput),
     ParseFault(ParseFault),
+    EndpointError(String),
     Checks(Vec<FileFact>, Vec<CommandFact>),
     Noop,
 }
@@ -63,6 +66,9 @@ pub fn apply_turn(
     match (work, outcome) {
         (Work::CallModel { step_id, prompt }, TurnOutcome::ParseFault(fault)) => {
             handle_fault(&mut next, &mut commands, *step_id, prompt, fault);
+        }
+        (Work::CallModel { step_id, prompt }, TurnOutcome::EndpointError(error)) => {
+            handle_endpoint_error(&mut next, &mut commands, *step_id, prompt, &error);
         }
         (Work::CallModel { step_id, prompt }, TurnOutcome::Model(parsed)) => {
             next.task.budget_used = next.task.budget_used.saturating_add(1);

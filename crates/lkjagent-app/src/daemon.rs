@@ -136,10 +136,12 @@ fn run_turn<E: Endpoint>(
                 .iter()
                 .find(|step| step.id == *step_id)
                 .ok_or_else(|| "active step missing".to_string())?;
-            let raw = endpoint.complete(prompt, step.attempts_used)?;
-            match parse_expected(step.kind, &raw) {
-                Ok(parsed) => TurnOutcome::Model(parsed),
-                Err(fault) => TurnOutcome::ParseFault(fault),
+            match endpoint.complete(prompt, step.attempts_used) {
+                Ok(raw) => match parse_expected(step.kind, &raw) {
+                    Ok(parsed) => TurnOutcome::Model(parsed),
+                    Err(fault) => TurnOutcome::ParseFault(fault),
+                },
+                Err(error) => TurnOutcome::EndpointError(error),
             }
         }
         Work::RunChecks { step_id } => gather_checks(workspace, &snapshot, *step_id)?,

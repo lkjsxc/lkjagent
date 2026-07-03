@@ -32,6 +32,28 @@ pub(crate) fn handle_fault(
     }
 }
 
+pub(crate) fn handle_endpoint_error(
+    snapshot: &mut TaskSnapshot,
+    commands: &mut Vec<Command>,
+    step_id: u64,
+    prompt: &Prompt,
+    error: &str,
+) {
+    let Some(index) = step_index(snapshot, step_id) else {
+        return;
+    };
+    let step = &mut snapshot.steps[index];
+    step.state = StepState::Active;
+    step.attempts_used = step.attempts_used.saturating_add(1);
+    let attempt = attempt(step, prompt, AttemptOutcome::EndpointError, error);
+    snapshot.attempts.push(attempt.clone());
+    commands.push(Command::RecordAttempt(attempt));
+    if snapshot.steps[index].attempts_used >= 3 {
+        snapshot.steps[index].state = StepState::Blocked;
+        record_event(commands, EventKind::StepBlocked, error.to_string());
+    }
+}
+
 pub(crate) fn handle_model(
     snapshot: &mut TaskSnapshot,
     commands: &mut Vec<Command>,
