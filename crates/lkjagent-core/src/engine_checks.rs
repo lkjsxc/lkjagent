@@ -23,6 +23,7 @@ pub(crate) fn handle_checks(
     commands.push(Command::RecordChecks(results.clone()));
     if passed {
         snapshot.steps[index].state = StepState::Done;
+        feed_next_step(snapshot, index, &results);
         crate::engine_steps::record_event(
             commands,
             EventKind::StepDone,
@@ -30,6 +31,32 @@ pub(crate) fn handle_checks(
         );
     } else {
         handle_failed(snapshot, commands, index, files, &results);
+    }
+}
+
+fn feed_next_step(
+    snapshot: &mut TaskSnapshot,
+    index: usize,
+    results: &[crate::model::CheckResult],
+) {
+    let summary = results
+        .iter()
+        .map(|result| {
+            format!(
+                "{}={} measured={}",
+                result.name, result.passed, result.measured
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n");
+    if let Some(step) = snapshot
+        .steps
+        .iter_mut()
+        .skip(index + 1)
+        .find(|step| matches!(step.state, StepState::Pending | StepState::Active))
+    {
+        step.inputs.push_str("\ncheck_results:\n");
+        step.inputs.push_str(&summary);
     }
 }
 
