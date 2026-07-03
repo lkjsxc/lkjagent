@@ -9,6 +9,13 @@ fn parses_docs_plan_examples() {
 }
 
 #[test]
+fn accepts_comma_separated_plan_actions() {
+    let raw = "<plan>write notes/a.md | A | words=20, explore | gather facts | budget=3</plan>";
+    let parsed = parse_expected(StepKind::Plan, raw);
+    assert!(matches!(parsed, Ok(ParsedOutput::Plan(lines)) if lines.len() == 2));
+}
+
+#[test]
 fn reports_docs_fault_examples() {
     assert_eq!(
         parse_expected(StepKind::Write, "<message>x</message>"),

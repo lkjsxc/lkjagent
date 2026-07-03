@@ -1,9 +1,23 @@
 use crate::parse::{ParseFault, PlanLine};
 
 pub(crate) fn parse_plan(body: &str) -> Result<Vec<PlanLine>, ParseFault> {
-    body.lines()
+    logical_lines(body)
+        .into_iter()
         .filter(|line| !line.trim().is_empty())
-        .map(parse_plan_line)
+        .map(|line| parse_plan_line(&line))
+        .collect()
+}
+
+fn logical_lines(body: &str) -> Vec<String> {
+    body.lines()
+        .flat_map(|line| {
+            line.replace(", write ", "\nwrite ")
+                .replace(", explore |", "\nexplore |")
+                .replace(", respond |", "\nrespond |")
+                .lines()
+                .map(|part| part.trim().to_string())
+                .collect::<Vec<_>>()
+        })
         .collect()
 }
 
