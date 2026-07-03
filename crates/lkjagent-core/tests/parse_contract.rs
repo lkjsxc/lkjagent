@@ -16,6 +16,13 @@ fn accepts_comma_separated_plan_actions() {
 }
 
 #[test]
+fn accepts_extended_respond_plan_action() {
+    let raw = "<plan>respond | Documentation completed | SUMMARY</plan>";
+    let parsed = parse_expected(StepKind::Plan, raw);
+    assert!(matches!(parsed, Ok(ParsedOutput::Plan(lines)) if lines.len() == 1));
+}
+
+#[test]
 fn reports_docs_fault_examples() {
     assert_eq!(
         parse_expected(StepKind::Write, "<message>x</message>"),

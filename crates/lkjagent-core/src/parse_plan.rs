@@ -26,8 +26,8 @@ fn parse_plan_line(line: &str) -> Result<PlanLine, ParseFault> {
     match parts.as_slice() {
         [left, title, words] if left.starts_with("write ") => write_line(line, left, title, words),
         ["explore", goal, budget] => explore_line(line, goal, budget),
-        ["respond", summary] => Ok(PlanLine::Respond {
-            summary: (*summary).to_string(),
+        ["respond", parts @ ..] if !parts.is_empty() => Ok(PlanLine::Respond {
+            summary: parts.join(" | "),
         }),
         _ => Err(ParseFault::BadPlanLine(line.to_string())),
     }
