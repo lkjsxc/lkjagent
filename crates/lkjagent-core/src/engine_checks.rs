@@ -1,5 +1,6 @@
 use crate::checks::{evaluate, CommandFact, FileFact};
 use crate::engine::Command;
+use crate::engine_completion::record_event;
 use crate::engine_extend::{add_steps, insert_after, shortfall_steps};
 use crate::model::{EventKind, StepState, TaskSnapshot};
 
@@ -27,7 +28,7 @@ pub(crate) fn handle_checks(
     if passed {
         snapshot.steps[index].state = StepState::Done;
         feed_next_step(snapshot, index, &results);
-        crate::engine_steps::record_event(
+        record_event(
             commands,
             EventKind::StepDone,
             snapshot.steps[index].title.clone(),
@@ -74,7 +75,7 @@ fn handle_failed(
     let additions = shortfall_steps(&snapshot.steps[index], files, results);
     if additions.is_empty() {
         snapshot.steps[index].state = StepState::Blocked;
-        crate::engine_steps::record_event(
+        record_event(
             commands,
             EventKind::StepBlocked,
             "deterministic checks failed".to_string(),

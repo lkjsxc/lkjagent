@@ -1,5 +1,6 @@
 use crate::engine::Command;
-use crate::engine_actions::{finish_summary, memory_save};
+use crate::engine_actions::{action_fingerprint, finish_summary, memory_save};
+use crate::engine_completion::record_event;
 use crate::engine_extend::{add_steps, insert_after, split_after_fault};
 use crate::engine_plan::finish_plan;
 use crate::model::*;
@@ -64,6 +65,13 @@ pub(crate) fn handle_model(
     let Some(index) = step_index(snapshot, step_id) else {
         return;
     };
+    if let ParsedOutput::Action(action) = &parsed {
+        if finish_summary(action).is_none() && repeated_action(&snapshot.steps[index], action) {
+            let attempt = guard_repeated_action(&mut snapshot.steps[index], commands, prompt);
+            snapshot.attempts.push(attempt);
+            return;
+        }
+    }
     let attempt_row = attempt(&snapshot.steps[index], prompt, AttemptOutcome::Ok, "ok");
     snapshot.attempts.push(attempt_row.clone());
     commands.push(Command::RecordAttempt(attempt_row));
@@ -84,27 +92,6 @@ pub(crate) fn handle_model(
     }
 }
 
-pub(crate) fn close_task(snapshot: &mut TaskSnapshot, commands: &mut Vec<Command>) {
-    let missing_checks = !snapshot.task.checks.is_empty() && snapshot.check_results.is_empty();
-    let passed = !missing_checks && snapshot.check_results.iter().all(|result| result.passed);
-    if passed {
-        snapshot.task.state = TaskState::Closed;
-        record_event(
-            commands,
-            EventKind::TaskClosed,
-            snapshot.task.summary.clone(),
-        );
-    } else {
-        block_task(snapshot, commands, "task checks failed");
-    }
-}
-
-pub(crate) fn block_task(snapshot: &mut TaskSnapshot, commands: &mut Vec<Command>, reason: &str) {
-    snapshot.task.state = TaskState::Blocked;
-    snapshot.task.summary = reason.to_string();
-    record_event(commands, EventKind::TaskBlocked, reason.to_string());
-}
-
 fn finish_content(step: &mut Step, commands: &mut Vec<Command>, content: String) {
     if let Some(path) = &step.output_path {
         commands.push(Command::WriteFile {
@@ -119,7 +106,12 @@ fn finish_content(step: &mut Step, commands: &mut Vec<Command>, content: String)
 fn keep_exploring(step: &mut Step, commands: &mut Vec<Command>, action: Action) {
     step.state = StepState::Active;
     step.actions_used = step.actions_used.saturating_add(1);
-    step.inputs = format!("last_action={} count={}", action.tool, step.actions_used);
+    step.inputs = format!(
+        "last_action_fingerprint={}\nlast_action={}\ncount={}",
+        action_fingerprint(&action),
+        action.tool,
+        step.actions_used
+    );
     if let Some((topic, content)) = memory_save(&action) {
         commands.push(Command::RecordMemory { topic, content });
     }
@@ -127,6 +119,26 @@ fn keep_exploring(step: &mut Step, commands: &mut Vec<Command>, action: Action) 
     if step.actions_used >= step.action_budget && step.action_budget > 0 {
         step.state = StepState::Blocked;
     }
+}
+
+fn guard_repeated_action(step: &mut Step, commands: &mut Vec<Command>, prompt: &Prompt) -> Attempt {
+    let diagnosis = "repeated action; state the next different action or finish";
+    step.state = StepState::Active;
+    step.attempts_used = step.attempts_used.saturating_add(1);
+    let attempt = attempt(step, prompt, AttemptOutcome::ParseFault, diagnosis);
+    commands.push(Command::RecordAttempt(attempt.clone()));
+    attempt
+}
+
+fn repeated_action(step: &Step, action: &Action) -> bool {
+    let Some(previous) = step
+        .inputs
+        .lines()
+        .find_map(|line| line.strip_prefix("last_action_fingerprint="))
+    else {
+        return false;
+    };
+    previous == action_fingerprint(action)
 }
 
 fn finish_message(
@@ -185,8 +197,4 @@ fn attempt(step: &Step, prompt: &Prompt, outcome: AttemptOutcome, diagnosis: &st
         tokens_out: 0,
         cached_tokens: 0,
     }
-}
-
-pub(crate) fn record_event(commands: &mut Vec<Command>, kind: EventKind, content: String) {
-    commands.push(Command::RecordEvent(Event { kind, content }));
 }

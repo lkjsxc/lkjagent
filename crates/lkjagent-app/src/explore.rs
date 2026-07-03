@@ -17,8 +17,17 @@ pub fn run(conn: &Connection, workspace: &Path, snapshot: &mut TaskSnapshot, act
         .iter_mut()
         .find(|step| step.state == StepState::Active)
     {
-        step.inputs = format!("latest_observation=\n{rendered}");
+        let action_state = action_state(&step.inputs);
+        step.inputs = format!("{action_state}latest_observation=\n{rendered}");
     }
+}
+
+fn action_state(inputs: &str) -> String {
+    inputs
+        .lines()
+        .filter(|line| line.starts_with("last_action") || line.starts_with("count="))
+        .map(|line| format!("{line}\n"))
+        .collect()
 }
 
 fn dispatch(conn: &Connection, workspace: &Path, action: &Action) -> Result<String, String> {

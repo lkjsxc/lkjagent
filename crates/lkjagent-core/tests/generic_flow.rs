@@ -41,6 +41,25 @@ fn generic_task_closes_after_eight_plus_turns_with_faults() {
         .any(|cmd| matches!(cmd, Command::RecordEvent(_))));
 }
 
+#[test]
+fn repeated_explore_action_is_not_executed() {
+    let snapshot = instantiate(3, "Survey the workspace and report.");
+    let work = next_work(&snapshot);
+    let (snapshot, _) = apply_turn(&snapshot, &work, action("fs.read", "path", "README.md"));
+    let work = next_work(&snapshot);
+    let (snapshot, commands) = apply_turn(&snapshot, &work, action("fs.read", "path", "README.md"));
+    assert_eq!(snapshot.steps[0].actions_used, 1);
+    assert_eq!(snapshot.steps[0].attempts_used, 1);
+    assert!(!commands
+        .iter()
+        .any(|cmd| matches!(cmd, Command::RunExplore(_))));
+    assert!(commands.iter().any(|cmd| matches!(
+        cmd,
+        Command::RecordAttempt(attempt)
+            if attempt.diagnosis.contains("repeated action")
+    )));
+}
+
 fn action(tool: &str, name: &str, value: &str) -> TurnOutcome {
     TurnOutcome::Model(ParsedOutput::Action(Action {
         tool: tool.to_string(),

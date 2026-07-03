@@ -30,7 +30,8 @@ rows, and records waiting answers as rows before continuing.
 The parser now rejects explore `<finish>` and `<ask>` envelopes, leading or
 trailing prose, duplicate action parameters, unknown action parameters, and
 unknown tools. Prompt rendering tells explore steps to finish with the `finish`
-action inside `<action>`.
+action inside `<action>`, and the engine rejects adjacent repeated explore
+actions before effects run.
 
 Queue rows persist `force_new`, send uses it, and daemon intake can select a
 forced-new row without treating it as an answer. Status, task, queue, log,
