@@ -39,6 +39,13 @@ pub fn commit_commands(
                 update_task_for_event(&tx, task_id, event.kind, &event.content, now)?;
                 insert_event(&tx, task_id, event.kind, &event.content, now)?
             }
+            Command::RecordMemory { topic, content } => {
+                tx.execute(
+                    "INSERT INTO memory (topic, content, task_id, created_at)
+                     VALUES (?1, ?2, ?3, ?4)",
+                    params![topic, content, task_id, now],
+                )?;
+            }
             Command::RecordChecks { step_id, results } => {
                 for result in results {
                     tx.execute(

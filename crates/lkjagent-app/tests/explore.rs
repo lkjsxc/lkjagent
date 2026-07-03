@@ -1,6 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
+use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::model::TaskState;
 use lkjagent_store::plan_access::enqueue;
@@ -20,6 +21,7 @@ fn explore_registry_runs_bounded_workspace_tools() -> TestResult<()> {
         outputs: vec![
             action("fs.write", &[('p', "probe.txt"), ('c', "hello aurora")]),
             action("fs.read", &[('p', "probe.txt")]),
+            memory_save("probe", "hello aurora"),
             finish("read probe"),
             "<message>done</message>".to_string(),
         ],
@@ -29,7 +31,14 @@ fn explore_registry_runs_bounded_workspace_tools() -> TestResult<()> {
     assert_eq!(snapshot.task.state, TaskState::Closed);
     assert!(data.join("workspace/probe.txt").exists());
     assert!(snapshot.steps[0].inputs.contains("<observation>"));
-    assert!(snapshot.steps[0].inputs.contains("path=probe.txt"));
+    assert!(snapshot.steps[0].inputs.contains("saved topic=probe"));
+    assert!(cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "memory",
+        "aurora"
+    ])?
+    .contains("hello aurora"));
     Ok(())
 }
 
@@ -40,6 +49,12 @@ fn action(tool: &str, params: &[(char, &str)]) -> String {
         body.push_str(&format!("<{name}>{value}</{name}>"));
     }
     format!("<action>{body}</action>")
+}
+
+fn memory_save(topic: &str, content: &str) -> String {
+    format!(
+        "<action><tool>memory.save</tool><topic>{topic}</topic><content>{content}</content></action>"
+    )
 }
 
 fn finish(summary: &str) -> String {

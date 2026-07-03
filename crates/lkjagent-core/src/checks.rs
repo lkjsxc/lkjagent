@@ -21,7 +21,7 @@ pub fn evaluate(spec: &CheckSpec, files: &[FileFact], commands: &[CommandFact]) 
         }
         CheckSpec::MinWords { path, n } => {
             let measured = file(files, path).map_or(0, count_words);
-            result("min_words", measured >= *n, format!("{measured} >= {n}"))
+            result("min_words", measured >= *n, measured.to_string())
         }
         CheckSpec::MinWordsTotal { glob, n } => {
             let measured = files
@@ -29,15 +29,11 @@ pub fn evaluate(spec: &CheckSpec, files: &[FileFact], commands: &[CommandFact]) 
                 .filter(|fact| glob_match(glob, &fact.path))
                 .map(|fact| count_words(&fact.content))
                 .sum::<usize>();
-            result(
-                "min_words_total",
-                measured >= *n,
-                format!("{measured} >= {n}"),
-            )
+            result("min_words_total", measured >= *n, measured.to_string())
         }
         CheckSpec::MaxLines { path, n } => {
             let measured = file(files, path).map_or(0, |content| content.lines().count());
-            result("max_lines", measured <= *n, format!("{measured} <= {n}"))
+            result("max_lines", measured <= *n, measured.to_string())
         }
         CheckSpec::FileCount { glob, min, max } => {
             let measured = files
@@ -64,8 +60,8 @@ pub fn evaluate(spec: &CheckSpec, files: &[FileFact], commands: &[CommandFact]) 
             result("command", passed, passed.to_string())
         }
         CheckSpec::Judged { path, .. } => result("judged", file(files, path).is_some(), path),
-        CheckSpec::ReadmeCoverage { root } => readme_coverage(files, root),
-        CheckSpec::LinksResolve { root } => links_resolve(files, root),
+        CheckSpec::ReadmeCoverage { root } => crate::checks_links::readme_coverage(files, root),
+        CheckSpec::LinksResolve { root } => crate::checks_links::links_resolve(files, root),
     }
 }
 
@@ -90,75 +86,4 @@ fn glob_match(glob: &str, path: &str) -> bool {
     } else {
         path == glob
     }
-}
-
-fn readme_coverage(files: &[FileFact], root: &str) -> CheckResult {
-    let dirs = dirs_under(files, root);
-    let passed = dirs.iter().all(|dir| {
-        let readme = format!("{dir}/README.md");
-        files.iter().any(|fact| fact.path == readme)
-    });
-    result("readme_coverage", passed, format!("dirs={}", dirs.len()))
-}
-
-fn links_resolve(files: &[FileFact], root: &str) -> CheckResult {
-    let paths = files
-        .iter()
-        .map(|fact| fact.path.as_str())
-        .collect::<Vec<_>>();
-    let mut missing = 0;
-    for fact in files.iter().filter(|fact| fact.path.starts_with(root)) {
-        let base = fact.path.rsplit_once('/').map_or("", |(dir, _)| dir);
-        for link in markdown_links(&fact.content) {
-            let resolved = if base.is_empty() {
-                link
-            } else {
-                format!("{base}/{link}")
-            };
-            if !paths.iter().any(|path| **path == resolved) {
-                missing += 1;
-            }
-        }
-    }
-    result("links_resolve", missing == 0, format!("missing={missing}"))
-}
-
-fn dirs_under(files: &[FileFact], root: &str) -> Vec<String> {
-    let mut dirs = vec![root.trim_end_matches('/').to_string()];
-    for fact in files.iter().filter(|fact| fact.path.starts_with(root)) {
-        let mut current = String::new();
-        for part in fact
-            .path
-            .split('/')
-            .take_while(|part| !part.ends_with(".md"))
-        {
-            if current.is_empty() {
-                current.push_str(part);
-            } else {
-                current.push('/');
-                current.push_str(part);
-            }
-            if current.starts_with(root) && !dirs.contains(&current) {
-                dirs.push(current.clone());
-            }
-        }
-    }
-    dirs
-}
-
-fn markdown_links(text: &str) -> Vec<String> {
-    let mut links = Vec::new();
-    for line in text.lines() {
-        let mut rest = line;
-        while let Some(start) = rest.find("](") {
-            let after = &rest[start + 2..];
-            let Some(end) = after.find(')') else { break };
-            let target = after[..end].split('#').next().unwrap_or("");
-            if !target.is_empty() && !target.contains("://") && !target.starts_with('#') {
-                links.push(target.to_string());
-            }
-            rest = &after[end + 1..];
-        }
-    }
-    links
 }

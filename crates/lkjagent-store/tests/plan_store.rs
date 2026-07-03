@@ -1,9 +1,10 @@
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::engine::Command;
-use lkjagent_core::model::{Event, EventKind, TaskState};
+use lkjagent_core::model::{CheckResult, Event, EventKind, StepKind, TaskState};
 use lkjagent_store::plan_access::{
-    attach_answer, deliver_next, enqueue, insert_task, set_task_state,
+    attach_answer, deliver_next, enqueue, insert_step_tx, insert_task, set_task_state,
 };
+use lkjagent_store::plan_commit::commit_turn;
 use lkjagent_store::plan_inspect::application_tables;
 use lkjagent_store::plan_schema::{setup, APPLICATION_TABLES};
 use lkjagent_store::plan_turn::{commit_commands, events, orphan_exchanges};
@@ -82,6 +83,46 @@ fn turn_transaction_rolls_back_uncommitted_rows() -> TestResult<()> {
     assert_eq!(rows.len(), 2);
     let orphans = orphan_exchanges(&["a".to_string(), "b".to_string()], &["a".to_string()]);
     assert_eq!(orphans.len(), 1);
+    Ok(())
+}
+
+#[test]
+fn turn_commit_stores_check_params_with_step_id() -> TestResult<()> {
+    let mut conn = Connection::open_in_memory()?;
+    setup(&conn)?;
+    let snapshot = instantiate(11, "Write notes/out.md with setup notes.");
+    insert_task(&conn, &snapshot.task, None, "now")?;
+    let tx = conn.transaction()?;
+    for step in &snapshot.steps {
+        insert_step_tx(&tx, step, "now")?;
+    }
+    tx.commit()?;
+    let step_id = snapshot
+        .steps
+        .iter()
+        .find(|step| step.kind == StepKind::Verify)
+        .map(|step| step.id)
+        .unwrap_or(2);
+    commit_turn(
+        &mut conn,
+        &snapshot,
+        &[Command::RecordChecks {
+            step_id,
+            results: vec![CheckResult {
+                name: "file_exists".to_string(),
+                passed: true,
+                measured: "true".to_string(),
+            }],
+        }],
+        "later",
+    )?;
+    let row: (i64, String) = conn.query_row(
+        "SELECT step_id, params_json FROM check_results LIMIT 1",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?)),
+    )?;
+    assert_eq!(row.0, step_id as i64);
+    assert!(row.1.contains("notes/out.md"));
     Ok(())
 }
 

@@ -35,38 +35,39 @@ Queue rows persist `force_new`, send uses it, and daemon intake can select a
 forced-new row without treating it as an answer. Status, task, queue, log,
 memory, and watch surfaces read rows instead of a config snapshot. The bounded
 explore dispatcher runs the documented filesystem, shell, memory, plan-note,
-and finish actions and stores the latest observation in step inputs.
+and finish actions, stores latest observations in step inputs, and persists
+`memory.save` rows.
+
+Endpoint calls produce exchange files and structured completion records with
+usage, cache metrics, provider anomalies, closure mode, timing, generated
+exchange refs, and nullable token usage rows. Check results use the active step
+id, store check parameters, and keep numeric measurements as scalar values.
+README coverage requires links to children, and link checks normalize `./`,
+`../`, anchors, and directory README inference. Deterministic effect failures
+commit an `effect_error` attempt and notice without marking the step done.
 
 During this implementation pass, `cargo test -q`, `check-docs`, `check-lines`,
 `quiet verify`, and `docker compose run --rm verify` passed after the row-first,
-parser, CLI, explore, exchange-log, and token-usage changes.
+parser, CLI, explore, exchange-log, token-usage, check-measurement, memory
+persistence, docs-link, and effect-error settlement changes.
 
 ## Implemented Code
 
 `lkjagent-core` owns the pure plan engine, parser, renderer, checks, word
-counting, classifier, templates, and recovery helpers. `lkjagent-store` owns the
-plan-store schema, row hydration, queue access, and atomic turn state commits.
-`lkjagent-effects` owns filesystem, shell, check gathering, observations, and
-exchange log file helpers. `lkjagent-app` owns the daemon interpreter,
-row-backed CLI renderers, endpoint adapter, waiting answer routing, and bounded
-explore dispatcher. `lkjagent-llm` owns the endpoint wire client.
-`lkjagent-xtask` owns repository gates, structure audit, deterministic replay,
-benchmark commands, and proof bundle collection.
+counting, classifier, templates, docs-link helpers, and recovery helpers.
+`lkjagent-store` owns the plan-store schema, row hydration, queue access, and
+atomic turn state commits. `lkjagent-effects` owns filesystem, shell, check
+gathering, observations, and exchange log file helpers. `lkjagent-app` owns the
+daemon interpreter, row-backed CLI renderers, endpoint adapter, waiting answer
+routing, effect-error settlement, and bounded explore dispatcher. `lkjagent-llm`
+owns the endpoint wire client. `lkjagent-xtask` owns repository gates, structure
+audit, deterministic replay, benchmark commands, and proof bundle collection.
 
 ## Open Implementation Gaps
 
-- Endpoint calls now produce exchange files and structured completion records
-  with usage, cache metrics, provider anomalies, closure mode, timing, and
-  generated exchange refs. Unknown endpoint usage is still represented by the
-  absence of a token row rather than an explicit per-attempt unknown row.
-- Check results now use the active step id, but parameters are still stored as
-  `{}` and measured values are still text rather than structured values for the
-  retry ladder.
-- Turn commits occur after deterministic effects, so a failed effect is not
-  committed as done. Settlement is still not a fully data-rich effect-result
-  feedback model.
-- `memory.save` returns a bounded observation through the explore path, but it
-  does not yet insert a durable memory row.
+No executable implementation gap is known in the current checkout. Future retry
+policies may choose richer typed effect-result and judged-check records, but the
+current behavior has deterministic tests and passing gates.
 
 ## Historical Evidence
 
@@ -77,8 +78,8 @@ gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Store structured check parameters and measured values so the retry ladder can
-consume check data without parsing prose.
+No executable implementation task is known. If new owner requirements arrive,
+start by updating this ledger with the observed gap and add a focused test.
 
 ## Honesty Rules
 

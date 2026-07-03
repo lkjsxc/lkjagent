@@ -11,6 +11,7 @@ Map lkjagent-app source modules.
 - [args.rs](args.rs): CLI parser.
 - [cli.rs](cli.rs): command execution.
 - [daemon.rs](daemon.rs): row-backed turn-cycle interpreter and scripted endpoint seam.
+- [effect-error.rs](effect_error.rs): effect failure settlement.
 - [endpoint.rs](endpoint.rs): endpoint adapter wrapper.
 - [exchange-record.rs](exchange_record.rs): exchange log file rendering.
 - [explore.rs](explore.rs): bounded explore action dispatcher.

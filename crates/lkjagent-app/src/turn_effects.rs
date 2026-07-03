@@ -40,6 +40,7 @@ pub fn dispatch_effects(
             Command::RunExplore(action) => crate::explore::run(workspace, snapshot, action),
             Command::RecordAttempt(_)
             | Command::RecordEvent(_)
+            | Command::RecordMemory { .. }
             | Command::RecordChecks { .. }
             | Command::AddSteps(_) => {}
         }

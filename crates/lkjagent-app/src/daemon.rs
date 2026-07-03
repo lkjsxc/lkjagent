@@ -11,6 +11,7 @@ use lkjagent_store::plan_hydrate::first_snapshot_with_state;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+use crate::effect_error::settle as settle_effect_error;
 use crate::endpoint::LlmEndpoint;
 use crate::model_call::{apply_record, call};
 use crate::turn_effects::{dispatch_effects, gather_checks};
@@ -164,7 +165,9 @@ fn run_turn<E: Endpoint>(
             if let Some(record) = record {
                 apply_record(&mut next, &mut commands, &record);
             }
-            dispatch_effects(workspace, &mut next, &commands)?;
+            if let Err(error) = dispatch_effects(workspace, &mut next, &commands) {
+                return settle_effect_error(conn, &snapshot, &work, error);
+            }
             commit_turn(conn, &next, &commands, "now").map_err(|error| error.to_string())?;
             return Ok(next);
         }
@@ -172,7 +175,9 @@ fn run_turn<E: Endpoint>(
         Work::CloseTask | Work::BlockTask(_) | Work::Wait => TurnOutcome::Noop,
     };
     let (mut next, commands) = apply_turn(&snapshot, &work, outcome);
-    dispatch_effects(workspace, &mut next, &commands)?;
+    if let Err(error) = dispatch_effects(workspace, &mut next, &commands) {
+        return settle_effect_error(conn, &snapshot, &work, error);
+    }
     commit_turn(conn, &next, &commands, "now").map_err(|error| error.to_string())?;
     Ok(next)
 }

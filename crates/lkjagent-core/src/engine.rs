@@ -34,6 +34,10 @@ pub enum Command {
     RunExplore(Action),
     RecordAttempt(Attempt),
     RecordEvent(Event),
+    RecordMemory {
+        topic: String,
+        content: String,
+    },
     RecordChecks {
         step_id: u64,
         results: Vec<CheckResult>,

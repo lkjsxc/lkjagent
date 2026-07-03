@@ -52,19 +52,24 @@ fn persist_command(
                     now,
                 ],
             )?;
-            if attempt.tokens_in > 0 || attempt.tokens_out > 0 {
-                insert_usage(tx, task_id, attempt, now)?;
-            }
+            insert_usage(tx, task_id, attempt, now)?;
         }
         Command::RecordEvent(event) => insert_event(tx, task_id, event.kind, &event.content, now)?,
+        Command::RecordMemory { topic, content } => {
+            tx.execute(
+                "INSERT INTO memory (topic, content, task_id, created_at) VALUES (?1, ?2, ?3, ?4)",
+                params![topic, content, task_id, now],
+            )?;
+        }
         Command::RecordChecks { step_id, results } => {
-            for result in results {
+            for (index, result) in results.iter().enumerate() {
                 tx.execute(
                     "INSERT INTO check_results (step_id, name, params_json, passed, measured,
-                     created_at) VALUES (?1, ?2, '{}', ?3, ?4, ?5)",
+                     created_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
                     params![
                         *step_id as i64,
                         result.name,
+                        check_params(snapshot, *step_id, index)?,
                         i64::from(result.passed),
                         result.measured,
                         now
@@ -137,17 +142,26 @@ fn insert_usage(
         params![
             task_id,
             tx.last_insert_rowid(),
-            attempt.tokens_in as i64,
-            attempt.tokens_out as i64,
-            cached(attempt),
+            token(attempt.tokens_in),
+            token(attempt.tokens_out),
+            token(attempt.cached_tokens),
             now
         ],
     )?;
     Ok(())
 }
 
-fn cached(attempt: &lkjagent_core::model::Attempt) -> Option<i64> {
-    (attempt.cached_tokens > 0).then_some(attempt.cached_tokens as i64)
+fn check_params(snapshot: &TaskSnapshot, step_id: u64, index: usize) -> StoreResult<String> {
+    let params = snapshot
+        .steps
+        .iter()
+        .find(|step| step.id == step_id)
+        .and_then(|step| step.checks.get(index));
+    serde_json::to_string(&params).map_err(|error| StoreError::Sql(error.to_string()))
+}
+
+fn token(value: u32) -> Option<i64> {
+    (value > 0).then_some(value as i64)
 }
 
 fn insert_event(

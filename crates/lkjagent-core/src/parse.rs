@@ -7,9 +7,7 @@ pub enum ParsedOutput {
     Content(String),
     Plan(Vec<PlanLine>),
     Action(Action),
-    Finish(String),
     Message(String),
-    Question(String),
     Verdict(CheckResult),
 }
 

@@ -1,4 +1,5 @@
 use crate::engine::Command;
+use crate::engine_actions::{finish_summary, memory_save};
 use crate::engine_extend::{add_steps, insert_after, split_after_fault};
 use crate::engine_plan::finish_plan;
 use crate::model::*;
@@ -71,25 +72,14 @@ pub(crate) fn handle_model(
             finish_content(&mut snapshot.steps[index], commands, content)
         }
         ParsedOutput::Plan(lines) => finish_plan(snapshot, commands, index, lines),
-        ParsedOutput::Action(action) => {
-            if action.tool == "finish" {
-                let summary = action
-                    .params
-                    .iter()
-                    .find(|(name, _)| name == "summary")
-                    .map(|(_, value)| value.clone())
-                    .unwrap_or_else(|| "explore finished".to_string());
-                finish_message(snapshot, commands, index, summary);
-            } else {
-                keep_exploring(&mut snapshot.steps[index], commands, action)
-            }
-        }
-        ParsedOutput::Finish(summary) => finish_message(snapshot, commands, index, summary),
+        ParsedOutput::Action(action) => match finish_summary(&action) {
+            Some(summary) => finish_message(snapshot, commands, index, summary),
+            None => keep_exploring(&mut snapshot.steps[index], commands, action),
+        },
         ParsedOutput::Message(summary) if snapshot.steps[index].kind == StepKind::Ask => {
             wait_for_answer(snapshot, commands, index, summary);
         }
         ParsedOutput::Message(summary) => finish_message(snapshot, commands, index, summary),
-        ParsedOutput::Question(question) => wait_for_answer(snapshot, commands, index, question),
         ParsedOutput::Verdict(result) => finish_verdict(snapshot, commands, index, result),
     }
 }
@@ -130,6 +120,9 @@ fn keep_exploring(step: &mut Step, commands: &mut Vec<Command>, action: Action) 
     step.state = StepState::Active;
     step.actions_used = step.actions_used.saturating_add(1);
     step.inputs = format!("last_action={} count={}", action.tool, step.actions_used);
+    if let Some((topic, content)) = memory_save(&action) {
+        commands.push(Command::RecordMemory { topic, content });
+    }
     commands.push(Command::RunExplore(action));
     if step.actions_used >= step.action_budget && step.action_budget > 0 {
         step.state = StepState::Blocked;

@@ -2,6 +2,7 @@ pub mod args;
 pub mod cli;
 pub mod config;
 pub mod daemon;
+mod effect_error;
 pub mod endpoint;
 mod exchange_record;
 mod explore;

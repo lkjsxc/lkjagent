@@ -2,7 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use lkjagent_app::cli;
-use lkjagent_app::daemon::{run_until_idle, CompletionRecord, Endpoint};
+use lkjagent_app::daemon::{run_until_idle, CompletionRecord, Endpoint, ScriptedEndpoint};
 use lkjagent_core::render::Prompt;
 use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
@@ -40,6 +40,28 @@ fn endpoint_completion_writes_exchange_and_usage_rows() -> TestResult<()> {
     assert_eq!(usage, (13, 7));
     let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
     assert!(status.contains("task in=13 out=7 cached=3"));
+    Ok(())
+}
+
+#[test]
+fn missing_endpoint_usage_gets_unknown_token_row() -> TestResult<()> {
+    let data = fixture_root("unknown-usage")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    enqueue(&conn, "What is an agent?", "now")?;
+    drop(conn);
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec!["<message>done</message>".to_string()],
+        index: 0,
+    };
+    run_until_idle(&data, &mut endpoint, 3)?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let unknown: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM token_usage WHERE prompt_tokens IS NULL",
+        [],
+        |row| row.get(0),
+    )?;
+    assert!(unknown > 0);
     Ok(())
 }
 
