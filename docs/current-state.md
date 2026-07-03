@@ -54,10 +54,11 @@ Markdown, crate README contract links, `./`, `../`, anchors, and directory READM
 inference. Deterministic effect failures commit an `effect_error` attempt and
 notice without marking the step done.
 
-During this implementation pass, `cargo test -q`, `check-docs`, `check-lines`,
-`quiet verify`, and `docker compose run --rm verify` passed after the row-first,
-parser, CLI, explore, exchange-log, token-usage, check-measurement, memory
-persistence, docs-link, and effect-error settlement changes.
+Focused tests cover the row-first store path, parser, CLI, explore actions,
+exchange logs, token usage, check measurements, memory rows and admission,
+docs-link checks, daemon clock and lease, repeat guard, endpoint patience,
+plan-word checks, prompt briefs, and effect-error settlement. Current gate
+results belong in the handoff after commands are rerun against this checkout.
 
 ## Implemented Code
 
