@@ -1,6 +1,7 @@
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::engine::Command;
 use lkjagent_core::model::{Event, EventKind, StepKind, StepState, TaskSnapshot, TaskState};
+use lkjagent_store::memory::search_memory;
 use lkjagent_store::plan_access::{
     deliver_answer, deliver_forced_new, deliver_next, insert_step_tx, insert_task,
 };
@@ -52,6 +53,7 @@ fn intake<C: Clock>(
     let Some(row) = queue else { return Ok(None) };
     let mut snapshot = instantiate(task_id, &row.content);
     assign_step_ids(&mut snapshot);
+    admit_memory(conn, &mut snapshot, &row.content)?;
     insert_task(conn, &snapshot.task, Some(row.id), &now).map_err(|error| error.to_string())?;
     let tx = conn.transaction().map_err(|error| error.to_string())?;
     for step in &snapshot.steps {
@@ -59,6 +61,21 @@ fn intake<C: Clock>(
     }
     tx.commit().map_err(|error| error.to_string())?;
     Ok(Some(snapshot))
+}
+
+fn admit_memory(conn: &Connection, snapshot: &mut TaskSnapshot, query: &str) -> Result<(), String> {
+    let rows = search_memory(conn, query, 3).map_err(|error| error.to_string())?;
+    if rows.is_empty() {
+        return Ok(());
+    }
+    snapshot.task.brief.push_str("\nmemory_facts:");
+    for row in rows {
+        snapshot
+            .task
+            .brief
+            .push_str(&format!("\nmemory {} {}", row.topic, row.content));
+    }
+    Ok(())
 }
 
 fn resume_waiting<C: Clock>(

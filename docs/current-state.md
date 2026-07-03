@@ -40,7 +40,8 @@ memory, and watch surfaces read rows instead of a config snapshot. The bounded
 explore dispatcher runs the documented filesystem, shell, memory, plan-note,
 and finish actions, stores latest observations in step inputs, persists
 `memory.save` rows, suppresses exact duplicate memory facts, mirrors memory into
-FTS, and resolves `memory.find` from durable rows.
+FTS, admits bounded row-backed memory facts into new task briefs, and resolves
+`memory.find` from durable rows.
 
 Plan-authored write steps carry `words=N` into deterministic `min_words` checks.
 Endpoint calls produce exchange files and structured completion records with

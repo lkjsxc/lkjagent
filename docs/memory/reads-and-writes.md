@@ -18,8 +18,8 @@ There is no idle distillation, merge pass, or hidden memory rewrite.
 
 Memory rows are read by:
 
-- the classifier, which queries objective terms and keeps
-  `memory.classifier.max-hits=3` bounded facts;
+- task intake, which queries owner-message terms and admits
+  `memory.intake.max-hits=3` bounded facts into the task brief;
 - `memory.find` inside explore steps, capped by `tools.memory-find.max-hits=10`;
 - the owner CLI memory command.
 

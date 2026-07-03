@@ -79,6 +79,29 @@ fn daemon_uses_injected_clock_for_durable_rows() -> TestResult<()> {
 }
 
 #[test]
+fn task_intake_admits_bounded_memory_facts() -> TestResult<()> {
+    let data = fixture_root("memory-admission")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    conn.execute(
+        "INSERT INTO memory (topic, content, created_at)
+         VALUES ('aurora', 'row memory fact', 'seed')",
+        [],
+    )?;
+    enqueue(&conn, "Report aurora details.", "queued")?;
+    drop(conn);
+    let mut endpoint = ScriptedEndpoint {
+        outputs: Vec::new(),
+        index: 0,
+    };
+    let mut clock = FixedClock::new("fixed-utc");
+    let snapshot = run_until_idle_with_clock(&data, &mut endpoint, 0, &mut clock)?;
+    assert!(snapshot.task.brief.contains("memory_facts"));
+    assert!(snapshot.task.brief.contains("row memory fact"));
+    Ok(())
+}
+
+#[test]
 fn status_snapshot_contains_documented_fields() -> TestResult<()> {
     let data = fixture_root("status")?;
     let sent = cli::run([
