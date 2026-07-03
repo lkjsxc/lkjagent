@@ -3,8 +3,6 @@ use std::path::Path;
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::engine::{apply_turn, next_work, Command, TurnOutcome, Work};
 use lkjagent_core::model::{Event, EventKind, StepKind, StepState, TaskSnapshot, TaskState};
-use lkjagent_core::parse::parse_expected;
-use lkjagent_core::render::Prompt;
 use lkjagent_store::plan_access::{
     deliver_answer, deliver_forced_new, deliver_next, insert_step_tx, insert_task,
 };
@@ -14,11 +12,10 @@ use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
 use crate::endpoint::LlmEndpoint;
+use crate::model_call::{apply_record, call};
 use crate::turn_effects::{dispatch_effects, gather_checks};
 
-pub trait Endpoint {
-    fn complete(&mut self, prompt: &Prompt, attempt: u32) -> Result<String, String>;
-}
+pub use crate::model_io::{CompletionRecord, Endpoint, ScriptedEndpoint};
 
 pub fn run_daemon(data_dir: &Path) -> Result<(), String> {
     let mut endpoint = LlmEndpoint::new(data_dir);
@@ -37,6 +34,7 @@ pub fn run_until_idle<E: Endpoint>(
 ) -> Result<TaskSnapshot, String> {
     let db = data_dir.join("lkjagent.sqlite3");
     let workspace = data_dir.join("workspace");
+    let logs = data_dir.join("logs");
     std::fs::create_dir_all(&workspace).map_err(|error| error.to_string())?;
     let mut conn = Connection::open(db).map_err(|error| error.to_string())?;
     setup(&conn).map_err(|error| error.to_string())?;
@@ -49,7 +47,7 @@ pub fn run_until_idle<E: Endpoint>(
         if !matches!(snapshot.task.state, TaskState::Open) {
             break;
         }
-        snapshot = run_turn(&mut conn, &workspace, snapshot, endpoint)?;
+        snapshot = run_turn(&mut conn, &workspace, &logs, snapshot, endpoint)?;
     }
     Ok(snapshot)
 }
@@ -154,24 +152,21 @@ fn resume_waiting(
 fn run_turn<E: Endpoint>(
     conn: &mut Connection,
     workspace: &Path,
+    logs: &Path,
     snapshot: TaskSnapshot,
     endpoint: &mut E,
 ) -> Result<TaskSnapshot, String> {
     let work = next_work(&snapshot);
     let outcome = match &work {
         Work::CallModel { step_id, prompt } => {
-            let step = snapshot
-                .steps
-                .iter()
-                .find(|step| step.id == *step_id)
-                .ok_or_else(|| "active step missing".to_string())?;
-            match endpoint.complete(prompt, step.attempts_used) {
-                Ok(raw) => match parse_expected(step.kind, &raw) {
-                    Ok(parsed) => TurnOutcome::Model(parsed),
-                    Err(fault) => TurnOutcome::ParseFault(fault),
-                },
-                Err(error) => TurnOutcome::EndpointError(error),
+            let (outcome, record) = call(logs, &snapshot, *step_id, prompt, endpoint)?;
+            let (mut next, mut commands) = apply_turn(&snapshot, &work, outcome);
+            if let Some(record) = record {
+                apply_record(&mut next, &mut commands, &record);
             }
+            dispatch_effects(workspace, &mut next, &commands)?;
+            commit_turn(conn, &next, &commands, "now").map_err(|error| error.to_string())?;
+            return Ok(next);
         }
         Work::RunChecks { step_id } => gather_checks(workspace, &snapshot, *step_id)?,
         Work::CloseTask | Work::BlockTask(_) | Work::Wait => TurnOutcome::Noop,
@@ -180,20 +175,4 @@ fn run_turn<E: Endpoint>(
     dispatch_effects(workspace, &mut next, &commands)?;
     commit_turn(conn, &next, &commands, "now").map_err(|error| error.to_string())?;
     Ok(next)
-}
-
-#[derive(Debug, Clone)]
-pub struct ScriptedEndpoint {
-    pub outputs: Vec<String>,
-    pub index: usize,
-}
-
-impl Endpoint for ScriptedEndpoint {
-    fn complete(&mut self, _prompt: &Prompt, _attempt: u32) -> Result<String, String> {
-        let Some(output) = self.outputs.get(self.index).cloned() else {
-            return Err("scripted endpoint exhausted".to_string());
-        };
-        self.index = self.index.saturating_add(1);
-        Ok(output)
-    }
 }

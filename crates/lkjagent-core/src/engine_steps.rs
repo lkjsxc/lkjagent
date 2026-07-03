@@ -190,6 +190,7 @@ fn attempt(step: &Step, prompt: &Prompt, outcome: AttemptOutcome, diagnosis: &st
         diagnosis: diagnosis.to_string(),
         tokens_in: 0,
         tokens_out: 0,
+        cached_tokens: 0,
     }
 }
 

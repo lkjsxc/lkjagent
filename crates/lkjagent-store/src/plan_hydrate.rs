@@ -143,6 +143,7 @@ fn attempts(conn: &Connection, task_id: i64) -> StoreResult<Vec<Attempt>> {
             diagnosis: row.4,
             tokens_in: row.5 as u32,
             tokens_out: row.6 as u32,
+            cached_tokens: 0,
         });
     }
     Ok(output)

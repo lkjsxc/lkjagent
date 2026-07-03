@@ -23,7 +23,7 @@ fn llm_endpoint_uses_configured_chat_endpoint() -> TestResult<()> {
     std::env::set_var("LKJAGENT_MODEL", "local");
     let handle = thread::spawn(move || serve_once(listener));
     let mut endpoint = LlmEndpoint::new(&data);
-    let text = endpoint.complete(&prompt(), 0)?;
+    let text = endpoint.complete(&prompt(), 0)?.content;
     handle.join().map_err(|_| "server thread failed")??;
     assert_eq!(text, "<message>hello</message>");
     Ok(())

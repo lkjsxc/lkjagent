@@ -13,7 +13,7 @@ pub fn commit_turn(
 ) -> StoreResult<()> {
     let tx = conn.transaction()?;
     for command in commands {
-        persist_command(&tx, snapshot.task.id as i64, command, now)?;
+        persist_command(&tx, snapshot, command, now)?;
     }
     update_task(&tx, &snapshot.task, now)?;
     for step in &snapshot.steps {
@@ -25,10 +25,11 @@ pub fn commit_turn(
 
 fn persist_command(
     tx: &rusqlite::Transaction<'_>,
-    task_id: i64,
+    snapshot: &TaskSnapshot,
     command: &Command,
     now: &str,
 ) -> StoreResult<()> {
+    let task_id = snapshot.task.id as i64;
     match command {
         Command::RecordAttempt(attempt) => {
             tx.execute(
@@ -39,7 +40,11 @@ fn persist_command(
                     attempt.step_id as i64,
                     attempt.ordinal as i64,
                     attempt.prompt_fingerprint,
-                    exchange_ref(task_id, attempt.step_id, attempt.ordinal),
+                    exchange_ref(
+                        task_id,
+                        step_ordinal(snapshot, attempt.step_id),
+                        attempt.ordinal
+                    ),
                     lower(&format!("{:?}", attempt.outcome)),
                     attempt.diagnosis,
                     attempt.tokens_in as i64,
@@ -128,16 +133,21 @@ fn insert_usage(
 ) -> StoreResult<()> {
     tx.execute(
         "INSERT INTO token_usage (task_id, attempt_id, prompt_tokens, completion_tokens,
-         cached_tokens, created_at) VALUES (?1, ?2, ?3, ?4, NULL, ?5)",
+         cached_tokens, created_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
         params![
             task_id,
             tx.last_insert_rowid(),
             attempt.tokens_in as i64,
             attempt.tokens_out as i64,
+            cached(attempt),
             now
         ],
     )?;
     Ok(())
+}
+
+fn cached(attempt: &lkjagent_core::model::Attempt) -> Option<i64> {
+    (attempt.cached_tokens > 0).then_some(attempt.cached_tokens as i64)
 }
 
 fn insert_event(
@@ -154,8 +164,16 @@ fn insert_event(
     Ok(())
 }
 
-fn exchange_ref(task_id: i64, step_id: u64, ordinal: u32) -> String {
-    format!("logs/task-{task_id}/step-{step_id}/attempt-{ordinal}")
+fn exchange_ref(task_id: i64, step_ordinal: u32, ordinal: u32) -> String {
+    format!("logs/task-{task_id}/step-{step_ordinal}/attempt-{ordinal}")
+}
+
+fn step_ordinal(snapshot: &TaskSnapshot, step_id: u64) -> u32 {
+    snapshot
+        .steps
+        .iter()
+        .find(|step| step.id == step_id)
+        .map_or(step_id as u32, |step| step.ordinal)
 }
 
 fn lower(value: &str) -> String {

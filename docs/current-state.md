@@ -39,7 +39,7 @@ and finish actions and stores the latest observation in step inputs.
 
 During this implementation pass, `cargo test -q`, `check-docs`, `check-lines`,
 `quiet verify`, and `docker compose run --rm verify` passed after the row-first,
-parser, CLI, and explore changes.
+parser, CLI, explore, exchange-log, and token-usage changes.
 
 ## Implemented Code
 
@@ -55,12 +55,10 @@ benchmark commands, and proof bundle collection.
 
 ## Open Implementation Gaps
 
-- Endpoint completion still returns content to the interpreter without a durable
-  structured completion record. Usage, cache metrics, provider anomalies,
-  closure mode, timing, and exchange refs are not yet fully connected from live
-  endpoint calls to rows and exchange files.
-- Token usage rows are nullable and status renders missing totals as unknown,
-  but unknown endpoint usage is not yet represented by per-attempt rows.
+- Endpoint calls now produce exchange files and structured completion records
+  with usage, cache metrics, provider anomalies, closure mode, timing, and
+  generated exchange refs. Unknown endpoint usage is still represented by the
+  absence of a token row rather than an explicit per-attempt unknown row.
 - Check results now use the active step id, but parameters are still stored as
   `{}` and measured values are still text rather than structured values for the
   retry ladder.
@@ -79,9 +77,8 @@ gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Connect endpoint completions to structured attempt data: write exchange files,
-store real exchange refs, persist nullable usage and cache metrics, and make
-proof/status surfaces read those rows.
+Store structured check parameters and measured values so the retry ladder can
+consume check data without parsing prose.
 
 ## Honesty Rules
 
