@@ -22,10 +22,18 @@ metadata and paths without copying model bodies.
 
 ## File Meanings
 
-- `request.json`: endpoint request body and stop sequence.
+- `request.json`: endpoint request body, prompt fingerprint, max tokens, and
+  stop sequence.
 - `response.json`: endpoint response or provider anomaly body.
-- `outcome.json`: parsed envelope or fault, diagnosis, and check result refs.
+- `outcome.json`: parsed envelope or fault, diagnosis, closure mode, usage
+  refs, cache metrics, and check result refs.
 - `timing.json`: start time, end time, duration, and retry timing.
+
+## Durable Owners
+
+SQLite rows own resumable facts. Exchange files own large request and response
+bodies. The attempt row owns the exchange path; token usage rows own usage
+numbers; event and diagnosis rows own bounded owner-visible summaries.
 
 ## Integrity
 

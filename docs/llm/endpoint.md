@@ -12,7 +12,21 @@ come from `data/lkjagent.json` plus environment overrides.
 
 The client sends the selected step prompt, sampling values, max token cap, and
 stop sequence. The stop sequence is the expected closing envelope tag for the
-step.
+selected step.
+
+## Completion Record
+
+The endpoint adapter returns structured completion data to the interpreter:
+
+- response content or a typed endpoint outcome;
+- request and response timestamps;
+- prompt, completion, and cached token counts when reported;
+- provider anomaly details;
+- closure mode, including whether pure closing-tag repair was applied.
+
+The interpreter persists the record through `attempts.exchange_ref`,
+`token_usage`, exchange files, and bounded event or diagnosis rows. Unknown usage
+fields remain unknown.
 
 ## Response Handling
 
@@ -27,4 +41,5 @@ closing-tag append for the expected envelope.
 
 Empty completions, reasoning-only completions, transport failures, and length
 truncation become endpoint outcomes. They are retried by the endpoint backoff
-policy before the engine consumes an attempt.
+policy before the engine consumes an attempt. A model call that reached the
+endpoint counts against the task budget even when parsing later fails.

@@ -27,9 +27,8 @@ cargo run -p lkjagent-app -- log --limit 20
 docker compose run --rm verify
 ```
 
-During the staged cutover, some commands are still served by the existing
-workspace binary. [docs/current-state.md](docs/current-state.md) is the ledger
-for what is implemented now.
+Some commands are still implementation gaps. [docs/current-state.md](docs/current-state.md)
+is the ledger for what is implemented now and what remains open.
 
 ## Read Order
 

@@ -17,7 +17,8 @@ At boot the daemon:
 - opens the store and enables WAL plus foreign keys;
 - reclaims the lock when heartbeat staleness exceeds
   `daemon.lock-stale-seconds=300`;
-- loads the first non-terminal task in FIFO order;
+- loads the first non-terminal task in FIFO order from normalized rows;
+- hydrates a pure in-memory snapshot only from those rows;
 - resumes at engine selection.
 
 ## Loss Bound
@@ -28,5 +29,5 @@ committed check rows.
 
 ## Failure Boundary
 
-Resume reads only durable rows and ignores orphaned exchange bodies, so a crash
-cannot replay stale instructions as prompt context.
+Resume reads only durable rows and ignores config snapshots and orphaned
+exchange bodies, so a crash cannot replay stale instructions as prompt context.

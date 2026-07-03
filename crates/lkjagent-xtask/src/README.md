@@ -6,7 +6,7 @@ This directory holds the repository gate dispatcher, checks, and command runner.
 
 ## Table of Contents
 
-- [benchmark/](benchmark/README.md): benchmark command stub.
+- [benchmark/](benchmark/README.md): benchmark command implementation.
 - [doc-catalog.rs](doc_catalog.rs): documentation catalog checks.
 - [doc-common.rs](doc_common.rs): shared Markdown shape checks.
 - [doc-crate-readmes.rs](doc_crate_readmes.rs): crate README coverage checks.
@@ -21,8 +21,8 @@ This directory holds the repository gate dispatcher, checks, and command runner.
 - [lines.rs](lines.rs): check-lines implementation.
 - [main.rs](main.rs): binary entrypoint.
 - [model.rs](model.rs): shared check data.
-- [proof.rs](proof.rs): proof command stub.
+- [proof.rs](proof.rs): proof bundle command.
 - [runner.rs](runner.rs): quiet command execution.
-- [smoke.rs](smoke.rs): smoke command stub.
-- [structure/](structure/README.md): structure command stub.
+- [smoke.rs](smoke.rs): smoke replay and live commands.
+- [structure/](structure/README.md): structure audit commands.
 - [style.rs](style.rs): check-style implementation.
