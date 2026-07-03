@@ -1,6 +1,6 @@
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::engine::{apply_turn, next_work, Command, TurnOutcome, Work};
-use lkjagent_core::model::TaskState;
+use lkjagent_core::model::{StepState, TaskState};
 use lkjagent_core::parse::{Action, ParseFault, ParsedOutput};
 
 #[test]
@@ -58,6 +58,20 @@ fn repeated_explore_action_is_not_executed() {
         Command::RecordAttempt(attempt)
             if attempt.diagnosis.contains("repeated action")
     )));
+}
+
+#[test]
+fn endpoint_errors_use_ten_failure_patience() {
+    let mut snapshot = instantiate(4, "What is an agent?");
+    for _ in 0..9 {
+        let work = next_work(&snapshot);
+        let (next, _) = apply_turn(&snapshot, &work, TurnOutcome::EndpointError("down".into()));
+        snapshot = next;
+        assert_ne!(snapshot.steps[0].state, StepState::Blocked);
+    }
+    let work = next_work(&snapshot);
+    let (snapshot, _) = apply_turn(&snapshot, &work, TurnOutcome::EndpointError("down".into()));
+    assert_eq!(snapshot.steps[0].state, StepState::Blocked);
 }
 
 fn action(tool: &str, name: &str, value: &str) -> TurnOutcome {

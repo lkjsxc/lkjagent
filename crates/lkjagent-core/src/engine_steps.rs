@@ -49,7 +49,7 @@ pub(crate) fn handle_endpoint_error(
     let attempt = attempt(step, prompt, AttemptOutcome::EndpointError, error);
     snapshot.attempts.push(attempt.clone());
     commands.push(Command::RecordAttempt(attempt));
-    if snapshot.steps[index].attempts_used >= 3 {
+    if snapshot.steps[index].attempts_used >= 10 {
         snapshot.steps[index].state = StepState::Blocked;
         record_event(commands, EventKind::StepBlocked, error.to_string());
     }

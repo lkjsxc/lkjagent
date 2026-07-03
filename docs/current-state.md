@@ -31,7 +31,8 @@ The parser now rejects explore `<finish>` and `<ask>` envelopes, leading or
 trailing prose, duplicate action parameters, unknown action parameters, and
 unknown tools. Prompt rendering tells explore steps to finish with the `finish`
 action inside `<action>`, and the engine rejects adjacent repeated explore
-actions before effects run.
+actions before effects run. Endpoint errors use the documented ten-failure
+patience before blocking a step.
 
 Queue rows persist `force_new`, send uses it, and daemon intake can select a
 forced-new row without treating it as an answer. Status, task, queue, log,
