@@ -114,6 +114,19 @@ fn combined_catalog_checks_match_expected_results() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn missing_tree_checks_return_failed_results_not_io_errors() -> TestResult<()> {
+    let root = fixture_root("missing-tree")?;
+    let result = run_check(
+        &root,
+        &CheckSpec::ReadmeCoverage {
+            root: "docs/missing".to_string(),
+        },
+    )?;
+    assert!(!result.passed);
+    Ok(())
+}
+
 fn fixture_root(name: &str) -> TestResult<PathBuf> {
     let path = std::env::temp_dir().join(format!("lkjagent-effects-{name}-{}", std::process::id()));
     if path.exists() {

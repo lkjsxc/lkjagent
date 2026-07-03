@@ -62,6 +62,9 @@ fn read_glob(root: &Path, glob: &str) -> EffectResult<Vec<FileFact>> {
 
 fn read_tree(root: &Path, subroot: &str) -> EffectResult<Vec<FileFact>> {
     let base = resolve(root, subroot)?;
+    if !base.exists() {
+        return Ok(Vec::new());
+    }
     let mut paths = Vec::new();
     collect(root, &base, &mut paths)?;
     Ok(paths
