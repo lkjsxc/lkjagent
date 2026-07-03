@@ -35,6 +35,7 @@ pub fn commit_commands(
                 )?;
             }
             Command::RecordEvent(event) => {
+                update_task_for_event(&tx, task_id, event.kind, &event.content, now)?;
                 insert_event(&tx, task_id, event.kind, &event.content, now)?
             }
             Command::RecordChecks(results) => {
@@ -89,6 +90,31 @@ pub fn orphan_exchanges(paths: &[String], committed_refs: &[String]) -> Vec<Orph
         .filter(|path| !committed.contains(path))
         .map(|path| OrphanExchange { path: path.clone() })
         .collect()
+}
+
+fn update_task_for_event(
+    tx: &rusqlite::Transaction<'_>,
+    task_id: i64,
+    kind: EventKind,
+    content: &str,
+    now: &str,
+) -> StoreResult<()> {
+    match kind {
+        EventKind::TaskClosed => {
+            tx.execute(
+                "UPDATE tasks SET state = 'closed', summary = ?1, updated_at = ?2 WHERE id = ?3",
+                params![content, now, task_id],
+            )?;
+        }
+        EventKind::TaskBlocked => {
+            tx.execute(
+                "UPDATE tasks SET state = 'blocked', summary = ?1, updated_at = ?2 WHERE id = ?3",
+                params![content, now, task_id],
+            )?;
+        }
+        _ => {}
+    }
+    Ok(())
 }
 
 fn insert_event(

@@ -42,6 +42,28 @@ fn fifo_queue_and_waiting_answer_routing() -> TestResult<()> {
 }
 
 #[test]
+fn task_closed_event_updates_task_row() -> TestResult<()> {
+    let mut conn = Connection::open_in_memory()?;
+    setup(&conn)?;
+    let snapshot = instantiate(10, "What is here?");
+    insert_task(&conn, &snapshot.task, None, "now")?;
+    commit_commands(
+        &mut conn,
+        10,
+        &[Command::RecordEvent(Event {
+            kind: EventKind::TaskClosed,
+            content: "done".to_string(),
+        })],
+        "later",
+    )?;
+    let state: String = conn.query_row("SELECT state FROM tasks WHERE id = 10", [], |row| {
+        row.get(0)
+    })?;
+    assert_eq!(state, "closed");
+    Ok(())
+}
+
+#[test]
 fn turn_transaction_rolls_back_uncommitted_rows() -> TestResult<()> {
     let mut conn = Connection::open_in_memory()?;
     setup(&conn)?;
