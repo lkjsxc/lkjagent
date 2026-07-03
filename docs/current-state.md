@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This file is the honest ledger of lkjagent. Live proof status: endpoint adapter
-implemented; the Aurora Ledger unattended run is not yet proven in a captured
-proof bundle.
+This file is the honest ledger of lkjagent. Live proof status: the endpoint
+adapter is implemented and the Aurora Ledger unattended run has a captured proof
+bundle.
 
 ## Summary
 
@@ -15,44 +15,50 @@ graph, tools, CLI, context, protocol, benchmark crates, and old store modules
 are deleted.
 
 The deterministic plan engine is implemented and cut over. Benchmark corpus,
-smoke replay, proof collection, structure audit, Docker verify, and app
-container idle startup have green evidence. The app daemon now calls the
-configured endpoint when a model step is selected. The live Aurora Ledger
-endpoint proof has not yet produced a captured success bundle.
+benchmark live-suite command, smoke replay, proof collection, structure audit,
+Docker verify, app container idle startup, endpoint-backed daemon calls, and the
+Aurora Ledger live proof have green evidence. The live proof closed one
+manuscript task after ten chapter files, passing file-count, word-count, and
+absence checks without operator intervention after queueing the task.
 
 ## Proven Surfaces
 
 | Surface | Evidence |
 | --- | --- |
-| Docs topology, links, ASCII, and bans | `tmp/final-20260702T180819Z/check-docs.txt`: `ok check-docs` |
-| Per-file line cap | `tmp/final-20260702T180819Z/check-lines.txt`: `ok check-lines` |
-| Source and docs file budgets | `tmp/final-20260702T180819Z/check-files.txt`: `ok check-files` |
-| Panic-path and dependency style | `tmp/final-20260702T180819Z/check-style.txt`: `ok check-style` |
-| Benchmark corpus | `tmp/final-20260702T180819Z/bench-check-corpus.txt`: `ok bench check-corpus` |
-| Deterministic replay | `tmp/final-20260702T180819Z/smoke-replay.txt`: `ok smoke replay` |
-| Workspace fmt, clippy, and tests | `tmp/final-20260702T180819Z/quiet-verify.txt`: `ok verify` |
-| Docker verify image | `tmp/final-20260702T180819Z/docker-verify.txt`: `ok verify` |
-| App container idle status | `tmp/final-20260702T180819Z/docker-agent-status.txt`: status output exit 0 |
-| Forbidden old control-plane markers absent | `tmp/final-20260702T180819Z/forbidden-grep.txt`: no output |
+| Docs topology, links, ASCII, and bans | `tmp/final-20260703T043703Z/check-docs.txt`: `ok check-docs` |
+| Per-file line cap | `tmp/final-20260703T043703Z/check-lines.txt`: `ok check-lines` |
+| Source and docs file budgets | `tmp/final-20260703T043703Z/check-files.txt`: `ok check-files` |
+| Panic-path and dependency style | `tmp/final-20260703T043703Z/check-style.txt`: `ok check-style` |
+| Structure audit | `tmp/final-20260703T043703Z/structure-audit.txt`: `ok structure audit` |
+| Benchmark corpus | `tmp/final-20260703T043703Z/bench-check-corpus.txt`: `ok bench check-corpus` |
+| Deterministic replay | `tmp/final-20260703T043703Z/smoke-replay.txt`: `ok smoke replay` |
+| Live smoke status | `tmp/final-20260703T043703Z/smoke-live.txt`: `ok smoke live` |
+| Workspace fmt, clippy, and tests | `tmp/final-20260703T043703Z/quiet-verify.txt`: `ok verify` |
+| Docker verify image | `tmp/final-20260703T043703Z/docker-verify.txt`: `ok verify` |
+| App container idle status | `tmp/final-20260703T043703Z/docker-agent-status.txt`: status output exit 0 |
+| Forbidden old control-plane markers absent | `tmp/final-20260703T043703Z/forbidden-grep.txt`: no output |
+| Aurora Ledger live proof | `tmp/live-proof-20260703T040903Z/proof/summary.md`: closed manuscript, ten chapters, checks passed |
 
 ## Implemented Code
 
 `lkjagent-core` owns the pure plan engine, parser, renderer, checks, word
 counting, classifier, simple templates, manuscript template, docs-tree template,
-and recovery helpers. `lkjagent-store` owns the plan-store schema and
-transactions. `lkjagent-llm` owns the endpoint wire client. `lkjagent-effects`
+and recovery helpers. `lkjagent-store` owns the plan-store schema and terminal
+state transactions. `lkjagent-llm` owns the endpoint wire client. `lkjagent-effects`
 owns filesystem, shell, check gathering, observations, and exchange logs.
 `lkjagent-app` owns the daemon interpreter, queue-backed fake endpoint seam, CLI
-parser, status and watch renderers, store-backed resume, and template
-end-to-end coverage. `lkjagent-xtask` owns the repository gates, benchmark
-corpus validation, deterministic replay, and proof bundle collection.
+parser, status and watch renderers, store-backed resume, endpoint adapter, and
+template end-to-end coverage. `lkjagent-xtask` owns the repository gates,
+structure audit, benchmark corpus validation, live benchmark suite runner,
+deterministic replay, and proof bundle collection.
 
 ## Open Boundaries
 
-- The Aurora Ledger live proof has not yet produced a captured success bundle;
-  no live success is claimed.
-- `bench run` writes the bounded report surface but does not yet drive a real
-  endpoint scoring run.
+- No executable reforge task is known to be open in the current repository
+  state.
+- The ledger does not claim a full endpoint benchmark score; it claims that the
+  benchmark live-suite command is implemented and that the Aurora Ledger live
+  proof passed.
 
 ## Proven Baseline
 
