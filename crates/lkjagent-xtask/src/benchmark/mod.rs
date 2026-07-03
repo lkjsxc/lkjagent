@@ -1,4 +1,5 @@
 mod corpus;
+mod live;
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -33,14 +34,14 @@ fn run_suite(root: &Path, args: &[String]) -> i32 {
         Ok(options) => options,
         Err(error) => return fail("bench run", &error),
     };
-    let entries = match corpus::validate_all(root) {
+    let entries = match corpus::validate_suite(root, &options.suite) {
         Ok(entries) => entries,
         Err(error) => return fail("bench run", &error),
     };
-    if let Err(error) = fs::create_dir_all(&options.data_dir) {
-        return fail("bench run", &format!("create data dir: {error}"));
-    }
-    let report = report(&options.suite, &entries);
+    let report = match live::run(&options.data_dir, &options.suite, &entries) {
+        Ok(report) => report,
+        Err(error) => return fail("bench run", &error),
+    };
     let path = options.data_dir.join("benchmark-report.md");
     match fs::write(&path, report) {
         Ok(()) => {
@@ -72,25 +73,6 @@ fn parse_run(root: &Path, args: &[String]) -> Result<RunOptions, String> {
         suite,
         data_dir: data_dir.ok_or("--data is required")?,
     })
-}
-
-fn report(suite: &str, entries: &[corpus::Entry]) -> String {
-    let mut lines = vec![
-        format!("# Benchmark Report"),
-        String::new(),
-        format!("suite: {suite}"),
-    ];
-    lines.push(format!("entries: {}", entries.len()));
-    lines.push("score: not-run".to_string());
-    for entry in entries {
-        lines.push(format!(
-            "- {} checks={} objective={}",
-            entry.name,
-            entry.checks.len(),
-            entry.objective.trim()
-        ));
-    }
-    lines.join("\n")
 }
 
 fn fail(name: &str, message: &str) -> i32 {

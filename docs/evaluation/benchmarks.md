@@ -23,9 +23,11 @@ passing run prints `ok bench check-corpus`. The gate is part of `quiet verify`.
 
 ## Run Command
 
-`cargo run -p lkjagent-xtask -- bench run --suite tiny --data DIR` writes a
-bounded Markdown report. The command validates the corpus before writing the
-report. Real endpoint scoring is rebuilt on top of this report surface.
+`cargo run -p lkjagent-xtask -- bench run --suite tiny --data DIR` drives each
+suite entry through the app daemon with the configured endpoint and writes a
+bounded Markdown report. `DIR/lkjagent.json` or endpoint environment variables
+provide the endpoint configuration. Each entry writes an isolated artifact
+subdirectory under `DIR/entries/`.
 
 ## Coverage
 

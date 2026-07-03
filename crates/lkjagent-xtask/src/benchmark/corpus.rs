@@ -16,12 +16,27 @@ pub fn validate_all(root: &Path) -> Result<Vec<Entry>, String> {
     let base = root.join("evaluation/corpus");
     let mut entries = Vec::new();
     for suite in read_dirs(&base)? {
-        for entry in read_dirs(&suite)? {
-            entries.push(validate_entry(&entry)?);
-        }
+        entries.extend(validate_suite_path(&suite)?);
     }
     if entries.is_empty() {
         return Err("benchmark corpus is empty".to_string());
+    }
+    Ok(entries)
+}
+
+pub fn validate_suite(root: &Path, suite: &str) -> Result<Vec<Entry>, String> {
+    let path = root.join("evaluation/corpus").join(suite);
+    let entries = validate_suite_path(&path)?;
+    if entries.is_empty() {
+        return Err(format!("benchmark suite {suite} is empty"));
+    }
+    Ok(entries)
+}
+
+fn validate_suite_path(path: &Path) -> Result<Vec<Entry>, String> {
+    let mut entries = Vec::new();
+    for entry in read_dirs(path)? {
+        entries.push(validate_entry(&entry)?);
     }
     Ok(entries)
 }

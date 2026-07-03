@@ -9,6 +9,7 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+lkjagent-app = { path = "../lkjagent-app" }
 lkjagent-core = { path = "../lkjagent-core" }
 lkjagent-effects = { path = "../lkjagent-effects" }
 lkjagent-store = { path = "../lkjagent-store" }
