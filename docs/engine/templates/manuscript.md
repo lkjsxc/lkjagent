@@ -27,8 +27,9 @@ The snapshot starts with these steps:
 
 The engine materializes chapter write steps from extracted objective fields
 before any endpoint call. Each chapter path is
-`<root>/manuscript/chapter-NN.md`. The path is in the step record before any
-model-authored content can be written.
+`<root>/manuscript/chapter-NN.md`. Chapter instructions ask for the target word
+count plus a small ceiling so the endpoint stops near the needed length. The
+path is in the step record before any model-authored content can be written.
 
 ## Assembly
 

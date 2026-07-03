@@ -14,7 +14,7 @@ Define generation budgets, sampling defaults, and endpoint retry limits.
 
 | Step kind | Config key |
 | --- | ---: |
-| write and revise | `llm.max-tokens.write=3000` |
+| write and revise | `llm.max-tokens.write=2400` |
 | plan | `llm.max-tokens.plan=900` |
 | explore action | `llm.max-tokens.explore=500` |
 | respond and ask | `llm.max-tokens.respond=700` |
