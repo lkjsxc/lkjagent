@@ -18,14 +18,17 @@ thousand, and ten thousand are recognized; unparsed word targets default to
 
 The snapshot starts with these steps:
 
-- `plan` outline step seeded with one plan-line grammar write line per chapter;
+- completed `plan` outline step seeded with one engine-owned write line per
+  chapter;
 - `write` settings step for `<root>/settings.md`;
+- one `write` step for each chapter path;
 - `verify` step carrying the task checks;
 - `respond` step for measured paths and word counts.
 
-A valid outline materializes chapter write steps immediately after the plan step.
-Each chapter path is `<root>/manuscript/chapter-NN.md`. The engine keeps the
-path in the step record before any model-authored content can be written.
+The engine materializes chapter write steps from extracted objective fields
+before any endpoint call. Each chapter path is
+`<root>/manuscript/chapter-NN.md`. The path is in the step record before any
+model-authored content can be written.
 
 ## Assembly
 

@@ -2,7 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
-use lkjagent_core::manuscript::{chapter_plan, extract};
+
 use lkjagent_core::model::TaskState;
 use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
@@ -18,12 +18,11 @@ fn manuscript_fake_endpoint_closes_with_ten_chapters_and_word_count() -> TestRes
     setup(&conn)?;
     enqueue(&conn, objective, "now")?;
     drop(conn);
-    let fields = extract(objective);
-    let mut outputs = vec![format!("<plan>{}</plan>", chapter_plan(&fields).join("\n"))];
+    let mut outputs =
+        vec!["<content># Settings\n\nAurora Ledger continuity facts.</content>".to_string()];
     for index in 1..=10 {
         outputs.push(format!("<content>{}</content>", prose(index, 1_000)));
     }
-    outputs.push("<content># Settings\n\nAurora Ledger continuity facts.</content>".to_string());
     outputs
         .push("<message>Manuscript complete: 10 chapters and 10000 words.</message>".to_string());
     let mut endpoint = ScriptedEndpoint { outputs, index: 0 };
@@ -46,8 +45,8 @@ fn manuscript_shortfall_extends_and_write_fault_splits() -> TestResult<()> {
     setup(&conn)?;
     enqueue(&conn, objective, "now")?;
     drop(conn);
-    let fields = extract(objective);
-    let mut outputs = vec![format!("<plan>{}</plan>", chapter_plan(&fields).join("\n"))];
+    let mut outputs =
+        vec!["<content># Settings\n\nAurora Ledger continuity facts.</content>".to_string()];
     outputs.extend(
         [
             "<message>bad</message>",
@@ -60,7 +59,6 @@ fn manuscript_shortfall_extends_and_write_fault_splits() -> TestResult<()> {
     for index in 2..=10 {
         outputs.push(format!("<content>{}</content>", prose(index, 900)));
     }
-    outputs.push("<content># Settings\n\nAurora Ledger continuity facts.</content>".to_string());
     outputs.push(format!("<content>{}</content>", prose(11, 1_000)));
     outputs.push("<message>Manuscript extended after split.</message>".to_string());
     let mut endpoint = ScriptedEndpoint { outputs, index: 0 };

@@ -1,6 +1,6 @@
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::manuscript::{chapter_plan, extract};
-use lkjagent_core::model::{CheckSpec, StepKind, TemplateId};
+use lkjagent_core::model::{CheckSpec, StepKind, StepState, TemplateId};
 
 #[test]
 fn manuscript_field_extraction_covers_real_objectives() {
@@ -34,12 +34,18 @@ fn aurora_manuscript_snapshot_has_plan_settings_verify_and_checks() {
     );
     assert_eq!(snapshot.task.template, TemplateId::Manuscript);
     assert_eq!(snapshot.steps[0].kind, StepKind::Plan);
+    assert_eq!(snapshot.steps[0].state, StepState::Done);
     assert_eq!(
         snapshot.steps[1].output_path.as_deref(),
         Some("stories/aurora-ledger/settings.md")
     );
-    assert_eq!(snapshot.steps[2].kind, StepKind::Verify);
-    assert_eq!(snapshot.steps[3].kind, StepKind::Respond);
+    assert_eq!(snapshot.steps[2].kind, StepKind::Write);
+    assert_eq!(
+        snapshot.steps[2].output_path.as_deref(),
+        Some("stories/aurora-ledger/manuscript/chapter-01.md")
+    );
+    assert_eq!(snapshot.steps[12].kind, StepKind::Verify);
+    assert_eq!(snapshot.steps[13].kind, StepKind::Respond);
     assert!(snapshot.task.checks.contains(&CheckSpec::FileCount {
         glob: "stories/aurora-ledger/manuscript/*.md".to_string(),
         min: 10,

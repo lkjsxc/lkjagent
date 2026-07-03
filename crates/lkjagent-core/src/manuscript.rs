@@ -17,12 +17,11 @@ pub fn instantiate(id: u64, objective: &str) -> TaskSnapshot {
         summary: fields.note.clone().unwrap_or_default(),
         checks: checks.clone(),
     };
-    let steps = vec![
-        plan(id, objective, &fields),
-        settings(id, &fields),
-        verify(id, checks),
-        respond(id),
-    ];
+    let mut steps = vec![plan(id, objective, &fields), settings(id, &fields)];
+    steps.extend(chapter_steps(id, &fields));
+    let next = steps.len() as u32 + 1;
+    steps.push(verify(id, next, checks));
+    steps.push(respond(id, next + 1));
     TaskSnapshot {
         task,
         steps,
@@ -78,6 +77,31 @@ fn chapter_paths(fields: &ManuscriptFields) -> Vec<String> {
 fn plan(task_id: u64, objective: &str, fields: &ManuscriptFields) -> Step {
     let mut step = base(task_id, 1, 1, StepKind::Plan, "outline", objective);
     step.inputs = chapter_plan(fields).join("\n");
+    step.state = StepState::Done;
+    step
+}
+
+fn chapter_steps(task_id: u64, fields: &ManuscriptFields) -> Vec<Step> {
+    let per = fields.total_words.div_ceil(fields.chapter_count);
+    chapter_paths(fields)
+        .into_iter()
+        .enumerate()
+        .map(|(index, path)| chapter_step(task_id, index as u32 + 3, path, per))
+        .collect()
+}
+
+fn chapter_step(task_id: u64, ordinal: u32, path: String, words: usize) -> Step {
+    let mut step = base(
+        task_id,
+        ordinal as u64,
+        ordinal,
+        StepKind::Write,
+        "chapter",
+        "",
+    );
+    step.title = format!("chapter {:02}", ordinal.saturating_sub(2));
+    step.instruction = format!("write at least {words} finished manuscript words");
+    step.output_path = Some(path);
     step
 }
 
@@ -94,11 +118,11 @@ fn settings(task_id: u64, fields: &ManuscriptFields) -> Step {
     step
 }
 
-fn verify(task_id: u64, checks: Vec<CheckSpec>) -> Step {
+fn verify(task_id: u64, ordinal: u32, checks: Vec<CheckSpec>) -> Step {
     let mut step = base(
         task_id,
-        3,
-        3,
+        ordinal as u64,
+        ordinal,
         StepKind::Verify,
         "verify manuscript",
         "measure manuscript",
@@ -107,11 +131,11 @@ fn verify(task_id: u64, checks: Vec<CheckSpec>) -> Step {
     step
 }
 
-fn respond(task_id: u64) -> Step {
+fn respond(task_id: u64, ordinal: u32) -> Step {
     base(
         task_id,
-        4,
-        4,
+        ordinal as u64,
+        ordinal,
         StepKind::Respond,
         "respond",
         "report measured paths and words",
