@@ -1,4 +1,4 @@
-use crate::model::{Step, StepKind, StepState};
+use crate::model::{CheckSpec, Step, StepKind, StepState};
 use crate::parse::PlanLine;
 
 pub(crate) fn plan_steps(parent: &Step, lines: Vec<PlanLine>) -> Vec<Step> {
@@ -20,8 +20,8 @@ fn plan_step(parent: &Step, offset: u32, line: PlanLine) -> Step {
             title,
             instruction: format!("write at least {words} words"),
             inputs: String::new(),
-            output_path: Some(path),
-            checks: Vec::new(),
+            output_path: Some(path.clone()),
+            checks: vec![CheckSpec::MinWords { path, n: words }],
             state: StepState::Pending,
             attempts_used: 0,
             actions_used: 0,

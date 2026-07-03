@@ -42,6 +42,7 @@ and finish actions, stores latest observations in step inputs, persists
 `memory.save` rows, suppresses exact duplicate memory facts, mirrors memory into
 FTS, and resolves `memory.find` from durable rows.
 
+Plan-authored write steps carry `words=N` into deterministic `min_words` checks.
 Endpoint calls produce exchange files and structured completion records with
 usage, cache metrics, provider anomalies, closure mode, timing, generated
 exchange refs, and nullable token usage rows. Check results use the active step

@@ -1,6 +1,6 @@
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::engine::{apply_turn, next_work, Command, TurnOutcome, Work};
-use lkjagent_core::model::{StepState, TaskState};
+use lkjagent_core::model::{CheckSpec, StepState, TaskState};
 use lkjagent_core::parse::{Action, ParseFault, ParsedOutput};
 
 #[test]
@@ -57,6 +57,22 @@ fn repeated_explore_action_is_not_executed() {
         cmd,
         Command::RecordAttempt(attempt)
             if attempt.diagnosis.contains("repeated action")
+    )));
+}
+
+#[test]
+fn planned_write_steps_keep_word_checks() {
+    let snapshot = instantiate(5, "Write notes/out.md with setup notes.");
+    let work = next_work(&snapshot);
+    let plan = ParsedOutput::Plan(vec![lkjagent_core::parse::PlanLine::Write {
+        path: "notes/out.md".to_string(),
+        title: "draft".to_string(),
+        words: 25,
+    }]);
+    let (snapshot, _) = apply_turn(&snapshot, &work, TurnOutcome::Model(plan));
+    assert!(snapshot.steps.iter().any(|step| matches!(
+        step.checks.as_slice(),
+        [CheckSpec::MinWords { path, n }] if path == "notes/out.md" && *n == 25
     )));
 }
 
