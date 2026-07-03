@@ -7,6 +7,7 @@ Map lkjagent-store source modules.
 ## Table of Contents
 
 - [lib.rs](lib.rs): module exports.
+- [memory.rs](memory.rs): duplicate-suppressed memory writes and search.
 - [plan-schema.rs](plan_schema.rs): ten-table schema setup.
 - [plan-names.rs](plan_names.rs): database enum name parsing.
 - [plan-rows.rs](plan_rows.rs): row structs for the plan store.

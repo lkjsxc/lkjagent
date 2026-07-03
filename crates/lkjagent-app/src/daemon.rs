@@ -165,7 +165,7 @@ fn run_turn<E: Endpoint>(
             if let Some(record) = record {
                 apply_record(&mut next, &mut commands, &record);
             }
-            if let Err(error) = dispatch_effects(workspace, &mut next, &commands) {
+            if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands) {
                 return settle_effect_error(conn, &snapshot, &work, error);
             }
             commit_turn(conn, &next, &commands, "now").map_err(|error| error.to_string())?;
@@ -175,7 +175,7 @@ fn run_turn<E: Endpoint>(
         Work::CloseTask | Work::BlockTask(_) | Work::Wait => TurnOutcome::Noop,
     };
     let (mut next, commands) = apply_turn(&snapshot, &work, outcome);
-    if let Err(error) = dispatch_effects(workspace, &mut next, &commands) {
+    if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands) {
         return settle_effect_error(conn, &snapshot, &work, error);
     }
     commit_turn(conn, &next, &commands, "now").map_err(|error| error.to_string())?;

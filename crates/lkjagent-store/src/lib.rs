@@ -1,4 +1,5 @@
 pub mod error;
+pub mod memory;
 pub mod plan_access;
 pub mod plan_commit;
 pub mod plan_hydrate;

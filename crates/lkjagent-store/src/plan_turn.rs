@@ -5,6 +5,7 @@ use lkjagent_core::model::EventKind;
 use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
+use crate::memory::insert_memory_tx;
 use crate::plan_access::insert_step_tx;
 use crate::plan_rows::{OrphanExchange, StoredEvent};
 
@@ -40,11 +41,7 @@ pub fn commit_commands(
                 insert_event(&tx, task_id, event.kind, &event.content, now)?
             }
             Command::RecordMemory { topic, content } => {
-                tx.execute(
-                    "INSERT INTO memory (topic, content, task_id, created_at)
-                     VALUES (?1, ?2, ?3, ?4)",
-                    params![topic, content, task_id, now],
-                )?;
+                insert_memory_tx(&tx, topic, content, task_id, now)?;
             }
             Command::RecordChecks { step_id, results } => {
                 for result in results {

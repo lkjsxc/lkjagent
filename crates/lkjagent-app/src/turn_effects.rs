@@ -3,6 +3,7 @@ use std::path::Path;
 use lkjagent_core::checks::{CommandFact, FileFact};
 use lkjagent_core::engine::{Command, TurnOutcome};
 use lkjagent_core::model::{CheckSpec, TaskSnapshot};
+use rusqlite::Connection;
 
 pub fn gather_checks(
     workspace: &Path,
@@ -30,6 +31,7 @@ pub fn gather_checks(
 }
 
 pub fn dispatch_effects(
+    conn: &Connection,
     workspace: &Path,
     snapshot: &mut TaskSnapshot,
     commands: &[Command],
@@ -37,7 +39,7 @@ pub fn dispatch_effects(
     for command in commands {
         match command {
             Command::WriteFile { path, content } => write_content(workspace, path, content)?,
-            Command::RunExplore(action) => crate::explore::run(workspace, snapshot, action),
+            Command::RunExplore(action) => crate::explore::run(conn, workspace, snapshot, action),
             Command::RecordAttempt(_)
             | Command::RecordEvent(_)
             | Command::RecordMemory { .. }

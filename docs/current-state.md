@@ -35,8 +35,9 @@ Queue rows persist `force_new`, send uses it, and daemon intake can select a
 forced-new row without treating it as an answer. Status, task, queue, log,
 memory, and watch surfaces read rows instead of a config snapshot. The bounded
 explore dispatcher runs the documented filesystem, shell, memory, plan-note,
-and finish actions, stores latest observations in step inputs, and persists
-`memory.save` rows.
+and finish actions, stores latest observations in step inputs, persists
+`memory.save` rows, suppresses exact duplicate memory facts, mirrors memory into
+FTS, and resolves `memory.find` from durable rows.
 
 Endpoint calls produce exchange files and structured completion records with
 usage, cache metrics, provider anomalies, closure mode, timing, generated

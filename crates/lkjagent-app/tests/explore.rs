@@ -42,10 +42,35 @@ fn explore_registry_runs_bounded_workspace_tools() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn memory_find_reads_durable_rows() -> TestResult<()> {
+    let data = fixture_root("memory-find")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    enqueue(&conn, "Survey memory and report.", "now")?;
+    drop(conn);
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec![
+            memory_save("probe", "hello aurora"),
+            action("memory.find", &[('q', "aurora")]),
+        ],
+        index: 0,
+    };
+    let snapshot = run_until_idle(&data, &mut endpoint, 2)?;
+    assert_eq!(snapshot.task.state, TaskState::Open);
+    assert!(snapshot.steps[0].inputs.contains("memory 1 task=1 probe"));
+    assert!(snapshot.steps[0].inputs.contains("hello aurora"));
+    Ok(())
+}
+
 fn action(tool: &str, params: &[(char, &str)]) -> String {
     let mut body = format!("<tool>{tool}</tool>");
     for (kind, value) in params {
-        let name = if *kind == 'p' { "path" } else { "content" };
+        let name = match *kind {
+            'p' => "path",
+            'q' => "query",
+            _ => "content",
+        };
         body.push_str(&format!("<{name}>{value}</{name}>"));
     }
     format!("<action>{body}</action>")

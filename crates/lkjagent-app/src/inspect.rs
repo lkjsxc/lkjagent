@@ -98,24 +98,16 @@ pub fn memory(conn: &Connection, query: &str) -> Result<String, String> {
     if query.trim().is_empty() {
         return Ok("memory: query required".to_string());
     }
-    let pattern = format!("%{}%", query.trim());
-    let mut statement = conn
-        .prepare(
-            "SELECT id, topic, content FROM memory
-             WHERE topic LIKE ?1 OR content LIKE ?1 ORDER BY id LIMIT 20",
-        )
+    let rows = lkjagent_store::memory::search_memory(conn, query, 20)
         .map_err(|error| error.to_string())?;
-    let rows = statement
-        .query_map(params![pattern], |row| {
-            Ok(format!(
-                "memory {} {} {}",
-                row.get::<_, i64>(0)?,
-                row.get::<_, String>(1)?,
-                row.get::<_, String>(2)?
-            ))
-        })
-        .map_err(|error| error.to_string())?;
-    collect(rows)
+    if rows.is_empty() {
+        return Ok("none".to_string());
+    }
+    Ok(rows
+        .iter()
+        .map(|row| format!("memory {} {} {}", row.id, row.topic, row.content))
+        .collect::<Vec<_>>()
+        .join("\n"))
 }
 
 pub fn watch(conn: &Connection) -> Result<String, String> {

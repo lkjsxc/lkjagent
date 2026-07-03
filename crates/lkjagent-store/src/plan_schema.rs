@@ -114,6 +114,15 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
 
         CREATE VIRTUAL TABLE IF NOT EXISTS memory_fts USING fts5(topic, content);
 
+        CREATE TRIGGER IF NOT EXISTS memory_ai AFTER INSERT ON memory BEGIN
+            INSERT INTO memory_fts(rowid, topic, content)
+            VALUES (new.id, new.topic, new.content);
+        END;
+
+        INSERT INTO memory_fts(rowid, topic, content)
+        SELECT id, topic, content FROM memory
+        WHERE id NOT IN (SELECT rowid FROM memory_fts);
+
         CREATE TABLE IF NOT EXISTS token_usage (
             id INTEGER PRIMARY KEY,
             task_id INTEGER NOT NULL,

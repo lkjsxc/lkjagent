@@ -1,6 +1,7 @@
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::engine::Command;
 use lkjagent_core::model::{CheckResult, Event, EventKind, StepKind, TaskState};
+use lkjagent_store::memory::search_memory;
 use lkjagent_store::plan_access::{
     attach_answer, deliver_next, enqueue, insert_step_tx, insert_task, set_task_state,
 };
@@ -83,6 +84,26 @@ fn turn_transaction_rolls_back_uncommitted_rows() -> TestResult<()> {
     assert_eq!(rows.len(), 2);
     let orphans = orphan_exchanges(&["a".to_string(), "b".to_string()], &["a".to_string()]);
     assert_eq!(orphans.len(), 1);
+    Ok(())
+}
+
+#[test]
+fn memory_writes_are_deduplicated_and_searchable() -> TestResult<()> {
+    let mut conn = Connection::open_in_memory()?;
+    setup(&conn)?;
+    let snapshot = instantiate(12, "Remember aurora facts.");
+    insert_task(&conn, &snapshot.task, None, "now")?;
+    let memory = Command::RecordMemory {
+        topic: "probe".to_string(),
+        content: "aurora memory survives".to_string(),
+    };
+    commit_turn(&mut conn, &snapshot, &[memory.clone()], "later")?;
+    commit_turn(&mut conn, &snapshot, &[memory], "again")?;
+    let count: i64 = conn.query_row("SELECT COUNT(*) FROM memory", [], |row| row.get(0))?;
+    assert_eq!(count, 1);
+    let rows = search_memory(&conn, "aurora", 10)?;
+    assert_eq!(rows.len(), 1);
+    assert_eq!(rows[0].content, "aurora memory survives");
     Ok(())
 }
 

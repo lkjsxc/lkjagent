@@ -3,6 +3,7 @@ use lkjagent_core::model::{EventKind, Step, Task, TaskSnapshot};
 use rusqlite::{params, Connection};
 
 use crate::error::{StoreError, StoreResult};
+use crate::memory::insert_memory_tx;
 use crate::plan_access::insert_step_tx;
 
 pub fn commit_turn(
@@ -56,10 +57,7 @@ fn persist_command(
         }
         Command::RecordEvent(event) => insert_event(tx, task_id, event.kind, &event.content, now)?,
         Command::RecordMemory { topic, content } => {
-            tx.execute(
-                "INSERT INTO memory (topic, content, task_id, created_at) VALUES (?1, ?2, ?3, ?4)",
-                params![topic, content, task_id, now],
-            )?;
+            insert_memory_tx(tx, topic, content, task_id, now)?;
         }
         Command::RecordChecks { step_id, results } => {
             for (index, result) in results.iter().enumerate() {

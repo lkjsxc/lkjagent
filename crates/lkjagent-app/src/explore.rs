@@ -3,9 +3,11 @@ use std::path::Path;
 use lkjagent_core::model::{StepState, TaskSnapshot};
 use lkjagent_core::parse::Action;
 use lkjagent_effects::observation::observation;
+use lkjagent_store::memory::{search_memory, MemoryRow};
+use rusqlite::Connection;
 
-pub fn run(workspace: &Path, snapshot: &mut TaskSnapshot, action: &Action) {
-    let result = dispatch(workspace, snapshot, action);
+pub fn run(conn: &Connection, workspace: &Path, snapshot: &mut TaskSnapshot, action: &Action) {
+    let result = dispatch(conn, workspace, action);
     let rendered = match result {
         Ok(content) => observation("ok", &content),
         Err(error) => observation("error", &error),
@@ -19,7 +21,7 @@ pub fn run(workspace: &Path, snapshot: &mut TaskSnapshot, action: &Action) {
     }
 }
 
-fn dispatch(workspace: &Path, snapshot: &TaskSnapshot, action: &Action) -> Result<String, String> {
+fn dispatch(conn: &Connection, workspace: &Path, action: &Action) -> Result<String, String> {
     match action.tool.as_str() {
         "fs.read" => lkjagent_effects::workspace::read(
             workspace,
@@ -53,7 +55,7 @@ fn dispatch(workspace: &Path, snapshot: &TaskSnapshot, action: &Action) -> Resul
         )
         .map_err(|error| error.to_string()),
         "shell.run" => shell(workspace, param(action, "command")?),
-        "memory.find" => Ok(memory_find(snapshot, param(action, "query")?)),
+        "memory.find" => memory_find(conn, param(action, "query")?),
         "memory.save" => Ok(format!("saved topic={}", param(action, "topic")?)),
         "plan.note" => Ok(format!("noted: {}", param(action, "note")?)),
         "finish" => Ok(param(action, "summary")?.to_string()),
@@ -69,22 +71,27 @@ fn shell(workspace: &Path, command: &str) -> Result<String, String> {
     ))
 }
 
-fn memory_find(snapshot: &TaskSnapshot, query: &str) -> String {
-    let query = query.to_ascii_lowercase();
-    let mut rows = Vec::new();
-    if snapshot.task.brief.to_ascii_lowercase().contains(&query) {
-        rows.push(format!("task brief: {}", snapshot.task.brief));
-    }
-    for event in &snapshot.events {
-        if event.content.to_ascii_lowercase().contains(&query) {
-            rows.push(format!("event {:?}: {}", event.kind, event.content));
-        }
-    }
+fn memory_find(conn: &Connection, query: &str) -> Result<String, String> {
+    let rows = search_memory(conn, query, 10).map_err(|error| error.to_string())?;
     if rows.is_empty() {
-        "no matches".to_string()
+        Ok("no matches".to_string())
     } else {
-        rows.join("\n")
+        Ok(rows
+            .iter()
+            .map(render_memory)
+            .collect::<Vec<_>>()
+            .join("\n"))
     }
+}
+
+fn render_memory(row: &MemoryRow) -> String {
+    let task = row
+        .task_id
+        .map_or_else(|| "none".to_string(), |task_id| task_id.to_string());
+    format!(
+        "memory {} task={} {} {}",
+        row.id, task, row.topic, row.content
+    )
 }
 
 fn param<'a>(action: &'a Action, name: &str) -> Result<&'a str, String> {
