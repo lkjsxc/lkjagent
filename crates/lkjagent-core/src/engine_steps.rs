@@ -84,7 +84,8 @@ pub(crate) fn handle_model(
 }
 
 pub(crate) fn close_task(snapshot: &mut TaskSnapshot, commands: &mut Vec<Command>) {
-    let passed = snapshot.check_results.iter().all(|result| result.passed);
+    let missing_checks = !snapshot.task.checks.is_empty() && snapshot.check_results.is_empty();
+    let passed = !missing_checks && snapshot.check_results.iter().all(|result| result.passed);
     if passed {
         snapshot.task.state = TaskState::Closed;
         record_event(

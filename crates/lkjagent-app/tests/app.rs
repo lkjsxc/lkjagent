@@ -91,7 +91,7 @@ fn simple_templates_close_with_fake_endpoint() -> TestResult<()> {
         "filework",
         "Write notes/out.md with setup notes.",
         vec![
-            "<plan>write notes/out.md | draft | words=1\nrespond | summarize file work</plan>",
+            "<plan>write notes/out.md | draft | words=1</plan>",
             "<content>setup notes</content>",
             "<message>wrote notes</message>",
         ],

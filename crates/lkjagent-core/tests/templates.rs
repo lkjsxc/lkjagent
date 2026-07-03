@@ -53,6 +53,7 @@ fn simple_template_snapshots_have_expected_shapes() {
 
     let file_work = instantiate(4, "Write notes/new-page.md with setup notes.");
     assert_eq!(file_work.steps[0].kind, StepKind::Plan);
+    assert_eq!(file_work.steps[1].kind, StepKind::Verify);
     assert!(file_work.task.checks.contains(&CheckSpec::FileExists {
         path: "notes/new-page.md".to_string()
     }));
@@ -63,5 +64,6 @@ fn simple_template_snapshots_have_expected_shapes() {
         journal.steps[0].output_path.as_deref(),
         Some("journal/today.md")
     );
-    assert_eq!(journal.steps[1].kind, StepKind::Respond);
+    assert_eq!(journal.steps[1].kind, StepKind::Verify);
+    assert_eq!(journal.steps[2].kind, StepKind::Respond);
 }
