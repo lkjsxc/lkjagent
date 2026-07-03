@@ -10,7 +10,10 @@ Map lkjagent-app source modules.
 - [lib.rs](lib.rs): public library entry.
 - [args.rs](args.rs): CLI parser.
 - [cli.rs](cli.rs): command execution.
+- [clock.rs](clock.rs): timestamp seam for runtime and deterministic tests.
 - [daemon.rs](daemon.rs): row-backed turn-cycle interpreter and scripted endpoint seam.
+- [daemon-intake.rs](daemon_intake.rs): queue intake and waiting-answer resume.
+- [daemon-lock.rs](daemon_lock.rs): heartbeat config-row daemon lease.
 - [effect-error.rs](effect_error.rs): effect failure settlement.
 - [endpoint.rs](endpoint.rs): endpoint adapter wrapper.
 - [exchange-record.rs](exchange_record.rs): exchange log file rendering.

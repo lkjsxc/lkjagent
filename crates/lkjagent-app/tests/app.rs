@@ -2,7 +2,8 @@ use std::fs;
 use std::path::PathBuf;
 
 use lkjagent_app::cli;
-use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
+use lkjagent_app::clock::FixedClock;
+use lkjagent_app::daemon::{run_until_idle, run_until_idle_with_clock, ScriptedEndpoint};
 use lkjagent_app::status::render_status;
 use lkjagent_core::model::TaskState;
 use lkjagent_store::plan_access::enqueue;
@@ -44,6 +45,36 @@ fn fake_endpoint_task_closes_and_resumes_from_store() -> TestResult<()> {
     let closed = run_until_idle(&data, &mut second, 4)?;
     assert_eq!(closed.task.state, TaskState::Closed);
     assert!(render_status(&closed).contains("daemon: stopped"));
+    Ok(())
+}
+
+#[test]
+fn daemon_uses_injected_clock_for_durable_rows() -> TestResult<()> {
+    let data = fixture_root("clock")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    enqueue(&conn, "What is an agent?", "queued")?;
+    drop(conn);
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec!["<message>An agent follows checks.</message>".to_string()],
+        index: 0,
+    };
+    let mut clock = FixedClock::new("fixed-utc");
+    let snapshot = run_until_idle_with_clock(&data, &mut endpoint, 2, &mut clock)?;
+    assert_eq!(snapshot.task.state, TaskState::Closed);
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let row: (String, String) = conn.query_row(
+        "SELECT created_at, updated_at FROM tasks WHERE id = 1",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?)),
+    )?;
+    assert_eq!(row, ("fixed-utc".to_string(), "fixed-utc".to_string()));
+    let heartbeat: String = conn.query_row(
+        "SELECT value FROM config WHERE key = 'daemon.lock.heartbeat'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(heartbeat, "fixed-utc");
     Ok(())
 }
 

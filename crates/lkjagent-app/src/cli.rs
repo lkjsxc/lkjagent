@@ -25,9 +25,9 @@ where
             Ok(String::new())
         }
         Command::Send { text, force_new } => {
-            let id =
-                lkjagent_store::plan_access::enqueue_with_force(&conn, &text, force_new, "now")
-                    .map_err(|error| error.to_string())?;
+            let now = crate::clock::utc_now();
+            let id = lkjagent_store::plan_access::enqueue_with_force(&conn, &text, force_new, &now)
+                .map_err(|error| error.to_string())?;
             Ok(format!("queue: {id} new={force_new}"))
         }
         Command::Status => status(&conn),

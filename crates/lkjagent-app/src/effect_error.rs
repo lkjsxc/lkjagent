@@ -8,6 +8,7 @@ pub fn settle(
     snapshot: &TaskSnapshot,
     work: &Work,
     error: String,
+    now: &str,
 ) -> Result<TaskSnapshot, String> {
     let mut failed = snapshot.clone();
     let mut commands = Vec::new();
@@ -37,6 +38,6 @@ pub fn settle(
     };
     failed.events.push(event.clone());
     commands.push(Command::RecordEvent(event));
-    commit_turn(conn, &failed, &commands, "now").map_err(|error| error.to_string())?;
+    commit_turn(conn, &failed, &commands, now).map_err(|error| error.to_string())?;
     Ok(failed)
 }

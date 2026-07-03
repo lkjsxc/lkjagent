@@ -22,9 +22,10 @@ as `waiting`. Explore output never asks the owner directly.
 
 The app no longer reads `app.active-snapshot` as runtime authority. Focused
 resume tests prove that config snapshots are ignored when rows are absent and
-that normalized task and step rows win over stale config. The daemon hydrates
-open and waiting tasks from normalized rows, commits turn state through rows,
-and records waiting answers as rows before continuing.
+that normalized task and step rows win over stale config. The daemon claims a
+heartbeat config-row lease, uses an injected clock seam for durable timestamps,
+hydrates open and waiting tasks from normalized rows, commits turn state through
+rows, and records waiting answers as rows before continuing.
 
 The parser now rejects explore `<finish>` and `<ask>` envelopes, leading or
 trailing prose, duplicate action parameters, unknown action parameters, and
