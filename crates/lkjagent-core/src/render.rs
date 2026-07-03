@@ -100,7 +100,7 @@ fn fingerprint(system: &str, user: &str) -> String {
 
 pub fn max_tokens(kind: StepKind) -> u32 {
     match kind {
-        StepKind::Write | StepKind::Revise => 1_400,
+        StepKind::Write | StepKind::Revise => 3_000,
         StepKind::Plan => 900,
         StepKind::Explore => 500,
         StepKind::Respond | StepKind::Ask => 700,
