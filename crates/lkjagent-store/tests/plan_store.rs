@@ -97,7 +97,7 @@ fn memory_writes_are_deduplicated_and_searchable() -> TestResult<()> {
         topic: "probe".to_string(),
         content: "aurora memory survives".to_string(),
     };
-    commit_turn(&mut conn, &snapshot, &[memory.clone()], "later")?;
+    commit_turn(&mut conn, &snapshot, std::slice::from_ref(&memory), "later")?;
     commit_turn(&mut conn, &snapshot, &[memory], "again")?;
     let count: i64 = conn.query_row("SELECT COUNT(*) FROM memory", [], |row| row.get(0))?;
     assert_eq!(count, 1);
