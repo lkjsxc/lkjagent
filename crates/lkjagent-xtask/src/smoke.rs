@@ -13,7 +13,7 @@ pub fn run(args: &[String], root: &Path) -> i32 {
     match args {
         [] => replay(root),
         [cmd] if cmd == "replay" => replay(root),
-        [cmd] if cmd == "live" => live(),
+        [cmd] if cmd == "live" => live(root),
         _ => fail("smoke", "use: smoke replay | smoke live"),
     }
 }
@@ -90,8 +90,9 @@ fn persist_snapshot(
     tx.commit().map_err(|e| e.to_string())
 }
 
-fn live() -> i32 {
-    let configured = env_present("LKJAGENT_ENDPOINT_URL") && env_present("LKJAGENT_MODEL");
+fn live(root: &Path) -> i32 {
+    let configured = (env_present("LKJAGENT_ENDPOINT_URL") && env_present("LKJAGENT_MODEL"))
+        || config_present(root);
     if configured {
         println!("ok smoke live status=skipped reason=operator-command-required");
     } else {
@@ -102,6 +103,24 @@ fn live() -> i32 {
 
 fn env_present(name: &str) -> bool {
     std::env::var(name).is_ok_and(|value| !value.trim().is_empty())
+}
+
+fn config_present(root: &Path) -> bool {
+    let Ok(text) = fs::read_to_string(root.join("data/lkjagent.json")) else {
+        return false;
+    };
+    let Ok(value) = serde_json::from_str::<serde_json::Value>(&text) else {
+        return false;
+    };
+    let endpoint = value.get("endpoint").unwrap_or(&serde_json::Value::Null);
+    endpoint
+        .get("url")
+        .and_then(serde_json::Value::as_str)
+        .is_some_and(|url| !url.is_empty())
+        && endpoint
+            .get("model")
+            .and_then(serde_json::Value::as_str)
+            .is_some_and(|model| !model.is_empty())
 }
 
 fn prose(index: usize, words: usize) -> String {

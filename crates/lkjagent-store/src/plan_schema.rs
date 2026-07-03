@@ -89,8 +89,7 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
             params_json TEXT NOT NULL,
             passed INTEGER NOT NULL,
             measured TEXT NOT NULL,
-            created_at TEXT NOT NULL,
-            FOREIGN KEY(step_id) REFERENCES steps(id)
+            created_at TEXT NOT NULL
         );
 
         CREATE TABLE IF NOT EXISTS events (

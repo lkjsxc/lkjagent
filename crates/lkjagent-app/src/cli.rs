@@ -1,10 +1,9 @@
 use std::fs;
 
-use std::time::Duration;
-
 use rusqlite::Connection;
 
 use crate::args::{parse, Command};
+use crate::daemon::run_daemon;
 use crate::state::load_snapshot;
 use crate::status::{status, task_show, watch};
 
@@ -23,11 +22,8 @@ where
     lkjagent_store::plan_schema::setup(&conn).map_err(|error| error.to_string())?;
     match invocation.command {
         Command::Run => {
-            fs::create_dir_all(invocation.data_dir.join("workspace"))
-                .map_err(|error| error.to_string())?;
-            loop {
-                std::thread::sleep(Duration::from_secs(60));
-            }
+            run_daemon(&invocation.data_dir)?;
+            Ok(String::new())
         }
         Command::Send { text, force_new } => {
             let id = lkjagent_store::plan_access::enqueue(&conn, &text, "now")

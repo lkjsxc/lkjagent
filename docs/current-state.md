@@ -2,9 +2,9 @@
 
 ## Purpose
 
-This file is the honest ledger of lkjagent. Live proof status: blocked before
-loop iteration one because `lkjagent-app` has no production endpoint adapter yet;
-see `tmp/final-20260702T180819Z/handoff.md` for the final sweep evidence.
+This file is the honest ledger of lkjagent. Live proof status: endpoint adapter
+implemented; the Aurora Ledger unattended run is not yet proven in a captured
+proof bundle.
 
 ## Summary
 
@@ -16,8 +16,9 @@ are deleted.
 
 The deterministic plan engine is implemented and cut over. Benchmark corpus,
 smoke replay, proof collection, Docker verify, and app container idle startup
-have green evidence. The live Aurora Ledger endpoint proof has not run because
-the app daemon still lacks the production endpoint adapter.
+have green evidence. The app daemon now calls the configured endpoint when a
+model step is selected. The live Aurora Ledger endpoint proof has not yet
+produced a captured success bundle.
 
 ## Proven Surfaces
 
@@ -48,9 +49,8 @@ corpus validation, deterministic replay, and proof bundle collection.
 
 ## Open Boundaries
 
-- `lkjagent-app` does not yet call the configured endpoint in its daemon loop.
-- The Aurora Ledger live proof is blocked before loop iteration one for that
-  reason; no live success is claimed.
+- The Aurora Ledger live proof has not yet produced a captured success bundle;
+  no live success is claimed.
 - Structure audit is not yet rebuilt for the plan engine.
 - `bench run` writes the bounded report surface but does not yet drive a real
   endpoint scoring run.
