@@ -70,6 +70,12 @@ fn handle_failed(
     snapshot.steps[index].attempts_used += 1;
     let additions = shortfall_steps(&snapshot.steps[index], files, results);
     if additions.is_empty() {
+        snapshot.steps[index].state = StepState::Blocked;
+        crate::engine_steps::record_event(
+            commands,
+            EventKind::StepBlocked,
+            "deterministic checks failed".to_string(),
+        );
         return;
     }
     let keep = snapshot.check_results.len().saturating_sub(results.len());
