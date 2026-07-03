@@ -18,9 +18,11 @@ const RETRY_FRAME: usize = 250;
 
 pub fn render_prompt(task: &Task, steps: &[Step], step: &Step) -> Prompt {
     let tag = expected_block(step.kind);
+    let brief = truncate(&task.brief, 450);
     let system = format!(
-        "lkjagent writes honestly. Objective: {}\nExpected: {tag}\n{}",
+        "lkjagent writes honestly. Objective: {}\nTask brief:\n{}\nExpected: {tag}\n{}",
         task.objective,
+        brief,
         protocol(step.kind)
     );
     let digest = plan_digest(steps);
@@ -133,6 +135,15 @@ mod tests {
     use crate::classify::instantiate;
 
     use super::*;
+
+    #[test]
+    fn prompt_includes_task_brief() {
+        let mut snapshot = instantiate(2, "What is known?");
+        snapshot.task.brief = "memory_facts:\nrow memory fact".to_string();
+        let prompt = render_prompt(&snapshot.task, &snapshot.steps, &snapshot.steps[0]);
+        assert!(prompt.system.contains("Task brief:"));
+        assert!(prompt.system.contains("row memory fact"));
+    }
 
     #[test]
     fn retry_prompt_fingerprint_changes() {
