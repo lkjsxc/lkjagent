@@ -18,7 +18,7 @@ The chosen protocol target has five model envelopes. Explore returns only
 `summary` parameter. Ask steps return `<message>...</message>` and park the task
 as `waiting`. Explore output never asks the owner directly.
 
-## Proven In This Session
+## Proven In Current Checkout
 
 The app no longer reads `app.active-snapshot` as runtime authority. Focused
 resume tests prove that config snapshots are ignored when rows are absent and
@@ -42,9 +42,10 @@ Endpoint calls produce exchange files and structured completion records with
 usage, cache metrics, provider anomalies, closure mode, timing, generated
 exchange refs, and nullable token usage rows. Check results use the active step
 id, store check parameters, and keep numeric measurements as scalar values.
-README coverage requires links to children, and link checks normalize `./`,
-`../`, anchors, and directory README inference. Deterministic effect failures
-commit an `effect_error` attempt and notice without marking the step done.
+README coverage requires links to children, and link checks cover tracked
+Markdown, crate README contract links, `./`, `../`, anchors, and directory README
+inference. Deterministic effect failures commit an `effect_error` attempt and
+notice without marking the step done.
 
 During this implementation pass, `cargo test -q`, `check-docs`, `check-lines`,
 `quiet verify`, and `docker compose run --rm verify` passed after the row-first,

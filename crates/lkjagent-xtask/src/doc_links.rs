@@ -8,7 +8,7 @@ pub fn check_doc_links(files: &[RepoFile]) -> Vec<Violation> {
         .map(|file| file.path.as_str())
         .collect::<BTreeSet<_>>();
     let mut violations = Vec::new();
-    for file in files.iter().filter(|file| is_doc(file)) {
+    for file in files.iter().filter(|file| is_markdown(file)) {
         for target in markdown_links(&file.text) {
             if skip_target(&target) {
                 continue;
@@ -33,8 +33,8 @@ pub fn check_doc_links(files: &[RepoFile]) -> Vec<Violation> {
     violations
 }
 
-fn is_doc(file: &RepoFile) -> bool {
-    file.path.starts_with("docs/") && file.path.ends_with(".md")
+fn is_markdown(file: &RepoFile) -> bool {
+    file.path.ends_with(".md")
 }
 
 fn markdown_links(text: &str) -> Vec<String> {
@@ -118,5 +118,16 @@ mod tests {
         let violations = check_doc_links(&files);
         assert_eq!(violations.len(), 1);
         assert!(violations[0].fix.contains("missing.md"));
+    }
+
+    #[test]
+    fn reports_broken_crate_readme_contract_links() {
+        let files = vec![RepoFile::new(
+            "crates/demo/README.md",
+            "# Demo\n\n## Purpose\n\nDoc contract: [old](../../docs/old/README.md).",
+        )];
+        let violations = check_doc_links(&files);
+        assert_eq!(violations.len(), 1);
+        assert!(violations[0].fix.contains("docs/old/README.md"));
     }
 }

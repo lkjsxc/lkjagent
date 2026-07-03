@@ -24,7 +24,9 @@ is reachable from [../README.md](../README.md) within
 
 State the current contract directly. Do not preserve reference copies, history
 narration, release shorthand, migration framing, open markers, or dead links.
-Examples must be real paths, commands, fixtures, or protocol blocks.
+Every tracked Markdown link resolves to a tracked repository path or an allowed
+external target. Examples must be real paths, commands, fixtures, or protocol
+blocks.
 
 ## Ownership
 
