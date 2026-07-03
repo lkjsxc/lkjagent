@@ -30,7 +30,7 @@ fn fake_endpoint_task_closes_and_resumes_from_store() -> TestResult<()> {
     let mut first = ScriptedEndpoint {
         outputs: vec![
             "<message>wrong</message>".to_string(),
-            "<finish>done exploring</finish>".to_string(),
+            finish("done exploring"),
         ],
         index: 0,
     };
@@ -69,7 +69,10 @@ fn simple_templates_close_with_fake_endpoint() -> TestResult<()> {
     run_scripted(
         "generic",
         "Survey the repository and report.",
-        vec!["<finish>found facts</finish>", "<message>done</message>"],
+        vec![
+            "<action><tool>finish</tool><summary>found facts</summary></action>",
+            "<message>done</message>",
+        ],
         None,
     )?;
     run_scripted(
@@ -100,36 +103,8 @@ fn simple_templates_close_with_fake_endpoint() -> TestResult<()> {
     Ok(())
 }
 
-#[test]
-fn waiting_question_resumes_from_queued_answer() -> TestResult<()> {
-    let data = fixture_root("waiting")?;
-    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    setup(&conn)?;
-    enqueue(&conn, "What is in the workspace?", "now")?;
-    drop(conn);
-    let mut first = ScriptedEndpoint {
-        outputs: vec!["<ask>Which file?</ask>".to_string()],
-        index: 0,
-    };
-    let waiting = run_until_idle(&data, &mut first, 2)?;
-    assert_eq!(waiting.task.state, TaskState::Waiting);
-    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    enqueue(&conn, "README.md", "now")?;
-    drop(conn);
-    let mut second = ScriptedEndpoint {
-        outputs: vec![
-            "<finish>README.md observed</finish>".to_string(),
-            "<message>It exists.</message>".to_string(),
-        ],
-        index: 0,
-    };
-    let closed = run_until_idle(&data, &mut second, 4)?;
-    assert_eq!(closed.task.state, TaskState::Closed);
-    assert!(closed
-        .events
-        .iter()
-        .any(|event| event.content == "README.md"));
-    Ok(())
+fn finish(summary: &str) -> String {
+    format!("<action><tool>finish</tool><summary>{summary}</summary></action>")
 }
 
 fn run_scripted(

@@ -25,6 +25,7 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             id INTEGER PRIMARY KEY,
             content TEXT NOT NULL,
             state TEXT NOT NULL,
+            force_new INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL,
             delivered_at TEXT,
             task_id INTEGER
@@ -56,6 +57,9 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             checks_json TEXT NOT NULL,
             state TEXT NOT NULL,
             attempts_used INTEGER NOT NULL,
+            actions_used INTEGER NOT NULL DEFAULT 0,
+            action_budget INTEGER NOT NULL DEFAULT 0,
+            split_used INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL,
             FOREIGN KEY(task_id) REFERENCES tasks(id)
@@ -114,9 +118,9 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
             id INTEGER PRIMARY KEY,
             task_id INTEGER NOT NULL,
             attempt_id INTEGER,
-            prompt_tokens INTEGER NOT NULL,
-            completion_tokens INTEGER NOT NULL,
-            cached_tokens INTEGER NOT NULL,
+            prompt_tokens INTEGER,
+            completion_tokens INTEGER,
+            cached_tokens INTEGER,
             created_at TEXT NOT NULL
         );
 

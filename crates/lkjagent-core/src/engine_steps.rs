@@ -72,11 +72,23 @@ pub(crate) fn handle_model(
         }
         ParsedOutput::Plan(lines) => finish_plan(snapshot, commands, index, lines),
         ParsedOutput::Action(action) => {
-            keep_exploring(&mut snapshot.steps[index], commands, action)
+            if action.tool == "finish" {
+                let summary = action
+                    .params
+                    .iter()
+                    .find(|(name, _)| name == "summary")
+                    .map(|(_, value)| value.clone())
+                    .unwrap_or_else(|| "explore finished".to_string());
+                finish_message(snapshot, commands, index, summary);
+            } else {
+                keep_exploring(&mut snapshot.steps[index], commands, action)
+            }
         }
-        ParsedOutput::Finish(summary) | ParsedOutput::Message(summary) => {
-            finish_message(snapshot, commands, index, summary);
+        ParsedOutput::Finish(summary) => finish_message(snapshot, commands, index, summary),
+        ParsedOutput::Message(summary) if snapshot.steps[index].kind == StepKind::Ask => {
+            wait_for_answer(snapshot, commands, index, summary);
         }
+        ParsedOutput::Message(summary) => finish_message(snapshot, commands, index, summary),
         ParsedOutput::Question(question) => wait_for_answer(snapshot, commands, index, question),
         ParsedOutput::Verdict(result) => finish_verdict(snapshot, commands, index, result),
     }
@@ -159,7 +171,10 @@ fn finish_verdict(
     } else {
         StepState::Active
     };
-    commands.push(Command::RecordChecks(vec![result]));
+    commands.push(Command::RecordChecks {
+        step_id: snapshot.steps[index].id,
+        results: vec![result],
+    });
 }
 
 fn step_index(snapshot: &TaskSnapshot, step_id: u64) -> Option<usize> {

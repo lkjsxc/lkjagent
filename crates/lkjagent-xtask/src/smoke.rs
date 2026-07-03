@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::engine::Command;
-use lkjagent_core::model::TaskState;
+use lkjagent_core::model::{StepKind, TaskState};
 use lkjagent_store::plan_access::{insert_step_tx, insert_task, set_task_state};
 use lkjagent_store::plan_schema::setup;
 use lkjagent_store::plan_turn::commit_commands;
@@ -64,8 +64,19 @@ fn replay_manuscript(conn: &mut Connection, data: &Path) -> Result<(), String> {
         .map(|check| lkjagent_effects::checks::run_check(&data.join("workspace"), check))
         .collect::<Result<Vec<_>, _>>()
         .map_err(|e| e.to_string())?;
-    commit_commands(conn, 1, &[Command::RecordChecks(results)], "now")
-        .map_err(|e| e.to_string())?;
+    let step_id = snapshot
+        .steps
+        .iter()
+        .find(|step| step.kind == StepKind::Verify)
+        .map(|step| step.id)
+        .unwrap_or(1);
+    commit_commands(
+        conn,
+        1,
+        &[Command::RecordChecks { step_id, results }],
+        "now",
+    )
+    .map_err(|e| e.to_string())?;
     set_task_state(conn, 1, TaskState::Closed, "now").map_err(|e| e.to_string())
 }
 

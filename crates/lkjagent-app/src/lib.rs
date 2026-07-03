@@ -3,6 +3,8 @@ pub mod cli;
 pub mod config;
 pub mod daemon;
 pub mod endpoint;
+mod explore;
+mod inspect;
 pub mod state;
 pub mod status;
 mod turn_effects;

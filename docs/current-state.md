@@ -20,43 +20,55 @@ as `waiting`. Explore output never asks the owner directly.
 
 ## Proven In This Session
 
-Static source reading on 2026-07-03 confirmed the repository still has the Rust
-workspace split described by the docs: `lkjagent-core`, `lkjagent-store`,
-`lkjagent-llm`, `lkjagent-effects`, `lkjagent-app`, and `lkjagent-xtask`.
-During this documentation pass, these gates passed: `check-docs`,
-`check-lines`, `quiet verify`, and `docker compose run --rm verify`.
+The app no longer reads `app.active-snapshot` as runtime authority. Focused
+resume tests prove that config snapshots are ignored when rows are absent and
+that normalized task and step rows win over stale config. The daemon hydrates
+open and waiting tasks from normalized rows, commits turn state through rows,
+and records waiting answers as rows before continuing.
+
+The parser now rejects explore `<finish>` and `<ask>` envelopes, leading or
+trailing prose, duplicate action parameters, unknown action parameters, and
+unknown tools. Prompt rendering tells explore steps to finish with the `finish`
+action inside `<action>`.
+
+Queue rows persist `force_new`, send uses it, and daemon intake can select a
+forced-new row without treating it as an answer. Status, task, queue, log,
+memory, and watch surfaces read rows instead of a config snapshot. The bounded
+explore dispatcher runs the documented filesystem, shell, memory, plan-note,
+and finish actions and stores the latest observation in step inputs.
+
+During this implementation pass, `cargo test -q`, `check-docs`, `check-lines`,
+`quiet verify`, and `docker compose run --rm verify` passed after the row-first,
+parser, CLI, and explore changes.
+
+## Implemented Code
+
+`lkjagent-core` owns the pure plan engine, parser, renderer, checks, word
+counting, classifier, templates, and recovery helpers. `lkjagent-store` owns the
+plan-store schema, row hydration, queue access, and atomic turn state commits.
+`lkjagent-effects` owns filesystem, shell, check gathering, observations, and
+exchange log file helpers. `lkjagent-app` owns the daemon interpreter,
+row-backed CLI renderers, endpoint adapter, waiting answer routing, and bounded
+explore dispatcher. `lkjagent-llm` owns the endpoint wire client.
+`lkjagent-xtask` owns repository gates, structure audit, deterministic replay,
+benchmark commands, and proof bundle collection.
 
 ## Open Implementation Gaps
 
-The following gaps are based on local source reading, not on failing test output:
-
-- `crates/lkjagent-app/src/state.rs` persists `TaskSnapshot` JSON under
-  `app.active-snapshot`, and `daemon.rs` loads it before row intake. Normalized
-  SQLite rows are therefore not yet the only runtime truth.
-- The store has normalized tables, but no row-first hydrator is wired into the
-  app. Step rows do not store `actions_used`, `action_budget`, or `split_used`;
-  attempts write an empty `exchange_ref`; check results are inserted with the
-  task id in the `step_id` column; token usage has no observed writer.
-- `parse.rs` still accepts explore `<finish>` and `<ask>` envelopes. It does
-  not yet enforce the target exactness for trailing prose, attributes,
-  duplicate action parameters, or unknown action parameters.
-- `render.rs` still tells explore steps to return `<finish>summary</finish>` as
-  an alternative to `<action>`, so prompt rendering is not aligned with the
-  target grammar.
-- `send --new` is parsed, but queue rows do not persist `force_new`, and enqueue
-  behavior does not use the flag for answer routing.
-- `status`, `task show`, and `watch` render from the config snapshot. `log`,
-  `task list`, `queue list`, `queue show`, and `memory` still return placeholder
-  text rather than row-backed data.
-- Endpoint completion returns only content to the interpreter. Durable usage,
-  cache metrics, provider anomalies, closure mode, timing, and exchange refs are
-  not yet owned by structured rows plus exchange files.
-- Explore effects do not yet dispatch the documented ten-tool registry. The app
-  currently records a generic `observation=ok` note for explore commands.
-- Turn settlement marks write content done in pure state before the effect is
-  dispatched. If the effect fails, the returned error prevents the snapshot save
-  for that turn, but the engine command stream is not yet a data-rich settlement
-  of effect results.
+- Endpoint completion still returns content to the interpreter without a durable
+  structured completion record. Usage, cache metrics, provider anomalies,
+  closure mode, timing, and exchange refs are not yet fully connected from live
+  endpoint calls to rows and exchange files.
+- Token usage rows are nullable and status renders missing totals as unknown,
+  but unknown endpoint usage is not yet represented by per-attempt rows.
+- Check results now use the active step id, but parameters are still stored as
+  `{}` and measured values are still text rather than structured values for the
+  retry ladder.
+- Turn commits occur after deterministic effects, so a failed effect is not
+  committed as done. Settlement is still not a fully data-rich effect-result
+  feedback model.
+- `memory.save` returns a bounded observation through the explore path, but it
+  does not yet insert a durable memory row.
 
 ## Historical Evidence
 
@@ -67,9 +79,9 @@ gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Add focused store hydration tests that prove the app cannot resume from
-`app.active-snapshot` when normalized rows are absent or stale, then replace
-config-snapshot authority with row-first hydration.
+Connect endpoint completions to structured attempt data: write exchange files,
+store real exchange refs, persist nullable usage and cache metrics, and make
+proof/status surfaces read those rows.
 
 ## Honesty Rules
 

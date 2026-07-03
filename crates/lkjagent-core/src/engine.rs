@@ -27,11 +27,17 @@ pub enum TurnOutcome {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Command {
-    WriteFile { path: String, content: String },
+    WriteFile {
+        path: String,
+        content: String,
+    },
     RunExplore(Action),
     RecordAttempt(Attempt),
     RecordEvent(Event),
-    RecordChecks(Vec<CheckResult>),
+    RecordChecks {
+        step_id: u64,
+        results: Vec<CheckResult>,
+    },
     AddSteps(Vec<Step>),
 }
 

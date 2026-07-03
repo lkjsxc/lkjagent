@@ -112,7 +112,7 @@ fn protocol(kind: StepKind) -> &'static str {
     match kind {
         StepKind::Plan => "Return exactly <plan> lines </plan>. Lines: write PATH | TITLE | words=N, explore | GOAL | budget=N, or respond | SUMMARY. Use only relative paths.",
         StepKind::Write | StepKind::Revise => "Return exactly <content> prose </content>. Write the requested file body only. No analysis outside the block.",
-        StepKind::Explore => "Return exactly <action>...</action> using one allowed tool, or <finish>summary</finish> when enough evidence is gathered.",
+        StepKind::Explore => "Return exactly <action>...</action> using one allowed tool. To finish, use <tool>finish</tool> with <summary>...</summary>.",
         StepKind::Respond | StepKind::Ask => "Return exactly <message>owner-facing answer</message>. Use gathered facts only.",
         StepKind::Verify => "Return exactly <verdict>pass or fail plus measured evidence</verdict>.",
     }

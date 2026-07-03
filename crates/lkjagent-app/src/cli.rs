@@ -4,8 +4,7 @@ use rusqlite::Connection;
 
 use crate::args::{parse, Command};
 use crate::daemon::run_daemon;
-use crate::state::load_snapshot;
-use crate::status::{status, task_show, watch};
+use crate::status::status;
 
 pub fn run<I, S>(args: I) -> Result<String, String>
 where
@@ -26,27 +25,19 @@ where
             Ok(String::new())
         }
         Command::Send { text, force_new } => {
-            let id = lkjagent_store::plan_access::enqueue(&conn, &text, "now")
-                .map_err(|error| error.to_string())?;
+            let id =
+                lkjagent_store::plan_access::enqueue_with_force(&conn, &text, force_new, "now")
+                    .map_err(|error| error.to_string())?;
             Ok(format!("queue: {id} new={force_new}"))
         }
         Command::Status => status(&conn),
-        Command::Log { limit } => Ok(format!("log: limit={limit}")),
-        Command::TaskList => Ok("tasks: see task show ID".to_string()),
-        Command::TaskShow { id } => {
-            let snapshot = load_snapshot(&conn).map_err(|error| error.to_string())?;
-            snapshot.map_or_else(
-                || Ok(format!("task {id}: not found")),
-                |snap| Ok(task_show(&snap)),
-            )
-        }
-        Command::QueueList => Ok("queue: use queue show ID".to_string()),
-        Command::QueueShow { id } => Ok(format!("queue {id}")),
-        Command::Memory { query } => Ok(format!("memory: {query}")),
-        Command::Watch => {
-            let snapshot = load_snapshot(&conn).map_err(|error| error.to_string())?;
-            snapshot.map_or_else(|| Ok("watch: idle".to_string()), |snap| Ok(watch(&snap)))
-        }
+        Command::Log { limit } => crate::inspect::log(&conn, limit),
+        Command::TaskList => crate::inspect::task_list(&conn),
+        Command::TaskShow { id } => crate::inspect::task_show(&conn, id),
+        Command::QueueList => crate::inspect::queue_list(&conn),
+        Command::QueueShow { id } => crate::inspect::queue_show(&conn, id),
+        Command::Memory { query } => crate::inspect::memory(&conn, &query),
+        Command::Watch => crate::inspect::watch(&conn),
         Command::Help => Ok(help()),
     }
 }

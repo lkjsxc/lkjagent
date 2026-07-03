@@ -41,4 +41,39 @@ fn reports_docs_fault_examples() {
         parse_expected(StepKind::Explore, action),
         Err(ParseFault::UnknownTool)
     );
+    assert_eq!(
+        parse_expected(StepKind::Write, "note <content>x</content>"),
+        Err(ParseFault::WrongBlock)
+    );
+    assert_eq!(
+        parse_expected(StepKind::Write, "<content>x</content> tail"),
+        Err(ParseFault::WrongBlock)
+    );
+}
+
+#[test]
+fn explore_accepts_only_exact_action_blocks() {
+    let finish = "<action><tool>finish</tool><summary>done</summary></action>";
+    assert!(matches!(
+        parse_expected(StepKind::Explore, finish),
+        Ok(ParsedOutput::Action(action)) if action.tool == "finish"
+    ));
+    assert_eq!(
+        parse_expected(StepKind::Explore, "<finish>done</finish>"),
+        Err(ParseFault::WrongBlock)
+    );
+    assert_eq!(
+        parse_expected(StepKind::Explore, "<ask>Which file?</ask>"),
+        Err(ParseFault::WrongBlock)
+    );
+    let duplicate = "<action><tool>fs.read</tool><path>a</path><path>b</path></action>";
+    assert_eq!(
+        parse_expected(StepKind::Explore, duplicate),
+        Err(ParseFault::BadParams)
+    );
+    let unknown = "<action><tool>fs.read</tool><path>a</path><extra>x</extra></action>";
+    assert_eq!(
+        parse_expected(StepKind::Explore, unknown),
+        Err(ParseFault::BadParams)
+    );
 }

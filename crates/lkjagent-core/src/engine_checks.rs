@@ -20,7 +20,10 @@ pub(crate) fn handle_checks(
         .collect::<Vec<_>>();
     let passed = results.iter().all(|result| result.passed);
     snapshot.check_results.extend(results.clone());
-    commands.push(Command::RecordChecks(results.clone()));
+    commands.push(Command::RecordChecks {
+        step_id,
+        results: results.clone(),
+    });
     if passed {
         snapshot.steps[index].state = StepState::Done;
         feed_next_step(snapshot, index, &results);

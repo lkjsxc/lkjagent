@@ -15,7 +15,7 @@ fn generic_task_closes_after_eight_plus_turns_with_faults() {
         action("fs.search", "query", "Aurora"),
         action("memory.find", "query", "workspace"),
         action("plan.note", "note", "ready to summarize"),
-        TurnOutcome::Model(ParsedOutput::Finish("found enough evidence".to_string())),
+        action("finish", "summary", "found enough evidence"),
         TurnOutcome::Model(ParsedOutput::Message("Survey complete.".to_string())),
         TurnOutcome::Noop,
     ];

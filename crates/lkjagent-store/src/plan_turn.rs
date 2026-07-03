@@ -21,11 +21,12 @@ pub fn commit_commands(
                 tx.execute(
                     "INSERT INTO attempts (step_id, ordinal, prompt_fingerprint, exchange_ref,
                      outcome, diagnosis, tokens_in, tokens_out, created_at)
-                     VALUES (?1, ?2, ?3, '', ?4, ?5, ?6, ?7, ?8)",
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
                     params![
                         attempt.step_id as i64,
                         attempt.ordinal as i64,
                         attempt.prompt_fingerprint,
+                        exchange_ref(task_id, attempt.step_id, attempt.ordinal),
                         format!("{:?}", attempt.outcome).to_ascii_lowercase(),
                         attempt.diagnosis,
                         attempt.tokens_in as i64,
@@ -38,13 +39,13 @@ pub fn commit_commands(
                 update_task_for_event(&tx, task_id, event.kind, &event.content, now)?;
                 insert_event(&tx, task_id, event.kind, &event.content, now)?
             }
-            Command::RecordChecks(results) => {
+            Command::RecordChecks { step_id, results } => {
                 for result in results {
                     tx.execute(
                         "INSERT INTO check_results (step_id, name, params_json, passed, measured,
                          created_at) VALUES (?1, ?2, '{}', ?3, ?4, ?5)",
                         params![
-                            task_id,
+                            *step_id as i64,
                             result.name,
                             i64::from(result.passed),
                             result.measured,
@@ -143,6 +144,10 @@ pub fn set_config(conn: &Connection, key: &str, value: &str) -> StoreResult<()> 
         params![key, value],
     )?;
     Ok(())
+}
+
+fn exchange_ref(task_id: i64, step_id: u64, ordinal: u32) -> String {
+    format!("logs/task-{task_id}/step-{step_id}/attempt-{ordinal}")
 }
 
 pub fn config(conn: &Connection, key: &str) -> StoreResult<Option<String>> {

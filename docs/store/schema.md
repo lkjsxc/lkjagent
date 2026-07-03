@@ -16,7 +16,7 @@ FTS mirror as a table.
 | `tasks` | id, queue_id, objective, template, state, brief, budget, summary | engine | engine, CLI |
 | `steps` | id, task_id, ordinal, kind, instruction, inputs_json, checks_json, state, attempts_used, actions_used, action_budget, split_used | engine | engine, CLI |
 | `attempts` | id, step_id, ordinal, fingerprint, exchange_ref, outcome, diagnosis | engine | engine, proof |
-| `check_results` | id, step_id, name, params_json, passed, measured_json, created_at | engine | engine, proof |
+| `check_results` | id, step_id, name, params_json, passed, measured, created_at | engine | engine, proof |
 | `events` | id, task_id, kind, content, created_at | engine, intake | CLI, console |
 | `memory` | id, topic, content, task_id, created_at | engine, explore | classifier, CLI |
 | `memory_fts` | topic, content | triggers | memory search |

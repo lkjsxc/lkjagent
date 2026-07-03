@@ -4,6 +4,7 @@ pub struct QueueRow {
     pub content: String,
     pub state: String,
     pub task_id: Option<i64>,
+    pub force_new: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

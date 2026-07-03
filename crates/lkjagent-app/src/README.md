@@ -10,6 +10,10 @@ Map lkjagent-app source modules.
 - [lib.rs](lib.rs): public library entry.
 - [args.rs](args.rs): CLI parser.
 - [cli.rs](cli.rs): command execution.
-- [daemon.rs](daemon.rs): turn-cycle interpreter and scripted endpoint seam.
-- [state.rs](state.rs): current config-snapshot load and save seam.
+- [daemon.rs](daemon.rs): row-backed turn-cycle interpreter and scripted endpoint seam.
+- [endpoint.rs](endpoint.rs): endpoint adapter wrapper.
+- [explore.rs](explore.rs): bounded explore action dispatcher.
+- [inspect.rs](inspect.rs): row-backed CLI inspection renderers.
+- [state.rs](state.rs): active snapshot hydration from normalized rows.
 - [status.rs](status.rs): status, task, and watch rendering helpers.
+- [turn-effects.rs](turn_effects.rs): deterministic write, check, and explore effects.
