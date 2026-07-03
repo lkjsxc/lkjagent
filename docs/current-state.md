@@ -15,10 +15,10 @@ graph, tools, CLI, context, protocol, benchmark crates, and old store modules
 are deleted.
 
 The deterministic plan engine is implemented and cut over. Benchmark corpus,
-smoke replay, proof collection, Docker verify, and app container idle startup
-have green evidence. The app daemon now calls the configured endpoint when a
-model step is selected. The live Aurora Ledger endpoint proof has not yet
-produced a captured success bundle.
+smoke replay, proof collection, structure audit, Docker verify, and app
+container idle startup have green evidence. The app daemon now calls the
+configured endpoint when a model step is selected. The live Aurora Ledger
+endpoint proof has not yet produced a captured success bundle.
 
 ## Proven Surfaces
 
@@ -51,7 +51,6 @@ corpus validation, deterministic replay, and proof bundle collection.
 
 - The Aurora Ledger live proof has not yet produced a captured success bundle;
   no live success is claimed.
-- Structure audit is not yet rebuilt for the plan engine.
 - `bench run` writes the bounded report surface but does not yet drive a real
   endpoint scoring run.
 

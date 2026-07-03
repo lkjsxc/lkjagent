@@ -17,10 +17,11 @@ const STEP_FRAME: usize = 4_000;
 const RETRY_FRAME: usize = 250;
 
 pub fn render_prompt(task: &Task, steps: &[Step], step: &Step) -> Prompt {
+    let tag = expected_block(step.kind);
     let system = format!(
-        "lkjagent writes honestly. Objective: {}\nExpected: {}",
+        "lkjagent writes honestly. Objective: {}\nExpected: {tag}\n{}",
         task.objective,
-        expected_block(step.kind)
+        protocol(step.kind)
     );
     let digest = plan_digest(steps);
     let retry = if step.attempts_used > 0 {
@@ -45,7 +46,7 @@ pub fn render_prompt(task: &Task, steps: &[Step], step: &Step) -> Prompt {
         user,
         fingerprint,
         max_tokens: max_tokens(step.kind),
-        stop: format!("</{}>", expected_block(step.kind)),
+        stop: format!("</{tag}>"),
     }
 }
 
@@ -104,6 +105,16 @@ pub fn max_tokens(kind: StepKind) -> u32 {
         StepKind::Explore => 500,
         StepKind::Respond | StepKind::Ask => 700,
         StepKind::Verify => 300,
+    }
+}
+
+fn protocol(kind: StepKind) -> &'static str {
+    match kind {
+        StepKind::Plan => "Return exactly <plan> lines </plan>. Lines: write PATH | TITLE | words=N, explore | GOAL | budget=N, or respond | SUMMARY. Use only relative paths.",
+        StepKind::Write | StepKind::Revise => "Return exactly <content> prose </content>. Write the requested file body only. No analysis outside the block.",
+        StepKind::Explore => "Return exactly <action>...</action> using one allowed tool, or <finish>summary</finish> when enough evidence is gathered.",
+        StepKind::Respond | StepKind::Ask => "Return exactly <message>owner-facing answer</message>. Use gathered facts only.",
+        StepKind::Verify => "Return exactly <verdict>pass or fail plus measured evidence</verdict>.",
     }
 }
 

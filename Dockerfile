@@ -32,7 +32,7 @@ RUN apt-get update \
         'cd /data/workspace' \
         'case "${1:-}" in' \
         '  ""|run|send|status|log|watch|help|task|queue|memory)' \
-        '    set -- /usr/local/bin/lkjagent "$@"' \
+        '    set -- /usr/local/bin/lkjagent --data /data "$@"' \
         '    ;;' \
         'esac' \
         'exec setpriv --reuid=1000 --regid=1000 --init-groups -- "$@"' \
