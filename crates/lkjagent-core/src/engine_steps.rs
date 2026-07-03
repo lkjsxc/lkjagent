@@ -1,9 +1,8 @@
-use crate::docs_tree::validate_plan;
 use crate::engine::Command;
 use crate::engine_extend::{add_steps, insert_after, split_after_fault};
+use crate::engine_plan::finish_plan;
 use crate::model::*;
-use crate::parse::{Action, ParseFault, ParsedOutput, PlanLine};
-use crate::plan::plan_steps;
+use crate::parse::{Action, ParseFault, ParsedOutput};
 use crate::render::Prompt;
 
 pub(crate) fn handle_fault(
@@ -181,19 +180,4 @@ fn attempt(step: &Step, prompt: &Prompt, outcome: AttemptOutcome, diagnosis: &st
 
 pub(crate) fn record_event(commands: &mut Vec<Command>, kind: EventKind, content: String) {
     commands.push(Command::RecordEvent(Event { kind, content }));
-}
-
-fn finish_plan(s: &mut TaskSnapshot, c: &mut Vec<Command>, index: usize, lines: Vec<PlanLine>) {
-    let additions = plan_steps(&s.steps[index], lines);
-    if s.steps[index].title == "docs tree plan" {
-        if let Err(diagnosis) = validate_plan(&s.steps[index], &additions) {
-            s.steps[index].state = StepState::Active;
-            s.steps[index].attempts_used += 1;
-            record_event(c, EventKind::Notice, diagnosis);
-            return;
-        }
-    }
-    s.steps[index].state = StepState::Done;
-    insert_after(s, index, &additions);
-    c.push(Command::AddSteps(additions));
 }

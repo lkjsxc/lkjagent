@@ -84,8 +84,25 @@ fn checks(fields: &DocsFields) -> Vec<CheckSpec> {
     checks
 }
 
-fn plan(task_id: u64, objective: &str, fields: &DocsFields) -> Step {
-    let mut step = base(task_id, 1, 1, StepKind::Plan, "docs tree plan", objective);
+fn plan(task_id: u64, _objective: &str, fields: &DocsFields) -> Step {
+    let instruction = match fields.page_count {
+        Some(count) => format!(
+            "plan docs tree: write {}/README.md and exactly {count} page files under {}",
+            fields.root, fields.root
+        ),
+        None => format!(
+            "plan docs tree: write {}/README.md and page files",
+            fields.root
+        ),
+    };
+    let mut step = base(
+        task_id,
+        1,
+        1,
+        StepKind::Plan,
+        "docs tree plan",
+        &instruction,
+    );
     step.inputs = format!(
         "root={} pages={:?} exact={}",
         fields.root, fields.page_count, fields.exact

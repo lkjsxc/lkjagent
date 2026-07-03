@@ -5,6 +5,7 @@ mod docs_tree_extract;
 pub mod engine;
 mod engine_checks;
 mod engine_extend;
+mod engine_plan;
 mod engine_steps;
 
 pub mod manuscript;
