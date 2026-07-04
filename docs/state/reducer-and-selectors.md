@@ -1,0 +1,41 @@
+# Reducer And Selectors
+
+## Purpose
+
+Define pure state transitions and deterministic turn selection.
+
+## Event Model
+
+Events are append-only facts from queue intake, owner answers, parser results,
+tool admissions, effects, observations, checks, compaction, recovery, and
+completion attempts. Each event has a kind key, payload schema, payload JSON,
+source ref, created time, and optional decision id.
+
+## Reducer
+
+The reducer is pure:
+
+```text
+RuntimeSnapshot + RuntimeEvent -> StatePatch
+```
+
+A patch inserts, updates, suppresses, resolves, or blocks state cells. The store
+commits the event and patch in one transaction. The reducer never reads files,
+opens SQLite, calls the endpoint, or asks the wall clock.
+
+## Selectors
+
+Selectors read the whole hydrated state vector and choose one operation for the
+next `RuntimeDecision`. Selection is deterministic and explainable. It prefers
+owner intake, waiting answer handling, active recovery, runnable effects, model
+calls, checks, completion, then idle.
+
+## Fingerprints
+
+State-vector and snapshot fingerprints are canonical over stable bytes such as
+canonical JSON. Rust debug formatting is not a persisted fingerprint format.
+
+## Failure This Prevents
+
+The daemon can replay events into the same state, and tests can prove decisions
+without filesystem, endpoint, or SQLite side effects.

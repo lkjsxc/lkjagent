@@ -7,9 +7,11 @@ Define the session loop for coding agents.
 ## Read Order
 
 1. [../current-state.md](../current-state.md)
-2. [../engine/README.md](../engine/README.md)
-3. The docs page that owns the task being changed
-4. [../operations/verification.md](../operations/verification.md)
+2. [../vision/README.md](../vision/README.md)
+3. [../state/README.md](../state/README.md)
+4. [../runtime/README.md](../runtime/README.md)
+5. The docs page that owns the task being changed
+6. [../operations/verification.md](../operations/verification.md)
 
 ## Case State
 

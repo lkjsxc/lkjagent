@@ -2,46 +2,53 @@
 
 ## Purpose
 
-Define the SQLite tables read and written by lkjagent.
+Define the SQLite tables needed for arbitrary state, decisions, context hygiene,
+and evidence-gated completion.
 
 ## Database
 
 The store file is `data/lkjagent.sqlite3`. SQLite runs with WAL and foreign keys
-enabled. The schema table count is `store.schema.table-count=10`, counting the
-FTS mirror as a table.
+enabled. Durable rows own runtime truth. Exchange files may hold large request,
+response, or artifact bodies, but rows own resumable facts and references.
 
-| Table | Columns | Writer | Reader |
-| --- | --- | --- | --- |
-| `queue` | id, content, state, force_new, timestamps, task_id | CLI, intake | intake, CLI |
-| `tasks` | id, queue_id, objective, template, state, brief, budget, summary | engine | engine, CLI |
-| `steps` | id, task_id, ordinal, kind, instruction, inputs_json, checks_json, state, attempts_used, actions_used, action_budget, split_used | engine | engine, CLI |
-| `attempts` | id, step_id, ordinal, fingerprint, exchange_ref, outcome, diagnosis | engine | engine, proof |
-| `check_results` | id, step_id, name, params_json, passed, measured, created_at | engine | engine, proof |
-| `events` | id, task_id, kind, content, created_at | engine, intake | CLI, console |
-| `memory` | id, topic, content, task_id, created_at | engine, explore | classifier, CLI |
-| `memory_fts` | topic, content | triggers | memory search |
-| `token_usage` | id, task_id, attempt_id, prompt_tokens?, completion_tokens?, cached_tokens? | engine | status, proof |
-| `config` | key, value | CLI, daemon | daemon |
+## Table Set
 
-## Nullable Usage
+Use a fresh state-ledger schema when replacing the current plan-store tables.
+Required tables:
 
-Token counts are nullable. A null value means the endpoint did not report that
-field. Status and proof render null usage as `unknown`, never as zero.
+| Table | Role |
+| --- | --- |
+| `queue` | owner messages, answer routing, and forced-new intent |
+| `cases` | owner objective, lifecycle summary, and terminal report |
+| `events` | append-only runtime facts with optional decision id |
+| `state_cells` | current arbitrary state vector |
+| `state_history` | audit of applied state patches |
+| `decisions` | persisted `RuntimeDecision` authority rows |
+| `prompt_frames` | prompt metadata, fingerprints, and bounded body refs |
+| `tool_admissions` | parsed action, result, and view fingerprint |
+| `observations` | bounded tool or effect output tied to decisions |
+| `context_items` | source-tagged prompt candidates |
+| `context_edges` | provenance, suppression, and conflict links |
+| `artifacts` | files, roots, fingerprints, and ownership metadata |
+| `check_results` | deterministic and judged evidence |
+| `provider_exchanges` | endpoint request and response refs |
+| `token_usage` | nullable provider usage fields |
+| `memory` | durable owner-useful facts with FTS mirror when useful |
+| `config` | owner settings and daemon lease values only |
 
-## Durable Owners
+## JSON Columns
 
-- Queue rows own `force_new`; command output alone is not durable routing state.
-- Attempts own `exchange_ref`, which points to the exchange log directory for
-  the attempt.
-- Check results own the active `step_id`, parameters, structured measured value,
-  pass flag, and timestamp.
-- Token usage rows own prompt, completion, and cached token counts when the
-  provider reports them.
-- Config rows own settings only; they do not own active task snapshots or plan
-  authority.
+JSON payloads include schema names and are validated at crate boundaries. Prefer
+small typed mappers over ad hoc string parsing. Nullable provider usage means the
+provider did not report the value, not zero.
 
-## Deliberate Non-Tables
+## Indexes
 
-There is no separate plan table; ordered steps are the plan. There are no
-authority, admission, graph, artifact, personal-record, or provider-exchange
-tables. Exchange files carry model request and response bodies.
+Index state cells by case id, key, status, priority, and conflict group. Index
+context items by semantic key, contamination class, trust class, and source
+fingerprint. Index decisions by case id, state, and created time.
+
+## Failure This Prevents
+
+The runtime can resume and explain why a tool was rendered, admitted, refused,
+hidden, or recovered for a specific turn.

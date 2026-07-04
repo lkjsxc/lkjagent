@@ -2,29 +2,33 @@
 
 ## Purpose
 
-Define the explore tools available to the model.
+Define the canonical descriptor fields for the tool catalog.
 
-## Tool Set
+## Catalog Rule
 
-The registry size is `tools.registry.count=10`.
+There is one tool catalog. Docs, prompt rendering, parser shape checks, action
+admission, dispatcher wiring, and tests derive from the same descriptor set.
+Fixed explore-only lists are helper views, not independent law.
 
-| Tool | Parameters | Bound |
-| --- | --- | --- |
-| `fs.read` | `path`, `offset?`, `count?` | `tools.fs-read.default-lines=200` |
-| `fs.list` | `path?`, `depth?` | `tools.fs-list.max-entries=200` |
-| `fs.tree` | `path?`, `depth?` | `tools.fs-tree.max-entries=150` |
-| `fs.search` | `query`, `path?` | `tools.fs-search.max-hits=50` |
-| `fs.write` | `path`, `content` | one file inside workspace |
-| `shell.run` | `command` | `tools.shell.timeout-seconds=30` |
-| `memory.find` | `query` | `tools.memory-find.max-hits=10` |
-| `memory.save` | `topic`, `content` | `memory.distill.words=120` |
-| `plan.note` | `note` | one bounded proposal |
-| `finish` | `summary` | ends explore step |
+## Descriptor Fields
 
-`ask` and `done` are not tools. Asking the owner belongs to the retry ladder;
-completion belongs to checks.
+Each descriptor stores:
 
-## Tool Form
+- stable tool name;
+- one-line purpose;
+- input fields with type, required flag, and limits;
+- observation contract and output bound;
+- effect boundary;
+- workspace path requirements;
+- timeout or count budget;
+- state affordance predicates;
+- safety notes; and
+- denial diagnostics for status, not prompt text.
+
+## Prompt Form
+
+The runtime renders exact action shapes only for tools in the active
+`ToolSetView`:
 
 ```text
 <action>
@@ -34,7 +38,10 @@ completion belongs to checks.
 </action>
 ```
 
+If no tools are available, the decision renders an output contract that does not
+ask for an action.
+
 ## Failure This Prevents
 
-The model explores with a small registry and cannot enter a broad legality maze
-while scripted steps wait.
+A tool list cannot drift between documentation, prompt text, parser validation,
+and effect dispatch.

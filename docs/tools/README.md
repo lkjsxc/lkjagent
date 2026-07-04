@@ -2,15 +2,19 @@
 
 ## Purpose
 
-Define the explore toolset, observation shape, and engine guards.
+Define the tool catalog, policy layers, decision-specific tool views,
+admissions, observations, and guards.
 
 ## Table of Contents
 
-- [registry.md](registry.md): the bounded tools available inside explore steps.
+- [registry.md](registry.md): canonical descriptor fields for the tool catalog.
+- [policy.md](policy.md): layered policy that derives per-decision access.
+- [toolset-view-and-admission.md](toolset-view-and-admission.md): prompt-visible
+  tool projection and action admission.
 - [observations.md](observations.md): returned observation envelope and example.
-- [guards.md](guards.md): path, budget, and repeat guards.
+- [guards.md](guards.md): path, budget, repeat, and recovery guards.
 
 ## Failure This Prevents
 
-Tools are confined to exploration, so scripted writing and completion cannot be
-blocked by a refused model-selected tool.
+Tools shown to the model are exactly the tools the harness can admit for the
+same persisted runtime decision.

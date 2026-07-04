@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the status output, task display, event log, watch console, and proof
+Define the status output, case display, event log, watch console, and proof
 visibility that make daemon progress observable.
 
 ## Status Shape
@@ -11,36 +11,39 @@ visibility that make daemon progress observable.
 
 ```text
 daemon: working | idle | waiting | stopped
-task: 12 open manuscript "Aurora Ledger..." budget 47/200
-step: 7/14 write manuscript/chapter-03.md attempt 2/3
-last: step_done 6/14 words=1043
-question: none
+case: 12 open "Aurora Ledger..." budget 47/200
+decision: d-20260704-0007 model.call fp=9ac4... tools=fs.read,finish
+state: active=case:objective,plan:item-7,completion:check-pending
+conflicts: none
 queue: 0 pending
-tokens: task in=61k out=18k cached=44k
+tokens: case in=61k out=18k cached=44k
 ```
 
 Every field is available with the daemon stopped. Unknown token counts are
 printed as unknown rather than guessed.
 
-## Task Display
+## Case Display
 
-`task show` renders the plan digest exactly as prompt assembly renders it: one
-line per step with state marks, attempt counts, diagnoses, check results, and
-exchange-log references. The plan is the progress bar for both owner and model.
+`task show` or the case display renders active state cells, plan-family progress,
+current decision fingerprints, context conflicts, suppressed contaminated items,
+check results, artifact fingerprints, admissions, observations, and exchange
+refs. Plan rows are progress evidence, not the only runtime authority.
 
 ## Event Log
 
-`log` prints transcript events: owner messages, questions, answers, step_done,
-step_blocked, task_closed, task_blocked, and notices. It does not print full
-model requests or prose bodies; exchange refs point to the files.
+`log` prints durable events: owner messages, questions, answers, decision
+selection, admissions, observations, check results, context conflicts,
+completion, blocks, and notices. It does not print full model requests or prose
+bodies; exchange refs point to the files.
 
 ## Watch Console
 
 `watch` is a terminal view over the same store rows:
 
-- top deck: transcript events and the active task summary;
-- bottom deck: plan digest, active step, attempts, budget, queue depth, and
-  token totals;
+- top deck: owner-visible events and the active case summary;
+- middle deck: state vector, current decision, tool view, and conflicts;
+- bottom deck: plan-family progress, attempts, budget, queue depth, and token
+  totals;
 - footer: key hints and last refresh time.
 
 The renderer is width-aware and CJK-safe. It never owns facts that are absent
@@ -48,6 +51,8 @@ from the store.
 
 ## Proof Visibility
 
-Proof bundles are produced by xtask. A bundle summarizes store rows, check
-results, workspace trees with word counts, token usage, attempt outcomes, and
-warnings. It does not copy SQLite files or large model bodies.
+Proof bundles are produced by xtask. A bundle summarizes cases, state cells,
+decisions, prompt frames, tool views, admissions, observations, context
+conflicts, contaminated suppressions, checks, artifact fingerprints, exchanges,
+token usage, workspace trees, and warnings. It does not copy SQLite files or
+large model bodies.

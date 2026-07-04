@@ -2,25 +2,32 @@
 
 ## Purpose
 
-Record the decision that the plan ledger is the only runtime authority.
+Record the decision that durable state rows and persisted runtime decisions are
+the only runtime authority.
 
 ## Context
 
 The harness must direct a weak model without asking it to navigate competing
-policy surfaces.
+policy surfaces. The earlier plan ledger proved the value of durable authority,
+but fixed task and step enums cannot express arbitrary simultaneous state.
 
 ## Decision
 
-Tasks, steps, attempts, checks, and the retry ladder are the single control
-plane. The model authors bounded content or one explore action for the active
-step.
+The state ledger is the single control plane. Runtime state is stored as durable
+case, event, state-cell, decision, context, admission, observation, check, and
+artifact rows. A `RuntimeDecision` is persisted for each turn before prompts,
+endpoint calls, tool admission, effects, recovery, compaction, or completion.
+
+The plan remains a state family for ordered artifact work, not the only control
+plane.
 
 ## Consequences
 
-There are no graph authority decisions, admission matrices, runtime modes, or
-model-selected completion tools. Status and prompts read the same plan digest.
+Prompt rendering, parser contracts, action admission, effect dispatch, status,
+resume, and proof bundles all project the same decision row. There is no
+prompt-only policy, dispatcher-only policy, or second graph authority.
 
 ## Rejected Alternatives
 
-A separate graph or policy layer could disagree with the selected step and make
-legal output impossible to identify from the prompt.
+A separate graph, mode layer, or hidden tool policy could disagree with the
+selected decision and make legal output impossible to identify from the prompt.

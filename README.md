@@ -3,14 +3,18 @@
 ## Purpose
 
 lkjagent is a continuously running personal agent for one owner, one local LLM,
-one workspace, and one SQLite store. The daemon turns owner messages into typed
-plans, executes steps, verifies results with deterministic checks, and reports
-honestly.
+one workspace, and one SQLite store. The daemon is moving toward a durable
+state-ledger runtime where owner messages become cases, events, state cells,
+runtime decisions, prompt frames, tool admissions, effects, observations, checks,
+and honest reports.
 
 ## Product Shape
 
-- The harness owns control flow, retries, paths, and completion checks.
-- The model authors bounded content inside a step-specific envelope.
+- Durable rows and persisted runtime decisions own control flow, retries, paths,
+  tool admission, context selection, and completion checks.
+- The active state vector determines output grammar and model-visible tools.
+- The model authors bounded content or requests an operation exposed by the
+  current decision.
 - Long artifacts are first-class: manuscripts, document trees, reports, and
   other structured outputs.
 - The daemon runs inside Docker Compose; the container boundary is the safety
@@ -34,14 +38,17 @@ is the ledger for what is implemented now and what remains open.
 
 1. [docs/current-state.md](docs/current-state.md)
 2. [docs/vision/README.md](docs/vision/README.md)
-3. [docs/product/README.md](docs/product/README.md)
-4. [docs/agent/README.md](docs/agent/README.md)
-5. [docs/operations/verification.md](docs/operations/verification.md)
+3. [docs/state/README.md](docs/state/README.md)
+4. [docs/runtime/README.md](docs/runtime/README.md)
+5. [docs/context/README.md](docs/context/README.md)
+6. [docs/tools/README.md](docs/tools/README.md)
+7. [docs/agent/README.md](docs/agent/README.md)
+8. [docs/operations/verification.md](docs/operations/verification.md)
 
 ## Repository Rules
 
 - Documentation is the implementation contract.
 - Every authored file stays at or below 200 lines.
-- Completion is checks-gated and engine-computed.
+- Completion is checks-gated and harness-computed.
 - No fake success, placeholders, or unrun verification claims.
 - Commit small slices with honest `Tested` and `Not-tested` trailers.

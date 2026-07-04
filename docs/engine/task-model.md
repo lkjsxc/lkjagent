@@ -2,47 +2,44 @@
 
 ## Purpose
 
-Define the durable task record and its state machine.
+Define how the current task record maps into the state-ledger case model.
 
-## Task Record
+## Current Rows
 
-A delivered owner message opens a task unless it answers a waiting task. The
-objective is stored verbatim and is never rewritten. The classifier records the
-template name that shaped the initial plan.
+The current checkout stores delivered owner work as task rows with objective,
+template, state, brief, model-call budget, and terminal summary. This is the
+implemented plan-engine shape and remains useful evidence while the state ledger
+is introduced.
 
-Task fields:
+## Target Rows
 
-| Field | Meaning |
+The state-ledger target stores owner work as a case plus state cells:
+
+| Current task field | State-ledger owner |
 | --- | --- |
-| `id` | stable store id |
-| `queue_id` | opening owner message |
-| `objective` | owner text exactly as received |
-| `template` | selected template name |
-| `state` | `open`, `waiting`, `blocked`, or `closed` |
-| `brief` | bounded engine-maintained working summary |
-| `budget_used` | model calls consumed |
-| `budget` | model call cap, `engine.task-budget.model-calls=200` |
-| `summary` | terminal owner-facing report |
+| `id` | `cases.id` |
+| `queue_id` | `events` source ref from queue intake |
+| `objective` | `cases.objective` and clean context item |
+| `template` | initial classification event and plan state payload |
+| `state` | completion, recovery, and waiting state cells |
+| `brief` | context item with provenance edges |
+| `budget` | case budget state cell |
+| `summary` | terminal report context item and case field |
 
-## State Machine
+## State Semantics
 
-- `open` becomes `waiting` when an ask step delivers a question.
-- `waiting` becomes `open` when the owner answers through the queue.
-- `open` becomes `blocked` when the retry ladder or task budget exhausts.
-- `open` becomes `closed` only when task checks pass.
-
-`closed` and `blocked` are terminal. A later owner message starts a separate
-task unless it is routed as the answer to `waiting`.
+Open, waiting, blocked, and closed remain known helper statuses. They are not the
+complete active state vector. A case may also carry simultaneous cells for
+needed evidence, suppressed tools, unresolved context conflicts, artifact
+fingerprints, retry policy, and completion blockers.
 
 ## Budget Rule
 
-`engine.task-budget.model-calls=200` counts endpoint calls that reach the model.
-Verify-only and engine-side work do not consume that budget. Budget exhaustion
-jumps directly to the blocked report rung in
-[retry-and-escalation.md](retry-and-escalation.md).
+Endpoint-call budgets are represented as durable state and usage rows. Verify,
+recovery, and engine-side work do not consume model-call budget unless the
+runtime decision calls the endpoint.
 
 ## Failure This Prevents
 
-Task closure cannot be inferred from model prose or a tool name. It is a state
-edge guarded by [completion checks](completion.md), which prevents false done
-reports.
+Task status cannot hide concurrent facts such as waiting owner answer, evidence
+needed, tool suppressed, and completion blocked.

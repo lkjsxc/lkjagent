@@ -2,44 +2,45 @@
 
 ## Purpose
 
-Define the bounded units of work the engine can execute.
+Define known plan operation helpers without making them the full runtime state
+space.
 
-## Kind Set
+## Known Helpers
 
-`engine.step-kinds.count=7` names the complete set: `plan`, `write`, `revise`,
-`explore`, `verify`, `respond`, and `ask`. No task work happens outside these
-kinds.
+The current plan engine recognizes helpers for plan, write, revise, explore,
+verify, respond, and ask work. In the state-ledger target these become operation
+keys or typed helpers selected by `RuntimeDecision`, not a closed list of all
+possible runtime states.
 
 ## Contracts
 
-| Kind | Model block | Engine effect |
+| Helper | Model block | Engine effect |
 | --- | --- | --- |
-| `plan` | `<plan>` | parse plan lines and materialize valid steps |
+| `plan` | `<plan>` | parse plan lines into events and plan state |
 | `write` | `<content>` | write or append content at the planned path |
 | `revise` | `<content>` | replace one planned file with corrected content |
-| `explore` | `<action>` | run one bounded tool, including `finish` |
+| `explore` | `<action>` when the decision exposes tools | admit one tool action |
 | `verify` | none, or `<verdict>` for judged checks | record check results |
 | `respond` | `<message>` | append an owner-facing event |
-| `ask` | `<message>` | ask the owner and set the task to waiting |
+| `ask` | `<message>` | ask the owner and set waiting state |
 
-A write step for Aurora Ledger might say: write the next section of
-`stories/aurora-ledger/manuscript/chapter-03.md`, target the objective-derived
-word range, and return only `<content>...</content>`. The owner target is data
-from the objective; generation size is controlled by `llm.max-tokens.write`.
+The exact envelope for a turn comes from the persisted decision. A helper cannot
+render tools or blocks that are absent from that decision.
 
 ## Explore And Ask
 
-Explore completion is the `finish` tool inside `<action>`, with a `summary`
-parameter. Asking the owner is not an explore action; it requires an `ask` step
-that returns `<message>` and parks the task as `waiting`.
+Explore completion is a decision-visible action only when the `ToolSetView`
+exposes it. Asking the owner is a selected operation that parks waiting state and
+records the question as a clean context item.
 
 ## Checks
 
-Step and task checks use the [completion catalog](completion.md). A verify step
-that needs model judgment uses `<verdict>`, but deterministic checks are the
-normal path.
+Step and case checks use the [completion catalog](completion.md). Deterministic
+checks are the normal path; sparse model judgment is bounded evidence when the
+decision selects it.
 
 ## Failure This Prevents
 
-Illegal action loops cannot form for scripted work. The model sees one expected
-block for the selected kind, so there is no rejected tool search space.
+Known plan helpers remain convenient while unknown state keys and future
+operation keys can hydrate, render diagnostics, and influence decisions without a
+central enum edit.

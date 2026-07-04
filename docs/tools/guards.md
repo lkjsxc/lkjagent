@@ -2,32 +2,33 @@
 
 ## Purpose
 
-Define the engine-side guards that remain for explore tools.
+Define deterministic guards applied during tool admission and effect dispatch.
 
 ## Path Guard
 
 All file paths resolve inside the workspace. Absolute paths and `..` segments
-return an effect error. The guard name is `tools.guard.path-inside-workspace`.
+are denied by admission before any effect runs. The guard name is
+`tools.guard.path-inside-workspace`.
 
 ## Budget Guard
 
-Each explore step has an action budget. The default is
-`engine.explore.action-budget=20`, and templates may set lower caps. Budget
-exhaustion invokes the retry ladder in
-[../engine/retry-and-escalation.md](../engine/retry-and-escalation.md).
+A runtime decision carries the remaining tool, token, and retry budgets relevant
+to the active state. Budget exhaustion suppresses tools in the `ToolSetView` or
+selects a recovery decision. It does not render tools that admission will refuse.
 
 ## Repeat Guard
 
-A byte-identical action to the previous explore action is not executed. The
-attempt records diagnosis `repeated action; state the next different action or
-finish`. The guard key is `tools.guard.repeat-adjacent=true`.
+A byte-identical action to the previous admitted action for the same state edge
+is not executed. Admission records diagnosis `repeated action; state the next
+different action or finish` and emits a bounded recovery event.
 
-## Terminal Effect
+## Recovery Guard
 
-A guard failure affects only the active explore step. It does not change tool
-admission for unrelated steps and does not add global recovery text.
+Recovery constraints may hide non-idempotent tools or require an observation
+repair step. Hidden tools appear only in diagnostics and proof bundles, never in
+normal prompt text.
 
 ## Failure This Prevents
 
-Repeated explore actions cannot form a fixed point. The guard produces one
-bounded diagnosis, and the retry prompt changes.
+Repeated or unsafe actions cannot form a fixed point, and the prompt does not
+teach the model to call tools that guards will reject.

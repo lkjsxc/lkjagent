@@ -6,9 +6,10 @@ Entry instructions for automated coding agents working on lkjagent.
 
 ## What lkjagent Is
 
-lkjagent is a graph-free, plan-driven agent daemon in Rust for one owner and
-one local LLM. Owner messages become durable tasks, ordered steps, bounded model
-asks, deterministic effects, and engine-computed completion checks.
+lkjagent is a durable state-ledger agent daemon in Rust for one owner and one
+local LLM. Owner messages become durable cases, events, state cells, runtime
+decisions, bounded model asks, deterministic effects, and harness-computed
+completion checks.
 
 ## Non-Negotiable Rules
 
@@ -24,8 +25,9 @@ asks, deterministic effects, and engine-computed completion checks.
    crates.
 7. Honest state only: no fake success, placeholders, mocks as product behavior,
    or unrun gate claims.
-8. The plan ledger is the single control plane. Do not add graph authority,
-   MCP, runtime sub-agents, or a broad model-selected tool registry.
+8. Durable state rows and persisted `RuntimeDecision` rows are the single
+   control plane. Do not add a second graph authority, MCP, runtime sub-agents,
+   prompt-only policy, or dispatcher-only tool registry.
 9. Completion is engine-computed through checks. The model never decides that a
    task is done.
 10. Commit small coherent slices with `Tested` and `Not-tested` trailers that
@@ -37,9 +39,13 @@ asks, deterministic effects, and engine-computed completion checks.
 
 1. [docs/current-state.md](docs/current-state.md)
 2. [docs/vision/README.md](docs/vision/README.md)
-3. [docs/product/README.md](docs/product/README.md)
-4. [docs/agent/README.md](docs/agent/README.md)
-5. [docs/operations/verification.md](docs/operations/verification.md)
+3. [docs/state/README.md](docs/state/README.md)
+4. [docs/runtime/README.md](docs/runtime/README.md)
+5. [docs/product/README.md](docs/product/README.md)
+6. [docs/context/README.md](docs/context/README.md)
+7. [docs/tools/README.md](docs/tools/README.md)
+8. [docs/agent/README.md](docs/agent/README.md)
+9. [docs/operations/verification.md](docs/operations/verification.md)
 
 ## Task Routing
 

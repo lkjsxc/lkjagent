@@ -2,10 +2,11 @@
 
 ## Purpose
 
-Pure engine crate for task plans, prompt rendering, output parsing, checks,
-word counting, classification, and step transitions.
+Pure engine crate for state-ledger domain types, task-plan helpers, prompt
+rendering, output parsing, checks, word counting, classification, and state
+transitions.
 
-Doc contract: ../../docs/engine/README.md
+Doc contract: ../../docs/state/README.md and ../../docs/runtime/README.md
 
 ## Table of Contents
 

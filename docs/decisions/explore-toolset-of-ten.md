@@ -1,25 +1,33 @@
-# Explore Toolset Of Ten
+# Tool Catalog And Decision Views
 
 ## Purpose
 
-Record the decision to cap model-chosen tools.
+Record the decision to derive model-visible tools from a catalog and persisted
+runtime decision.
 
 ## Context
 
-Scripted steps do not need model-selected tools. Discovery still needs bounded
-workspace and memory actions.
+A fixed explore-only tool list kept the plan engine small, but tool legality now
+has to flex by active state, evidence need, workspace boundary, owner settings,
+budget, retry suppression, and recovery constraints. Duplicating tool law across
+docs, prompt text, parser, and dispatcher creates drift.
 
 ## Decision
 
-Explore steps expose `tools.registry.count=10` tools: read, list, tree, search,
-write, shell, memory find, memory save, plan note, and finish.
+There is one tool catalog. For each `RuntimeDecision`, policy layers derive a
+`ToolSetView` containing only tools admissible for that turn. Prompt rendering
+lists only that view. Parser and admission validate model actions against the
+same persisted view fingerprint.
 
 ## Consequences
 
-Most tasks run without tool choice. When exploration is needed, the prompt can
-list every legal form inside the budget.
+A tool the harness would reject for the turn is absent from the prompt. Hidden
+and denied tools are recorded for diagnostics and proof bundles, not normal
+prompt text. Explore-style actions become one decision-visible operation, not a
+separate global authority.
 
 ## Rejected Alternatives
 
-A broad registry would require admission policy and refusal recovery, recreating
-the legality maze the engine removes.
+A broad visible registry with caveats would train the model to probe rejected
+tools. A fixed registry would prevent state-derived evidence gathering and
+recovery policies.

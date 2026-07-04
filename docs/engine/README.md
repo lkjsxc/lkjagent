@@ -2,21 +2,25 @@
 
 ## Purpose
 
-This directory defines the plan ledger, step engine, turn cycle, retry ladder,
-completion rules, and templates.
+Define the plan-family helpers that remain inside the broader state-ledger
+runtime.
 
 ## Table of Contents
 
-- [task-model.md](task-model.md): durable task state and lifecycle.
-- [plan-and-steps.md](plan-and-steps.md): ordered steps, attempts, and plan
-  mutation.
-- [step-kinds.md](step-kinds.md): the bounded work kinds the model may answer.
-- [turn-cycle.md](turn-cycle.md): one daemon cycle from intake to persistence.
-- [retry-and-escalation.md](retry-and-escalation.md): finite retry ladder.
-- [completion.md](completion.md): checks-gated step and task closure.
-- [templates/](templates/): template contracts for task families.
+- [task-model.md](task-model.md): current task rows and their state-ledger
+  replacement shape.
+- [plan-and-steps.md](plan-and-steps.md): ordered artifact work as plan state
+  cells.
+- [step-kinds.md](step-kinds.md): known plan operation helpers and envelopes.
+- [turn-cycle.md](turn-cycle.md): mapping from old turn cycle to runtime
+  decisions.
+- [retry-and-escalation.md](retry-and-escalation.md): finite recovery ladder as
+  state transitions.
+- [completion.md](completion.md): checks-gated closure for steps and cases.
+- [templates/](templates/): template contracts for initial events and state
+  cells.
 
 ## Failure This Prevents
 
-A single table-of-contents owner prevents competing engine contracts from
-emerging in separate directories.
+Plan work remains useful without reasserting fixed steps as the only runtime
+control plane.

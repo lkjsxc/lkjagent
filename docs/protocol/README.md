@@ -2,15 +2,18 @@
 
 ## Purpose
 
-Define the model output envelopes, plan-line grammar, and fault taxonomy.
+Define model output envelopes, action grammar, and fault taxonomy as projections
+of persisted runtime decisions.
 
 ## Table of Contents
 
-- [envelopes.md](envelopes.md): expected block forms by step kind.
-- [plan-line-grammar.md](plan-line-grammar.md): exact plan step grammar and examples.
-- [faults.md](faults.md): parse faults and retry hints.
+- [envelopes.md](envelopes.md): decision-selected block forms and action
+  envelopes.
+- [plan-line-grammar.md](plan-line-grammar.md): exact plan helper grammar and
+  examples.
+- [faults.md](faults.md): parse faults, contamination, and retry hints.
 
 ## Failure This Prevents
 
-The model receives a small grammar for the active step instead of a broad action
+The model receives the grammar for the active decision instead of a broad action
 language with repair heuristics.

@@ -2,21 +2,25 @@
 
 ## Purpose
 
-Record the decision that checks close steps and tasks.
+Record the decision that evidence checks close cases.
 
 ## Context
 
-Owner-visible completion must be backed by evidence over real workspace state.
+Owner-visible completion must be backed by fresh evidence over real workspace
+state and active state cells.
 
 ## Decision
 
-A task reaches `closed` only when task-level checks pass and check rows are
-recorded. The model may write summaries, but it cannot decide completion.
+A case reaches terminal closure only when completion predicates from the active
+`RuntimeDecision` read current passing check rows and artifact fingerprints. The
+model may write summaries or request a finish-like operation only when the
+current decision exposes that grammar, but it cannot decide completion.
 
 ## Consequences
 
-Benchmarks, replay, proof bundles, status, and task closure all read the same
-check results. A failed check creates a diagnosis for the retry ladder.
+Benchmarks, replay, proof bundles, status, and closure all read the same check
+results and state cells. A failed or stale check creates a diagnosis and a new
+state edge for retry, evidence gathering, owner ask, or blocked reporting.
 
 ## Rejected Alternatives
 
