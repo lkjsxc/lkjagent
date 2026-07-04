@@ -96,6 +96,14 @@ fn prompt_view_and_admission_share_persisted_tool_fingerprint() -> TestResult<()
     assert_eq!(observation.0, 1);
     assert_eq!(observation.1, "fs.read");
     assert_eq!(observation.2, "ok");
+    let context: (String, String) = conn.query_row(
+        "SELECT semantic_key, contamination_class FROM context_items
+         WHERE semantic_key = 'observation/fs.read'",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?)),
+    )?;
+    assert_eq!(context.0, "observation/fs.read");
+    assert_eq!(context.1, "Clean");
     Ok(())
 }
 

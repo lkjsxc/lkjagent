@@ -91,7 +91,9 @@ tool-view fingerprint, active timeout, and provider-exchange rows tied to the
 runtime decision. Status output now summarizes active state cells, conflict
 cells, latest decision, admissions, observations, provider exchanges, and
 artifacts. Prompt-frame rows are persisted before model calls, and observation
-rows are persisted after deterministic effects. Unfinished decisions with
+rows are persisted after deterministic effects. Clean observations are converted
+into durable context items while error observations are marked recovery-only.
+Unfinished decisions with
 committed provider exchanges, admissions, or observations are recovered before a
 new decision is selected; decisions without external evidence are reused. Proof
 collection writes state-ledger sections for state cells, decisions, admissions,
@@ -118,8 +120,8 @@ gate evidence:
 - tool descriptors are catalog-backed for prompt, parser, and admission, but the
   effect dispatcher still has a separate tool-to-effect match table;
 - prompt context has a durable context-item bridge for clean items, conflicts,
-  and contaminated exclusion, but prompt-frame rows do not yet own the selected
-  context body and observations are not yet converted into context items;
+  observations, and contaminated exclusion, but prompt-frame rows do not yet own
+  the selected context body;
 - contradictions become conflict state cells in the bridge, but conflict
   resolution events and suppression of losing items are not yet wired;
 - contaminated material is excluded from bridge prompt context, but all failure
