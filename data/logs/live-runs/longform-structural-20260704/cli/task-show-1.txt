@@ -1,0 +1,18 @@
+$ cargo run -p lkjagent-app -- --data data/live-longform-structural-20260704 task show 1
+exit=0
+
+task 1 Open
+1 Plan Done outline attempts=0 actions=0 checks=0
+2 Write Done settings attempts=0 actions=0 checks=0
+3 Write Done chapter 01 attempts=0 actions=0 checks=0
+4 Write Active chapter 02 attempts=9 actions=0 checks=0
+5 Write Pending chapter 03 attempts=0 actions=0 checks=0
+6 Write Pending chapter 04 attempts=0 actions=0 checks=0
+7 Write Pending chapter 05 attempts=0 actions=0 checks=0
+8 Write Pending chapter 06 attempts=0 actions=0 checks=0
+9 Write Pending chapter 07 attempts=0 actions=0 checks=0
+10 Write Pending chapter 08 attempts=0 actions=0 checks=0
+11 Write Pending chapter 09 attempts=0 actions=0 checks=0
+12 Write Pending chapter 10 attempts=0 actions=0 checks=0
+13 Verify Pending verify manuscript attempts=0 actions=0 checks=32
+14 Respond Pending respond attempts=0 actions=0 checks=0

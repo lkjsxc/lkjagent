@@ -1,0 +1,2 @@
+id	content	state	force_new	created_at	delivered_at	task_id
+1	Create a novel manuscript of about 10000 words in 10 chapters at stories/structural-trial-20260704. First write a structural settings document with premise, world rules, cast, timeline, motifs, chapter architecture, and continuity facts. Then write the manuscript chapters as finished prose. Use original English fiction. Avoid TODO, placeholder text, and notes to self. Ensure the manuscript files total at least 10000 words.	delivered	1	unix:1783138911.018595532Z	unix:1783138917.732727844Z	1

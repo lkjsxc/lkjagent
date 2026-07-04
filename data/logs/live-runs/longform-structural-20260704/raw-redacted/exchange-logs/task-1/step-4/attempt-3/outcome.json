@@ -1,0 +1,1 @@
+{"diagnosis":"endpoint failure: connection: error sending request for url (<LKJAGENT_ENDPOINT>/v1/chat/completions); retry after 64s","outcome":"endpoint_error"}
