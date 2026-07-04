@@ -1,18 +1,14 @@
-use lkjagent_core::model::{CheckSpec, Step, StepKind, StepState, TaskSnapshot, TaskState};
-use lkjagent_core::render::max_tokens;
+use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::runtime_decision::RuntimeDecision;
-use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
 use lkjagent_core::runtime_selector::select_runtime_decision;
-use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
-use lkjagent_core::runtime_tool_catalog::explore_tool_view;
 use lkjagent_store::decision_rows::{
     insert_runtime_decision, next_decision_id, settle_decision, unfinished_decisions,
 };
-use lkjagent_store::event_rows::{append_and_apply_event, next_event_id};
 use lkjagent_store::state_rows::{hydrate_snapshot, insert_case};
 use rusqlite::Connection;
 
 use crate::recovery_bridge::recover_or_reuse;
+use crate::runtime_projection::{ensure_runtime_cell, suppress_decision_cell};
 
 pub fn prepare_runtime_decision(
     conn: &Connection,
@@ -23,14 +19,13 @@ pub fn prepare_runtime_decision(
     let case_id = snapshot.task.id.to_string();
     insert_case(conn, &case_id, &snapshot.task.objective, now)
         .map_err(|error| error.to_string())?;
-    suppress_bridge_cells(conn, &case_id)?;
-    let cell = next_work_cell(snapshot, now)?;
-    append_projection_event(conn, &case_id, cell, now)?;
-    let state_snapshot = hydrate_snapshot(conn, &case_id).map_err(|error| error.to_string())?;
     let unfinished = unfinished_decisions(conn, &case_id).map_err(|error| error.to_string())?;
     if let Some(decision) = recover_or_reuse(conn, &unfinished, now)? {
         return Ok(decision);
     }
+    let mut state_snapshot = hydrate_snapshot(conn, &case_id).map_err(|error| error.to_string())?;
+    ensure_runtime_cell(conn, snapshot, &state_snapshot, now)?;
+    state_snapshot = hydrate_snapshot(conn, &case_id).map_err(|error| error.to_string())?;
     let id = next_decision_id(conn, &case_id).map_err(|error| error.to_string())?;
     let mut decision =
         select_runtime_decision(&state_snapshot, &id, &[]).map_err(|error| error.message)?;
@@ -45,149 +40,6 @@ pub fn settle_runtime_decision(
     status: &str,
     now: &str,
 ) -> Result<(), String> {
-    settle_decision(conn, &decision.id, status, now)
-        .map(|_| ())
-        .map_err(|error| error.to_string())
-}
-
-fn append_projection_event(
-    conn: &Connection,
-    case_id: &str,
-    mut cell: StateCell,
-    now: &str,
-) -> Result<(), String> {
-    let event_id =
-        next_event_id(conn, case_id, "state-project").map_err(|error| error.to_string())?;
-    cell.source_event_id = event_id.clone();
-    let event = RuntimeEvent {
-        id: event_id,
-        case_id: case_id.to_string(),
-        kind: "state.cell.upsert".to_string(),
-        payload: RuntimeEventPayload::UpsertCell(Box::new(cell)),
-        source: "plan-bridge".to_string(),
-        created_at: now.to_string(),
-        decision_id: None,
-    };
-    append_and_apply_event(conn, &event).map_err(|error| error.to_string())
-}
-
-fn next_work_cell(snapshot: &TaskSnapshot, now: &str) -> Result<StateCell, String> {
-    let parts = cell_parts(snapshot);
-    let mut cell = StateCell::active(
-        key(&parts.namespace, &parts.name)?,
-        format!("task-{}", snapshot.task.id),
-    );
-    cell.payload_schema = parts.schema;
-    cell.payload_json = parts.payload.to_string();
-    cell.evidence_refs = vec![EvidenceRef {
-        source_type: "task".to_string(),
-        source_id: snapshot.task.id.to_string(),
-        fingerprint: format!("budget-{}", snapshot.task.budget_used),
-    }];
-    cell.created_at = now.to_string();
-    cell.updated_at = now.to_string();
-    Ok(cell)
-}
-
-fn suppress_bridge_cells(conn: &Connection, case_id: &str) -> Result<(), String> {
-    conn.execute(
-        "UPDATE state_cells SET status = 'Suppressed'
-         WHERE case_id = ?1 AND payload_schema LIKE 'plan-bridge.%'",
-        [case_id],
-    )
-    .map_err(|error| error.to_string())?;
-    Ok(())
-}
-
-fn cell_parts(snapshot: &TaskSnapshot) -> CellParts {
-    match snapshot.task.state {
-        TaskState::Waiting => CellParts::new("case", "waiting-answer", "plan-bridge.waiting.v1"),
-        TaskState::Blocked | TaskState::Closed => {
-            CellParts::new("runtime", "idle", "plan-bridge.idle.v1")
-        }
-        TaskState::Open => open_parts(snapshot),
-    }
-}
-
-fn open_parts(snapshot: &TaskSnapshot) -> CellParts {
-    let Some(step) = snapshot
-        .steps
-        .iter()
-        .find(|step| matches!(step.state, StepState::Pending | StepState::Active))
-    else {
-        return CellParts::new("completion", "close-candidate", "plan-bridge.completion.v1");
-    };
-    if step.kind == StepKind::Verify && step.checks.iter().all(deterministic) {
-        return CellParts {
-            namespace: "check".to_string(),
-            name: step.id.to_string(),
-            schema: "plan-bridge.check.v1".to_string(),
-            payload: serde_json::json!({"step_id": step.id}),
-        };
-    }
-    CellParts {
-        namespace: "model".to_string(),
-        name: step.id.to_string(),
-        schema: "plan-bridge.model.v1".to_string(),
-        payload: serde_json::json!({
-            "step_id": step.id,
-            "expected_envelope": envelope(step.kind),
-            "model_budget_tokens": max_tokens(step.kind),
-            "tool_view": tool_view(step),
-        }),
-    }
-}
-
-struct CellParts {
-    namespace: String,
-    name: String,
-    schema: String,
-    payload: serde_json::Value,
-}
-
-impl CellParts {
-    fn new(namespace: &str, name: &str, schema: &str) -> Self {
-        Self {
-            namespace: namespace.to_string(),
-            name: name.to_string(),
-            schema: schema.to_string(),
-            payload: serde_json::json!({}),
-        }
-    }
-}
-
-fn envelope(kind: StepKind) -> &'static str {
-    match kind {
-        StepKind::Write | StepKind::Revise => "Content",
-        StepKind::Plan => "Plan",
-        StepKind::Explore => "Action",
-        StepKind::Respond | StepKind::Ask => "Message",
-        StepKind::Verify => "Verdict",
-    }
-}
-
-fn tool_view(step: &Step) -> Vec<serde_json::Value> {
-    if step.kind != StepKind::Explore {
-        return Vec::new();
-    }
-    explore_tool_view()
-        .entries
-        .into_iter()
-        .map(|entry| {
-            serde_json::json!({
-                "name": entry.name,
-                "purpose": entry.purpose,
-                "required_params": entry.required_params,
-                "optional_params": entry.optional_params,
-            })
-        })
-        .collect()
-}
-
-fn deterministic(spec: &CheckSpec) -> bool {
-    !matches!(spec, CheckSpec::Judged { .. })
-}
-
-fn key(namespace: &str, name: &str) -> Result<StateKey, String> {
-    StateKey::new(namespace, name).map_err(|error| error.message)
+    settle_decision(conn, &decision.id, status, now).map_err(|error| error.to_string())?;
+    suppress_decision_cell(conn, decision, now)
 }

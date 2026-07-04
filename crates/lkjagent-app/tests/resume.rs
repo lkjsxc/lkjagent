@@ -53,6 +53,13 @@ fn rows_win_over_stale_config_snapshot() -> TestResult<()> {
     assert_eq!(snapshot.task.id, 1);
     assert_eq!(snapshot.task.state, TaskState::Closed);
     assert_eq!(snapshot.task.summary, "Rows are authority.");
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let active: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM state_cells WHERE namespace = 'model' AND status = 'Active'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(active, 0);
     Ok(())
 }
 

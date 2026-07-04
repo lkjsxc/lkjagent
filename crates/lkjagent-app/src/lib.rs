@@ -21,6 +21,8 @@ mod observation_bridge;
 mod prompt_bridge;
 mod recovery_bridge;
 mod runtime_bridge;
+mod runtime_cell;
+mod runtime_projection;
 pub mod state;
 pub mod status;
 mod turn_effects;

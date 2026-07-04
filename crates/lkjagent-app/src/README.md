@@ -30,8 +30,9 @@ Map lkjagent-app source modules.
 - [prompt-bridge.rs](prompt_bridge.rs): prompt-frame rows before model calls.
 - [recovery-bridge.rs](recovery_bridge.rs): unfinished decision reuse and
   recovery settlement.
-- [runtime-bridge.rs](runtime_bridge.rs): plan-row projection into state-ledger
-  decisions.
+- [runtime-bridge.rs](runtime_bridge.rs): state-ledger decision preparation.
+- [runtime-cell.rs](runtime_cell.rs): operation cell projection payloads.
+- [runtime-projection.rs](runtime_projection.rs): plan bridge projection events.
 - [state.rs](state.rs): active snapshot hydration from normalized rows.
 - [status.rs](status.rs): status, task, and watch rendering helpers.
 - [turn-effects.rs](turn_effects.rs): deterministic write, check, and explore effects.
