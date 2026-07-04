@@ -1,5 +1,13 @@
 use lkjagent_core::classify::instantiate;
-use lkjagent_core::render::render_prompt;
+use lkjagent_core::model::StepKind;
+use lkjagent_core::render::{max_tokens, render_prompt};
+use lkjagent_core::runtime_artifact::DEFAULT_UNIT_TARGET_TOKENS;
+
+#[test]
+fn write_steps_use_artifact_unit_budget() {
+    assert_eq!(max_tokens(StepKind::Write), DEFAULT_UNIT_TARGET_TOKENS);
+    assert_eq!(max_tokens(StepKind::Revise), DEFAULT_UNIT_TARGET_TOKENS);
+}
 
 #[test]
 fn prompt_includes_task_brief() {

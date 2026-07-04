@@ -2,6 +2,7 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
 use crate::model::{Step, StepKind, Task};
+use crate::runtime_artifact::DEFAULT_UNIT_TARGET_TOKENS;
 use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolSetView};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -130,7 +131,7 @@ fn fingerprint(system: &str, user: &str) -> String {
 
 pub fn max_tokens(kind: StepKind) -> u32 {
     match kind {
-        StepKind::Write | StepKind::Revise => 2_400,
+        StepKind::Write | StepKind::Revise => DEFAULT_UNIT_TARGET_TOKENS,
         StepKind::Plan => 900,
         StepKind::Explore => 500,
         StepKind::Respond | StepKind::Ask => 700,
