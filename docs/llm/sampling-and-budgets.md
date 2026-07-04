@@ -13,9 +13,11 @@ Define generation budgets, sampling defaults, and endpoint retry limits.
 ## Generation Units
 
 Ordinary model-authored artifact units target about 512 output tokens through
-`llm.max-tokens.unit=512`. Decisions may select larger caps for planning,
-response, or review work only when the decision row records the budget and the
-reason.
+`llm.max-tokens.unit=512`. Write decisions include close-tag headroom above the
+unit target so providers can finish the required envelope without turning a good
+bounded unit into an endpoint-length fault. Decisions may select larger caps for
+planning, response, or review work only when the decision row records the budget
+and the reason.
 
 The current plan-family bridge may still pass step-kind caps into endpoint
 calls. The state-ledger budget policy replaces those caps as decisions are wired

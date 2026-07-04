@@ -99,7 +99,7 @@ units, deterministic assembly, artifact fingerprints, and fresh-fingerprint
 completion evidence; the store persists artifact rows with unit metadata, and
 write effects split large bodies into checked units, assemble them before file
 writes, and record file and unit artifact fingerprints. Write and revise prompts
-use the 512-token artifact-unit generation budget. Endpoint exchanges
+use the 512-token artifact-unit target with close-tag headroom. Endpoint exchanges
 now carry decision id, context-frame fingerprint, tool-view fingerprint, active
 timeout, and provider-exchange rows tied to the
 runtime decision. Status output now summarizes active state cells, conflict
@@ -158,7 +158,7 @@ before prompt admission.
 
 Artifact units, deterministic assembly, fresh fingerprint checks, and artifact
 rows are wired into write effects. Write effects split and assemble checked units
-before file writes, and write prompts use 512-token caps. Proof bundles expose
+before file writes, and write prompts use bounded close-tag headroom. Proof bundles expose
 state-vector, decisions, prompt-frame, admission, observation, exchange,
 artifact, context, suppression, and conflict-edge sections.
 

@@ -5,9 +5,10 @@ use lkjagent_core::runtime_artifact::DEFAULT_UNIT_TARGET_TOKENS;
 use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
 
 #[test]
-fn write_steps_use_artifact_unit_budget() {
-    assert_eq!(max_tokens(StepKind::Write), DEFAULT_UNIT_TARGET_TOKENS);
-    assert_eq!(max_tokens(StepKind::Revise), DEFAULT_UNIT_TARGET_TOKENS);
+fn write_steps_use_artifact_unit_budget_with_close_headroom() {
+    let expected = DEFAULT_UNIT_TARGET_TOKENS + 256;
+    assert_eq!(max_tokens(StepKind::Write), expected);
+    assert_eq!(max_tokens(StepKind::Revise), expected);
 }
 
 #[test]

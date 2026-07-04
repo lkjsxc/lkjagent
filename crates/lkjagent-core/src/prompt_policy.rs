@@ -1,10 +1,12 @@
 use crate::model::StepKind;
 use crate::runtime_artifact::DEFAULT_UNIT_TARGET_TOKENS;
+
+pub const WRITE_PROMPT_MAX_TOKENS: u32 = DEFAULT_UNIT_TARGET_TOKENS + 256;
 use crate::runtime_decision::OutputEnvelope;
 
 pub fn max_tokens(kind: StepKind) -> u32 {
     match kind {
-        StepKind::Write | StepKind::Revise => DEFAULT_UNIT_TARGET_TOKENS,
+        StepKind::Write | StepKind::Revise => WRITE_PROMPT_MAX_TOKENS,
         StepKind::Plan => 900,
         StepKind::Explore => 500,
         StepKind::Respond | StepKind::Ask => 700,
