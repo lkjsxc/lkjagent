@@ -6,7 +6,7 @@ use lkjagent_core::runtime_context::{
 };
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
-use lkjagent_store::context_rows::{context_items, insert_context_item};
+use lkjagent_store::context_rows::{context_items, insert_context_item, suppress_context_item};
 use lkjagent_store::state_rows::upsert_state_cell;
 use rusqlite::Connection;
 
@@ -24,6 +24,7 @@ pub fn prepare_prompt_context(
     let case_id = snapshot.task.id.to_string();
     insert_context_item(conn, &case_id, &objective_item(snapshot, now))
         .map_err(|error| error.to_string())?;
+    apply_resolutions(conn, &case_id)?;
     let items = context_items(conn, &case_id).map_err(|error| error.to_string())?;
     let conflicts = detect_contradictions(&items);
     for conflict in &conflicts {
@@ -59,6 +60,74 @@ fn objective_item(snapshot: &TaskSnapshot, now: &str) -> ContextItem {
     item.source_fingerprint = format!("objective-{}", snapshot.task.id);
     item.created_at = now.to_string();
     item
+}
+
+fn apply_resolutions(conn: &Connection, case_id: &str) -> Result<(), String> {
+    for resolution in resolution_cells(conn, case_id)? {
+        let mut statement = conn
+            .prepare(
+                "SELECT id FROM context_items
+                 WHERE case_id = ?1 AND semantic_key = ?2 AND id != ?3
+                 AND suppression_reason IS NULL",
+            )
+            .map_err(|error| error.to_string())?;
+        let rows = statement
+            .query_map(
+                (
+                    &case_id,
+                    &resolution.semantic_key,
+                    &resolution.winning_item_id,
+                ),
+                |row| row.get::<_, String>(0),
+            )
+            .map_err(|error| error.to_string())?;
+        for row in rows {
+            suppress_context_item(
+                conn,
+                &row.map_err(|error| error.to_string())?,
+                "resolved-conflict",
+            )
+            .map_err(|error| error.to_string())?;
+        }
+    }
+    Ok(())
+}
+
+fn resolution_cells(conn: &Connection, case_id: &str) -> Result<Vec<Resolution>, String> {
+    let mut statement = conn
+        .prepare(
+            "SELECT payload_json FROM state_cells
+             WHERE case_id = ?1 AND key_label LIKE 'context:resolve/%'
+             AND status = 'Active'",
+        )
+        .map_err(|error| error.to_string())?;
+    let rows = statement
+        .query_map([case_id], |row| row.get::<_, String>(0))
+        .map_err(|error| error.to_string())?;
+    let mut output = Vec::new();
+    for row in rows {
+        let value: serde_json::Value = serde_json::from_str(&row.map_err(|e| e.to_string())?)
+            .map_err(|error| error.to_string())?;
+        if let (Some(semantic_key), Some(winning_item_id)) = (
+            value
+                .get("semantic_key")
+                .and_then(serde_json::Value::as_str),
+            value
+                .get("winning_item_id")
+                .and_then(serde_json::Value::as_str),
+        ) {
+            output.push(Resolution {
+                semantic_key: semantic_key.to_string(),
+                winning_item_id: winning_item_id.to_string(),
+            });
+        }
+    }
+    Ok(output)
+}
+
+struct Resolution {
+    semantic_key: String,
+    winning_item_id: String,
 }
 
 fn conflict_cell(conflict: &ContextConflict, now: &str) -> Result<StateCell, String> {

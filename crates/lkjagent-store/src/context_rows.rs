@@ -40,12 +40,22 @@ pub fn insert_context_item(
 }
 
 pub fn context_items(conn: &Connection, case_id: &str) -> StoreResult<Vec<ContextItem>> {
-    let mut statement =
-        conn.prepare("SELECT item_json FROM context_items WHERE case_id = ?1 ORDER BY id")?;
+    let mut statement = conn.prepare(
+        "SELECT item_json FROM context_items
+         WHERE case_id = ?1 AND suppression_reason IS NULL ORDER BY id",
+    )?;
     let rows = statement.query_map([case_id], |row| row.get::<_, String>(0))?;
     let mut items = Vec::new();
     for row in rows {
         items.push(json_value(&row?)?);
     }
     Ok(items)
+}
+
+pub fn suppress_context_item(conn: &Connection, id: &str, reason: &str) -> StoreResult<usize> {
+    let changed = conn.execute(
+        "UPDATE context_items SET suppression_reason = ?1 WHERE id = ?2",
+        params![reason, id],
+    )?;
+    Ok(changed)
 }
