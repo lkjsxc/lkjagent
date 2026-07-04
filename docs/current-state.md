@@ -107,8 +107,8 @@ deterministic effects. Clean observations are converted into durable context
 items while error observations are marked recovery-only.
 Parse-fault provider exchanges create failed-model-output context items,
 endpoint errors create recovery-only context items, shell observations become
-external-raw context, and secret-like observation bodies become sensitive-owner
-context. Active
+external-raw context, and secret-like observation bodies become redacted
+sensitive-owner context. Active
 `context:resolve/<key>` cells suppress losing conflict items before prompt
 rendering. Unfinished decisions with committed provider exchanges, admissions, or
 observations are recovered before a new decision is selected and write resolved
@@ -147,8 +147,8 @@ gate evidence:
   suppress losing items with `context_edges` lineage, but owner-facing conflict
   repair operations are still bridge-level;
 - parse faults, endpoint errors, effect errors, shell observations, and
-  secret-like observation bodies classify contamination durably, but owner-data
-  redaction policy is still intentionally conservative;
+  secret-like observation bodies classify contamination durably with conservative
+  redaction before prompt admission;
 - crash resume reuses decisions with no external evidence, recovers externally
   evidenced unfinished decisions, and writes recovery report state cells;
 - artifact units, deterministic assembly, and fresh fingerprint checks have pure
@@ -156,7 +156,7 @@ gate evidence:
   write prompts use 512-token caps, but multi-unit expansion is still bridge-led;
   and
 - proof bundles expose first state-ledger sections, context suppression reasons,
-  and conflict edges, but full owner-data redaction policy is not yet complete.
+  and conflict edges.
 
 ## Implemented Code
 

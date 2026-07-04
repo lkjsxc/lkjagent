@@ -31,8 +31,45 @@ fn shell_observation_is_external_raw_context() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn sensitive_observation_body_is_redacted() -> TestResult<()> {
+    let data = fixture_root("sensitive")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    enqueue(&conn, "Survey the workspace and report.", "now")?;
+    drop(conn);
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec![
+            action("fs.write", &[('p', "secret.txt"), ('c', "token=abc123")]),
+            action("fs.read", &[('p', "secret.txt")]),
+        ],
+        index: 0,
+    };
+    let _snapshot = run_until_idle(&data, &mut endpoint, 2)?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let row: (String, String) = conn.query_row(
+        "SELECT contamination_class, body FROM context_items
+         WHERE semantic_key = 'observation/fs.read'",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?)),
+    )?;
+    assert_eq!(row.0, "SensitiveOwnerData");
+    assert!(row.1.contains("token=[redacted]"));
+    assert!(!row.1.contains("abc123"));
+    Ok(())
+}
+
 fn shell_action(command: &str) -> String {
     format!("<action><tool>shell.run</tool><command>{command}</command></action>")
+}
+
+fn action(tool: &str, params: &[(char, &str)]) -> String {
+    let mut body = format!("<tool>{tool}</tool>");
+    for (kind, value) in params {
+        let name = if *kind == 'p' { "path" } else { "content" };
+        body.push_str(&format!("<{name}>{value}</{name}>"));
+    }
+    format!("<action>{body}</action>")
 }
 
 fn fixture_root(name: &str) -> TestResult<PathBuf> {

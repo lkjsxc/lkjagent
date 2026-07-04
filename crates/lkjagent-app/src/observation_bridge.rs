@@ -1,7 +1,8 @@
 use lkjagent_core::engine::Command;
 use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::runtime_context::{
-    contamination_for_observation, ContaminationClass, ContextItem, TrustClass,
+    contamination_for_observation, redact_sensitive_owner_data, ContaminationClass, ContextItem,
+    TrustClass,
 };
 use lkjagent_core::runtime_decision::RuntimeDecision;
 use lkjagent_store::context_rows::insert_context_item;
@@ -39,9 +40,10 @@ fn insert(
     snapshot: &TaskSnapshot,
     now: &str,
 ) -> Result<(), String> {
-    let content = latest_observation(snapshot);
-    let status = observation_status(&content);
-    let contamination = contamination_for_observation(effect_name, status, &content);
+    let raw_content = latest_observation(snapshot);
+    let status = observation_status(&raw_content);
+    let contamination = contamination_for_observation(effect_name, status, &raw_content);
+    let content = stored_content(&raw_content, contamination);
     let id = format!("{}-observation-{:04}", decision.id, index + 1);
     insert_observation(
         conn,
@@ -68,6 +70,14 @@ fn insert(
         .map_err(|error| error.to_string())?;
     }
     Ok(())
+}
+
+fn stored_content(content: &str, contamination: ContaminationClass) -> String {
+    if contamination == ContaminationClass::SensitiveOwnerData {
+        redact_sensitive_owner_data(content)
+    } else {
+        content.to_string()
+    }
 }
 
 fn context_item(

@@ -90,6 +90,23 @@ pub fn select_normal_context(items: &[ContextItem]) -> Vec<ContextItem> {
         .collect()
 }
 
+pub fn redact_sensitive_owner_data(body: &str) -> String {
+    body.split_whitespace()
+        .map(redact_token)
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+fn redact_token(token: &str) -> String {
+    let lower = token.to_ascii_lowercase();
+    for pattern in ["password=", "secret=", "token=", "api_key=", "apikey="] {
+        if lower.starts_with(pattern) {
+            return format!("{pattern}[redacted]");
+        }
+    }
+    token.to_string()
+}
+
 pub fn contamination_for_observation(
     effect_name: &str,
     status: &str,
@@ -110,7 +127,7 @@ pub fn contamination_for_observation(
 
 fn has_sensitive_owner_data(body: &str) -> bool {
     let lower = body.to_ascii_lowercase();
-    ["password=", "secret=", "token=", "api_key", "apikey"]
+    ["password=", "secret=", "token=", "api_key=", "apikey="]
         .iter()
         .any(|pattern| lower.contains(pattern))
 }

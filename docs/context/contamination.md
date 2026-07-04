@@ -29,6 +29,8 @@ Only the current relevant observation is normally admitted. Old observations
 remain source evidence, not transcript text. Shell observations are
 `external-raw`, failed observations are `recovery-only`, and observations with
 secret-like owner data such as tokens or passwords are `sensitive-owner-data`.
+The observation bridge redacts those token bodies before writing observation or
+context body text.
 
 ## Failure This Prevents
 
