@@ -105,13 +105,15 @@ fn context(conn: &Connection) -> Result<String, String> {
     rows(
         conn,
         "Context",
-        "SELECT id, semantic_key, contamination_class FROM context_items ORDER BY id",
+        "SELECT id, semantic_key, contamination_class,
+         COALESCE(suppression_reason, 'none') FROM context_items ORDER BY id",
         |row| {
             Ok(format!(
-                "- {} key={} contamination={}",
+                "- {} key={} contamination={} suppressed={}",
                 row.get::<_, String>(0)?,
                 row.get::<_, String>(1)?,
-                row.get::<_, String>(2)?
+                row.get::<_, String>(2)?,
+                row.get::<_, String>(3)?
             ))
         },
     )

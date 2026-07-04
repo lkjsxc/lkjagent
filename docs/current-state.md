@@ -141,8 +141,9 @@ gate evidence:
 - artifact units, deterministic assembly, and fresh fingerprint checks have pure
   helpers and rows, and write effects persist file and unit artifacts, but model
   generation is not yet split into checked 512-token units before assembly; and
-- proof bundles expose first state-ledger sections, but full conflict resolution
-  lineage and sensitive-data suppression evidence are not yet complete.
+- proof bundles expose first state-ledger sections and context suppression
+  reasons, but full conflict resolution lineage and sensitive-data policy are
+  not yet complete.
 
 ## Implemented Code
 
