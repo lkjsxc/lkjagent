@@ -21,8 +21,8 @@ fn selector_reuses_unfinished_decision_before_new_work() {
 }
 
 #[test]
-fn selector_prefers_bridge_next_work_and_preserves_tool_view() {
-    let snapshot = snapshot_with(bridge_cell());
+fn selector_reads_model_cells_and_preserves_tool_view() {
+    let snapshot = snapshot_with(model_cell());
 
     let selected = select(&snapshot, "decision-1", &[]);
 
@@ -71,12 +71,10 @@ fn cell(namespace: &str, name: &str) -> StateCell {
     StateCell::active(key(namespace, name), "event-1")
 }
 
-fn bridge_cell() -> StateCell {
-    let mut cell = cell("runtime", "next-work");
-    cell.payload_schema = "plan-bridge.next-work.v1".to_string();
+fn model_cell() -> StateCell {
+    let mut cell = cell("model", "42");
+    cell.payload_schema = "state.model.v1".to_string();
     cell.payload_json = serde_json::json!({
-        "operation": "model.call",
-        "step_id": 42,
         "expected_envelope": "Action",
         "model_budget_tokens": 512,
         "tool_view": [{

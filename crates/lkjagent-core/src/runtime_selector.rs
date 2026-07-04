@@ -34,9 +34,6 @@ pub fn select_runtime_decision(
 }
 
 pub fn select_operation(snapshot: &RuntimeSnapshot) -> RuntimeOperation {
-    if let Some(cell) = cell(snapshot, "runtime", "next-work") {
-        return operation_from_bridge(cell);
-    }
     if cell(snapshot, "case", "owner-intake").is_some() {
         return RuntimeOperation::model_free("owner.intake", vec!["queue row".to_string()]);
     }
@@ -74,28 +71,6 @@ pub fn select_operation(snapshot: &RuntimeSnapshot) -> RuntimeOperation {
         return RuntimeOperation::model_free("completion.close", vec!["fresh checks".to_string()]);
     }
     RuntimeOperation::idle()
-}
-
-fn operation_from_bridge(cell: &StateCell) -> RuntimeOperation {
-    let payload = payload(cell);
-    let key = text(&payload, "operation").unwrap_or("runtime.idle");
-    if key == "model.call" || key.starts_with("model.call/") {
-        return RuntimeOperation::model_call(
-            step_key(key, &payload),
-            envelope_from_value(&payload).unwrap_or(OutputEnvelope::Message),
-            tool_view_from_value(&payload),
-            number(&payload, "model_budget_tokens"),
-            evidence(cell),
-        );
-    }
-    RuntimeOperation::model_free(step_key(key, &payload), evidence(cell))
-}
-
-fn step_key(base: &str, payload: &Value) -> String {
-    match number(payload, "step_id") {
-        Some(step_id) if !base.contains('/') => format!("{base}/{step_id}"),
-        _ => base.to_string(),
-    }
 }
 
 fn cell<'a>(snapshot: &'a RuntimeSnapshot, namespace: &str, name: &str) -> Option<&'a StateCell> {

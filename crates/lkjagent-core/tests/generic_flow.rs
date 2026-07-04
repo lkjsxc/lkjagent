@@ -1,7 +1,10 @@
 use lkjagent_core::classify::instantiate;
-use lkjagent_core::engine::{apply_turn, next_work, Command, TurnOutcome, Work};
+use lkjagent_core::engine::{
+    apply_turn, next_work, next_work_with_decision, Command, TurnOutcome, Work,
+};
 use lkjagent_core::model::{CheckSpec, StepState, TaskState};
 use lkjagent_core::parse::{Action, ParseFault, ParsedOutput};
+use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
 
 #[test]
 fn generic_task_closes_after_eight_plus_turns_with_faults() {
@@ -90,11 +93,46 @@ fn endpoint_errors_use_ten_failure_patience() {
     assert_eq!(snapshot.steps[0].state, StepState::Blocked);
 }
 
+fn decision(operation: &str, envelope: OutputEnvelope) -> RuntimeDecision {
+    RuntimeDecision::new(
+        "decision-1",
+        "case-1",
+        OperationKey(operation.to_string()),
+        ToolSetView::empty(),
+        envelope,
+    )
+}
+
 fn action(tool: &str, name: &str, value: &str) -> TurnOutcome {
     TurnOutcome::Model(ParsedOutput::Action(Action {
         tool: tool.to_string(),
         params: vec![(name.to_string(), value.to_string())],
     }))
+}
+
+#[test]
+fn decision_operation_selects_work_even_when_step_order_differs() {
+    let snapshot = instantiate(7, "Write notes/out.md with setup notes.");
+    let close = decision("completion.close", OutputEnvelope::None);
+    assert!(matches!(
+        next_work_with_decision(&snapshot, &close),
+        Work::CloseTask
+    ));
+    let model = decision("model.call/1", OutputEnvelope::Plan);
+    assert!(matches!(
+        next_work_with_decision(&snapshot, &model),
+        Work::CallModel { step_id: 1, .. }
+    ));
+}
+
+#[test]
+fn unsupported_decision_blocks_instead_of_recomputing_work() {
+    let snapshot = instantiate(8, "What is in the workspace?");
+    let decision = decision("unknown.operation", OutputEnvelope::None);
+    assert!(matches!(
+        next_work_with_decision(&snapshot, &decision),
+        Work::BlockTask(_)
+    ));
 }
 
 #[test]

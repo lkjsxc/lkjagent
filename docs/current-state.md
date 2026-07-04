@@ -76,9 +76,10 @@ from hydrated state and reuses unfinished decisions before selecting new work.
 rows, with row helpers for cases, unknown state cells, state history, pending runtime
 decisions, and context items. `lkjagent-app` projects plan rows into
 operation-specific state cells, hydrates state cells, persists or reuses a
-`RuntimeDecision` before prompt rendering, and settles the decision after the
-turn. The bridge projects cells such as `model:<step>`, `check:<step>`,
-`case:waiting-answer`, and `completion:close-candidate`. Explore tool
+`RuntimeDecision` before prompt rendering, derives turn work from the persisted
+decision operation, and settles the decision after the turn. The bridge projects
+cells such as `model:<step>`, `check:<step>`, `case:waiting-answer`, and
+`completion:close-candidate`. Explore tool
 descriptors now live in one core catalog used to derive the bridge
 `ToolSetView`; prompt rendering prints that persisted view, parsing reads
 the same decision view, app admission rows are persisted before explore effects,
@@ -121,9 +122,11 @@ gate evidence:
   kinds; state-ledger tables and row helpers exist but are not yet runtime
   authority;
 - runtime selection reads operation-specific state cells projected from plan
-  rows; the full reducer does not yet own all state transitions;
-- persisted `RuntimeDecision` rows are created and reused by the daemon, but old
-  plan rows still determine which operation-specific cells are projected;
+  rows and the turn interpreter follows the persisted decision operation, but
+  the full reducer does not yet own all state transitions;
+- persisted `RuntimeDecision` rows are created, reused, and interpreted by the
+  daemon, but old plan rows still determine which operation-specific cells are
+  projected;
 - prompt rendering, parsing, and admission use the persisted explore
   `ToolSetView`, but non-explore prompts and full policy-layer derivation are
   still bridge-limited;

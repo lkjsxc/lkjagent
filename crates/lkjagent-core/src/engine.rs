@@ -46,14 +46,31 @@ pub enum Command {
 }
 
 pub fn next_work_with_decision(snapshot: &TaskSnapshot, decision: &RuntimeDecision) -> Work {
-    next_work_rendered(snapshot, Some(decision))
+    match snapshot.task.state {
+        TaskState::Waiting | TaskState::Blocked | TaskState::Closed => return Work::Wait,
+        TaskState::Open => {}
+    }
+    let operation = decision.operation.0.as_str();
+    if operation == "runtime.idle" || operation == "owner.answer" {
+        return Work::Wait;
+    }
+    if operation == "completion.close" {
+        return Work::CloseTask;
+    }
+    if let Some(step_id) = step_operation(operation, "check.run/") {
+        return Work::RunChecks { step_id };
+    }
+    if let Some(step_id) = step_operation(operation, "model.call/") {
+        return call_model_work(snapshot, decision, step_id);
+    }
+    Work::BlockTask(format!("unsupported runtime decision: {operation}"))
 }
 
 pub fn next_work(snapshot: &TaskSnapshot) -> Work {
-    next_work_rendered(snapshot, None)
+    next_work_rendered(snapshot)
 }
 
-fn next_work_rendered(snapshot: &TaskSnapshot, decision: Option<&RuntimeDecision>) -> Work {
+fn next_work_rendered(snapshot: &TaskSnapshot) -> Work {
     match snapshot.task.state {
         TaskState::Waiting | TaskState::Blocked | TaskState::Closed => return Work::Wait,
         TaskState::Open => {}
@@ -70,13 +87,24 @@ fn next_work_rendered(snapshot: &TaskSnapshot, decision: Option<&RuntimeDecision
     }
     Work::CallModel {
         step_id: step.id,
-        prompt: match decision {
-            Some(decision) => {
-                render_prompt_for_decision(&snapshot.task, &snapshot.steps, step, decision)
-            }
-            None => render_prompt(&snapshot.task, &snapshot.steps, step),
-        },
+        prompt: render_prompt(&snapshot.task, &snapshot.steps, step),
     }
+}
+
+fn call_model_work(snapshot: &TaskSnapshot, decision: &RuntimeDecision, step_id: u64) -> Work {
+    let Some(step) = snapshot.steps.iter().find(|step| step.id == step_id) else {
+        return Work::BlockTask(format!("decision step not found: {step_id}"));
+    };
+    Work::CallModel {
+        step_id,
+        prompt: render_prompt_for_decision(&snapshot.task, &snapshot.steps, step, decision),
+    }
+}
+
+fn step_operation(operation: &str, prefix: &str) -> Option<u64> {
+    operation
+        .strip_prefix(prefix)
+        .and_then(|value| value.parse::<u64>().ok())
 }
 
 pub fn apply_turn(
