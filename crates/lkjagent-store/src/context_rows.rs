@@ -52,6 +52,36 @@ pub fn context_items(conn: &Connection, case_id: &str) -> StoreResult<Vec<Contex
     Ok(items)
 }
 
+pub fn insert_context_edge(
+    conn: &Connection,
+    case_id: &str,
+    from_item_id: &str,
+    to_item_id: &str,
+    edge_kind: &str,
+    reason: &str,
+    created_at: &str,
+) -> StoreResult<()> {
+    conn.execute(
+        "INSERT INTO context_edges
+         (case_id, from_item_id, to_item_id, edge_kind, reason, created_at)
+         SELECT ?1, ?2, ?3, ?4, ?5, ?6
+         WHERE NOT EXISTS (
+           SELECT 1 FROM context_edges
+           WHERE case_id = ?1 AND from_item_id = ?2 AND to_item_id = ?3
+           AND edge_kind = ?4 AND reason = ?5
+         )",
+        params![
+            case_id,
+            from_item_id,
+            to_item_id,
+            edge_kind,
+            reason,
+            created_at,
+        ],
+    )?;
+    Ok(())
+}
+
 pub fn suppress_context_item(conn: &Connection, id: &str, reason: &str) -> StoreResult<usize> {
     let changed = conn.execute(
         "UPDATE context_items SET suppression_reason = ?1 WHERE id = ?2",

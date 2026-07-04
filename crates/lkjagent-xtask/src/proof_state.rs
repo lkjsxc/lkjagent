@@ -15,7 +15,8 @@ pub fn write_state_bundle(conn: &Connection, out_dir: &Path) -> Result<(), Strin
     write(out_dir, "observations.md", &observations(conn)?)?;
     write(out_dir, "exchanges.md", &exchanges(conn)?)?;
     write(out_dir, "artifacts.md", &artifacts(conn)?)?;
-    write(out_dir, "context.md", &context(conn)?)
+    write(out_dir, "context.md", &context(conn)?)?;
+    write(out_dir, "context-edges.md", &context_edges(conn)?)
 }
 
 fn state_cells(conn: &Connection) -> Result<String, String> {
@@ -127,6 +128,23 @@ fn context(conn: &Connection) -> Result<String, String> {
         |row| {
             Ok(format!(
                 "- {} key={} contamination={} suppressed={}",
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, String>(2)?,
+                row.get::<_, String>(3)?
+            ))
+        },
+    )
+}
+
+fn context_edges(conn: &Connection) -> Result<String, String> {
+    rows(
+        conn,
+        "Context Edges",
+        "SELECT from_item_id, to_item_id, edge_kind, reason FROM context_edges ORDER BY id",
+        |row| {
+            Ok(format!(
+                "- {} -> {} kind={} reason={}",
                 row.get::<_, String>(0)?,
                 row.get::<_, String>(1)?,
                 row.get::<_, String>(2)?,

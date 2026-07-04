@@ -86,8 +86,9 @@ the same decision view, app admission rows are persisted before explore effects,
 and the explore dispatcher resolves tool effects through the catalog descriptor.
 The daemon bridge also persists source-tagged context items, selects
 clean current items for prompt briefs, detects contradictory clean items into
-`context:conflict/<semantic-key>` state cells, and excludes contaminated items
-from normal prompts. The core artifact slice models checked 512-token-target
+`context:conflict/<semantic-key>` state cells, writes contradiction and
+resolution `context_edges`, and excludes contaminated items from normal prompts.
+The core artifact slice models checked 512-token-target
 units, deterministic assembly, artifact fingerprints, and fresh-fingerprint
 completion evidence; the store persists artifact rows with unit metadata, and
 write effects record file and unit artifact fingerprints. Write and revise
@@ -136,8 +137,8 @@ gate evidence:
   observations, and contaminated exclusion, and prompt-frame rows own bounded
   body refs; full prompt-frame replay is still bridge-level;
 - contradictions become conflict state cells and active resolution cells
-  suppress losing items in the bridge, but full resolution event lineage is not
-  yet wired;
+  suppress losing items with `context_edges` lineage, but owner-facing conflict
+  repair operations are still bridge-level;
 - parse faults, endpoint errors, and effect errors classify contamination
   durably, but sensitive-owner-data and external-raw classes are not fully wired;
 - crash resume reuses decisions with no external evidence and recovers
@@ -147,9 +148,8 @@ gate evidence:
   helpers and rows, write effects persist file and unit artifacts, and write
   prompts use 512-token caps, but assembly is not yet the only path to larger
   owner files; and
-- proof bundles expose first state-ledger sections and context suppression
-  reasons, but full conflict resolution lineage and sensitive-data policy are
-  not yet complete.
+- proof bundles expose first state-ledger sections, context suppression reasons,
+  and conflict edges, but sensitive-data policy is not yet complete.
 
 ## Implemented Code
 

@@ -29,6 +29,12 @@ Normal prompts do not render both sides as facts. They render one bounded
 `Unresolved Conflict` section with source refs and the operation selected by the
 runtime, such as inspect evidence, ask owner, or take a conservative path.
 
+## Lineage
+
+Detection writes `context_edges` rows with `contradicts` links between competing
+items. A resolution writes `resolved-by` links from each suppressed loser to the
+winning item. Proof bundles include these rows with the context items.
+
 ## Resolution
 
 A conflict resolves through a durable event: owner answer, check evidence,

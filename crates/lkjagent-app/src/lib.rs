@@ -4,6 +4,7 @@ pub mod cli;
 pub mod clock;
 pub mod config;
 mod context_bridge;
+mod context_resolution_bridge;
 pub mod daemon;
 mod daemon_intake;
 mod daemon_lock;

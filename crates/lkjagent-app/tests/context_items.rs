@@ -50,6 +50,12 @@ fn context_prompt_excludes_contaminated_and_creates_conflict_cell() -> TestResul
         |row| row.get(0),
     )?;
     assert_eq!(count, 1);
+    let edges: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM context_edges WHERE edge_kind = 'contradicts'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(edges, 1);
     Ok(())
 }
 
@@ -87,6 +93,12 @@ fn context_resolution_suppresses_losing_conflict_items() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert_eq!(reason, "resolved-conflict");
+    let edges: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM context_edges WHERE edge_kind = 'resolved-by'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(edges, 1);
     Ok(())
 }
 
