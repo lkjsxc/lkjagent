@@ -44,6 +44,9 @@ fn aurora_manuscript_snapshot_has_plan_settings_verify_and_checks() {
         snapshot.steps[2].output_path.as_deref(),
         Some("stories/aurora-ledger/manuscript/chapter-01.md")
     );
+    assert!(snapshot.steps[2]
+        .instruction
+        .contains("bounded 350-word unit"));
     assert_eq!(snapshot.steps[12].kind, StepKind::Verify);
     assert_eq!(snapshot.steps[13].kind, StepKind::Respond);
     assert!(snapshot.task.checks.contains(&CheckSpec::FileCount {

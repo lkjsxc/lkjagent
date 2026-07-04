@@ -100,10 +100,8 @@ fn chapter_step(task_id: u64, ordinal: u32, path: String, words: usize) -> Step 
         "",
     );
     step.title = format!("chapter {:02}", ordinal.saturating_sub(2));
-    step.instruction = format!(
-        "write {words} to {} finished manuscript words, then stop",
-        words.saturating_add(150)
-    );
+    step.instruction =
+        format!("write one bounded 350-word unit toward a {words}-word chapter, then stop");
     step.output_path = Some(path);
     step
 }

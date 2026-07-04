@@ -157,8 +157,9 @@ observation bodies classify contamination durably with conservative redaction
 before prompt admission.
 
 Artifact units, deterministic assembly, fresh fingerprint checks, and artifact
-rows are wired into write effects. Write effects split and assemble checked units
-before file writes, and write prompts use bounded close-tag headroom. Proof bundles expose
+rows are wired into write effects. Manuscript chapter prompts ask for bounded
+350-word units, write effects split and assemble checked units before file
+writes, and write prompts use bounded close-tag headroom. Proof bundles expose
 state-vector, decisions, prompt-frame, admission, observation, exchange,
 artifact, context, suppression, and conflict-edge sections.
 
