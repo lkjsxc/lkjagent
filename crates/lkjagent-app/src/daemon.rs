@@ -88,7 +88,7 @@ fn run_turn<E: Endpoint, C: Clock>(
     let work = next_work_with_decision(&prompt_snapshot, &decision);
     let outcome = match &work {
         Work::CallModel { step_id, prompt } => {
-            persist_prompt_frame(conn, &decision, prompt, &selected_at)?;
+            persist_prompt_frame(conn, logs, &decision, prompt, &selected_at)?;
             let (outcome, record) = call(logs, &snapshot, *step_id, prompt, &decision, endpoint)?;
             let (mut next, mut commands) = apply_turn(&snapshot, &work, outcome);
             let now = clock.now();

@@ -42,12 +42,13 @@ fn endpoint_completion_writes_exchange_and_usage_rows() -> TestResult<()> {
     assert!(provider.0.starts_with("case-1-decision-"));
     assert_eq!(provider.1, exchange_ref);
     assert_eq!(provider.2, 900);
-    let frames: i64 = conn.query_row(
-        "SELECT COUNT(*) FROM prompt_frames WHERE decision_id = ?1",
+    let body_ref: String = conn.query_row(
+        "SELECT body_ref FROM prompt_frames WHERE decision_id = ?1",
         [provider.0],
         |row| row.get(0),
     )?;
-    assert_eq!(frames, 1);
+    assert!(body_ref.starts_with("logs/case-1/decision-"));
+    assert!(data.join(&body_ref).exists());
     let usage: (i64, i64) = conn.query_row(
         "SELECT prompt_tokens, completion_tokens FROM token_usage LIMIT 1",
         [],

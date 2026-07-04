@@ -99,8 +99,9 @@ committed provider exchanges, admissions, or observations are recovered before a
 new decision is selected; decisions without external evidence are reused. Proof
 collection writes state-ledger sections for state cells, decisions, admissions,
 observations, exchanges, artifacts, and context. Status reports active or stale
-daemon lease rows from heartbeat config evidence. Current gate results belong in
-the handoff after commands are rerun against this checkout.
+daemon lease rows from heartbeat config evidence. Prompt-frame rows now point to
+bounded prompt body refs under `data/logs/`. Current gate results belong in the
+handoff after commands are rerun against this checkout.
 
 ## State-Ledger Gap
 
@@ -121,8 +122,8 @@ gate evidence:
 - tool descriptors are catalog-backed for prompt, parser, admission, and explore
   effect selection, but full policy-layer derivation is still bridge-limited;
 - prompt context has a durable context-item bridge for clean items, conflicts,
-  observations, and contaminated exclusion, but prompt-frame rows do not yet own
-  the selected context body;
+  observations, and contaminated exclusion, and prompt-frame rows own bounded
+  body refs; full prompt-frame replay is still bridge-level;
 - contradictions become conflict state cells in the bridge, but conflict
   resolution events and suppression of losing items are not yet wired;
 - contaminated material is excluded from bridge prompt context, but all failure
