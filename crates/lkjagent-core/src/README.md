@@ -21,6 +21,8 @@ Map lkjagent-core source modules.
   selection.
 - [runtime-admission.rs](runtime_admission.rs): action admission and workspace
   path policy.
+- [runtime-artifact.rs](runtime_artifact.rs): checked artifact units,
+  deterministic assembly, and fingerprints.
 - [runtime-context.rs](runtime_context.rs): context items, contamination, and
   contradiction detection.
 - [runtime-completion.rs](runtime_completion.rs): fresh evidence rules for

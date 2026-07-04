@@ -19,6 +19,7 @@ mod parse_plan;
 mod plan;
 pub mod render;
 pub mod runtime_admission;
+pub mod runtime_artifact;
 pub mod runtime_completion;
 pub mod runtime_context;
 pub mod runtime_decision;

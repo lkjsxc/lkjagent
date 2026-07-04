@@ -83,8 +83,11 @@ the same decision view, and app admission rows are persisted before explore
 effects. The daemon bridge also persists source-tagged context items, selects
 clean current items for prompt briefs, detects contradictory clean items into
 `context:conflict/<semantic-key>` state cells, and excludes contaminated items
-from normal prompts. Current gate results belong in the handoff after commands
-are rerun against this checkout.
+from normal prompts. The core artifact slice models checked 512-token-target
+units, deterministic assembly, artifact fingerprints, and fresh-fingerprint
+completion evidence; the store persists artifact rows with unit metadata.
+Current gate results belong in the handoff after commands are rerun against this
+checkout.
 
 ## State-Ledger Gap
 
@@ -113,8 +116,9 @@ gate evidence:
   paths do not yet classify contamination durably;
 - crash resume reuses an incomplete persisted runtime decision in the bridge,
   but recovery policies are not yet applied to every incomplete decision state;
-- artifact units, deterministic assembly, and fresh aggregate artifact checks are
-  documented but not wired into generation; and
+- artifact units, deterministic assembly, and fresh fingerprint checks have pure
+  helpers and rows, but model generation still writes plan-family files rather
+  than checked unit rows; and
 - proof bundles do not yet expose state vectors, decisions, tool views,
   admissions, context conflicts, contamination suppressions, and artifact
   fingerprints as first-class evidence.
@@ -141,10 +145,10 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Next, implement artifact units and deterministic assembly: persist artifact
-roots, files, units, and fingerprints, generate ordinary units around the
-512-token target, assemble larger owner files only after unit checks pass, and
-prove closure depends on fresh artifact checks.
+Next, wire endpoint outcomes and budgets into decisions and exchange rows: keep
+loose configurable timeouts observable, use the 512-token unit budget for normal
+artifact calls, classify transport and envelope faults as typed outcomes, and
+record retry changes instead of replaying failed prompts unchanged.
 
 ## Honesty Rules
 

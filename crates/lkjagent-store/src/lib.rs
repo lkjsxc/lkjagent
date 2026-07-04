@@ -1,4 +1,5 @@
 pub mod admission_rows;
+pub mod artifact_rows;
 pub mod context_rows;
 pub mod decision_rows;
 pub mod error;
