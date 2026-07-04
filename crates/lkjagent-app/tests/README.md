@@ -19,3 +19,4 @@ Integration tests for lkjagent-app.
 - [prompt-frame.rs](prompt_frame.rs): prompt-frame body replay tests.
 - [recovery.rs](recovery.rs): unfinished decision recovery tests.
 - [resume.rs](resume.rs): row-first resume, waiting answer, and decision reuse tests.
+- [state-snapshot.rs](state_snapshot.rs): state-cell snapshot hydration tests.

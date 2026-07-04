@@ -34,6 +34,7 @@ Map lkjagent-app source modules.
 - [runtime-bridge.rs](runtime_bridge.rs): state-ledger decision preparation.
 - [runtime-cell.rs](runtime_cell.rs): operation cell projection payloads.
 - [runtime-projection.rs](runtime_projection.rs): plan bridge projection events.
+- [snapshot-state.rs](snapshot_state.rs): task snapshot state-cell mirror.
 - [state.rs](state.rs): active snapshot hydration from normalized rows.
 - [status.rs](status.rs): status, task, and watch rendering helpers.
 - [turn-effects.rs](turn_effects.rs): deterministic write, check, and explore effects.

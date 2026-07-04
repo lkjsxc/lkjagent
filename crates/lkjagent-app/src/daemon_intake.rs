@@ -10,23 +10,23 @@ use lkjagent_store::plan_hydrate::first_snapshot_with_state;
 use rusqlite::Connection;
 
 use crate::clock::Clock;
+use crate::snapshot_state::{load_snapshot_cell, persist_snapshot_cell};
 
 pub fn load_runtime_snapshot<C: Clock>(
     conn: &mut Connection,
     clock: &mut C,
 ) -> Result<Option<TaskSnapshot>, String> {
+    if let Some(snapshot) = load_snapshot_cell(conn)? {
+        if snapshot.task.state == TaskState::Waiting {
+            return resume_loaded_waiting(conn, snapshot, clock);
+        }
+        return Ok(Some(snapshot));
+    }
     if let Some(snapshot) = first_snapshot_with_state(conn, "open").map_err(|e| e.to_string())? {
         return Ok(Some(snapshot));
     }
     if let Some(waiting) = first_snapshot_with_state(conn, "waiting").map_err(|e| e.to_string())? {
-        let resumed = resume_waiting(conn, waiting, clock)?;
-        if resumed.task.state == TaskState::Open {
-            return Ok(Some(resumed));
-        }
-        if let Some(snapshot) = intake(conn, true, clock)? {
-            return Ok(Some(snapshot));
-        }
-        return Ok(Some(resumed));
+        return resume_loaded_waiting(conn, waiting, clock);
     }
     intake(conn, false, clock)
 }
@@ -35,6 +35,21 @@ pub fn idle_snapshot() -> TaskSnapshot {
     let mut snapshot = instantiate(0, "idle");
     snapshot.task.state = TaskState::Closed;
     snapshot
+}
+
+fn resume_loaded_waiting<C: Clock>(
+    conn: &mut Connection,
+    waiting: TaskSnapshot,
+    clock: &mut C,
+) -> Result<Option<TaskSnapshot>, String> {
+    let resumed = resume_waiting(conn, waiting, clock)?;
+    if resumed.task.state == TaskState::Open {
+        return Ok(Some(resumed));
+    }
+    if let Some(snapshot) = intake(conn, true, clock)? {
+        return Ok(Some(snapshot));
+    }
+    Ok(Some(resumed))
 }
 
 fn intake<C: Clock>(
@@ -60,6 +75,7 @@ fn intake<C: Clock>(
         insert_step_tx(&tx, step, &now).map_err(|error| error.to_string())?;
     }
     tx.commit().map_err(|error| error.to_string())?;
+    persist_snapshot_cell(conn, &snapshot, &now)?;
     Ok(Some(snapshot))
 }
 
@@ -111,6 +127,7 @@ fn resume_waiting<C: Clock>(
     snapshot.events.push(event.clone());
     commit_turn(conn, &snapshot, &[Command::RecordEvent(event)], &now)
         .map_err(|error| error.to_string())?;
+    persist_snapshot_cell(conn, &snapshot, &now)?;
     Ok(snapshot)
 }
 

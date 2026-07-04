@@ -75,9 +75,10 @@ from hydrated state and reuses unfinished decisions before selecting new work.
 `lkjagent-store` creates the first state-ledger table set beside the plan-family
 rows, with row helpers for cases, events, unknown state cells, state history,
 pending runtime decisions, and context items. `lkjagent-app` projects plan rows
-through durable runtime events into operation-specific state cells, hydrates
-state cells, leaves active operation cells as decision authority until
-settlement, persists or reuses a `RuntimeDecision` before prompt rendering,
+through durable runtime events into operation-specific state cells, mirrors task
+snapshots into `case:snapshot` state cells, hydrates runnable snapshots from
+state cells before plan rows, leaves active operation cells as decision authority
+until settlement, persists or reuses a `RuntimeDecision` before prompt rendering,
 derives turn work from the persisted
 decision operation, and settles the decision after the turn. The bridge projects
 cells such as `model:<step>`, `check:<step>`, `case:waiting-answer`, and
@@ -127,9 +128,8 @@ The checkout does not yet satisfy the owner-requested state-ledger contract. The
 open gaps are executable and must be closed with docs, code, tests, and current
 gate evidence:
 
-- daemon runtime hydration is still shaped around fixed tasks, steps, and step
-  kinds; state-ledger tables and row helpers exist but are not yet runtime
-  authority;
+- daemon runtime hydration now prefers `case:snapshot` state cells before plan
+  rows, but the mirrored snapshot still carries fixed task and step shapes;
 - runtime selection reads operation-specific state cells projected through
   durable events and the turn interpreter follows the persisted decision
   operation, but the full reducer does not yet own all state transitions;

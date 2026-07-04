@@ -71,8 +71,14 @@ fn append_cell_event(
 fn has_operation_cell(snapshot: &RuntimeSnapshot) -> bool {
     snapshot.active_cells().iter().any(|cell| {
         matches!(
+            (cell.key.namespace.as_str(), cell.key.name.as_str()),
+            ("case", "owner-intake")
+                | ("case", "waiting-answer")
+                | ("completion", "close-candidate")
+                | ("runtime", "idle")
+        ) || matches!(
             cell.key.namespace.as_str(),
-            "case" | "recovery" | "effect" | "model" | "check" | "completion" | "runtime"
+            "recovery" | "effect" | "model" | "check"
         )
     })
 }
