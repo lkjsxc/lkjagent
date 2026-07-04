@@ -4,6 +4,15 @@ use rusqlite::{params, Connection};
 use crate::error::StoreResult;
 use crate::row_json::{fingerprint_error, json_string, json_value};
 
+pub fn next_decision_id(conn: &Connection, case_id: &str) -> StoreResult<String> {
+    let count: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM runtime_decisions WHERE case_id = ?1",
+        [case_id],
+        |row| row.get(0),
+    )?;
+    Ok(format!("case-{case_id}-decision-{:04}", count + 1))
+}
+
 pub fn insert_runtime_decision(
     conn: &Connection,
     decision: &RuntimeDecision,

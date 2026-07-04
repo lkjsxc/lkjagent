@@ -13,6 +13,10 @@ Map lkjagent-core source modules.
   application.
 - [runtime-decision.rs](runtime_decision.rs): runtime decisions, envelopes, and
   tool-set views.
+- [runtime-operation.rs](runtime_operation.rs): selected runtime operation
+  payload.
+- [runtime-selector.rs](runtime_selector.rs): pure state-vector decision
+  selection.
 - [runtime-admission.rs](runtime_admission.rs): action admission and workspace
   path policy.
 - [runtime-context.rs](runtime_context.rs): context items, contamination, and

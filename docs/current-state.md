@@ -70,10 +70,15 @@ has a first pure state-ledger domain slice in `lkjagent-core`: state keys and
 cells, runtime events and patches, runtime decisions, tool-set views, action
 admission with workspace path policy, context items with contamination classes,
 contradiction detection, stable fingerprints, and fresh-evidence completion
-helpers. `lkjagent-store` now creates the first state-ledger table set beside the
-plan-family rows, with row helpers for cases, unknown state cells, pending
-runtime decisions, and context items. Current gate results belong in the handoff
-after commands are rerun against this checkout.
+helpers. `lkjagent-core` also has a pure selector that picks a runtime decision
+from hydrated state and reuses unfinished decisions before selecting new work.
+`lkjagent-store` creates the first state-ledger table set beside the plan-family
+rows, with row helpers for cases, unknown state cells, pending runtime
+decisions, and context items. `lkjagent-app` projects plan rows into a
+`runtime:next-work` state cell, hydrates state cells, persists or reuses a
+`RuntimeDecision` before prompt rendering, and settles the decision after the
+turn. Current gate results belong in the handoff after commands are rerun
+against this checkout.
 
 ## State-Ledger Gap
 
@@ -84,11 +89,10 @@ gate evidence:
 - daemon runtime hydration is still shaped around fixed tasks, steps, and step
   kinds; state-ledger tables and row helpers exist but are not yet runtime
   authority;
-- runtime selection is not yet driven by the new pure state reducer and
-  selectors;
-- the daemon does not yet persist a `RuntimeDecision` row that freezes the
-  state-vector fingerprint, context-frame fingerprint, tool-view fingerprint,
-  expected output grammar, evidence needs, and recovery policy for a turn;
+- runtime selection is still a plan-row bridge that projects one next-work cell;
+  the full reducer does not yet own all state transitions;
+- persisted `RuntimeDecision` rows are created and reused by the daemon, but old
+  plan rows still determine the projected next-work cell;
 - prompt rendering and action admission are not yet wired to the same stored
   decision-specific `ToolSetView`;
 - tool descriptors and legality are duplicated across docs, parser, renderer,
@@ -100,7 +104,8 @@ gate evidence:
   rendering;
 - contaminated material is avoided in some retry paths but is not represented as
   a durable contamination class with normal-prompt exclusion rules;
-- crash resume does not yet recover incomplete persisted runtime decisions;
+- crash resume reuses an incomplete persisted runtime decision in the bridge,
+  but recovery policies are not yet applied to every incomplete decision state;
 - artifact units, deterministic assembly, and fresh aggregate artifact checks are
   documented but not wired into generation; and
 - proof bundles do not yet expose state vectors, decisions, tool views,
@@ -129,10 +134,10 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Next, wire the state-ledger rows into runtime selection: add reducer-driven
-selectors, hydrate state cells from SQLite in the daemon, persist each selected
-`RuntimeDecision` before rendering or admission, and prove crash resume reuses
-that decision id and tool-view fingerprint.
+Next, wire prompt rendering, parsing, action admission, and dispatch to the
+persisted decision-specific `ToolSetView`: add the catalog-backed view, render
+only that view, parse actions against it, persist `ToolAdmission` rows before
+effects, and prove prompt-visible tools exactly match admission.
 
 ## Honesty Rules
 

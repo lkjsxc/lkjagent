@@ -12,6 +12,7 @@ mod explore;
 mod inspect;
 mod model_call;
 mod model_io;
+mod runtime_bridge;
 pub mod state;
 pub mod status;
 mod turn_effects;

@@ -21,6 +21,8 @@ Map lkjagent-app source modules.
 - [inspect.rs](inspect.rs): row-backed CLI inspection renderers.
 - [model-call.rs](model_call.rs): endpoint call, exchange log, and usage handling.
 - [model-io.rs](model_io.rs): endpoint trait and scripted completion record.
+- [runtime-bridge.rs](runtime_bridge.rs): plan-row projection into state-ledger
+  decisions.
 - [state.rs](state.rs): active snapshot hydration from normalized rows.
 - [status.rs](status.rs): status, task, and watch rendering helpers.
 - [turn-effects.rs](turn_effects.rs): deterministic write, check, and explore effects.

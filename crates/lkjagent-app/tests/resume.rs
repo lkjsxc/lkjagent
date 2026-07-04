@@ -4,9 +4,12 @@ use std::path::PathBuf;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::model::{StepKind, StepState, TaskState};
+use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
+use lkjagent_store::decision_rows::insert_runtime_decision;
 use lkjagent_store::plan_access::{enqueue, insert_step_tx, insert_task};
 use lkjagent_store::plan_schema::setup;
 use lkjagent_store::plan_turn::set_config;
+use lkjagent_store::state_rows::insert_case;
 use rusqlite::Connection;
 
 const SNAPSHOT_KEY: &str = "app.active-snapshot";
@@ -54,6 +57,38 @@ fn rows_win_over_stale_config_snapshot() -> TestResult<()> {
 }
 
 #[test]
+fn pending_runtime_decision_is_reused_on_resume() -> TestResult<()> {
+    let data = fixture_root("decision-reuse")?;
+    let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    let snapshot = instantiate(1, "What is an agent?");
+    persist(&mut conn, &snapshot)?;
+    insert_case(&conn, "1", &snapshot.task.objective, "before")?;
+    let decision = pending_decision(&snapshot);
+    let expected_fp = decision.tool_view_fingerprint().unwrap_or_default();
+    insert_runtime_decision(&conn, &decision, "pending", "before")?;
+    drop(conn);
+
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec!["<message>Rows are authority.</message>".to_string()],
+        index: 0,
+    };
+    let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;
+
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let row: (i64, String, String, String) = conn.query_row(
+        "SELECT COUNT(*), id, status, tool_view_fingerprint FROM runtime_decisions",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+    )?;
+    assert_eq!(row.0, 1);
+    assert_eq!(row.1, "decision-reused");
+    assert_eq!(row.2, "settled");
+    assert_eq!(row.3, expected_fp);
+    Ok(())
+}
+
+#[test]
 fn ask_step_records_answer_and_resumes_next_step() -> TestResult<()> {
     let data = fixture_root("ask")?;
     let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
@@ -86,6 +121,17 @@ fn ask_step_records_answer_and_resumes_next_step() -> TestResult<()> {
         .any(|event| event.content == "README.md"));
     assert_eq!(closed.steps[0].state, StepState::Done);
     Ok(())
+}
+
+fn pending_decision(snapshot: &lkjagent_core::model::TaskSnapshot) -> RuntimeDecision {
+    let step_id = snapshot.steps.first().map_or(0, |step| step.id);
+    RuntimeDecision::new(
+        "decision-reused",
+        "1",
+        OperationKey(format!("model.call/{step_id}")),
+        ToolSetView::empty(),
+        OutputEnvelope::Message,
+    )
 }
 
 fn persist(conn: &mut Connection, snapshot: &lkjagent_core::model::TaskSnapshot) -> TestResult<()> {

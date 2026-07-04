@@ -11,6 +11,7 @@ use crate::daemon_intake::{idle_snapshot, load_runtime_snapshot};
 use crate::effect_error::settle as settle_effect_error;
 use crate::endpoint::LlmEndpoint;
 use crate::model_call::{apply_record, call};
+use crate::runtime_bridge::{prepare_runtime_decision, settle_runtime_decision};
 use crate::turn_effects::{dispatch_effects, gather_checks};
 
 pub use crate::model_io::{CompletionRecord, Endpoint, ScriptedEndpoint};
@@ -74,6 +75,8 @@ fn run_turn<E: Endpoint, C: Clock>(
     endpoint: &mut E,
     clock: &mut C,
 ) -> Result<TaskSnapshot, String> {
+    let selected_at = clock.now();
+    let decision = prepare_runtime_decision(conn, &snapshot, &selected_at)?;
     let work = next_work(&snapshot);
     let outcome = match &work {
         Work::CallModel { step_id, prompt } => {
@@ -84,10 +87,13 @@ fn run_turn<E: Endpoint, C: Clock>(
             }
             if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands) {
                 let now = clock.now();
-                return settle_effect_error(conn, &snapshot, &work, error, &now);
+                let settled = settle_effect_error(conn, &snapshot, &work, error, &now)?;
+                settle_runtime_decision(conn, &decision, "effect_error", &now)?;
+                return Ok(settled);
             }
             let now = clock.now();
             commit_turn(conn, &next, &commands, &now).map_err(|error| error.to_string())?;
+            settle_runtime_decision(conn, &decision, "settled", &now)?;
             return Ok(next);
         }
         Work::RunChecks { step_id } => gather_checks(workspace, &snapshot, *step_id)?,
@@ -96,9 +102,12 @@ fn run_turn<E: Endpoint, C: Clock>(
     let (mut next, commands) = apply_turn(&snapshot, &work, outcome);
     if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands) {
         let now = clock.now();
-        return settle_effect_error(conn, &snapshot, &work, error, &now);
+        let settled = settle_effect_error(conn, &snapshot, &work, error, &now)?;
+        settle_runtime_decision(conn, &decision, "effect_error", &now)?;
+        return Ok(settled);
     }
     let now = clock.now();
     commit_turn(conn, &next, &commands, &now).map_err(|error| error.to_string())?;
+    settle_runtime_decision(conn, &decision, "settled", &now)?;
     Ok(next)
 }
