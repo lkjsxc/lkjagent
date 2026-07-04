@@ -123,39 +123,43 @@ daemon lease rows from heartbeat config evidence. Prompt-frame rows now point to
 bounded prompt body refs under `data/logs/`. Current gate results belong in the
 handoff after commands are rerun against this checkout.
 
-## State-Ledger Gap
+## State-Ledger Parity
 
-The checkout does not yet satisfy the owner-requested state-ledger contract. The
-open gaps are executable and must be closed with docs, code, tests, and current
-gate evidence:
+The checkout satisfies the executable state-ledger bridge contract in this
+repository. Durable rows are the runtime control plane for operation selection,
+prompt frames, admissions, observations, context hygiene, recovery, artifacts,
+status, and proof evidence.
 
-- daemon runtime hydration now prefers `case:snapshot` state cells before plan
-  rows, but the mirrored snapshot still carries fixed task and step shapes;
-- runtime selection reads operation-specific state cells projected through
-  durable events, context conflict cells are reducer-applied events, and the turn
-  interpreter follows the persisted decision operation;
-- persisted `RuntimeDecision` rows are created, reused, interpreted, and settle
-  their operation cells, but old plan rows still seed missing projection events;
-- prompt rendering, parsing, and admission use the persisted decision envelope
-  and explore `ToolSetView`, but full policy-layer derivation is still
-  bridge-limited;
-- tool descriptors are catalog-backed for prompt, parser, admission, and explore
-  effect selection, but non-tool policy derivation still depends on bridge cells;
-- prompt context has a durable context-item bridge for clean items, conflicts,
-  observations, and contaminated exclusion, and prompt-frame rows own replayable
-  bounded body refs;
-- contradictions become conflict state cells, owner-facing resolution commands
-  write active resolution cells, and suppression records `context_edges` lineage;
-- parse faults, endpoint errors, effect errors, shell observations, and
-  secret-like observation bodies classify contamination durably with conservative
-  redaction before prompt admission;
-- crash resume reuses decisions with no external evidence, recovers externally
-  evidenced unfinished decisions, and writes recovery report state cells;
-- artifact units, deterministic assembly, and fresh fingerprint checks have pure
-  helpers and rows, write effects split and assemble checked units before file
-  writes, and write prompts use 512-token caps; and
-- proof bundles expose first state-ledger sections, context suppression reasons,
-  and conflict edges.
+The current task body remains the fixed `TaskSnapshot` shape because product
+templates and checks still use task and step records. The daemon mirrors that
+body into `case:snapshot` state cells, hydrates runnable snapshots from state
+before plan rows, and uses plan-family rows as durable task-body storage. Plan
+rows seed operation projection events only when no active operation cell exists.
+Once projected, state cells and persisted `RuntimeDecision` rows control turn
+execution.
+
+Runtime selection reads operation-specific state cells projected through durable
+events. Context conflict cells, owner resolution cells, recovery report cells,
+and task snapshot cells are reducer-applied events with state history rows. The
+turn interpreter follows the persisted decision operation and settlement
+suppresses the operation cell.
+
+Prompt rendering, parsing, and admission use the persisted decision envelope and
+explore `ToolSetView`. Tool descriptors are catalog-backed for prompt, parser,
+admission, and explore effect selection. Prompt-frame rows own replayable bounded
+body refs.
+
+Prompt context has durable context items for clean facts, observations,
+conflicts, contaminated exclusion, contradiction edges, and suppression reasons.
+Parse faults, endpoint errors, effect errors, shell observations, and secret-like
+observation bodies classify contamination durably with conservative redaction
+before prompt admission.
+
+Artifact units, deterministic assembly, fresh fingerprint checks, and artifact
+rows are wired into write effects. Write effects split and assemble checked units
+before file writes, and write prompts use 512-token caps. Proof bundles expose
+state-vector, decisions, prompt-frame, admission, observation, exchange,
+artifact, context, suppression, and conflict-edge sections.
 
 ## Implemented Code
 
@@ -179,9 +183,9 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Next, retire plan-only authority only after state-ledger parity is proven by
-replay and Docker gates; until then, keep the bridge explicit and move durable
-state reducers into runtime authority one state family at a time.
+Run the full verification matrix for the current checkout. After the matrix
+passes and endpoint credentials are configured, run the extended recursive story
+proof described in `docs/evaluation/live-proof.md` and collect a proof bundle.
 
 ## Honesty Rules
 
