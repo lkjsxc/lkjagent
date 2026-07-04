@@ -100,8 +100,10 @@ cells, latest decision, admissions, observations, provider exchanges, and
 artifacts. Prompt-frame rows are persisted before model calls, and observation
 rows are persisted after deterministic effects. Clean observations are converted
 into durable context items while error observations are marked recovery-only.
-Parse-fault provider exchanges create failed-model-output context items, and
-endpoint errors create recovery-only context items. Active
+Parse-fault provider exchanges create failed-model-output context items,
+endpoint errors create recovery-only context items, shell observations become
+external-raw context, and secret-like observation bodies become sensitive-owner
+context. Active
 `context:resolve/<key>` cells suppress losing conflict items before prompt
 rendering. Unfinished decisions with
 committed provider exchanges, admissions, or observations are recovered before a
@@ -139,8 +141,9 @@ gate evidence:
 - contradictions become conflict state cells and active resolution cells
   suppress losing items with `context_edges` lineage, but owner-facing conflict
   repair operations are still bridge-level;
-- parse faults, endpoint errors, and effect errors classify contamination
-  durably, but sensitive-owner-data and external-raw classes are not fully wired;
+- parse faults, endpoint errors, effect errors, shell observations, and
+  secret-like observation bodies classify contamination durably, but owner-data
+  redaction policy is still intentionally conservative;
 - crash resume reuses decisions with no external evidence and recovers
   externally evidenced unfinished decisions, but recovery state reports remain
   bridge-level;
@@ -149,7 +152,7 @@ gate evidence:
   prompts use 512-token caps, but assembly is not yet the only path to larger
   owner files; and
 - proof bundles expose first state-ledger sections, context suppression reasons,
-  and conflict edges, but sensitive-data policy is not yet complete.
+  and conflict edges, but full owner-data redaction policy is not yet complete.
 
 ## Implemented Code
 

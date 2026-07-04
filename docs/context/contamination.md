@@ -26,7 +26,9 @@ the concrete change required.
 
 Tool observations are bounded before storage and bounded again before rendering.
 Only the current relevant observation is normally admitted. Old observations
-remain source evidence, not transcript text.
+remain source evidence, not transcript text. Shell observations are
+`external-raw`, failed observations are `recovery-only`, and observations with
+secret-like owner data such as tokens or passwords are `sensitive-owner-data`.
 
 ## Failure This Prevents
 

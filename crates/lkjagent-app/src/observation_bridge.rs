@@ -1,6 +1,8 @@
 use lkjagent_core::engine::Command;
 use lkjagent_core::model::TaskSnapshot;
-use lkjagent_core::runtime_context::{ContaminationClass, ContextItem, TrustClass};
+use lkjagent_core::runtime_context::{
+    contamination_for_observation, ContaminationClass, ContextItem, TrustClass,
+};
 use lkjagent_core::runtime_decision::RuntimeDecision;
 use lkjagent_store::context_rows::insert_context_item;
 use lkjagent_store::observation_rows::{insert_observation, ObservationRow};
@@ -39,7 +41,7 @@ fn insert(
 ) -> Result<(), String> {
     let content = latest_observation(snapshot);
     let status = observation_status(&content);
-    let contamination = contamination(status);
+    let contamination = contamination_for_observation(effect_name, status, &content);
     let id = format!("{}-observation-{:04}", decision.id, index + 1);
     insert_observation(
         conn,
@@ -88,14 +90,6 @@ fn context_item(
     item.decision_id = id.split("-observation-").next().map(str::to_string);
     item.created_at = now.to_string();
     item
-}
-
-fn contamination(status: &str) -> ContaminationClass {
-    if status == "ok" {
-        ContaminationClass::Clean
-    } else {
-        ContaminationClass::RecoveryOnly
-    }
 }
 
 fn latest_observation(snapshot: &TaskSnapshot) -> String {

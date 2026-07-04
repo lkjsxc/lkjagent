@@ -1,6 +1,7 @@
 use std::collections::BTreeMap;
 
 use lkjagent_core::runtime_admission::{admit_action, AdmissionStatus, ModelAction};
+use lkjagent_core::runtime_context::{contamination_for_observation, ContaminationClass};
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
 };
@@ -63,6 +64,22 @@ fn rendered_tool_view_and_admission_match() {
         .tool_view
         .tool_names()
         .contains(&"shell.run".to_string()));
+}
+
+#[test]
+fn observation_contamination_classifies_sensitive_and_external_raw() {
+    assert_eq!(
+        contamination_for_observation("shell.run", "ok", "exit=0 raw output"),
+        ContaminationClass::ExternalRaw
+    );
+    assert_eq!(
+        contamination_for_observation("fs.read", "ok", "token=abc123"),
+        ContaminationClass::SensitiveOwnerData
+    );
+    assert_eq!(
+        contamination_for_observation("fs.read", "error", "failed"),
+        ContaminationClass::RecoveryOnly
+    );
 }
 
 #[test]

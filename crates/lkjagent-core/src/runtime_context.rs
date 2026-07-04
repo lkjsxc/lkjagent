@@ -90,6 +90,31 @@ pub fn select_normal_context(items: &[ContextItem]) -> Vec<ContextItem> {
         .collect()
 }
 
+pub fn contamination_for_observation(
+    effect_name: &str,
+    status: &str,
+    body: &str,
+) -> ContaminationClass {
+    if status != "ok" {
+        return ContaminationClass::RecoveryOnly;
+    }
+    if has_sensitive_owner_data(body) {
+        return ContaminationClass::SensitiveOwnerData;
+    }
+    match effect_name {
+        "shell.run" => ContaminationClass::ExternalRaw,
+        "raw-tool-log" => ContaminationClass::RawToolLog,
+        _ => ContaminationClass::Clean,
+    }
+}
+
+fn has_sensitive_owner_data(body: &str) -> bool {
+    let lower = body.to_ascii_lowercase();
+    ["password=", "secret=", "token=", "api_key", "apikey"]
+        .iter()
+        .any(|pattern| lower.contains(pattern))
+}
+
 pub fn detect_contradictions(items: &[ContextItem]) -> Vec<ContextConflict> {
     let mut bodies_by_key: BTreeMap<String, BTreeMap<String, BTreeSet<String>>> = BTreeMap::new();
     for item in items
