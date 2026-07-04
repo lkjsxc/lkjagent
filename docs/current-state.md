@@ -79,8 +79,9 @@ decisions, and context items. `lkjagent-app` projects plan rows into a
 `RuntimeDecision` before prompt rendering, and settles the decision after the
 turn. Explore tool descriptors now live in one core catalog used to derive the
 bridge `ToolSetView`; prompt rendering prints that persisted view, parsing reads
-the same decision view, and app admission rows are persisted before explore
-effects. The daemon bridge also persists source-tagged context items, selects
+the same decision view, app admission rows are persisted before explore effects,
+and the explore dispatcher resolves tool effects through the catalog descriptor.
+The daemon bridge also persists source-tagged context items, selects
 clean current items for prompt briefs, detects contradictory clean items into
 `context:conflict/<semantic-key>` state cells, and excludes contaminated items
 from normal prompts. The core artifact slice models checked 512-token-target
@@ -117,8 +118,8 @@ gate evidence:
 - prompt rendering, parsing, and admission use the persisted explore
   `ToolSetView`, but non-explore prompts and full policy-layer derivation are
   still bridge-limited;
-- tool descriptors are catalog-backed for prompt, parser, and admission, but the
-  effect dispatcher still has a separate tool-to-effect match table;
+- tool descriptors are catalog-backed for prompt, parser, admission, and explore
+  effect selection, but full policy-layer derivation is still bridge-limited;
 - prompt context has a durable context-item bridge for clean items, conflicts,
   observations, and contaminated exclusion, but prompt-frame rows do not yet own
   the selected context body;
@@ -158,8 +159,8 @@ the current checkout passes a gate unless that gate is rerun now.
 ## Next Executable Step
 
 Next, retire plan-only authority only after state-ledger parity is proven by
-replay and Docker gates; until then, keep the bridge explicit and remove any
-remaining duplicate dispatcher-only law as catalog coverage expands.
+replay and Docker gates; until then, keep the bridge explicit and move durable
+state reducers into runtime authority one state family at a time.
 
 ## Honesty Rules
 

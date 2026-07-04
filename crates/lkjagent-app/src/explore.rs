@@ -2,6 +2,7 @@ use std::path::Path;
 
 use lkjagent_core::model::{StepState, TaskSnapshot};
 use lkjagent_core::parse::Action;
+use lkjagent_core::runtime_tool_catalog::{effect_for_tool, ToolEffect};
 use lkjagent_effects::observation::observation;
 use lkjagent_store::memory::{search_memory, MemoryRow};
 use rusqlite::Connection;
@@ -31,44 +32,46 @@ fn action_state(inputs: &str) -> String {
 }
 
 fn dispatch(conn: &Connection, workspace: &Path, action: &Action) -> Result<String, String> {
-    match action.tool.as_str() {
-        "fs.read" => lkjagent_effects::workspace::read(
+    let Some(effect) = effect_for_tool(&action.tool) else {
+        return Err(format!("unknown tool: {}", action.tool));
+    };
+    match effect {
+        ToolEffect::FsRead => lkjagent_effects::workspace::read(
             workspace,
             param(action, "path")?,
             number(action, "offset").unwrap_or(0),
             number(action, "count").unwrap_or(0),
         )
         .map_err(|error| error.to_string()),
-        "fs.list" => lkjagent_effects::workspace::list(
+        ToolEffect::FsList => lkjagent_effects::workspace::list(
             workspace,
             param_default(action, "path", "."),
             number(action, "depth").unwrap_or(1),
         )
         .map_err(|error| error.to_string()),
-        "fs.tree" => lkjagent_effects::workspace::tree(
+        ToolEffect::FsTree => lkjagent_effects::workspace::tree(
             workspace,
             param_default(action, "path", "."),
             number(action, "depth").unwrap_or(2),
         )
         .map_err(|error| error.to_string()),
-        "fs.search" => lkjagent_effects::workspace::search(
+        ToolEffect::FsSearch => lkjagent_effects::workspace::search(
             workspace,
             param_default(action, "path", "."),
             param(action, "query")?,
         )
         .map_err(|error| error.to_string()),
-        "fs.write" => lkjagent_effects::workspace::write(
+        ToolEffect::FsWrite => lkjagent_effects::workspace::write(
             workspace,
             param(action, "path")?,
             param(action, "content")?,
         )
         .map_err(|error| error.to_string()),
-        "shell.run" => shell(workspace, param(action, "command")?),
-        "memory.find" => memory_find(conn, param(action, "query")?),
-        "memory.save" => Ok(format!("saved topic={}", param(action, "topic")?)),
-        "plan.note" => Ok(format!("noted: {}", param(action, "note")?)),
-        "finish" => Ok(param(action, "summary")?.to_string()),
-        other => Err(format!("unknown tool: {other}")),
+        ToolEffect::ShellRun => shell(workspace, param(action, "command")?),
+        ToolEffect::MemoryFind => memory_find(conn, param(action, "query")?),
+        ToolEffect::MemorySave => Ok(format!("saved topic={}", param(action, "topic")?)),
+        ToolEffect::PlanNote => Ok(format!("noted: {}", param(action, "note")?)),
+        ToolEffect::Finish => Ok(param(action, "summary")?.to_string()),
     }
 }
 
