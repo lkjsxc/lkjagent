@@ -25,7 +25,11 @@ fn parser_accepts_log_follow_forms() -> TestResult<()> {
 }
 
 #[test]
-fn parser_rejects_empty_memory_query() {
-    let error = parse(["memory"]).unwrap_err();
+fn parser_rejects_empty_memory_query() -> TestResult<()> {
+    let error = match parse(["memory"]) {
+        Ok(_) => return Err("memory without query parsed".into()),
+        Err(error) => error,
+    };
     assert!(error.contains("memory requires QUERY"));
+    Ok(())
 }
