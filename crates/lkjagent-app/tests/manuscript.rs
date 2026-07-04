@@ -40,7 +40,7 @@ fn manuscript_fake_endpoint_closes_with_ten_chapters_and_word_count() -> TestRes
         [],
         |row| row.get(0),
     )?;
-    assert!(units >= 10);
+    assert!(units > 10);
     Ok(())
 }
 

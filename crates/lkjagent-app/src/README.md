@@ -9,6 +9,7 @@ Map lkjagent-app source modules.
 - [main.rs](main.rs): binary entrypoint.
 - [lib.rs](lib.rs): public library entry.
 - [admission-bridge.rs](admission_bridge.rs): decision-specific admission rows.
+- [artifact-effects.rs](artifact_effects.rs): checked unit assembly and artifact rows.
 - [args.rs](args.rs): CLI parser.
 - [cli.rs](cli.rs): command execution.
 - [clock.rs](clock.rs): timestamp seam for runtime and deterministic tests.

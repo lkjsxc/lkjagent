@@ -1,5 +1,6 @@
 mod admission_bridge;
 pub mod args;
+mod artifact_effects;
 pub mod cli;
 pub mod clock;
 pub mod config;

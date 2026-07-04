@@ -94,9 +94,9 @@ resolution `context_edges`, and excludes contaminated items from normal prompts.
 The core artifact slice models checked 512-token-target
 units, deterministic assembly, artifact fingerprints, and fresh-fingerprint
 completion evidence; the store persists artifact rows with unit metadata, and
-write effects assemble checked units before writing file bodies and record file
-and unit artifact fingerprints. Write and revise prompts use the 512-token
-artifact-unit generation budget. Endpoint exchanges
+write effects split large bodies into checked units, assemble them before file
+writes, and record file and unit artifact fingerprints. Write and revise prompts
+use the 512-token artifact-unit generation budget. Endpoint exchanges
 now carry decision id, context-frame fingerprint, tool-view fingerprint, active
 timeout, and provider-exchange rows tied to the
 runtime decision. Status output now summarizes active state cells, conflict
@@ -152,9 +152,8 @@ gate evidence:
 - crash resume reuses decisions with no external evidence, recovers externally
   evidenced unfinished decisions, and writes recovery report state cells;
 - artifact units, deterministic assembly, and fresh fingerprint checks have pure
-  helpers and rows, write effects assemble checked units before file writes, and
-  write prompts use 512-token caps, but multi-unit expansion is still bridge-led;
-  and
+  helpers and rows, write effects split and assemble checked units before file
+  writes, and write prompts use 512-token caps; and
 - proof bundles expose first state-ledger sections, context suppression reasons,
   and conflict edges.
 
