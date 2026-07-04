@@ -94,8 +94,10 @@ cells, latest decision, admissions, observations, provider exchanges, and
 artifacts. Prompt-frame rows are persisted before model calls, and observation
 rows are persisted after deterministic effects. Clean observations are converted
 into durable context items while error observations are marked recovery-only.
-Active `context:resolve/<key>` cells suppress losing conflict items before
-prompt rendering. Unfinished decisions with
+Parse-fault provider exchanges create failed-model-output context items, and
+endpoint errors create recovery-only context items. Active
+`context:resolve/<key>` cells suppress losing conflict items before prompt
+rendering. Unfinished decisions with
 committed provider exchanges, admissions, or observations are recovered before a
 new decision is selected; decisions without external evidence are reused. Proof
 collection writes state-ledger sections for state cells, decisions, admissions,
@@ -128,8 +130,8 @@ gate evidence:
 - contradictions become conflict state cells and active resolution cells
   suppress losing items in the bridge, but full resolution event lineage is not
   yet wired;
-- contaminated material is excluded from bridge prompt context, but all failure
-  paths do not yet classify contamination durably;
+- parse faults, endpoint errors, and effect errors classify contamination
+  durably, but sensitive-owner-data and external-raw classes are not fully wired;
 - crash resume reuses decisions with no external evidence and recovers
   externally evidenced unfinished decisions, but recovery state reports remain
   bridge-level;
@@ -137,7 +139,7 @@ gate evidence:
   helpers and rows, but model generation still writes plan-family files rather
   than checked unit rows; and
 - proof bundles expose first state-ledger sections, but full conflict resolution
-  lineage and contamination suppression evidence are not yet complete.
+  lineage and sensitive-data suppression evidence are not yet complete.
 
 ## Implemented Code
 

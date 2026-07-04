@@ -61,6 +61,29 @@ fn endpoint_completion_writes_exchange_and_usage_rows() -> TestResult<()> {
 }
 
 #[test]
+fn parse_fault_exchange_creates_contaminated_context_item() -> TestResult<()> {
+    let data = fixture_root("parse-fault-context")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    enqueue(&conn, "What is an agent?", "now")?;
+    drop(conn);
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec!["<content>wrong</content>".to_string()],
+        index: 0,
+    };
+    run_until_idle(&data, &mut endpoint, 1)?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let contamination: String = conn.query_row(
+        "SELECT contamination_class FROM context_items
+         WHERE source_type = 'provider_exchange' LIMIT 1",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(contamination, "FailedModelOutput");
+    Ok(())
+}
+
+#[test]
 fn missing_endpoint_usage_gets_unknown_token_row() -> TestResult<()> {
     let data = fixture_root("unknown-usage")?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
