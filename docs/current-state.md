@@ -88,9 +88,10 @@ clean current items for prompt briefs, detects contradictory clean items into
 `context:conflict/<semantic-key>` state cells, and excludes contaminated items
 from normal prompts. The core artifact slice models checked 512-token-target
 units, deterministic assembly, artifact fingerprints, and fresh-fingerprint
-completion evidence; the store persists artifact rows with unit metadata.
-Endpoint exchanges now carry decision id, context-frame fingerprint,
-tool-view fingerprint, active timeout, and provider-exchange rows tied to the
+completion evidence; the store persists artifact rows with unit metadata, and
+write effects record file and unit artifact fingerprints. Endpoint exchanges now
+carry decision id, context-frame fingerprint, tool-view fingerprint, active
+timeout, and provider-exchange rows tied to the
 runtime decision. Status output now summarizes active state cells, conflict
 cells, latest decision, admissions, observations, provider exchanges, and
 artifacts. Prompt-frame rows are persisted before model calls, and observation
@@ -138,8 +139,8 @@ gate evidence:
   externally evidenced unfinished decisions, but recovery state reports remain
   bridge-level;
 - artifact units, deterministic assembly, and fresh fingerprint checks have pure
-  helpers and rows, but model generation still writes plan-family files rather
-  than checked unit rows; and
+  helpers and rows, and write effects persist file and unit artifacts, but model
+  generation is not yet split into checked 512-token units before assembly; and
 - proof bundles expose first state-ledger sections, but full conflict resolution
   lineage and sensitive-data suppression evidence are not yet complete.
 

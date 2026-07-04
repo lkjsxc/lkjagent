@@ -3,6 +3,8 @@ use std::path::Path;
 use lkjagent_core::checks::{CommandFact, FileFact};
 use lkjagent_core::engine::{Command, TurnOutcome};
 use lkjagent_core::model::{CheckSpec, TaskSnapshot};
+use lkjagent_core::runtime_artifact::{artifact_fingerprint, DEFAULT_UNIT_TARGET_TOKENS};
+use lkjagent_store::artifact_rows::{insert_artifact, ArtifactRow};
 use rusqlite::Connection;
 
 pub fn gather_checks(
@@ -38,7 +40,10 @@ pub fn dispatch_effects(
 ) -> Result<(), String> {
     for command in commands {
         match command {
-            Command::WriteFile { path, content } => write_content(workspace, path, content)?,
+            Command::WriteFile { path, content } => {
+                let body = write_content(workspace, path, content)?;
+                persist_artifacts(conn, snapshot, path, content, &body)?;
+            }
             Command::RunExplore(action) => crate::explore::run(conn, workspace, snapshot, action),
             Command::RecordAttempt(_)
             | Command::RecordEvent(_)
@@ -68,7 +73,64 @@ fn dedupe_files(files: &mut Vec<FileFact>) {
     });
 }
 
-fn write_content(workspace: &Path, path: &str, content: &str) -> Result<(), String> {
+fn persist_artifacts(
+    conn: &Connection,
+    snapshot: &TaskSnapshot,
+    path: &str,
+    unit: &str,
+    body: &str,
+) -> Result<(), String> {
+    let file_id = format!("task-{}-file-{}", snapshot.task.id, safe_id(path));
+    let unit_id = format!("{file_id}-unit-{:04}", snapshot.task.budget_used + 1);
+    insert_artifact(
+        conn,
+        &artifact_row(snapshot, &file_id, "file", path, body, None, "{}")?,
+    )
+    .map_err(|error| error.to_string())?;
+    let metadata = serde_json::json!({"target_tokens": DEFAULT_UNIT_TARGET_TOKENS}).to_string();
+    insert_artifact(
+        conn,
+        &artifact_row(
+            snapshot,
+            &unit_id,
+            "unit",
+            path,
+            unit,
+            Some(file_id),
+            &metadata,
+        )?,
+    )
+    .map_err(|error| error.to_string())
+}
+
+fn artifact_row(
+    snapshot: &TaskSnapshot,
+    id: &str,
+    kind: &str,
+    path: &str,
+    content: &str,
+    parent_artifact_id: Option<String>,
+    metadata_json: &str,
+) -> Result<ArtifactRow, String> {
+    Ok(ArtifactRow {
+        id: id.to_string(),
+        case_id: snapshot.task.id.to_string(),
+        kind: kind.to_string(),
+        path: path.to_string(),
+        fingerprint: artifact_fingerprint(path, content).map_err(|error| error.message)?,
+        parent_artifact_id,
+        metadata_json: metadata_json.to_string(),
+        created_at: "turn".to_string(),
+    })
+}
+
+fn safe_id(path: &str) -> String {
+    path.chars()
+        .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
+        .collect()
+}
+
+fn write_content(workspace: &Path, path: &str, content: &str) -> Result<String, String> {
     let full = workspace.join(path);
     let body = if path.contains("/manuscript/chapter-") && full.exists() {
         let current = std::fs::read_to_string(&full).map_err(|error| error.to_string())?;
@@ -78,5 +140,5 @@ fn write_content(workspace: &Path, path: &str, content: &str) -> Result<(), Stri
     };
     lkjagent_effects::workspace::write(workspace, path, &body)
         .map_err(|error| error.to_string())?;
-    Ok(())
+    Ok(body)
 }

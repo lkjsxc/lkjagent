@@ -34,6 +34,13 @@ fn manuscript_fake_endpoint_closes_with_ten_chapters_and_word_count() -> TestRes
     let total = total_words(&chapter_dir)?;
     assert!(total >= 10_000, "{total}");
     assert!(!fs::read_to_string(chapter_dir.join("chapter-01.md"))?.contains("TODO"));
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let units: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM artifacts WHERE kind = 'unit'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert!(units >= 10);
     Ok(())
 }
 
