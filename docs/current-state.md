@@ -95,7 +95,8 @@ rows are persisted after deterministic effects. Unfinished decisions with
 committed provider exchanges, admissions, or observations are recovered before a
 new decision is selected; decisions without external evidence are reused. Proof
 collection writes state-ledger sections for state cells, decisions, admissions,
-observations, exchanges, artifacts, and context. Current gate results belong in
+observations, exchanges, artifacts, and context. Status reports active or stale
+daemon lease rows from heartbeat config evidence. Current gate results belong in
 the handoff after commands are rerun against this checkout.
 
 ## State-Ledger Gap
@@ -130,8 +131,7 @@ gate evidence:
   helpers and rows, but model generation still writes plan-family files rather
   than checked unit rows; and
 - proof bundles expose first state-ledger sections, but conflict resolution
-  lineage, full contamination suppression evidence, and stale-lease recovery
-  reports are not yet complete.
+  lineage and full contamination suppression evidence are not yet complete.
 
 ## Implemented Code
 
@@ -155,9 +155,9 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Next, report stale leases and recovery state in owner-facing logs and proof
-bundles, then retire plan-only authority only after state-ledger parity is
-proven by replay and Docker gates.
+Next, retire plan-only authority only after state-ledger parity is proven by
+replay and Docker gates; until then, keep the bridge explicit and remove any
+remaining duplicate dispatcher-only law as catalog coverage expands.
 
 ## Honesty Rules
 

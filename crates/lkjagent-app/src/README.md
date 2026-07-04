@@ -21,6 +21,7 @@ Map lkjagent-app source modules.
 - [exchange-record.rs](exchange_record.rs): exchange log file rendering.
 - [explore.rs](explore.rs): bounded explore action dispatcher.
 - [inspect.rs](inspect.rs): row-backed CLI inspection renderers.
+- [lease-status.rs](lease_status.rs): owner-visible lease freshness line.
 - [model-call.rs](model_call.rs): endpoint call, exchange log, and usage handling.
 - [model-io.rs](model_io.rs): endpoint trait and scripted completion record.
 - [observation-bridge.rs](observation_bridge.rs): effect observation rows.

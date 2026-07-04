@@ -12,6 +12,7 @@ mod exchange_bridge;
 mod exchange_record;
 mod explore;
 mod inspect;
+mod lease_status;
 mod model_call;
 mod model_io;
 mod observation_bridge;

@@ -10,6 +10,24 @@ use rusqlite::Connection;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
+fn status_reports_stale_lease_rows() -> TestResult<()> {
+    let data = fixture_root("lease")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    conn.execute(
+        "INSERT INTO config (key, value) VALUES
+         ('daemon.lock.owner', 'pid:old'),
+         ('daemon.lock.heartbeat', 'unix:1')",
+        [],
+    )?;
+    drop(conn);
+
+    let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
+
+    assert!(status.contains("lease: stale owner=pid:old heartbeat=unix:1"));
+    Ok(())
+}
+
+#[test]
 fn cli_inspection_reads_store_rows() -> TestResult<()> {
     let data = fixture_root("cli")?;
     let sent = cli::run([

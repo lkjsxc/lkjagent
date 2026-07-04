@@ -1,6 +1,7 @@
 use lkjagent_core::model::{EventKind, StepState, TaskSnapshot, TaskState};
 use rusqlite::Connection;
 
+use crate::lease_status;
 use crate::state::load_snapshot;
 
 pub fn status(conn: &Connection) -> Result<String, String> {
@@ -9,10 +10,11 @@ pub fn status(conn: &Connection) -> Result<String, String> {
         lkjagent_store::plan_hydrate::pending_count(conn).map_err(|error| error.to_string())?;
     let tokens = token_line(conn)?;
     let ledger = state_ledger_lines(conn)?;
+    let lease = lease_status::line(conn)?;
     Ok(match snapshot {
-        Some(snapshot) => format!("{}\n{}", render_status_with(&snapshot, pending, &tokens), ledger),
+        Some(snapshot) => format!("{}\n{}\n{}", render_status_with(&snapshot, pending, &tokens), lease, ledger),
         None => format!(
-            "daemon: idle\ntask: none\nstep: none\nlast: none\nquestion: none\nqueue: {pending} pending\ntokens: {tokens}\n{ledger}"
+            "daemon: idle\ntask: none\nstep: none\nlast: none\nquestion: none\nqueue: {pending} pending\ntokens: {tokens}\n{lease}\n{ledger}"
         ),
     })
 }
