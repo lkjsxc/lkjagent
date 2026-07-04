@@ -4,10 +4,11 @@ use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::runtime_context::{
     detect_contradictions, select_normal_context, ContextConflict, ContextItem,
 };
+use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
 use lkjagent_store::context_rows::{context_items, insert_context_item};
-use lkjagent_store::state_rows::upsert_state_cell;
+use lkjagent_store::event_rows::{append_and_apply_event, next_event_id};
 use rusqlite::Connection;
 
 use crate::context_resolution_bridge::{apply_resolutions, persist_conflict_edges};
@@ -30,8 +31,7 @@ pub fn prepare_prompt_context(
     let items = context_items(conn, &case_id).map_err(|error| error.to_string())?;
     let conflicts = detect_contradictions(&items);
     for conflict in &conflicts {
-        upsert_state_cell(conn, &case_id, &conflict_cell(conflict, now)?)
-            .map_err(|error| error.to_string())?;
+        append_conflict_cell(conn, &case_id, conflict, now)?;
         persist_conflict_edges(conn, &case_id, conflict, now)?;
     }
     let text = render_context(&items, &conflicts);
@@ -63,6 +63,28 @@ fn objective_item(snapshot: &TaskSnapshot, now: &str) -> ContextItem {
     item.source_fingerprint = format!("objective-{}", snapshot.task.id);
     item.created_at = now.to_string();
     item
+}
+
+fn append_conflict_cell(
+    conn: &Connection,
+    case_id: &str,
+    conflict: &ContextConflict,
+    now: &str,
+) -> Result<(), String> {
+    let event_id =
+        next_event_id(conn, case_id, "context-conflict").map_err(|error| error.to_string())?;
+    let mut cell = conflict_cell(conflict, now)?;
+    cell.source_event_id = event_id.clone();
+    let event = RuntimeEvent {
+        id: event_id,
+        case_id: case_id.to_string(),
+        kind: "context.conflict".to_string(),
+        payload: RuntimeEventPayload::UpsertCell(Box::new(cell)),
+        source: "context-bridge".to_string(),
+        created_at: now.to_string(),
+        decision_id: None,
+    };
+    append_and_apply_event(conn, &event).map_err(|error| error.to_string())
 }
 
 fn conflict_cell(conflict: &ContextConflict, now: &str) -> Result<StateCell, String> {

@@ -50,6 +50,12 @@ fn context_prompt_excludes_contaminated_and_creates_conflict_cell() -> TestResul
         |row| row.get(0),
     )?;
     assert_eq!(count, 1);
+    let events: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM runtime_events WHERE kind = 'context.conflict'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(events, 1);
     let edges: i64 = conn.query_row(
         "SELECT COUNT(*) FROM context_edges WHERE edge_kind = 'contradicts'",
         [],

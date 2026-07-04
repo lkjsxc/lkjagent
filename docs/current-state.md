@@ -89,9 +89,10 @@ the same decision view, non-explore prompt protocol follows the decision
 envelope, app admission rows are persisted before explore effects, and the
 explore dispatcher resolves tool effects through the catalog descriptor.
 The daemon bridge also persists source-tagged context items, selects
-clean current items for prompt briefs, detects contradictory clean items into
-`context:conflict/<semantic-key>` state cells, writes contradiction and
-resolution `context_edges`, and excludes contaminated items from normal prompts.
+clean current items for prompt briefs, detects contradictory clean items through
+runtime events into `context:conflict/<semantic-key>` state cells, writes
+contradiction and resolution `context_edges`, and excludes contaminated items
+from normal prompts.
 The core artifact slice models checked 512-token-target
 units, deterministic assembly, artifact fingerprints, and fresh-fingerprint
 completion evidence; the store persists artifact rows with unit metadata, and
@@ -131,8 +132,8 @@ gate evidence:
 - daemon runtime hydration now prefers `case:snapshot` state cells before plan
   rows, but the mirrored snapshot still carries fixed task and step shapes;
 - runtime selection reads operation-specific state cells projected through
-  durable events and the turn interpreter follows the persisted decision
-  operation, but the full reducer does not yet own all state transitions;
+  durable events, context conflict cells are reducer-applied events, and the turn
+  interpreter follows the persisted decision operation;
 - persisted `RuntimeDecision` rows are created, reused, interpreted, and settle
   their operation cells, but old plan rows still seed missing projection events;
 - prompt rendering, parsing, and admission use the persisted decision envelope
