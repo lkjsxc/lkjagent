@@ -28,7 +28,7 @@ pub(crate) fn handle_fault(
         snapshot.steps[index].state = StepState::Blocked;
         record_event(commands, EventKind::StepBlocked, diagnosis);
         let additions = split_after_fault(&snapshot.steps[index]);
-        insert_after(snapshot, index, &additions);
+        let additions = insert_after(snapshot, index, &additions);
         add_steps(commands, additions, "split write after repeated faults");
     }
 }

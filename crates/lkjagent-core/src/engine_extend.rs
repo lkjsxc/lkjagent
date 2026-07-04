@@ -79,10 +79,27 @@ pub(crate) fn insert_after(
     snapshot: &mut crate::model::TaskSnapshot,
     index: usize,
     additions: &[Step],
-) {
-    for (offset, step) in additions.iter().cloned().enumerate() {
+) -> Vec<Step> {
+    let mut assigned = additions.to_vec();
+    let mut next_id = next_step_id(snapshot);
+    for step in &mut assigned {
+        step.id = next_id;
+        next_id = next_id.saturating_add(1);
+    }
+    for (offset, step) in assigned.iter().cloned().enumerate() {
         snapshot.steps.insert(index + 1 + offset, step);
     }
+    assigned
+}
+
+fn next_step_id(snapshot: &crate::model::TaskSnapshot) -> u64 {
+    snapshot
+        .steps
+        .iter()
+        .map(|step| step.id)
+        .max()
+        .unwrap_or_else(|| snapshot.task.id.saturating_mul(1_000))
+        .saturating_add(1)
 }
 
 fn write_step(parent: &Step, path: &str, words: usize) -> Step {
@@ -151,5 +168,31 @@ fn glob_match(glob: &str, path: &str) -> bool {
         path.starts_with(prefix) && path.ends_with(suffix)
     } else {
         path == glob
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::classify::instantiate;
+
+    use super::insert_after;
+
+    #[test]
+    fn inserted_extension_steps_get_unique_ids() {
+        let mut snapshot = instantiate(1, "What is an agent?");
+        let additions = vec![snapshot.steps[0].clone(), snapshot.steps[0].clone()];
+
+        let assigned = insert_after(&mut snapshot, 0, &additions);
+
+        assert_eq!(assigned[0].id, 2);
+        assert_eq!(assigned[1].id, 3);
+        let mut ids = snapshot
+            .steps
+            .iter()
+            .map(|step| step.id)
+            .collect::<Vec<_>>();
+        ids.sort_unstable();
+        ids.dedup();
+        assert_eq!(ids.len(), snapshot.steps.len());
     }
 }

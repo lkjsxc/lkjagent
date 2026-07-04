@@ -19,7 +19,7 @@ pub(crate) fn finish_plan(
         }
     }
     snapshot.steps[index].state = StepState::Done;
-    insert_after(snapshot, index, &additions);
+    let additions = insert_after(snapshot, index, &additions);
     commands.push(Command::AddSteps(additions));
 }
 

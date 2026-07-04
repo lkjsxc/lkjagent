@@ -85,6 +85,6 @@ fn handle_failed(
     let keep = snapshot.check_results.len().saturating_sub(results.len());
     snapshot.check_results.truncate(keep);
     snapshot.steps[index].state = StepState::Skipped;
-    insert_after(snapshot, index, &additions);
+    let additions = insert_after(snapshot, index, &additions);
     add_steps(commands, additions, "extend manuscript after shortfall");
 }
