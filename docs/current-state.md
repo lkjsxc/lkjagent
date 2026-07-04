@@ -91,10 +91,12 @@ tool-view fingerprint, active timeout, and provider-exchange rows tied to the
 runtime decision. Status output now summarizes active state cells, conflict
 cells, latest decision, admissions, observations, provider exchanges, and
 artifacts. Prompt-frame rows are persisted before model calls, and observation
-rows are persisted after deterministic effects. Proof collection writes
-state-ledger sections for state cells, decisions, admissions, observations,
-exchanges, artifacts, and context. Current gate results belong in the handoff
-after commands are rerun against this checkout.
+rows are persisted after deterministic effects. Unfinished decisions with
+committed provider exchanges, admissions, or observations are recovered before a
+new decision is selected; decisions without external evidence are reused. Proof
+collection writes state-ledger sections for state cells, decisions, admissions,
+observations, exchanges, artifacts, and context. Current gate results belong in
+the handoff after commands are rerun against this checkout.
 
 ## State-Ledger Gap
 
@@ -121,8 +123,9 @@ gate evidence:
   resolution events and suppression of losing items are not yet wired;
 - contaminated material is excluded from bridge prompt context, but all failure
   paths do not yet classify contamination durably;
-- crash resume reuses an incomplete persisted runtime decision in the bridge,
-  but recovery policies are not yet applied to every incomplete decision state;
+- crash resume reuses decisions with no external evidence and recovers
+  externally evidenced unfinished decisions, but recovery state reports remain
+  bridge-level;
 - artifact units, deterministic assembly, and fresh fingerprint checks have pure
   helpers and rows, but model generation still writes plan-family files rather
   than checked unit rows; and
@@ -152,9 +155,9 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Next, wire recovery policies for unfinished decisions beyond simple reuse,
-report stale leases from state-ledger evidence, and retire plan-only authority
-only after state-ledger parity is proven by replay and Docker gates.
+Next, report stale leases and recovery state in owner-facing logs and proof
+bundles, then retire plan-only authority only after state-ledger parity is
+proven by replay and Docker gates.
 
 ## Honesty Rules
 

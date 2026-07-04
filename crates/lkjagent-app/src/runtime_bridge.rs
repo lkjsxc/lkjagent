@@ -16,6 +16,8 @@ use lkjagent_store::decision_rows::{
 use lkjagent_store::state_rows::{hydrate_snapshot, insert_case, upsert_state_cell};
 use rusqlite::Connection;
 
+use crate::recovery_bridge::recover_or_reuse;
+
 pub fn prepare_runtime_decision(
     conn: &Connection,
     snapshot: &TaskSnapshot,
@@ -29,8 +31,8 @@ pub fn prepare_runtime_decision(
     upsert_state_cell(conn, &case_id, &cell).map_err(|error| error.to_string())?;
     let state_snapshot = hydrate_snapshot(conn, &case_id).map_err(|error| error.to_string())?;
     let unfinished = unfinished_decisions(conn, &case_id).map_err(|error| error.to_string())?;
-    if let Some(decision) = unfinished.first() {
-        return Ok(decision.clone());
+    if let Some(decision) = recover_or_reuse(conn, &unfinished, now)? {
+        return Ok(decision);
     }
     let id = next_decision_id(conn, &case_id).map_err(|error| error.to_string())?;
     let mut decision =
