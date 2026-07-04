@@ -77,8 +77,9 @@ rows, with row helpers for cases, events, unknown state cells, state history,
 pending runtime decisions, and context items. `lkjagent-app` projects plan rows
 through durable runtime events into operation-specific state cells, mirrors task
 snapshots into `case:snapshot` state cells, hydrates runnable snapshots from
-state cells before plan rows, leaves active operation cells as decision authority
-until settlement, persists or reuses a `RuntimeDecision` before prompt rendering,
+state cells before plan rows, uses the same path for status, leaves active
+operation cells as decision authority until settlement, persists or reuses a
+`RuntimeDecision` before prompt rendering,
 derives turn work from the persisted
 decision operation, and settles the decision after the turn. The bridge projects
 cells such as `model:<step>`, `check:<step>`, `case:waiting-answer`, and

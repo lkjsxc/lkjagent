@@ -1,6 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
+use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::model::TaskSnapshot;
@@ -26,6 +27,8 @@ fn state_snapshot_cell_wins_over_older_plan_rows() -> TestResult<()> {
     insert_case(&conn, "2", &state_snapshot.task.objective, "later")?;
     upsert_state_cell(&conn, "2", &snapshot_cell(&state_snapshot)?)?;
     drop(conn);
+    let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
+    assert!(status.contains("task: 2 Open"));
 
     let mut endpoint = ScriptedEndpoint {
         outputs: vec!["<message>State cell wins.</message>".to_string()],
