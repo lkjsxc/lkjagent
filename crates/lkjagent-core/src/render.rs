@@ -1,9 +1,11 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-use crate::model::{Step, StepKind, Task};
-use crate::runtime_artifact::DEFAULT_UNIT_TARGET_TOKENS;
-use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolSetView};
+use crate::model::{Step, Task};
+pub use crate::prompt_policy::max_tokens;
+
+use crate::prompt_policy::{envelope_tag, expected_block, protocol, protocol_for_envelope};
+use crate::runtime_decision::{RuntimeDecision, ToolSetView};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Prompt {
@@ -30,6 +32,16 @@ pub fn render_prompt_for_decision(
     }
     if let Some(tag) = envelope_tag(decision.expected_envelope) {
         prompt.stop = format!("</{tag}>");
+        prompt.system = prompt
+            .system
+            .replace(
+                &format!("Expected: {}", expected_block(step.kind)),
+                &format!("Expected: {tag}"),
+            )
+            .replace(
+                protocol(step.kind),
+                protocol_for_envelope(decision.expected_envelope),
+            );
     }
     let rendered_view = render_tool_view(&decision.tool_view);
     if !rendered_view.is_empty() {
@@ -127,47 +139,6 @@ fn fingerprint(system: &str, user: &str) -> String {
     system.hash(&mut hasher);
     user.hash(&mut hasher);
     format!("{:016x}", hasher.finish())
-}
-
-pub fn max_tokens(kind: StepKind) -> u32 {
-    match kind {
-        StepKind::Write | StepKind::Revise => DEFAULT_UNIT_TARGET_TOKENS,
-        StepKind::Plan => 900,
-        StepKind::Explore => 500,
-        StepKind::Respond | StepKind::Ask => 700,
-        StepKind::Verify => 300,
-    }
-}
-
-fn protocol(kind: StepKind) -> &'static str {
-    match kind {
-        StepKind::Plan => "Return exactly <plan> lines </plan>. Lines: write PATH | TITLE | words=N, explore | GOAL | budget=N, or respond | SUMMARY. Use only relative paths.",
-        StepKind::Write | StepKind::Revise => "Return exactly <content> prose </content>. Write the requested file body only. No analysis outside the block.",
-        StepKind::Explore => "Return exactly <action>...</action> using one allowed tool. To finish, use <tool>finish</tool> with <summary>...</summary>.",
-        StepKind::Respond | StepKind::Ask => "Return exactly <message>owner-facing answer</message>. Use gathered facts only.",
-        StepKind::Verify => "Return exactly <verdict>pass or fail plus measured evidence</verdict>.",
-    }
-}
-
-fn expected_block(kind: StepKind) -> &'static str {
-    match kind {
-        StepKind::Write | StepKind::Revise => "content",
-        StepKind::Plan => "plan",
-        StepKind::Explore => "action",
-        StepKind::Respond | StepKind::Ask => "message",
-        StepKind::Verify => "verdict",
-    }
-}
-
-fn envelope_tag(envelope: OutputEnvelope) -> Option<&'static str> {
-    match envelope {
-        OutputEnvelope::Content => Some("content"),
-        OutputEnvelope::Plan => Some("plan"),
-        OutputEnvelope::Action => Some("action"),
-        OutputEnvelope::Message => Some("message"),
-        OutputEnvelope::Verdict => Some("verdict"),
-        OutputEnvelope::None => None,
-    }
 }
 
 fn render_tool_view(view: &ToolSetView) -> String {

@@ -17,6 +17,7 @@ pub mod model;
 pub mod parse;
 mod parse_plan;
 mod plan;
+mod prompt_policy;
 pub mod render;
 pub mod runtime_admission;
 pub mod runtime_artifact;

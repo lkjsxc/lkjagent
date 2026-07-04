@@ -82,8 +82,9 @@ cells such as `model:<step>`, `check:<step>`, `case:waiting-answer`, and
 `completion:close-candidate`. Explore tool
 descriptors now live in one core catalog used to derive the bridge
 `ToolSetView`; prompt rendering prints that persisted view, parsing reads
-the same decision view, app admission rows are persisted before explore effects,
-and the explore dispatcher resolves tool effects through the catalog descriptor.
+the same decision view, non-explore prompt protocol follows the decision
+envelope, app admission rows are persisted before explore effects, and the
+explore dispatcher resolves tool effects through the catalog descriptor.
 The daemon bridge also persists source-tagged context items, selects
 clean current items for prompt briefs, detects contradictory clean items into
 `context:conflict/<semantic-key>` state cells, writes contradiction and
@@ -130,11 +131,11 @@ gate evidence:
 - persisted `RuntimeDecision` rows are created, reused, and interpreted by the
   daemon, but old plan rows still determine which operation-specific cells are
   projected;
-- prompt rendering, parsing, and admission use the persisted explore
-  `ToolSetView`, but non-explore prompts and full policy-layer derivation are
-  still bridge-limited;
+- prompt rendering, parsing, and admission use the persisted decision envelope
+  and explore `ToolSetView`, but full policy-layer derivation is still
+  bridge-limited;
 - tool descriptors are catalog-backed for prompt, parser, admission, and explore
-  effect selection, but full policy-layer derivation is still bridge-limited;
+  effect selection, but non-tool policy derivation still depends on bridge cells;
 - prompt context has a durable context-item bridge for clean items, conflicts,
   observations, and contaminated exclusion, and prompt-frame rows own bounded
   body refs; full prompt-frame replay is still bridge-level;
