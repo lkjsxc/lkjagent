@@ -39,6 +39,23 @@ with an explicit marker. Contaminated items are excluded from normal prompts.
 Contradictions render only as unresolved-conflict summaries until resolved.
 Observations are bounded before storage and bounded again during rendering.
 
+## Fingerprint Contract
+
+The context-frame fingerprint on a `RuntimeDecision` is the fingerprint of the
+prepared prompt-context projection admitted for that turn. The same value is
+stored on the prompt frame, provider exchange row, exchange request body, status
+output, and proof bundle. A selector must not invent an empty-context
+fingerprint.
+
+## Acceptance Checks
+
+- `prepare_prompt_context` computes the admitted context fingerprint before
+  decision selection.
+- Runtime selector tests pass the prepared fingerprint into new decisions and
+  prove unfinished decisions keep their recorded value.
+- Prompt-frame and provider-exchange tests compare stored fingerprints with the
+  decision row and replayed body refs.
+
 ## Failure This Prevents
 
 A repeated failure cannot become the strongest token pattern in the next prompt,

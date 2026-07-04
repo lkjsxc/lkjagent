@@ -23,9 +23,9 @@ pub fn projected_cell(snapshot: &TaskSnapshot, now: &str) -> Result<StateCell, S
 
 fn cell_parts(snapshot: &TaskSnapshot) -> CellParts {
     match snapshot.task.state {
-        TaskState::Waiting => CellParts::new("case", "waiting-answer", "plan-bridge.waiting.v1"),
+        TaskState::Waiting => CellParts::new("case", "waiting-answer", "plan-bridge.waiting"),
         TaskState::Blocked | TaskState::Closed => {
-            CellParts::new("runtime", "idle", "plan-bridge.idle.v1")
+            CellParts::new("runtime", "idle", "plan-bridge.idle")
         }
         TaskState::Open => open_parts(snapshot),
     }
@@ -37,20 +37,20 @@ fn open_parts(snapshot: &TaskSnapshot) -> CellParts {
         .iter()
         .find(|step| matches!(step.state, StepState::Pending | StepState::Active))
     else {
-        return CellParts::new("completion", "close-candidate", "plan-bridge.completion.v1");
+        return CellParts::new("completion", "close-candidate", "plan-bridge.completion");
     };
     if step.kind == StepKind::Verify && step.checks.iter().all(deterministic) {
         return CellParts::with_payload(
             "check",
             &step.id.to_string(),
-            "plan-bridge.check.v1",
+            "plan-bridge.check",
             serde_json::json!({"step_id": step.id}),
         );
     }
     CellParts::with_payload(
         "model",
         &step.id.to_string(),
-        "plan-bridge.model.v1",
+        "plan-bridge.model",
         serde_json::json!({
             "step_id": step.id,
             "expected_envelope": envelope(step.kind),

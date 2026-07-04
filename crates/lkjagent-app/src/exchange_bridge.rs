@@ -21,6 +21,7 @@ pub fn persist_provider_exchange(
             decision_id: decision.id.clone(),
             exchange_ref: record.exchange_ref.clone(),
             outcome_json: record.outcome_json.clone(),
+            context_frame_fingerprint: decision.context_frame_fingerprint.clone(),
             timeout_seconds: record.timeout_seconds,
             started_at: started_at.to_string(),
             finished_at: Some(finished_at.to_string()),

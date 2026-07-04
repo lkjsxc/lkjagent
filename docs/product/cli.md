@@ -11,11 +11,12 @@ Define the owner command surface and output discipline.
 | `lkjagent run` | run the daemon in the foreground |
 | `lkjagent send TEXT [--new]` | enqueue an owner message and print its queue id |
 | `lkjagent status` | print daemon, task, step, budgets, queue, and tokens |
-| `lkjagent log [--limit N] [--follow]` | print transcript events |
+| `lkjagent log [--limit N] [--follow]` | print bounded transcript events, then optionally stream new rows |
 | `lkjagent task list` | list tasks with state and summary |
 | `lkjagent task show ID` | show plan, diagnoses, checks, and exchange refs |
 | `lkjagent queue list` | list owner messages |
 | `lkjagent queue show ID` | show one owner message and delivery state |
+| `lkjagent context resolve CASE_ID KEY WINNING_ITEM_ID` | record the owner-selected winner for a conflict |
 | `lkjagent memory QUERY` | search memory rows |
 | `lkjagent watch` | open the terminal console |
 | `lkjagent help [group]` | print usage |
@@ -29,11 +30,26 @@ Define the owner command surface and output discipline.
   exists.
 - Quiet gates are owned by xtask, not by the owner CLI.
 
+## Log Follow Contract
+
+`log --follow` first prints the same bounded row-backed output as `log --limit
+N`, then polls the store and prints only events with ids greater than the last
+printed row. It owns no state outside SQLite and exits naturally when the owner
+interrupts the process.
+
 ## Data Directory
 
 Commands accept the configured data directory consistently. Status and read-only
 inspection commands work while the daemon is stopped because they read the
 store directly.
+
+## Acceptance Checks
+
+- `crates/lkjagent-app/src/args.rs` accepts `log --follow` and `log --limit N
+  --follow`.
+- `crates/lkjagent-app/src/inspect.rs` keeps non-follow output deterministic and
+  follows events by monotonically increasing row id.
+- CLI tests cover parser shape and row-backed log continuation.
 
 ## Removed Surfaces
 

@@ -7,17 +7,19 @@ use lkjagent_core::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
 #[test]
 fn selector_reuses_unfinished_decision_before_new_work() {
     let snapshot = snapshot_with(cell("model", "call/7"));
-    let unfinished = RuntimeDecision::new(
+    let mut unfinished = RuntimeDecision::new(
         "decision-existing",
         "case-1",
         OperationKey("model.call/7".to_string()),
         ToolSetView::empty(),
         OutputEnvelope::Message,
     );
+    unfinished.context_frame_fingerprint = "recorded-context".to_string();
 
     let selected = select(&snapshot, "decision-new", &[unfinished]);
 
     assert_eq!(selected.id, "decision-existing");
+    assert_eq!(selected.context_frame_fingerprint, "recorded-context");
 }
 
 #[test]
@@ -30,6 +32,7 @@ fn selector_reads_model_cells_and_preserves_tool_view() {
     assert_eq!(selected.expected_envelope, OutputEnvelope::Action);
     assert_eq!(selected.model_budget_tokens, Some(512));
     assert_eq!(selected.tool_view.tool_names(), vec!["fs.read"]);
+    assert_eq!(selected.context_frame_fingerprint, "prepared-context");
     assert!(!selected.snapshot_fingerprint.is_empty());
     assert_eq!(
         selected.snapshot_fingerprint,
@@ -73,7 +76,7 @@ fn cell(namespace: &str, name: &str) -> StateCell {
 
 fn model_cell() -> StateCell {
     let mut cell = cell("model", "42");
-    cell.payload_schema = "state.model.v1".to_string();
+    cell.payload_schema = "state.model".to_string();
     cell.payload_json = serde_json::json!({
         "expected_envelope": "Action",
         "model_budget_tokens": 512,
@@ -99,7 +102,7 @@ fn key(namespace: &str, name: &str) -> StateKey {
 }
 
 fn select(snapshot: &RuntimeSnapshot, id: &str, unfinished: &[RuntimeDecision]) -> RuntimeDecision {
-    match select_runtime_decision(snapshot, id, unfinished) {
+    match select_runtime_decision(snapshot, id, "prepared-context", unfinished) {
         Ok(decision) => decision,
         Err(_) => RuntimeDecision::new(
             "error",

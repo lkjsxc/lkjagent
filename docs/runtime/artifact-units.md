@@ -26,8 +26,18 @@ completion evidence.
 ## Longform Rule
 
 Long manuscripts generate settings first, compact them into clean context items,
-generate chapter units with previous-tail continuity, assemble chapter files,
-and run per-chapter and aggregate word checks before completion.
+generate bounded chapter units with previous-tail continuity, assemble chapter
+files, and run per-chapter and aggregate word checks before completion.
+Shortfalls insert fresh continuation write and verify steps from current rows.
+
+## Acceptance Checks
+
+- `lkjagent-core` manuscript templates ask for bounded chapter units and insert
+  shortfall continuation steps with fresh ids.
+- `lkjagent-app` write effects assemble checked units and persist file plus unit
+  artifact fingerprints.
+- `lkjagent-core` completion tests require fresh artifact fingerprints for
+  closing evidence.
 
 ## Failure This Prevents
 

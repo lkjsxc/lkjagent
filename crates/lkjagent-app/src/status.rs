@@ -145,16 +145,18 @@ fn state_ledger_lines(conn: &Connection) -> Result<String, String> {
 
 fn decision_line(conn: &Connection) -> Result<String, String> {
     let row = conn.query_row(
-        "SELECT id, operation_key, status, substr(tool_view_fingerprint, 1, 16)
+        "SELECT id, operation_key, status, substr(context_frame_fingerprint, 1, 16),
+         substr(tool_view_fingerprint, 1, 16)
          FROM runtime_decisions ORDER BY selected_at DESC, id DESC LIMIT 1",
         [],
         |row| {
             Ok(format!(
-                "{} {} status={} tools={}",
+                "{} {} status={} ctx={} tools={}",
                 row.get::<_, String>(0)?,
                 row.get::<_, String>(1)?,
                 row.get::<_, String>(2)?,
-                row.get::<_, String>(3)?
+                row.get::<_, String>(3)?,
+                row.get::<_, String>(4)?
             ))
         },
     );

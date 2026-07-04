@@ -137,7 +137,7 @@ fn key(namespace: &str, name: &str) -> StateKey {
 
 fn custom_cell(namespace: &str, name: &str) -> StateCell {
     let mut cell = StateCell::active(key(namespace, name), "event-1");
-    cell.payload_schema = "custom.v1".to_string();
+    cell.payload_schema = "custom.schema".to_string();
     cell.payload_json = "{\"value\":7}".to_string();
     cell.created_at = "t1".to_string();
     cell.updated_at = "t1".to_string();

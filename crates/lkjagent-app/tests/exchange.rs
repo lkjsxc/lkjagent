@@ -29,26 +29,35 @@ fn endpoint_completion_writes_exchange_and_usage_rows() -> TestResult<()> {
     assert_eq!(exchange_ref, "logs/task-1/step-1/attempt-1");
     let request = fs::read_to_string(data.join(&exchange_ref).join("request.json"))?;
     assert!(request.contains("decision_id"));
+    assert!(request.contains("context_frame_fingerprint"));
     assert!(request.contains("timeout_seconds"));
     assert!(
         fs::read_to_string(data.join(&exchange_ref).join("response.json"))?
             .contains("StopSequenceClosed")
     );
-    let provider: (String, String, i64) = conn.query_row(
-        "SELECT decision_id, exchange_ref, timeout_seconds FROM provider_exchanges LIMIT 1",
+    let provider: (String, String, String, i64) = conn.query_row(
+        "SELECT decision_id, exchange_ref, context_frame_fingerprint, timeout_seconds
+         FROM provider_exchanges LIMIT 1",
         [],
-        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
     )?;
     assert!(provider.0.starts_with("case-1-decision-"));
     assert_eq!(provider.1, exchange_ref);
-    assert_eq!(provider.2, 900);
+    assert_eq!(provider.3, 900);
+    let decision_fp: String = conn.query_row(
+        "SELECT context_frame_fingerprint FROM runtime_decisions WHERE id = ?1",
+        [&provider.0],
+        |row| row.get(0),
+    )?;
+    assert_eq!(provider.2, decision_fp);
     let body_ref: String = conn.query_row(
         "SELECT body_ref FROM prompt_frames WHERE decision_id = ?1",
         [provider.0],
         |row| row.get(0),
     )?;
     assert!(body_ref.starts_with("logs/case-1/decision-"));
-    assert!(data.join(&body_ref).exists());
+    let prompt_body = fs::read_to_string(data.join(&body_ref))?;
+    assert!(prompt_body.contains(&provider.2));
     let usage: (i64, i64) = conn.query_row(
         "SELECT prompt_tokens, completion_tokens FROM token_usage LIMIT 1",
         [],

@@ -57,7 +57,7 @@ fn unfinished_decision_with_exchange_is_recovered_before_new_selection() -> Test
         |row| Ok((row.get(0)?, row.get(1)?)),
     )?;
     assert_eq!(recovery.0, "Resolved");
-    assert_eq!(recovery.1, "recovery.report.v1");
+    assert_eq!(recovery.1, "recovery.report");
     Ok(())
 }
 
@@ -79,6 +79,7 @@ fn exchange_row(decision: &RuntimeDecision) -> ProviderExchangeRow {
         decision_id: decision.id.clone(),
         exchange_ref: "logs/task-1/step-1/attempt-1".to_string(),
         outcome_json: "{\"outcome\":\"parsed\"}".to_string(),
+        context_frame_fingerprint: decision.context_frame_fingerprint.clone(),
         timeout_seconds: Some(900),
         started_at: "before".to_string(),
         finished_at: Some("before".to_string()),

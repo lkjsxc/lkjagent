@@ -33,6 +33,13 @@ Each cell stores:
 - optional conflict group; and
 - optional parent or lineage key.
 
+## Schema Names
+
+Payload schema names are semantic contract labels such as `context-conflict`,
+`task-snapshot`, or `plan-bridge.model`. Do not add numbered suffix labels for
+project-authored schemas. Endpoint paths, hash algorithm names, and external API
+versions may still contain numbers when those names are externally owned.
+
 ## Unknown Keys
 
 Storage, hydration, diagnostics, and reducer plumbing must preserve unknown

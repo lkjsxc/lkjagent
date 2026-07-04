@@ -17,6 +17,7 @@ mod exchange_record;
 mod explore;
 mod inspect;
 mod lease_status;
+mod log_view;
 mod model_call;
 mod model_io;
 mod observation_bridge;

@@ -17,6 +17,7 @@ pub enum Command {
     Status,
     Log {
         limit: usize,
+        follow: bool,
     },
     TaskList,
     TaskShow {
@@ -70,15 +71,11 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
         "run" => no_args(rest, Command::Run),
         "send" => parse_send(rest),
         "status" => no_args(rest, Command::Status),
-        "log" => Ok(Command::Log {
-            limit: parse_limit(rest, 20)?,
-        }),
+        "log" => parse_log(rest),
         "task" => parse_task(rest),
         "queue" => parse_queue(rest),
         "context" => parse_context(rest),
-        "memory" => Ok(Command::Memory {
-            query: rest.join(" "),
-        }),
+        "memory" => parse_memory(rest),
         "watch" => no_args(rest, Command::Watch),
         other => Err(format!("unknown command: {other}")),
     }
@@ -137,11 +134,35 @@ fn parse_context(rest: Vec<String>) -> Result<Command, String> {
     }
 }
 
-fn parse_limit(rest: Vec<String>, default: usize) -> Result<usize, String> {
-    match rest.as_slice() {
-        [] => Ok(default),
-        [flag, value] if flag == "--limit" => value.parse::<usize>().map_err(|e| e.to_string()),
-        _ => Err("use --limit N".to_string()),
+fn parse_log(rest: Vec<String>) -> Result<Command, String> {
+    let mut limit = 20;
+    let mut follow = false;
+    let mut index = 0;
+    while index < rest.len() {
+        match rest[index].as_str() {
+            "--follow" => {
+                follow = true;
+                index += 1;
+            }
+            "--limit" => {
+                let value = rest
+                    .get(index + 1)
+                    .ok_or_else(|| "use log [--limit N] [--follow]".to_string())?;
+                limit = value.parse::<usize>().map_err(|e| e.to_string())?;
+                index += 2;
+            }
+            _ => return Err("use log [--limit N] [--follow]".to_string()),
+        }
+    }
+    Ok(Command::Log { limit, follow })
+}
+
+fn parse_memory(rest: Vec<String>) -> Result<Command, String> {
+    let query = rest.join(" ");
+    if query.trim().is_empty() {
+        Err("memory requires QUERY".to_string())
+    } else {
+        Ok(Command::Memory { query })
     }
 }
 

@@ -93,7 +93,7 @@ fn conflict_cell(conflict: &ContextConflict, now: &str) -> Result<StateCell, Str
             .map_err(|error| error.message)?,
         format!("context-conflict/{}", conflict.semantic_key),
     );
-    cell.payload_schema = "context-conflict.v1".to_string();
+    cell.payload_schema = "context-conflict".to_string();
     cell.payload_json = serde_json::json!({
         "semantic_key": conflict.semantic_key,
         "item_ids": conflict.item_ids,

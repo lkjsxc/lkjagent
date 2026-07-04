@@ -47,7 +47,7 @@ fn snapshot_cell(snapshot: &TaskSnapshot) -> Result<StateCell, serde_json::Error
         name: "snapshot".to_string(),
     });
     let mut cell = StateCell::active(key, "event-snapshot");
-    cell.payload_schema = "task-snapshot.v1".to_string();
+    cell.payload_schema = "task-snapshot".to_string();
     cell.payload_json = serde_json::to_string(snapshot)?;
     cell.created_at = "later".to_string();
     cell.updated_at = "later".to_string();

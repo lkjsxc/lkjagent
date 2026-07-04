@@ -29,6 +29,16 @@ fn prompt_frame_body_ref_replays_rendered_prompt() -> TestResult<()> {
     let json: serde_json::Value = serde_json::from_str(&body)?;
     assert_eq!(json["decision_id"], frames[0].decision_id);
     assert_eq!(json["prompt_fingerprint"], frames[0].prompt_fingerprint);
+    assert_eq!(
+        json["context_frame_fingerprint"],
+        frames[0].context_frame_fingerprint
+    );
+    let decision_fp: String = conn.query_row(
+        "SELECT context_frame_fingerprint FROM runtime_decisions WHERE id = ?1",
+        [&frames[0].decision_id],
+        |row| row.get(0),
+    )?;
+    assert_eq!(decision_fp, frames[0].context_frame_fingerprint);
     assert!(json["system"]
         .as_str()
         .unwrap_or_default()

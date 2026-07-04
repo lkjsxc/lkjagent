@@ -35,7 +35,7 @@ fn record_recovery_cell(
         .map_err(|error| error.message)?;
     let mut cell = StateCell::active(key, event_id.clone());
     cell.status = StateStatus::Resolved;
-    cell.payload_schema = "recovery.report.v1".to_string();
+    cell.payload_schema = "recovery.report".to_string();
     cell.payload_json = serde_json::json!({
         "decision_id": decision.id,
         "evidence_count": evidence_count,

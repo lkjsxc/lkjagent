@@ -178,6 +178,7 @@ fn setup_indexes(conn: &Connection) -> StoreResult<()> {
             decision_id TEXT NOT NULL,
             exchange_ref TEXT NOT NULL,
             outcome_json TEXT NOT NULL,
+            context_frame_fingerprint TEXT NOT NULL,
             timeout_seconds INTEGER,
             started_at TEXT NOT NULL,
             finished_at TEXT

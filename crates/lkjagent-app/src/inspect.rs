@@ -4,24 +4,11 @@ use crate::state::load_snapshot;
 use crate::status::{task_show as render_task, watch as render_watch};
 
 pub fn log(conn: &Connection, limit: usize) -> Result<String, String> {
-    let mut statement = conn
-        .prepare(
-            "SELECT id, COALESCE(task_id, 0), kind, content FROM events
-             ORDER BY id DESC LIMIT ?1",
-        )
-        .map_err(|error| error.to_string())?;
-    let rows = statement
-        .query_map(params![limit as i64], |row| {
-            Ok(format!(
-                "{} task={} {} {}",
-                row.get::<_, i64>(0)?,
-                row.get::<_, i64>(1)?,
-                row.get::<_, String>(2)?,
-                row.get::<_, String>(3)?
-            ))
-        })
-        .map_err(|error| error.to_string())?;
-    collect_reverse(rows)
+    crate::log_view::log(conn, limit)
+}
+
+pub fn follow_log(conn: &Connection, limit: usize) -> Result<String, String> {
+    crate::log_view::follow_log(conn, limit)
 }
 
 pub fn task_list(conn: &Connection) -> Result<String, String> {
@@ -122,18 +109,6 @@ fn collect(rows: impl Iterator<Item = rusqlite::Result<String>>) -> Result<Strin
     let output = rows
         .collect::<Result<Vec<_>, _>>()
         .map_err(|e| e.to_string())?;
-    Ok(if output.is_empty() {
-        "none".to_string()
-    } else {
-        output.join("\n")
-    })
-}
-
-fn collect_reverse(rows: impl Iterator<Item = rusqlite::Result<String>>) -> Result<String, String> {
-    let mut output = rows
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|e| e.to_string())?;
-    output.reverse();
     Ok(if output.is_empty() {
         "none".to_string()
     } else {

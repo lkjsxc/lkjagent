@@ -27,9 +27,8 @@ pub fn prepare_runtime_decision(
     ensure_runtime_cell(conn, snapshot, &state_snapshot, now)?;
     state_snapshot = hydrate_snapshot(conn, &case_id).map_err(|error| error.to_string())?;
     let id = next_decision_id(conn, &case_id).map_err(|error| error.to_string())?;
-    let mut decision =
-        select_runtime_decision(&state_snapshot, &id, &[]).map_err(|error| error.message)?;
-    decision.context_frame_fingerprint = context_frame_fingerprint.to_string();
+    let decision = select_runtime_decision(&state_snapshot, &id, context_frame_fingerprint, &[])
+        .map_err(|error| error.message)?;
     insert_runtime_decision(conn, &decision, "pending", now).map_err(|error| error.to_string())?;
     Ok(decision)
 }

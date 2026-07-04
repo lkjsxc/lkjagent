@@ -3,13 +3,14 @@ use serde_json::Value;
 use crate::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
 };
-use crate::runtime_fingerprint::{stable_fingerprint, FingerprintError};
+use crate::runtime_fingerprint::FingerprintError;
 use crate::runtime_operation::RuntimeOperation;
 use crate::runtime_state::{RuntimeSnapshot, StateCell};
 
 pub fn select_runtime_decision(
     snapshot: &RuntimeSnapshot,
     decision_id: &str,
+    context_frame_fingerprint: &str,
     unfinished: &[RuntimeDecision],
 ) -> Result<RuntimeDecision, FingerprintError> {
     if let Some(decision) = unfinished.first() {
@@ -26,7 +27,7 @@ pub fn select_runtime_decision(
     let snapshot_fingerprint = snapshot.fingerprint()?;
     decision.snapshot_fingerprint = snapshot_fingerprint.clone();
     decision.state_vector_fingerprint = snapshot_fingerprint;
-    decision.context_frame_fingerprint = context_fingerprint(snapshot)?;
+    decision.context_frame_fingerprint = context_frame_fingerprint.to_string();
     decision.model_budget_tokens = operation.model_budget_tokens;
     decision.evidence_requirements = operation.evidence_requirements;
     decision.recovery_policy = operation.recovery_policy;
@@ -165,8 +166,4 @@ fn number(payload: &Value, key: &str) -> Option<u32> {
         .get(key)
         .and_then(Value::as_u64)
         .and_then(|value| u32::try_from(value).ok())
-}
-
-fn context_fingerprint(snapshot: &RuntimeSnapshot) -> Result<String, FingerprintError> {
-    stable_fingerprint(&serde_json::json!({"case_id": snapshot.case_id, "context": []}))
 }

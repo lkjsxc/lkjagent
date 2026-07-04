@@ -13,7 +13,7 @@ pub fn resolve_conflict(
     let event_id =
         next_event_id(conn, case_id, "context-resolve").map_err(|error| error.to_string())?;
     let mut cell = StateCell::active(resolve_key(semantic_key)?, event_id.clone());
-    cell.payload_schema = "context-resolution.v1".to_string();
+    cell.payload_schema = "context-resolution".to_string();
     cell.payload_json = serde_json::json!({
         "semantic_key": semantic_key,
         "winning_item_id": winning_item_id,

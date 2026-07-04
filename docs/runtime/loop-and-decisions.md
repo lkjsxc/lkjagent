@@ -38,6 +38,15 @@ recovery policy.
 There is no prompt-only policy and no dispatcher-only policy. Prompt rendering
 and admission are projections of the same persisted decision.
 
+## Acceptance Checks
+
+- `lkjagent-core` selector tests prove operation priority, reused decisions, and
+  prepared context-frame fingerprints.
+- `lkjagent-app` prompt-frame and exchange tests prove the decision, prompt
+  frame, exchange row, and replay body refs agree on fingerprints.
+- Status output exposes the latest decision operation, status, context
+  fingerprint, and tool-view fingerprint.
+
 ## Failure This Prevents
 
 The model cannot be shown a tool that the harness refuses for the turn, and a

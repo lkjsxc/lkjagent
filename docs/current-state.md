@@ -44,10 +44,10 @@ documented ten-failure patience before blocking a step. Endpoint clients default
 to a loose finite 900-second timeout unless configuration overrides it.
 
 Queue rows persist `force_new`, send uses it, and daemon intake can select a
-forced-new row without treating it as an answer. Status, task, queue, log,
-memory, and watch surfaces read rows instead of a config snapshot. The bounded
-explore dispatcher runs the documented filesystem, shell, memory, plan-note, and
-finish actions, stores latest observations in step inputs, persists
+forced-new row without treating it as an answer. Status, task, queue, bounded
+log, follow log, memory, and watch surfaces read rows instead of a config
+snapshot. The bounded explore dispatcher runs the documented filesystem, shell,
+memory, plan-note, and finish actions, stores latest observations in step inputs, persists
 `memory.save` rows, suppresses exact duplicate memory facts, mirrors memory into
 FTS, admits bounded row-backed memory facts into new task briefs, and resolves
 `memory.find` from durable rows.

@@ -12,7 +12,7 @@ visibility that make daemon progress observable.
 ```text
 daemon: working | idle | waiting | stopped
 case: 12 open "Aurora Ledger..." budget 47/200
-decision: d-20260704-0007 model.call fp=9ac4... tools=fs.read,finish
+decision: d-20260704-0007 model.call ctx=9ac4... tools=fs.read,finish
 state: active=case:objective,plan:item-7,completion:check-pending
 conflicts: none
 queue: 0 pending
