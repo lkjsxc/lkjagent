@@ -109,9 +109,10 @@ endpoint errors create recovery-only context items, shell observations become
 external-raw context, and secret-like observation bodies become sensitive-owner
 context. Active
 `context:resolve/<key>` cells suppress losing conflict items before prompt
-rendering. Unfinished decisions with
-committed provider exchanges, admissions, or observations are recovered before a
-new decision is selected; decisions without external evidence are reused. Proof
+rendering. Unfinished decisions with committed provider exchanges, admissions, or
+observations are recovered before a new decision is selected and write resolved
+`recovery:recovered/<decision>` report cells; decisions without external
+evidence are reused. Proof
 collection writes state-ledger sections for state cells, decisions,
 prompt frames, admissions, observations, exchanges, artifacts, and context.
 Status reports active or stale
@@ -147,9 +148,8 @@ gate evidence:
 - parse faults, endpoint errors, effect errors, shell observations, and
   secret-like observation bodies classify contamination durably, but owner-data
   redaction policy is still intentionally conservative;
-- crash resume reuses decisions with no external evidence and recovers
-  externally evidenced unfinished decisions, but recovery state reports remain
-  bridge-level;
+- crash resume reuses decisions with no external evidence, recovers externally
+  evidenced unfinished decisions, and writes recovery report state cells;
 - artifact units, deterministic assembly, and fresh fingerprint checks have pure
   helpers and rows, write effects persist file and unit artifacts, and write
   prompts use 512-token caps, but assembly is not yet the only path to larger

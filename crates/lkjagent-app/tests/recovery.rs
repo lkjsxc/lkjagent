@@ -50,6 +50,14 @@ fn unfinished_decision_with_exchange_is_recovered_before_new_selection() -> Test
     assert_eq!(old_status, "recovered");
     assert_eq!(pending, 0);
     assert_eq!(total, 2);
+    let recovery: (String, String) = conn.query_row(
+        "SELECT status, payload_schema FROM state_cells
+         WHERE key_label = 'recovery:recovered/decision-old'",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?)),
+    )?;
+    assert_eq!(recovery.0, "Resolved");
+    assert_eq!(recovery.1, "recovery.report.v1");
     Ok(())
 }
 
