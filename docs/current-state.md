@@ -89,8 +89,10 @@ completion evidence; the store persists artifact rows with unit metadata.
 Endpoint exchanges now carry decision id, context-frame fingerprint,
 tool-view fingerprint, active timeout, and provider-exchange rows tied to the
 runtime decision. Status output now summarizes active state cells, conflict
-cells, latest decision, admissions, provider exchanges, and artifacts. Proof
-collection writes state-ledger sections for state cells, decisions, admissions,
+cells, latest decision, admissions, observations, provider exchanges, and
+artifacts. Prompt-frame rows are persisted before model calls, and observation
+rows are persisted after deterministic effects. Proof collection writes
+state-ledger sections for state cells, decisions, admissions, observations,
 exchanges, artifacts, and context. Current gate results belong in the handoff
 after commands are rerun against this checkout.
 
@@ -124,9 +126,9 @@ gate evidence:
 - artifact units, deterministic assembly, and fresh fingerprint checks have pure
   helpers and rows, but model generation still writes plan-family files rather
   than checked unit rows; and
-- proof bundles expose first state-ledger sections, but prompt frames,
-  observations, conflict resolution lineage, and full contamination suppression
-  evidence are not yet complete.
+- proof bundles expose first state-ledger sections, but conflict resolution
+  lineage, full contamination suppression evidence, and stale-lease recovery
+  reports are not yet complete.
 
 ## Implemented Code
 
@@ -150,10 +152,9 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Next, persist prompt-frame and observation rows for each model call or effect,
-wire recovery policies for unfinished decisions beyond simple reuse, and then
-retire plan-only authority once state-ledger parity is proven by replay and
-Docker gates.
+Next, wire recovery policies for unfinished decisions beyond simple reuse,
+report stale leases from state-ledger evidence, and retire plan-only authority
+only after state-ledger parity is proven by replay and Docker gates.
 
 ## Honesty Rules
 

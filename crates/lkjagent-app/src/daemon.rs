@@ -13,6 +13,8 @@ use crate::effect_error::settle as settle_effect_error;
 use crate::endpoint::LlmEndpoint;
 use crate::exchange_bridge::persist_provider_exchange;
 use crate::model_call::{apply_record, call};
+use crate::observation_bridge::persist_observations;
+use crate::prompt_bridge::persist_prompt_frame;
 use crate::runtime_bridge::{
     persist_tool_admissions, prepare_runtime_decision, settle_runtime_decision,
 };
@@ -86,6 +88,7 @@ fn run_turn<E: Endpoint, C: Clock>(
     let work = next_work_with_decision(&prompt_snapshot, &decision);
     let outcome = match &work {
         Work::CallModel { step_id, prompt } => {
+            persist_prompt_frame(conn, &decision, prompt, &selected_at)?;
             let (outcome, record) = call(logs, &snapshot, *step_id, prompt, &decision, endpoint)?;
             let (mut next, mut commands) = apply_turn(&snapshot, &work, outcome);
             let now = clock.now();
@@ -99,6 +102,7 @@ fn run_turn<E: Endpoint, C: Clock>(
                 settle_runtime_decision(conn, &decision, "effect_error", &now)?;
                 return Ok(settled);
             }
+            persist_observations(conn, &decision, &next, &commands, &now)?;
             commit_turn(conn, &next, &commands, &now).map_err(|error| error.to_string())?;
             settle_runtime_decision(conn, &decision, "settled", &now)?;
             return Ok(next);
@@ -114,6 +118,7 @@ fn run_turn<E: Endpoint, C: Clock>(
         settle_runtime_decision(conn, &decision, "effect_error", &now)?;
         return Ok(settled);
     }
+    persist_observations(conn, &decision, &next, &commands, &now)?;
     commit_turn(conn, &next, &commands, &now).map_err(|error| error.to_string())?;
     settle_runtime_decision(conn, &decision, "settled", &now)?;
     Ok(next)

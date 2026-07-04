@@ -132,10 +132,11 @@ fn state_ledger_lines(conn: &Connection) -> Result<String, String> {
         "SELECT COUNT(*) FROM state_cells WHERE key_label LIKE 'context:conflict/%'",
     )?;
     let admissions = count_table(conn, "tool_admissions")?;
+    let observations = count_table(conn, "observations")?;
     let exchanges = count_table(conn, "provider_exchanges")?;
     let artifacts = count_table(conn, "artifacts")?;
     Ok(format!(
-        "state: active={active} conflicts={conflicts}\ndecision: {}\nadmissions: {admissions} exchanges: {exchanges} artifacts: {artifacts}",
+        "state: active={active} conflicts={conflicts}\ndecision: {}\nadmissions: {admissions} observations: {observations} exchanges: {exchanges} artifacts: {artifacts}",
         decision_line(conn)?
     ))
 }

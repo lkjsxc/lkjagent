@@ -11,6 +11,7 @@ pub fn write_state_bundle(conn: &Connection, out_dir: &Path) -> Result<(), Strin
         "admissions.md",
         &count_doc(conn, "tool_admissions")?,
     )?;
+    write(out_dir, "observations.md", &observations(conn)?)?;
     write(out_dir, "exchanges.md", &exchanges(conn)?)?;
     write(out_dir, "artifacts.md", &artifacts(conn)?)?;
     write(out_dir, "context.md", &context(conn)?)
@@ -46,6 +47,22 @@ fn decisions(conn: &Connection) -> Result<String, String> {
                 row.get::<_, String>(2)?,
                 row.get::<_, String>(3)?,
                 row.get::<_, String>(4)?
+            ))
+        },
+    )
+}
+
+fn observations(conn: &Connection) -> Result<String, String> {
+    rows(
+        conn,
+        "Observations",
+        "SELECT decision_id, effect_name, status FROM observations ORDER BY id",
+        |row| {
+            Ok(format!(
+                "- decision={} effect={} status={}",
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, String>(2)?
             ))
         },
     )

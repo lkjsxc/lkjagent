@@ -88,6 +88,14 @@ fn prompt_view_and_admission_share_persisted_tool_fingerprint() -> TestResult<()
     assert_eq!(row.1, "fs.read");
     assert_eq!(row.2, "Admitted");
     assert_eq!(row.3, expected_fp);
+    let observation: (i64, String, String) = conn.query_row(
+        "SELECT COUNT(*), effect_name, status FROM observations",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+    )?;
+    assert_eq!(observation.0, 1);
+    assert_eq!(observation.1, "fs.read");
+    assert_eq!(observation.2, "ok");
     Ok(())
 }
 

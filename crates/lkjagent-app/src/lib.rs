@@ -14,6 +14,8 @@ mod explore;
 mod inspect;
 mod model_call;
 mod model_io;
+mod observation_bridge;
+mod prompt_bridge;
 mod runtime_bridge;
 pub mod state;
 pub mod status;
