@@ -17,6 +17,7 @@ Map lkjagent-app source modules.
 - [daemon-lock.rs](daemon_lock.rs): heartbeat config-row daemon lease.
 - [effect-error.rs](effect_error.rs): effect failure settlement.
 - [endpoint.rs](endpoint.rs): endpoint adapter wrapper.
+- [exchange-bridge.rs](exchange_bridge.rs): provider exchange row persistence.
 - [exchange-record.rs](exchange_record.rs): exchange log file rendering.
 - [explore.rs](explore.rs): bounded explore action dispatcher.
 - [inspect.rs](inspect.rs): row-backed CLI inspection renderers.

@@ -8,6 +8,7 @@ mod daemon_intake;
 mod daemon_lock;
 mod effect_error;
 pub mod endpoint;
+mod exchange_bridge;
 mod exchange_record;
 mod explore;
 mod inspect;

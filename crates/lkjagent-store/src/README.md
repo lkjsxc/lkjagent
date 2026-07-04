@@ -11,6 +11,7 @@ Map lkjagent-store source modules.
 - [artifact-rows.rs](artifact_rows.rs): artifact ref and fingerprint rows.
 - [context-rows.rs](context_rows.rs): context item row helpers.
 - [decision-rows.rs](decision_rows.rs): runtime decision row helpers.
+- [exchange-rows.rs](exchange_rows.rs): provider exchange row helpers.
 - [memory.rs](memory.rs): duplicate-suppressed memory writes and search.
 - [plan-schema.rs](plan_schema.rs): plan and state-ledger schema setup.
 - [plan-names.rs](plan_names.rs): database enum name parsing.

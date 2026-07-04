@@ -11,6 +11,7 @@ use crate::context_bridge::{prepare_prompt_context, snapshot_with_prompt_context
 use crate::daemon_intake::{idle_snapshot, load_runtime_snapshot};
 use crate::effect_error::settle as settle_effect_error;
 use crate::endpoint::LlmEndpoint;
+use crate::exchange_bridge::persist_provider_exchange;
 use crate::model_call::{apply_record, call};
 use crate::runtime_bridge::{
     persist_tool_admissions, prepare_runtime_decision, settle_runtime_decision,
@@ -87,10 +88,11 @@ fn run_turn<E: Endpoint, C: Clock>(
         Work::CallModel { step_id, prompt } => {
             let (outcome, record) = call(logs, &snapshot, *step_id, prompt, &decision, endpoint)?;
             let (mut next, mut commands) = apply_turn(&snapshot, &work, outcome);
-            if let Some(record) = record {
-                apply_record(&mut next, &mut commands, &record);
-            }
             let now = clock.now();
+            if let Some(record) = &record {
+                apply_record(&mut next, &mut commands, record);
+                persist_provider_exchange(conn, &decision, record, &selected_at, &now)?;
+            }
             persist_tool_admissions(conn, &decision, &commands, &now)?;
             if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands) {
                 let settled = settle_effect_error(conn, &snapshot, &work, error, &now)?;

@@ -14,6 +14,10 @@ pub struct ExchangeContext<'a> {
     pub step_ordinal: u32,
     pub attempt_ordinal: u32,
     pub prompt: &'a Prompt,
+    pub decision_id: String,
+    pub tool_view_fingerprint: String,
+    pub context_frame_fingerprint: String,
+    pub timeout_seconds: Option<u64>,
     pub started: Instant,
 }
 
@@ -25,10 +29,10 @@ pub fn write_success(
     write_files(
         &context,
         Bodies {
-            request: request_json(context.prompt),
+            request: request_json(&context),
             response: response_json(record),
             outcome: outcome_json(outcome),
-            timing: timing_json(context.started),
+            timing: timing_json(context.started, context.timeout_seconds),
         },
     )
 }
@@ -37,10 +41,10 @@ pub fn write_error(context: ExchangeContext<'_>, error: &str) -> Result<(), Stri
     write_files(
         &context,
         Bodies {
-            request: request_json(context.prompt),
+            request: request_json(&context),
             response: serde_json::json!({"error": error}).to_string(),
             outcome: serde_json::json!({"outcome":"endpoint_error","diagnosis": error}).to_string(),
-            timing: timing_json(context.started),
+            timing: timing_json(context.started, context.timeout_seconds),
         },
     )
 }
@@ -69,13 +73,17 @@ fn write_files(context: &ExchangeContext<'_>, bodies: Bodies) -> Result<(), Stri
     .map_err(|error| error.to_string())
 }
 
-fn request_json(prompt: &Prompt) -> String {
+fn request_json(context: &ExchangeContext<'_>) -> String {
     serde_json::json!({
-        "fingerprint": prompt.fingerprint,
-        "system": prompt.system,
-        "user": prompt.user,
-        "max_tokens": prompt.max_tokens,
-        "stop": prompt.stop
+        "fingerprint": context.prompt.fingerprint,
+        "decision_id": context.decision_id,
+        "tool_view_fingerprint": context.tool_view_fingerprint,
+        "context_frame_fingerprint": context.context_frame_fingerprint,
+        "timeout_seconds": context.timeout_seconds,
+        "system": context.prompt.system,
+        "user": context.prompt.user,
+        "max_tokens": context.prompt.max_tokens,
+        "stop": context.prompt.stop
     })
     .to_string()
 }
@@ -108,6 +116,10 @@ fn outcome_json(outcome: &TurnOutcome) -> String {
     }
 }
 
-fn timing_json(started: Instant) -> String {
-    serde_json::json!({"duration_ms": started.elapsed().as_millis()}).to_string()
+fn timing_json(started: Instant, timeout_seconds: Option<u64>) -> String {
+    serde_json::json!({
+        "duration_ms": started.elapsed().as_millis(),
+        "timeout_seconds": timeout_seconds
+    })
+    .to_string()
 }

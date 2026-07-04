@@ -29,6 +29,10 @@ impl CompletionRecord {
 
 pub trait Endpoint {
     fn complete(&mut self, prompt: &Prompt, attempt: u32) -> Result<CompletionRecord, String>;
+
+    fn timeout_seconds(&self) -> Option<u64> {
+        None
+    }
 }
 
 #[derive(Debug, Clone)]

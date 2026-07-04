@@ -27,11 +27,21 @@ fn endpoint_completion_writes_exchange_and_usage_rows() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert_eq!(exchange_ref, "logs/task-1/step-1/attempt-1");
-    assert!(data.join(&exchange_ref).join("request.json").exists());
+    let request = fs::read_to_string(data.join(&exchange_ref).join("request.json"))?;
+    assert!(request.contains("decision_id"));
+    assert!(request.contains("timeout_seconds"));
     assert!(
         fs::read_to_string(data.join(&exchange_ref).join("response.json"))?
             .contains("StopSequenceClosed")
     );
+    let provider: (String, String, i64) = conn.query_row(
+        "SELECT decision_id, exchange_ref, timeout_seconds FROM provider_exchanges LIMIT 1",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+    )?;
+    assert!(provider.0.starts_with("case-1-decision-"));
+    assert_eq!(provider.1, exchange_ref);
+    assert_eq!(provider.2, 900);
     let usage: (i64, i64) = conn.query_row(
         "SELECT prompt_tokens, completion_tokens FROM token_usage LIMIT 1",
         [],
@@ -79,6 +89,10 @@ impl Endpoint for UsageEndpoint {
             cache_metrics: vec![("cache".to_string(), "hit".to_string())],
             anomaly: None,
         })
+    }
+
+    fn timeout_seconds(&self) -> Option<u64> {
+        Some(900)
     }
 }
 

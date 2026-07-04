@@ -43,6 +43,12 @@ impl Endpoint for LlmEndpoint {
         }
         Err(last_error)
     }
+
+    fn timeout_seconds(&self) -> Option<u64> {
+        load_client(&self.data_dir)
+            .ok()
+            .map(|config| config.timeout.as_secs())
+    }
 }
 
 fn record(completion: Completion) -> CompletionRecord {

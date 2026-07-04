@@ -22,12 +22,14 @@ metadata and paths without copying model bodies by default.
 
 ## File Meanings
 
-- `request.json`: endpoint request body, prompt-frame id, prompt fingerprint,
-  tool-view fingerprint, max tokens, and stop sequence.
+- `request.json`: endpoint request body, decision id, prompt-frame id, prompt
+  fingerprint, context-frame fingerprint, tool-view fingerprint, active timeout,
+  max tokens, and stop sequence.
 - `response.json`: endpoint response or provider anomaly body.
 - `outcome.json`: parsed envelope or fault, diagnosis, closure mode, admission
   refs, usage refs, cache metrics, and check result refs.
-- `timing.json`: start time, end time, duration, and retry timing.
+- `timing.json`: start time, end time, duration, active timeout, and retry
+  timing.
 
 ## Durable Owners
 

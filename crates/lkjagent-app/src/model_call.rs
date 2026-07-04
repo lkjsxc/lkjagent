@@ -17,6 +17,9 @@ pub struct CallRecord {
     pub tokens_out: Option<u32>,
     pub cached_tokens: Option<u32>,
     pub count_budget: bool,
+    pub exchange_ref: String,
+    pub outcome_json: String,
+    pub timeout_seconds: Option<u64>,
 }
 
 pub fn call<E: Endpoint>(
@@ -34,12 +37,24 @@ pub fn call<E: Endpoint>(
         .ok_or_else(|| "active step missing".to_string())?;
     let ordinal = step.actions_used + step.attempts_used + 1;
     let started = Instant::now();
+    let timeout_seconds = endpoint.timeout_seconds();
     match endpoint.complete(prompt, step.attempts_used) {
         Ok(record) => {
             let outcome = parse_expected_for_decision(decision, &record.content)
                 .map_or_else(TurnOutcome::ParseFault, TurnOutcome::Model);
             write_success(
-                context(logs, snapshot, step.ordinal, ordinal, prompt, started),
+                context(
+                    ContextInput {
+                        logs,
+                        snapshot,
+                        step_ordinal: step.ordinal,
+                        attempt_ordinal: ordinal,
+                        prompt,
+                        decision,
+                        timeout_seconds,
+                    },
+                    started,
+                ),
                 &record,
                 &outcome,
             )?;
@@ -51,15 +66,42 @@ pub fn call<E: Endpoint>(
                     tokens_out: record.completion_tokens,
                     cached_tokens: record.cached_tokens,
                     count_budget: matches!(outcome, TurnOutcome::ParseFault(_)),
+                    exchange_ref: exchange_ref(snapshot, step.ordinal, ordinal),
+                    outcome_json: outcome_summary(&outcome),
+                    timeout_seconds,
                 }),
             ))
         }
         Err(error) => {
             write_error(
-                context(logs, snapshot, step.ordinal, ordinal, prompt, started),
+                context(
+                    ContextInput {
+                        logs,
+                        snapshot,
+                        step_ordinal: step.ordinal,
+                        attempt_ordinal: ordinal,
+                        prompt,
+                        decision,
+                        timeout_seconds,
+                    },
+                    started,
+                ),
                 &error,
             )?;
-            Ok((TurnOutcome::EndpointError(error), None))
+            let outcome = TurnOutcome::EndpointError(error);
+            Ok((
+                outcome.clone(),
+                Some(CallRecord {
+                    step_id,
+                    tokens_in: None,
+                    tokens_out: None,
+                    cached_tokens: None,
+                    count_budget: false,
+                    exchange_ref: exchange_ref(snapshot, step.ordinal, ordinal),
+                    outcome_json: outcome_summary(&outcome),
+                    timeout_seconds,
+                }),
+            ))
         }
     }
 }
@@ -87,21 +129,52 @@ pub fn apply_record(snapshot: &mut TaskSnapshot, commands: &mut [Command], recor
     }
 }
 
-fn context<'a>(
+struct ContextInput<'a> {
     logs: &'a Path,
     snapshot: &'a TaskSnapshot,
     step_ordinal: u32,
     attempt_ordinal: u32,
     prompt: &'a Prompt,
-    started: Instant,
-) -> ExchangeContext<'a> {
+    decision: &'a RuntimeDecision,
+    timeout_seconds: Option<u64>,
+}
+
+fn context<'a>(input: ContextInput<'a>, started: Instant) -> ExchangeContext<'a> {
     ExchangeContext {
-        logs,
-        snapshot,
-        step_ordinal,
-        attempt_ordinal,
-        prompt,
+        logs: input.logs,
+        snapshot: input.snapshot,
+        step_ordinal: input.step_ordinal,
+        attempt_ordinal: input.attempt_ordinal,
+        prompt: input.prompt,
+        decision_id: input.decision.id.clone(),
+        tool_view_fingerprint: input.decision.tool_view_fingerprint().unwrap_or_default(),
+        context_frame_fingerprint: input.decision.context_frame_fingerprint.clone(),
+        timeout_seconds: input.timeout_seconds,
         started,
+    }
+}
+
+fn exchange_ref(snapshot: &TaskSnapshot, step_ordinal: u32, ordinal: u32) -> String {
+    format!(
+        "logs/task-{}/step-{}/attempt-{}",
+        snapshot.task.id, step_ordinal, ordinal
+    )
+}
+
+fn outcome_summary(outcome: &TurnOutcome) -> String {
+    match outcome {
+        TurnOutcome::Model(_) => serde_json::json!({"outcome":"parsed"}).to_string(),
+        TurnOutcome::ParseFault(fault) => serde_json::json!({
+            "outcome":"parse_fault",
+            "diagnosis": format!("{fault:?}")
+        })
+        .to_string(),
+        TurnOutcome::EndpointError(error) => serde_json::json!({
+            "outcome":"endpoint_error",
+            "diagnosis": error
+        })
+        .to_string(),
+        other => serde_json::json!({"outcome": format!("{other:?}")}).to_string(),
     }
 }
 

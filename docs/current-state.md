@@ -86,8 +86,10 @@ clean current items for prompt briefs, detects contradictory clean items into
 from normal prompts. The core artifact slice models checked 512-token-target
 units, deterministic assembly, artifact fingerprints, and fresh-fingerprint
 completion evidence; the store persists artifact rows with unit metadata.
-Current gate results belong in the handoff after commands are rerun against this
-checkout.
+Endpoint exchanges now carry decision id, context-frame fingerprint,
+tool-view fingerprint, active timeout, and provider-exchange rows tied to the
+runtime decision. Current gate results belong in the handoff after commands are
+rerun against this checkout.
 
 ## State-Ledger Gap
 
@@ -145,10 +147,10 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Next, wire endpoint outcomes and budgets into decisions and exchange rows: keep
-loose configurable timeouts observable, use the 512-token unit budget for normal
-artifact calls, classify transport and envelope faults as typed outcomes, and
-record retry changes instead of replaying failed prompts unchanged.
+Next, update status, logs, proof bundles, and stale-lease reports to read the
+state-ledger rows: expose state cells, decisions, prompt context fingerprints,
+tool admissions, provider exchanges, context conflicts, contamination
+suppressions, artifact fingerprints, and unfinished-decision recovery.
 
 ## Honesty Rules
 
