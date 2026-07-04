@@ -71,12 +71,34 @@ and 13,275 words across all generated Markdown files.
 Token usage rows summed to 3,965 prompt tokens and 17,899 completion tokens
 across 12 endpoint attempts. All stable-run attempt outcomes were `ok`.
 
+## Recursive Story Trial
+
+The recursive story proof uses `tmp/recursive-story-live-proof-fixed`. It asks
+for `stories/aurora-ledger-recursive` with ten chapters and recursive arc targets
+near 10000, 40000, 160000, and 640000 words. This directory is ignored runtime
+evidence, so this section records the committed summary.
+
+At 2026-07-04T21:43:25Z the daemon was still working. Status showed task `1`
+open, budget `83/50`, step `13/160` as a write step, one pending decision,
+83 observations, 83 provider exchanges, and 96 artifact rows. The manuscript
+root already had ten chapter files and an external scan measured 31285 words.
+A proof bundle was collected at `tmp/recursive-story-live-proof-fixed-bundle`.
+The run has not yet satisfied the extended 640000 word target or terminal task
+state.
+
+This run exposed and fixed an inserted-step id bug. Before the fix, repeated
+manuscript shortfall extensions reused derived ids and could hit SQLite unique
+constraints or signed integer overflow. Runtime-inserted plan, split, and
+shortfall steps now receive fresh ids from the current snapshot before in-memory
+insertion and `AddSteps` persistence.
+
 ## Improvement Evidence
 
-Long write steps can exceed the default 60 second endpoint timeout even when the
-endpoint is healthy. Future endpoint tuning should keep a longer write timeout
-or make write-step timeout explicit in typed configuration.
+Long write steps can exceed endpoint token or timeout limits even when the
+endpoint is healthy. Future endpoint tuning should keep longer write timeouts,
+use bounded artifact-unit prompts, and leave deterministic checks to extend long
+manuscripts through durable shortfall steps.
 
-The live proof succeeded only after timeout configuration changed. The earlier
-partial run remains useful as a failure fixture for endpoint patience and
-operator feedback, but it is not proof of task completion.
+The baseline live proof succeeded only after timeout configuration changed. The
+earlier partial run remains useful as a failure fixture for endpoint patience and
+operator feedback, but it is not proof of the recursive 640000 word target.
