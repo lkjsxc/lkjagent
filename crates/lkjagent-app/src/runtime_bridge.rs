@@ -19,6 +19,7 @@ use rusqlite::Connection;
 pub fn prepare_runtime_decision(
     conn: &Connection,
     snapshot: &TaskSnapshot,
+    context_frame_fingerprint: &str,
     now: &str,
 ) -> Result<RuntimeDecision, String> {
     let case_id = snapshot.task.id.to_string();
@@ -32,8 +33,9 @@ pub fn prepare_runtime_decision(
         return Ok(decision.clone());
     }
     let id = next_decision_id(conn, &case_id).map_err(|error| error.to_string())?;
-    let decision =
+    let mut decision =
         select_runtime_decision(&state_snapshot, &id, &[]).map_err(|error| error.message)?;
+    decision.context_frame_fingerprint = context_frame_fingerprint.to_string();
     insert_runtime_decision(conn, &decision, "pending", now).map_err(|error| error.to_string())?;
     Ok(decision)
 }

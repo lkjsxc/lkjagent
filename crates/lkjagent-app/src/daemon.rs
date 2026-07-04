@@ -7,6 +7,7 @@ use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
 use crate::clock::{Clock, SystemClock};
+use crate::context_bridge::{prepare_prompt_context, snapshot_with_prompt_context};
 use crate::daemon_intake::{idle_snapshot, load_runtime_snapshot};
 use crate::effect_error::settle as settle_effect_error;
 use crate::endpoint::LlmEndpoint;
@@ -78,8 +79,10 @@ fn run_turn<E: Endpoint, C: Clock>(
     clock: &mut C,
 ) -> Result<TaskSnapshot, String> {
     let selected_at = clock.now();
-    let decision = prepare_runtime_decision(conn, &snapshot, &selected_at)?;
-    let work = next_work_with_decision(&snapshot, &decision);
+    let context = prepare_prompt_context(conn, &snapshot, &selected_at)?;
+    let decision = prepare_runtime_decision(conn, &snapshot, &context.fingerprint, &selected_at)?;
+    let prompt_snapshot = snapshot_with_prompt_context(&snapshot, &context);
+    let work = next_work_with_decision(&prompt_snapshot, &decision);
     let outcome = match &work {
         Work::CallModel { step_id, prompt } => {
             let (outcome, record) = call(logs, &snapshot, *step_id, prompt, &decision, endpoint)?;

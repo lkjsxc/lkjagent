@@ -80,8 +80,11 @@ decisions, and context items. `lkjagent-app` projects plan rows into a
 turn. Explore tool descriptors now live in one core catalog used to derive the
 bridge `ToolSetView`; prompt rendering prints that persisted view, parsing reads
 the same decision view, and app admission rows are persisted before explore
-effects. Current gate results belong in the handoff after commands are rerun
-against this checkout.
+effects. The daemon bridge also persists source-tagged context items, selects
+clean current items for prompt briefs, detects contradictory clean items into
+`context:conflict/<semantic-key>` state cells, and excludes contaminated items
+from normal prompts. Current gate results belong in the handoff after commands
+are rerun against this checkout.
 
 ## State-Ledger Gap
 
@@ -101,13 +104,13 @@ gate evidence:
   still bridge-limited;
 - tool descriptors are catalog-backed for prompt, parser, and admission, but the
   effect dispatcher still has a separate tool-to-effect match table;
-- prompt context is still assembled from briefs, inputs, memory facts, and
-  bounded observations rather than durable context items with source,
-  fingerprint, trust, staleness, contamination, and semantic keys;
-- contradictions do not yet become unresolved conflict state cells before prompt
-  rendering;
-- contaminated material is avoided in some retry paths but is not represented as
-  a durable contamination class with normal-prompt exclusion rules;
+- prompt context has a durable context-item bridge for clean items, conflicts,
+  and contaminated exclusion, but prompt-frame rows do not yet own the selected
+  context body and observations are not yet converted into context items;
+- contradictions become conflict state cells in the bridge, but conflict
+  resolution events and suppression of losing items are not yet wired;
+- contaminated material is excluded from bridge prompt context, but all failure
+  paths do not yet classify contamination durably;
 - crash resume reuses an incomplete persisted runtime decision in the bridge,
   but recovery policies are not yet applied to every incomplete decision state;
 - artifact units, deterministic assembly, and fresh aggregate artifact checks are
@@ -138,10 +141,10 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Next, replace transcript-like prompt context with durable context items: persist
-source-tagged items through the daemon bridge, select clean current items for
-prompt frames, create unresolved conflict state cells before rendering, and
-prove contaminated items are excluded from normal prompts.
+Next, implement artifact units and deterministic assembly: persist artifact
+roots, files, units, and fingerprints, generate ordinary units around the
+512-token target, assemble larger owner files only after unit checks pass, and
+prove closure depends on fresh artifact checks.
 
 ## Honesty Rules
 

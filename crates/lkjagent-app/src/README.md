@@ -11,6 +11,7 @@ Map lkjagent-app source modules.
 - [args.rs](args.rs): CLI parser.
 - [cli.rs](cli.rs): command execution.
 - [clock.rs](clock.rs): timestamp seam for runtime and deterministic tests.
+- [context-bridge.rs](context_bridge.rs): durable context item prompt projection.
 - [daemon.rs](daemon.rs): row-backed turn-cycle interpreter and scripted endpoint seam.
 - [daemon-intake.rs](daemon_intake.rs): queue intake and waiting-answer resume.
 - [daemon-lock.rs](daemon_lock.rs): heartbeat config-row daemon lease.

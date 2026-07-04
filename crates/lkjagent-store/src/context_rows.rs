@@ -12,7 +12,7 @@ pub fn insert_context_item(
     let artifact_refs_json = json_string(&item.artifact_refs)?;
     let item_json = json_string(item)?;
     conn.execute(
-        "INSERT INTO context_items
+        "INSERT OR REPLACE INTO context_items
          (id, case_id, semantic_key, body, source_type, source_id,
           source_fingerprint, trust_class, staleness_class, contamination_class,
           artifact_refs_json, decision_id, item_json, created_at,
