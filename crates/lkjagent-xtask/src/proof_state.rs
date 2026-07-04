@@ -1,0 +1,132 @@
+use std::fs;
+use std::path::Path;
+
+use rusqlite::Connection;
+
+pub fn write_state_bundle(conn: &Connection, out_dir: &Path) -> Result<(), String> {
+    write(out_dir, "state-vector.md", &state_cells(conn)?)?;
+    write(out_dir, "decisions.md", &decisions(conn)?)?;
+    write(
+        out_dir,
+        "admissions.md",
+        &count_doc(conn, "tool_admissions")?,
+    )?;
+    write(out_dir, "exchanges.md", &exchanges(conn)?)?;
+    write(out_dir, "artifacts.md", &artifacts(conn)?)?;
+    write(out_dir, "context.md", &context(conn)?)
+}
+
+fn state_cells(conn: &Connection) -> Result<String, String> {
+    rows(
+        conn,
+        "State Vector",
+        "SELECT case_id, key_label, status, payload_schema FROM state_cells ORDER BY case_id, key_label",
+        |row| {
+            Ok(format!(
+                "- case={} {} status={} schema={}",
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, String>(2)?,
+                row.get::<_, String>(3)?
+            ))
+        },
+    )
+}
+
+fn decisions(conn: &Connection) -> Result<String, String> {
+    rows(
+        conn,
+        "Decisions",
+        "SELECT id, case_id, operation_key, status, tool_view_fingerprint FROM runtime_decisions ORDER BY selected_at, id",
+        |row| {
+            Ok(format!(
+                "- {} case={} op={} status={} tools={}",
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, String>(2)?,
+                row.get::<_, String>(3)?,
+                row.get::<_, String>(4)?
+            ))
+        },
+    )
+}
+
+fn exchanges(conn: &Connection) -> Result<String, String> {
+    rows(
+        conn,
+        "Exchanges",
+        "SELECT decision_id, exchange_ref, COALESCE(timeout_seconds, 0) FROM provider_exchanges ORDER BY id",
+        |row| {
+            Ok(format!(
+                "- decision={} ref={} timeout={}",
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, i64>(2)?
+            ))
+        },
+    )
+}
+
+fn artifacts(conn: &Connection) -> Result<String, String> {
+    rows(
+        conn,
+        "Artifacts",
+        "SELECT id, kind, path, fingerprint FROM artifacts ORDER BY id",
+        |row| {
+            Ok(format!(
+                "- {} kind={} path={} fp={}",
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, String>(2)?,
+                row.get::<_, String>(3)?
+            ))
+        },
+    )
+}
+
+fn context(conn: &Connection) -> Result<String, String> {
+    rows(
+        conn,
+        "Context",
+        "SELECT id, semantic_key, contamination_class FROM context_items ORDER BY id",
+        |row| {
+            Ok(format!(
+                "- {} key={} contamination={}",
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, String>(2)?
+            ))
+        },
+    )
+}
+
+fn count_doc(conn: &Connection, table: &str) -> Result<String, String> {
+    let count: i64 = conn
+        .query_row(&format!("SELECT COUNT(*) FROM {table}"), [], |row| {
+            row.get(0)
+        })
+        .map_err(|error| error.to_string())?;
+    Ok(format!("# {table}\n\ncount={count}\n"))
+}
+
+fn rows<F>(conn: &Connection, title: &str, sql: &str, render: F) -> Result<String, String>
+where
+    F: Fn(&rusqlite::Row<'_>) -> rusqlite::Result<String>,
+{
+    let mut statement = conn.prepare(sql).map_err(|error| error.to_string())?;
+    let mapped = statement
+        .query_map([], render)
+        .map_err(|error| error.to_string())?;
+    let mut lines = vec![format!("# {title}"), String::new()];
+    for row in mapped {
+        lines.push(row.map_err(|error| error.to_string())?);
+    }
+    if lines.len() == 2 {
+        lines.push("none".to_string());
+    }
+    Ok(lines.join("\n"))
+}
+
+fn write(dir: &Path, name: &str, body: &str) -> Result<(), String> {
+    fs::write(dir.join(name), body).map_err(|error| error.to_string())
+}

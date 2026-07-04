@@ -47,6 +47,10 @@ fn cli_inspection_reads_store_rows() -> TestResult<()> {
         index: 0,
     };
     run_until_idle(&data, &mut endpoint, 3)?;
+    let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
+    assert!(status.contains("state: active="));
+    assert!(status.contains("decision: case-1-decision-"));
+    assert!(status.contains("exchanges: 1"));
     let task_list = cli::run(["--data", data.to_string_lossy().as_ref(), "task", "list"])?;
     assert!(task_list.contains("task 1 closed"));
     assert!(cli::run([

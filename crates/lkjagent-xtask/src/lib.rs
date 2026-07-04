@@ -12,6 +12,7 @@ pub mod file_counts;
 pub mod lines;
 pub mod model;
 pub mod proof;
+pub mod proof_state;
 pub mod runner;
 pub mod smoke;
 pub mod structure;
