@@ -20,9 +20,9 @@ Define the token and content budgets that keep each turn bounded.
 ## Generation Budgets
 
 The LLM page owns generation caps. Context rendering uses those caps to leave
-headroom. The step defaults are `llm.max-tokens.write=2400`,
-`llm.max-tokens.plan=900`, `llm.max-tokens.explore=500`, and
-`llm.max-tokens.respond=700`.
+headroom. Ordinary artifact units target about 512 output tokens. Larger
+response or review caps are decision-specific and must be recorded with the
+persisted `RuntimeDecision`.
 
 ## Estimator
 

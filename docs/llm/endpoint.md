@@ -10,6 +10,10 @@ lkjagent calls one OpenAI-compatible chat-completions endpoint. The endpoint URL
 model name, optional API key environment variable, timeout, and context length
 come from `data/lkjagent.json` plus environment overrides.
 
+The default timeout is a loose finite 900 seconds. It remains configurable by
+`LKJAGENT_ENDPOINT_TIMEOUT_SECONDS` and `endpoint.timeout-seconds`, and the
+active value is recorded with exchange timing evidence.
+
 The client sends the selected step prompt, sampling values, max token cap, and
 stop sequence. The stop sequence is the expected closing envelope tag for the
 selected step.

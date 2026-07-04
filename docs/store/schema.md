@@ -13,8 +13,8 @@ response, or artifact bodies, but rows own resumable facts and references.
 
 ## Table Set
 
-Use a fresh state-ledger schema when replacing the current plan-store tables.
-Required tables:
+State-ledger tables are created beside the current plan-family tables until the
+runtime reads only state rows. Required tables:
 
 | Table | Role |
 | --- | --- |
@@ -23,7 +23,7 @@ Required tables:
 | `events` | append-only runtime facts with optional decision id |
 | `state_cells` | current arbitrary state vector |
 | `state_history` | audit of applied state patches |
-| `decisions` | persisted `RuntimeDecision` authority rows |
+| `runtime_decisions` | persisted `RuntimeDecision` authority rows |
 | `prompt_frames` | prompt metadata, fingerprints, and bounded body refs |
 | `tool_admissions` | parsed action, result, and view fingerprint |
 | `observations` | bounded tool or effect output tied to decisions |
@@ -46,7 +46,7 @@ provider did not report the value, not zero.
 
 Index state cells by case id, key, status, priority, and conflict group. Index
 context items by semantic key, contamination class, trust class, and source
-fingerprint. Index decisions by case id, state, and created time.
+fingerprint. Index runtime decisions by case id, status, and selected time.
 
 ## Failure This Prevents
 

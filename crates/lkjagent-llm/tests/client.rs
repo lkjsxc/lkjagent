@@ -3,7 +3,7 @@ mod support;
 use std::net::TcpListener;
 use std::time::Duration;
 
-use lkjagent_llm::client::{complete, ClientConfig};
+use lkjagent_llm::client::{complete, ClientConfig, DEFAULT_TIMEOUT_SECONDS};
 use lkjagent_llm::error::{ClientError, EndpointFailure};
 use lkjagent_llm::message::{Message, Role};
 use lkjagent_llm::wire::CallSpec;
@@ -15,6 +15,14 @@ fn action_call_spec_uses_compact_output_budget() {
 
     assert_eq!(spec.max_tokens, 512);
     assert_eq!(spec.stop, vec!["</action>".to_string()]);
+}
+
+#[test]
+fn client_config_defaults_to_loose_finite_timeout() {
+    let config = ClientConfig::new("http://localhost:1234", "local-model");
+
+    assert_eq!(config.timeout, Duration::from_secs(DEFAULT_TIMEOUT_SECONDS));
+    assert_eq!(DEFAULT_TIMEOUT_SECONDS, 900);
 }
 
 #[test]

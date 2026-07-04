@@ -10,6 +10,8 @@ use crate::wire::{
     build_request, decode_completion, CallSpec, Completion, FinishReason, MAX_TOKENS,
 };
 
+pub const DEFAULT_TIMEOUT_SECONDS: u64 = 900;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ClientConfig {
     pub base_url: String,
@@ -25,7 +27,7 @@ impl ClientConfig {
             base_url: base_url.into(),
             model: model.into(),
             api_key: None,
-            timeout: Duration::from_secs(60),
+            timeout: Duration::from_secs(DEFAULT_TIMEOUT_SECONDS),
             max_tokens: MAX_TOKENS,
         }
     }

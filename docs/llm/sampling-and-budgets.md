@@ -10,15 +10,16 @@ Define generation budgets, sampling defaults, and endpoint retry limits.
 - `llm.top-p=0.9`
 - `llm.reasoning-effort=none` when the provider supports it
 
-## Max Tokens By Step
+## Generation Units
 
-| Step kind | Config key |
-| --- | ---: |
-| write and revise | `llm.max-tokens.write=2400` |
-| plan | `llm.max-tokens.plan=900` |
-| explore action | `llm.max-tokens.explore=500` |
-| respond and ask | `llm.max-tokens.respond=700` |
-| judged verify | `checks.judged.max-tokens=300` |
+Ordinary model-authored artifact units target about 512 output tokens through
+`llm.max-tokens.unit=512`. Decisions may select larger caps for planning,
+response, or review work only when the decision row records the budget and the
+reason.
+
+The current plan-family bridge may still pass step-kind caps into endpoint
+calls. The state-ledger budget policy replaces those caps as decisions are wired
+through prompt frames.
 
 ## Backoff
 

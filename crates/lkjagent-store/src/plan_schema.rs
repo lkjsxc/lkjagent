@@ -1,6 +1,7 @@
 use rusqlite::Connection;
 
 use crate::error::StoreResult;
+use crate::state_schema;
 
 pub const APPLICATION_TABLES: &[&str] = &[
     "queue",
@@ -13,6 +14,17 @@ pub const APPLICATION_TABLES: &[&str] = &[
     "memory_fts",
     "token_usage",
     "config",
+    "cases",
+    "state_cells",
+    "state_history",
+    "runtime_decisions",
+    "prompt_frames",
+    "tool_admissions",
+    "observations",
+    "context_items",
+    "context_edges",
+    "artifacts",
+    "provider_exchanges",
 ];
 
 pub fn setup(conn: &Connection) -> StoreResult<()> {
@@ -139,5 +151,5 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
         );
         ",
     )?;
-    Ok(())
+    state_schema::setup(conn)
 }

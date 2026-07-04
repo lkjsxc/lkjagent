@@ -2,7 +2,7 @@
 
 ## Purpose
 
-SQLite persistence crate for the plan-driven lkjagent store.
+SQLite persistence crate for plan-family rows and state-ledger rows.
 
 Doc contract: ../../docs/store/README.md
 

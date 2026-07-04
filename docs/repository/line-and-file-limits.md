@@ -11,6 +11,12 @@ includes Markdown, Rust, scripts, config, Compose files, and workflows.
 Generated logs under `data/logs/` are diagnostic evidence and are not authored
 source.
 
+## Token Target
+
+Project-authored files target about 512 tokens when practical. This is an
+authoring target, not a hard gate. Owner-requested final artifacts may be
+larger when generated from small checked units and deterministic assembly.
+
 ## File Budgets
 
 | Surface | Budget |

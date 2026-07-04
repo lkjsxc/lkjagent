@@ -1,7 +1,7 @@
 use std::path::Path;
 use std::time::Duration;
 
-use lkjagent_llm::client::ClientConfig;
+use lkjagent_llm::client::{ClientConfig, DEFAULT_TIMEOUT_SECONDS};
 use serde_json::Value;
 
 pub fn load_client(data_dir: &Path) -> Result<ClientConfig, String> {
@@ -15,7 +15,7 @@ pub fn load_client(data_dir: &Path) -> Result<ClientConfig, String> {
     config.timeout = Duration::from_secs(
         env_number("LKJAGENT_ENDPOINT_TIMEOUT_SECONDS")
             .or_else(|| number(endpoint, "timeout-seconds"))
-            .unwrap_or(60),
+            .unwrap_or(DEFAULT_TIMEOUT_SECONDS),
     );
     config.api_key = api_key(endpoint);
     Ok(config)

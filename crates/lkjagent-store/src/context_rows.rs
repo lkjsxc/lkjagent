@@ -1,0 +1,51 @@
+use lkjagent_core::runtime_context::ContextItem;
+use rusqlite::{params, Connection};
+
+use crate::error::StoreResult;
+use crate::row_json::{json_string, json_value};
+
+pub fn insert_context_item(
+    conn: &Connection,
+    case_id: &str,
+    item: &ContextItem,
+) -> StoreResult<()> {
+    let artifact_refs_json = json_string(&item.artifact_refs)?;
+    let item_json = json_string(item)?;
+    conn.execute(
+        "INSERT INTO context_items
+         (id, case_id, semantic_key, body, source_type, source_id,
+          source_fingerprint, trust_class, staleness_class, contamination_class,
+          artifact_refs_json, decision_id, item_json, created_at,
+          suppression_reason)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13,
+                 ?14, NULL)",
+        params![
+            item.id,
+            case_id,
+            item.semantic_key,
+            item.body,
+            item.source_type,
+            item.source_id,
+            item.source_fingerprint,
+            format!("{:?}", item.trust),
+            format!("{:?}", item.staleness),
+            format!("{:?}", item.contamination),
+            artifact_refs_json,
+            item.decision_id,
+            item_json,
+            item.created_at,
+        ],
+    )?;
+    Ok(())
+}
+
+pub fn context_items(conn: &Connection, case_id: &str) -> StoreResult<Vec<ContextItem>> {
+    let mut statement =
+        conn.prepare("SELECT item_json FROM context_items WHERE case_id = ?1 ORDER BY id")?;
+    let rows = statement.query_map([case_id], |row| row.get::<_, String>(0))?;
+    let mut items = Vec::new();
+    for row in rows {
+        items.push(json_value(&row?)?);
+    }
+    Ok(items)
+}

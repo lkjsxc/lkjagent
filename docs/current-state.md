@@ -40,7 +40,8 @@ from the fixed explore registry. Prompt rendering tells explore steps to finish
 with the `finish` action inside `<action>`, and the engine rejects adjacent
 repeated explore actions before effects run. Prompt rendering includes the
 bounded task brief, including admitted memory facts. Endpoint errors use the
-documented ten-failure patience before blocking a step.
+documented ten-failure patience before blocking a step. Endpoint clients default
+to a loose finite 900-second timeout unless configuration overrides it.
 
 Queue rows persist `force_new`, send uses it, and daemon intake can select a
 forced-new row without treating it as an answer. Status, task, queue, log,
@@ -69,8 +70,10 @@ has a first pure state-ledger domain slice in `lkjagent-core`: state keys and
 cells, runtime events and patches, runtime decisions, tool-set views, action
 admission with workspace path policy, context items with contamination classes,
 contradiction detection, stable fingerprints, and fresh-evidence completion
-helpers. Current gate results belong in the handoff after commands are rerun
-against this checkout.
+helpers. `lkjagent-store` now creates the first state-ledger table set beside the
+plan-family rows, with row helpers for cases, unknown state cells, pending
+runtime decisions, and context items. Current gate results belong in the handoff
+after commands are rerun against this checkout.
 
 ## State-Ledger Gap
 
@@ -78,13 +81,14 @@ The checkout does not yet satisfy the owner-requested state-ledger contract. The
 open gaps are executable and must be closed with docs, code, tests, and current
 gate evidence:
 
-- state storage and hydration are still shaped around fixed tasks, steps, and
-  step kinds instead of arbitrary keyed state cells;
+- daemon runtime hydration is still shaped around fixed tasks, steps, and step
+  kinds; state-ledger tables and row helpers exist but are not yet runtime
+  authority;
 - runtime selection is not yet driven by the new pure state reducer and
   selectors;
-- there is no persisted `RuntimeDecision` row that freezes the state-vector
-  fingerprint, context-frame fingerprint, tool-view fingerprint, expected output
-  grammar, evidence needs, and recovery policy for a turn;
+- the daemon does not yet persist a `RuntimeDecision` row that freezes the
+  state-vector fingerprint, context-frame fingerprint, tool-view fingerprint,
+  expected output grammar, evidence needs, and recovery policy for a turn;
 - prompt rendering and action admission are not yet wired to the same stored
   decision-specific `ToolSetView`;
 - tool descriptors and legality are duplicated across docs, parser, renderer,
@@ -96,7 +100,9 @@ gate evidence:
   rendering;
 - contaminated material is avoided in some retry paths but is not represented as
   a durable contamination class with normal-prompt exclusion rules;
-- crash resume does not yet recover incomplete persisted runtime decisions; and
+- crash resume does not yet recover incomplete persisted runtime decisions;
+- artifact units, deterministic assembly, and fresh aggregate artifact checks are
+  documented but not wired into generation; and
 - proof bundles do not yet expose state vectors, decisions, tool views,
   admissions, context conflicts, contamination suppressions, and artifact
   fingerprints as first-class evidence.
@@ -106,9 +112,10 @@ gate evidence:
 `lkjagent-core` owns the first pure state-ledger domain modules plus the current
 plan engine, parser, renderer, checks, word counting, classifier, templates,
 docs-link helpers, and recovery helpers.
-`lkjagent-store` owns the plan-store schema, row hydration, queue access, and
-atomic turn state commits. `lkjagent-effects` owns filesystem, shell, check
-gathering, observations, and exchange log file helpers. `lkjagent-app` owns the
+`lkjagent-store` owns the plan-store schema, first state-ledger tables, row
+hydration, queue access, and atomic turn state commits. `lkjagent-effects` owns
+filesystem, shell, check gathering, observations, and exchange log file helpers.
+`lkjagent-app` owns the
 daemon interpreter, row-backed CLI renderers, endpoint adapter, waiting answer
 routing, effect-error settlement, and bounded explore dispatcher. `lkjagent-llm`
 owns the endpoint wire client. `lkjagent-xtask` owns repository gates, structure
@@ -122,10 +129,10 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Next, wire the pure state-ledger domain slice into selection and persistence:
-add reducer-driven decision selectors, persist `RuntimeDecision` rows, hydrate
-state cells from SQLite, and prove crash resume reuses the persisted decision
-before rendering or admission.
+Next, wire the state-ledger rows into runtime selection: add reducer-driven
+selectors, hydrate state cells from SQLite in the daemon, persist each selected
+`RuntimeDecision` before rendering or admission, and prove crash resume reuses
+that decision id and tool-view fingerprint.
 
 ## Honesty Rules
 
