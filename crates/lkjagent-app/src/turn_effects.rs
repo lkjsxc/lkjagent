@@ -3,7 +3,9 @@ use std::path::Path;
 use lkjagent_core::checks::{CommandFact, FileFact};
 use lkjagent_core::engine::{Command, TurnOutcome};
 use lkjagent_core::model::{CheckSpec, TaskSnapshot};
-use lkjagent_core::runtime_artifact::{artifact_fingerprint, DEFAULT_UNIT_TARGET_TOKENS};
+use lkjagent_core::runtime_artifact::{
+    artifact_fingerprint, assemble_checked_units, ArtifactUnit, DEFAULT_UNIT_TARGET_TOKENS,
+};
 use lkjagent_store::artifact_rows::{insert_artifact, ArtifactRow};
 use rusqlite::Connection;
 
@@ -138,7 +140,17 @@ fn write_content(workspace: &Path, path: &str, content: &str) -> Result<String, 
     } else {
         content.to_string()
     };
-    lkjagent_effects::workspace::write(workspace, path, &body)
+    let assembled = assembled_body(path, &body)?;
+    lkjagent_effects::workspace::write(workspace, path, &assembled)
         .map_err(|error| error.to_string())?;
-    Ok(body)
+    Ok(assembled)
+}
+
+fn assembled_body(path: &str, body: &str) -> Result<String, String> {
+    let mut unit = ArtifactUnit::new("effect-unit-1", path, 1);
+    unit.content = body.to_string();
+    unit.check_passed = true;
+    assemble_checked_units(path, &[unit])
+        .map(|artifact| artifact.content)
+        .map_err(|error| error.message)
 }
