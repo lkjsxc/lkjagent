@@ -104,8 +104,9 @@ endpoint errors create recovery-only context items. Active
 rendering. Unfinished decisions with
 committed provider exchanges, admissions, or observations are recovered before a
 new decision is selected; decisions without external evidence are reused. Proof
-collection writes state-ledger sections for state cells, decisions, admissions,
-observations, exchanges, artifacts, and context. Status reports active or stale
+collection writes state-ledger sections for state cells, decisions,
+prompt frames, admissions, observations, exchanges, artifacts, and context.
+Status reports active or stale
 daemon lease rows from heartbeat config evidence. Prompt-frame rows now point to
 bounded prompt body refs under `data/logs/`. Current gate results belong in the
 handoff after commands are rerun against this checkout.

@@ -6,6 +6,7 @@ use rusqlite::Connection;
 pub fn write_state_bundle(conn: &Connection, out_dir: &Path) -> Result<(), String> {
     write(out_dir, "state-vector.md", &state_cells(conn)?)?;
     write(out_dir, "decisions.md", &decisions(conn)?)?;
+    write(out_dir, "prompt-frames.md", &prompt_frames(conn)?)?;
     write(
         out_dir,
         "admissions.md",
@@ -60,6 +61,22 @@ fn observations(conn: &Connection) -> Result<String, String> {
         |row| {
             Ok(format!(
                 "- decision={} effect={} status={}",
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, String>(2)?
+            ))
+        },
+    )
+}
+
+fn prompt_frames(conn: &Connection) -> Result<String, String> {
+    rows(
+        conn,
+        "Prompt Frames",
+        "SELECT decision_id, prompt_fingerprint, body_ref FROM prompt_frames ORDER BY id",
+        |row| {
+            Ok(format!(
+                "- decision={} prompt={} body={}",
                 row.get::<_, String>(0)?,
                 row.get::<_, String>(1)?,
                 row.get::<_, String>(2)?
