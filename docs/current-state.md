@@ -73,7 +73,7 @@ contradiction detection, stable fingerprints, and fresh-evidence completion
 helpers. `lkjagent-core` also has a pure selector that picks a runtime decision
 from hydrated state and reuses unfinished decisions before selecting new work.
 `lkjagent-store` creates the first state-ledger table set beside the plan-family
-rows, with row helpers for cases, unknown state cells, pending runtime
+rows, with row helpers for cases, unknown state cells, state history, pending runtime
 decisions, and context items. `lkjagent-app` projects plan rows into
 operation-specific state cells, hydrates state cells, persists or reuses a
 `RuntimeDecision` before prompt rendering, and settles the decision after the

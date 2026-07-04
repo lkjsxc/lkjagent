@@ -61,6 +61,18 @@ pub fn upsert_state_cell(conn: &Connection, case_id: &str, cell: &StateCell) -> 
             cell_json,
         ],
     )?;
+    conn.execute(
+        "INSERT INTO state_history
+         (case_id, event_id, key_label, patch_json, created_at)
+         VALUES (?1, ?2, ?3, ?4, ?5)",
+        params![
+            case_id,
+            cell.source_event_id,
+            key_label,
+            cell_json,
+            cell.updated_at,
+        ],
+    )?;
     Ok(())
 }
 

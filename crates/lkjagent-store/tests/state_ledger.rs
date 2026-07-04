@@ -38,6 +38,12 @@ fn unknown_state_cells_round_trip_from_sqlite() -> TestResult<()> {
 
     assert_eq!(snapshot.case_id, "case-1");
     assert_eq!(snapshot.cells.get(&cell.key), Some(&cell));
+    let history: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM state_history WHERE key_label = ?1",
+        [cell.key.as_label()],
+        |row| row.get(0),
+    )?;
+    assert_eq!(history, 1);
     Ok(())
 }
 
