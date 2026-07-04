@@ -16,5 +16,6 @@ Integration tests for lkjagent-app.
 - [exchange.rs](exchange.rs): exchange refs and token usage persistence.
 - [explore.rs](explore.rs): bounded explore registry behavior.
 - [manuscript.rs](manuscript.rs): manuscript app flows.
+- [prompt-frame.rs](prompt_frame.rs): prompt-frame body replay tests.
 - [recovery.rs](recovery.rs): unfinished decision recovery tests.
 - [resume.rs](resume.rs): row-first resume, waiting answer, and decision reuse tests.

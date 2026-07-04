@@ -100,9 +100,10 @@ now carry decision id, context-frame fingerprint, tool-view fingerprint, active
 timeout, and provider-exchange rows tied to the
 runtime decision. Status output now summarizes active state cells, conflict
 cells, latest decision, admissions, observations, provider exchanges, and
-artifacts. Prompt-frame rows are persisted before model calls, and observation
-rows are persisted after deterministic effects. Clean observations are converted
-into durable context items while error observations are marked recovery-only.
+artifacts. Prompt-frame rows are persisted before model calls and can replay
+bounded prompt bodies from their refs. Observation rows are persisted after
+deterministic effects. Clean observations are converted into durable context
+items while error observations are marked recovery-only.
 Parse-fault provider exchanges create failed-model-output context items,
 endpoint errors create recovery-only context items, shell observations become
 external-raw context, and secret-like observation bodies become sensitive-owner
@@ -138,8 +139,8 @@ gate evidence:
 - tool descriptors are catalog-backed for prompt, parser, admission, and explore
   effect selection, but non-tool policy derivation still depends on bridge cells;
 - prompt context has a durable context-item bridge for clean items, conflicts,
-  observations, and contaminated exclusion, and prompt-frame rows own bounded
-  body refs; full prompt-frame replay is still bridge-level;
+  observations, and contaminated exclusion, and prompt-frame rows own replayable
+  bounded body refs;
 - contradictions become conflict state cells and active resolution cells
   suppress losing items with `context_edges` lineage, but owner-facing conflict
   repair operations are still bridge-level;
