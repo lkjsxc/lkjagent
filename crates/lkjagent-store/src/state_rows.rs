@@ -1,3 +1,4 @@
+use lkjagent_core::runtime_event::{StatePatch, StatePatchOp};
 use lkjagent_core::runtime_state::{RuntimeSnapshot, StateCell};
 use rusqlite::{params, Connection};
 
@@ -73,6 +74,51 @@ pub fn upsert_state_cell(conn: &Connection, case_id: &str, cell: &StateCell) -> 
             cell.updated_at,
         ],
     )?;
+    Ok(())
+}
+
+pub fn persist_state_patch(
+    conn: &Connection,
+    case_id: &str,
+    patch: &StatePatch,
+) -> StoreResult<()> {
+    for operation in &patch.operations {
+        match operation {
+            StatePatchOp::Upsert(cell) => upsert_state_cell(conn, case_id, cell)?,
+            StatePatchOp::SetStatus {
+                key,
+                status,
+                updated_at,
+                source_event_id,
+                ..
+            } => {
+                let key_label = key.as_label();
+                conn.execute(
+                    "UPDATE state_cells SET status = ?1, updated_at = ?2,
+                     source_event_id = ?3 WHERE case_id = ?4 AND key_label = ?5",
+                    params![
+                        format!("{:?}", status),
+                        updated_at,
+                        source_event_id,
+                        case_id,
+                        key_label,
+                    ],
+                )?;
+                conn.execute(
+                    "INSERT INTO state_history
+                     (case_id, event_id, key_label, patch_json, created_at)
+                     VALUES (?1, ?2, ?3, ?4, ?5)",
+                    params![
+                        case_id,
+                        patch.event_id,
+                        key_label,
+                        json_string(operation)?,
+                        updated_at,
+                    ],
+                )?;
+            }
+        }
+    }
     Ok(())
 }
 

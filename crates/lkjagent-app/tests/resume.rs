@@ -85,6 +85,9 @@ fn pending_runtime_decision_is_reused_on_resume() -> TestResult<()> {
     assert_eq!(row.1, "decision-reused");
     assert_eq!(row.2, "settled");
     assert_eq!(row.3, expected_fp);
+    let events: i64 =
+        conn.query_row("SELECT COUNT(*) FROM runtime_events", [], |row| row.get(0))?;
+    assert!(events >= 1);
     Ok(())
 }
 

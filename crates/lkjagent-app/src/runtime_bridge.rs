@@ -1,13 +1,15 @@
 use lkjagent_core::model::{CheckSpec, Step, StepKind, StepState, TaskSnapshot, TaskState};
 use lkjagent_core::render::max_tokens;
 use lkjagent_core::runtime_decision::RuntimeDecision;
+use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
 use lkjagent_core::runtime_selector::select_runtime_decision;
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
 use lkjagent_core::runtime_tool_catalog::explore_tool_view;
 use lkjagent_store::decision_rows::{
     insert_runtime_decision, next_decision_id, settle_decision, unfinished_decisions,
 };
-use lkjagent_store::state_rows::{hydrate_snapshot, insert_case, upsert_state_cell};
+use lkjagent_store::event_rows::{append_and_apply_event, next_event_id};
+use lkjagent_store::state_rows::{hydrate_snapshot, insert_case};
 use rusqlite::Connection;
 
 use crate::recovery_bridge::recover_or_reuse;
@@ -23,7 +25,7 @@ pub fn prepare_runtime_decision(
         .map_err(|error| error.to_string())?;
     suppress_bridge_cells(conn, &case_id)?;
     let cell = next_work_cell(snapshot, now)?;
-    upsert_state_cell(conn, &case_id, &cell).map_err(|error| error.to_string())?;
+    append_projection_event(conn, &case_id, cell, now)?;
     let state_snapshot = hydrate_snapshot(conn, &case_id).map_err(|error| error.to_string())?;
     let unfinished = unfinished_decisions(conn, &case_id).map_err(|error| error.to_string())?;
     if let Some(decision) = recover_or_reuse(conn, &unfinished, now)? {
@@ -46,6 +48,27 @@ pub fn settle_runtime_decision(
     settle_decision(conn, &decision.id, status, now)
         .map(|_| ())
         .map_err(|error| error.to_string())
+}
+
+fn append_projection_event(
+    conn: &Connection,
+    case_id: &str,
+    mut cell: StateCell,
+    now: &str,
+) -> Result<(), String> {
+    let event_id =
+        next_event_id(conn, case_id, "state-project").map_err(|error| error.to_string())?;
+    cell.source_event_id = event_id.clone();
+    let event = RuntimeEvent {
+        id: event_id,
+        case_id: case_id.to_string(),
+        kind: "state.cell.upsert".to_string(),
+        payload: RuntimeEventPayload::UpsertCell(Box::new(cell)),
+        source: "plan-bridge".to_string(),
+        created_at: now.to_string(),
+        decision_id: None,
+    };
+    append_and_apply_event(conn, &event).map_err(|error| error.to_string())
 }
 
 fn next_work_cell(snapshot: &TaskSnapshot, now: &str) -> Result<StateCell, String> {

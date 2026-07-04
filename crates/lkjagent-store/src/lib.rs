@@ -3,6 +3,7 @@ pub mod artifact_rows;
 pub mod context_rows;
 pub mod decision_rows;
 pub mod error;
+pub mod event_rows;
 pub mod exchange_rows;
 pub mod memory;
 pub mod observation_rows;

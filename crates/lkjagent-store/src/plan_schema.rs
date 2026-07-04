@@ -15,6 +15,7 @@ pub const APPLICATION_TABLES: &[&str] = &[
     "token_usage",
     "config",
     "cases",
+    "runtime_events",
     "state_cells",
     "state_history",
     "runtime_decisions",

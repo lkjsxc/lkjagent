@@ -20,7 +20,7 @@ runtime reads only state rows. Required tables:
 | --- | --- |
 | `queue` | owner messages, answer routing, and forced-new intent |
 | `cases` | owner objective, lifecycle summary, and terminal report |
-| `events` | append-only runtime facts with optional decision id |
+| `runtime_events` | append-only runtime facts with optional decision id |
 | `state_cells` | current arbitrary state vector |
 | `state_history` | audit of applied state patches |
 | `runtime_decisions` | persisted `RuntimeDecision` authority rows |

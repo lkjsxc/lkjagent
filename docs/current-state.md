@@ -73,10 +73,11 @@ contradiction detection, stable fingerprints, and fresh-evidence completion
 helpers. `lkjagent-core` also has a pure selector that picks a runtime decision
 from hydrated state and reuses unfinished decisions before selecting new work.
 `lkjagent-store` creates the first state-ledger table set beside the plan-family
-rows, with row helpers for cases, unknown state cells, state history, pending runtime
-decisions, and context items. `lkjagent-app` projects plan rows into
-operation-specific state cells, hydrates state cells, persists or reuses a
-`RuntimeDecision` before prompt rendering, derives turn work from the persisted
+rows, with row helpers for cases, events, unknown state cells, state history,
+pending runtime decisions, and context items. `lkjagent-app` projects plan rows
+through durable runtime events into operation-specific state cells, hydrates
+state cells, persists or reuses a `RuntimeDecision` before prompt rendering,
+derives turn work from the persisted
 decision operation, and settles the decision after the turn. The bridge projects
 cells such as `model:<step>`, `check:<step>`, `case:waiting-answer`, and
 `completion:close-candidate`. Explore tool
@@ -125,12 +126,11 @@ gate evidence:
 - daemon runtime hydration is still shaped around fixed tasks, steps, and step
   kinds; state-ledger tables and row helpers exist but are not yet runtime
   authority;
-- runtime selection reads operation-specific state cells projected from plan
-  rows and the turn interpreter follows the persisted decision operation, but
-  the full reducer does not yet own all state transitions;
+- runtime selection reads operation-specific state cells projected through
+  durable events and the turn interpreter follows the persisted decision
+  operation, but the full reducer does not yet own all state transitions;
 - persisted `RuntimeDecision` rows are created, reused, and interpreted by the
-  daemon, but old plan rows still determine which operation-specific cells are
-  projected;
+  daemon, but old plan rows still determine which projection events are emitted;
 - prompt rendering, parsing, and admission use the persisted decision envelope
   and explore `ToolSetView`, but full policy-layer derivation is still
   bridge-limited;

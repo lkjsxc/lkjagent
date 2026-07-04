@@ -2,11 +2,13 @@ use lkjagent_core::runtime_context::{ContaminationClass, ContextItem, StalenessC
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
 };
+use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
 use lkjagent_store::context_rows::{context_items, insert_context_item};
 use lkjagent_store::decision_rows::{
     insert_runtime_decision, settle_decision, unfinished_decisions,
 };
+use lkjagent_store::event_rows::append_and_apply_event;
 use lkjagent_store::plan_inspect::application_tables;
 use lkjagent_store::plan_schema::setup;
 use lkjagent_store::state_rows::{hydrate_snapshot, insert_case, upsert_state_cell};
@@ -44,6 +46,32 @@ fn unknown_state_cells_round_trip_from_sqlite() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert_eq!(history, 1);
+    Ok(())
+}
+
+#[test]
+fn events_append_and_apply_reducer_patches() -> TestResult<()> {
+    let conn = Connection::open_in_memory()?;
+    setup(&conn)?;
+    insert_case(&conn, "case-1", "Apply events.", "t0")?;
+    let mut cell = custom_cell("model", "1");
+    cell.source_event_id = "event-1".to_string();
+    let event = RuntimeEvent {
+        id: "event-1".to_string(),
+        case_id: "case-1".to_string(),
+        kind: "state.cell.upsert".to_string(),
+        payload: RuntimeEventPayload::UpsertCell(Box::new(cell.clone())),
+        source: "test".to_string(),
+        created_at: "t1".to_string(),
+        decision_id: None,
+    };
+
+    append_and_apply_event(&conn, &event)?;
+    let snapshot = hydrate_snapshot(&conn, "case-1")?;
+
+    assert_eq!(snapshot.cells.get(&cell.key), Some(&cell));
+    let count: i64 = conn.query_row("SELECT COUNT(*) FROM runtime_events", [], |row| row.get(0))?;
+    assert_eq!(count, 1);
     Ok(())
 }
 

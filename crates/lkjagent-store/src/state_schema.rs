@@ -4,6 +4,7 @@ use crate::error::StoreResult;
 
 pub const STATE_LEDGER_TABLES: &[&str] = &[
     "cases",
+    "runtime_events",
     "state_cells",
     "state_history",
     "runtime_decisions",
@@ -27,7 +28,17 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         );
-
+        CREATE TABLE IF NOT EXISTS runtime_events (
+            id TEXT PRIMARY KEY,
+            case_id TEXT NOT NULL,
+            kind TEXT NOT NULL,
+            payload_json TEXT NOT NULL,
+            source TEXT NOT NULL,
+            decision_id TEXT,
+            event_json TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY(case_id) REFERENCES cases(id)
+        );
         CREATE TABLE IF NOT EXISTS state_cells (
             case_id TEXT NOT NULL,
             key_label TEXT NOT NULL,
@@ -50,7 +61,6 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             PRIMARY KEY(case_id, key_label),
             FOREIGN KEY(case_id) REFERENCES cases(id)
         );
-
         CREATE TABLE IF NOT EXISTS state_history (
             id INTEGER PRIMARY KEY,
             case_id TEXT NOT NULL,
@@ -59,7 +69,6 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             patch_json TEXT NOT NULL,
             created_at TEXT NOT NULL
         );
-
         CREATE TABLE IF NOT EXISTS runtime_decisions (
             id TEXT PRIMARY KEY,
             case_id TEXT NOT NULL,
@@ -96,7 +105,6 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
             body_ref TEXT NOT NULL,
             created_at TEXT NOT NULL
         );
-
         CREATE TABLE IF NOT EXISTS tool_admissions (
             id TEXT PRIMARY KEY,
             case_id TEXT NOT NULL,
@@ -108,7 +116,6 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
             result_json TEXT NOT NULL,
             created_at TEXT NOT NULL
         );
-
         CREATE TABLE IF NOT EXISTS observations (
             id TEXT PRIMARY KEY,
             case_id TEXT NOT NULL,
@@ -121,7 +128,6 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
             contamination_class TEXT NOT NULL,
             created_at TEXT NOT NULL
         );
-
         CREATE TABLE IF NOT EXISTS context_items (
             id TEXT PRIMARY KEY,
             case_id TEXT NOT NULL,
@@ -156,7 +162,6 @@ fn setup_indexes(conn: &Connection) -> StoreResult<()> {
             reason TEXT NOT NULL,
             created_at TEXT NOT NULL
         );
-
         CREATE TABLE IF NOT EXISTS artifacts (
             id TEXT PRIMARY KEY,
             case_id TEXT NOT NULL,
@@ -167,7 +172,6 @@ fn setup_indexes(conn: &Connection) -> StoreResult<()> {
             metadata_json TEXT NOT NULL,
             created_at TEXT NOT NULL
         );
-
         CREATE TABLE IF NOT EXISTS provider_exchanges (
             id TEXT PRIMARY KEY,
             case_id TEXT NOT NULL,
