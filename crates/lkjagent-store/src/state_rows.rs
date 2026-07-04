@@ -67,7 +67,7 @@ pub fn upsert_state_cell(conn: &Connection, case_id: &str, cell: &StateCell) -> 
 pub fn hydrate_snapshot(conn: &Connection, case_id: &str) -> StoreResult<RuntimeSnapshot> {
     let mut statement = conn.prepare(
         "SELECT cell_json FROM state_cells
-         WHERE case_id = ?1 ORDER BY key_label",
+         WHERE case_id = ?1 AND status = 'Active' ORDER BY key_label",
     )?;
     let rows = statement.query_map([case_id], |row| row.get::<_, String>(0))?;
     let mut snapshot = RuntimeSnapshot::empty(case_id);

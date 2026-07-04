@@ -74,11 +74,13 @@ helpers. `lkjagent-core` also has a pure selector that picks a runtime decision
 from hydrated state and reuses unfinished decisions before selecting new work.
 `lkjagent-store` creates the first state-ledger table set beside the plan-family
 rows, with row helpers for cases, unknown state cells, pending runtime
-decisions, and context items. `lkjagent-app` projects plan rows into a
-`runtime:next-work` state cell, hydrates state cells, persists or reuses a
+decisions, and context items. `lkjagent-app` projects plan rows into
+operation-specific state cells, hydrates state cells, persists or reuses a
 `RuntimeDecision` before prompt rendering, and settles the decision after the
-turn. Explore tool descriptors now live in one core catalog used to derive the
-bridge `ToolSetView`; prompt rendering prints that persisted view, parsing reads
+turn. The bridge projects cells such as `model:<step>`, `check:<step>`,
+`case:waiting-answer`, and `completion:close-candidate`. Explore tool
+descriptors now live in one core catalog used to derive the bridge
+`ToolSetView`; prompt rendering prints that persisted view, parsing reads
 the same decision view, app admission rows are persisted before explore effects,
 and the explore dispatcher resolves tool effects through the catalog descriptor.
 The daemon bridge also persists source-tagged context items, selects
@@ -115,10 +117,10 @@ gate evidence:
 - daemon runtime hydration is still shaped around fixed tasks, steps, and step
   kinds; state-ledger tables and row helpers exist but are not yet runtime
   authority;
-- runtime selection is still a plan-row bridge that projects one next-work cell;
-  the full reducer does not yet own all state transitions;
+- runtime selection reads operation-specific state cells projected from plan
+  rows; the full reducer does not yet own all state transitions;
 - persisted `RuntimeDecision` rows are created and reused by the daemon, but old
-  plan rows still determine the projected next-work cell;
+  plan rows still determine which operation-specific cells are projected;
 - prompt rendering, parsing, and admission use the persisted explore
   `ToolSetView`, but non-explore prompts and full policy-layer derivation are
   still bridge-limited;

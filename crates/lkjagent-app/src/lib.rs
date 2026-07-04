@@ -1,3 +1,4 @@
+mod admission_bridge;
 pub mod args;
 pub mod cli;
 pub mod clock;
