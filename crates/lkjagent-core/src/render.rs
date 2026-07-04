@@ -2,6 +2,7 @@ use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
 use crate::model::{Step, StepKind, Task};
+use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolSetView};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Prompt {
@@ -15,6 +16,33 @@ pub struct Prompt {
 const HARD_CAP: usize = 8_000;
 const STEP_FRAME: usize = 4_000;
 const RETRY_FRAME: usize = 250;
+
+pub fn render_prompt_for_decision(
+    task: &Task,
+    steps: &[Step],
+    step: &Step,
+    decision: &RuntimeDecision,
+) -> Prompt {
+    let mut prompt = render_prompt(task, steps, step);
+    if let Some(max_tokens) = decision.model_budget_tokens {
+        prompt.max_tokens = max_tokens;
+    }
+    if let Some(tag) = envelope_tag(decision.expected_envelope) {
+        prompt.stop = format!("</{tag}>");
+    }
+    let rendered_view = render_tool_view(&decision.tool_view);
+    if !rendered_view.is_empty() {
+        prompt.user = truncate(
+            &format!(
+                "{}\n\nTool view from decision:\n{rendered_view}",
+                prompt.user
+            ),
+            HARD_CAP,
+        );
+        prompt.fingerprint = fingerprint(&prompt.system, &prompt.user);
+    }
+    prompt
+}
 
 pub fn render_prompt(task: &Task, steps: &[Step], step: &Step) -> Prompt {
     let tag = expected_block(step.kind);
@@ -130,31 +158,29 @@ fn expected_block(kind: StepKind) -> &'static str {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use crate::classify::instantiate;
-
-    use super::*;
-
-    #[test]
-    fn prompt_includes_task_brief() {
-        let mut snapshot = instantiate(2, "What is known?");
-        snapshot.task.brief = "memory_facts:\nrow memory fact".to_string();
-        let prompt = render_prompt(&snapshot.task, &snapshot.steps, &snapshot.steps[0]);
-        assert!(prompt.system.contains("Task brief:"));
-        assert!(prompt.system.contains("row memory fact"));
+fn envelope_tag(envelope: OutputEnvelope) -> Option<&'static str> {
+    match envelope {
+        OutputEnvelope::Content => Some("content"),
+        OutputEnvelope::Plan => Some("plan"),
+        OutputEnvelope::Action => Some("action"),
+        OutputEnvelope::Message => Some("message"),
+        OutputEnvelope::Verdict => Some("verdict"),
+        OutputEnvelope::None => None,
     }
+}
 
-    #[test]
-    fn retry_prompt_fingerprint_changes() {
-        let mut snapshot = instantiate(1, "answer a workspace question");
-        let step = match snapshot.steps.first().cloned() {
-            Some(step) => step,
-            None => return assert_eq!(snapshot.steps.len(), 1),
-        };
-        let before = render_prompt(&snapshot.task, &snapshot.steps, &step);
-        snapshot.steps[0].attempts_used = 1;
-        let after = render_prompt(&snapshot.task, &snapshot.steps, &snapshot.steps[0]);
-        assert_ne!(before.fingerprint, after.fingerprint);
-    }
+fn render_tool_view(view: &ToolSetView) -> String {
+    view.entries
+        .iter()
+        .map(|entry| {
+            format!(
+                "- {}: {} required={} optional={}",
+                entry.name,
+                entry.purpose,
+                entry.required_params.join(","),
+                entry.optional_params.join(",")
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
 }

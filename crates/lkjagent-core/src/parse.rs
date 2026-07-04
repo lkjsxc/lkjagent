@@ -1,6 +1,8 @@
 use std::collections::BTreeSet;
 
 use crate::model::{CheckResult, StepKind};
+use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolSetView};
+use crate::runtime_tool_catalog::explore_tool_view;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ParsedOutput {
@@ -44,14 +46,40 @@ pub enum ParseFault {
 }
 
 pub fn parse_expected(kind: StepKind, raw: &str) -> Result<ParsedOutput, ParseFault> {
+    parse_expected_with_view(kind, raw, &explore_tool_view())
+}
+
+pub fn parse_expected_with_view(
+    kind: StepKind,
+    raw: &str,
+    view: &ToolSetView,
+) -> Result<ParsedOutput, ParseFault> {
     match kind {
         StepKind::Write | StepKind::Revise => block(raw, "content").map(ParsedOutput::Content),
         StepKind::Plan => {
             crate::parse_plan::parse_plan(&block(raw, "plan")?).map(ParsedOutput::Plan)
         }
-        StepKind::Explore => parse_action(raw),
+        StepKind::Explore => parse_action(raw, view),
         StepKind::Respond | StepKind::Ask => block(raw, "message").map(ParsedOutput::Message),
         StepKind::Verify => parse_verdict(&block(raw, "verdict")?).map(ParsedOutput::Verdict),
+    }
+}
+
+pub fn parse_expected_for_decision(
+    decision: &RuntimeDecision,
+    raw: &str,
+) -> Result<ParsedOutput, ParseFault> {
+    match decision.expected_envelope {
+        OutputEnvelope::Content => block(raw, "content").map(ParsedOutput::Content),
+        OutputEnvelope::Plan => {
+            crate::parse_plan::parse_plan(&block(raw, "plan")?).map(ParsedOutput::Plan)
+        }
+        OutputEnvelope::Action => parse_action(raw, &decision.tool_view),
+        OutputEnvelope::Message => block(raw, "message").map(ParsedOutput::Message),
+        OutputEnvelope::Verdict => {
+            parse_verdict(&block(raw, "verdict")?).map(ParsedOutput::Verdict)
+        }
+        OutputEnvelope::None => Err(ParseFault::WrongBlock),
     }
 }
 
@@ -76,14 +104,11 @@ pub fn block(raw: &str, tag: &str) -> Result<String, ParseFault> {
     }
 }
 
-fn parse_action(raw: &str) -> Result<ParsedOutput, ParseFault> {
+fn parse_action(raw: &str, view: &ToolSetView) -> Result<ParsedOutput, ParseFault> {
     let body = block(raw, "action")?;
     let params = parse_params(&body)?;
     let tool = one(&params, "tool")?.to_string();
-    if allowed_params(&tool).is_none() {
-        return Err(ParseFault::UnknownTool);
-    }
-    validate_params(&tool, &params)?;
+    validate_params(view, &tool, &params)?;
     Ok(ParsedOutput::Action(Action { tool, params }))
 }
 
@@ -135,14 +160,18 @@ fn one<'a>(params: &'a [(String, String)], name: &str) -> Result<&'a str, ParseF
         .ok_or(ParseFault::BadParams)
 }
 
-fn validate_params(tool: &str, params: &[(String, String)]) -> Result<(), ParseFault> {
-    let allowed = allowed_params(tool).ok_or(ParseFault::UnknownTool)?;
+fn validate_params(
+    view: &ToolSetView,
+    tool: &str,
+    params: &[(String, String)],
+) -> Result<(), ParseFault> {
+    let entry = view.entry(tool).ok_or(ParseFault::UnknownTool)?;
     for (name, _) in params {
-        if !allowed.contains(&name.as_str()) {
+        if name != "tool" && !entry.accepts_param(name) {
             return Err(ParseFault::BadParams);
         }
     }
-    for required in required_params(tool) {
+    for required in &entry.required_params {
         one(params, required)?;
     }
     Ok(())
@@ -163,33 +192,4 @@ fn parse_verdict(body: &str) -> Result<CheckResult, ParseFault> {
         passed,
         measured: lines.collect::<Vec<_>>().join(" "),
     })
-}
-
-fn allowed_params(tool: &str) -> Option<&'static [&'static str]> {
-    match tool {
-        "fs.read" => Some(&["tool", "path", "offset", "count"]),
-        "fs.list" | "fs.tree" => Some(&["tool", "path", "depth"]),
-        "fs.search" => Some(&["tool", "query", "path"]),
-        "fs.write" => Some(&["tool", "path", "content"]),
-        "shell.run" => Some(&["tool", "command"]),
-        "memory.find" => Some(&["tool", "query"]),
-        "memory.save" => Some(&["tool", "topic", "content"]),
-        "plan.note" => Some(&["tool", "note"]),
-        "finish" => Some(&["tool", "summary"]),
-        _ => None,
-    }
-}
-
-fn required_params(tool: &str) -> &'static [&'static str] {
-    match tool {
-        "fs.read" => &["path"],
-        "fs.search" | "memory.find" => &["query"],
-        "fs.write" => &["path", "content"],
-        "shell.run" => &["command"],
-        "memory.save" => &["topic", "content"],
-        "plan.note" => &["note"],
-        "finish" => &["summary"],
-        "fs.list" | "fs.tree" => &[],
-        _ => &[],
-    }
 }

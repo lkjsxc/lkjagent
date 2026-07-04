@@ -1,8 +1,15 @@
+use std::collections::BTreeMap;
+
+use lkjagent_core::engine::Command;
 use lkjagent_core::model::{CheckSpec, Step, StepKind, StepState, TaskSnapshot, TaskState};
+use lkjagent_core::parse::Action;
 use lkjagent_core::render::max_tokens;
-use lkjagent_core::runtime_decision::{RuntimeDecision, ToolViewEntry};
+use lkjagent_core::runtime_admission::{admit_action, AdmissionStatus, ModelAction};
+use lkjagent_core::runtime_decision::RuntimeDecision;
 use lkjagent_core::runtime_selector::select_runtime_decision;
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
+use lkjagent_core::runtime_tool_catalog::explore_tool_view;
+use lkjagent_store::admission_rows::insert_tool_admission;
 use lkjagent_store::decision_rows::{
     insert_runtime_decision, next_decision_id, settle_decision, unfinished_decisions,
 };
@@ -40,6 +47,41 @@ pub fn settle_runtime_decision(
     settle_decision(conn, &decision.id, status, now)
         .map(|_| ())
         .map_err(|error| error.to_string())
+}
+
+pub fn persist_tool_admissions(
+    conn: &Connection,
+    decision: &RuntimeDecision,
+    commands: &[Command],
+    now: &str,
+) -> Result<(), String> {
+    for (index, command) in commands.iter().enumerate() {
+        let Command::RunExplore(action) = command else {
+            continue;
+        };
+        let model_action = model_action(action);
+        let admission = admit_action(decision, &model_action).map_err(|error| error.message)?;
+        let id = format!("{}-admission-{:04}", decision.id, index + 1);
+        let parsed = serde_json::to_string(&model_action).map_err(|error| error.to_string())?;
+        insert_tool_admission(conn, &id, &decision.case_id, &admission, &parsed, now)
+            .map_err(|error| error.to_string())?;
+        if admission.status == AdmissionStatus::Rejected {
+            return Err(format!("admission rejected: {}", admission.reason));
+        }
+    }
+    Ok(())
+}
+
+fn model_action(action: &Action) -> ModelAction {
+    ModelAction {
+        tool: action.tool.clone(),
+        params: action
+            .params
+            .iter()
+            .filter(|(name, _)| name != "tool")
+            .map(|(name, value)| (name.clone(), value.clone()))
+            .collect::<BTreeMap<_, _>>(),
+    }
 }
 
 fn next_work_cell(snapshot: &TaskSnapshot, now: &str) -> Result<StateCell, String> {
@@ -101,7 +143,8 @@ fn tool_view(step: &Step) -> Vec<serde_json::Value> {
     if step.kind != StepKind::Explore {
         return Vec::new();
     }
-    explore_tools()
+    explore_tool_view()
+        .entries
         .into_iter()
         .map(|entry| {
             serde_json::json!({
@@ -112,70 +155,6 @@ fn tool_view(step: &Step) -> Vec<serde_json::Value> {
             })
         })
         .collect()
-}
-
-fn explore_tools() -> Vec<ToolViewEntry> {
-    vec![
-        tool("finish", "finish exploration", vec!["summary"], vec![]),
-        tool(
-            "fs.read",
-            "read a workspace file",
-            vec!["path"],
-            vec!["count", "offset"],
-        ),
-        tool(
-            "fs.list",
-            "list a workspace directory",
-            vec![],
-            vec!["path", "depth"],
-        ),
-        tool(
-            "fs.tree",
-            "show a bounded workspace tree",
-            vec![],
-            vec!["path", "depth"],
-        ),
-        tool(
-            "fs.search",
-            "search workspace text",
-            vec!["query"],
-            vec!["path"],
-        ),
-        tool(
-            "fs.write",
-            "write a workspace file",
-            vec!["path", "content"],
-            vec![],
-        ),
-        tool(
-            "shell.run",
-            "run a bounded shell command",
-            vec!["command"],
-            vec![],
-        ),
-        tool(
-            "memory.find",
-            "search durable memory",
-            vec!["query"],
-            vec![],
-        ),
-        tool(
-            "memory.save",
-            "save durable memory",
-            vec!["topic", "content"],
-            vec![],
-        ),
-        tool(
-            "plan.note",
-            "record an exploration note",
-            vec!["note"],
-            vec![],
-        ),
-    ]
-}
-
-fn tool(name: &str, purpose: &str, required: Vec<&str>, optional: Vec<&str>) -> ToolViewEntry {
-    ToolViewEntry::new(name, purpose).with_params(required, optional)
 }
 
 fn deterministic(spec: &CheckSpec) -> bool {

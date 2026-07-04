@@ -1,5 +1,8 @@
 use lkjagent_core::model::StepKind;
-use lkjagent_core::parse::{parse_expected, ParseFault, ParsedOutput};
+use lkjagent_core::parse::{parse_expected, parse_expected_for_decision, ParseFault, ParsedOutput};
+use lkjagent_core::runtime_decision::{
+    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
+};
 
 #[test]
 fn parses_docs_plan_examples() {
@@ -48,6 +51,30 @@ fn reports_docs_fault_examples() {
     assert_eq!(
         parse_expected(StepKind::Write, "<content>x</content> tail"),
         Err(ParseFault::WrongBlock)
+    );
+}
+
+#[test]
+fn decision_action_parser_uses_only_the_decision_tool_view() {
+    let decision = RuntimeDecision::new(
+        "decision-1",
+        "case-1",
+        OperationKey("model.call/1".to_string()),
+        ToolSetView::new(vec![
+            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new())
+        ]),
+        OutputEnvelope::Action,
+    );
+    let read = "<action><tool>fs.read</tool><path>README.md</path></action>";
+    let shell = "<action><tool>shell.run</tool><command>pwd</command></action>";
+
+    assert!(matches!(
+        parse_expected_for_decision(&decision, read),
+        Ok(ParsedOutput::Action(action)) if action.tool == "fs.read"
+    ));
+    assert_eq!(
+        parse_expected_for_decision(&decision, shell),
+        Err(ParseFault::UnknownTool)
     );
 }
 

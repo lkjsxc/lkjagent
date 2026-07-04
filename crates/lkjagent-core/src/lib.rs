@@ -27,5 +27,6 @@ pub mod runtime_fingerprint;
 pub mod runtime_operation;
 pub mod runtime_selector;
 pub mod runtime_state;
+pub mod runtime_tool_catalog;
 pub mod templates;
 pub mod words;

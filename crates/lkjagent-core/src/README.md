@@ -9,6 +9,8 @@ Map lkjagent-core source modules.
 - [lib.rs](lib.rs): public module exports.
 - [runtime-state.rs](runtime_state.rs): state keys, cells, snapshots, and
   state-vector fingerprints.
+- [runtime-tool-catalog.rs](runtime_tool_catalog.rs): canonical tool
+  descriptors and views.
 - [runtime-event.rs](runtime_event.rs): events, patches, reducer, and patch
   application.
 - [runtime-decision.rs](runtime_decision.rs): runtime decisions, envelopes, and

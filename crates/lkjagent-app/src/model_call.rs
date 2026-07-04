@@ -3,8 +3,9 @@ use std::time::Instant;
 
 use lkjagent_core::engine::{Command, TurnOutcome};
 use lkjagent_core::model::{Attempt, TaskSnapshot};
-use lkjagent_core::parse::parse_expected;
+use lkjagent_core::parse::parse_expected_for_decision;
 use lkjagent_core::render::Prompt;
+use lkjagent_core::runtime_decision::RuntimeDecision;
 
 use crate::exchange_record::{write_error, write_success, ExchangeContext};
 use crate::model_io::Endpoint;
@@ -23,6 +24,7 @@ pub fn call<E: Endpoint>(
     snapshot: &TaskSnapshot,
     step_id: u64,
     prompt: &Prompt,
+    decision: &RuntimeDecision,
     endpoint: &mut E,
 ) -> Result<(TurnOutcome, Option<CallRecord>), String> {
     let step = snapshot
@@ -34,7 +36,7 @@ pub fn call<E: Endpoint>(
     let started = Instant::now();
     match endpoint.complete(prompt, step.attempts_used) {
         Ok(record) => {
-            let outcome = parse_expected(step.kind, &record.content)
+            let outcome = parse_expected_for_decision(decision, &record.content)
                 .map_or_else(TurnOutcome::ParseFault, TurnOutcome::Model);
             write_success(
                 context(logs, snapshot, step.ordinal, ordinal, prompt, started),

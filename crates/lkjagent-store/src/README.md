@@ -7,6 +7,7 @@ Map lkjagent-store source modules.
 ## Table of Contents
 
 - [lib.rs](lib.rs): module exports.
+- [admission-rows.rs](admission_rows.rs): tool admission row helpers.
 - [context-rows.rs](context_rows.rs): context item row helpers.
 - [decision-rows.rs](decision_rows.rs): runtime decision row helpers.
 - [memory.rs](memory.rs): duplicate-suppressed memory writes and search.

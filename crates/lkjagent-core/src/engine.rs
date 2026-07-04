@@ -4,7 +4,8 @@ use crate::engine_completion::{block_task, close_task};
 use crate::engine_steps::{handle_endpoint_error, handle_fault, handle_model};
 use crate::model::*;
 use crate::parse::{Action, ParseFault, ParsedOutput};
-use crate::render::{render_prompt, Prompt};
+use crate::render::{render_prompt, render_prompt_for_decision, Prompt};
+use crate::runtime_decision::RuntimeDecision;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Work {
@@ -44,7 +45,15 @@ pub enum Command {
     AddSteps(Vec<Step>),
 }
 
+pub fn next_work_with_decision(snapshot: &TaskSnapshot, decision: &RuntimeDecision) -> Work {
+    next_work_rendered(snapshot, Some(decision))
+}
+
 pub fn next_work(snapshot: &TaskSnapshot) -> Work {
+    next_work_rendered(snapshot, None)
+}
+
+fn next_work_rendered(snapshot: &TaskSnapshot, decision: Option<&RuntimeDecision>) -> Work {
     match snapshot.task.state {
         TaskState::Waiting | TaskState::Blocked | TaskState::Closed => return Work::Wait,
         TaskState::Open => {}
@@ -61,7 +70,12 @@ pub fn next_work(snapshot: &TaskSnapshot) -> Work {
     }
     Work::CallModel {
         step_id: step.id,
-        prompt: render_prompt(&snapshot.task, &snapshot.steps, step),
+        prompt: match decision {
+            Some(decision) => {
+                render_prompt_for_decision(&snapshot.task, &snapshot.steps, step, decision)
+            }
+            None => render_prompt(&snapshot.task, &snapshot.steps, step),
+        },
     }
 }
 

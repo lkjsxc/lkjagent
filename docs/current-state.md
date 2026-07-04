@@ -77,7 +77,10 @@ rows, with row helpers for cases, unknown state cells, pending runtime
 decisions, and context items. `lkjagent-app` projects plan rows into a
 `runtime:next-work` state cell, hydrates state cells, persists or reuses a
 `RuntimeDecision` before prompt rendering, and settles the decision after the
-turn. Current gate results belong in the handoff after commands are rerun
+turn. Explore tool descriptors now live in one core catalog used to derive the
+bridge `ToolSetView`; prompt rendering prints that persisted view, parsing reads
+the same decision view, and app admission rows are persisted before explore
+effects. Current gate results belong in the handoff after commands are rerun
 against this checkout.
 
 ## State-Ledger Gap
@@ -93,10 +96,11 @@ gate evidence:
   the full reducer does not yet own all state transitions;
 - persisted `RuntimeDecision` rows are created and reused by the daemon, but old
   plan rows still determine the projected next-work cell;
-- prompt rendering and action admission are not yet wired to the same stored
-  decision-specific `ToolSetView`;
-- tool descriptors and legality are duplicated across docs, parser, renderer,
-  and dispatcher instead of derived from one catalog plus policy layers;
+- prompt rendering, parsing, and admission use the persisted explore
+  `ToolSetView`, but non-explore prompts and full policy-layer derivation are
+  still bridge-limited;
+- tool descriptors are catalog-backed for prompt, parser, and admission, but the
+  effect dispatcher still has a separate tool-to-effect match table;
 - prompt context is still assembled from briefs, inputs, memory facts, and
   bounded observations rather than durable context items with source,
   fingerprint, trust, staleness, contamination, and semantic keys;
@@ -134,10 +138,10 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Next, wire prompt rendering, parsing, action admission, and dispatch to the
-persisted decision-specific `ToolSetView`: add the catalog-backed view, render
-only that view, parse actions against it, persist `ToolAdmission` rows before
-effects, and prove prompt-visible tools exactly match admission.
+Next, replace transcript-like prompt context with durable context items: persist
+source-tagged items through the daemon bridge, select clean current items for
+prompt frames, create unresolved conflict state cells before rendering, and
+prove contaminated items are excluded from normal prompts.
 
 ## Honesty Rules
 
