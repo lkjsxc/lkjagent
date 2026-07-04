@@ -34,6 +34,9 @@ Create a novel manuscript of about 10000 words in 10 chapters at stories/structu
 - Chapter prompts did not include the settings content as continuity context.
 - Step 4 reached high endpoint attempts while the stale lock still rendered the
   daemon as `working`.
+- The endpoint-side log shows LM Studio accepted the chapter 02 request, then
+  logged `Client disconnected` after one minute and generated an undelivered
+  chapter response.
 - The original data directory had a permission incident; ownership was repaired
   before this fixture was captured.
 
@@ -49,6 +52,7 @@ present in the captured exchange files.
 - `raw-redacted/exchange-logs/`: redacted request, response, outcome, and timing
   files from endpoint exchanges.
 - `raw-redacted/daemon.log`: daemon stderr/stdout capture.
+- `endpoint-server-log.md`: owner-supplied endpoint-side excerpt and findings.
 - `sqlite-extracts/`: TSV extracts of durable store rows.
 - `word-counts.tsv`: generated markdown word counts.
 - `manifest.json`: capture metadata.
