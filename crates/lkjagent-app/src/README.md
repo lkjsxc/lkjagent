@@ -13,6 +13,7 @@ Map lkjagent-app source modules.
 - [args.rs](args.rs): CLI parser.
 - [cli.rs](cli.rs): command execution.
 - [clock.rs](clock.rs): timestamp seam for runtime and deterministic tests.
+- [context-admin.rs](context_admin.rs): owner conflict-resolution commands.
 - [context-bridge.rs](context_bridge.rs): durable context item prompt projection.
 - [context-resolution-bridge.rs](context_resolution_bridge.rs): conflict lineage rows.
 - [daemon.rs](daemon.rs): row-backed turn-cycle interpreter and scripted endpoint seam.

@@ -8,6 +8,7 @@ Integration tests for lkjagent-app.
 
 - [app.rs](app.rs): CLI help, scripted endpoint, and template tests.
 - [cli-rows.rs](cli_rows.rs): row-backed CLI inspection tests.
+- [context-cli.rs](context_cli.rs): owner context resolution command tests.
 - [context-items.rs](context_items.rs): durable context hygiene tests.
 - [contamination.rs](contamination.rs): contamination classification tests.
 - [docs-tree.rs](docs_tree.rs): documentation tree app flows.

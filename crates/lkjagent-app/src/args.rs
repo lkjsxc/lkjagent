@@ -10,14 +10,30 @@ pub struct Invocation {
 pub enum Command {
     Help,
     Run,
-    Send { text: String, force_new: bool },
+    Send {
+        text: String,
+        force_new: bool,
+    },
     Status,
-    Log { limit: usize },
+    Log {
+        limit: usize,
+    },
     TaskList,
-    TaskShow { id: u64 },
+    TaskShow {
+        id: u64,
+    },
     QueueList,
-    QueueShow { id: i64 },
-    Memory { query: String },
+    QueueShow {
+        id: i64,
+    },
+    ContextResolve {
+        case_id: String,
+        semantic_key: String,
+        winning_item_id: String,
+    },
+    Memory {
+        query: String,
+    },
     Watch,
 }
 
@@ -59,6 +75,7 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
         }),
         "task" => parse_task(rest),
         "queue" => parse_queue(rest),
+        "context" => parse_context(rest),
         "memory" => Ok(Command::Memory {
             query: rest.join(" "),
         }),
@@ -104,6 +121,19 @@ fn parse_queue(rest: Vec<String>) -> Result<Command, String> {
             .map(|id| Command::QueueShow { id })
             .map_err(|error| error.to_string()),
         _ => Err("use queue list | queue show ID".to_string()),
+    }
+}
+
+fn parse_context(rest: Vec<String>) -> Result<Command, String> {
+    match rest.as_slice() {
+        [action, case_id, semantic_key, winning_item_id] if action == "resolve" => {
+            Ok(Command::ContextResolve {
+                case_id: case_id.clone(),
+                semantic_key: semantic_key.clone(),
+                winning_item_id: winning_item_id.clone(),
+            })
+        }
+        _ => Err("use context resolve CASE_ID KEY WINNING_ITEM_ID".to_string()),
     }
 }
 

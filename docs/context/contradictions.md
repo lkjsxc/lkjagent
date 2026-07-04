@@ -38,8 +38,9 @@ winning item. Proof bundles include these rows with the context items.
 ## Resolution
 
 A conflict resolves through a durable event: owner answer, check evidence,
-artifact inspection, or a deterministic reducer rule. Losing context items are
-suppressed from normal prompt admission, not deleted.
+artifact inspection, or a deterministic reducer rule. The owner can write a
+resolution cell with `context resolve CASE_ID KEY WINNING_ITEM_ID`. Losing
+context items are suppressed from normal prompt admission, not deleted.
 
 ## Failure This Prevents
 

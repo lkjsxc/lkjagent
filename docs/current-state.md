@@ -109,8 +109,8 @@ items while error observations are marked recovery-only.
 Parse-fault provider exchanges create failed-model-output context items,
 endpoint errors create recovery-only context items, shell observations become
 external-raw context, and secret-like observation bodies become redacted
-sensitive-owner context. Active
-`context:resolve/<key>` cells suppress losing conflict items before prompt
+sensitive-owner context. The owner-facing `context resolve` command writes active
+`context:resolve/<key>` cells that suppress losing conflict items before prompt
 rendering. Unfinished decisions with committed provider exchanges, admissions, or
 observations are recovered before a new decision is selected and write resolved
 `recovery:recovered/<decision>` report cells; decisions without external
@@ -143,9 +143,8 @@ gate evidence:
 - prompt context has a durable context-item bridge for clean items, conflicts,
   observations, and contaminated exclusion, and prompt-frame rows own replayable
   bounded body refs;
-- contradictions become conflict state cells and active resolution cells
-  suppress losing items with `context_edges` lineage, but owner-facing conflict
-  repair operations are still bridge-level;
+- contradictions become conflict state cells, owner-facing resolution commands
+  write active resolution cells, and suppression records `context_edges` lineage;
 - parse faults, endpoint errors, effect errors, shell observations, and
   secret-like observation bodies classify contamination durably with conservative
   redaction before prompt admission;
