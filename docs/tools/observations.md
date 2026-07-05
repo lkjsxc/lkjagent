@@ -28,11 +28,11 @@ bounded resumable fact.
 ## Example
 
 ```text
-<action>
-<tool>fs.read</tool>
+<tool_call>
+<tool_name>fs.read</tool_name>
 <path>data/logs/current-model-run.md</path>
 <count>20</count>
-</action>
+</tool_call>
 ```
 
 Observation:

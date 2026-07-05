@@ -24,10 +24,10 @@ plane.
 
 ## Consequences
 
-Prompt rendering, parser contracts, action admission, effect dispatch, status,
-resume, record commands, state-edge diagnostics, and proof bundles all project
-the same decision row. There is no prompt-only policy, dispatcher-only policy,
-private command state, or second graph authority.
+Prompt rendering, parser contracts, tool-call admission, effect dispatch,
+status, resume, record commands, state-edge diagnostics, and proof bundles all
+project the same decision row. There is no prompt-only policy,
+dispatcher-only policy, private command state, or second graph authority.
 
 ## Rejected Alternatives
 

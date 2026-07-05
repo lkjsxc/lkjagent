@@ -10,7 +10,7 @@ admissions, observations, and guards.
 - [registry.md](registry.md): canonical descriptor fields for the tool catalog.
 - [policy.md](policy.md): layered policy that derives per-decision access.
 - [toolset-view-and-admission.md](toolset-view-and-admission.md): prompt-visible
-  tool projection and action admission.
+  tool projection and tool-call admission.
 - [observations.md](observations.md): returned observation envelope and example.
 - [guards.md](guards.md): path, budget, repeat, and recovery guards.
 

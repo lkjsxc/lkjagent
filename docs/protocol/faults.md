@@ -11,8 +11,8 @@ Define parse faults, contamination rules, and retry hints for model output.
 | `wrong_block` | missing or different envelope, including prose outside it | restate expected tags |
 | `unclosed` | closing tag absent before EOF | shorten to fit budget |
 | `empty` | expected body is blank | restate minimum content |
-| `unknown_tool` | action tool absent from the decision view | list rendered tool names |
-| `bad_params` | missing, duplicate, or unknown action parameter | show exact tool form |
+| `unknown_tool` | `tool_name` absent from the decision view | list rendered tool names |
+| `bad_params` | missing, duplicate, or unknown tool-call field | show exact tool form |
 | `bad_plan_line` | unparseable or invalid plan line | quote failing line and grammar |
 
 Fault names are stable data, but the parser validates against the current
@@ -32,9 +32,10 @@ diagnosis and required change.
 - `<message>` during a write decision yields `wrong_block`.
 - A missing closing `</content>` yields `unclosed`.
 - Empty `<content></content>` yields `empty`.
-- An action with a tool absent from the decision view yields `unknown_tool`.
-- An action with duplicate `<path>` parameters yields `bad_params`.
-- An action with an unsupported parameter yields `bad_params`.
+- A `<tool_call>` with a `tool_name` absent from the decision view yields
+  `unknown_tool`.
+- A `<tool_call>` with duplicate `<path>` fields yields `bad_params`.
+- A `<tool_call>` with an unsupported field yields `bad_params`.
 - A plan line without `words=` yields `bad_plan_line`.
 
 ## Failure This Prevents

@@ -32,4 +32,4 @@ specific report.
 ## Failure Boundary
 
 Generation caps are sized by step kind, so honest prose is not forced through a
-small action budget.
+small tool-call budget.

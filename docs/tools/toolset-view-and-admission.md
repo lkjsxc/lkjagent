@@ -2,14 +2,15 @@
 
 ## Purpose
 
-Tie prompt-visible tools and action admission to the persisted runtime decision.
+Tie prompt-visible tools and tool-call admission to the persisted runtime
+decision.
 
 ## ToolSetView
 
 `ToolSetView` is produced from the catalog, policy layers, and active state
 vector. It contains only tools admissible for the current decision. Each entry
-renders the tool name, purpose, exact XML action shape, required parameters,
-optional parameters, relevant limits, and one concise example when budget allows.
+renders the tool name, purpose, exact XML `<tool_call>` shape, required fields,
+optional fields, relevant limits, and one concise example when budget allows.
 
 ## View Fingerprint
 
@@ -26,10 +27,10 @@ means absent from the decision view, not absent from a hidden global list.
 
 ## Admission
 
-Admission validates the parsed action against the same view fingerprint and then
-runs final deterministic checks such as path canonicalization, budget remaining,
-state suppressors, and recovery constraints. A prompt/admission mismatch is a
-high-severity runtime event.
+Admission validates the parsed tool call against the same view fingerprint and
+then runs final deterministic checks such as path canonicalization, budget
+remaining, state suppressors, and recovery constraints. A prompt/admission
+mismatch is a high-severity runtime event.
 
 ## Fault Handling
 
@@ -39,5 +40,6 @@ change.
 
 ## Failure This Prevents
 
-A model action cannot sneak through a dispatcher path that was absent from the
-prompt, and a legal prompt action cannot be refused by a stale parser registry.
+A model tool call cannot sneak through a dispatcher path that was absent from
+the prompt, and a legal prompt tool call cannot be refused by a stale parser
+registry.

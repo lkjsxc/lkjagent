@@ -29,6 +29,7 @@ or body refs.
 | unresolved conflicts | `context.user.conflict-tokens=600` |
 | tool view, when present | `context.user.tool-view-tokens=1200` |
 | recovery or retry diagnosis | `context.user.recovery-tokens=250` |
+| output skeleton | `context.user.protocol-card-tokens=250` |
 
 The whole request is capped by `context.request.hard-cap-tokens=8000`.
 
@@ -37,7 +38,9 @@ The whole request is capped by `context.request.hard-cap-tokens=8000`.
 Every region has an owner and a cap. Oversize items are truncated head-and-tail
 with an explicit marker. Contaminated items are excluded from normal prompts.
 Contradictions render only as unresolved-conflict summaries until resolved.
-Observations are bounded before storage and bounded again during rendering.
+Observations are bounded before storage and bounded again during rendering. The
+final prompt region is a copyable output skeleton for the selected envelope and
+active tool view.
 
 ## Fingerprint Contract
 

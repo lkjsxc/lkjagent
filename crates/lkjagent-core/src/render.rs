@@ -5,7 +5,7 @@ use crate::model::{Step, Task};
 pub use crate::prompt_policy::max_tokens;
 
 use crate::prompt_policy::{envelope_tag, expected_block, protocol, protocol_for_envelope};
-use crate::runtime_decision::{RuntimeDecision, ToolSetView};
+use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolSetView};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Prompt {
@@ -52,8 +52,12 @@ pub fn render_prompt_for_decision(
             ),
             HARD_CAP,
         );
-        prompt.fingerprint = fingerprint(&prompt.system, &prompt.user);
     }
+    prompt.user = truncate(
+        &format!("{}\n\n{}", prompt.user, protocol_card(decision)),
+        HARD_CAP,
+    );
+    prompt.fingerprint = fingerprint(&prompt.system, &prompt.user);
     prompt
 }
 
@@ -145,14 +149,52 @@ fn render_tool_view(view: &ToolSetView) -> String {
     view.entries
         .iter()
         .map(|entry| {
+            let required = entry.required_params.join(",");
+            let optional = entry.optional_params.join(",");
             format!(
-                "- {}: {} required={} optional={}",
-                entry.name,
-                entry.purpose,
-                entry.required_params.join(","),
-                entry.optional_params.join(",")
+                "- {}: {} required={required} optional={optional}",
+                entry.name, entry.purpose
             )
         })
         .collect::<Vec<_>>()
         .join("\n")
+}
+
+fn protocol_card(decision: &RuntimeDecision) -> String {
+    match decision.expected_envelope {
+        OutputEnvelope::Action => tool_call_card(&decision.tool_view),
+        envelope => generic_card(envelope),
+    }
+}
+
+fn tool_call_card(view: &ToolSetView) -> String {
+    let first = view.entries.first();
+    let tool_name = first.map_or("TOOL", |entry| entry.name.as_str());
+    let mut lines = vec![
+        "Output contract for this turn:".to_string(),
+        "- Return exactly one <tool_call> block.".to_string(),
+        "- Do not write prose before or after the block.".to_string(),
+        "- Use one tool_name from the Tool view and include required fields.".to_string(),
+        "- Close with </tool_call>.".to_string(),
+        "\nCopy this shape:".to_string(),
+        "<tool_call>".to_string(),
+        format!("<tool_name>{tool_name}</tool_name>"),
+    ];
+    if let Some(entry) = first {
+        for field in &entry.required_params {
+            lines.push(format!("<{field}>...</{field}>"));
+        }
+    }
+    lines.push("</tool_call>".to_string());
+    lines.join("\n")
+}
+
+fn generic_card(envelope: OutputEnvelope) -> String {
+    let tag = envelope_tag(envelope).unwrap_or("no_output");
+    if envelope == OutputEnvelope::None {
+        return "Output contract for this turn:\n- No model output expected.".to_string();
+    }
+    format!(
+        "Output contract for this turn:\n- Return exactly one <{tag}> block.\n- Do not write prose before or after the block.\n- Close with </{tag}>.\n\nCopy this shape:\n<{tag}>\n...\n</{tag}>"
+    )
 }

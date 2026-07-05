@@ -6,9 +6,9 @@ Define the canonical descriptor fields for the tool catalog.
 
 ## Catalog Rule
 
-There is one tool catalog. Docs, prompt rendering, parser shape checks, action
-admission, dispatcher wiring, and tests derive from the same descriptor set.
-Fixed explore-only lists are helper views, not independent law.
+There is one tool catalog. Docs, prompt rendering, parser shape checks,
+tool-call admission, dispatcher wiring, and tests derive from the same
+descriptor set. Fixed explore-only lists are helper views, not independent law.
 
 ## Descriptor Fields
 
@@ -27,19 +27,19 @@ Each descriptor stores:
 
 ## Prompt Form
 
-The runtime renders exact action shapes only for tools in the active
+The runtime renders exact tool-call shapes only for tools in the active
 `ToolSetView`:
 
 ```text
-<action>
-<tool>fs.read</tool>
+<tool_call>
+<tool_name>fs.read</tool_name>
 <path>data/logs/current-model-run.md</path>
 <count>20</count>
-</action>
+</tool_call>
 ```
 
 If no tools are available, the decision renders an output contract that does not
-ask for an action.
+ask for a tool call.
 
 ## Failure This Prevents
 

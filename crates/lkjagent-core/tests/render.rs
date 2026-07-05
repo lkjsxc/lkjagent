@@ -2,7 +2,9 @@ use lkjagent_core::classify::instantiate;
 use lkjagent_core::model::StepKind;
 use lkjagent_core::render::{max_tokens, render_prompt, render_prompt_for_decision};
 use lkjagent_core::runtime_artifact::DEFAULT_UNIT_TARGET_TOKENS;
-use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
+use lkjagent_core::runtime_decision::{
+    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
+};
 
 #[test]
 fn write_steps_use_artifact_unit_budget_with_close_headroom() {
@@ -29,7 +31,32 @@ fn decision_envelope_replaces_step_prompt_policy() {
     );
     assert!(prompt.system.contains("Expected: message"));
     assert!(prompt.system.contains("Return exactly <message>"));
-    assert!(!prompt.system.contains("Return exactly <action>"));
+    assert!(!prompt.system.contains("Return exactly <tool_call>"));
+}
+
+#[test]
+fn explore_decision_renders_tool_call_contract() {
+    let snapshot = instantiate(3, "Survey workspace and report.");
+    let decision = RuntimeDecision::new(
+        "decision-1",
+        "case-1",
+        OperationKey("model.call/1".to_string()),
+        ToolSetView::new(vec![
+            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new())
+        ]),
+        OutputEnvelope::Action,
+    );
+    let prompt = render_prompt_for_decision(
+        &snapshot.task,
+        &snapshot.steps,
+        &snapshot.steps[0],
+        &decision,
+    );
+    assert!(prompt.system.contains("Expected: tool_call"));
+    assert!(prompt.system.contains("Return exactly <tool_call>"));
+    assert!(prompt.user.contains("<tool_name>fs.read</tool_name>"));
+    assert!(prompt.user.contains("<path>...</path>"));
+    assert_eq!(prompt.stop, "</tool_call>");
 }
 
 #[test]

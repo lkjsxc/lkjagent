@@ -129,7 +129,7 @@ fn memory_find_reads_durable_rows() -> TestResult<()> {
 }
 
 fn action(tool: &str, params: &[(char, &str)]) -> String {
-    let mut body = format!("<tool>{tool}</tool>");
+    let mut body = format!("<tool_name>{tool}</tool_name>");
     for (kind, value) in params {
         let name = match *kind {
             'p' => "path",
@@ -138,17 +138,17 @@ fn action(tool: &str, params: &[(char, &str)]) -> String {
         };
         body.push_str(&format!("<{name}>{value}</{name}>"));
     }
-    format!("<action>{body}</action>")
+    format!("<tool_call>{body}</tool_call>")
 }
 
 fn memory_save(topic: &str, content: &str) -> String {
     format!(
-        "<action><tool>memory.save</tool><topic>{topic}</topic><content>{content}</content></action>"
+        "<tool_call><tool_name>memory.save</tool_name><topic>{topic}</topic><content>{content}</content></tool_call>"
     )
 }
 
 fn finish(summary: &str) -> String {
-    format!("<action><tool>finish</tool><summary>{summary}</summary></action>")
+    format!("<tool_call><tool_name>finish</tool_name><summary>{summary}</summary></tool_call>")
 }
 
 struct CapturingEndpoint {

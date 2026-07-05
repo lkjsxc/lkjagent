@@ -18,9 +18,9 @@ selects a recovery decision. It does not render tools that admission will refuse
 
 ## Repeat Guard
 
-A byte-identical action to the previous admitted action for the same state edge
-is not executed. Admission records diagnosis `repeated action; state the next
-different action or finish` and emits a bounded recovery event.
+A byte-identical tool call to the previous admitted tool call for the same state
+edge is not executed. Admission records diagnosis `repeated tool call; state the
+next different tool call or finish` and emits a bounded recovery event.
 
 ## Recovery Guard
 
@@ -30,5 +30,5 @@ normal prompt text.
 
 ## Failure This Prevents
 
-Repeated or unsafe actions cannot form a fixed point, and the prompt does not
+Repeated or unsafe tool calls cannot form a fixed point, and the prompt does not
 teach the model to call tools that guards will reject.

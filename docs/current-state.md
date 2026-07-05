@@ -32,13 +32,13 @@ commits turn state through rows, and records waiting answers as rows before
 continuing.
 
 The parser rejects explore `<finish>` and `<ask>` envelopes, leading or trailing
-prose, duplicate action parameters, unknown action parameters, and unknown tools
-from the fixed explore registry. Prompt rendering tells explore steps to finish
-with the `finish` action inside `<action>`, and the engine rejects adjacent
-repeated explore actions before effects run. Prompt rendering includes the
-bounded task brief, including admitted memory facts. Endpoint errors use the
-documented ten-failure patience before blocking a step. Endpoint clients default
-to a loose finite 900-second timeout unless configuration overrides it.
+prose, old `<action>` envelopes, missing `<tool_name>`, duplicate or unknown
+tool-call fields, and unknown tools from the fixed explore registry. Prompt
+rendering exposes `<tool_call>` with a copyable output skeleton and the active
+`ToolSetView`; internal `Action` domain names remain. Prompt rendering includes
+the bounded task brief. Endpoint errors use the documented ten-failure patience
+before blocking a step, and endpoint clients default to a loose finite
+900-second timeout unless configured.
 
 Queue rows persist `force_new`, send uses it, and daemon intake can select a
 forced-new row without treating it as an answer. Status, task, queue, bounded
@@ -184,8 +184,10 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Implement selector candidates and generic workspace record files before
-expanding CLI and proof-live behavior.
+Expand selector candidates and generic workspace record files, then carry the
+same decision-coupled protocol-card pattern into artifact, plan, message, and
+verdict envelopes. Keep authority on persisted `RuntimeDecision` rows and the
+active `ToolSetView` while future protocol changes are experimented and proven.
 
 ## Honesty Rules
 

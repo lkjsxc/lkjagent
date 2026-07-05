@@ -22,7 +22,7 @@ RuntimeEvent -> durable rows
 The selector creates bounded candidates from active cells, state edges, context
 summaries, records, artifacts, and stale evidence. Exactly one `RuntimeDecision`
 is selected for a turn and persisted before prompt rendering, endpoint calls,
-action admission, tool execution, recovery, compaction, or completion. The
+tool-call admission, tool execution, recovery, compaction, or completion. The
 decision id and fingerprint are carried through prompt frames, provider
 exchanges, admissions, observations, events, checks, status output, and proof
 bundles.
@@ -31,9 +31,9 @@ bundles.
 
 A decision stores case id, selected operation key, snapshot fingerprint,
 state-vector fingerprint, context-frame fingerprint, tool-view fingerprint,
-expected envelope, model budget, admissible tool schemas, hidden tool reasons
-for diagnostics, effect command when model-free, completion predicates, and
-recovery policy.
+expected envelope, model budget, admissible tool-call schemas, hidden tool
+reasons for diagnostics, effect command when model-free, completion predicates,
+and recovery policy.
 
 ## Authority Rule
 

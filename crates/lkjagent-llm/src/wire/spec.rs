@@ -1,6 +1,6 @@
 use super::{TEMPERATURE, TOP_P};
 
-const ACTION_CLOSE: &str = "</action>";
+const ACTION_CLOSE: &str = "</tool_call>";
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CallSpec {

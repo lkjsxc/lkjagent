@@ -17,7 +17,7 @@ must preserve.
    The model writes bounded content or requests an operation exposed by the
    current decision.
 4. Prompt and admission match. The active state vector derives the output
-   grammar and `ToolSetView`; admission accepts only actions from that same
+   grammar and `ToolSetView`; admission accepts only tool calls from that same
    persisted view.
 5. Context is engineered per turn. A prompt is a projection of durable
    source-tagged context items, not a transcript dump. Contaminated material is

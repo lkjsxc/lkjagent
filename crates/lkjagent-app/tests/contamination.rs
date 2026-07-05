@@ -60,16 +60,16 @@ fn sensitive_observation_body_is_redacted() -> TestResult<()> {
 }
 
 fn shell_action(command: &str) -> String {
-    format!("<action><tool>shell.run</tool><command>{command}</command></action>")
+    format!("<tool_call><tool_name>shell.run</tool_name><command>{command}</command></tool_call>")
 }
 
 fn action(tool: &str, params: &[(char, &str)]) -> String {
-    let mut body = format!("<tool>{tool}</tool>");
+    let mut body = format!("<tool_name>{tool}</tool_name>");
     for (kind, value) in params {
         let name = if *kind == 'p' { "path" } else { "content" };
         body.push_str(&format!("<{name}>{value}</{name}>"));
     }
-    format!("<action>{body}</action>")
+    format!("<tool_call>{body}</tool_call>")
 }
 
 fn fixture_root(name: &str) -> TestResult<PathBuf> {

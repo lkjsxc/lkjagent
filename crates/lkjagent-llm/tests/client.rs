@@ -13,7 +13,7 @@ fn action_call_spec_uses_compact_output_budget() {
     let spec = CallSpec::action(512);
 
     assert_eq!(spec.max_tokens, 512);
-    assert_eq!(spec.stop, vec!["</action>".to_string()]);
+    assert_eq!(spec.stop, vec!["</tool_call>".to_string()]);
 }
 
 #[test]
@@ -26,7 +26,7 @@ fn client_config_defaults_to_loose_finite_timeout() {
 
 #[test]
 fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()> {
-    let body = r#"{"choices":[{"message":{"content":"<action></action>"},"finish_reason":"stop"}],"usage":{"prompt_tokens":5,"completion_tokens":3},"prompt_cache_hit_tokens":4}"#;
+    let body = r#"{"choices":[{"message":{"content":"<tool_call></tool_call>"},"finish_reason":"stop"}],"usage":{"prompt_tokens":5,"completion_tokens":3},"prompt_cache_hit_tokens":4}"#;
     let server = serve_once(200, body)?;
     let mut config = ClientConfig::new(server.base_url.clone(), "local-model");
     config.api_key = Some("secret-token".to_string());
@@ -37,7 +37,7 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     let completion = complete(&config, &messages, &spec, 0)?;
     let request = server.recorded()?;
 
-    assert_eq!(completion.content, "<action></action>");
+    assert_eq!(completion.content, "<tool_call></tool_call>");
     assert_eq!(completion.usage.prompt_tokens, Some(5));
     assert_eq!(request.method, "POST");
     assert_eq!(request.path, "/v1/chat/completions");
@@ -47,7 +47,7 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     );
     assert_eq!(
         request.body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"reasoning_effort\":\"none\",\"stop\":[\"</action>\"],\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"reasoning_effort\":\"none\",\"stop\":[\"</tool_call>\"],\"stream\":false}"
     );
     Ok(())
 }
@@ -75,7 +75,7 @@ fn length_finish_reason_maps_to_oversize() -> TestResult<()> {
 
 #[test]
 fn length_with_closed_action_is_accepted() -> TestResult<()> {
-    let body = r#"{"choices":[{"message":{"content":"<action>\n<tool>agent.done</tool>\n<summary>x</summary>\n</action>\nextra"},"finish_reason":"length"}],"usage":{"prompt_tokens":5,"completion_tokens":2048}}"#;
+    let body = r#"{"choices":[{"message":{"content":"<tool_call>\n<tool_name>agent.done</tool_name>\n<summary>x</summary>\n</tool_call>\nextra"},"finish_reason":"length"}],"usage":{"prompt_tokens":5,"completion_tokens":2048}}"#;
     let server = serve_once(200, body)?;
     let config = ClientConfig::new(server.base_url.clone(), "local-model");
 
@@ -83,7 +83,7 @@ fn length_with_closed_action_is_accepted() -> TestResult<()> {
     let completion = complete(&config, &[Message::new(Role::System, "system")], &spec, 1)?;
     let _request = server.recorded()?;
 
-    assert!(completion.content.contains("</action>"));
+    assert!(completion.content.contains("</tool_call>"));
     assert_eq!(
         completion.finish_reason,
         lkjagent_llm::wire::FinishReason::Length

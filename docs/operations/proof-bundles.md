@@ -20,7 +20,7 @@ A proof bundle records these Markdown files:
 - `decisions.md`: decision ids, operation keys, and fingerprints;
 - `prompt-frames.md`: prompt-frame refs and context fingerprints;
 - `tool-views.md`: rendered tool names and hidden-tool diagnostics;
-- `admissions.md`: admitted and rejected actions tied to decisions;
+- `admissions.md`: admitted and rejected tool calls tied to decisions;
 - `observations.md`: bounded effect output and artifact refs;
 - `context.md`: conflicts and contaminated items suppressed from prompts;
 - `checks.md`: check results and artifact fingerprints;

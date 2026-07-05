@@ -39,7 +39,7 @@ fn reports_docs_fault_examples() {
         parse_expected(StepKind::Write, "<content></content>"),
         Err(ParseFault::Empty)
     );
-    let action = "<action><tool>graph.state</tool></action>";
+    let action = "<tool_call><tool_name>graph.state</tool_name></tool_call>";
     assert_eq!(
         parse_expected(StepKind::Explore, action),
         Err(ParseFault::UnknownTool)
@@ -65,8 +65,8 @@ fn decision_action_parser_uses_only_the_decision_tool_view() {
         ]),
         OutputEnvelope::Action,
     );
-    let read = "<action><tool>fs.read</tool><path>README.md</path></action>";
-    let shell = "<action><tool>shell.run</tool><command>pwd</command></action>";
+    let read = "<tool_call><tool_name>fs.read</tool_name><path>README.md</path></tool_call>";
+    let shell = "<tool_call><tool_name>shell.run</tool_name><command>pwd</command></tool_call>";
 
     assert!(matches!(
         parse_expected_for_decision(&decision, read),
@@ -79,12 +79,19 @@ fn decision_action_parser_uses_only_the_decision_tool_view() {
 }
 
 #[test]
-fn explore_accepts_only_exact_action_blocks() {
-    let finish = "<action><tool>finish</tool><summary>done</summary></action>";
+fn explore_accepts_only_exact_tool_call_blocks() {
+    let finish = "<tool_call><tool_name>finish</tool_name><summary>done</summary></tool_call>";
     assert!(matches!(
         parse_expected(StepKind::Explore, finish),
         Ok(ParsedOutput::Action(action)) if action.tool == "finish"
     ));
+    assert_eq!(
+        parse_expected(
+            StepKind::Explore,
+            "<action><tool_name>finish</tool_name></action>"
+        ),
+        Err(ParseFault::WrongBlock)
+    );
     assert_eq!(
         parse_expected(StepKind::Explore, "<finish>done</finish>"),
         Err(ParseFault::WrongBlock)
@@ -93,12 +100,19 @@ fn explore_accepts_only_exact_action_blocks() {
         parse_expected(StepKind::Explore, "<ask>Which file?</ask>"),
         Err(ParseFault::WrongBlock)
     );
-    let duplicate = "<action><tool>fs.read</tool><path>a</path><path>b</path></action>";
+    let missing_tool_name = "<tool_call><tool>finish</tool><summary>done</summary></tool_call>";
+    assert_eq!(
+        parse_expected(StepKind::Explore, missing_tool_name),
+        Err(ParseFault::BadParams)
+    );
+    let duplicate =
+        "<tool_call><tool_name>fs.read</tool_name><path>a</path><path>b</path></tool_call>";
     assert_eq!(
         parse_expected(StepKind::Explore, duplicate),
         Err(ParseFault::BadParams)
     );
-    let unknown = "<action><tool>fs.read</tool><path>a</path><extra>x</extra></action>";
+    let unknown =
+        "<tool_call><tool_name>fs.read</tool_name><path>a</path><extra>x</extra></tool_call>";
     assert_eq!(
         parse_expected(StepKind::Explore, unknown),
         Err(ParseFault::BadParams)

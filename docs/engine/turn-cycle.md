@@ -13,7 +13,7 @@ Map one daemon cycle to the state-ledger runtime loop.
 - Rendering builds a `PromptFrame` only from that decision and selected context.
 - Calling sends at most one endpoint request when the decision needs a model.
 - Parsing expects the envelope and tool view from the decision.
-- Admission validates model actions against the persisted `ToolSetView`.
+- Admission validates model tool calls against the persisted `ToolSetView`.
 - Effects run only after admission or model-free decision selection.
 - Observations become runtime events.
 - Checking evaluates selected predicates from [completion.md](completion.md).

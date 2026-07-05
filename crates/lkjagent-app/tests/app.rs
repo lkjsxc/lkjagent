@@ -124,7 +124,7 @@ fn simple_templates_close_with_fake_endpoint() -> TestResult<()> {
         "generic",
         "Survey the repository and report.",
         vec![
-            "<action><tool>finish</tool><summary>found facts</summary></action>",
+            "<tool_call><tool_name>finish</tool_name><summary>found facts</summary></tool_call>",
             "<message>done</message>",
         ],
         None,
@@ -158,7 +158,7 @@ fn simple_templates_close_with_fake_endpoint() -> TestResult<()> {
 }
 
 fn finish(summary: &str) -> String {
-    format!("<action><tool>finish</tool><summary>{summary}</summary></action>")
+    format!("<tool_call><tool_name>finish</tool_name><summary>{summary}</summary></tool_call>")
 }
 
 fn run_scripted(

@@ -2,8 +2,8 @@
 
 ## Purpose
 
-Define model output envelopes, action grammar, and fault taxonomy as projections
-of persisted runtime decisions.
+Define model output envelopes, tool-call grammar, and fault taxonomy as
+projections of persisted runtime decisions.
 
 ## Table of Contents
 
@@ -15,5 +15,5 @@ of persisted runtime decisions.
 
 ## Failure This Prevents
 
-The model receives the grammar for the active decision instead of a broad action
+The model receives the grammar for the active decision instead of a broad tool
 language with repair heuristics.

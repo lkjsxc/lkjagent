@@ -105,9 +105,9 @@ pub fn block(raw: &str, tag: &str) -> Result<String, ParseFault> {
 }
 
 fn parse_action(raw: &str, view: &ToolSetView) -> Result<ParsedOutput, ParseFault> {
-    let body = block(raw, "action")?;
+    let body = block(raw, "tool_call")?;
     let params = parse_params(&body)?;
-    let tool = one(&params, "tool")?.to_string();
+    let tool = one(&params, "tool_name")?.to_string();
     validate_params(view, &tool, &params)?;
     Ok(ParsedOutput::Action(Action { tool, params }))
 }
@@ -167,7 +167,7 @@ fn validate_params(
 ) -> Result<(), ParseFault> {
     let entry = view.entry(tool).ok_or(ParseFault::UnknownTool)?;
     for (name, _) in params {
-        if name != "tool" && !entry.accepts_param(name) {
+        if name != "tool_name" && !entry.accepts_param(name) {
             return Err(ParseFault::BadParams);
         }
     }

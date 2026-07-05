@@ -18,7 +18,7 @@ pub fn protocol(kind: StepKind) -> &'static str {
     match kind {
         StepKind::Plan => "Return exactly <plan> lines </plan>. Lines: write PATH | TITLE | words=N, explore | GOAL | budget=N, or respond | SUMMARY. Use only relative paths.",
         StepKind::Write | StepKind::Revise => "Return exactly <content> prose </content>. Write the requested file body only. No analysis outside the block.",
-        StepKind::Explore => "Return exactly <action>...</action> using one allowed tool. To finish, use <tool>finish</tool> with <summary>...</summary>.",
+        StepKind::Explore => "Return exactly <tool_call>...</tool_call> using one allowed tool. Start with <tool_name>TOOL</tool_name>. To finish, use <tool_name>finish</tool_name> with <summary>...</summary>.",
         StepKind::Respond | StepKind::Ask => "Return exactly <message>owner-facing answer</message>. Use gathered facts only.",
         StepKind::Verify => "Return exactly <verdict>pass or fail plus measured evidence</verdict>.",
     }
@@ -39,7 +39,7 @@ pub fn expected_block(kind: StepKind) -> &'static str {
     match kind {
         StepKind::Write | StepKind::Revise => "content",
         StepKind::Plan => "plan",
-        StepKind::Explore => "action",
+        StepKind::Explore => "tool_call",
         StepKind::Respond | StepKind::Ask => "message",
         StepKind::Verify => "verdict",
     }
@@ -49,7 +49,7 @@ pub fn envelope_tag(envelope: OutputEnvelope) -> Option<&'static str> {
     match envelope {
         OutputEnvelope::Content => Some("content"),
         OutputEnvelope::Plan => Some("plan"),
-        OutputEnvelope::Action => Some("action"),
+        OutputEnvelope::Action => Some("tool_call"),
         OutputEnvelope::Message => Some("message"),
         OutputEnvelope::Verdict => Some("verdict"),
         OutputEnvelope::None => None,

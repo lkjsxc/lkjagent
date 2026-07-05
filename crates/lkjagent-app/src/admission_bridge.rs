@@ -36,7 +36,7 @@ fn model_action(action: &Action) -> ModelAction {
         params: action
             .params
             .iter()
-            .filter(|(name, _)| name != "tool")
+            .filter(|(name, _)| name != "tool_name")
             .map(|(name, value)| (name.clone(), value.clone()))
             .collect::<BTreeMap<_, _>>(),
     }
