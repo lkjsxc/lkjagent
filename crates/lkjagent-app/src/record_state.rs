@@ -1,5 +1,6 @@
 use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
+use lkjagent_core::runtime_state_edge::{EdgeEvidenceRef, StateEdge, StateEdgeRelation, StateRef};
 use lkjagent_core::workspace_record::{state_keys_for_record, WorkspaceRecord};
 use lkjagent_store::event_rows::{append_and_apply_event, next_event_id};
 use lkjagent_store::record_rows::RecordRow;
@@ -30,6 +31,7 @@ pub fn upsert_record_cells(
             decision_id: None,
         };
         append_and_apply_event(conn, &event).map_err(|error| error.to_string())?;
+        upsert_record_edge(conn, record, label, fingerprint)?;
     }
     Ok(())
 }
@@ -52,8 +54,68 @@ pub fn suppress_record_cells(conn: &Connection, row: &RecordRow, now: &str) -> R
             decision_id: None,
         };
         append_and_apply_event(conn, &event).map_err(|error| error.to_string())?;
+        suppress_record_edge(conn, row, &label, now)?;
     }
     Ok(())
+}
+
+fn upsert_record_edge(
+    conn: &Connection,
+    record: &WorkspaceRecord,
+    label: &str,
+    fingerprint: &str,
+) -> Result<(), String> {
+    let event_id = next_event_id(conn, CASE_ID, "record-edge").map_err(|e| e.to_string())?;
+    let mut edge = StateEdge::active(
+        edge_id(&record.id, label),
+        CASE_ID,
+        StateRef::new("record", &record.id),
+        StateRef::new("state", label),
+        relation_for(label),
+        event_id.clone(),
+    )
+    .with_reason("record projects workspace state")
+    .with_evidence(vec![EdgeEvidenceRef::new(
+        "record",
+        &record.id,
+        fingerprint,
+    )]);
+    edge.created_at = record.updated_at.clone();
+    append_and_apply_event(
+        conn,
+        &RuntimeEvent {
+            id: event_id,
+            case_id: CASE_ID.to_string(),
+            kind: "state.edge.upsert".to_string(),
+            payload: RuntimeEventPayload::UpsertEdge(Box::new(edge)),
+            source: "workspace-record".to_string(),
+            created_at: record.updated_at.clone(),
+            decision_id: None,
+        },
+    )
+    .map_err(|error| error.to_string())
+}
+
+fn suppress_record_edge(
+    conn: &Connection,
+    row: &RecordRow,
+    label: &str,
+    now: &str,
+) -> Result<(), String> {
+    let event_id = next_event_id(conn, CASE_ID, "record-edge").map_err(|e| e.to_string())?;
+    let event = RuntimeEvent {
+        id: event_id,
+        case_id: CASE_ID.to_string(),
+        kind: "state.edge.suppress".to_string(),
+        payload: RuntimeEventPayload::SuppressEdge {
+            edge_id: edge_id(&row.id, label),
+            reason: "record archived".to_string(),
+        },
+        source: "workspace-record".to_string(),
+        created_at: now.to_string(),
+        decision_id: None,
+    };
+    append_and_apply_event(conn, &event).map_err(|error| error.to_string())
 }
 
 fn record_cell(
@@ -97,4 +159,20 @@ fn selector_tier(label: &str) -> u8 {
         Some("project") => 41,
         _ => 80,
     }
+}
+
+fn relation_for(label: &str) -> StateEdgeRelation {
+    match label.split_once(':').map(|(namespace, _)| namespace) {
+        Some("calendar" | "routine") => StateEdgeRelation::schedules(),
+        Some("index") => StateEdgeRelation::new("stale-input"),
+        _ => StateEdgeRelation::owns(),
+    }
+}
+
+fn edge_id(record_id: &str, label: &str) -> String {
+    let safe = label
+        .chars()
+        .map(|ch| if ch.is_ascii_alphanumeric() { ch } else { '-' })
+        .collect::<String>();
+    format!("record-edge-{record_id}-{safe}")
 }

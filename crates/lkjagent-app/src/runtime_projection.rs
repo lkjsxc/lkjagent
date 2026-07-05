@@ -1,6 +1,7 @@
 use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::runtime_decision::RuntimeDecision;
 use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
+use lkjagent_core::runtime_selector::candidates;
 use lkjagent_core::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
 use lkjagent_store::event_rows::{append_and_apply_event, next_event_id};
 use rusqlite::Connection;
@@ -69,18 +70,9 @@ fn append_cell_event(
 }
 
 fn has_operation_cell(snapshot: &RuntimeSnapshot) -> bool {
-    snapshot.active_cells().iter().any(|cell| {
-        matches!(
-            (cell.key.namespace.as_str(), cell.key.name.as_str()),
-            ("case", "owner-intake")
-                | ("case", "waiting-answer")
-                | ("completion", "close-candidate")
-                | ("runtime", "idle")
-        ) || matches!(
-            cell.key.namespace.as_str(),
-            "recovery" | "effect" | "model" | "check"
-        )
-    })
+    candidates(snapshot)
+        .iter()
+        .any(|item| item.state_key.is_some() && item.operation.key != "runtime.idle")
 }
 
 fn decision_cell_key(decision: &RuntimeDecision) -> Result<Option<StateKey>, String> {

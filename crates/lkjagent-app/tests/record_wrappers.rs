@@ -44,6 +44,8 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
     let labels = state_labels(&conn)?;
     assert!(labels.contains(&"todo:open/".to_string()));
     assert!(labels.contains(&"index:stale/records".to_string()));
+    assert!(edge_relations(&conn)?.contains(&"owns".to_string()));
+    assert!(edge_relations(&conn)?.contains(&"stale-input".to_string()));
 
     let dev = cli::run([
         "--data",
@@ -62,6 +64,12 @@ fn state_labels(conn: &Connection) -> rusqlite::Result<Vec<String>> {
     let rows = statement.query_map([], |row| row.get::<_, String>(0))?;
     rows.map(|row| row.map(|label| label_prefix(&label)))
         .collect()
+}
+
+fn edge_relations(conn: &Connection) -> rusqlite::Result<Vec<String>> {
+    let mut statement = conn.prepare("SELECT relation FROM state_edges ORDER BY relation")?;
+    let rows = statement.query_map([], |row| row.get::<_, String>(0))?;
+    rows.collect()
 }
 
 fn label_prefix(label: &str) -> String {
