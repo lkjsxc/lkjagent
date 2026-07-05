@@ -126,7 +126,7 @@ decision envelopes render protocol cards. Generic record CLI adds, lists, shows,
 links, and archives Markdown records under `workspace/records` with fingerprint
 rows but not turn authority; `today` through `dev` wrappers reuse that path and
 project workspace state cells for todo, calendar, routine, index, proof, dev, and
-project families. Experiment records use it too, and xtask writes result ledgers.
+project families. Xtask writes decision-backed protocol matrix ledgers.
 
 ## State-Ledger Parity
 
@@ -187,7 +187,7 @@ Checked-in `tmp/` logs are historical proof or failure fixtures unless rerun her
 
 ## Next Executable Step
 
-Harden protocol experiments and adoption evidence without adding a second control plane.
+Harden context selection and adoption evidence without adding a second control plane.
 
 ## Honesty Rules
 

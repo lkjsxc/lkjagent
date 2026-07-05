@@ -105,6 +105,11 @@ fn explore_accepts_only_exact_tool_call_blocks() {
         parse_expected(StepKind::Explore, missing_tool_name),
         Err(ParseFault::BadParams)
     );
+    let attr = "<tool_call><tool_name kind=\"x\">finish</tool_name></tool_call>";
+    assert_eq!(
+        parse_expected(StepKind::Explore, attr),
+        Err(ParseFault::BadParams)
+    );
     let duplicate =
         "<tool_call><tool_name>fs.read</tool_name><path>a</path><path>b</path></tool_call>";
     assert_eq!(

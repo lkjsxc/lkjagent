@@ -1,6 +1,8 @@
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::model::StepKind;
+use lkjagent_core::parse::{parse_expected_for_decision, ParsedOutput};
 use lkjagent_core::render::{max_tokens, render_prompt, render_prompt_for_decision};
+use lkjagent_core::runtime_admission::{admit_action, AdmissionStatus, ModelAction};
 use lkjagent_core::runtime_artifact::DEFAULT_UNIT_TARGET_TOKENS;
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
@@ -57,6 +59,45 @@ fn explore_decision_renders_tool_call_contract() {
     assert!(prompt.user.contains("<tool_name>fs.read</tool_name>"));
     assert!(prompt.user.contains("<path>...</path>"));
     assert_eq!(prompt.stop, "</tool_call>");
+}
+
+#[test]
+fn rendered_tool_shape_parses_and_admits_for_same_decision() {
+    let snapshot = instantiate(3, "Survey workspace and report.");
+    let decision = RuntimeDecision::new(
+        "decision-1",
+        "case-1",
+        OperationKey("model.call/1".to_string()),
+        ToolSetView::new(vec![
+            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new())
+        ]),
+        OutputEnvelope::Action,
+    );
+    let prompt = render_prompt_for_decision(
+        &snapshot.task,
+        &snapshot.steps,
+        &snapshot.steps[0],
+        &decision,
+    );
+    let shape = prompt.user.split("Copy this shape:\n").last().unwrap_or("");
+    let parsed = parse_expected_for_decision(&decision, shape);
+    let ParsedOutput::Action(action) = parsed.expect("shape parses") else {
+        panic!("shape did not parse as action")
+    };
+    let admission = admit_action(
+        &decision,
+        &ModelAction {
+            tool: action.tool,
+            params: action
+                .params
+                .into_iter()
+                .filter(|(name, _)| name != "tool_name")
+                .collect(),
+        },
+    )
+    .expect("admission fingerprints");
+
+    assert_eq!(admission.status, AdmissionStatus::Admitted);
 }
 
 #[test]
