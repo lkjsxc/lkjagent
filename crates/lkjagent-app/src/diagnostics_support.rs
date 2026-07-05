@@ -11,12 +11,12 @@ pub(crate) fn endpoint_state(data_dir: &Path) -> String {
         .and_then(|value| value.get("api-key-env"))
         .and_then(serde_json::Value::as_str)
         .unwrap_or("LKJAGENT_API_KEY");
-    let api_key = if env_present(key_env) {
+    let credential = if env_present(key_env) {
         "env"
     } else {
         "absent"
     };
-    format!("url={url} model={model} api_key={api_key}")
+    format!("url={url} model={model} credential={credential}")
 }
 
 pub(crate) fn missing_dirs(data_dir: &Path) -> Vec<String> {
