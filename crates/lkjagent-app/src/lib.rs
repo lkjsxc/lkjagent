@@ -1,4 +1,5 @@
 mod admission_bridge;
+mod arg_helpers;
 pub mod args;
 mod artifact_effects;
 pub mod cli;
@@ -11,6 +12,8 @@ mod context_resolution_bridge;
 pub mod daemon;
 mod daemon_intake;
 mod daemon_lock;
+mod diagnostics;
+mod diagnostics_support;
 mod effect_error;
 pub mod endpoint;
 mod exchange_bridge;

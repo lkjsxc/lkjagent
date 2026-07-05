@@ -9,6 +9,20 @@ fn parser_accepts_console_command() -> TestResult<()> {
 }
 
 #[test]
+fn parser_accepts_diagnostic_commands() -> TestResult<()> {
+    assert_eq!(parse(["doctor"])?.command, Command::Doctor { json: false });
+    assert_eq!(
+        parse(["doctor", "--json"])?.command,
+        Command::Doctor { json: true }
+    );
+    assert_eq!(
+        parse(["workspace", "--json"])?.command,
+        Command::Workspace { json: true }
+    );
+    Ok(())
+}
+
+#[test]
 fn parser_accepts_log_follow_forms() -> TestResult<()> {
     let first = parse(["log", "--follow"])?;
     assert_eq!(

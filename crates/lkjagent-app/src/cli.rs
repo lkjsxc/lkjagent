@@ -32,6 +32,10 @@ where
         }
         Command::Status => status(&conn),
         Command::Console => crate::console::run(&conn),
+        Command::Doctor { json } => crate::diagnostics::doctor(&conn, &invocation.data_dir, json),
+        Command::Workspace { json } => {
+            crate::diagnostics::workspace(&conn, &invocation.data_dir, json)
+        }
         Command::Log { limit, follow } if follow => crate::inspect::follow_log(&conn, limit),
         Command::Log { limit, .. } => crate::inspect::log(&conn, limit),
         Command::TaskList => crate::inspect::task_list(&conn),
@@ -82,6 +86,8 @@ pub fn help() -> String {
         "  send TEXT [--new]",
         "  status",
         "  console",
+        "  doctor [--json]",
+        "  workspace [--json]",
         "  log [--limit N] [--follow]",
         "  task list | task show ID",
         "  queue list | queue show ID",

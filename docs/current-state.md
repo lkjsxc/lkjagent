@@ -119,13 +119,13 @@ evidence are reused. Proof
 collection writes state-ledger sections for cells, decisions, candidates,
 records, prompt frames, admissions, observations, exchanges, artifacts, and
 context.
-Status reports active or stale daemon lease rows from heartbeat config evidence,
-and watch prints bounded status, event, trace, and proof-row sections. Prompt
-frames point to bounded body refs and every decision envelope renders a final
-protocol card. Generic record CLI commands add, list, show, link, and archive Markdown records
-under `workspace/records` with fingerprint rows but not turn authority; friendly
-wrappers from `today` through `dev` reuse the same path. Experiment records use
-it too, and xtask writes result ledgers.
+Status, doctor, and workspace report row-backed lease, schema, table, endpoint,
+workspace, record, artifact, and proof counts. Watch prints bounded status, event,
+trace, and proof rows. Prompt frames point to bounded body refs and every
+decision envelopes render protocol cards. Generic record CLI adds, lists, shows,
+links, and archives Markdown records under `workspace/records` with fingerprint
+rows but not turn authority; `today` through `dev` wrappers reuse that path.
+Experiment records use it too, and xtask writes result ledgers.
 
 ## State-Ledger Parity
 
@@ -187,7 +187,7 @@ proof `tmp/live-run-20260705T102438Z-068ce1f` closed task 1. Older logs are hist
 
 ## Next Executable Step
 
-Add row-backed doctor and workspace diagnostics without a second control plane.
+Expand state families and protocol experiments without adding a second control plane.
 
 ## Honesty Rules
 
