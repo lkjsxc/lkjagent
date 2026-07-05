@@ -39,6 +39,28 @@ states commands run, results, anomalies, commands not run, and next action.
 
 ## Live Attempt Ledger
 
+### 2026-07-05
+
+- commit: `fc53ff4`
+- run id: `live-proof-20260705T002040Z-fc53ff4`
+- data dir: `tmp/live-proof-20260705T002040Z-fc53ff4/data`
+- proof bundle: `tmp/live-proof-20260705T002040Z-fc53ff4/proof-bundle`
+- objective: 10000 word Aurora Ledger manuscript under `stories/aurora-ledger`
+  with settings and 10 chapter files.
+- endpoint condition: endpoint URL, model, and API key were present.
+- time box: 2026-07-05T00:20:40Z to 2026-07-05T00:50:40Z, 1800 seconds.
+- terminal state: not reached; task remained open at budget 11/50.
+- latest decision: `case-1-decision-0020`, `model.call/1015`, pending,
+  context fingerprint `fnv1a64:0bb12cbd`.
+- rows: tasks 1, steps 16, decisions 20, prompt frames 19, exchanges 18,
+  observations 11, artifacts 23, checks 32, context items 8.
+- files: settings plus chapter 01 through chapter 10 existed under
+  `stories/aurora-ledger/manuscript`.
+- chapter word counts were 316, 306, 355, 301, 302, 306, 300, 314, 283, and
+  305; Aurora markdown total was 3502 words including settings.
+- result: honest bounded live attempt, not a passing live proof; the 10000 word
+  closure target was not met before the time box ended.
+
 ### 2026-07-04
 
 - commit: `b0f5b18`
