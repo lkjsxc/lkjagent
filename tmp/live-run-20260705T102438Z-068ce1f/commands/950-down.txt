@@ -1,0 +1,7 @@
+ Container lkjlive20260705102438-agent-1 Stopping
+ Container lkjlive20260705102438-agent-1 Stopped
+ Container lkjlive20260705102438-agent-1 Removing
+ Container lkjlive20260705102438-agent-1 Removed
+ Network lkjlive20260705102438_default Removing
+ Network lkjlive20260705102438_default Removed
+exit:0

@@ -181,13 +181,13 @@ audit, deterministic replay, benchmark commands, and proof bundle collection.
 
 ## Historical Evidence
 
-Checked-in logs under `tmp/` proof folders record previous successful gates and
-live proof artifacts. They are historical evidence only. They do not prove that
-the current checkout passes a gate unless that gate is rerun now.
+Checked-in `tmp/` logs record gate and live proof artifacts. Latest small live
+run `tmp/live-run-20260705T102438Z-068ce1f` closed task 1 with proof collected
+and strict secret scan clean. Older logs are historical unless rerun here.
 
 ## Next Executable Step
 
-Run the twenty-minute live proof path and record honest evidence.
+Run cleanup and full Docker gates for remaining grammar or authority gaps.
 
 ## Honesty Rules
 
