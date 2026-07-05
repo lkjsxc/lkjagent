@@ -13,7 +13,8 @@ StateKey = namespace + ":" + name
 ```
 
 Suggested namespaces include `case`, `plan`, `tool`, `context`, `artifact`,
-`recovery`, and `completion`. Names may contain scoped suffixes such as
+`recovery`, `completion`, `todo`, `calendar`, `routine`, `index`, `proof`,
+`dev`, and `project`. Names may contain scoped suffixes such as
 `context:conflict/target-root` when the semantic key matters.
 
 ## Cell Fields
@@ -39,6 +40,24 @@ Payload schema names are semantic contract labels such as `context-conflict`,
 `task-snapshot`, or `plan-bridge.model`. Do not add numbered suffix labels for
 project-authored schemas. Endpoint paths, hash algorithm names, and external API
 versions may still contain numbers when those names are externally owned.
+
+## Workspace Families
+
+Record-backed helpers use data keys, not private tables:
+
+```text
+todo:open/<id>
+calendar:due/<id>
+routine:ready/<id>
+index:stale/<name>
+proof:collect/<run>
+dev:repo-task/<id>
+project:active/<id>
+```
+
+These cells may carry payload hints such as `deadline_at`, `selector_tier`, or
+`operation_key`. They remain ordinary state rows and do not create another task
+engine.
 
 ## Unknown Keys
 
