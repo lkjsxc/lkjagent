@@ -24,9 +24,10 @@ Each generated index records:
 ## Rebuild Rule
 
 Indexes are derived views. They can be deleted and rebuilt from records,
-artifacts, and ledger rows. A stale index may still be shown to the owner with a
-warning, but it must not satisfy completion checks or be admitted to prompts as
-current evidence.
+artifacts, and ledger rows. `lkjagent workspace --rebuild` writes the first
+record-backed indexes and records index artifacts. A stale index may still be
+shown to the owner with a warning, but it must not satisfy completion checks or
+be admitted to prompts as current evidence.
 
 ## Search Rule
 

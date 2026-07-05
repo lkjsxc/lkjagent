@@ -21,7 +21,7 @@ Define the owner command surface and output discipline.
 | `lkjagent memory QUERY` | search memory rows |
 | `lkjagent watch` | print a refreshable terminal snapshot with status, trace, and proof rows |
 | `lkjagent doctor [--json]` | print row-backed health diagnostics without secrets |
-| `lkjagent workspace [--json]` | summarize configured workspace paths and indexes |
+| `lkjagent workspace [--json] [--rebuild]` | summarize workspace paths and rebuild derived indexes |
 | `lkjagent record add KIND TITLE [--body TEXT]` | create a generic workspace record and metadata row |
 | `lkjagent record list [KIND]` | list current generic records by row metadata |
 | `lkjagent record show ID` | print one record row and Markdown body |
