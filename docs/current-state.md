@@ -119,10 +119,10 @@ observations are recovered before a new decision is selected and write resolved
 evidence are reused. Proof
 collection writes state-ledger sections for state cells, decisions,
 prompt frames, admissions, observations, exchanges, artifacts, and context.
-Status reports active or stale
-daemon lease rows from heartbeat config evidence. Prompt-frame rows now point to
-bounded prompt body refs under `data/logs/`. Current gate results belong in the
-handoff after commands are rerun against this checkout.
+Status reports active or stale daemon lease rows from heartbeat config evidence,
+and watch prints bounded status, event, trace, and proof-row sections.
+Prompt-frame rows now point to bounded prompt body refs under `data/logs/`.
+Current gate results belong in handoff after commands rerun against this checkout.
 
 ## State-Ledger Parity
 

@@ -1,7 +1,6 @@
 use rusqlite::{params, Connection};
 
-use crate::state::load_snapshot;
-use crate::status::{task_show as render_task, watch as render_watch};
+use crate::status::task_show as render_task;
 
 pub fn log(conn: &Connection, limit: usize) -> Result<String, String> {
     crate::log_view::log(conn, limit)
@@ -98,11 +97,7 @@ pub fn memory(conn: &Connection, query: &str) -> Result<String, String> {
 }
 
 pub fn watch(conn: &Connection) -> Result<String, String> {
-    let snapshot = load_snapshot(conn).map_err(|error| error.to_string())?;
-    snapshot.map_or_else(
-        || Ok("watch: idle".to_string()),
-        |snap| Ok(render_watch(&snap)),
-    )
+    crate::watch_view::watch(conn)
 }
 
 fn collect(rows: impl Iterator<Item = rusqlite::Result<String>>) -> Result<String, String> {

@@ -11,12 +11,16 @@ visibility that make daemon progress observable.
 
 ```text
 daemon: working | idle | waiting | stopped
-case: 12 open "Aurora Ledger..." budget 47/200
-decision: d-20260704-0007 model.call ctx=9ac4... tools=fs.read,finish
-state: active=case:objective,plan:item-7,completion:check-pending
-conflicts: none
+task: 12 Open Manuscript budget 47/200
+step: 7/16 Write attempt 1/3
+last: Notice taskclosed
+question: none
 queue: 0 pending
-tokens: case in=61k out=18k cached=44k
+tokens: task in=61000 out=18000 cached=44000
+lease: active owner=pid:123 heartbeat=unix:1780000000
+state: active=4 conflicts=0
+decision: case-12-decision-0007 model.call/700 status=pending ctx=9ac4 tools=aa12
+admissions: 3 observations: 2 exchanges: 1 artifacts: 10
 ```
 
 Every field is available with the daemon stopped. Unknown token counts are
@@ -24,10 +28,10 @@ printed as unknown rather than guessed.
 
 ## Case Display
 
-`task show` or the case display renders active state cells, plan-family progress,
-current decision fingerprints, context conflicts, suppressed contaminated items,
-check results, artifact fingerprints, admissions, observations, and exchange
-refs. Plan rows are progress evidence, not the only runtime authority.
+`task show` renders plan-family progress for one task: task state, step order,
+step kind, attempt counts, action counts, and check counts. `status`, `watch`,
+and proof bundles expose state-ledger counts and fingerprints. Plan rows are
+progress evidence, not the only runtime authority.
 
 ## Event Log
 
@@ -38,15 +42,17 @@ bodies; exchange refs point to the files.
 
 ## Watch Console
 
-`watch` is a terminal view over the same store rows:
+`watch` is a bounded terminal snapshot over the same store rows:
 
-- top deck: owner-visible events and the active case summary;
-- middle deck: state vector, current decision, tool view, and conflicts;
-- bottom deck: plan-family progress, attempts, budget, queue depth, and token
-  totals;
-- footer: key hints and last refresh time.
+- status section: the same daemon, queue, token, lease, state, and decision
+  lines as `status`;
+- recent events section: the latest eight bounded event rows;
+- task trace section: the same plan-family trace as `task show` for the active
+  task, then the latest task when no task is active, or `task: none`;
+- proof rows section: prompt-frame, check, artifact, and exchange row counts;
+- footer hint: rerun `watch` to refresh or use `log --follow` to stream.
 
-The renderer is width-aware and CJK-safe. It never owns facts that are absent
+The renderer is line-oriented and bounded. It never owns facts that are absent
 from the store.
 
 ## Proof Visibility

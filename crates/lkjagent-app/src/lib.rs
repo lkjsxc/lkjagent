@@ -30,3 +30,4 @@ mod snapshot_state;
 pub mod state;
 pub mod status;
 mod turn_effects;
+mod watch_view;

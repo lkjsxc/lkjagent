@@ -2,6 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
+use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use lkjagent_store::prompt_rows::prompt_frames;
@@ -39,6 +40,15 @@ fn prompt_frame_body_ref_replays_rendered_prompt() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert_eq!(decision_fp, frames[0].context_frame_fingerprint);
+    let expected_context = "case-objective [owner:1] What is an agent?";
+    assert_eq!(
+        frames[0].context_frame_fingerprint,
+        stable_fingerprint(&expected_context).map_err(|error| error.message)?
+    );
+    assert_ne!(
+        frames[0].context_frame_fingerprint,
+        stable_fingerprint(&String::new()).map_err(|error| error.message)?
+    );
     assert!(json["system"]
         .as_str()
         .unwrap_or_default()

@@ -18,7 +18,7 @@ Define the owner command surface and output discipline.
 | `lkjagent queue show ID` | show one owner message and delivery state |
 | `lkjagent context resolve CASE_ID KEY WINNING_ITEM_ID` | record the owner-selected winner for a conflict |
 | `lkjagent memory QUERY` | search memory rows |
-| `lkjagent watch` | open the terminal console |
+| `lkjagent watch` | print a refreshable terminal snapshot with status, trace, and proof rows |
 | `lkjagent help [group]` | print usage |
 
 ## Output Rules
@@ -49,7 +49,7 @@ store directly.
   --follow`.
 - `crates/lkjagent-app/src/inspect.rs` keeps non-follow output deterministic and
   follows events by monotonically increasing row id.
-- CLI tests cover parser shape and row-backed log continuation.
+- CLI tests cover parser shape, row-backed log continuation, and the watch sections.
 
 ## Removed Surfaces
 

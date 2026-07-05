@@ -79,6 +79,12 @@ fn cli_inspection_reads_store_rows() -> TestResult<()> {
         "1"
     ])?
     .contains("task 1 Closed"));
+    let watch = cli::run(["--data", data.to_string_lossy().as_ref(), "watch"])?;
+    assert!(watch.contains("== status =="));
+    assert!(watch.contains("== recent events =="));
+    assert!(watch.contains("task 1 Closed"));
+    assert!(watch.contains("proof: prompt_frames="));
+    assert!(watch.contains("exchanges=1"));
     assert!(cli::run(["--data", data.to_string_lossy().as_ref(), "log"])?.contains("taskclosed"));
     assert!(
         cli::run(["--data", data.to_string_lossy().as_ref(), "memory", "row"])?
