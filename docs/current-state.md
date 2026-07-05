@@ -42,10 +42,9 @@ before blocking a step, and endpoint clients default to a loose finite
 
 Queue rows persist `force_new`, send uses it, and daemon intake can select a
 forced-new row without treating it as an answer. Status, task, queue, bounded
-log, follow log, memory, and watch read rows instead of config. The console line
-handler is row-backed, but the binary buffers output until exit; FIFO proof in
-tmp confirms the gap. The bounded explore dispatcher runs the documented filesystem, shell,
-memory, plan-note, and finish actions, stores latest observations in step inputs, persists
+log, follow log, memory, watch, and console read rows instead of config. Console
+output now flushes prompt and replies directly. The bounded explore dispatcher
+runs the filesystem, shell, memory, plan-note, and finish actions, stores observations, persists
 `memory.save` rows, suppresses exact duplicate memory facts, mirrors memory into
 FTS, admits bounded row-backed memory facts into new task briefs, and resolves
 `memory.find` from durable rows.
@@ -187,7 +186,7 @@ proof `tmp/live-run-20260705T102438Z-068ce1f` closed task 1. Older logs are hist
 
 ## Next Executable Step
 
-Fix console streaming, then add record wrappers and diagnostics without a second control plane.
+Add record-backed wrappers and diagnostics without a second control plane.
 
 ## Honesty Rules
 
