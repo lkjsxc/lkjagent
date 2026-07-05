@@ -1,7 +1,5 @@
 use rusqlite::{params, Connection};
 
-use crate::status::task_show as render_task;
-
 pub fn log(conn: &Connection, limit: usize) -> Result<String, String> {
     crate::log_view::log(conn, limit)
 }
@@ -29,12 +27,7 @@ pub fn task_list(conn: &Connection) -> Result<String, String> {
 }
 
 pub fn task_show(conn: &Connection, id: u64) -> Result<String, String> {
-    let snapshot = lkjagent_store::plan_hydrate::snapshot_by_id(conn, id as i64)
-        .map_err(|error| error.to_string())?;
-    snapshot.map_or_else(
-        || Ok(format!("task {id}: not found")),
-        |snap| Ok(render_task(&snap)),
-    )
+    crate::task_view::show(conn, id)
 }
 
 pub fn queue_list(conn: &Connection) -> Result<String, String> {

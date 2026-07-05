@@ -28,10 +28,17 @@ printed as unknown rather than guessed.
 
 ## Case Display
 
-`task show` renders plan-family progress for one task: task state, step order,
-step kind, attempt counts, action counts, and check counts. `status`, `watch`,
-and proof bundles expose state-ledger counts and fingerprints. Plan rows are
-progress evidence, not the only runtime authority.
+`task show` renders one task as a bounded proof trace:
+
+- plan-family progress: task state, step order, step kind, attempts, actions,
+  and check counts;
+- state summary: active state cells and conflict cells for the case;
+- decision summary: latest runtime decisions with operation, status, context
+  fingerprint, and tool-view fingerprint;
+- proof refs: prompt-frame count, check totals, artifact fingerprints, and
+  exchange refs.
+
+Plan rows are progress evidence, not the only runtime authority.
 
 ## Event Log
 

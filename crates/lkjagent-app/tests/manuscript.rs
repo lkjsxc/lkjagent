@@ -1,6 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
+use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 
 use lkjagent_core::model::TaskState;
@@ -41,6 +42,16 @@ fn manuscript_fake_endpoint_closes_with_ten_chapters_and_word_count() -> TestRes
         |row| row.get(0),
     )?;
     assert!(units > 10);
+    let show = cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "task",
+        "show",
+        "1",
+    ])?;
+    assert!(show.contains("artifacts:"));
+    assert!(show.contains("checks: total="));
+    assert!(show.contains("exchanges:"));
     Ok(())
 }
 
