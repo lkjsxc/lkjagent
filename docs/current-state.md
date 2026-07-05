@@ -154,11 +154,10 @@ explore `ToolSetView`. Tool descriptors are catalog-backed for prompt, parser,
 admission, and explore effect selection. Prompt-frame rows own replayable bounded
 body refs.
 
-Prompt context has durable context items for clean facts, observations,
-conflicts, contaminated exclusion, contradiction edges, and suppression reasons.
-Parse faults, endpoint errors, effect errors, shell observations, and secret-like
-observation bodies classify contamination durably with conservative redaction
-before prompt admission.
+Prompt context has durable context items, conflict cards, contamination and stale
+exclusions, contradiction edges, and prompt-frame context plans with included and
+excluded ids plus reasons. Parse faults, endpoint errors, effect errors, shell
+observations, and secret-like bodies classify contamination durably before prompt admission.
 
 Artifact units, deterministic assembly, fresh fingerprint checks, and artifact
 rows are wired into write effects. Manuscript chapter prompts ask for bounded
@@ -187,7 +186,7 @@ Checked-in `tmp/` logs are historical proof or failure fixtures unless rerun her
 
 ## Next Executable Step
 
-Harden context selection and adoption evidence without adding a second control plane.
+Run final verification and evidence review without adding a second control plane.
 
 ## Honesty Rules
 

@@ -5,14 +5,17 @@ use lkjagent_core::runtime_decision::RuntimeDecision;
 use lkjagent_store::prompt_rows::insert_prompt_frame;
 use rusqlite::Connection;
 
+use crate::context_bridge::PromptContext;
+
 pub fn persist_prompt_frame(
     conn: &Connection,
     logs: &Path,
     decision: &RuntimeDecision,
     prompt: &Prompt,
+    context: &PromptContext,
     now: &str,
 ) -> Result<(), String> {
-    let body_ref = write_prompt_body(logs, decision, prompt)?;
+    let body_ref = write_prompt_body(logs, decision, prompt, context)?;
     insert_prompt_frame(
         conn,
         &format!("prompt-{}", decision.id),
@@ -28,6 +31,7 @@ fn write_prompt_body(
     logs: &Path,
     decision: &RuntimeDecision,
     prompt: &Prompt,
+    context: &PromptContext,
 ) -> Result<String, String> {
     let relative = format!(
         "logs/case-{}/decision-{}/prompt-frame.json",
@@ -42,6 +46,7 @@ fn write_prompt_body(
         "prompt_fingerprint": prompt.fingerprint,
         "context_frame_fingerprint": decision.context_frame_fingerprint,
         "tool_view_fingerprint": decision.tool_view_fingerprint().unwrap_or_default(),
+        "context_plan": context.plan,
         "system": prompt.system,
         "user": prompt.user,
         "max_tokens": prompt.max_tokens,

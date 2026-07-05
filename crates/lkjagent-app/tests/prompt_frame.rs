@@ -31,6 +31,14 @@ fn prompt_frame_body_ref_replays_rendered_prompt() -> TestResult<()> {
     assert_eq!(json["decision_id"], frames[0].decision_id);
     assert_eq!(json["prompt_fingerprint"], frames[0].prompt_fingerprint);
     assert_eq!(
+        json["context_plan"]["included"][0]["item_id"],
+        "case-1-objective"
+    );
+    assert_eq!(
+        json["context_plan"]["included"][0]["reason"],
+        "clean-current"
+    );
+    assert_eq!(
         json["context_frame_fingerprint"],
         frames[0].context_frame_fingerprint
     );

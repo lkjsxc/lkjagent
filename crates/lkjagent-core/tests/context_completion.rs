@@ -1,6 +1,7 @@
 use lkjagent_core::runtime_completion::{can_close, CheckEvidence, CompletionRequirement};
 use lkjagent_core::runtime_context::{
-    detect_contradictions, select_normal_context, ContaminationClass, ContextItem,
+    detect_contradictions, select_context_plan, select_normal_context, ContaminationClass,
+    ContextItem, StalenessClass,
 };
 
 #[test]
@@ -18,6 +19,21 @@ fn contradictions_render_as_conflicts_and_contamination_is_excluded() {
     assert_eq!(conflicts.len(), 1);
     assert_eq!(conflicts[0].semantic_key, "target-root");
     assert_eq!(conflicts[0].item_ids, vec!["item-1", "item-2"]);
+}
+
+#[test]
+fn context_plan_records_inclusion_and_suppression_reasons() {
+    let clean = ContextItem::clean_fact("item-1", "root", "stories/a");
+    let mut stale = ContextItem::clean_fact("item-2", "old", "stories/b");
+    stale.staleness = StalenessClass::Stale;
+    let mut bad = ContextItem::clean_fact("item-3", "raw", "log");
+    bad.contamination = ContaminationClass::ExternalRaw;
+
+    let plan = select_context_plan(&[clean, stale, bad], &[]);
+
+    assert_eq!(plan.included[0].reason, "clean-current");
+    assert_eq!(plan.excluded[0].reason, "staleness:Stale");
+    assert_eq!(plan.excluded[1].reason, "contamination:ExternalRaw");
 }
 
 #[test]

@@ -2,6 +2,8 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
 
+pub use crate::runtime_context_plan::{select_context_plan, ContextFramePlan, ContextPlanEntry};
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum TrustClass {
     Owner,
@@ -83,9 +85,15 @@ pub struct ContextConflict {
 }
 
 pub fn select_normal_context(items: &[ContextItem]) -> Vec<ContextItem> {
+    let plan = select_context_plan(items, &[]);
+    let included = plan
+        .included
+        .iter()
+        .map(|entry| entry.item_id.as_str())
+        .collect::<BTreeSet<_>>();
     items
         .iter()
-        .filter(|item| item.is_normal_prompt_candidate())
+        .filter(|item| included.contains(item.id.as_str()))
         .cloned()
         .collect()
 }

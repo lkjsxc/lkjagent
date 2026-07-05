@@ -2,7 +2,7 @@ use std::collections::BTreeSet;
 
 use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::runtime_context::{
-    detect_contradictions, select_normal_context, ContextConflict, ContextItem,
+    detect_contradictions, select_context_plan, ContextConflict, ContextFramePlan, ContextItem,
 };
 use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
@@ -17,6 +17,7 @@ use crate::context_resolution_bridge::{apply_resolutions, persist_conflict_edges
 pub struct PromptContext {
     pub text: String,
     pub fingerprint: String,
+    pub plan: ContextFramePlan,
 }
 
 pub fn prepare_prompt_context(
@@ -34,9 +35,14 @@ pub fn prepare_prompt_context(
         append_conflict_cell(conn, &case_id, conflict, now)?;
         persist_conflict_edges(conn, &case_id, conflict, now)?;
     }
-    let text = render_context(&items, &conflicts);
+    let plan = select_context_plan(&items, &conflicts);
+    let text = render_context(&items, &conflicts, &plan);
     let fingerprint = stable_fingerprint(&text).map_err(|error| error.message)?;
-    Ok(PromptContext { text, fingerprint })
+    Ok(PromptContext {
+        text,
+        fingerprint,
+        plan,
+    })
 }
 
 pub fn snapshot_with_prompt_context(
@@ -109,19 +115,25 @@ fn conflict_cell(conflict: &ContextConflict, now: &str) -> Result<StateCell, Str
     Ok(cell)
 }
 
-fn render_context(items: &[ContextItem], conflicts: &[ContextConflict]) -> String {
-    let conflict_keys = conflicts
+fn render_context(
+    items: &[ContextItem],
+    conflicts: &[ContextConflict],
+    plan: &ContextFramePlan,
+) -> String {
+    let included = plan
+        .included
         .iter()
-        .map(|conflict| conflict.semantic_key.as_str())
+        .map(|entry| entry.item_id.as_str())
         .collect::<BTreeSet<_>>();
     let mut lines = Vec::new();
-    for item in select_normal_context(items) {
-        if !conflict_keys.contains(item.semantic_key.as_str()) {
-            lines.push(format!(
-                "{} [{}:{}] {}",
-                item.semantic_key, item.source_type, item.source_id, item.body
-            ));
-        }
+    for item in items
+        .iter()
+        .filter(|item| included.contains(item.id.as_str()))
+    {
+        lines.push(format!(
+            "{} [{}:{}] {}",
+            item.semantic_key, item.source_type, item.source_id, item.body
+        ));
     }
     for conflict in conflicts {
         lines.push(format!(
