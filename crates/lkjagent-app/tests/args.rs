@@ -3,6 +3,12 @@ use lkjagent_app::args::{parse, Command};
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
+fn parser_accepts_console_command() -> TestResult<()> {
+    assert_eq!(parse(["console"])?.command, Command::Console);
+    Ok(())
+}
+
+#[test]
 fn parser_accepts_log_follow_forms() -> TestResult<()> {
     let first = parse(["log", "--follow"])?;
     assert_eq!(

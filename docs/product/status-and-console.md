@@ -47,6 +47,16 @@ selection, admissions, observations, check results, context conflicts,
 completion, blocks, and notices. It does not print full model requests or prose
 bodies; exchange refs point to the files.
 
+## Owner Console
+
+`lkjagent console` is a normal-screen command loop. It never switches to an
+alternate screen, so ordinary terminal scrollback, tmux copy mode, and screen
+scrollback continue to work. Plain text lines enqueue owner messages. Slash
+commands read rows or enqueue intent: `/status`, `/watch`, `/log`, `/queue`,
+`/task`, `/send TEXT`, `/new TEXT`, and `/quit`. The console opens short store
+operations per line and owns no daemon state. Exiting it does not stop the
+daemon.
+
 ## Watch Console
 
 `watch` is a bounded terminal snapshot over the same store rows:

@@ -1,8 +1,8 @@
 use std::fs;
 use std::path::PathBuf;
 
-use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
+use lkjagent_app::{cli, console};
 use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
@@ -24,6 +24,24 @@ fn status_reports_stale_lease_rows() -> TestResult<()> {
     let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
 
     assert!(status.contains("lease: stale owner=pid:old heartbeat=unix:1"));
+    Ok(())
+}
+
+#[test]
+fn console_line_handler_routes_owner_input_without_daemon_state() -> TestResult<()> {
+    let data = fixture_root("console")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+
+    let sent = console::handle_line(&conn, "hello from console", "now")?;
+    assert_eq!(sent.output, "queue: 1 new=false");
+    assert!(!sent.quit);
+    assert!(console::handle_line(&conn, "/status", "now")?
+        .output
+        .contains("daemon:"));
+    assert!(console::handle_line(&conn, "/new fresh task", "now")?
+        .output
+        .contains("new=true"));
+    assert!(console::handle_line(&conn, "/quit", "now")?.quit);
     Ok(())
 }
 

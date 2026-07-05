@@ -10,3 +10,4 @@ Define deterministic benchmarks, recorded replay, and the live proof contract.
 - [replay.md](replay.md): recorded-exchange smoke replay.
 - [live-proof.md](live-proof.md): Aurora Ledger live proof criteria and capture.
 - [longform-trial.md](longform-trial.md): live longform trial evidence for endpoint tuning.
+- [protocol-experiments.md](protocol-experiments.md): prompt and protocol experiment records.

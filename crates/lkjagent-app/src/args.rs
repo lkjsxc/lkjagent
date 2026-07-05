@@ -15,6 +15,7 @@ pub enum Command {
         force_new: bool,
     },
     Status,
+    Console,
     Log {
         limit: usize,
         follow: bool,
@@ -89,6 +90,7 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
         "run" => no_args(rest, Command::Run),
         "send" => parse_send(rest),
         "status" => no_args(rest, Command::Status),
+        "console" => no_args(rest, Command::Console),
         "log" => parse_log(rest),
         "task" => parse_task(rest),
         "queue" => parse_queue(rest),

@@ -31,6 +31,7 @@ where
             Ok(format!("queue: {id} new={force_new}"))
         }
         Command::Status => status(&conn),
+        Command::Console => crate::console::run(&conn),
         Command::Log { limit, follow } if follow => crate::inspect::follow_log(&conn, limit),
         Command::Log { limit, .. } => crate::inspect::log(&conn, limit),
         Command::TaskList => crate::inspect::task_list(&conn),
@@ -80,6 +81,7 @@ pub fn help() -> String {
         "  run",
         "  send TEXT [--new]",
         "  status",
+        "  console",
         "  log [--limit N] [--follow]",
         "  task list | task show ID",
         "  queue list | queue show ID",

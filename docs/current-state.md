@@ -42,8 +42,8 @@ before blocking a step, and endpoint clients default to a loose finite
 
 Queue rows persist `force_new`, send uses it, and daemon intake can select a
 forced-new row without treating it as an answer. Status, task, queue, bounded
-log, follow log, memory, and watch surfaces read rows instead of a config
-snapshot. The bounded explore dispatcher runs the documented filesystem, shell,
+log, follow log, memory, watch, and normal-screen console surfaces read rows
+instead of a config snapshot. The bounded explore dispatcher runs the documented filesystem, shell,
 memory, plan-note, and finish actions, stores latest observations in step inputs, persists
 `memory.save` rows, suppresses exact duplicate memory facts, mirrors memory into
 FTS, admits bounded row-backed memory facts into new task briefs, and resolves
@@ -123,8 +123,8 @@ Status reports active or stale daemon lease rows from heartbeat config evidence,
 and watch prints bounded status, event, trace, and proof-row sections. Prompt
 frames point to bounded body refs and every decision envelope renders a final
 protocol card. Generic record CLI commands add, list, show, link, and archive Markdown records
-under `workspace/records` with fingerprint rows but not turn authority. Current
-gate results belong in handoff after commands rerun against this checkout.
+under `workspace/records` with fingerprint rows but not turn authority;
+experiment records use the same path. Gate results belong in handoff after rerun.
 
 ## State-Ledger Parity
 
@@ -187,7 +187,7 @@ and strict secret scan clean. Older logs are historical unless rerun here.
 
 ## Next Executable Step
 
-Run cleanup and full Docker gates for remaining grammar or authority gaps.
+Automate protocol experiment runs and consider an optional full TUI console.
 
 ## Honesty Rules
 

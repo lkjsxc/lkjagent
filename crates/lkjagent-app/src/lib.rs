@@ -4,6 +4,7 @@ mod artifact_effects;
 pub mod cli;
 pub mod clock;
 pub mod config;
+pub mod console;
 mod context_admin;
 mod context_bridge;
 mod context_resolution_bridge;

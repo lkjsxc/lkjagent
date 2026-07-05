@@ -11,6 +11,7 @@ Define the owner command surface and output discipline.
 | `lkjagent run` | run the daemon in the foreground |
 | `lkjagent send TEXT [--new]` | enqueue an owner message and print its queue id |
 | `lkjagent status` | print daemon, task, step, budgets, queue, and tokens |
+| `lkjagent console` | read owner input in normal scrollback while the daemon keeps working |
 | `lkjagent log [--limit N] [--follow]` | print bounded transcript events, then optionally stream new rows |
 | `lkjagent task list` | list tasks with state and summary |
 | `lkjagent task show ID` | show plan, diagnoses, checks, and exchange refs |
@@ -60,8 +61,8 @@ store directly.
   --follow`.
 - `crates/lkjagent-app/src/inspect.rs` keeps non-follow output deterministic and
   follows events by monotonically increasing row id.
-- CLI tests cover parser shape, record commands, row-backed log continuation,
-  and watch sections.
+- CLI tests cover parser shape, console line routing, record commands,
+  row-backed log continuation, and watch sections.
 
 ## Authority Limits
 
