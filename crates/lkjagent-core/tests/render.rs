@@ -62,7 +62,7 @@ fn explore_decision_renders_tool_call_contract() {
 }
 
 #[test]
-fn rendered_tool_shape_parses_and_admits_for_same_decision() {
+fn rendered_tool_shape_parses_and_admits_for_same_decision() -> Result<(), String> {
     let snapshot = instantiate(3, "Survey workspace and report.");
     let decision = RuntimeDecision::new(
         "decision-1",
@@ -80,9 +80,10 @@ fn rendered_tool_shape_parses_and_admits_for_same_decision() {
         &decision,
     );
     let shape = prompt.user.split("Copy this shape:\n").last().unwrap_or("");
-    let parsed = parse_expected_for_decision(&decision, shape);
-    let ParsedOutput::Action(action) = parsed.expect("shape parses") else {
-        panic!("shape did not parse as action")
+    let parsed =
+        parse_expected_for_decision(&decision, shape).map_err(|fault| format!("{fault:?}"))?;
+    let ParsedOutput::Action(action) = parsed else {
+        return Err("shape did not parse as action".to_string());
     };
     let admission = admit_action(
         &decision,
@@ -95,9 +96,10 @@ fn rendered_tool_shape_parses_and_admits_for_same_decision() {
                 .collect(),
         },
     )
-    .expect("admission fingerprints");
+    .map_err(|error| error.message)?;
 
     assert_eq!(admission.status, AdmissionStatus::Admitted);
+    Ok(())
 }
 
 #[test]
