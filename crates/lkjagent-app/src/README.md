@@ -30,6 +30,8 @@ Map lkjagent-app source modules.
 - [model-io.rs](model_io.rs): endpoint trait and scripted completion record.
 - [observation-bridge.rs](observation_bridge.rs): effect observation rows.
 - [prompt-bridge.rs](prompt_bridge.rs): prompt-frame rows before model calls.
+- [record-args.rs](record_args.rs): record subcommand parsing.
+- [record-files.rs](record_files.rs): workspace record file commands.
 - [recovery-bridge.rs](recovery_bridge.rs): unfinished decision reuse and
   recovery settlement.
 - [runtime-bridge.rs](runtime_bridge.rs): state-ledger decision preparation.

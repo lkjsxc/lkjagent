@@ -27,15 +27,20 @@ asks the wall clock.
 ## Selectors
 
 Selectors read the hydrated state vector and compact state-edge evidence, create
-bounded `SelectorCandidate` values, filter blocked candidates, sort them
-deterministically, and persist the winning `RuntimeDecision`. Selection prefers
-recovery, owner intake or answers, safety resolution, due scheduled work,
-admitted effects, stale checks, model calls, compaction, maintenance, then idle.
+bounded `SelectorCandidate` values, filter candidates blocked by active
+`blocks` edges, sort them deterministically, and persist only the winning
+`RuntimeDecision`. The first implemented candidate tiers are owner intake,
+owner answer, recovery, effects, model calls, checks, completion, payload-defined
+custom operations, cooldown suppression, and idle. A state cell with an
+`operation_key` payload can become a candidate without adding a central enum
+branch. Candidate rows are not a second control plane.
 
 ## Fingerprints
 
 State-vector and snapshot fingerprints are canonical over stable bytes such as
-canonical JSON. Rust debug formatting is not a persisted fingerprint format.
+canonical JSON. Candidate ordering uses tier, cell priority, optional
+`deadline_at`, and state key label. Rust debug formatting is not a persisted
+fingerprint format.
 
 ## Failure This Prevents
 

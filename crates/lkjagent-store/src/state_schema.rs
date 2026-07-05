@@ -14,6 +14,8 @@ pub const STATE_LEDGER_TABLES: &[&str] = &[
     "context_items",
     "context_edges",
     "state_edges",
+    "workspace_records",
+    "workspace_record_history",
     "artifacts",
     "provider_exchanges",
 ];
@@ -163,7 +165,7 @@ fn setup_indexes(conn: &Connection) -> StoreResult<()> {
             reason TEXT NOT NULL,
             created_at TEXT NOT NULL
         );
-        CREATE TABLE IF NOT EXISTS artifacts (
+CREATE TABLE IF NOT EXISTS artifacts (
             id TEXT PRIMARY KEY,
             case_id TEXT NOT NULL,
             kind TEXT NOT NULL,
@@ -185,15 +187,12 @@ fn setup_indexes(conn: &Connection) -> StoreResult<()> {
             finished_at TEXT
         );
 
-        CREATE INDEX IF NOT EXISTS idx_state_cells_case_status
-            ON state_cells(case_id, status, priority, conflict_group);
-        CREATE INDEX IF NOT EXISTS idx_context_items_prompt
-            ON context_items(case_id, semantic_key, contamination_class,
-                trust_class, source_fingerprint);
-        CREATE INDEX IF NOT EXISTS idx_runtime_decisions_unfinished
-            ON runtime_decisions(case_id, status, selected_at);
+        CREATE INDEX IF NOT EXISTS idx_state_cells_case_status ON state_cells(case_id, status, priority, conflict_group);
+        CREATE INDEX IF NOT EXISTS idx_context_items_prompt ON context_items(case_id, semantic_key, contamination_class, trust_class, source_fingerprint);
+        CREATE INDEX IF NOT EXISTS idx_runtime_decisions_unfinished ON runtime_decisions(case_id, status, selected_at);
         ",
     )?;
     crate::state_edge_schema::setup(conn)?;
+    crate::record_schema::setup(conn)?;
     Ok(())
 }

@@ -22,6 +22,8 @@ mod model_call;
 mod model_io;
 mod observation_bridge;
 mod prompt_bridge;
+mod record_args;
+mod record_files;
 mod recovery_bridge;
 mod runtime_bridge;
 mod runtime_cell;

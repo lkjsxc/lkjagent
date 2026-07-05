@@ -48,6 +48,26 @@ where
             &winning_item_id,
             &crate::clock::utc_now(),
         ),
+        Command::RecordAdd { kind, title, body } => crate::record_files::add(
+            &conn,
+            &invocation.data_dir,
+            &kind,
+            &title,
+            &body,
+            &crate::clock::utc_now(),
+        ),
+        Command::RecordList { kind } => crate::record_files::list(&conn, kind.as_deref()),
+        Command::RecordShow { id } => crate::record_files::show(&conn, &invocation.data_dir, &id),
+        Command::RecordLink { id, target } => crate::record_files::link(
+            &conn,
+            &invocation.data_dir,
+            &id,
+            &target,
+            &crate::clock::utc_now(),
+        ),
+        Command::RecordArchive { id } => {
+            crate::record_files::archive(&conn, &invocation.data_dir, &id, &crate::clock::utc_now())
+        }
         Command::Memory { query } => crate::inspect::memory(&conn, &query),
         Command::Watch => crate::inspect::watch(&conn),
         Command::Help => Ok(help()),
@@ -64,6 +84,7 @@ pub fn help() -> String {
         "  task list | task show ID",
         "  queue list | queue show ID",
         "  context resolve CASE_ID KEY WINNING_ITEM_ID",
+        "  record add KIND TITLE [--body TEXT] | list [KIND] | show ID | link ID REF | archive ID",
         "  memory QUERY",
         "  watch",
         "  help",

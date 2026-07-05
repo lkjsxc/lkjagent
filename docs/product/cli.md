@@ -21,7 +21,11 @@ Define the owner command surface and output discipline.
 | `lkjagent watch` | print a refreshable terminal snapshot with status, trace, and proof rows |
 | `lkjagent doctor [--json]` | print row-backed health diagnostics without secrets |
 | `lkjagent workspace [--json]` | summarize configured workspace paths and indexes |
-| `lkjagent record add, list, show, link, archive` | manage generic workspace records |
+| `lkjagent record add KIND TITLE [--body TEXT]` | create a generic workspace record and metadata row |
+| `lkjagent record list [KIND]` | list current generic records by row metadata |
+| `lkjagent record show ID` | print one record row and Markdown body |
+| `lkjagent record link ID REF` | add a frontmatter link and refresh fingerprint evidence |
+| `lkjagent record archive ID` | move a record under `records/archive` and hide it from normal list |
 | `lkjagent today, journal, todo, calendar, finance, project, dev` | friendly record-backed wrappers |
 | `lkjagent proof collect [--json]` | collect a bounded proof bundle from rows and refs |
 | `lkjagent proof live --minutes N` | run the bounded live proof path when endpoint evidence is available |
@@ -56,7 +60,8 @@ store directly.
   --follow`.
 - `crates/lkjagent-app/src/inspect.rs` keeps non-follow output deterministic and
   follows events by monotonically increasing row id.
-- CLI tests cover parser shape, row-backed log continuation, and watch sections.
+- CLI tests cover parser shape, record commands, row-backed log continuation,
+  and watch sections.
 
 ## Authority Limits
 

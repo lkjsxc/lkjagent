@@ -25,6 +25,8 @@ pub const APPLICATION_TABLES: &[&str] = &[
     "context_items",
     "context_edges",
     "state_edges",
+    "workspace_records",
+    "workspace_record_history",
     "artifacts",
     "provider_exchanges",
 ];

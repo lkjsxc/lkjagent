@@ -20,8 +20,6 @@ created_at: 2026-07-05T12:00:00Z
 updated_at: 2026-07-05T12:00:00Z
 tags: [home, finance]
 links: []
-source_refs: []
-artifact_refs: []
 state_keys: [todo:open/rec_20260705_120000_slug]
 ---
 
@@ -35,15 +33,18 @@ state_keys: [todo:open/rec_20260705_120000_slug]
 ## Identity
 
 The `id` is stable and sorts by creation time. Paths are convenient storage
-locations, not identity. Unknown `kind` values are valid records and must list,
-show, link, archive, and round-trip without central enum edits.
+locations, not identity. The first file implementation stores records under
+`workspace/records/<kind>/<id>.md` and archived records under
+`workspace/records/archive/<kind>/<id>.md`. Unknown `kind` values are valid
+records and must list, show, link, archive, and round-trip without central enum
+edits.
 
 ## Ledger Links
 
-Record writes append runtime events, refresh fingerprints, and create evidence
-for state cells or artifacts. Frontmatter refs may point to owner messages,
-state keys, checks, provider exchanges, artifacts, other records, or proof
-bundles.
+Record writes refresh `workspace_records` metadata and
+`workspace_record_history` fingerprints. These rows are evidence and indexes,
+not turn authority. Frontmatter refs may point to owner messages, state keys,
+checks, provider exchanges, artifacts, other records, or proof bundles.
 
 ## Staleness
 

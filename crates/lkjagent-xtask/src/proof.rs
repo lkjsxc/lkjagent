@@ -43,6 +43,7 @@ fn collect(options: Options) -> Result<PathBuf, String> {
     write(&options.out_dir, "summary.md", &summary(&conn)?)?;
     write(&options.out_dir, "status.md", &status(&conn)?)?;
     crate::proof_state::write_state_bundle(&conn, &options.out_dir)?;
+    crate::proof_records::write_record_selector_bundle(&conn, &options.out_dir)?;
     write(
         &options.out_dir,
         "attempts.md",

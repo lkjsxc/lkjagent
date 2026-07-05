@@ -28,6 +28,59 @@ fn status_reports_stale_lease_rows() -> TestResult<()> {
 }
 
 #[test]
+fn record_cli_manages_generic_records_while_daemon_is_stopped() -> TestResult<()> {
+    let data = fixture_root("records")?;
+
+    let added = cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "record",
+        "add",
+        "custom",
+        "Odd",
+        "Task",
+        "--body",
+        "body",
+    ])?;
+    assert!(added.contains("record: rec_"));
+    let id = added
+        .split_whitespace()
+        .nth(1)
+        .ok_or("missing record id")?
+        .to_string();
+    assert!(cli::run(["--data", data.to_string_lossy().as_ref(), "record", "list"])?.contains(&id));
+    assert!(cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "record",
+        "show",
+        &id
+    ])?
+    .contains("body"));
+    assert!(cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "record",
+        "link",
+        &id,
+        "record:other",
+    ])?
+    .contains("linked record"));
+    assert!(cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "record",
+        "archive",
+        &id,
+    ])?
+    .contains("archived record"));
+    assert!(
+        !cli::run(["--data", data.to_string_lossy().as_ref(), "record", "list"])?.contains(&id)
+    );
+    Ok(())
+}
+
+#[test]
 fn cli_inspection_reads_store_rows() -> TestResult<()> {
     let data = fixture_root("cli")?;
     let sent = cli::run([

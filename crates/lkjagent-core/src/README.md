@@ -17,6 +17,8 @@ Map lkjagent-core source modules.
   tool-set views.
 - [runtime-operation.rs](runtime_operation.rs): selected runtime operation
   payload.
+- [runtime-candidate.rs](runtime_candidate.rs): selector candidate generation,
+  scoring, and edge blocking.
 - [runtime-selector.rs](runtime_selector.rs): pure state-vector decision
   selection.
 - [runtime-admission.rs](runtime_admission.rs): action admission and workspace
@@ -39,4 +41,5 @@ Map lkjagent-core source modules.
 - [plan.rs](plan.rs): materialize validated plan lines into steps.
 - [checks.rs](checks.rs): pure check evaluation over supplied facts.
 - [words.rs](words.rs): shared word counting.
+- [workspace-record.rs](workspace_record.rs): generic Markdown record format.
 - [classify.rs](classify.rs): objective classification and starter templates.

@@ -60,6 +60,33 @@ fn explore_decision_renders_tool_call_contract() {
 }
 
 #[test]
+fn generic_decision_envelopes_render_protocol_cards() {
+    for (envelope, tag) in [
+        (OutputEnvelope::Content, "content"),
+        (OutputEnvelope::Plan, "plan"),
+        (OutputEnvelope::Message, "message"),
+        (OutputEnvelope::Verdict, "verdict"),
+    ] {
+        let snapshot = instantiate(3, "Render contract.");
+        let decision = RuntimeDecision::new(
+            "decision-1",
+            "case-1",
+            OperationKey("model.call/1".to_string()),
+            ToolSetView::empty(),
+            envelope,
+        );
+        let prompt = render_prompt_for_decision(
+            &snapshot.task,
+            &snapshot.steps,
+            &snapshot.steps[0],
+            &decision,
+        );
+        assert!(prompt.user.contains(&format!("Copy this shape:\n<{tag}>")));
+        assert_eq!(prompt.stop, format!("</{tag}>"));
+    }
+}
+
+#[test]
 fn prompt_includes_task_brief() {
     let mut snapshot = instantiate(2, "What is known?");
     snapshot.task.brief = "memory_facts:\nrow memory fact".to_string();

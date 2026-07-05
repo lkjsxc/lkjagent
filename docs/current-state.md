@@ -67,19 +67,19 @@ has a first pure state-ledger domain slice in `lkjagent-core`: state keys and
 cells, runtime events and patches, runtime decisions, tool-set views, action
 admission with workspace path policy, context items with contamination classes,
 contradiction detection, stable fingerprints, and fresh-evidence completion
-helpers. `lkjagent-core` also has a pure selector that picks a runtime decision
-from hydrated state and reuses unfinished decisions before selecting new work.
-`lkjagent-store` creates the first state-ledger table set beside the plan-family
-rows, with row helpers for cases, events, unknown state cells, state history,
-pending runtime decisions, and context items. `lkjagent-app` projects plan rows
+helpers. `lkjagent-core` also has a pure selector that builds bounded
+`SelectorCandidate` values from cells, payload operation keys, priority,
+deadlines, cooldowns, and blocking edges before persisting the winner; unfinished
+decisions still win first. `lkjagent-store` adds row helpers for cases, events,
+state cells, decisions, context items, workspace record metadata, and record
+fingerprint history. `lkjagent-app` projects plan rows
 through durable runtime events into operation-specific state cells, mirrors task
 snapshots into `case:snapshot` state cells, hydrates runnable snapshots from
 state cells before plan rows, uses the same path for status, leaves active
 operation cells as decision authority until settlement, persists or reuses a
-`RuntimeDecision` before prompt rendering,
-derives turn work from the persisted
-decision operation, and settles the decision after the turn. The bridge projects
-cells such as `model:<step>`, `check:<step>`, `case:waiting-answer`, and
+`RuntimeDecision` before prompt rendering, derives turn work from the persisted
+decision operation, and settles it after the turn. The bridge projects cells
+such as `model:<step>`, `check:<step>`, `case:waiting-answer`, and
 `completion:close-candidate`. Explore tool
 descriptors now live in one core catalog used to derive the bridge
 `ToolSetView`; prompt rendering prints that persisted view, parsing reads
@@ -116,12 +116,15 @@ rendering. Unfinished decisions with committed provider exchanges, admissions, o
 observations are recovered before a new decision is selected and write resolved
 `recovery:recovered/<decision>` report cells; decisions without external
 evidence are reused. Proof
-collection writes state-ledger sections for state cells, decisions,
-prompt frames, admissions, observations, exchanges, artifacts, and context.
+collection writes state-ledger sections for cells, decisions, candidates,
+records, prompt frames, admissions, observations, exchanges, artifacts, and
+context.
 Status reports active or stale daemon lease rows from heartbeat config evidence,
-and watch prints bounded status, event, trace, and proof-row sections.
-Prompt-frame rows now point to bounded prompt body refs under `data/logs/`.
-Current gate results belong in handoff after commands rerun against this checkout.
+and watch prints bounded status, event, trace, and proof-row sections. Prompt
+frames point to bounded body refs and every decision envelope renders a final
+protocol card. Generic record CLI commands add, list, show, link, and archive Markdown records
+under `workspace/records` with fingerprint rows but not turn authority. Current
+gate results belong in handoff after commands rerun against this checkout.
 
 ## State-Ledger Parity
 
@@ -184,10 +187,7 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Expand selector candidates and generic workspace record files, then carry the
-same decision-coupled protocol-card pattern into artifact, plan, message, and
-verdict envelopes. Keep authority on persisted `RuntimeDecision` rows and the
-active `ToolSetView` while future protocol changes are experimented and proven.
+Run the twenty-minute live proof path and record honest evidence.
 
 ## Honesty Rules
 

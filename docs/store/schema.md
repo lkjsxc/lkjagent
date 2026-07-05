@@ -30,6 +30,8 @@ runtime reads only state rows. Required tables:
 | `context_items` | source-tagged prompt candidates |
 | `context_edges` | provenance, suppression, and conflict links between context items |
 | `state_edges` | generic relation evidence between state, records, artifacts, checks, and messages |
+| `workspace_records` | current record metadata and fingerprints for owner-readable files |
+| `workspace_record_history` | record fingerprint history for staleness checks |
 | `artifacts` | files, roots, fingerprints, and ownership metadata |
 | `check_results` | deterministic and judged evidence |
 | `provider_exchanges` | endpoint request and response refs |

@@ -1,8 +1,9 @@
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
 };
-use lkjagent_core::runtime_selector::select_runtime_decision;
+use lkjagent_core::runtime_selector::{candidates, select_runtime_decision};
 use lkjagent_core::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
+use lkjagent_core::runtime_state_edge::{StateEdge, StateEdgeRelation, StateRef};
 
 #[test]
 fn selector_reuses_unfinished_decision_before_new_work() {
@@ -62,6 +63,59 @@ fn selector_uses_idle_when_no_active_cells_exist() {
 
     assert_eq!(selected.operation.0, "runtime.idle");
     assert_eq!(selected.expected_envelope, OutputEnvelope::None);
+}
+
+#[test]
+fn selector_skips_candidates_blocked_by_state_edges() {
+    let mut snapshot = RuntimeSnapshot::empty("case-1");
+    let model = cell("model", "1");
+    let check = cell("check", "1");
+    snapshot.cells.insert(model.key.clone(), model);
+    snapshot.cells.insert(check.key.clone(), check);
+    snapshot.edges.insert(
+        "edge-1".to_string(),
+        StateEdge::active(
+            "edge-1",
+            "case-1",
+            StateRef::new("state", "context:conflict/root"),
+            StateRef::new("state", "model:1"),
+            StateEdgeRelation::blocks(),
+            "event-1",
+        ),
+    );
+
+    let items = candidates(&snapshot);
+    let blocked = items
+        .iter()
+        .find(|item| item.operation.key == "model.call/1");
+    assert_eq!(
+        blocked.map(|item| item.blocked_by.clone()),
+        Some(vec!["edge-1".to_string()])
+    );
+    let selected = select(&snapshot, "decision-1", &[]);
+    assert_eq!(selected.operation.0, "check.run/1");
+}
+
+#[test]
+fn payload_operation_selects_unknown_state_namespace() {
+    let mut custom = cell("calendar", "due/today");
+    custom.payload_json = serde_json::json!({
+        "operation_key": "model.call/42",
+        "expected_envelope": "Message",
+        "selector_tier": 25,
+        "evidence_requirements": ["record:todo-1"]
+    })
+    .to_string();
+    let snapshot = snapshot_with(custom);
+
+    let selected = select(&snapshot, "decision-1", &[]);
+
+    assert_eq!(selected.operation.0, "model.call/42");
+    assert_eq!(selected.expected_envelope, OutputEnvelope::Message);
+    assert_eq!(
+        selected.evidence_requirements,
+        vec!["selector:payload", "record:todo-1"]
+    );
 }
 
 fn snapshot_with(cell: StateCell) -> RuntimeSnapshot {

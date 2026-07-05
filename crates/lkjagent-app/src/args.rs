@@ -32,6 +32,24 @@ pub enum Command {
         semantic_key: String,
         winning_item_id: String,
     },
+    RecordAdd {
+        kind: String,
+        title: String,
+        body: String,
+    },
+    RecordList {
+        kind: Option<String>,
+    },
+    RecordShow {
+        id: String,
+    },
+    RecordLink {
+        id: String,
+        target: String,
+    },
+    RecordArchive {
+        id: String,
+    },
     Memory {
         query: String,
     },
@@ -75,6 +93,7 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
         "task" => parse_task(rest),
         "queue" => parse_queue(rest),
         "context" => parse_context(rest),
+        "record" => crate::record_args::parse_record(rest),
         "memory" => parse_memory(rest),
         "watch" => no_args(rest, Command::Watch),
         other => Err(format!("unknown command: {other}")),

@@ -23,6 +23,8 @@ Map lkjagent-store source modules.
 - [plan-commit.rs](plan_commit.rs): atomic turn state commits.
 - [plan-turn.rs](plan_turn.rs): command transaction helpers.
 - [prompt-rows.rs](prompt_rows.rs): prompt frame row helpers.
+- [record-schema.rs](record_schema.rs): workspace record table setup.
+- [record-rows.rs](record_rows.rs): workspace record metadata and history rows.
 - [plan-inspect.rs](plan_inspect.rs): schema and log inspection helpers.
 - [row-json.rs](row_json.rs): shared JSON and fingerprint error mapping.
 - [state-rows.rs](state_rows.rs): state cell row helpers and hydration.
