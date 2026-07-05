@@ -58,6 +58,27 @@ fn parser_accepts_record_forms() -> TestResult<()> {
 }
 
 #[test]
+fn parser_accepts_record_wrappers() -> TestResult<()> {
+    assert_eq!(
+        parse(["todo", "Buy", "milk"])?.command,
+        Command::RecordAdd {
+            kind: "todo".to_string(),
+            title: "Buy milk".to_string(),
+            body: "Buy milk".to_string(),
+        }
+    );
+    assert_eq!(
+        parse(["dev", "Ship", "console"])?.command,
+        Command::RecordAdd {
+            kind: "development".to_string(),
+            title: "Ship console".to_string(),
+            body: "Ship console".to_string(),
+        }
+    );
+    Ok(())
+}
+
+#[test]
 fn parser_rejects_empty_memory_query() -> TestResult<()> {
     let error = match parse(["memory"]) {
         Ok(_) => return Err("memory without query parsed".into()),

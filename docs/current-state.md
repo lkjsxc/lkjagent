@@ -123,8 +123,9 @@ Status reports active or stale daemon lease rows from heartbeat config evidence,
 and watch prints bounded status, event, trace, and proof-row sections. Prompt
 frames point to bounded body refs and every decision envelope renders a final
 protocol card. Generic record CLI commands add, list, show, link, and archive Markdown records
-under `workspace/records` with fingerprint rows but not turn authority;
-experiment records use the same path, and xtask writes protocol result ledgers.
+under `workspace/records` with fingerprint rows but not turn authority; friendly
+wrappers from `today` through `dev` reuse the same path. Experiment records use
+it too, and xtask writes result ledgers.
 
 ## State-Ledger Parity
 
@@ -186,7 +187,7 @@ proof `tmp/live-run-20260705T102438Z-068ce1f` closed task 1. Older logs are hist
 
 ## Next Executable Step
 
-Add record-backed wrappers and diagnostics without a second control plane.
+Add row-backed doctor and workspace diagnostics without a second control plane.
 
 ## Honesty Rules
 

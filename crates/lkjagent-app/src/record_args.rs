@@ -1,5 +1,25 @@
 use crate::args::Command;
 
+pub fn wrapper_kind(command: &str) -> Option<&str> {
+    match command {
+        "today" | "journal" | "todo" | "calendar" | "finance" | "project" => Some(command),
+        "dev" => Some("development"),
+        _ => None,
+    }
+}
+
+pub fn parse_wrapper(kind: &str, rest: Vec<String>) -> Result<Command, String> {
+    let text = rest.join(" ");
+    if text.trim().is_empty() {
+        return Err(format!("{kind} requires TEXT"));
+    }
+    Ok(Command::RecordAdd {
+        kind: kind.to_string(),
+        title: text.clone(),
+        body: text,
+    })
+}
+
 pub fn parse_record(rest: Vec<String>) -> Result<Command, String> {
     match rest.as_slice() {
         [action, kind, title @ ..] if action == "add" && !title.is_empty() => {

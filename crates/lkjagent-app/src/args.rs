@@ -85,6 +85,9 @@ where
 }
 
 fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
+    if let Some(kind) = crate::record_args::wrapper_kind(command) {
+        return crate::record_args::parse_wrapper(kind, rest);
+    }
     match command {
         "help" => Ok(Command::Help),
         "run" => no_args(rest, Command::Run),

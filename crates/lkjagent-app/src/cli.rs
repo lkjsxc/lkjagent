@@ -87,6 +87,7 @@ pub fn help() -> String {
         "  queue list | queue show ID",
         "  context resolve CASE_ID KEY WINNING_ITEM_ID",
         "  record add KIND TITLE [--body TEXT] | list [KIND] | show ID | link ID REF | archive ID",
+        "  today|journal|todo|calendar|finance|project|dev TEXT",
         "  memory QUERY",
         "  watch",
         "  help",
