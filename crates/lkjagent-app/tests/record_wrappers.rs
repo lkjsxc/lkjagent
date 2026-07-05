@@ -2,6 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use lkjagent_app::cli;
+use rusqlite::Connection;
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
@@ -39,6 +40,11 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
     assert!(shown.contains("kind: todo"));
     assert!(shown.contains("## Body\n\nBuy milk"));
 
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let labels = state_labels(&conn)?;
+    assert!(labels.contains(&"todo:open/".to_string()));
+    assert!(labels.contains(&"index:stale/records".to_string()));
+
     let dev = cli::run([
         "--data",
         data.to_string_lossy().as_ref(),
@@ -47,7 +53,23 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
         "parser",
     ])?;
     assert!(dev.contains("path=records/development/"));
+    assert!(state_labels(&conn)?.contains(&"dev:repo-task/".to_string()));
     Ok(())
+}
+
+fn state_labels(conn: &Connection) -> rusqlite::Result<Vec<String>> {
+    let mut statement = conn.prepare("SELECT key_label FROM state_cells ORDER BY key_label")?;
+    let rows = statement.query_map([], |row| row.get::<_, String>(0))?;
+    rows.map(|row| row.map(|label| label_prefix(&label)))
+        .collect()
+}
+
+fn label_prefix(label: &str) -> String {
+    if let Some((prefix, _)) = label.rsplit_once("rec_") {
+        prefix.to_string()
+    } else {
+        label.to_string()
+    }
 }
 
 fn fixture_root(name: &str) -> TestResult<PathBuf> {

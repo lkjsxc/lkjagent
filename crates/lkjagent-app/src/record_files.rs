@@ -2,8 +2,8 @@ use std::fs;
 use std::path::Path;
 
 use lkjagent_core::workspace_record::{
-    archive_path, parse_record, record_fingerprint, record_path, render_record, slug,
-    WorkspaceRecord,
+    archive_path, default_state_for_kind, parse_record, record_fingerprint, record_path,
+    render_record, slug, state_keys_for_record, WorkspaceRecord,
 };
 use lkjagent_store::record_rows::{record, records, upsert_record, RecordRow};
 use rusqlite::Connection;
@@ -19,6 +19,8 @@ pub fn add(
     ensure_dirs(data_dir)?;
     let id = record_id(now, title);
     let mut record = WorkspaceRecord::new(&id, kind, title, now);
+    record.state = default_state_for_kind(kind).to_string();
+    record.state_keys = state_keys_for_record(kind, &id, &record.state);
     record.body = body.to_string();
     write_record(conn, data_dir, &record, false)
 }
@@ -68,6 +70,7 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
         )?,
     )
     .map_err(|error| error.to_string())?;
+    crate::record_state::suppress_record_cells(conn, &row, now)?;
     Ok(format!("archived record: {id}"))
 }
 
@@ -90,17 +93,15 @@ pub fn link(
     parsed.updated_at = now.to_string();
     let output = render_record(&parsed);
     fs::write(&path, &output).map_err(|error| error.to_string())?;
-    upsert_record(
-        conn,
-        &record_row(
-            (&row.id, &row.kind, &row.title, &row.state),
-            &row.path,
-            &output,
-            false,
-            now,
-        )?,
-    )
-    .map_err(|error| error.to_string())?;
+    let updated = record_row(
+        (&row.id, &row.kind, &row.title, &row.state),
+        &row.path,
+        &output,
+        false,
+        now,
+    )?;
+    upsert_record(conn, &updated).map_err(|error| error.to_string())?;
+    crate::record_state::upsert_record_cells(conn, &parsed, &row.path, &updated.fingerprint)?;
     Ok(format!("linked record: {id} -> {target}"))
 }
 
@@ -125,6 +126,7 @@ fn write_record(
         &record.updated_at,
     )?;
     upsert_record(conn, &row).map_err(|error| error.to_string())?;
+    crate::record_state::upsert_record_cells(conn, record, &rel, &row.fingerprint)?;
     Ok(format!("record: {} path={rel}", record.id))
 }
 

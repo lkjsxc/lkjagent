@@ -1,5 +1,6 @@
 use serde_json::Value;
 
+use crate::runtime_candidate_edges::apply_edge_blocks;
 use crate::runtime_candidate_payload as payload;
 use crate::runtime_decision::OutputEnvelope;
 use crate::runtime_operation::RuntimeOperation;
@@ -101,8 +102,19 @@ fn namespace_candidate(cell: &StateCell, body: &Value) -> Option<SelectorCandida
             60,
             "check",
         )),
-        _ => None,
+        _ => workspace_candidate(cell),
     }
+}
+
+fn workspace_candidate(cell: &StateCell) -> Option<SelectorCandidate> {
+    let (operation, tier, reason) =
+        crate::runtime_workspace_family::operation(&cell.key.namespace)?;
+    Some(model_free(
+        cell,
+        &format!("{operation}/{}", cell.key.name),
+        tier,
+        reason,
+    ))
 }
 
 fn operation_from_payload(body: &Value) -> Option<RuntimeOperation> {
@@ -169,21 +181,6 @@ fn idle_candidate() -> SelectorCandidate {
             key: "runtime:idle".to_string(),
         },
     }
-}
-
-fn apply_edge_blocks(snapshot: &RuntimeSnapshot, mut item: SelectorCandidate) -> SelectorCandidate {
-    let Some(key) = &item.state_key else {
-        return item;
-    };
-    let label = key.as_label();
-    item.blocked_by = snapshot
-        .active_edges()
-        .into_iter()
-        .filter(|edge| edge.relation.0 == "blocks")
-        .filter(|edge| edge.to_ref.kind == "state" && edge.to_ref.id == label)
-        .map(|edge| edge.id)
-        .collect();
-    item
 }
 
 fn evidence(cell: &StateCell) -> Vec<String> {

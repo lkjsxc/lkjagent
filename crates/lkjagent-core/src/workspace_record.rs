@@ -37,6 +37,30 @@ impl WorkspaceRecord {
     }
 }
 
+pub fn default_state_for_kind(kind: &str) -> &'static str {
+    match kind {
+        "calendar" => "due",
+        "routine" => "ready",
+        "project" => "active",
+        "proof" => "collect",
+        _ => "open",
+    }
+}
+
+pub fn state_keys_for_record(kind: &str, id: &str, state: &str) -> Vec<String> {
+    let mut keys = vec!["index:stale/records".to_string()];
+    match kind {
+        "todo" => keys.push(format!("todo:{state}/{id}")),
+        "calendar" => keys.push(format!("calendar:{state}/{id}")),
+        "routine" => keys.push(format!("routine:{state}/{id}")),
+        "project" => keys.push(format!("project:{state}/{id}")),
+        "development" => keys.push(format!("dev:repo-task/{id}")),
+        "proof" => keys.push(format!("proof:collect/{id}")),
+        _ => {}
+    }
+    keys
+}
+
 pub fn render_record(record: &WorkspaceRecord) -> String {
     format!(
         "---\nid: {}\nkind: {}\ntitle: {}\nstate: {}\ncreated_at: {}\nupdated_at: {}\ntags: {}\nlinks: {}\nstate_keys: {}\n---\n\n# {}\n\n## Body\n\n{}\n",

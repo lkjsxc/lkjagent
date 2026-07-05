@@ -1,6 +1,6 @@
 use lkjagent_core::workspace_record::{
-    archive_path, parse_record, record_fingerprint, record_path, render_record, slug,
-    WorkspaceRecord,
+    archive_path, default_state_for_kind, parse_record, record_fingerprint, record_path,
+    render_record, slug, state_keys_for_record, WorkspaceRecord,
 };
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -23,6 +23,20 @@ fn record_round_trips_unknown_kind_and_lists() -> TestResult<()> {
     let left = record_fingerprint(&rendered).map_err(|error| error.message)?;
     let right = record_fingerprint(&rendered).map_err(|error| error.message)?;
     assert_eq!(left, right);
+    Ok(())
+}
+
+#[test]
+fn record_families_emit_state_keys() -> TestResult<()> {
+    assert_eq!(default_state_for_kind("project"), "active");
+    assert_eq!(
+        state_keys_for_record("todo", "rec_1", "open"),
+        vec!["index:stale/records", "todo:open/rec_1"]
+    );
+    assert_eq!(
+        state_keys_for_record("development", "rec_2", "open"),
+        vec!["index:stale/records", "dev:repo-task/rec_2"]
+    );
     Ok(())
 }
 

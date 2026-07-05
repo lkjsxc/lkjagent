@@ -36,6 +36,10 @@ impl<'de> Deserialize<'de> for StateKey {
 }
 
 impl StateKey {
+    pub fn from_label(label: &str) -> Result<Self, StateKeyError> {
+        parse_state_key(label).map_err(|message| StateKeyError { message })
+    }
+
     pub fn new(
         namespace: impl Into<String>,
         name: impl Into<String>,

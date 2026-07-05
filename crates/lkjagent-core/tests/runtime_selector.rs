@@ -97,6 +97,36 @@ fn selector_skips_candidates_blocked_by_state_edges() {
 }
 
 #[test]
+fn selector_maps_workspace_record_families() {
+    let selected = select(
+        &snapshot_with(cell("todo", "open/rec_1")),
+        "decision-1",
+        &[],
+    );
+
+    assert_eq!(selected.operation.0, "todo.review/open/rec_1");
+    assert_eq!(
+        selected.evidence_requirements,
+        vec!["selector:todo", "todo:open/rec_1"]
+    );
+}
+
+#[test]
+fn selector_orders_workspace_family_priority() {
+    let mut low = cell("todo", "open/low");
+    let mut high = cell("todo", "open/high");
+    low.priority = 1;
+    high.priority = 7;
+    let mut snapshot = RuntimeSnapshot::empty("case-1");
+    snapshot.cells.insert(low.key.clone(), low);
+    snapshot.cells.insert(high.key.clone(), high);
+
+    let selected = select(&snapshot, "decision-1", &[]);
+
+    assert_eq!(selected.operation.0, "todo.review/open/high");
+}
+
+#[test]
 fn payload_operation_selects_unknown_state_namespace() {
     let mut custom = cell("calendar", "due/today");
     custom.payload_json = serde_json::json!({

@@ -124,8 +124,9 @@ workspace, record, artifact, and proof counts. Watch prints bounded status, even
 trace, and proof rows. Prompt frames point to bounded body refs and every
 decision envelopes render protocol cards. Generic record CLI adds, lists, shows,
 links, and archives Markdown records under `workspace/records` with fingerprint
-rows but not turn authority; `today` through `dev` wrappers reuse that path.
-Experiment records use it too, and xtask writes result ledgers.
+rows but not turn authority; `today` through `dev` wrappers reuse that path and
+project workspace state cells for todo, calendar, routine, index, proof, dev, and
+project families. Experiment records use it too, and xtask writes result ledgers.
 
 ## State-Ledger Parity
 
@@ -182,12 +183,11 @@ audit, deterministic replay, benchmark commands, and proof bundle collection.
 
 ## Historical Evidence
 
-Checked-in `tmp/` logs record gate and live proof artifacts. Latest small live
-proof `tmp/live-run-20260705T102438Z-068ce1f` closed task 1. Older logs are historical unless rerun.
+Checked-in `tmp/` logs are historical proof or failure fixtures unless rerun here.
 
 ## Next Executable Step
 
-Expand state families and protocol experiments without adding a second control plane.
+Harden protocol experiments and adoption evidence without adding a second control plane.
 
 ## Honesty Rules
 
