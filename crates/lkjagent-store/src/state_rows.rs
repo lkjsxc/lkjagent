@@ -117,6 +117,14 @@ pub fn persist_state_patch(
                     ],
                 )?;
             }
+            StatePatchOp::UpsertEdge(edge) => {
+                crate::state_edge_rows::insert_state_edge(conn, Some(case_id), edge)?;
+            }
+            StatePatchOp::SetEdgeStatus {
+                edge_id, reason, ..
+            } => {
+                crate::state_edge_rows::suppress_state_edge(conn, edge_id, reason)?;
+            }
         }
     }
     Ok(())
@@ -132,6 +140,9 @@ pub fn hydrate_snapshot(conn: &Connection, case_id: &str) -> StoreResult<Runtime
     for row in rows {
         let cell: StateCell = json_value(&row?)?;
         snapshot.cells.insert(cell.key.clone(), cell);
+    }
+    for edge in crate::state_edge_rows::state_edges(conn, case_id)? {
+        snapshot.edges.insert(edge.id.clone(), edge);
     }
     Ok(snapshot)
 }

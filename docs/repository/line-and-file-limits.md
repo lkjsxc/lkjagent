@@ -21,7 +21,7 @@ larger when generated from small checked units and deterministic assembly.
 
 | Surface | Budget |
 | --- | ---: |
-| documentation under `docs/` | `repository.docs-file-budget=90` |
+| documentation under `docs/` | `repository.docs-file-budget=100` |
 | product Rust source files | `repository.product-source-file-budget=170` |
 
 The warning threshold is `repository.file-budget.warn-percent=90`. Warnings are

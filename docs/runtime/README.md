@@ -8,7 +8,7 @@ recovery, and completion.
 ## Table of Contents
 
 - [loop-and-decisions.md](loop-and-decisions.md): snapshot hydration,
-  `RuntimeDecision` fields, and prompt or effect selection.
+  selector candidates, `RuntimeDecision` fields, and prompt or effect selection.
 - [recovery-and-completion.md](recovery-and-completion.md): crash recovery,
   evidence-gated closure, observability, and proof requirements.
 - [artifact-units.md](artifact-units.md): small generation units,

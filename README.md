@@ -28,6 +28,7 @@ cargo run -p lkjagent-app -- send "Create a document tree about ..."
 cargo run -p lkjagent-app -- status
 cargo run -p lkjagent-app -- task list
 cargo run -p lkjagent-app -- log --limit 20
+cargo run -p lkjagent-app -- watch
 docker compose run --rm verify
 ```
 
@@ -40,10 +41,12 @@ is the ledger for what is implemented now and what remains open.
 2. [docs/vision/README.md](docs/vision/README.md)
 3. [docs/state/README.md](docs/state/README.md)
 4. [docs/runtime/README.md](docs/runtime/README.md)
-5. [docs/context/README.md](docs/context/README.md)
-6. [docs/tools/README.md](docs/tools/README.md)
-7. [docs/agent/README.md](docs/agent/README.md)
-8. [docs/operations/verification.md](docs/operations/verification.md)
+5. [docs/product/README.md](docs/product/README.md)
+6. [docs/workspace/README.md](docs/workspace/README.md)
+7. [docs/context/README.md](docs/context/README.md)
+8. [docs/tools/README.md](docs/tools/README.md)
+9. [docs/agent/README.md](docs/agent/README.md)
+10. [docs/operations/verification.md](docs/operations/verification.md)
 
 ## Repository Rules
 

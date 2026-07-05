@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::runtime_state::{RuntimeSnapshot, StateCell, StateKey, StateStatus};
+use crate::runtime_state_edge::{StateEdge, StateEdgeStatus};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RuntimeEvent {
@@ -19,6 +20,8 @@ pub enum RuntimeEventPayload {
     SuppressCell { key: StateKey, reason: String },
     ResolveCell { key: StateKey, reason: String },
     BlockCell { key: StateKey, reason: String },
+    UpsertEdge(Box<StateEdge>),
+    SuppressEdge { edge_id: String, reason: String },
     Unknown { schema: String, json: String },
 }
 
@@ -38,6 +41,13 @@ pub enum StatePatchOp {
         updated_at: String,
         source_event_id: String,
     },
+    UpsertEdge(StateEdge),
+    SetEdgeStatus {
+        edge_id: String,
+        status: StateEdgeStatus,
+        reason: String,
+        source_event_id: String,
+    },
 }
 
 pub fn reduce_event(_snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> StatePatch {
@@ -51,6 +61,17 @@ pub fn reduce_event(_snapshot: &RuntimeSnapshot, event: &RuntimeEvent) -> StateP
         }
         RuntimeEventPayload::BlockCell { key, reason } => {
             status_op(key, StateStatus::Blocked, reason, event)
+        }
+        RuntimeEventPayload::UpsertEdge(edge) => {
+            vec![StatePatchOp::UpsertEdge(edge.as_ref().clone())]
+        }
+        RuntimeEventPayload::SuppressEdge { edge_id, reason } => {
+            vec![StatePatchOp::SetEdgeStatus {
+                edge_id: edge_id.clone(),
+                status: StateEdgeStatus::Suppressed,
+                reason: reason.clone(),
+                source_event_id: event.id.clone(),
+            }]
         }
         RuntimeEventPayload::Unknown { .. } => Vec::new(),
     };
@@ -78,6 +99,21 @@ pub fn apply_patch(snapshot: &RuntimeSnapshot, patch: &StatePatch) -> RuntimeSna
                     cell.status = *status;
                     cell.updated_at = updated_at.clone();
                     cell.source_event_id = source_event_id.clone();
+                }
+            }
+            StatePatchOp::UpsertEdge(edge) => {
+                next.edges.insert(edge.id.clone(), edge.clone());
+            }
+            StatePatchOp::SetEdgeStatus {
+                edge_id,
+                status,
+                reason,
+                source_event_id,
+            } => {
+                if let Some(edge) = next.edges.get_mut(edge_id) {
+                    edge.status = *status;
+                    edge.suppression_reason = Some(reason.clone());
+                    edge.source_event_id = source_event_id.clone();
                 }
             }
         }

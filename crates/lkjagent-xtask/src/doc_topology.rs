@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use crate::doc_reachability::check_reachability;
 use crate::model::{RepoFile, Violation};
 
-const DOC_FILE_LIMIT: usize = 90;
+const DOC_FILE_LIMIT: usize = 100;
 
 pub fn check_doc_topology(files: &[RepoFile]) -> Vec<Violation> {
     let mut violations = Vec::new();

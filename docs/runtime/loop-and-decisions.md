@@ -19,11 +19,13 @@ RuntimeEvent -> durable rows
 
 ## Decision Rule
 
-Exactly one `RuntimeDecision` is selected for a turn and persisted before prompt
-rendering, endpoint calls, action admission, tool execution, recovery,
-compaction, or completion. The decision id and fingerprint are carried through
-prompt frames, provider exchanges, admissions, observations, events, checks,
-status output, and proof bundles.
+The selector creates bounded candidates from active cells, state edges, context
+summaries, records, artifacts, and stale evidence. Exactly one `RuntimeDecision`
+is selected for a turn and persisted before prompt rendering, endpoint calls,
+action admission, tool execution, recovery, compaction, or completion. The
+decision id and fingerprint are carried through prompt frames, provider
+exchanges, admissions, observations, events, checks, status output, and proof
+bundles.
 
 ## Decision Fields
 

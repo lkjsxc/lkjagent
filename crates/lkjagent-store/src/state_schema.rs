@@ -13,6 +13,7 @@ pub const STATE_LEDGER_TABLES: &[&str] = &[
     "observations",
     "context_items",
     "context_edges",
+    "state_edges",
     "artifacts",
     "provider_exchanges",
 ];
@@ -193,5 +194,6 @@ fn setup_indexes(conn: &Connection) -> StoreResult<()> {
             ON runtime_decisions(case_id, status, selected_at);
         ",
     )?;
+    crate::state_edge_schema::setup(conn)?;
     Ok(())
 }

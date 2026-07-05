@@ -7,21 +7,18 @@ this checkout, and open implementation gaps.
 
 ## Contract Target
 
-lkjagent is moving from a fixed plan-ledger engine to a durable state-ledger
-runtime. Owner messages become durable cases, events, state cells, runtime
-decisions, prompt frames, bounded model calls, tool admissions, deterministic
-effects, observations, checks, context items, exchange logs, token usage, and
-proof rows. Durable rows are the single control plane.
+lkjagent is moving from a fixed plan-ledger engine to a one-workspace durable
+state-ledger runtime. Owner messages become durable cases, events, state cells,
+state edges, runtime decisions, prompt frames, bounded model calls, tool
+admissions, deterministic effects, observations, checks, workspace records,
+context items, exchange logs, token usage, artifacts, and proof rows. Durable
+rows are the single control plane.
 
-The runtime target supports any number of active state cells. A persisted
-`RuntimeDecision` is selected from the hydrated state vector before prompt
-rendering, endpoint calls, tool admission, tool execution, recovery, compaction,
-or completion. The decision id and fingerprint travel through prompt frames,
-provider exchanges, admissions, observations, status output, and proof bundles.
-
-Completion remains harness-computed. The model may author bounded content or
-request a decision-visible operation, but a case closes only when fresh evidence
-satisfies the checks selected by the runtime.
+The target supports many active cells and dense edge evidence. A selector builds
+bounded candidates from state, records, artifacts, context, and stale evidence,
+then persists one `RuntimeDecision` before prompts, endpoint calls, tool
+admission, effects, recovery, compaction, or completion. Completion remains
+harness-computed through fresh checks.
 
 ## Proven In Current Checkout
 
@@ -93,7 +90,9 @@ The daemon bridge also persists source-tagged context items, selects
 clean current items for prompt briefs, detects contradictory clean items through
 runtime events into `context:conflict/<semantic-key>` state cells, writes
 contradiction and resolution `context_edges`, and excludes contaminated items
-from normal prompts.
+from normal prompts. The first generic state-edge slice adds pure edge refs,
+relations, reducer patch operations, snapshot edge visibility, and `state_edges`
+rows for relation evidence.
 The core artifact slice models checked 512-token-target
 units, deterministic assembly, artifact fingerprints, and fresh-fingerprint
 completion evidence; the store persists artifact rows with unit metadata, and
@@ -168,9 +167,9 @@ artifact, context, suppression, and conflict-edge sections.
 `lkjagent-core` owns the first pure state-ledger domain modules plus the current
 plan engine, parser, renderer, checks, word counting, classifier, templates,
 docs-link helpers, and recovery helpers.
-`lkjagent-store` owns the plan-store schema, first state-ledger tables, row
-hydration, queue access, and atomic turn state commits. `lkjagent-effects` owns
-filesystem, shell, check gathering, observations, and exchange log file helpers.
+`lkjagent-store` owns the plan-store schema, state-ledger tables, state-edge
+rows, hydration, queue access, and atomic turn state commits. `lkjagent-effects`
+owns filesystem, shell, check gathering, observations, and exchange log file helpers.
 `lkjagent-app` owns the
 daemon interpreter, row-backed CLI renderers, endpoint adapter, waiting answer
 routing, effect-error settlement, and bounded explore dispatcher. `lkjagent-llm`
@@ -185,9 +184,8 @@ the current checkout passes a gate unless that gate is rerun now.
 
 ## Next Executable Step
 
-Run the full verification matrix for the current checkout. After the matrix
-passes and endpoint credentials are configured, run the extended recursive story
-proof described in `docs/evaluation/live-proof.md` and collect a proof bundle.
+Implement selector candidates and generic workspace record files before
+expanding CLI and proof-live behavior.
 
 ## Honesty Rules
 

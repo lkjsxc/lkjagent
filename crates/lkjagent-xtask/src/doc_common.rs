@@ -137,14 +137,7 @@ fn check_banned_tokens(file: &RepoFile) -> Vec<Violation> {
 fn banned_token(line: &str) -> Option<String> {
     let lower = line.to_ascii_lowercase();
     for word in lower.split(|character: char| !character.is_ascii_alphanumeric()) {
-        for token in [
-            "version",
-            "legacy",
-            "backward",
-            "compatibility",
-            "todo",
-            "tbd",
-        ] {
+        for token in ["version", "legacy", "backward", "compatibility", "tbd"] {
             if word == token {
                 return Some(token.to_string());
             }

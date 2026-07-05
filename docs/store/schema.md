@@ -28,7 +28,8 @@ runtime reads only state rows. Required tables:
 | `tool_admissions` | parsed action, result, and view fingerprint |
 | `observations` | bounded tool or effect output tied to decisions |
 | `context_items` | source-tagged prompt candidates |
-| `context_edges` | provenance, suppression, and conflict links |
+| `context_edges` | provenance, suppression, and conflict links between context items |
+| `state_edges` | generic relation evidence between state, records, artifacts, checks, and messages |
 | `artifacts` | files, roots, fingerprints, and ownership metadata |
 | `check_results` | deterministic and judged evidence |
 | `provider_exchanges` | endpoint request and response refs |
@@ -45,7 +46,8 @@ provider did not report the value, not zero.
 ## Indexes
 
 Index state cells by case id, key, status, priority, and conflict group. Index
-context items by semantic key, contamination class, trust class, and source
+state edges by case id or workspace scope, relation, status, and endpoint refs.
+Index context items by semantic key, contamination class, trust class, and source
 fingerprint. Index runtime decisions by case id, status, and selected time.
 
 ## Failure This Prevents

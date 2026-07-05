@@ -3,6 +3,7 @@ use std::collections::BTreeMap;
 use serde::{de::Error, Deserialize, Deserializer, Serialize, Serializer};
 
 use crate::runtime_fingerprint::{stable_fingerprint, FingerprintError};
+use crate::runtime_state_edge::{active_edges, StateEdge};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct StateKeyError {
@@ -127,6 +128,7 @@ impl StateCell {
 pub struct RuntimeSnapshot {
     pub case_id: String,
     pub cells: BTreeMap<StateKey, StateCell>,
+    pub edges: BTreeMap<String, StateEdge>,
 }
 
 impl RuntimeSnapshot {
@@ -134,6 +136,7 @@ impl RuntimeSnapshot {
         Self {
             case_id: case_id.into(),
             cells: BTreeMap::new(),
+            edges: BTreeMap::new(),
         }
     }
 
@@ -142,6 +145,10 @@ impl RuntimeSnapshot {
             .values()
             .filter(|cell| cell.status == StateStatus::Active)
             .collect()
+    }
+
+    pub fn active_edges(&self) -> Vec<StateEdge> {
+        active_edges(self.edges.values().cloned())
     }
 
     pub fn fingerprint(&self) -> Result<String, FingerprintError> {

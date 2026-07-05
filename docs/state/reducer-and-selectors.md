@@ -19,16 +19,18 @@ The reducer is pure:
 RuntimeSnapshot + RuntimeEvent -> StatePatch
 ```
 
-A patch inserts, updates, suppresses, resolves, or blocks state cells. The store
-commits the event and patch in one transaction. The reducer never reads files,
-opens SQLite, calls the endpoint, or asks the wall clock.
+A patch inserts, updates, suppresses, resolves, or blocks state cells. It may
+also add or suppress state edges. The store commits the event and patch in one
+transaction. The reducer never reads files, opens SQLite, calls the endpoint, or
+asks the wall clock.
 
 ## Selectors
 
-Selectors read the whole hydrated state vector and choose one operation for the
-next `RuntimeDecision`. Selection is deterministic and explainable. It prefers
-owner intake, waiting answer handling, active recovery, runnable effects, model
-calls, checks, completion, then idle.
+Selectors read the hydrated state vector and compact state-edge evidence, create
+bounded `SelectorCandidate` values, filter blocked candidates, sort them
+deterministically, and persist the winning `RuntimeDecision`. Selection prefers
+recovery, owner intake or answers, safety resolution, due scheduled work,
+admitted effects, stale checks, model calls, compaction, maintenance, then idle.
 
 ## Fingerprints
 

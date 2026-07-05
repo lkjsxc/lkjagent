@@ -14,9 +14,10 @@ but fixed task and step enums cannot express arbitrary simultaneous state.
 ## Decision
 
 The state ledger is the single control plane. Runtime state is stored as durable
-case, event, state-cell, decision, context, admission, observation, check, and
-artifact rows. A `RuntimeDecision` is persisted for each turn before prompts,
-endpoint calls, tool admission, effects, recovery, compaction, or completion.
+case, event, state-cell, state-edge, decision, context, admission, observation,
+check, record-evidence, and artifact rows. A `RuntimeDecision` is persisted for
+each turn before prompts, endpoint calls, tool admission, effects, recovery,
+compaction, or completion.
 
 The plan remains a state family for ordered artifact work, not the only control
 plane.
@@ -24,8 +25,9 @@ plane.
 ## Consequences
 
 Prompt rendering, parser contracts, action admission, effect dispatch, status,
-resume, and proof bundles all project the same decision row. There is no
-prompt-only policy, dispatcher-only policy, or second graph authority.
+resume, record commands, state-edge diagnostics, and proof bundles all project
+the same decision row. There is no prompt-only policy, dispatcher-only policy,
+private command state, or second graph authority.
 
 ## Rejected Alternatives
 

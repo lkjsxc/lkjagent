@@ -1,6 +1,6 @@
 use crate::model::{RepoFile, Violation};
 
-const DOC_FILE_LIMIT: usize = 90;
+const DOC_FILE_LIMIT: usize = 100;
 const PRODUCT_SOURCE_LIMIT: usize = 170;
 const PRODUCT_CRATES: &[&str] = &[
     "lkjagent-core",

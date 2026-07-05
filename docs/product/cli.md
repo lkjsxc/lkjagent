@@ -19,11 +19,18 @@ Define the owner command surface and output discipline.
 | `lkjagent context resolve CASE_ID KEY WINNING_ITEM_ID` | record the owner-selected winner for a conflict |
 | `lkjagent memory QUERY` | search memory rows |
 | `lkjagent watch` | print a refreshable terminal snapshot with status, trace, and proof rows |
+| `lkjagent doctor [--json]` | print row-backed health diagnostics without secrets |
+| `lkjagent workspace [--json]` | summarize configured workspace paths and indexes |
+| `lkjagent record add, list, show, link, archive` | manage generic workspace records |
+| `lkjagent today, journal, todo, calendar, finance, project, dev` | friendly record-backed wrappers |
+| `lkjagent proof collect [--json]` | collect a bounded proof bundle from rows and refs |
+| `lkjagent proof live --minutes N` | run the bounded live proof path when endpoint evidence is available |
 | `lkjagent help [group]` | print usage |
 
 ## Output Rules
 
 - Commands print line-oriented, machine-readable text by default.
+- Read-only commands accept `--json` when their row-backed shape is stable.
 - A successful mutating command prints the created id or one concise success
   line.
 - A failed command prints the command, reason, and next useful action when one
@@ -49,10 +56,11 @@ store directly.
   --follow`.
 - `crates/lkjagent-app/src/inspect.rs` keeps non-follow output deterministic and
   follows events by monotonically increasing row id.
-- CLI tests cover parser shape, row-backed log continuation, and the watch sections.
+- CLI tests cover parser shape, row-backed log continuation, and watch sections.
 
-## Removed Surfaces
+## Authority Limits
 
-There are no graph, personal-records, model-log, audit, or verification command
-groups in the owner CLI. The task, queue, memory, log, status, and proof-bundle
-surfaces expose the same facts without a second control plane.
+Personal and proof command groups are allowed only as ledger-backed views or
+record-writing helpers. They do not get private state, a graph authority, hidden
+tool policy, or a separate completion rule. Mutating commands append events,
+write workspace records or artifacts, or enqueue owner text.

@@ -17,5 +17,7 @@ pub mod plan_schema;
 pub mod plan_turn;
 pub mod prompt_rows;
 mod row_json;
+pub mod state_edge_rows;
+mod state_edge_schema;
 pub mod state_rows;
 pub mod state_schema;
