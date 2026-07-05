@@ -18,6 +18,12 @@ selector candidates, and command logs. The record fingerprint is evidence; it is
 not runtime authority. Selectors may later use explicit state cells derived from
 experiment records, but the record file alone does not choose turns.
 
+## Runner
+
+`cargo run -p lkjagent-xtask -- experiment protocol --out tmp/protocol-experiment-current.md`
+writes a deterministic parser ledger for the current tool-call profile and the
+rejected old action forms. It does not call the endpoint.
+
 ## Trial Rule
 
 Try combinations, not isolated tweaks, and keep rejected ideas. A protocol

@@ -124,7 +124,7 @@ and watch prints bounded status, event, trace, and proof-row sections. Prompt
 frames point to bounded body refs and every decision envelope renders a final
 protocol card. Generic record CLI commands add, list, show, link, and archive Markdown records
 under `workspace/records` with fingerprint rows but not turn authority;
-experiment records use the same path. Gate results belong in handoff after rerun.
+experiment records use the same path, and xtask writes protocol result ledgers.
 
 ## State-Ledger Parity
 
@@ -187,7 +187,7 @@ and strict secret scan clean. Older logs are historical unless rerun here.
 
 ## Next Executable Step
 
-Automate protocol experiment runs and consider an optional full TUI console.
+Consider an optional full TUI console after the normal-screen console settles.
 
 ## Honesty Rules
 

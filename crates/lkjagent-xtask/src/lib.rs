@@ -7,8 +7,10 @@ pub mod doc_reachability;
 pub mod doc_special;
 pub mod doc_topology;
 pub mod docs;
+pub mod experiment;
 pub mod facts;
 pub mod file_counts;
+pub mod gate;
 pub mod lines;
 pub mod model;
 pub mod proof;
@@ -24,6 +26,7 @@ use std::path::Path;
 use docs::check_docs;
 use facts::collect_files;
 use file_counts::check_files;
+use gate::{parse_gate, Gate};
 use lines::check_lines;
 use runner::run_quiet_test;
 use style::check_style;
@@ -38,6 +41,7 @@ pub fn run(args: &[String], root: &Path) -> i32 {
         Ok(Gate::QuietTest) => run_command_gate(root, "test"),
         Ok(Gate::QuietVerify) => run_verify(root),
         Ok(Gate::Benchmark(rest)) => benchmark::run(&rest, root),
+        Ok(Gate::Experiment(rest)) => experiment::run(&rest, root),
         Ok(Gate::Proof(rest)) => proof::run(&rest, root),
         Ok(Gate::Smoke(rest)) => smoke::run(&rest, root),
         Ok(Gate::Structure(rest)) => structure::run(&rest, root),
@@ -155,43 +159,5 @@ fn report_static(name: &'static str, violations: Vec<model::Violation>) -> i32 {
 fn print_failure(lines: &[String]) {
     for line in lines {
         eprintln!("{line}");
-    }
-}
-
-enum Gate {
-    CheckDocs,
-    CheckLines,
-    CheckFiles,
-    CheckStyle,
-    QuietTest,
-    QuietVerify,
-    HygieneCheck,
-    Benchmark(Vec<String>),
-    Proof(Vec<String>),
-    Smoke(Vec<String>),
-    Structure(Vec<String>),
-}
-
-fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
-    match args {
-        [one] if one == "check-docs" || one == "docs-check" => Ok(Gate::CheckDocs),
-        [one] if one == "check-lines" => Ok(Gate::CheckLines),
-        [one] if one == "check-files" => Ok(Gate::CheckFiles),
-        [one] if one == "check-style" => Ok(Gate::CheckStyle),
-        [one] if one == "hygiene-check" => Ok(Gate::HygieneCheck),
-        [first, second] if first == "quiet" && second == "test" => Ok(Gate::QuietTest),
-        [first, second] if first == "quiet" && second == "verify" => Ok(Gate::QuietVerify),
-        [first, rest @ ..] if first == "benchmark" || first == "bench" => {
-            Ok(Gate::Benchmark(rest.to_vec()))
-        }
-        [first, rest @ ..] if first == "proof" => Ok(Gate::Proof(rest.to_vec())),
-        [first, rest @ ..] if first == "smoke" => Ok(Gate::Smoke(rest.to_vec())),
-        [first, rest @ ..] if first == "structure" => Ok(Gate::Structure(rest.to_vec())),
-        _ => Err(vec![
-            "xtask failed".to_string(),
-            "exit status: 2".to_string(),
-            "use: check-docs | docs-check | check-lines | check-files | check-style | hygiene-check | quiet test | quiet verify | bench ... | proof ... | smoke ... | structure ..."
-                .to_string(),
-        ]),
     }
 }
