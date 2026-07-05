@@ -1,6 +1,5 @@
 mod support;
 
-use std::net::TcpListener;
 use std::time::Duration;
 
 use lkjagent_llm::client::{complete, ClientConfig, DEFAULT_TIMEOUT_SECONDS};
@@ -94,10 +93,7 @@ fn length_with_closed_action_is_accepted() -> TestResult<()> {
 
 #[test]
 fn connection_failure_maps_to_attempt_backoff() -> TestResult<()> {
-    let listener = TcpListener::bind("127.0.0.1:0")?;
-    let address = listener.local_addr()?;
-    drop(listener);
-    let config = ClientConfig::new(format!("http://{address}"), "local-model");
+    let config = ClientConfig::new("http://127.0.0.1:1", "local-model");
     let spec = CallSpec::action(config.max_tokens);
     let result = complete(&config, &[Message::new(Role::System, "system")], &spec, 3);
 
