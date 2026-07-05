@@ -187,7 +187,7 @@ Checked-in `tmp/` logs are historical proof or failure fixtures unless rerun her
 
 ## Next Executable Step
 
-Run final verification and evidence review without adding a second control plane.
+No required step is open in this pass; optional next work is longform quality or stale tmp cleanup.
 
 ## Honesty Rules
 
