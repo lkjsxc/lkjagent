@@ -54,7 +54,7 @@ pub fn handle_line(conn: &Connection, line: &str, now: &str) -> Result<ConsoleRe
         Some(("/task", _)) => reply(crate::inspect::task_list(conn)?, false),
         Some(("/new", text)) => enqueue(conn, text, true, now),
         Some(("/send", text)) => enqueue(conn, text, false, now),
-        Some((other, _)) => reply(&format!("console: unknown command {other}"), false),
+        Some((other, _)) => reply(format!("console: unknown command {other}"), false),
         None => enqueue(conn, trimmed, false, now),
     }
 }
@@ -70,7 +70,7 @@ fn enqueue(
     }
     let id = lkjagent_store::plan_access::enqueue_with_force(conn, text, force_new, now)
         .map_err(|error| error.to_string())?;
-    reply(&format!("queue: {id} new={force_new}"), false)
+    reply(format!("queue: {id} new={force_new}"), false)
 }
 
 fn command(line: &str) -> Option<(&str, &str)> {

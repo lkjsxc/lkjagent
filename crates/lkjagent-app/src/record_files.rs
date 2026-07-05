@@ -60,7 +60,11 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
     upsert_record(
         conn,
         &record_row(
-            &row.id, &row.kind, &row.title, "archived", &new_rel, &text, true, now,
+            (&row.id, &row.kind, &row.title, "archived"),
+            &new_rel,
+            &text,
+            true,
+            now,
         )?,
     )
     .map_err(|error| error.to_string())?;
@@ -89,7 +93,11 @@ pub fn link(
     upsert_record(
         conn,
         &record_row(
-            &row.id, &row.kind, &row.title, &row.state, &row.path, &output, false, now,
+            (&row.id, &row.kind, &row.title, &row.state),
+            &row.path,
+            &output,
+            false,
+            now,
         )?,
     )
     .map_err(|error| error.to_string())?;
@@ -110,10 +118,7 @@ fn write_record(
     let text = render_record(record);
     fs::write(&path, &text).map_err(|error| error.to_string())?;
     let row = record_row(
-        &record.id,
-        &record.kind,
-        &record.title,
-        &record.state,
+        (&record.id, &record.kind, &record.title, &record.state),
         &rel,
         &text,
         archived,
@@ -124,15 +129,13 @@ fn write_record(
 }
 
 fn record_row(
-    id: &str,
-    kind: &str,
-    title: &str,
-    state: &str,
+    fields: (&str, &str, &str, &str),
     path: &str,
     text: &str,
     archived: bool,
     updated_at: &str,
 ) -> Result<RecordRow, String> {
+    let (id, kind, title, state) = fields;
     Ok(RecordRow {
         id: id.to_string(),
         kind: kind.to_string(),
