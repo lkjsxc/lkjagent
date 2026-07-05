@@ -1,0 +1,5 @@
+COMMAND: compose run --rm agent send --new 実験1: このワークスペースの状態を確認し、短い作業ログを作ってください。
+ Container lkjtrial20260705042441-agent-run-51fcbffc1498 Creating
+ Container lkjtrial20260705042441-agent-run-51fcbffc1498 Created
+queue: 1 new=true
+EXIT=0

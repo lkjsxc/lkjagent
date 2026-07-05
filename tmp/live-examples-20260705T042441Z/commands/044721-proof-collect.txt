@@ -1,0 +1,3 @@
+COMMAND: cargo run -p lkjagent-xtask -- proof collect --data /home/lkjsxc/workspace/lkjagent/tmp/live-examples-20260705T042441Z/data --out tmp/live-examples-20260705T042441Z/proof
+ok proof collect artifact=./tmp/live-examples-20260705T042441Z/proof/summary.md
+EXIT=0

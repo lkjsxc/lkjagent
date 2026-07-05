@@ -1,0 +1,109 @@
+
+[2026-07-05T04:24:41Z] docker-version
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/042441-docker-version.txt
+
+[2026-07-05T04:24:41Z] compose-version
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/042441-compose-version.txt
+
+[2026-07-05T04:24:41Z] compose-build-up
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/042441-compose-build-up.txt
+
+[2026-07-05T04:25:58Z] compose-ps-start
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/042558-compose-ps-start.txt
+
+[2026-07-05T04:25:58Z] send-1
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/042558-send-1.txt
+
+[2026-07-05T04:25:58Z] status-after-send-1
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/042558-status-after-send-1.txt
+
+[2026-07-05T04:25:59Z] queue-after-send-1
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/042559-queue-after-send-1.txt
+
+[2026-07-05T04:27:59Z] watch-after-wait-1
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/042759-watch-after-wait-1.txt
+
+[2026-07-05T04:28:00Z] status-monitor-042800
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/042800-status-monitor-042800.txt
+
+[2026-07-05T04:28:00Z] task-monitor-042800
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/042800-task-monitor-042800.txt
+
+[2026-07-05T04:30:00Z] status-monitor-043000
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/043000-status-monitor-043000.txt
+
+[2026-07-05T04:30:01Z] task-monitor-043000
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/043001-task-monitor-043000.txt
+
+[2026-07-05T04:32:01Z] status-monitor-043201
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/043201-status-monitor-043201.txt
+
+[2026-07-05T04:32:02Z] task-monitor-043201
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/043202-task-monitor-043201.txt
+
+[2026-07-05T04:34:02Z] status-monitor-043402
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/043402-status-monitor-043402.txt
+
+[2026-07-05T04:34:03Z] task-monitor-043402
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/043403-task-monitor-043402.txt
+
+[2026-07-05T04:36:03Z] status-monitor-043603
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/043603-status-monitor-043603.txt
+
+[2026-07-05T04:36:03Z] task-monitor-043603
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/043603-task-monitor-043603.txt
+
+[2026-07-05T04:38:04Z] status-monitor-043804
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/043804-status-monitor-043804.txt
+
+[2026-07-05T04:38:04Z] task-monitor-043804
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/043804-task-monitor-043804.txt
+
+[2026-07-05T04:40:05Z] status-monitor-044005
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044005-status-monitor-044005.txt
+
+[2026-07-05T04:40:05Z] task-monitor-044005
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044005-task-monitor-044005.txt
+
+[2026-07-05T04:42:05Z] status-monitor-044205
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044205-status-monitor-044205.txt
+
+[2026-07-05T04:42:06Z] task-monitor-044205
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044206-task-monitor-044205.txt
+
+[2026-07-05T04:44:06Z] status-monitor-044406
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044406-status-monitor-044406.txt
+
+[2026-07-05T04:44:07Z] task-monitor-044406
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044407-task-monitor-044406.txt
+
+[2026-07-05T04:47:07Z] closeout-compose-ps
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044707-closeout-compose-ps.txt
+
+[2026-07-05T04:47:07Z] closeout-status
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044707-closeout-status.txt
+
+[2026-07-05T04:47:08Z] closeout-task-list
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044708-closeout-task-list.txt
+
+[2026-07-05T04:47:08Z] closeout-queue-list
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044708-closeout-queue-list.txt
+
+[2026-07-05T04:47:08Z] closeout-log
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044708-closeout-log.txt
+
+[2026-07-05T04:47:09Z] closeout-watch
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044709-closeout-watch.txt
+
+[2026-07-05T04:47:09Z] closeout-compose-logs
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044709-closeout-compose-logs.txt
+
+[2026-07-05T04:47:09Z] closeout-compose-down
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044709-closeout-compose-down.txt
+SECRET_SCAN=no-api-key-found
+
+[2026-07-05T04:47:21Z] proof-collect
+EXIT=0 file=tmp/live-examples-20260705T042441Z/commands/044721-proof-collect.txt
+SECRET_SCAN_AFTER_PROOF=no-api-key-found
+SECRET_SCAN_AFTER_DB_DUMP=no-api-key-found
+SECRET_SCAN_FINAL=no-api-key-found

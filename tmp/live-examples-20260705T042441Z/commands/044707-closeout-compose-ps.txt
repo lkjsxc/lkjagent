@@ -1,0 +1,4 @@
+COMMAND: compose ps
+NAME                             IMAGE                          COMMAND                  SERVICE   CREATED          STATUS                    PORTS
+lkjtrial20260705042441-agent-1   lkjtrial20260705042441-agent   "/usr/local/bin/lkja…"   agent     21 minutes ago   Up 21 minutes (healthy)
+EXIT=0

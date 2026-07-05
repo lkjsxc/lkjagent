@@ -1,0 +1,5 @@
+COMMAND: compose run --rm agent queue list
+ Container lkjtrial20260705042441-agent-run-c9d7f9b0be74 Creating
+ Container lkjtrial20260705042441-agent-run-c9d7f9b0be74 Created
+queue 1 delivered force_new=true task=1 実験1: このワークスペースの状態を確認し、短い作業ログを作ってください。
+EXIT=0

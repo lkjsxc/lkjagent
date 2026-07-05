@@ -1,0 +1,17 @@
+COMMAND: compose run --rm agent status
+ Network lkjtrial20260705042441_default Creating
+ Network lkjtrial20260705042441_default Created
+ Container lkjtrial20260705042441-agent-run-6a53fdcc6cdc Creating
+ Container lkjtrial20260705042441-agent-run-6a53fdcc6cdc Created
+daemon: idle
+task: none
+step: none
+last: none
+question: none
+queue: 0 pending
+tokens: task in=1193 out=136 cached=unknown
+lease: active owner=pid:7 heartbeat=unix:1783226829.418014409Z
+state: active=1 conflicts=0
+decision: case-1-decision-0005 completion.close status=settled ctx=fnv1a64:3e2b32d7 tools=fnv1a64:b4e036f2
+admissions: 0 observations: 0 exchanges: 4 artifacts: 0
+EXIT=0
