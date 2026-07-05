@@ -33,7 +33,14 @@ where
         Command::Status => status(&conn),
         Command::Console => crate::console::run(&conn),
         Command::Doctor { json } => crate::diagnostics::doctor(&conn, &invocation.data_dir, json),
-        Command::Workspace { json } => {
+        Command::Workspace { json, rebuild } => {
+            if rebuild {
+                crate::workspace_index::rebuild(
+                    &conn,
+                    &invocation.data_dir,
+                    &crate::clock::utc_now(),
+                )?;
+            }
             crate::diagnostics::workspace(&conn, &invocation.data_dir, json)
         }
         Command::Log { limit, follow } if follow => crate::inspect::follow_log(&conn, limit),
@@ -87,7 +94,7 @@ pub fn help() -> String {
         "  status",
         "  console",
         "  doctor [--json]",
-        "  workspace [--json]",
+        "  workspace [--json] [--rebuild]",
         "  log [--limit N] [--follow]",
         "  task list | task show ID",
         "  queue list | queue show ID",

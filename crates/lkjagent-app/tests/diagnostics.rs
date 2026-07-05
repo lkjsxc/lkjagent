@@ -32,9 +32,17 @@ fn workspace_reports_rows_and_json_shape() -> TestResult<()> {
         "milk",
     ])?;
 
-    let text = cli::run(["--data", data.to_string_lossy().as_ref(), "workspace"])?;
-    assert!(text.contains("records: total=1 archived=0"));
-    assert!(text.contains("readmes: workspace=true,records=true"));
+    let rebuilt = cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "workspace",
+        "--rebuild",
+    ])?;
+    assert!(rebuilt.contains("records: total=1 archived=0"));
+    assert!(rebuilt.contains("artifacts: total=6"));
+    assert!(rebuilt.contains("indexes: files=7"));
+    let open_todos = fs::read_to_string(data.join("workspace/indexes/open-todos.md"))?;
+    assert!(open_todos.contains("Buy milk"));
 
     let json = cli::run([
         "--data",
@@ -44,7 +52,7 @@ fn workspace_reports_rows_and_json_shape() -> TestResult<()> {
     ])?;
     let value: Value = serde_json::from_str(&json)?;
     assert_eq!(value["records"]["total"], 1);
-    assert_eq!(value["artifacts"], 0);
+    assert_eq!(value["artifacts"], 6);
     Ok(())
 }
 

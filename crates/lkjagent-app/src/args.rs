@@ -25,6 +25,7 @@ pub enum Command {
     },
     Workspace {
         json: bool,
+        rebuild: bool,
     },
     Log {
         limit: usize,
@@ -105,7 +106,7 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
         "status" => no_args(rest, Command::Status),
         "console" => no_args(rest, Command::Console),
         "doctor" => parse_json_flag(command, rest).map(|json| Command::Doctor { json }),
-        "workspace" => parse_json_flag(command, rest).map(|json| Command::Workspace { json }),
+        "workspace" => crate::arg_helpers::parse_workspace(rest),
         "log" => parse_log(rest),
         "task" => parse_task(rest),
         "queue" => parse_queue(rest),

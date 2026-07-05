@@ -58,6 +58,19 @@ pub(crate) fn parse_log(rest: Vec<String>) -> Result<Command, String> {
     Ok(Command::Log { limit, follow })
 }
 
+pub(crate) fn parse_workspace(rest: Vec<String>) -> Result<Command, String> {
+    let mut json = false;
+    let mut rebuild = false;
+    for arg in rest {
+        match arg.as_str() {
+            "--json" => json = true,
+            "--rebuild" => rebuild = true,
+            _ => return Err("use workspace [--json] [--rebuild]".to_string()),
+        }
+    }
+    Ok(Command::Workspace { json, rebuild })
+}
+
 pub(crate) fn parse_json_flag(command: &str, rest: Vec<String>) -> Result<bool, String> {
     match rest.as_slice() {
         [] => Ok(false),

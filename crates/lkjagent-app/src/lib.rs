@@ -39,3 +39,4 @@ pub mod status;
 mod task_view;
 mod turn_effects;
 mod watch_view;
+mod workspace_index;

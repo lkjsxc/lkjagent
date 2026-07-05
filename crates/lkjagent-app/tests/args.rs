@@ -17,7 +17,17 @@ fn parser_accepts_diagnostic_commands() -> TestResult<()> {
     );
     assert_eq!(
         parse(["workspace", "--json"])?.command,
-        Command::Workspace { json: true }
+        Command::Workspace {
+            json: true,
+            rebuild: false
+        }
+    );
+    assert_eq!(
+        parse(["workspace", "--rebuild"])?.command,
+        Command::Workspace {
+            json: false,
+            rebuild: true
+        }
     );
     Ok(())
 }
