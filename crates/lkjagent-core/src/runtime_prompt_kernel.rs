@@ -46,15 +46,7 @@ pub fn build_prompt_card_plan(
                 decision.snapshot_fingerprint, decision.state_vector_fingerprint
             ),
         )?,
-        card(
-            "facts",
-            format!(
-                "context={} included={} excluded={}",
-                decision.context_frame_fingerprint,
-                context_plan.included.len(),
-                context_plan.excluded.len()
-            ),
-        )?,
+        card("facts", facts_reason(decision, context_plan))?,
         card("conflicts", conflict_reason(context_plan))?,
         card("recovery", format!("policy={}", decision.recovery_policy))?,
         card(
@@ -86,13 +78,35 @@ pub fn build_prompt_card_plan(
     })
 }
 
+fn facts_reason(decision: &RuntimeDecision, plan: &ContextFramePlan) -> String {
+    format!(
+        "context={} included={} excluded={}",
+        decision.context_frame_fingerprint,
+        entry_list(&plan.included),
+        entry_list(&plan.excluded)
+    )
+}
+
 fn conflict_reason(plan: &ContextFramePlan) -> String {
-    let count = plan
+    let unresolved = plan
         .excluded
         .iter()
         .filter(|entry| entry.reason == "unresolved-conflict")
-        .count();
-    format!("unresolved={count}")
+        .cloned()
+        .collect::<Vec<_>>();
+    format!("unresolved={}", entry_list(&unresolved))
+}
+
+fn entry_list(entries: &[crate::runtime_context::ContextPlanEntry]) -> String {
+    if entries.is_empty() {
+        return "none".to_string();
+    }
+    let mut values = entries
+        .iter()
+        .map(|entry| format!("{}:{}", entry.item_id, entry.reason))
+        .collect::<Vec<_>>();
+    values.sort();
+    values.join(",")
 }
 
 fn card(kind: &str, reason: String) -> Result<PromptCard, FingerprintError> {

@@ -91,8 +91,7 @@ runtime events into `context:conflict/<semantic-key>` state cells, writes
 contradiction and resolution `context_edges`, and excludes contaminated items
 from normal prompts. The first generic state-edge slice adds pure edge refs,
 relations, reducer patch operations, snapshot edge visibility, and `state_edges`
-rows for relation evidence.
-The core artifact slice models checked 512-token-target
+rows for relation evidence. The core artifact slice models checked 512-token-target
 units, deterministic assembly, artifact fingerprints, and fresh-fingerprint
 completion evidence; the store persists artifact rows with unit metadata, and
 write effects split large bodies into checked units, assemble them before file
@@ -120,8 +119,9 @@ records, prompt frames, admissions, observations, exchanges, artifacts, checks,
 and context. Status, doctor, and workspace report row-backed lease, schema, table,
 endpoint, workspace, record, artifact, and proof counts. Watch and workbench
 print bounded status, trace, and proof rows; workbench also accepts owner input.
-Prompt frames point to bounded body refs and persist queryable prompt card rows;
-every decision envelope renders protocol cards. Generic record CLI adds, lists,
+Prompt frames point to bounded body refs and persist queryable prompt card rows
+with context inclusion and exclusion reasons; every decision envelope renders
+protocol cards. Generic record CLI adds, lists,
 shows, links, and archives Markdown records under `workspace/records` with
 fingerprint rows but not turn authority. Wrappers are today, journal, todo,
 calendar, finance, project, and dev; generic record kinds project index, todo,

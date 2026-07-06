@@ -62,6 +62,13 @@ fn context_prompt_excludes_contaminated_and_creates_conflict_cell() -> TestResul
         |row| row.get(0),
     )?;
     assert_eq!(edges, 1);
+    let facts = prompt_card_reason(&conn, "facts")?;
+    assert!(facts.contains("ctx-bad:contamination:FailedModelOutput"));
+    assert!(facts.contains("ctx-a:unresolved-conflict"));
+    assert!(facts.contains("ctx-b:unresolved-conflict"));
+    let conflicts = prompt_card_reason(&conn, "conflicts")?;
+    assert!(conflicts.contains("ctx-a:unresolved-conflict"));
+    assert!(conflicts.contains("ctx-b:unresolved-conflict"));
     Ok(())
 }
 
@@ -150,6 +157,14 @@ fn resolution_cell() -> StateCell {
     cell.created_at = "before".to_string();
     cell.updated_at = "before".to_string();
     cell
+}
+
+fn prompt_card_reason(conn: &Connection, kind: &str) -> rusqlite::Result<String> {
+    conn.query_row(
+        "SELECT reason FROM prompt_cards WHERE kind = ?1 ORDER BY id LIMIT 1",
+        [kind],
+        |row| row.get(0),
+    )
 }
 
 fn persist(conn: &mut Connection, snapshot: &TaskSnapshot) -> TestResult<()> {

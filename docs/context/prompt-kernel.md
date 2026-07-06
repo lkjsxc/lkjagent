@@ -21,10 +21,10 @@ Prompt assembly renders cards in this order:
 ## Fingerprints
 
 Each card has a deterministic fingerprint over canonical data. The prompt frame
-stores card ids, section fingerprints, inclusion reasons, excluded context ids,
-and the final context-frame fingerprint. `prompt_cards` rows make card reasons
-queryable, while provider exchange rows and proof bundles carry the same frame
-fingerprint.
+stores card ids, section fingerprints, included context ids, excluded context ids
+with reasons, and the final context-frame fingerprint. `prompt_cards.reason`
+keeps compact `item_id:reason` pairs queryable, while provider exchange rows and
+proof bundles carry the same frame fingerprint.
 
 ## Profiles
 
@@ -42,6 +42,6 @@ body.
 
 ## Acceptance Checks
 
-Tests should prove card order is stable, contamination exclusions are listed,
-conflict cards render only when unresolved, output cards are never truncated
-away, and profile or card changes alter the frame fingerprint.
+Tests should prove card order is stable, contamination and conflict exclusions
+are listed in card reasons, output cards are never truncated away, and profile or
+card changes alter the frame fingerprint.
