@@ -107,6 +107,9 @@ pub fn block(raw: &str, tag: &str) -> Result<String, ParseFault> {
 fn parse_action(raw: &str, view: &ToolSetView) -> Result<ParsedOutput, ParseFault> {
     let body = block(raw, "tool_call")?;
     let params = parse_params(&body)?;
+    if params.first().map(|(name, _)| name.as_str()) != Some("tool_name") {
+        return Err(ParseFault::BadParams);
+    }
     let tool = one(&params, "tool_name")?.to_string();
     validate_params(view, &tool, &params)?;
     Ok(ParsedOutput::Action(Action { tool, params }))

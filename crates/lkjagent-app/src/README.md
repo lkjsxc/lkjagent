@@ -42,3 +42,4 @@ Map lkjagent-app source modules.
 - [state.rs](state.rs): active snapshot hydration from normalized rows.
 - [status.rs](status.rs): status, task, and watch rendering helpers.
 - [turn-effects.rs](turn_effects.rs): deterministic write, check, and explore effects.
+- [workbench.rs](workbench.rs): refreshing normal-screen progress and input loop.

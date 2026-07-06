@@ -105,6 +105,12 @@ fn explore_accepts_only_exact_tool_call_blocks() {
         parse_expected(StepKind::Explore, missing_tool_name),
         Err(ParseFault::BadParams)
     );
+    let tool_name_second =
+        "<tool_call><summary>done</summary><tool_name>finish</tool_name></tool_call>";
+    assert_eq!(
+        parse_expected(StepKind::Explore, tool_name_second),
+        Err(ParseFault::BadParams)
+    );
     let attr = "<tool_call><tool_name kind=\"x\">finish</tool_name></tool_call>";
     assert_eq!(
         parse_expected(StepKind::Explore, attr),

@@ -59,9 +59,12 @@ fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<
             return Some(format!("missing required parameter {required}"));
         }
     }
-    for name in action.params.keys() {
+    for (name, value) in &action.params {
         if !entry.accepts_param(name) {
             return Some(format!("unknown parameter {name}"));
+        }
+        if placeholder_value(value) {
+            return Some(format!("placeholder value for {name}"));
         }
     }
     if let Some(path) = action.params.get("path") {
@@ -70,6 +73,21 @@ fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<
         }
     }
     None
+}
+
+fn placeholder_value(value: &str) -> bool {
+    let trimmed = value.trim();
+    let upper = trimmed.to_ascii_uppercase();
+    matches!(
+        upper.as_str(),
+        "..." | "PATH" | "TOOL" | "TODO" | "VALUE" | "FIELD_VALUE" | "REPLACE_ME"
+    ) || wrapped_placeholder(trimmed, '<', '>')
+        || wrapped_placeholder(trimmed, '[', ']')
+        || wrapped_placeholder(trimmed, '{', '}')
+}
+
+fn wrapped_placeholder(value: &str, open: char, close: char) -> bool {
+    value.starts_with(open) && value.ends_with(close) && value.len() > 2
 }
 
 pub fn workspace_relative_path(path: &str) -> bool {

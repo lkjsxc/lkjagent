@@ -55,14 +55,14 @@ fn explore_decision_renders_tool_call_contract() {
         &decision,
     );
     assert!(prompt.system.contains("Expected: tool_call"));
-    assert!(prompt.system.contains("Return exactly <tool_call>"));
+    assert!(prompt.system.contains("Return exactly one <tool_call>"));
     assert!(prompt.user.contains("<tool_name>fs.read</tool_name>"));
-    assert!(prompt.user.contains("<path>...</path>"));
+    assert!(prompt.user.contains("<path>FIELD_VALUE</path>"));
     assert_eq!(prompt.stop, "</tool_call>");
 }
 
 #[test]
-fn rendered_tool_shape_parses_and_admits_for_same_decision() -> Result<(), String> {
+fn rendered_placeholder_shape_parses_but_is_rejected() -> Result<(), String> {
     let snapshot = instantiate(3, "Survey workspace and report.");
     let decision = RuntimeDecision::new(
         "decision-1",
@@ -98,7 +98,8 @@ fn rendered_tool_shape_parses_and_admits_for_same_decision() -> Result<(), Strin
     )
     .map_err(|error| error.message)?;
 
-    assert_eq!(admission.status, AdmissionStatus::Admitted);
+    assert_eq!(admission.status, AdmissionStatus::Rejected);
+    assert_eq!(admission.reason, "placeholder value for path");
     Ok(())
 }
 

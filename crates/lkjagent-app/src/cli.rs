@@ -32,6 +32,7 @@ where
         }
         Command::Status => status(&conn),
         Command::Console => crate::console::run(&conn),
+        Command::Workbench => crate::workbench::run(&conn),
         Command::Doctor { json } => crate::diagnostics::doctor(&conn, &invocation.data_dir, json),
         Command::Workspace { json, rebuild } => {
             if rebuild {
@@ -93,6 +94,7 @@ pub fn help() -> String {
         "  send TEXT [--new]",
         "  status",
         "  console",
+        "  workbench",
         "  doctor [--json]",
         "  workspace [--json] [--rebuild]",
         "  log [--limit N] [--follow]",

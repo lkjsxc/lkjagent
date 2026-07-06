@@ -16,6 +16,7 @@ type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 fn help_matches_documented_command_tree() -> TestResult<()> {
     let output = cli::run(["help"])?;
     assert!(output.contains("send TEXT [--new]"));
+    assert!(output.contains("workbench"));
     assert!(output.contains("task list | task show ID"));
     Ok(())
 }

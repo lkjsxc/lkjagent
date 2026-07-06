@@ -31,7 +31,7 @@ RUN apt-get update \
         'chown -R agent:agent /data' \
         'cd /data/workspace' \
         'case "${1:-}" in' \
-        '  ""|run|send|status|log|watch|help|task|queue|memory)' \
+        '  ""|run|send|status|console|workbench|doctor|workspace|log|watch|help|task|queue|context|record|memory|today|journal|todo|calendar|finance|project|dev)' \
         '    set -- /usr/local/bin/lkjagent --data /data "$@"' \
         '    ;;' \
         'esac' \

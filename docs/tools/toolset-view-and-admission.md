@@ -39,7 +39,7 @@ A prompt/admission mismatch is a high-severity runtime event.
 Raw failed model output is stored in exchange logs and marked contaminated.
 Normal retry prompts include only bounded diagnoses and the exact required
 change. Placeholder-looking executable values such as `...`, `PATH`, `TODO`,
-`<path>`, or `[path]` are rejected before effects.
+`VALUE`, `FIELD_VALUE`, `<path>`, or `[path]` are rejected before effects.
 
 ## Failure This Prevents
 

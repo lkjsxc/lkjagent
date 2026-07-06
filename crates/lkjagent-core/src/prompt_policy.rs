@@ -18,7 +18,7 @@ pub fn protocol(kind: StepKind) -> &'static str {
     match kind {
         StepKind::Plan => "Return exactly <plan> lines </plan>. Lines: write PATH | TITLE | words=N, explore | GOAL | budget=N, or respond | SUMMARY. Use only relative paths.",
         StepKind::Write | StepKind::Revise => "Return exactly <content> prose </content>. Write the requested file body only. No analysis outside the block.",
-        StepKind::Explore => "Return exactly <tool_call>...</tool_call> using one allowed tool. Start with <tool_name>TOOL</tool_name>. To finish, use <tool_name>finish</tool_name> with <summary>...</summary>.",
+        StepKind::Explore => "Return exactly one <tool_call> block using one allowed tool. Start with <tool_name> from the decision tool view. Replace placeholder values before sending.",
         StepKind::Respond | StepKind::Ask => "Return exactly <message>owner-facing answer</message>. Use gathered facts only.",
         StepKind::Verify => "Return exactly <verdict>pass or fail plus measured evidence</verdict>.",
     }

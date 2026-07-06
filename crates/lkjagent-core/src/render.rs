@@ -3,7 +3,6 @@ use std::hash::{Hash, Hasher};
 
 use crate::model::{Step, Task};
 pub use crate::prompt_policy::max_tokens;
-
 use crate::prompt_policy::{envelope_tag, expected_block, protocol, protocol_for_envelope};
 use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolSetView};
 
@@ -175,6 +174,7 @@ fn tool_call_card(view: &ToolSetView) -> String {
         "- Return exactly one <tool_call> block.".to_string(),
         "- Do not write prose before or after the block.".to_string(),
         "- Use one tool_name from the Tool view and include required fields.".to_string(),
+        "- Replace FIELD_VALUE before sending; placeholders are rejected.".to_string(),
         "- Close with </tool_call>.".to_string(),
         "\nCopy this shape:".to_string(),
         "<tool_call>".to_string(),
@@ -182,7 +182,7 @@ fn tool_call_card(view: &ToolSetView) -> String {
     ];
     if let Some(entry) = first {
         for field in &entry.required_params {
-            lines.push(format!("<{field}>...</{field}>"));
+            lines.push(format!("<{field}>FIELD_VALUE</{field}>"));
         }
     }
     lines.push("</tool_call>".to_string());

@@ -20,6 +20,7 @@ pub enum Command {
     },
     Status,
     Console,
+    Workbench,
     Doctor {
         json: bool,
     },
@@ -105,6 +106,7 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
         "send" => parse_send(rest),
         "status" => no_args(rest, Command::Status),
         "console" => no_args(rest, Command::Console),
+        "workbench" => no_args(rest, Command::Workbench),
         "doctor" => parse_json_flag(command, rest).map(|json| Command::Doctor { json }),
         "workspace" => crate::arg_helpers::parse_workspace(rest),
         "log" => parse_log(rest),

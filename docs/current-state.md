@@ -118,11 +118,11 @@ observations are recovered before a new decision is selected and write resolved
 evidence are reused. Proof
 collection writes state-ledger sections for cells, decisions, candidates,
 records, prompt frames, admissions, observations, exchanges, artifacts, and
-context.
-Status, doctor, and workspace report row-backed lease, schema, table, endpoint,
-workspace, record, artifact, and proof counts. Watch prints bounded status, event,
-trace, and proof rows. Prompt frames point to bounded body refs and every
-decision envelopes render protocol cards. Generic record CLI adds, lists, shows,
+context. Status, doctor, and workspace report row-backed lease, schema, table,
+endpoint, workspace, record, artifact, and proof counts. Watch and workbench
+print bounded status, trace, and proof rows; workbench also accepts owner input.
+Prompt frames point to bounded body refs and every decision envelopes render
+protocol cards. Generic record CLI adds, lists, shows,
 links, and archives Markdown records under `workspace/records` with fingerprint
 rows but not turn authority; `today` through `dev` wrappers reuse that path and
 project workspace state cells for todo, calendar, routine, index, proof, dev, and
@@ -187,7 +187,7 @@ Checked-in `tmp/` logs are historical proof or failure fixtures unless rerun her
 
 ## Next Executable Step
 
-Reconcile CLI, Docker routing, prompt cards, workbench behavior, and experiment evidence.
+Run Docker verification and bounded prompt-card or live trials when evidence is available.
 
 ## Honesty Rules
 

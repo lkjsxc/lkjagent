@@ -29,6 +29,8 @@ fn protocol_experiment_writes_decision_backed_matrix() -> TestResult<()> {
     let text = fs::read_to_string(&out)?;
     assert!(text.contains("decision=experiment-decision"));
     assert!(text.contains("tool_fp=fnv1a64:"));
+    assert!(text.contains("tool-name-second parse=reject:BadParams"));
+    assert!(text.contains("placeholder-path parse=accept admission=rejected result=pass"));
     assert!(text.contains("workspace-escape parse=accept admission=rejected result=pass"));
     assert!(!text.contains("result=fail"));
     Ok(())
