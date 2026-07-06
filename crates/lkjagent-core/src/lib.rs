@@ -1,3 +1,4 @@
+pub mod artifact_manifest;
 pub mod checks;
 mod checks_links;
 pub mod classify;
@@ -30,6 +31,7 @@ mod runtime_context_plan;
 pub mod runtime_decision;
 pub mod runtime_event;
 pub mod runtime_fingerprint;
+pub mod runtime_graph_query;
 pub mod runtime_operation;
 pub mod runtime_prompt_kernel;
 pub mod runtime_selector;
@@ -41,4 +43,5 @@ pub mod runtime_tool_view;
 mod runtime_workspace_family;
 pub mod templates;
 pub mod words;
+pub mod workspace_manifest;
 pub mod workspace_record;

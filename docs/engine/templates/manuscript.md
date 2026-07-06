@@ -2,8 +2,8 @@
 
 ## Purpose
 
-Define how lkjagent writes long prose manuscripts through engine-owned paths,
-word checks, and recovery steps.
+Define the manuscript template that is kept for existing checks now that generic
+artifact manifests are the structured-artifact target.
 
 ## Objective Fields
 
@@ -13,6 +13,12 @@ win. Aurora Ledger resolves to `stories/aurora-ledger`, ten chapters, and
 10,000 words. Simple digits and limited kanji numerals for ten, thousand, two
 thousand, and ten thousand are recognized; unparsed word targets default to
 10,000 words with a note in the plan state.
+
+## Current Role
+
+The template remains for existing Aurora Ledger tests and old manuscript input.
+New structured work should prefer an artifact manifest with nested units, source
+refs, and generic checks.
 
 ## Initial Plan
 

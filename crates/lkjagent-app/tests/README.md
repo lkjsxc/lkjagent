@@ -21,3 +21,4 @@ Integration tests for lkjagent-app.
 - [recovery.rs](recovery.rs): unfinished decision recovery tests.
 - [resume.rs](resume.rs): row-first resume, waiting answer, and decision reuse tests.
 - [state-snapshot.rs](state_snapshot.rs): state-cell snapshot hydration tests.
+- [workspace-rebalance.rs](workspace_rebalance.rs): workspace manifest, rebalance, audit, and alias tests.

@@ -59,16 +59,43 @@ pub(crate) fn parse_log(rest: Vec<String>) -> Result<Command, String> {
 }
 
 pub(crate) fn parse_workspace(rest: Vec<String>) -> Result<Command, String> {
+    match rest.as_slice() {
+        [cmd, flags @ ..] if cmd == "plan-rebalance" => Ok(Command::WorkspacePlanRebalance {
+            json: only_json(flags)?,
+        }),
+        [cmd, flags @ ..] if cmd == "apply-rebalance" => Ok(Command::WorkspaceApplyRebalance {
+            json: only_json(flags)?,
+        }),
+        [cmd, flags @ ..] if cmd == "validate" => Ok(Command::WorkspaceValidate {
+            json: only_json(flags)?,
+        }),
+        _ => parse_workspace_report(rest),
+    }
+}
+
+fn parse_workspace_report(rest: Vec<String>) -> Result<Command, String> {
     let mut json = false;
     let mut rebuild = false;
     for arg in rest {
         match arg.as_str() {
             "--json" => json = true,
             "--rebuild" => rebuild = true,
-            _ => return Err("use workspace [--json] [--rebuild]".to_string()),
+            _ => return Err(workspace_usage()),
         }
     }
     Ok(Command::Workspace { json, rebuild })
+}
+
+fn only_json(flags: &[String]) -> Result<bool, String> {
+    match flags {
+        [] => Ok(false),
+        [flag] if flag == "--json" => Ok(true),
+        _ => Err(workspace_usage()),
+    }
+}
+
+fn workspace_usage() -> String {
+    "use workspace [--json] [--rebuild] | plan-rebalance [--json] | apply-rebalance [--json] | validate [--json]".to_string()
 }
 
 pub(crate) fn parse_json_flag(command: &str, rest: Vec<String>) -> Result<bool, String> {

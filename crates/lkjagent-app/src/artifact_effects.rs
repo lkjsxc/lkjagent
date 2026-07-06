@@ -2,6 +2,7 @@ use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::runtime_artifact::{
     artifact_fingerprint, assemble_checked_units, ArtifactUnit, DEFAULT_UNIT_TARGET_TOKENS,
 };
+use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_store::artifact_rows::{insert_artifact, ArtifactRow};
 use rusqlite::Connection;
 
@@ -20,7 +21,7 @@ pub fn persist_artifacts(
     body: &str,
     units: &[ArtifactUnit],
 ) -> Result<(), String> {
-    let file_id = format!("task-{}-file-{}", snapshot.task.id, safe_id(path));
+    let file_id = stable_artifact_id(snapshot, body)?;
     insert_artifact(
         conn,
         &artifact_row(snapshot, &file_id, "file", path, body, None, "{}")?,
@@ -98,8 +99,11 @@ fn artifact_row(
     })
 }
 
-fn safe_id(path: &str) -> String {
-    path.chars()
-        .map(|c| if c.is_ascii_alphanumeric() { c } else { '-' })
-        .collect()
+fn stable_artifact_id(snapshot: &TaskSnapshot, body: &str) -> Result<String, String> {
+    stable_fingerprint(&serde_json::json!({
+        "task": snapshot.task.id,
+        "content": body,
+    }))
+    .map(|fingerprint| format!("task-{}-artifact-{fingerprint}", snapshot.task.id))
+    .map_err(|error| error.message)
 }

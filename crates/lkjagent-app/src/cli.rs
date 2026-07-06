@@ -44,6 +44,24 @@ where
             }
             crate::diagnostics::workspace(&conn, &invocation.data_dir, json)
         }
+        Command::WorkspacePlanRebalance { json } => crate::workspace_rebalance::plan(
+            &conn,
+            &invocation.data_dir,
+            json,
+            &crate::clock::utc_now(),
+        ),
+        Command::WorkspaceApplyRebalance { json } => crate::workspace_rebalance::apply(
+            &conn,
+            &invocation.data_dir,
+            json,
+            &crate::clock::utc_now(),
+        ),
+        Command::WorkspaceValidate { json } => crate::workspace_rebalance::validate(
+            &conn,
+            &invocation.data_dir,
+            json,
+            &crate::clock::utc_now(),
+        ),
         Command::Log { limit, follow } if follow => crate::inspect::follow_log(&conn, limit),
         Command::Log { limit, .. } => crate::inspect::log(&conn, limit),
         Command::TaskList => crate::inspect::task_list(&conn),
@@ -97,6 +115,7 @@ pub fn help() -> String {
         "  workbench [--mode append|pane]",
         "  doctor [--json]",
         "  workspace [--json] [--rebuild]",
+        "  workspace plan-rebalance|apply-rebalance|validate [--json]",
         "  log [--limit N] [--follow]",
         "  task list | task show ID",
         "  queue list | queue show ID",

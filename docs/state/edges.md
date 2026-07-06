@@ -45,3 +45,10 @@ persisted `RuntimeDecision` selected for a turn.
 Events may add edges or suppress edges. Suppression keeps the row and changes its
 status with a reason so proof can explain why a relation no longer participates
 in selection.
+
+## Query Rule
+
+Bounded graph queries report blockers, conflicts, stale dependencies, and
+lineage edges from the current snapshot. Each diagnostic row names subject,
+relation, object, reason, and evidence refs. Queries explain state; they do not
+choose runtime turns.

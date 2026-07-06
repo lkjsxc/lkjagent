@@ -29,8 +29,9 @@ cargo run -p lkjagent-xtask -- experiment protocol \
 ```
 
 The single-profile form writes one deterministic `RuntimeDecision`-backed
-matrix. The `--all` form writes baseline, protocol-safe, and context-kernel
-records plus an `adoption.md` summary. Rows record the profile, declared feature
+matrix. The `--all` form writes baseline, protocol-safe, context-kernel,
+personal-workspace, software-project, artifact-manifest, and protocol-stress records
+plus an `adoption.md` summary. Rows record the profile, declared feature
 set, decision id, expected envelope, tool-view fingerprint, stop tag, parse
 result, optional admission result, and pass or fail status. Covered cases include
 valid tool calls, safe filled examples, old action envelopes, missing or
@@ -39,6 +40,20 @@ invalid counts, prose outside the block, unclosed or empty blocks, and workspace
 path escapes. It does not call the endpoint. Profile records are evidence labels
 until code explicitly wires profile-specific renderer, parser, or admission
 behavior.
+
+## Live Profiles
+
+```sh
+cargo run -p lkjagent-xtask -- experiment live-profiles \
+  --out-dir tmp/live-runs/<stamp>-profiles \
+  --data tmp/live-profile-data/<stamp> \
+  --duration-seconds 900
+```
+
+The live runner covers personal workspace, software project, structured
+artifact, and protocol stress objectives. If `LKJAGENT_ENDPOINT_URL` or
+`LKJAGENT_MODEL` is absent, it writes an honest skip summary and raw-evidence
+note for every profile rather than faking endpoint success.
 
 ## Trial Rule
 

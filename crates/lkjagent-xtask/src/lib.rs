@@ -9,6 +9,7 @@ pub mod doc_topology;
 pub mod docs;
 pub mod experiment;
 pub mod experiment_cases;
+pub mod experiment_live;
 pub mod experiment_protocol;
 pub mod facts;
 pub mod file_counts;

@@ -13,8 +13,9 @@ never quoted back, except through bounded recovery-only diagnoses.
 ## Frame Inputs
 
 Prompt assembly consumes the persisted decision id, expected envelope,
-`ToolSetView`, context item selection, active state payloads, retry or recovery
-policy, profile names, and budget caps. The resulting `PromptFrame` stores the
+`ToolSetView`, context item selection, named context lanes, active state
+payloads, retry or recovery policy, profile names, and budget caps. The
+resulting `PromptFrame` stores the
 decision id, prompt fingerprint, context-frame fingerprint, tool-view
 fingerprint, card plan, compact included and excluded context id reasons, and
 body or body refs.
@@ -33,6 +34,9 @@ body or body refs.
 | output skeleton | `context.user.protocol-card-tokens=250` |
 
 The whole request is capped by `context.request.hard-cap-tokens=8000`.
+`ContextFramePlan` also records replayable lane summaries for relevant records
+and excluded context notes, including lane budgets, source refs, included or
+excluded item ids, and lane fingerprints.
 
 ## Admission Rules
 

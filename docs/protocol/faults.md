@@ -23,7 +23,9 @@ Fault names are stable data, but the parser validates against the current
 Every parse fault records an event with outcome `parse_fault`, the fault name,
 decision id, and one-line diagnosis. The raw faulty output is stored in exchange
 logs and marked contaminated. Normal retry prompts include only bounded
-diagnosis and required change.
+diagnosis and required change. The recovery frame names the decision id,
+attempt ordinal, fault diagnosis, and the next expected envelope without quoting
+the full faulty body.
 
 ## Envelope Desk Check
 

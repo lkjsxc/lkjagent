@@ -80,11 +80,23 @@ pub fn build_prompt_card_plan(
 
 fn facts_reason(decision: &RuntimeDecision, plan: &ContextFramePlan) -> String {
     format!(
-        "context={} included={} excluded={}",
+        "context={} included={} excluded={} lanes={}",
         decision.context_frame_fingerprint,
         entry_list(&plan.included),
-        entry_list(&plan.excluded)
+        entry_list(&plan.excluded),
+        lane_list(plan)
     )
+}
+
+fn lane_list(plan: &ContextFramePlan) -> String {
+    if plan.lanes.is_empty() {
+        return "none".to_string();
+    }
+    plan.lanes
+        .iter()
+        .map(|lane| format!("{}:{}", lane.name, lane.fingerprint))
+        .collect::<Vec<_>>()
+        .join(",")
 }
 
 fn conflict_reason(plan: &ContextFramePlan) -> String {

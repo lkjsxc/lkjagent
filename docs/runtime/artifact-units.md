@@ -5,16 +5,29 @@
 Define how long owner artifacts are generated through small checked units and
 assembled into the requested final shape.
 
+## Manifest Contract
+
+An artifact manifest records id, kind, title, root, schema number, audience,
+objectives, source records, checks, status, layout rules, and units. The generic
+manifest can describe reports, meeting packs, investigations, project design
+docs, travel plans, manuscripts, and exports.
+
 ## Unit Contract
 
 An artifact root contains one or more files. Each file contains ordered units.
-A unit stores target path, ordinal, target tokens, target words when relevant,
-source context keys, previous-tail refs, check requirements, assembly policy,
-and the decision id that authorized generation.
+A unit stores stable id, optional parent id, target path, ordinal, target tokens,
+target words when relevant, source refs, previous-tail refs, check requirements,
+assembly policy, and the decision id that authorized generation.
 
 Ordinary model-authored units target about 512 output tokens. A decision may use
 a different cap only when its row records the reason and budget. The 200-line
 repository file cap still applies to authored project files.
+
+## Nested Paths
+
+Unit output paths may be nested, for example `reports/q1/sections/intro.md`.
+Nested paths are validated as workspace-relative paths before effects can write
+or rebalance them.
 
 ## Assembly Rule
 
@@ -25,7 +38,8 @@ completion evidence.
 
 ## Longform Rule
 
-Long manuscripts generate settings first, compact them into clean context items,
+Manuscripts are one artifact kind, not the sole target. Long manuscripts
+generate settings first, compact them into clean context items,
 generate bounded chapter units with previous-tail continuity, assemble chapter
 files, and run per-chapter and aggregate word checks before completion.
 Shortfalls insert fresh continuation write and verify steps from current rows.

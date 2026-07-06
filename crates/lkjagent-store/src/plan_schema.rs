@@ -28,6 +28,9 @@ pub const APPLICATION_TABLES: &[&str] = &[
     "state_edges",
     "workspace_records",
     "workspace_record_history",
+    "workspace_manifest",
+    "workspace_path_aliases",
+    "workspace_rebalance_audit",
     "artifacts",
     "provider_exchanges",
 ];

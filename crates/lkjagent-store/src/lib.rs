@@ -23,3 +23,4 @@ pub mod state_edge_rows;
 mod state_edge_schema;
 pub mod state_rows;
 pub mod state_schema;
+pub mod workspace_rows;

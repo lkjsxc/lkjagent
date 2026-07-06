@@ -99,36 +99,26 @@ writes, and record file and unit artifact fingerprints. Write and revise prompts
 use the 512-token artifact-unit target with close-tag headroom. Endpoint exchanges
 now carry decision id, context-frame fingerprint, tool-view fingerprint, active
 timeout, and provider-exchange rows tied to the
-runtime decision. Status output now summarizes active state cells, conflict
-cells, latest decision, admissions, observations, provider exchanges, and
-artifacts. Prompt-frame rows are persisted before model calls and can replay
-bounded prompt bodies from their refs. Observation rows are persisted after
-deterministic effects. Clean observations are converted into durable context
-items while error observations are marked recovery-only.
-Parse-fault provider exchanges create failed-model-output context items,
-endpoint errors create recovery-only context items, shell observations become
-external-raw context, and secret-like observation bodies become redacted
-sensitive-owner context. The owner-facing `context resolve` command writes active
-`context:resolve/<key>` cells that suppress losing conflict items before prompt
-rendering. Unfinished decisions with committed provider exchanges, admissions, or
-observations are recovered before a new decision is selected and write resolved
-`recovery:recovered/<decision>` report cells; decisions without external
-evidence are reused. Proof
-collection writes state-ledger sections for cells, decisions, candidates,
-records, prompt frames, admissions, observations, exchanges, artifacts, checks,
-and context. Status, doctor, and workspace report row-backed lease, schema, table,
-endpoint, workspace, record, artifact, and proof counts. Watch and workbench
-print bounded status, trace, and proof rows; workbench accepts owner input and
-supports explicit append or pane modes with pane scroll commands.
-Prompt frames point to bounded body refs and persist queryable prompt card rows
-with context inclusion and exclusion reasons; every decision envelope renders
-protocol cards. Generic record CLI adds, lists,
-shows, links, and archives Markdown records under `workspace/records` with
-fingerprint rows but not turn authority. Wrappers are today, journal, todo,
-calendar, finance, project, and dev; generic record kinds project index, todo,
-calendar, finance, routine, proof, dev, and project state cells. `workspace --rebuild`
-writes derived indexes and artifact rows. Xtask writes single-profile and
-three-profile protocol ledgers.
+runtime decision. Status output summarizes active cells, conflicts, decisions,
+admissions, observations, provider exchanges, and artifacts. Prompt-frame rows
+are persisted before model calls and replay bounded bodies from refs; prompt
+cards include context lanes with source refs, item ids, budgets, and lane
+fingerprints. Parse faults, endpoint errors, effect errors, shell observations,
+and secret-like bodies become classified context items. Recovery prompts now name
+the decision, attempt, bounded fault diagnosis, and next expected envelope.
+The owner-facing `context resolve` command writes active resolution cells.
+Unfinished decisions with committed external evidence recover before new
+selection; decisions without external evidence are reused. Proof collection
+writes state-ledger sections for cells, decisions, candidates, records, prompt
+frames, admissions, observations, exchanges, artifacts, checks, and context.
+Status, doctor, workspace, watch, and workbench read rows. Workbench accepts
+owner input, append or pane mode, scroll commands, follow on/off, and status rail
+fallbacks. Generic records add, list, show, link, archive, and resolve path
+aliases. Wrappers are today, journal, todo, calendar, finance, project, and dev;
+record kinds project index, todo, calendar, finance, routine, proof, dev, and
+project state cells. Workspace rebuild writes derived indexes and artifact rows;
+workspace rebalance writes manifest, preview, apply audit, and alias rows. Xtask
+writes deterministic protocol ledgers and live-profile run or skip evidence.
 ## State-Ledger Parity
 
 The checkout satisfies the executable state-ledger bridge contract in this
@@ -155,25 +145,26 @@ admission, and explore effect selection. Prompt-frame rows own replayable bounde
 body refs plus structured prompt card rows and fingerprints.
 
 Prompt context has durable context items, conflict cards, contamination and stale
-exclusions, contradiction edges, and prompt-frame context plans with included and
-excluded ids plus reasons. Parse faults, endpoint errors, effect errors, shell
-observations, and secret-like bodies classify contamination durably before prompt
-admission.
+exclusions, contradiction edges, and context lane plans with included and
+excluded ids, source refs, reasons, budgets, and fingerprints. Parse faults,
+endpoint errors, effect errors, shell observations, and secret-like bodies
+classify contamination durably before prompt admission.
 
-Artifact units, deterministic assembly, fresh fingerprint checks, and artifact
-rows are wired into write effects. Manuscript chapter prompts ask for bounded
-350-word units, write effects split and assemble checked units before file
-writes, and write prompts use bounded close-tag headroom. Proof bundles expose
-state-vector, decisions, prompt-frame, admission, observation, exchange,
-artifact, context, suppression, and conflict-edge sections.
+Artifact manifests, units, deterministic assembly, fresh fingerprint checks, and
+artifact rows are wired into the generic artifact target. Manuscript remains an
+old template kept for existing checks, while generic manifests support nested
+units, source refs, checks, and workspace rebalancing. Proof bundles expose state-vector,
+decisions, prompt-frame, admission, observation, exchange, artifact, context,
+suppression, and conflict-edge sections.
 
 ## Implemented Code
 
 `lkjagent-core` owns the first pure state-ledger domain modules plus the current
 plan engine, parser, renderer, checks, word counting, classifier, templates,
-docs-link helpers, and recovery helpers.
-`lkjagent-store` owns the plan-store schema, state-ledger tables, state-edge
-rows, hydration, queue access, and atomic turn state commits. `lkjagent-effects`
+docs-link helpers, graph queries, workspace manifests, artifact manifests, and
+recovery helpers. `lkjagent-store` owns the plan-store schema, state-ledger
+tables, state-edge rows, workspace manifest, alias, audit rows, hydration, queue
+access, and atomic turn state commits. `lkjagent-effects`
 owns filesystem, shell, check gathering, observations, and exchange log file helpers.
 `lkjagent-app` owns the
 daemon interpreter, row-backed CLI renderers, endpoint adapter, waiting answer

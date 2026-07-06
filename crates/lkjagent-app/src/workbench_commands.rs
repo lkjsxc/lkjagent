@@ -5,6 +5,7 @@ pub enum WorkbenchCommand {
     Mode(WorkbenchMode),
     Scroll(isize),
     Top,
+    Follow(bool),
 }
 
 pub fn apply(state: &mut UiState, command: WorkbenchCommand) -> String {
@@ -21,6 +22,10 @@ pub fn apply(state: &mut UiState, command: WorkbenchCommand) -> String {
             *state = reduce(state.clone(), UiEvent::Top);
             "workbench: scroll=0".to_string()
         }
+        WorkbenchCommand::Follow(enabled) => {
+            *state = reduce(state.clone(), UiEvent::Follow(enabled));
+            format!("workbench: follow={enabled}")
+        }
     }
 }
 
@@ -34,6 +39,9 @@ pub fn parse(line: &str) -> Result<Option<WorkbenchCommand>, String> {
     }
     if let Some(rest) = trimmed.strip_prefix("/page") {
         return page(rest.trim()).map(Some);
+    }
+    if let Some(rest) = trimmed.strip_prefix("/follow") {
+        return follow(rest.trim()).map(Some);
     }
     Ok(None)
 }
@@ -51,6 +59,14 @@ fn scroll(value: &str) -> Result<WorkbenchCommand, String> {
         "down" => Ok(WorkbenchCommand::Scroll(1)),
         "top" => Ok(WorkbenchCommand::Top),
         _ => Err("/scroll requires up, down, or top".to_string()),
+    }
+}
+
+fn follow(value: &str) -> Result<WorkbenchCommand, String> {
+    match value {
+        "on" => Ok(WorkbenchCommand::Follow(true)),
+        "off" => Ok(WorkbenchCommand::Follow(false)),
+        _ => Err("/follow requires on or off".to_string()),
     }
 }
 
@@ -74,6 +90,10 @@ mod tests {
         );
         assert_eq!(parse("/scroll down"), Ok(Some(WorkbenchCommand::Scroll(1))));
         assert_eq!(parse("/page up"), Ok(Some(WorkbenchCommand::Scroll(-10))));
+        assert_eq!(
+            parse("/follow off"),
+            Ok(Some(WorkbenchCommand::Follow(false)))
+        );
         assert_eq!(parse("hello"), Ok(None));
     }
 }

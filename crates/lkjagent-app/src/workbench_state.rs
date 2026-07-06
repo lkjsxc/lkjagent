@@ -26,6 +26,7 @@ pub struct UiState {
     pub mode: WorkbenchMode,
     pub refreshes: u64,
     pub scroll: usize,
+    pub follow: bool,
     pub width: u16,
     pub height: u16,
     pub latest: String,
@@ -37,6 +38,7 @@ impl UiState {
             mode,
             refreshes: 0,
             scroll: 0,
+            follow: true,
             width: 100,
             height: 30,
             latest: String::new(),
@@ -50,6 +52,7 @@ pub enum UiEvent {
     Mode(WorkbenchMode),
     Scroll(isize),
     Top,
+    Follow(bool),
     Resize { width: u16, height: u16 },
 }
 
@@ -63,10 +66,18 @@ pub fn reduce(mut state: UiState, event: UiEvent) -> UiState {
             state.mode = mode;
         }
         UiEvent::Scroll(delta) => {
+            state.follow = false;
             state.scroll = scroll(state.scroll, delta);
         }
         UiEvent::Top => {
+            state.follow = false;
             state.scroll = 0;
+        }
+        UiEvent::Follow(enabled) => {
+            state.follow = enabled;
+            if enabled {
+                state.scroll = 0;
+            }
         }
         UiEvent::Resize { width, height } => {
             state.width = width.max(40);
@@ -96,10 +107,12 @@ mod tests {
         let state = reduce(state, UiEvent::Scroll(4));
         let state = reduce(state, UiEvent::Scroll(-1));
         let state = reduce(state, UiEvent::Top);
+        let state = reduce(state, UiEvent::Follow(true));
 
         assert_eq!(state.mode, WorkbenchMode::Pane);
         assert_eq!(state.refreshes, 1);
         assert_eq!(state.scroll, 0);
+        assert!(state.follow);
         assert_eq!(state.latest, "body");
     }
 }

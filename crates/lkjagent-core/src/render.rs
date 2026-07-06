@@ -1,7 +1,7 @@
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 
-use crate::model::{Step, Task};
+use crate::model::{Attempt, Step, Task};
 pub use crate::prompt_policy::max_tokens;
 use crate::prompt_policy::{envelope_tag, expected_block, protocol, protocol_for_envelope};
 use crate::runtime_decision::RuntimeDecision;
@@ -23,6 +23,16 @@ const RETRY_FRAME: usize = 250;
 pub fn render_prompt_for_decision(
     task: &Task,
     steps: &[Step],
+    step: &Step,
+    decision: &RuntimeDecision,
+) -> Prompt {
+    render_prompt_for_decision_with_attempts(task, steps, &[], step, decision)
+}
+
+pub fn render_prompt_for_decision_with_attempts(
+    task: &Task,
+    steps: &[Step],
+    attempts: &[Attempt],
     step: &Step,
     decision: &RuntimeDecision,
 ) -> Prompt {
@@ -57,6 +67,9 @@ pub fn render_prompt_for_decision(
         &format!("{}\n\n{}", prompt.user, protocol_card(decision)),
         HARD_CAP,
     );
+    if let Some(frame) = recovery_frame(decision, attempts, step.id) {
+        prompt.user = truncate(&format!("{}\n\n{frame}", prompt.user), HARD_CAP);
+    }
     prompt.fingerprint = fingerprint(&prompt.system, &prompt.user);
     prompt
 }
@@ -95,6 +108,25 @@ pub fn render_prompt(task: &Task, steps: &[Step], step: &Step) -> Prompt {
         max_tokens: max_tokens(step.kind),
         stop: format!("</{tag}>"),
     }
+}
+
+fn recovery_frame(
+    decision: &RuntimeDecision,
+    attempts: &[Attempt],
+    step_id: u64,
+) -> Option<String> {
+    let attempt = attempts
+        .iter()
+        .rev()
+        .find(|attempt| attempt.step_id == step_id && !attempt.diagnosis.trim().is_empty())?;
+    let tag = envelope_tag(decision.expected_envelope).unwrap_or("no_output");
+    Some(truncate(
+        &format!(
+            "Recovery frame:\ndecision={} attempt={} fault={}\nNext expected envelope: <{}>...</{}>",
+            decision.id, attempt.ordinal, attempt.diagnosis, tag, tag
+        ),
+        RETRY_FRAME,
+    ))
 }
 
 fn plan_digest(steps: &[Step]) -> String {

@@ -12,7 +12,7 @@ recovery, and completion.
 - [recovery-and-completion.md](recovery-and-completion.md): crash recovery,
   evidence-gated closure, observability, and proof requirements.
 - [artifact-units.md](artifact-units.md): small generation units,
-  deterministic assembly, and artifact-fingerprint checks.
+  deterministic assembly, artifact manifests, and artifact-fingerprint checks.
 
 ## Failure This Prevents
 

@@ -34,6 +34,14 @@ fn context_plan_records_inclusion_and_suppression_reasons() {
     assert_eq!(plan.included[0].reason, "clean-current");
     assert_eq!(plan.excluded[0].reason, "staleness:Stale");
     assert_eq!(plan.excluded[1].reason, "contamination:ExternalRaw");
+    assert_eq!(plan.lanes[0].name, "relevant-records");
+    assert_eq!(plan.lanes[0].included_item_ids, vec!["item-1"]);
+    assert_eq!(plan.lanes[1].name, "excluded-context-notes");
+    assert_eq!(plan.lanes[1].excluded_item_ids, vec!["item-2", "item-3"]);
+    assert!(plan
+        .lanes
+        .iter()
+        .all(|lane| lane.fingerprint.starts_with("fnv1a64:")));
 }
 
 #[test]

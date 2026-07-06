@@ -13,4 +13,5 @@ commit protocol.
 - [documentation-standards.md](documentation-standards.md): Markdown shape and
   topology.
 - [functional-style.md](functional-style.md): pure core and effect edge rules.
-- [commit-protocol.md](commit-protocol.md): commit message and cadence.
+- [commit-protocol.md](commit-protocol.md): commit message, cadence, and
+  attribution cleanup guardrails.

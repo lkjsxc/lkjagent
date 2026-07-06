@@ -29,6 +29,7 @@ fn card_plan_has_ordered_profiles_and_fingerprints() -> Result<(), String> {
         &ContextFramePlan {
             included: Vec::new(),
             excluded: Vec::new(),
+            lanes: Vec::new(),
         },
     )
     .map_err(|error| error.message)?;
@@ -81,6 +82,7 @@ fn card_reasons_list_context_selection_audit() -> Result<(), String> {
                 entry("ctx-bad", "contamination:FailedModelOutput"),
                 entry("ctx-conflict", "unresolved-conflict"),
             ],
+            lanes: Vec::new(),
         },
     )
     .map_err(|error| error.message)?;

@@ -39,7 +39,7 @@ Each cell stores:
 Payload schema names are semantic contract labels such as `context-conflict`,
 `task-snapshot`, or `plan-bridge.model`. Do not add numbered suffix labels for
 project-authored schemas. Endpoint paths, hash algorithm names, and external API
-versions may still contain numbers when those names are externally owned.
+revisions may still contain numbers when those names are externally owned.
 
 ## Workspace Families
 

@@ -164,6 +164,7 @@ mod tests {
         let (sender, receiver) = mpsc::channel();
         sender.send("/mode pane".to_string())?;
         sender.send("/scroll down".to_string())?;
+        sender.send("/follow on".to_string())?;
         sender.send("/quit".to_string())?;
         drop(sender);
         let mut output = Vec::new();
@@ -179,6 +180,7 @@ mod tests {
         let text = String::from_utf8(output)?;
         assert!(text.contains("workbench: mode=pane"));
         assert!(text.contains("workbench: scroll=1"));
+        assert!(text.contains("workbench: follow=true"));
         assert!(text.contains("== workbench pane refresh"));
         Ok(())
     }

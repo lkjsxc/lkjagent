@@ -44,3 +44,4 @@ mod workbench_commands;
 mod workbench_render;
 pub mod workbench_state;
 mod workspace_index;
+mod workspace_rebalance;

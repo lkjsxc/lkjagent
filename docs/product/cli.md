@@ -23,9 +23,12 @@ Define the owner command surface and output discipline.
 | `lkjagent watch` | print a refreshable terminal snapshot with status, trace, and proof rows |
 | `lkjagent doctor [--json]` | print row-backed health diagnostics without secrets |
 | `lkjagent workspace [--json] [--rebuild]` | summarize workspace paths and rebuild derived indexes |
+| `lkjagent workspace plan-rebalance [--json]` | preview canonical path moves without writing files |
+| `lkjagent workspace apply-rebalance [--json]` | move files and write alias plus audit rows |
+| `lkjagent workspace validate [--json]` | verify manifest and record file paths |
 | `lkjagent record add KIND TITLE [--body TEXT]` | create a generic workspace record and metadata row |
 | `lkjagent record list [KIND]` | list current generic records by row metadata |
-| `lkjagent record show ID` | print one record row and Markdown body |
+| `lkjagent record show ID` | print one record row and Markdown body, resolving path aliases |
 | `lkjagent record link ID REF` | add a frontmatter link and refresh fingerprint evidence |
 | `lkjagent record archive ID` | move a record under `records/archive` and hide it from normal list |
 | `lkjagent today, journal, todo, calendar, finance, project, dev` | friendly record-backed wrappers |

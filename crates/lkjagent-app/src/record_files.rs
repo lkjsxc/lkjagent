@@ -38,9 +38,7 @@ pub fn list(conn: &Connection, kind: Option<&str>) -> Result<String, String> {
 }
 
 pub fn show(conn: &Connection, data_dir: &Path, id: &str) -> Result<String, String> {
-    let row = record(conn, id)
-        .map_err(|error| error.to_string())?
-        .ok_or_else(|| format!("record not found: {id}"))?;
+    let row = record_or_alias(conn, id)?;
     let text = fs::read_to_string(data_dir.join("workspace").join(&row.path))
         .map_err(|error| error.to_string())?;
     Ok(format!("{}\n{}", format_record_row("record", &row), text))
@@ -103,6 +101,20 @@ pub fn link(
     upsert_record(conn, &updated).map_err(|error| error.to_string())?;
     crate::record_state::upsert_record_cells(conn, &parsed, &row.path, &updated.fingerprint)?;
     Ok(format!("linked record: {id} -> {target}"))
+}
+
+fn record_or_alias(conn: &Connection, id: &str) -> Result<RecordRow, String> {
+    if let Some(row) = record(conn, id).map_err(|error| error.to_string())? {
+        return Ok(row);
+    }
+    let Some(alias) = lkjagent_store::workspace_rows::resolve_alias(conn, id)
+        .map_err(|error| error.to_string())?
+    else {
+        return Err(format!("record not found: {id}"));
+    };
+    record(conn, &alias.entity_id)
+        .map_err(|error| error.to_string())?
+        .ok_or_else(|| format!("record not found for alias: {id}"))
 }
 
 fn write_record(

@@ -37,8 +37,9 @@ an owner message. Slash commands reuse the console handlers for `/status`,
 `/watch`, `/log`, `/queue`, `/task`, `/send TEXT`, `/new TEXT`, and `/quit`.
 `/mode append` and `/mode pane` switch render modes without touching daemon
 state. `/scroll up`, `/scroll down`, `/scroll top`, `/page up`, and `/page down`
-move pane scroll state only. The loop opens short store operations per input or
-refresh.
+move pane scroll state only. `/follow on` returns the transcript window to the
+latest rows; `/follow off` leaves manual scroll in place. The loop opens short
+store operations per input or refresh.
 
 ## Authority Limits
 
@@ -49,7 +50,7 @@ context-resolution, record, or other row-backed command paths.
 ## Evidence
 
 Tests should cover parser routing, reducer mode changes, line handling,
-closed-input exit, pane scroll state, and bounded rendering. Interactive behavior
-is proven by captured command logs under
+closed-input exit, pane scroll and follow state, status rail fallback fields, and
+bounded rendering. Interactive behavior is proven by captured command logs under
 `tmp/agent-runs/` or `tmp/live-runs/`, with unavailable terminals recorded as an
 honest skip.

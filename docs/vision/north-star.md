@@ -35,11 +35,13 @@ content instead of navigating policy.
 
 ## Measured Success
 
-The product succeeds when a configured checkout can run the daemon, accept the
-Aurora Ledger manuscript request, and produce ten chapter files under the
-requested root with at least 10,000 measured manuscript words. The task closes
-only after engine-computed checks pass. A failed task ends as blocked with a
-bounded report and evidence.
+The product succeeds when a configured checkout can run the daemon, accept one
+workspace objective, and produce row-backed evidence across records, state
+cells, prompt frames, tool admissions, observations, checks, and artifacts. A
+structured artifact success uses an `ArtifactManifest`, nested units, source
+refs, fresh artifact fingerprints, and harness-computed checks before closure.
 
-The same engine also handles a docs-tree request, a question, and a file-work
-request without task-family code paths outside templates and checks.
+Aurora Ledger remains an old manuscript proof, not the north star. The same
+engine must also handle personal records, a software
+project report, a docs-tree request, a question, and file work without creating a
+second runtime authority.

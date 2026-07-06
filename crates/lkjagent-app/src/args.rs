@@ -31,6 +31,15 @@ pub enum Command {
         json: bool,
         rebuild: bool,
     },
+    WorkspacePlanRebalance {
+        json: bool,
+    },
+    WorkspaceApplyRebalance {
+        json: bool,
+    },
+    WorkspaceValidate {
+        json: bool,
+    },
     Log {
         limit: usize,
         follow: bool,

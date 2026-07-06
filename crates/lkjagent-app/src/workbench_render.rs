@@ -11,9 +11,10 @@ pub fn render(state: &UiState) -> String {
 
 fn render_append(state: &UiState) -> String {
     bounded(&format!(
-        "== workbench refresh {} mode={} ==\n{}\ninput: plain text enqueues; /mode pane switches layout; /quit exits workbench",
+        "== workbench refresh {} mode={} follow={} ==\n{}\ninput: plain text enqueues; /mode pane switches layout; /quit exits workbench",
         state.refreshes,
         state.mode.as_str(),
+        state.follow,
         state.latest
     ))
 }
@@ -26,15 +27,19 @@ fn render_pane(state: &UiState) -> String {
         .map(|(name, body)| format!("[{}]\n{}", name, body.trim()))
         .collect::<Vec<_>>()
         .join("\n\n");
-    let left = window(&transcript, state.scroll, 18);
+    let left = window(&transcript, state.scroll, state.follow, 18);
     let right = sections
         .iter()
         .find(|(name, _)| *name == "status")
         .map(|(_, body)| body.trim())
         .unwrap_or("status: unavailable");
     bounded(&format!(
-        "== workbench pane refresh {} scroll={} ==\n+-- transcript --+\n{}\n+-- right rail --+\n{}\n+-- input --+\nplain text enqueues | /mode append | /quit",
-        state.refreshes, state.scroll, left, right
+        "== workbench pane refresh {} scroll={} follow={} ==\n+-- transcript --+\n{}\n+-- right rail --+\n{}\n+-- input --+\nplain text enqueues | /follow on|off | /mode append | /quit",
+        state.refreshes,
+        state.scroll,
+        state.follow,
+        left,
+        rail_summary(right)
     ))
 }
 
@@ -56,10 +61,30 @@ fn split_sections(body: &str) -> Vec<(String, String)> {
     sections
 }
 
-fn window(text: &str, scroll: usize, height: usize) -> String {
-    let lines = text.lines().skip(scroll).take(height).collect::<Vec<_>>();
+fn window(text: &str, scroll: usize, follow: bool, height: usize) -> String {
+    let all = text.lines().collect::<Vec<_>>();
+    let start = if follow {
+        all.len().saturating_sub(height)
+    } else {
+        scroll
+    };
+    let lines = all.into_iter().skip(start).take(height).collect::<Vec<_>>();
     if lines.is_empty() {
         return "[end of pane]".to_string();
+    }
+    lines.join("\n")
+}
+
+fn rail_summary(status: &str) -> String {
+    let mut lines = status
+        .lines()
+        .take(12)
+        .map(str::to_string)
+        .collect::<Vec<_>>();
+    for label in ["model", "faults", "workspace", "repo"] {
+        if !status.contains(label) {
+            lines.push(format!("{label}: see rows"));
+        }
     }
     lines.join("\n")
 }
@@ -90,14 +115,16 @@ mod tests {
         let mut state = UiState::new(WorkbenchMode::Pane);
         state.refreshes = 2;
         state.scroll = 1;
+        state.follow = false;
         state.latest = "== status ==\ndaemon: idle\n== recent events ==\none\ntwo".to_string();
 
         let text = render(&state);
 
-        assert!(text.contains("== workbench pane refresh 2 scroll=1 =="));
+        assert!(text.contains("== workbench pane refresh 2 scroll=1 follow=false =="));
         assert!(text.contains("+-- transcript --+"));
         assert!(text.contains("two"));
         assert!(!text.contains("[recent events]"));
         assert!(text.contains("daemon: idle"));
+        assert!(text.contains("model: see rows"));
     }
 }

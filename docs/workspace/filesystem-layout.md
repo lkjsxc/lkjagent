@@ -56,3 +56,12 @@ external repositories require explicit policy before prompt admission.
 Each major owner-facing workspace directory should have a README explaining its
 purpose, record shape, and allowed agent actions. These files guide the owner and
 may be admitted as bounded context with source refs and fingerprints.
+
+## Rebalancing
+
+`workspace/system/workspace-manifest.json` records the schema number, root
+policy, archive root, system root, and owner-facing directories. `workspace
+plan-rebalance` previews canonical record moves. `workspace apply-rebalance`
+validates paths, moves files, updates record rows, writes path aliases, and
+stores rebalance audit rows. `record show` can resolve an old path alias to the
+current stable record id.

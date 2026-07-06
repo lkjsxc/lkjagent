@@ -2,23 +2,13 @@ use rusqlite::Connection;
 
 use crate::error::StoreResult;
 
+#[rustfmt::skip]
 pub const STATE_LEDGER_TABLES: &[&str] = &[
-    "cases",
-    "runtime_events",
-    "state_cells",
-    "state_history",
-    "runtime_decisions",
-    "prompt_frames",
-    "prompt_cards",
-    "tool_admissions",
-    "observations",
-    "context_items",
-    "context_edges",
-    "state_edges",
-    "workspace_records",
-    "workspace_record_history",
-    "artifacts",
-    "provider_exchanges",
+    "cases", "runtime_events", "state_cells", "state_history", "runtime_decisions",
+    "prompt_frames", "prompt_cards", "tool_admissions", "observations", "context_items",
+    "context_edges", "state_edges", "workspace_records", "workspace_record_history",
+    "workspace_manifest", "workspace_path_aliases", "workspace_rebalance_audit",
+    "artifacts", "provider_exchanges",
 ];
 pub fn setup(conn: &Connection) -> StoreResult<()> {
     conn.execute_batch(
@@ -188,7 +178,9 @@ CREATE TABLE IF NOT EXISTS artifacts (
             started_at TEXT NOT NULL,
             finished_at TEXT
         );
-
+        CREATE TABLE IF NOT EXISTS workspace_manifest (id TEXT PRIMARY KEY, schema_version INTEGER NOT NULL, root_policy_json TEXT NOT NULL, manifest_json TEXT NOT NULL, updated_at TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS workspace_path_aliases (old_path TEXT PRIMARY KEY, entity_id TEXT NOT NULL, entity_kind TEXT NOT NULL, new_path TEXT NOT NULL, decision_id TEXT NOT NULL, created_at TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS workspace_rebalance_audit (id TEXT PRIMARY KEY, entity_id TEXT NOT NULL, entity_kind TEXT NOT NULL, old_path TEXT NOT NULL, new_path TEXT NOT NULL, decision_id TEXT NOT NULL, validation_json TEXT NOT NULL, created_at TEXT NOT NULL);
         CREATE INDEX IF NOT EXISTS idx_state_cells_case_status ON state_cells(case_id, status, priority, conflict_group);
         CREATE INDEX IF NOT EXISTS idx_context_items_prompt ON context_items(case_id, semantic_key, contamination_class, trust_class, source_fingerprint);
         CREATE INDEX IF NOT EXISTS idx_runtime_decisions_unfinished ON runtime_decisions(case_id, status, selected_at);

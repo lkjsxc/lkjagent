@@ -4,7 +4,7 @@ use crate::engine_completion::{block_task, close_task};
 use crate::engine_steps::{handle_endpoint_error, handle_fault, handle_model};
 use crate::model::*;
 use crate::parse::{Action, ParseFault, ParsedOutput};
-use crate::render::{render_prompt, render_prompt_for_decision, Prompt};
+use crate::render::{render_prompt, render_prompt_for_decision_with_attempts, Prompt};
 use crate::runtime_decision::RuntimeDecision;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -97,7 +97,13 @@ fn call_model_work(snapshot: &TaskSnapshot, decision: &RuntimeDecision, step_id:
     };
     Work::CallModel {
         step_id,
-        prompt: render_prompt_for_decision(&snapshot.task, &snapshot.steps, step, decision),
+        prompt: render_prompt_for_decision_with_attempts(
+            &snapshot.task,
+            &snapshot.steps,
+            &snapshot.attempts,
+            step,
+            decision,
+        ),
     }
 }
 

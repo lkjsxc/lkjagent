@@ -1,7 +1,9 @@
 use lkjagent_core::classify::instantiate;
-use lkjagent_core::model::StepKind;
+use lkjagent_core::model::{Attempt, AttemptOutcome, StepKind};
 use lkjagent_core::parse::{parse_expected_for_decision, ParsedOutput};
-use lkjagent_core::render::{max_tokens, render_prompt, render_prompt_for_decision};
+use lkjagent_core::render::{
+    max_tokens, render_prompt, render_prompt_for_decision, render_prompt_for_decision_with_attempts,
+};
 use lkjagent_core::runtime_admission::{admit_action, AdmissionStatus, ModelAction};
 use lkjagent_core::runtime_artifact::DEFAULT_UNIT_TARGET_TOKENS;
 use lkjagent_core::runtime_decision::{
@@ -133,6 +135,42 @@ fn generic_decision_envelopes_render_protocol_cards() {
         assert!(prompt.user.contains(&format!("Copy this shape:\n<{tag}>")));
         assert_eq!(prompt.stop, format!("</{tag}>"));
     }
+}
+
+#[test]
+fn fault_linked_recovery_frame_names_next_envelope() {
+    let snapshot = instantiate(3, "Survey workspace and report.");
+    let decision = RuntimeDecision::new(
+        "decision-1",
+        "case-1",
+        OperationKey("model.call/1".to_string()),
+        ToolSetView::empty(),
+        OutputEnvelope::Message,
+    );
+    let attempts = vec![Attempt {
+        step_id: snapshot.steps[0].id,
+        ordinal: 2,
+        prompt_fingerprint: "old".to_string(),
+        outcome: AttemptOutcome::ParseFault,
+        diagnosis: "WrongBlock".to_string(),
+        tokens_in: 0,
+        tokens_out: 0,
+        cached_tokens: 0,
+    }];
+    let prompt = render_prompt_for_decision_with_attempts(
+        &snapshot.task,
+        &snapshot.steps,
+        &attempts,
+        &snapshot.steps[0],
+        &decision,
+    );
+
+    assert!(prompt.user.contains("Recovery frame:"));
+    assert!(prompt.user.contains("decision=decision-1"));
+    assert!(prompt.user.contains("fault=WrongBlock"));
+    assert!(prompt
+        .user
+        .contains("Next expected envelope: <message>...</message>"));
 }
 
 #[test]

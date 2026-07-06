@@ -86,38 +86,48 @@ struct ProfileSpec {
     next: &'static str,
 }
 
+#[rustfmt::skip]
 fn profile(name: &str) -> ProfileSpec {
-    profiles()
-        .into_iter()
-        .find(|spec| spec.name == name)
-        .unwrap_or_else(|| ProfileSpec {
-            name: name.to_string(),
-            features: vec!["custom-label"],
-            result: "candidate",
-            next: "compare-before-adoption",
-        })
+    profiles().into_iter().find(|spec| spec.name == name)
+        .unwrap_or_else(|| spec_owned(name, vec!["custom-label"], "candidate", "compare"))
 }
 
+#[rustfmt::skip]
 fn profiles() -> Vec<ProfileSpec> {
     vec![
         spec("baseline", vec!["current"], "candidate", "compare"),
-        spec(
-            "protocol-safe",
-            vec!["safe-filled-card", "placeholder-reject"],
-            "candidate",
-            "live-trial",
-        ),
-        spec(
-            "context-kernel",
-            vec!["prompt-cards", "context-exclusion-audit"],
-            "candidate",
-            "live-trial",
-        ),
+        spec("protocol-safe", vec!["safe-filled-card"], "candidate", "live"),
+        spec("context-kernel", vec!["prompt-cards"], "candidate", "live"),
+        spec("personal-workspace", vec!["journal", "todo"], "deferred", "live"),
+        spec("software-project", vec!["repo-evidence"], "deferred", "live"),
+        spec("artifact-manifest", vec!["manifest", "nested-units"], "deferred", "live"),
+        spec("protocol-stress", vec!["parse-fault"], "deferred", "live"),
     ]
+}
+
+#[rustfmt::skip]
+fn adoption_summary() -> String {
+    ["# Protocol Adoption Summary", "",
+     "- idea=safe-filled-card status=deferred reason=compare live invalid-call rate",
+     "- idea=context-lanes status=deferred reason=needs live proof",
+     "- idea=personal-workspace status=deferred reason=requires endpoint profile run",
+     "- idea=software-project status=deferred reason=requires endpoint profile run",
+     "- idea=artifact-manifest status=deferred reason=requires artifact live profile",
+     "- idea=protocol-recovery status=deferred reason=requires protocol stress run", ""]
+    .join("\n")
 }
 
 fn spec(
     name: &'static str,
+    features: Vec<&'static str>,
+    result: &'static str,
+    next: &'static str,
+) -> ProfileSpec {
+    spec_owned(name, features, result, next)
+}
+
+fn spec_owned(
+    name: &str,
     features: Vec<&'static str>,
     result: &'static str,
     next: &'static str,
@@ -186,8 +196,4 @@ fn render_admission(status: &Option<AdmissionStatus>) -> String {
         Some(AdmissionStatus::Rejected) => "rejected".to_string(),
         None => "n/a".to_string(),
     }
-}
-
-fn adoption_summary() -> String {
-    "# Protocol Adoption Summary\n\nprofiles=baseline,protocol-safe,context-kernel\nresult=defer-default\nnext=run-live-trials\n".to_string()
 }

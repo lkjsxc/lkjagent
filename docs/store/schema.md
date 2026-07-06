@@ -33,6 +33,9 @@ runtime reads only state rows. Required tables:
 | `state_edges` | generic relation evidence between state, records, artifacts, and checks |
 | `workspace_records` | current record metadata and fingerprints for owner-readable files |
 | `workspace_record_history` | record fingerprint history for staleness checks |
+| `workspace_manifest` | schema-numbered workspace root and directory policy |
+| `workspace_path_aliases` | old path to stable entity id and new path mappings |
+| `workspace_rebalance_audit` | applied path moves with decision and validation data |
 | `artifacts` | files, roots, fingerprints, and ownership metadata |
 | `check_results` | deterministic and judged evidence |
 | `provider_exchanges` | endpoint request and response refs |

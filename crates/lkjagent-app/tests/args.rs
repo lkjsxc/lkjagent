@@ -42,6 +42,18 @@ fn parser_accepts_diagnostic_commands() -> TestResult<()> {
             rebuild: true
         }
     );
+    assert_eq!(
+        parse(["workspace", "plan-rebalance", "--json"])?.command,
+        Command::WorkspacePlanRebalance { json: true }
+    );
+    assert_eq!(
+        parse(["workspace", "apply-rebalance"])?.command,
+        Command::WorkspaceApplyRebalance { json: false }
+    );
+    assert_eq!(
+        parse(["workspace", "validate"])?.command,
+        Command::WorkspaceValidate { json: false }
+    );
     Ok(())
 }
 
