@@ -1,0 +1,11 @@
+daemon: working
+task: 1 Open Generic budget 2/200
+step: 1/2 Explore attempt 2/3
+last: none
+question: none
+queue: 0 pending
+tokens: task in=1521 out=634 cached=unknown
+lease: active owner=pid:546344 heartbeat=unix:1783328171.444079033Z
+state: active=2 conflicts=0
+decision: case-1-decision-0003 model.call/1001 status=pending ctx=fnv1a64:990ac705 tools=fnv1a64:d60ff133
+admissions: 0 observations: 0 exchanges: 2 artifacts: 0

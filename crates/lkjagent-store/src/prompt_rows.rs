@@ -1,5 +1,6 @@
 use lkjagent_core::render::Prompt;
 use lkjagent_core::runtime_decision::RuntimeDecision;
+use lkjagent_core::runtime_prompt_kernel::PromptCardPlan;
 use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
@@ -40,6 +41,34 @@ pub fn insert_prompt_frame(
             created_at,
         ],
     )?;
+    Ok(())
+}
+
+pub fn insert_prompt_cards(
+    conn: &Connection,
+    decision: &RuntimeDecision,
+    plan: &PromptCardPlan,
+    created_at: &str,
+) -> StoreResult<()> {
+    for card in &plan.cards {
+        conn.execute(
+            "INSERT OR REPLACE INTO prompt_cards
+             (id, case_id, decision_id, card_id, kind, reason,
+              fingerprint, plan_fingerprint, created_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+            params![
+                format!("{}-{}", decision.id, card.id),
+                &decision.case_id,
+                &decision.id,
+                &card.id,
+                &card.kind,
+                &card.reason,
+                &card.fingerprint,
+                &plan.fingerprint,
+                created_at,
+            ],
+        )?;
+    }
     Ok(())
 }
 

@@ -1,0 +1,1 @@
+ok proof collect artifact=./tmp/live-runs/20260706T085235Z-profile-smokes/field-spec-kernel/proof/summary.md

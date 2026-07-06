@@ -1,0 +1,11 @@
+daemon: idle
+task: none
+step: none
+last: none
+question: none
+queue: 0 pending
+tokens: task in=2926 out=1177 cached=unknown
+lease: active owner=pid:546344 heartbeat=unix:1783328263.850552476Z
+state: active=1 conflicts=0
+decision: case-1-decision-0007 completion.close status=settled ctx=fnv1a64:990ac705 tools=fnv1a64:b4e036f2
+admissions: 0 observations: 0 exchanges: 6 artifacts: 0

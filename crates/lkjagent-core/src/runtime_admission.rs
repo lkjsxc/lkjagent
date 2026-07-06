@@ -3,7 +3,7 @@ use std::path::{Component, Path};
 
 use serde::{Deserialize, Serialize};
 
-use crate::runtime_decision::{OutputEnvelope, RuntimeDecision};
+use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolValueClass};
 use crate::runtime_fingerprint::FingerprintError;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -60,16 +60,14 @@ fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<
         }
     }
     for (name, value) in &action.params {
-        if !entry.accepts_param(name) {
+        let Some(spec) = entry.field_spec(name) else {
             return Some(format!("unknown parameter {name}"));
-        }
+        };
         if placeholder_value(value) {
             return Some(format!("placeholder value for {name}"));
         }
-    }
-    if let Some(path) = action.params.get("path") {
-        if !workspace_relative_path(path) {
-            return Some("path escapes workspace".to_string());
+        if let Some(reason) = value_class_rejection(name, value, spec.value_class) {
+            return Some(reason);
         }
     }
     None
@@ -88,6 +86,18 @@ fn placeholder_value(value: &str) -> bool {
 
 fn wrapped_placeholder(value: &str, open: char, close: char) -> bool {
     value.starts_with(open) && value.ends_with(close) && value.len() > 2
+}
+
+fn value_class_rejection(name: &str, value: &str, class: ToolValueClass) -> Option<String> {
+    match class {
+        ToolValueClass::WorkspacePath if !workspace_relative_path(value) => {
+            Some("path escapes workspace".to_string())
+        }
+        ToolValueClass::Count if value.parse::<u64>().is_err() => {
+            Some(format!("invalid count for {name}"))
+        }
+        _ => None,
+    }
 }
 
 pub fn workspace_relative_path(path: &str) -> bool {

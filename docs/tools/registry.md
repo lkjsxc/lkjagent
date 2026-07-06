@@ -16,7 +16,8 @@ Each descriptor stores:
 
 - stable tool name;
 - one-line purpose;
-- input fields with type, required flag, and limits;
+- input fields as `ToolFieldSpec` values with name, required flag, value class,
+  and limits;
 - observation contract and output bound;
 - effect boundary;
 - workspace path requirements;
@@ -24,6 +25,13 @@ Each descriptor stores:
 - state affordance predicates;
 - safety notes; and
 - denial diagnostics for status, not prompt text.
+
+## Field Value Classes
+
+The catalog assigns each field a value class before rendering a `ToolSetView`.
+Current classes are text, workspace path, shell command, count, and query.
+Admission uses the same field spec to reject placeholder values, path escapes,
+and non-numeric count values before effects.
 
 ## Prompt Form
 

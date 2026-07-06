@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use lkjagent_core::runtime_admission::{admit_action, AdmissionStatus, ModelAction};
 use lkjagent_core::runtime_decision::{
-    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
+    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolValueClass, ToolViewEntry,
 };
 
 #[test]
@@ -30,9 +30,48 @@ fn rejects_placeholder_values_before_effects() -> Result<(), String> {
     Ok(())
 }
 
+#[test]
+fn tool_field_specs_drive_value_class_admission() -> Result<(), String> {
+    let decision = RuntimeDecision::new(
+        "decision-1",
+        "case-1",
+        OperationKey("model.call".to_string()),
+        ToolSetView::new(vec![
+            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], vec!["count"])
+        ]),
+        OutputEnvelope::Action,
+    );
+    let entry = decision.tool_view.entry("fs.read").ok_or("missing tool")?;
+    assert_eq!(
+        entry.field_spec("path").map(|spec| spec.value_class),
+        Some(ToolValueClass::WorkspacePath)
+    );
+    assert_eq!(
+        entry.field_spec("count").map(|spec| spec.value_class),
+        Some(ToolValueClass::Count)
+    );
+
+    let bad = admit_action(
+        &decision,
+        &action_params("fs.read", vec![("path", "README.md"), ("count", "many")]),
+    )
+    .map_err(|error| error.message)?;
+
+    assert_eq!(bad.status, AdmissionStatus::Rejected);
+    assert_eq!(bad.reason, "invalid count for count");
+    Ok(())
+}
+
 fn action(tool: &str, field: &str, value: &str) -> ModelAction {
+    action_params(tool, vec![(field, value)])
+}
+
+fn action_params(tool: &str, params: Vec<(&str, &str)>) -> ModelAction {
     ModelAction {
         tool: tool.to_string(),
-        params: BTreeMap::from([(field.to_string(), value.to_string())]),
+        params: params
+            .into_iter()
+            .map(|(field, value)| (field.to_string(), value.to_string()))
+            .collect::<BTreeMap<_, _>>(),
     }
 }

@@ -1,0 +1,11 @@
+daemon: idle
+task: none
+step: none
+last: none
+question: none
+queue: 1 pending
+tokens: unknown
+lease: active owner=pid:546344 heartbeat=unix:1783328112.017942713Z
+state: active=0 conflicts=0
+decision: none
+admissions: 0 observations: 0 exchanges: 0 artifacts: 0

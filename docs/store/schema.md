@@ -25,11 +25,12 @@ runtime reads only state rows. Required tables:
 | `state_history` | audit of applied state patches |
 | `runtime_decisions` | persisted `RuntimeDecision` authority rows |
 | `prompt_frames` | prompt metadata, fingerprints, and bounded body refs |
+| `prompt_cards` | prompt-kernel card reasons and section fingerprints |
 | `tool_admissions` | parsed action, result, and view fingerprint |
 | `observations` | bounded tool or effect output tied to decisions |
 | `context_items` | source-tagged prompt candidates |
 | `context_edges` | provenance, suppression, and conflict links between context items |
-| `state_edges` | generic relation evidence between state, records, artifacts, checks, and messages |
+| `state_edges` | generic relation evidence between state, records, artifacts, and checks |
 | `workspace_records` | current record metadata and fingerprints for owner-readable files |
 | `workspace_record_history` | record fingerprint history for staleness checks |
 | `artifacts` | files, roots, fingerprints, and ownership metadata |

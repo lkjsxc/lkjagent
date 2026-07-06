@@ -20,6 +20,7 @@ pub const APPLICATION_TABLES: &[&str] = &[
     "state_history",
     "runtime_decisions",
     "prompt_frames",
+    "prompt_cards",
     "tool_admissions",
     "observations",
     "context_items",

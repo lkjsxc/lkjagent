@@ -10,8 +10,8 @@ decision.
 `ToolSetView` is produced from the catalog, policy layers, and active state
 vector. It contains only tools admissible for the current decision. Each entry
 renders the tool name, purpose, exact XML `<tool_call>` shape, required fields,
-optional fields, value rules, relevant limits, and one concise example when
-budget allows.
+optional fields, `ToolFieldSpec` value classes, value rules, relevant limits,
+and one concise example when budget allows.
 
 ## View Fingerprint
 
@@ -30,8 +30,9 @@ the decision view, not absent from a hidden global list.
 ## Admission
 
 Admission validates the parsed tool call against the same view fingerprint and
-then runs final deterministic checks such as placeholder rejection, path
-canonicalization, budget remaining, state suppressors, and recovery constraints.
+then runs final deterministic checks such as placeholder rejection, value-class
+validation, path canonicalization, budget remaining, state suppressors, and
+recovery constraints.
 A prompt/admission mismatch is a high-severity runtime event.
 
 ## Fault Handling

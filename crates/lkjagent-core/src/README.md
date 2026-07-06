@@ -17,6 +17,8 @@ Map lkjagent-core source modules.
   tool-set views.
 - [runtime-operation.rs](runtime_operation.rs): selected runtime operation
   payload.
+- [runtime-prompt-kernel.rs](runtime_prompt_kernel.rs): structured prompt card
+  plan and fingerprints.
 - [runtime-candidate.rs](runtime_candidate.rs): selector candidate generation,
   scoring, and edge blocking.
 - [runtime-selector.rs](runtime_selector.rs): pure state-vector decision

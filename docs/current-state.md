@@ -121,14 +121,13 @@ records, prompt frames, admissions, observations, exchanges, artifacts, and
 context. Status, doctor, and workspace report row-backed lease, schema, table,
 endpoint, workspace, record, artifact, and proof counts. Watch and workbench
 print bounded status, trace, and proof rows; workbench also accepts owner input.
-Prompt frames point to bounded body refs and every decision envelopes render
-protocol cards. Generic record CLI adds, lists, shows,
+Prompt frames point to bounded body refs and persist queryable prompt card rows;
+every decision envelope renders protocol cards. Generic record CLI adds, lists, shows,
 links, and archives Markdown records under `workspace/records` with fingerprint
 rows but not turn authority; `today` through `dev` wrappers reuse that path and
 project workspace state cells for todo, calendar, routine, index, proof, dev, and
 project families. `workspace --rebuild` writes derived indexes and artifact rows.
 Xtask writes decision-backed protocol matrix ledgers.
-
 ## State-Ledger Parity
 
 The checkout satisfies the executable state-ledger bridge contract in this
@@ -151,14 +150,15 @@ turn interpreter follows the persisted decision operation and settlement
 suppresses the operation cell.
 
 Prompt rendering, parsing, and admission use the persisted decision envelope and
-explore `ToolSetView`. Tool descriptors are catalog-backed for prompt, parser,
+explore `ToolSetView`. Tool field specs are catalog-backed for prompt, parser,
 admission, and explore effect selection. Prompt-frame rows own replayable bounded
-body refs.
+body refs plus structured prompt card rows and fingerprints.
 
 Prompt context has durable context items, conflict cards, contamination and stale
 exclusions, contradiction edges, and prompt-frame context plans with included and
 excluded ids plus reasons. Parse faults, endpoint errors, effect errors, shell
-observations, and secret-like bodies classify contamination durably before prompt admission.
+observations, and secret-like bodies classify contamination durably before prompt
+admission.
 
 Artifact units, deterministic assembly, fresh fingerprint checks, and artifact
 rows are wired into write effects. Manuscript chapter prompts ask for bounded
@@ -187,7 +187,7 @@ Checked-in `tmp/` logs are historical proof or failure fixtures unless rerun her
 
 ## Next Executable Step
 
-Run Docker verification and bounded prompt-card or live trials when evidence is available.
+Run longer story proof trials when endpoint budget is available.
 
 ## Honesty Rules
 

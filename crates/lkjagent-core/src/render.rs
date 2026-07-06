@@ -151,8 +151,8 @@ fn render_tool_view(view: &ToolSetView) -> String {
             let required = entry.required_params.join(",");
             let optional = entry.optional_params.join(",");
             format!(
-                "- {}: {} required={required} optional={optional}",
-                entry.name, entry.purpose
+                "- {}: {} required={required} optional={optional} fields={:?}",
+                entry.name, entry.purpose, entry.field_specs
             )
         })
         .collect::<Vec<_>>()

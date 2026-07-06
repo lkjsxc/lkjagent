@@ -30,6 +30,13 @@ fn prompt_frame_body_ref_replays_rendered_prompt() -> TestResult<()> {
     let json: serde_json::Value = serde_json::from_str(&body)?;
     assert_eq!(json["decision_id"], frames[0].decision_id);
     assert_eq!(json["prompt_fingerprint"], frames[0].prompt_fingerprint);
+    assert_eq!(json["prompt_profile"], "kernel-v1");
+    assert_eq!(json["context_profile"], "clean-context-v1");
+    assert_eq!(json["card_plan"]["cards"][0]["kind"], "kernel");
+    assert!(json["card_plan"]["fingerprint"]
+        .as_str()
+        .unwrap_or_default()
+        .starts_with("fnv1a64:"));
     assert_eq!(
         json["context_plan"]["included"][0]["item_id"],
         "case-1-objective"
@@ -62,6 +69,12 @@ fn prompt_frame_body_ref_replays_rendered_prompt() -> TestResult<()> {
         .unwrap_or_default()
         .contains("Expected"));
     assert!(json["user"].as_str().unwrap_or_default().contains("Plan:"));
+    let cards: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM prompt_cards WHERE decision_id = ?1",
+        [&frames[0].decision_id],
+        |row| row.get(0),
+    )?;
+    assert_eq!(cards, 8);
     Ok(())
 }
 

@@ -7,7 +7,6 @@ use lkjagent_core::runtime_admission::{admit_action, AdmissionStatus, ModelActio
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
 };
-
 pub fn run(args: &[String], root: &Path) -> i32 {
     match parse(args, root).and_then(run_protocol) {
         Ok(path) => {
@@ -22,9 +21,9 @@ pub fn run(args: &[String], root: &Path) -> i32 {
         }
     }
 }
-
 fn parse(args: &[String], root: &Path) -> Result<Options, String> {
     let mut out = root.join("tmp/protocol-experiment-current.md");
+    let mut profile = "baseline".to_string();
     let mut index = if args.first().is_some_and(|arg| arg == "protocol") {
         1
     } else {
@@ -36,12 +35,15 @@ fn parse(args: &[String], root: &Path) -> Result<Options, String> {
                 out = path_arg(args, index + 1, root)?;
                 index += 2;
             }
+            "--profile" => {
+                profile = args.get(index + 1).ok_or("--profile needs a name")?.clone();
+                index += 2;
+            }
             other => return Err(format!("unknown experiment argument: {other}")),
         }
     }
-    Ok(Options { out })
+    Ok(Options { out, profile })
 }
-
 fn run_protocol(options: Options) -> Result<PathBuf, String> {
     if let Some(parent) = options.out.parent() {
         fs::create_dir_all(parent).map_err(|error| error.to_string())?;
@@ -52,8 +54,8 @@ fn run_protocol(options: Options) -> Result<PathBuf, String> {
         .map_err(|error| error.message)?;
     let mut lines = vec!["# Protocol Experiment Results".to_string(), String::new()];
     lines.push(format!(
-        "decision={} envelope={:?} tool_fp={} stop=</tool_call>",
-        decision.id, decision.expected_envelope, tool_fp
+        "profile={} decision={} envelope={:?} tool_fp={} stop=</tool_call>",
+        options.profile, decision.id, decision.expected_envelope, tool_fp
     ));
     for case in cases() {
         lines.push(run_case(&decision, &case)?);
@@ -64,7 +66,6 @@ fn run_protocol(options: Options) -> Result<PathBuf, String> {
     fs::write(&options.out, lines.join("\n")).map_err(|error| error.to_string())?;
     Ok(options.out)
 }
-
 fn decision() -> RuntimeDecision {
     RuntimeDecision::new(
         "experiment-decision",
@@ -194,4 +195,5 @@ fn path_arg(args: &[String], index: usize, root: &Path) -> Result<PathBuf, Strin
 
 struct Options {
     out: PathBuf,
+    profile: String,
 }

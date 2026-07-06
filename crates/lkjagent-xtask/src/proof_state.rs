@@ -1,12 +1,11 @@
+use rusqlite::Connection;
 use std::fs;
 use std::path::Path;
-
-use rusqlite::Connection;
-
 pub fn write_state_bundle(conn: &Connection, out_dir: &Path) -> Result<(), String> {
     write(out_dir, "state-vector.md", &state_cells(conn)?)?;
     write(out_dir, "decisions.md", &decisions(conn)?)?;
     write(out_dir, "prompt-frames.md", &prompt_frames(conn)?)?;
+    write(out_dir, "prompt-cards.md", &prompt_cards(conn)?)?;
     write(
         out_dir,
         "admissions.md",
@@ -18,7 +17,6 @@ pub fn write_state_bundle(conn: &Connection, out_dir: &Path) -> Result<(), Strin
     write(out_dir, "context.md", &context(conn)?)?;
     write(out_dir, "context-edges.md", &context_edges(conn)?)
 }
-
 fn state_cells(conn: &Connection) -> Result<String, String> {
     rows(
         conn,
@@ -35,7 +33,6 @@ fn state_cells(conn: &Connection) -> Result<String, String> {
         },
     )
 }
-
 fn decisions(conn: &Connection) -> Result<String, String> {
     rows(
         conn,
@@ -53,7 +50,6 @@ fn decisions(conn: &Connection) -> Result<String, String> {
         },
     )
 }
-
 fn observations(conn: &Connection) -> Result<String, String> {
     rows(
         conn,
@@ -69,7 +65,6 @@ fn observations(conn: &Connection) -> Result<String, String> {
         },
     )
 }
-
 fn prompt_frames(conn: &Connection) -> Result<String, String> {
     rows(
         conn,
@@ -85,7 +80,21 @@ fn prompt_frames(conn: &Connection) -> Result<String, String> {
         },
     )
 }
-
+fn prompt_cards(conn: &Connection) -> Result<String, String> {
+    rows(
+        conn,
+        "Prompt Cards",
+        "SELECT decision_id, kind, fingerprint FROM prompt_cards ORDER BY id",
+        |row| {
+            Ok(format!(
+                "- decision={} kind={} fp={}",
+                row.get::<_, String>(0)?,
+                row.get::<_, String>(1)?,
+                row.get::<_, String>(2)?
+            ))
+        },
+    )
+}
 fn exchanges(conn: &Connection) -> Result<String, String> {
     rows(
         conn,
@@ -101,7 +110,6 @@ fn exchanges(conn: &Connection) -> Result<String, String> {
         },
     )
 }
-
 fn artifacts(conn: &Connection) -> Result<String, String> {
     rows(
         conn,
@@ -118,7 +126,6 @@ fn artifacts(conn: &Connection) -> Result<String, String> {
         },
     )
 }
-
 fn context(conn: &Connection) -> Result<String, String> {
     rows(
         conn,
@@ -136,7 +143,6 @@ fn context(conn: &Connection) -> Result<String, String> {
         },
     )
 }
-
 fn context_edges(conn: &Connection) -> Result<String, String> {
     rows(
         conn,
@@ -155,19 +161,27 @@ fn context_edges(conn: &Connection) -> Result<String, String> {
 }
 
 fn count_doc(conn: &Connection, table: &str) -> Result<String, String> {
-    let count: i64 = conn
-        .query_row(&format!("SELECT COUNT(*) FROM {table}"), [], |row| {
-            row.get(0)
-        })
-        .map_err(|error| error.to_string())?;
-    Ok(format!("# {table}\n\ncount={count}\n"))
+    let sql = format!("SELECT COUNT(*) FROM {table}");
+    let count = conn.query_row(&sql, [], |row| row.get::<_, i64>(0));
+    match count {
+        Ok(count) => Ok(format!("# {table}\n\ncount={count}\n")),
+        Err(error) if error.to_string().contains("no such table") => {
+            Ok(format!("# {table}\n\ncount=0\n"))
+        }
+        Err(error) => Err(error.to_string()),
+    }
 }
-
 fn rows<F>(conn: &Connection, title: &str, sql: &str, render: F) -> Result<String, String>
 where
     F: Fn(&rusqlite::Row<'_>) -> rusqlite::Result<String>,
 {
-    let mut statement = conn.prepare(sql).map_err(|error| error.to_string())?;
+    let mut statement = match conn.prepare(sql) {
+        Ok(statement) => statement,
+        Err(error) if error.to_string().contains("no such table") => {
+            return Ok(format!("# {title}\n\nnone"))
+        }
+        Err(error) => return Err(error.to_string()),
+    };
     let mapped = statement
         .query_map([], render)
         .map_err(|error| error.to_string())?;
@@ -180,7 +194,6 @@ where
     }
     Ok(lines.join("\n"))
 }
-
 fn write(dir: &Path, name: &str, body: &str) -> Result<(), String> {
     fs::write(dir.join(name), body).map_err(|error| error.to_string())
 }

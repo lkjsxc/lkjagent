@@ -21,11 +21,15 @@ experiment records, but the record file alone does not choose turns.
 
 ## Runner
 
-`cargo run -p lkjagent-xtask -- experiment protocol --out tmp/protocol-experiment-current.md`
-writes a deterministic `RuntimeDecision`-backed matrix. Rows record the decision
-id, expected envelope, tool-view fingerprint, stop tag, parse result, optional
-admission result, and pass or fail status. Covered cases include valid tool
-calls, old action envelopes, missing or duplicate fields, unknown tools,
+```sh
+cargo run -p lkjagent-xtask -- experiment protocol \
+  --profile NAME --out tmp/protocol-experiment-current.md
+```
+
+This writes a deterministic `RuntimeDecision`-backed matrix. Rows record the profile,
+decision id, expected envelope, tool-view fingerprint, stop tag, parse result,
+optional admission result, and pass or fail status. Covered cases include valid
+tool calls, old action envelopes, missing or duplicate fields, unknown tools,
 `tool_name` ordering, placeholder values, prose outside the block, unclosed or
 empty blocks, and workspace path escapes. It does not call the endpoint.
 

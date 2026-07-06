@@ -1,0 +1,26 @@
+# Prompt Cards
+
+- decision=case-1-decision-0001 kind=conflicts fp=fnv1a64:3fd4879390932716
+- decision=case-1-decision-0001 kind=facts fp=fnv1a64:2590d5cc893c2572
+- decision=case-1-decision-0001 kind=kernel fp=fnv1a64:37e2068ff8ffe61b
+- decision=case-1-decision-0001 kind=objective fp=fnv1a64:fe138df621bd4b6e
+- decision=case-1-decision-0001 kind=output fp=fnv1a64:61a6ad1c3582ed5b
+- decision=case-1-decision-0001 kind=recovery fp=fnv1a64:a463d38e24d213cf
+- decision=case-1-decision-0001 kind=state fp=fnv1a64:3940a8c17e923a55
+- decision=case-1-decision-0001 kind=tools fp=fnv1a64:605d20706f4ae3ba
+- decision=case-1-decision-0002 kind=conflicts fp=fnv1a64:3fd4879390932716
+- decision=case-1-decision-0002 kind=facts fp=fnv1a64:1dceaccc8518e039
+- decision=case-1-decision-0002 kind=kernel fp=fnv1a64:4fd0ad31aa3d11b2
+- decision=case-1-decision-0002 kind=objective fp=fnv1a64:fe138df621bd4b6e
+- decision=case-1-decision-0002 kind=output fp=fnv1a64:61a6ad1c3582ed5b
+- decision=case-1-decision-0002 kind=recovery fp=fnv1a64:a463d38e24d213cf
+- decision=case-1-decision-0002 kind=state fp=fnv1a64:d1ae69e22d87ea91
+- decision=case-1-decision-0002 kind=tools fp=fnv1a64:605d20706f4ae3ba
+- decision=case-1-decision-0003 kind=conflicts fp=fnv1a64:3fd4879390932716
+- decision=case-1-decision-0003 kind=facts fp=fnv1a64:36f123cc931742ac
+- decision=case-1-decision-0003 kind=kernel fp=fnv1a64:ecc011a0b9aced8d
+- decision=case-1-decision-0003 kind=objective fp=fnv1a64:fe138df621bd4b6e
+- decision=case-1-decision-0003 kind=output fp=fnv1a64:61a6ad1c3582ed5b
+- decision=case-1-decision-0003 kind=recovery fp=fnv1a64:a463d38e24d213cf
+- decision=case-1-decision-0003 kind=state fp=fnv1a64:c320a9e98dc1db01
+- decision=case-1-decision-0003 kind=tools fp=fnv1a64:605d20706f4ae3ba

@@ -9,6 +9,7 @@ pub const STATE_LEDGER_TABLES: &[&str] = &[
     "state_history",
     "runtime_decisions",
     "prompt_frames",
+    "prompt_cards",
     "tool_admissions",
     "observations",
     "context_items",
@@ -19,7 +20,6 @@ pub const STATE_LEDGER_TABLES: &[&str] = &[
     "artifacts",
     "provider_exchanges",
 ];
-
 pub fn setup(conn: &Connection) -> StoreResult<()> {
     conn.execute_batch(
         "
@@ -99,13 +99,15 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
     conn.execute_batch(
         "
         CREATE TABLE IF NOT EXISTS prompt_frames (
-            id TEXT PRIMARY KEY,
-            case_id TEXT NOT NULL,
-            decision_id TEXT NOT NULL,
-            prompt_fingerprint TEXT NOT NULL,
-            context_frame_fingerprint TEXT NOT NULL,
-            tool_view_fingerprint TEXT NOT NULL,
-            body_ref TEXT NOT NULL,
+            id TEXT PRIMARY KEY, case_id TEXT NOT NULL, decision_id TEXT NOT NULL,
+            prompt_fingerprint TEXT NOT NULL, context_frame_fingerprint TEXT NOT NULL,
+            tool_view_fingerprint TEXT NOT NULL, body_ref TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS prompt_cards (
+            id TEXT PRIMARY KEY, case_id TEXT NOT NULL, decision_id TEXT NOT NULL,
+            card_id TEXT NOT NULL, kind TEXT NOT NULL, reason TEXT NOT NULL,
+            fingerprint TEXT NOT NULL, plan_fingerprint TEXT NOT NULL,
             created_at TEXT NOT NULL
         );
         CREATE TABLE IF NOT EXISTS tool_admissions (

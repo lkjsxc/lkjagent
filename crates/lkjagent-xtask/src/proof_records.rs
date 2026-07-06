@@ -12,7 +12,11 @@ pub fn write_record_selector_bundle(conn: &Connection, out_dir: &Path) -> Result
 }
 
 fn record_rows(conn: &Connection) -> Result<String, String> {
-    let rows = records(conn, None, true).map_err(|error| error.to_string())?;
+    let rows = match records(conn, None, true) {
+        Ok(rows) => rows,
+        Err(error) if error.to_string().contains("no such table") => Vec::new(),
+        Err(error) => return Err(error.to_string()),
+    };
     let mut lines = vec!["# Workspace Records".to_string(), String::new()];
     for row in rows {
         lines.push(format!(
@@ -52,9 +56,11 @@ fn selector_rows(conn: &Connection) -> Result<String, String> {
 }
 
 fn case_ids(conn: &Connection) -> Result<Vec<String>, String> {
-    let mut statement = conn
-        .prepare("SELECT id FROM cases ORDER BY id")
-        .map_err(|error| error.to_string())?;
+    let mut statement = match conn.prepare("SELECT id FROM cases ORDER BY id") {
+        Ok(statement) => statement,
+        Err(error) if error.to_string().contains("no such table") => return Ok(Vec::new()),
+        Err(error) => return Err(error.to_string()),
+    };
     let rows = statement
         .query_map([], |row| row.get::<_, String>(0))
         .map_err(|error| error.to_string())?;
