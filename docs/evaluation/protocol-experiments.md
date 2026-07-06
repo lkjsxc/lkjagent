@@ -24,20 +24,26 @@ experiment records, but the record file alone does not choose turns.
 ```sh
 cargo run -p lkjagent-xtask -- experiment protocol \
   --profile NAME --out tmp/protocol-experiment-current.md
+cargo run -p lkjagent-xtask -- experiment protocol \
+  --all --out-dir tmp/protocol-experiments/<stamp>
 ```
 
-This writes a deterministic `RuntimeDecision`-backed matrix. Rows record the profile,
-decision id, expected envelope, tool-view fingerprint, stop tag, parse result,
-optional admission result, and pass or fail status. Covered cases include valid
-tool calls, safe filled examples, old action envelopes, missing or duplicate
-fields, unknown tools, `tool_name` ordering, placeholder values, invalid counts,
-prose outside the block, unclosed or empty blocks, and workspace path escapes. It
-does not call the endpoint. Current `--profile` values are labels until a later
-slice wires profile-specific renderer or parser behavior.
+The single-profile form writes one deterministic `RuntimeDecision`-backed
+matrix. The `--all` form writes baseline, protocol-safe, and context-kernel
+records plus an `adoption.md` summary. Rows record the profile, declared feature
+set, decision id, expected envelope, tool-view fingerprint, stop tag, parse
+result, optional admission result, and pass or fail status. Covered cases include
+valid tool calls, safe filled examples, old action envelopes, missing or
+duplicate fields, unknown tools, `tool_name` ordering, placeholder values,
+invalid counts, prose outside the block, unclosed or empty blocks, and workspace
+path escapes. It does not call the endpoint. Profile records are evidence labels
+until code explicitly wires profile-specific renderer, parser, or admission
+behavior.
 
 ## Trial Rule
 
-Try combinations, not isolated tweaks, and keep rejected ideas. A profile is
+Try combinations, not isolated tweaks, and keep rejected ideas. The first
+required deterministic set is baseline plus two combinations. A profile is
 adopted only when docs, parser, prompt renderer, fixtures, proof, and focused
 tests agree. Live endpoint trials store raw commands and summaries under
 `tmp/live-runs/<stamp>/` without secrets.

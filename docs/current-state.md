@@ -127,7 +127,8 @@ shows, links, and archives Markdown records under `workspace/records` with
 fingerprint rows but not turn authority. Wrappers are today, journal, todo,
 calendar, finance, project, and dev; generic record kinds project index, todo,
 calendar, finance, routine, proof, dev, and project state cells. `workspace --rebuild`
-writes derived indexes and artifact rows. Xtask writes decision-backed protocol matrix ledgers.
+writes derived indexes and artifact rows. Xtask writes single-profile and
+three-profile protocol ledgers.
 ## State-Ledger Parity
 
 The checkout satisfies the executable state-ledger bridge contract in this
@@ -140,8 +141,7 @@ templates and checks still use task and step records. The daemon mirrors that
 body into `case:snapshot` state cells, hydrates runnable snapshots from state
 before plan rows, and uses plan-family rows as durable task-body storage. Plan
 rows seed operation projection events only when no active operation cell exists.
-Once projected, state cells and persisted `RuntimeDecision` rows control turn
-execution.
+Once projected, state cells and persisted `RuntimeDecision` rows control turn execution.
 
 Runtime selection reads operation-specific state cells projected through durable
 events. Context conflict cells, owner resolution cells, recovery report cells,

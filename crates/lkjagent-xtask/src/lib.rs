@@ -8,6 +8,8 @@ pub mod doc_special;
 pub mod doc_topology;
 pub mod docs;
 pub mod experiment;
+pub mod experiment_cases;
+pub mod experiment_protocol;
 pub mod facts;
 pub mod file_counts;
 pub mod gate;

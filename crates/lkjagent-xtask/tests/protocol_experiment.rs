@@ -37,3 +37,34 @@ fn protocol_experiment_writes_decision_backed_matrix() -> TestResult<()> {
     assert!(!text.contains("result=fail"));
     Ok(())
 }
+
+#[test]
+fn protocol_experiment_writes_three_profile_set() -> TestResult<()> {
+    let root = std::env::current_dir()?;
+    let out = std::env::temp_dir().join(format!("lkjagent-protocol-{}-all", std::process::id()));
+    if out.exists() {
+        fs::remove_dir_all(&out)?;
+    }
+
+    let code = run(
+        &[
+            "experiment".to_string(),
+            "protocol".to_string(),
+            "--all".to_string(),
+            "--out-dir".to_string(),
+            out.to_string_lossy().to_string(),
+        ],
+        &root,
+    );
+
+    assert_eq!(code, 0);
+    for name in ["baseline", "protocol-safe", "context-kernel"] {
+        let text = fs::read_to_string(out.join(format!("{name}.md")))?;
+        assert!(text.contains(&format!("profile={name}")));
+        assert!(text.contains("result=pass"));
+        assert!(!text.contains("result=fail"));
+    }
+    let adoption = fs::read_to_string(out.join("adoption.md"))?;
+    assert!(adoption.contains("result=defer-default"));
+    Ok(())
+}
