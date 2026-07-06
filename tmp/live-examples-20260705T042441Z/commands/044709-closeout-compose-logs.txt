@@ -1,2 +1,0 @@
-COMMAND: compose logs --no-color --timestamps agent
-EXIT=0

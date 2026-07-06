@@ -1,3 +1,0 @@
-NAME                            IMAGE                         COMMAND                  SERVICE   CREATED          STATUS                    PORTS
-lkjlive20260705102438-agent-1   lkjlive20260705102438-agent   "/usr/local/bin/lkja…"   agent     20 minutes ago   Up 20 minutes (healthy)
-exit:0

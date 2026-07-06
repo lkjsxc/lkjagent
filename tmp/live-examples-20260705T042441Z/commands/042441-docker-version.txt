@@ -1,3 +1,0 @@
-COMMAND: docker --version
-Docker version 29.5.3, build d1c06ef
-EXIT=0

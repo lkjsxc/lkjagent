@@ -1,3 +1,0 @@
-COMMAND: docker compose version
-Docker Compose version v5.1.4
-EXIT=0

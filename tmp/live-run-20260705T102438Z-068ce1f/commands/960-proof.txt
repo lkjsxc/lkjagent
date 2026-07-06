@@ -1,2 +1,0 @@
-ok proof collect artifact=./tmp/live-run-20260705T102438Z-068ce1f/proof/summary.md
-exit:0

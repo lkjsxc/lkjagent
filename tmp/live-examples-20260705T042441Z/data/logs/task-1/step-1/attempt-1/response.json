@@ -1,1 +1,0 @@
-{"anomaly":null,"cache_metrics":[],"closure_mode":"StopSequenceClosed","content":"<action>fs.tree(depth=2)</action>","finish_reason":"Stop","usage":{"cached_tokens":null,"completion_tokens":13,"prompt_tokens":339}}

@@ -1,8 +1,0 @@
-COMMAND: compose down
- Container lkjtrial20260705042441-agent-1 Stopping
- Container lkjtrial20260705042441-agent-1 Stopped
- Container lkjtrial20260705042441-agent-1 Removing
- Container lkjtrial20260705042441-agent-1 Removed
- Network lkjtrial20260705042441_default Removing
- Network lkjtrial20260705042441_default Removed
-EXIT=0
