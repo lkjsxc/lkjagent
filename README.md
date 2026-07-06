@@ -34,8 +34,9 @@ cargo run -p lkjagent-xtask -- proof collect --data data --out tmp/proof-current
 docker compose run --rm verify
 ```
 
-Some commands are still implementation gaps. [docs/current-state.md](docs/current-state.md)
-is the ledger for what is implemented now and what remains open.
+The commands above are the current app and xtask surfaces.
+[docs/current-state.md](docs/current-state.md) is the behavior and evidence
+ledger; proof collection remains an xtask developer command.
 
 ## Read Order
 

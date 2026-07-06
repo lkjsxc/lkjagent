@@ -28,17 +28,16 @@ authority. Focused resume tests prove that config snapshots are ignored when
 rows are absent and that normalized task and step rows win over stale config.
 The daemon claims a heartbeat config-row lease, uses an injected clock seam for
 durable timestamps, hydrates open and waiting tasks from normalized rows,
-commits turn state through rows, and records waiting answers as rows before
-continuing.
+commits turn state through rows, and records waiting answers as rows before continuing.
 
 The parser rejects explore `<finish>` and `<ask>` envelopes, leading or trailing
 prose, old `<action>` envelopes, missing `<tool_name>`, duplicate or unknown
-tool-call fields, and unknown tools from the fixed explore registry. Prompt
-rendering exposes `<tool_call>` with a copyable output skeleton and the active
-`ToolSetView`; internal `Action` domain names remain. Prompt rendering includes
-the bounded task brief. Endpoint errors use the documented ten-failure patience
-before blocking a step, and endpoint clients default to a loose finite
-900-second timeout unless configured.
+tool-call fields, and unknown tools absent from the persisted decision
+`ToolSetView`. Prompt rendering exposes a copyable tool-call shape whose
+placeholders parse but admission rejects them until replaced; internal `Action`
+domain names remain. Prompt rendering includes the bounded task brief. Endpoint
+errors use the documented ten-failure patience before blocking a step, and
+endpoint clients default to a loose finite 900-second timeout unless configured.
 
 Queue rows persist `force_new`, send uses it, and daemon intake can select a
 forced-new row without treating it as an answer. Status, task, queue, bounded
@@ -122,11 +121,12 @@ context. Status, doctor, and workspace report row-backed lease, schema, table,
 endpoint, workspace, record, artifact, and proof counts. Watch and workbench
 print bounded status, trace, and proof rows; workbench also accepts owner input.
 Prompt frames point to bounded body refs and persist queryable prompt card rows;
-every decision envelope renders protocol cards. Generic record CLI adds, lists, shows,
-links, and archives Markdown records under `workspace/records` with fingerprint
-rows but not turn authority; `today` through `dev` wrappers reuse that path and
-project workspace state cells for todo, calendar, routine, index, proof, dev, and
-project families. `workspace --rebuild` writes derived indexes and artifact rows.
+every decision envelope renders protocol cards. Generic record CLI adds, lists,
+shows, links, and archives Markdown records under `workspace/records` with
+fingerprint rows but not turn authority. Wrappers are today, journal, todo,
+calendar, finance, project, and dev; generic record kinds project index, todo,
+calendar, routine, proof, dev, and project state cells. `workspace --rebuild`
+writes derived indexes and artifact rows.
 Xtask writes decision-backed protocol matrix ledgers.
 ## State-Ledger Parity
 
