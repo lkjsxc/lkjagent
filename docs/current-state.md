@@ -119,7 +119,7 @@ records, prompt frames, admissions, observations, exchanges, artifacts, checks,
 and context. Status, doctor, and workspace report row-backed lease, schema, table,
 endpoint, workspace, record, artifact, and proof counts. Watch and workbench
 print bounded status, trace, and proof rows; workbench accepts owner input and
-supports explicit append or pane rendering modes.
+supports explicit append or pane modes with pane scroll commands.
 Prompt frames point to bounded body refs and persist queryable prompt card rows
 with context inclusion and exclusion reasons; every decision envelope renders
 protocol cards. Generic record CLI adds, lists,

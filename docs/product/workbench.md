@@ -36,7 +36,9 @@ Owner input must remain available while progress refreshes. Plain text enqueues
 an owner message. Slash commands reuse the console handlers for `/status`,
 `/watch`, `/log`, `/queue`, `/task`, `/send TEXT`, `/new TEXT`, and `/quit`.
 `/mode append` and `/mode pane` switch render modes without touching daemon
-state. The loop opens short store operations per input or refresh.
+state. `/scroll up`, `/scroll down`, `/scroll top`, `/page up`, and `/page down`
+move pane scroll state only. The loop opens short store operations per input or
+refresh.
 
 ## Authority Limits
 

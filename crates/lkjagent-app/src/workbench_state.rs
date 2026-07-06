@@ -49,6 +49,7 @@ pub enum UiEvent {
     Refresh(String),
     Mode(WorkbenchMode),
     Scroll(isize),
+    Top,
     Resize { width: u16, height: u16 },
 }
 
@@ -63,6 +64,9 @@ pub fn reduce(mut state: UiState, event: UiEvent) -> UiState {
         }
         UiEvent::Scroll(delta) => {
             state.scroll = scroll(state.scroll, delta);
+        }
+        UiEvent::Top => {
+            state.scroll = 0;
         }
         UiEvent::Resize { width, height } => {
             state.width = width.max(40);
@@ -91,10 +95,11 @@ mod tests {
         let state = reduce(state, UiEvent::Mode(WorkbenchMode::Pane));
         let state = reduce(state, UiEvent::Scroll(4));
         let state = reduce(state, UiEvent::Scroll(-1));
+        let state = reduce(state, UiEvent::Top);
 
         assert_eq!(state.mode, WorkbenchMode::Pane);
         assert_eq!(state.refreshes, 1);
-        assert_eq!(state.scroll, 3);
+        assert_eq!(state.scroll, 0);
         assert_eq!(state.latest, "body");
     }
 }

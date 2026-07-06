@@ -85,12 +85,15 @@ fn handle_line<W>(
 where
     W: Write,
 {
-    if let Some(mode) = parse_mode_command(line)? {
-        *state = reduce(state.clone(), UiEvent::Mode(mode));
-        writeln!(output, "workbench: mode={}", mode.as_str())
-            .and_then(|_| writeln!(output, "{}", crate::workbench_render::render(state)))
-            .and_then(|_| output.flush())
-            .map_err(|error| error.to_string())?;
+    if let Some(command) = crate::workbench_commands::parse(line)? {
+        let message = crate::workbench_commands::apply(state, command);
+        writeln!(
+            output,
+            "{message}\n{}",
+            crate::workbench_render::render(state)
+        )
+        .and_then(|_| output.flush())
+        .map_err(|error| error.to_string())?;
         return Ok(false);
     }
     let reply = crate::console::handle_line(conn, line, &crate::clock::utc_now())?;
@@ -99,18 +102,6 @@ where
         output.flush().map_err(|error| error.to_string())?;
     }
     Ok(reply.quit)
-}
-
-fn parse_mode_command(line: &str) -> Result<Option<WorkbenchMode>, String> {
-    let trimmed = line.trim();
-    let Some(rest) = trimmed.strip_prefix("/mode") else {
-        return Ok(None);
-    };
-    let value = rest.trim();
-    if value.is_empty() {
-        return Err("/mode requires append or pane".to_string());
-    }
-    WorkbenchMode::parse(value).map(Some)
 }
 
 #[cfg(test)]
@@ -172,6 +163,7 @@ mod tests {
         setup(&conn)?;
         let (sender, receiver) = mpsc::channel();
         sender.send("/mode pane".to_string())?;
+        sender.send("/scroll down".to_string())?;
         sender.send("/quit".to_string())?;
         drop(sender);
         let mut output = Vec::new();
@@ -186,6 +178,7 @@ mod tests {
 
         let text = String::from_utf8(output)?;
         assert!(text.contains("workbench: mode=pane"));
+        assert!(text.contains("workbench: scroll=1"));
         assert!(text.contains("== workbench pane refresh"));
         Ok(())
     }

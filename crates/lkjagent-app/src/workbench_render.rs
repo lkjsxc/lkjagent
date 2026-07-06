@@ -20,12 +20,13 @@ fn render_append(state: &UiState) -> String {
 
 fn render_pane(state: &UiState) -> String {
     let sections = split_sections(&state.latest);
-    let left = sections
+    let transcript = sections
         .iter()
         .filter(|(name, _)| *name != "status")
         .map(|(name, body)| format!("[{}]\n{}", name, body.trim()))
         .collect::<Vec<_>>()
         .join("\n\n");
+    let left = window(&transcript, state.scroll, 18);
     let right = sections
         .iter()
         .find(|(name, _)| *name == "status")
@@ -55,6 +56,14 @@ fn split_sections(body: &str) -> Vec<(String, String)> {
     sections
 }
 
+fn window(text: &str, scroll: usize, height: usize) -> String {
+    let lines = text.lines().skip(scroll).take(height).collect::<Vec<_>>();
+    if lines.is_empty() {
+        return "[end of pane]".to_string();
+    }
+    lines.join("\n")
+}
+
 fn section_name(line: &str) -> Option<String> {
     line.strip_prefix("== ")
         .and_then(|rest| rest.strip_suffix(" =="))
@@ -80,14 +89,15 @@ mod tests {
     fn pane_renderer_groups_status_and_transcript() {
         let mut state = UiState::new(WorkbenchMode::Pane);
         state.refreshes = 2;
-        state.scroll = 5;
-        state.latest = "== status ==\ndaemon: idle\n== recent events ==\nnone".to_string();
+        state.scroll = 1;
+        state.latest = "== status ==\ndaemon: idle\n== recent events ==\none\ntwo".to_string();
 
         let text = render(&state);
 
-        assert!(text.contains("== workbench pane refresh 2 scroll=5 =="));
+        assert!(text.contains("== workbench pane refresh 2 scroll=1 =="));
         assert!(text.contains("+-- transcript --+"));
-        assert!(text.contains("[recent events]"));
+        assert!(text.contains("two"));
+        assert!(!text.contains("[recent events]"));
         assert!(text.contains("daemon: idle"));
     }
 }
