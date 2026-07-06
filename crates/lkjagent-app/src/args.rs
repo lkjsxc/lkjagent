@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use crate::arg_helpers::{
     no_args, parse_context, parse_json_flag, parse_log, parse_memory, parse_queue, parse_task,
 };
+use crate::workbench_state::WorkbenchMode;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Invocation {
@@ -20,7 +21,9 @@ pub enum Command {
     },
     Status,
     Console,
-    Workbench,
+    Workbench {
+        mode: WorkbenchMode,
+    },
     Doctor {
         json: bool,
     },
@@ -106,7 +109,7 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
         "send" => parse_send(rest),
         "status" => no_args(rest, Command::Status),
         "console" => no_args(rest, Command::Console),
-        "workbench" => no_args(rest, Command::Workbench),
+        "workbench" => parse_workbench(rest),
         "doctor" => parse_json_flag(command, rest).map(|json| Command::Doctor { json }),
         "workspace" => crate::arg_helpers::parse_workspace(rest),
         "log" => parse_log(rest),
@@ -117,6 +120,21 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
         "memory" => parse_memory(rest),
         "watch" => no_args(rest, Command::Watch),
         other => Err(format!("unknown command: {other}")),
+    }
+}
+
+fn parse_workbench(rest: Vec<String>) -> Result<Command, String> {
+    match rest.as_slice() {
+        [] => Ok(Command::Workbench {
+            mode: WorkbenchMode::Append,
+        }),
+        [flag, value] if flag == "--mode" => Ok(Command::Workbench {
+            mode: WorkbenchMode::parse(value)?,
+        }),
+        [flag] if flag == "--pane" => Ok(Command::Workbench {
+            mode: WorkbenchMode::Pane,
+        }),
+        _ => Err("workbench accepts --mode append|pane".to_string()),
     }
 }
 

@@ -12,7 +12,7 @@ Define the owner command surface and output discipline.
 | `lkjagent send TEXT [--new]` | enqueue an owner message and print its queue id |
 | `lkjagent status` | print daemon, task, step, budgets, queue, and tokens |
 | `lkjagent console` | read owner input and `/help` in normal scrollback while the daemon keeps working |
-| `lkjagent workbench` | show a refreshing normal-screen progress view while accepting owner input |
+| `lkjagent workbench [--mode append|pane]` | show a refreshing progress view while accepting owner input |
 | `lkjagent log [--limit N] [--follow]` | print bounded transcript events, then optionally stream new rows |
 | `lkjagent task list` | list tasks with state and summary |
 | `lkjagent task show ID` | show plan, diagnoses, checks, and exchange refs |

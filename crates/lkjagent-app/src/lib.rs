@@ -40,4 +40,6 @@ mod task_view;
 mod turn_effects;
 mod watch_view;
 pub mod workbench;
+mod workbench_render;
+pub mod workbench_state;
 mod workspace_index;

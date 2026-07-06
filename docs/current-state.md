@@ -118,7 +118,8 @@ collection writes state-ledger sections for cells, decisions, candidates,
 records, prompt frames, admissions, observations, exchanges, artifacts, checks,
 and context. Status, doctor, and workspace report row-backed lease, schema, table,
 endpoint, workspace, record, artifact, and proof counts. Watch and workbench
-print bounded status, trace, and proof rows; workbench also accepts owner input.
+print bounded status, trace, and proof rows; workbench accepts owner input and
+supports explicit append or pane rendering modes.
 Prompt frames point to bounded body refs and persist queryable prompt card rows
 with context inclusion and exclusion reasons; every decision envelope renders
 protocol cards. Generic record CLI adds, lists,
@@ -126,8 +127,7 @@ shows, links, and archives Markdown records under `workspace/records` with
 fingerprint rows but not turn authority. Wrappers are today, journal, todo,
 calendar, finance, project, and dev; generic record kinds project index, todo,
 calendar, finance, routine, proof, dev, and project state cells. `workspace --rebuild`
-writes derived indexes and artifact rows.
-Xtask writes decision-backed protocol matrix ledgers.
+writes derived indexes and artifact rows. Xtask writes decision-backed protocol matrix ledgers.
 ## State-Ledger Parity
 
 The checkout satisfies the executable state-ledger bridge contract in this

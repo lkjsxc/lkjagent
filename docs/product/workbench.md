@@ -7,14 +7,22 @@ controller.
 
 ## Command
 
-`lkjagent workbench` attaches to the configured data directory. It does not start
-or stop the daemon. The Docker entrypoint routes the command the same way it
-routes `status`, `console`, and `watch`.
+`lkjagent workbench [--mode append|pane]` attaches to the configured data
+directory. It does not start or stop the daemon. The Docker entrypoint routes the
+command the same way it routes `status`, `console`, and `watch`.
 
-## Layout
+## Modes
 
-The first useful implementation is a normal-screen loop, not an alternate-screen
-full-screen application. Each refresh prints bounded sections:
+`append` is the default safest mode. It prints immutable refresh cards to the
+primary screen. Plain terminal scrollback, tmux copy mode, and saved command
+output remain usable.
+
+`pane` is an explicit framed primary-screen renderer. It groups the same durable
+rows into transcript, right-rail, and input-hint panes without raw terminal mode
+or alternate-screen ownership. A later raw terminal pane may use terminal
+features only after docs and tests make that mode explicit.
+
+Each refresh includes bounded sections:
 
 - status fields from `lkjagent status`;
 - recent durable events;
@@ -22,15 +30,13 @@ full-screen application. Each refresh prints bounded sections:
 - active decision, prompt, context, tool-view, and proof counts when present;
 - a prompt hint for owner input.
 
-Plain terminal scrollback, tmux copy mode, and saved command output remain
-usable.
-
 ## Input
 
 Owner input must remain available while progress refreshes. Plain text enqueues
 an owner message. Slash commands reuse the console handlers for `/status`,
 `/watch`, `/log`, `/queue`, `/task`, `/send TEXT`, `/new TEXT`, and `/quit`.
-The loop opens short store operations per input or refresh.
+`/mode append` and `/mode pane` switch render modes without touching daemon
+state. The loop opens short store operations per input or refresh.
 
 ## Authority Limits
 
@@ -40,7 +46,8 @@ context-resolution, record, or other row-backed command paths.
 
 ## Evidence
 
-Tests should cover parser routing, line handling, closed-input exit, and bounded
-rendering. Interactive behavior is proven by captured command logs under
+Tests should cover parser routing, reducer mode changes, line handling,
+closed-input exit, pane scroll state, and bounded rendering. Interactive behavior
+is proven by captured command logs under
 `tmp/agent-runs/` or `tmp/live-runs/`, with unavailable terminals recorded as an
 honest skip.

@@ -4,7 +4,9 @@ use std::time::Duration;
 
 use rusqlite::Connection;
 
-pub fn run(conn: &Connection) -> Result<String, String> {
+use crate::workbench_state::{reduce, UiEvent, UiState, WorkbenchMode};
+
+pub fn run(conn: &Connection, mode: WorkbenchMode) -> Result<String, String> {
     let (sender, receiver) = mpsc::channel();
     std::thread::spawn(move || {
         let stdin = std::io::stdin();
@@ -15,7 +17,7 @@ pub fn run(conn: &Connection) -> Result<String, String> {
         }
     });
     let mut stdout = std::io::stdout();
-    run_with_input(conn, receiver, &mut stdout, Duration::from_secs(2))?;
+    run_with_input(conn, receiver, &mut stdout, mode, Duration::from_secs(2))?;
     Ok(String::new())
 }
 
@@ -23,27 +25,27 @@ pub fn run_with_input<W>(
     conn: &Connection,
     input: Receiver<String>,
     output: &mut W,
+    mode: WorkbenchMode,
     refresh_every: Duration,
 ) -> Result<(), String>
 where
     W: Write,
 {
+    let mut state = UiState::new(mode);
     writeln!(
         output,
-        "lkjagent workbench: type text, /status, /watch, /log, /quit"
+        "lkjagent workbench: type text, /mode append, /mode pane, /quit"
     )
     .map_err(|error| error.to_string())?;
     loop {
-        writeln!(output, "{}", render_once(conn)?)
-            .and_then(|_| output.flush())
-            .map_err(|error| error.to_string())?;
+        state = refresh(conn, state, output)?;
         match input.recv_timeout(refresh_every) {
             Ok(line) => {
-                if handle_line(conn, output, &line)? {
+                if handle_line(conn, output, &mut state, &line)? {
                     break;
                 }
                 while let Ok(next) = input.try_recv() {
-                    if handle_line(conn, output, &next)? {
+                    if handle_line(conn, output, &mut state, &next)? {
                         return Ok(());
                     }
                 }
@@ -55,23 +57,60 @@ where
     Ok(())
 }
 
-pub fn render_once(conn: &Connection) -> Result<String, String> {
-    Ok(format!(
-        "== workbench refresh ==\n{}\ninput: plain text enqueues; /quit exits workbench",
-        crate::inspect::watch(conn)?
-    ))
+pub fn render_once(conn: &Connection, mode: WorkbenchMode) -> Result<String, String> {
+    let state = reduce(
+        UiState::new(mode),
+        UiEvent::Refresh(crate::inspect::watch(conn)?),
+    );
+    Ok(crate::workbench_render::render(&state))
 }
 
-fn handle_line<W>(conn: &Connection, output: &mut W, line: &str) -> Result<bool, String>
+fn refresh<W>(conn: &Connection, state: UiState, output: &mut W) -> Result<UiState, String>
 where
     W: Write,
 {
+    let state = reduce(state, UiEvent::Refresh(crate::inspect::watch(conn)?));
+    writeln!(output, "{}", crate::workbench_render::render(&state))
+        .and_then(|_| output.flush())
+        .map_err(|error| error.to_string())?;
+    Ok(state)
+}
+
+fn handle_line<W>(
+    conn: &Connection,
+    output: &mut W,
+    state: &mut UiState,
+    line: &str,
+) -> Result<bool, String>
+where
+    W: Write,
+{
+    if let Some(mode) = parse_mode_command(line)? {
+        *state = reduce(state.clone(), UiEvent::Mode(mode));
+        writeln!(output, "workbench: mode={}", mode.as_str())
+            .and_then(|_| writeln!(output, "{}", crate::workbench_render::render(state)))
+            .and_then(|_| output.flush())
+            .map_err(|error| error.to_string())?;
+        return Ok(false);
+    }
     let reply = crate::console::handle_line(conn, line, &crate::clock::utc_now())?;
     if !reply.output.is_empty() {
         writeln!(output, "{}", reply.output).map_err(|error| error.to_string())?;
         output.flush().map_err(|error| error.to_string())?;
     }
     Ok(reply.quit)
+}
+
+fn parse_mode_command(line: &str) -> Result<Option<WorkbenchMode>, String> {
+    let trimmed = line.trim();
+    let Some(rest) = trimmed.strip_prefix("/mode") else {
+        return Ok(None);
+    };
+    let value = rest.trim();
+    if value.is_empty() {
+        return Err("/mode requires append or pane".to_string());
+    }
+    WorkbenchMode::parse(value).map(Some)
 }
 
 #[cfg(test)]
@@ -88,11 +127,17 @@ mod tests {
         drop(sender);
         let mut output = Vec::new();
 
-        run_with_input(&conn, receiver, &mut output, Duration::from_millis(1))?;
+        run_with_input(
+            &conn,
+            receiver,
+            &mut output,
+            WorkbenchMode::Append,
+            Duration::from_millis(1),
+        )?;
 
         let text = String::from_utf8(output)?;
         assert!(text.contains("lkjagent workbench"));
-        assert!(text.contains("== workbench refresh =="));
+        assert!(text.contains("== workbench refresh"));
         assert!(text.contains("== status =="));
         Ok(())
     }
@@ -107,11 +152,41 @@ mod tests {
         drop(sender);
         let mut output = Vec::new();
 
-        run_with_input(&conn, receiver, &mut output, Duration::from_millis(1))?;
+        run_with_input(
+            &conn,
+            receiver,
+            &mut output,
+            WorkbenchMode::Append,
+            Duration::from_millis(1),
+        )?;
 
         let text = String::from_utf8(output)?;
         assert!(text.contains("queue: 1 new=false"));
         assert!(text.contains("console: bye"));
+        Ok(())
+    }
+
+    #[test]
+    fn mode_command_switches_to_pane_renderer() -> Result<(), Box<dyn std::error::Error>> {
+        let conn = Connection::open_in_memory()?;
+        setup(&conn)?;
+        let (sender, receiver) = mpsc::channel();
+        sender.send("/mode pane".to_string())?;
+        sender.send("/quit".to_string())?;
+        drop(sender);
+        let mut output = Vec::new();
+
+        run_with_input(
+            &conn,
+            receiver,
+            &mut output,
+            WorkbenchMode::Append,
+            Duration::from_millis(1),
+        )?;
+
+        let text = String::from_utf8(output)?;
+        assert!(text.contains("workbench: mode=pane"));
+        assert!(text.contains("== workbench pane refresh"));
         Ok(())
     }
 }

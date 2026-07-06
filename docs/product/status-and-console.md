@@ -76,9 +76,10 @@ from the store.
 ## Workbench
 
 `workbench` repeatedly renders the same bounded view while keeping owner input
-available. It is normal-screen output, reuses console slash-command handlers,
-and exits without stopping the daemon. It does not own decisions, completion, or
-private state.
+available. Append mode is normal-screen output. Pane mode is an explicit framed
+primary-screen renderer, not an alternate-screen owner. Both reuse console
+slash-command handlers and exit without stopping the daemon. They do not own
+decisions, completion, or private state.
 
 ## Proof Visibility
 

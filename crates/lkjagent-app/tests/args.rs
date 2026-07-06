@@ -1,11 +1,23 @@
 use lkjagent_app::args::{parse, Command};
+use lkjagent_app::workbench_state::WorkbenchMode;
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
 fn parser_accepts_console_command() -> TestResult<()> {
     assert_eq!(parse(["console"])?.command, Command::Console);
-    assert_eq!(parse(["workbench"])?.command, Command::Workbench);
+    assert_eq!(
+        parse(["workbench"])?.command,
+        Command::Workbench {
+            mode: WorkbenchMode::Append
+        }
+    );
+    assert_eq!(
+        parse(["workbench", "--mode", "pane"])?.command,
+        Command::Workbench {
+            mode: WorkbenchMode::Pane
+        }
+    );
     Ok(())
 }
 
