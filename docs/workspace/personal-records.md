@@ -20,7 +20,7 @@ Known personal `kind` values include:
 ## State Links
 
 Records may create state keys such as `todo:open/<id>`, `calendar:due/<id>`,
-`finance:review/<month>`, or `routine:ready/<id>`. These keys inform selector
+`finance:review/<id>`, or `routine:ready/<id>`. These keys inform selector
 candidates, but a turn still executes only after one `RuntimeDecision` is
 persisted.
 

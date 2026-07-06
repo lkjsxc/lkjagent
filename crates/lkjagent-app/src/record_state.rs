@@ -157,6 +157,7 @@ fn selector_tier(label: &str) -> u8 {
         Some("proof") => 39,
         Some("dev") => 40,
         Some("project") => 41,
+        Some("finance") => 42,
         _ => 80,
     }
 }

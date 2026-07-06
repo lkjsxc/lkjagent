@@ -29,9 +29,14 @@ fn record_round_trips_unknown_kind_and_lists() -> TestResult<()> {
 #[test]
 fn record_families_emit_state_keys() -> TestResult<()> {
     assert_eq!(default_state_for_kind("project"), "active");
+    assert_eq!(default_state_for_kind("finance"), "review");
     assert_eq!(
         state_keys_for_record("todo", "rec_1", "open"),
         vec!["index:stale/records", "todo:open/rec_1"]
+    );
+    assert_eq!(
+        state_keys_for_record("finance", "rec_3", "review"),
+        vec!["index:stale/records", "finance:review/rec_3"]
     );
     assert_eq!(
         state_keys_for_record("development", "rec_2", "open"),

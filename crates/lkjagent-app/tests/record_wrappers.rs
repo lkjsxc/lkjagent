@@ -56,6 +56,16 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
     ])?;
     assert!(dev.contains("path=records/development/"));
     assert!(state_labels(&conn)?.contains(&"dev:repo-task/".to_string()));
+
+    let finance = cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "finance",
+        "Pay",
+        "bill",
+    ])?;
+    assert!(finance.contains("path=records/finance/"));
+    assert!(state_labels(&conn)?.contains(&"finance:review/".to_string()));
     Ok(())
 }
 

@@ -40,6 +40,7 @@ impl WorkspaceRecord {
 pub fn default_state_for_kind(kind: &str) -> &'static str {
     match kind {
         "calendar" => "due",
+        "finance" => "review",
         "routine" => "ready",
         "project" => "active",
         "proof" => "collect",
@@ -52,6 +53,7 @@ pub fn state_keys_for_record(kind: &str, id: &str, state: &str) -> Vec<String> {
     match kind {
         "todo" => keys.push(format!("todo:{state}/{id}")),
         "calendar" => keys.push(format!("calendar:{state}/{id}")),
+        "finance" => keys.push(format!("finance:{state}/{id}")),
         "routine" => keys.push(format!("routine:{state}/{id}")),
         "project" => keys.push(format!("project:{state}/{id}")),
         "development" => keys.push(format!("dev:repo-task/{id}")),

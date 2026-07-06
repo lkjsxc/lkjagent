@@ -7,6 +7,7 @@ pub(crate) fn operation(namespace: &str) -> Option<(&'static str, u8, &'static s
         "proof" => Some(("proof.collect", 39, "proof")),
         "dev" => Some(("dev.review", 40, "dev")),
         "project" => Some(("project.advance", 41, "project")),
+        "finance" => Some(("finance.review", 42, "finance")),
         _ => None,
     }
 }

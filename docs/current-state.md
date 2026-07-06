@@ -125,7 +125,7 @@ every decision envelope renders protocol cards. Generic record CLI adds, lists,
 shows, links, and archives Markdown records under `workspace/records` with
 fingerprint rows but not turn authority. Wrappers are today, journal, todo,
 calendar, finance, project, and dev; generic record kinds project index, todo,
-calendar, routine, proof, dev, and project state cells. `workspace --rebuild`
+calendar, finance, routine, proof, dev, and project state cells. `workspace --rebuild`
 writes derived indexes and artifact rows.
 Xtask writes decision-backed protocol matrix ledgers.
 ## State-Ledger Parity

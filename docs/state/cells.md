@@ -13,8 +13,8 @@ StateKey = namespace + ":" + name
 ```
 
 Suggested namespaces include `case`, `plan`, `tool`, `context`, `artifact`,
-`recovery`, `completion`, `todo`, `calendar`, `routine`, `index`, `proof`,
-`dev`, and `project`. Names may contain scoped suffixes such as
+`recovery`, `completion`, `todo`, `calendar`, `finance`, `routine`, `index`,
+`proof`, `dev`, and `project`. Names may contain scoped suffixes such as
 `context:conflict/target-root` when the semantic key matters.
 
 ## Cell Fields
@@ -48,6 +48,7 @@ Record-backed helpers use data keys, not private tables:
 ```text
 todo:open/<id>
 calendar:due/<id>
+finance:review/<id>
 routine:ready/<id>
 index:stale/<name>
 proof:collect/<run>
