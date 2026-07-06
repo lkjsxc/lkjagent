@@ -42,12 +42,12 @@ before blocking a step, and endpoint clients default to a loose finite
 
 Queue rows persist `force_new`, send uses it, and daemon intake can select a
 forced-new row without treating it as an answer. Status, task, queue, bounded
-log, follow log, memory, watch, and console read rows instead of config. Console
-output now flushes prompt and replies directly. The bounded explore dispatcher
-runs the filesystem, shell, memory, plan-note, and finish actions, stores observations, persists
-`memory.save` rows, suppresses exact duplicate memory facts, mirrors memory into
-FTS, admits bounded row-backed memory facts into new task briefs, and resolves
-`memory.find` from durable rows.
+log, follow log, memory, watch, and console read rows instead of config; console
+flushes prompt and replies directly and exposes local `/help`. The bounded
+explore dispatcher runs filesystem, shell, memory, plan-note, and finish actions,
+stores observations, persists `memory.save` rows, suppresses exact duplicate
+memory facts, mirrors memory into FTS, admits bounded row-backed memory facts
+into new task briefs, and resolves `memory.find` from durable rows.
 
 Plan-authored write steps carry `words=N` into deterministic `min_words` checks.
 Endpoint calls produce exchange files and structured completion records with

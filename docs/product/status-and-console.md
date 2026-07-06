@@ -52,10 +52,11 @@ bodies; exchange refs point to the files.
 `lkjagent console` is a normal-screen command loop. It never switches to an
 alternate screen, so ordinary terminal scrollback, tmux copy mode, and screen
 scrollback continue to work. Plain text lines enqueue owner messages. Slash
-commands read rows or enqueue intent: `/status`, `/watch`, `/log`, `/queue`,
-`/task`, `/send TEXT`, `/new TEXT`, and `/quit`. The console opens short store
-operations per line and owns no daemon state. Exiting it does not stop the
-daemon.
+commands read rows, enqueue intent, or print local help: `/help`, `/status`,
+`/watch`, `/log`, `/queue`, `/task`, `/send TEXT`, `/new TEXT`, and `/quit`.
+The console flushes its banner and every non-empty reply before reading the next
+line. It opens short store operations per line and owns no daemon state. Exiting
+it does not stop the daemon.
 
 ## Watch Console
 

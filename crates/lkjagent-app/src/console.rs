@@ -8,6 +8,9 @@ pub struct ConsoleReply {
     pub quit: bool,
 }
 
+const BANNER: &str = "lkjagent console: type text to send, /help for commands, /quit to exit";
+const HELP: &str = "lkjagent console commands: text | /help | /status | /watch | /log | /queue | /task | /send TEXT | /new TEXT | /quit";
+
 pub fn run(conn: &Connection) -> Result<String, String> {
     let stdin = std::io::stdin();
     let mut stdout = std::io::stdout();
@@ -20,11 +23,7 @@ where
     R: BufRead,
     W: Write,
 {
-    writeln!(
-        output,
-        "lkjagent console: type text to send, /status, /watch, /new TEXT, /quit"
-    )
-    .map_err(|error| error.to_string())?;
+    writeln!(output, "{BANNER}").map_err(|error| error.to_string())?;
     output.flush().map_err(|error| error.to_string())?;
     for line in input.lines() {
         let line = line.map_err(|error| error.to_string())?;
@@ -47,6 +46,7 @@ pub fn handle_line(conn: &Connection, line: &str, now: &str) -> Result<ConsoleRe
     }
     match command(trimmed) {
         Some(("/quit", _)) | Some(("/exit", _)) => reply("console: bye", true),
+        Some(("/help", _)) => reply(HELP, false),
         Some(("/status", _)) => reply(crate::status::status(conn)?, false),
         Some(("/watch", _)) => reply(crate::inspect::watch(conn)?, false),
         Some(("/log", _)) => reply(crate::inspect::log(conn, 20)?, false),
@@ -106,18 +106,36 @@ mod tests {
 
         run_with_io(&conn, input, &mut output)?;
 
+        let flush_points = output.flush_points.clone();
         let text = String::from_utf8(output.bytes)?;
-        assert!(text.starts_with("lkjagent console:"));
-        assert!(text.contains("queue: 1 new=false\n"));
+        assert_eq!(flush_points.len(), 3);
+        assert!(text.starts_with(BANNER));
+        assert!(text[..flush_points[0]].contains("/help"));
+        assert!(!text[..flush_points[0]].contains("queue:"));
+        assert!(text[..flush_points[1]].contains("queue: 1 new=false\n"));
+        assert!(!text[..flush_points[1]].contains("console: bye\n"));
+        assert_eq!(flush_points[2], text.len());
         assert!(text.ends_with("console: bye\n"));
-        assert_eq!(output.flushes, 3);
+        Ok(())
+    }
+
+    #[test]
+    fn help_is_local_console_output() -> Result<(), Box<dyn std::error::Error>> {
+        let conn = Connection::open_in_memory()?;
+        setup(&conn)?;
+
+        let reply = handle_line(&conn, "/help", "now")?;
+
+        assert!(!reply.quit);
+        assert!(reply.output.contains("/status"));
+        assert!(reply.output.contains("/send TEXT"));
         Ok(())
     }
 
     #[derive(Default)]
     struct FlushOutput {
         bytes: Vec<u8>,
-        flushes: usize,
+        flush_points: Vec<usize>,
     }
 
     impl Write for FlushOutput {
@@ -127,7 +145,7 @@ mod tests {
         }
 
         fn flush(&mut self) -> std::io::Result<()> {
-            self.flushes += 1;
+            self.flush_points.push(self.bytes.len());
             Ok(())
         }
     }

@@ -41,6 +41,9 @@ fn console_line_handler_routes_owner_input_without_daemon_state() -> TestResult<
     assert!(console::handle_line(&conn, "/new fresh task", "now")?
         .output
         .contains("new=true"));
+    assert!(console::handle_line(&conn, "/help", "now")?
+        .output
+        .contains("/send TEXT"));
     assert!(console::handle_line(&conn, "/quit", "now")?.quit);
     Ok(())
 }
