@@ -18,6 +18,7 @@ Each descriptor stores:
 - one-line purpose;
 - input fields as `ToolFieldSpec` values with name, required flag, value class,
   and limits;
+- safe example parameters when the prompt may show a copyable filled call;
 - observation contract and output bound;
 - effect boundary;
 - workspace path requirements;
@@ -35,13 +36,14 @@ and non-numeric count values before effects.
 
 ## Prompt Form
 
-The runtime renders exact tool-call shapes only for tools in the active
-`ToolSetView`:
+The runtime renders safe filled examples only when the active `ToolSetView`
+carries example parameters. Schema-only shapes are labelled non-copyable and
+remain rejected by admission when placeholders are unchanged:
 
 ```text
 <tool_call>
 <tool_name>fs.read</tool_name>
-<path>data/logs/current-model-run.md</path>
+<path>README.md</path>
 <count>20</count>
 </tool_call>
 ```

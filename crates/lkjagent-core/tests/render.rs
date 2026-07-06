@@ -57,6 +57,7 @@ fn explore_decision_renders_tool_call_contract() {
     assert!(prompt.system.contains("Expected: tool_call"));
     assert!(prompt.system.contains("Return exactly one <tool_call>"));
     assert!(prompt.user.contains("<tool_name>fs.read</tool_name>"));
+    assert!(prompt.user.contains("Schema-only shape, not copyable:"));
     assert!(prompt.user.contains("<path>FIELD_VALUE</path>"));
     assert_eq!(prompt.stop, "</tool_call>");
 }
@@ -79,7 +80,11 @@ fn rendered_placeholder_shape_parses_but_is_rejected() -> Result<(), String> {
         &snapshot.steps[0],
         &decision,
     );
-    let shape = prompt.user.split("Copy this shape:\n").last().unwrap_or("");
+    let shape = prompt
+        .user
+        .split("Schema-only shape, not copyable:\n")
+        .last()
+        .unwrap_or("");
     let parsed =
         parse_expected_for_decision(&decision, shape).map_err(|fault| format!("{fault:?}"))?;
     let ParsedOutput::Action(action) = parsed else {

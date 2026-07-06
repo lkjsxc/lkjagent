@@ -29,9 +29,11 @@ cargo run -p lkjagent-xtask -- experiment protocol \
 This writes a deterministic `RuntimeDecision`-backed matrix. Rows record the profile,
 decision id, expected envelope, tool-view fingerprint, stop tag, parse result,
 optional admission result, and pass or fail status. Covered cases include valid
-tool calls, old action envelopes, missing or duplicate fields, unknown tools,
-`tool_name` ordering, placeholder values, prose outside the block, unclosed or
-empty blocks, and workspace path escapes. It does not call the endpoint.
+tool calls, safe filled examples, old action envelopes, missing or duplicate
+fields, unknown tools, `tool_name` ordering, placeholder values, invalid counts,
+prose outside the block, unclosed or empty blocks, and workspace path escapes. It
+does not call the endpoint. Current `--profile` values are labels until a later
+slice wires profile-specific renderer or parser behavior.
 
 ## Trial Rule
 

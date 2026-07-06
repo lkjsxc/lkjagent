@@ -75,12 +75,11 @@ fn decision() -> RuntimeDecision {
             ToolViewEntry::new("finish", "finish exploration")
                 .with_params(vec!["summary"], Vec::new()),
             ToolViewEntry::new("fs.read", "read workspace file")
-                .with_params(vec!["path"], Vec::new()),
+                .with_params(vec!["path"], vec!["count"]),
         ]),
         OutputEnvelope::Action,
     )
 }
-
 struct ExperimentCase {
     name: &'static str,
     raw: &'static str,
@@ -92,6 +91,8 @@ struct ExperimentCase {
 fn cases() -> Vec<ExperimentCase> {
     vec![
         case("valid-tool-call", "<tool_call><tool_name>finish</tool_name><summary>done</summary></tool_call>", true, None, Some(AdmissionStatus::Admitted)),
+        case("safe-fs-read-example", "<tool_call><tool_name>fs.read</tool_name><path>README.md</path><count>20</count></tool_call>", true, None, Some(AdmissionStatus::Admitted)),
+        case("invalid-count", "<tool_call><tool_name>fs.read</tool_name><path>README.md</path><count>many</count></tool_call>", true, None, Some(AdmissionStatus::Rejected)),
         case("old-action-envelope", "<action><tool_name>finish</tool_name><summary>done</summary></action>", false, Some(ParseFault::WrongBlock), None),
         case("missing-tool-name", "<tool_call><summary>done</summary></tool_call>", false, Some(ParseFault::BadParams), None),
         case("unknown-tool", "<tool_call><tool_name>shell.run</tool_name><command>pwd</command></tool_call>", false, Some(ParseFault::UnknownTool), None),

@@ -21,15 +21,17 @@ pub struct ToolDescriptor {
     pub effect: ToolEffect,
     pub required_params: &'static [&'static str],
     pub optional_params: &'static [&'static str],
+    pub example_params: &'static [(&'static str, &'static str)],
 }
 
 const EXPLORE_CATALOG: &[ToolDescriptor] = &[
-    descriptor(
+    descriptor_with_examples(
         "fs.read",
         "read a workspace file",
         ToolEffect::FsRead,
         &["path"],
         &["offset", "count"],
+        &[("path", "README.md"), ("count", "20")],
     ),
     descriptor(
         "fs.list",
@@ -112,10 +114,12 @@ pub fn effect_for_tool(name: &str) -> Option<ToolEffect> {
 }
 
 pub fn descriptor_entry(descriptor: &ToolDescriptor) -> ToolViewEntry {
-    ToolViewEntry::new(descriptor.name, descriptor.purpose).with_params(
-        descriptor.required_params.to_vec(),
-        descriptor.optional_params.to_vec(),
-    )
+    ToolViewEntry::new(descriptor.name, descriptor.purpose)
+        .with_params(
+            descriptor.required_params.to_vec(),
+            descriptor.optional_params.to_vec(),
+        )
+        .with_examples(descriptor.example_params.to_vec())
 }
 
 const fn descriptor(
@@ -125,11 +129,23 @@ const fn descriptor(
     required_params: &'static [&'static str],
     optional_params: &'static [&'static str],
 ) -> ToolDescriptor {
+    descriptor_with_examples(name, purpose, effect, required_params, optional_params, &[])
+}
+
+const fn descriptor_with_examples(
+    name: &'static str,
+    purpose: &'static str,
+    effect: ToolEffect,
+    required_params: &'static [&'static str],
+    optional_params: &'static [&'static str],
+    example_params: &'static [(&'static str, &'static str)],
+) -> ToolDescriptor {
     ToolDescriptor {
         name,
         purpose,
         effect,
         required_params,
         optional_params,
+        example_params,
     }
 }

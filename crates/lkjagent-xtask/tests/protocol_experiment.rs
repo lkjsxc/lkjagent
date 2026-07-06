@@ -30,6 +30,8 @@ fn protocol_experiment_writes_decision_backed_matrix() -> TestResult<()> {
     assert!(text.contains("decision=experiment-decision"));
     assert!(text.contains("tool_fp=fnv1a64:"));
     assert!(text.contains("tool-name-second parse=reject:BadParams"));
+    assert!(text.contains("safe-fs-read-example parse=accept admission=admitted result=pass"));
+    assert!(text.contains("invalid-count parse=accept admission=rejected result=pass"));
     assert!(text.contains("placeholder-path parse=accept admission=rejected result=pass"));
     assert!(text.contains("workspace-escape parse=accept admission=rejected result=pass"));
     assert!(!text.contains("result=fail"));

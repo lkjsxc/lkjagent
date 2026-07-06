@@ -32,6 +32,14 @@ the current `ToolSetView` exposes them:
 </tool_call>
 ```
 
+## Tool Call Cards
+
+A tool-call prompt card may show a safe filled example or a schema-only shape. A
+safe filled example is copyable only when the same `RuntimeDecision` can parse
+and admit it. A schema-only shape is labelled non-copyable; unchanged placeholder
+values such as `FIELD_VALUE` must parse to a known admission rejection before any
+effect runs.
+
 ## Ask Semantics
 
 An ask decision expects `<message>...</message>`. Accepting that message records

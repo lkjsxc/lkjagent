@@ -33,9 +33,9 @@ commits turn state through rows, and records waiting answers as rows before cont
 The parser rejects explore `<finish>` and `<ask>` envelopes, leading or trailing
 prose, old `<action>` envelopes, missing `<tool_name>`, duplicate or unknown
 tool-call fields, and unknown tools absent from the persisted decision
-`ToolSetView`. Prompt rendering exposes a copyable tool-call shape whose
-placeholders parse but admission rejects them until replaced; internal `Action`
-domain names remain. Prompt rendering includes the bounded task brief. Endpoint
+`ToolSetView`. Prompt rendering labels safe filled tool examples separately from
+schema-only placeholders, which parse but admission rejects unchanged; internal
+`Action` domain names remain. Prompt rendering includes the bounded task brief. Endpoint
 errors use the documented ten-failure patience before blocking a step, and
 endpoint clients default to a loose finite 900-second timeout unless configured.
 
