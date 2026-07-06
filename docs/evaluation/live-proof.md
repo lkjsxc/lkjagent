@@ -25,10 +25,17 @@ small checked units, deterministic assembly, fresh artifact checks, status logs,
 and a proof bundle. If the endpoint or checks block before ten hours, capture the
 blocked state honestly instead of restarting silently.
 
+## Bounded Trial Capture
+
+Before long proofs, run bounded trials of about 15 minutes when an endpoint is
+available. Store command output, prompts, summaries, proof bundles, and rejected
+ideas under `tmp/live-runs/<stamp>/`. Commit only evidence that is useful and
+free of secrets.
+
 ## Command Shape
 
 The operator starts the daemon, sends the Aurora Ledger or recursive story
-objective, watches status until terminal state or the ten-hour proof window ends,
+objective, watches status until terminal state or the bounded proof window ends,
 then runs proof collection. Endpoint credentials come from the environment and
 are never committed.
 

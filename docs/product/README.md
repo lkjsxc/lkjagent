@@ -12,3 +12,4 @@ CLI commands, status, and console surfaces.
 - [queue.md](queue.md): owner message intake, answer routing, and FIFO order.
 - [status-and-console.md](status-and-console.md): status fields, task display,
   log output, proof visibility, and watch layout.
+- [workbench.md](workbench.md): normal-screen progress view with owner input.

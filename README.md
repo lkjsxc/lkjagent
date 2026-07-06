@@ -29,6 +29,8 @@ cargo run -p lkjagent-app -- status
 cargo run -p lkjagent-app -- task list
 cargo run -p lkjagent-app -- log --limit 20
 cargo run -p lkjagent-app -- watch
+cargo run -p lkjagent-app -- workbench
+cargo run -p lkjagent-xtask -- proof collect --data data --out tmp/proof-current
 docker compose run --rm verify
 ```
 

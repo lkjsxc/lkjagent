@@ -43,9 +43,11 @@ emit an ask block unless the decision selected that grammar.
 No prose may appear outside the envelope. Tags have no attributes. The body may
 not be empty. A `<tool_call>` starts with one `<tool_name>` whose value appears
 in the selected tool view. Other field names inside `<tool_call>` must be unique
-and legal for that tool. Unknown tools and unknown fields are faults relative to
-the persisted decision. JSON and implicit envelopes are not part of the
-protocol.
+and legal for that tool. Required fields follow in deterministic order.
+Placeholder values such as `...`, `PATH`, `TODO`, `<path>`, or `[path]` are not
+executable and are rejected before effects. Unknown tools and unknown fields are
+faults relative to the persisted decision. JSON and implicit envelopes are not
+part of the protocol.
 
 ## Examples
 
@@ -62,6 +64,11 @@ Invalid write fault `wrong_block`:
 ```text
 <message>The vault opened.</message>
 ```
+
+## Repair Cards
+
+A retry prompt names the decision id, expected block, bounded fault, allowed tool,
+and required shape. It never quotes the full failed body into normal context.
 
 ## Failure This Prevents
 

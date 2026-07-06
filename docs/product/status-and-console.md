@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the status output, case display, event log, watch console, and proof
+Define the status output, case display, event log, console, workbench, and proof
 visibility that make daemon progress observable.
 
 ## Status Shape
@@ -59,7 +59,7 @@ daemon.
 
 ## Watch Console
 
-`watch` is a bounded terminal snapshot over the same store rows:
+`watch` is a bounded one-shot terminal snapshot over the same store rows:
 
 - status section: the same daemon, queue, token, lease, state, and decision
   lines as `status`;
@@ -72,9 +72,17 @@ daemon.
 The renderer is line-oriented and bounded. It never owns facts that are absent
 from the store.
 
+## Workbench
+
+`workbench` repeatedly renders the same bounded view while keeping owner input
+available. It is normal-screen output, reuses console slash-command handlers,
+and exits without stopping the daemon. It does not own decisions, completion, or
+private state.
+
 ## Proof Visibility
 
-Proof bundles are produced by xtask. A bundle summarizes cases, state cells,
+Proof bundles are produced by xtask, not by the owner CLI. A bundle summarizes
+cases, state cells,
 decisions, prompt frames, tool views, admissions, observations, context
 conflicts, contaminated suppressions, checks, artifact fingerprints, exchanges,
 token usage, workspace trees, and warnings. It does not copy SQLite files or

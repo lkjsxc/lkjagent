@@ -12,6 +12,7 @@ Define the owner command surface and output discipline.
 | `lkjagent send TEXT [--new]` | enqueue an owner message and print its queue id |
 | `lkjagent status` | print daemon, task, step, budgets, queue, and tokens |
 | `lkjagent console` | read owner input in normal scrollback while the daemon keeps working |
+| `lkjagent workbench` | show a refreshing normal-screen progress view while accepting owner input |
 | `lkjagent log [--limit N] [--follow]` | print bounded transcript events, then optionally stream new rows |
 | `lkjagent task list` | list tasks with state and summary |
 | `lkjagent task show ID` | show plan, diagnoses, checks, and exchange refs |
@@ -28,9 +29,7 @@ Define the owner command surface and output discipline.
 | `lkjagent record link ID REF` | add a frontmatter link and refresh fingerprint evidence |
 | `lkjagent record archive ID` | move a record under `records/archive` and hide it from normal list |
 | `lkjagent today, journal, todo, calendar, finance, project, dev` | friendly record-backed wrappers |
-| `lkjagent proof collect [--json]` | collect a bounded proof bundle from rows and refs |
-| `lkjagent proof live --minutes N` | run the bounded live proof path when endpoint evidence is available |
-| `lkjagent help [group]` | print usage |
+| `lkjagent help` | print usage |
 
 ## Output Rules
 
@@ -40,7 +39,13 @@ Define the owner command surface and output discipline.
   line.
 - A failed command prints the command, reason, and next useful action when one
   exists.
-- Quiet gates are owned by xtask, not by the owner CLI.
+- Quiet gates and proof collection are owned by xtask, not by the owner CLI.
+
+## Developer Proof Commands
+
+`cargo run -p lkjagent-xtask -- proof collect --data data --out tmp/proof-current`
+collects a bounded proof bundle. Live proof orchestration also stays in xtask
+until it is factored into row-backed owner commands and help output.
 
 ## Log Follow Contract
 
@@ -61,8 +66,8 @@ store directly.
   --follow`.
 - `crates/lkjagent-app/src/inspect.rs` keeps non-follow output deterministic and
   follows events by monotonically increasing row id.
-- CLI tests cover parser shape, console line routing, record commands,
-  row-backed log continuation, and watch sections.
+- CLI tests cover parser shape, console and workbench line routing, record
+  commands, row-backed log continuation, and watch sections.
 
 ## Authority Limits
 

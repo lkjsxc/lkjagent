@@ -15,6 +15,8 @@ runtime state.
   material.
 - [prompt-assembly.md](prompt-assembly.md): prompt regions, budgets, and frame
   fingerprints.
+- [prompt-kernel.md](prompt-kernel.md): ordered prompt cards, profiles, and
+  section fingerprints.
 - [budgets.md](budgets.md): token caps and estimator ownership.
 - [task-brief.md](task-brief.md): rolling summary contract for the current plan
   family.

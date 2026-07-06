@@ -10,7 +10,8 @@ decision.
 `ToolSetView` is produced from the catalog, policy layers, and active state
 vector. It contains only tools admissible for the current decision. Each entry
 renders the tool name, purpose, exact XML `<tool_call>` shape, required fields,
-optional fields, relevant limits, and one concise example when budget allows.
+optional fields, value rules, relevant limits, and one concise example when
+budget allows.
 
 ## View Fingerprint
 
@@ -21,22 +22,24 @@ strings.
 ## Parser
 
 The parser receives the expected envelope and view from the decision. Unknown
-blocks, empty blocks, duplicate parameters, missing required parameters, unknown
-parameters, and tools absent from the view produce structured faults. Unknown
-means absent from the decision view, not absent from a hidden global list.
+blocks, empty blocks, prose outside the block, duplicate parameters,
+`<tool_name>` not first, missing required parameters, unknown parameters, and
+tools absent from the view produce structured faults. Unknown means absent from
+the decision view, not absent from a hidden global list.
 
 ## Admission
 
 Admission validates the parsed tool call against the same view fingerprint and
-then runs final deterministic checks such as path canonicalization, budget
-remaining, state suppressors, and recovery constraints. A prompt/admission
-mismatch is a high-severity runtime event.
+then runs final deterministic checks such as placeholder rejection, path
+canonicalization, budget remaining, state suppressors, and recovery constraints.
+A prompt/admission mismatch is a high-severity runtime event.
 
 ## Fault Handling
 
 Raw failed model output is stored in exchange logs and marked contaminated.
 Normal retry prompts include only bounded diagnoses and the exact required
-change.
+change. Placeholder-looking executable values such as `...`, `PATH`, `TODO`,
+`<path>`, or `[path]` are rejected before effects.
 
 ## Failure This Prevents
 

@@ -187,7 +187,7 @@ Checked-in `tmp/` logs are historical proof or failure fixtures unless rerun her
 
 ## Next Executable Step
 
-No required step is open in this pass; optional next work is longform quality or stale tmp cleanup.
+Reconcile CLI, Docker routing, prompt cards, workbench behavior, and experiment evidence.
 
 ## Honesty Rules
 

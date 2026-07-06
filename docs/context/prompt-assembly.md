@@ -14,9 +14,9 @@ never quoted back, except through bounded recovery-only diagnoses.
 
 Prompt assembly consumes the persisted decision id, expected envelope,
 `ToolSetView`, context item selection, active state payloads, retry or recovery
-policy, and budget caps. The resulting `PromptFrame` stores the decision id,
-prompt fingerprint, context-frame fingerprint, tool-view fingerprint, and body
-or body refs.
+policy, profile names, and budget caps. The resulting `PromptFrame` stores the
+decision id, prompt fingerprint, context-frame fingerprint, tool-view
+fingerprint, card plan, inclusion reasons, exclusions, and body or body refs.
 
 ## Layout
 
@@ -40,7 +40,8 @@ with an explicit marker. Contaminated items are excluded from normal prompts.
 Contradictions render only as unresolved-conflict summaries until resolved.
 Observations are bounded before storage and bounded again during rendering. The
 final prompt region is a copyable output skeleton for the selected envelope and
-active tool view.
+active tool view. Kernel, objective, state, facts, conflicts, recovery, tools,
+and output cards keep the shape stable across profiles.
 
 ## Fingerprint Contract
 
@@ -57,7 +58,7 @@ fingerprint.
 - Runtime selector tests pass the prepared fingerprint into new decisions and
   prove unfinished decisions keep their recorded value.
 - Prompt-frame and provider-exchange tests compare stored fingerprints with the
-  decision row and replayed body refs.
+  decision row, card plan, profile names, and replayed body refs.
 
 ## Failure This Prevents
 
