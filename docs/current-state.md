@@ -116,8 +116,8 @@ observations are recovered before a new decision is selected and write resolved
 `recovery:recovered/<decision>` report cells; decisions without external
 evidence are reused. Proof
 collection writes state-ledger sections for cells, decisions, candidates,
-records, prompt frames, admissions, observations, exchanges, artifacts, and
-context. Status, doctor, and workspace report row-backed lease, schema, table,
+records, prompt frames, admissions, observations, exchanges, artifacts, checks,
+and context. Status, doctor, and workspace report row-backed lease, schema, table,
 endpoint, workspace, record, artifact, and proof counts. Watch and workbench
 print bounded status, trace, and proof rows; workbench also accepts owner input.
 Prompt frames point to bounded body refs and persist queryable prompt card rows;

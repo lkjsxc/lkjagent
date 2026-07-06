@@ -14,6 +14,7 @@ pub mod gate;
 pub mod lines;
 pub mod model;
 pub mod proof;
+pub mod proof_checks;
 pub mod proof_records;
 pub mod proof_state;
 pub mod runner;

@@ -24,15 +24,16 @@ A proof bundle records these Markdown files:
 - `admissions.md`: admitted and rejected tool calls tied to decisions;
 - `observations.md`: bounded effect output and artifact refs;
 - `context.md`: conflicts and contaminated items suppressed from prompts;
-- `checks.md`: check results and artifact fingerprints;
+- `checks.md`: check rows with step id, name, pass/fail, bounded params, and measured value;
 - `exchanges.md`: provider exchange refs and nullable token usage;
 - `records.md`: workspace record fingerprints and archived state;
 - `workspace-tree.md`: file paths under the workspace;
 - `warnings.md`: orphaned exchange, observation, or artifact warnings.
 
 It does not copy SQLite files, endpoint secrets, full prompt bodies, full model
-responses, or full artifact prose. Large data stays in the workspace or logs and
-is referenced by path.
+responses, or full artifact prose. Artifact fingerprints are summarized in
+`artifacts.md`; check parameters are bounded in `checks.md`. Large data stays in
+the workspace or logs and is referenced by path.
 
 ## Capture Rule
 
