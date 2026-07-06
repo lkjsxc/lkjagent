@@ -1,3 +1,0 @@
-endpoint_url_present=yes
-model_present=yes
-api_key_present=yes

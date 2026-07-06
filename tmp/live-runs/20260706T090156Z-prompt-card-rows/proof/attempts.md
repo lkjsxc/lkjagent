@@ -1,3 +1,0 @@
-# attempts
-
-count=3

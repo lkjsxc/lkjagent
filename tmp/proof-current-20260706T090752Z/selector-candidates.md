@@ -1,3 +1,0 @@
-# Selector Candidates
-
-none

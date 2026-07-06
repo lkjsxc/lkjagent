@@ -1,3 +1,0 @@
-1 task=1 stepblocked WrongBlock
-2 task=1 stepblocked WrongBlock
-3 task=1 taskclosed
