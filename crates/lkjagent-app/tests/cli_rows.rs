@@ -38,7 +38,7 @@ fn console_line_handler_routes_owner_input_without_daemon_state() -> TestResult<
     assert!(console::handle_line(&conn, "/status", "now")?
         .output
         .contains("daemon:"));
-    assert!(console::handle_line(&conn, "/new fresh task", "now")?
+    assert!(console::handle_line(&conn, "/new fresh matter", "now")?
         .output
         .contains("new=true"));
     assert!(console::handle_line(&conn, "/help", "now")?
@@ -59,7 +59,7 @@ fn record_cli_manages_generic_records_while_daemon_is_stopped() -> TestResult<()
         "add",
         "custom",
         "Odd",
-        "Task",
+        "Work",
         "--body",
         "body",
     ])?;
@@ -145,25 +145,25 @@ fn cli_inspection_reads_store_rows() -> TestResult<()> {
     assert!(status.contains("context_lanes:"));
     assert!(status.contains("lanes="));
     assert!(status.contains("exchanges: 1"));
-    let task_list = cli::run(["--data", data.to_string_lossy().as_ref(), "task", "list"])?;
-    assert!(task_list.contains("task 1 closed"));
-    let task_show = cli::run([
+    let matter_list = cli::run(["--data", data.to_string_lossy().as_ref(), "matter", "list"])?;
+    assert!(matter_list.contains("matter 1 closed"));
+    let matter_show = cli::run([
         "--data",
         data.to_string_lossy().as_ref(),
-        "task",
+        "matter",
         "show",
         "1",
     ])?;
-    assert!(task_show.contains("task 1 Closed"));
-    assert!(task_show.contains("state: active="));
-    assert!(task_show.contains("decisions:"));
-    assert!(task_show.contains("prompt_frames: 1"));
-    assert!(task_show.contains("checks: total=0"));
-    assert!(task_show.contains("exchanges: 1"));
+    assert!(matter_show.contains("matter 1 Closed"));
+    assert!(matter_show.contains("state: active="));
+    assert!(matter_show.contains("decisions:"));
+    assert!(matter_show.contains("prompt_frames: 1"));
+    assert!(matter_show.contains("checks: total=0"));
+    assert!(matter_show.contains("exchanges: 1"));
     let watch = cli::run(["--data", data.to_string_lossy().as_ref(), "watch"])?;
     assert!(watch.contains("== status =="));
     assert!(watch.contains("== recent events =="));
-    assert!(watch.contains("task 1 Closed"));
+    assert!(watch.contains("matter 1 Closed"));
     assert!(watch.contains("proof: prompt_frames="));
     assert!(watch.contains("exchanges=1"));
     assert!(cli::run(["--data", data.to_string_lossy().as_ref(), "log"])?.contains("taskclosed"));

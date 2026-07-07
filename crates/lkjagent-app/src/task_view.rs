@@ -4,7 +4,7 @@ pub fn show(conn: &Connection, id: u64) -> Result<String, String> {
     let snapshot = lkjagent_store::plan_hydrate::snapshot_by_id(conn, id as i64)
         .map_err(|error| error.to_string())?;
     let Some(snapshot) = snapshot else {
-        return Ok(format!("task {id}: not found"));
+        return Ok(format!("matter {id}: not found"));
     };
     let case_id = id.to_string();
     Ok([

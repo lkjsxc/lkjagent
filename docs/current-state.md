@@ -50,6 +50,10 @@ unknown tools, wrong primitive classes, unclosed tags, crossed tags, and bad
 entities. Prompt cards, recovery cards, scripted endpoint helpers, experiment
 fixtures, and stop tags render the same XML-like action grammar.
 
+Owner CLI, status, watch, console, and TUI labels now expose matters rather than
+tasks. Plan-family rows still exist as bridge storage, but owner-visible list,
+show, queue, log, status, and exchange paths use matter and operation wording.
+
 Explicit record-like owner turns now route before model calls. Japanese record
 requests, todo-like text, calendar-like text, finance notes, notes, project
 notes, and artifact records write workspace Markdown files directly, update
@@ -64,7 +68,6 @@ that bridge until the semantic matter surface is complete.
 
 ## Known Gaps
 
-- Some CLI output still exposes owner work through plan-family vocabulary.
 - Semantic owner-turn routing to existing matters, artifact requests,
   inspection, and system operations needs focused tests beyond direct records.
 - Workspace READMEs, indexes, and rebalance link-repair evidence need stronger
@@ -81,8 +84,9 @@ that bridge until the semantic matter surface is complete.
 
 ## Next Executable Step
 
-Implement the smallest coherent slice that makes the docs true: expose semantic
-matter views in the owner CLI while keeping plan-family rows as bridge evidence.
+Implement the smallest coherent slice that makes the docs true: add first-class
+token accounting fields for total input, cached input, uncached input, output,
+and unknown cache status.
 
 ## Honesty Rules
 

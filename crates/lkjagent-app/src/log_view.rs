@@ -71,7 +71,7 @@ fn log_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<LogRow> {
     Ok(LogRow {
         id,
         line: format!(
-            "{} task={} {} {}",
+            "{} matter={} {} {}",
             id,
             row.get::<_, i64>(1)?,
             row.get::<_, String>(2)?,

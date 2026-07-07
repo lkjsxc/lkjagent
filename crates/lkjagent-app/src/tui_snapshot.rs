@@ -31,7 +31,7 @@ pub fn load(conn: &Connection, data_dir: &Path) -> Result<TuiSnapshot, String> {
     let status = crate::status::status(conn)?;
     Ok(TuiSnapshot {
         logs: crate::log_view::log(conn, 12)?,
-        tasks: crate::inspect::task_list(conn)?,
+        tasks: crate::inspect::matter_list(conn)?,
         queue: crate::inspect::queue_list(conn)?,
         proof: proof(conn)?,
         workspace: crate::diagnostics::workspace(conn, data_dir, false)?,

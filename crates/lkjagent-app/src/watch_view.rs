@@ -5,7 +5,7 @@ use crate::state::load_snapshot;
 pub fn watch(conn: &Connection) -> Result<String, String> {
     let status = crate::status::status(conn)?;
     let events = crate::log_view::log(conn, 8)?;
-    let trace = task_trace(conn)?;
+    let trace = matter_trace(conn)?;
     let proof = proof_line(conn)?;
     Ok([
         "watch: rerun to refresh; use log --follow to stream".to_string(),
@@ -13,7 +13,7 @@ pub fn watch(conn: &Connection) -> Result<String, String> {
         status,
         "== recent events ==".to_string(),
         events,
-        "== task trace ==".to_string(),
+        "== matter trace ==".to_string(),
         trace,
         "== proof rows ==".to_string(),
         proof,
@@ -21,17 +21,17 @@ pub fn watch(conn: &Connection) -> Result<String, String> {
     .join("\n"))
 }
 
-fn task_trace(conn: &Connection) -> Result<String, String> {
+fn matter_trace(conn: &Connection) -> Result<String, String> {
     if let Some(snapshot) = load_snapshot(conn).map_err(|error| error.to_string())? {
         return Ok(crate::status::task_show(&snapshot));
     }
     let Some(id) = latest_task_id(conn)? else {
-        return Ok("task: none".to_string());
+        return Ok("matter: none".to_string());
     };
     lkjagent_store::plan_hydrate::snapshot_by_id(conn, id)
         .map_err(|error| error.to_string())?
         .map_or_else(
-            || Ok("task: none".to_string()),
+            || Ok("matter: none".to_string()),
             |snapshot| Ok(crate::status::task_show(&snapshot)),
         )
 }

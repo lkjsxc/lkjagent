@@ -81,12 +81,12 @@ fn parser_accepts_log_follow_forms() -> TestResult<()> {
 
 #[test]
 fn parser_accepts_record_forms() -> TestResult<()> {
-    let add = parse(["record", "add", "custom", "Odd", "Task", "--body", "body"])?;
+    let add = parse(["record", "add", "custom", "Odd", "Work", "--body", "body"])?;
     assert_eq!(
         add.command,
         Command::RecordAdd {
             kind: "custom".to_string(),
-            title: "Odd Task".to_string(),
+            title: "Odd Work".to_string(),
             body: "body".to_string(),
         }
     );

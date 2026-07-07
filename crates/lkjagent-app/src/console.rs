@@ -9,7 +9,7 @@ pub struct ConsoleReply {
 }
 
 const BANNER: &str = "lkjagent console: type text to send, /help for commands, /quit to exit";
-const HELP: &str = "lkjagent console commands: text | /help | /status | /watch | /log | /queue | /task | /send TEXT | /new TEXT | /quit";
+const HELP: &str = "lkjagent console commands: text | /help | /status | /watch | /log | /queue | /matter | /send TEXT | /new TEXT | /quit";
 
 pub fn run(conn: &Connection) -> Result<String, String> {
     let stdin = std::io::stdin();
@@ -51,7 +51,7 @@ pub fn handle_line(conn: &Connection, line: &str, now: &str) -> Result<ConsoleRe
         Some(("/watch", _)) => reply(crate::inspect::watch(conn)?, false),
         Some(("/log", _)) => reply(crate::inspect::log(conn, 20)?, false),
         Some(("/queue", _)) => reply(crate::inspect::queue_list(conn)?, false),
-        Some(("/task", _)) => reply(crate::inspect::task_list(conn)?, false),
+        Some(("/matter", _)) => reply(crate::inspect::matter_list(conn)?, false),
         Some(("/new", text)) => enqueue(conn, text, true, now),
         Some(("/send", text)) => enqueue(conn, text, false, now),
         Some((other, _)) => reply(format!("console: unknown command {other}"), false),

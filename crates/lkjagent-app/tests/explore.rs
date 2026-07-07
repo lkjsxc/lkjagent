@@ -126,7 +126,7 @@ fn memory_find_reads_durable_rows() -> TestResult<()> {
     };
     let snapshot = run_until_idle(&data, &mut endpoint, 2)?;
     assert_eq!(snapshot.task.state, TaskState::Open);
-    assert!(snapshot.steps[0].inputs.contains("memory 1 task=1 probe"));
+    assert!(snapshot.steps[0].inputs.contains("memory 1 matter=1 probe"));
     assert!(snapshot.steps[0].inputs.contains("hello release"));
     Ok(())
 }

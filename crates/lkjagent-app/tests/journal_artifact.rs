@@ -38,7 +38,7 @@ fn journal_endpoint_closes_with_file_check_and_artifacts() -> TestResult<()> {
     let show = cli::run([
         "--data",
         data.to_string_lossy().as_ref(),
-        "task",
+        "matter",
         "show",
         "1",
     ])?;

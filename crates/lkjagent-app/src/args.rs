@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use crate::arg_helpers::{
-    no_args, parse_context, parse_json_flag, parse_log, parse_memory, parse_queue, parse_task,
+    no_args, parse_context, parse_json_flag, parse_log, parse_matter, parse_memory, parse_queue,
 };
 use crate::workbench_state::WorkbenchMode;
 
@@ -44,8 +44,8 @@ pub enum Command {
         limit: usize,
         follow: bool,
     },
-    TaskList,
-    TaskShow {
+    MatterList,
+    MatterShow {
         id: u64,
     },
     QueueList,
@@ -122,7 +122,7 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
         "doctor" => parse_json_flag(command, rest).map(|json| Command::Doctor { json }),
         "workspace" => crate::arg_helpers::parse_workspace(rest),
         "log" => parse_log(rest),
-        "task" => parse_task(rest),
+        "matter" => parse_matter(rest),
         "queue" => parse_queue(rest),
         "context" => parse_context(rest),
         "record" => crate::record_args::parse_record(rest),

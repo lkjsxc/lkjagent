@@ -130,7 +130,7 @@ fn help() -> String {
         "Keys",
         "Ctrl+Q quit | Ctrl+C interrupt | Ctrl+P palette | Ctrl+S save transcript",
         "Ctrl+L search using composer | Ctrl+J newline | Enter submit",
-        "F1 transcript | F2 tasks | F3 tools | F4 graph | F5 workspace | F6 help",
+        "F1 transcript | F2 matters | F3 tools | F4 graph | F5 workspace | F6 help",
         "Up/Down scroll | PageUp/PageDown page | Home top | End follow",
     ]
     .join("\n")

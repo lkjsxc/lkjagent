@@ -26,7 +26,7 @@ fn endpoint_completion_writes_exchange_and_usage_rows() -> TestResult<()> {
         [],
         |row| row.get(0),
     )?;
-    assert_eq!(exchange_ref, "logs/task-1/step-1/attempt-1");
+    assert_eq!(exchange_ref, "logs/matter-1/operation-1/attempt-1");
     let request = fs::read_to_string(data.join(&exchange_ref).join("request.json"))?;
     assert!(request.contains("decision_id"));
     assert!(request.contains("context_frame_fingerprint"));
@@ -65,7 +65,7 @@ fn endpoint_completion_writes_exchange_and_usage_rows() -> TestResult<()> {
     )?;
     assert_eq!(usage, (13, 7));
     let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
-    assert!(status.contains("task in=13 out=7 cached=3"));
+    assert!(status.contains("input_total=13 output=7 input_cached=3"));
     Ok(())
 }
 

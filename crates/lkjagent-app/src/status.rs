@@ -14,7 +14,7 @@ pub fn status(conn: &Connection) -> Result<String, String> {
     Ok(match snapshot {
         Some(snapshot) => format!("{}\n{}\n{}", render_status_with(&snapshot, pending, &tokens), lease, ledger),
         None => format!(
-            "daemon: idle\ntask: none\nstep: none\nlast: none\nquestion: none\nqueue: {pending} pending\ntokens: {tokens}\n{lease}\n{ledger}"
+            "daemon: idle\nmatter: none\noperation: none\nlast: none\nquestion: none\nqueue: {pending} pending\ntokens: {tokens}\n{lease}\n{ledger}"
         ),
     })
 }
@@ -34,10 +34,10 @@ fn render_status_with(snapshot: &TaskSnapshot, pending: usize, tokens: &str) -> 
         .iter()
         .find(|step| !matches!(step.state, StepState::Done | StepState::Skipped));
     let step_line = active.map_or_else(
-        || "step: none".to_string(),
+        || "operation: none".to_string(),
         |step| {
             format!(
-                "step: {}/{} {:?} attempt {}/3",
+                "operation: {}/{} {:?} attempt {}/3",
                 step.ordinal,
                 snapshot.steps.len(),
                 step.kind,
@@ -46,7 +46,7 @@ fn render_status_with(snapshot: &TaskSnapshot, pending: usize, tokens: &str) -> 
         },
     );
     format!(
-        "daemon: {daemon}\ntask: {} {:?} {:?} budget {}/{}\n{}\nlast: {}\nquestion: {}\nqueue: {pending} pending\ntokens: {tokens}",
+        "daemon: {daemon}\nmatter: {} {:?} {:?} budget {}/{}\n{}\nlast: {}\nquestion: {}\nqueue: {pending} pending\ntokens: {tokens}",
         snapshot.task.id,
         snapshot.task.state,
         snapshot.task.template,
@@ -60,7 +60,7 @@ fn render_status_with(snapshot: &TaskSnapshot, pending: usize, tokens: &str) -> 
 
 pub fn task_show(snapshot: &TaskSnapshot) -> String {
     let mut lines = vec![format!(
-        "task {} {:?}",
+        "matter {} {:?}",
         snapshot.task.id, snapshot.task.state
     )];
     for step in &snapshot.steps {
@@ -80,7 +80,7 @@ pub fn task_show(snapshot: &TaskSnapshot) -> String {
 
 pub fn watch(snapshot: &TaskSnapshot) -> String {
     format!(
-        "transcript\n{}\n---\nplan\n{}",
+        "transcript\n{}\n---\nmatter\n{}",
         snapshot.task.summary,
         task_show(snapshot)
     )
@@ -117,7 +117,7 @@ fn token_line(conn: &Connection) -> Result<String, String> {
         )
         .map_err(|error| error.to_string())?;
     Ok(format!(
-        "task in={} out={} cached={}",
+        "input_total={} output={} input_cached={}",
         fmt_token(prompt),
         fmt_token(completion),
         fmt_token(cached)

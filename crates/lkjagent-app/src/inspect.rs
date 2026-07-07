@@ -8,14 +8,14 @@ pub fn follow_log(conn: &Connection, limit: usize) -> Result<String, String> {
     crate::log_view::follow_log(conn, limit)
 }
 
-pub fn task_list(conn: &Connection) -> Result<String, String> {
+pub fn matter_list(conn: &Connection) -> Result<String, String> {
     let mut statement = conn
         .prepare("SELECT id, state, template, summary FROM tasks ORDER BY id")
         .map_err(|error| error.to_string())?;
     let rows = statement
         .query_map([], |row| {
             Ok(format!(
-                "task {} {} {} {}",
+                "matter {} {} {} {}",
                 row.get::<_, i64>(0)?,
                 row.get::<_, String>(1)?,
                 row.get::<_, String>(2)?,
@@ -26,7 +26,7 @@ pub fn task_list(conn: &Connection) -> Result<String, String> {
     collect(rows)
 }
 
-pub fn task_show(conn: &Connection, id: u64) -> Result<String, String> {
+pub fn matter_show(conn: &Connection, id: u64) -> Result<String, String> {
     crate::task_view::show(conn, id)
 }
 
@@ -39,7 +39,7 @@ pub fn queue_list(conn: &Connection) -> Result<String, String> {
     let rows = statement
         .query_map([], |row| {
             Ok(format!(
-                "queue {} {} force_new={} task={} {}",
+                "queue {} {} force_new={} matter={} {}",
                 row.get::<_, i64>(0)?,
                 row.get::<_, String>(1)?,
                 row.get::<_, i64>(2)? != 0,
@@ -57,7 +57,7 @@ pub fn queue_show(conn: &Connection, id: i64) -> Result<String, String> {
         params![id],
         |row| {
             Ok(format!(
-                "queue {} state={} force_new={} task={} content={}",
+                "queue {} state={} force_new={} matter={} content={}",
                 row.get::<_, i64>(0)?,
                 row.get::<_, String>(2)?,
                 row.get::<_, i64>(3)? != 0,

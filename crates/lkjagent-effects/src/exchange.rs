@@ -14,14 +14,14 @@ pub struct ExchangePaths {
 
 pub fn write_exchange(
     root: &Path,
-    task_id: u64,
-    step_ordinal: u32,
+    matter_id: u64,
+    operation_ordinal: u32,
     attempt_ordinal: u32,
     files: ExchangeFiles<'_>,
 ) -> EffectResult<ExchangePaths> {
     let dir = root
-        .join(format!("task-{task_id}"))
-        .join(format!("step-{step_ordinal}"))
+        .join(format!("matter-{matter_id}"))
+        .join(format!("operation-{operation_ordinal}"))
         .join(format!("attempt-{attempt_ordinal}"));
     fs::create_dir_all(&dir)?;
     let paths = ExchangePaths {

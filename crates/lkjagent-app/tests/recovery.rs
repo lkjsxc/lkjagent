@@ -77,7 +77,7 @@ fn exchange_row(decision: &RuntimeDecision) -> ProviderExchangeRow {
         id: "exchange-old".to_string(),
         case_id: decision.case_id.clone(),
         decision_id: decision.id.clone(),
-        exchange_ref: "logs/task-1/step-1/attempt-1".to_string(),
+        exchange_ref: "logs/matter-1/operation-1/attempt-1".to_string(),
         outcome_json: "{\"outcome\":\"parsed\"}".to_string(),
         context_frame_fingerprint: decision.context_frame_fingerprint.clone(),
         timeout_seconds: Some(900),

@@ -28,7 +28,7 @@ fn state_snapshot_cell_wins_over_older_plan_rows() -> TestResult<()> {
     upsert_state_cell(&conn, "2", &snapshot_cell(&state_snapshot)?)?;
     drop(conn);
     let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
-    assert!(status.contains("task: 2 Open"));
+    assert!(status.contains("matter: 2 Open"));
 
     let mut endpoint = ScriptedEndpoint {
         outputs: vec!["<message>State cell wins.</message>".to_string()],
@@ -47,7 +47,7 @@ fn snapshot_cell(snapshot: &TaskSnapshot) -> Result<StateCell, serde_json::Error
         name: "snapshot".to_string(),
     });
     let mut cell = StateCell::active(key, "event-snapshot");
-    cell.payload_schema = "task-snapshot".to_string();
+    cell.payload_schema = "matter-snapshot".to_string();
     cell.payload_json = serde_json::to_string(snapshot)?;
     cell.created_at = "later".to_string();
     cell.updated_at = "later".to_string();

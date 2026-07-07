@@ -35,10 +35,10 @@ pub fn persist_snapshot_cell(
     insert_case(conn, &case_id, &snapshot.task.objective, now).map_err(|e| e.to_string())?;
     let event_id = next_event_id(conn, &case_id, "snapshot").map_err(|e| e.to_string())?;
     let mut cell = StateCell::active(key()?, event_id.clone());
-    cell.payload_schema = "task-snapshot".to_string();
+    cell.payload_schema = "matter-snapshot".to_string();
     cell.payload_json = serde_json::to_string(snapshot).map_err(|error| error.to_string())?;
     cell.evidence_refs = vec![EvidenceRef {
-        source_type: "task".to_string(),
+        source_type: "matter".to_string(),
         source_id: case_id.clone(),
         fingerprint: format!("budget-{}", snapshot.task.budget_used),
     }];

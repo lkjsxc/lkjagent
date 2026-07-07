@@ -140,7 +140,7 @@ pub fn run_state_label(state: TuiRunState) -> &'static str {
 pub fn pane_label(pane: TuiPane) -> &'static str {
     match pane {
         TuiPane::Transcript => "transcript",
-        TuiPane::Tasks => "tasks",
+        TuiPane::Tasks => "matters",
         TuiPane::Tools => "tools",
         TuiPane::StateGraph => "state-graph",
         TuiPane::Workspace => "workspace",

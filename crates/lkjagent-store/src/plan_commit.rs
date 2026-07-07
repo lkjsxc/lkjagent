@@ -177,7 +177,7 @@ fn insert_event(
 }
 
 fn exchange_ref(task_id: i64, step_ordinal: u32, ordinal: u32) -> String {
-    format!("logs/task-{task_id}/step-{step_ordinal}/attempt-{ordinal}")
+    format!("logs/matter-{task_id}/operation-{step_ordinal}/attempt-{ordinal}")
 }
 
 fn step_ordinal(snapshot: &TaskSnapshot, step_id: u64) -> u32 {

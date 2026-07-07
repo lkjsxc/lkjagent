@@ -1,13 +1,13 @@
 use crate::args::Command;
 
-pub(crate) fn parse_task(rest: Vec<String>) -> Result<Command, String> {
+pub(crate) fn parse_matter(rest: Vec<String>) -> Result<Command, String> {
     match rest.as_slice() {
-        [one] if one == "list" => Ok(Command::TaskList),
+        [one] if one == "list" => Ok(Command::MatterList),
         [one, id] if one == "show" => id
             .parse::<u64>()
-            .map(|id| Command::TaskShow { id })
+            .map(|id| Command::MatterShow { id })
             .map_err(|error| error.to_string()),
-        _ => Err("use task list | task show ID".to_string()),
+        _ => Err("use matter list | matter show REF".to_string()),
     }
 }
 

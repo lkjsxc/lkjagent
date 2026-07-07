@@ -156,7 +156,7 @@ fn context<'a>(input: ContextInput<'a>, started: Instant) -> ExchangeContext<'a>
 
 fn exchange_ref(snapshot: &TaskSnapshot, step_ordinal: u32, ordinal: u32) -> String {
     format!(
-        "logs/task-{}/step-{}/attempt-{}",
+        "logs/matter-{}/operation-{}/attempt-{}",
         snapshot.task.id, step_ordinal, ordinal
     )
 }

@@ -18,7 +18,7 @@ Map lkjagent-app source modules.
 - [context-bridge.rs](context_bridge.rs): durable context item prompt projection.
 - [context-resolution-bridge.rs](context_resolution_bridge.rs): conflict lineage rows.
 - [daemon.rs](daemon.rs): row-backed turn-cycle interpreter and scripted endpoint seam.
-- [daemon-intake.rs](daemon_intake.rs): queue intake and waiting-answer resume.
+- [daemon-intake.rs](daemon_intake.rs): owner-turn intake, direct records, and waiting-answer resume.
 - [daemon-lock.rs](daemon_lock.rs): heartbeat config-row daemon lease.
 - [effect-error.rs](effect_error.rs): effect failure settlement.
 - [endpoint.rs](endpoint.rs): endpoint adapter wrapper.
@@ -33,13 +33,14 @@ Map lkjagent-app source modules.
 - [prompt-bridge.rs](prompt_bridge.rs): prompt-frame rows before model calls.
 - [record-args.rs](record_args.rs): record subcommand parsing.
 - [record-files.rs](record_files.rs): workspace record file commands.
+- [workspace-scaffold.rs](workspace_scaffold.rs): README and directory scaffold writes.
 - [recovery-bridge.rs](recovery_bridge.rs): unfinished decision reuse and
   recovery settlement.
 - [runtime-bridge.rs](runtime_bridge.rs): state-ledger decision preparation.
 - [runtime-cell.rs](runtime_cell.rs): operation cell projection payloads.
 - [runtime-projection.rs](runtime_projection.rs): plan bridge projection events.
-- [snapshot-state.rs](snapshot_state.rs): task snapshot state-cell mirror.
+- [snapshot-state.rs](snapshot_state.rs): matter snapshot state-cell mirror.
 - [state.rs](state.rs): active snapshot hydration from normalized rows.
-- [status.rs](status.rs): status, task, and watch rendering helpers.
+- [status.rs](status.rs): status, matter, and watch rendering helpers.
 - [turn-effects.rs](turn_effects.rs): deterministic write, check, and explore effects.
 - [workbench.rs](workbench.rs): refreshing normal-screen progress and input loop.

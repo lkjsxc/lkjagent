@@ -151,7 +151,7 @@ pub fn set_config(conn: &Connection, key: &str, value: &str) -> StoreResult<()> 
 }
 
 fn exchange_ref(task_id: i64, step_id: u64, ordinal: u32) -> String {
-    format!("logs/task-{task_id}/step-{step_id}/attempt-{ordinal}")
+    format!("logs/matter-{task_id}/operation-{step_id}/attempt-{ordinal}")
 }
 
 pub fn config(conn: &Connection, key: &str) -> StoreResult<Option<String>> {

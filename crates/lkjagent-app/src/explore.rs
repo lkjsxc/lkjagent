@@ -101,7 +101,7 @@ fn render_memory(row: &MemoryRow) -> String {
         .task_id
         .map_or_else(|| "none".to_string(), |task_id| task_id.to_string());
     format!(
-        "memory {} task={} {} {}",
+        "memory {} matter={} {} {}",
         row.id, task, row.topic, row.content
     )
 }
