@@ -6,7 +6,9 @@ Define transaction boundaries and daemon boot recovery for the state ledger.
 
 ## Turn Transactions
 
-The store commits events and their state patches together. Prompt frames,
+The store commits events and their state patches together in one transaction.
+Duplicate runtime event ids are ignored before reduction, so a replay cannot
+apply a second patch from an event row that was not inserted. Prompt frames,
 decisions, admissions, observations, checks, exchange refs, and usage rows carry
 the same decision id when they belong to one turn. A gate that did not commit a
 row did not happen.

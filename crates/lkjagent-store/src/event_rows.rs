@@ -14,10 +14,10 @@ pub fn next_event_id(conn: &Connection, case_id: &str, prefix: &str) -> StoreRes
     Ok(format!("{prefix}-{case_id}-{:04}", count + 1))
 }
 
-pub fn insert_event(conn: &Connection, event: &RuntimeEvent) -> StoreResult<()> {
+pub fn insert_event(conn: &Connection, event: &RuntimeEvent) -> StoreResult<bool> {
     let payload_json = json_string(&event.payload)?;
     let event_json = json_string(event)?;
-    conn.execute(
+    let inserted = conn.execute(
         "INSERT OR IGNORE INTO runtime_events
          (id, case_id, kind, payload_json, source, decision_id, event_json,
           created_at)
@@ -33,11 +33,24 @@ pub fn insert_event(conn: &Connection, event: &RuntimeEvent) -> StoreResult<()> 
             event.created_at,
         ],
     )?;
-    Ok(())
+    Ok(inserted == 1)
 }
 
 pub fn append_and_apply_event(conn: &Connection, event: &RuntimeEvent) -> StoreResult<()> {
-    insert_event(conn, event)?;
+    conn.execute_batch("BEGIN IMMEDIATE")?;
+    let result = append_and_apply_event_tx(conn, event);
+    if result.is_ok() {
+        conn.execute_batch("COMMIT")?;
+    } else {
+        let _ = conn.execute_batch("ROLLBACK");
+    }
+    result
+}
+
+fn append_and_apply_event_tx(conn: &Connection, event: &RuntimeEvent) -> StoreResult<()> {
+    if !insert_event(conn, event)? {
+        return Ok(());
+    }
     let snapshot = hydrate_snapshot(conn, &event.case_id)?;
     let patch = reduce_event(&snapshot, event);
     persist_state_patch(conn, &event.case_id, &patch)

@@ -133,6 +133,12 @@ step and zero artifacts, check rows, workspace records, tool admissions, or
 observations becomes blocked rather than closed. This slice passed `cargo run -p
 lkjagent-xtask -- quiet verify` and Docker Compose `verify` in this run.
 
+The native state store slice now commits runtime events and their state patches
+inside one transaction. Duplicate runtime event ids are ignored before
+reduction, so replaying an already inserted event cannot apply a second patch or
+state history row. This slice has focused store coverage and passed quiet test
+and Docker Compose `verify` in this run.
+
 ## Known Gaps
 
 - Check freshness remains bridge-limited: current check rows do not yet carry
@@ -141,11 +147,14 @@ lkjagent-xtask -- quiet verify` and Docker Compose `verify` in this run.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, blocked, active, pending, failed, or
   unsuperseded skipped bridge steps must prevent close candidates.
+- Native state settlement still reverse-parses operation keys for many cells;
+  selected-state-key settlement remains a follow-up state-harness slice.
 
 ## Next Executable Step
 
-Commit the bridge completion-safety slice with honest trailers, then move to the
-next packet work item: native state reducer coverage.
+Commit the native state store atomicity slice with honest trailers, then
+continue native state reducer work with selected-state-key settlement and native
+operation cells.
 
 ## Honesty Rules
 
