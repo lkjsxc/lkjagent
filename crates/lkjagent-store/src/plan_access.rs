@@ -26,6 +26,14 @@ pub fn deliver_next(conn: &Connection, task_id: i64, now: &str) -> StoreResult<O
     deliver_matching(conn, task_id, None, now)
 }
 
+pub fn mark_recorded(conn: &Connection, queue_id: i64, now: &str) -> StoreResult<()> {
+    conn.execute(
+        "UPDATE queue SET state = 'recorded', delivered_at = ?1 WHERE id = ?2",
+        params![now, queue_id],
+    )?;
+    Ok(())
+}
+
 pub fn deliver_answer(conn: &Connection, task_id: i64, now: &str) -> StoreResult<Option<QueueRow>> {
     deliver_matching(conn, task_id, Some(false), now)
 }

@@ -13,7 +13,7 @@ visibility that make daemon progress observable.
 daemon: working | idle | waiting | stopped
 matter: daily-capture open title="July notes" budget 47/200
 decision: matter-daily-capture-decision-0007 model.call status=pending ctx=9ac4 tools=aa12
-last: record_written path=workspace/records/life/journal/2026/07/2026-07-07.md
+last: record_written path=workspace/records/life/journal/rec_20260707_note.md
 question: none
 queue: 0 pending
 tokens: input_uncached=804 input_cached=1200 input_total=2004 output=196 cache=known

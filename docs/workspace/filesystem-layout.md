@@ -13,10 +13,10 @@ workspace/
   today/
   records/
     life/
-      journal/YYYY/MM/
+      journal/
       todo/
-      calendar/YYYY/
-      finance/YYYY/
+      calendar/
+      finance/
       notes/
       routines/
       contacts/

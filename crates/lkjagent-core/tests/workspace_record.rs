@@ -40,17 +40,17 @@ fn record_families_emit_state_keys() -> TestResult<()> {
     );
     assert_eq!(
         state_keys_for_record("development", "rec_2", "open"),
-        vec!["index:stale/records", "dev:repo-task/rec_2"]
+        vec!["index:stale/records", "dev:repo-work/rec_2"]
     );
     Ok(())
 }
 
 #[test]
 fn record_paths_reject_escapes() -> TestResult<()> {
-    assert_eq!(record_path("todo", "rec_1")?, "records/todo/rec_1.md");
+    assert_eq!(record_path("todo", "rec_1")?, "records/life/todo/rec_1.md");
     assert_eq!(
         archive_path("todo", "rec_1")?,
-        "records/archive/todo/rec_1.md"
+        "archive/records/todo/rec_1.md"
     );
     assert!(record_path("../todo", "rec_1").is_err());
     assert!(record_path("todo", "../rec_1").is_err());

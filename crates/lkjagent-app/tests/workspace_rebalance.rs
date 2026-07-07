@@ -13,9 +13,9 @@ type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<()> {
     let data = fixture_root("rebalance")?;
     let workspace = data.join("workspace");
-    fs::create_dir_all(workspace.join("records/note"))?;
+    fs::create_dir_all(workspace.join("records/knowledge/notes"))?;
     let body = record_body();
-    fs::write(workspace.join("records/note/old.md"), &body)?;
+    fs::write(workspace.join("records/knowledge/notes/old.md"), &body)?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
     upsert_record(
@@ -25,7 +25,7 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
             kind: "todo".to_string(),
             title: "Move me".to_string(),
             state: "open".to_string(),
-            path: "records/note/old.md".to_string(),
+            path: "records/knowledge/notes/old.md".to_string(),
             fingerprint: record_fingerprint(&body)
                 .map_err(|error| std::io::Error::other(error.message))?,
             archived: false,
@@ -35,18 +35,18 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
     drop(conn);
 
     let plan = cli::run(["--data", data_str(&data), "workspace", "plan-rebalance"])?;
-    assert!(plan.contains("records/note/old.md -> records/todo/rec_1.md"));
+    assert!(plan.contains("records/knowledge/notes/old.md -> records/life/todo/rec_1.md"));
     let applied = cli::run(["--data", data_str(&data), "workspace", "apply-rebalance"])?;
     assert!(applied.contains("move rec_1"));
-    assert!(workspace.join("records/todo/rec_1.md").exists());
-    assert!(!workspace.join("records/note/old.md").exists());
+    assert!(workspace.join("records/life/todo/rec_1.md").exists());
+    assert!(!workspace.join("records/knowledge/notes/old.md").exists());
 
     let shown = cli::run([
         "--data",
         data_str(&data),
         "record",
         "show",
-        "records/note/old.md",
+        "records/knowledge/notes/old.md",
     ])?;
     assert!(shown.contains("record rec_1"));
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;

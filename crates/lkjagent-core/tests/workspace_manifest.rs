@@ -13,14 +13,14 @@ fn manifest_has_versioned_roots_and_path_validation() -> Result<(), String> {
         .starts_with("fnv1a64:"));
     assert_eq!(
         canonical_record_path("todo", "rec_1"),
-        "records/todo/rec_1.md"
+        "records/life/todo/rec_1.md"
     );
 
     let ok = RebalanceMove {
         entity_id: "rec_1".to_string(),
         entity_kind: "record".to_string(),
-        old_path: "records/note/old.md".to_string(),
-        new_path: "records/todo/rec_1.md".to_string(),
+        old_path: "records/knowledge/notes/old.md".to_string(),
+        new_path: "records/life/todo/rec_1.md".to_string(),
         decision_id: "decision-1".to_string(),
         reason: "canonical record path".to_string(),
         validation: Vec::new(),

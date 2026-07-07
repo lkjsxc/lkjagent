@@ -50,6 +50,13 @@ unknown tools, wrong primitive classes, unclosed tags, crossed tags, and bad
 entities. Prompt cards, recovery cards, scripted endpoint helpers, experiment
 fixtures, and stop tags render the same XML-like action grammar.
 
+Explicit record-like owner turns now route before model calls. Japanese record
+requests, todo-like text, calendar-like text, finance notes, notes, project
+notes, and artifact records write workspace Markdown files directly, update
+`workspace_records`, write fingerprint history, mark queue rows recorded, create
+workspace state cells and edges, and avoid creating plan-family rows for those
+turns. Record writes create README files along the touched workspace path.
+
 The implementation still contains a plan-family bridge. Existing task and step
 rows are treated as body storage and continuity evidence while state cells and
 runtime decisions take over turn authority. Transitional commands may expose
@@ -58,10 +65,8 @@ that bridge until the semantic matter surface is complete.
 ## Known Gaps
 
 - Some CLI output still exposes owner work through plan-family vocabulary.
-- Record-like owner turns are not yet guaranteed to write workspace files before
-  any claim of recording.
-- Semantic owner-turn routing to existing matters, direct records, artifacts,
-  inspection, and system operations needs focused tests.
+- Semantic owner-turn routing to existing matters, artifact requests,
+  inspection, and system operations needs focused tests beyond direct records.
 - Workspace READMEs, indexes, and rebalance link-repair evidence need stronger
   coverage.
 - The workbench composer needs grapheme-aware cursor movement and durable agent
@@ -76,9 +81,8 @@ that bridge until the semantic matter surface is complete.
 
 ## Next Executable Step
 
-Implement the smallest coherent slice that makes the docs true: route explicit
-record-like owner turns to direct workspace record writes before any model call
-or recording claim.
+Implement the smallest coherent slice that makes the docs true: expose semantic
+matter views in the owner CLI while keeping plan-family rows as bridge evidence.
 
 ## Honesty Rules
 

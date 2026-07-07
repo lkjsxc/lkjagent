@@ -1,9 +1,12 @@
+use std::path::Path;
+
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::engine::Command;
 use lkjagent_core::model::{Event, EventKind, StepKind, StepState, TaskSnapshot, TaskState};
 use lkjagent_store::memory::search_memory;
 use lkjagent_store::plan_access::{
-    deliver_answer, deliver_forced_new, deliver_next, insert_step_tx, insert_task,
+    deliver_answer, deliver_forced_new, deliver_next, insert_step_tx, insert_task, mark_recorded,
+    next_pending,
 };
 use lkjagent_store::plan_commit::commit_turn;
 use lkjagent_store::plan_hydrate::first_snapshot_with_state;
@@ -14,11 +17,12 @@ use crate::snapshot_state::{load_snapshot_cell, persist_snapshot_cell};
 
 pub fn load_runtime_snapshot<C: Clock>(
     conn: &mut Connection,
+    data_dir: &Path,
     clock: &mut C,
 ) -> Result<Option<TaskSnapshot>, String> {
     if let Some(snapshot) = load_snapshot_cell(conn)? {
         if snapshot.task.state == TaskState::Waiting {
-            return resume_loaded_waiting(conn, snapshot, clock);
+            return resume_loaded_waiting(conn, data_dir, snapshot, clock);
         }
         return Ok(Some(snapshot));
     }
@@ -26,9 +30,9 @@ pub fn load_runtime_snapshot<C: Clock>(
         return Ok(Some(snapshot));
     }
     if let Some(waiting) = first_snapshot_with_state(conn, "waiting").map_err(|e| e.to_string())? {
-        return resume_loaded_waiting(conn, waiting, clock);
+        return resume_loaded_waiting(conn, data_dir, waiting, clock);
     }
-    intake(conn, false, clock)
+    intake(conn, data_dir, false, clock)
 }
 
 pub fn idle_snapshot() -> TaskSnapshot {
@@ -39,6 +43,7 @@ pub fn idle_snapshot() -> TaskSnapshot {
 
 fn resume_loaded_waiting<C: Clock>(
     conn: &mut Connection,
+    data_dir: &Path,
     waiting: TaskSnapshot,
     clock: &mut C,
 ) -> Result<Option<TaskSnapshot>, String> {
@@ -46,7 +51,7 @@ fn resume_loaded_waiting<C: Clock>(
     if resumed.task.state == TaskState::Open {
         return Ok(Some(resumed));
     }
-    if let Some(snapshot) = intake(conn, true, clock)? {
+    if let Some(snapshot) = intake(conn, data_dir, true, clock)? {
         return Ok(Some(snapshot));
     }
     Ok(Some(resumed))
@@ -54,9 +59,13 @@ fn resume_loaded_waiting<C: Clock>(
 
 fn intake<C: Clock>(
     conn: &mut Connection,
+    data_dir: &Path,
     forced_only: bool,
     clock: &mut C,
 ) -> Result<Option<TaskSnapshot>, String> {
+    if !forced_only {
+        write_direct_records(conn, data_dir, clock)?;
+    }
     let task_id = next_task_id(conn)?;
     let now = clock.now();
     let queue = if forced_only {
@@ -77,6 +86,34 @@ fn intake<C: Clock>(
     tx.commit().map_err(|error| error.to_string())?;
     persist_snapshot_cell(conn, &snapshot, &now)?;
     Ok(Some(snapshot))
+}
+
+fn write_direct_records<C: Clock>(
+    conn: &Connection,
+    data_dir: &Path,
+    clock: &mut C,
+) -> Result<(), String> {
+    loop {
+        let Some(row) = next_pending(conn).map_err(|error| error.to_string())? else {
+            return Ok(());
+        };
+        if row.force_new {
+            return Ok(());
+        }
+        let Some(intent) = lkjagent_core::owner_turn::record_intent(&row.content) else {
+            return Ok(());
+        };
+        let now = clock.now();
+        crate::record_files::add(
+            conn,
+            data_dir,
+            &intent.kind,
+            &intent.title,
+            &intent.body,
+            &now,
+        )?;
+        mark_recorded(conn, row.id, &now).map_err(|error| error.to_string())?;
+    }
 }
 
 fn admit_memory(conn: &Connection, snapshot: &mut TaskSnapshot, query: &str) -> Result<(), String> {

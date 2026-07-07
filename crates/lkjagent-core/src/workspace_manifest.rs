@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::runtime_admission::workspace_relative_path;
 use crate::runtime_fingerprint::{stable_fingerprint, FingerprintError};
-use crate::workspace_record::WorkspaceRecord;
+use crate::workspace_record::{record_path, WorkspaceRecord};
 
 pub const WORKSPACE_SCHEMA_VERSION: u32 = 1;
 
@@ -63,7 +63,7 @@ impl WorkspaceManifest {
 }
 
 pub fn canonical_record_path(kind: &str, id: &str) -> String {
-    format!("records/{kind}/{id}.md")
+    record_path(kind, id).unwrap_or_else(|_| format!("records/knowledge/notes/{kind}/{id}.md"))
 }
 
 pub fn validate_workspace_path(path: &str) -> Result<(), String> {

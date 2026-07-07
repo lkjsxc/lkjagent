@@ -36,7 +36,7 @@ The `id` is stable and sorts by creation time. Paths are convenient storage
 locations, not identity. Pure workspace entity refs use the record id as the
 stable entity id, so a rebalance can validate path moves without changing
 ledger links. The canonical file implementation stores records under semantic directories
-such as `workspace/records/life/journal/YYYY/MM/<id>.md`,
+such as `workspace/records/life/journal/<id>.md`,
 `workspace/records/life/todo/<id>.md`, or
 `workspace/records/work/projects/<id>.md`. Archived records move under
 `workspace/archive/records/...` with aliases preserved. Unknown `kind` values

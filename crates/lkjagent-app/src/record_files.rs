@@ -16,7 +16,6 @@ pub fn add(
     body: &str,
     now: &str,
 ) -> Result<String, String> {
-    ensure_dirs(data_dir)?;
     let id = record_id(now, title);
     let mut record = WorkspaceRecord::new(&id, kind, title, now);
     record.state = default_state_for_kind(kind).to_string();
@@ -124,10 +123,9 @@ fn write_record(
     archived: bool,
 ) -> Result<String, String> {
     let rel = record_path(&record.kind, &record.id)?;
-    let path = data_dir.join("workspace").join(&rel);
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).map_err(|error| error.to_string())?;
-    }
+    let workspace = data_dir.join("workspace");
+    crate::workspace_scaffold::ensure_for_path(&workspace, &rel)?;
+    let path = workspace.join(&rel);
     let text = render_record(record);
     fs::write(&path, &text).map_err(|error| error.to_string())?;
     let row = record_row(
@@ -169,26 +167,6 @@ fn record_id(now: &str, title: &str) -> String {
         .collect::<String>();
     let suffix = slug(title);
     format!("rec_{}_{}", stamp, suffix)
-}
-
-fn ensure_dirs(data_dir: &Path) -> Result<(), String> {
-    let workspace = data_dir.join("workspace");
-    fs::create_dir_all(workspace.join("records")).map_err(|error| error.to_string())?;
-    write_if_missing(
-        &workspace.join("README.md"),
-        "# Workspace\n\nOwner-readable files.\n",
-    )?;
-    write_if_missing(
-        &workspace.join("records/README.md"),
-        "# Records\n\nGeneric owner-readable records.\n",
-    )
-}
-
-fn write_if_missing(path: &Path, body: &str) -> Result<(), String> {
-    if !path.exists() {
-        fs::write(path, body).map_err(|error| error.to_string())?;
-    }
-    Ok(())
 }
 
 fn format_record_row(prefix: &str, row: &RecordRow) -> String {

@@ -17,7 +17,7 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
         "Buy",
         "milk",
     ])?;
-    assert!(added.contains("path=records/todo/"));
+    assert!(added.contains("path=records/life/todo/"));
     let id = added.split_whitespace().nth(1).ok_or("missing id")?;
 
     let listed = cli::run([
@@ -54,8 +54,8 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
         "Fix",
         "parser",
     ])?;
-    assert!(dev.contains("path=records/development/"));
-    assert!(state_labels(&conn)?.contains(&"dev:repo-task/".to_string()));
+    assert!(dev.contains("path=records/work/development/"));
+    assert!(state_labels(&conn)?.contains(&"dev:repo-work/".to_string()));
 
     let finance = cli::run([
         "--data",
@@ -64,7 +64,7 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
         "Pay",
         "bill",
     ])?;
-    assert!(finance.contains("path=records/finance/"));
+    assert!(finance.contains("path=records/life/finance/"));
     assert!(state_labels(&conn)?.contains(&"finance:review/".to_string()));
     Ok(())
 }

@@ -2,7 +2,9 @@ use crate::args::Command;
 
 pub fn wrapper_kind(command: &str) -> Option<&str> {
     match command {
-        "today" | "journal" | "todo" | "calendar" | "finance" | "project" => Some(command),
+        "today" | "journal" | "todo" | "calendar" | "finance" | "note" | "project" | "artifact" => {
+            Some(command)
+        }
         "dev" => Some("development"),
         _ => None,
     }

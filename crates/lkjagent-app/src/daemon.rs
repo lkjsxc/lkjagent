@@ -55,7 +55,7 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     setup(&conn).map_err(|error| error.to_string())?;
     let heartbeat = clock.now();
     crate::daemon_lock::claim(&conn, &heartbeat)?;
-    let mut snapshot = match load_runtime_snapshot(&mut conn, clock)? {
+    let mut snapshot = match load_runtime_snapshot(&mut conn, data_dir, clock)? {
         Some(snapshot) if runnable(&snapshot) => snapshot,
         Some(snapshot) => return Ok(snapshot),
         None => return Ok(idle_snapshot()),
