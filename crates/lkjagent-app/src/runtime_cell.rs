@@ -1,3 +1,4 @@
+use lkjagent_core::engine::completion_blocker_reason;
 use lkjagent_core::model::{CheckSpec, Step, StepKind, StepState, TaskSnapshot, TaskState};
 use lkjagent_core::render::max_tokens;
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
@@ -37,6 +38,14 @@ fn open_parts(snapshot: &TaskSnapshot) -> CellParts {
         .iter()
         .find(|step| matches!(step.state, StepState::Pending | StepState::Active))
     else {
+        if let Some(reason) = completion_blocker_reason(snapshot) {
+            return CellParts::with_payload(
+                "completion",
+                "blocked",
+                "plan-bridge.blocked",
+                serde_json::json!({"reason": reason}),
+            );
+        }
         return CellParts::new("completion", "close-candidate", "plan-bridge.completion");
     };
     if step.kind == StepKind::Verify && step.checks.iter().all(deterministic) {
@@ -116,4 +125,55 @@ fn deterministic(spec: &CheckSpec) -> bool {
 
 fn key(namespace: &str, name: &str) -> Result<StateKey, String> {
     StateKey::new(namespace, name).map_err(|error| error.message)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use lkjagent_core::classify::instantiate;
+    use lkjagent_core::model::StepState;
+
+    #[test]
+    fn blocked_step_projects_completion_blocked() {
+        let mut snapshot = instantiate(1, "Create something to read");
+        snapshot.steps[0].state = StepState::Blocked;
+        for step in snapshot.steps.iter_mut().skip(1) {
+            step.state = StepState::Done;
+        }
+
+        let cell = test_cell(&snapshot);
+
+        assert_eq!(cell.key.namespace, "completion");
+        assert_eq!(cell.key.name, "blocked");
+        assert_eq!(cell.payload_schema, "plan-bridge.blocked");
+        assert!(cell.payload_json.contains("blocked"));
+    }
+
+    #[test]
+    fn all_done_bridge_projects_close_candidate() {
+        let mut snapshot = instantiate(2, "are you ok?");
+        for step in &mut snapshot.steps {
+            step.state = StepState::Done;
+        }
+
+        let cell = test_cell(&snapshot);
+
+        assert_eq!(cell.key.namespace, "completion");
+        assert_eq!(cell.key.name, "close-candidate");
+    }
+
+    fn test_cell(snapshot: &TaskSnapshot) -> StateCell {
+        let result = projected_cell(snapshot, "now");
+        assert!(result.is_ok());
+        match result {
+            Ok(cell) => cell,
+            Err(_) => StateCell::active(
+                StateKey {
+                    namespace: "invalid".to_string(),
+                    name: "invalid".to_string(),
+                },
+                "test",
+            ),
+        }
+    }
 }

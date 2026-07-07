@@ -32,7 +32,8 @@ selectors use that cell and do not recreate bridge work.
 ## Removal Direction
 
 New features should write semantic rows directly. Bridge code may remain only to
-migrate old data, compare behavior, and prove continuity during cutover.
+read existing bridge data, compare behavior, and prove continuity while semantic
+rows take over.
 
 ## Failure This Prevents
 

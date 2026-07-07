@@ -28,9 +28,9 @@ render tools or blocks that are absent from that decision.
 
 ## Explore And Ask
 
-Explore completion is a decision-visible JSON tool call only when the
-`ToolSetView` exposes it. Asking the owner is a selected operation that parks
-waiting state and records the question as a clean context item.
+Explore output is a decision-visible `<lkjagent_action>` tool call only when
+the `ToolSetView` exposes it. Asking the owner is a selected operation that
+parks waiting state and records the question as a clean context item.
 
 ## Checks
 

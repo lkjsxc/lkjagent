@@ -23,8 +23,8 @@ Define the product boundary so every feature has a clear place or no place.
   contamination class, contradiction handling, and bounded prompt admission.
 - Deterministic checks for file existence, word counts, link resolution, README
   coverage, command success, artifact fingerprints, and sparse model judgment.
-- CLI status, logs, case inspection, queue inspection, memory search, state and
-  decision diagnostics, and a terminal watch surface.
+- CLI status, logs, matter inspection, queue inspection, memory search, state
+  and decision diagnostics, and a terminal watch surface.
 - Docker Compose gates and proof-bundle capture.
 
 ## Out Of Scope

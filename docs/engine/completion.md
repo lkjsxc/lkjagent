@@ -8,8 +8,9 @@ Define how plan items and cases finish through fresh evidence.
 
 Completion belongs to the harness. Model output can provide content or a sparse
 judgment block, but terminal closure is reachable only when the active
-`RuntimeDecision` names completion predicates and current check rows satisfy
-them.
+`RuntimeDecision` names completion predicates, current check rows satisfy them,
+and no operation remains pending, active, blocked, failed, or unsuperseded
+skipped.
 
 ## State Cells
 
@@ -27,10 +28,19 @@ diagnosis with measured values and a recovery state edge.
 
 ## Case Checks
 
-When no runnable work remains, case checks run over the real workspace and
-current artifacts. A structured artifact case checks the concrete files,
-manifest units, fingerprints, and objective-specific constraints. A docs-tree
-case checks README coverage and relative links.
+When no runnable or blocking work remains, case checks run over the real
+workspace and current artifacts. A structured artifact case checks the concrete
+files, manifest units, fingerprints, and objective-specific constraints. A
+docs-tree case checks README coverage and relative links. Empty task-level
+checks do not authorize closure for file-work or artifact matters without fresh
+artifact evidence.
+
+## Bridge Safety
+
+While task and step rows remain, every step must be done or superseded with
+evidence before the matter can close. Blocked, active, pending, failed, or
+unsuperseded skipped bridge steps force open or blocked matter state and cannot
+be hidden by a `completion:close-candidate` cell.
 
 ## Evidence Rows
 

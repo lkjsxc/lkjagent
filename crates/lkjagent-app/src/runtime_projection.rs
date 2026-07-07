@@ -88,6 +88,7 @@ fn decision_cell_key(decision: &RuntimeDecision) -> Result<Option<StateKey>, Str
             .map_err(|e| e.message);
     }
     match operation {
+        "completion.blocked" => StateKey::new("completion", "blocked"),
         "completion.close" => StateKey::new("completion", "close-candidate"),
         "owner.answer" => StateKey::new("case", "waiting-answer"),
         "runtime.idle" => StateKey::new("runtime", "idle"),

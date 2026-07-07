@@ -59,6 +59,12 @@ fn cell_candidate(cell: &StateCell) -> Option<SelectorCandidate> {
     match (cell.key.namespace.as_str(), cell.key.name.as_str()) {
         ("case", "owner-intake") => Some(model_free(cell, "owner.intake", 10, "owner intake")),
         ("case", "waiting-answer") => Some(model_free(cell, "owner.answer", 20, "owner answer")),
+        ("completion", "blocked") => Some(model_free(
+            cell,
+            "completion.blocked",
+            65,
+            "completion blocked",
+        )),
         ("completion", "close-candidate") => Some(model_free(
             cell,
             "completion.close",

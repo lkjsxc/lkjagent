@@ -48,7 +48,9 @@ arguments. It rejects JSON-shaped bodies, attributes, unknown tags, duplicate
 scalar tags, duplicate argument names, stale decisions, context mismatches,
 unknown tools, wrong primitive classes, unclosed tags, crossed tags, and bad
 entities. Prompt cards, recovery cards, scripted endpoint helpers, experiment
-fixtures, and stop tags render the same XML-like action grammar.
+fixtures, and stop tags render the same XML-like action grammar. Internal JSON
+exchange files and flat data config are allowed as ledger evidence, not as
+model-visible action output.
 
 Token usage rows now keep total input, cached input, derived uncached input,
 output, and cache status beside bridge prompt, completion, and cached columns.
@@ -82,12 +84,10 @@ turns and event rows ordered by row time, and the Transcript pane merges that
 stream with in-session entries. Daemon-written agent messages remain visible
 after refresh or TUI restart without splitting owner and agent blocks.
 
-After the owner-turn routing slice, Docker Compose `test`, `lint`, `bench`,
-and `replay` services passed. After the TUI transcript display fix, these gates
-passed in this checkout: `cargo fmt --check`, source and docs line audit,
-`cargo clippy --workspace --all-targets -- -D warnings`, `cargo test
---workspace`, `cargo run -p lkjagent-xtask -- quiet verify`, and Docker Compose
-`verify`.
+Earlier owner-turn and TUI transcript slices recorded Docker Compose and quiet
+gate evidence. Those historical gates are useful proof records but must be
+rerun after current behavior changes before claiming this checkout is fully
+verified.
 
 Owner CLI, status, watch, console, and TUI labels now expose matters rather than
 tasks. Plan-family rows still exist as bridge storage, but owner-visible list,
@@ -111,25 +111,41 @@ with a read-only summary of pending queue, active matters, and record count.
 System-operation routes also avoid endpoint access; until an allowlisted executor
 exists they block honestly with unsupported-executor and no-command-run evidence.
 Artifact-request routes now build a write/verify/respond matter with a concrete
-workspace artifact path and file-exists check, so an artifact request cannot
-close without a produced artifact or an honest blocked state. Continuation turns
-such as "also" or "this matter" attach to an open matter at cycle boundaries,
-record an owner event, update the matter brief, and feed the active step inputs
-without calling the endpoint.
+workspace artifact path and file-exists check. The route supplies intended
+evidence, while bridge closure safety must still be proven by current focused
+and Docker-backed gates. Continuation turns such as "also" or "this matter"
+attach to an open matter at cycle boundaries, record an owner event, update the
+matter brief, and feed the active step inputs without calling the endpoint.
 
 The implementation still contains a plan-family bridge. Existing task and step
 rows are treated as body storage and continuity evidence while state cells and
 runtime decisions take over turn authority. Transitional commands may expose
 that bridge until the semantic matter surface is complete.
 
+The bridge completion-safety slice now has focused and Docker-backed coverage
+for the packet's false closure shape. Core completion rejects blocked, active,
+pending, and unsuperseded skipped bridge steps, requires artifact/check evidence
+for artifact-like templates, and allows superseded skipped verify steps only
+after repair and verify evidence. Runtime projection emits `completion:blocked`
+instead of `completion:close-candidate` for blocked bridge states. The app has a
+SQLite-backed regression proving an open file-work matter with a blocked plan
+step and zero artifacts, check rows, workspace records, tool admissions, or
+observations becomes blocked rather than closed. This slice passed `cargo run -p
+lkjagent-xtask -- quiet verify` and Docker Compose `verify` in this run.
+
 ## Known Gaps
 
-- No known owner-turn routing gap remains in the current checkout.
+- Check freshness remains bridge-limited: current check rows do not yet carry
+  decision ids, artifact fingerprints, or full parameter matching, so broader
+  freshness work remains for later state-ledger slices.
+- The plan-family bridge still participates in runtime projection. Until native
+  state cells fully own selection, blocked, active, pending, failed, or
+  unsuperseded skipped bridge steps must prevent close candidates.
 
 ## Next Executable Step
 
-Commit the focused TUI transcript display slice while leaving unrelated
-`data/logs` changes untouched.
+Commit the bridge completion-safety slice with honest trailers, then move to the
+next packet work item: native state reducer coverage.
 
 ## Honesty Rules
 

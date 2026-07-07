@@ -116,6 +116,14 @@ fn decision_operation_selects_work_even_when_step_order_differs() {
     let close = decision("completion.close", OutputEnvelope::None);
     assert!(matches!(
         next_work_with_decision(&snapshot, &close),
+        Work::BlockTask(_)
+    ));
+    let mut done = instantiate(70, "are you ok?");
+    for step in &mut done.steps {
+        step.state = StepState::Done;
+    }
+    assert!(matches!(
+        next_work_with_decision(&done, &close),
         Work::CloseTask
     ));
     let model = decision("model.call/1", OutputEnvelope::Plan);

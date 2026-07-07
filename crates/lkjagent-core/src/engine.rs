@@ -1,6 +1,6 @@
 use crate::checks::{CommandFact, FileFact};
 use crate::engine_checks::handle_checks;
-use crate::engine_completion::{block_task, close_task};
+use crate::engine_completion::{block_task, close_task, completion_blocker};
 use crate::engine_steps::{handle_endpoint_error, handle_fault, handle_model};
 use crate::model::*;
 use crate::parse::{Action, ParseFault, ParsedOutput};
@@ -45,6 +45,10 @@ pub enum Command {
     AddSteps(Vec<Step>),
 }
 
+pub fn completion_blocker_reason(snapshot: &TaskSnapshot) -> Option<String> {
+    completion_blocker(snapshot)
+}
+
 pub fn next_work_with_decision(snapshot: &TaskSnapshot, decision: &RuntimeDecision) -> Work {
     match snapshot.task.state {
         TaskState::Waiting | TaskState::Blocked | TaskState::Closed => return Work::Wait,
@@ -55,7 +59,10 @@ pub fn next_work_with_decision(snapshot: &TaskSnapshot, decision: &RuntimeDecisi
         return Work::Wait;
     }
     if operation == "completion.close" {
-        return Work::CloseTask;
+        return completion_blocker(snapshot).map_or(Work::CloseTask, Work::BlockTask);
+    }
+    if operation == "completion.blocked" {
+        return Work::BlockTask("completion blocked by bridge step".to_string());
     }
     if let Some(step_id) = step_operation(operation, "check.run/") {
         return Work::RunChecks { step_id };
@@ -80,7 +87,7 @@ fn next_work_rendered(snapshot: &TaskSnapshot) -> Work {
         .iter()
         .find(|step| matches!(step.state, StepState::Pending | StepState::Active))
     else {
-        return Work::CloseTask;
+        return completion_blocker(snapshot).map_or(Work::CloseTask, Work::BlockTask);
     };
     if step.kind == StepKind::Verify && step.checks.iter().all(deterministic) {
         return Work::RunChecks { step_id: step.id };

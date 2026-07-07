@@ -19,10 +19,16 @@ facts are durable events and may produce recovery state cells.
 ## Completion
 
 Completion is represented by state cells such as `completion:check-pending`,
-`completion:check-passed`, `completion:check-failed`, and
-`completion:close-candidate`. Closing a case requires current passing check
+`completion:check-passed`, `completion:check-failed`, `completion:blocked`, and
+`completion:close-candidate`. Closing a case requires no pending, active,
+blocked, failed, or unsuperseded skipped operation and current passing check
 results tied to artifact fingerprints and the active decision. Model prose is
 not completion evidence.
+
+While plan-family rows remain as bridge storage, they are blocking evidence.
+Any blocked, active, pending, failed, or unsuperseded skipped bridge step keeps
+the matter open or blocked even if task-level checks are empty or model prose
+claims success.
 
 If an artifact changes after a passing check, the reducer suppresses dependent
 `completion:check-passed` cells or creates a fresh check requirement.
