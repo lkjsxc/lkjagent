@@ -76,13 +76,7 @@ fn write_content(
     path: &str,
     content: &str,
 ) -> Result<(String, Vec<lkjagent_core::runtime_artifact::ArtifactUnit>), String> {
-    let full = workspace.join(path);
-    let body = if path.contains("/manuscript/chapter-") && full.exists() {
-        let current = std::fs::read_to_string(&full).map_err(|error| error.to_string())?;
-        format!("{current}\n\n{content}")
-    } else {
-        content.to_string()
-    };
+    let body = content.to_string();
     let (assembled, units) = crate::artifact_effects::assemble_content(path, &body)?;
     lkjagent_effects::workspace::write(workspace, path, &assembled)
         .map_err(|error| error.to_string())?;

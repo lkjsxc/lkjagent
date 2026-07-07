@@ -20,7 +20,7 @@ mod tests {
 
     #[test]
     fn counts_latin_cjk_and_mixed_text() {
-        assert_eq!(count_words("Aurora Ledger opened"), 3);
+        assert_eq!(count_words("Daily report opened"), 3);
         assert_eq!(count_words("\u{661f}\u{304c}\u{5149}\u{308b}"), 4);
         assert_eq!(count_words("Chapter 1 \u{661f}"), 3);
     }

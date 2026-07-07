@@ -27,21 +27,21 @@ materialized steps are capped by `engine.plan.max-steps=80`.
 ## Valid Examples
 
 ```text
-write stories/aurora-ledger/manuscript/chapter-01.md | Opening Vault | words=1000
+write reports/status.md | Weekly Status | words=500
 explore | Find the file that names the target root | budget=5
-respond | Report created paths and measured word counts
+respond | Report created paths and measured checks
 ```
 
 ## Invalid Examples
 
 ```text
-write /tmp/chapter.md | Outside root | words=1000
+write /tmp/report.md | Outside root | words=500
 ```
 
 Fault: `bad_plan_line`, because absolute paths are rejected after grammar parse.
 
 ```text
-write stories/x.md | Missing words
+write reports/x.md | Missing words
 ```
 
 Fault: `bad_plan_line`, because the `words=` field is absent.

@@ -42,11 +42,31 @@ pub struct ScriptedEndpoint {
 }
 
 impl Endpoint for ScriptedEndpoint {
-    fn complete(&mut self, _prompt: &Prompt, _attempt: u32) -> Result<CompletionRecord, String> {
+    fn complete(&mut self, prompt: &Prompt, _attempt: u32) -> Result<CompletionRecord, String> {
         let Some(output) = self.outputs.get(self.index).cloned() else {
             return Err("scripted endpoint exhausted".to_string());
         };
         self.index = self.index.saturating_add(1);
-        Ok(CompletionRecord::scripted(output))
+        Ok(CompletionRecord::scripted(fill_prompt_markers(
+            &output, prompt,
+        )))
     }
+}
+
+fn fill_prompt_markers(output: &str, prompt: &Prompt) -> String {
+    output
+        .replace("__DECISION_ID__", &prompt_value(prompt, "- decision_id: "))
+        .replace(
+            "__CONTEXT_FRAME_FINGERPRINT__",
+            &prompt_value(prompt, "- context_frame_fingerprint: "),
+        )
+}
+
+fn prompt_value(prompt: &Prompt, prefix: &str) -> String {
+    prompt
+        .user
+        .lines()
+        .chain(prompt.system.lines())
+        .find_map(|line| line.trim().strip_prefix(prefix).map(str::to_string))
+        .unwrap_or_default()
 }

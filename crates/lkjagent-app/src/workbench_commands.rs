@@ -1,11 +1,12 @@
 use crate::workbench_state::{reduce, UiEvent, UiState, WorkbenchMode};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WorkbenchCommand {
     Mode(WorkbenchMode),
     Scroll(isize),
     Top,
     Follow(bool),
+    Search(String),
 }
 
 pub fn apply(state: &mut UiState, command: WorkbenchCommand) -> String {
@@ -26,6 +27,10 @@ pub fn apply(state: &mut UiState, command: WorkbenchCommand) -> String {
             *state = reduce(state.clone(), UiEvent::Follow(enabled));
             format!("workbench: follow={enabled}")
         }
+        WorkbenchCommand::Search(query) => {
+            *state = reduce(state.clone(), UiEvent::Search(query.clone()));
+            format!("workbench: search={query}")
+        }
     }
 }
 
@@ -42,6 +47,9 @@ pub fn parse(line: &str) -> Result<Option<WorkbenchCommand>, String> {
     }
     if let Some(rest) = trimmed.strip_prefix("/follow") {
         return follow(rest.trim()).map(Some);
+    }
+    if let Some(rest) = trimmed.strip_prefix("/search") {
+        return search(rest.trim()).map(Some);
     }
     Ok(None)
 }
@@ -70,6 +78,14 @@ fn follow(value: &str) -> Result<WorkbenchCommand, String> {
     }
 }
 
+fn search(value: &str) -> Result<WorkbenchCommand, String> {
+    if value.is_empty() {
+        Err("/search requires text".to_string())
+    } else {
+        Ok(WorkbenchCommand::Search(value.to_string()))
+    }
+}
+
 fn page(value: &str) -> Result<WorkbenchCommand, String> {
     match value {
         "up" => Ok(WorkbenchCommand::Scroll(-10)),
@@ -93,6 +109,10 @@ mod tests {
         assert_eq!(
             parse("/follow off"),
             Ok(Some(WorkbenchCommand::Follow(false)))
+        );
+        assert_eq!(
+            parse("/search daemon"),
+            Ok(Some(WorkbenchCommand::Search("daemon".to_string())))
         );
         assert_eq!(parse("hello"), Ok(None));
     }

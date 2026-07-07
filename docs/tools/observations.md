@@ -27,23 +27,15 @@ bounded resumable fact.
 
 ## Example
 
-```text
-<tool_call>
-<tool_name>fs.read</tool_name>
-<path>data/logs/current-model-run.md</path>
-<count>20</count>
-</tool_call>
-```
-
-Observation:
+A read action for `data/logs/current-model-run.md` with count `20` records the
+admitted tool call, then produces this observation shape:
 
 ```text
 <observation>
 <status>ok</status>
 <content>
-Historical failure fixture for the manuscript run. The active case is in
-recovery, the observed root is stories/novel-named, and final verification is
-pending.
+Historical recovery fixture. The active case is in recovery and final
+verification is pending.
 </content>
 </observation>
 ```

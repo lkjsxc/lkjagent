@@ -17,7 +17,7 @@ pub struct Task {
 pub enum TemplateId {
     Generic,
     Question,
-    Manuscript,
+    LegacyArtifact,
     DocsTree,
     FileWork,
     Journal,

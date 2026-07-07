@@ -6,6 +6,9 @@ use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+mod support;
+use support::{action_chars, shell_action};
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -40,8 +43,8 @@ fn sensitive_observation_body_is_redacted() -> TestResult<()> {
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![
-            action("fs.write", &[('p', "secret.txt"), ('c', "token=abc123")]),
-            action("fs.read", &[('p', "secret.txt")]),
+            action_chars("fs.write", &[('p', "secret.txt"), ('c', "token=abc123")]),
+            action_chars("fs.read", &[('p', "secret.txt")]),
         ],
         index: 0,
     };
@@ -57,19 +60,6 @@ fn sensitive_observation_body_is_redacted() -> TestResult<()> {
     assert!(row.1.contains("token=[redacted]"));
     assert!(!row.1.contains("abc123"));
     Ok(())
-}
-
-fn shell_action(command: &str) -> String {
-    format!("<tool_call><tool_name>shell.run</tool_name><command>{command}</command></tool_call>")
-}
-
-fn action(tool: &str, params: &[(char, &str)]) -> String {
-    let mut body = format!("<tool_name>{tool}</tool_name>");
-    for (kind, value) in params {
-        let name = if *kind == 'p' { "path" } else { "content" };
-        body.push_str(&format!("<{name}>{value}</{name}>"));
-    }
-    format!("<tool_call>{body}</tool_call>")
 }
 
 fn fixture_root(name: &str) -> TestResult<PathBuf> {

@@ -1,0 +1,1 @@
+What context facts should enter a clean prompt when one record is stale and one is sensitive?

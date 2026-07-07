@@ -15,11 +15,10 @@ possible runtime states.
 ## Contracts
 
 | Helper | Model block | Engine effect |
-| --- | --- | --- |
 | `plan` | `<plan>` | parse plan lines into events and plan state |
 | `write` | `<content>` | write or append content at the planned path |
 | `revise` | `<content>` | replace one planned file with corrected content |
-| `explore` | `<tool_call>` when the decision exposes tools | admit one tool call |
+| `explore` | JSON action block when tools are exposed | admit one tool call |
 | `verify` | none, or `<verdict>` for judged checks | record check results |
 | `respond` | `<message>` | append an owner-facing event |
 | `ask` | `<message>` | ask the owner and set waiting state |
@@ -29,9 +28,9 @@ render tools or blocks that are absent from that decision.
 
 ## Explore And Ask
 
-Explore completion is a decision-visible tool call only when the `ToolSetView`
-exposes it. Asking the owner is a selected operation that parks waiting state and
-records the question as a clean context item.
+Explore completion is a decision-visible JSON tool call only when the
+`ToolSetView` exposes it. Asking the owner is a selected operation that parks
+waiting state and records the question as a clean context item.
 
 ## Checks
 

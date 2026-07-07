@@ -25,7 +25,7 @@ workspace/
   artifacts/
     documents/
     reports/
-    manuscripts/
+    transcripts/
     exports/
   projects/
   repos/

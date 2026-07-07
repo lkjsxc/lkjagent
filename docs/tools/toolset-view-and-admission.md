@@ -9,9 +9,9 @@ decision.
 
 `ToolSetView` is produced from the catalog, policy layers, and active state
 vector. It contains only tools admissible for the current decision. Each entry
-renders the tool name, purpose, exact XML `<tool_call>` shape, required fields,
-optional fields, `ToolFieldSpec` value classes, value rules, relevant limits,
-and one concise example when budget allows.
+renders the tool name, purpose, required args, optional args, `ToolFieldSpec`
+value classes, value rules, relevant limits, and one concise JSON example when
+budget allows.
 
 ## View Fingerprint
 
@@ -21,26 +21,28 @@ strings.
 
 ## Parser
 
-The parser receives the expected envelope and view from the decision. Unknown
-blocks, empty blocks, prose outside the block, duplicate parameters,
-`<tool_name>` not first, missing required parameters, unknown parameters, and
-tools absent from the view produce structured faults. Unknown means absent from
-the decision view, not absent from a hidden global list.
+The parser receives the expected envelope and view from the decision. Action
+turns must use exactly one dedicated JSON action block. Unknown blocks, prose
+outside the block, duplicate JSON keys, stale decision ids, unknown top-level
+fields, missing args, unknown args, wrong primitive classes, and tools absent
+from the view produce structured faults. Unknown means absent from the decision
+view, not absent from a hidden global list.
 
 ## Admission
 
 Admission validates the parsed tool call against the same view fingerprint and
 then runs final deterministic checks such as placeholder rejection, value-class
 validation, path canonicalization, budget remaining, state suppressors, and
-recovery constraints.
-A prompt/admission mismatch is a high-severity runtime event.
+recovery constraints. A prompt/admission mismatch is a high-severity runtime
+event.
 
 ## Fault Handling
 
 Raw failed model output is stored in exchange logs and marked contaminated.
-Normal retry prompts include only bounded diagnoses and the exact required
-change. Placeholder-looking executable values such as `...`, `PATH`, `TODO`,
-`VALUE`, `FIELD_VALUE`, `<path>`, or `[path]` are rejected before effects.
+Normal retry prompts include only bounded diagnoses, invalid-excerpt hashes, and
+the exact required JSON action shape. Placeholder-looking executable values such
+as `...`, `PATH`, `TODO`, `VALUE`, `FIELD_VALUE`, `<path>`, or `[path]` are
+rejected before effects.
 
 ## Failure This Prevents
 

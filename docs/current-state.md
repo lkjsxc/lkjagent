@@ -30,16 +30,16 @@ The daemon claims a heartbeat config-row lease, uses an injected clock seam for
 durable timestamps, hydrates open and waiting tasks from normalized rows,
 commits turn state through rows, and records waiting answers as rows before continuing.
 
-The parser rejects explore `<finish>` and `<ask>` envelopes, leading or trailing
-prose, old `<action>` envelopes, missing `<tool_name>`, duplicate or unknown
-tool-call fields, and unknown tools absent from the persisted decision
-`ToolSetView`. `lkjagent-core` also contains a staged JSON action parser for one
-bounded action envelope with duplicate-key rejection, decision-id validation,
-unknown-field rejection, and per-tool primitive argument checks; the daemon has
-not yet switched active prompts to that JSON grammar. Prompt rendering labels safe filled tool
-examples separately from schema-only placeholders, which parse but admission
-rejects unchanged; internal `Action` domain names remain. Prompt rendering
-includes the bounded task brief. Endpoint errors use the documented ten-failure
+The parser rejects old explore XML tool calls, `<finish>` and `<ask>` envelopes,
+leading or trailing prose, old `<action>` envelopes, duplicate JSON keys, stale
+or missing decision ids, unknown fields, wrong primitive args, and unknown tools
+absent from the persisted decision `ToolSetView`. Active action prompts now use
+one JSON action grammar, and recovery frames name the decision, fault,
+invalid-excerpt hash, and corrected minimal JSON shape. Prompt rendering labels
+safe filled JSON examples separately from schema-only placeholders, which parse
+but admission rejects unchanged; internal `Action` domain names remain. Prompt
+rendering includes the bounded task brief. Endpoint errors use the documented
+ten-failure
 patience before blocking a step, and endpoint clients default to a loose finite
 900-second timeout unless configured.
 
@@ -161,7 +161,7 @@ classify contamination durably before prompt admission.
 
 Artifact manifests, units, deterministic assembly, fresh fingerprint checks, and
 artifact rows are wired into the generic artifact target. New owner objectives no
-longer route to the old manuscript template; generic manifests support nested
+longer route to the old prose benchmark; generic manifests support nested
 units, source refs, checks, and workspace rebalancing. Proof bundles expose state-vector,
 decisions, prompt-frame, admission, observation, exchange, artifact, context,
 suppression, and conflict-edge sections.
@@ -187,7 +187,7 @@ Checked-in `tmp/` logs are historical proof or failure fixtures unless rerun her
 
 ## Next Executable Step
 
-Run longer story proof trials when endpoint budget is available.
+Run longer variance live profiles when endpoint budget is available.
 
 ## Honesty Rules
 

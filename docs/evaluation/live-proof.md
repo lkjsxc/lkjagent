@@ -2,46 +2,45 @@
 
 ## Purpose
 
-Define the Aurora Ledger live endpoint proof and capture rules.
+Define the daily-use live endpoint proof and capture rules.
 
-## Success Criteria
+## Acceptance Criteria
 
-A baseline live proof passes only when all of these are true:
+A live proof is acceptable only when the proof bundle shows:
 
-- the requested root is `stories/aurora-ledger`;
-- chapter files `chapter-01.md` through `chapter-10.md` exist under the
-  requested manuscript directory;
-- measured manuscript words satisfy `objective.total-words=10000` or more;
-- the task state is `closed` through passed engine checks;
-- no human intervention occurs between send and terminal task state;
-- a proof bundle is captured under `tmp/`.
+- the requested profile and success checks;
+- prompt frames, context lane fingerprints, and tool-view fingerprints;
+- provider exchanges with request and response refs;
+- admitted or rejected tool calls tied to decisions;
+- observations, artifacts, checks, and final state rows;
+- workspace records or aliases touched by the profile; and
+- adoption notes that say what changed because of the evidence.
 
-## Extended Story Proof
+The preferred profiles are personal daily capture, finance receipt flow,
+calendar meeting flow, software maintenance, workspace rebalance, protocol
+stress, TUI operator flow, and recovery flow.
 
-After state-ledger parity is complete, run an unattended structured-story proof
-for about ten hours. The objective asks for recursively expanding story arcs with
-measured targets near 10000, 40000, 160000, then 640000 words. The run must use
-small checked units, deterministic assembly, fresh artifact checks, status logs,
-and a proof bundle. If the endpoint or checks block before ten hours, capture the
-blocked state honestly instead of restarting silently.
+## Duration
 
-## Bounded Trial Capture
+Standard live profile duration is 900 seconds when endpoint credentials are
+available. Short dry runs are allowed only to prove setup before spending live
+budget. Missing endpoint configuration writes explicit skip evidence instead of
+a pass.
 
-Before long proofs, run bounded trials of about 15 minutes when an endpoint is
-available. Store command output, prompts, summaries, proof bundles, and rejected
-ideas under `tmp/live-runs/<stamp>/`. Commit only evidence that is useful and
-free of secrets.
+## Capture
 
-## Command Shape
+Each run writes a stamped directory under `tmp/live-runs/` with data, prompt
+frames, request and response refs, observations, final state, metrics, and an
+adoption note. Secret-bearing raw bodies stay local or are redacted before any
+committed summary.
 
-The operator starts the daemon, sends the Aurora Ledger or recursive story
-objective, watches status until terminal state or the bounded proof window ends,
-then runs proof collection. Endpoint credentials come from the environment and
-are never committed.
+## Procedure
 
-## Honest Failure
+The operator starts the daemon, sends the profile objective, waits until the time
+box or harness-computed completion, collects proof, and records the exact gates
+or skip reason. The model never decides that the live proof passed.
 
-Anything less than the criteria above is a failed proof. The ledger records the
-exact failing criterion, captures fixtures, and names the next fix task. A
-blocked task with precise evidence is an acceptable outcome; fake completion is
-not.
+## Failure This Prevents
+
+Live evidence measures real daily-use behavior instead of optimizing for a
+single prose-generation benchmark.

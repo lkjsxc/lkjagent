@@ -6,7 +6,7 @@ pub fn template(value: &str) -> StoreResult<TemplateId> {
     match value {
         "generic" => Ok(TemplateId::Generic),
         "question" => Ok(TemplateId::Question),
-        "manuscript" => Ok(TemplateId::Manuscript),
+        "legacyartifact" => Ok(TemplateId::LegacyArtifact),
         "docstree" => Ok(TemplateId::DocsTree),
         "filework" => Ok(TemplateId::FileWork),
         "journal" => Ok(TemplateId::Journal),

@@ -165,6 +165,7 @@ mod tests {
         sender.send("/mode pane".to_string())?;
         sender.send("/scroll down".to_string())?;
         sender.send("/follow on".to_string())?;
+        sender.send("/search daemon".to_string())?;
         sender.send("/quit".to_string())?;
         drop(sender);
         let mut output = Vec::new();
@@ -181,6 +182,7 @@ mod tests {
         assert!(text.contains("workbench: mode=pane"));
         assert!(text.contains("workbench: scroll=1"));
         assert!(text.contains("workbench: follow=true"));
+        assert!(text.contains("workbench: search=daemon"));
         assert!(text.contains("== workbench pane refresh"));
         Ok(())
     }

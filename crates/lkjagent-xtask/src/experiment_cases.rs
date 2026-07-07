@@ -1,9 +1,10 @@
 use lkjagent_core::parse::ParseFault;
 use lkjagent_core::runtime_admission::AdmissionStatus;
+use lkjagent_core::runtime_tool_call_v2::ToolCallV2Error;
 
 pub struct ExperimentCase {
     pub name: &'static str,
-    pub raw: &'static str,
+    pub raw: String,
     pub accept: bool,
     pub fault: Option<ParseFault>,
     pub admission: Option<AdmissionStatus>,
@@ -11,34 +12,39 @@ pub struct ExperimentCase {
 
 pub fn cases() -> Vec<ExperimentCase> {
     vec![
-        case("valid-tool-call", "<tool_call><tool_name>finish</tool_name><summary>done</summary></tool_call>", true, None, Some(AdmissionStatus::Admitted)),
-        case("safe-fs-read-example", "<tool_call><tool_name>fs.read</tool_name><path>README.md</path><count>20</count></tool_call>", true, None, Some(AdmissionStatus::Admitted)),
-        case("invalid-count", "<tool_call><tool_name>fs.read</tool_name><path>README.md</path><count>many</count></tool_call>", true, None, Some(AdmissionStatus::Rejected)),
-        case("old-action-envelope", "<action><tool_name>finish</tool_name><summary>done</summary></action>", false, Some(ParseFault::WrongBlock), None),
-        case("missing-tool-name", "<tool_call><summary>done</summary></tool_call>", false, Some(ParseFault::BadParams), None),
-        case("unknown-tool", "<tool_call><tool_name>shell.run</tool_name><command>pwd</command></tool_call>", false, Some(ParseFault::UnknownTool), None),
-        case("duplicate-field", "<tool_call><tool_name>finish</tool_name><summary>a</summary><summary>b</summary></tool_call>", false, Some(ParseFault::BadParams), None),
-        case("tool-name-second", "<tool_call><summary>done</summary><tool_name>finish</tool_name></tool_call>", false, Some(ParseFault::BadParams), None),
-        case("missing-required", "<tool_call><tool_name>finish</tool_name></tool_call>", false, Some(ParseFault::BadParams), None),
-        case("unknown-field", "<tool_call><tool_name>finish</tool_name><summary>done</summary><extra>x</extra></tool_call>", false, Some(ParseFault::BadParams), None),
-        case("placeholder-path", "<tool_call><tool_name>fs.read</tool_name><path>FIELD_VALUE</path></tool_call>", true, None, Some(AdmissionStatus::Rejected)),
-        case("prose-outside", "note <tool_call><tool_name>finish</tool_name><summary>done</summary></tool_call>", false, Some(ParseFault::WrongBlock), None),
-        case("unclosed", "<tool_call><tool_name>finish</tool_name>", false, Some(ParseFault::Unclosed), None),
-        case("empty", "<tool_call></tool_call>", false, Some(ParseFault::Empty), None),
-        case("workspace-escape", "<tool_call><tool_name>fs.read</tool_name><path>../secret</path></tool_call>", true, None, Some(AdmissionStatus::Rejected)),
+        case("valid-v2-finish", v2("finish", "{\"summary\":\"done\"}"), true, None, Some(AdmissionStatus::Admitted)),
+        case("safe-v2-fs-read", v2("fs.read", "{\"path\":\"README.md\",\"count\":20}"), true, None, Some(AdmissionStatus::Admitted)),
+        case("invalid-count", v2("fs.read", "{\"path\":\"README.md\",\"count\":\"many\"}"), false, Some(ParseFault::ActionV2(ToolCallV2Error::ArgsSchemaViolation("wrong primitive for count".into()))), None),
+        case("legacy-v1-tool-call", "<tool_call><tool_name>finish</tool_name><summary>done</summary></tool_call>", false, Some(ParseFault::ActionV2(ToolCallV2Error::NoActionFound)), None),
+        case("old-action-envelope", "<action><tool_name>finish</tool_name><summary>done</summary></action>", false, Some(ParseFault::ActionV2(ToolCallV2Error::NoActionFound)), None),
+        case("missing-required", v2("finish", "{}"), false, Some(ParseFault::ActionV2(ToolCallV2Error::ArgsSchemaViolation("missing arg summary".into()))), None),
+        case("unknown-tool", v2("shell.run", "{\"command\":\"pwd\"}"), false, Some(ParseFault::UnknownTool), None),
+        case("duplicate-field", "<lkjagent_action_v2>{\"schema_version\":\"lkjagent.tool_call.v2\",\"decision_id\":\"experiment-decision\",\"tool_name\":\"fs.read\",\"args\":{\"path\":\"a\",\"path\":\"b\"},\"context_frame_fingerprint\":\"\"}</lkjagent_action_v2>", false, Some(ParseFault::ActionV2(ToolCallV2Error::DuplicateKey("/args/path".into()))), None),
+        case("unknown-field", v2("finish", "{\"summary\":\"done\",\"extra\":\"x\"}"), false, Some(ParseFault::ActionV2(ToolCallV2Error::ArgsSchemaViolation("unknown arg extra".into()))), None),
+        case("placeholder-path", v2("fs.read", "{\"path\":\"FIELD_VALUE\"}"), true, None, Some(AdmissionStatus::Rejected)),
+        case("prose-outside", "note <lkjagent_action_v2>{\"schema_version\":\"lkjagent.tool_call.v2\",\"decision_id\":\"experiment-decision\",\"tool_name\":\"finish\",\"args\":{\"summary\":\"done\"},\"context_frame_fingerprint\":\"\"}</lkjagent_action_v2>", false, Some(ParseFault::ActionV2(ToolCallV2Error::EnvelopeMalformed)), None),
+        case("unclosed", "<lkjagent_action_v2>{\"schema_version\":\"lkjagent.tool_call.v2\"}", false, Some(ParseFault::ActionV2(ToolCallV2Error::EnvelopeMalformed)), None),
+        case("empty", "<lkjagent_action_v2></lkjagent_action_v2>", false, Some(ParseFault::ActionV2(ToolCallV2Error::JsonMalformed)), None),
+        case("workspace-escape", v2("fs.read", "{\"path\":\"../secret\"}"), true, None, Some(AdmissionStatus::Rejected)),
     ]
+}
+
+fn v2(tool: &str, args: &str) -> String {
+    format!(
+        "<lkjagent_action_v2>{{\"schema_version\":\"lkjagent.tool_call.v2\",\"decision_id\":\"experiment-decision\",\"tool_name\":\"{tool}\",\"args\":{args},\"context_frame_fingerprint\":\"\"}}</lkjagent_action_v2>"
+    )
 }
 
 fn case(
     name: &'static str,
-    raw: &'static str,
+    raw: impl Into<String>,
     accept: bool,
     fault: Option<ParseFault>,
     admission: Option<AdmissionStatus>,
 ) -> ExperimentCase {
     ExperimentCase {
         name,
-        raw,
+        raw: raw.into(),
         accept,
         fault,
         admission,

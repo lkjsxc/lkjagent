@@ -19,8 +19,7 @@ Docker runs the same command through `docker compose run --rm replay`.
 
 The replay currently covers:
 
-- `manuscript-small`: three Aurora Ledger chapter files totaling at least 1,500
-  words with engine-computed checks;
+- `artifact-report`: a structured report with engine-computed checks;
 - `question`: a closed direct-answer task in the plan store.
 
 The replay output data directory is suitable input for
@@ -33,10 +32,8 @@ presence and prints an explicit skip line when a live run is not requested.
 
 ## Historical Fixtures
 
-The stage baseline preserved `tmp/fixtures/live-proof-20260701T100958Z/`,
-`tmp/fixtures/live-proof-20260701T113018Z/`, and `tmp/fixtures/data/logs/` as
-raw seed material. Task fixtures distilled into the corpus are committed with
-the replay test that uses them.
+Historical live-stress fixtures are raw seed material only. Task fixtures
+distilled into the corpus are committed with the replay test that uses them.
 
 ## Failure Rule
 

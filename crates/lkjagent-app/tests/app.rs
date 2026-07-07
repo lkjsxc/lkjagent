@@ -10,6 +10,9 @@ use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+mod support;
+use support::finish;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -86,10 +89,10 @@ fn task_intake_admits_bounded_memory_facts() -> TestResult<()> {
     setup(&conn)?;
     conn.execute(
         "INSERT INTO memory (topic, content, created_at)
-         VALUES ('aurora', 'row memory fact', 'seed')",
+         VALUES ('release', 'row memory fact', 'seed')",
         [],
     )?;
-    enqueue(&conn, "Report aurora details.", "queued")?;
+    enqueue(&conn, "Report release details.", "queued")?;
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
         outputs: Vec::new(),
@@ -124,24 +127,21 @@ fn simple_templates_close_with_fake_endpoint() -> TestResult<()> {
     run_scripted(
         "generic",
         "Survey the repository and report.",
-        vec![
-            "<tool_call><tool_name>finish</tool_name><summary>found facts</summary></tool_call>",
-            "<message>done</message>",
-        ],
+        vec![finish("found facts"), "<message>done</message>".to_string()],
         None,
     )?;
     run_scripted(
         "question",
         "What is an agent?",
-        vec!["<message>An agent follows a loop.</message>"],
+        vec!["<message>An agent follows a loop.</message>".to_string()],
         None,
     )?;
     run_scripted(
         "journal",
         "Add a journal note about the release.",
         vec![
-            "<content># Release\n\nShipped notes.</content>",
-            "<message>journal updated</message>",
+            "<content># Release\n\nShipped notes.</content>".to_string(),
+            "<message>journal updated</message>".to_string(),
         ],
         Some("journal/today.md"),
     )?;
@@ -149,23 +149,19 @@ fn simple_templates_close_with_fake_endpoint() -> TestResult<()> {
         "filework",
         "Write notes/out.md with setup notes.",
         vec![
-            "<plan>write notes/out.md | draft | words=1</plan>",
-            "<content>setup notes</content>",
-            "<message>wrote notes</message>",
+            "<plan>write notes/out.md | draft | words=1</plan>".to_string(),
+            "<content>setup notes</content>".to_string(),
+            "<message>wrote notes</message>".to_string(),
         ],
         Some("notes/out.md"),
     )?;
     Ok(())
 }
 
-fn finish(summary: &str) -> String {
-    format!("<tool_call><tool_name>finish</tool_name><summary>{summary}</summary></tool_call>")
-}
-
 fn run_scripted(
     name: &str,
     objective: &str,
-    outputs: Vec<&str>,
+    outputs: Vec<String>,
     expected_file: Option<&str>,
 ) -> TestResult<()> {
     let data = fixture_root(name)?;
@@ -173,10 +169,7 @@ fn run_scripted(
     setup(&conn)?;
     enqueue(&conn, objective, "now")?;
     drop(conn);
-    let mut endpoint = ScriptedEndpoint {
-        outputs: outputs.into_iter().map(str::to_string).collect(),
-        index: 0,
-    };
+    let mut endpoint = ScriptedEndpoint { outputs, index: 0 };
     let snapshot = run_until_idle(&data, &mut endpoint, 8)?;
     assert_eq!(snapshot.task.state, TaskState::Closed);
     if let Some(path) = expected_file {

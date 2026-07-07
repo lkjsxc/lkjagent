@@ -8,6 +8,6 @@ Define deterministic benchmarks, recorded replay, and the live proof contract.
 
 - [benchmarks.md](benchmarks.md): corpus records and judges as checks.
 - [replay.md](replay.md): recorded-exchange smoke replay.
-- [live-proof.md](live-proof.md): Aurora Ledger live proof criteria and capture.
-- [longform-trial.md](longform-trial.md): live longform trial evidence for endpoint tuning.
+- [live-proof.md](live-proof.md): daily-use live proof criteria and capture.
+- [prose-trial.md](prose-trial.md): archived prose-stress evidence notes.
 - [protocol-experiments.md](protocol-experiments.md): prompt and protocol experiment records.

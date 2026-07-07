@@ -1,6 +1,6 @@
 use super::{TEMPERATURE, TOP_P};
 
-const ACTION_CLOSE: &str = "</tool_call>";
+const ACTION_CLOSE: &str = "</lkjagent_action_v2>";
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct CallSpec {

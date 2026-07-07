@@ -107,7 +107,7 @@ fn context_items_preserve_semantic_key_and_contamination() -> TestResult<()> {
     let conn = Connection::open_in_memory()?;
     setup(&conn)?;
     insert_case(&conn, "case-1", "Persist context.", "t0")?;
-    let mut item = ContextItem::clean_fact("ctx-1", "target-root", "stories/aurora");
+    let mut item = ContextItem::clean_fact("ctx-1", "target-root", "workspace/reports");
     item.trust = TrustClass::Model;
     item.staleness = StalenessClass::Current;
     item.contamination = ContaminationClass::FailedModelOutput;

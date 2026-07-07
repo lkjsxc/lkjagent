@@ -15,6 +15,9 @@ use lkjagent_store::plan_schema::setup;
 use lkjagent_store::state_rows::insert_case;
 use rusqlite::Connection;
 
+mod support;
+use support::{action_chars, action_for, finish, memory_save};
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -26,9 +29,9 @@ fn explore_registry_runs_bounded_workspace_tools() -> TestResult<()> {
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![
-            action("fs.write", &[('p', "probe.txt"), ('c', "hello aurora")]),
-            action("fs.read", &[('p', "probe.txt")]),
-            memory_save("probe", "hello aurora"),
+            action_chars("fs.write", &[('p', "probe.txt"), ('c', "hello release")]),
+            action_chars("fs.read", &[('p', "probe.txt")]),
+            memory_save("probe", "hello release"),
             finish("read probe"),
             "<message>done</message>".to_string(),
         ],
@@ -43,9 +46,9 @@ fn explore_registry_runs_bounded_workspace_tools() -> TestResult<()> {
         "--data",
         data.to_string_lossy().as_ref(),
         "memory",
-        "aurora"
+        "release"
     ])?
-    .contains("hello aurora"));
+    .contains("hello release"));
     Ok(())
 }
 
@@ -66,7 +69,7 @@ fn prompt_view_and_admission_share_persisted_tool_fingerprint() -> TestResult<()
     drop(conn);
 
     let mut endpoint = CapturingEndpoint {
-        output: action("fs.read", &[('p', "probe.txt")]),
+        output: action_for("decision-view", "", "fs.read", &[("path", "probe.txt")]),
         prompts: Vec::new(),
     };
     let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;
@@ -116,39 +119,16 @@ fn memory_find_reads_durable_rows() -> TestResult<()> {
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![
-            memory_save("probe", "hello aurora"),
-            action("memory.find", &[('q', "aurora")]),
+            memory_save("probe", "hello release"),
+            action_chars("memory.find", &[('q', "release")]),
         ],
         index: 0,
     };
     let snapshot = run_until_idle(&data, &mut endpoint, 2)?;
     assert_eq!(snapshot.task.state, TaskState::Open);
     assert!(snapshot.steps[0].inputs.contains("memory 1 task=1 probe"));
-    assert!(snapshot.steps[0].inputs.contains("hello aurora"));
+    assert!(snapshot.steps[0].inputs.contains("hello release"));
     Ok(())
-}
-
-fn action(tool: &str, params: &[(char, &str)]) -> String {
-    let mut body = format!("<tool_name>{tool}</tool_name>");
-    for (kind, value) in params {
-        let name = match *kind {
-            'p' => "path",
-            'q' => "query",
-            _ => "content",
-        };
-        body.push_str(&format!("<{name}>{value}</{name}>"));
-    }
-    format!("<tool_call>{body}</tool_call>")
-}
-
-fn memory_save(topic: &str, content: &str) -> String {
-    format!(
-        "<tool_call><tool_name>memory.save</tool_name><topic>{topic}</topic><content>{content}</content></tool_call>"
-    )
-}
-
-fn finish(summary: &str) -> String {
-    format!("<tool_call><tool_name>finish</tool_name><summary>{summary}</summary></tool_call>")
 }
 
 struct CapturingEndpoint {

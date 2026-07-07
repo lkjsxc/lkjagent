@@ -31,7 +31,7 @@ subdirectory under `DIR/entries/`.
 
 ## Coverage
 
-The tiny suite includes manuscript planning, docs-tree planning, file work,
+The tiny suite includes structured reports, docs-tree planning, file work,
 questions, journal work, truncated exchanges, and wrong-envelope exchanges.
 
 ## Fixture Rule

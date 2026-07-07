@@ -8,7 +8,7 @@ benchmarks, replay, and proof bundles.
 ## Table of Contents
 
 - [catalog.md](catalog.md): check names, parameters, and pass rules.
-- [word-counting.md](word-counting.md): the shared manuscript word rule.
+- [word-counting.md](word-counting.md): the shared artifact word rule.
 
 ## Failure This Prevents
 

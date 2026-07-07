@@ -1,0 +1,2 @@
+ok|Plan|<plan>write artifacts/reports/meeting-pack.md | Meeting Pack | words=80\nrespond | Report the checked meeting pack</plan>
+ok|Write|<content># Meeting Pack\n\nDecisions and action items.</content>

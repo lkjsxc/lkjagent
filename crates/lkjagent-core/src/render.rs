@@ -4,7 +4,7 @@ use std::hash::{Hash, Hasher};
 use crate::model::{Attempt, Step, Task};
 pub use crate::prompt_policy::max_tokens;
 use crate::prompt_policy::{envelope_tag, expected_block, protocol, protocol_for_envelope};
-use crate::runtime_decision::RuntimeDecision;
+use crate::runtime_decision::{OutputEnvelope, RuntimeDecision};
 use crate::runtime_tool_cards::{protocol_card, render_tool_view};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -120,13 +120,30 @@ fn recovery_frame(
         .rev()
         .find(|attempt| attempt.step_id == step_id && !attempt.diagnosis.trim().is_empty())?;
     let tag = envelope_tag(decision.expected_envelope).unwrap_or("no_output");
+    let excerpt_hash = fingerprint(&decision.id, &attempt.diagnosis);
+    let repair = repair_shape(decision, tag);
     Some(truncate(
         &format!(
-            "Recovery frame:\ndecision={} attempt={} fault={}\nNext expected envelope: <{}>...</{}>",
-            decision.id, attempt.ordinal, attempt.diagnosis, tag, tag
+            "Recovery frame:\ndecision={} attempt={} fault={} invalid_excerpt_hash={}\nOutput only a corrected envelope or ask plainly for missing information.\n{}",
+            decision.id, attempt.ordinal, attempt.diagnosis, excerpt_hash, repair
         ),
         RETRY_FRAME,
     ))
+}
+
+fn repair_shape(decision: &RuntimeDecision, tag: &str) -> String {
+    if decision.expected_envelope != OutputEnvelope::Action {
+        return format!("Next expected envelope: <{tag}>...</{tag}>");
+    }
+    let tool = decision
+        .tool_view
+        .entries
+        .first()
+        .map_or("TOOL", |entry| entry.name.as_str());
+    format!(
+        "Corrected minimal V2 shape:\n<lkjagent_action_v2>{{\"schema_version\":\"lkjagent.tool_call.v2\",\"decision_id\":\"{}\",\"tool_name\":\"{}\",\"args\":{{}},\"context_frame_fingerprint\":\"{}\"}}</lkjagent_action_v2>",
+        decision.id, tool, decision.context_frame_fingerprint
+    )
 }
 
 fn plan_digest(steps: &[Step]) -> String {

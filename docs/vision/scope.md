@@ -17,8 +17,8 @@ Define the product boundary so every feature has a clear place or no place.
   bounds, active state affordances, case constraints, retry suppressors,
   evidence needs, and recovery constraints.
 - Workspace file work inside the mounted repository or owner workspace.
-- Plan templates as initial events and state cells for manuscripts, docs trees,
-  file work, questions, journal entries, and generic exploration.
+- Plan templates as initial events and state cells for docs trees, file work,
+  questions, journal entries, structured artifacts, and generic exploration.
 - Durable context items with source fingerprints, trust, staleness,
   contamination class, contradiction handling, and bounded prompt admission.
 - Deterministic checks for file existence, word counts, link resolution, README

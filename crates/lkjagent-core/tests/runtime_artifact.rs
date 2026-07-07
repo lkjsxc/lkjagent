@@ -6,7 +6,7 @@ use lkjagent_core::runtime_completion::{can_close, CheckEvidence, CompletionRequ
 #[test]
 fn artifact_units_use_512_token_target_and_require_checks() {
     let mut unit = ArtifactUnit::new("unit-1", "stories/chapter.md", 1);
-    unit.content = "Aurora opened the ledger".to_string();
+    unit.content = "Report opened the ledger".to_string();
 
     assert_eq!(unit.target_tokens, DEFAULT_UNIT_TARGET_TOKENS);
     assert!(assemble_checked_units("stories/chapter.md", &[unit.clone()]).is_err());

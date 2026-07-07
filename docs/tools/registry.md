@@ -36,17 +36,11 @@ and non-numeric count values before effects.
 
 ## Prompt Form
 
-The runtime renders safe filled examples only when the active `ToolSetView`
+The runtime renders safe filled JSON examples only when the active `ToolSetView`
 carries example parameters. Schema-only shapes are labelled non-copyable and
-remain rejected by admission when placeholders are unchanged:
-
-```text
-<tool_call>
-<tool_name>fs.read</tool_name>
-<path>README.md</path>
-<count>20</count>
-</tool_call>
-```
+remain rejected by admission when placeholders are unchanged. A copyable read
+example contains the decision id, tool name `fs.read`, path `README.md`, numeric
+count `20`, and the current context-frame fingerprint.
 
 If no tools are available, the decision renders an output contract that does not
 ask for a tool call.

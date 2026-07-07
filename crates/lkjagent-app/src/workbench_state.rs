@@ -30,6 +30,7 @@ pub struct UiState {
     pub width: u16,
     pub height: u16,
     pub latest: String,
+    pub search: String,
 }
 
 impl UiState {
@@ -42,6 +43,7 @@ impl UiState {
             width: 100,
             height: 30,
             latest: String::new(),
+            search: String::new(),
         }
     }
 }
@@ -53,6 +55,7 @@ pub enum UiEvent {
     Scroll(isize),
     Top,
     Follow(bool),
+    Search(String),
     Resize { width: u16, height: u16 },
 }
 
@@ -78,6 +81,10 @@ pub fn reduce(mut state: UiState, event: UiEvent) -> UiState {
             if enabled {
                 state.scroll = 0;
             }
+        }
+        UiEvent::Search(query) => {
+            state.search = query;
+            state.follow = false;
         }
         UiEvent::Resize { width, height } => {
             state.width = width.max(40);
@@ -108,11 +115,13 @@ mod tests {
         let state = reduce(state, UiEvent::Scroll(-1));
         let state = reduce(state, UiEvent::Top);
         let state = reduce(state, UiEvent::Follow(true));
+        let state = reduce(state, UiEvent::Search("daemon".to_string()));
 
         assert_eq!(state.mode, WorkbenchMode::Pane);
         assert_eq!(state.refreshes, 1);
         assert_eq!(state.scroll, 0);
-        assert!(state.follow);
+        assert!(!state.follow);
+        assert_eq!(state.search, "daemon");
         assert_eq!(state.latest, "body");
     }
 }

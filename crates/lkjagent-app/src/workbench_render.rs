@@ -11,10 +11,11 @@ pub fn render(state: &UiState) -> String {
 
 fn render_append(state: &UiState) -> String {
     bounded(&format!(
-        "== workbench refresh {} mode={} follow={} ==\n{}\ninput: plain text enqueues; /mode pane switches layout; /quit exits workbench",
+        "== workbench refresh {} mode={} follow={} search={} ==\n{}\ninput: plain text enqueues; /mode pane switches layout; /search TEXT filters; /quit exits workbench",
         state.refreshes,
         state.mode.as_str(),
         state.follow,
+        search_label(state),
         state.latest
     ))
 }
@@ -27,6 +28,7 @@ fn render_pane(state: &UiState) -> String {
         .map(|(name, body)| format!("[{}]\n{}", name, body.trim()))
         .collect::<Vec<_>>()
         .join("\n\n");
+    let transcript = filter_search(&transcript, &state.search);
     let left = window(&transcript, state.scroll, state.follow, 18);
     let right = sections
         .iter()
@@ -34,13 +36,33 @@ fn render_pane(state: &UiState) -> String {
         .map(|(_, body)| body.trim())
         .unwrap_or("status: unavailable");
     bounded(&format!(
-        "== workbench pane refresh {} scroll={} follow={} ==\n+-- transcript --+\n{}\n+-- right rail --+\n{}\n+-- input --+\nplain text enqueues | /follow on|off | /mode append | /quit",
+        "== workbench pane refresh {} scroll={} follow={} search={} ==\n+-- transcript --+\n{}\n+-- right rail --+\n{}\n+-- input --+\nplain text enqueues | /follow on|off | /search TEXT | /mode append | /quit",
         state.refreshes,
         state.scroll,
         state.follow,
+        search_label(state),
         left,
         rail_summary(right)
     ))
+}
+
+fn search_label(state: &UiState) -> &str {
+    if state.search.is_empty() {
+        "none"
+    } else {
+        state.search.as_str()
+    }
+}
+
+fn filter_search(text: &str, query: &str) -> String {
+    if query.is_empty() {
+        return text.to_string();
+    }
+    let needle = query.to_ascii_lowercase();
+    text.lines()
+        .filter(|line| line.to_ascii_lowercase().contains(&needle))
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
 fn split_sections(body: &str) -> Vec<(String, String)> {
@@ -120,7 +142,7 @@ mod tests {
 
         let text = render(&state);
 
-        assert!(text.contains("== workbench pane refresh 2 scroll=1 follow=false =="));
+        assert!(text.contains("== workbench pane refresh 2 scroll=1 follow=false search=none =="));
         assert!(text.contains("+-- transcript --+"));
         assert!(text.contains("two"));
         assert!(!text.contains("[recent events]"));

@@ -26,12 +26,12 @@ fn path_guard_rejects_escape_and_symlink_out() -> TestResult<()> {
 #[test]
 fn workspace_shell_observation_and_exchange_work() -> TestResult<()> {
     let root = fixture_root("ops")?;
-    workspace::write(&root, "a/readme.md", "hello\nworld\nAurora")?;
+    workspace::write(&root, "a/readme.md", "hello\nworld\nRelease")?;
     let read = workspace::read(&root, "a/readme.md", 0, 2)?;
     assert!(read.contains("total=3"));
     assert!(workspace::list(&root, ".", 2)?.contains("a/readme.md"));
     assert!(workspace::tree(&root, ".", 2)?.contains("dir a"));
-    assert!(workspace::search(&root, ".", "aurora")?.contains("Aurora"));
+    assert!(workspace::search(&root, ".", "release")?.contains("Release"));
 
     let report = shell::run(&root, "printf ok", 30)?;
     assert!(report.success());
@@ -58,7 +58,7 @@ fn workspace_shell_observation_and_exchange_work() -> TestResult<()> {
 fn combined_catalog_checks_match_expected_results() -> TestResult<()> {
     let root = fixture_root("checks")?;
     workspace::write(&root, "docs/README.md", "# Docs\n\n- [page.md](page.md)\n")?;
-    workspace::write(&root, "docs/page.md", "Aurora words here\n")?;
+    workspace::write(&root, "docs/page.md", "Release words here\n")?;
     let specs = vec![
         CheckSpec::FileExists {
             path: "docs/page.md".to_string(),
@@ -82,7 +82,7 @@ fn combined_catalog_checks_match_expected_results() -> TestResult<()> {
         },
         CheckSpec::Contains {
             path: "docs/page.md".to_string(),
-            needle: "Aurora".to_string(),
+            needle: "Release".to_string(),
         },
         CheckSpec::Absent {
             path: "docs/page.md".to_string(),

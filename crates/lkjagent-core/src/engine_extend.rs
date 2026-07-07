@@ -10,7 +10,7 @@ pub(crate) fn shortfall_steps(
     if results.iter().all(|result| result.passed) {
         return Vec::new();
     }
-    if let Some(steps) = manuscript_shortfall(step, files, results) {
+    if let Some(steps) = word_total_shortfall(step, files, results) {
         return steps;
     }
     if results
@@ -29,7 +29,7 @@ pub(crate) fn shortfall_steps(
     Vec::new()
 }
 
-fn manuscript_shortfall(
+fn word_total_shortfall(
     step: &Step,
     files: &[FileFact],
     results: &[CheckResult],
@@ -58,7 +58,7 @@ pub(crate) fn split_after_fault(step: &Step) -> Vec<Step> {
     let Some(path) = &step.output_path else {
         return Vec::new();
     };
-    if !path.contains("/manuscript/chapter-") {
+    if !path.ends_with(".md") {
         return Vec::new();
     }
     vec![write_step(step, path, 250)]
@@ -108,7 +108,7 @@ fn write_step(parent: &Step, path: &str, words: usize) -> Step {
         parent.id.saturating_mul(10).saturating_add(1),
         StepKind::Write,
     );
-    step.title = "manuscript extension".to_string();
+    step.title = "artifact extension".to_string();
     step.instruction = format!("append at least {words} continuation words");
     step.output_path = Some(path.to_string());
     step.checks.clear();
@@ -134,7 +134,7 @@ fn verify_step(parent: &Step) -> Step {
         parent.id.saturating_mul(10).saturating_add(2),
         StepKind::Verify,
     );
-    step.title = "verify manuscript extension".to_string();
+    step.title = "verify artifact extension".to_string();
     step.checks = parent.checks.clone();
     step
 }

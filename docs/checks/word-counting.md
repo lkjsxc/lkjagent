@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the shared word counting rule for manuscript and content checks.
+Define the shared word counting rule for artifact and content checks.
 
 ## Rule
 
@@ -17,12 +17,12 @@ The implementation owner is `checks.word-count.algorithm=latin-cjk-sum`.
 
 ## Examples
 
-`Aurora Ledger opened` counts as `checks.example.aurora-words=3`.
+`Daily report opened` counts as `checks.example.report-words=3`.
 
 A string containing four characters from those ranges counts as
 `checks.example.cjk-words=4`.
 
-A mixed string with `Chapter`, `1`, and one Han character counts as
+A mixed string with `Section`, `1`, and one Han character counts as
 `checks.example.mixed-words=3`.
 
 ## Shared Use

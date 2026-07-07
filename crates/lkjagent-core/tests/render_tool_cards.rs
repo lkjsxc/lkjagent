@@ -8,13 +8,14 @@ use lkjagent_core::runtime_tool_catalog::explore_tool_view;
 #[test]
 fn rendered_filled_tool_example_parses_and_admits() -> Result<(), String> {
     let snapshot = instantiate(3, "Survey workspace and report.");
-    let decision = RuntimeDecision::new(
+    let mut decision = RuntimeDecision::new(
         "decision-1",
         "case-1",
         OperationKey("model.call/1".to_string()),
         explore_tool_view(),
         OutputEnvelope::Action,
     );
+    decision.context_frame_fingerprint = "ctx-1".to_string();
     let prompt = render_prompt_for_decision(
         &snapshot.task,
         &snapshot.steps,
@@ -35,16 +36,13 @@ fn rendered_filled_tool_example_parses_and_admits() -> Result<(), String> {
         &decision,
         &ModelAction {
             tool: action.tool,
-            params: action
-                .params
-                .into_iter()
-                .filter(|(name, _)| name != "tool_name")
-                .collect(),
+            params: action.params.into_iter().collect(),
         },
     )
     .map_err(|error| error.message)?;
 
-    assert!(prompt.user.contains("<path>README.md</path>"));
+    assert!(prompt.user.contains("<lkjagent_action_v2>"));
+    assert!(prompt.user.contains("\"path\": \"README.md\""));
     assert_eq!(admission.status, AdmissionStatus::Admitted);
     Ok(())
 }

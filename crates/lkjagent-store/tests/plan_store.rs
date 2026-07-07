@@ -91,19 +91,19 @@ fn turn_transaction_rolls_back_uncommitted_rows() -> TestResult<()> {
 fn memory_writes_are_deduplicated_and_searchable() -> TestResult<()> {
     let mut conn = Connection::open_in_memory()?;
     setup(&conn)?;
-    let snapshot = instantiate(12, "Remember aurora facts.");
+    let snapshot = instantiate(12, "Remember release facts.");
     insert_task(&conn, &snapshot.task, None, "now")?;
     let memory = Command::RecordMemory {
         topic: "probe".to_string(),
-        content: "aurora memory survives".to_string(),
+        content: "release memory survives".to_string(),
     };
     commit_turn(&mut conn, &snapshot, std::slice::from_ref(&memory), "later")?;
     commit_turn(&mut conn, &snapshot, &[memory], "again")?;
     let count: i64 = conn.query_row("SELECT COUNT(*) FROM memory", [], |row| row.get(0))?;
     assert_eq!(count, 1);
-    let rows = search_memory(&conn, "aurora", 10)?;
+    let rows = search_memory(&conn, "release", 10)?;
     assert_eq!(rows.len(), 1);
-    assert_eq!(rows[0].content, "aurora memory survives");
+    assert_eq!(rows[0].content, "release memory survives");
     Ok(())
 }
 

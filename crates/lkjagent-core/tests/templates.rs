@@ -5,10 +5,10 @@ use lkjagent_core::model::{CheckSpec, StepKind, TemplateId};
 fn classifier_fixture_table_routes_specific_and_ambiguous_work() {
     let cases = vec![
         (
-            "Write a manuscript chapter about Aurora.",
+            "Write reports/chapter.md with project notes.",
             TemplateId::FileWork,
         ),
-        ("Draft chapter 3 of the novel.", TemplateId::Generic),
+        ("Draft section 3 of the report.", TemplateId::Generic),
         ("Refresh the documentation pages.", TemplateId::DocsTree),
         ("Repair docs/README.md links.", TemplateId::DocsTree),
         ("What changed in the workspace?", TemplateId::Question),

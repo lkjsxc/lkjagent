@@ -84,13 +84,14 @@ fn prompt_cards(conn: &Connection) -> Result<String, String> {
     rows(
         conn,
         "Prompt Cards",
-        "SELECT decision_id, kind, fingerprint FROM prompt_cards ORDER BY id",
+        "SELECT decision_id, kind, fingerprint, reason FROM prompt_cards ORDER BY id",
         |row| {
             Ok(format!(
-                "- decision={} kind={} fp={}",
+                "- decision={} kind={} fp={} reason={}",
                 row.get::<_, String>(0)?,
                 row.get::<_, String>(1)?,
-                row.get::<_, String>(2)?
+                row.get::<_, String>(2)?,
+                row.get::<_, String>(3)?
             ))
         },
     )

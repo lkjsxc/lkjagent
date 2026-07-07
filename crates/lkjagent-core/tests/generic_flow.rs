@@ -15,7 +15,7 @@ fn generic_task_closes_after_eight_plus_turns_with_faults() {
         TurnOutcome::ParseFault(ParseFault::WrongBlock),
         TurnOutcome::ParseFault(ParseFault::Empty),
         action("fs.read", "path", "README.md"),
-        action("fs.search", "query", "Aurora"),
+        action("fs.search", "query", "release"),
         action("memory.find", "query", "workspace"),
         action("plan.note", "note", "ready to summarize"),
         action("finish", "summary", "found enough evidence"),

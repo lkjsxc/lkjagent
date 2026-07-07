@@ -18,7 +18,7 @@ pub fn instantiate(id: u64, objective: &str) -> TaskSnapshot {
         TemplateId::Question => question_steps(id, objective),
         TemplateId::FileWork => file_work_steps(id, objective, &task.checks),
         TemplateId::Journal => journal_steps(id, objective, &task.checks),
-        TemplateId::Manuscript | TemplateId::DocsTree => generic_steps(id, objective),
+        TemplateId::LegacyArtifact | TemplateId::DocsTree => generic_steps(id, objective),
     };
     TaskSnapshot {
         task,

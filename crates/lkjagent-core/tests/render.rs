@@ -35,7 +35,9 @@ fn decision_envelope_replaces_step_prompt_policy() {
     );
     assert!(prompt.system.contains("Expected: message"));
     assert!(prompt.system.contains("Return exactly <message>"));
-    assert!(!prompt.system.contains("Return exactly <tool_call>"));
+    assert!(!prompt
+        .system
+        .contains("Return exactly <lkjagent_action_v2>"));
 }
 
 #[test]
@@ -56,12 +58,14 @@ fn explore_decision_renders_tool_call_contract() {
         &snapshot.steps[0],
         &decision,
     );
-    assert!(prompt.system.contains("Expected: tool_call"));
-    assert!(prompt.system.contains("Return exactly one <tool_call>"));
-    assert!(prompt.user.contains("<tool_name>fs.read</tool_name>"));
+    assert!(prompt.system.contains("Expected: lkjagent_action_v2"));
+    assert!(prompt
+        .system
+        .contains("Return exactly one <lkjagent_action_v2>"));
+    assert!(prompt.user.contains("\"tool_name\": \"fs.read\""));
     assert!(prompt.user.contains("Schema-only shape, not copyable:"));
-    assert!(prompt.user.contains("<path>FIELD_VALUE</path>"));
-    assert_eq!(prompt.stop, "</tool_call>");
+    assert!(prompt.user.contains("\"path\": \"FIELD_VALUE\""));
+    assert_eq!(prompt.stop, "</lkjagent_action_v2>");
 }
 
 #[test]
@@ -96,11 +100,7 @@ fn rendered_placeholder_shape_parses_but_is_rejected() -> Result<(), String> {
         &decision,
         &ModelAction {
             tool: action.tool,
-            params: action
-                .params
-                .into_iter()
-                .filter(|(name, _)| name != "tool_name")
-                .collect(),
+            params: action.params.into_iter().collect(),
         },
     )
     .map_err(|error| error.message)?;
@@ -168,6 +168,7 @@ fn fault_linked_recovery_frame_names_next_envelope() {
     assert!(prompt.user.contains("Recovery frame:"));
     assert!(prompt.user.contains("decision=decision-1"));
     assert!(prompt.user.contains("fault=WrongBlock"));
+    assert!(prompt.user.contains("invalid_excerpt_hash="));
     assert!(prompt
         .user
         .contains("Next expected envelope: <message>...</message>"));

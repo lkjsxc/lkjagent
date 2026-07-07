@@ -11,7 +11,7 @@ visibility that make daemon progress observable.
 
 ```text
 daemon: working | idle | waiting | stopped
-task: 12 Open Manuscript budget 47/200
+task: 12 Open Generic budget 47/200
 step: 7/16 Write attempt 1/3
 last: Notice taskclosed
 question: none

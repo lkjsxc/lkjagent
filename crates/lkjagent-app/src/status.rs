@@ -138,9 +138,23 @@ fn state_ledger_lines(conn: &Connection) -> Result<String, String> {
     let exchanges = count_table(conn, "provider_exchanges")?;
     let artifacts = count_table(conn, "artifacts")?;
     Ok(format!(
-        "state: active={active} conflicts={conflicts}\ndecision: {}\nadmissions: {admissions} observations: {observations} exchanges: {exchanges} artifacts: {artifacts}",
-        decision_line(conn)?
+        "state: active={active} conflicts={conflicts}\ndecision: {}\ncontext_lanes: {}\nadmissions: {admissions} observations: {observations} exchanges: {exchanges} artifacts: {artifacts}",
+        decision_line(conn)?,
+        context_lanes(conn)?
     ))
+}
+
+fn context_lanes(conn: &Connection) -> Result<String, String> {
+    let row = conn.query_row(
+        "SELECT reason FROM prompt_cards WHERE kind = 'facts' ORDER BY created_at DESC, id DESC LIMIT 1",
+        [],
+        |row| row.get::<_, String>(0),
+    );
+    match row {
+        Ok(line) => Ok(line),
+        Err(rusqlite::Error::QueryReturnedNoRows) => Ok("none".to_string()),
+        Err(error) => Err(error.to_string()),
+    }
 }
 
 fn decision_line(conn: &Connection) -> Result<String, String> {

@@ -90,19 +90,49 @@ fn run_profile(options: &LiveOptions, profile: &Profile, out: &Path) -> Result<(
             }
         }
     }
+    let elapsed = started.elapsed().as_secs();
+    let metrics = metrics_line(&data)?;
     fs::write(
         out.join("summary.md"),
         format!(
-            "# Live Profile Summary\n\nprofile={}\nstatus={}\nstate={}\nobjective={}\nnote={}\n",
-            profile.name, status, final_state, profile.objective, note
+            "# Live Profile Summary\n\nprofile={}\nstatus={}\nstate={}\nelapsed_seconds={}\nobjective={}\nmetrics={}\nnote={}\n",
+            profile.name, status, final_state, elapsed, profile.objective, metrics, note
         ),
     )
     .map_err(|error| error.to_string())?;
     fs::write(
         out.join("raw-evidence.md"),
-        format!("# Raw Evidence\n\ndata={}\nnote={}\n", data.display(), note),
+        format!(
+            "# Raw Evidence\n\ndata={}\nmetrics={}\nnote={}\n",
+            data.display(),
+            metrics,
+            note
+        ),
     )
     .map_err(|error| error.to_string())
+}
+
+fn metrics_line(data: &Path) -> Result<String, String> {
+    let conn = Connection::open(data.join("lkjagent.sqlite3")).map_err(|e| e.to_string())?;
+    let names = [
+        "prompt_frames",
+        "provider_exchanges",
+        "observations",
+        "artifacts",
+        "check_results",
+        "context_items",
+    ];
+    names
+        .iter()
+        .map(|name| table_count(&conn, name).map(|count| format!("{name}={count}")))
+        .collect::<Result<Vec<_>, _>>()
+        .map(|items| items.join(","))
+}
+
+fn table_count(conn: &Connection, table: &str) -> Result<i64, String> {
+    let sql = format!("SELECT COUNT(*) FROM {table}");
+    conn.query_row(&sql, [], |row| row.get(0))
+        .map_err(|error| error.to_string())
 }
 
 fn write_skip(out: &Path, profile: &Profile, missing: &[&str]) -> Result<(), String> {

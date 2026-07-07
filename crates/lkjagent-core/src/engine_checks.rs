@@ -86,5 +86,9 @@ fn handle_failed(
     snapshot.check_results.truncate(keep);
     snapshot.steps[index].state = StepState::Skipped;
     let additions = insert_after(snapshot, index, &additions);
-    add_steps(commands, additions, "extend manuscript after shortfall");
+    add_steps(
+        commands,
+        additions,
+        "extend artifact after word-count shortfall",
+    );
 }
