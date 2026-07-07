@@ -100,6 +100,7 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
         );
         ",
     )?;
+    crate::plan_migrations::migrate(conn)?;
     setup_tail(conn)
 }
 

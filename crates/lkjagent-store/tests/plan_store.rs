@@ -3,7 +3,8 @@ use lkjagent_core::engine::Command;
 use lkjagent_core::model::{CheckResult, Event, EventKind, StepKind, TaskState};
 use lkjagent_store::memory::search_memory;
 use lkjagent_store::plan_access::{
-    attach_answer, deliver_next, enqueue, insert_step_tx, insert_task, set_task_state,
+    attach_answer, deliver_next, enqueue, enqueue_with_force, insert_step_tx, insert_task,
+    next_pending, set_task_state,
 };
 use lkjagent_store::plan_commit::commit_turn;
 use lkjagent_store::plan_inspect::application_tables;
@@ -22,6 +23,35 @@ fn fresh_schema_has_declared_tables() -> TestResult<()> {
         assert!(tables.contains(*table), "missing {table}");
     }
     assert_eq!(tables.len(), APPLICATION_TABLES.len());
+    Ok(())
+}
+
+#[test]
+fn setup_adds_force_new_to_legacy_queue() -> TestResult<()> {
+    let conn = Connection::open_in_memory()?;
+    conn.execute_batch(
+        "CREATE TABLE queue (
+            id INTEGER PRIMARY KEY,
+            content TEXT NOT NULL,
+            state TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        );
+        INSERT INTO queue (content, state, created_at) VALUES ('old', 'pending', 'then');",
+    )?;
+
+    setup(&conn)?;
+    let row = match next_pending(&conn)? {
+        Some(row) => row,
+        None => return Err("missing migrated queue row".into()),
+    };
+    let id = enqueue_with_force(&conn, "new", true, "now")?;
+    let forced: i64 = conn.query_row("SELECT force_new FROM queue WHERE id = ?1", [id], |row| {
+        row.get(0)
+    })?;
+
+    assert_eq!(row.content, "old");
+    assert!(!row.force_new);
+    assert_eq!(forced, 1);
     Ok(())
 }
 

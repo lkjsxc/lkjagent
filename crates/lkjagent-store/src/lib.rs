@@ -11,6 +11,7 @@ pub mod plan_access;
 pub mod plan_commit;
 pub mod plan_hydrate;
 pub mod plan_inspect;
+mod plan_migrations;
 pub mod plan_names;
 pub mod plan_rows;
 pub mod plan_schema;

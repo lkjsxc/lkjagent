@@ -117,13 +117,13 @@ Unfinished decisions with committed external evidence recover before new
 selection; decisions without external evidence are reused. Proof collection
 writes state-ledger sections for cells, decisions, candidates, records, prompt
 frames, admissions, observations, exchanges, artifacts, checks, and context.
-Status, doctor, workspace, watch, and workbench read rows. Workbench uses a
-TTY alternate-screen console with composer, palette, panes, transcript saving,
-search, scroll, follow, and keyboard events; non-TTY append and pane rendering
-remain deterministic fallbacks. Generic records add, list, show, link,
+Schema setup repairs existing queue columns including `force_new`; status, doctor,
+workspace, watch, and workbench read rows. Workbench uses a TTY console with
+composer, palette, panes, transcript saving, search, scroll, follow, keyboard
+events, and non-TTY append/pane fallbacks. Generic records add, list, show, link,
 archive, resolve path aliases, and project to pure workspace entity refs for
-move validation. Wrappers are
-today, journal, todo, calendar, finance, project, and dev;
+move validation. Wrappers are today, journal, todo, calendar, finance, project,
+and dev;
 record kinds project index, todo, calendar, finance, routine, proof, dev, and
 project state cells. Workspace rebuild writes derived indexes and artifact rows;
 workspace rebalance writes manifest, preview, apply audit, and alias rows. Xtask
