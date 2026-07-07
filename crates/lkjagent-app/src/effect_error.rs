@@ -27,6 +27,7 @@ pub fn settle(
                 tokens_in: 0,
                 tokens_out: 0,
                 cached_tokens: 0,
+                cache_status: "unknown".to_string(),
             };
             failed.attempts.push(attempt.clone());
             commands.push(Command::RecordAttempt(attempt));

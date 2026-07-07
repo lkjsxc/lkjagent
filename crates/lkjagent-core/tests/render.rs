@@ -155,6 +155,7 @@ fn fault_linked_recovery_frame_names_next_envelope() {
         tokens_in: 0,
         tokens_out: 0,
         cached_tokens: 0,
+        cache_status: "unknown".to_string(),
     }];
     let prompt = render_prompt_for_decision_with_attempts(
         &snapshot.task,

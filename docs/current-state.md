@@ -50,6 +50,11 @@ unknown tools, wrong primitive classes, unclosed tags, crossed tags, and bad
 entities. Prompt cards, recovery cards, scripted endpoint helpers, experiment
 fixtures, and stop tags render the same XML-like action grammar.
 
+Token usage rows now keep total input, cached input, derived uncached input,
+output, and cache status beside bridge prompt, completion, and cached columns.
+Status and proof bundles render cached input separately and print unknown cache
+values as unknown, not zero.
+
 Owner CLI, status, watch, console, and TUI labels now expose matters rather than
 tasks. Plan-family rows still exist as bridge storage, but owner-visible list,
 show, queue, log, status, and exchange paths use matter and operation wording.
@@ -74,8 +79,6 @@ that bridge until the semantic matter surface is complete.
   coverage.
 - The workbench composer needs grapheme-aware cursor movement and durable agent
   transcript rendering tests.
-- Token accounting needs first-class total input, cached input, uncached input,
-  output, and unknown cache status in schema, status, and proof.
 - Flat `data/lkjagent.json` migration from older nested config needs proof.
 - Docker layering must avoid broad `COPY . .` and final compose verification
   must be rerun in this checkout.
@@ -84,9 +87,9 @@ that bridge until the semantic matter surface is complete.
 
 ## Next Executable Step
 
-Implement the smallest coherent slice that makes the docs true: add first-class
-token accounting fields for total input, cached input, uncached input, output,
-and unknown cache status.
+Implement the smallest coherent slice that makes the docs true: migrate runtime
+configuration to flat `data/lkjagent.json` while preserving environment
+overrides and setup repair.
 
 ## Honesty Rules
 

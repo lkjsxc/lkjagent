@@ -20,6 +20,7 @@ pub mod proof;
 pub mod proof_checks;
 pub mod proof_records;
 pub mod proof_state;
+pub mod proof_tokens;
 pub mod runner;
 pub mod smoke;
 pub mod structure;

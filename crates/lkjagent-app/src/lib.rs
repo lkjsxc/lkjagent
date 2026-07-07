@@ -37,6 +37,7 @@ mod snapshot_state;
 pub mod state;
 pub mod status;
 mod task_view;
+mod token_status;
 pub mod tui_event {
     pub use crate::tui_state::TuiEvent;
 }

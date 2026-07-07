@@ -185,7 +185,6 @@ fn finish_verdict(
 fn step_index(snapshot: &TaskSnapshot, step_id: u64) -> Option<usize> {
     snapshot.steps.iter().position(|step| step.id == step_id)
 }
-
 fn attempt(step: &Step, prompt: &Prompt, outcome: AttemptOutcome, diagnosis: &str) -> Attempt {
     Attempt {
         step_id: step.id,
@@ -196,5 +195,6 @@ fn attempt(step: &Step, prompt: &Prompt, outcome: AttemptOutcome, diagnosis: &st
         tokens_in: 0,
         tokens_out: 0,
         cached_tokens: 0,
+        cache_status: "unknown".to_string(),
     }
 }

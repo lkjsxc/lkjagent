@@ -58,14 +58,23 @@ fn endpoint_completion_writes_exchange_and_usage_rows() -> TestResult<()> {
     assert!(body_ref.starts_with("logs/case-1/decision-"));
     let prompt_body = fs::read_to_string(data.join(&body_ref))?;
     assert!(prompt_body.contains(&provider.2));
-    let usage: (i64, i64) = conn.query_row(
-        "SELECT prompt_tokens, completion_tokens FROM token_usage LIMIT 1",
+    let usage: (i64, i64, i64, i64, String) = conn.query_row(
+        "SELECT input_total_tokens, input_cached_tokens, input_uncached_tokens,
+         output_tokens, cache_status FROM token_usage LIMIT 1",
         [],
-        |row| Ok((row.get(0)?, row.get(1)?)),
+        |row| {
+            Ok((
+                row.get(0)?,
+                row.get(1)?,
+                row.get(2)?,
+                row.get(3)?,
+                row.get(4)?,
+            ))
+        },
     )?;
-    assert_eq!(usage, (13, 7));
+    assert_eq!(usage, (13, 3, 10, 7, "known".to_string()));
     let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
-    assert!(status.contains("input_total=13 output=7 input_cached=3"));
+    assert!(status.contains("input_uncached=10 input_cached=3 input_total=13 output=7 cache=known"));
     Ok(())
 }
 
@@ -106,11 +115,15 @@ fn missing_endpoint_usage_gets_unknown_token_row() -> TestResult<()> {
     run_until_idle(&data, &mut endpoint, 3)?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     let unknown: i64 = conn.query_row(
-        "SELECT COUNT(*) FROM token_usage WHERE prompt_tokens IS NULL",
+        "SELECT COUNT(*) FROM token_usage WHERE input_total_tokens IS NULL
+         AND cache_status = 'unknown'",
         [],
         |row| row.get(0),
     )?;
     assert!(unknown > 0);
+    let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
+    assert!(status.contains("input_cached=unknown"));
+    assert!(status.contains("cache=unknown"));
     Ok(())
 }
 

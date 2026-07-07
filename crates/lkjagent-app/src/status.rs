@@ -8,7 +8,7 @@ pub fn status(conn: &Connection) -> Result<String, String> {
     let snapshot = load_snapshot(conn).map_err(|error| error.to_string())?;
     let pending =
         lkjagent_store::plan_hydrate::pending_count(conn).map_err(|error| error.to_string())?;
-    let tokens = token_line(conn)?;
+    let tokens = crate::token_status::token_line(conn)?;
     let ledger = state_ledger_lines(conn)?;
     let lease = lease_status::line(conn)?;
     Ok(match snapshot {
@@ -102,28 +102,6 @@ fn question(snapshot: &TaskSnapshot) -> String {
         .map_or_else(|| "none".to_string(), |event| event.content.clone())
 }
 
-fn token_line(conn: &Connection) -> Result<String, String> {
-    let count: i64 = conn
-        .query_row("SELECT COUNT(*) FROM token_usage", [], |row| row.get(0))
-        .map_err(|error| error.to_string())?;
-    if count == 0 {
-        return Ok("unknown".to_string());
-    }
-    let (prompt, completion, cached): (Option<i64>, Option<i64>, Option<i64>) = conn
-        .query_row(
-            "SELECT SUM(prompt_tokens), SUM(completion_tokens), SUM(cached_tokens) FROM token_usage",
-            [],
-            |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
-        )
-        .map_err(|error| error.to_string())?;
-    Ok(format!(
-        "input_total={} output={} input_cached={}",
-        fmt_token(prompt),
-        fmt_token(completion),
-        fmt_token(cached)
-    ))
-}
-
 fn state_ledger_lines(conn: &Connection) -> Result<String, String> {
     let active = count_sql(
         conn,
@@ -188,8 +166,4 @@ fn count_table(conn: &Connection, table: &str) -> Result<i64, String> {
 fn count_sql(conn: &Connection, sql: &str) -> Result<i64, String> {
     conn.query_row(sql, [], |row| row.get(0))
         .map_err(|error| error.to_string())
-}
-
-fn fmt_token(value: Option<i64>) -> String {
-    value.map_or_else(|| "unknown".to_string(), |value| value.to_string())
 }

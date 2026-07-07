@@ -45,11 +45,7 @@ fn collect(options: Options) -> Result<PathBuf, String> {
     crate::proof_state::write_state_bundle(&conn, &options.out_dir)?;
     crate::proof_records::write_record_selector_bundle(&conn, &options.out_dir)?;
     crate::proof_checks::write_checks(&conn, &options.out_dir)?;
-    write(
-        &options.out_dir,
-        "attempts.md",
-        &table_count(&conn, "attempts")?,
-    )?;
+    crate::proof_tokens::write_attempts_and_tokens(&conn, &options.out_dir)?;
     write(
         &options.out_dir,
         "workspace-tree.md",
@@ -66,7 +62,7 @@ fn collect(options: Options) -> Result<PathBuf, String> {
 
 fn summary(conn: &Connection) -> Result<String, String> {
     Ok(format!(
-        "# Proof Summary\n\ntasks={}\nsteps={}\nchecks={}\n",
+        "# Proof Summary\n\nmatters={}\noperations={}\nchecks={}\n",
         count(conn, "tasks")?,
         count(conn, "steps")?,
         count(conn, "check_results")?
@@ -80,7 +76,7 @@ fn status(conn: &Connection) -> Result<String, String> {
     let rows = statement
         .query_map([], |row| {
             Ok(format!(
-                "- task={} state={} template={} budget={}/{}",
+                "- matter={} state={} template={} budget={}/{}",
                 row.get::<_, i64>(0)?,
                 row.get::<_, String>(1)?,
                 row.get::<_, String>(2)?,
@@ -94,10 +90,6 @@ fn status(conn: &Connection) -> Result<String, String> {
         lines.push(row.map_err(|e| e.to_string())?);
     }
     Ok(lines.join("\n"))
-}
-
-fn table_count(conn: &Connection, table: &str) -> Result<String, String> {
-    Ok(format!("# {table}\n\ncount={}\n", count(conn, table)?))
 }
 
 fn count(conn: &Connection, table: &str) -> Result<i64, String> {

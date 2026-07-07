@@ -79,6 +79,7 @@ pub struct Attempt {
     pub tokens_in: u32,
     pub tokens_out: u32,
     pub cached_tokens: u32,
+    pub cache_status: String,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

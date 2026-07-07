@@ -16,6 +16,7 @@ fn proof_collect_writes_bounded_checks_file() -> TestResult<()> {
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
     seed_check(&conn)?;
+    seed_token_usage(&conn)?;
     drop(conn);
 
     let code = run(
@@ -36,6 +37,11 @@ fn proof_collect_writes_bounded_checks_file() -> TestResult<()> {
     assert!(checks.contains("step=1 name=min_words passed=true"));
     assert!(checks.contains("params={\"min\":350}"));
     assert!(checks.contains("measured=words=370"));
+    let tokens = fs::read_to_string(out.join("token-usage.md"))?;
+    assert!(tokens.contains("input_total=13"));
+    assert!(tokens.contains("input_cached=3"));
+    assert!(tokens.contains("input_uncached=10"));
+    assert!(tokens.contains("cache=known"));
     Ok(())
 }
 
@@ -57,6 +63,16 @@ fn seed_check(conn: &Connection) -> rusqlite::Result<()> {
         "INSERT INTO check_results (step_id, name, params_json, passed,
          measured, created_at) VALUES (1, 'min_words', '{\"min\":350}', 1,
          'words=370', 'now')",
+        [],
+    )?;
+    Ok(())
+}
+
+fn seed_token_usage(conn: &Connection) -> rusqlite::Result<()> {
+    conn.execute(
+        "INSERT INTO token_usage (task_id, input_total_tokens, input_cached_tokens,
+         input_uncached_tokens, output_tokens, cache_status, created_at)
+         VALUES (1, 13, 3, 10, 7, 'known', 'now')",
         [],
     )?;
     Ok(())

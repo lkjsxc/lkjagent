@@ -151,6 +151,11 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
             prompt_tokens INTEGER,
             completion_tokens INTEGER,
             cached_tokens INTEGER,
+            input_total_tokens INTEGER,
+            input_cached_tokens INTEGER,
+            input_uncached_tokens INTEGER,
+            output_tokens INTEGER,
+            cache_status TEXT NOT NULL DEFAULT 'unknown',
             created_at TEXT NOT NULL
         );
 
@@ -160,5 +165,35 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
         );
         ",
     )?;
+    ensure_token_usage_columns(conn)?;
     state_schema::setup(conn)
+}
+
+fn ensure_token_usage_columns(conn: &Connection) -> StoreResult<()> {
+    for (name, spec) in [
+        ("input_total_tokens", "INTEGER"),
+        ("input_cached_tokens", "INTEGER"),
+        ("input_uncached_tokens", "INTEGER"),
+        ("output_tokens", "INTEGER"),
+        ("cache_status", "TEXT NOT NULL DEFAULT 'unknown'"),
+    ] {
+        if !has_column(conn, "token_usage", name)? {
+            conn.execute(
+                &format!("ALTER TABLE token_usage ADD COLUMN {name} {spec}"),
+                [],
+            )?;
+        }
+    }
+    Ok(())
+}
+
+fn has_column(conn: &Connection, table: &str, name: &str) -> StoreResult<bool> {
+    let mut statement = conn.prepare(&format!("PRAGMA table_info({table})"))?;
+    let rows = statement.query_map([], |row| row.get::<_, String>(1))?;
+    for row in rows {
+        if row? == name {
+            return Ok(true);
+        }
+    }
+    Ok(false)
 }

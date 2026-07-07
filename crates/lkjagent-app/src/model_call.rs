@@ -16,6 +16,7 @@ pub struct CallRecord {
     pub tokens_in: Option<u32>,
     pub tokens_out: Option<u32>,
     pub cached_tokens: Option<u32>,
+    pub cache_status: String,
     pub count_budget: bool,
     pub exchange_ref: String,
     pub outcome_json: String,
@@ -65,6 +66,7 @@ pub fn call<E: Endpoint>(
                     tokens_in: record.prompt_tokens,
                     tokens_out: record.completion_tokens,
                     cached_tokens: record.cached_tokens,
+                    cache_status: cache_status(&record),
                     count_budget: matches!(outcome, TurnOutcome::ParseFault(_)),
                     exchange_ref: exchange_ref(snapshot, step.ordinal, ordinal),
                     outcome_json: outcome_summary(&outcome),
@@ -96,6 +98,7 @@ pub fn call<E: Endpoint>(
                     tokens_in: None,
                     tokens_out: None,
                     cached_tokens: None,
+                    cache_status: "unknown".to_string(),
                     count_budget: false,
                     exchange_ref: exchange_ref(snapshot, step.ordinal, ordinal),
                     outcome_json: outcome_summary(&outcome),
@@ -182,4 +185,15 @@ fn apply_tokens(attempt: &mut Attempt, record: &CallRecord) {
     attempt.tokens_in = record.tokens_in.unwrap_or(0);
     attempt.tokens_out = record.tokens_out.unwrap_or(0);
     attempt.cached_tokens = record.cached_tokens.unwrap_or(0);
+    attempt.cache_status = record.cache_status.clone();
+}
+
+fn cache_status(record: &crate::model_io::CompletionRecord) -> String {
+    if record.cached_tokens.is_some() {
+        "known".to_string()
+    } else if record.cache_metrics.is_empty() {
+        "unknown".to_string()
+    } else {
+        "provider_specific".to_string()
+    }
 }

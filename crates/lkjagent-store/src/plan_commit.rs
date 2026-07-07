@@ -53,7 +53,7 @@ fn persist_command(
                     now,
                 ],
             )?;
-            insert_usage(tx, task_id, attempt, now)?;
+            crate::token_usage::insert_usage_tx(tx, task_id, tx.last_insert_rowid(), attempt, now)?;
         }
         Command::RecordEvent(event) => insert_event(tx, task_id, event.kind, &event.content, now)?,
         Command::RecordMemory { topic, content } => {
@@ -128,27 +128,6 @@ fn update_step(tx: &rusqlite::Transaction<'_>, step: &Step, now: &str) -> StoreR
     Ok(())
 }
 
-fn insert_usage(
-    tx: &rusqlite::Transaction<'_>,
-    task_id: i64,
-    attempt: &lkjagent_core::model::Attempt,
-    now: &str,
-) -> StoreResult<()> {
-    tx.execute(
-        "INSERT INTO token_usage (task_id, attempt_id, prompt_tokens, completion_tokens,
-         cached_tokens, created_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
-        params![
-            task_id,
-            tx.last_insert_rowid(),
-            token(attempt.tokens_in),
-            token(attempt.tokens_out),
-            token(attempt.cached_tokens),
-            now
-        ],
-    )?;
-    Ok(())
-}
-
 fn check_params(snapshot: &TaskSnapshot, step_id: u64, index: usize) -> StoreResult<String> {
     let params = snapshot
         .steps
@@ -156,10 +135,6 @@ fn check_params(snapshot: &TaskSnapshot, step_id: u64, index: usize) -> StoreRes
         .find(|step| step.id == step_id)
         .and_then(|step| step.checks.get(index));
     serde_json::to_string(&params).map_err(|error| StoreError::Sql(error.to_string()))
-}
-
-fn token(value: u32) -> Option<i64> {
-    (value > 0).then_some(value as i64)
 }
 
 fn insert_event(
