@@ -1,0 +1,2 @@
+ok|Plan|<plan>write reports/daily-status.md | Daily Status | words=120\nrespond | Report the checked artifact path</plan>
+ok|Write|<content># Daily Status\n\nWork captured.</content>

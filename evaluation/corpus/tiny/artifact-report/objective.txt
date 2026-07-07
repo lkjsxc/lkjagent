@@ -1,0 +1,1 @@
+Write reports/daily-status.md with a concise status report.

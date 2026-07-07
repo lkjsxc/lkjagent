@@ -1,2 +1,0 @@
-ok|Plan|<plan>write stories/aurora-ledger/manuscript/chapter-01.md | Chapter 1 | words=500\nwrite stories/aurora-ledger/manuscript/chapter-02.md | Chapter 2 | words=500\nwrite stories/aurora-ledger/manuscript/chapter-03.md | Chapter 3 | words=500</plan>
-ok|Write|<content>aurora ledger prose</content>

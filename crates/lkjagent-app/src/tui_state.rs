@@ -91,6 +91,7 @@ pub enum TuiEffect {
 }
 
 impl TuiModel {
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             composer: String::new(),

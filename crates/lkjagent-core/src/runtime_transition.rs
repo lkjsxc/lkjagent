@@ -67,22 +67,6 @@ pub struct TransitionGuard {
     pub reason: String,
 }
 
-impl TransitionGuard {
-    pub fn allow(reason: impl Into<String>) -> Self {
-        Self {
-            allowed: true,
-            reason: reason.into(),
-        }
-    }
-
-    pub fn reject(reason: impl Into<String>) -> Self {
-        Self {
-            allowed: false,
-            reason: reason.into(),
-        }
-    }
-}
-
 impl RuntimeTransition {
     pub fn new(
         id: impl Into<String>,
@@ -122,46 +106,49 @@ pub fn validate_transition(
 ) -> TransitionGuard {
     if is_terminal(transition.previous_state) && transition.previous_state != transition.next_state
     {
-        return TransitionGuard::reject("terminal state cannot transition");
+        return reject("terminal state cannot transition");
     }
     if !is_legal_state_step(transition.previous_state, transition.next_state) {
-        return TransitionGuard::reject("state step is not legal");
+        return reject("state step is not legal");
     }
     if requires_evidence(transition.next_state) && transition.evidence_refs.is_empty() {
-        return TransitionGuard::reject("verification evidence is required");
+        return reject("verification evidence is required");
     }
     if wants_progress(transition.next_state) {
         if let Some(edge) = blocking_edge(&transition.node_ref, active_edges) {
-            return TransitionGuard::reject(format!("blocked by edge {}", edge.id));
+            return reject(format!("blocked by edge {}", edge.id));
         }
     }
-    TransitionGuard::allow("transition accepted")
+    allow("transition accepted")
 }
 
+fn allow(reason: impl Into<String>) -> TransitionGuard {
+    TransitionGuard {
+        allowed: true,
+        reason: reason.into(),
+    }
+}
+
+fn reject(reason: impl Into<String>) -> TransitionGuard {
+    TransitionGuard {
+        allowed: false,
+        reason: reason.into(),
+    }
+}
+
+#[rustfmt::skip]
 fn is_legal_state_step(previous: NodeState, next: NodeState) -> bool {
-    if previous == next {
-        return true;
-    }
-    match (previous, next) {
-        (NodeState::Proposed, NodeState::Admitted | NodeState::Archived) => true,
-        (NodeState::Admitted, NodeState::Ready | NodeState::Blocked | NodeState::Archived) => true,
-        (NodeState::Ready, NodeState::Active | NodeState::Blocked | NodeState::WaitingExternal) => {
-            true
-        }
-        (NodeState::Active, NodeState::WaitingOwner | NodeState::WaitingExternal) => true,
-        (NodeState::Active, NodeState::Blocked | NodeState::Recovering | NodeState::Verifying) => {
-            true
-        }
-        (NodeState::WaitingOwner | NodeState::WaitingExternal, NodeState::Ready) => true,
-        (NodeState::Blocked, NodeState::Ready | NodeState::Recovering | NodeState::Failed) => true,
-        (NodeState::Recovering, NodeState::Ready | NodeState::Active | NodeState::Failed) => true,
-        (
-            NodeState::Verifying,
-            NodeState::Succeeded | NodeState::Failed | NodeState::Recovering,
-        ) => true,
-        (_, NodeState::Superseded) => true,
-        _ => false,
-    }
+    previous == next || matches!((previous, next),
+        (NodeState::Proposed, NodeState::Admitted | NodeState::Archived)
+        | (NodeState::Admitted, NodeState::Ready | NodeState::Blocked | NodeState::Archived)
+        | (NodeState::Ready, NodeState::Active | NodeState::Blocked | NodeState::WaitingExternal)
+        | (NodeState::Active, NodeState::WaitingOwner | NodeState::WaitingExternal)
+        | (NodeState::Active, NodeState::Blocked | NodeState::Recovering | NodeState::Verifying)
+        | (NodeState::WaitingOwner | NodeState::WaitingExternal, NodeState::Ready)
+        | (NodeState::Blocked, NodeState::Ready | NodeState::Recovering | NodeState::Failed)
+        | (NodeState::Recovering, NodeState::Ready | NodeState::Active | NodeState::Failed)
+        | (NodeState::Verifying, NodeState::Succeeded | NodeState::Failed | NodeState::Recovering)
+        | (_, NodeState::Superseded))
 }
 
 fn requires_evidence(next: NodeState) -> bool {
