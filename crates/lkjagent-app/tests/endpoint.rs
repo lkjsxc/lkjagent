@@ -26,6 +26,11 @@ fn llm_endpoint_uses_configured_chat_endpoint() -> TestResult<()> {
     let text = endpoint.complete(&prompt(), 0)?.content;
     handle.join().map_err(|_| "server thread failed")??;
     assert_eq!(text, "<message>hello</message>");
+    let migrated = fs::read_to_string(data.join("lkjagent.json"))?;
+    assert!(migrated.contains("endpoint_url"));
+    assert!(migrated.contains("endpoint_model"));
+    assert!(migrated.contains("endpoint_timeout_seconds"));
+    assert!(!migrated.contains("\"endpoint\""));
     Ok(())
 }
 

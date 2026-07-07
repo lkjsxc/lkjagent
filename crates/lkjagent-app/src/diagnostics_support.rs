@@ -1,14 +1,12 @@
 use std::path::Path;
 
 pub(crate) fn endpoint_state(data_dir: &Path) -> String {
-    let config = std::fs::read_to_string(data_dir.join("lkjagent.json"))
-        .ok()
-        .and_then(|text| serde_json::from_str::<serde_json::Value>(&text).ok());
-    let endpoint = config.as_ref().and_then(|value| value.get("endpoint"));
-    let url = source("LKJAGENT_ENDPOINT_URL", endpoint, "url");
-    let model = source("LKJAGENT_MODEL", endpoint, "model");
-    let key_env = endpoint
-        .and_then(|value| value.get("api-key-env"))
+    let config = crate::config::load_flat_config(data_dir).ok();
+    let root = config.as_ref();
+    let url = source("LKJAGENT_ENDPOINT_URL", root, "endpoint_url");
+    let model = source("LKJAGENT_MODEL", root, "endpoint_model");
+    let key_env = root
+        .and_then(|value| value.get("endpoint_api_key_env"))
         .and_then(serde_json::Value::as_str)
         .unwrap_or("LKJAGENT_API_KEY");
     let credential = if env_present(key_env) {

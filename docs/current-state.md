@@ -55,6 +55,12 @@ output, and cache status beside bridge prompt, completion, and cached columns.
 Status and proof bundles render cached input separately and print unknown cache
 values as unknown, not zero.
 
+Endpoint configuration now reads flat `data/lkjagent.json` keys such as
+`endpoint_url`, `endpoint_model`, `endpoint_timeout_seconds`, and
+`endpoint_api_key_env`. When an older nested endpoint object is present, loading
+or diagnostics rewrites it to the flat shape while environment variables still
+take precedence.
+
 Owner CLI, status, watch, console, and TUI labels now expose matters rather than
 tasks. Plan-family rows still exist as bridge storage, but owner-visible list,
 show, queue, log, status, and exchange paths use matter and operation wording.
@@ -79,7 +85,6 @@ that bridge until the semantic matter surface is complete.
   coverage.
 - The workbench composer needs grapheme-aware cursor movement and durable agent
   transcript rendering tests.
-- Flat `data/lkjagent.json` migration from older nested config needs proof.
 - Docker layering must avoid broad `COPY . .` and final compose verification
   must be rerun in this checkout.
 - Live campaigns must run for real elapsed time when an endpoint is available,
@@ -87,9 +92,8 @@ that bridge until the semantic matter surface is complete.
 
 ## Next Executable Step
 
-Implement the smallest coherent slice that makes the docs true: migrate runtime
-configuration to flat `data/lkjagent.json` while preserving environment
-overrides and setup repair.
+Implement the smallest coherent slice that makes the docs true: add Docker
+Compose proof for an owner record turn through the workspace path.
 
 ## Honesty Rules
 
