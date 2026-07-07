@@ -1,6 +1,6 @@
 use lkjagent_app::tui_event::TuiEvent;
 use lkjagent_app::tui_render::render_non_tty;
-use lkjagent_app::tui_state::{reduce, TuiEffect, TuiModel, TuiRunState};
+use lkjagent_app::tui_state::{reduce, TuiEffect, TuiModel, TuiPane, TuiRunState};
 
 #[test]
 fn composer_survives_streaming_agent_events() {
@@ -56,6 +56,36 @@ fn tool_approval_preserves_composer_until_submit() {
     assert!(
         matches!(effects.last(), Some(TuiEffect::ApproveTool(card)) if card.name == "fs.write")
     );
+}
+
+#[test]
+fn palette_search_scroll_follow_and_quit_are_pure() {
+    let (model, _) = reduce(TuiModel::new(), TuiEvent::UserOpenPalette);
+    let (model, _) = reduce(model, TuiEvent::UserSearchChanged("daemon".into()));
+    let (model, _) = reduce(model, TuiEvent::UserScroll(5));
+    let (model, _) = reduce(model, TuiEvent::UserSelectPane(TuiPane::Tools));
+    let (model, _) = reduce(model, TuiEvent::UserFollow(true));
+    let (model, effects) = reduce(model, TuiEvent::QuitRequested);
+
+    assert!(model.palette_open);
+    assert_eq!(model.search, "daemon");
+    assert_eq!(model.scroll, 0);
+    assert!(model.follow);
+    assert_eq!(model.active_pane, TuiPane::Tools);
+    assert!(effects.contains(&TuiEffect::Quit));
+}
+
+#[test]
+fn multiline_composer_keeps_newlines() {
+    let (model, _) = reduce(
+        TuiModel::new(),
+        TuiEvent::UserInputChanged("line one".into()),
+    );
+    let (model, _) = reduce(model, TuiEvent::UserComposerNewline);
+    let text = format!("{}line two", model.composer);
+    let (model, _) = reduce(model, TuiEvent::UserInputChanged(text));
+
+    assert_eq!(model.composer, "line one\nline two");
 }
 
 #[test]

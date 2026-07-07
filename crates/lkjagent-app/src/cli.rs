@@ -32,7 +32,7 @@ where
         }
         Command::Status => status(&conn),
         Command::Console => crate::console::run(&conn),
-        Command::Workbench { mode } => crate::workbench::run(&conn, mode),
+        Command::Workbench { mode } => crate::workbench::run(&conn, &invocation.data_dir, mode),
         Command::Doctor { json } => crate::diagnostics::doctor(&conn, &invocation.data_dir, json),
         Command::Workspace { json, rebuild } => {
             if rebuild {

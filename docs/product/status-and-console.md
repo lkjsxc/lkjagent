@@ -75,11 +75,11 @@ from the store.
 
 ## Workbench
 
-`workbench` repeatedly renders the same bounded view while keeping owner input
-available. Append mode is normal-screen output. Pane mode is an explicit framed
-primary-screen renderer, not an alternate-screen owner. Both reuse console
-slash-command handlers and exit without stopping the daemon. They do not own
-decisions, completion, or private state.
+`workbench` opens a terminal operator console when stdin and stdout are TTYs.
+The console uses alternate-screen raw mode, keeps a persistent composer, renders
+transcript, task, tool, graph, workspace, proof, queue, and log panes from rows,
+and can save a transcript. Non-TTY runs keep the line-oriented append or pane
+fallback. Neither mode owns decisions, completion, or private state.
 
 ## Proof Visibility
 

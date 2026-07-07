@@ -1,6 +1,14 @@
 use crate::model::{RepoFile, Violation};
 
-const ALLOWED_EXTERNAL: &[&str] = &["reqwest", "rusqlite", "serde", "serde_json", "toml"];
+const ALLOWED_EXTERNAL: &[&str] = &[
+    "crossterm",
+    "ratatui",
+    "reqwest",
+    "rusqlite",
+    "serde",
+    "serde_json",
+    "toml",
+];
 const FORBIDDEN_RUST: &[&str] = &[".unwrap(", ".expect(", "panic!", "todo!", "unimplemented!"];
 const FORBIDDEN_SKILL_RUST: &[&str] = &[
     "SkillRegistry",
