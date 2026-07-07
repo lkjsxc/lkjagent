@@ -6,9 +6,9 @@ fn classifier_fixture_table_routes_specific_and_ambiguous_work() {
     let cases = vec![
         (
             "Write a manuscript chapter about Aurora.",
-            TemplateId::Manuscript,
+            TemplateId::FileWork,
         ),
-        ("Draft chapter 3 of the novel.", TemplateId::Manuscript),
+        ("Draft chapter 3 of the novel.", TemplateId::Generic),
         ("Refresh the documentation pages.", TemplateId::DocsTree),
         ("Repair docs/README.md links.", TemplateId::DocsTree),
         ("What changed in the workspace?", TemplateId::Question),

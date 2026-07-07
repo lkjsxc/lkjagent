@@ -2,9 +2,7 @@ use crate::model::TemplateId;
 
 pub fn classify(objective: &str) -> TemplateId {
     let lower = objective.to_ascii_lowercase();
-    if has_any(&lower, &["manuscript", "chapter", "novel"]) {
-        TemplateId::Manuscript
-    } else if has_any(&lower, &["docs tree", "documentation", "docs/"]) {
+    if has_any(&lower, &["docs tree", "documentation", "docs/"]) {
         TemplateId::DocsTree
     } else if has_any(&lower, &["journal", "schedule", "todo", "task-list"]) {
         TemplateId::Journal

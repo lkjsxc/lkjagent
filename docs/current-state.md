@@ -160,8 +160,8 @@ endpoint errors, effect errors, shell observations, and secret-like bodies
 classify contamination durably before prompt admission.
 
 Artifact manifests, units, deterministic assembly, fresh fingerprint checks, and
-artifact rows are wired into the generic artifact target. Manuscript remains an
-old template kept for existing checks, while generic manifests support nested
+artifact rows are wired into the generic artifact target. New owner objectives no
+longer route to the old manuscript template; generic manifests support nested
 units, source refs, checks, and workspace rebalancing. Proof bundles expose state-vector,
 decisions, prompt-frame, admission, observation, exchange, artifact, context,
 suppression, and conflict-edge sections.

@@ -34,7 +34,7 @@ pub fn run_replay(root: &Path) -> Result<PathBuf, String> {
     fs::create_dir_all(data.join("workspace")).map_err(|e| e.to_string())?;
     let mut conn = Connection::open(data.join("lkjagent.sqlite3")).map_err(|e| e.to_string())?;
     setup(&conn).map_err(|e| e.to_string())?;
-    replay_manuscript(&mut conn, &data)?;
+    replay_report(&mut conn, &data)?;
     replay_question(&mut conn)?;
     fs::write(
         data.join("summary.md"),
@@ -44,19 +44,15 @@ pub fn run_replay(root: &Path) -> Result<PathBuf, String> {
     Ok(data)
 }
 
-fn replay_manuscript(conn: &mut Connection, data: &Path) -> Result<(), String> {
-    let objective = "Write the Aurora Ledger manuscript at stories/aurora-ledger as 3 chapters totaling 1500 words.";
+fn replay_report(conn: &mut Connection, data: &Path) -> Result<(), String> {
+    let objective = "Write reports/daily-status.md with a concise status report.";
     let snapshot = instantiate(1, objective);
     persist_snapshot(conn, &snapshot)?;
-    let dir = data.join("workspace/stories/aurora-ledger/manuscript");
-    fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
-    for index in 1..=3 {
-        fs::write(
-            dir.join(format!("chapter-{index:02}.md")),
-            prose(index, 500),
-        )
-        .map_err(|e| e.to_string())?;
+    let report = data.join("workspace/reports/daily-status.md");
+    if let Some(parent) = report.parent() {
+        fs::create_dir_all(parent).map_err(|e| e.to_string())?;
     }
+    fs::write(&report, "# Daily Status\n\n- Work captured.\n").map_err(|e| e.to_string())?;
     let results = snapshot
         .task
         .checks
@@ -148,13 +144,6 @@ fn config_endpoint(root: &Path) -> serde_json::Value {
         .get("endpoint")
         .cloned()
         .unwrap_or(serde_json::Value::Null)
-}
-
-fn prose(index: usize, words: usize) -> String {
-    (0..words)
-        .map(|n| format!("aurora{index}_{n}"))
-        .collect::<Vec<_>>()
-        .join(" ")
 }
 
 fn fail(name: &str, message: &str) -> i32 {

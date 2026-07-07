@@ -22,13 +22,23 @@ fn manuscript_field_extraction_covers_real_objectives() {
 
     let fallback = extract("Write a manuscript without a count.");
     assert_eq!(fallback.chapter_count, 10);
-    assert_eq!(fallback.total_words, 10000);
+    assert_eq!(fallback.total_words, 1000);
     assert!(fallback.note.is_some());
 }
 
 #[test]
-fn aurora_manuscript_snapshot_has_plan_settings_verify_and_checks() {
+fn active_templates_no_longer_route_to_manuscript_by_default() {
     let snapshot = instantiate(
+        7,
+        "Write the Aurora Ledger manuscript at stories/aurora-ledger as 10 chapters totaling 10000 words.",
+    );
+    assert_eq!(snapshot.task.template, TemplateId::FileWork);
+    assert_eq!(snapshot.steps[0].kind, StepKind::Plan);
+}
+
+#[test]
+fn direct_manuscript_snapshot_remains_for_existing_rows() {
+    let snapshot = lkjagent_core::manuscript::instantiate(
         7,
         "Write the Aurora Ledger manuscript at stories/aurora-ledger as 10 chapters totaling 10000 words.",
     );

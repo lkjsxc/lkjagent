@@ -17,7 +17,7 @@ pub fn extract(objective: &str) -> ManuscriptFields {
         .unwrap_or(10);
     let (total_words, note) = match word_target(objective, &lower) {
         Some(words) => (words, None),
-        None => (10_000, Some("word target defaulted".to_string())),
+        None => (1_000, Some("bounded word target defaulted".to_string())),
     };
     ManuscriptFields {
         title,

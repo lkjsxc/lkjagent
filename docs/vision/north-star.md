@@ -14,8 +14,8 @@ truth.
 
 The product serves these work types in priority order:
 
-1. Long structured artifacts: manuscripts, document trees, reports, study
-   material, and other multi-file or multi-thousand-word outputs.
+1. Structured artifacts: notes, document trees, reports, study material,
+   workspace manifests, transcripts, and other checked outputs.
 2. Ordinary workspace file work: create, revise, organize, and summarize.
 3. Questions and small tasks answered directly into the transcript.
 4. Personal records as plain workspace files maintained by the same plan engine.
@@ -41,7 +41,6 @@ cells, prompt frames, tool admissions, observations, checks, and artifacts. A
 structured artifact success uses an `ArtifactManifest`, nested units, source
 refs, fresh artifact fingerprints, and harness-computed checks before closure.
 
-Aurora Ledger remains an old manuscript proof, not the north star. The same
-engine must also handle personal records, a software
-project report, a docs-tree request, a question, and file work without creating a
-second runtime authority.
+The same engine must handle personal records, a software project report, a
+docs-tree request, a question, and file work without creating a second runtime
+authority.

@@ -8,9 +8,6 @@ const WORKSPACE_WORDS: &[&str] = &["workspace", "repo", "repository", "file", "d
 
 pub fn instantiate(id: u64, objective: &str) -> TaskSnapshot {
     let template = classify(objective);
-    if template == TemplateId::Manuscript {
-        return crate::manuscript::instantiate(id, objective);
-    }
     if template == TemplateId::DocsTree {
         return crate::docs_tree::instantiate(id, objective);
     }

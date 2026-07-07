@@ -15,8 +15,8 @@ and honest reports.
 - The active state vector determines output grammar and model-visible tools.
 - The model authors bounded content or requests an operation exposed by the
   current decision.
-- Long artifacts are first-class: manuscripts, document trees, reports, and
-  other structured outputs.
+- Structured artifacts are first-class: notes, document trees, reports,
+  workspace manifests, transcripts, and other checked outputs.
 - The daemon runs inside Docker Compose; the container boundary is the safety
   model.
 
