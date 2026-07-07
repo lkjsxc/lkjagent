@@ -35,11 +35,13 @@ state_keys: [todo:open/rec_20260705_120000_slug]
 The `id` is stable and sorts by creation time. Paths are convenient storage
 locations, not identity. Pure workspace entity refs use the record id as the
 stable entity id, so a rebalance can validate path moves without changing
-ledger links. The first file implementation stores records under
-`workspace/records/<kind>/<id>.md` and archived records under
-`workspace/records/archive/<kind>/<id>.md`. Unknown `kind` values are valid
-records and must list, show, link, archive, and round-trip without central enum
-edits.
+ledger links. The canonical file implementation stores records under semantic directories
+such as `workspace/records/life/journal/YYYY/MM/<id>.md`,
+`workspace/records/life/todo/<id>.md`, or
+`workspace/records/work/projects/<id>.md`. Archived records move under
+`workspace/archive/records/...` with aliases preserved. Unknown `kind` values
+are valid records and must list, show, link, archive, and round-trip without
+central enum edits.
 
 ## Ledger Links
 
@@ -51,5 +53,5 @@ checks, provider exchanges, artifacts, other records, or proof bundles.
 ## Staleness
 
 Editing a record changes its fingerprint. Reducers mark dependent indexes,
-checks, completion evidence, prompt frames, and state edges stale or superseded
-before selectors can refresh them.
+checks, completion evidence, prompt frames, matter briefs, and state edges stale
+or superseded before selectors can refresh them.

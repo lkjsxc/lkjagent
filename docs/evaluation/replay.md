@@ -6,8 +6,8 @@ Define deterministic replay over recorded exchanges.
 
 ## Replay Contract
 
-Replay drives the plan-engine store, effects, workspace, and checks with
-committed deterministic fixtures. It does not contact a live endpoint.
+Replay drives the store, effects, workspace, and checks with committed
+deterministic fixtures. It does not contact a live endpoint.
 
 ## Gate
 
@@ -20,7 +20,7 @@ Docker runs the same command through `docker compose run --rm replay`.
 The replay currently covers:
 
 - `artifact-report`: a structured report with engine-computed checks;
-- `question`: a closed direct-answer task in the plan store.
+- `question`: a closed direct-answer matter in the store.
 
 The replay output data directory is suitable input for
 [../operations/proof-bundles.md](../operations/proof-bundles.md).
@@ -32,7 +32,7 @@ presence and prints an explicit skip line when a live run is not requested.
 
 ## Historical Fixtures
 
-Historical live-stress fixtures are raw seed material only. Task fixtures
+Historical live-stress fixtures are raw seed material only. Matter fixtures
 distilled into the corpus are committed with the replay test that uses them.
 
 ## Failure Rule

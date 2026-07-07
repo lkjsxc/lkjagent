@@ -9,7 +9,7 @@ the only runtime authority.
 
 The harness must direct a weak model without asking it to navigate competing
 policy surfaces. The earlier plan ledger proved the value of durable authority,
-but fixed task and step enums cannot express arbitrary simultaneous state.
+but fixed plan-family enums cannot express arbitrary simultaneous state.
 
 ## Decision
 

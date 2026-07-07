@@ -11,12 +11,12 @@ model name, optional API key environment variable, timeout, and context length
 come from `data/lkjagent.json` plus environment overrides.
 
 The default timeout is a loose finite 900 seconds. It remains configurable by
-`LKJAGENT_ENDPOINT_TIMEOUT_SECONDS` and `endpoint.timeout-seconds`, and the
+`LKJAGENT_ENDPOINT_TIMEOUT_SECONDS` and `endpoint_timeout_seconds`, and the
 active value is recorded with exchange timing evidence.
 
-The client sends the selected step prompt, sampling values, max token cap, and
-stop sequence. The stop sequence is the expected closing envelope tag for the
-selected step.
+The client sends the selected decision prompt, sampling values, max token cap,
+and stop sequence. The stop sequence is the expected closing envelope tag for
+the selected decision.
 
 ## Completion Record
 
@@ -28,9 +28,9 @@ The endpoint adapter returns structured completion data to the interpreter:
 - provider anomaly details;
 - closure mode, including whether pure closing-tag repair was applied.
 
-The interpreter persists the record through `attempts.exchange_ref`,
-`token_usage`, exchange files, and bounded event or diagnosis rows. Unknown usage
-fields remain unknown.
+The interpreter persists the record through `provider_exchanges`, `token_usage`,
+exchange files, and bounded event or diagnosis rows. Unknown usage fields remain
+unknown.
 
 ## Response Handling
 
@@ -46,4 +46,4 @@ closing-tag append for the expected envelope.
 Empty completions, reasoning-only completions, transport failures, and length
 truncation become endpoint outcomes. They are retried by the endpoint backoff
 policy before the engine consumes an attempt. A model call that reached the
-endpoint counts against the task budget even when parsing later fails.
+endpoint counts against the matter budget even when parsing later fails.

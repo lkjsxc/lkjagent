@@ -2,39 +2,55 @@
 
 ## Purpose
 
-Define how owner messages enter the system and how waiting tasks receive
-answers.
+Define how owner turns enter the system and how semantic routing preserves
+conversation continuity.
 
-## Message Intake
+## Owner Turn Intake
 
-`lkjagent send TEXT` inserts one pending row into the queue table with
-`force_new=false`. It does not require a running daemon. The daemon delivers
-queue rows only at cycle start, so an owner message never interrupts a turn
-halfway through an endpoint call or state transaction.
+`lkjagent send TEXT` inserts one pending owner-turn row. It does not require a
+running daemon. The daemon delivers pending rows only at cycle start, so owner
+input never interrupts an endpoint call or state transaction.
 
-## Task Creation
+A turn stores the raw owner text, received time, routing flags, optional
+preferred matter ref, and delivery state. The row is evidence, not the visible
+unit of work.
 
-If no task is waiting, the first pending message opens a task. The objective is
-the owner text verbatim. A deterministic classifier picks the initial template,
-which creates the first steps and task-level checks.
+## Semantic Routing
+
+The deterministic router chooses one outcome before asking the model whenever
+rules are sufficient:
+
+- answer a waiting matter;
+- append to an existing matter;
+- create or update a workspace record;
+- create an artifact request;
+- inspect or retrieve workspace evidence;
+- request a system operation;
+- create a new matter.
+
+Record-like phrases such as "record this", Japanese diary requests, todo-like
+text, calendar-like text, finance notes, and project notes prefer workspace
+write-through over matter creation.
 
 ## Answer Routing
 
-If the active task is `waiting`, the next pending row with `force_new=false` is
-treated as the answer to that task. The queue row is linked to the task, an
-answer event is recorded, and the task becomes `open`.
+If a matter is waiting and the owner turn is not marked as separate, the row is
+linked as the answer. The daemon records an answer event, a relation edge from
+the question to the answer, and a state patch that makes the matter runnable.
 
-`lkjagent send --new TEXT` inserts a pending row with `force_new=true`. It
-bypasses answer routing and creates a separate task when selected. The existing
-waiting task remains waiting.
+`lkjagent send --new TEXT` marks the turn as separate. It bypasses answer
+routing and is selected by the semantic router in FIFO order with other
+matter-opening turns.
 
 ## Ordering
 
-Tasks run strictly FIFO. The daemon does not interleave model calls from two
-open tasks. Forced-new rows keep their queue id and are selected in FIFO order
-among task-opening rows.
+The daemon selects one persisted decision at a time. It does not interleave
+endpoint calls from two active matters. Owner turns retain FIFO order inside
+routing groups, but direct record writes may complete without waiting for a
+model-dependent matter.
 
 ## Visibility
 
-`lkjagent queue list` shows pending, delivered, answered, and force-new rows.
-`task show` links the task back to its opening queue row and any answer rows.
+`lkjagent queue list` shows pending, delivered, answered, recorded, separate,
+and failed-routing rows. Matter and record views link back to the owner turn and
+show the workspace paths or decision refs produced by routing.

@@ -6,7 +6,7 @@ Define ordered artifact work as a state-ledger plan family.
 
 ## Plan State
 
-The current checkout stores plans as ordered `steps` rows for a task. The target
+The current checkout stores bridge plans as ordered row bodies. The target
 keeps ordered artifact work but represents it as `plan:*` state cells plus
 events and context items. Exactly one runnable plan item may be selected by a
 runtime decision, but other state cells can remain active at the same time.

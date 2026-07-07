@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define what lkjagent remembers across tasks and how memory enters prompts.
+Define what lkjagent remembers across matters and how memory enters prompts.
 
 ## Table of Contents
 

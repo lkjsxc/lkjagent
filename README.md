@@ -3,30 +3,34 @@
 ## Purpose
 
 lkjagent is a continuously running personal agent for one owner, one local LLM,
-one workspace, and one SQLite store. The daemon is moving toward a durable
-state-ledger runtime where owner messages become cases, events, state cells,
-runtime decisions, prompt frames, tool admissions, effects, observations, checks,
-and honest reports.
+one visible workspace, and one SQLite ledger. Owner turns become matters,
+records, decisions, state cells, events, artifacts, checks, and proof evidence.
+Record-like owner requests write through to files under `data/workspace` by
+default.
 
 ## Product Shape
 
 - Durable rows and persisted runtime decisions own control flow, retries, paths,
   tool admission, context selection, and completion checks.
-- The active state vector determines output grammar and model-visible tools.
-- The model authors bounded content or requests an operation exposed by the
-  current decision.
-- Structured artifacts are first-class: notes, document trees, reports,
-  workspace manifests, transcripts, and other checked outputs.
-- The daemon runs inside Docker Compose; the container boundary is the safety
-  model.
+- The workspace is the owner-readable source for journals, notes, calendar-like
+  entries, finance records, project notes, generated artifacts, transcripts,
+  indexes, and proof logs.
+- Owner turns are routed semantically: answer a pending question, append to a
+  matter, write or update a record, request an artifact, inspect workspace
+  evidence, or request a system operation.
+- The model sees compact XML-like prompt cards with source refs. Model action
+  output uses an attribute-less XML-like grammar, not JSON.
+- The daemon runs inside Docker Compose; durable rows and workspace files remain
+  the audit boundary.
 
 ## Common Commands
 
 ```sh
 cargo run -p lkjagent-app -- run
-cargo run -p lkjagent-app -- send "Create a document tree about ..."
+cargo run -p lkjagent-app -- send "Record that I paid the train fare"
 cargo run -p lkjagent-app -- status
-cargo run -p lkjagent-app -- task list
+cargo run -p lkjagent-app -- matter list
+cargo run -p lkjagent-app -- record list
 cargo run -p lkjagent-app -- log --limit 20
 cargo run -p lkjagent-app -- watch
 cargo run -p lkjagent-app -- workbench
@@ -34,9 +38,10 @@ cargo run -p lkjagent-xtask -- proof collect --data data --out tmp/proof-current
 docker compose run --rm verify
 ```
 
-The commands above are the current app and xtask surfaces.
-[docs/current-state.md](docs/current-state.md) is the behavior and evidence
-ledger; proof collection remains an xtask developer command.
+The commands above are the target owner and developer surfaces. Transitional
+bridge commands may still read plan-family rows until the implementation no
+longer needs them. [docs/current-state.md](docs/current-state.md) is the
+behavior and evidence ledger.
 
 ## Read Order
 
@@ -47,9 +52,10 @@ ledger; proof collection remains an xtask developer command.
 5. [docs/product/README.md](docs/product/README.md)
 6. [docs/workspace/README.md](docs/workspace/README.md)
 7. [docs/context/README.md](docs/context/README.md)
-8. [docs/tools/README.md](docs/tools/README.md)
-9. [docs/agent/README.md](docs/agent/README.md)
-10. [docs/operations/verification.md](docs/operations/verification.md)
+8. [docs/protocol/README.md](docs/protocol/README.md)
+9. [docs/tools/README.md](docs/tools/README.md)
+10. [docs/agent/README.md](docs/agent/README.md)
+11. [docs/operations/verification.md](docs/operations/verification.md)
 
 ## Repository Rules
 

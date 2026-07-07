@@ -10,7 +10,7 @@ Known personal `kind` values include:
 
 - `journal`: dated owner notes, reflections, and status reports;
 - `calendar`: events, appointments, deadlines, and reminders;
-- `todo`: tasks with state, due dates, blockers, and evidence;
+- `todo`: actions with state, due dates, blockers, and evidence;
 - `finance`: budget entries, bills, receipts, and reviews;
 - `note`: general notes and long-lived knowledge;
 - `contact`: owner-provided people and organizations;

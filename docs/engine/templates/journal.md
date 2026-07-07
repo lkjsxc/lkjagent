@@ -2,29 +2,25 @@
 
 ## Purpose
 
-Define personal record tasks as plain workspace file writes.
+Define personal record capture as plain workspace file writes.
 
 ## Selection
 
-The classifier selects this template for journal, schedule, task-list, and
-similar personal-record objectives.
+The deterministic router selects this template for journal, schedule, todo, and
+small daily record requests when the owner intent is explicit enough to write
+without clarification.
 
-## Plan
+## Shape
 
-- Journal entries append to `journal/<date>.md` using
-  `template.journal.date-source=local-clock`.
-- Schedule entries write under `schedule/` when the objective names dates.
-- Task-list entries write under `todos/` as Markdown.
-- Substantial entries may create a memory row capped by
-  `memory.distill.words=120` after the respond step.
+- Journal entries append or create dated Markdown under `records/life/journal/`.
+- Todo entries write under `records/life/todo/` with open state.
+- Calendar-like entries write under `records/life/calendar/YYYY/`.
+- Finance entries write under `records/life/finance/YYYY/`.
+- Each write records a workspace metadata row, fingerprint history, and index
+  staleness event.
 
 ## Checks
 
-The template attaches `file_exists` and objective-specific `contains` checks
-from [../completion.md](../completion.md). It does not create dedicated
-personal tables.
-
-## Failure This Prevents
-
-Personal records use the same plan, file, and check path as other work, so they
-cannot become a separate feature stack with untested persistence.
+The completion check verifies the file exists under the workspace root, the
+body contains the owner-provided fact, and the fingerprint matches the ledger
+row. No model call is needed for explicit record capture.

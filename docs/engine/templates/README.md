@@ -2,24 +2,24 @@
 
 ## Purpose
 
-Define the pure template functions that turn owner objectives into initial
-plans and task checks.
+Define transitional templates that project owner intents into initial state
+cells, checks, and workspace refs.
 
 ## Table of Contents
 
-- [docs-tree.md](docs-tree.md): structured Markdown knowledge-base plan.
-- [file-work.md](file-work.md): workspace create and revise work.
-- [question.md](question.md): direct answer tasks.
-- [journal.md](journal.md): personal record file tasks.
-- [generic.md](generic.md): bounded exploration fallback.
+- [docs-tree.md](docs-tree.md): structured documentation artifacts.
+- [file-work.md](file-work.md): create, revise, organize, and summarize files.
+- [question.md](question.md): direct answer matters.
+- [journal.md](journal.md): personal record file capture.
+- [generic.md](generic.md): fallback matter shape when no specific template fits.
 
-## Shared Contract
+## Contract
 
-A template is a pure function over extracted objective fields, memory facts,
-and config. It returns initial steps plus task checks from
-[../completion.md](../completion.md). It performs no IO.
+A template is pure data. It reads the owner turn, state snapshot, and config. It
+returns initial operations plus matter-level checks from `lkjagent-core`. The
+app persists rows and events; templates never perform effects.
 
-## Failure This Prevents
+## Extensibility
 
-Task families stay as data over the engine. A family cannot grow a hidden tool
-or control plane that bypasses checks.
+Matter families stay as data over the engine. A family cannot grow a hidden
+tool registry, prompt-only policy, or separate completion rule.

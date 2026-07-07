@@ -11,14 +11,14 @@ endpoint budget without an owner objective.
 
 ## Decision
 
-When there is no open task and no pending queue row, the daemon updates
+When there is no open matter and no pending queue row, the daemon updates
 heartbeat state and waits. It does not call the endpoint, inspect the workspace,
 or rewrite memory.
 
 ## Consequences
 
 Owner-visible work starts only from queue messages. Self-improvement work is an
-ordinary owner task.
+ordinary owner matter.
 
 ## Rejected Alternatives
 

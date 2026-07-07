@@ -2,16 +2,22 @@
 
 ## Purpose
 
-Define model output envelopes, tool-call grammar, and fault taxonomy as
-projections of persisted runtime decisions.
+Define model output envelopes, attribute-less XML-like tool-call grammar, and
+fault taxonomy as projections of persisted runtime decisions.
 
 ## Table of Contents
 
-- [envelopes.md](envelopes.md): decision-selected block forms and the active
-  JSON action envelope.
+- [envelopes.md](envelopes.md): decision-selected block forms and active
+  XML-like action envelope.
 - [plan-line-grammar.md](plan-line-grammar.md): exact plan helper grammar and
-  examples.
+  examples for bridge operations.
 - [faults.md](faults.md): parse faults, contamination, and retry hints.
+
+## Core Rule
+
+The model never emits JSON for actions. The selected `RuntimeDecision` renders
+one allowed envelope and one copyable XML-like skeleton. Internal exchange files
+and flat data configuration may use JSON because they are not model context.
 
 ## Failure This Prevents
 

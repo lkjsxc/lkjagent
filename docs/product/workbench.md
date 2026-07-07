@@ -8,15 +8,15 @@ controller.
 ## Command
 
 `lkjagent workbench [--mode append|pane]` attaches to the configured data
-directory. It does not start or stop the daemon. The Docker entrypoint routes the
-command the same way it routes `status`, `console`, and `watch`.
+directory. It does not start or stop the daemon. The Docker entrypoint routes
+the command the same way it routes `status`, `console`, and `watch`.
 
 ## Pure TUI Core
 
-The app has a pure terminal model, event reducer, and non-TTY renderer for the
-next operator console. It preserves composer input while agent, tool, state,
-artifact, resize, interrupt, approval, save, and quit events arrive. The current
-command remains the append or pane fallback until a terminal backend is wired.
+The app has a pure terminal model, event reducer, grapheme-aware composer, and
+non-TTY renderer. It preserves composer input while agent, tool, state,
+artifact, resize, interrupt, approval, save, and quit events arrive. Terminal
+backends are effects at the edge.
 
 ## Modes
 
@@ -24,29 +24,35 @@ command remains the append or pane fallback until a terminal backend is wired.
 primary screen. Plain terminal scrollback, tmux copy mode, and saved command
 output remain usable.
 
-`pane` is an explicit framed primary-screen renderer. It groups the same durable
-rows into transcript, right-rail, and input-hint panes without raw terminal mode
-or alternate-screen ownership. A later raw terminal pane may use terminal
-features only after docs and tests make that mode explicit.
+`pane` is an explicit framed primary-screen renderer. It groups durable rows
+into transcript, right-rail, and input-hint panes without raw terminal mode or
+alternate-screen ownership unless that mode is explicitly selected and tested.
 
 Each refresh includes bounded sections:
 
 - status fields from `lkjagent status`;
-- recent durable events;
-- the active task trace or `task: none`;
-- active decision, prompt, context, tool-view, and proof counts when present;
+- durable transcript events from owner, lkjagent, tools, records, and artifacts;
+- the active matter trace or `matter: none`;
+- active decision, prompt, context, tool-view, workspace, and proof counts;
 - a prompt hint for owner input.
 
 ## Input
 
-Owner input must remain available while progress refreshes. Plain text enqueues
-an owner message. Slash commands reuse the console handlers for `/status`,
-`/watch`, `/log`, `/queue`, `/task`, `/send TEXT`, `/new TEXT`, and `/quit`.
+Owner input remains available while progress refreshes. Plain text enqueues an
+owner turn. Slash commands reuse the console handlers for `/status`, `/watch`,
+`/log`, `/queue`, `/matter`, `/record`, `/send TEXT`, `/new TEXT`, and `/quit`.
 `/mode append` and `/mode pane` switch render modes without touching daemon
 state. `/scroll up`, `/scroll down`, `/scroll top`, `/page up`, and `/page down`
 move pane scroll state only. `/follow on` returns the transcript window to the
-latest rows; `/follow off` leaves manual scroll in place. The loop opens short
-store operations per input or refresh.
+latest rows; `/follow off` leaves manual scroll in place.
+
+## Japanese And Mixed-Width Text
+
+The composer stores text as grapheme clusters plus a cursor grapheme index. It
+uses Unicode display width to position the cursor. Insert, delete, left, right,
+home, end, multiline, and submit operations never split a grapheme or corrupt
+IME-composed text. Tests cover Japanese strings, emoji, ASCII, and mixed-width
+text.
 
 ## Authority Limits
 
@@ -56,8 +62,8 @@ context-resolution, record, or other row-backed command paths.
 
 ## Evidence
 
-Tests should cover parser routing, reducer mode changes, line handling,
-closed-input exit, pane scroll and follow state, status rail fallback fields, and
-bounded rendering. Interactive behavior is proven by captured command logs under
-`tmp/agent-runs/` or `tmp/live-runs/`, with unavailable terminals recorded as an
-honest skip.
+Tests cover parser routing, reducer mode changes, line handling, closed-input
+exit, grapheme cursor movement, pane scroll and follow state, durable transcript
+merge, status rail fallback fields, and bounded rendering. Interactive behavior
+is proven by captured command logs under `tmp/agent-runs/` or `tmp/live-runs/`,
+with unavailable terminals recorded as an honest skip.

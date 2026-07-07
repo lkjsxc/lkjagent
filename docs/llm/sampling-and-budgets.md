@@ -26,7 +26,7 @@ through prompt frames.
 ## Backoff
 
 Endpoint retries use bounded exponential backoff. Consecutive endpoint failures
-are capped by `engine.endpoint-patience=10`; exhaustion blocks the task with a
+are capped by `engine.endpoint-patience=10`; exhaustion blocks the matter with a
 specific report.
 
 ## Failure Boundary

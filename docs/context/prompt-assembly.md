@@ -44,8 +44,8 @@ Every region has an owner and a cap. Oversize items are truncated head-and-tail
 with an explicit marker. Contaminated items are excluded from normal prompts.
 Contradictions render only as unresolved-conflict summaries until resolved.
 Observations are bounded before storage and bounded again during rendering. The
-final prompt region is a copyable output skeleton for the selected envelope and
-active tool view. Kernel, objective, state, facts, conflicts, recovery, tools,
+final prompt region is a copyable XML-like output skeleton for the selected
+envelope and active tool view. Kernel, objective, state, facts, conflicts, recovery, tools,
 and output cards keep the shape stable across profiles.
 
 ## Fingerprint Contract

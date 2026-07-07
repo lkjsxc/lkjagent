@@ -13,7 +13,7 @@ Corpus entries live under `evaluation/corpus/<suite>/<entry>/`. Each entry has:
 - `checks.json`: checks from [../checks/catalog.md](../checks/catalog.md);
 - `fixtures/exchanges.txt`: scripted parse fixtures as `mode|kind|raw` lines.
 
-Judges are check evaluators, not separate task-family code. Entry-specific judge
+Judges are check evaluators, not separate matter-family code. Entry-specific judge
 logic is a corpus-definition error.
 
 ## Gate

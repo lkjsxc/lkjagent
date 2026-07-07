@@ -36,11 +36,11 @@ docker compose run --rm replay
 ```
 
 `docker compose run --rm verify` is the final deterministic gate. It builds the
-image from the committed checkout and runs `quiet verify` without source bind
-mounts.
+image from explicit Dockerfile copies, not broad `COPY . .`, and runs
+`quiet verify` without source bind mounts.
 
 ## Claims
 
 Any claim that runtime behavior is implemented names the focused test, quiet
-gate, and Docker gate that ran. Unavailable live endpoints are recorded as an
-honest skip, not a pass.
+gate, and Docker gate that ran. Unavailable Docker or live endpoints are
+recorded as honest skips with exact command and error, not as passes.

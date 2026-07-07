@@ -14,4 +14,4 @@ Define the durable state vector that replaces fixed plan-only authority.
 ## Failure This Prevents
 
 The runtime can represent many simultaneous facts without forcing them into one
-coarse task state or a closed Rust enum.
+coarse matter state or a closed Rust enum.

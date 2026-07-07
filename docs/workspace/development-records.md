@@ -9,7 +9,7 @@ Define records for software development, projects, and proof work.
 Known development `kind` values include:
 
 - `project`: objective, state, milestones, decisions, and next actions;
-- `development`: repository tasks, branches, tests, and code evidence;
+- `development`: repository work items, branches, tests, and code evidence;
 - `reference`: API notes, local design facts, and owner-approved citations;
 - `routine`: recurring verification, dependency checks, or maintenance;
 - `proof`: evidence bundle manifest and command results.

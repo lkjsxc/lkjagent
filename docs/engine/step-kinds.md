@@ -18,7 +18,7 @@ possible runtime states.
 | `plan` | `<plan>` | parse plan lines into events and plan state |
 | `write` | `<content>` | write or append content at the planned path |
 | `revise` | `<content>` | replace one planned file with corrected content |
-| `explore` | JSON action block when tools are exposed | admit one tool call |
+| `explore` | `lkjagent_action` block when tools are exposed | admit one tool call |
 | `verify` | none, or `<verdict>` for judged checks | record check results |
 | `respond` | `<message>` | append an owner-facing event |
 | `ask` | `<message>` | ask the owner and set waiting state |

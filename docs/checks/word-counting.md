@@ -27,11 +27,11 @@ A mixed string with `Section`, `1`, and one Han character counts as
 
 ## Shared Use
 
-The same function is used by templates, step checks, task checks, status,
+The same function is used by templates, operation checks, matter checks, status,
 benchmarks, replay, and proof bundles. A caller may not substitute a family-
 specific counter.
 
 ## Failure This Prevents
 
-Long-artifact completion cannot depend on task-specific counting heuristics.
+Long-artifact completion cannot depend on matter-specific counting heuristics.
 Every surface measures the same files the same way.

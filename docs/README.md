@@ -14,16 +14,16 @@ product.
    selectors, and arbitrary state keys.
 4. [runtime/](runtime/README.md): durable runtime decisions, loop, recovery, and
    completion.
-5. [product/](product/README.md): daemon lifecycle, queue, CLI, status, and
-   console.
+5. [product/](product/README.md): daemon lifecycle, owner turns, matters,
+   records, CLI, status, and console.
 6. [workspace/](workspace/README.md): owner-readable record tree, artifacts,
    indexes, and archive rules.
 7. [engine/](engine/README.md): plan-family helpers during the state-ledger
    transition.
 8. [context/](context/README.md): context items, contradictions,
-   contamination, budgets, and prompt frames.
-9. [protocol/](protocol/README.md): model output envelopes and faults tied to
-   decisions.
+   contamination, budgets, matter briefs, and prompt frames.
+9. [protocol/](protocol/README.md): model output envelopes, XML-like actions,
+   and faults tied to decisions.
 10. [tools/](tools/README.md): catalog, policy, tool views, admissions,
     observations, and guards.
 11. [checks/](checks/README.md): deterministic checks and word counting.

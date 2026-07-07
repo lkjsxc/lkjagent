@@ -27,8 +27,8 @@ The check count is `checks.catalog.count=11`.
 
 ## Placement
 
-Step checks run immediately after the step effect. Task checks run when no
-runnable steps remain. Benchmarks and replay use the same check evaluator.
+Operation checks run immediately after the effect. Matter checks run when no
+runnable decisions remain. Benchmarks and replay use the same check evaluator.
 
 ## Diagnosis
 
@@ -39,5 +39,5 @@ values rather than parsing prose.
 
 ## Failure This Prevents
 
-A task cannot close because a model says it is complete; closure reads measured
-check rows.
+A matter cannot close because a model says it is complete; closure reads
+measured check rows.

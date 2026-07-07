@@ -13,13 +13,13 @@ response, or artifact bodies, but rows own resumable facts and references.
 
 ## Table Set
 
-State-ledger tables are created beside the current plan-family tables until the
-runtime reads only state rows. Required tables:
+State-ledger tables are created beside transitional plan-family tables until the
+runtime reads only matter, state, and record rows. Required tables:
 
 | Table | Role |
 | --- | --- |
-| `queue` | owner messages, answer routing, and forced-new intent |
-| `cases` | owner objective, lifecycle summary, and terminal report |
+| `queue` | owner turns, answer routing, and separate-matter intent |
+| `cases` | matter objective, lifecycle summary, and terminal report |
 | `runtime_events` | append-only runtime facts with optional decision id |
 | `state_cells` | current arbitrary state vector |
 | `state_history` | audit of applied state patches |
@@ -41,7 +41,7 @@ runtime reads only state rows. Required tables:
 | `provider_exchanges` | endpoint request and response refs |
 | `token_usage` | nullable provider usage fields |
 | `memory` | durable owner-useful facts with FTS mirror when useful |
-| `config` | owner settings and daemon lease values only |
+| `config` | bridge settings and daemon lease values only |
 
 ## JSON Columns
 

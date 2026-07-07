@@ -9,9 +9,9 @@ decision.
 
 `ToolSetView` is produced from the catalog, policy layers, and active state
 vector. It contains only tools admissible for the current decision. Each entry
-renders the tool name, purpose, required args, optional args, `ToolFieldSpec`
-value classes, value rules, relevant limits, and one concise JSON example when
-budget allows.
+renders the tool name, purpose, required arguments, optional arguments,
+`ToolFieldSpec` value classes, value rules, relevant limits, and one concise
+XML-like skeleton when budget allows.
 
 ## View Fingerprint
 
@@ -22,11 +22,11 @@ strings.
 ## Parser
 
 The parser receives the expected envelope and view from the decision. Action
-turns must use exactly one dedicated JSON action block. Unknown blocks, prose
-outside the block, duplicate JSON keys, stale decision ids, unknown top-level
-fields, missing args, unknown args, wrong primitive classes, and tools absent
-from the view produce structured faults. Unknown means absent from the decision
-view, not absent from a hidden global list.
+turns must use exactly one dedicated `lkjagent_action` block. Unknown blocks,
+attributes, prose outside the block, duplicate scalar tags, stale decision ids,
+missing arguments, unknown arguments, wrong primitive classes, JSON-looking
+bodies, and tools absent from the view produce structured faults. Unknown means
+absent from the decision view, not absent from a hidden global list.
 
 ## Admission
 
@@ -40,9 +40,9 @@ event.
 
 Raw failed model output is stored in exchange logs and marked contaminated.
 Normal retry prompts include only bounded diagnoses, invalid-excerpt hashes, and
-the exact required JSON action shape. Placeholder-looking executable values such
-as `...`, `PATH`, `TODO`, `VALUE`, `FIELD_VALUE`, `<path>`, or `[path]` are
-rejected before effects.
+the exact required XML-like action shape. Placeholder-looking executable values
+such as `...`, `PATH`, `TODO`, `VALUE`, `FIELD_VALUE`, `<path>`, or `[path]`
+are rejected before effects.
 
 ## Failure This Prevents
 

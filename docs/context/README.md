@@ -2,8 +2,8 @@
 
 ## Purpose
 
-Define how prompts are assembled from durable, source-tagged context items and
-runtime state.
+Define how prompts are assembled from durable, source-tagged context items,
+workspace evidence, and runtime state.
 
 ## Table of Contents
 
@@ -18,8 +18,13 @@ runtime state.
 - [prompt-kernel.md](prompt-kernel.md): ordered prompt cards, profiles, and
   section fingerprints.
 - [budgets.md](budgets.md): token caps and estimator ownership.
-- [task-brief.md](task-brief.md): rolling summary contract for the current plan
-  family.
+- [matter-brief.md](matter-brief.md): rolling summary contract for the current
+  matter and workspace evidence.
+
+## Model-Visible Shape
+
+Context renders as compact XML-like cards with source handles and fingerprints.
+It does not dump JSON blobs, whole transcripts, or unbounded workspace files.
 
 ## Failure This Prevents
 

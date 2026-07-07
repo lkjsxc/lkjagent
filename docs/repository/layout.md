@@ -8,7 +8,7 @@ Define path ownership in the repository.
 
 | Path | Owner |
 | --- | --- |
-| `crates/lkjagent-core/` | pure task, plan, prompt, parse, check, and ladder logic |
+| `crates/lkjagent-core/` | pure matter, state, prompt, parse, check, and ladder logic |
 | `crates/lkjagent-store/` | SQLite schema and access |
 | `crates/lkjagent-llm/` | endpoint client |
 | `crates/lkjagent-effects/` | filesystem, shell, checks, and exchange logs |

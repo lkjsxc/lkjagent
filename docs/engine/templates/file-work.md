@@ -2,29 +2,23 @@
 
 ## Purpose
 
-Define create, revise, organize, and summarize tasks over workspace files.
+Define create, revise, organize, and summarize matters over workspace files.
 
 ## Selection
 
-The classifier selects this template when the objective names concrete files,
-directories, or edit verbs. If target paths are uncertain, the template starts
-with an explore step capped by `template.file-work.explore-budget=8`.
+The classifier selects this template when the owner explicitly wants a workspace
+file changed or summarized and the request is not a simple daily record.
 
-## Plan
+## Shape
 
-- Known write targets become write steps with exact output paths.
-- Known revisions become revise steps with the current file as input.
-- Summaries become respond steps, optionally preceded by bounded reads.
-- A verify step attaches objective-specific checks from
-  [../completion.md](../completion.md) when the task names measurable criteria.
+- Create: render content, write file under workspace policy, and verify hash.
+- Revise: read bounded source refs, render changed body, write atomically, and
+  keep fingerprint history.
+- Organize: plan moves, validate paths, apply aliases, and write audit rows.
+- Summarize: write a record or artifact with source refs and checks.
 
-## Edits
+## Checks
 
-Revisions are whole-file for model-authored content. The engine may provide an
-excerpt when the file exceeds `context.revise.input-tokens=4000`, but the model
-still returns a full replacement for the planned target or a blocked diagnosis.
-
-## Failure This Prevents
-
-The model does not guess patch hunks or write paths during scripted edits, so a
-format mistake cannot corrupt unrelated files.
+File work attaches checks from [../completion.md](../completion.md) when the
+owner names measurable criteria. Otherwise file existence, path policy, source
+refs, and fingerprint checks are the minimum closure evidence.

@@ -9,28 +9,28 @@ Define the owner command surface and output discipline.
 | Command | Behavior |
 | --- | --- |
 | `lkjagent run` | run the daemon in the foreground |
-| `lkjagent send TEXT [--new]` | enqueue an owner message and print its queue id |
-| `lkjagent status` | print daemon, task, step, budgets, queue, and tokens |
-| `lkjagent console` | read owner input and `/help` in normal scrollback while the daemon keeps working |
-| `lkjagent workbench [--mode append|pane]` | show a refreshing progress view while accepting owner input |
-| `lkjagent log [--limit N] [--follow]` | print bounded transcript events, then optionally stream new rows |
-| `lkjagent task list` | list tasks with state and summary |
-| `lkjagent task show ID` | show plan, diagnoses, checks, and exchange refs |
-| `lkjagent queue list` | list owner messages |
-| `lkjagent queue show ID` | show one owner message and delivery state |
-| `lkjagent context resolve CASE_ID KEY WINNING_ITEM_ID` | record the owner-selected winner for a conflict |
-| `lkjagent memory QUERY` | search memory rows |
-| `lkjagent watch` | print a refreshable terminal snapshot with status, trace, and proof rows |
+| `lkjagent send TEXT [--new]` | enqueue an owner turn and print its row id |
+| `lkjagent status` | print daemon, matter, budgets, queue, and tokens |
+| `lkjagent console` | read owner input and `/help` while the daemon works |
+| `lkjagent workbench [--mode append|pane]` | show progress while accepting owner input |
+| `lkjagent log [--limit N] [--follow]` | print bounded transcript events and optionally follow |
+| `lkjagent matter list` | list active matters by title, state, and dates |
+| `lkjagent matter show REF` | show matter events, decisions, checks, and workspace refs |
+| `lkjagent queue list` | list owner-turn delivery and routing state |
+| `lkjagent queue show ID` | show one owner turn and routing evidence |
+| `lkjagent context resolve MATTER_REF KEY WINNING_ITEM_ID` | record owner conflict resolution |
+| `lkjagent memory QUERY` | search durable memory rows |
+| `lkjagent watch` | print a refreshable terminal snapshot |
 | `lkjagent doctor [--json]` | print row-backed health diagnostics without secrets |
-| `lkjagent workspace [--json] [--rebuild]` | summarize workspace paths and rebuild derived indexes |
-| `lkjagent workspace plan-rebalance [--json]` | preview canonical path moves without writing files |
-| `lkjagent workspace apply-rebalance [--json]` | move files and write alias plus audit rows |
-| `lkjagent workspace validate [--json]` | verify manifest and record file paths |
-| `lkjagent record add KIND TITLE [--body TEXT]` | create a generic workspace record and metadata row |
-| `lkjagent record list [KIND]` | list current generic records by row metadata |
-| `lkjagent record show ID` | print one record row and Markdown body, resolving path aliases |
-| `lkjagent record link ID REF` | add a frontmatter link and refresh fingerprint evidence |
-| `lkjagent record archive ID` | move a record under `records/archive` and hide it from normal list |
+| `lkjagent workspace [--json] [--rebuild]` | summarize workspace paths and rebuild indexes |
+| `lkjagent workspace plan-rebalance [--json]` | preview moves and link edits |
+| `lkjagent workspace apply-rebalance [--json]` | apply moves with aliases and audit rows |
+| `lkjagent workspace validate [--json]` | verify manifest, links, indexes, and paths |
+| `lkjagent record add KIND TITLE [--body TEXT]` | create a workspace record and metadata row |
+| `lkjagent record list [KIND]` | list current records by row metadata |
+| `lkjagent record show ID` | print one record row and Markdown body |
+| `lkjagent record link ID REF` | add a frontmatter link and refresh evidence |
+| `lkjagent record archive ID` | move a record under archive and keep aliases |
 | `lkjagent today, journal, todo, calendar, finance, project, dev` | friendly record-backed wrappers |
 | `lkjagent help` | print usage |
 
@@ -38,8 +38,8 @@ Define the owner command surface and output discipline.
 
 - Commands print line-oriented, machine-readable text by default.
 - Read-only commands accept `--json` when their row-backed shape is stable.
-- A successful mutating command prints the created id or one concise success
-  line.
+- A successful mutating command prints the created id, path, and fingerprint
+  when a workspace file changed.
 - A failed command prints the command, reason, and next useful action when one
   exists.
 - Quiet gates and proof collection are owned by xtask, not by the owner CLI.
@@ -47,8 +47,8 @@ Define the owner command surface and output discipline.
 ## Developer Proof Commands
 
 `cargo run -p lkjagent-xtask -- proof collect --data data --out tmp/proof-current`
-collects a bounded proof bundle. Live proof orchestration also stays in xtask
-until it is factored into row-backed owner commands and help output.
+collects a bounded proof bundle. Live proof orchestration stays in xtask until
+it is factored into row-backed owner commands and help output.
 
 ## Log Follow Contract
 
@@ -61,20 +61,20 @@ interrupts the process.
 
 Commands accept the configured data directory consistently. Status and read-only
 inspection commands work while the daemon is stopped because they read the
-store directly.
+store and workspace files directly.
 
 ## Acceptance Checks
 
-- `crates/lkjagent-app/src/args.rs` accepts `log --follow` and `log --limit N
-  --follow`.
-- `crates/lkjagent-app/src/inspect.rs` keeps non-follow output deterministic and
-  follows events by monotonically increasing row id.
-- CLI tests cover parser shape, console and workbench line routing, record
-  commands, row-backed log continuation, and watch sections.
+- Argument parsing accepts matter, record, workspace, console, workbench, and
+  log-follow shapes.
+- Inspect renderers keep non-follow output deterministic and follow events by
+  monotonically increasing row id.
+- CLI tests cover console and workbench line routing, record commands,
+  row-backed log continuation, watch sections, and matter display.
 
 ## Authority Limits
 
-Personal and proof command groups are allowed only as ledger-backed views or
-record-writing helpers. They do not get private state, a graph authority, hidden
-tool policy, or a separate completion rule. Mutating commands append events,
-write workspace records or artifacts, or enqueue owner text.
+Personal, matter, and proof command groups are allowed only as ledger-backed
+views or record-writing helpers. They do not get private state, hidden tool
+policy, or a separate completion rule. Mutating commands append events, write
+workspace records or artifacts, or enqueue owner text.

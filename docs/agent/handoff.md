@@ -25,5 +25,5 @@ inspect.
 ## Continuity
 
 Anything the next agent must know goes into repository files, usually
-[../current-state.md](../current-state.md), evaluation fixtures, or task docs.
+[../current-state.md](../current-state.md), evaluation fixtures, or request docs.
 The chat transcript is not the durable handoff.

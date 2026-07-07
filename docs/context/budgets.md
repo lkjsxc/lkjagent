@@ -15,7 +15,7 @@ Define the token and content budgets that keep each turn bounded.
 - `context.write.continuity-tail-words=150` supplies prose continuity.
 - `context.explore.observation-tokens=1500` bounds the latest tool observation.
 - `context.revise.input-tokens=4000` bounds revise input excerpts.
-- `context.memory.fact-tokens=100` bounds memory facts in a task brief.
+- `context.memory.fact-tokens=100` bounds memory facts in a matter brief.
 
 ## Generation Budgets
 

@@ -2,28 +2,22 @@
 
 ## Purpose
 
-Define the fallback for objectives that do not match a specific template.
+Define the fallback matter shape when no specific template fits.
 
-## Plan
+## Selection
 
-The generic template creates one explore step and one respond step. The explore
-budget is `template.generic.explore-budget=20`. The explore goal restates the
-objective and asks the model to gather enough bounded evidence to answer or
-propose plan notes.
+The router uses this template only after deterministic record, answer,
+artifact, inspection, and system-operation routes do not apply.
 
-## Finish
+## Shape
 
-The explore step may finish with a summary. The respond step turns the gathered
-facts into an owner-facing message. If exploration discovers measurable file
-work, `plan.note` can propose steps that the engine validates before adding
-anything to the plan.
+A generic matter starts with a short objective, current owner turn, candidate
+state cells, and one next operation. It does not assume a long artifact or a
+large prose benchmark.
 
 ## Checks
 
-Generic tasks attach checks from [../completion.md](../completion.md) only when
-the objective contains explicit measurable criteria.
-
-## Failure This Prevents
-
-Unknown work receives bounded exploration instead of falling into unrestricted
-tool choice or silently pretending to match a specialized template.
+Generic matters attach checks from [../completion.md](../completion.md) only
+when the owner request or selected operation gives measurable evidence.
+Otherwise the matter must ask for clarification or write an explicit blocked
+report.

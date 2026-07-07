@@ -16,7 +16,7 @@ The benchmark corpus, judges, replay smoke, and proof collector live in
 
 ## Consequences
 
-The daemon stays focused on owner tasks. Evaluation code can depend on core,
+The daemon stays focused on owner turns and matters. Evaluation code can depend on core,
 store, and effects without importing the app binary.
 
 ## Rejected Alternatives
