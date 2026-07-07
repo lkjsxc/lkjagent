@@ -79,6 +79,9 @@ by Unicode grapheme clusters, maps left and right keys to composer movement, and
 persists Japanese owner and agent transcript entries to workspace transcript
 files.
 
+Final local `quiet verify`, Docker Compose `verify` with rebuild, and proof
+bundle collection have run in this checkout after the implementation slices.
+
 Owner CLI, status, watch, console, and TUI labels now expose matters rather than
 tasks. Plan-family rows still exist as bridge storage, but owner-visible list,
 show, queue, log, status, and exchange paths use matter and operation wording.
@@ -99,13 +102,12 @@ that bridge until the semantic matter surface is complete.
 
 - Semantic owner-turn routing to existing matters, artifact requests,
   inspection, and system operations needs focused tests beyond direct records.
-- Final compose verification must be rerun after the last code change in this
-  checkout.
 
 ## Next Executable Step
 
-Implement the smallest coherent slice that makes the docs true: run final
-repository and Docker verification, then capture proof and handoff evidence.
+Implement the smallest coherent slice that makes the docs true: add focused
+semantic owner-turn routing tests for existing matters, artifact requests,
+inspection, and system operations.
 
 ## Honesty Rules
 
