@@ -81,7 +81,7 @@ fn panel<'a>(title: &'a str, lines: Vec<Line<'a>>) -> Paragraph<'a> {
 
 fn activity<'a>(model: &TuiModel, snapshot: &'a TuiSnapshot) -> Vec<Line<'a>> {
     let text = match model.active_pane {
-        TuiPane::Transcript => transcript(model),
+        TuiPane::Transcript => transcript(model, snapshot),
         TuiPane::Tasks => snapshot.tasks.clone(),
         TuiPane::Tools => snapshot.tools.clone(),
         TuiPane::StateGraph => format!("{}\n\n{}", snapshot.status, snapshot.proof),
@@ -113,16 +113,20 @@ fn side<'a>(model: &TuiModel, snapshot: &'a TuiSnapshot) -> Vec<Line<'a>> {
     into_lines(text)
 }
 
-fn transcript(model: &TuiModel) -> String {
-    if model.transcript.is_empty() {
-        return "system: no transcript entries yet".to_string();
+fn transcript(model: &TuiModel, snapshot: &TuiSnapshot) -> String {
+    let mut lines = Vec::new();
+    lines.extend(snapshot.transcript.lines().map(str::to_string));
+    for entry in &model.transcript {
+        let line = format!("{}: {}", source_label(entry.source), entry.text.trim());
+        if !lines.iter().any(|existing| existing == &line) {
+            lines.push(line);
+        }
     }
-    model
-        .transcript
-        .iter()
-        .map(|entry| format!("{}: {}", source_label(entry.source), entry.text.trim()))
-        .collect::<Vec<_>>()
-        .join("\n")
+    if lines.is_empty() {
+        "system: no transcript entries yet".to_string()
+    } else {
+        lines.join("\n")
+    }
 }
 
 fn help() -> String {
@@ -171,4 +175,19 @@ fn into_lines(text: String) -> Vec<Line<'static>> {
     text.lines()
         .map(|line| Line::from(line.to_string()))
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn transcript_uses_durable_snapshot_agent_messages() {
+        let mut snapshot = TuiSnapshot::empty();
+        snapshot.transcript = "agent: durable answer".to_string();
+
+        let text = transcript(&TuiModel::new(), &snapshot);
+
+        assert!(text.contains("agent: durable answer"));
+    }
 }

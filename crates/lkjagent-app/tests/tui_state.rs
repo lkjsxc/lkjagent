@@ -1,9 +1,13 @@
 use std::fs;
 
+use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_app::tui_event::TuiEvent;
 use lkjagent_app::tui_render::render_non_tty;
-use lkjagent_app::tui_snapshot::TuiSnapshot;
+use lkjagent_app::tui_snapshot::{self, TuiSnapshot};
 use lkjagent_app::tui_state::{reduce, TuiEffect, TuiModel, TuiPane, TuiRunState};
+use lkjagent_store::plan_access::enqueue;
+use lkjagent_store::plan_schema::setup;
+use rusqlite::Connection;
 
 #[test]
 fn composer_survives_streaming_agent_events() {
@@ -144,4 +148,30 @@ fn non_tty_render_shows_state_without_raw_terminal_control() {
     assert!(text.contains("state: running"));
     assert!(text.contains("agent: hello"));
     assert!(!text.contains("\u{1b}"));
+}
+
+#[test]
+fn tui_snapshot_shows_durable_agent_message_after_daemon_turn(
+) -> Result<(), Box<dyn std::error::Error>> {
+    let data = std::env::temp_dir().join(format!("lkjagent-tui-agent-{}", std::process::id()));
+    if data.exists() {
+        fs::remove_dir_all(&data)?;
+    }
+    fs::create_dir_all(&data)?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    enqueue(&conn, "What is an agent?", "now")?;
+    drop(conn);
+
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec!["<message>done</message>".to_string()],
+        index: 0,
+    };
+    run_until_idle(&data, &mut endpoint, 3)?;
+
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let snapshot = tui_snapshot::load(&conn, &data)?;
+
+    assert!(snapshot.transcript.contains("agent: done"));
+    Ok(())
 }

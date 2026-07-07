@@ -6,6 +6,7 @@ use rusqlite::Connection;
 pub struct TuiSnapshot {
     pub status: String,
     pub logs: String,
+    pub transcript: String,
     pub tasks: String,
     pub queue: String,
     pub proof: String,
@@ -18,6 +19,7 @@ impl TuiSnapshot {
         Self {
             status: "status: unavailable".to_string(),
             logs: "none".to_string(),
+            transcript: "".to_string(),
             tasks: "none".to_string(),
             queue: "none".to_string(),
             proof: "proof: unavailable".to_string(),
@@ -31,6 +33,7 @@ pub fn load(conn: &Connection, data_dir: &Path) -> Result<TuiSnapshot, String> {
     let status = crate::status::status(conn)?;
     Ok(TuiSnapshot {
         logs: crate::log_view::log(conn, 12)?,
+        transcript: transcript(conn, 40)?,
         tasks: crate::inspect::matter_list(conn)?,
         queue: crate::inspect::queue_list(conn)?,
         proof: proof(conn)?,
@@ -38,6 +41,38 @@ pub fn load(conn: &Connection, data_dir: &Path) -> Result<TuiSnapshot, String> {
         tools: tools(conn)?,
         status,
     })
+}
+
+fn transcript(conn: &Connection, limit: usize) -> Result<String, String> {
+    let mut statement = conn
+        .prepare("SELECT kind, content FROM events ORDER BY id DESC LIMIT ?1")
+        .map_err(|error| error.to_string())?;
+    let rows = statement
+        .query_map([limit as i64], |row| {
+            Ok(transcript_line(
+                &row.get::<_, String>(0)?,
+                &row.get::<_, String>(1)?,
+            ))
+        })
+        .map_err(|error| error.to_string())?;
+    let mut lines = rows
+        .collect::<rusqlite::Result<Vec<_>>>()
+        .map_err(|error| error.to_string())?;
+    lines.reverse();
+    Ok(lines.join("\n"))
+}
+
+fn transcript_line(kind: &str, content: &str) -> String {
+    format!("{}: {}", transcript_source(kind), content.trim())
+}
+
+fn transcript_source(kind: &str) -> &'static str {
+    match kind {
+        "owner" | "answer" => "owner",
+        "stepdone" | "taskclosed" | "question" => "agent",
+        "stepblocked" | "taskblocked" => "error",
+        _ => "state",
+    }
 }
 
 fn proof(conn: &Connection) -> Result<String, String> {
@@ -99,6 +134,13 @@ mod tests {
         let conn = Connection::open_in_memory()?;
         setup(&conn)?;
         enqueue_with_force(&conn, "hello", false, &crate::clock::utc_now())?;
+        conn.execute(
+            "INSERT INTO events (task_id, kind, content, created_at)
+             VALUES (1, 'owner', 'hello', 'now'),
+                    (1, 'stepdone', 'AI answered', 'now'),
+                    (1, 'taskclosed', 'done', 'now')",
+            [],
+        )?;
 
         let snapshot = load(&conn, Path::new("data"))?;
 
@@ -106,6 +148,9 @@ mod tests {
         assert!(snapshot.queue.contains("queue 1"));
         assert!(snapshot.proof.contains("prompt_frames=0"));
         assert!(snapshot.workspace.contains("workspace: root="));
+        assert!(snapshot.transcript.contains("owner: hello"));
+        assert!(snapshot.transcript.contains("agent: AI answered"));
+        assert!(snapshot.transcript.contains("agent: done"));
         Ok(())
     }
 }

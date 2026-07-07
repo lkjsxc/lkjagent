@@ -77,13 +77,16 @@ old paths resolvable through the alias table.
 The terminal workbench reducer now stores a composer cursor, inserts and deletes
 by Unicode grapheme clusters, maps left and right keys to composer movement, and
 persists Japanese owner and agent transcript entries to workspace transcript
-files.
+files. The TUI snapshot now also builds a durable transcript from event rows and
+the Transcript pane merges those rows with in-session entries, so daemon-written
+agent messages remain visible after refresh or TUI restart.
 
-After the owner-turn routing slice, these gates passed in this checkout:
-`cargo fmt --check`, source and docs line audit, `cargo clippy --workspace
---all-targets -- -D warnings`, `cargo test --workspace`, `cargo run -p
-lkjagent-xtask -- quiet verify`, and Docker Compose `verify`, `test`, `lint`,
-`bench`, and `replay` services.
+After the owner-turn routing slice, Docker Compose `test`, `lint`, `bench`,
+and `replay` services passed. After the TUI transcript display fix, these gates
+passed in this checkout: `cargo fmt --check`, source and docs line audit,
+`cargo clippy --workspace --all-targets -- -D warnings`, `cargo test
+--workspace`, `cargo run -p lkjagent-xtask -- quiet verify`, and Docker Compose
+`verify`.
 
 Owner CLI, status, watch, console, and TUI labels now expose matters rather than
 tasks. Plan-family rows still exist as bridge storage, but owner-visible list,
@@ -124,8 +127,8 @@ that bridge until the semantic matter surface is complete.
 
 ## Next Executable Step
 
-If more work is requested, run an endpoint-backed live campaign for the routing
-lanes or inspect the unrelated `data/logs` working tree changes before cleanup.
+Commit the focused TUI transcript display slice while leaving unrelated
+`data/logs` changes untouched.
 
 ## Honesty Rules
 

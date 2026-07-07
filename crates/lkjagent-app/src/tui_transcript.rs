@@ -12,16 +12,7 @@ pub fn save(data_dir: &Path, model: &TuiModel, snapshot: &TuiSnapshot) -> Result
 }
 
 pub fn text(model: &TuiModel, snapshot: &TuiSnapshot) -> String {
-    let entries = if model.transcript.is_empty() {
-        "[no transcript entries]".to_string()
-    } else {
-        model
-            .transcript
-            .iter()
-            .map(|entry| format!("{}: {}", source_label(entry.source), entry.text.trim()))
-            .collect::<Vec<_>>()
-            .join("\n")
-    };
+    let entries = transcript_entries(model, snapshot);
     [
         "# lkjagent tui transcript".to_string(),
         format!("state: {}", run_state_label(model.run_state)),
@@ -42,6 +33,25 @@ pub fn text(model: &TuiModel, snapshot: &TuiSnapshot) -> String {
         entries,
     ]
     .join("\n")
+}
+
+fn transcript_entries(model: &TuiModel, snapshot: &TuiSnapshot) -> String {
+    let mut lines = snapshot
+        .transcript
+        .lines()
+        .map(str::to_string)
+        .collect::<Vec<_>>();
+    for entry in &model.transcript {
+        let line = format!("{}: {}", source_label(entry.source), entry.text.trim());
+        if !lines.iter().any(|existing| existing == &line) {
+            lines.push(line);
+        }
+    }
+    if lines.is_empty() {
+        "[no transcript entries]".to_string()
+    } else {
+        lines.join("\n")
+    }
 }
 
 fn stamp() -> String {
