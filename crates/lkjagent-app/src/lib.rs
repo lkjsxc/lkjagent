@@ -12,6 +12,8 @@ mod context_resolution_bridge;
 pub mod daemon;
 mod daemon_intake;
 mod daemon_lock;
+mod daemon_owner_routes;
+mod daemon_route_effects;
 mod diagnostics;
 mod diagnostics_support;
 mod effect_error;

@@ -52,5 +52,6 @@ model-dependent matter.
 ## Visibility
 
 `lkjagent queue list` shows pending, delivered, answered, recorded, separate,
-and failed-routing rows. Matter and record views link back to the owner turn and
-show the workspace paths or decision refs produced by routing.
+and failed-routing rows with route lane, desired durability, and transformation
+permission. Matter and record views link back to the owner turn and show the
+workspace paths or decision refs produced by routing.

@@ -33,17 +33,22 @@ pub fn matter_show(conn: &Connection, id: u64) -> Result<String, String> {
 pub fn queue_list(conn: &Connection) -> Result<String, String> {
     let mut statement = conn
         .prepare(
-            "SELECT id, state, force_new, COALESCE(task_id, 0), content FROM queue ORDER BY id",
+            "SELECT id, state, force_new, COALESCE(task_id, 0), content,
+             COALESCE(route_lane, 'unknown'), COALESCE(route_durability, 'unknown'),
+             route_transform_allowed FROM queue ORDER BY id",
         )
         .map_err(|error| error.to_string())?;
     let rows = statement
         .query_map([], |row| {
             Ok(format!(
-                "queue {} {} force_new={} matter={} {}",
+                "queue {} {} force_new={} matter={} route={} durability={} transform={} {}",
                 row.get::<_, i64>(0)?,
                 row.get::<_, String>(1)?,
                 row.get::<_, i64>(2)? != 0,
                 row.get::<_, i64>(3)?,
+                row.get::<_, String>(5)?,
+                row.get::<_, String>(6)?,
+                transform(row.get(7)?),
                 row.get::<_, String>(4)?
             ))
         })
@@ -53,15 +58,20 @@ pub fn queue_list(conn: &Connection) -> Result<String, String> {
 
 pub fn queue_show(conn: &Connection, id: i64) -> Result<String, String> {
     let row = conn.query_row(
-        "SELECT id, content, state, force_new, COALESCE(task_id, 0) FROM queue WHERE id = ?1",
+        "SELECT id, content, state, force_new, COALESCE(task_id, 0),
+         COALESCE(route_lane, 'unknown'), COALESCE(route_durability, 'unknown'),
+         route_transform_allowed FROM queue WHERE id = ?1",
         params![id],
         |row| {
             Ok(format!(
-                "queue {} state={} force_new={} matter={} content={}",
+                "queue {} state={} force_new={} matter={} route={} durability={} transform={} content={}",
                 row.get::<_, i64>(0)?,
                 row.get::<_, String>(2)?,
                 row.get::<_, i64>(3)? != 0,
                 row.get::<_, i64>(4)?,
+                row.get::<_, String>(5)?,
+                row.get::<_, String>(6)?,
+                transform(row.get(7)?),
                 row.get::<_, String>(1)?
             ))
         },
@@ -91,6 +101,14 @@ pub fn memory(conn: &Connection, query: &str) -> Result<String, String> {
 
 pub fn watch(conn: &Connection) -> Result<String, String> {
     crate::watch_view::watch(conn)
+}
+
+fn transform(value: Option<i64>) -> &'static str {
+    match value {
+        Some(0) => "false",
+        Some(_) => "true",
+        None => "unknown",
+    }
 }
 
 fn collect(rows: impl Iterator<Item = rusqlite::Result<String>>) -> Result<String, String> {

@@ -25,8 +25,10 @@ Each cycle has one active concern:
 9. evaluate checks and commit events, observations, state patches, workspace
    fingerprints, and token usage.
 
-At most one endpoint call happens in a cycle. Verify-only or record-only work
-consumes no model call.
+At most one endpoint call happens in a cycle. Verify-only, record-only,
+read-only inspection, and unsupported system-operation routing consumes no model
+call. Unsupported system operations block with evidence instead of pretending a
+command ran.
 
 ## Matter States
 
@@ -53,6 +55,12 @@ rewrite memory, inspect files, or self-assign work.
 A waiting matter parks like idle, but status prints the pending question. The
 next owner turn is attached as the answer unless the owner asks for a separate
 new matter. Answer routing is recorded as an event and relation edge.
+
+## Artifact Requests
+
+Artifact-request routing creates a write, verify, and respond matter with a
+concrete workspace artifact path. The matter closes only after the artifact file
+exists, otherwise it stays open or blocks with failed-check evidence.
 
 ## Record-Only Turns
 

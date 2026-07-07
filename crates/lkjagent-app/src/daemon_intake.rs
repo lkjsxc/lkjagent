@@ -5,8 +5,7 @@ use lkjagent_core::engine::Command;
 use lkjagent_core::model::{Event, EventKind, StepKind, StepState, TaskSnapshot, TaskState};
 use lkjagent_store::memory::search_memory;
 use lkjagent_store::plan_access::{
-    deliver_answer, deliver_forced_new, deliver_next, insert_step_tx, insert_task, mark_recorded,
-    next_pending,
+    deliver_answer, deliver_forced_new, deliver_next, insert_step_tx, insert_task,
 };
 use lkjagent_store::plan_commit::commit_turn;
 use lkjagent_store::plan_hydrate::first_snapshot_with_state;
@@ -20,13 +19,19 @@ pub fn load_runtime_snapshot<C: Clock>(
     data_dir: &Path,
     clock: &mut C,
 ) -> Result<Option<TaskSnapshot>, String> {
-    if let Some(snapshot) = load_snapshot_cell(conn)? {
+    if let Some(mut snapshot) = load_snapshot_cell(conn)? {
         if snapshot.task.state == TaskState::Waiting {
             return resume_loaded_waiting(conn, data_dir, snapshot, clock);
         }
+        if snapshot.task.state == TaskState::Open {
+            crate::daemon_owner_routes::attach_updates(conn, &mut snapshot, clock)?;
+        }
         return Ok(Some(snapshot));
     }
-    if let Some(snapshot) = first_snapshot_with_state(conn, "open").map_err(|e| e.to_string())? {
+    if let Some(mut snapshot) =
+        first_snapshot_with_state(conn, "open").map_err(|e| e.to_string())?
+    {
+        crate::daemon_owner_routes::attach_updates(conn, &mut snapshot, clock)?;
         return Ok(Some(snapshot));
     }
     if let Some(waiting) = first_snapshot_with_state(conn, "waiting").map_err(|e| e.to_string())? {
@@ -64,7 +69,7 @@ fn intake<C: Clock>(
     clock: &mut C,
 ) -> Result<Option<TaskSnapshot>, String> {
     if !forced_only {
-        write_direct_records(conn, data_dir, clock)?;
+        crate::daemon_owner_routes::write_direct_records(conn, data_dir, clock)?;
     }
     let task_id = next_task_id(conn)?;
     let now = clock.now();
@@ -75,7 +80,20 @@ fn intake<C: Clock>(
     }
     .map_err(|error| error.to_string())?;
     let Some(row) = queue else { return Ok(None) };
-    let mut snapshot = instantiate(task_id, &row.content);
+    match row.route_lane.as_deref() {
+        Some("inspection") => {
+            return crate::daemon_route_effects::routed_inspection(conn, &row, task_id, &now);
+        }
+        Some("system_operation") => {
+            return crate::daemon_route_effects::routed_system_operation(conn, &row, task_id, &now);
+        }
+        _ => {}
+    }
+    let mut snapshot = if row.route_lane.as_deref() == Some("artifact_request") {
+        crate::daemon_route_effects::artifact_request_snapshot(task_id, &row.content)
+    } else {
+        instantiate(task_id, &row.content)
+    };
     assign_step_ids(&mut snapshot);
     admit_memory(conn, &mut snapshot, &row.content)?;
     insert_task(conn, &snapshot.task, Some(row.id), &now).map_err(|error| error.to_string())?;
@@ -86,34 +104,6 @@ fn intake<C: Clock>(
     tx.commit().map_err(|error| error.to_string())?;
     persist_snapshot_cell(conn, &snapshot, &now)?;
     Ok(Some(snapshot))
-}
-
-fn write_direct_records<C: Clock>(
-    conn: &Connection,
-    data_dir: &Path,
-    clock: &mut C,
-) -> Result<(), String> {
-    loop {
-        let Some(row) = next_pending(conn).map_err(|error| error.to_string())? else {
-            return Ok(());
-        };
-        if row.force_new {
-            return Ok(());
-        }
-        let Some(intent) = lkjagent_core::owner_turn::record_intent(&row.content) else {
-            return Ok(());
-        };
-        let now = clock.now();
-        crate::record_files::add(
-            conn,
-            data_dir,
-            &intent.kind,
-            &intent.title,
-            &intent.body,
-            &now,
-        )?;
-        mark_recorded(conn, row.id, &now).map_err(|error| error.to_string())?;
-    }
 }
 
 fn admit_memory(conn: &Connection, snapshot: &mut TaskSnapshot, query: &str) -> Result<(), String> {

@@ -43,6 +43,12 @@ runtime reads only matter, state, and record rows. Required tables:
 | `memory` | durable owner-useful facts with FTS mirror when useful |
 | `config` | bridge settings and daemon lease values only |
 
+## Queue Route Evidence
+
+Queue rows keep nullable deterministic route evidence: lane, desired durability,
+title seed, and transformation permission. Delivery refreshes these fields when
+waiting-answer context changes a pending turn into an existing-matter answer.
+
 ## JSON Columns
 
 JSON payloads include schema names and are validated at crate boundaries. Prefer

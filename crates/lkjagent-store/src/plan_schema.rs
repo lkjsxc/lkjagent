@@ -1,8 +1,6 @@
-use rusqlite::Connection;
-
 use crate::error::StoreResult;
 use crate::state_schema;
-
+use rusqlite::Connection;
 pub const APPLICATION_TABLES: &[&str] = &[
     "queue",
     "tasks",
@@ -34,13 +32,11 @@ pub const APPLICATION_TABLES: &[&str] = &[
     "artifacts",
     "provider_exchanges",
 ];
-
 pub fn setup(conn: &Connection) -> StoreResult<()> {
     conn.execute_batch(
         "
         PRAGMA foreign_keys = ON;
         PRAGMA journal_mode = WAL;
-
         CREATE TABLE IF NOT EXISTS queue (
             id INTEGER PRIMARY KEY,
             content TEXT NOT NULL,
@@ -48,9 +44,12 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             force_new INTEGER NOT NULL DEFAULT 0,
             created_at TEXT NOT NULL,
             delivered_at TEXT,
-            task_id INTEGER
+            task_id INTEGER,
+            route_lane TEXT,
+            route_durability TEXT,
+            route_title_seed TEXT,
+            route_transform_allowed INTEGER
         );
-
         CREATE TABLE IF NOT EXISTS tasks (
             id INTEGER PRIMARY KEY,
             queue_id INTEGER,
@@ -64,7 +63,6 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         );
-
         CREATE TABLE IF NOT EXISTS steps (
             id INTEGER PRIMARY KEY,
             task_id INTEGER NOT NULL,
@@ -84,7 +82,6 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
             updated_at TEXT NOT NULL,
             FOREIGN KEY(task_id) REFERENCES tasks(id)
         );
-
         CREATE TABLE IF NOT EXISTS attempts (
             id INTEGER PRIMARY KEY,
             step_id INTEGER NOT NULL,
@@ -103,7 +100,6 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
     crate::plan_migrations::migrate(conn)?;
     setup_tail(conn)
 }
-
 fn setup_tail(conn: &Connection) -> StoreResult<()> {
     conn.execute_batch(
         "
@@ -168,7 +164,6 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
     ensure_token_usage_columns(conn)?;
     state_schema::setup(conn)
 }
-
 fn ensure_token_usage_columns(conn: &Connection) -> StoreResult<()> {
     for (name, spec) in [
         ("input_total_tokens", "INTEGER"),

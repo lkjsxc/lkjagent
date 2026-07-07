@@ -17,6 +17,7 @@ pub mod plan_rows;
 pub mod plan_schema;
 pub mod plan_turn;
 pub mod prompt_rows;
+mod queue_access;
 pub mod record_rows;
 mod record_schema;
 mod row_json;

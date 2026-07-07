@@ -79,8 +79,11 @@ by Unicode grapheme clusters, maps left and right keys to composer movement, and
 persists Japanese owner and agent transcript entries to workspace transcript
 files.
 
-Final local `quiet verify`, Docker Compose `verify` with rebuild, and proof
-bundle collection have run in this checkout after the implementation slices.
+After the owner-turn routing slice, these gates passed in this checkout:
+`cargo fmt --check`, source and docs line audit, `cargo clippy --workspace
+--all-targets -- -D warnings`, `cargo test --workspace`, `cargo run -p
+lkjagent-xtask -- quiet verify`, and Docker Compose `verify`, `test`, `lint`,
+`bench`, and `replay` services.
 
 Owner CLI, status, watch, console, and TUI labels now expose matters rather than
 tasks. Plan-family rows still exist as bridge storage, but owner-visible list,
@@ -93,6 +96,23 @@ notes, and artifact records write workspace Markdown files directly, update
 workspace state cells and edges, and avoid creating plan-family rows for those
 turns. Record writes create README files along the touched workspace path.
 
+Owner-turn routing now has focused pure coverage for existing-matter answers,
+existing-matter continuations, artifact requests, inspection turns, system
+operations, direct records, and Japanese diary/save wording. Queue rows persist
+the deterministic route lane, desired durability, title seed, and transformation
+permission; waiting-answer delivery refreshes the route to `existing_matter` and
+`queue_answer`, and queue inspection commands display the route evidence.
+Inspection routes now execute without endpoint access by closing a ledger matter
+with a read-only summary of pending queue, active matters, and record count.
+System-operation routes also avoid endpoint access; until an allowlisted executor
+exists they block honestly with unsupported-executor and no-command-run evidence.
+Artifact-request routes now build a write/verify/respond matter with a concrete
+workspace artifact path and file-exists check, so an artifact request cannot
+close without a produced artifact or an honest blocked state. Continuation turns
+such as "also" or "this matter" attach to an open matter at cycle boundaries,
+record an owner event, update the matter brief, and feed the active step inputs
+without calling the endpoint.
+
 The implementation still contains a plan-family bridge. Existing task and step
 rows are treated as body storage and continuity evidence while state cells and
 runtime decisions take over turn authority. Transitional commands may expose
@@ -100,14 +120,12 @@ that bridge until the semantic matter surface is complete.
 
 ## Known Gaps
 
-- Semantic owner-turn routing to existing matters, artifact requests,
-  inspection, and system operations needs focused tests beyond direct records.
+- No known owner-turn routing gap remains in the current checkout.
 
 ## Next Executable Step
 
-Implement the smallest coherent slice that makes the docs true: add focused
-semantic owner-turn routing tests for existing matters, artifact requests,
-inspection, and system operations.
+If more work is requested, run an endpoint-backed live campaign for the routing
+lanes or inspect the unrelated `data/logs` working tree changes before cleanup.
 
 ## Honesty Rules
 

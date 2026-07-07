@@ -5,7 +5,11 @@ use crate::error::StoreResult;
 pub fn migrate(conn: &Connection) -> StoreResult<()> {
     ensure_column(conn, "queue", "force_new", "INTEGER NOT NULL DEFAULT 0")?;
     ensure_column(conn, "queue", "delivered_at", "TEXT")?;
-    ensure_column(conn, "queue", "task_id", "INTEGER")
+    ensure_column(conn, "queue", "task_id", "INTEGER")?;
+    ensure_column(conn, "queue", "route_lane", "TEXT")?;
+    ensure_column(conn, "queue", "route_durability", "TEXT")?;
+    ensure_column(conn, "queue", "route_title_seed", "TEXT")?;
+    ensure_column(conn, "queue", "route_transform_allowed", "INTEGER")
 }
 
 fn ensure_column(conn: &Connection, table: &str, column: &str, spec: &str) -> StoreResult<()> {

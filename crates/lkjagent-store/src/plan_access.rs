@@ -2,68 +2,11 @@ use lkjagent_core::model::{Step, Task, TaskState};
 use rusqlite::{params, Connection, Transaction};
 
 use crate::error::StoreResult;
-use crate::plan_rows::QueueRow;
 
-pub fn enqueue(conn: &Connection, content: &str, now: &str) -> StoreResult<i64> {
-    enqueue_with_force(conn, content, false, now)
-}
-
-pub fn enqueue_with_force(
-    conn: &Connection,
-    content: &str,
-    force_new: bool,
-    now: &str,
-) -> StoreResult<i64> {
-    conn.execute(
-        "INSERT INTO queue (content, state, force_new, created_at)
-         VALUES (?1, 'pending', ?2, ?3)",
-        params![content, i64::from(force_new), now],
-    )?;
-    Ok(conn.last_insert_rowid())
-}
-
-pub fn deliver_next(conn: &Connection, task_id: i64, now: &str) -> StoreResult<Option<QueueRow>> {
-    deliver_matching(conn, task_id, None, now)
-}
-
-pub fn mark_recorded(conn: &Connection, queue_id: i64, now: &str) -> StoreResult<()> {
-    conn.execute(
-        "UPDATE queue SET state = 'recorded', delivered_at = ?1 WHERE id = ?2",
-        params![now, queue_id],
-    )?;
-    Ok(())
-}
-
-pub fn deliver_answer(conn: &Connection, task_id: i64, now: &str) -> StoreResult<Option<QueueRow>> {
-    deliver_matching(conn, task_id, Some(false), now)
-}
-
-pub fn deliver_forced_new(
-    conn: &Connection,
-    task_id: i64,
-    now: &str,
-) -> StoreResult<Option<QueueRow>> {
-    deliver_matching(conn, task_id, Some(true), now)
-}
-
-fn deliver_matching(
-    conn: &Connection,
-    task_id: i64,
-    force_new: Option<bool>,
-    now: &str,
-) -> StoreResult<Option<QueueRow>> {
-    let row = next_pending_matching(conn, force_new)?;
-    let Some(row) = row else { return Ok(None) };
-    conn.execute(
-        "UPDATE queue SET state = 'delivered', delivered_at = ?1, task_id = ?2 WHERE id = ?3",
-        params![now, task_id, row.id],
-    )?;
-    Ok(Some(QueueRow {
-        state: "delivered".to_string(),
-        task_id: Some(task_id),
-        ..row
-    }))
-}
+pub use crate::queue_access::{
+    deliver_answer, deliver_forced_new, deliver_matter_update, deliver_next, enqueue,
+    enqueue_with_force, mark_recorded, next_pending,
+};
 
 pub fn attach_answer(
     conn: &Connection,
@@ -80,45 +23,6 @@ pub fn attach_answer(
         params![now, task_id],
     )?;
     Ok(conn.last_insert_rowid())
-}
-
-pub fn next_pending(conn: &Connection) -> StoreResult<Option<QueueRow>> {
-    next_pending_matching(conn, None)
-}
-
-pub fn next_answer(conn: &Connection) -> StoreResult<Option<QueueRow>> {
-    next_pending_matching(conn, Some(false))
-}
-
-pub fn next_forced_new(conn: &Connection) -> StoreResult<Option<QueueRow>> {
-    next_pending_matching(conn, Some(true))
-}
-
-fn next_pending_matching(
-    conn: &Connection,
-    force_new: Option<bool>,
-) -> StoreResult<Option<QueueRow>> {
-    let clause = match force_new {
-        Some(true) => " AND force_new = 1",
-        Some(false) => " AND force_new = 0",
-        None => "",
-    };
-    let sql = format!(
-        "SELECT id, content, state, task_id, force_new FROM queue
-         WHERE state = 'pending'{clause} ORDER BY id LIMIT 1",
-    );
-    let mut statement = conn.prepare(&sql)?;
-    let mut rows = statement.query([])?;
-    let Some(row) = rows.next()? else {
-        return Ok(None);
-    };
-    Ok(Some(QueueRow {
-        id: row.get(0)?,
-        content: row.get(1)?,
-        state: row.get(2)?,
-        task_id: row.get(3)?,
-        force_new: row.get::<_, i64>(4)? != 0,
-    }))
 }
 
 pub fn insert_task(

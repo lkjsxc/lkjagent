@@ -5,6 +5,10 @@ pub struct QueueRow {
     pub state: String,
     pub task_id: Option<i64>,
     pub force_new: bool,
+    pub route_lane: Option<String>,
+    pub route_durability: Option<String>,
+    pub route_title_seed: Option<String>,
+    pub route_transform_allowed: Option<bool>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
