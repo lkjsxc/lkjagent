@@ -1,9 +1,8 @@
 use serde_json::Value;
 
-use crate::runtime_candidate_edges::apply_edge_blocks;
-use crate::runtime_candidate_payload as payload;
 use crate::runtime_decision::OutputEnvelope;
 use crate::runtime_operation::RuntimeOperation;
+use crate::runtime_selector as selector;
 use crate::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -28,7 +27,7 @@ pub fn selector_candidates(snapshot: &RuntimeSnapshot) -> Vec<SelectorCandidate>
         .active_cells()
         .into_iter()
         .filter_map(cell_candidate)
-        .map(|candidate| apply_edge_blocks(snapshot, candidate))
+        .map(|candidate| selector::apply_edge_blocks(snapshot, candidate))
         .collect::<Vec<_>>();
     if candidates.is_empty() {
         candidates.push(idle_candidate());
@@ -45,7 +44,7 @@ pub fn selected_candidate(snapshot: &RuntimeSnapshot) -> SelectorCandidate {
 }
 
 fn cell_candidate(cell: &StateCell) -> Option<SelectorCandidate> {
-    let body = payload::value(cell);
+    let body = selector::payload_value(cell);
     if cell.cooldown_until.is_some() {
         return Some(candidate(cell, RuntimeOperation::idle(), 98, "cooldown"));
     }
@@ -53,7 +52,7 @@ fn cell_candidate(cell: &StateCell) -> Option<SelectorCandidate> {
         return Some(candidate(
             cell,
             operation,
-            payload::tier(&body, 80),
+            selector::payload_tier(&body, 80),
             "payload",
         ));
     }
@@ -88,9 +87,9 @@ fn namespace_candidate(cell: &StateCell, body: &Value) -> Option<SelectorCandida
             cell,
             RuntimeOperation::model_call(
                 format!("model.call/{}", cell.key.name),
-                payload::envelope(body),
-                payload::tool_view(body),
-                payload::number(body, "model_budget_tokens"),
+                selector::payload_envelope(body),
+                selector::payload_tool_view(body),
+                selector::payload_number(body, "model_budget_tokens"),
                 evidence(cell),
             ),
             50,
@@ -118,20 +117,20 @@ fn workspace_candidate(cell: &StateCell) -> Option<SelectorCandidate> {
 }
 
 fn operation_from_payload(body: &Value) -> Option<RuntimeOperation> {
-    let key = payload::text(body, "operation_key")?;
-    let expected = payload::envelope(body);
+    let key = selector::payload_text(body, "operation_key")?;
+    let expected = selector::payload_envelope(body);
     if expected == OutputEnvelope::None {
         Some(RuntimeOperation::model_free(
             key,
-            payload::evidence_requirements(body),
+            selector::payload_evidence_requirements(body),
         ))
     } else {
         Some(RuntimeOperation::model_call(
             key,
             expected,
-            payload::tool_view(body),
-            payload::number(body, "model_budget_tokens"),
-            payload::evidence_requirements(body),
+            selector::payload_tool_view(body),
+            selector::payload_number(body, "model_budget_tokens"),
+            selector::payload_evidence_requirements(body),
         ))
     }
 }
@@ -151,7 +150,7 @@ fn candidate(
     tier: u8,
     reason: &str,
 ) -> SelectorCandidate {
-    let body = payload::value(cell);
+    let body = selector::payload_value(cell);
     SelectorCandidate {
         operation,
         state_key: Some(cell.key.clone()),
@@ -160,7 +159,7 @@ fn candidate(
         score: CandidateScore {
             tier,
             priority_rank: -cell.priority,
-            deadline: payload::text(&body, "deadline_at")
+            deadline: selector::payload_text(&body, "deadline_at")
                 .unwrap_or("~")
                 .to_string(),
             key: cell.key.as_label(),

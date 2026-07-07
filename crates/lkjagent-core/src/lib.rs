@@ -12,8 +12,6 @@ mod engine_extend;
 mod engine_plan;
 mod engine_steps;
 
-pub mod manuscript;
-mod manuscript_extract;
 pub mod model;
 pub mod parse;
 mod parse_plan;
@@ -23,8 +21,6 @@ pub mod render;
 pub mod runtime_admission;
 pub mod runtime_artifact;
 pub mod runtime_candidate;
-mod runtime_candidate_edges;
-mod runtime_candidate_payload;
 pub mod runtime_completion;
 pub mod runtime_context;
 mod runtime_context_plan;
@@ -46,6 +42,11 @@ pub mod runtime_transition;
 mod runtime_workspace_family;
 pub mod templates;
 pub mod words;
-pub mod workspace_entity;
+pub mod workspace_entity {
+    pub use crate::workspace_manifest::{
+        preserve_identity_after_move, validate_entity, WorkspaceEntity, WorkspaceEntityIssue,
+        WorkspaceEntityKind, WorkspaceRetention, WorkspaceVisibility,
+    };
+}
 pub mod workspace_manifest;
 pub mod workspace_record;

@@ -1,4 +1,26 @@
-use crate::tui_event::TuiEvent;
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TuiEvent {
+    UserInputChanged(String),
+    UserSubmit,
+    UserInterrupt,
+    UserApproveTool,
+    UserRejectTool(String),
+    UserOpenPalette,
+    UserCloseModal,
+    AgentTextDelta(String),
+    AgentMessageComplete,
+    ToolCallProposed { name: String, decision_id: String },
+    ToolCallStarted(String),
+    ToolCallFinished(String),
+    StateTransitionObserved(String),
+    ArtifactCreated(String),
+    WorkspaceChanged(String),
+    TimerTick,
+    TerminalResize { width: u16, height: u16 },
+    ErrorObserved(String),
+    SaveTranscript,
+    QuitRequested,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum TuiPane {
@@ -83,12 +105,6 @@ impl TuiModel {
             pending_tool: None,
             last_error: None,
         }
-    }
-}
-
-impl Default for TuiModel {
-    fn default() -> Self {
-        Self::new()
     }
 }
 

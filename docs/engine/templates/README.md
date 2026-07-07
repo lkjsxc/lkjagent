@@ -7,7 +7,6 @@ plans and task checks.
 
 ## Table of Contents
 
-- [manuscript.md](manuscript.md): long prose artifact plan contract.
 - [docs-tree.md](docs-tree.md): structured Markdown knowledge-base plan.
 - [file-work.md](file-work.md): workspace create and revise work.
 - [question.md](question.md): direct answer tasks.

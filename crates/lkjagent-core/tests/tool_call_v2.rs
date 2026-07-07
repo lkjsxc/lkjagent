@@ -2,93 +2,103 @@ use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecis
 use lkjagent_core::runtime_tool_call_v2::{parse_tool_call_v2, ToolCallV2Error};
 use lkjagent_core::runtime_tool_catalog::explore_tool_view;
 
+type TestResult<T> = Result<T, String>;
+
 #[test]
-fn accepts_valid_multiline_write_action() {
+fn accepts_valid_multiline_write_action() -> TestResult<()> {
     let parsed = parse_tool_call_v2(
         &action(r#""tool_name":"fs.write","args":{"path":"notes/today.md","content":"one\ntwo"}"#),
         &decision(),
     )
-    .expect("valid v2 action");
+    .map_err(|error| format!("valid action failed: {error:?}"))?;
 
     assert_eq!(parsed.decision_id, "dec-1");
     assert_eq!(parsed.tool_name, "fs.write");
     assert_eq!(parsed.args["path"], "notes/today.md");
     assert_eq!(parsed.args["content"], "one\ntwo");
     assert_eq!(parsed.context_frame_fingerprint, "ctx-1");
+    Ok(())
 }
 
 #[test]
-fn rejects_duplicate_keys_with_pointer() {
-    let err = parse_tool_call_v2(
+fn rejects_duplicate_keys_with_pointer() -> TestResult<()> {
+    let err = parse_err(
         &action(r#""tool_name":"fs.write","args":{"path":"notes/a.md","content":{"a":1,"a":2}}"#),
-        &decision(),
-    )
-    .expect_err("duplicate key must fail first");
+        "duplicate key must fail first",
+    )?;
 
     assert_eq!(err, ToolCallV2Error::DuplicateKey("/args/content/a".into()));
+    Ok(())
 }
 
 #[test]
-fn rejects_prose_and_multiple_envelopes() {
+fn rejects_prose_and_multiple_envelopes() -> TestResult<()> {
     assert_eq!(
-        parse_tool_call_v2("plain response", &decision()).expect_err("no action"),
+        parse_err("plain response", "no action")?,
         ToolCallV2Error::NoActionFound
     );
     let one = action(r#""tool_name":"finish","args":{"summary":"done"}"#);
-    let err = parse_tool_call_v2(&format!("{one}\n{one}"), &decision()).expect_err("two actions");
+    let err = parse_err(&format!("{one}\n{one}"), "two actions")?;
     assert_eq!(err, ToolCallV2Error::MultipleActionsFound);
+    Ok(())
 }
 
 #[test]
-fn rejects_stale_decision_and_unknown_tool() {
+fn rejects_stale_decision_and_unknown_tool() -> TestResult<()> {
     let stale = action_with_decision(
         "dec-old",
         r#""tool_name":"finish","args":{"summary":"done"}"#,
     );
     assert_eq!(
-        parse_tool_call_v2(&stale, &decision()).expect_err("stale decision"),
+        parse_err(&stale, "stale decision")?,
         ToolCallV2Error::DecisionMismatch
     );
 
-    let err = parse_tool_call_v2(
+    let err = parse_err(
         &action(r#""tool_name":"calendar.send","args":{}"#),
-        &decision(),
-    )
-    .expect_err("unknown tool");
+        "unknown tool",
+    )?;
     assert_eq!(err, ToolCallV2Error::ToolUnknown);
+    Ok(())
 }
 
 #[test]
-fn rejects_unknown_top_level_and_args() {
+fn rejects_unknown_top_level_and_args() -> TestResult<()> {
     let top = action(r#""tool_name":"finish","args":{"summary":"done"},"extra":1"#);
     assert_eq!(
-        parse_tool_call_v2(&top, &decision()).expect_err("unknown top level"),
+        parse_err(&top, "unknown top level")?,
         ToolCallV2Error::UnknownTopLevel("extra".into())
     );
 
-    let err = parse_tool_call_v2(
+    let err = parse_err(
         &action(r#""tool_name":"finish","args":{"summary":"done","other":"x"}"#),
-        &decision(),
-    )
-    .expect_err("unknown arg");
+        "unknown arg",
+    )?;
     assert!(matches!(err, ToolCallV2Error::ArgsSchemaViolation(_)));
+    Ok(())
 }
 
 #[test]
-fn rejects_missing_required_and_wrong_primitive() {
-    let err = parse_tool_call_v2(
+fn rejects_missing_required_and_wrong_primitive() -> TestResult<()> {
+    let err = parse_err(
         &action(r#""tool_name":"fs.write","args":{"path":"a.md"}"#),
-        &decision(),
-    )
-    .expect_err("missing content");
+        "missing content",
+    )?;
     assert!(matches!(err, ToolCallV2Error::ArgsSchemaViolation(_)));
 
-    let err = parse_tool_call_v2(
+    let err = parse_err(
         &action(r#""tool_name":"fs.read","args":{"path":"a.md","count":"ten"}"#),
-        &decision(),
-    )
-    .expect_err("count must be numeric");
+        "count must be numeric",
+    )?;
     assert!(matches!(err, ToolCallV2Error::ArgsSchemaViolation(_)));
+    Ok(())
+}
+
+fn parse_err(raw: &str, label: &str) -> TestResult<ToolCallV2Error> {
+    match parse_tool_call_v2(raw, &decision()) {
+        Ok(_) => Err(format!("{label}: parse unexpectedly succeeded")),
+        Err(error) => Ok(error),
+    }
 }
 
 fn decision() -> RuntimeDecision {

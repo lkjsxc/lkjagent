@@ -28,9 +28,9 @@ diagnosis with measured values and a recovery state edge.
 ## Case Checks
 
 When no runnable work remains, case checks run over the real workspace and
-current artifacts. A manuscript case checks chapter file count, total words, and
-objective-specific constraints. A docs-tree case checks README coverage and
-relative links.
+current artifacts. A structured artifact case checks the concrete files,
+manifest units, fingerprints, and objective-specific constraints. A docs-tree
+case checks README coverage and relative links.
 
 ## Evidence Rows
 

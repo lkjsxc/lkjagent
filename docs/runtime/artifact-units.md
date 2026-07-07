@@ -10,7 +10,7 @@ assembled into the requested final shape.
 An artifact manifest records id, kind, title, root, schema number, audience,
 objectives, source records, checks, status, layout rules, and units. The generic
 manifest can describe reports, meeting packs, investigations, project design
-docs, travel plans, manuscripts, and exports.
+docs, travel plans, transcripts, and exports.
 
 ## Unit Contract
 
@@ -36,18 +36,17 @@ The assembled file gets its own artifact fingerprint. Case closure requires
 fresh checks that match current artifact fingerprints; model prose alone is not
 completion evidence.
 
-## Longform Rule
+## Long Artifact Rule
 
-Manuscripts are one artifact kind, not the sole target. Long manuscripts
-generate settings first, compact them into clean context items,
-generate bounded chapter units with previous-tail continuity, assemble chapter
-files, and run per-chapter and aggregate word checks before completion.
-Shortfalls insert fresh continuation write and verify steps from current rows.
+Large reports or document packs are generated as bounded units with source refs,
+previous-tail continuity where relevant, deterministic assembly, and fresh checks
+before completion. Shortfalls create new row-backed continuation work from the
+current artifact state.
 
 ## Acceptance Checks
 
-- `lkjagent-core` manuscript templates ask for bounded chapter units and insert
-  shortfall continuation steps with fresh ids.
+- Artifact manifests describe nested units, source refs, checks, assembly, and
+  fingerprints.
 - `lkjagent-app` write effects assemble checked units and persist file plus unit
   artifact fingerprints.
 - `lkjagent-core` completion tests require fresh artifact fingerprints for

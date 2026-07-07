@@ -10,7 +10,8 @@ fn record_entity_preserves_stable_id_across_move() {
     record.tags = vec!["finance".into()];
     record.state_keys = vec!["todo:open/rec-1".into()];
     let entity = WorkspaceEntity::record(&record, "records/todo/rec-1.md");
-    let moved = entity.moved_to("archive/todo/rec-1.md");
+    let mut moved = entity.clone();
+    moved.path = "archive/todo/rec-1.md".into();
 
     assert!(validate_entity(&entity).is_empty());
     assert!(preserve_identity_after_move(&entity, &moved));
