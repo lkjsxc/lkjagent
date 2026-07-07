@@ -128,6 +128,7 @@ fn write_record(
     let path = workspace.join(&rel);
     let text = render_record(record);
     fs::write(&path, &text).map_err(|error| error.to_string())?;
+    crate::workspace_scaffold::refresh_for_path(&workspace, &rel)?;
     let row = record_row(
         (&record.id, &record.kind, &record.title, &record.state),
         &rel,

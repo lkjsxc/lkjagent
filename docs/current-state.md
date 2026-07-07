@@ -70,6 +70,10 @@ flat data config, copy root config into per-profile data directories, run each
 available-endpoint profile for the requested elapsed time unless blocked, and
 write explicit skip evidence when endpoint inputs are absent.
 
+Workspace rebalance now refreshes generated README child links, records path
+aliases and audit rows, rebuilds record-backed indexes after moves, and keeps
+old paths resolvable through the alias table.
+
 Owner CLI, status, watch, console, and TUI labels now expose matters rather than
 tasks. Plan-family rows still exist as bridge storage, but owner-visible list,
 show, queue, log, status, and exchange paths use matter and operation wording.
@@ -90,8 +94,6 @@ that bridge until the semantic matter surface is complete.
 
 - Semantic owner-turn routing to existing matters, artifact requests,
   inspection, and system operations needs focused tests beyond direct records.
-- Workspace READMEs, indexes, and rebalance link-repair evidence need stronger
-  coverage.
 - The workbench composer needs grapheme-aware cursor movement and durable agent
   transcript rendering tests.
 - Final compose verification must be rerun after the last code change in this
@@ -99,8 +101,8 @@ that bridge until the semantic matter surface is complete.
 
 ## Next Executable Step
 
-Implement the smallest coherent slice that makes the docs true: strengthen
-workspace rebalance README, index, and link-repair coverage.
+Implement the smallest coherent slice that makes the docs true: add grapheme-
+aware workbench composer cursor movement and transcript durability tests.
 
 ## Honesty Rules
 

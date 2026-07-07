@@ -40,6 +40,12 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
     assert!(applied.contains("move rec_1"));
     assert!(workspace.join("records/life/todo/rec_1.md").exists());
     assert!(!workspace.join("records/knowledge/notes/old.md").exists());
+    let todo_readme = fs::read_to_string(workspace.join("records/life/todo/README.md"))?;
+    assert!(todo_readme.contains("[rec_1.md](rec_1.md)"));
+    let life_readme = fs::read_to_string(workspace.join("records/life/README.md"))?;
+    assert!(life_readme.contains("[todo](todo/)"));
+    let index = fs::read_to_string(workspace.join("indexes/open-todos.md"))?;
+    assert!(index.contains("rec_1 [open] Move me (records/life/todo/rec_1.md)"));
 
     let shown = cli::run([
         "--data",
@@ -56,6 +62,12 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
         |row| row.get(0),
     )?;
     assert_eq!(audits, 1);
+    let alias: String = conn.query_row(
+        "SELECT new_path FROM workspace_path_aliases WHERE old_path = ?1",
+        ["records/knowledge/notes/old.md"],
+        |row| row.get(0),
+    )?;
+    assert_eq!(alias, "records/life/todo/rec_1.md");
     let valid = cli::run(["--data", data_str(&data), "workspace", "validate"])?;
     assert_eq!(valid, "workspace validate: ok");
     Ok(())

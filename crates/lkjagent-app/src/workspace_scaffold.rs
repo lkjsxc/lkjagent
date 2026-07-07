@@ -3,50 +3,80 @@ use std::path::{Path, PathBuf};
 
 pub fn ensure_for_path(workspace: &Path, rel: &str) -> Result<(), String> {
     fs::create_dir_all(workspace).map_err(|error| error.to_string())?;
-    write_if_missing(
-        &workspace.join("README.md"),
-        "# Workspace\n\nOwner-readable files linked to the lkjagent ledger.\n",
-    )?;
     let path = workspace.join(rel);
     let Some(parent) = path.parent() else {
         return Ok(());
     };
     fs::create_dir_all(parent).map_err(|error| error.to_string())?;
-    for dir in lineage(workspace, parent) {
+    refresh_for_path(workspace, rel)
+}
+
+pub fn refresh_for_path(workspace: &Path, rel: &str) -> Result<(), String> {
+    let path = workspace.join(rel);
+    let Some(parent) = path.parent() else {
+        return write_readme(workspace);
+    };
+    for dir in readme_dirs(workspace, parent) {
         write_readme(&dir)?;
     }
     Ok(())
 }
 
-fn lineage(workspace: &Path, leaf: &Path) -> Vec<PathBuf> {
-    let mut dirs = Vec::new();
+fn readme_dirs(workspace: &Path, leaf: &Path) -> Vec<PathBuf> {
+    let mut dirs = vec![workspace.to_path_buf()];
     let mut current = leaf.to_path_buf();
+    let mut lineage = Vec::new();
     while current.starts_with(workspace) && current != workspace {
-        dirs.push(current.clone());
+        lineage.push(current.clone());
         if !current.pop() {
             break;
         }
     }
-    dirs.reverse();
+    lineage.reverse();
+    dirs.extend(lineage);
     dirs
 }
 
 fn write_readme(dir: &Path) -> Result<(), String> {
-    let name = dir
-        .file_name()
-        .and_then(|value| value.to_str())
-        .unwrap_or("workspace");
-    let title = title(name);
-    let body =
-        format!("# {title}\n\nPurpose: owner-readable workspace directory managed by lkjagent.\n");
-    write_if_missing(&dir.join("README.md"), &body)
+    let title = title(
+        dir.file_name()
+            .and_then(|value| value.to_str())
+            .unwrap_or("workspace"),
+    );
+    let mut lines = vec![
+        format!("# {title}"),
+        String::new(),
+        "Purpose: owner-readable workspace directory managed by lkjagent.".to_string(),
+        String::new(),
+        "## Children".to_string(),
+        String::new(),
+    ];
+    let children = child_links(dir)?;
+    if children.is_empty() {
+        lines.push("none".to_string());
+    } else {
+        lines.extend(children);
+    }
+    lines.push(String::new());
+    fs::write(dir.join("README.md"), lines.join("\n")).map_err(|error| error.to_string())
 }
 
-fn write_if_missing(path: &Path, body: &str) -> Result<(), String> {
-    if !path.exists() {
-        fs::write(path, body).map_err(|error| error.to_string())?;
+fn child_links(dir: &Path) -> Result<Vec<String>, String> {
+    let mut links = Vec::new();
+    for entry in fs::read_dir(dir).map_err(|error| error.to_string())? {
+        let entry = entry.map_err(|error| error.to_string())?;
+        let name = entry.file_name().to_string_lossy().to_string();
+        if name == "README.md" {
+            continue;
+        }
+        if entry.path().is_dir() {
+            links.push(format!("- [{name}]({name}/)"));
+        } else {
+            links.push(format!("- [{name}]({name})"));
+        }
     }
-    Ok(())
+    links.sort();
+    Ok(links)
 }
 
 fn title(name: &str) -> String {

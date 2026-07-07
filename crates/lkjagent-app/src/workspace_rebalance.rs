@@ -26,10 +26,14 @@ pub fn apply(conn: &Connection, data_dir: &Path, json: bool, now: &str) -> Resul
             return Err(format!("invalid rebalance move: {}", item.entity_id));
         }
         move_record_file(&workspace, item)?;
+        crate::workspace_scaffold::refresh_for_path(&workspace, &item.new_path)?;
         update_record(conn, item, now)?;
         insert_alias(conn, &alias(item, now)).map_err(|error| error.to_string())?;
         insert_rebalance_audit(conn, &audit_id(item), item, now)
             .map_err(|error| error.to_string())?;
+    }
+    if !moves.is_empty() {
+        crate::workspace_index::rebuild(conn, data_dir, now)?;
     }
     render_plan(&moves, json)
 }
