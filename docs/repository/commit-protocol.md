@@ -31,8 +31,8 @@ is still evidence and is recorded with the result.
 
 ## Attribution Cleanup
 
-Cursor or CursorAgent cleanup starts with local inventory: `git shortlog -sne
---all`, filtered author and committer logs, and commit bodies containing Cursor
-terms or `Co-authored-by`. If author or committer metadata contains unwanted
-identity, stop before history rewrite and prepare an owner-approved plan with a
-backup branch, dry run, verification commands, and GitHub cache notes.
+Unwanted coauthor cleanup starts with local inventory: `git shortlog -sne
+--all`, filtered author and committer logs, and commit bodies containing
+third-party attribution trailers. If author or committer metadata contains an
+unwanted identity, stop before history rewrite and prepare an owner-approved
+plan with a backup branch, dry run, verification commands, and host cache notes.
