@@ -24,6 +24,9 @@ fn collect_files_with_git(root: &Path) -> Result<Vec<RepoFile>, String> {
     let stdout = String::from_utf8_lossy(&output.stdout);
     let mut files = Vec::new();
     for relative in stdout.lines().filter(|line| !line.trim().is_empty()) {
+        if is_ignored(relative) {
+            continue;
+        }
         let path = root.join(relative);
         if path.is_file() {
             files.push(read_file(&path, relative)?);

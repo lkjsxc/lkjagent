@@ -55,8 +55,10 @@ exchange refs, and nullable token usage rows. Check results use the active step
 id, store check parameters, and keep numeric measurements as scalar values.
 README coverage requires links to children, and link checks cover tracked
 Markdown, crate README contract links, `./`, `../`, anchors, and directory
-README inference. Deterministic effect failures commit an `effect_error` attempt
-and notice without marking the step done.
+README inference. Static gate collection ignores generated runtime state under
+`data/`, `tmp/`, local workspace directories, lock files, and SQLite sidecars in
+git-backed and plain checkouts. Deterministic effect failures commit an
+`effect_error` attempt and notice without marking the step done.
 
 Focused tests cover the row-first store path, parser, CLI, explore actions,
 exchange logs, token usage, check measurements, memory rows and admission,

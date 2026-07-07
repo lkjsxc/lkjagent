@@ -9,7 +9,9 @@ Define size budgets for authored files and product surfaces.
 Every authored file is capped by `repository.file.line-cap=200` lines. This
 includes Markdown, Rust, scripts, config, Compose files, and workflows.
 Generated logs under `data/logs/` are diagnostic evidence and are not authored
-source.
+source. Gate file collection also ignores runtime state under `data/`, `tmp/`,
+`target/`, local workspace state directories, lock files, and SQLite sidecar
+files in both git-backed and plain directory checkouts.
 
 ## Token Target
 
