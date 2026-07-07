@@ -118,9 +118,11 @@ selection; decisions without external evidence are reused. Proof collection
 writes state-ledger sections for cells, decisions, candidates, records, prompt
 frames, admissions, observations, exchanges, artifacts, checks, and context.
 Status, doctor, workspace, watch, and workbench read rows. Workbench accepts
-owner input, append or pane mode, scroll commands, follow on/off, and status rail
-fallbacks. Generic records add, list, show, link, archive, resolve path aliases,
-and project to pure workspace entity refs for move validation. Wrappers are
+owner input, append or pane mode, scroll and follow commands, and status rail
+fallbacks. A pure TUI reducer preserves composer input across agent and tool
+events and renders a non-TTY view. Generic records add, list, show, link,
+archive, resolve path aliases, and project to pure workspace entity refs for
+move validation. Wrappers are
 today, journal, todo, calendar, finance, project, and dev;
 record kinds project index, todo, calendar, finance, routine, proof, dev, and
 project state cells. Workspace rebuild writes derived indexes and artifact rows;

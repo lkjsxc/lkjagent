@@ -11,6 +11,13 @@ controller.
 directory. It does not start or stop the daemon. The Docker entrypoint routes the
 command the same way it routes `status`, `console`, and `watch`.
 
+## Pure TUI Core
+
+The app has a pure terminal model, event reducer, and non-TTY renderer for the
+next operator console. It preserves composer input while agent, tool, state,
+artifact, resize, interrupt, approval, save, and quit events arrive. The current
+command remains the append or pane fallback until a terminal backend is wired.
+
 ## Modes
 
 `append` is the default safest mode. It prints immutable refresh cards to the
