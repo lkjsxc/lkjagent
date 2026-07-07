@@ -33,7 +33,9 @@ state_keys: [todo:open/rec_20260705_120000_slug]
 ## Identity
 
 The `id` is stable and sorts by creation time. Paths are convenient storage
-locations, not identity. The first file implementation stores records under
+locations, not identity. Pure workspace entity refs use the record id as the
+stable entity id, so a rebalance can validate path moves without changing
+ledger links. The first file implementation stores records under
 `workspace/records/<kind>/<id>.md` and archived records under
 `workspace/records/archive/<kind>/<id>.md`. Unknown `kind` values are valid
 records and must list, show, link, archive, and round-trip without central enum

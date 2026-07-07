@@ -46,5 +46,6 @@ pub mod runtime_transition;
 mod runtime_workspace_family;
 pub mod templates;
 pub mod words;
+pub mod workspace_entity;
 pub mod workspace_manifest;
 pub mod workspace_record;

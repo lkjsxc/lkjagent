@@ -119,8 +119,9 @@ writes state-ledger sections for cells, decisions, candidates, records, prompt
 frames, admissions, observations, exchanges, artifacts, checks, and context.
 Status, doctor, workspace, watch, and workbench read rows. Workbench accepts
 owner input, append or pane mode, scroll commands, follow on/off, and status rail
-fallbacks. Generic records add, list, show, link, archive, and resolve path
-aliases. Wrappers are today, journal, todo, calendar, finance, project, and dev;
+fallbacks. Generic records add, list, show, link, archive, resolve path aliases,
+and project to pure workspace entity refs for move validation. Wrappers are
+today, journal, todo, calendar, finance, project, and dev;
 record kinds project index, todo, calendar, finance, routine, proof, dev, and
 project state cells. Workspace rebuild writes derived indexes and artifact rows;
 workspace rebalance writes manifest, preview, apply audit, and alias rows. Xtask

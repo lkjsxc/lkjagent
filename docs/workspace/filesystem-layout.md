@@ -60,8 +60,9 @@ may be admitted as bounded context with source refs and fingerprints.
 ## Rebalancing
 
 `workspace/system/workspace-manifest.json` records the schema number, root
-policy, archive root, system root, and owner-facing directories. `workspace
-plan-rebalance` previews canonical record moves. `workspace apply-rebalance`
-validates paths, moves files, updates record rows, writes path aliases, and
-stores rebalance audit rows. `record show` can resolve an old path alias to the
-current stable record id.
+policy, archive root, system root, and owner-facing directories. Pure workspace
+entity validation treats record ids as stable identities and paths as movable
+locations. `workspace plan-rebalance` previews canonical record moves.
+`workspace apply-rebalance` validates paths, moves files, updates record rows,
+writes path aliases, and stores rebalance audit rows. `record show` can resolve
+an old path alias to the current stable record id.
