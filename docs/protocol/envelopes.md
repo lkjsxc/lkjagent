@@ -55,7 +55,17 @@ and legal for that tool. Required fields follow in deterministic order.
 Placeholder values such as `...`, `PATH`, `TODO`, `VALUE`, `FIELD_VALUE`,
 `<path>`, or `[path]` are not executable and are rejected before effects.
 Unknown tools and unknown fields are faults relative to the persisted decision.
-JSON and implicit envelopes are not part of the protocol.
+Implicit envelopes are not part of the active daemon prompt protocol.
+
+## JSON Action Parser
+
+A staged pure parser accepts one JSON action object inside its dedicated action
+delimiter pair. The object carries the schema discriminator, the persisted
+decision id, the tool name, the argument object, and the context frame
+fingerprint. The parser rejects duplicate keys at every object level,
+unknown top-level fields, stale decision ids, unknown tools, missing required
+arguments, unknown arguments, and wrong primitive types before any effect can
+run. Active daemon prompts still use `<tool_call>` until the bridge is wired.
 
 ## Examples
 

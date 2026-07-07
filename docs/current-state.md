@@ -33,11 +33,15 @@ commits turn state through rows, and records waiting answers as rows before cont
 The parser rejects explore `<finish>` and `<ask>` envelopes, leading or trailing
 prose, old `<action>` envelopes, missing `<tool_name>`, duplicate or unknown
 tool-call fields, and unknown tools absent from the persisted decision
-`ToolSetView`. Prompt rendering labels safe filled tool examples separately from
-schema-only placeholders, which parse but admission rejects unchanged; internal
-`Action` domain names remain. Prompt rendering includes the bounded task brief. Endpoint
-errors use the documented ten-failure patience before blocking a step, and
-endpoint clients default to a loose finite 900-second timeout unless configured.
+`ToolSetView`. `lkjagent-core` also contains a staged JSON action parser for one
+bounded action envelope with duplicate-key rejection, decision-id validation,
+unknown-field rejection, and per-tool primitive argument checks; the daemon has
+not yet switched active prompts to that JSON grammar. Prompt rendering labels safe filled tool
+examples separately from schema-only placeholders, which parse but admission
+rejects unchanged; internal `Action` domain names remain. Prompt rendering
+includes the bounded task brief. Endpoint errors use the documented ten-failure
+patience before blocking a step, and endpoint clients default to a loose finite
+900-second timeout unless configured.
 
 Queue rows persist `force_new`, send uses it, and daemon intake can select a
 forced-new row without treating it as an answer. Status, task, queue, bounded
