@@ -8,7 +8,11 @@ RUN apt-get update \
         ripgrep \
     && rm -rf /var/lib/apt/lists/*
 RUN rustup component add rustfmt clippy
-COPY . .
+COPY Cargo.toml Cargo.lock README.md ./
+COPY crates ./crates
+COPY docs ./docs
+COPY evaluation ./evaluation
+COPY Dockerfile docker-compose.yml ./
 RUN cargo build --release -p lkjagent-app
 
 FROM debian:bookworm-slim AS runtime
@@ -31,7 +35,7 @@ RUN apt-get update \
         'chown -R agent:agent /data' \
         'cd /data/workspace' \
         'case "${1:-}" in' \
-        '  ""|run|send|status|console|workbench|doctor|workspace|log|watch|help|task|queue|context|record|memory|today|journal|todo|calendar|finance|project|dev)' \
+        '  ""|run|send|status|console|workbench|doctor|workspace|log|watch|help|matter|queue|context|record|memory|today|journal|todo|calendar|finance|project|dev)' \
         '    set -- /usr/local/bin/lkjagent --data /data "$@"' \
         '    ;;' \
         'esac' \

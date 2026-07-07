@@ -3,7 +3,6 @@
 .lkjagent-models
 .lkjagent-workspace
 .omx
-Cargo.lock
 data/*
 !data/logs/
 !data/logs/**

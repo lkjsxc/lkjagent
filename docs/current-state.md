@@ -61,6 +61,10 @@ Endpoint configuration now reads flat `data/lkjagent.json` keys such as
 or diagnostics rewrites it to the flat shape while environment variables still
 take precedence.
 
+The Docker image now copies explicit repository inputs instead of a broad build
+context copy. Compose proof has run an owner record turn through `send`, the
+long-running agent, and the workspace write path with an isolated data bind.
+
 Owner CLI, status, watch, console, and TUI labels now expose matters rather than
 tasks. Plan-family rows still exist as bridge storage, but owner-visible list,
 show, queue, log, status, and exchange paths use matter and operation wording.
@@ -85,15 +89,15 @@ that bridge until the semantic matter surface is complete.
   coverage.
 - The workbench composer needs grapheme-aware cursor movement and durable agent
   transcript rendering tests.
-- Docker layering must avoid broad `COPY . .` and final compose verification
-  must be rerun in this checkout.
+- Final compose verification must be rerun after the last code change in this
+  checkout.
 - Live campaigns must run for real elapsed time when an endpoint is available,
   or write explicit skip evidence.
 
 ## Next Executable Step
 
-Implement the smallest coherent slice that makes the docs true: add Docker
-Compose proof for an owner record turn through the workspace path.
+Implement the smallest coherent slice that makes the docs true: add live
+campaign elapsed-time and explicit skip evidence behavior.
 
 ## Honesty Rules
 
