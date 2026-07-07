@@ -51,9 +51,12 @@ cargo run -p lkjagent-xtask -- experiment live-profiles \
 ```
 
 The live runner covers personal workspace, software project, structured
-artifact, and protocol stress objectives. If `LKJAGENT_ENDPOINT_URL` or
-`LKJAGENT_MODEL` is absent, it writes an honest skip summary and raw-evidence
-note for every profile rather than faking endpoint success.
+artifact, and protocol stress objectives. It reads endpoint settings from
+environment variables or flat `data/lkjagent.json`; if neither source has an
+endpoint URL and model, it writes an honest skip summary and raw-evidence note
+for every profile rather than faking endpoint success. When an endpoint is
+available, each profile loop runs for the requested elapsed time unless an
+endpoint or store error blocks it.
 
 ## Trial Rule
 

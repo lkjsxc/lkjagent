@@ -107,7 +107,9 @@ fn live_profiles_write_honest_skip_when_endpoint_env_absent() -> TestResult<()> 
     ] {
         let text = fs::read_to_string(out.join(name).join("summary.md"))?;
         assert!(text.contains("status=skipped"));
-        assert!(text.contains("missing_env=LKJAGENT_ENDPOINT_URL,LKJAGENT_MODEL"));
+        assert!(text.contains("missing_endpoint=LKJAGENT_ENDPOINT_URL or endpoint_url"));
+        assert!(text.contains("LKJAGENT_MODEL or endpoint_model"));
+        assert!(text.contains("elapsed_seconds=0"));
     }
     let adoption = fs::read_to_string(out.join("adoption.md"))?;
     assert!(adoption.contains("status=skipped"));

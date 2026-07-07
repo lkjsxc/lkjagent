@@ -4,7 +4,6 @@ use std::time::{Duration, Instant};
 
 use lkjagent_app::daemon::run_until_idle;
 use lkjagent_app::endpoint::LlmEndpoint;
-use lkjagent_core::model::TaskState;
 use rusqlite::Connection;
 
 pub struct LiveOptions {
@@ -17,9 +16,9 @@ pub struct LiveOptions {
 pub fn run(options: LiveOptions) -> Result<PathBuf, String> {
     fs::create_dir_all(&options.out_dir).map_err(|error| error.to_string())?;
     let missing = if options.force_skip {
-        vec!["LKJAGENT_ENDPOINT_URL", "LKJAGENT_MODEL"]
+        crate::experiment_live_config::force_missing()
     } else {
-        missing_env()
+        crate::experiment_live_config::missing_endpoint(&options.data_dir)
     };
     for profile in profiles() {
         let dir = options.out_dir.join(profile.name);
@@ -69,19 +68,20 @@ fn profiles() -> Vec<Profile> {
 fn run_profile(options: &LiveOptions, profile: &Profile, out: &Path) -> Result<(), String> {
     let data = options.data_dir.join(profile.name);
     fs::create_dir_all(&data).map_err(|error| error.to_string())?;
+    crate::experiment_live_config::install_profile_config(&options.data_dir, &data)?;
     enqueue(&data, profile.objective)?;
+    let target = Duration::from_secs(options.duration_seconds.max(1));
     let started = Instant::now();
     let mut endpoint = LlmEndpoint::new(&data);
     let mut final_state = "open".to_string();
     let mut status = "ran".to_string();
     let mut note = String::new();
-    while started.elapsed() < Duration::from_secs(options.duration_seconds.max(1)) {
+    let mut turns = 0_u64;
+    while started.elapsed() < target {
         match run_until_idle(&data, &mut endpoint, 1) {
             Ok(snapshot) => {
+                turns += 1;
                 final_state = format!("{:?}", snapshot.task.state).to_ascii_lowercase();
-                if snapshot.task.state != TaskState::Open {
-                    break;
-                }
             }
             Err(error) => {
                 status = "blocked".to_string();
@@ -89,14 +89,23 @@ fn run_profile(options: &LiveOptions, profile: &Profile, out: &Path) -> Result<(
                 break;
             }
         }
+        std::thread::sleep(Duration::from_millis(200));
     }
     let elapsed = started.elapsed().as_secs();
     let metrics = metrics_line(&data)?;
     fs::write(
         out.join("summary.md"),
         format!(
-            "# Live Profile Summary\n\nprofile={}\nstatus={}\nstate={}\nelapsed_seconds={}\nobjective={}\nmetrics={}\nnote={}\n",
-            profile.name, status, final_state, elapsed, profile.objective, metrics, note
+            "# Live Profile Summary\n\nprofile={}\nstatus={}\nstate={}\ntarget_seconds={}\nelapsed_seconds={}\nturns={}\nobjective={}\nmetrics={}\nnote={}\n",
+            profile.name,
+            status,
+            final_state,
+            target.as_secs(),
+            elapsed,
+            turns,
+            profile.objective,
+            metrics,
+            note
         ),
     )
     .map_err(|error| error.to_string())?;
@@ -135,11 +144,11 @@ fn table_count(conn: &Connection, table: &str) -> Result<i64, String> {
         .map_err(|error| error.to_string())
 }
 
-fn write_skip(out: &Path, profile: &Profile, missing: &[&str]) -> Result<(), String> {
+fn write_skip(out: &Path, profile: &Profile, missing: &[String]) -> Result<(), String> {
     fs::write(
         out.join("summary.md"),
         format!(
-            "# Live Profile Summary\n\nprofile={}\nstatus=skipped\nmissing_env={}\nobjective={}\n",
+            "# Live Profile Summary\n\nprofile={}\nstatus=skipped\nmissing_endpoint={}\nelapsed_seconds=0\nobjective={}\n",
             profile.name,
             missing.join(","),
             profile.objective
@@ -149,7 +158,7 @@ fn write_skip(out: &Path, profile: &Profile, missing: &[&str]) -> Result<(), Str
     fs::write(
         out.join("raw-evidence.md"),
         format!(
-            "# Raw Evidence\n\nNo endpoint call was made. Missing: {}\n",
+            "# Raw Evidence\n\nNo endpoint call was made. Missing endpoint input: {}\n",
             missing.join(",")
         ),
     )
@@ -165,19 +174,7 @@ fn enqueue(data: &Path, objective: &str) -> Result<(), String> {
         .map_err(|error| error.to_string())
 }
 
-fn missing_env() -> Vec<&'static str> {
-    ["LKJAGENT_ENDPOINT_URL", "LKJAGENT_MODEL"]
-        .into_iter()
-        .filter(|name| {
-            std::env::var(name)
-                .ok()
-                .filter(|v| !v.trim().is_empty())
-                .is_none()
-        })
-        .collect()
-}
-
-fn adoption(missing: &[&str]) -> String {
+fn adoption(missing: &[String]) -> String {
     let status = if missing.is_empty() {
         "deferred"
     } else {
@@ -186,7 +183,7 @@ fn adoption(missing: &[&str]) -> String {
     let reason = if missing.is_empty() {
         "compare live metrics before default adoption".to_string()
     } else {
-        format!("missing env {}", missing.join(","))
+        format!("missing endpoint input {}", missing.join(","))
     };
     let mut lines = vec!["# Live Profile Adoption Ledger".to_string(), String::new()];
     for profile in profiles() {
