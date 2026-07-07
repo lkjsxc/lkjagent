@@ -78,7 +78,7 @@ pub fn render_prompt(task: &Task, steps: &[Step], step: &Step) -> Prompt {
     let tag = expected_block(step.kind);
     let brief = truncate(&task.brief, 450);
     let system = format!(
-        "lkjagent writes honestly. Objective: {}\nTask brief:\n{}\nExpected: {tag}\n{}",
+        "lkjagent writes honestly. Objective: {}\nMatter brief:\n{}\nExpected: {tag}\n{}",
         task.objective,
         brief,
         protocol(step.kind)
@@ -141,8 +141,8 @@ fn repair_shape(decision: &RuntimeDecision, tag: &str) -> String {
         .first()
         .map_or("TOOL", |entry| entry.name.as_str());
     format!(
-        "Corrected minimal V2 shape:\n<lkjagent_action_v2>{{\"schema_version\":\"lkjagent.tool_call.v2\",\"decision_id\":\"{}\",\"tool_name\":\"{}\",\"args\":{{}},\"context_frame_fingerprint\":\"{}\"}}</lkjagent_action_v2>",
-        decision.id, tool, decision.context_frame_fingerprint
+        "Corrected minimal action shape:\n<lkjagent_action>\n<decision_id>{}</decision_id>\n<context_fingerprint>{}</context_fingerprint>\n<tool_name>{}</tool_name>\n</lkjagent_action>",
+        decision.id, decision.context_frame_fingerprint, tool
     )
 }
 

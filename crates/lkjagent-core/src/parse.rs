@@ -2,7 +2,7 @@ use serde_json::Value;
 
 use crate::model::{CheckResult, StepKind};
 use crate::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
-use crate::runtime_tool_call_v2::{parse_tool_call_v2, ToolCallV2Error};
+use crate::runtime_tool_call::{parse_tool_call, ToolCallError};
 use crate::runtime_tool_catalog::explore_tool_view;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -44,7 +44,7 @@ pub enum ParseFault {
     UnknownTool,
     BadParams,
     BadPlanLine(String),
-    ActionV2(ToolCallV2Error),
+    Action(ToolCallError),
 }
 
 pub fn parse_expected(kind: StepKind, raw: &str) -> Result<ParsedOutput, ParseFault> {
@@ -61,7 +61,7 @@ pub fn parse_expected_with_view(
         StepKind::Plan => {
             crate::parse_plan::parse_plan(&block(raw, "plan")?).map(ParsedOutput::Plan)
         }
-        StepKind::Explore => parse_action_v2(raw, &synthetic_action_decision(view)),
+        StepKind::Explore => parse_action(raw, &synthetic_action_decision(view)),
         StepKind::Respond | StepKind::Ask => block(raw, "message").map(ParsedOutput::Message),
         StepKind::Verify => parse_verdict(&block(raw, "verdict")?).map(ParsedOutput::Verdict),
     }
@@ -76,7 +76,7 @@ pub fn parse_expected_for_decision(
         OutputEnvelope::Plan => {
             crate::parse_plan::parse_plan(&block(raw, "plan")?).map(ParsedOutput::Plan)
         }
-        OutputEnvelope::Action => parse_action_v2(raw, decision),
+        OutputEnvelope::Action => parse_action(raw, decision),
         OutputEnvelope::Message => block(raw, "message").map(ParsedOutput::Message),
         OutputEnvelope::Verdict => {
             parse_verdict(&block(raw, "verdict")?).map(ParsedOutput::Verdict)
@@ -106,8 +106,8 @@ pub fn block(raw: &str, tag: &str) -> Result<String, ParseFault> {
     }
 }
 
-fn parse_action_v2(raw: &str, decision: &RuntimeDecision) -> Result<ParsedOutput, ParseFault> {
-    let parsed = parse_tool_call_v2(raw, decision).map_err(map_action_fault)?;
+fn parse_action(raw: &str, decision: &RuntimeDecision) -> Result<ParsedOutput, ParseFault> {
+    let parsed = parse_tool_call(raw, decision).map_err(map_action_fault)?;
     Ok(ParsedOutput::Action(Action {
         tool: parsed.tool_name,
         params: parsed
@@ -118,10 +118,10 @@ fn parse_action_v2(raw: &str, decision: &RuntimeDecision) -> Result<ParsedOutput
     }))
 }
 
-fn map_action_fault(error: ToolCallV2Error) -> ParseFault {
+fn map_action_fault(error: ToolCallError) -> ParseFault {
     match error {
-        ToolCallV2Error::ToolUnknown => ParseFault::UnknownTool,
-        other => ParseFault::ActionV2(other),
+        ToolCallError::ToolUnknown => ParseFault::UnknownTool,
+        other => ParseFault::Action(other),
     }
 }
 

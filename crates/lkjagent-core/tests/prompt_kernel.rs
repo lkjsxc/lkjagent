@@ -21,7 +21,7 @@ fn card_plan_has_ordered_profiles_and_fingerprints() -> Result<(), String> {
         user: "user".to_string(),
         fingerprint: "prompt-fp".to_string(),
         max_tokens: 500,
-        stop: "</lkjagent_action_v2>".to_string(),
+        stop: "</lkjagent_action>".to_string(),
     };
     let plan = build_prompt_card_plan(
         &decision,

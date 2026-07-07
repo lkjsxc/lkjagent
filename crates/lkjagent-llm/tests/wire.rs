@@ -36,7 +36,7 @@ fn compact_default_max_tokens_is_512() -> TestResult<()> {
 #[test]
 fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
     let response = r#"{
-        "choices":[{"message":{"content":"<lkjagent_action_v2></lkjagent_action_v2>"},"finish_reason":"stop"}],
+        "choices":[{"message":{"content":"<lkjagent_action></lkjagent_action>"},"finish_reason":"stop"}],
         "usage":{
           "prompt_tokens":11,
           "completion_tokens":7,
@@ -47,10 +47,7 @@ fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
         "timings":{"prompt_ms":4.5}
     }"#;
     let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
-    assert_eq!(
-        completion.content,
-        "<lkjagent_action_v2></lkjagent_action_v2>"
-    );
+    assert_eq!(completion.content, "<lkjagent_action></lkjagent_action>");
     assert_eq!(completion.finish_reason, FinishReason::Stop);
     assert_eq!(completion.closure_mode, ClosureMode::Natural);
     assert_eq!(completion.usage.prompt_tokens, Some(11));
@@ -72,7 +69,7 @@ fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
 #[test]
 fn response_preserves_missing_usage_as_unknown() -> TestResult<()> {
     let response = r#"{
-        "choices":[{"message":{"content":"<lkjagent_action_v2></lkjagent_action_v2>"},"finish_reason":"stop"}]
+        "choices":[{"message":{"content":"<lkjagent_action></lkjagent_action>"},"finish_reason":"stop"}]
     }"#;
 
     let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
@@ -133,13 +130,13 @@ fn missing_content_field_is_provider_anomaly() -> TestResult<()> {
 #[test]
 fn stop_stripped_tool_call_close_is_restored() -> TestResult<()> {
     let response = r#"{
-        "choices":[{"message":{"content":"<lkjagent_action_v2>\n{}\n"},"finish_reason":"stop"}],
+        "choices":[{"message":{"content":"<lkjagent_action>\n{}\n"},"finish_reason":"stop"}],
         "usage":{"prompt_tokens":11,"completion_tokens":7}
     }"#;
 
     let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
 
-    assert!(completion.content.ends_with("</lkjagent_action_v2>"));
+    assert!(completion.content.ends_with("</lkjagent_action>"));
     assert_eq!(completion.finish_reason, FinishReason::Stop);
     assert_eq!(completion.closure_mode, ClosureMode::StopSequenceClosed);
     Ok(())

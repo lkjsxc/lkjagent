@@ -1,9 +1,5 @@
-use serde_json::json;
-
 use crate::prompt_policy::envelope_tag;
-use crate::runtime_decision::{
-    OutputEnvelope, RuntimeDecision, ToolSetView, ToolValueClass, ToolViewEntry,
-};
+use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry};
 
 pub(crate) fn render_tool_view(view: &ToolSetView) -> String {
     view.entries
@@ -44,18 +40,18 @@ pub(crate) fn protocol_card(decision: &RuntimeDecision) -> String {
 fn tool_call_card(decision: &RuntimeDecision) -> String {
     let mut lines = vec![
         "Output contract for this turn:".to_string(),
-        "- Return exactly one <lkjagent_action_v2> block.".to_string(),
+        "- Return exactly one <lkjagent_action> block.".to_string(),
         "- Do not write prose before or after the block.".to_string(),
-        "- The block body is canonical JSON, not XML fields.".to_string(),
+        "- Tags have no attributes and the body is not JSON.".to_string(),
         format!("- decision_id: {}", decision.id),
         format!(
-            "- context_frame_fingerprint: {}",
+            "- context_fingerprint: {}",
             decision.context_frame_fingerprint
         ),
-        "- Use one tool_name from the Tool view and include required args.".to_string(),
+        "- Use one tool_name from the Tool view and include required arguments.".to_string(),
         "- Safe filled examples are copyable only when they match your intent.".to_string(),
         "- Schema-only FIELD_VALUE placeholders are rejected unchanged.".to_string(),
-        "- Close with </lkjagent_action_v2>.".to_string(),
+        "- Close with </lkjagent_action>.".to_string(),
     ];
     if let Some(entry) = decision
         .tool_view
@@ -84,52 +80,41 @@ fn example_block(decision: &RuntimeDecision, entry: &ToolViewEntry) -> Vec<Strin
     let args = entry
         .example_params
         .iter()
-        .map(|param| {
-            (
-                param.name.clone(),
-                example_value(entry, &param.name, &param.value),
-            )
-        })
-        .collect::<serde_json::Map<_, _>>();
-    action_json(decision, &entry.name, args)
+        .map(|param| (param.name.as_str(), param.value.as_str()))
+        .collect::<Vec<_>>();
+    action_xml(decision, &entry.name, &args)
 }
 
 fn schema_block(decision: &RuntimeDecision, entry: Option<&ToolViewEntry>) -> Vec<String> {
     let Some(entry) = entry else {
-        return action_json(decision, "TOOL", serde_json::Map::new());
+        return action_xml(decision, "TOOL", &[]);
     };
     let args = entry
         .required_params
         .iter()
-        .map(|field| ((*field).to_string(), json!("FIELD_VALUE")))
-        .collect::<serde_json::Map<_, _>>();
-    action_json(decision, &entry.name, args)
+        .map(|field| (field.as_str(), "FIELD_VALUE"))
+        .collect::<Vec<_>>();
+    action_xml(decision, &entry.name, &args)
 }
 
-fn action_json(
-    decision: &RuntimeDecision,
-    tool_name: &str,
-    args: serde_json::Map<String, serde_json::Value>,
-) -> Vec<String> {
-    let value = json!({
-        "schema_version": "lkjagent.tool_call.v2",
-        "decision_id": decision.id,
-        "tool_name": tool_name,
-        "args": args,
-        "context_frame_fingerprint": decision.context_frame_fingerprint,
-    });
-    vec![
-        "<lkjagent_action_v2>".to_string(),
-        serde_json::to_string_pretty(&value).unwrap_or_else(|_| "{}".to_string()),
-        "</lkjagent_action_v2>".to_string(),
-    ]
-}
-
-fn example_value(entry: &ToolViewEntry, name: &str, value: &str) -> serde_json::Value {
-    match entry.field_spec(name).map(|spec| spec.value_class) {
-        Some(ToolValueClass::Count) => value.parse::<u64>().map_or_else(|_| json!(0), |n| json!(n)),
-        _ => json!(value),
+fn action_xml(decision: &RuntimeDecision, tool_name: &str, args: &[(&str, &str)]) -> Vec<String> {
+    let mut lines = vec![
+        "<lkjagent_action>".to_string(),
+        format!("<decision_id>{}</decision_id>", escape_xml(&decision.id)),
+        format!(
+            "<context_fingerprint>{}</context_fingerprint>",
+            escape_xml(&decision.context_frame_fingerprint)
+        ),
+        format!("<tool_name>{}</tool_name>", escape_xml(tool_name)),
+    ];
+    for (name, value) in args {
+        lines.push("<argument>".to_string());
+        lines.push(format!("<name>{}</name>", escape_xml(name)));
+        lines.push(format!("<value>{}</value>", escape_xml(value)));
+        lines.push("</argument>".to_string());
     }
+    lines.push("</lkjagent_action>".to_string());
+    lines
 }
 
 fn generic_card(envelope: OutputEnvelope) -> String {
@@ -153,4 +138,13 @@ fn example_summary(entry: &ToolViewEntry) -> String {
         .collect::<Vec<_>>()
         .join(",");
     format!(" example={values}")
+}
+
+fn escape_xml(value: &str) -> String {
+    value
+        .replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('\'', "&apos;")
+        .replace('"', "&quot;")
 }

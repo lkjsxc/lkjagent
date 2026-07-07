@@ -30,17 +30,21 @@ pub fn action_pairs(tool: &str, params: &[(&str, &str)]) -> String {
 }
 
 pub fn action_for(decision: &str, context: &str, tool: &str, params: &[(&str, &str)]) -> String {
-    let args = params
-        .iter()
-        .map(|(name, value)| format!("{}:{}", json(name), json(value)))
-        .collect::<Vec<_>>()
-        .join(",");
-    format!(
-        "<lkjagent_action_v2>{{\"schema_version\":\"lkjagent.tool_call.v2\",\"decision_id\":{},\"tool_name\":{},\"args\":{{{args}}},\"context_frame_fingerprint\":{}}}</lkjagent_action_v2>",
-        json(decision),
-        json(tool),
-        json(context)
-    )
+    let mut out = format!(
+        "<lkjagent_action><decision_id>{}</decision_id><context_fingerprint>{}</context_fingerprint><tool_name>{}</tool_name>",
+        xml(decision),
+        xml(context),
+        xml(tool)
+    );
+    for (name, value) in params {
+        out.push_str(&format!(
+            "<argument><name>{}</name><value>{}</value></argument>",
+            xml(name),
+            xml(value)
+        ));
+    }
+    out.push_str("</lkjagent_action>");
+    out
 }
 
 fn field_name(kind: char) -> &'static str {
@@ -51,6 +55,11 @@ fn field_name(kind: char) -> &'static str {
     }
 }
 
-fn json(value: &str) -> String {
-    serde_json::to_string(value).unwrap_or_else(|_| "\"\"".to_string())
+fn xml(value: &str) -> String {
+    value
+        .replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
+        .replace('\'', "&apos;")
+        .replace('"', "&quot;")
 }

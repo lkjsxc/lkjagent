@@ -3,7 +3,7 @@ use lkjagent_core::parse::{parse_expected, parse_expected_for_decision, ParseFau
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
 };
-use lkjagent_core::runtime_tool_call_v2::ToolCallV2Error;
+use lkjagent_core::runtime_tool_call::ToolCallError;
 
 #[test]
 fn parses_docs_plan_examples() {
@@ -40,7 +40,7 @@ fn reports_docs_fault_examples() {
         parse_expected(StepKind::Write, "<content></content>"),
         Err(ParseFault::Empty)
     );
-    let action = action("decision-1", "graph.state", "{}", "ctx-1");
+    let action = action("decision-1", "graph.state", &[], "ctx-1");
     assert_eq!(
         parse_expected(StepKind::Explore, &action),
         Err(ParseFault::UnknownTool)
@@ -57,7 +57,7 @@ fn reports_docs_fault_examples() {
 
 #[test]
 fn decision_action_parser_uses_only_the_decision_tool_view() {
-    let decision = RuntimeDecision::new(
+    let mut decision = RuntimeDecision::new(
         "decision-1",
         "case-1",
         OperationKey("model.call/1".to_string()),
@@ -66,8 +66,9 @@ fn decision_action_parser_uses_only_the_decision_tool_view() {
         ]),
         OutputEnvelope::Action,
     );
-    let read = action("decision-1", "fs.read", r#"{"path":"README.md"}"#, "");
-    let shell = action("decision-1", "shell.run", r#"{"command":"pwd"}"#, "");
+    decision.context_frame_fingerprint = "ctx-1".into();
+    let read = action("decision-1", "fs.read", &[("path", "README.md")], "ctx-1");
+    let shell = action("decision-1", "shell.run", &[("command", "pwd")], "ctx-1");
 
     assert!(matches!(
         parse_expected_for_decision(&decision, &read),
@@ -80,8 +81,8 @@ fn decision_action_parser_uses_only_the_decision_tool_view() {
 }
 
 #[test]
-fn explore_accepts_only_exact_v2_action_blocks() {
-    let finish = action("decision-1", "finish", r#"{"summary":"done"}"#, "ctx-1");
+fn explore_accepts_only_exact_action_blocks() {
+    let finish = action("decision-1", "finish", &[("summary", "done")], "ctx-1");
     assert!(matches!(
         parse_expected(StepKind::Explore, &finish),
         Ok(ParsedOutput::Action(action)) if action.tool == "finish"
@@ -91,34 +92,39 @@ fn explore_accepts_only_exact_v2_action_blocks() {
             StepKind::Explore,
             "<action><tool_name>finish</tool_name></action>",
         ),
-        Err(ParseFault::ActionV2(ToolCallV2Error::NoActionFound))
+        Err(ParseFault::Action(ToolCallError::NoActionFound))
     );
     assert_eq!(
         parse_expected(StepKind::Explore, "<finish>done</finish>"),
-        Err(ParseFault::ActionV2(ToolCallV2Error::NoActionFound))
+        Err(ParseFault::Action(ToolCallError::NoActionFound))
     );
     assert_eq!(
         parse_expected(StepKind::Explore, "<ask>Which file?</ask>"),
-        Err(ParseFault::ActionV2(ToolCallV2Error::NoActionFound))
+        Err(ParseFault::Action(ToolCallError::NoActionFound))
     );
-    let missing_tool = action("decision-1", "finish", "{}", "ctx-1");
+    let missing_tool = action("decision-1", "finish", &[], "ctx-1");
     assert!(matches!(
         parse_expected(StepKind::Explore, &missing_tool),
-        Err(ParseFault::ActionV2(ToolCallV2Error::ArgsSchemaViolation(
-            _
-        )))
+        Err(ParseFault::Action(ToolCallError::ArgsSchemaViolation(_)))
     ));
-    let duplicate = "<lkjagent_action_v2>{\"schema_version\":\"lkjagent.tool_call.v2\",\"decision_id\":\"decision-1\",\"tool_name\":\"fs.read\",\"args\":{\"path\":\"a\",\"path\":\"b\"},\"context_frame_fingerprint\":\"ctx-1\"}</lkjagent_action_v2>";
+    let duplicate = "<lkjagent_action><decision_id>decision-1</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>fs.read</tool_name><argument><name>path</name><value>a</value></argument><argument><name>path</name><value>b</value></argument></lkjagent_action>";
     assert_eq!(
         parse_expected(StepKind::Explore, duplicate),
-        Err(ParseFault::ActionV2(ToolCallV2Error::DuplicateKey(
-            "/args/path".into(),
+        Err(ParseFault::Action(ToolCallError::DuplicateTag(
+            "argument/path".into(),
         )))
     );
 }
 
-fn action(decision_id: &str, tool: &str, args: &str, context: &str) -> String {
-    format!(
-        "<lkjagent_action_v2>{{\"schema_version\":\"lkjagent.tool_call.v2\",\"decision_id\":\"{decision_id}\",\"tool_name\":\"{tool}\",\"args\":{args},\"context_frame_fingerprint\":\"{context}\"}}</lkjagent_action_v2>"
-    )
+fn action(decision_id: &str, tool: &str, args: &[(&str, &str)], context: &str) -> String {
+    let mut out = format!(
+        "<lkjagent_action><decision_id>{decision_id}</decision_id><context_fingerprint>{context}</context_fingerprint><tool_name>{tool}</tool_name>"
+    );
+    for (name, value) in args {
+        out.push_str(&format!(
+            "<argument><name>{name}</name><value>{value}</value></argument>"
+        ));
+    }
+    out.push_str("</lkjagent_action>");
+    out
 }

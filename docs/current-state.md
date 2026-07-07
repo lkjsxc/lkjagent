@@ -42,6 +42,14 @@ crate has bridge interpreters, endpoint exchange capture, record commands,
 workspace rebuild and rebalance commands, console, watch, status, workbench, and
 row-backed inspection paths.
 
+The model action parser now accepts one `<lkjagent_action>` envelope with no
+attributes and child tags for decision id, context fingerprint, tool name, and
+arguments. It rejects JSON-shaped bodies, attributes, unknown tags, duplicate
+scalar tags, duplicate argument names, stale decisions, context mismatches,
+unknown tools, wrong primitive classes, unclosed tags, crossed tags, and bad
+entities. Prompt cards, recovery cards, scripted endpoint helpers, experiment
+fixtures, and stop tags render the same XML-like action grammar.
+
 The implementation still contains a plan-family bridge. Existing task and step
 rows are treated as body storage and continuity evidence while state cells and
 runtime decisions take over turn authority. Transitional commands may expose
@@ -50,8 +58,6 @@ that bridge until the semantic matter surface is complete.
 ## Known Gaps
 
 - Some CLI output still exposes owner work through plan-family vocabulary.
-- The active model action grammar still contains structured blobs in some
-  parser, renderer, recovery, and prompt-card paths.
 - Record-like owner turns are not yet guaranteed to write workspace files before
   any claim of recording.
 - Semantic owner-turn routing to existing matters, direct records, artifacts,
@@ -70,9 +76,9 @@ that bridge until the semantic matter surface is complete.
 
 ## Next Executable Step
 
-Implement the smallest coherent slice that makes the docs true: replace the
-existing model action protocol with a strict attribute-less XML-like parser,
-renderer, recovery card, and tests, while preserving typed internal structs.
+Implement the smallest coherent slice that makes the docs true: route explicit
+record-like owner turns to direct workspace record writes before any model call
+or recording claim.
 
 ## Honesty Rules
 

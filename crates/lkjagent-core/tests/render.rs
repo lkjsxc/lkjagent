@@ -35,9 +35,7 @@ fn decision_envelope_replaces_step_prompt_policy() {
     );
     assert!(prompt.system.contains("Expected: message"));
     assert!(prompt.system.contains("Return exactly <message>"));
-    assert!(!prompt
-        .system
-        .contains("Return exactly <lkjagent_action_v2>"));
+    assert!(!prompt.system.contains("Return exactly <lkjagent_action>"));
 }
 
 #[test]
@@ -58,14 +56,15 @@ fn explore_decision_renders_tool_call_contract() {
         &snapshot.steps[0],
         &decision,
     );
-    assert!(prompt.system.contains("Expected: lkjagent_action_v2"));
+    assert!(prompt.system.contains("Expected: lkjagent_action"));
     assert!(prompt
         .system
-        .contains("Return exactly one <lkjagent_action_v2>"));
-    assert!(prompt.user.contains("\"tool_name\": \"fs.read\""));
+        .contains("Return exactly one <lkjagent_action>"));
+    assert!(prompt.user.contains("<tool_name>fs.read</tool_name>"));
     assert!(prompt.user.contains("Schema-only shape, not copyable:"));
-    assert!(prompt.user.contains("\"path\": \"FIELD_VALUE\""));
-    assert_eq!(prompt.stop, "</lkjagent_action_v2>");
+    assert!(prompt.user.contains("<name>path</name>"));
+    assert!(prompt.user.contains("<value>FIELD_VALUE</value>"));
+    assert_eq!(prompt.stop, "</lkjagent_action>");
 }
 
 #[test]
@@ -175,11 +174,11 @@ fn fault_linked_recovery_frame_names_next_envelope() {
 }
 
 #[test]
-fn prompt_includes_task_brief() {
+fn prompt_includes_matter_brief() {
     let mut snapshot = instantiate(2, "What is known?");
     snapshot.task.brief = "memory_facts:\nrow memory fact".to_string();
     let prompt = render_prompt(&snapshot.task, &snapshot.steps, &snapshot.steps[0]);
-    assert!(prompt.system.contains("Task brief:"));
+    assert!(prompt.system.contains("Matter brief:"));
     assert!(prompt.system.contains("row memory fact"));
 }
 

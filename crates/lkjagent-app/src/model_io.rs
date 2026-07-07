@@ -58,7 +58,7 @@ fn fill_prompt_markers(output: &str, prompt: &Prompt) -> String {
         .replace("__DECISION_ID__", &prompt_value(prompt, "- decision_id: "))
         .replace(
             "__CONTEXT_FRAME_FINGERPRINT__",
-            &prompt_value(prompt, "- context_frame_fingerprint: "),
+            &prompt_value(prompt, "- context_fingerprint: "),
         )
 }
 

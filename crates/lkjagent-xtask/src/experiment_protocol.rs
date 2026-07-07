@@ -44,7 +44,7 @@ fn write_profile(out: &PathBuf, spec: &ProfileSpec) -> Result<PathBuf, String> {
         .map_err(|error| error.message)?;
     let mut lines = vec!["# Protocol Experiment Results".to_string(), String::new()];
     lines.push(format!(
-        "profile={} features={} decision={} envelope={:?} tool_fp={} stop=</lkjagent_action_v2>",
+        "profile={} features={} decision={} envelope={:?} tool_fp={} stop=</lkjagent_action>",
         spec.name,
         spec.features.join("+"),
         decision.id,
