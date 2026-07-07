@@ -24,18 +24,19 @@ larger when generated from small checked units and deterministic assembly.
 | Surface | Budget |
 | --- | ---: |
 | documentation under `docs/` | `repository.docs-file-budget=100` |
-| product Rust source files | `repository.product-source-file-budget=180` |
+| product Rust source files | `repository.product-source-file-budget=190` |
 
 The warning threshold is `repository.file-budget.warn-percent=90`. Warnings are
 for planning; hard failures happen at the budget. The product source budget
-allows the terminal UI to stay split by reducer, event, snapshot, renderer,
-transcript, and terminal-effect ownership while preserving the line cap.
+allows the terminal UI to stay split by reducer, event, key input, snapshot,
+renderer, transcript, and terminal-effect ownership while preserving the line
+cap.
 
 ## Dependency Allowlist
 
 Product crates may use `crossterm`, `ratatui`, `reqwest`, `rusqlite`, `serde`,
-`serde_json`, and `toml`. New external crates require updating this contract and
-the `check-style` allowlist in the same change.
+`serde_json`, `toml`, and `unicode-segmentation`. New external crates require
+updating this contract and the `check-style` allowlist in the same change.
 
 ## Split Rule
 
