@@ -21,3 +21,4 @@ lkjagent-store = { path = "../lkjagent-store" }
 ratatui = "0.28.1"
 rusqlite = { version = "0.40.1", features = ["bundled"] }
 serde_json = "1"
+unicode-segmentation = "1.12.0"

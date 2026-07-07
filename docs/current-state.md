@@ -74,6 +74,11 @@ Workspace rebalance now refreshes generated README child links, records path
 aliases and audit rows, rebuilds record-backed indexes after moves, and keeps
 old paths resolvable through the alias table.
 
+The terminal workbench reducer now stores a composer cursor, inserts and deletes
+by Unicode grapheme clusters, maps left and right keys to composer movement, and
+persists Japanese owner and agent transcript entries to workspace transcript
+files.
+
 Owner CLI, status, watch, console, and TUI labels now expose matters rather than
 tasks. Plan-family rows still exist as bridge storage, but owner-visible list,
 show, queue, log, status, and exchange paths use matter and operation wording.
@@ -94,15 +99,13 @@ that bridge until the semantic matter surface is complete.
 
 - Semantic owner-turn routing to existing matters, artifact requests,
   inspection, and system operations needs focused tests beyond direct records.
-- The workbench composer needs grapheme-aware cursor movement and durable agent
-  transcript rendering tests.
 - Final compose verification must be rerun after the last code change in this
   checkout.
 
 ## Next Executable Step
 
-Implement the smallest coherent slice that makes the docs true: add grapheme-
-aware workbench composer cursor movement and transcript durability tests.
+Implement the smallest coherent slice that makes the docs true: run final
+repository and Docker verification, then capture proof and handoff evidence.
 
 ## Honesty Rules
 

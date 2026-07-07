@@ -41,13 +41,14 @@ mod token_status;
 pub mod tui_event {
     pub use crate::tui_state::TuiEvent;
 }
+mod tui_keys;
 mod tui_palette;
 mod tui_reduce;
 pub mod tui_render;
-mod tui_snapshot;
+pub mod tui_snapshot;
 pub mod tui_state;
 mod tui_terminal;
-mod tui_transcript;
+pub mod tui_transcript;
 mod tui_types;
 mod tui_view;
 mod turn_effects;

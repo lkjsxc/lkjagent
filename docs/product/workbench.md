@@ -48,11 +48,11 @@ latest rows; `/follow off` leaves manual scroll in place.
 
 ## Japanese And Mixed-Width Text
 
-The composer stores text as grapheme clusters plus a cursor grapheme index. It
-uses Unicode display width to position the cursor. Insert, delete, left, right,
-home, end, multiline, and submit operations never split a grapheme or corrupt
-IME-composed text. Tests cover Japanese strings, emoji, ASCII, and mixed-width
-text.
+The composer stores UTF-8 text plus a byte cursor that is clamped to Unicode
+grapheme boundaries. Insert, backspace, left, right, multiline, and submit
+operations do not split Japanese characters, emoji graphemes, or IME-composed
+text. Tests cover Japanese strings, emoji, ASCII, newline handling, and durable
+transcript saves.
 
 ## Authority Limits
 

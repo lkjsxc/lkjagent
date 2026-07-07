@@ -1,7 +1,10 @@
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TuiEvent {
     UserInputChanged(String),
+    UserInsertChar(char),
     UserComposerNewline,
+    UserBackspace,
+    UserMoveComposer(isize),
     UserSubmit,
     UserInterrupt,
     UserApproveTool,
@@ -72,6 +75,7 @@ pub struct ToolCard {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TuiModel {
     pub composer: String,
+    pub composer_cursor: usize,
     pub transcript: Vec<TranscriptEntry>,
     pub active_pane: TuiPane,
     pub palette_open: bool,
@@ -101,6 +105,7 @@ impl TuiModel {
     pub fn new() -> Self {
         Self {
             composer: String::new(),
+            composer_cursor: 0,
             transcript: Vec::new(),
             active_pane: TuiPane::Transcript,
             palette_open: false,

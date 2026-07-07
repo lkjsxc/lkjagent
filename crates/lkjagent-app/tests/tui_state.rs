@@ -1,5 +1,8 @@
+use std::fs;
+
 use lkjagent_app::tui_event::TuiEvent;
 use lkjagent_app::tui_render::render_non_tty;
+use lkjagent_app::tui_snapshot::TuiSnapshot;
 use lkjagent_app::tui_state::{reduce, TuiEffect, TuiModel, TuiPane, TuiRunState};
 
 #[test]
@@ -76,6 +79,28 @@ fn palette_search_scroll_follow_and_quit_are_pure() {
 }
 
 #[test]
+fn japanese_composer_moves_cursor_by_grapheme() {
+    let (model, _) = reduce(TuiModel::new(), TuiEvent::UserInsertChar('あ'));
+    let (model, _) = reduce(model, TuiEvent::UserInsertChar('い'));
+    let (model, _) = reduce(model, TuiEvent::UserInsertChar('う'));
+    let (model, _) = reduce(model, TuiEvent::UserMoveComposer(-1));
+    let (model, _) = reduce(model, TuiEvent::UserInsertChar('X'));
+
+    assert_eq!(model.composer, "あいXう");
+    assert!(model.composer.is_char_boundary(model.composer_cursor));
+}
+
+#[test]
+fn backspace_removes_whole_emoji_grapheme() {
+    let (model, _) = reduce(TuiModel::new(), TuiEvent::UserInputChanged("👨‍👩‍👧‍👦a".into()));
+    let (model, _) = reduce(model, TuiEvent::UserMoveComposer(-1));
+    let (model, _) = reduce(model, TuiEvent::UserBackspace);
+
+    assert_eq!(model.composer, "a");
+    assert_eq!(model.composer_cursor, 0);
+}
+
+#[test]
 fn multiline_composer_keeps_newlines() {
     let (model, _) = reduce(
         TuiModel::new(),
@@ -86,6 +111,28 @@ fn multiline_composer_keeps_newlines() {
     let (model, _) = reduce(model, TuiEvent::UserInputChanged(text));
 
     assert_eq!(model.composer, "line one\nline two");
+}
+
+#[test]
+fn transcript_save_persists_japanese_entries() -> Result<(), Box<dyn std::error::Error>> {
+    let data = std::env::temp_dir().join(format!("lkjagent-tui-{}", std::process::id()));
+    if data.exists() {
+        fs::remove_dir_all(&data)?;
+    }
+    let (model, _) = reduce(
+        TuiModel::new(),
+        TuiEvent::UserInputChanged("記録して".into()),
+    );
+    let (model, _) = reduce(model, TuiEvent::UserSubmit);
+    let (model, _) = reduce(model, TuiEvent::AgentTextDelta("保存しました".into()));
+
+    let path = lkjagent_app::tui_transcript::save(&data, &model, &TuiSnapshot::empty())
+        .map_err(std::io::Error::other)?;
+    let text = fs::read_to_string(path)?;
+
+    assert!(text.contains("owner: 記録して"));
+    assert!(text.contains("agent: 保存しました"));
+    Ok(())
 }
 
 #[test]

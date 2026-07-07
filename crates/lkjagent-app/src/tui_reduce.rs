@@ -1,3 +1,5 @@
+use unicode_segmentation::UnicodeSegmentation;
+
 use crate::tui_types::{
     ToolCard, TranscriptEntry, TranscriptSource, TuiEffect, TuiEvent, TuiModel, TuiRunState,
 };
@@ -5,8 +7,11 @@ use crate::tui_types::{
 pub fn reduce(mut model: TuiModel, event: TuiEvent) -> (TuiModel, Vec<TuiEffect>) {
     let mut effects = vec![TuiEffect::Redraw];
     match event {
-        TuiEvent::UserInputChanged(text) => model.composer = text,
-        TuiEvent::UserComposerNewline => model.composer.push('\n'),
+        TuiEvent::UserInputChanged(text) => set_composer(&mut model, text),
+        TuiEvent::UserInsertChar(character) => insert_text(&mut model, &character.to_string()),
+        TuiEvent::UserComposerNewline => insert_text(&mut model, "\n"),
+        TuiEvent::UserBackspace => backspace(&mut model),
+        TuiEvent::UserMoveComposer(delta) => move_cursor(&mut model, delta),
         TuiEvent::UserSubmit => submit_composer(&mut model, &mut effects),
         TuiEvent::UserInterrupt => interrupt(&mut model, &mut effects),
         TuiEvent::UserApproveTool => approve_tool(&mut model, &mut effects),
@@ -67,12 +72,71 @@ pub fn reduce(mut model: TuiModel, event: TuiEvent) -> (TuiModel, Vec<TuiEffect>
     (model, effects)
 }
 
+fn set_composer(model: &mut TuiModel, text: String) {
+    model.composer = text;
+    model.composer_cursor = model.composer.len();
+}
+
+fn insert_text(model: &mut TuiModel, text: &str) {
+    clamp_cursor(model);
+    model.composer.insert_str(model.composer_cursor, text);
+    model.composer_cursor += text.len();
+}
+
+fn backspace(model: &mut TuiModel) {
+    clamp_cursor(model);
+    let start = previous_grapheme(&model.composer, model.composer_cursor);
+    if start == model.composer_cursor {
+        return;
+    }
+    model
+        .composer
+        .replace_range(start..model.composer_cursor, "");
+    model.composer_cursor = start;
+}
+
+fn move_cursor(model: &mut TuiModel, delta: isize) {
+    clamp_cursor(model);
+    let mut cursor = model.composer_cursor;
+    for _ in 0..delta.unsigned_abs() {
+        cursor = if delta.is_negative() {
+            previous_grapheme(&model.composer, cursor)
+        } else {
+            next_grapheme(&model.composer, cursor)
+        };
+    }
+    model.composer_cursor = cursor;
+}
+
+fn clamp_cursor(model: &mut TuiModel) {
+    while model.composer_cursor > 0 && !model.composer.is_char_boundary(model.composer_cursor) {
+        model.composer_cursor -= 1;
+    }
+    model.composer_cursor = model.composer_cursor.min(model.composer.len());
+}
+
+fn previous_grapheme(text: &str, cursor: usize) -> usize {
+    text.grapheme_indices(true)
+        .take_while(|(index, _)| *index < cursor)
+        .map(|(index, _)| index)
+        .last()
+        .unwrap_or(0)
+}
+
+fn next_grapheme(text: &str, cursor: usize) -> usize {
+    text.grapheme_indices(true)
+        .map(|(index, graph)| index + graph.len())
+        .find(|end| *end > cursor)
+        .unwrap_or(text.len())
+}
+
 fn submit_composer(model: &mut TuiModel, effects: &mut Vec<TuiEffect>) {
     let text = model.composer.trim().to_string();
     if text.is_empty() {
         return;
     }
     model.composer.clear();
+    model.composer_cursor = 0;
     model.palette_open = false;
     push(model, TranscriptSource::Owner, text.clone());
     effects.push(TuiEffect::SubmitOwnerMessage(text));

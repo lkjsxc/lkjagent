@@ -2,7 +2,7 @@ use std::io::{IsTerminal, Write};
 use std::path::Path;
 use std::time::{Duration, Instant};
 
-use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyModifiers};
+use crossterm::event::{self, Event};
 use crossterm::execute;
 use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen,
@@ -12,7 +12,7 @@ use ratatui::Terminal;
 use rusqlite::Connection;
 
 use crate::tui_snapshot::TuiSnapshot;
-use crate::tui_state::{reduce, TuiEffect, TuiEvent, TuiModel, TuiPane};
+use crate::tui_state::{reduce, TuiEffect, TuiEvent, TuiModel};
 
 pub fn can_run_tty() -> bool {
     std::io::stdin().is_terminal() && std::io::stdout().is_terminal()
@@ -61,7 +61,7 @@ fn run_loop<W: Write>(
 }
 fn event_to_effects(event: Event, model: &mut TuiModel) -> Vec<TuiEffect> {
     match event {
-        Event::Key(key) => apply_key(model, key),
+        Event::Key(key) => crate::tui_keys::apply_key(model, key),
         Event::Resize(width, height) => {
             apply_event(model, TuiEvent::TerminalResize { width, height })
         }
@@ -69,59 +69,6 @@ fn event_to_effects(event: Event, model: &mut TuiModel) -> Vec<TuiEffect> {
     }
 }
 
-fn apply_key(model: &mut TuiModel, key: KeyEvent) -> Vec<TuiEffect> {
-    if key.modifiers.contains(KeyModifiers::CONTROL) {
-        return ctrl_key(model, key.code);
-    }
-    match key.code {
-        KeyCode::Enter => apply_event(model, TuiEvent::UserSubmit),
-        KeyCode::Backspace => {
-            let mut text = model.composer.clone();
-            text.pop();
-            apply_event(model, TuiEvent::UserInputChanged(text))
-        }
-        KeyCode::Esc => apply_event(model, TuiEvent::UserCloseModal),
-        KeyCode::Up => apply_event(model, TuiEvent::UserScroll(-1)),
-        KeyCode::Down => apply_event(model, TuiEvent::UserScroll(1)),
-        KeyCode::PageUp => apply_event(model, TuiEvent::UserScroll(-10)),
-        KeyCode::PageDown => apply_event(model, TuiEvent::UserScroll(10)),
-        KeyCode::Home => apply_event(model, TuiEvent::UserScroll(-1000)),
-        KeyCode::End => apply_event(model, TuiEvent::UserFollow(true)),
-        KeyCode::F(n) => apply_pane(model, n),
-        KeyCode::Char(c) => {
-            let mut text = model.composer.clone();
-            text.push(c);
-            apply_event(model, TuiEvent::UserInputChanged(text))
-        }
-        _ => vec![TuiEffect::Redraw],
-    }
-}
-fn ctrl_key(model: &mut TuiModel, code: KeyCode) -> Vec<TuiEffect> {
-    match code {
-        KeyCode::Char('q') => apply_event(model, TuiEvent::QuitRequested),
-        KeyCode::Char('c') => apply_event(model, TuiEvent::UserInterrupt),
-        KeyCode::Char('p') => apply_event(model, TuiEvent::UserOpenPalette),
-        KeyCode::Char('s') => apply_event(model, TuiEvent::SaveTranscript),
-        KeyCode::Char('j') => apply_event(model, TuiEvent::UserComposerNewline),
-        KeyCode::Char('l') => {
-            apply_event(model, TuiEvent::UserSearchChanged(model.composer.clone()))
-        }
-        _ => vec![TuiEffect::Redraw],
-    }
-}
-
-fn apply_pane(model: &mut TuiModel, n: u8) -> Vec<TuiEffect> {
-    let pane = match n {
-        1 => TuiPane::Transcript,
-        2 => TuiPane::Tasks,
-        3 => TuiPane::Tools,
-        4 => TuiPane::StateGraph,
-        5 => TuiPane::Workspace,
-        6 => TuiPane::Help,
-        _ => return vec![TuiEffect::Redraw],
-    };
-    apply_event(model, TuiEvent::UserSelectPane(pane))
-}
 fn apply_event(model: &mut TuiModel, event: TuiEvent) -> Vec<TuiEffect> {
     let (next, effects) = reduce(model.clone(), event);
     *model = next;
