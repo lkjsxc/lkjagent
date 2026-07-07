@@ -77,9 +77,10 @@ old paths resolvable through the alias table.
 The terminal workbench reducer now stores a composer cursor, inserts and deletes
 by Unicode grapheme clusters, maps left and right keys to composer movement, and
 persists Japanese owner and agent transcript entries to workspace transcript
-files. The TUI snapshot now also builds a durable transcript from event rows and
-the Transcript pane merges those rows with in-session entries, so daemon-written
-agent messages remain visible after refresh or TUI restart.
+files. The TUI snapshot now builds one durable transcript stream from queue owner
+turns and event rows ordered by row time, and the Transcript pane merges that
+stream with in-session entries. Daemon-written agent messages remain visible
+after refresh or TUI restart without splitting owner and agent blocks.
 
 After the owner-turn routing slice, Docker Compose `test`, `lint`, `bench`,
 and `replay` services passed. After the TUI transcript display fix, these gates

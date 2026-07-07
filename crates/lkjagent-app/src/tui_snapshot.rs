@@ -45,7 +45,16 @@ pub fn load(conn: &Connection, data_dir: &Path) -> Result<TuiSnapshot, String> {
 
 fn transcript(conn: &Connection, limit: usize) -> Result<String, String> {
     let mut statement = conn
-        .prepare("SELECT kind, content FROM events ORDER BY id DESC LIMIT ?1")
+        .prepare(
+            "SELECT source, content FROM (
+                 SELECT created_at AS moment, 0 AS source_order, id AS row_id,
+                        'owner' AS source, content FROM queue
+                 UNION ALL
+                 SELECT created_at AS moment, 1 AS source_order, id AS row_id,
+                        kind AS source, content FROM events
+                        WHERE kind NOT IN ('owner', 'answer')
+             ) ORDER BY moment DESC, source_order DESC, row_id DESC LIMIT ?1",
+        )
         .map_err(|error| error.to_string())?;
     let rows = statement
         .query_map([limit as i64], |row| {
@@ -133,24 +142,41 @@ mod tests {
     fn snapshot_reads_durable_queue_and_proof_rows() -> Result<(), Box<dyn std::error::Error>> {
         let conn = Connection::open_in_memory()?;
         setup(&conn)?;
-        enqueue_with_force(&conn, "hello", false, &crate::clock::utc_now())?;
+        enqueue_with_force(&conn, "hello", false, "001")?;
+        enqueue_with_force(&conn, "follow up", false, "003")?;
         conn.execute(
             "INSERT INTO events (task_id, kind, content, created_at)
-             VALUES (1, 'owner', 'hello', 'now'),
-                    (1, 'stepdone', 'AI answered', 'now'),
-                    (1, 'taskclosed', 'done', 'now')",
+             VALUES (1, 'stepdone', 'AI answered', '002'),
+                    (1, 'taskclosed', 'done', '004')",
             [],
         )?;
 
         let snapshot = load(&conn, Path::new("data"))?;
 
-        assert!(snapshot.status.contains("queue: 1 pending"));
+        assert!(snapshot.status.contains("queue: 2 pending"));
         assert!(snapshot.queue.contains("queue 1"));
         assert!(snapshot.proof.contains("prompt_frames=0"));
         assert!(snapshot.workspace.contains("workspace: root="));
-        assert!(snapshot.transcript.contains("owner: hello"));
-        assert!(snapshot.transcript.contains("agent: AI answered"));
-        assert!(snapshot.transcript.contains("agent: done"));
+        assert_order(
+            &snapshot.transcript,
+            &[
+                "owner: hello",
+                "agent: AI answered",
+                "owner: follow up",
+                "agent: done",
+            ],
+        )?;
+        Ok(())
+    }
+
+    fn assert_order(text: &str, expected: &[&str]) -> Result<(), Box<dyn std::error::Error>> {
+        let mut cursor = 0;
+        for needle in expected {
+            let Some(offset) = text[cursor..].find(needle) else {
+                return Err(format!("missing {needle} after byte {cursor} in {text}").into());
+            };
+            cursor += offset + needle.len();
+        }
         Ok(())
     }
 }
