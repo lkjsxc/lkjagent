@@ -24,6 +24,15 @@ also add or suppress state edges. The store commits the event and patch in one
 transaction. The reducer never reads files, opens SQLite, calls the endpoint, or
 asks the wall clock.
 
+## Transition Guard
+
+The pure transition guard models generic node states such as proposed, admitted,
+ready, active, waiting, blocked, recovering, verifying, succeeded, failed,
+superseded, and archived. It rejects illegal state steps, terminal-state reopen
+attempts, progress while active blocking or dependency edges remain, and success,
+failure, or supersession without evidence refs. The guard returns data for row
+commit callers; it does not execute effects or replace persisted decisions.
+
 ## Selectors
 
 Selectors read the hydrated state vector and compact state-edge evidence, create

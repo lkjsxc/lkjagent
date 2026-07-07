@@ -71,8 +71,8 @@ plan-word checks, prompt briefs, and effect-error settlement. This checkout also
 has a first pure state-ledger domain slice in `lkjagent-core`: state keys and
 cells, runtime events and patches, runtime decisions, tool-set views, action
 admission with workspace path policy, context items with contamination classes,
-contradiction detection, stable fingerprints, and fresh-evidence completion
-helpers. `lkjagent-core` also has a pure selector that builds bounded
+contradiction detection, stable fingerprints, transition guards, and
+fresh-evidence completion helpers. `lkjagent-core` also has a pure selector that builds bounded
 `SelectorCandidate` values from cells, payload operation keys, priority,
 deadlines, cooldowns, and blocking edges before persisting the winner; unfinished
 decisions still win first. `lkjagent-store` adds row helpers for cases, events,
