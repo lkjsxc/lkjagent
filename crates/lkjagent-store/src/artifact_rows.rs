@@ -32,6 +32,27 @@ pub fn insert_artifact(conn: &Connection, row: &ArtifactRow) -> StoreResult<()> 
             row.created_at,
         ],
     )?;
+    if row.parent_artifact_id.is_none() {
+        suppress_superseded_edges(conn, row)?;
+    }
+    Ok(())
+}
+
+fn suppress_superseded_edges(conn: &Connection, row: &ArtifactRow) -> StoreResult<()> {
+    conn.execute(
+        "UPDATE state_edges SET status = 'Suppressed', suppression_reason = ?1
+         WHERE case_id = ?2 AND status = 'Active' AND to_ref_kind = 'artifact'
+         AND to_ref_id IN (
+             SELECT id FROM artifacts WHERE case_id = ?2 AND path = ?3
+             AND parent_artifact_id IS NULL AND id != ?4
+         )",
+        params![
+            "artifact superseded by newer fingerprint",
+            row.case_id,
+            row.path,
+            row.id
+        ],
+    )?;
     Ok(())
 }
 

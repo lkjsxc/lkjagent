@@ -41,6 +41,12 @@ fn journal_endpoint_closes_with_file_check_and_artifacts() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert!(refs.contains("task-1-artifact-"));
+    let edges: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM state_edges WHERE relation = 'verifies'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert!(edges >= 1);
     let show = cli::run([
         "--data",
         data.to_string_lossy().as_ref(),

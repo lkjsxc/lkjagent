@@ -157,17 +157,18 @@ file and artifact rows are created without endpoint output or bridge step
 execution.
 
 Bridge check results now carry their required check parameters, decision id,
-evidence fingerprint, and artifact refs in core state and through SQLite
-hydration. Completion requires a passed row whose check name and parameters
-match each required matter check, whose decision id and evidence fingerprint are
-present, and whose artifact refs are present for artifact-backed checks.
+evidence fingerprint, artifact refs, and native state-edge freshness evidence.
+Completion requires a passed row whose check name and parameters match each
+required matter check, whose decision id and evidence fingerprint are present,
+and whose artifact refs are present for artifact-backed checks. Store hydration
+suppresses stale passed rows, and artifact replacement suppresses active
+check-to-artifact edges for the old artifact.
 
 ## Known Gaps
 
-- Check freshness remains bridge-limited: check rows reference concrete artifact
-  row ids and hydration suppresses stale passed rows when a newer artifact row
-  replaces those refs, but artifact refs are still bridge rows rather than native
-  state-edge evidence.
+- Check freshness still depends on transitional check rows for completion, but
+  check-to-artifact freshness now also has native state-edge evidence and stale
+  edges are suppressed when a newer artifact replaces the referenced artifact.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, blocked, active, pending, failed, or
   unsuperseded skipped bridge steps must prevent close candidates.
@@ -178,9 +179,9 @@ present, and whose artifact refs are present for artifact-backed checks.
 
 ## Next Executable Step
 
-Implement the next state-ledger evidence slice: promote artifact/check freshness
-from bridge check rows into native state-edge evidence with docs, focused tests,
-quiet gates, and Docker verification.
+Implement the next workspace-first slice: make record-like turns write durable
+owner-readable workspace files with row, fingerprint, README/path coverage, and
+index evidence, with docs, focused tests, quiet gates, and Docker verification.
 
 ## Honesty Rules
 

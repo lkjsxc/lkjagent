@@ -64,6 +64,13 @@ pub fn commit_commands(
                             now
                         ],
                     )?;
+                    crate::state_edge_rows::insert_check_artifact_edges_tx(
+                        &tx,
+                        task_id,
+                        tx.last_insert_rowid(),
+                        result,
+                        now,
+                    )?;
                 }
             }
             Command::AddSteps(steps) => {

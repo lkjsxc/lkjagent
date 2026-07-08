@@ -37,14 +37,18 @@ preserved for round trip and diagnostics.
 ## Authority Rule
 
 Edges inform selector candidates, context admission, staleness, proof, and
-status. They do not execute effects, grant tools, close cases, or replace the
-persisted `RuntimeDecision` selected for a turn.
+status. Check-to-artifact freshness edges are evidence only; completion still
+reads deterministic check rows and state cells. Edges do not execute effects,
+grant tools, close cases, or replace the persisted `RuntimeDecision` selected
+for a turn.
 
 ## Reducer Rule
 
-Events may add edges or suppress edges. Suppression keeps the row and changes its
-status with a reason so proof can explain why a relation no longer participates
-in selection.
+Events and deterministic store effects may add edges or suppress edges.
+Suppression keeps the row and changes its status with a reason so proof can
+explain why a relation no longer participates in selection. When a newer
+artifact row replaces an older artifact for the same path, active check edges to
+the older artifact are suppressed as stale.
 
 ## Query Rule
 

@@ -36,11 +36,22 @@ fn hydrated_checks_suppress_stale_artifact_refs() -> TestResult<()> {
     )?;
     assert_eq!(row, "[\"artifact-old\"]");
     assert_eq!(hydrated(&conn)?.check_results.len(), 1);
+    assert_eq!(edge_count(&conn, "Active")?, 1);
 
     insert_file_artifact(&conn, "artifact-new", "new-fingerprint", "003")?;
 
     assert!(hydrated(&conn)?.check_results.is_empty());
+    assert_eq!(edge_count(&conn, "Active")?, 0);
+    assert_eq!(edge_count(&conn, "Suppressed")?, 1);
     Ok(())
+}
+
+fn edge_count(conn: &Connection, status: &str) -> TestResult<i64> {
+    Ok(conn.query_row(
+        "SELECT COUNT(*) FROM state_edges WHERE status = ?1",
+        [status],
+        |row| row.get(0),
+    )?)
 }
 
 fn hydrated(conn: &Connection) -> TestResult<lkjagent_core::model::TaskSnapshot> {

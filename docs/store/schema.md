@@ -30,7 +30,7 @@ runtime reads only matter, state, and record rows. Required tables:
 | `observations` | bounded tool or effect output tied to decisions |
 | `context_items` | source-tagged prompt candidates |
 | `context_edges` | provenance, suppression, and conflict links between context items |
-| `state_edges` | generic relation evidence between state, records, artifacts, and checks |
+| `state_edges` | generic relation evidence, including check-to-artifact freshness refs |
 | `workspace_records` | current record metadata and fingerprints for owner-readable files |
 | `workspace_record_history` | record fingerprint history for staleness checks |
 | `workspace_manifest` | schema-numbered workspace root and directory policy |
