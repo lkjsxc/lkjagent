@@ -176,7 +176,7 @@ Native model-free effects support `workspace.write_text` and
 Deterministic verify projects `completion:check-pending/<step>` carrying
 `check.run/<step>`; hydration suppresses passed rows lacking native outcome cells.
 Model work uses native `work:model/*`; blocked/close projections use native
-completion schemas.
+completion schemas. Matter snapshots use `matter:snapshot/*`.
 
 ## Known Gaps
 
@@ -187,7 +187,7 @@ completion schemas.
 
 ## Next Executable Step
 
-Implement next bridge-retirement: project and load `matter:snapshot/*` cells.
+Implement next bridge-retirement: reduce close-candidate bridge input safely.
 
 ## Honesty Rules
 

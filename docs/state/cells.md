@@ -38,7 +38,7 @@ Each cell stores:
 ## Schema Names
 
 Payload schema names are semantic contract labels such as `context-conflict`,
-`matter-snapshot`, or `plan-bridge.model`. Do not add numbered suffix labels for
+`matter-snapshot`, or `state.model-call`. Do not add numbered suffix labels for
 project-authored schemas. Endpoint paths, hash algorithm names, and external API
 revisions may still contain numbers when those names are externally owned.
 

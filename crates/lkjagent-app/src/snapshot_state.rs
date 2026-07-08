@@ -9,7 +9,8 @@ pub fn load_snapshot_cell(conn: &Connection) -> Result<Option<TaskSnapshot>, Str
     let mut statement = conn
         .prepare(
             "SELECT payload_json FROM state_cells
-             WHERE key_label = 'case:snapshot' AND status = 'Active'
+             WHERE status = 'Active'
+             AND (key_label = 'case:snapshot' OR key_label LIKE 'matter:snapshot/%')
              ORDER BY updated_at DESC, case_id DESC",
         )
         .map_err(|error| error.to_string())?;
@@ -34,7 +35,7 @@ pub fn persist_snapshot_cell(
     let case_id = snapshot.task.id.to_string();
     insert_case(conn, &case_id, &snapshot.task.objective, now).map_err(|e| e.to_string())?;
     let event_id = next_event_id(conn, &case_id, "snapshot").map_err(|e| e.to_string())?;
-    let mut cell = StateCell::active(key()?, event_id.clone());
+    let mut cell = StateCell::active(key(&case_id)?, event_id.clone());
     cell.payload_schema = "matter-snapshot".to_string();
     cell.payload_json = serde_json::to_string(snapshot).map_err(|error| error.to_string())?;
     cell.evidence_refs = vec![EvidenceRef {
@@ -56,6 +57,6 @@ pub fn persist_snapshot_cell(
     append_and_apply_event(conn, &event).map_err(|error| error.to_string())
 }
 
-fn key() -> Result<StateKey, String> {
-    StateKey::new("case", "snapshot").map_err(|error| error.message)
+fn key(case_id: &str) -> Result<StateKey, String> {
+    StateKey::new("matter", format!("snapshot/{case_id}")).map_err(|error| error.message)
 }

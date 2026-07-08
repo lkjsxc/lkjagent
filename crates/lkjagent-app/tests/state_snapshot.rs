@@ -38,14 +38,27 @@ fn state_snapshot_cell_wins_over_older_plan_rows() -> TestResult<()> {
 
     assert_eq!(snapshot.task.id, 2);
     assert_eq!(snapshot.task.summary, "State cell wins.");
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    assert_eq!(matter_snapshot_rows(&conn)?, 1);
     Ok(())
 }
 
+fn matter_snapshot_rows(conn: &Connection) -> TestResult<i64> {
+    Ok(conn.query_row(
+        "SELECT COUNT(*) FROM state_cells WHERE key_label LIKE 'matter:snapshot/%'",
+        [],
+        |row| row.get(0),
+    )?)
+}
+
 fn snapshot_cell(snapshot: &TaskSnapshot) -> Result<StateCell, serde_json::Error> {
-    let key = StateKey::new("case", "snapshot").unwrap_or_else(|_| StateKey {
-        namespace: "case".to_string(),
-        name: "snapshot".to_string(),
-    });
+    let key =
+        StateKey::new("matter", format!("snapshot/{}", snapshot.task.id)).unwrap_or_else(|_| {
+            StateKey {
+                namespace: "matter".to_string(),
+                name: "snapshot/fallback".to_string(),
+            }
+        });
     let mut cell = StateCell::active(key, "event-snapshot");
     cell.payload_schema = "matter-snapshot".to_string();
     cell.payload_json = serde_json::to_string(snapshot)?;
