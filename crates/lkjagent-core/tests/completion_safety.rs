@@ -1,6 +1,9 @@
 use lkjagent_core::classify::instantiate;
-use lkjagent_core::engine::{apply_turn, next_work, Command, TurnOutcome, Work};
+use lkjagent_core::engine::{
+    apply_turn, next_work, next_work_with_decision, Command, TurnOutcome, Work,
+};
 use lkjagent_core::model::{CheckResult, CheckSpec, EventKind, StepState, TaskSnapshot, TaskState};
+use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
 
 #[test]
 fn blocked_bridge_step_never_closes() {
@@ -58,6 +61,33 @@ fn blocked_bridge_projection_selects_block_instead_of_close() {
     let snapshot = unsafe_file_work(StepState::Blocked);
 
     assert!(matches!(next_work(&snapshot), Work::BlockTask(_)));
+}
+
+#[test]
+fn blocked_file_work_with_later_pending_response_does_not_continue() {
+    let mut snapshot = instantiate(91, "Create something to read with structured settings");
+    snapshot.steps[0].state = StepState::Blocked;
+
+    assert!(
+        matches!(next_work(&snapshot), Work::BlockTask(reason) if reason.contains("plan file work"))
+    );
+}
+
+#[test]
+fn stale_later_response_decision_is_blocked_by_earlier_step() {
+    let mut snapshot = instantiate(92, "Create something to read with structured settings");
+    snapshot.steps[0].state = StepState::Blocked;
+    let decision = RuntimeDecision::new(
+        "decision-1",
+        "case-92",
+        OperationKey("model.call/3".to_string()),
+        ToolSetView::empty(),
+        OutputEnvelope::Message,
+    );
+
+    assert!(
+        matches!(next_work_with_decision(&snapshot, &decision), Work::BlockTask(reason) if reason.contains("plan file work"))
+    );
 }
 
 #[test]

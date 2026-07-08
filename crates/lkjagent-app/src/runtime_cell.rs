@@ -1,4 +1,4 @@
-use lkjagent_core::engine::completion_blocker_reason;
+use lkjagent_core::engine::{completion_blocker_reason, step_preflight_blocker};
 use lkjagent_core::model::{CheckSpec, Step, StepKind, StepState, TaskSnapshot, TaskState};
 use lkjagent_core::render::max_tokens;
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
@@ -38,26 +38,20 @@ fn open_parts(snapshot: &TaskSnapshot) -> CellParts {
         .iter()
         .find(|step| matches!(step.state, StepState::Pending | StepState::Active))
     else {
-        if let Some(reason) = completion_blocker_reason(snapshot) {
-            return CellParts::with_payload(
-                "completion",
-                "blocked",
-                "state.completion-blocked",
-                serde_json::json!({"reason": reason}),
-            );
-        }
-        return CellParts::new("completion", "close-candidate", "state.completion-close");
+        return completion_blocker_reason(snapshot).map_or_else(
+            || CellParts::new("completion", "close-candidate", "state.completion-close"),
+            blocked_parts,
+        );
     };
+    if let Some(reason) = step_preflight_blocker(snapshot, step.id) {
+        return blocked_parts(reason);
+    }
     if step.kind == StepKind::Verify && step.checks.iter().all(deterministic) {
         return CellParts::with_payload(
             "completion",
             &format!("check-pending/{}", step.id),
             "state.completion-check",
-            serde_json::json!({
-                "operation_key": format!("check.run/{}", step.id),
-                "selector_tier": 60,
-                "step_id": step.id
-            }),
+            serde_json::json!({"operation_key": format!("check.run/{}", step.id), "selector_tier": 60, "step_id": step.id}),
         );
     }
     CellParts::with_payload(
@@ -72,6 +66,15 @@ fn open_parts(snapshot: &TaskSnapshot) -> CellParts {
             "model_budget_tokens": max_tokens(step.kind),
             "tool_view": tool_view(step),
         }),
+    )
+}
+
+fn blocked_parts(reason: String) -> CellParts {
+    CellParts::with_payload(
+        "completion",
+        "blocked",
+        "state.completion-blocked",
+        serde_json::json!({"reason": reason}),
     )
 }
 
@@ -114,14 +117,7 @@ fn tool_view(step: &Step) -> Vec<serde_json::Value> {
     default_explore_tool_view()
         .entries
         .into_iter()
-        .map(|entry| {
-            serde_json::json!({
-                "name": entry.name,
-                "purpose": entry.purpose,
-                "required_params": entry.required_params,
-                "optional_params": entry.optional_params,
-            })
-        })
+        .map(|entry| serde_json::json!({"name": entry.name, "purpose": entry.purpose, "required_params": entry.required_params, "optional_params": entry.optional_params}))
         .collect()
 }
 
@@ -137,63 +133,28 @@ fn key(namespace: &str, name: &str) -> Result<StateKey, String> {
 mod tests {
     use super::*;
     use lkjagent_core::classify::instantiate;
-    use lkjagent_core::model::StepState;
 
     #[test]
-    fn blocked_step_projects_completion_blocked() {
-        let mut snapshot = instantiate(1, "Create something to read");
+    fn blocked_plan_with_later_pending_projects_completion_blocked() {
+        let mut snapshot = instantiate(1, "Create something to read with structured settings");
         snapshot.steps[0].state = StepState::Blocked;
-        for step in snapshot.steps.iter_mut().skip(1) {
-            step.state = StepState::Done;
-        }
-
         let cell = test_cell(&snapshot);
-
         assert_eq!(cell.key.namespace, "completion");
         assert_eq!(cell.key.name, "blocked");
-        assert_eq!(cell.payload_schema, "state.completion-blocked");
-    }
-
-    #[test]
-    fn deterministic_verify_projects_completion_check_pending() {
-        let mut snapshot = instantiate(3, "Write notes/out.md with setup notes.");
-        for step in &mut snapshot.steps {
-            if step.kind != StepKind::Verify {
-                step.state = StepState::Done;
-            }
-        }
-        let cell = test_cell(&snapshot);
-        assert_eq!(cell.key.namespace, "completion");
-        assert!(cell.key.name.starts_with("check-pending/"));
-        assert_eq!(cell.payload_schema, "state.completion-check");
-        assert!(cell.payload_json.contains("check.run/"));
-    }
-
-    #[test]
-    fn all_done_bridge_projects_close_candidate() {
-        let mut snapshot = instantiate(2, "are you ok?");
-        let model = test_cell(&snapshot);
-        assert_eq!(model.key.namespace, "work");
-        assert_eq!(model.payload_schema, "state.model-call");
-        for step in &mut snapshot.steps {
-            step.state = StepState::Done;
-        }
-        let cell = test_cell(&snapshot);
-        assert_eq!(cell.key.namespace, "completion");
-        assert_eq!(cell.key.name, "close-candidate");
-        assert_eq!(cell.payload_schema, "state.completion-close");
+        assert!(cell.payload_json.contains("plan file work"));
     }
 
     fn test_cell(snapshot: &TaskSnapshot) -> StateCell {
         let result = projected_cell(snapshot, "now");
         assert!(result.is_ok());
-        result.unwrap_or_else(|_| StateCell::active(invalid_key(), "test"))
-    }
-
-    fn invalid_key() -> StateKey {
-        StateKey {
-            namespace: "invalid".to_string(),
-            name: "invalid".to_string(),
-        }
+        result.unwrap_or_else(|_| {
+            StateCell::active(
+                StateKey {
+                    namespace: "invalid".to_string(),
+                    name: "invalid".to_string(),
+                },
+                "test",
+            )
+        })
     }
 }

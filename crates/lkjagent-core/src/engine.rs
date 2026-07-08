@@ -52,9 +52,9 @@ pub enum Command {
     AddSteps(Vec<Step>),
 }
 
-pub fn completion_blocker_reason(snapshot: &TaskSnapshot) -> Option<String> {
-    completion_blocker(snapshot)
-}
+pub use crate::engine_completion::{
+    completion_blocker as completion_blocker_reason, step_preflight_blocker,
+};
 
 pub fn next_work_with_decision(snapshot: &TaskSnapshot, decision: &RuntimeDecision) -> Work {
     match snapshot.task.state {
@@ -89,10 +89,6 @@ pub fn next_work_with_decision(snapshot: &TaskSnapshot, decision: &RuntimeDecisi
 }
 
 pub fn next_work(snapshot: &TaskSnapshot) -> Work {
-    next_work_rendered(snapshot)
-}
-
-fn next_work_rendered(snapshot: &TaskSnapshot) -> Work {
     match snapshot.task.state {
         TaskState::Waiting | TaskState::Blocked | TaskState::Closed => return Work::Wait,
         TaskState::Open => {}
@@ -104,6 +100,9 @@ fn next_work_rendered(snapshot: &TaskSnapshot) -> Work {
     else {
         return completion_blocker(snapshot).map_or(Work::CloseTask, Work::BlockTask);
     };
+    if let Some(reason) = step_preflight_blocker(snapshot, step.id) {
+        return Work::BlockTask(reason);
+    }
     if step.kind == StepKind::Verify && step.checks.iter().all(deterministic) {
         return Work::RunChecks { step_id: step.id };
     }
@@ -114,6 +113,9 @@ fn next_work_rendered(snapshot: &TaskSnapshot) -> Work {
 }
 
 fn call_model_work(snapshot: &TaskSnapshot, decision: &RuntimeDecision, step_id: u64) -> Work {
+    if let Some(reason) = step_preflight_blocker(snapshot, step_id) {
+        return Work::BlockTask(reason);
+    }
     let Some(step) = snapshot.steps.iter().find(|step| step.id == step_id) else {
         return Work::BlockTask(format!("decision step not found: {step_id}"));
     };

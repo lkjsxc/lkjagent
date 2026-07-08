@@ -62,7 +62,8 @@ Parse, admission, effect, endpoint, and check failures now write
 `recovery.failure` state cells keyed by kind and decision. Native model-free
 operations support state resolution and workspace text effects for
 `workspace.write_text` and `workspace.append_text` through path-checked
-workspace effects and artifact rows.
+workspace effects and artifact rows. Runtime projection and decision dispatch now
+preflight earlier unfinished step blockers before later model response work.
 
 Record-like owner turns have focused coverage for direct workspace writes,
 record rows, history, fingerprints, README links, index contents, and index
@@ -121,9 +122,9 @@ artifacts=6, check_results=0, tool_admissions=5, and observations=5.
 
 ## Next Executable Step
 
-Commit this docs-first product architecture update, then implement the earlier
-blocked-step guard with a focused regression before continuing through the
-workspace, context, tool, recovery, TUI, and evaluation worktracks.
+Continue through workspace, context, tool, recovery, TUI, and evaluation
+worktracks. Re-run deterministic replay, quiet verify, Docker Compose verify,
+and daily-use campaigns after source changes before final claims.
 
 ## Honesty Rules
 

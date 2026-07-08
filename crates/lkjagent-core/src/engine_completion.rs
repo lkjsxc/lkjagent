@@ -17,19 +17,64 @@ pub(crate) fn close_task(snapshot: &mut TaskSnapshot, commands: &mut Vec<Command
     );
 }
 
-pub(crate) fn completion_blocker(snapshot: &TaskSnapshot) -> Option<String> {
+pub fn completion_blocker(snapshot: &TaskSnapshot) -> Option<String> {
     for (index, step) in snapshot.steps.iter().enumerate() {
         if step.state == StepState::Done || skipped_is_superseded(snapshot, index) {
             continue;
         }
-        return Some(format!(
-            "step {} {} is {}",
-            step.id,
-            step.title,
-            step_state(step.state)
-        ));
+        return Some(step_reason(step));
     }
     check_blocker(snapshot)
+}
+
+pub fn step_preflight_blocker(snapshot: &TaskSnapshot, target_step_id: u64) -> Option<String> {
+    for (index, step) in snapshot.steps.iter().enumerate() {
+        if step.id == target_step_id {
+            return None;
+        }
+        if step.state == StepState::Done
+            || skipped_is_superseded(snapshot, index)
+            || skipped_is_superseded_by_target(snapshot, index, target_step_id)
+        {
+            continue;
+        }
+        return Some(step_reason(step));
+    }
+    None
+}
+
+fn skipped_is_superseded_by_target(
+    snapshot: &TaskSnapshot,
+    index: usize,
+    target_step_id: u64,
+) -> bool {
+    let step = &snapshot.steps[index];
+    if step.state != StepState::Skipped || step.kind != StepKind::Verify {
+        return false;
+    }
+    let later = &snapshot.steps[index + 1..];
+    let Some(target) = later.iter().find(|item| item.id == target_step_id) else {
+        return false;
+    };
+    if matches!(target.kind, StepKind::Write | StepKind::Revise) {
+        return true;
+    }
+    let repair_done = later
+        .iter()
+        .take_while(|item| item.id != target_step_id)
+        .any(|item| {
+            matches!(item.kind, StepKind::Write | StepKind::Revise) && item.state == StepState::Done
+        });
+    repair_done && target.kind == StepKind::Verify && target.checks == step.checks
+}
+
+fn step_reason(step: &crate::model::Step) -> String {
+    format!(
+        "step {} {} is {}",
+        step.id,
+        step.title,
+        step_state(step.state)
+    )
 }
 
 fn skipped_is_superseded(snapshot: &TaskSnapshot, index: usize) -> bool {
