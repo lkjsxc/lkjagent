@@ -28,9 +28,10 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Commit 80e080db (`feat: track tui transcript identity`) adds stable transcript
   entry ids, agent draft accumulation, id-based durable/session merge, and saved
   transcript ids/source paths.
-- Pending viewport slice adds a `Viewport::Follow`/`Viewport::Manual` state,
-  scroll-down follow restoration, manual-top preservation, and pane rendering
-  that uses the viewport height helper without adding a product source file.
+- Commit a1ecdcdc (`feat: model workbench viewport follow state`) adds a
+  `Viewport::Follow`/`Viewport::Manual` state, scroll-down follow restoration,
+  manual-top preservation, and pane rendering that uses the viewport height
+  helper without adding a product source file.
 
 ## Tests Added
 - `crates/lkjagent-core/tests/owner_turn.rs::ambiguous_save_like_turns_route_to_inbox`.
@@ -179,5 +180,4 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Commit the viewport slice, then address artifact/check proof gaps and remaining
-recovery/no-JSON acceptance items.
+Address artifact/check proof gaps and remaining recovery/no-JSON acceptance items.
