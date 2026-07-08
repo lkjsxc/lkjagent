@@ -27,7 +27,7 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   fingerprint.
 - Commit faec18ca (`feat: suppress json-like prompt context`) suppresses
   JSON-like context bodies with source-linked prompt markers.
-- Pending artifact proof slice blocks artifact-request closure until the response names the output path after file, artifact row, and check row evidence exists.
+- Commit ea640511 (`feat: gate artifact success on proof path`) blocks artifact-request closure until the response names the output path after file, artifact row, and check row evidence exists.
 - Commit 80e080db (`feat: track tui transcript identity`) adds stable transcript
   entry ids, agent draft accumulation, id-based durable/session merge, and saved
   transcript ids/source paths.
@@ -197,4 +197,4 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Commit artifact/check proof, then address recovery acceptance.
+Address recovery acceptance.
