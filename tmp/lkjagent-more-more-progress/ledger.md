@@ -37,6 +37,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   helper without adding a product source file.
 - Commit 660429b1 (`feat: harden action value admission`) bounds XML-like action
   argument values and rejects empty executable values before effects.
+- Pending recovery ladder slice records resolved `recovery.failure` cells for
+  parse, admission, effect, endpoint, and check failures.
 
 ## Tests Added
 - `crates/lkjagent-core/tests/owner_turn.rs::ambiguous_save_like_turns_route_to_inbox`.
@@ -58,6 +60,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   large bounded values, and oversized action values.
 - Added admission coverage for empty required values.
 - Extended queue routing artifact tests for file, artifact/check rows, response path, and missing-path blocking.
+- Added `recovery_ladder.rs` and updated admission rejection coverage for durable
+  recovery failure cells.
 
 ## Commands Run
 - `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs`.
@@ -134,27 +138,17 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - No-JSON context: context_no_json 1 passed; docs, lines, quiet verify, and Docker verify passed.
 - Artifact proof: queue_routing 7 passed, app template regression 1 passed,
   quiet verify passed, and fmt/docs/lines/Docker gates passed.
+- Recovery ladder: recovery_ladder, recovery, admission_rejection, and app fake
+  endpoint tests passed; quiet verify, fmt/docs/lines, and Docker gates passed.
 
 ## Failed Or Skipped Commands
-- `python tmp/lkjagent-more-more-thinking-20260708/12-scripts/repo_static_report.py .`
-  failed because `python` was not found; reran with `python3`.
-- `python tmp/lkjagent-more-more-thinking-20260708/12-scripts/sqlite_evidence.py data/lkjagent.sqlite3`
-  failed because `python` was not found; reran with `python3`.
-- Initial `cargo test -p lkjagent-app --test workspace_evidence` failed because
-  the mixed daily-use test used a generic wording that stayed open; changed the
-  scenario to a simple question and reran successfully.
-- Initial post-slice `cargo run -p lkjagent-xtask -- quiet verify` failed in
-  `doctor_reports_schema_and_safe_warnings` because the new CLI scaffold removes
-  the missing-workspace warning; updated the test and reran successfully.
-- Initial viewport `cargo run -p lkjagent-xtask -- quiet verify` failed because a
-  new product source file exceeded the file budget; inlined the helper and moved
-  tests to an integration test.
-- `cargo test -p lkjagent-app --lib workbench_line::tests::mode_command_switches_to_pane_renderer workbench_render::tests`
-  failed because cargo accepts only one test filter; reran the filters separately.
-- Initial protocol-edge quiet verify failed on `expect_err`; replaced it with
-  explicit match handling and reran successfully.
-- Initial artifact-proof quiet verify failed because generic filework responses
-  lacked artifact paths; scoped the blocker to `artifacts/` outputs and reran.
+- Packet scripts failed under `python`; reran with `python3`.
+- Early workspace, diagnostics, viewport, protocol, and artifact-proof gates
+  failed on stale expectations or guardrails; adjusted tests/code and reran.
+- Combined workbench lib filter failed because cargo accepts one filter; reran
+  filters separately.
+- Recovery gates failed on clippy `ptr_arg`, changed admission-error behavior,
+  and active recovery cells blocking work; fixed each and reran successfully.
 
 ## Evidence Files
 - Packet indexed from tmp/lkjagent-more-more-thinking-20260708.
@@ -179,7 +173,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - XML-like action grammar and admission have focused tests: commit 660429b1
   records focused Japanese, multiline, entity, stale decision, context mismatch,
   bad params, oversized, empty, and placeholder test evidence.
-- Recovery states handle parse, admission, effect, endpoint, and check failures: open.
+- Recovery states handle parse, admission, effect, endpoint, and check failures:
+  focused recovery ladder passed; broad campaign proof remains open.
 - TUI duplicate and bottom-follow regressions have tests: transcript identity,
   duplicate-by-id, pane bottom-follow, and reducer-level re-enable-follow
   focused tests passed.
@@ -197,4 +192,4 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Address recovery acceptance.
+Commit recovery ladder, then run final packet/campaign acceptance checks.

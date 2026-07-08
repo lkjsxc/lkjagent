@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use lkjagent_app::daemon::{run_until_idle, CompletionRecord, Endpoint};
 use lkjagent_core::classify::instantiate;
-use lkjagent_core::model::{StepKind, TaskSnapshot};
+use lkjagent_core::model::{StepKind, TaskSnapshot, TaskState};
 use lkjagent_core::render::Prompt;
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
@@ -36,11 +36,8 @@ fn rejected_tool_admission_persists_refusal_evidence() -> TestResult<()> {
     let mut endpoint = OneShotEndpoint {
         output: action_for("decision-view", "", "fs.read", &[("path", "../secret.txt")]),
     };
-    let error = match run_until_idle(&data, &mut endpoint, 1) {
-        Ok(_) => return Err("unsafe action unexpectedly ran".into()),
-        Err(error) => error,
-    };
-    assert!(error.contains("admission rejected"));
+    let snapshot = run_until_idle(&data, &mut endpoint, 1)?;
+    assert_eq!(snapshot.task.state, TaskState::Open);
 
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     let row: (String, String, String, String) = conn.query_row(
@@ -53,7 +50,25 @@ fn rejected_tool_admission_persists_refusal_evidence() -> TestResult<()> {
     assert_eq!(row.2, expected_fp);
     assert!(row.3.contains("path escapes workspace"));
     assert_eq!(count(&conn, "observations")?, 0);
+    let status: String = conn.query_row(
+        "SELECT status FROM runtime_decisions WHERE id = 'decision-view'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(status, "admission_error");
+    assert_eq!(recovery_count(&conn)?, 1);
+    assert_eq!(count(&conn, "attempts")?, 1);
+    assert_eq!(count(&conn, "provider_exchanges")?, 1);
     Ok(())
+}
+
+fn recovery_count(conn: &Connection) -> rusqlite::Result<i64> {
+    conn.query_row(
+        "SELECT COUNT(*) FROM state_cells
+         WHERE key_label LIKE 'recovery:admission/%' AND payload_schema = 'recovery.failure'",
+        [],
+        |row| row.get(0),
+    )
 }
 
 struct OneShotEndpoint {

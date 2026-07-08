@@ -16,6 +16,7 @@ use crate::exchange_bridge::persist_provider_exchange;
 use crate::model_call::{apply_record, call};
 use crate::observation_bridge::persist_observations;
 use crate::prompt_bridge::persist_prompt_frame;
+use crate::recovery_bridge::{record_command_recovery_facts, record_recovery_fact};
 use crate::runtime_bridge::{prepare_runtime_decision, settle_runtime_decision};
 use crate::snapshot_state::persist_snapshot_cell;
 use crate::turn_effects::{dispatch_effects, gather_checks, tag_check_evidence};
@@ -97,15 +98,39 @@ fn run_turn<E: Endpoint, C: Clock>(
                 persist_provider_exchange(conn, &decision, record, &selected_at, &now)?;
             }
             tag_check_evidence(conn, &mut next, &mut commands, &decision.id)?;
-            persist_tool_admissions(conn, &decision, &commands, &now)?;
+            if let Err(error) = persist_tool_admissions(conn, &decision, &commands, &now) {
+                let settled = settle_effect_error(conn, &snapshot, &work, error.clone(), &now)?;
+                record_recovery_fact(
+                    conn,
+                    &decision.case_id,
+                    &decision.id,
+                    "admission",
+                    &error,
+                    0,
+                    &now,
+                )?;
+                persist_snapshot_cell(conn, &settled, &now)?;
+                settle_runtime_decision(conn, &decision, "admission_error", &now)?;
+                return Ok(settled);
+            }
             if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands, &now) {
-                let settled = settle_effect_error(conn, &snapshot, &work, error, &now)?;
+                let settled = settle_effect_error(conn, &snapshot, &work, error.clone(), &now)?;
+                record_recovery_fact(
+                    conn,
+                    &decision.case_id,
+                    &decision.id,
+                    "effect",
+                    &error,
+                    0,
+                    &now,
+                )?;
                 persist_snapshot_cell(conn, &settled, &now)?;
                 settle_runtime_decision(conn, &decision, "effect_error", &now)?;
                 return Ok(settled);
             }
             persist_observations(conn, &decision, &next, &commands, &now)?;
             commit_turn(conn, &next, &commands, &now).map_err(|error| error.to_string())?;
+            record_command_recovery_facts(conn, &next, &commands, &decision.id, &now)?;
             persist_snapshot_cell(conn, &next, &now)?;
             settle_runtime_decision(conn, &decision, "settled", &now)?;
             return Ok(next);
@@ -122,13 +147,23 @@ fn run_turn<E: Endpoint, C: Clock>(
     tag_check_evidence(conn, &mut next, &mut commands, &decision.id)?;
     persist_tool_admissions(conn, &decision, &commands, &now)?;
     if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands, &now) {
-        let settled = settle_effect_error(conn, &snapshot, &work, error, &now)?;
+        let settled = settle_effect_error(conn, &snapshot, &work, error.clone(), &now)?;
+        record_recovery_fact(
+            conn,
+            &decision.case_id,
+            &decision.id,
+            "effect",
+            &error,
+            0,
+            &now,
+        )?;
         persist_snapshot_cell(conn, &settled, &now)?;
         settle_runtime_decision(conn, &decision, "effect_error", &now)?;
         return Ok(settled);
     }
     persist_observations(conn, &decision, &next, &commands, &now)?;
     commit_turn(conn, &next, &commands, &now).map_err(|error| error.to_string())?;
+    record_command_recovery_facts(conn, &next, &commands, &decision.id, &now)?;
     persist_snapshot_cell(conn, &next, &now)?;
     settle_runtime_decision(conn, &decision, "settled", &now)?;
     Ok(next)

@@ -54,8 +54,10 @@ executable values, and placeholder-like executable values.
 
 Runtime decisions carry selected state keys, selected tool views, context-frame
 fingerprints, expected envelopes, evidence requirements, and recovery policy.
-Native model-free operations support state resolution and workspace text effects
-for `workspace.write_text` and `workspace.append_text` through path-checked
+Parse, admission, effect, endpoint, and check failures now write
+`recovery.failure` state cells keyed by kind and decision. Native model-free
+operations support state resolution and workspace text effects for
+`workspace.write_text` and `workspace.append_text` through path-checked
 workspace effects and artifact rows.
 
 Record-like owner turns have focused coverage for direct workspace writes,
@@ -96,8 +98,8 @@ had no workspace records, artifacts, check results, admissions, or observations.
   TUI, and recovery flows.
 - Artifact creation has focused proof for file, artifact row, check row, and
   response-path gating; broad packet-level campaign proof is still open.
-- Recovery state coverage is incomplete for parse, admission, effect, endpoint,
-  and check failures as one coherent ladder.
+- Recovery state coverage has focused parse, admission, effect, endpoint, and
+  check failure proof; broad campaign recovery proof remains open.
 - Tool-view selection still needs broader state-by-state coverage, but focused
   tests now prove the default explore prompt hides shell and explicit shell views
   still admit shell with contamination tracking.

@@ -25,11 +25,11 @@ Fault names are stable data, but the parser validates against the current
 
 ## Attempt Effect
 
-Every parse fault records an event with outcome `parse_fault`, the fault name,
-decision id, and one-line diagnosis. The raw faulty output is stored in exchange
-logs and marked contaminated. Normal retry prompts include only bounded
-diagnosis, invalid-excerpt hash, required change, and the minimal corrected
-XML-like shape when the decision expects an action.
+Every parse fault records an attempt with outcome `parse_fault`, the fault name,
+decision id, a one-line diagnosis, and a `recovery.failure` state cell. The raw
+faulty output is stored in exchange logs and marked contaminated. Normal retry
+prompts include only bounded diagnosis, invalid-excerpt hash, required change,
+and the minimal corrected XML-like shape when the decision expects an action.
 
 ## Envelope Desk Check
 
