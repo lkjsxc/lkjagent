@@ -25,8 +25,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Commit 3803a3b0 (`feat: deduplicate prompt context items`) suppresses
   duplicate clean context items by semantic key, body, source type, and source
   fingerprint.
-- Pending no-JSON context slice suppresses JSON-like context bodies with
-  source-linked prompt markers.
+- Commit faec18ca (`feat: suppress json-like prompt context`) suppresses
+  JSON-like context bodies with source-linked prompt markers.
 - Commit 80e080db (`feat: track tui transcript identity`) adds stable transcript
   entry ids, agent draft accumulation, id-based durable/session merge, and saved
   transcript ids/source paths.
@@ -197,4 +197,4 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Commit no-JSON context, then address artifact/check proof and recovery.
+Address artifact/check proof and recovery acceptance items.
