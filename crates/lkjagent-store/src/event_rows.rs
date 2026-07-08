@@ -1,4 +1,6 @@
-use lkjagent_core::runtime_event::{reduce_event, RuntimeEvent};
+use lkjagent_core::model::CheckResult;
+use lkjagent_core::runtime_event::{reduce_event, RuntimeEvent, RuntimeEventPayload};
+use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
 use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
@@ -45,6 +47,69 @@ pub fn append_and_apply_event(conn: &Connection, event: &RuntimeEvent) -> StoreR
         let _ = conn.execute_batch("ROLLBACK");
     }
     result
+}
+
+pub fn append_check_result_cell_tx(
+    conn: &Connection,
+    case_id: &str,
+    step_id: u64,
+    row_id: i64,
+    result: &CheckResult,
+    now: &str,
+) -> StoreResult<()> {
+    ensure_case(conn, case_id, now)?;
+    let state = if result.passed {
+        "check-passed"
+    } else {
+        "check-failed"
+    };
+    let event_id = next_event_id(conn, case_id, "state-check")?;
+    let mut cell = StateCell::active(check_key(state, step_id, row_id)?, event_id.clone());
+    cell.payload_schema = "state.completion-check-outcome".to_string();
+    cell.payload_json = json_string(&serde_json::json!({
+        "step_id": step_id,
+        "check_result_id": row_id,
+        "name": result.name,
+        "passed": result.passed,
+        "measured": result.measured,
+        "artifact_refs": result.artifact_refs,
+    }))?;
+    cell.evidence_refs = vec![EvidenceRef {
+        source_type: "check_result".to_string(),
+        source_id: row_id.to_string(),
+        fingerprint: result
+            .evidence_fingerprint
+            .clone()
+            .unwrap_or_else(|| result.measured.clone()),
+    }];
+    cell.created_at = now.to_string();
+    cell.updated_at = now.to_string();
+    let event = RuntimeEvent {
+        id: event_id,
+        case_id: case_id.to_string(),
+        kind: "state.cell.upsert".to_string(),
+        payload: RuntimeEventPayload::UpsertCell(Box::new(cell)),
+        source: "check-result".to_string(),
+        created_at: now.to_string(),
+        decision_id: result.decision_id.clone(),
+    };
+    append_and_apply_event_tx(conn, &event)
+}
+
+fn ensure_case(conn: &Connection, case_id: &str, now: &str) -> StoreResult<()> {
+    conn.execute(
+        "INSERT OR IGNORE INTO cases
+         (id, objective, lifecycle, summary, created_at, updated_at)
+         VALUES (?1, COALESCE((SELECT objective FROM tasks WHERE id = CAST(?1 AS INTEGER)), ?2),
+                 'open', '', ?3, ?3)",
+        params![case_id, format!("case {case_id}"), now],
+    )?;
+    Ok(())
+}
+
+fn check_key(state: &str, step_id: u64, row_id: i64) -> StoreResult<StateKey> {
+    StateKey::new("completion", format!("{state}/{step_id}/{row_id}"))
+        .map_err(|error| crate::error::StoreError::InvalidState(error.message))
 }
 
 fn append_and_apply_event_tx(conn: &Connection, event: &RuntimeEvent) -> StoreResult<()> {

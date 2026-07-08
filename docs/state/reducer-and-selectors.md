@@ -21,8 +21,9 @@ RuntimeSnapshot + RuntimeEvent -> StatePatch
 
 A patch inserts, updates, suppresses, resolves, or blocks state cells. It may
 also add or suppress state edges. The store commits the event and patch in one
-transaction. The reducer never reads files, opens SQLite, calls the endpoint, or
-asks the wall clock.
+transaction. Check result commits also emit native completion outcome cells in
+the same transaction as the check row. The reducer never reads files, opens
+SQLite, calls the endpoint, or asks the wall clock.
 
 ## Transition Guard
 

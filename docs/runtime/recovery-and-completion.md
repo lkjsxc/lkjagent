@@ -21,10 +21,11 @@ facts are durable events and may produce recovery state cells.
 Completion is represented by state cells such as `completion:check-pending/*`,
 `completion:check-passed`, `completion:check-failed`, `completion:blocked`, and
 `completion:close-candidate`. A pending deterministic verify cell carries the
-native `check.run/<step>` operation. Closing a case requires no pending, active,
-blocked, failed, or unsuperseded skipped operation and current passing check
-results tied to artifact fingerprints and the active decision. Model prose is
-not completion evidence.
+native `check.run/<step>` operation. Each recorded check row emits a native
+`completion:check-passed/*` or `completion:check-failed/*` cell with evidence
+refs. Closing a case requires no pending, active, blocked, failed, or
+unsuperseded skipped operation and current passing check results tied to artifact
+fingerprints and the active decision. Model prose is not completion evidence.
 
 While plan-family rows remain as bridge storage, they are blocking evidence.
 Any blocked, active, pending, failed, or unsuperseded skipped bridge step keeps

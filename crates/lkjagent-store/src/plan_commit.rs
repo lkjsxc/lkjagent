@@ -81,10 +81,15 @@ fn persist_command(
                         now
                     ],
                 )?;
+                let row_id = tx.last_insert_rowid();
                 crate::state_edge_rows::insert_check_artifact_edges_tx(
+                    tx, task_id, row_id, result, now,
+                )?;
+                crate::event_rows::append_check_result_cell_tx(
                     tx,
-                    task_id,
-                    tx.last_insert_rowid(),
+                    &task_id.to_string(),
+                    *step_id,
+                    row_id,
                     result,
                     now,
                 )?;

@@ -173,12 +173,12 @@ counts. `run --once` executes a bounded daemon turn; refreshed workspace smoke
 passed with `missing: none`. Bounded live profiles ran with exchange evidence.
 Native model-free effects support `workspace.write_text` and
 `workspace.append_text`, both path-checked and persisted as artifact rows.
-Deterministic verify now projects `completion:check-pending/<step>` carrying
-`check.run/<step>`.
+Deterministic verify projects `completion:check-pending/<step>` carrying
+`check.run/<step>`; check rows emit native outcome cells with evidence refs.
 
 ## Known Gaps
 
-- Check freshness still depends on transitional check rows for completion.
+- Closure still reads transitional check rows while native outcome cells mature.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, unsafe bridge steps must block close candidates.
 - Native operation execution remains limited to state resolution, workspace text
@@ -186,8 +186,8 @@ Deterministic verify now projects `completion:check-pending/<step>` carrying
 
 ## Next Executable Step
 
-Implement next bridge-retirement: move passed/failed check outcomes toward
-native completion state cells with docs and gates.
+Implement next bridge-retirement: read native completion evidence without
+trusting stale or bridge-only rows.
 
 ## Honesty Rules
 

@@ -7,7 +7,6 @@ use lkjagent_store::plan_access::{
     next_pending, set_task_state,
 };
 use lkjagent_store::plan_commit::commit_turn;
-use lkjagent_store::plan_hydrate::snapshot_by_id;
 use lkjagent_store::plan_inspect::application_tables;
 use lkjagent_store::plan_schema::{setup, APPLICATION_TABLES};
 use lkjagent_store::plan_turn::{commit_commands, events, orphan_exchanges};
@@ -178,17 +177,17 @@ fn turn_commit_stores_check_params_with_step_id() -> TestResult<()> {
         [],
         |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
     )?;
+    let state_cell: (String, String, String) = conn.query_row(
+        "SELECT key_label, evidence_json, payload_json FROM state_cells LIMIT 1",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+    )?;
     assert_eq!(row.0, step_id as i64);
     assert!(row.1.contains("notes/out.md"));
     assert_eq!(row.2, "decision-check");
     assert_eq!(row.3, "evidence-fp");
-    let Some(hydrated) = snapshot_by_id(&conn, 11)? else {
-        return Err("missing hydrated snapshot".into());
-    };
-    assert_eq!(
-        hydrated.check_results[0].params,
-        snapshot.task.checks.first().cloned()
-    );
+    assert!(state_cell.0.starts_with("completion:check-passed/"));
+    assert!(state_cell.1.contains("check_result") && state_cell.2.contains("file_exists"));
     Ok(())
 }
 fn event(content: &str) -> Command {
