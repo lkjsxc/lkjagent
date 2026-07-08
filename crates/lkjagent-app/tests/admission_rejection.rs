@@ -1,0 +1,105 @@
+use std::fs;
+use std::path::PathBuf;
+
+use lkjagent_app::daemon::{run_until_idle, CompletionRecord, Endpoint};
+use lkjagent_core::classify::instantiate;
+use lkjagent_core::model::{StepKind, TaskSnapshot};
+use lkjagent_core::render::Prompt;
+use lkjagent_core::runtime_decision::{
+    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
+};
+use lkjagent_store::decision_rows::insert_runtime_decision;
+use lkjagent_store::plan_access::{insert_step_tx, insert_task};
+use lkjagent_store::plan_schema::setup;
+use lkjagent_store::state_rows::insert_case;
+use rusqlite::Connection;
+
+mod support;
+use support::action_for;
+
+type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
+
+#[test]
+fn rejected_tool_admission_persists_refusal_evidence() -> TestResult<()> {
+    let data = fixture_root("admission-rejection")?;
+    let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    let mut snapshot = instantiate(1, "Survey workspace and report.");
+    snapshot.steps[0].kind = StepKind::Explore;
+    persist(&mut conn, &snapshot)?;
+    insert_case(&conn, "1", &snapshot.task.objective, "before")?;
+    let decision = restricted_read_decision(&snapshot);
+    let expected_fp = decision.tool_view_fingerprint().map_err(|e| e.message)?;
+    insert_runtime_decision(&conn, &decision, "pending", "before")?;
+    drop(conn);
+
+    let mut endpoint = OneShotEndpoint {
+        output: action_for("decision-view", "", "fs.read", &[("path", "../secret.txt")]),
+    };
+    let error = match run_until_idle(&data, &mut endpoint, 1) {
+        Ok(_) => return Err("unsafe action unexpectedly ran".into()),
+        Err(error) => error,
+    };
+    assert!(error.contains("admission rejected"));
+
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let row: (String, String, String, String) = conn.query_row(
+        "SELECT action_tool, status, tool_view_fingerprint, result_json FROM tool_admissions",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+    )?;
+    assert_eq!(row.0, "fs.read");
+    assert_eq!(row.1, "Rejected");
+    assert_eq!(row.2, expected_fp);
+    assert!(row.3.contains("path escapes workspace"));
+    assert_eq!(count(&conn, "observations")?, 0);
+    Ok(())
+}
+
+struct OneShotEndpoint {
+    output: String,
+}
+
+impl Endpoint for OneShotEndpoint {
+    fn complete(&mut self, _prompt: &Prompt, _attempt: u32) -> Result<CompletionRecord, String> {
+        Ok(CompletionRecord::scripted(self.output.clone()))
+    }
+}
+
+fn restricted_read_decision(snapshot: &TaskSnapshot) -> RuntimeDecision {
+    let step_id = snapshot.steps.first().map_or(0, |step| step.id);
+    RuntimeDecision::new(
+        "decision-view",
+        "1",
+        OperationKey(format!("model.call/{step_id}")),
+        ToolSetView::new(vec![
+            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new())
+        ]),
+        OutputEnvelope::Action,
+    )
+}
+
+fn persist(conn: &mut Connection, snapshot: &TaskSnapshot) -> TestResult<()> {
+    insert_task(conn, &snapshot.task, None, "now")?;
+    let tx = conn.transaction()?;
+    for step in &snapshot.steps {
+        insert_step_tx(&tx, step, "now")?;
+    }
+    tx.commit()?;
+    Ok(())
+}
+
+fn count(conn: &Connection, table: &str) -> rusqlite::Result<i64> {
+    conn.query_row(&format!("SELECT COUNT(*) FROM {table}"), [], |row| {
+        row.get(0)
+    })
+}
+
+fn fixture_root(name: &str) -> TestResult<PathBuf> {
+    let path = std::env::temp_dir().join(format!("lkjagent-{name}-{}", std::process::id()));
+    if path.exists() {
+        fs::remove_dir_all(&path)?;
+    }
+    fs::create_dir_all(&path)?;
+    Ok(path)
+}

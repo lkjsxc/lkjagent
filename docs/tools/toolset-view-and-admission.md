@@ -33,8 +33,10 @@ absent from the decision view, not absent from a hidden global list.
 Admission validates the parsed tool call against the same view fingerprint and
 then runs final deterministic checks such as placeholder rejection, value-class
 validation, path canonicalization, budget remaining, state suppressors, and
-recovery constraints. A prompt/admission mismatch is a high-severity runtime
-event.
+recovery constraints. Admitted and rejected parsed actions persist
+`ToolAdmission` rows with the decision id, action tool, status, reason, parsed
+action, and tool-view fingerprint before effects run. A prompt/admission
+mismatch is a high-severity runtime event.
 
 ## Fault Handling
 

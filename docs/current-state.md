@@ -156,13 +156,11 @@ runs the existing workspace-safe write edge, and a focused regression proves the
 file and artifact rows are created without endpoint output or bridge step
 execution.
 
-Bridge check results now carry their required check parameters, decision id,
-evidence fingerprint, artifact refs, and native state-edge freshness evidence.
-Completion requires a passed row whose check name and parameters match each
-required matter check, whose decision id and evidence fingerprint are present,
-and whose artifact refs are present for artifact-backed checks. Store hydration
-suppresses stale passed rows, and artifact replacement suppresses active
-check-to-artifact edges for the old artifact.
+Bridge check results now carry parameters, decision id, evidence fingerprint,
+artifact refs, and native state-edge freshness evidence. Completion requires
+matching check name and parameters plus decision/evidence/artifact refs. Store
+hydration suppresses stale passed rows, and artifact replacement suppresses old
+check-to-artifact edges.
 
 Record-like owner turns now write owner-readable workspace records without
 creating tasks, refresh rows/history, write README path coverage, rebuild record
@@ -171,7 +169,8 @@ rows, history, fingerprints, README links, index contents, and index artifacts.
 
 Prompt context now admits bounded workspace record/index metadata with source
 fingerprints and artifact refs, avoids full workspace dumps, and records admitted
-item ids in the context plan.
+item ids in the context plan. Parsed unsafe XML-like tool actions persist
+rejected `ToolAdmission` rows with refusal reason and tool-view fingerprint.
 
 ## Known Gaps
 
@@ -186,8 +185,8 @@ item ids in the context plan.
 
 ## Next Executable Step
 
-Implement the next tool-protocol slice: tighten XML-like action admission,
-refusal evidence, and persisted tool-view fingerprints with docs and gates.
+Implement the next recovery/TUI slice: expose blocked, refused, and stale
+evidence clearly in status/TUI with docs and gates.
 
 ## Honesty Rules
 
