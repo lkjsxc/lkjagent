@@ -6,7 +6,7 @@ use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::runtime_state::{StateCell, StateKey};
-use lkjagent_store::plan_access::{insert_step_tx, insert_task};
+use lkjagent_store::plan_access::{enqueue, insert_step_tx, insert_task};
 use lkjagent_store::plan_schema::setup;
 use lkjagent_store::state_rows::{insert_case, upsert_state_cell};
 use rusqlite::Connection;
@@ -94,6 +94,26 @@ fn plan_row_fallback_seeds_matter_snapshot_before_turn() -> TestResult<()> {
     let loaded = run_until_idle(&data, &mut endpoint, 0)?;
 
     assert_eq!(loaded.task.id, 4);
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    assert_eq!(matter_snapshot_rows(&conn)?, 1);
+    Ok(())
+}
+
+#[test]
+fn queued_intake_writes_matter_snapshot_before_turns() -> TestResult<()> {
+    let data = fixture_root("state-intake-seed")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    enqueue(&conn, "What is an agent?", "queued")?;
+    drop(conn);
+    let mut endpoint = ScriptedEndpoint {
+        outputs: Vec::new(),
+        index: 0,
+    };
+
+    let loaded = run_until_idle(&data, &mut endpoint, 0)?;
+
+    assert_eq!(loaded.task.id, 1);
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     assert_eq!(matter_snapshot_rows(&conn)?, 1);
     Ok(())

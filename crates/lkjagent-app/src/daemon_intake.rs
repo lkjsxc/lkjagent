@@ -106,13 +106,13 @@ fn intake<C: Clock>(
     };
     assign_step_ids(&mut snapshot);
     admit_memory(conn, &mut snapshot, &row.content)?;
+    persist_snapshot_cell(conn, &snapshot, &now)?;
     insert_task(conn, &snapshot.task, Some(row.id), &now).map_err(|error| error.to_string())?;
     let tx = conn.transaction().map_err(|error| error.to_string())?;
     for step in &snapshot.steps {
         insert_step_tx(&tx, step, &now).map_err(|error| error.to_string())?;
     }
     tx.commit().map_err(|error| error.to_string())?;
-    persist_snapshot_cell(conn, &snapshot, &now)?;
     Ok(Some(snapshot))
 }
 
