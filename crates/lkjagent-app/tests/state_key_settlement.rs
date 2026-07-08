@@ -26,7 +26,7 @@ fn settled_payload_decision_suppresses_selected_state_key() -> TestResult<()> {
     tx.commit()?;
     insert_case(&conn, "1", &snapshot.task.objective, "now")?;
     upsert_state_cell(&conn, "1", &snapshot_cell(&snapshot)?)?;
-    upsert_state_cell(&conn, "1", &payload_cell()?)?;
+    upsert_state_cell(&conn, "1", &payload_cell("custom.done")?)?;
     drop(conn);
 
     let mut endpoint = ScriptedEndpoint {
@@ -41,6 +41,37 @@ fn settled_payload_decision_suppresses_selected_state_key() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn state_resolve_payload_settles_without_blocking_matter() -> TestResult<()> {
+    let data = fixture_root("state-resolve")?;
+    let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    let mut snapshot = instantiate(1, "Resolve payload state key.");
+    assign_step_ids(&mut snapshot);
+    insert_task(&conn, &snapshot.task, None, "now")?;
+    let tx = conn.transaction()?;
+    for step in &snapshot.steps {
+        insert_step_tx(&tx, step, "now")?;
+    }
+    tx.commit()?;
+    insert_case(&conn, "1", &snapshot.task.objective, "now")?;
+    upsert_state_cell(&conn, "1", &snapshot_cell(&snapshot)?)?;
+    upsert_state_cell(&conn, "1", &payload_cell("state.resolve")?)?;
+    drop(conn);
+
+    let mut endpoint = ScriptedEndpoint {
+        outputs: Vec::new(),
+        index: 0,
+    };
+    let next = run_until_idle(&data, &mut endpoint, 1)?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+
+    assert_eq!(format!("{:?}", next.task.state), "Open");
+    assert_eq!(cell_status(&conn, "custom:settle-me")?, "Suppressed");
+    assert_eq!(blocked_events(&conn)?, 0);
+    Ok(())
+}
+
 fn snapshot_cell(snapshot: &lkjagent_core::model::TaskSnapshot) -> TestResult<StateCell> {
     let mut cell = StateCell::active(key("case", "snapshot")?, "snapshot-event");
     cell.payload_schema = "matter-snapshot".to_string();
@@ -50,10 +81,10 @@ fn snapshot_cell(snapshot: &lkjagent_core::model::TaskSnapshot) -> TestResult<St
     Ok(cell)
 }
 
-fn payload_cell() -> TestResult<StateCell> {
+fn payload_cell(operation: &str) -> TestResult<StateCell> {
     let mut cell = StateCell::active(key("custom", "settle-me")?, "custom-event");
     cell.payload_schema = "custom.operation".to_string();
-    cell.payload_json = serde_json::json!({"operation_key":"custom.done"}).to_string();
+    cell.payload_json = serde_json::json!({"operation_key": operation}).to_string();
     cell.created_at = "now".to_string();
     cell.updated_at = "now".to_string();
     Ok(cell)
@@ -73,6 +104,14 @@ fn cell_status(conn: &Connection, key_label: &str) -> TestResult<String> {
     Ok(conn.query_row(
         "SELECT status FROM state_cells WHERE key_label = ?1",
         [key_label],
+        |row| row.get(0),
+    )?)
+}
+
+fn blocked_events(conn: &Connection) -> TestResult<i64> {
+    Ok(conn.query_row(
+        "SELECT COUNT(*) FROM events WHERE kind = 'taskblocked'",
+        [],
         |row| row.get(0),
     )?)
 }

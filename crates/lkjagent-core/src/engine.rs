@@ -12,6 +12,7 @@ pub enum Work {
     CallModel { step_id: u64, prompt: Prompt },
     RunChecks { step_id: u64 },
     CloseTask,
+    ResolveState,
     BlockTask(String),
     Wait,
 }
@@ -57,6 +58,9 @@ pub fn next_work_with_decision(snapshot: &TaskSnapshot, decision: &RuntimeDecisi
     let operation = decision.operation.0.as_str();
     if operation == "runtime.idle" || operation == "owner.answer" {
         return Work::Wait;
+    }
+    if operation == "state.resolve" {
+        return Work::ResolveState;
     }
     if operation == "completion.close" {
         return completion_blocker(snapshot).map_or(Work::CloseTask, Work::BlockTask);
@@ -142,6 +146,7 @@ pub fn apply_turn(
             handle_checks(&mut next, &mut commands, *step_id, &files, &command_facts);
         }
         (Work::CloseTask, _) => close_task(&mut next, &mut commands),
+        (Work::ResolveState, _) => {}
         (Work::BlockTask(reason), _) => block_task(&mut next, &mut commands, reason),
         _ => {}
     }

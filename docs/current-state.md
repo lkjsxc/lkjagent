@@ -144,6 +144,11 @@ and payload-defined cells, store tests prove the key survives unfinished-decisio
 hydration, and an app regression proves settlement suppresses a payload-defined
 cell by its recorded key instead of reverse-parsing the operation string.
 
+Native model-free state resolution now supports payload-defined cells with
+`operation_key` `state.resolve`. The runtime selects this operation from state,
+settles the selected state key without a bridge step, does not call the endpoint,
+and leaves the matter open for the next state candidate instead of blocking it.
+
 ## Known Gaps
 
 - Check freshness remains bridge-limited: current check rows do not yet carry
@@ -152,14 +157,14 @@ cell by its recorded key instead of reverse-parsing the operation string.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, blocked, active, pending, failed, or
   unsuperseded skipped bridge steps must prevent close candidates.
-- Native operation execution remains bridge-limited: payload-defined model-free
-  operations without a bridge executor block honestly rather than running a
-  native effect.
+- Native operation execution remains limited to generic state resolution plus
+  bridge-backed model, check, completion, and route effects; broader native
+  effect commands remain a follow-up state-harness slice.
 
 ## Next Executable Step
 
-Implement native model-free operation cells so at least one payload-defined
-state cell can execute without a bridge task-step operation, with docs, focused
+Implement the next native state-harness slice: payload-defined effect command
+execution for a narrow model-free workspace-safe effect, with docs, focused
 tests, quiet gates, and Docker verification.
 
 ## Honesty Rules

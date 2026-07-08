@@ -110,7 +110,7 @@ fn run_turn<E: Endpoint, C: Clock>(
             return Ok(next);
         }
         Work::RunChecks { step_id } => gather_checks(workspace, &snapshot, *step_id)?,
-        Work::CloseTask | Work::BlockTask(_) | Work::Wait => TurnOutcome::Noop,
+        Work::CloseTask | Work::ResolveState | Work::BlockTask(_) | Work::Wait => TurnOutcome::Noop,
     };
     let (mut next, commands) = apply_turn(&snapshot, &work, outcome);
     let now = clock.now();

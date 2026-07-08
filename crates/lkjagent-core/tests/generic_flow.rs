@@ -144,6 +144,16 @@ fn unsupported_decision_blocks_instead_of_recomputing_work() {
 }
 
 #[test]
+fn state_resolve_decision_is_native_model_free_work() {
+    let snapshot = instantiate(9, "What is in the workspace?");
+    let decision = decision("state.resolve", OutputEnvelope::None);
+    assert_eq!(
+        next_work_with_decision(&snapshot, &decision),
+        Work::ResolveState
+    );
+}
+
+#[test]
 fn waiting_and_closed_tasks_have_no_model_work() {
     let mut snapshot = instantiate(2, "What is in the workspace?");
     snapshot.task.state = TaskState::Waiting;

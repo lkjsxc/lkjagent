@@ -14,6 +14,7 @@ PromptFrame + RuntimeDecision -> ModelCall
 ModelAction + RuntimeDecision -> ToolAdmission
 ToolAdmission -> EffectCommand
 EffectObservation -> RuntimeEvent
+ModelFreeDecision -> RuntimeEvent
 RuntimeEvent -> durable rows
 ```
 
@@ -40,7 +41,9 @@ which cell settled.
 ## Authority Rule
 
 There is no prompt-only policy and no dispatcher-only policy. Prompt rendering
-and admission are projections of the same persisted decision.
+and admission are projections of the same persisted decision. A model-free
+operation such as `state.resolve` may settle the selected state key directly
+through the runtime loop without creating or reading a bridge step.
 
 ## Acceptance Checks
 

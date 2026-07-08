@@ -42,8 +42,9 @@ bounded `SelectorCandidate` values, filter candidates blocked by active
 tiers are owner intake, owner answer, recovery, effects, model calls, checks,
 completion, workspace record families, payload-defined custom operations,
 cooldown suppression, and idle. A state cell with an `operation_key` payload can
-become a candidate without adding a central enum branch. Candidate rows are not
-a second control plane.
+become a candidate without adding a central enum branch. Payload-defined
+model-free operations may use `state.resolve` when the only required effect is
+settling the selected state key. Candidate rows are not a second control plane.
 
 ## Fingerprints
 
