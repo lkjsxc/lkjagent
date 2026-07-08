@@ -26,6 +26,7 @@ pub fn select_runtime_decision(
         operation.tool_view,
         operation.expected_envelope,
     );
+    decision.selected_state_key = candidate.state_key.as_ref().map(|key| key.as_label());
     let snapshot_fingerprint = snapshot.fingerprint()?;
     decision.snapshot_fingerprint = snapshot_fingerprint.clone();
     decision.state_vector_fingerprint = snapshot_fingerprint;

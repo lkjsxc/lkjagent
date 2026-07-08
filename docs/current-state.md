@@ -139,6 +139,11 @@ reduction, so replaying an already inserted event cannot apply a second patch or
 state history row. This slice has focused store coverage and passed quiet test
 and Docker Compose `verify` in this run.
 
+Runtime decisions now carry the selected state key. Selector tests cover model
+and payload-defined cells, store tests prove the key survives unfinished-decision
+hydration, and an app regression proves settlement suppresses a payload-defined
+cell by its recorded key instead of reverse-parsing the operation string.
+
 ## Known Gaps
 
 - Check freshness remains bridge-limited: current check rows do not yet carry
@@ -147,14 +152,15 @@ and Docker Compose `verify` in this run.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, blocked, active, pending, failed, or
   unsuperseded skipped bridge steps must prevent close candidates.
-- Native state settlement still reverse-parses operation keys for many cells;
-  selected-state-key settlement remains a follow-up state-harness slice.
+- Native operation execution remains bridge-limited: payload-defined model-free
+  operations without a bridge executor block honestly rather than running a
+  native effect.
 
 ## Next Executable Step
 
-Commit the native state store atomicity slice with honest trailers, then
-continue native state reducer work with selected-state-key settlement and native
-operation cells.
+Implement native model-free operation cells so at least one payload-defined
+state cell can execute without a bridge task-step operation, with docs, focused
+tests, quiet gates, and Docker verification.
 
 ## Honesty Rules
 

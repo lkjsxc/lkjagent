@@ -76,6 +76,9 @@ fn has_operation_cell(snapshot: &RuntimeSnapshot) -> bool {
 }
 
 fn decision_cell_key(decision: &RuntimeDecision) -> Result<Option<StateKey>, String> {
+    if let Some(label) = &decision.selected_state_key {
+        return StateKey::from_label(label).map(Some).map_err(|e| e.message);
+    }
     let operation = decision.operation.0.as_str();
     if let Some(step) = operation.strip_prefix("model.call/") {
         return StateKey::new("model", step)

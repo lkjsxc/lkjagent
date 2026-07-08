@@ -87,6 +87,10 @@ fn runtime_decisions_persist_and_unfinished_hydrate_first() -> TestResult<()> {
     insert_runtime_decision(&conn, &early, "pending", "t1")?;
     let pending = unfinished_decisions(&conn, "case-1")?;
     assert_eq!(ids(&pending), vec!["decision-a", "decision-b"]);
+    assert_eq!(
+        pending[0].selected_state_key.as_deref(),
+        Some("model:from-decision")
+    );
 
     let tool_fp: String = conn.query_row(
         "SELECT tool_view_fingerprint FROM runtime_decisions WHERE id = 'decision-a'",
@@ -157,6 +161,7 @@ fn decision(id: &str) -> RuntimeDecision {
         ToolSetView::new(vec![read_tool()]),
         OutputEnvelope::Action,
     );
+    decision.selected_state_key = Some("model:from-decision".to_string());
     decision.snapshot_fingerprint = "snapshot-fp".to_string();
     decision.state_vector_fingerprint = "state-fp".to_string();
     decision.context_frame_fingerprint = "context-fp".to_string();

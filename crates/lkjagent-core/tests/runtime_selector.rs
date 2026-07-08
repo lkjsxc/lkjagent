@@ -29,6 +29,7 @@ fn selector_reads_model_cells_and_preserves_tool_view() {
 
     let selected = select(&snapshot, "decision-1", &[]);
 
+    assert_eq!(selected.selected_state_key.as_deref(), Some("model:42"));
     assert_eq!(selected.operation.0, "model.call/42");
     assert_eq!(selected.expected_envelope, OutputEnvelope::Action);
     assert_eq!(selected.model_budget_tokens, Some(512));
@@ -110,6 +111,10 @@ fn payload_operation_selects_unknown_state_namespace() {
 
     let selected = select(&snapshot, "decision-1", &[]);
 
+    assert_eq!(
+        selected.selected_state_key.as_deref(),
+        Some("calendar:due/today")
+    );
     assert_eq!(selected.operation.0, "model.call/42");
     assert_eq!(selected.expected_envelope, OutputEnvelope::Message);
     assert_eq!(

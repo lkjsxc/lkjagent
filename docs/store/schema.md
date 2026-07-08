@@ -23,7 +23,7 @@ runtime reads only matter, state, and record rows. Required tables:
 | `runtime_events` | append-only runtime facts with optional decision id |
 | `state_cells` | current arbitrary state vector |
 | `state_history` | audit of applied state patches |
-| `runtime_decisions` | persisted `RuntimeDecision` authority rows |
+| `runtime_decisions` | persisted `RuntimeDecision` authority rows with selected state key |
 | `prompt_frames` | prompt metadata, fingerprints, and bounded body refs |
 | `prompt_cards` | prompt-kernel card reasons and section fingerprints |
 | `tool_admissions` | parsed action, result, and view fingerprint |
@@ -60,7 +60,8 @@ provider did not report the value, not zero.
 Index state cells by case id, key, status, priority, and conflict group. Index
 state edges by case id or workspace scope, relation, status, and endpoint refs.
 Index context items by semantic key, contamination class, trust class, and source
-fingerprint. Index runtime decisions by case id, status, and selected time.
+fingerprint. Index runtime decisions by case id, status, and selected time. The decision JSON
+also carries the selected state key used for settlement diagnostics.
 
 ## Failure This Prevents
 

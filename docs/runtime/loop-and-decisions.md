@@ -29,11 +29,13 @@ bundles.
 
 ## Decision Fields
 
-A decision stores case id, selected operation key, snapshot fingerprint,
-state-vector fingerprint, context-frame fingerprint, tool-view fingerprint,
-expected envelope, model budget, admissible tool-call schemas, hidden tool
-reasons for diagnostics, effect command when model-free, completion predicates,
-and recovery policy.
+A decision stores case id, selected state key, selected operation key, snapshot
+fingerprint, state-vector fingerprint, context-frame fingerprint, tool-view
+fingerprint, expected envelope, model budget, admissible tool-call schemas,
+hidden tool reasons for diagnostics, effect command when model-free, completion
+predicates, and recovery policy. Settlement resolves or suppresses the selected
+state key recorded on the decision; operation strings are not the authority for
+which cell settled.
 
 ## Authority Rule
 

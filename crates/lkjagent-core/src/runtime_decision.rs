@@ -22,6 +22,8 @@ pub enum OutputEnvelope {
 pub struct RuntimeDecision {
     pub id: String,
     pub case_id: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub selected_state_key: Option<String>,
     pub operation: OperationKey,
     pub snapshot_fingerprint: String,
     pub state_vector_fingerprint: String,
@@ -44,6 +46,7 @@ impl RuntimeDecision {
         Self {
             id: id.into(),
             case_id: case_id.into(),
+            selected_state_key: None,
             operation,
             snapshot_fingerprint: String::new(),
             state_vector_fingerprint: String::new(),
