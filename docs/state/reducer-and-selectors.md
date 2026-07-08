@@ -44,7 +44,9 @@ completion, workspace record families, payload-defined custom operations,
 cooldown suppression, and idle. A state cell with an `operation_key` payload can
 become a candidate without adding a central enum branch. Payload-defined
 model-free operations may use `state.resolve` when the only required effect is
-settling the selected state key. Candidate rows are not a second control plane.
+settling the selected state key, or carry a narrow `workspace.write_text` effect
+command when the selected cell has explicit path and content evidence. Candidate
+rows are not a second control plane.
 
 ## Fingerprints
 

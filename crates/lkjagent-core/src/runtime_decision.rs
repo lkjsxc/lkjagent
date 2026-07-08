@@ -19,6 +19,15 @@ pub enum OutputEnvelope {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EffectCommand {
+    pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub path: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub content: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RuntimeDecision {
     pub id: String,
     pub case_id: String,
@@ -31,6 +40,8 @@ pub struct RuntimeDecision {
     pub tool_view: ToolSetView,
     pub expected_envelope: OutputEnvelope,
     pub model_budget_tokens: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub effect_command: Option<EffectCommand>,
     pub evidence_requirements: Vec<String>,
     pub recovery_policy: String,
 }
@@ -54,6 +65,7 @@ impl RuntimeDecision {
             tool_view,
             expected_envelope,
             model_budget_tokens: None,
+            effect_command: None,
             evidence_requirements: Vec::new(),
             recovery_policy: "default".to_string(),
         }

@@ -149,6 +149,13 @@ Native model-free state resolution now supports payload-defined cells with
 settles the selected state key without a bridge step, does not call the endpoint,
 and leaves the matter open for the next state candidate instead of blocking it.
 
+Payload-defined model-free effect commands now support a narrow
+`workspace.write_text` command. The selector copies the effect command into the
+persisted decision, the engine turns it into a workspace write command, the app
+runs the existing workspace-safe write edge, and a focused regression proves the
+file and artifact rows are created without endpoint output or bridge step
+execution.
+
 ## Known Gaps
 
 - Check freshness remains bridge-limited: current check rows do not yet carry
@@ -157,14 +164,15 @@ and leaves the matter open for the next state candidate instead of blocking it.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, blocked, active, pending, failed, or
   unsuperseded skipped bridge steps must prevent close candidates.
-- Native operation execution remains limited to generic state resolution plus
-  bridge-backed model, check, completion, and route effects; broader native
-  effect commands remain a follow-up state-harness slice.
+- Native operation execution remains limited to generic state resolution,
+  `workspace.write_text`, and bridge-backed model, check, completion, and route
+  effects; broader native effect commands remain a follow-up state-harness
+  slice.
 
 ## Next Executable Step
 
-Implement the next native state-harness slice: payload-defined effect command
-execution for a narrow model-free workspace-safe effect, with docs, focused
+Implement the next native state-harness slice: fresh check rows tied to
+specified check parameters and artifact/workspace evidence, with docs, focused
 tests, quiet gates, and Docker verification.
 
 ## Honesty Rules

@@ -107,28 +107,27 @@ fn namespace_candidate(cell: &StateCell, body: &Value) -> Option<SelectorCandida
             60,
             "check",
         )),
-        _ => workspace_candidate(cell),
+        _ => crate::runtime_workspace_family::operation(&cell.key.namespace).map(
+            |(operation, tier, reason)| {
+                model_free(
+                    cell,
+                    &format!("{operation}/{}", cell.key.name),
+                    tier,
+                    reason,
+                )
+            },
+        ),
     }
-}
-
-fn workspace_candidate(cell: &StateCell) -> Option<SelectorCandidate> {
-    let (operation, tier, reason) =
-        crate::runtime_workspace_family::operation(&cell.key.namespace)?;
-    Some(model_free(
-        cell,
-        &format!("{operation}/{}", cell.key.name),
-        tier,
-        reason,
-    ))
 }
 
 fn operation_from_payload(body: &Value) -> Option<RuntimeOperation> {
     let key = selector::payload_text(body, "operation_key")?;
     let expected = selector::payload_envelope(body);
     if expected == OutputEnvelope::None {
-        Some(RuntimeOperation::model_free(
+        Some(RuntimeOperation::model_free_effect(
             key,
             selector::payload_evidence_requirements(body),
+            selector::payload_effect_command(body),
         ))
     } else {
         Some(RuntimeOperation::model_call(

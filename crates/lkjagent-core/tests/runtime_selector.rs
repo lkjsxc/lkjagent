@@ -104,7 +104,8 @@ fn payload_operation_selects_unknown_state_namespace() {
         "operation_key": "model.call/42",
         "expected_envelope": "Message",
         "selector_tier": 25,
-        "evidence_requirements": ["record:todo-1"]
+        "evidence_requirements": ["record:todo-1"],
+        "effect_command": {"name":"workspace.write_text","path":"native.md","content":"body"}
     })
     .to_string();
     let snapshot = snapshot_with(custom);
@@ -117,10 +118,31 @@ fn payload_operation_selects_unknown_state_namespace() {
     );
     assert_eq!(selected.operation.0, "model.call/42");
     assert_eq!(selected.expected_envelope, OutputEnvelope::Message);
+    assert!(selected.effect_command.is_none());
     assert_eq!(
         selected.evidence_requirements,
         vec!["selector:payload", "record:todo-1"]
     );
+}
+
+#[test]
+fn payload_model_free_operation_carries_effect_command() {
+    let mut custom = cell("effect", "write/native");
+    custom.payload_json = serde_json::json!({
+        "operation_key": "effect.workspace.write",
+        "effect_command": {"name":"workspace.write_text","path":"native.md","content":"body"}
+    })
+    .to_string();
+    let selected = select(&snapshot_with(custom), "decision-1", &[]);
+
+    assert_eq!(selected.operation.0, "effect.workspace.write");
+    assert!(selected.effect_command.is_some());
+    let Some(effect) = selected.effect_command else {
+        return;
+    };
+    assert_eq!(effect.name, "workspace.write_text");
+    assert_eq!(effect.path.as_deref(), Some("native.md"));
+    assert_eq!(effect.content.as_deref(), Some("body"));
 }
 
 fn snapshot_with(cell: StateCell) -> RuntimeSnapshot {

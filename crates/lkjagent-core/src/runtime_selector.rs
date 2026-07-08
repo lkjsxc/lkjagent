@@ -2,7 +2,7 @@ use crate::runtime_candidate::{selected_candidate, selector_candidates, Selector
 use serde_json::Value;
 
 use crate::runtime_decision::{
-    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
+    EffectCommand, OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
 };
 use crate::runtime_fingerprint::FingerprintError;
 use crate::runtime_operation::RuntimeOperation;
@@ -27,6 +27,7 @@ pub fn select_runtime_decision(
         operation.expected_envelope,
     );
     decision.selected_state_key = candidate.state_key.as_ref().map(|key| key.as_label());
+    decision.effect_command = operation.effect_command;
     let snapshot_fingerprint = snapshot.fingerprint()?;
     decision.snapshot_fingerprint = snapshot_fingerprint.clone();
     decision.state_vector_fingerprint = snapshot_fingerprint;
@@ -109,6 +110,15 @@ pub(crate) fn payload_tier(payload: &Value, default: u8) -> u8 {
 
 pub(crate) fn payload_evidence_requirements(payload: &Value) -> Vec<String> {
     strings(payload.get("evidence_requirements"))
+}
+
+pub(crate) fn payload_effect_command(payload: &Value) -> Option<EffectCommand> {
+    let value = payload.get("effect_command")?;
+    Some(EffectCommand {
+        name: payload_text(value, "name")?.to_string(),
+        path: payload_text(value, "path").map(str::to_string),
+        content: payload_text(value, "content").map(str::to_string),
+    })
 }
 
 fn tool_entry(value: &Value) -> Option<ToolViewEntry> {

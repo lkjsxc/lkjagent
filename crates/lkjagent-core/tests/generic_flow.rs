@@ -4,7 +4,9 @@ use lkjagent_core::engine::{
 };
 use lkjagent_core::model::{CheckSpec, StepState, TaskState};
 use lkjagent_core::parse::{Action, ParseFault, ParsedOutput};
-use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
+use lkjagent_core::runtime_decision::{
+    EffectCommand, OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView,
+};
 
 #[test]
 fn generic_task_closes_after_eight_plus_turns_with_faults() {
@@ -151,6 +153,25 @@ fn state_resolve_decision_is_native_model_free_work() {
         next_work_with_decision(&snapshot, &decision),
         Work::ResolveState
     );
+}
+
+#[test]
+fn native_workspace_write_effect_emits_write_command() {
+    let snapshot = instantiate(10, "What is in the workspace?");
+    let mut decision = decision("effect.workspace.write", OutputEnvelope::None);
+    decision.effect_command = Some(EffectCommand {
+        name: "workspace.write_text".to_string(),
+        path: Some("native.md".to_string()),
+        content: Some("body".to_string()),
+    });
+
+    let work = next_work_with_decision(&snapshot, &decision);
+    let (_next, commands) = apply_turn(&snapshot, &work, TurnOutcome::Noop);
+
+    assert!(commands.iter().any(|command| matches!(
+        command,
+        Command::WriteFile { path, content } if path == "native.md" && content == "body"
+    )));
 }
 
 #[test]

@@ -5,7 +5,7 @@ use crate::engine_steps::{handle_endpoint_error, handle_fault, handle_model};
 use crate::model::*;
 use crate::parse::{Action, ParseFault, ParsedOutput};
 use crate::render::{render_prompt, render_prompt_for_decision_with_attempts, Prompt};
-use crate::runtime_decision::RuntimeDecision;
+use crate::runtime_decision::{EffectCommand, RuntimeDecision};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Work {
@@ -13,6 +13,7 @@ pub enum Work {
     RunChecks { step_id: u64 },
     CloseTask,
     ResolveState,
+    RunNativeEffect(EffectCommand),
     BlockTask(String),
     Wait,
 }
@@ -58,6 +59,9 @@ pub fn next_work_with_decision(snapshot: &TaskSnapshot, decision: &RuntimeDecisi
     let operation = decision.operation.0.as_str();
     if operation == "runtime.idle" || operation == "owner.answer" {
         return Work::Wait;
+    }
+    if let Some(effect) = &decision.effect_command {
+        return Work::RunNativeEffect(effect.clone());
     }
     if operation == "state.resolve" {
         return Work::ResolveState;
@@ -147,10 +151,33 @@ pub fn apply_turn(
         }
         (Work::CloseTask, _) => close_task(&mut next, &mut commands),
         (Work::ResolveState, _) => {}
+        (Work::RunNativeEffect(effect), _) => {
+            handle_native_effect(&mut next, &mut commands, effect)
+        }
         (Work::BlockTask(reason), _) => block_task(&mut next, &mut commands, reason),
         _ => {}
     }
     (next, commands)
+}
+
+fn handle_native_effect(
+    snapshot: &mut TaskSnapshot,
+    commands: &mut Vec<Command>,
+    effect: &EffectCommand,
+) {
+    match (
+        effect.name.as_str(),
+        effect.path.as_deref(),
+        effect.content.as_deref(),
+    ) {
+        ("workspace.write_text", Some(path), Some(content)) if !content.trim().is_empty() => {
+            commands.push(Command::WriteFile {
+                path: path.to_string(),
+                content: content.to_string(),
+            });
+        }
+        _ => block_task(snapshot, commands, "unsupported native effect command"),
+    }
 }
 
 fn deterministic(spec: &CheckSpec) -> bool {
