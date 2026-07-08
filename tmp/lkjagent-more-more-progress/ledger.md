@@ -99,8 +99,9 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - `cargo run -p lkjagent-xtask -- smoke live` -> `ok smoke live status=skipped
   reason=operator-command-required`; skip recorded in
   `tmp/agent-runs/20260708T110203Z/live-skip.txt`.
-- `cargo test -p lkjagent-app --lib workbench_render::tests` -> 3 passed after
-  adding pane bottom-follow and manual-scroll growth coverage.
+- Commit 88075ff6 (`test: cover workbench bottom follow`) added pane
+  bottom-follow and manual-scroll growth coverage; `cargo test -p lkjagent-app
+  --lib workbench_render::tests` -> 3 passed.
 - `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs` after the
   bottom-follow test slice.
 - `cargo run -p lkjagent-xtask -- check-lines` -> `ok check-lines` after the
@@ -159,4 +160,4 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Commit the TUI bottom-follow test slice, then address artifact/check proof gaps.
+Address artifact/check proof gaps and remaining recovery/no-JSON acceptance items.
