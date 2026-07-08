@@ -137,8 +137,9 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Deterministic replay passes: open.
 - Quiet verify passes: open.
 - Docker Compose verify passes or honest skip committed: open.
-- Live campaigns run or honest skips committed: scripted campaign evidence and
-  live skip file exist under tmp/agent-runs/20260708T110203Z; commit pending.
+- Live campaigns run or honest skips committed: commit 88272e70 recorded the
+  scripted campaign transcript and live skip file under
+  tmp/agent-runs/20260708T110203Z.
 - Final handoff names commits, commands, evidence paths, and risks: open.
 
 ## Open Risks
@@ -147,5 +148,4 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Commit scripted campaign evidence, then address bottom-follow or artifact/check
-proof gaps.
+Address bottom-follow or artifact/check proof gaps.
