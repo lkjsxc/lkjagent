@@ -171,23 +171,23 @@ Prompt context admits bounded workspace record/index metadata; unsafe XML-like
 tool actions persist rejections; status/TUI show blocked, refused, and stale-edge
 counts. `run --once` executes a bounded daemon turn; refreshed workspace smoke
 passed with `missing: none`. Bounded live profiles ran with exchange evidence.
-Native model-free effects now support `workspace.write_text` and
-`workspace.append_text`, both path-checked at the workspace edge and persisted as
-artifact rows.
+Native model-free effects support `workspace.write_text` and
+`workspace.append_text`, both path-checked and persisted as artifact rows.
+Deterministic verify now projects `completion:check-pending/<step>` carrying
+`check.run/<step>`.
 
 ## Known Gaps
 
-- Check freshness still depends on transitional check rows for completion, but
-  native check-to-artifact edges now record and suppress stale freshness evidence.
+- Check freshness still depends on transitional check rows for completion.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, unsafe bridge steps must block close candidates.
-- Native operation execution remains limited to generic state resolution,
-  narrow workspace text effects, and bridge-backed effects.
+- Native operation execution remains limited to state resolution, workspace text
+  effects, and bridge-backed effects.
 
 ## Next Executable Step
 
-Implement the next bridge-retirement slice: move more check/completion routing
-from plan-family bridge rows into native state cells with docs and gates.
+Implement next bridge-retirement: move passed/failed check outcomes toward
+native completion state cells with docs and gates.
 
 ## Honesty Rules
 

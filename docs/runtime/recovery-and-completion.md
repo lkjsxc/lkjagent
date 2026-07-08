@@ -18,9 +18,10 @@ facts are durable events and may produce recovery state cells.
 
 ## Completion
 
-Completion is represented by state cells such as `completion:check-pending`,
+Completion is represented by state cells such as `completion:check-pending/*`,
 `completion:check-passed`, `completion:check-failed`, `completion:blocked`, and
-`completion:close-candidate`. Closing a case requires no pending, active,
+`completion:close-candidate`. A pending deterministic verify cell carries the
+native `check.run/<step>` operation. Closing a case requires no pending, active,
 blocked, failed, or unsuperseded skipped operation and current passing check
 results tied to artifact fingerprints and the active decision. Model prose is
 not completion evidence.

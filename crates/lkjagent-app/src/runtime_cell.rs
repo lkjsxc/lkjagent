@@ -50,10 +50,14 @@ fn open_parts(snapshot: &TaskSnapshot) -> CellParts {
     };
     if step.kind == StepKind::Verify && step.checks.iter().all(deterministic) {
         return CellParts::with_payload(
-            "check",
-            &step.id.to_string(),
-            "plan-bridge.check",
-            serde_json::json!({"step_id": step.id}),
+            "completion",
+            &format!("check-pending/{}", step.id),
+            "state.completion-check",
+            serde_json::json!({
+                "operation_key": format!("check.run/{}", step.id),
+                "selector_tier": 60,
+                "step_id": step.id
+            }),
         );
     }
     CellParts::with_payload(
@@ -147,6 +151,21 @@ mod tests {
         assert_eq!(cell.key.name, "blocked");
         assert_eq!(cell.payload_schema, "plan-bridge.blocked");
         assert!(cell.payload_json.contains("blocked"));
+    }
+
+    #[test]
+    fn deterministic_verify_projects_completion_check_pending() {
+        let mut snapshot = instantiate(3, "Write notes/out.md with setup notes.");
+        for step in &mut snapshot.steps {
+            if step.kind != StepKind::Verify {
+                step.state = StepState::Done;
+            }
+        }
+        let cell = test_cell(&snapshot);
+        assert_eq!(cell.key.namespace, "completion");
+        assert!(cell.key.name.starts_with("check-pending/"));
+        assert_eq!(cell.payload_schema, "state.completion-check");
+        assert!(cell.payload_json.contains("check.run/"));
     }
 
     #[test]
