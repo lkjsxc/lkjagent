@@ -45,10 +45,10 @@ be hidden by a `completion:close-candidate` cell.
 ## Evidence Rows
 
 Each check result stores check name, parameters, pass flag, measured value or
-structured JSON, artifact refs when available, decision id when available, and
-timestamp. Bridge completion matches check names and parameters before accepting
-a row. Status, display, benchmarks, replay, and proof bundles read those rows
-rather than model prose.
+structured JSON, evidence fingerprint, decision id, artifact refs when
+available, and timestamp. Bridge completion matches check names and parameters
+and requires decision and evidence refs before accepting a row. Status, display,
+benchmarks, replay, and proof bundles read those rows rather than model prose.
 
 ## Stale Evidence
 

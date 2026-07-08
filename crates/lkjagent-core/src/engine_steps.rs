@@ -169,15 +169,14 @@ fn finish_verdict(
     index: usize,
     result: CheckResult,
 ) {
-    let passed = result.passed;
     snapshot.check_results.push(result.clone());
-    snapshot.steps[index].state = if passed {
-        StepState::Done
-    } else {
-        StepState::Active
-    };
+    snapshot.steps[index].state = StepState::Done;
+    if !result.passed {
+        snapshot.steps[index].state = StepState::Active;
+    }
     commands.push(Command::RecordChecks {
         step_id: snapshot.steps[index].id,
+        decision_id: None,
         results: vec![result],
     });
 }

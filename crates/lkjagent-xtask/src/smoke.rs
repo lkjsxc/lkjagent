@@ -69,7 +69,11 @@ fn replay_report(conn: &mut Connection, data: &Path) -> Result<(), String> {
     commit_commands(
         conn,
         1,
-        &[Command::RecordChecks { step_id, results }],
+        &[Command::RecordChecks {
+            step_id,
+            decision_id: None,
+            results,
+        }],
         "now",
     )
     .map_err(|e| e.to_string())?;

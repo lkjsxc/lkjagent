@@ -76,6 +76,8 @@ fn result(name: &str, passed: bool, measured: impl Into<String>) -> CheckResult 
     CheckResult {
         name: name.to_string(),
         params: None,
+        decision_id: None,
+        evidence_fingerprint: None,
         passed,
         measured: measured.into(),
     }

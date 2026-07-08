@@ -152,16 +152,18 @@ fn attempts(conn: &Connection, task_id: i64) -> StoreResult<Vec<Attempt>> {
 
 fn check_results(conn: &Connection, task_id: i64) -> StoreResult<Vec<CheckResult>> {
     let mut statement = conn.prepare(
-        "SELECT name, params_json, passed, measured FROM check_results
-         WHERE step_id IN (SELECT id FROM steps WHERE task_id = ?1) ORDER BY id",
+        "SELECT name, params_json, decision_id, evidence_fingerprint, passed, measured
+         FROM check_results WHERE step_id IN (SELECT id FROM steps WHERE task_id = ?1)
+         ORDER BY id",
     )?;
     let mapped = statement.query_map(params![task_id], |row| {
-        let params_json: String = row.get(1)?;
         Ok(CheckResult {
             name: row.get(0)?,
-            params: serde_json::from_str(&params_json).unwrap_or(None),
-            passed: row.get::<_, i64>(2)? != 0,
-            measured: row.get(3)?,
+            params: serde_json::from_str(&row.get::<_, String>(1)?).unwrap_or(None),
+            decision_id: row.get(2)?,
+            evidence_fingerprint: row.get(3)?,
+            passed: row.get::<_, i64>(4)? != 0,
+            measured: row.get(5)?,
         })
     })?;
     rows(mapped)

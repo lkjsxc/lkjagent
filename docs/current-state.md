@@ -156,16 +156,18 @@ runs the existing workspace-safe write edge, and a focused regression proves the
 file and artifact rows are created without endpoint output or bridge step
 execution.
 
-Bridge check results now carry their required check parameters in core state and
-through SQLite hydration. Completion requires a passed row whose check name and
-parameters match each required matter check, so unrelated or stale-by-parameter
-check rows cannot close file-work matters.
+Bridge check results now carry their required check parameters, decision id, and
+an evidence fingerprint over gathered workspace facts in core state and through
+SQLite hydration. Completion requires a passed row whose check name and
+parameters match each required matter check and whose decision id and evidence
+fingerprint are present, so unrelated or stale-by-parameter check rows cannot
+close file-work matters.
 
 ## Known Gaps
 
-- Check freshness remains bridge-limited: current check rows now match names and
-  parameters but do not yet carry decision ids or artifact fingerprints, so
-  broader freshness work remains for later state-ledger slices.
+- Check freshness remains bridge-limited: current check rows carry decision ids
+  and evidence fingerprints but do not yet reference concrete artifact row ids,
+  so broader artifact-freshness work remains for later state-ledger slices.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, blocked, active, pending, failed, or
   unsuperseded skipped bridge steps must prevent close candidates.
@@ -176,9 +178,9 @@ check rows cannot close file-work matters.
 
 ## Next Executable Step
 
-Implement the next completion-evidence slice: tie check rows to artifact or
-workspace fingerprints and decision ids, with docs, focused tests, quiet gates,
-and Docker verification.
+Implement the next completion-evidence slice: tie check rows to concrete
+artifact row ids and suppress stale passed-check cells when artifact fingerprints
+change, with docs, focused tests, quiet gates, and Docker verification.
 
 ## Honesty Rules
 

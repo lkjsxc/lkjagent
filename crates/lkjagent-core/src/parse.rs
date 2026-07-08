@@ -157,6 +157,8 @@ fn parse_verdict(body: &str) -> Result<CheckResult, ParseFault> {
     Ok(CheckResult {
         name: "judged".to_string(),
         params: None,
+        decision_id: None,
+        evidence_fingerprint: None,
         passed,
         measured: lines.collect::<Vec<_>>().join(" "),
     })

@@ -108,6 +108,8 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
             step_id INTEGER NOT NULL,
             name TEXT NOT NULL,
             params_json TEXT NOT NULL,
+            decision_id TEXT,
+            evidence_fingerprint TEXT,
             passed INTEGER NOT NULL,
             measured TEXT NOT NULL,
             created_at TEXT NOT NULL
@@ -162,6 +164,7 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
         ",
     )?;
     ensure_token_usage_columns(conn)?;
+    crate::plan_migrations::migrate_checks(conn)?;
     state_schema::setup(conn)
 }
 fn ensure_token_usage_columns(conn: &Connection) -> StoreResult<()> {

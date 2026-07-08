@@ -42,6 +42,7 @@ pub enum Command {
     },
     RecordChecks {
         step_id: u64,
+        decision_id: Option<String>,
         results: Vec<CheckResult>,
     },
     AddSteps(Vec<Step>),

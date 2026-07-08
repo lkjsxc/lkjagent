@@ -69,7 +69,17 @@ fn check_blocker(snapshot: &TaskSnapshot) -> Option<String> {
 }
 
 fn check_matches(result: &CheckResult, spec: &CheckSpec) -> bool {
-    result.passed && result.name == check_name(spec) && result.params.as_ref() == Some(spec)
+    let decision = result
+        .decision_id
+        .as_deref()
+        .is_some_and(|id| !id.is_empty());
+    let evidence =
+        matches!(spec, CheckSpec::Judged { .. }) || result.evidence_fingerprint.is_some();
+    result.passed
+        && decision
+        && evidence
+        && result.name == check_name(spec)
+        && result.params.as_ref() == Some(spec)
 }
 
 fn check_name(spec: &CheckSpec) -> &'static str {

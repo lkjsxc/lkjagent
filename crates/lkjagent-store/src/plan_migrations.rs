@@ -12,6 +12,11 @@ pub fn migrate(conn: &Connection) -> StoreResult<()> {
     ensure_column(conn, "queue", "route_transform_allowed", "INTEGER")
 }
 
+pub fn migrate_checks(conn: &Connection) -> StoreResult<()> {
+    ensure_column(conn, "check_results", "decision_id", "TEXT")?;
+    ensure_column(conn, "check_results", "evidence_fingerprint", "TEXT")
+}
+
 fn ensure_column(conn: &Connection, table: &str, column: &str, spec: &str) -> StoreResult<()> {
     if has_column(conn, table, column)? {
         return Ok(());

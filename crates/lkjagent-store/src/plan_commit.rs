@@ -59,15 +59,22 @@ fn persist_command(
         Command::RecordMemory { topic, content } => {
             insert_memory_tx(tx, topic, content, task_id, now)?;
         }
-        Command::RecordChecks { step_id, results } => {
+        Command::RecordChecks {
+            step_id,
+            decision_id,
+            results,
+        } => {
             for (index, result) in results.iter().enumerate() {
                 tx.execute(
-                    "INSERT INTO check_results (step_id, name, params_json, passed, measured,
-                     created_at) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+                    "INSERT INTO check_results (step_id, name, params_json, decision_id,
+                     evidence_fingerprint, passed, measured, created_at)
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
                     params![
                         *step_id as i64,
                         result.name,
                         check_params(snapshot, *step_id, index)?,
+                        result.decision_id.as_ref().or(decision_id.as_ref()),
+                        result.evidence_fingerprint.as_ref(),
                         i64::from(result.passed),
                         result.measured,
                         now

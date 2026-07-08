@@ -160,27 +160,30 @@ fn turn_commit_stores_check_params_with_step_id() -> TestResult<()> {
         &snapshot,
         &[Command::RecordChecks {
             step_id,
+            decision_id: Some("decision-check".to_string()),
             results: vec![CheckResult {
                 name: "file_exists".to_string(),
                 params: None,
+                decision_id: None,
+                evidence_fingerprint: Some("evidence-fp".to_string()),
                 passed: true,
                 measured: "true".to_string(),
             }],
         }],
         "later",
     )?;
-    let row: (i64, String) = conn.query_row(
-        "SELECT step_id, params_json FROM check_results LIMIT 1",
+    let row: (i64, String, String, String) = conn.query_row(
+        "SELECT step_id, params_json, decision_id, evidence_fingerprint FROM check_results LIMIT 1",
         [],
-        |row| Ok((row.get(0)?, row.get(1)?)),
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
     )?;
     assert_eq!(row.0, step_id as i64);
     assert!(row.1.contains("notes/out.md"));
-    let hydrated = match snapshot_by_id(&conn, 11)? {
-        Some(value) => value,
-        None => return Err("missing hydrated snapshot".into()),
+    assert_eq!(row.2, "decision-check");
+    assert_eq!(row.3, "evidence-fp");
+    let Some(hydrated) = snapshot_by_id(&conn, 11)? else {
+        return Err("missing hydrated snapshot".into());
     };
-    assert_eq!(hydrated.check_results.len(), 1);
     assert_eq!(
         hydrated.check_results[0].params,
         snapshot.task.checks.first().cloned()

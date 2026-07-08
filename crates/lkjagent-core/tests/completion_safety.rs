@@ -99,6 +99,8 @@ fn check_result(spec: CheckSpec) -> CheckResult {
     CheckResult {
         name: "file_exists".to_string(),
         params: Some(spec),
+        decision_id: Some("decision-check".to_string()),
+        evidence_fingerprint: Some("evidence-fp".to_string()),
         passed: true,
         measured: "true".to_string(),
     }

@@ -20,6 +20,7 @@ pub(crate) fn handle_checks(
         .map(|spec| {
             let mut result = evaluate(spec, files, command_facts);
             result.params = Some(spec.clone());
+            result.evidence_fingerprint = evidence_fingerprint(spec, files, command_facts, &result);
             result
         })
         .collect::<Vec<_>>();
@@ -27,6 +28,7 @@ pub(crate) fn handle_checks(
     snapshot.check_results.extend(results.clone());
     commands.push(Command::RecordChecks {
         step_id,
+        decision_id: None,
         results: results.clone(),
     });
     if passed {
@@ -40,6 +42,30 @@ pub(crate) fn handle_checks(
     } else {
         handle_failed(snapshot, commands, index, files, &results);
     }
+}
+
+fn evidence_fingerprint(
+    spec: &crate::model::CheckSpec,
+    files: &[FileFact],
+    commands: &[CommandFact],
+    result: &crate::model::CheckResult,
+) -> Option<String> {
+    let files = files
+        .iter()
+        .map(|fact| serde_json::json!({"path": fact.path, "content": fact.content}))
+        .collect::<Vec<_>>();
+    let commands = commands
+        .iter()
+        .map(|fact| serde_json::json!({"cmd": fact.cmd, "success": fact.success}))
+        .collect::<Vec<_>>();
+    crate::runtime_fingerprint::stable_fingerprint(&serde_json::json!({
+        "spec": spec,
+        "files": files,
+        "commands": commands,
+        "passed": result.passed,
+        "measured": result.measured,
+    }))
+    .ok()
 }
 
 fn feed_next_step(

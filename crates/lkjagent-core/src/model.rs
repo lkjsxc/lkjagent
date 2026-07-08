@@ -150,6 +150,10 @@ pub struct CheckResult {
     pub name: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub params: Option<CheckSpec>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub decision_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub evidence_fingerprint: Option<String>,
     pub passed: bool,
     pub measured: String,
 }
