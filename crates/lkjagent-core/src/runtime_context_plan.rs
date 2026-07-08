@@ -42,9 +42,13 @@ pub fn select_context_plan(
         excluded: Vec::new(),
         lanes: Vec::new(),
     };
+    let mut seen = BTreeSet::new();
     for item in items {
         match suppression_reason(item, &conflict_keys) {
             Some(reason) => plan.excluded.push(plan_entry(item, &reason)),
+            None if !seen.insert(dedup_key(item)) => {
+                plan.excluded.push(plan_entry(item, "duplicate-context"));
+            }
             None => plan.included.push(plan_entry(item, "clean-current")),
         }
     }
@@ -105,6 +109,13 @@ fn lane(
 
 fn lane_fingerprint(plan: &ContextLanePlan) -> String {
     stable_fingerprint(plan).unwrap_or_else(|error| format!("fingerprint-error:{}", error.message))
+}
+
+fn dedup_key(item: &ContextItem) -> String {
+    format!(
+        "{}\n{}\n{}\n{}",
+        item.semantic_key, item.body, item.source_type, item.source_fingerprint
+    )
 }
 
 fn plan_entry(item: &ContextItem, reason: &str) -> ContextPlanEntry {

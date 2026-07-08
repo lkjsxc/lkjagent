@@ -14,11 +14,11 @@ never quoted back, except through bounded recovery-only diagnoses.
 
 Prompt assembly consumes the persisted decision id, expected envelope,
 `ToolSetView`, context item selection, named context lanes, active state
-payloads, retry or recovery policy, profile names, and budget caps. Candidates
-are deduplicated by semantic key and fingerprint before rendering. The resulting
-`PromptFrame` stores the decision id, prompt fingerprint, context-frame
-fingerprint, tool-view fingerprint, card plan, compact included and excluded
-context id reasons, and body or body refs.
+payloads, retry or recovery policy, profile names, and budget caps. Clean
+candidates are deduplicated by semantic key, body, source type, and source
+fingerprint before rendering. The resulting `PromptFrame` stores the decision
+id, prompt fingerprint, context-frame fingerprint, tool-view fingerprint, card
+plan, compact included and excluded context id reasons, and body or body refs.
 
 ## Layout
 

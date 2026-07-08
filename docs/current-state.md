@@ -66,11 +66,12 @@ inspection, unsupported system operations, direct records, ambiguous inbox
 routing, and Japanese diary or save wording.
 
 Prompt context can admit bounded workspace record and index metadata with source
-fingerprints. Default explore tool views exclude `shell.run`; shell is available
-only through an explicit persisted shell-capable decision view. Unsafe XML-like
-tool actions persist rejections. Status and proof surfaces expose cached token
-usage, blocked counts, stale-edge counts, prompt frames, tool-view fingerprints,
-artifact refs, check refs, and proof rows.
+fingerprints and suppress duplicate clean context items by semantic key, body,
+source type, and source fingerprint. Default explore tool views exclude
+`shell.run`; shell is available only through an explicit persisted shell-capable
+decision view. Unsafe XML-like tool actions persist rejections. Status and proof
+surfaces expose cached token usage, blocked counts, stale-edge counts, prompt
+frames, tool-view fingerprints, artifact refs, check refs, and proof rows.
 
 The terminal workbench has a pure reducer, durable transcript stream, Japanese
 and grapheme-aware composer operations, append and pane modes, row-backed status
@@ -93,8 +94,8 @@ had no workspace records, artifacts, check results, admissions, or observations.
 - Tool-view selection still needs broader state-by-state coverage, but focused
   tests now prove the default explore prompt hides shell and explicit shell views
   still admit shell with contamination tracking.
-- Prompt context still needs packet-level deduplication, non-JSON rendering, and
-  failed-output containment evidence.
+- Prompt context still needs packet-level no-JSON rendering and failed-output
+  containment evidence beyond focused duplicate-context coverage.
 - TUI duplicate suppression and bottom-follow behavior need packet-level
   focused tests and evidence.
 - Deterministic replay, quiet verify, Docker Compose verify, and live or

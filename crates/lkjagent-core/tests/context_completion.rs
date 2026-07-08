@@ -45,6 +45,22 @@ fn context_plan_records_inclusion_and_suppression_reasons() {
 }
 
 #[test]
+fn context_plan_suppresses_duplicate_clean_items() {
+    let first = ContextItem::clean_fact("item-1", "root", "stories/a");
+    let mut duplicate = ContextItem::clean_fact("item-2", "root", "stories/a");
+    duplicate.source_type = first.source_type.clone();
+    duplicate.source_fingerprint = first.source_fingerprint.clone();
+    let distinct = ContextItem::clean_fact("item-3", "root", "stories/a v2");
+
+    let plan = select_context_plan(&[first, duplicate, distinct], &[]);
+
+    assert_eq!(plan.included.len(), 2);
+    assert_eq!(plan.excluded.len(), 1);
+    assert_eq!(plan.excluded[0].item_id, "item-2");
+    assert_eq!(plan.excluded[0].reason, "duplicate-context");
+}
+
+#[test]
 fn completion_requires_fresh_matching_evidence() {
     let requirement = CompletionRequirement {
         check_name: "links_resolve".to_string(),
