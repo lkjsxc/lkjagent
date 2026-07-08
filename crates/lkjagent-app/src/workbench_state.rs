@@ -21,12 +21,19 @@ impl WorkbenchMode {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Viewport {
+    Follow,
+    Manual { top_line: usize },
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UiState {
     pub mode: WorkbenchMode,
     pub refreshes: u64,
     pub scroll: usize,
     pub follow: bool,
+    pub viewport: Viewport,
     pub width: u16,
     pub height: u16,
     pub latest: String,
@@ -40,6 +47,7 @@ impl UiState {
             refreshes: 0,
             scroll: 0,
             follow: true,
+            viewport: Viewport::Follow,
             width: 100,
             height: 30,
             latest: String::new(),
@@ -64,64 +72,91 @@ pub fn reduce(mut state: UiState, event: UiEvent) -> UiState {
         UiEvent::Refresh(body) => {
             state.latest = body;
             state.refreshes = state.refreshes.saturating_add(1);
+            normalize_viewport(&mut state);
         }
-        UiEvent::Mode(mode) => {
-            state.mode = mode;
-        }
-        UiEvent::Scroll(delta) => {
-            state.follow = false;
-            state.scroll = scroll(state.scroll, delta);
-        }
-        UiEvent::Top => {
-            state.follow = false;
-            state.scroll = 0;
-        }
+        UiEvent::Mode(mode) => state.mode = mode,
+        UiEvent::Scroll(delta) => scroll_viewport(&mut state, delta),
+        UiEvent::Top => set_viewport(&mut state, Viewport::Manual { top_line: 0 }),
         UiEvent::Follow(enabled) => {
-            state.follow = enabled;
-            if enabled {
-                state.scroll = 0;
-            }
+            let viewport = if enabled {
+                Viewport::Follow
+            } else {
+                Viewport::Manual {
+                    top_line: state.scroll,
+                }
+            };
+            set_viewport(&mut state, viewport);
         }
         UiEvent::Search(query) => {
             state.search = query;
-            state.follow = false;
+            let top_line = state.scroll;
+            set_viewport(&mut state, Viewport::Manual { top_line });
         }
         UiEvent::Resize { width, height } => {
             state.width = width.max(40);
             state.height = height.max(10);
+            normalize_viewport(&mut state);
         }
     }
     state
 }
 
-fn scroll(current: usize, delta: isize) -> usize {
-    if delta.is_negative() {
+pub fn visible_height(state: &UiState) -> usize {
+    (state.height.saturating_sub(12) as usize).max(1)
+}
+
+fn scroll_viewport(state: &mut UiState, delta: isize) {
+    let max_top = max_top_line(state);
+    let current = match state.viewport {
+        Viewport::Follow => max_top,
+        Viewport::Manual { top_line } => top_line.min(max_top),
+    };
+    let next = if delta.is_negative() {
         current.saturating_sub(delta.unsigned_abs())
     } else {
         current.saturating_add(delta as usize)
+    };
+    if !delta.is_negative() && next >= max_top {
+        set_viewport(state, Viewport::Follow);
+    } else {
+        set_viewport(
+            state,
+            Viewport::Manual {
+                top_line: next.min(max_top),
+            },
+        );
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+fn normalize_viewport(state: &mut UiState) {
+    let max_top = max_top_line(state);
+    let viewport = match state.viewport {
+        Viewport::Follow => Viewport::Follow,
+        Viewport::Manual { top_line } => Viewport::Manual {
+            top_line: top_line.min(max_top),
+        },
+    };
+    set_viewport(state, viewport);
+}
 
-    #[test]
-    fn reducer_tracks_mode_refresh_and_scroll() {
-        let state = UiState::new(WorkbenchMode::Append);
-        let state = reduce(state, UiEvent::Refresh("body".to_string()));
-        let state = reduce(state, UiEvent::Mode(WorkbenchMode::Pane));
-        let state = reduce(state, UiEvent::Scroll(4));
-        let state = reduce(state, UiEvent::Scroll(-1));
-        let state = reduce(state, UiEvent::Top);
-        let state = reduce(state, UiEvent::Follow(true));
-        let state = reduce(state, UiEvent::Search("daemon".to_string()));
-
-        assert_eq!(state.mode, WorkbenchMode::Pane);
-        assert_eq!(state.refreshes, 1);
-        assert_eq!(state.scroll, 0);
-        assert!(!state.follow);
-        assert_eq!(state.search, "daemon");
-        assert_eq!(state.latest, "body");
+fn set_viewport(state: &mut UiState, viewport: Viewport) {
+    state.viewport = viewport;
+    match viewport {
+        Viewport::Follow => {
+            state.follow = true;
+            state.scroll = 0;
+        }
+        Viewport::Manual { top_line } => {
+            state.follow = false;
+            state.scroll = top_line;
+        }
     }
+}
+
+fn max_top_line(state: &UiState) -> usize {
+    state
+        .latest
+        .lines()
+        .count()
+        .saturating_sub(visible_height(state))
 }

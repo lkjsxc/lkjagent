@@ -184,7 +184,7 @@ mod tests {
 
         let text = String::from_utf8(output)?;
         assert!(text.contains("workbench: mode=pane"));
-        assert!(text.contains("workbench: scroll=1"));
+        assert!(text.contains("workbench: scroll=0"));
         assert!(text.contains("workbench: follow=true"));
         assert!(text.contains("workbench: search=daemon"));
         assert!(text.contains("== workbench pane refresh"));

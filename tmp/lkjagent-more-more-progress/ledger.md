@@ -28,6 +28,9 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Commit 80e080db (`feat: track tui transcript identity`) adds stable transcript
   entry ids, agent draft accumulation, id-based durable/session merge, and saved
   transcript ids/source paths.
+- Pending viewport slice adds a `Viewport::Follow`/`Viewport::Manual` state,
+  scroll-down follow restoration, manual-top preservation, and pane rendering
+  that uses the viewport height helper without adding a product source file.
 
 ## Tests Added
 - `crates/lkjagent-core/tests/owner_turn.rs::ambiguous_save_like_turns_route_to_inbox`.
@@ -41,6 +44,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Added `crates/lkjagent-app/tests/tui_transcript_identity.rs` for streaming
   delta commit, identical text with different ids, durable override by id, and
   saved ids/source paths.
+- Added workbench viewport reducer tests for scroll-down follow restoration and
+  manual-top preservation after refresh.
 
 ## Commands Run
 - `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs`.
@@ -102,6 +107,15 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Commit 88075ff6 (`test: cover workbench bottom follow`) added pane
   bottom-follow and manual-scroll growth coverage; `cargo test -p lkjagent-app
   --lib workbench_render::tests` -> 3 passed.
+- `cargo test -p lkjagent-app --test workbench_viewport` -> 3 passed after
+  adding viewport state and scroll-down follow restoration.
+- `cargo test -p lkjagent-app --lib workbench_render::tests` -> 3 passed after
+  switching pane height to the viewport helper.
+- `cargo test -p lkjagent-app --lib workbench_line::tests::mode_command_switches_to_pane_renderer`
+  -> 1 passed after updating the scroll-at-bottom expectation.
+- `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after keeping the
+  viewport helper inside existing source-file budget.
+- `docker compose run --rm verify` -> `ok verify` after the viewport slice.
 - `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs` after the
   bottom-follow test slice.
 - `cargo run -p lkjagent-xtask -- check-lines` -> `ok check-lines` after the
@@ -122,6 +136,11 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Initial post-slice `cargo run -p lkjagent-xtask -- quiet verify` failed in
   `doctor_reports_schema_and_safe_warnings` because the new CLI scaffold removes
   the missing-workspace warning; updated the test and reran successfully.
+- Initial viewport `cargo run -p lkjagent-xtask -- quiet verify` failed because a
+  new product source file exceeded the file budget; inlined the helper and moved
+  tests to an integration test.
+- `cargo test -p lkjagent-app --lib workbench_line::tests::mode_command_switches_to_pane_renderer workbench_render::tests`
+  failed because cargo accepts only one test filter; reran the filters separately.
 
 ## Evidence Files
 - Packet indexed from tmp/lkjagent-more-more-thinking-20260708.
@@ -144,8 +163,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - XML-like action grammar and admission have focused tests: open.
 - Recovery states handle parse, admission, effect, endpoint, and check failures: open.
 - TUI duplicate and bottom-follow regressions have tests: transcript identity,
-  duplicate-by-id, and pane bottom-follow focused tests passed; reducer-level
-  re-enable-follow coverage remains open.
+  duplicate-by-id, pane bottom-follow, and reducer-level re-enable-follow
+  focused tests passed.
 - Deterministic replay passes: open.
 - Quiet verify passes: open.
 - Docker Compose verify passes or honest skip committed: open.
@@ -160,4 +179,5 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Address artifact/check proof gaps and remaining recovery/no-JSON acceptance items.
+Commit the viewport slice, then address artifact/check proof gaps and remaining
+recovery/no-JSON acceptance items.

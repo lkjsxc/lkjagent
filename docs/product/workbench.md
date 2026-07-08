@@ -65,9 +65,9 @@ context-resolution, record, or other row-backed command paths.
 ## Evidence
 
 Tests cover parser routing, reducer mode changes, line handling, closed-input
-exit, grapheme cursor movement, pane scroll and follow state, pane bottom
-anchoring after growth, agent delta draft commit, durable transcript merge,
-duplicate suppression by stable row identity, saved ids and source paths, status
-rail fallback fields, and bounded rendering. Interactive behavior is proven by
-captured command logs under `tmp/agent-runs/` or `tmp/live-runs/`, with
-unavailable terminals recorded as an honest skip.
+exit, grapheme cursor movement, pane scroll and follow state, scroll-down follow
+restoration, pane bottom anchoring after growth, agent delta draft commit,
+durable transcript merge, duplicate suppression by stable row identity, saved
+ids and source paths, status rail fallback fields, and bounded rendering.
+Interactive behavior is proven by captured command logs under `tmp/agent-runs/`
+or `tmp/live-runs/`, with unavailable terminals recorded as an honest skip.

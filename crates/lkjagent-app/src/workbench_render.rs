@@ -1,4 +1,4 @@
-use crate::workbench_state::{UiState, WorkbenchMode};
+use crate::workbench_state::{visible_height, UiState, WorkbenchMode};
 
 const CAP: usize = 12_000;
 
@@ -29,7 +29,12 @@ fn render_pane(state: &UiState) -> String {
         .collect::<Vec<_>>()
         .join("\n\n");
     let transcript = filter_search(&transcript, &state.search);
-    let left = window(&transcript, state.scroll, state.follow, 18);
+    let left = window(
+        &transcript,
+        state.scroll,
+        state.follow,
+        visible_height(state),
+    );
     let right = sections
         .iter()
         .find(|(name, _)| *name == "status")
