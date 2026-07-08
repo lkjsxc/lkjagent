@@ -151,11 +151,8 @@ fn attempts(conn: &Connection, task_id: i64) -> StoreResult<Vec<Attempt>> {
 }
 
 fn check_results(conn: &Connection, task_id: i64) -> StoreResult<Vec<CheckResult>> {
-    let mut statement = conn.prepare(
-        "SELECT name, params_json, decision_id, evidence_fingerprint, artifact_refs_json,
-         passed, measured FROM check_results
-         WHERE step_id IN (SELECT id FROM steps WHERE task_id = ?1) ORDER BY id",
-    )?;
+    let sql = "SELECT cr.name, cr.params_json, cr.decision_id, cr.evidence_fingerprint, cr.artifact_refs_json, cr.passed, cr.measured FROM check_results cr WHERE cr.step_id IN (SELECT id FROM steps WHERE task_id = ?1) AND (cr.passed = 0 OR EXISTS (SELECT 1 FROM state_cells sc WHERE sc.case_id = CAST(?1 AS TEXT) AND sc.key_label = 'completion:check-passed/' || cr.step_id || '/' || cr.id AND sc.status = 'Active')) ORDER BY cr.id";
+    let mut statement = conn.prepare(sql)?;
     let mapped = statement.query_map(params![task_id], |row| {
         Ok(CheckResult {
             name: row.get(0)?,

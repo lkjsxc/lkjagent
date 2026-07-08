@@ -174,11 +174,11 @@ passed with `missing: none`. Bounded live profiles ran with exchange evidence.
 Native model-free effects support `workspace.write_text` and
 `workspace.append_text`, both path-checked and persisted as artifact rows.
 Deterministic verify projects `completion:check-pending/<step>` carrying
-`check.run/<step>`; check rows emit native outcome cells with evidence refs.
+`check.run/<step>`; hydration suppresses passed rows lacking native outcome cells.
 
 ## Known Gaps
 
-- Closure still reads transitional check rows while native outcome cells mature.
+- Closure still reads transitional check rows after native hydration admits them.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, unsafe bridge steps must block close candidates.
 - Native operation execution remains limited to state resolution, workspace text
@@ -186,8 +186,8 @@ Deterministic verify projects `completion:check-pending/<step>` carrying
 
 ## Next Executable Step
 
-Implement next bridge-retirement: read native completion evidence without
-trusting stale or bridge-only rows.
+Implement next bridge-retirement: reduce remaining model and close-candidate
+projection from plan-family bridge rows.
 
 ## Honesty Rules
 
