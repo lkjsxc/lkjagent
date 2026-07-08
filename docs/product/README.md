@@ -17,10 +17,11 @@ and record surfaces, status, console, and workbench.
 
 ## Product Architecture
 
-The product is workspace-first. The owner sees one readable workspace plus
-matter, record, artifact, transcript, status, and proof surfaces. SQLite rows and
-persisted `RuntimeDecision` rows remain the authority for routing, effects, and
-completion.
+The product is workspace-first. The owner sees one readable workspace that acts
+as an auxiliary memory device: daily records, calendar notes, TODOs, finance,
+project work, artifacts, transcripts, indexes, and proof bundles are inspectable
+without asking the agent. SQLite rows and persisted `RuntimeDecision` rows remain
+the authority for routing, effects, recovery, and completion.
 
 Every owner turn leaves workspace evidence. Ordinary conversation appends a
 durable transcript entry. Ambiguous save-like text writes an inbox trace or asks
@@ -33,12 +34,15 @@ writes row, history, fingerprint, README, index artifact, state-cell, and queue
 route evidence.
 
 Model-dependent work uses selected runtime state. The prompt shows bounded
-source-linked context, the selected XML-like envelope, and only the tools
-admissible for that decision. It does not show the global tool catalog, ask for
-JSON, or let model prose decide completion.
+source-linked context, the selected attribute-less XML-like envelope, and only
+the tools admissible for that decision. It does not show the global tool catalog,
+ask for JSON, or let model prose decide completion. Artifact success requires a
+file, artifact row, check row, and response path evidence. Earlier blocked,
+active, failed, pending, or unsuperseded skipped work blocks later response work
+until recovery or supersession evidence exists.
 
 ## Product Units
 
 The owner sees turns, matters, records, artifacts, transcripts, decisions,
-events, and proof. Plan-family rows may appear only as bridge evidence until
-removed from the implementation.
+events, and proof. Plan-family rows are internal evidence only; they are never a
+second owner-facing task contract or completion authority.

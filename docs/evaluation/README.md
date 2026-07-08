@@ -5,6 +5,14 @@
 Define deterministic benchmarks, recorded replay, scripted daily-use campaigns,
 and the live proof contract.
 
+## Acceptance Posture
+
+Acceptance evidence is committed as raw or bounded proof under `tmp/agent-runs/`
+or `tmp/live-runs/` when a campaign runs. If an endpoint or terminal is
+unavailable, the run writes an honest skip file with the exact command and reason
+instead of a pass. Deterministic gates and Docker Compose verification are rerun
+after source changes before final claims.
+
 ## Table of Contents
 
 - [benchmarks.md](benchmarks.md): corpus records and judges as checks.

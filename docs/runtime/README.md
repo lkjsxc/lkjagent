@@ -14,7 +14,14 @@ recovery, and completion.
 - [artifact-units.md](artifact-units.md): small generation units,
   deterministic assembly, artifact manifests, and artifact-fingerprint checks.
 
+## Runtime Contract
+
+Each cycle projects fresh durable state before choosing work. Earlier blocked,
+active, failed, pending, or unsuperseded skipped cells are preflight blockers for
+later model response work. Recovery or supersession evidence must settle the
+blocker before the selector can project a happy response or close candidate.
+
 ## Failure This Prevents
 
-Prompt rendering, tool admission, effect dispatch, and resume all use the same
-persisted authority row for a turn.
+Prompt rendering, tool admission, effect dispatch, recovery, resume, and
+completion all use the same persisted authority row for a turn.

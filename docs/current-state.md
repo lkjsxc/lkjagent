@@ -93,10 +93,11 @@ transcript merge, saved transcript ids and source paths, Japanese and
 grapheme-aware composer operations, append and pane modes, row-backed status
 fallbacks, and focused coverage for transcript merge and rendering surfaces.
 
-Baseline commands in this work session passed `cargo run -p lkjagent-xtask --
-check-docs`, `cargo run -p lkjagent-xtask -- quiet verify`, and `docker compose
-run --rm verify`. Packet static scripts require `python3`; the checked data DB
-had no workspace records, artifacts, check results, admissions, or observations.
+Baseline commands for the 2026-07-08 packet passed `cargo run -p
+lkjagent-xtask -- check-docs`, `cargo run -p lkjagent-xtask -- quiet verify`,
+and `docker compose run --rm verify`. Packet static scripts ran with `python3`.
+The checked data DB had workspace_records=1, workspace_record_history=2,
+artifacts=6, check_results=0, tool_admissions=5, and observations=5.
 
 ## Known Gaps
 
@@ -120,9 +121,9 @@ had no workspace records, artifacts, check results, admissions, or observations.
 
 ## Next Executable Step
 
-Make the docs-first product architecture commit, then implement focused source
-slices with tests and gate evidence until the packet acceptance matrix is fully
-checked in the progress ledger.
+Commit this docs-first product architecture update, then implement the earlier
+blocked-step guard with a focused regression before continuing through the
+workspace, context, tool, recovery, TUI, and evaluation worktracks.
 
 ## Honesty Rules
 

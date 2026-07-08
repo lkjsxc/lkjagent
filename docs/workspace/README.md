@@ -19,15 +19,18 @@ ledger.
 ## Core Contract
 
 The workspace is the local file tree the owner can read and edit as auxiliary
-memory. SQLite is the runtime ledger and decision authority. Records,
-transcripts, inbox traces, artifacts, indexes, state cells, edges, checks, and
-proof rows reference each other through stable ids and fingerprints. Neither
-files nor prose prompts become a second control plane.
+memory. The default root is `data/workspace`; configuration or Docker may expose
+the same contract as a plain `workspace/` directory. SQLite is the runtime ledger
+and decision authority. Records, transcripts, inbox traces, artifacts, indexes,
+state cells, edges, checks, and proof rows reference each other through stable ids
+and fingerprints. Neither files nor prose prompts become a second control plane.
 
 ## Write-Through Rule
 
-Anything the owner asks lkjagent to record is written under `data/workspace` by
-default. `send` and daemon intake ensure the workspace root exists and every
-owner turn writes either transcript evidence or an inbox trace. A successful
-recording report names the path, fingerprint, record id, and index state. A
-failure report says no file was written and records the reason.
+Anything the owner asks lkjagent to record is written under the configured
+workspace root before success is reported. `send` and daemon intake ensure the
+workspace root exists and every owner turn writes either transcript evidence or
+an inbox trace. A successful recording report names the path, fingerprint, record
+id, and index state. A failure report says no file was written and records the
+reason. Artifact-like turns are not successful until the artifact file, artifact
+row, check row, and final response path evidence all exist.

@@ -25,7 +25,9 @@ workspace evidence, and runtime state.
 
 Context renders as compact XML-like cards with source handles, lane names, and
 fingerprints. It does not dump JSON blobs, whole transcripts, raw failed model
-output, duplicate objective text, or unbounded workspace files.
+output, duplicate objective text, or unbounded workspace files. Flat JSON may
+exist only in data configuration or internal exchange storage; model context uses
+source-linked prose and attribute-less XML-like cards.
 
 ## Failure This Prevents
 
