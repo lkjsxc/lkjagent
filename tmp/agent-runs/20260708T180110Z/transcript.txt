@@ -1,0 +1,54 @@
+# Campaign 20260708T180110Z
+
+## Static
+files 1419
+lines 60149
+largest
+438	tmp/coding-agent-runs/20260707T080318Z-workspace-runtime-redesign/repository-baseline.md
+425	tmp/coding-agent-runs/20260707T080318Z-workspace-runtime-redesign/baseline.md
+201	crates/lkjagent-xtask/src/proof_state.rs
+201	crates/lkjagent-core/src/engine.rs
+200	crates/lkjagent-xtask/src/experiment_protocol.rs
+200	crates/lkjagent-llm/src/wire/response.rs
+200	crates/lkjagent-core/src/engine_steps.rs
+200	crates/lkjagent-app/src/model_call.rs
+199	crates/lkjagent-xtask/src/doc_crate_readmes.rs
+199	crates/lkjagent-store/tests/plan_store.rs
+199	crates/lkjagent-store/src/plan_schema.rs
+199	crates/lkjagent-core/src/runtime_candidate.rs
+199	crates/lkjagent-core/src/engine_extend.rs
+198	crates/lkjagent-xtask/src/experiment_live.rs
+198	crates/lkjagent-core/tests/render.rs
+197	crates/lkjagent-store/src/queue_access.rs
+197	crates/lkjagent-store/src/plan_hydrate.rs
+197	crates/lkjagent-core/tests/runtime_selector.rs
+197	crates/lkjagent-core/tests/generic_flow.rs
+197	crates/lkjagent-app/src/workbench_render.rs
+196	crates/lkjagent-xtask/src/doc_catalog.rs
+196	crates/lkjagent-core/src/render.rs
+195	crates/lkjagent-core/src/workspace_manifest.rs
+195	crates/lkjagent-core/src/templates.rs
+195	crates/lkjagent-app/tests/queue_routing.rs
+194	crates/lkjagent-core/tests/state_runtime.rs
+194	crates/lkjagent-app/tests/state_key_settlement.rs
+194	crates/lkjagent-app/src/workbench_line.rs
+194	crates/lkjagent-app/src/tui_view.rs
+193	crates/lkjagent-store/src/state_schema.rs
+193	crates/lkjagent-app/src/daemon_intake.rs
+192	crates/lkjagent-xtask/src/proof.rs
+192	crates/lkjagent-core/src/runtime_tool_call.rs
+192	crates/lkjagent-core/src/engine_completion.rs
+191	crates/lkjagent-core/tests/tool_call.rs
+191	crates/lkjagent-app/src/turn_effects.rs
+190	tmp/agent-runs/20260708T143432Z-amplified-packet/subagents/state-recovery.md
+189	crates/lkjagent-store/src/plan_commit.rs
+189	crates/lkjagent-app/tests/app.rs
+188	crates/lkjagent-store/tests/state_ledger.rs
+missing docs readmes
+
+## Gates
+ok check-docs
+ok verify
+
+## Workspace Probe
+unknown command: --

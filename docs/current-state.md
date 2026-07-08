@@ -94,37 +94,36 @@ transcript merge, saved transcript ids and source paths, Japanese and
 grapheme-aware composer operations, append and pane modes, row-backed status
 fallbacks, and focused coverage for transcript merge and rendering surfaces.
 
-Baseline commands for the 2026-07-08 packet passed `cargo run -p
-lkjagent-xtask -- check-docs`, `cargo run -p lkjagent-xtask -- quiet verify`,
-and `docker compose run --rm verify`. Packet static scripts ran with `python3`.
-The checked data DB had workspace_records=1, workspace_record_history=2,
-artifacts=6, check_results=0, tool_admissions=5, and observations=5.
+Baseline and post-change commands for the 2026-07-08 packet passed `cargo run
+-p lkjagent-xtask -- check-docs`, `cargo run -p lkjagent-xtask -- quiet
+verify`, and `docker compose run --rm verify`. Packet static scripts ran with a
+`python3` shim for `python`. The checked data DB had workspace_records=1,
+workspace_record_history=2, artifacts=6, check_results=0, tool_admissions=5,
+and observations=5.
+
+Focused acceptance evidence now covers owner record writes, transcript traces,
+artifact files and response-path gating, blocked-step preflight, prompt-context
+non-JSON suppression, state-selected tool views, XML action parsing and
+admission, recovery failures, and TUI transcript identity and follow behavior.
+Scripted evidence under `tmp/agent-runs/20260708T180141Z/` records the workspace
+probe, protocol experiment matrix, and proof bundle. Live endpoint profiles under
+`tmp/live-runs/20260708T180320Z/` are honest skips because endpoint input was
+intentionally absent.
 
 ## Known Gaps
 
-- Current acceptance still needs broad daily-use campaign evidence across
-  journal, todo, calendar, finance, notes, artifacts, questions, project work,
-  TUI, and recovery flows.
-- Artifact creation has focused proof for file, artifact row, check row, and
-  response-path gating; broad packet-level campaign proof is still open.
-- Recovery state coverage has focused parse, admission, effect, endpoint, and
-  check failure proof; broad campaign recovery proof remains open.
-- Tool-view selection still needs broader state-by-state coverage, but focused
-  tests now prove the default explore prompt hides shell and explicit shell views
-  still admit shell with contamination tracking.
-- Prompt context still needs packet-level failed-output containment evidence
-  beyond focused duplicate-context and JSON-like suppression coverage.
-- TUI transcript identity, draft accumulation, id-based merge, pane bottom
-  anchoring, manual-scroll preservation, and scroll-down follow restoration now
-  have focused coverage.
-- Deterministic replay, quiet verify, Docker Compose verify, and live or
-  scripted campaigns must run again after source changes before final claims.
+- Scripted workspace evidence covers todo, note, transcript, index, proof, and
+  blocked artifact-request behavior; a full live endpoint daily-use run remains
+  skipped until endpoint configuration is present.
+- TUI behavior is proven by reducer and transcript tests, not an interactive
+  terminal capture in this environment.
+- The worktree still contains preexisting dirty `data/logs` deletions and
+  untracked `data/` runtime files that are not part of this packet.
 
 ## Next Executable Step
 
-Continue through workspace, context, tool, recovery, TUI, and evaluation
-worktracks. Re-run deterministic replay, quiet verify, Docker Compose verify,
-and daily-use campaigns after source changes before final claims.
+Commit the current-state and evidence ledger, preserving exact command evidence
+and residual risks for the final handoff.
 
 ## Honesty Rules
 
