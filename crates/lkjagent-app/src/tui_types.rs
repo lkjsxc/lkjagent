@@ -62,8 +62,10 @@ pub enum TranscriptSource {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TranscriptEntry {
+    pub id: String,
     pub source: TranscriptSource,
     pub text: String,
+    pub path: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -77,6 +79,7 @@ pub struct TuiModel {
     pub composer: String,
     pub composer_cursor: usize,
     pub transcript: Vec<TranscriptEntry>,
+    pub agent_draft: Option<TranscriptEntry>,
     pub active_pane: TuiPane,
     pub palette_open: bool,
     pub follow: bool,
@@ -87,6 +90,7 @@ pub struct TuiModel {
     pub pending_tool: Option<ToolCard>,
     pub last_error: Option<String>,
     pub search: String,
+    pub next_entry_seq: u64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -107,6 +111,7 @@ impl TuiModel {
             composer: String::new(),
             composer_cursor: 0,
             transcript: Vec::new(),
+            agent_draft: None,
             active_pane: TuiPane::Transcript,
             palette_open: false,
             follow: true,
@@ -117,6 +122,7 @@ impl TuiModel {
             pending_tool: None,
             last_error: None,
             search: String::new(),
+            next_entry_seq: 1,
         }
     }
 }

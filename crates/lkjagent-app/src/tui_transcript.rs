@@ -1,7 +1,11 @@
+use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 use crate::tui_snapshot::TuiSnapshot;
-use crate::tui_types::{pane_label, run_state_label, source_label, TuiModel};
+use crate::tui_types::{
+    pane_label, run_state_label, source_label, TranscriptEntry, TranscriptSource, TuiModel,
+    TuiRunState,
+};
 
 pub fn save(data_dir: &Path, model: &TuiModel, snapshot: &TuiSnapshot) -> Result<PathBuf, String> {
     let dir = data_dir.join("workspace/tui-transcripts");
@@ -35,23 +39,99 @@ pub fn text(model: &TuiModel, snapshot: &TuiSnapshot) -> String {
     .join("\n")
 }
 
-fn transcript_entries(model: &TuiModel, snapshot: &TuiSnapshot) -> String {
-    let mut lines = snapshot
-        .transcript
-        .lines()
-        .map(str::to_string)
-        .collect::<Vec<_>>();
-    for entry in &model.transcript {
-        let line = format!("{}: {}", source_label(entry.source), entry.text.trim());
-        if !lines.iter().any(|existing| existing == &line) {
-            lines.push(line);
+pub fn display_lines(model: &TuiModel, snapshot: &TuiSnapshot) -> Vec<String> {
+    merged_entries(model, snapshot)
+        .into_iter()
+        .map(|entry| format!("{}: {}", source_label(entry.source), entry.text.trim()))
+        .collect()
+}
+
+pub fn merged_entries(model: &TuiModel, snapshot: &TuiSnapshot) -> Vec<TranscriptEntry> {
+    let mut seen = BTreeSet::new();
+    let mut entries = Vec::new();
+    for entry in snapshot
+        .transcript_entries
+        .iter()
+        .chain(model.transcript.iter())
+    {
+        if seen.insert(entry.id.clone()) {
+            entries.push(entry.clone());
         }
     }
+    if let Some(draft) = &model.agent_draft {
+        if seen.insert(draft.id.clone()) {
+            entries.push(draft.clone());
+        }
+    }
+    entries
+}
+
+fn transcript_entries(model: &TuiModel, snapshot: &TuiSnapshot) -> String {
+    let lines = merged_entries(model, snapshot)
+        .into_iter()
+        .map(|entry| saved_line(&entry))
+        .collect::<Vec<_>>();
     if lines.is_empty() {
         "[no transcript entries]".to_string()
     } else {
         lines.join("\n")
     }
+}
+
+fn saved_line(entry: &TranscriptEntry) -> String {
+    let path = entry.path.as_deref().unwrap_or("session");
+    format!(
+        "[id={} path={}] {}: {}",
+        entry.id,
+        path,
+        source_label(entry.source),
+        entry.text.trim()
+    )
+}
+
+pub(crate) fn append_agent_draft(model: &mut TuiModel, text: &str) {
+    match &mut model.agent_draft {
+        Some(draft) => draft.text.push_str(text),
+        None => {
+            model.agent_draft = Some(TranscriptEntry {
+                id: "draft-agent".to_string(),
+                source: TranscriptSource::Agent,
+                text: text.to_string(),
+                path: None,
+            });
+        }
+    }
+    if model.follow {
+        model.scroll = 0;
+    }
+}
+
+pub(crate) fn complete_agent_draft(model: &mut TuiModel) {
+    model.run_state = TuiRunState::Idle;
+    if let Some(mut draft) = model.agent_draft.take() {
+        draft.id = next_id(model, "agent");
+        model.transcript.push(draft);
+    }
+}
+
+pub(crate) fn push_entry(model: &mut TuiModel, source: TranscriptSource, text: impl Into<String>) {
+    let prefix = source_label(source);
+    let entry = TranscriptEntry {
+        id: next_id(model, prefix),
+        source,
+        text: text.into(),
+        path: None,
+    };
+    model.transcript.push(entry);
+    if model.follow {
+        model.scroll = 0;
+    }
+}
+
+fn next_id(model: &mut TuiModel, prefix: &str) -> String {
+    let id = format!("session:{}", model.next_entry_seq);
+    model.next_entry_seq = model.next_entry_seq.saturating_add(1);
+    format!("{prefix}:{id}")
 }
 
 fn stamp() -> String {

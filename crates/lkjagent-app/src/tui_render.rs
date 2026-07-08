@@ -16,12 +16,15 @@ pub fn render_non_tty(model: &TuiModel) -> String {
 }
 
 pub fn transcript(model: &TuiModel) -> String {
-    if model.transcript.is_empty() {
+    let mut entries = model.transcript.clone();
+    if let Some(draft) = &model.agent_draft {
+        entries.push(draft.clone());
+    }
+    if entries.is_empty() {
         return "[no transcript entries]".to_string();
     }
     let keep = (model.height.saturating_sub(10) as usize).max(3);
-    model
-        .transcript
+    entries
         .iter()
         .rev()
         .take(keep)

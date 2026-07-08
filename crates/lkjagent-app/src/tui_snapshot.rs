@@ -2,11 +2,14 @@ use std::path::Path;
 
 use rusqlite::Connection;
 
+use crate::tui_types::{TranscriptEntry, TranscriptSource};
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TuiSnapshot {
     pub status: String,
     pub logs: String,
     pub transcript: String,
+    pub transcript_entries: Vec<TranscriptEntry>,
     pub tasks: String,
     pub queue: String,
     pub proof: String,
@@ -20,6 +23,7 @@ impl TuiSnapshot {
             status: "status: unavailable".to_string(),
             logs: "none".to_string(),
             transcript: "".to_string(),
+            transcript_entries: Vec::new(),
             tasks: "none".to_string(),
             queue: "none".to_string(),
             proof: "proof: unavailable".to_string(),
@@ -31,9 +35,11 @@ impl TuiSnapshot {
 
 pub fn load(conn: &Connection, data_dir: &Path) -> Result<TuiSnapshot, String> {
     let status = crate::status::status(conn)?;
+    let transcript_entries = transcript_entries(conn, 40)?;
     Ok(TuiSnapshot {
         logs: crate::log_view::log(conn, 12)?,
-        transcript: transcript(conn, 40)?,
+        transcript: transcript_text(&transcript_entries),
+        transcript_entries,
         tasks: crate::inspect::matter_list(conn)?,
         queue: crate::inspect::queue_list(conn)?,
         proof: proof(conn)?,
@@ -43,44 +49,59 @@ pub fn load(conn: &Connection, data_dir: &Path) -> Result<TuiSnapshot, String> {
     })
 }
 
-fn transcript(conn: &Connection, limit: usize) -> Result<String, String> {
+fn transcript_entries(conn: &Connection, limit: usize) -> Result<Vec<TranscriptEntry>, String> {
     let mut statement = conn
         .prepare(
-            "SELECT source, content FROM (
+            "SELECT entry_id, source, content, source_path FROM (
                  SELECT created_at AS moment, 0 AS source_order, id AS row_id,
-                        'owner' AS source, content FROM queue
+                        'queue:' || id AS entry_id, 'owner' AS source, content,
+                        'sqlite:queue:' || id AS source_path FROM queue
                  UNION ALL
                  SELECT created_at AS moment, 1 AS source_order, id AS row_id,
-                        kind AS source, content FROM events
+                        'event:' || id AS entry_id, kind AS source, content,
+                        'sqlite:events:' || id AS source_path FROM events
                         WHERE kind NOT IN ('owner', 'answer')
              ) ORDER BY moment DESC, source_order DESC, row_id DESC LIMIT ?1",
         )
         .map_err(|error| error.to_string())?;
     let rows = statement
         .query_map([limit as i64], |row| {
-            Ok(transcript_line(
-                &row.get::<_, String>(0)?,
-                &row.get::<_, String>(1)?,
-            ))
+            let source = row.get::<_, String>(1)?;
+            Ok(TranscriptEntry {
+                id: row.get(0)?,
+                source: transcript_source(&source),
+                text: row.get::<_, String>(2)?.trim().to_string(),
+                path: Some(row.get(3)?),
+            })
         })
         .map_err(|error| error.to_string())?;
-    let mut lines = rows
+    let mut entries = rows
         .collect::<rusqlite::Result<Vec<_>>>()
         .map_err(|error| error.to_string())?;
-    lines.reverse();
-    Ok(lines.join("\n"))
+    entries.reverse();
+    Ok(entries)
 }
 
-fn transcript_line(kind: &str, content: &str) -> String {
-    format!("{}: {}", transcript_source(kind), content.trim())
+fn transcript_text(entries: &[TranscriptEntry]) -> String {
+    entries
+        .iter()
+        .map(|entry| {
+            format!(
+                "{}: {}",
+                crate::tui_types::source_label(entry.source),
+                entry.text
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
 }
 
-fn transcript_source(kind: &str) -> &'static str {
+fn transcript_source(kind: &str) -> TranscriptSource {
     match kind {
-        "owner" | "answer" => "owner",
-        "stepdone" | "taskclosed" | "question" => "agent",
-        "stepblocked" | "taskblocked" => "error",
-        _ => "state",
+        "owner" | "answer" => TranscriptSource::Owner,
+        "stepdone" | "taskclosed" | "question" => TranscriptSource::Agent,
+        "stepblocked" | "taskblocked" => TranscriptSource::Error,
+        _ => TranscriptSource::State,
     }
 }
 

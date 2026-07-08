@@ -1,8 +1,7 @@
 use unicode_segmentation::UnicodeSegmentation;
 
-use crate::tui_types::{
-    ToolCard, TranscriptEntry, TranscriptSource, TuiEffect, TuiEvent, TuiModel, TuiRunState,
-};
+use crate::tui_transcript::{append_agent_draft, complete_agent_draft, push_entry};
+use crate::tui_types::{ToolCard, TranscriptSource, TuiEffect, TuiEvent, TuiModel, TuiRunState};
 
 pub fn reduce(mut model: TuiModel, event: TuiEvent) -> (TuiModel, Vec<TuiEffect>) {
     let mut effects = vec![TuiEffect::Redraw];
@@ -35,16 +34,16 @@ pub fn reduce(mut model: TuiModel, event: TuiEvent) -> (TuiModel, Vec<TuiEffect>
         TuiEvent::UserSelectPane(pane) => model.active_pane = pane,
         TuiEvent::AgentTextDelta(text) => {
             model.run_state = TuiRunState::Running;
-            push(&mut model, TranscriptSource::Agent, text);
+            append_agent_draft(&mut model, &text);
         }
-        TuiEvent::AgentMessageComplete => model.run_state = TuiRunState::Idle,
+        TuiEvent::AgentMessageComplete => complete_agent_draft(&mut model),
         TuiEvent::ToolCallProposed { name, decision_id } => {
             model.run_state = TuiRunState::ToolPending;
             model.pending_tool = Some(ToolCard { name, decision_id });
         }
         TuiEvent::ToolCallStarted(name) => {
             model.run_state = TuiRunState::ToolRunning;
-            push(
+            push_entry(
                 &mut model,
                 TranscriptSource::Tool,
                 format!("started {name}"),
@@ -52,11 +51,13 @@ pub fn reduce(mut model: TuiModel, event: TuiEvent) -> (TuiModel, Vec<TuiEffect>
         }
         TuiEvent::ToolCallFinished(summary) => {
             model.run_state = TuiRunState::Running;
-            push(&mut model, TranscriptSource::Tool, summary);
+            push_entry(&mut model, TranscriptSource::Tool, summary);
         }
-        TuiEvent::StateTransitionObserved(text) => push(&mut model, TranscriptSource::State, text),
-        TuiEvent::ArtifactCreated(text) => push(&mut model, TranscriptSource::System, text),
-        TuiEvent::WorkspaceChanged(text) => push(&mut model, TranscriptSource::System, text),
+        TuiEvent::StateTransitionObserved(text) => {
+            push_entry(&mut model, TranscriptSource::State, text);
+        }
+        TuiEvent::ArtifactCreated(text) => push_entry(&mut model, TranscriptSource::System, text),
+        TuiEvent::WorkspaceChanged(text) => push_entry(&mut model, TranscriptSource::System, text),
         TuiEvent::TimerTick => {}
         TuiEvent::TerminalResize { width, height } => {
             model.width = width.max(40);
@@ -64,7 +65,7 @@ pub fn reduce(mut model: TuiModel, event: TuiEvent) -> (TuiModel, Vec<TuiEffect>
         }
         TuiEvent::ErrorObserved(text) => {
             model.last_error = Some(text.clone());
-            push(&mut model, TranscriptSource::Error, text);
+            push_entry(&mut model, TranscriptSource::Error, text);
         }
         TuiEvent::SaveTranscript => effects.push(TuiEffect::SaveTranscript),
         TuiEvent::QuitRequested => effects.push(TuiEffect::Quit),
@@ -138,13 +139,13 @@ fn submit_composer(model: &mut TuiModel, effects: &mut Vec<TuiEffect>) {
     model.composer.clear();
     model.composer_cursor = 0;
     model.palette_open = false;
-    push(model, TranscriptSource::Owner, text.clone());
+    push_entry(model, TranscriptSource::Owner, text.clone());
     effects.push(TuiEffect::SubmitOwnerMessage(text));
 }
 
 fn interrupt(model: &mut TuiModel, effects: &mut Vec<TuiEffect>) {
     model.run_state = TuiRunState::Interrupted;
-    push(model, TranscriptSource::System, "interrupt requested");
+    push_entry(model, TranscriptSource::System, "interrupt requested");
     effects.push(TuiEffect::InterruptRun);
 }
 
@@ -159,16 +160,6 @@ fn reject_tool(model: &mut TuiModel, effects: &mut Vec<TuiEffect>, reason: Strin
     if let Some(card) = model.pending_tool.take() {
         model.run_state = TuiRunState::Running;
         effects.push(TuiEffect::RejectTool { card, reason });
-    }
-}
-
-fn push(model: &mut TuiModel, source: TranscriptSource, text: impl Into<String>) {
-    model.transcript.push(TranscriptEntry {
-        source,
-        text: text.into(),
-    });
-    if model.follow {
-        model.scroll = 0;
     }
 }
 

@@ -4,7 +4,7 @@ use ratatui::widgets::{Block, Borders, Paragraph, Wrap};
 use ratatui::Frame;
 
 use crate::tui_snapshot::TuiSnapshot;
-use crate::tui_types::{pane_label, run_state_label, source_label, TuiModel, TuiPane};
+use crate::tui_types::{pane_label, run_state_label, TuiModel, TuiPane};
 
 pub fn draw(frame: &mut Frame<'_>, model: &TuiModel, snapshot: &TuiSnapshot) {
     let area = frame.area();
@@ -114,14 +114,7 @@ fn side<'a>(model: &TuiModel, snapshot: &'a TuiSnapshot) -> Vec<Line<'a>> {
 }
 
 fn transcript(model: &TuiModel, snapshot: &TuiSnapshot) -> String {
-    let mut lines = Vec::new();
-    lines.extend(snapshot.transcript.lines().map(str::to_string));
-    for entry in &model.transcript {
-        let line = format!("{}: {}", source_label(entry.source), entry.text.trim());
-        if !lines.iter().any(|existing| existing == &line) {
-            lines.push(line);
-        }
-    }
+    let lines = crate::tui_transcript::display_lines(model, snapshot);
     if lines.is_empty() {
         "system: no transcript entries yet".to_string()
     } else {
@@ -184,7 +177,14 @@ mod tests {
     #[test]
     fn transcript_uses_durable_snapshot_agent_messages() {
         let mut snapshot = TuiSnapshot::empty();
-        snapshot.transcript = "agent: durable answer".to_string();
+        snapshot
+            .transcript_entries
+            .push(crate::tui_types::TranscriptEntry {
+                id: "event:1".to_string(),
+                source: crate::tui_types::TranscriptSource::Agent,
+                text: "durable answer".to_string(),
+                path: Some("sqlite:events:1".to_string()),
+            });
 
         let text = transcript(&TuiModel::new(), &snapshot);
 

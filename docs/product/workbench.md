@@ -14,10 +14,10 @@ the command the same way it routes `status`, `console`, and `watch`.
 ## Pure TUI Core
 
 The app has a pure terminal model, event reducer, grapheme-aware composer,
-stable transcript-entry identity, follow/manual viewport state, and non-TTY
-renderer. It preserves composer input while agent, tool, state, artifact,
-resize, interrupt, approval, save, and quit events arrive. Terminal backends are
-effects at the edge.
+stable transcript-entry identity, agent draft accumulation, id-based transcript
+merge, follow/manual viewport state, and non-TTY renderer. It preserves composer
+input while agent, tool, state, artifact, resize, interrupt, approval, save, and
+quit events arrive. Terminal backends are effects at the edge.
 
 ## Modes
 
@@ -65,8 +65,8 @@ context-resolution, record, or other row-backed command paths.
 ## Evidence
 
 Tests cover parser routing, reducer mode changes, line handling, closed-input
-exit, grapheme cursor movement, pane scroll and follow state, durable transcript
-merge, duplicate suppression by stable row identity, status rail fallback fields,
-and bounded rendering. Interactive behavior is proven by captured command logs
-under `tmp/agent-runs/` or `tmp/live-runs/`, with unavailable terminals recorded
-as an honest skip.
+exit, grapheme cursor movement, pane scroll and follow state, agent delta draft
+commit, durable transcript merge, duplicate suppression by stable row identity,
+saved ids and source paths, status rail fallback fields, and bounded rendering.
+Interactive behavior is proven by captured command logs under `tmp/agent-runs/`
+or `tmp/live-runs/`, with unavailable terminals recorded as an honest skip.

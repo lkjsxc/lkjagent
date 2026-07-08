@@ -73,8 +73,10 @@ decision view. Unsafe XML-like tool actions persist rejections. Status and proof
 surfaces expose cached token usage, blocked counts, stale-edge counts, prompt
 frames, tool-view fingerprints, artifact refs, check refs, and proof rows.
 
-The terminal workbench has a pure reducer, durable transcript stream, Japanese
-and grapheme-aware composer operations, append and pane modes, row-backed status
+The terminal workbench has a pure reducer, durable transcript stream with stable
+queue/event ids, agent draft accumulation for streaming deltas, id-based
+transcript merge, saved transcript ids and source paths, Japanese and
+grapheme-aware composer operations, append and pane modes, row-backed status
 fallbacks, and focused coverage for transcript merge and rendering surfaces.
 
 Baseline commands in this work session passed `cargo run -p lkjagent-xtask --
@@ -96,8 +98,9 @@ had no workspace records, artifacts, check results, admissions, or observations.
   still admit shell with contamination tracking.
 - Prompt context still needs packet-level no-JSON rendering and failed-output
   containment evidence beyond focused duplicate-context coverage.
-- TUI duplicate suppression and bottom-follow behavior need packet-level
-  focused tests and evidence.
+- TUI bottom-follow behavior still needs packet-level focused tests and
+  evidence; transcript identity, draft accumulation, and id-based merge now have
+  focused coverage.
 - Deterministic replay, quiet verify, Docker Compose verify, and live or
   scripted campaigns must run again after source changes before final claims.
 

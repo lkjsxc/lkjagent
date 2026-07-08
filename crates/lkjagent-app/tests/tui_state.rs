@@ -16,7 +16,10 @@ fn composer_survives_streaming_agent_events() {
 
     assert_eq!(model.composer, "draft");
     assert_eq!(model.run_state, TuiRunState::Running);
-    assert_eq!(model.transcript[0].text, "working");
+    assert_eq!(
+        model.agent_draft.as_ref().map(|entry| entry.text.as_str()),
+        Some("working")
+    );
 }
 
 #[test]
@@ -129,6 +132,7 @@ fn transcript_save_persists_japanese_entries() -> Result<(), Box<dyn std::error:
     );
     let (model, _) = reduce(model, TuiEvent::UserSubmit);
     let (model, _) = reduce(model, TuiEvent::AgentTextDelta("保存しました".into()));
+    let (model, _) = reduce(model, TuiEvent::AgentMessageComplete);
 
     let path = lkjagent_app::tui_transcript::save(&data, &model, &TuiSnapshot::empty())
         .map_err(std::io::Error::other)?;
