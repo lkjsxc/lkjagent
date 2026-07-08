@@ -7,6 +7,7 @@ use crate::runtime_decision::{RuntimeDecision, ToolValueClass};
 
 pub const ACTION_OPEN: &str = "<lkjagent_action>";
 pub const ACTION_CLOSE: &str = "</lkjagent_action>";
+const MAX_VALUE_CHARS: usize = 8192;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ToolCall {
@@ -135,6 +136,9 @@ fn insert_argument(args: &mut BTreeMap<String, String>, body: &str) -> Result<()
     }
     let name = name.ok_or_else(|| schema("missing arg name".into()))?;
     let value = value.ok_or_else(|| schema("missing arg value".into()))?;
+    if value.chars().count() > MAX_VALUE_CHARS {
+        return Err(schema(format!("value too large for {name}")));
+    }
     if args.insert(name.clone(), value).is_some() {
         return Err(ToolCallError::DuplicateTag(format!("argument/{name}")));
     }

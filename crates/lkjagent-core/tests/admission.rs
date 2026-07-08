@@ -31,6 +31,26 @@ fn rejects_placeholder_values_before_effects() -> Result<(), String> {
 }
 
 #[test]
+fn rejects_empty_required_values_before_effects() -> Result<(), String> {
+    let decision = RuntimeDecision::new(
+        "decision-1",
+        "case-1",
+        OperationKey("model.call".to_string()),
+        ToolSetView::new(vec![
+            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new())
+        ]),
+        OutputEnvelope::Action,
+    );
+
+    let result = admit_action(&decision, &action("fs.read", "path", "   "))
+        .map_err(|error| error.message)?;
+
+    assert_eq!(result.status, AdmissionStatus::Rejected);
+    assert_eq!(result.reason, "empty value for path");
+    Ok(())
+}
+
+#[test]
 fn tool_field_specs_drive_value_class_admission() -> Result<(), String> {
     let decision = RuntimeDecision::new(
         "decision-1",

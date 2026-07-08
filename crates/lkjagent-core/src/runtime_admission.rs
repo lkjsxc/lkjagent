@@ -89,6 +89,9 @@ fn wrapped_placeholder(value: &str, open: char, close: char) -> bool {
 }
 
 fn value_class_rejection(name: &str, value: &str, class: ToolValueClass) -> Option<String> {
+    if value.trim().is_empty() {
+        return Some(format!("empty value for {name}"));
+    }
     match class {
         ToolValueClass::WorkspacePath if !workspace_relative_path(value) => {
             Some("path escapes workspace".to_string())

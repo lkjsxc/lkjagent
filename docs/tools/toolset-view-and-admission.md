@@ -45,9 +45,9 @@ mismatch is a high-severity runtime event.
 
 Raw failed model output is stored in exchange logs and marked contaminated.
 Normal retry prompts include only bounded diagnoses, invalid-excerpt hashes, and
-the exact required XML-like action shape. Placeholder-looking executable values
-such as `...`, `PATH`, `TODO`, `VALUE`, `FIELD_VALUE`, `<path>`, or `[path]`
-are rejected before effects.
+the exact required XML-like action shape. Empty executable values and
+placeholder-looking executable values such as `...`, `PATH`, `TODO`, `VALUE`,
+`FIELD_VALUE`, `<path>`, or `[path]` are rejected before effects.
 
 ## Failure This Prevents
 

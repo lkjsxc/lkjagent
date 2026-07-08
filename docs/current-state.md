@@ -46,10 +46,11 @@ and bounded `run --once` paths.
 
 Current model action parsing accepts one attribute-less `<lkjagent_action>` with
 child tags for decision id, context fingerprint, tool name, and repeated
-arguments. It rejects JSON-shaped bodies, attributes, unknown tags, duplicate
+arguments. It preserves multiline and Japanese values, bounds argument value
+size, and rejects JSON-shaped bodies, attributes, unknown tags, duplicate
 scalars, duplicate argument names, stale decisions, context mismatches, unknown
-tools, bad primitive classes, unclosed tags, crossed tags, bad entities, and
-placeholder-like executable values.
+tools, bad primitive classes, unclosed tags, crossed tags, bad entities, empty
+executable values, and placeholder-like executable values.
 
 Runtime decisions carry selected state keys, selected tool views, context-frame
 fingerprints, expected envelopes, evidence requirements, and recovery policy.

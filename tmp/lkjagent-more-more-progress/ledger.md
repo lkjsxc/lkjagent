@@ -32,6 +32,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   `Viewport::Follow`/`Viewport::Manual` state, scroll-down follow restoration,
   manual-top preservation, and pane rendering that uses the viewport height
   helper without adding a product source file.
+- Pending protocol slice bounds XML-like action argument values and rejects empty
+  executable values before effects.
 
 ## Tests Added
 - `crates/lkjagent-core/tests/owner_turn.rs::ambiguous_save_like_turns_route_to_inbox`.
@@ -47,6 +49,9 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   saved ids/source paths.
 - Added workbench viewport reducer tests for scroll-down follow restoration and
   manual-top preservation after refresh.
+- Added `crates/lkjagent-core/tests/tool_call_edges.rs` for Japanese values,
+  large bounded values, and oversized action values.
+- Added admission coverage for empty required values.
 
 ## Commands Run
 - `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs`.
@@ -117,6 +122,12 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after keeping the
   viewport helper inside existing source-file budget.
 - `docker compose run --rm verify` -> `ok verify` after the viewport slice.
+- `cargo test -p lkjagent-core --test tool_call_edges` -> 2 passed.
+- `cargo test -p lkjagent-core --test admission` -> 3 passed.
+- `cargo fmt --all -- --check` -> no output after the protocol edge slice.
+- `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after replacing
+  `expect_err` in the new test.
+- `docker compose run --rm verify` -> `ok verify` after the protocol edge slice.
 - `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs` after the
   bottom-follow test slice.
 - `cargo run -p lkjagent-xtask -- check-lines` -> `ok check-lines` after the
@@ -142,6 +153,9 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   tests to an integration test.
 - `cargo test -p lkjagent-app --lib workbench_line::tests::mode_command_switches_to_pane_renderer workbench_render::tests`
   failed because cargo accepts only one test filter; reran the filters separately.
+- Initial protocol-edge `cargo run -p lkjagent-xtask -- quiet verify` failed in
+  clippy because the new test used `expect_err`; replaced it with explicit match
+  handling and reran successfully.
 
 ## Evidence Files
 - Packet indexed from tmp/lkjagent-more-more-thinking-20260708.
@@ -161,7 +175,9 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   duplicate-context focused test passed; no-JSON/failure containment still open.
 - Tool views are selected by state, not global catalog: default explore shell
   hiding has focused tests; broader state matrix remains open.
-- XML-like action grammar and admission have focused tests: open.
+- XML-like action grammar and admission have focused tests: focused Japanese,
+  multiline, entity, stale decision, context mismatch, bad params, oversized,
+  empty, and placeholder tests passed; commit pending for latest edge tests.
 - Recovery states handle parse, admission, effect, endpoint, and check failures: open.
 - TUI duplicate and bottom-follow regressions have tests: transcript identity,
   duplicate-by-id, pane bottom-follow, and reducer-level re-enable-follow
@@ -180,4 +196,5 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Address artifact/check proof gaps and remaining recovery/no-JSON acceptance items.
+Commit the protocol/admission edge slice, then address artifact/check proof gaps
+and remaining recovery/no-JSON acceptance items.

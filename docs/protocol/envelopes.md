@@ -43,8 +43,8 @@ JSON bodies, and no implicit fields.
 
 `argument` elements may repeat. `decision_id`, `context_fingerprint`, and
 `tool_name` are scalar and must appear once. The parser decodes XML entities,
-preserves multiline values, rejects duplicate scalar tags, and returns typed
-internal structs.
+preserves multiline and Japanese values, bounds argument value size, rejects
+duplicate scalar tags, and returns typed internal structs.
 
 ## Tool Call Cards
 
