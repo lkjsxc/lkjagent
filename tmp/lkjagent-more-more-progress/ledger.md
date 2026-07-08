@@ -97,6 +97,14 @@ docs-first product architecture commit before source edits.
 | 2026-07-08 | final `cargo run -p lkjagent-xtask -- check-docs` | ok check-docs; EXIT=0 | `ctx_batch_execute` final_check_docs |
 | 2026-07-08 | final `cargo run -p lkjagent-xtask -- quiet verify` | ok verify; EXIT=0 | `ctx_batch_execute` final_quiet_verify |
 | 2026-07-08 | final `docker compose run --rm verify` | ok verify; EXIT=0 | `ctx_batch_execute` final_docker_verify |
+| 2026-07-08 | `.env` inventory | `.env` exists with LKJAGENT_API_KEY, LKJAGENT_ENDPOINT_URL, LKJAGENT_MODEL, and LKJAGENT_CONTEXT_LENGTH present; values were not printed | `ctx_batch_execute` safe_env_inventory |
+| 2026-07-08 | live endpoint run with `.env` | `cargo run -p lkjagent-xtask -- experiment live-profiles --out-dir tmp/live-runs/20260708Tliveenv --data tmp/live-profile-data/20260708Tliveenv --duration-seconds 30`; EXIT=0 | `ctx_execute` live profile run using env |
+| 2026-07-08 | live endpoint summary | personal-workspace closed, structured-artifact closed, software-project open, protocol-stress open; metrics recorded without secret values | `tmp/live-runs/20260708Tliveenv/*/summary.md` |
+| 2026-07-08 | data cleanup | `sudo rm -rf data && git restore --source=HEAD --worktree -- data`; git status then reported 0 entries | `ctx_execute` sudo wipe data and restore tracked state |
+| 2026-07-08 | post-live line counts | `docs/current-state.md` 138 lines; ledger 123 lines; EXIT=0 | `ctx_batch_execute` post_live_line_counts |
+| 2026-07-08 | post-live `cargo run -p lkjagent-xtask -- check-docs` | ok check-docs; EXIT=0 | `ctx_batch_execute` post_live_check_docs |
+| 2026-07-08 | post-live `cargo run -p lkjagent-xtask -- quiet verify` | ok verify; EXIT=0 | `ctx_batch_execute` post_live_quiet_verify |
+| 2026-07-08 | post-live `docker compose run --rm verify` | ok verify; EXIT=0 | `ctx_execute` post live docker verify |
 
 ## Acceptance Ledger
 
@@ -116,4 +124,4 @@ docs-first product architecture commit before source edits.
 | deterministic replay | 9cd8069c | `cargo run -p lkjagent-xtask -- smoke replay` and quiet verify smoke replay passed | done |
 | quiet verify | 9cd8069c | final `cargo run -p lkjagent-xtask -- quiet verify` passed after source changes | done |
 | Docker verify | 9cd8069c | final `docker compose run --rm verify` passed after source changes | done |
-| live campaigns | 9cd8069c | scripted campaign passed with workspace validation; live profiles wrote honest endpoint skip files | done |
+| live campaigns | 9cd8069c; pending live-env commit | scripted campaign passed with workspace validation; skip files committed; `.env` endpoint run added under `tmp/live-runs/20260708Tliveenv/` with two closed and two open profiles after 30-second time boxes | done with residual standard-duration risk |

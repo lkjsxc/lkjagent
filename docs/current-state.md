@@ -108,17 +108,19 @@ admission, recovery failures, and TUI transcript identity and follow behavior.
 Scripted evidence under `tmp/agent-runs/20260708T180141Z/` records the workspace
 probe, protocol experiment matrix, and proof bundle. Live endpoint profiles under
 `tmp/live-runs/20260708T180320Z/` are honest skips because endpoint input was
-intentionally absent.
+intentionally absent. After `.env` use was authorized, a 30-second-per-profile
+endpoint run under `tmp/live-runs/20260708Tliveenv/` ran without exposing secret
+values; personal-workspace and structured-artifact closed, while software-project
+and protocol-stress remained open at the time box.
 
 ## Known Gaps
 
 - Scripted workspace evidence covers todo, note, transcript, index, proof, and
-  blocked artifact-request behavior; a full live endpoint daily-use run remains
-  skipped until endpoint configuration is present.
+  blocked artifact-request behavior.
+- The `.env` live run was intentionally short; it is current endpoint evidence,
+  not the standard 900-second-per-profile campaign.
 - TUI behavior is proven by reducer and transcript tests, not an interactive
   terminal capture in this environment.
-- The worktree still contains preexisting dirty `data/logs` deletions and
-  untracked `data/` runtime files that are not part of this packet.
 
 ## Next Executable Step
 
