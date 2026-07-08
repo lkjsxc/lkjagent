@@ -25,6 +25,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Commit 3803a3b0 (`feat: deduplicate prompt context items`) suppresses
   duplicate clean context items by semantic key, body, source type, and source
   fingerprint.
+- Pending no-JSON context slice suppresses JSON-like context bodies with
+  source-linked prompt markers.
 - Commit 80e080db (`feat: track tui transcript identity`) adds stable transcript
   entry ids, agent draft accumulation, id-based durable/session merge, and saved
   transcript ids/source paths.
@@ -44,6 +46,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Added `crates/lkjagent-app/tests/tool_views.rs::default_explore_prompt_hides_shell_tool`.
 - Updated contamination coverage so shell observations use an explicit shell view.
 - Added `context_plan_suppresses_duplicate_clean_items` in core context tests.
+- Added `crates/lkjagent-app/tests/context_no_json.rs` for JSON-like prompt
+  context suppression.
 - Added `crates/lkjagent-app/tests/tui_transcript_identity.rs` for streaming
   delta commit, identical text with different ids, durable override by id, and
   saved ids/source paths.
@@ -128,14 +132,10 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after replacing
   `expect_err` in the new test.
 - `docker compose run --rm verify` -> `ok verify` after the protocol edge slice.
-- `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs` after the
-  bottom-follow test slice.
-- `cargo run -p lkjagent-xtask -- check-lines` -> `ok check-lines` after the
-  bottom-follow test slice.
-- `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after the
-  bottom-follow test slice.
-- `docker compose run --rm verify` -> `ok verify` after the bottom-follow test
-  slice.
+- Bottom-follow gates: `check-docs`, `check-lines`, `quiet verify`, and
+  `docker compose run --rm verify` all passed.
+- `cargo test -p lkjagent-app --test context_no_json` -> 1 passed.
+- No-JSON context gates: docs, lines, quiet verify, and Docker verify passed.
 
 ## Failed Or Skipped Commands
 - `python tmp/lkjagent-more-more-thinking-20260708/12-scripts/repo_static_report.py .`
@@ -172,7 +172,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Observed file-work failure has focused regression: open.
 - Earlier blocked work prevents later response work without recovery: open.
 - Prompt context is deduplicated, source-linked, bounded, and non-JSON:
-  duplicate-context focused test passed; no-JSON/failure containment still open.
+  duplicate-context and JSON-like suppression focused tests passed; failed-output
+  containment still open.
 - Tool views are selected by state, not global catalog: default explore shell
   hiding has focused tests; broader state matrix remains open.
 - XML-like action grammar and admission have focused tests: commit 660429b1
@@ -196,4 +197,4 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Address artifact/check proof gaps and remaining recovery/no-JSON acceptance items.
+Commit no-JSON context, then address artifact/check proof and recovery.

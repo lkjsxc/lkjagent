@@ -133,7 +133,11 @@ fn render_context(
     {
         lines.push(format!(
             "{} [{}:{} fp={}] {}",
-            item.semantic_key, item.source_type, item.source_id, item.source_fingerprint, item.body
+            item.semantic_key,
+            item.source_type,
+            item.source_id,
+            item.source_fingerprint,
+            prompt_safe_body(item)
         ));
     }
     for conflict in conflicts {
@@ -144,4 +148,19 @@ fn render_context(
         ));
     }
     lines.join("\n")
+}
+
+fn prompt_safe_body(item: &ContextItem) -> String {
+    let trimmed = item.body.trim_start();
+    if trimmed.starts_with('{') || trimmed.starts_with('[') || has_json_pair(trimmed) {
+        return format!(
+            "[json-like context suppressed item={} source={}:{}]",
+            item.id, item.source_type, item.source_id
+        );
+    }
+    item.body.clone()
+}
+
+fn has_json_pair(text: &str) -> bool {
+    text.contains("\":") || text.contains("\" :")
 }

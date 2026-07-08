@@ -67,12 +67,14 @@ inspection, unsupported system operations, direct records, ambiguous inbox
 routing, and Japanese diary or save wording.
 
 Prompt context can admit bounded workspace record and index metadata with source
-fingerprints and suppress duplicate clean context items by semantic key, body,
-source type, and source fingerprint. Default explore tool views exclude
-`shell.run`; shell is available only through an explicit persisted shell-capable
-decision view. Unsafe XML-like tool actions persist rejections. Status and proof
-surfaces expose cached token usage, blocked counts, stale-edge counts, prompt
-frames, tool-view fingerprints, artifact refs, check refs, and proof rows.
+fingerprints, suppress duplicate clean context items by semantic key, body,
+source type, and source fingerprint, and replace JSON-like context bodies with
+source-linked suppression markers before prompt rendering. Default explore tool
+views exclude `shell.run`; shell is available only through an explicit persisted
+shell-capable decision view. Unsafe XML-like tool actions persist rejections.
+Status and proof surfaces expose cached token usage, blocked counts, stale-edge
+counts, prompt frames, tool-view fingerprints, artifact refs, check refs, and
+proof rows.
 
 The terminal workbench has a pure reducer, durable transcript stream with stable
 queue/event ids, agent draft accumulation for streaming deltas, id-based
@@ -97,8 +99,8 @@ had no workspace records, artifacts, check results, admissions, or observations.
 - Tool-view selection still needs broader state-by-state coverage, but focused
   tests now prove the default explore prompt hides shell and explicit shell views
   still admit shell with contamination tracking.
-- Prompt context still needs packet-level no-JSON rendering and failed-output
-  containment evidence beyond focused duplicate-context coverage.
+- Prompt context still needs packet-level failed-output containment evidence
+  beyond focused duplicate-context and JSON-like suppression coverage.
 - TUI transcript identity, draft accumulation, id-based merge, pane bottom
   anchoring, manual-scroll preservation, and scroll-down follow restoration now
   have focused coverage.
