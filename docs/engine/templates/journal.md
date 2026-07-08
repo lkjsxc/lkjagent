@@ -12,10 +12,10 @@ without clarification.
 
 ## Shape
 
-- Journal entries append or create dated Markdown under `records/life/journal/`.
-- Todo entries write under `records/life/todo/` with open state.
-- Calendar-like entries write under `records/life/calendar/YYYY/`.
-- Finance entries write under `records/life/finance/YYYY/`.
+- Journal entries append or create dated Markdown under `records/life/journal/YYYY/MM/DD/entry.md`.
+- Todo entries write under `records/life/todo/open/` with open state.
+- Calendar-like entries write under `records/life/calendar/YYYY/MM/DD/`.
+- Finance entries write under `records/life/finance/YYYY/MM/`.
 - Each write records a workspace metadata row, fingerprint history, and index
   staleness event.
 

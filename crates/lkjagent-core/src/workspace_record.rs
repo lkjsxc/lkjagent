@@ -1,5 +1,7 @@
 use crate::runtime_fingerprint::{stable_fingerprint, FingerprintError};
 
+pub use crate::workspace_record_paths::{archive_path, date_compact, record_path, record_path_at};
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WorkspaceRecord {
     pub id: String,
@@ -102,36 +104,6 @@ pub fn parse_record(text: &str) -> Result<WorkspaceRecord, String> {
     })
 }
 
-pub fn record_path(kind: &str, id: &str) -> Result<String, String> {
-    safe_segment(kind)?;
-    safe_segment(id)?;
-    Ok(format!("{}/{id}.md", record_dir(kind)))
-}
-
-pub fn archive_path(kind: &str, id: &str) -> Result<String, String> {
-    safe_segment(kind)?;
-    safe_segment(id)?;
-    Ok(format!("archive/records/{kind}/{id}.md"))
-}
-
-fn record_dir(kind: &str) -> String {
-    match kind {
-        "today" | "journal" => "records/life/journal".to_string(),
-        "todo" => "records/life/todo".to_string(),
-        "calendar" => "records/life/calendar".to_string(),
-        "finance" => "records/life/finance".to_string(),
-        "note" => "records/life/notes".to_string(),
-        "routine" => "records/life/routines".to_string(),
-        "contact" => "records/life/contacts".to_string(),
-        "reference" => "records/knowledge/references".to_string(),
-        "project" => "records/work/projects".to_string(),
-        "development" => "records/work/development".to_string(),
-        "artifact" => "artifacts/documents".to_string(),
-        "proof" => "artifacts/proof".to_string(),
-        other => format!("records/knowledge/notes/{other}"),
-    }
-}
-
 pub fn record_fingerprint(text: &str) -> Result<String, FingerprintError> {
     stable_fingerprint(&text)
 }
@@ -152,19 +124,6 @@ pub fn slug(text: &str) -> String {
         .take(8)
         .collect::<Vec<_>>()
         .join("-")
-}
-
-fn safe_segment(value: &str) -> Result<(), String> {
-    let safe = !value.is_empty()
-        && value != "."
-        && value != ".."
-        && !value.contains('/')
-        && !value.contains('\\');
-    if safe {
-        Ok(())
-    } else {
-        Err(format!("unsafe record path segment: {value}"))
-    }
 }
 
 fn field(head: &str, key: &str) -> Option<String> {

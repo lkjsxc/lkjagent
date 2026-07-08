@@ -5,6 +5,9 @@ use crate::runtime_operation::RuntimeOperation;
 use crate::runtime_selector as selector;
 use crate::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
 
+#[rustfmt::skip]
+const WORKSPACE_FAMILIES: &[(&str, &str, u8, &str)] = &[("todo", "todo.review", 35, "todo"), ("calendar", "calendar.review", 36, "calendar"), ("routine", "routine.run", 37, "routine"), ("index", "index.rebuild", 38, "index"), ("proof", "proof.collect", 39, "proof"), ("dev", "dev.review", 40, "dev"), ("project", "project.advance", 41, "project"), ("finance", "finance.review", 42, "finance")];
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SelectorCandidate {
     pub operation: RuntimeOperation,
@@ -36,11 +39,9 @@ pub fn selector_candidates(snapshot: &RuntimeSnapshot) -> Vec<SelectorCandidate>
     candidates
 }
 
+#[rustfmt::skip]
 pub fn selected_candidate(snapshot: &RuntimeSnapshot) -> SelectorCandidate {
-    selector_candidates(snapshot)
-        .into_iter()
-        .find(|candidate| candidate.blocked_by.is_empty())
-        .unwrap_or_else(idle_candidate)
+    selector_candidates(snapshot).into_iter().find(|candidate| candidate.blocked_by.is_empty()).unwrap_or_else(idle_candidate)
 }
 
 fn cell_candidate(cell: &StateCell) -> Option<SelectorCandidate> {
@@ -107,17 +108,20 @@ fn namespace_candidate(cell: &StateCell, body: &Value) -> Option<SelectorCandida
             60,
             "check",
         )),
-        _ => crate::runtime_workspace_family::operation(&cell.key.namespace).map(
-            |(operation, tier, reason)| {
-                model_free(
-                    cell,
-                    &format!("{operation}/{}", cell.key.name),
-                    tier,
-                    reason,
-                )
-            },
-        ),
+        _ => workspace_family_operation(&cell.key.namespace).map(|(operation, tier, reason)| {
+            model_free(
+                cell,
+                &format!("{operation}/{}", cell.key.name),
+                tier,
+                reason,
+            )
+        }),
     }
+}
+
+#[rustfmt::skip]
+fn workspace_family_operation(namespace: &str) -> Option<(&'static str, u8, &'static str)> {
+    WORKSPACE_FAMILIES.iter().find(|(name, _, _, _)| *name == namespace).map(|(_, operation, tier, reason)| (*operation, *tier, *reason))
 }
 
 fn operation_from_payload(body: &Value) -> Option<RuntimeOperation> {
@@ -140,13 +144,9 @@ fn operation_from_payload(body: &Value) -> Option<RuntimeOperation> {
     }
 }
 
+#[rustfmt::skip]
 fn model_free(cell: &StateCell, key: &str, tier: u8, reason: &str) -> SelectorCandidate {
-    candidate(
-        cell,
-        RuntimeOperation::model_free(key, evidence(cell)),
-        tier,
-        reason,
-    )
+    candidate(cell, RuntimeOperation::model_free(key, evidence(cell)), tier, reason)
 }
 
 fn candidate(

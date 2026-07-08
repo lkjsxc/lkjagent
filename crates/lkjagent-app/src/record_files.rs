@@ -2,8 +2,8 @@ use std::fs;
 use std::path::Path;
 
 use lkjagent_core::workspace_record::{
-    archive_path, default_state_for_kind, parse_record, record_fingerprint, record_path,
-    render_record, slug, state_keys_for_record, WorkspaceRecord,
+    archive_path, default_state_for_kind, parse_record, record_fingerprint, record_path_at,
+    render_record, state_keys_for_record, WorkspaceRecord,
 };
 use lkjagent_store::record_rows::{record, records, upsert_record, RecordRow};
 use rusqlite::Connection;
@@ -16,7 +16,8 @@ pub fn add(
     body: &str,
     now: &str,
 ) -> Result<String, String> {
-    let id = record_id(now, title);
+    let kind = crate::record_identity::normalized_kind(kind);
+    let id = crate::record_identity::record_id(kind, now, title);
     let mut record = WorkspaceRecord::new(&id, kind, title, now);
     record.state = default_state_for_kind(kind).to_string();
     record.state_keys = state_keys_for_record(kind, &id, &record.state);
@@ -122,7 +123,13 @@ fn write_record(
     record: &WorkspaceRecord,
     archived: bool,
 ) -> Result<String, String> {
-    let rel = record_path(&record.kind, &record.id)?;
+    let rel = record_path_at(
+        &record.kind,
+        &record.id,
+        &record.updated_at,
+        &record.title,
+        &record.state,
+    )?;
     let workspace = data_dir.join("workspace");
     crate::workspace_scaffold::ensure_for_path(&workspace, &rel)?;
     let path = workspace.join(&rel);
@@ -163,15 +170,6 @@ fn record_row(
         archived,
         updated_at: updated_at.to_string(),
     })
-}
-
-fn record_id(now: &str, title: &str) -> String {
-    let stamp = now
-        .chars()
-        .filter(char::is_ascii_alphanumeric)
-        .collect::<String>();
-    let suffix = slug(title);
-    format!("rec_{}_{}", stamp, suffix)
 }
 
 fn format_record_row(prefix: &str, row: &RecordRow) -> String {

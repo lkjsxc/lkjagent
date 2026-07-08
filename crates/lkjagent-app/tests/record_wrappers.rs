@@ -17,7 +17,7 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
         "Buy",
         "milk",
     ])?;
-    assert!(added.contains("path=records/life/todo/"));
+    assert!(added.contains("path=records/life/todo/open/"));
     let id = added.split_whitespace().nth(1).ok_or("missing id")?;
 
     let listed = cli::run([
@@ -65,6 +65,7 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
         "bill",
     ])?;
     assert!(finance.contains("path=records/life/finance/"));
+    assert!(!finance.contains("unix:"));
     assert!(state_labels(&conn)?.contains(&"finance:review/".to_string()));
     Ok(())
 }

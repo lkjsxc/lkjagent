@@ -3,8 +3,9 @@ use std::path::Path;
 
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_core::workspace_manifest::{
-    canonical_record_path, validate_rebalance_move, RebalanceMove, WorkspaceManifest,
+    validate_rebalance_move, RebalanceMove, WorkspaceManifest,
 };
+use lkjagent_core::workspace_record::record_path_at;
 use lkjagent_store::record_rows::{records, upsert_record, RecordRow};
 use lkjagent_store::workspace_rows::{
     insert_alias, insert_rebalance_audit, upsert_manifest, PathAliasRow,
@@ -81,7 +82,8 @@ fn planned_moves(conn: &Connection) -> Result<Vec<RebalanceMove>, String> {
 }
 
 fn move_for_row(row: &RecordRow) -> Option<RebalanceMove> {
-    let new_path = canonical_record_path(&row.kind, &row.id);
+    let new_path = record_path_at(&row.kind, &row.id, &row.updated_at, &row.title, &row.state)
+        .unwrap_or_else(|_| format!("records/knowledge/notes/{}/{}.md", row.kind, row.id));
     if row.path == new_path {
         return None;
     }

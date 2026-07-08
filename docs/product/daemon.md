@@ -67,10 +67,14 @@ exists, otherwise it stays open or blocks with failed-check evidence.
 ## Record-Only Turns
 
 Record-like owner turns may bypass the endpoint. The deterministic router writes
-or updates the workspace record, refreshes record metadata and indexes, writes
-route trace evidence, appends state events, and reports the path, record id, and
-fingerprint. If recording would be harmful or ambiguous, the daemon writes an
-inbox trace or asks at most one clarification.
+or updates the workspace record at its family path, refreshes record metadata and
+indexes, writes route trace evidence, appends state events, and reports the path,
+record id, and fingerprint. Journal records use `YYYY/MM/DD/entry.md`, TODOs use
+state directories, calendar records use date directories, and finance records use
+month directories. The owner command is stored in the transcript trace; the record
+body is structured unless the owner asks for verbatim storage. If recording would
+be harmful or ambiguous, the daemon writes an inbox trace or asks at most one
+clarification.
 
 ## Crash Resume
 

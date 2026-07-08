@@ -35,17 +35,17 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
     drop(conn);
 
     let plan = cli::run(["--data", data_str(&data), "workspace", "plan-rebalance"])?;
-    assert!(plan.contains("records/knowledge/notes/old.md -> records/life/todo/rec_1.md"));
+    assert!(plan.contains("records/knowledge/notes/old.md -> records/life/todo/open/rec_1.md"));
     let applied = cli::run(["--data", data_str(&data), "workspace", "apply-rebalance"])?;
     assert!(applied.contains("move rec_1"));
-    assert!(workspace.join("records/life/todo/rec_1.md").exists());
+    assert!(workspace.join("records/life/todo/open/rec_1.md").exists());
     assert!(!workspace.join("records/knowledge/notes/old.md").exists());
     let todo_readme = fs::read_to_string(workspace.join("records/life/todo/README.md"))?;
-    assert!(todo_readme.contains("[rec_1.md](rec_1.md)"));
+    assert!(todo_readme.contains("[open](open/)"));
     let life_readme = fs::read_to_string(workspace.join("records/life/README.md"))?;
     assert!(life_readme.contains("[todo](todo/)"));
     let index = fs::read_to_string(workspace.join("indexes/open-todos.md"))?;
-    assert!(index.contains("rec_1 [open] Move me (records/life/todo/rec_1.md)"));
+    assert!(index.contains("rec_1 [open] Move me (records/life/todo/open/rec_1.md)"));
 
     let shown = cli::run([
         "--data",
@@ -67,7 +67,7 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
         ["records/knowledge/notes/old.md"],
         |row| row.get(0),
     )?;
-    assert_eq!(alias, "records/life/todo/rec_1.md");
+    assert_eq!(alias, "records/life/todo/open/rec_1.md");
     let valid = cli::run(["--data", data_str(&data), "workspace", "validate"])?;
     assert_eq!(valid, "workspace validate: ok");
     Ok(())

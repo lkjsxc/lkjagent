@@ -10,7 +10,8 @@ fn routes_japanese_record_requests_to_records() -> Result<(), String> {
     ] {
         let intent = record_intent(text).ok_or_else(|| format!("not routed: {text}"))?;
         assert_eq!(intent.kind, "journal");
-        assert_eq!(intent.body, text);
+        assert_ne!(intent.body, text);
+        assert!(intent.body.contains("Summary"));
     }
     Ok(())
 }
@@ -93,6 +94,7 @@ fn ambiguous_save_like_turns_route_to_inbox() -> Result<(), String> {
     let intent = record_intent("remember that I paid 1200 yen")
         .ok_or_else(|| "contentful remember should record".to_string())?;
     assert_eq!(intent.kind, "finance");
+    assert!(intent.body.contains("I paid 1200 yen"));
     Ok(())
 }
 

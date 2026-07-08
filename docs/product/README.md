@@ -24,9 +24,13 @@ completion.
 
 Every owner turn leaves workspace evidence. Ordinary conversation appends a
 durable transcript entry. Ambiguous save-like text writes an inbox trace or asks
-one clarification. Record-like text writes a Markdown record, row, history,
-fingerprint, README coverage, index artifact, state cells, and queue route
-evidence before reporting success.
+one clarification. Record-like text writes a Markdown record at the canonical
+family path before reporting success: journals by human date, TODOs by state,
+calendar items by date, finance items by month, and work notes by project or
+repository slug. The owner command remains trace evidence; the record body is
+structured unless the owner explicitly asks for verbatim storage. Recording also
+writes row, history, fingerprint, README, index artifact, state-cell, and queue
+route evidence.
 
 Model-dependent work uses selected runtime state. The prompt shows bounded
 source-linked context, the selected XML-like envelope, and only the tools

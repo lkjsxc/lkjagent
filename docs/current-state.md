@@ -14,10 +14,14 @@ owner-readable memory surface; they never replace ledger authority.
 
 Every owner turn writes visible evidence: a transcript entry for ordinary turns
 or an inbox trace when routing is ambiguous. Record-like turns write Markdown
-under `data/workspace` by default and upsert workspace record rows, fingerprint
-history, README coverage, index artifacts, state cells, and queue route
-evidence. Artifact turns create concrete workspace paths, artifact rows, checks,
-and response paths before any success report.
+under canonical workspace family paths: dated journal entries, state-grouped
+TODOs, dated calendar notes, month-grouped finance notes, and readable work or
+knowledge records. The owner command is route evidence; the record body is a
+structured owner-readable note unless verbatim storage is explicit. Recording
+also upserts workspace record rows, fingerprint history, README coverage, index
+artifacts, state cells, and queue route evidence. Artifact turns create concrete
+workspace paths, artifact rows, checks, and response paths before any success
+report.
 
 The model-visible interface is compact XML-like text with source refs. Tool
 calls use one attribute-less `<lkjagent_action>` envelope selected by the active
@@ -62,13 +66,16 @@ workspace effects and artifact rows.
 
 Record-like owner turns have focused coverage for direct workspace writes,
 record rows, history, fingerprints, README links, index contents, and index
-artifacts. Artifact-request routing now blocks closure unless the final response
-names the artifact path after file, artifact row, and check row evidence exists.
-CLI send and daemon intake now scaffold the workspace and write owner-turn
-transcript or inbox trace files. Owner-turn routing has focused coverage for
-existing-matter answers, continuations, artifact requests, inspection,
-unsupported system operations, direct records, ambiguous inbox routing, and
-Japanese diary or save wording.
+artifacts. Journal records now use `YYYY/MM/DD/entry.md`, TODO records use state
+paths, calendar records use dated paths, finance records use month paths, and
+record bodies are structured separately from owner-turn transcript evidence.
+Artifact-request routing now blocks closure unless the final response names the
+artifact path after file, artifact row, and check row evidence exists. CLI send
+and daemon intake now scaffold the workspace and write owner-turn transcript or
+inbox trace files. Owner-turn routing has focused coverage for existing-matter
+answers, continuations, artifact requests, inspection, unsupported system
+operations, direct records, ambiguous inbox routing, and Japanese diary or save
+wording.
 
 Prompt context can admit bounded workspace record and index metadata with source
 fingerprints, suppress duplicate clean context items by semantic key, body,

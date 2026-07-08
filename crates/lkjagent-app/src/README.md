@@ -33,6 +33,7 @@ Map lkjagent-app source modules.
 - [prompt-bridge.rs](prompt_bridge.rs): prompt-frame rows before model calls.
 - [record-args.rs](record_args.rs): record subcommand parsing.
 - [record-files.rs](record_files.rs): workspace record file commands.
+- [record-identity.rs](record_identity.rs): canonical record ids and kind aliases.
 - [workspace-scaffold.rs](workspace_scaffold.rs): README and directory scaffold writes.
 - [recovery-bridge.rs](recovery_bridge.rs): unfinished decision reuse and
   recovery settlement.
@@ -40,7 +41,7 @@ Map lkjagent-app source modules.
 - [runtime-cell.rs](runtime_cell.rs): operation cell projection payloads.
 - [runtime-projection.rs](runtime_projection.rs): plan bridge projection events.
 - [snapshot-state.rs](snapshot_state.rs): matter snapshot state-cell mirror.
-- [state.rs](state.rs): active snapshot hydration from normalized rows.
+- [lib.rs](lib.rs): public state module for snapshot hydration from normalized rows.
 - [status.rs](status.rs): status, matter, and watch rendering helpers.
 - [turn-effects.rs](turn_effects.rs): deterministic write, check, and explore effects.
 - [workbench.rs](workbench.rs): refreshing normal-screen progress and input loop.

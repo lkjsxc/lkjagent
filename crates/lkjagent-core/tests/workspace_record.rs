@@ -1,6 +1,6 @@
 use lkjagent_core::workspace_record::{
     archive_path, default_state_for_kind, parse_record, record_fingerprint, record_path,
-    render_record, slug, state_keys_for_record, WorkspaceRecord,
+    record_path_at, render_record, slug, state_keys_for_record, WorkspaceRecord,
 };
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -47,7 +47,24 @@ fn record_families_emit_state_keys() -> TestResult<()> {
 
 #[test]
 fn record_paths_reject_escapes() -> TestResult<()> {
-    assert_eq!(record_path("todo", "rec_1")?, "records/life/todo/rec_1.md");
+    assert_eq!(
+        record_path("todo", "rec_1")?,
+        "records/life/todo/open/rec_1.md"
+    );
+    assert_eq!(
+        record_path_at(
+            "journal",
+            "journal_20260708",
+            "2026-07-08T09:30:00Z",
+            "day",
+            "open"
+        )?,
+        "records/life/journal/2026/07/08/entry.md"
+    );
+    assert_eq!(
+        record_path_at("finance", "rec_1", "2026-07-08T09:30:00Z", "bill", "review")?,
+        "records/life/finance/2026/07/rec_1.md"
+    );
     assert_eq!(
         archive_path("todo", "rec_1")?,
         "archive/records/todo/rec_1.md"

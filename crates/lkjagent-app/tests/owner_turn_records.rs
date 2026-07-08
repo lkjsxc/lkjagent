@@ -43,19 +43,27 @@ fn record_like_owner_turns_write_workspace_files_without_tasks() -> TestResult<(
     assert_eq!(count(&conn, "workspace_record_history")?, 7);
     assert_eq!(index_artifacts(&conn)?, 6);
     for (kind, path_part) in [
-        ("journal", "records/life/journal"),
-        ("todo", "records/life/todo"),
-        ("calendar", "records/life/calendar"),
-        ("finance", "records/life/finance"),
+        ("journal", "records/life/journal/"),
+        ("todo", "records/life/todo/open/"),
+        ("calendar", "records/life/calendar/"),
+        ("finance", "records/life/finance/"),
         ("note", "records/life/notes"),
         ("project", "records/work/projects"),
         ("artifact", "artifacts/documents"),
     ] {
         assert_path(&conn, &data, kind, path_part)?;
     }
+    let journal_path = record_path(&conn, "journal")?;
+    assert!(journal_path.ends_with("/entry.md"), "{journal_path}");
+    assert!(!journal_path.contains("unix:"), "{journal_path}");
     assert!(data.join("workspace/records/life/README.md").exists());
     assert_contains(&data, "workspace/indexes/README.md", "open-todos.md")?;
-    assert_contains(&data, "workspace/indexes/open-todos.md", "todo buy milk")?;
+    assert_contains(&data, "workspace/indexes/open-todos.md", "buy milk")?;
+    assert_not_contains(
+        &data,
+        &format!("workspace/{journal_path}"),
+        "記録してほしい\n",
+    )?;
     Ok(())
 }
 
@@ -110,6 +118,20 @@ fn assert_contains(data: &std::path::Path, rel: &str, needle: &str) -> TestResul
     let text = fs::read_to_string(data.join(rel))?;
     assert!(text.contains(needle), "{rel}: {needle}");
     Ok(())
+}
+
+fn assert_not_contains(data: &std::path::Path, rel: &str, needle: &str) -> TestResult<()> {
+    let text = fs::read_to_string(data.join(rel))?;
+    assert!(!text.contains(needle), "{rel}: {needle}");
+    Ok(())
+}
+
+fn record_path(conn: &Connection, kind: &str) -> rusqlite::Result<String> {
+    conn.query_row(
+        "SELECT path FROM workspace_records WHERE kind = ?1",
+        [kind],
+        |row| row.get(0),
+    )
 }
 
 fn index_artifacts(conn: &Connection) -> rusqlite::Result<i64> {
