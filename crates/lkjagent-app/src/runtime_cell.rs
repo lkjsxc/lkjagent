@@ -61,10 +61,12 @@ fn open_parts(snapshot: &TaskSnapshot) -> CellParts {
         );
     }
     CellParts::with_payload(
-        "model",
-        &step.id.to_string(),
-        "plan-bridge.model",
+        "work",
+        &format!("model/{}", step.id),
+        "state.model-call",
         serde_json::json!({
+            "operation_key": format!("model.call/{}", step.id),
+            "selector_tier": 50,
             "step_id": step.id,
             "expected_envelope": envelope(step.kind),
             "model_budget_tokens": max_tokens(step.kind),
@@ -171,12 +173,13 @@ mod tests {
     #[test]
     fn all_done_bridge_projects_close_candidate() {
         let mut snapshot = instantiate(2, "are you ok?");
+        let model = test_cell(&snapshot);
+        assert_eq!(model.key.namespace, "work");
+        assert_eq!(model.payload_schema, "state.model-call");
         for step in &mut snapshot.steps {
             step.state = StepState::Done;
         }
-
         let cell = test_cell(&snapshot);
-
         assert_eq!(cell.key.namespace, "completion");
         assert_eq!(cell.key.name, "close-candidate");
     }
@@ -184,15 +187,13 @@ mod tests {
     fn test_cell(snapshot: &TaskSnapshot) -> StateCell {
         let result = projected_cell(snapshot, "now");
         assert!(result.is_ok());
-        match result {
-            Ok(cell) => cell,
-            Err(_) => StateCell::active(
-                StateKey {
-                    namespace: "invalid".to_string(),
-                    name: "invalid".to_string(),
-                },
-                "test",
-            ),
+        result.unwrap_or_else(|_| StateCell::active(invalid_key(), "test"))
+    }
+
+    fn invalid_key() -> StateKey {
+        StateKey {
+            namespace: "invalid".to_string(),
+            name: "invalid".to_string(),
         }
     }
 }

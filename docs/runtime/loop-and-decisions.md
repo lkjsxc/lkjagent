@@ -43,10 +43,11 @@ which cell settled.
 There is no prompt-only policy and no dispatcher-only policy. Prompt rendering
 and admission are projections of the same persisted decision. A model-free
 operation such as `state.resolve` may settle the selected state key directly
-through the runtime loop without creating or reading a bridge step. Narrow
-model-free effects such as `workspace.write_text` and `workspace.append_text`
-are carried on the persisted decision as effect commands and path-checked by the
-workspace effect edge.
+through the runtime loop without creating or reading a bridge step. Projected
+model work uses payload-defined native `work:model/*` cells that carry their
+`model.call/*` operation key. Narrow model-free effects such as
+`workspace.write_text` and `workspace.append_text` are carried on the persisted
+decision as effect commands and path-checked by the workspace effect edge.
 
 ## Acceptance Checks
 

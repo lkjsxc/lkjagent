@@ -175,19 +175,19 @@ Native model-free effects support `workspace.write_text` and
 `workspace.append_text`, both path-checked and persisted as artifact rows.
 Deterministic verify projects `completion:check-pending/<step>` carrying
 `check.run/<step>`; hydration suppresses passed rows lacking native outcome cells.
+Model work uses native `work:model/*` cells carrying `model.call/*`.
 
 ## Known Gaps
 
 - Closure still reads transitional check rows after native hydration admits them.
-- The plan-family bridge still participates in runtime projection. Until native
-  state cells fully own selection, unsafe bridge steps must block close candidates.
+- Close-candidate projection still reads plan-family bridge rows.
 - Native operation execution remains limited to state resolution, workspace text
   effects, and bridge-backed effects.
 
 ## Next Executable Step
 
-Implement next bridge-retirement: reduce remaining model and close-candidate
-projection from plan-family bridge rows.
+Implement next bridge-retirement: reduce remaining close-candidate projection
+from plan-family bridge rows.
 
 ## Honesty Rules
 
