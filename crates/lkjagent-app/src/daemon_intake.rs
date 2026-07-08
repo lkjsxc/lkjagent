@@ -32,11 +32,10 @@ pub fn load_runtime_snapshot<C: Clock>(
         first_snapshot_with_state(conn, "open").map_err(|e| e.to_string())?
     {
         crate::daemon_owner_routes::attach_updates(conn, &mut snapshot, clock)?;
-        persist_snapshot_cell(conn, &snapshot, &clock.now())?;
-        return Ok(Some(snapshot));
+        return Ok(Some(seed_snapshot(conn, snapshot, &clock.now())?));
     }
     if let Some(waiting) = first_snapshot_with_state(conn, "waiting").map_err(|e| e.to_string())? {
-        persist_snapshot_cell(conn, &waiting, &clock.now())?;
+        let waiting = seed_snapshot(conn, waiting, &clock.now())?;
         return resume_loaded_waiting(conn, data_dir, waiting, clock);
     }
     intake(conn, data_dir, false, clock)
@@ -46,6 +45,15 @@ pub fn idle_snapshot() -> TaskSnapshot {
     let mut snapshot = instantiate(0, "idle");
     snapshot.task.state = TaskState::Closed;
     snapshot
+}
+
+fn seed_snapshot(
+    conn: &Connection,
+    snapshot: TaskSnapshot,
+    now: &str,
+) -> Result<TaskSnapshot, String> {
+    persist_snapshot_cell(conn, &snapshot, now)?;
+    load_snapshot_cell(conn).map(|loaded| loaded.unwrap_or(snapshot))
 }
 
 fn resume_loaded_waiting<C: Clock>(

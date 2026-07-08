@@ -176,18 +176,18 @@ Native model-free effects support `workspace.write_text` and
 Deterministic verify projects `completion:check-pending/<step>` carrying
 `check.run/<step>`; hydration suppresses passed rows lacking native outcome cells.
 Model work uses native `work:model/*`; blocked/close projections use native
-completion schemas. `matter:snapshot/*` wins; fallbacks seed snapshots first.
+completion schemas. `matter:snapshot/*` wins; fallbacks seed and reload snapshots.
 
 ## Known Gaps
 
 - Closure still reads transitional check rows after native hydration admits them.
-- Plan-family rows remain as recovery input when no semantic rows exist.
+- Plan-family rows remain as snapshot seed input when no semantic rows exist.
 - Native operation execution remains limited to state resolution, workspace text
   effects, and bridge-backed effects.
 
 ## Next Executable Step
 
-Implement next bridge-retirement: reduce remaining plan-family recovery input.
+Implement next bridge-retirement: write new intake through semantic matter rows.
 
 ## Honesty Rules
 
