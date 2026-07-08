@@ -37,7 +37,9 @@ docker compose run --rm replay
 
 `docker compose run --rm verify` is the final deterministic gate. It builds the
 image from explicit Dockerfile copies, not broad `COPY . .`, and runs
-`quiet verify` without source bind mounts.
+`quiet verify` without source bind mounts. The Docker context excludes runtime
+data, logs, tmp evidence, target output, local model files, and secrets while
+retaining `Cargo.lock`.
 
 ## Claims
 
