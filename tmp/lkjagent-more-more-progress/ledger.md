@@ -37,8 +37,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   helper without adding a product source file.
 - Commit 660429b1 (`feat: harden action value admission`) bounds XML-like action
   argument values and rejects empty executable values before effects.
-- Pending recovery ladder slice records resolved `recovery.failure` cells for
-  parse, admission, effect, endpoint, and check failures.
+- Commit 74a440e7 (`feat: record recovery failure ladder`) records resolved
+  `recovery.failure` cells for parse, admission, effect, endpoint, and check failures.
 
 ## Tests Added
 - `crates/lkjagent-core/tests/owner_turn.rs::ambiguous_save_like_turns_route_to_inbox`.
@@ -192,4 +192,4 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Commit recovery ladder, then run final packet/campaign acceptance checks.
+Run final packet/campaign acceptance checks.
