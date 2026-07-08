@@ -19,23 +19,10 @@ pub struct TurnRoute {
     pub transformation_allowed: bool,
 }
 const CONTINUATION_WORDS: &[&str] = &["continue", "also", "same matter", "this matter", "append"];
-const INSPECTION_WORDS: &[&str] = &[
-    "status",
-    "show",
-    "list",
-    "inspect",
-    "current state",
-    "queue",
-    "matter",
-];
-const SYSTEM_WORDS: &[&str] = &[
-    "run test",
-    "cargo test",
-    "cargo fmt",
-    "clippy",
-    "docker compose",
-    "verify",
-];
+#[rustfmt::skip]
+const INSPECTION_WORDS: &[&str] = &["status", "show", "list", "inspect", "current state", "queue", "matter"];
+#[rustfmt::skip]
+const SYSTEM_WORDS: &[&str] = &["run test", "cargo test", "cargo fmt", "clippy", "docker compose", "verify"];
 pub fn route_turn(text: &str, context: RouteContext) -> Option<TurnRoute> {
     let body = text.trim();
     if body.is_empty() {
@@ -44,6 +31,9 @@ pub fn route_turn(text: &str, context: RouteContext) -> Option<TurnRoute> {
     let lower = body.to_ascii_lowercase();
     if context.waiting_matter && !context.force_new {
         return Some(route("existing_matter", "queue_answer", body, false));
+    }
+    if ambiguous_inbox(body, &lower) {
+        return Some(route("inbox", "workspace_inbox", body, false));
     }
     if let Some(intent) = record_intent_from_parts(body, &lower) {
         return Some(TurnRoute {
@@ -77,6 +67,9 @@ pub fn record_intent(text: &str) -> Option<RecordIntent> {
     record_intent_from_parts(body, &lower)
 }
 fn record_intent_from_parts(body: &str, lower: &str) -> Option<RecordIntent> {
+    if ambiguous_inbox(body, lower) {
+        return None;
+    }
     if !explicit_record(body, lower) && !typed_record(body, lower) {
         return None;
     }
@@ -86,6 +79,14 @@ fn record_intent_from_parts(body: &str, lower: &str) -> Option<RecordIntent> {
         body: body.to_string(),
     })
 }
+fn ambiguous_inbox(text: &str, lower: &str) -> bool {
+    let compact = lower.trim_matches(|ch: char| ch.is_ascii_punctuation() || ch.is_whitespace());
+    matches!(
+        compact,
+        "remember this" | "save this" | "keep this" | "remember it" | "save it" | "keep it"
+    ) || matches!(text.trim(), "覚えておいて" | "保存して" | "残して")
+}
+
 fn explicit_record(text: &str, lower: &str) -> bool {
     japanese_record(text)
         || has_any(

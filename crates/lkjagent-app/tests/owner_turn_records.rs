@@ -74,6 +74,11 @@ fn cli_run_once_processes_record_like_turn() -> TestResult<()> {
     assert_eq!(queue_state_count(&conn, "recorded")?, 1);
     assert_eq!(count(&conn, "workspace_records")?, 1);
     assert!(data.join("workspace/indexes/open-todos.md").exists());
+    assert_contains(
+        &data,
+        "workspace/artifacts/transcripts/queue-000001.md",
+        "todo buy tea",
+    )?;
     Ok(())
 }
 

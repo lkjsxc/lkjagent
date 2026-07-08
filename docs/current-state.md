@@ -59,9 +59,11 @@ workspace effects and artifact rows.
 
 Record-like owner turns have focused coverage for direct workspace writes,
 record rows, history, fingerprints, README links, index contents, and index
-artifacts. Owner-turn routing has focused coverage for existing-matter answers,
-continuations, artifact requests, inspection, unsupported system operations,
-direct records, and Japanese diary or save wording.
+artifacts. CLI send and daemon intake now scaffold the workspace and write
+owner-turn transcript or inbox trace files. Owner-turn routing has focused
+coverage for existing-matter answers, continuations, artifact requests,
+inspection, unsupported system operations, direct records, ambiguous inbox
+routing, and Japanese diary or save wording.
 
 Prompt context can admit bounded workspace record and index metadata with source
 fingerprints. Unsafe XML-like tool actions persist rejections. Status and proof
@@ -79,8 +81,9 @@ had no workspace records, artifacts, check results, admissions, or observations.
 
 ## Known Gaps
 
-- Current acceptance has not yet proven daily-use campaigns that ordinary turns
-  always leave transcript or inbox evidence in a visible workspace.
+- Current acceptance still needs broad daily-use campaign evidence across
+  journal, todo, calendar, finance, notes, artifacts, questions, project work,
+  TUI, and recovery flows.
 - Artifact creation still needs packet-level proof that files, rows, checks, and
   response paths are all present before owner-facing success.
 - Recovery state coverage is incomplete for parse, admission, effect, endpoint,

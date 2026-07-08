@@ -7,8 +7,9 @@ conversation continuity.
 
 ## Owner Turn Intake
 
-`lkjagent send TEXT` inserts one pending owner-turn row. It does not require a
-running daemon. The daemon delivers pending rows only at cycle start, so owner
+`lkjagent send TEXT` inserts one pending owner-turn row, scaffolds the
+workspace, and writes an initial transcript or inbox trace. It does not require
+a running daemon. The daemon delivers pending rows only at cycle start, so owner
 input never interrupts an endpoint call or state transaction.
 
 A turn stores the raw owner text, received time, routing flags, optional
@@ -32,8 +33,9 @@ rules are sufficient:
 
 Record-like phrases such as "record this", Japanese diary requests, todo-like
 text, calendar-like text, finance notes, and project notes prefer workspace
-write-through over matter creation. Ambiguous save-like text writes an inbox
-trace with the route reason or asks one clarification instead of disappearing.
+write-through over matter creation. Ambiguous save-like text such as "remember
+this" writes an inbox trace with the route reason or asks one clarification
+instead of disappearing.
 
 ## Answer Routing
 

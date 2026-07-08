@@ -1,6 +1,33 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+pub fn ensure_root(workspace: &Path) -> Result<(), String> {
+    for rel in [
+        "inbox",
+        "records",
+        "artifacts/transcripts",
+        "artifacts/proof",
+        "indexes",
+        "system/manifests",
+    ] {
+        fs::create_dir_all(workspace.join(rel)).map_err(|error| error.to_string())?;
+    }
+    write_readme(workspace)?;
+    for rel in [
+        "inbox",
+        "records",
+        "artifacts",
+        "artifacts/transcripts",
+        "artifacts/proof",
+        "indexes",
+        "system",
+        "system/manifests",
+    ] {
+        write_readme(&workspace.join(rel))?;
+    }
+    Ok(())
+}
+
 pub fn ensure_for_path(workspace: &Path, rel: &str) -> Result<(), String> {
     fs::create_dir_all(workspace).map_err(|error| error.to_string())?;
     let path = workspace.join(rel);

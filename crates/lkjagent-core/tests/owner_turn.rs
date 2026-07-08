@@ -84,6 +84,19 @@ fn routes_artifact_inspection_and_system_operation() -> Result<(), String> {
 }
 
 #[test]
+fn ambiguous_save_like_turns_route_to_inbox() -> Result<(), String> {
+    for text in ["remember this", "save this", "keep this", "覚えておいて"] {
+        assert!(record_intent(text).is_none(), "{text}");
+        let route = route(text, RouteContext::default())?;
+        assert_route(&route, "inbox", "workspace_inbox", false);
+    }
+    let intent = record_intent("remember that I paid 1200 yen")
+        .ok_or_else(|| "contentful remember should record".to_string())?;
+    assert_eq!(intent.kind, "finance");
+    Ok(())
+}
+
+#[test]
 fn does_not_record_plain_questions() {
     assert!(record_intent("what is the current state?").is_none());
 }

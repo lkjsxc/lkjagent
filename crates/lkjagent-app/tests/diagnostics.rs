@@ -7,17 +7,17 @@ use serde_json::Value;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn doctor_reports_schema_and_safe_warnings() -> TestResult<()> {
+fn doctor_reports_schema_and_scaffolded_workspace() -> TestResult<()> {
     let data = fixture_root("doctor")?;
 
     let output = cli::run(["--data", data.to_string_lossy().as_ref(), "doctor"])?;
 
-    assert!(output.contains("doctor: warn"));
+    assert!(output.contains("doctor: ok"));
     assert!(output.contains("schema: tables=29 missing=none"));
     assert!(output.contains("endpoint: url="));
     assert!(output.contains("workspace: root="));
     assert!(output.contains("prompt_refs: orphan=0"));
-    assert!(output.contains("warnings: missing-workspace-dirs"));
+    assert!(output.contains("warnings: none"));
     Ok(())
 }
 

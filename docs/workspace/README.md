@@ -27,6 +27,7 @@ files nor prose prompts become a second control plane.
 ## Write-Through Rule
 
 Anything the owner asks lkjagent to record is written under `data/workspace` by
-default. Every owner turn writes either transcript evidence or an inbox trace. A
-successful recording report names the path, fingerprint, record id, and index
-state. A failure report says no file was written and records the reason.
+default. `send` and daemon intake ensure the workspace root exists and every
+owner turn writes either transcript evidence or an inbox trace. A successful
+recording report names the path, fingerprint, record id, and index state. A
+failure report says no file was written and records the reason.

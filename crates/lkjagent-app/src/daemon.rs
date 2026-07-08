@@ -50,7 +50,7 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     let db = data_dir.join("lkjagent.sqlite3");
     let workspace = data_dir.join("workspace");
     let logs = data_dir.join("logs");
-    std::fs::create_dir_all(&workspace).map_err(|error| error.to_string())?;
+    crate::workspace_scaffold::ensure_root(&workspace)?;
     let mut conn = Connection::open(db).map_err(|error| error.to_string())?;
     setup(&conn).map_err(|error| error.to_string())?;
     let heartbeat = clock.now();

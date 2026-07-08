@@ -19,6 +19,7 @@ where
     let db = invocation.data_dir.join("lkjagent.sqlite3");
     let conn = Connection::open(&db).map_err(|error| error.to_string())?;
     lkjagent_store::plan_schema::setup(&conn).map_err(|error| error.to_string())?;
+    crate::workspace_scaffold::ensure_root(&invocation.data_dir.join("workspace"))?;
     match invocation.command {
         Command::Run { once } if once => {
             let mut endpoint = crate::endpoint::LlmEndpoint::new(&invocation.data_dir);
@@ -36,6 +37,13 @@ where
             let now = crate::clock::utc_now();
             let id = lkjagent_store::plan_access::enqueue_with_force(&conn, &text, force_new, &now)
                 .map_err(|error| error.to_string())?;
+            crate::daemon_owner_routes::write_send_trace(
+                &invocation.data_dir,
+                id,
+                &text,
+                force_new,
+                &now,
+            )?;
             Ok(format!("queue: {id} new={force_new}"))
         }
         Command::Status => status(&conn),

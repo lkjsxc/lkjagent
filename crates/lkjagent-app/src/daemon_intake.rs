@@ -5,7 +5,7 @@ use lkjagent_core::engine::Command;
 use lkjagent_core::model::{Event, EventKind, StepKind, StepState, TaskSnapshot, TaskState};
 use lkjagent_store::memory::search_memory;
 use lkjagent_store::plan_access::{
-    deliver_answer, deliver_forced_new, deliver_next, insert_step_tx, insert_task,
+    deliver_answer, deliver_forced_new, deliver_next, insert_step_tx, insert_task, mark_recorded,
 };
 use lkjagent_store::plan_commit::commit_turn;
 use lkjagent_store::plan_hydrate::first_snapshot_with_state;
@@ -24,14 +24,14 @@ pub fn load_runtime_snapshot<C: Clock>(
             return resume_loaded_waiting(conn, data_dir, snapshot, clock);
         }
         if snapshot.task.state == TaskState::Open {
-            crate::daemon_owner_routes::attach_updates(conn, &mut snapshot, clock)?;
+            crate::daemon_owner_routes::attach_updates(conn, data_dir, &mut snapshot, clock)?;
         }
         return Ok(Some(snapshot));
     }
     if let Some(mut snapshot) =
         first_snapshot_with_state(conn, "open").map_err(|e| e.to_string())?
     {
-        crate::daemon_owner_routes::attach_updates(conn, &mut snapshot, clock)?;
+        crate::daemon_owner_routes::attach_updates(conn, data_dir, &mut snapshot, clock)?;
         return Ok(Some(seed_snapshot(conn, snapshot, &clock.now())?));
     }
     if let Some(waiting) = first_snapshot_with_state(conn, "waiting").map_err(|e| e.to_string())? {
@@ -62,7 +62,7 @@ fn resume_loaded_waiting<C: Clock>(
     waiting: TaskSnapshot,
     clock: &mut C,
 ) -> Result<Option<TaskSnapshot>, String> {
-    let resumed = resume_waiting(conn, waiting, clock)?;
+    let resumed = resume_waiting(conn, data_dir, waiting, clock)?;
     if resumed.task.state == TaskState::Open {
         return Ok(Some(resumed));
     }
@@ -90,7 +90,12 @@ fn intake<C: Clock>(
     }
     .map_err(|error| error.to_string())?;
     let Some(row) = queue else { return Ok(None) };
+    crate::daemon_owner_routes::write_owner_trace(data_dir, &row, &now)?;
     match row.route_lane.as_deref() {
+        Some("inbox") => {
+            mark_recorded(conn, row.id, &now).map_err(|error| error.to_string())?;
+            return Ok(None);
+        }
         Some("inspection") => {
             return crate::daemon_route_effects::routed_inspection(conn, &row, task_id, &now);
         }
@@ -133,6 +138,7 @@ fn admit_memory(conn: &Connection, snapshot: &mut TaskSnapshot, query: &str) -> 
 
 fn resume_waiting<C: Clock>(
     conn: &mut Connection,
+    data_dir: &Path,
     mut snapshot: TaskSnapshot,
     clock: &mut C,
 ) -> Result<TaskSnapshot, String> {
@@ -145,6 +151,7 @@ fn resume_waiting<C: Clock>(
     else {
         return Ok(snapshot);
     };
+    crate::daemon_owner_routes::write_owner_trace(data_dir, &answer, &now)?;
     snapshot.task.state = TaskState::Open;
     if let Some(step) = snapshot
         .steps
