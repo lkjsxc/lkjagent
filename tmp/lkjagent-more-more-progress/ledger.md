@@ -1,0 +1,151 @@
+# Progress Ledger
+
+## Current Objective
+Docs-first slice for workspace-first personal agent harness. Case state: objective is to align product docs with the packet target before source edits; constraints are docs as contract, files under 200 lines, no stale bridge or demo claims, XML-like non-JSON model protocol, operation-scoped tool views, evidence-only completion, and Docker-backed final verification; assumptions are that existing data/log deletions are pre-existing and must not be touched; risks are broad scope, dirty worktree, and existing bridge code; evidence requirements are docs diff, focused tests, quiet verify, Docker verify or honest skip, daily-use campaign evidence, and final acceptance matrix; candidate files are docs/current-state.md, docs/product/*, docs/workspace/*, docs/runtime/*, docs/context/*, docs/tools/*, docs/protocol/*, docs/evaluation/*, and later runtime/router/context/tool/TUI source files; next action is baseline inspection and docs-only target update.
+
+## Docs Changed
+- Commit dd97d9c2 (`docs: state workspace-first product target`) rewrote
+  docs/current-state.md with workspace-first target, proven checkout, baseline
+  evidence, and packet-level gaps.
+- Commit dd97d9c2 updated product, workspace, runtime, context, tools,
+  workbench, and evaluation docs to state transcript/inbox evidence,
+  write-through records, non-JSON prompt context, operation-scoped tool views,
+  recovery blockers, and TUI identity/follow requirements.
+
+## Source Changed
+- Commit 31ed049f (`feat: write owner turns to workspace evidence`) added
+  workspace root scaffolding on CLI and daemon entry.
+- Commit 31ed049f added owner-turn transcript and inbox trace writers, including
+  send-time trace files and daemon delivery refreshes.
+- Commit 31ed049f added ambiguous save-like inbox routing for `remember this` and
+  `save this` forms.
+- Commit 10e3d211 (`feat: scope default explore tool view`) added default
+  explore views without `shell.run` and an explicit shell-capable view for
+  persisted decisions.
+- Commit 3803a3b0 (`feat: deduplicate prompt context items`) suppresses
+  duplicate clean context items by semantic key, body, source type, and source
+  fingerprint.
+- Commit 80e080db (`feat: track tui transcript identity`) adds stable transcript
+  entry ids, agent draft accumulation, id-based durable/session merge, and saved
+  transcript ids/source paths.
+
+## Tests Added
+- `crates/lkjagent-core/tests/owner_turn.rs::ambiguous_save_like_turns_route_to_inbox`.
+- `crates/lkjagent-app/tests/workspace_evidence.rs` covering send transcript
+  traces, inbox trace without endpoint, and empty-workspace record/question
+  regression.
+- Extended `cli_run_once_processes_record_like_turn` to assert transcript trace.
+- Added `crates/lkjagent-app/tests/tool_views.rs::default_explore_prompt_hides_shell_tool`.
+- Updated contamination coverage so shell observations use an explicit shell view.
+- Added `context_plan_suppresses_duplicate_clean_items` in core context tests.
+- Added `crates/lkjagent-app/tests/tui_transcript_identity.rs` for streaming
+  delta commit, identical text with different ids, durable override by id, and
+  saved ids/source paths.
+
+## Commands Run
+- `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs`.
+- `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify`.
+- `docker compose run --rm verify` -> `ok verify`.
+- `python3 tmp/lkjagent-more-more-thinking-20260708/12-scripts/repo_static_report.py .`
+  -> 1087 files, 49957 lines, largest docs/current-state.md was 201 before rewrite.
+- `python3 tmp/lkjagent-more-more-thinking-20260708/12-scripts/sqlite_evidence.py data/lkjagent.sqlite3`
+  -> workspace_records 0, artifacts 0, check_results 0, admissions 0, observations 0.
+- `cargo test -p lkjagent-core --test owner_turn` -> 7 passed.
+- `cargo test -p lkjagent-app --test owner_turn_records` -> 2 passed.
+- `cargo test -p lkjagent-app --test workspace_evidence` -> 3 passed.
+- `cargo fmt --all -- --check` -> no output.
+- `cargo test -p lkjagent-app --test diagnostics` -> 2 passed after updating
+  the doctor expectation for scaffolded workspaces.
+- `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after the
+  diagnostics test update.
+- `docker compose run --rm verify` -> `ok verify` after the workspace-evidence
+  source slice.
+- `cargo test -p lkjagent-app --test tool_views` -> 1 passed.
+- `cargo test -p lkjagent-app --test contamination` -> 2 passed.
+- `cargo test -p lkjagent-app --test explore` -> 3 passed.
+- `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs` after the
+  tool-view slice.
+- `cargo run -p lkjagent-xtask -- check-lines` -> `ok check-lines` after the
+  tool-view slice.
+- `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after the
+  tool-view slice.
+- `docker compose run --rm verify` -> `ok verify` after the tool-view slice.
+- `cargo test -p lkjagent-core --test context_completion` -> 4 passed.
+- `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs` after the
+  context-dedup slice.
+- `cargo run -p lkjagent-xtask -- check-lines` -> `ok check-lines` after the
+  context-dedup slice.
+- `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after the
+  context-dedup slice.
+- `docker compose run --rm verify` -> `ok verify` after the context-dedup slice.
+- `cargo test -p lkjagent-app --test tui_state` -> 11 passed after the TUI
+  transcript identity slice.
+- `cargo test -p lkjagent-app --test tui_snapshot` -> 1 passed after the TUI
+  transcript identity slice.
+- `cargo test -p lkjagent-app --test tui_transcript_identity` -> 4 passed.
+- Initial `cargo run -p lkjagent-xtask -- quiet verify` for the TUI slice failed
+  in the inline `tui_view` durable transcript test because the test still used
+  the legacy string-only snapshot field; updated it to use transcript entries.
+- `cargo test -p lkjagent-app --lib tui_view::tests::transcript_uses_durable_snapshot_agent_messages`
+  -> 1 passed.
+- `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after the TUI
+  transcript identity fix.
+- `docker compose run --rm verify` -> `ok verify` after the TUI transcript
+  identity fix.
+- Scripted campaign command with `python` shim and `BIN='cargo run -p lkjagent-app'`
+  wrote `tmp/agent-runs/20260708T110203Z/transcript.txt`; gates printed
+  `ok check-docs` and `ok verify`; workspace probe printed `missing: none` and
+  `workspace validate: ok`, with transcript files and one todo record.
+- `cargo run -p lkjagent-xtask -- smoke live` -> `ok smoke live status=skipped
+  reason=operator-command-required`; skip recorded in
+  `tmp/agent-runs/20260708T110203Z/live-skip.txt`.
+
+## Failed Or Skipped Commands
+- `python tmp/lkjagent-more-more-thinking-20260708/12-scripts/repo_static_report.py .`
+  failed because `python` was not found; reran with `python3`.
+- `python tmp/lkjagent-more-more-thinking-20260708/12-scripts/sqlite_evidence.py data/lkjagent.sqlite3`
+  failed because `python` was not found; reran with `python3`.
+- Initial `cargo test -p lkjagent-app --test workspace_evidence` failed because
+  the mixed daily-use test used a generic wording that stayed open; changed the
+  scenario to a simple question and reran successfully.
+- Initial post-slice `cargo run -p lkjagent-xtask -- quiet verify` failed in
+  `doctor_reports_schema_and_safe_warnings` because the new CLI scaffold removes
+  the missing-workspace warning; updated the test and reran successfully.
+
+## Evidence Files
+- Packet indexed from tmp/lkjagent-more-more-thinking-20260708.
+- Baseline command output is indexed in the context-mode batch from this session.
+
+## Acceptance Matrix
+- Product docs describe implemented behavior and no stale contract remains: open.
+- Source files and docs respect line limits: open.
+- Ordinary record turns write workspace files and rows: focused tests passed;
+  broad campaign evidence still open.
+- Every owner turn writes transcript or inbox evidence: focused tests passed;
+  broad campaign evidence still open.
+- Artifact creation creates files, artifact rows, checks, and response paths: open.
+- Observed file-work failure has focused regression: open.
+- Earlier blocked work prevents later response work without recovery: open.
+- Prompt context is deduplicated, source-linked, bounded, and non-JSON:
+  duplicate-context focused test passed; no-JSON/failure containment still open.
+- Tool views are selected by state, not global catalog: default explore shell
+  hiding has focused tests; broader state matrix remains open.
+- XML-like action grammar and admission have focused tests: open.
+- Recovery states handle parse, admission, effect, endpoint, and check failures: open.
+- TUI duplicate and bottom-follow regressions have tests: transcript identity
+  and duplicate-by-id focused tests passed; bottom-follow tests remain open.
+- Deterministic replay passes: open.
+- Quiet verify passes: open.
+- Docker Compose verify passes or honest skip committed: open.
+- Live campaigns run or honest skips committed: scripted campaign evidence and
+  live skip file exist under tmp/agent-runs/20260708T110203Z; commit pending.
+- Final handoff names commits, commands, evidence paths, and risks: open.
+
+## Open Risks
+- Existing worktree contains many deleted data/log files and untracked logs before this work.
+- The request spans docs, runtime, workspace, context, tools, TUI, and evaluation.
+- Baseline gates may be expensive or blocked by environment.
+
+## Next Action
+Commit scripted campaign evidence, then address bottom-follow or artifact/check
+proof gaps.

@@ -1,0 +1,6 @@
+# Live Campaign Skip
+
+Command: cargo run -p lkjagent-xtask -- smoke live
+Result: ok smoke live status=skipped reason=operator-command-required
+
+Reason: this slice ran the scripted daily-use campaign. A live endpoint campaign requires an explicit operator command and endpoint budget.
