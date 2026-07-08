@@ -32,8 +32,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   `Viewport::Follow`/`Viewport::Manual` state, scroll-down follow restoration,
   manual-top preservation, and pane rendering that uses the viewport height
   helper without adding a product source file.
-- Pending protocol slice bounds XML-like action argument values and rejects empty
-  executable values before effects.
+- Commit 660429b1 (`feat: harden action value admission`) bounds XML-like action
+  argument values and rejects empty executable values before effects.
 
 ## Tests Added
 - `crates/lkjagent-core/tests/owner_turn.rs::ambiguous_save_like_turns_route_to_inbox`.
@@ -175,9 +175,9 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   duplicate-context focused test passed; no-JSON/failure containment still open.
 - Tool views are selected by state, not global catalog: default explore shell
   hiding has focused tests; broader state matrix remains open.
-- XML-like action grammar and admission have focused tests: focused Japanese,
-  multiline, entity, stale decision, context mismatch, bad params, oversized,
-  empty, and placeholder tests passed; commit pending for latest edge tests.
+- XML-like action grammar and admission have focused tests: commit 660429b1
+  records focused Japanese, multiline, entity, stale decision, context mismatch,
+  bad params, oversized, empty, and placeholder test evidence.
 - Recovery states handle parse, admission, effect, endpoint, and check failures: open.
 - TUI duplicate and bottom-follow regressions have tests: transcript identity,
   duplicate-by-id, pane bottom-follow, and reducer-level re-enable-follow
@@ -196,5 +196,4 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Commit the protocol/admission edge slice, then address artifact/check proof gaps
-and remaining recovery/no-JSON acceptance items.
+Address artifact/check proof gaps and remaining recovery/no-JSON acceptance items.
