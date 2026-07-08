@@ -27,6 +27,7 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   fingerprint.
 - Commit faec18ca (`feat: suppress json-like prompt context`) suppresses
   JSON-like context bodies with source-linked prompt markers.
+- Pending artifact proof slice blocks artifact-request closure until the response names the output path after file, artifact row, and check row evidence exists.
 - Commit 80e080db (`feat: track tui transcript identity`) adds stable transcript
   entry ids, agent draft accumulation, id-based durable/session merge, and saved
   transcript ids/source paths.
@@ -56,6 +57,7 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Added `crates/lkjagent-core/tests/tool_call_edges.rs` for Japanese values,
   large bounded values, and oversized action values.
 - Added admission coverage for empty required values.
+- Extended queue routing artifact tests for file, artifact/check rows, response path, and missing-path blocking.
 
 ## Commands Run
 - `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs`.
@@ -126,16 +128,12 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after keeping the
   viewport helper inside existing source-file budget.
 - `docker compose run --rm verify` -> `ok verify` after the viewport slice.
-- `cargo test -p lkjagent-core --test tool_call_edges` -> 2 passed.
-- `cargo test -p lkjagent-core --test admission` -> 3 passed.
-- `cargo fmt --all -- --check` -> no output after the protocol edge slice.
-- `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after replacing
-  `expect_err` in the new test.
-- `docker compose run --rm verify` -> `ok verify` after the protocol edge slice.
-- Bottom-follow gates: `check-docs`, `check-lines`, `quiet verify`, and
-  `docker compose run --rm verify` all passed.
-- `cargo test -p lkjagent-app --test context_no_json` -> 1 passed.
-- No-JSON context gates: docs, lines, quiet verify, and Docker verify passed.
+- Protocol gates: tool_call_edges 2 passed; admission 3 passed; fmt, quiet
+  verify, and Docker verify passed.
+- Bottom-follow gates: check-docs, check-lines, quiet verify, and Docker verify passed.
+- No-JSON context: context_no_json 1 passed; docs, lines, quiet verify, and Docker verify passed.
+- Artifact proof: queue_routing 7 passed, app template regression 1 passed,
+  quiet verify passed, and fmt/docs/lines/Docker gates passed.
 
 ## Failed Or Skipped Commands
 - `python tmp/lkjagent-more-more-thinking-20260708/12-scripts/repo_static_report.py .`
@@ -153,9 +151,10 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   tests to an integration test.
 - `cargo test -p lkjagent-app --lib workbench_line::tests::mode_command_switches_to_pane_renderer workbench_render::tests`
   failed because cargo accepts only one test filter; reran the filters separately.
-- Initial protocol-edge `cargo run -p lkjagent-xtask -- quiet verify` failed in
-  clippy because the new test used `expect_err`; replaced it with explicit match
-  handling and reran successfully.
+- Initial protocol-edge quiet verify failed on `expect_err`; replaced it with
+  explicit match handling and reran successfully.
+- Initial artifact-proof quiet verify failed because generic filework responses
+  lacked artifact paths; scoped the blocker to `artifacts/` outputs and reran.
 
 ## Evidence Files
 - Packet indexed from tmp/lkjagent-more-more-thinking-20260708.
@@ -168,7 +167,8 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   broad campaign evidence still open.
 - Every owner turn writes transcript or inbox evidence: focused tests passed;
   broad campaign evidence still open.
-- Artifact creation creates files, artifact rows, checks, and response paths: open.
+- Artifact creation creates files, artifact rows, checks, and response paths:
+  focused queue routing proof passed; broad campaign proof remains open.
 - Observed file-work failure has focused regression: open.
 - Earlier blocked work prevents later response work without recovery: open.
 - Prompt context is deduplicated, source-linked, bounded, and non-JSON:
@@ -197,4 +197,4 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Address artifact/check proof and recovery acceptance items.
+Commit artifact/check proof, then address recovery acceptance.

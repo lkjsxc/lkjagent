@@ -60,11 +60,13 @@ workspace effects and artifact rows.
 
 Record-like owner turns have focused coverage for direct workspace writes,
 record rows, history, fingerprints, README links, index contents, and index
-artifacts. CLI send and daemon intake now scaffold the workspace and write
-owner-turn transcript or inbox trace files. Owner-turn routing has focused
-coverage for existing-matter answers, continuations, artifact requests,
-inspection, unsupported system operations, direct records, ambiguous inbox
-routing, and Japanese diary or save wording.
+artifacts. Artifact-request routing now blocks closure unless the final response
+names the artifact path after file, artifact row, and check row evidence exists.
+CLI send and daemon intake now scaffold the workspace and write owner-turn
+transcript or inbox trace files. Owner-turn routing has focused coverage for
+existing-matter answers, continuations, artifact requests, inspection,
+unsupported system operations, direct records, ambiguous inbox routing, and
+Japanese diary or save wording.
 
 Prompt context can admit bounded workspace record and index metadata with source
 fingerprints, suppress duplicate clean context items by semantic key, body,
@@ -92,8 +94,8 @@ had no workspace records, artifacts, check results, admissions, or observations.
 - Current acceptance still needs broad daily-use campaign evidence across
   journal, todo, calendar, finance, notes, artifacts, questions, project work,
   TUI, and recovery flows.
-- Artifact creation still needs packet-level proof that files, rows, checks, and
-  response paths are all present before owner-facing success.
+- Artifact creation has focused proof for file, artifact row, check row, and
+  response-path gating; broad packet-level campaign proof is still open.
 - Recovery state coverage is incomplete for parse, admission, effect, endpoint,
   and check failures as one coherent ladder.
 - Tool-view selection still needs broader state-by-state coverage, but focused

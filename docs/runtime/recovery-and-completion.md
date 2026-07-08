@@ -29,8 +29,9 @@ refs. Hydration suppresses passed check rows that lack matching active native
 completion cells. Blocked and close-candidate projections use native completion
 schemas, not plan-bridge schemas. Closing a case requires no pending, active,
 blocked, failed, or unsuperseded skipped operation and current passing check
-results tied to artifact fingerprints and the active decision. Model prose is
-not completion evidence.
+results tied to artifact fingerprints and the active decision. Artifact request
+closure also requires the response summary to name the artifact path. Model prose
+alone is not completion evidence.
 
 While plan-family rows remain as bridge storage, they are blocking evidence.
 Any blocked, active, pending, failed, or unsuperseded skipped bridge step keeps

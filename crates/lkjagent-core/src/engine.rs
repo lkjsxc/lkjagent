@@ -75,7 +75,9 @@ pub fn next_work_with_decision(snapshot: &TaskSnapshot, decision: &RuntimeDecisi
         return completion_blocker(snapshot).map_or(Work::CloseTask, Work::BlockTask);
     }
     if operation == "completion.blocked" {
-        return Work::BlockTask("completion blocked by bridge step".to_string());
+        let reason = completion_blocker(snapshot)
+            .unwrap_or_else(|| "completion blocked by bridge step".to_string());
+        return Work::BlockTask(reason);
     }
     if let Some(step_id) = step_operation(operation, "check.run/") {
         return Work::RunChecks { step_id };

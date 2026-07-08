@@ -72,7 +72,7 @@ fn artifact_request_writes_verified_artifact() -> TestResult<()> {
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![
             "<content># Artifact\n\nA verified report.</content>".to_string(),
-            "<message>artifact ready</message>".to_string(),
+            "<message>artifact ready: artifacts/requests/matter-1.md</message>".to_string(),
         ],
         index: 0,
     };
@@ -83,6 +83,34 @@ fn artifact_request_writes_verified_artifact() -> TestResult<()> {
         .exists());
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     assert!(artifact_count(&conn)? >= 1);
+    assert!(check_count(&conn)? >= 1);
+    assert!(snapshot
+        .task
+        .summary
+        .contains("artifacts/requests/matter-1.md"));
+    Ok(())
+}
+
+#[test]
+fn artifact_request_requires_response_path() -> TestResult<()> {
+    let data = fixture_root("queue-artifact-response-path")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    enqueue(&conn, "create an artifact report from these notes", "now")?;
+    drop(conn);
+
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec![
+            "<content># Artifact\n\nA verified report.</content>".to_string(),
+            "<message>artifact ready</message>".to_string(),
+        ],
+        index: 0,
+    };
+    let snapshot = run_until_idle(&data, &mut endpoint, 4)?;
+    assert_eq!(snapshot.task.state, TaskState::Blocked);
+    assert!(snapshot
+        .task
+        .summary
+        .contains("artifact response path missing"));
     Ok(())
 }
 
@@ -148,6 +176,10 @@ fn delivered_answers_refresh_existing_matter_route() -> TestResult<()> {
 
 fn artifact_count(conn: &Connection) -> rusqlite::Result<i64> {
     conn.query_row("SELECT COUNT(*) FROM artifacts", [], |row| row.get(0))
+}
+
+fn check_count(conn: &Connection) -> rusqlite::Result<i64> {
+    conn.query_row("SELECT COUNT(*) FROM check_results", [], |row| row.get(0))
 }
 
 fn fixture_root(name: &str) -> TestResult<PathBuf> {

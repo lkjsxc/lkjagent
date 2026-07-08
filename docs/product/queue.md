@@ -56,8 +56,10 @@ model-dependent matter.
 
 ## Visibility
 
-`lkjagent queue list` shows pending, delivered, answered, recorded, separate,
-and failed-routing rows with route lane, desired durability, and transformation
-permission. Matter, transcript, inbox, artifact, and record views link back to the owner
-turn and show the workspace paths, fingerprints, decision refs, or blocker
-reasons produced by routing.
+Artifact-request routes are not successful until the requested file exists, an
+artifact row and check row are recorded, and the final response names the
+workspace artifact path. `lkjagent queue list` shows pending, delivered,
+answered, recorded, separate, and failed-routing rows with route lane, desired
+durability, and transformation permission. Matter, transcript, inbox, artifact,
+and record views link back to the owner turn and show the workspace paths,
+fingerprints, decision refs, or blocker reasons produced by routing.

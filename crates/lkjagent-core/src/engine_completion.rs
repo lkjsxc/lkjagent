@@ -61,11 +61,23 @@ fn check_blocker(snapshot: &TaskSnapshot) -> Option<String> {
             return Some(format!("task check missing: {}", check_name(spec)));
         }
     }
+    if artifact_response_path_missing(snapshot) {
+        return Some("artifact response path missing".to_string());
+    }
     snapshot
         .check_results
         .iter()
         .find(|result| !result.passed)
         .map(|result| format!("task check failed: {}", result.name))
+}
+
+fn artifact_response_path_missing(snapshot: &TaskSnapshot) -> bool {
+    snapshot
+        .steps
+        .iter()
+        .filter_map(|step| step.output_path.as_ref())
+        .filter(|path| path.starts_with("artifacts/"))
+        .any(|path| !snapshot.task.summary.contains(path))
 }
 
 fn check_matches(result: &CheckResult, spec: &CheckSpec) -> bool {
