@@ -1,0 +1,1 @@
+ok smoke live status=skipped reason=operator-command-required

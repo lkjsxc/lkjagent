@@ -1,0 +1,151 @@
+# Campaign 20260708T115614Z
+
+## Static
+files 1128
+lines 51770
+largest
+438	tmp/coding-agent-runs/20260707T080318Z-workspace-runtime-redesign/repository-baseline.md
+425	tmp/coding-agent-runs/20260707T080318Z-workspace-runtime-redesign/baseline.md
+201	crates/lkjagent-xtask/src/proof_state.rs
+200	crates/lkjagent-xtask/src/experiment_protocol.rs
+200	crates/lkjagent-llm/src/wire/response.rs
+200	crates/lkjagent-core/src/engine_steps.rs
+200	crates/lkjagent-app/src/runtime_cell.rs
+200	crates/lkjagent-app/src/model_call.rs
+199	crates/lkjagent-xtask/src/doc_crate_readmes.rs
+199	crates/lkjagent-store/tests/plan_store.rs
+199	crates/lkjagent-store/src/plan_schema.rs
+199	crates/lkjagent-core/src/runtime_candidate.rs
+199	crates/lkjagent-core/src/engine_extend.rs
+199	crates/lkjagent-core/src/engine.rs
+198	crates/lkjagent-xtask/src/experiment_live.rs
+198	crates/lkjagent-core/tests/render.rs
+197	crates/lkjagent-store/src/queue_access.rs
+197	crates/lkjagent-store/src/plan_hydrate.rs
+197	crates/lkjagent-core/tests/runtime_selector.rs
+197	crates/lkjagent-core/tests/generic_flow.rs
+197	crates/lkjagent-app/src/workbench_render.rs
+196	tmp/lkjagent-more-more-progress/ledger.md
+196	crates/lkjagent-xtask/src/doc_catalog.rs
+196	crates/lkjagent-core/src/render.rs
+195	crates/lkjagent-core/src/workspace_manifest.rs
+195	crates/lkjagent-core/src/templates.rs
+195	crates/lkjagent-core/src/owner_turn.rs
+195	crates/lkjagent-app/tests/queue_routing.rs
+194	crates/lkjagent-core/tests/state_runtime.rs
+194	crates/lkjagent-core/src/workspace_record.rs
+194	crates/lkjagent-app/tests/state_key_settlement.rs
+194	crates/lkjagent-app/src/workbench_line.rs
+194	crates/lkjagent-app/src/tui_view.rs
+193	crates/lkjagent-store/src/state_schema.rs
+193	crates/lkjagent-app/src/daemon_intake.rs
+192	crates/lkjagent-xtask/src/proof.rs
+192	crates/lkjagent-core/src/runtime_tool_call.rs
+191	crates/lkjagent-core/tests/tool_call.rs
+191	crates/lkjagent-app/src/turn_effects.rs
+189	crates/lkjagent-store/src/plan_commit.rs
+missing docs readmes
+
+## Gates
+ok check-docs
+ok verify
+
+## Workspace Probe
+queue: 1 new=false
+queue: 2 new=false
+queue: 3 new=false
+run-once: matter=1 state=Open
+workspace: root=tmp/probe-data-20260708T115614Z/workspace
+records: total=1 archived=0
+artifacts: total=6
+indexes: files=7
+readmes: workspace=true,records=true
+missing: none
+workspace validate: ok
+tmp/probe-data-20260708T115614Z/workspace/artifacts/proof/README.md
+tmp/probe-data-20260708T115614Z/workspace/artifacts/README.md
+tmp/probe-data-20260708T115614Z/workspace/artifacts/transcripts/queue-000001.md
+tmp/probe-data-20260708T115614Z/workspace/artifacts/transcripts/queue-000002.md
+tmp/probe-data-20260708T115614Z/workspace/artifacts/transcripts/queue-000003.md
+tmp/probe-data-20260708T115614Z/workspace/artifacts/transcripts/README.md
+tmp/probe-data-20260708T115614Z/workspace/inbox/README.md
+tmp/probe-data-20260708T115614Z/workspace/indexes/active-projects.md
+tmp/probe-data-20260708T115614Z/workspace/indexes/agenda.md
+tmp/probe-data-20260708T115614Z/workspace/indexes/experiments.md
+tmp/probe-data-20260708T115614Z/workspace/indexes/open-todos.md
+tmp/probe-data-20260708T115614Z/workspace/indexes/proof-runs.md
+tmp/probe-data-20260708T115614Z/workspace/indexes/README.md
+tmp/probe-data-20260708T115614Z/workspace/indexes/today.md
+tmp/probe-data-20260708T115614Z/workspace/README.md
+tmp/probe-data-20260708T115614Z/workspace/records/life/README.md
+tmp/probe-data-20260708T115614Z/workspace/records/life/todo/README.md
+tmp/probe-data-20260708T115614Z/workspace/records/life/todo/rec_unix1783511800842300428Z_todo-renew-passport.md
+tmp/probe-data-20260708T115614Z/workspace/records/README.md
+tmp/probe-data-20260708T115614Z/workspace/system/manifests/README.md
+tmp/probe-data-20260708T115614Z/workspace/system/README.md
+tmp/probe-data-20260708T115614Z/workspace/system/workspace-manifest.json
+tables
+artifacts	6
+attempts	1
+cases	2
+check_results	0
+config	2
+context_edges	0
+context_items	8
+events	0
+memory	0
+memory_fts	0
+memory_fts_config	1
+memory_fts_content	0
+memory_fts_data	2
+memory_fts_docsize	0
+memory_fts_idx	0
+observations	1
+prompt_cards	8
+prompt_frames	1
+provider_exchanges	1
+queue	3
+runtime_decisions	1
+runtime_events	10
+state_cells	4
+state_edges	2
+state_history	8
+steps	2
+tasks	1
+token_usage	1
+tool_admissions	1
+workspace_manifest	1
+workspace_path_aliases	0
+workspace_rebalance_audit	0
+workspace_record_history	1
+workspace_records	1
+
+## queue
+{"id": 1, "content": "todo: renew passport", "state": "recorded", "force_new": 0, "created_at": "unix:1783511800.612336042Z", "delivered_at": "unix:1783511800.842300428Z", "task_id": null, "route_lane": "record", "route_durability": "workspace_record", "route_title_seed": "todo: renew passport", "route_transform_allowed": 0}
+{"id": 2, "content": "note: lkjagent should actively use workspace", "state": "delivered", "force_new": 0, "created_at": "unix:1783511800.687220398Z", "delivered_at": "unix:1783511800.884444797Z", "task_id": 1, "route_lane": "new_matter", "route_durability": "matter", "route_title_seed": "note: lkjagent should actively use workspace", "route_transform_allowed": 1}
+{"id": 3, "content": "Create a short reading material about a quiet city.", "state": "pending", "force_new": 0, "created_at": "unix:1783511800.762514736Z", "delivered_at": null, "task_id": null, "route_lane": "new_matter", "route_durability": "matter", "route_title_seed": "Create a short reading material about a quiet ci", "route_transform_allowed": 1}
+
+## tasks
+{"id": 1, "queue_id": 2, "objective": "note: lkjagent should actively use workspace", "template": "generic", "state": "open", "brief": "note: lkjagent should actively use workspace", "budget_used": 1, "budget": 200, "summary": "", "created_at": "unix:1783511800.884444797Z", "updated_at": "unix:1783511823.108743836Z"}
+
+## workspace_records
+{"id": "rec_unix1783511800842300428Z_todo-renew-passport", "kind": "todo", "title": "todo: renew passport", "state": "open", "path": "records/life/todo/rec_unix1783511800842300428Z_todo-renew-passport.md", "fingerprint": "fnv1a64:cf74b72d03456e69", "archived": 0, "updated_at": "unix:1783511800.842300428Z"}
+
+## artifacts
+{"id": "index-today", "case_id": "workspace", "kind": "workspace-index", "path": "indexes/today.md", "fingerprint": "fnv1a64:b2349fc5d11cca9f", "parent_artifact_id": null, "metadata_json": "{\"input_records\":[],\"stale_reason\":null}", "created_at": "unix:1783511823.200128085Z"}
+{"id": "index-agenda", "case_id": "workspace", "kind": "workspace-index", "path": "indexes/agenda.md", "fingerprint": "fnv1a64:421bcc41d53557e7", "parent_artifact_id": null, "metadata_json": "{\"input_records\":[],\"stale_reason\":null}", "created_at": "unix:1783511823.200128085Z"}
+{"id": "index-open-todos", "case_id": "workspace", "kind": "workspace-index", "path": "indexes/open-todos.md", "fingerprint": "fnv1a64:789df7cb0a5ae475", "parent_artifact_id": null, "metadata_json": "{\"input_records\":[\"rec_unix1783511800842300428Z_todo-renew-passport\"],\"stale_reason\":null}", "created_at": "unix:1783511823.200128085Z"}
+{"id": "index-active-projects", "case_id": "workspace", "kind": "workspace-index", "path": "indexes/active-projects.md", "fingerprint": "fnv1a64:4917b5b57a40bb8a", "parent_artifact_id": null, "metadata_json": "{\"input_records\":[],\"stale_reason\":null}", "created_at": "unix:1783511823.200128085Z"}
+{"id": "index-proof-runs", "case_id": "workspace", "kind": "workspace-index", "path": "indexes/proof-runs.md", "fingerprint": "fnv1a64:4944770407f765ce", "parent_artifact_id": null, "metadata_json": "{\"input_records\":[],\"stale_reason\":null}", "created_at": "unix:1783511823.200128085Z"}
+{"id": "index-experiments", "case_id": "workspace", "kind": "workspace-index", "path": "indexes/experiments.md", "fingerprint": "fnv1a64:d224500222d27735", "parent_artifact_id": null, "metadata_json": "{\"input_records\":[],\"stale_reason\":null}", "created_at": "unix:1783511823.200128085Z"}
+
+## check_results
+
+## runtime_decisions
+{"id": "case-1-decision-0001", "case_id": "1", "operation_key": "model.call/1001", "status": "settled", "snapshot_fingerprint": "fnv1a64:d30f514b06f07c2e", "state_vector_fingerprint": "fnv1a64:d30f514b06f07c2e", "context_frame_fingerprint": "fnv1a64:d288db10179ebc79", "tool_view_fingerprint": "fnv1a64:2652f9612b438041", "expected_envelope": "Action", "model_budget_tokens": 500, "evidence_requirements_json": "[\"selector:payload\"]", "recovery_policy": "retry-same-decision", "decision_json": "{\"id\":\"case-1-decision-0001\",\"case_id\":\"1\",\"selected_state_key\":\"work:model/1001\",\"operation\":\"model.call/1001\",\"snapshot_fingerprint\":\"fnv1a64:d30f514b06f07c2e\",\"state_vector_fingerprint\":\"fnv1a64:d30f514b06f07c2e\",\"context_frame_fingerprint\":\"fnv1a64:d288db10179ebc79\",\"tool_view\":{\"entries\":[{\"name\":\"finish\",\"purpose\":\"finish exploration\",\"required_params\":[\"summary\"],\"optional_params\":[],\"field_specs\":[{\"name\":\"summary\",\"required\":true,\"value_class\":\"Text\"}],\"example_params\":[]},{\"name\":\"fs.list\",\"purpose\":\"list a workspace directory\",\"required_params\":[],\"optional_params\":[\"depth\",\"path\"],\"field_specs\":[{\"name\":
+
+## tool_admissions
+{"id": "case-1-decision-0001-admission-0002", "case_id": "1", "decision_id": "case-1-decision-0001", "tool_view_fingerprint": "fnv1a64:2652f9612b438041", "action_tool": "fs.tree", "status": "Admitted", "parsed_action_json": "{\"tool\":\"fs.tree\",\"params\":{\"path\":\".\"}}", "result_json": "{\"decision_id\":\"case-1-decision-0001\",\"tool_view_fingerprint\":\"fnv1a64:2652f9612b438041\",\"action_tool\":\"fs.tree\",\"status\":\"Admitted\",\"reason\":\"admitted\"}", "created_at": "unix:1783511823.108743836Z"}
+
+## observations
+{"id": "case-1-decision-0001-observation-0002", "case_id": "1", "decision_id": "case-1-decision-0001", "admission_id": "case-1-decision-0001-admission-0002", "effect_name": "fs.tree", "status": "error", "content": "last_action_fingerprint=53b5224519933773\nlast_action=fs.tree\ncount=1\nlatest_observation=\n<observation>\n<status>error</status>\n<content>\nio: prefix not found\n</content>\n</observation>", "artifact_refs_json": "[]", "contamination_class": "RecoveryOnly", "created_at": "unix:1783511823.108743836Z"}

@@ -151,45 +151,33 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   and active recovery cells blocking work; fixed each and reran successfully.
 
 ## Evidence Files
-- Packet indexed from tmp/lkjagent-more-more-thinking-20260708.
-- Baseline command output is indexed in the context-mode batch from this session.
+- Packet: tmp/lkjagent-more-more-thinking-20260708.
+- Campaign: tmp/agent-runs/20260708T115614Z/transcript.txt.
+- Replay: tmp/agent-runs/20260708T115614Z/smoke-replay.txt.
+- Live skip: tmp/agent-runs/20260708T115614Z/live-skip.txt.
 
 ## Acceptance Matrix
-- Product docs describe implemented behavior and no stale contract remains: open.
-- Source files and docs respect line limits: open.
-- Ordinary record turns write workspace files and rows: focused tests passed;
-  broad campaign evidence still open.
-- Every owner turn writes transcript or inbox evidence: focused tests passed;
-  broad campaign evidence still open.
-- Artifact creation creates files, artifact rows, checks, and response paths:
-  focused queue routing proof passed; broad campaign proof remains open.
-- Observed file-work failure has focused regression: open.
-- Earlier blocked work prevents later response work without recovery: open.
-- Prompt context is deduplicated, source-linked, bounded, and non-JSON:
-  duplicate-context and JSON-like suppression focused tests passed; failed-output
-  containment still open.
-- Tool views are selected by state, not global catalog: default explore shell
-  hiding has focused tests; broader state matrix remains open.
-- XML-like action grammar and admission have focused tests: commit 660429b1
-  records focused Japanese, multiline, entity, stale decision, context mismatch,
-  bad params, oversized, empty, and placeholder test evidence.
-- Recovery states handle parse, admission, effect, endpoint, and check failures:
-  focused recovery ladder passed; broad campaign proof remains open.
-- TUI duplicate and bottom-follow regressions have tests: transcript identity,
-  duplicate-by-id, pane bottom-follow, and reducer-level re-enable-follow
-  focused tests passed.
-- Deterministic replay passes: open.
-- Quiet verify passes: open.
-- Docker Compose verify passes or honest skip committed: open.
-- Live campaigns run or honest skips committed: commit 88272e70 recorded the
-  scripted campaign transcript and live skip file under
-  tmp/agent-runs/20260708T110203Z.
-- Final handoff names commits, commands, evidence paths, and risks: open.
+- Product docs match behavior: commits dd97d9c2, faec18ca, ea640511, 74a440e7; final `check-docs` passed.
+- Line limits: final `check-lines` passed; authored files remain under or at 200 lines.
+- Record turns write workspace files/rows: commit 31ed049f tests and campaign workspace probe passed.
+- Every owner turn writes transcript/inbox evidence: commit 31ed049f tests and campaign transcript paths passed.
+- Artifact proof before success: commit ea640511 queue routing test covers file, artifact row, check row, and response path.
+- Observed file-work failure regression: `completion_db_safety` and app filework template tests block false closure.
+- Earlier blocked work prevents later response: `completion_db_safety` and recovery ladder cells passed.
+- Prompt context is deduped, source-linked, bounded, and non-JSON: commits 3803a3b0 and faec18ca plus contamination tests passed.
+- Tool views are state-selected: commit 10e3d211 default explore hides shell; explicit shell view tests passed.
+- XML-like grammar and admission: commit 660429b1 covers Japanese, large bounded, oversized, empty, stale, and placeholder cases.
+- Recovery states: commit 74a440e7 covers parse, admission, effect, endpoint, and check `recovery.failure` cells.
+- TUI regressions: commits 80e080db, 88075ff6, and a1ecdcdc cover duplicate identity and bottom-follow behavior.
+- Deterministic replay: `cargo run -p lkjagent-xtask -- smoke replay` -> ok, evidence in smoke-replay.txt.
+- Quiet verify: final `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify`.
+- Docker verify: final `docker compose run --rm verify` -> `ok verify`.
+- Live campaign/skip: final campaign ran; `smoke live` skip saved with operator-command-required.
+- Final handoff: ready to name commits, commands, evidence paths, and residual risks.
 
 ## Open Risks
-- Existing worktree contains many deleted data/log files and untracked logs before this work.
-- The request spans docs, runtime, workspace, context, tools, TUI, and evaluation.
-- Baseline gates may be expensive or blocked by environment.
+- Pre-existing dirty `data/logs` deletions/untracked logs remain outside this work.
+- Final campaign probe left the model-dependent matter open rather than falsely closed.
 
 ## Next Action
-Run final packet/campaign acceptance checks.
+Provide final handoff.
