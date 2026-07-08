@@ -22,6 +22,7 @@ pub fn persist_observations(
                 insert(conn, decision, index, &action.tool, snapshot, now)?
             }
             Command::WriteFile { path, .. } => insert(conn, decision, index, path, snapshot, now)?,
+            Command::AppendFile { path, .. } => insert(conn, decision, index, path, snapshot, now)?,
             Command::RecordAttempt(_)
             | Command::RecordEvent(_)
             | Command::RecordMemory { .. }

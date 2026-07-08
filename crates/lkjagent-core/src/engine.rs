@@ -33,6 +33,10 @@ pub enum Command {
         path: String,
         content: String,
     },
+    AppendFile {
+        path: String,
+        content: String,
+    },
     RunExplore(Action),
     RecordAttempt(Attempt),
     RecordEvent(Event),
@@ -173,6 +177,12 @@ fn handle_native_effect(
     ) {
         ("workspace.write_text", Some(path), Some(content)) if !content.trim().is_empty() => {
             commands.push(Command::WriteFile {
+                path: path.to_string(),
+                content: content.to_string(),
+            });
+        }
+        ("workspace.append_text", Some(path), Some(content)) if !content.trim().is_empty() => {
+            commands.push(Command::AppendFile {
                 path: path.to_string(),
                 content: content.to_string(),
             });

@@ -170,10 +170,10 @@ rows, history, fingerprints, README links, index contents, and index artifacts.
 Prompt context admits bounded workspace record/index metadata; unsafe XML-like
 tool actions persist rejections; status/TUI show blocked, refused, and stale-edge
 counts. `run --once` executes a bounded daemon turn; refreshed workspace smoke
-passed with `missing: none`. Bounded live profiles ran under
-`tmp/live-runs/20260708-bounded-profiles`: personal-workspace closed, while the
-other three remained open after one turn with exchange, observation, and prompt
-evidence.
+passed with `missing: none`. Bounded live profiles ran with exchange evidence.
+Native model-free effects now support `workspace.write_text` and
+`workspace.append_text`, both path-checked at the workspace edge and persisted as
+artifact rows.
 
 ## Known Gaps
 
@@ -182,12 +182,12 @@ evidence.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, unsafe bridge steps must block close candidates.
 - Native operation execution remains limited to generic state resolution,
-  `workspace.write_text`, and bridge-backed effects.
+  narrow workspace text effects, and bridge-backed effects.
 
 ## Next Executable Step
 
-Implement the next native-effect slice: broaden model-free effect commands past
-`workspace.write_text` with docs, focused tests, quiet gates, and Docker verify.
+Implement the next bridge-retirement slice: move more check/completion routing
+from plan-family bridge rows into native state cells with docs and gates.
 
 ## Honesty Rules
 

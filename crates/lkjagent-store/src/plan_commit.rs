@@ -95,7 +95,7 @@ fn persist_command(
                 insert_step_tx(tx, step, now)?;
             }
         }
-        Command::WriteFile { .. } | Command::RunExplore(_) => {}
+        Command::WriteFile { .. } | Command::AppendFile { .. } | Command::RunExplore(_) => {}
     }
     Ok(())
 }

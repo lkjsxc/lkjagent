@@ -158,20 +158,32 @@ fn state_resolve_decision_is_native_model_free_work() {
 #[test]
 fn native_workspace_write_effect_emits_write_command() {
     let snapshot = instantiate(10, "What is in the workspace?");
+    assert!(native_effect_commands(&snapshot, "workspace.write_text")
+        .iter()
+        .any(|command| matches!(
+            command,
+            Command::WriteFile { path, content } if path == "native.md" && content == "body"
+        )));
+    assert!(native_effect_commands(&snapshot, "workspace.append_text")
+        .iter()
+        .any(|command| matches!(
+            command,
+            Command::AppendFile { path, content } if path == "native.md" && content == "body"
+        )));
+}
+
+fn native_effect_commands(
+    snapshot: &lkjagent_core::model::TaskSnapshot,
+    name: &str,
+) -> Vec<Command> {
     let mut decision = decision("effect.workspace.write", OutputEnvelope::None);
     decision.effect_command = Some(EffectCommand {
-        name: "workspace.write_text".to_string(),
+        name: name.to_string(),
         path: Some("native.md".to_string()),
         content: Some("body".to_string()),
     });
-
-    let work = next_work_with_decision(&snapshot, &decision);
-    let (_next, commands) = apply_turn(&snapshot, &work, TurnOutcome::Noop);
-
-    assert!(commands.iter().any(|command| matches!(
-        command,
-        Command::WriteFile { path, content } if path == "native.md" && content == "body"
-    )));
+    let work = next_work_with_decision(snapshot, &decision);
+    apply_turn(snapshot, &work, TurnOutcome::Noop).1
 }
 
 #[test]

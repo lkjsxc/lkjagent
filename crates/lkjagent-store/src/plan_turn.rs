@@ -78,7 +78,7 @@ pub fn commit_commands(
                     insert_step_tx(&tx, step, now)?;
                 }
             }
-            Command::WriteFile { .. } | Command::RunExplore(_) => {}
+            Command::WriteFile { .. } | Command::AppendFile { .. } | Command::RunExplore(_) => {}
         }
     }
     tx.commit()?;
