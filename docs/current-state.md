@@ -167,25 +167,27 @@ creating tasks, refresh rows/history, write README path coverage, rebuild record
 indexes, and record index artifact evidence. Focused coverage checks files,
 rows, history, fingerprints, README links, index contents, and index artifacts.
 
-Prompt context admits bounded workspace record/index metadata with fingerprints
-and artifact refs. Unsafe XML-like tool actions persist rejected admissions, and
-status/TUI now show blocked, refused, and stale-edge evidence counts.
+Prompt context admits bounded workspace record/index metadata; unsafe XML-like
+tool actions persist rejections; status/TUI show blocked, refused, and stale-edge
+counts. `run --once` executes a bounded daemon turn; refreshed workspace smoke
+passed with `missing: none`. Bounded live profiles ran under
+`tmp/live-runs/20260708-bounded-profiles`: personal-workspace closed, while the
+other three remained open after one turn with exchange, observation, and prompt
+evidence.
 
 ## Known Gaps
 
 - Check freshness still depends on transitional check rows for completion, but
   native check-to-artifact edges now record and suppress stale freshness evidence.
 - The plan-family bridge still participates in runtime projection. Until native
-  state cells fully own selection, blocked, active, pending, failed, or
-  unsuperseded skipped bridge steps must prevent close candidates.
+  state cells fully own selection, unsafe bridge steps must block close candidates.
 - Native operation execution remains limited to generic state resolution,
-  `workspace.write_text`, and bridge-backed effects; broader native effect
-  commands remain a follow-up state-harness slice.
+  `workspace.write_text`, and bridge-backed effects.
 
 ## Next Executable Step
 
-Implement the next live-eval slice: refresh stale runbooks and run bounded live
-endpoint campaigns with docs and gates.
+Implement the next native-effect slice: broaden model-free effect commands past
+`workspace.write_text` with docs, focused tests, quiet gates, and Docker verify.
 
 ## Honesty Rules
 

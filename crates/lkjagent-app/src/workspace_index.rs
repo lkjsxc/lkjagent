@@ -17,14 +17,11 @@ pub fn rebuild(conn: &Connection, data_dir: &Path, now: &str) -> Result<String, 
     let workspace = data_dir.join("workspace");
     let indexes = workspace.join("indexes");
     fs::create_dir_all(&indexes).map_err(|error| error.to_string())?;
-    write_if_missing(
-        &workspace.join("README.md"),
-        "# Workspace\n\nOwner-readable files.\n",
-    )?;
-    write_if_missing(
-        &indexes.join("README.md"),
-        "# Indexes\n\nGenerated workspace views.\n",
-    )?;
+    fs::create_dir_all(workspace.join("records")).map_err(|error| error.to_string())?;
+    fs::create_dir_all(workspace.join("artifacts")).map_err(|error| error.to_string())?;
+    crate::workspace_scaffold::refresh_for_path(&workspace, "records/README.md")?;
+    crate::workspace_scaffold::refresh_for_path(&workspace, "artifacts/README.md")?;
+    crate::workspace_scaffold::refresh_for_path(&workspace, "indexes/README.md")?;
     let specs = [
         ("today", &["today", "journal"][..]),
         ("agenda", &["calendar"][..]),
@@ -137,13 +134,6 @@ fn title(name: &str) -> String {
         })
         .collect::<Vec<_>>()
         .join(" ")
-}
-
-fn write_if_missing(path: &Path, body: &str) -> Result<(), String> {
-    if !path.exists() {
-        fs::write(path, body).map_err(|error| error.to_string())?;
-    }
-    Ok(())
 }
 
 fn null_reason() -> Option<String> {

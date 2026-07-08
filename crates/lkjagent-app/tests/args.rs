@@ -5,6 +5,11 @@ type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
 fn parser_accepts_console_command() -> TestResult<()> {
+    assert_eq!(parse(["run"])?.command, Command::Run { once: false });
+    assert_eq!(
+        parse(["run", "--once"])?.command,
+        Command::Run { once: true }
+    );
     assert_eq!(parse(["console"])?.command, Command::Console);
     assert_eq!(
         parse(["workbench"])?.command,

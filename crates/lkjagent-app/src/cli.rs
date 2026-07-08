@@ -3,7 +3,7 @@ use std::fs;
 use rusqlite::Connection;
 
 use crate::args::{parse, Command};
-use crate::daemon::run_daemon;
+use crate::daemon::{run_daemon, run_until_idle};
 use crate::status::status;
 
 pub fn run<I, S>(args: I) -> Result<String, String>
@@ -20,7 +20,15 @@ where
     let conn = Connection::open(&db).map_err(|error| error.to_string())?;
     lkjagent_store::plan_schema::setup(&conn).map_err(|error| error.to_string())?;
     match invocation.command {
-        Command::Run => {
+        Command::Run { once } if once => {
+            let mut endpoint = crate::endpoint::LlmEndpoint::new(&invocation.data_dir);
+            let snapshot = run_until_idle(&invocation.data_dir, &mut endpoint, 1)?;
+            Ok(format!(
+                "run-once: matter={} state={:?}",
+                snapshot.task.id, snapshot.task.state
+            ))
+        }
+        Command::Run { .. } => {
             run_daemon(&invocation.data_dir)?;
             Ok(String::new())
         }

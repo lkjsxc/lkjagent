@@ -41,6 +41,7 @@ fn workspace_reports_rows_and_json_shape() -> TestResult<()> {
     assert!(rebuilt.contains("records: total=1 archived=0"));
     assert!(rebuilt.contains("artifacts: total=6"));
     assert!(rebuilt.contains("indexes: files=7"));
+    assert!(rebuilt.contains("missing: none"));
     let open_todos = fs::read_to_string(data.join("workspace/indexes/open-todos.md"))?;
     assert!(open_todos.contains("Buy milk"));
 

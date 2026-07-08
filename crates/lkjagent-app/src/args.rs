@@ -14,7 +14,9 @@ pub struct Invocation {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Command {
     Help,
-    Run,
+    Run {
+        once: bool,
+    },
     Send {
         text: String,
         force_new: bool,
@@ -114,7 +116,7 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
     }
     match command {
         "help" => Ok(Command::Help),
-        "run" => no_args(rest, Command::Run),
+        "run" => parse_run(rest),
         "send" => parse_send(rest),
         "status" => no_args(rest, Command::Status),
         "console" => no_args(rest, Command::Console),
@@ -144,6 +146,14 @@ fn parse_workbench(rest: Vec<String>) -> Result<Command, String> {
             mode: WorkbenchMode::Pane,
         }),
         _ => Err("workbench accepts --mode append|pane".to_string()),
+    }
+}
+
+fn parse_run(rest: Vec<String>) -> Result<Command, String> {
+    match rest.as_slice() {
+        [] => Ok(Command::Run { once: false }),
+        [flag] if flag == "--once" => Ok(Command::Run { once: true }),
+        _ => Err("run accepts --once".to_string()),
     }
 }
 

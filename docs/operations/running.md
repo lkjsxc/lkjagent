@@ -37,12 +37,14 @@ docker compose run --rm agent lkjagent watch
 
 ```sh
 cargo run -p lkjagent-app -- run
+cargo run -p lkjagent-app -- run --once
 cargo run -p lkjagent-app -- send "Record that hello.md should say hello."
 cargo run -p lkjagent-app -- status
 ```
 
-During cutover, [../current-state.md](../current-state.md) states which binary
-is active.
+`run` is long-running. `run --once` executes one bounded daemon turn for smoke
+checks and exits with a short state summary. During cutover,
+[../current-state.md](../current-state.md) states which binary is active.
 
 ## Fresh Trial
 
