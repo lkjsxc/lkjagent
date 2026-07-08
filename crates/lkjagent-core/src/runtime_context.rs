@@ -2,7 +2,9 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
 
-pub use crate::runtime_context_plan::{select_context_plan, ContextFramePlan, ContextPlanEntry};
+pub use crate::runtime_context_plan::{
+    select_context_plan, ContextFramePlan, ContextLanePlan, ContextPlanEntry,
+};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum TrustClass {

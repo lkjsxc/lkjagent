@@ -12,8 +12,8 @@ pub fn insert_usage_tx(
     tx.execute(
         "INSERT INTO token_usage (task_id, attempt_id, prompt_tokens, completion_tokens,
          cached_tokens, input_total_tokens, input_cached_tokens, input_uncached_tokens,
-         output_tokens, cache_status, created_at)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
+         output_tokens, cache_status, raw_usage_json, created_at)
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)",
         params![
             matter_id,
             attempt_id,
@@ -25,10 +25,21 @@ pub fn insert_usage_tx(
             uncached_token(attempt),
             token(attempt.tokens_out),
             attempt.cache_status,
+            raw_usage(attempt),
             now
         ],
     )?;
     Ok(())
+}
+
+fn raw_usage(attempt: &lkjagent_core::model::Attempt) -> String {
+    serde_json::json!({
+        "prompt_tokens": token(attempt.tokens_in),
+        "completion_tokens": token(attempt.tokens_out),
+        "cached_tokens": cached_token(attempt),
+        "cache_status": attempt.cache_status,
+    })
+    .to_string()
 }
 
 fn token(value: u32) -> Option<i64> {

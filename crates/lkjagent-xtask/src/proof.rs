@@ -37,27 +37,21 @@ fn parse(args: &[String], root: &Path) -> Result<Options, String> {
 }
 
 fn collect(options: Options) -> Result<PathBuf, String> {
-    fs::create_dir_all(&options.out_dir).map_err(|e| e.to_string())?;
+    let out = &options.out_dir;
+    fs::create_dir_all(out).map_err(|e| e.to_string())?;
     let conn =
         Connection::open(options.data_dir.join("lkjagent.sqlite3")).map_err(|e| e.to_string())?;
-    write(&options.out_dir, "summary.md", &summary(&conn)?)?;
-    write(&options.out_dir, "status.md", &status(&conn)?)?;
-    crate::proof_state::write_state_bundle(&conn, &options.out_dir)?;
-    crate::proof_records::write_record_selector_bundle(&conn, &options.out_dir)?;
-    crate::proof_checks::write_checks(&conn, &options.out_dir)?;
-    crate::proof_tokens::write_attempts_and_tokens(&conn, &options.out_dir)?;
-    write(
-        &options.out_dir,
-        "workspace-tree.md",
-        &tree(&options.data_dir.join("workspace"))?,
-    )?;
-    write(
-        &options.out_dir,
-        "word-counts.md",
-        &word_counts(&options.data_dir.join("workspace"))?,
-    )?;
-    write(&options.out_dir, "warnings.md", "# Warnings\n\nnone\n")?;
-    Ok(options.out_dir.join("summary.md"))
+    write(out, "summary.md", &summary(&conn)?)?;
+    write(out, "status.md", &status(&conn)?)?;
+    crate::proof_state::write_state_bundle(&conn, out)?;
+    crate::proof_records::write_record_selector_bundle(&conn, out)?;
+    crate::proof_checks::write_checks(&conn, out)?;
+    crate::proof_tokens::write_attempts_and_tokens(&conn, out)?;
+    let workspace = workspace_root(&options.data_dir);
+    write(out, "workspace-tree.md", &tree(&workspace)?)?;
+    write(out, "word-counts.md", &word_counts(&workspace)?)?;
+    write(out, "warnings.md", "# Warnings\n\nnone\n")?;
+    Ok(out.join("summary.md"))
 }
 
 fn summary(conn: &Connection) -> Result<String, String> {
@@ -153,6 +147,19 @@ fn walk(root: &Path, path: &Path, lines: &mut Vec<String>) -> Result<(), String>
         }
     }
     Ok(())
+}
+
+fn workspace_root(data_dir: &Path) -> PathBuf {
+    let path = fs::read_to_string(data_dir.join("lkjagent.json"))
+        .ok()
+        .and_then(|text| serde_json::from_str::<serde_json::Value>(&text).ok())
+        .and_then(|value| value.get("workspace_root")?.as_str().map(PathBuf::from))
+        .unwrap_or_else(|| PathBuf::from("workspace"));
+    if path.is_absolute() {
+        path
+    } else {
+        data_dir.join(path)
+    }
 }
 
 fn path_arg(args: &[String], index: usize, root: &Path, flag: &str) -> Result<PathBuf, String> {

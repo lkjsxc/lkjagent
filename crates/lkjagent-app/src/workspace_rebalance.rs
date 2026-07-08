@@ -21,7 +21,7 @@ pub fn plan(conn: &Connection, data_dir: &Path, json: bool, now: &str) -> Result
 pub fn apply(conn: &Connection, data_dir: &Path, json: bool, now: &str) -> Result<String, String> {
     ensure_manifest(conn, data_dir, now)?;
     let moves = planned_moves(conn)?;
-    let workspace = data_dir.join("workspace");
+    let workspace = crate::config::workspace_root(data_dir)?;
     for item in &moves {
         if !validate_rebalance_move(item).is_empty() {
             return Err(format!("invalid rebalance move: {}", item.entity_id));
@@ -47,9 +47,10 @@ pub fn validate(
 ) -> Result<String, String> {
     ensure_manifest(conn, data_dir, now)?;
     let rows = records(conn, None, true).map_err(|error| error.to_string())?;
+    let workspace = crate::config::workspace_root(data_dir)?;
     let missing = rows
         .iter()
-        .filter(|row| !data_dir.join("workspace").join(&row.path).exists())
+        .filter(|row| !workspace.join(&row.path).exists())
         .map(|row| row.id.clone())
         .collect::<Vec<_>>();
     if json {
@@ -66,7 +67,7 @@ pub fn validate(
 
 fn ensure_manifest(conn: &Connection, data_dir: &Path, now: &str) -> Result<(), String> {
     let manifest = WorkspaceManifest::default_workspace();
-    let system = data_dir.join("workspace/system");
+    let system = crate::config::workspace_root(data_dir)?.join("system");
     fs::create_dir_all(&system).map_err(|error| error.to_string())?;
     let text = serde_json::to_string_pretty(&manifest).map_err(|error| error.to_string())?;
     fs::write(system.join("workspace-manifest.json"), text).map_err(|error| error.to_string())?;

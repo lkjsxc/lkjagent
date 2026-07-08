@@ -1,5 +1,5 @@
 use lkjagent_core::render::Prompt;
-use lkjagent_core::runtime_context::{ContextFramePlan, ContextPlanEntry};
+use lkjagent_core::runtime_context::{ContextFramePlan, ContextLanePlan, ContextPlanEntry};
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
 };
@@ -82,7 +82,14 @@ fn card_reasons_list_context_selection_audit() -> Result<(), String> {
                 entry("ctx-bad", "contamination:FailedModelOutput"),
                 entry("ctx-conflict", "unresolved-conflict"),
             ],
-            lanes: Vec::new(),
+            lanes: vec![ContextLanePlan {
+                name: "relevant-records".to_string(),
+                budget_tokens: 1200,
+                source_refs: vec!["record:records/life/notes/a.md".to_string()],
+                included_item_ids: vec!["ctx-good".to_string()],
+                excluded_item_ids: Vec::new(),
+                fingerprint: "lane-fp".to_string(),
+            }],
         },
     )
     .map_err(|error| error.message)?;
@@ -91,6 +98,8 @@ fn card_reasons_list_context_selection_audit() -> Result<(), String> {
     assert!(facts.contains("ctx-good:clean-current"));
     assert!(facts.contains("ctx-bad:contamination:FailedModelOutput"));
     assert!(facts.contains("ctx-conflict:unresolved-conflict"));
+    assert!(facts.contains("relevant-records:lane-fp"));
+    assert!(facts.contains("refs=record:records/life/notes/a.md"));
     assert!(reason(&plan, "conflicts")?.contains("ctx-conflict:unresolved-conflict"));
     Ok(())
 }

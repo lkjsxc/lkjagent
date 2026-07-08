@@ -4,6 +4,7 @@ use std::net::TcpListener;
 use std::path::PathBuf;
 use std::thread;
 
+use lkjagent_app::cli;
 use lkjagent_app::daemon::Endpoint;
 use lkjagent_app::endpoint::LlmEndpoint;
 use lkjagent_core::render::Prompt;
@@ -31,6 +32,37 @@ fn llm_endpoint_uses_configured_chat_endpoint() -> TestResult<()> {
     assert!(migrated.contains("endpoint_model"));
     assert!(migrated.contains("endpoint_timeout_seconds"));
     assert!(!migrated.contains("\"endpoint\""));
+    Ok(())
+}
+
+#[test]
+fn flat_config_exposes_workspace_and_budget_keys() -> TestResult<()> {
+    let data = fixture_root("flat-config")?;
+    fs::write(
+        data.join("lkjagent.json"),
+        "{\"workspace_root\":\"visible-workspace\",\"prompt_max_context_tokens\":1234,\"live_campaign_seconds\":77}",
+    )?;
+
+    cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "send",
+        "todo check flat config workspace",
+    ])?;
+    let status = cli::run(["--data", data.to_string_lossy().as_ref(), "doctor"])?;
+    let json = cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "doctor",
+        "--json",
+    ])?;
+
+    assert!(data
+        .join("visible-workspace/artifacts/transcripts/queue-000001.md")
+        .exists());
+    assert!(status.contains("prompt_cap=1234"));
+    assert!(status.contains("live_seconds=77"));
+    assert!(json.contains("visible-workspace"));
     Ok(())
 }
 

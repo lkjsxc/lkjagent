@@ -1,4 +1,4 @@
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use lkjagent_llm::client::{ClientConfig, DEFAULT_TIMEOUT_SECONDS};
@@ -18,6 +18,30 @@ pub fn load_client(data_dir: &Path) -> Result<ClientConfig, String> {
     );
     config.api_key = api_key(&value);
     Ok(config)
+}
+
+pub(crate) fn workspace_root(data_dir: &Path) -> Result<PathBuf, String> {
+    let value = load_flat_config(data_dir)?;
+    let root = env_or_value("LKJAGENT_WORKSPACE_ROOT", &value, "workspace_root")?
+        .unwrap_or_else(|| "workspace".to_string());
+    let path = PathBuf::from(root);
+    Ok(if path.is_absolute() {
+        path
+    } else {
+        data_dir.join(path)
+    })
+}
+
+pub(crate) fn prompt_max_context_tokens(data_dir: &Path) -> Result<Option<u64>, String> {
+    let value = load_flat_config(data_dir)?;
+    Ok(env_number("LKJAGENT_PROMPT_MAX_CONTEXT_TOKENS")
+        .or_else(|| number(&value, "prompt_max_context_tokens")))
+}
+
+pub(crate) fn live_campaign_seconds(data_dir: &Path) -> Result<Option<u64>, String> {
+    let value = load_flat_config(data_dir)?;
+    Ok(env_number("LKJAGENT_LIVE_CAMPAIGN_SECONDS")
+        .or_else(|| number(&value, "live_campaign_seconds")))
 }
 
 pub(crate) fn load_flat_config(data_dir: &Path) -> Result<Value, String> {

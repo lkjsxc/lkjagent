@@ -17,7 +17,7 @@ Define parse faults, contamination rules, and retry hints for model output.
 | `empty` | expected simple block body is blank | provide required content |
 | `unknown_tool` | tool name absent from the decision view | choose a rendered tool name |
 | `bad_params` | missing, unknown, or wrong argument values | show exact argument tags |
-| `json_like` | action body starts as JSON or embeds JSON object syntax | rewrite as XML-like tags |
+| `json_like` | action body starts as JSON or embeds braced data syntax | rewrite as XML-like tags |
 | `bad_plan_line` | bridge plan line is unparseable or invalid | quote failing line and grammar |
 
 Fault names are stable data, but the parser validates against the current

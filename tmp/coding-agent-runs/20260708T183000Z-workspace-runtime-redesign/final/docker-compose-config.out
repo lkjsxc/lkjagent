@@ -1,0 +1,51 @@
+name: lkjagent
+services:
+  agent:
+    build:
+      context: /home/lkjsxc/workspace/lkjagent
+      dockerfile: Dockerfile
+      target: runtime
+    cap_drop:
+      - NET_RAW
+    command:
+      - run
+    environment:
+      HOME: /home/agent
+      LKJAGENT_API_KEY: [redacted-api-key]
+      LKJAGENT_ENDPOINT_TIMEOUT_SECONDS: ""
+      LKJAGENT_ENDPOINT_URL: [redacted-endpoint-url]
+      LKJAGENT_MODEL: [redacted-model-name]
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pidof lkjagent >/dev/null && stat -c %u /data/workspace | grep -qx 1000 && test -w /data/workspace
+      timeout: 5s
+      interval: 30s
+      retries: 3
+      start_period: 20s
+    init: true
+    logging:
+      driver: json-file
+      options:
+        max-file: "3"
+        max-size: 10m
+    networks:
+      default: null
+    read_only: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 45s
+    stop_signal: SIGTERM
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+      - /home/agent:size=16m,uid=1000,gid=1000,mode=700
+    volumes:
+      - type: bind
+        source: /home/lkjsxc/workspace/lkjagent/data
+        target: /data
+        bind: {}
+    working_dir: /
+networks:
+  default:
+    name: lkjagent_default

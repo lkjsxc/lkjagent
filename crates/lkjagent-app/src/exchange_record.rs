@@ -3,6 +3,7 @@ use std::time::Instant;
 
 use lkjagent_core::engine::TurnOutcome;
 use lkjagent_core::model::TaskSnapshot;
+use lkjagent_core::parse::parse_fault_diagnosis;
 use lkjagent_core::render::Prompt;
 use lkjagent_effects::exchange::{write_exchange, ExchangeFiles};
 
@@ -109,7 +110,7 @@ fn outcome_json(outcome: &TurnOutcome) -> String {
         TurnOutcome::Model(_) => serde_json::json!({"outcome":"parsed"}).to_string(),
         TurnOutcome::ParseFault(fault) => serde_json::json!({
             "outcome":"parse_fault",
-            "diagnosis": format!("{fault:?}")
+            "diagnosis": parse_fault_diagnosis(fault)
         })
         .to_string(),
         other => serde_json::json!({"outcome": format!("{other:?}")}).to_string(),

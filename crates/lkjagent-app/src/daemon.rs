@@ -49,7 +49,7 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     clock: &mut C,
 ) -> Result<TaskSnapshot, String> {
     let db = data_dir.join("lkjagent.sqlite3");
-    let workspace = data_dir.join("workspace");
+    let workspace = crate::config::workspace_root(data_dir)?;
     let logs = data_dir.join("logs");
     crate::workspace_scaffold::ensure_root(&workspace)?;
     let mut conn = Connection::open(db).map_err(|error| error.to_string())?;

@@ -59,11 +59,13 @@ executable values, and placeholder-like executable values.
 Runtime decisions carry selected state keys, selected tool views, context-frame
 fingerprints, expected envelopes, evidence requirements, and recovery policy.
 Parse, admission, effect, endpoint, and check failures now write
-`recovery.failure` state cells keyed by kind and decision. Native model-free
-operations support state resolution and workspace text effects for
-`workspace.write_text` and `workspace.append_text` through path-checked
-workspace effects and artifact rows. Runtime projection and decision dispatch now
-preflight earlier unfinished step blockers before later model response work.
+`recovery.failure` state cells keyed by kind and decision. Parse diagnoses now
+include concrete repair guidance for envelope, action grammar, decision, context,
+tool, and argument faults. Native model-free operations support state resolution
+and workspace text effects for `workspace.write_text` and
+`workspace.append_text` through path-checked workspace effects and artifact rows.
+Runtime projection and decision dispatch now preflight earlier unfinished step
+blockers before later model response work.
 
 Record-like owner turns have focused coverage for direct workspace writes,
 record rows, history, fingerprints, README links, index contents, and index
@@ -75,31 +77,35 @@ artifact path after file, artifact row, and check row evidence exists. CLI send
 and daemon intake now scaffold the workspace and write owner-turn transcript or
 inbox trace files. Owner-turn routing has focused coverage for existing-matter
 answers, continuations, artifact requests, inspection, unsupported system
-operations, direct records, ambiguous inbox routing, and Japanese diary or save
-wording.
+operations, direct records, ambiguous inbox routing, Japanese diary or save
+wording, and todo, calendar, finance, note, project, and development wrapper
+writes.
 
 Prompt context can admit bounded workspace record and index metadata with source
 fingerprints, suppress duplicate clean context items by semantic key, body,
 source type, and source fingerprint, and replace JSON-like context bodies with
-source-linked suppression markers before prompt rendering. Default explore tool
-views exclude `shell.run`; shell is available only through an explicit persisted
+source-linked suppression markers before prompt rendering. Prompt card facts now
+carry compact lane fingerprints and source refs. Default explore tool views
+exclude `shell.run`; shell is available only through an explicit persisted
 shell-capable decision view. Unsafe XML-like tool actions persist rejections.
-Status and proof surfaces expose cached token usage, blocked counts, stale-edge
-counts, prompt frames, tool-view fingerprints, artifact refs, check refs, and
-proof rows.
+Status and proof surfaces expose cached and uncached token usage separately,
+raw provider usage metadata, blocked counts, stale-edge counts, prompt frames,
+tool-view fingerprints, artifact refs, check refs, and proof rows.
 
 The terminal workbench has a pure reducer, durable transcript stream with stable
 queue/event ids, agent draft accumulation for streaming deltas, id-based
 transcript merge, saved transcript ids and source paths, Japanese and
-grapheme-aware composer operations, append and pane modes, row-backed status
-fallbacks, and focused coverage for transcript merge and rendering surfaces.
+grapheme-aware composer operations, display-width cursor placement, append and
+pane modes, row-backed status fallbacks, and focused coverage for transcript
+merge and rendering surfaces.
 
 Baseline and post-change commands for the 2026-07-08 packet passed `cargo run
 -p lkjagent-xtask -- check-docs`, `cargo run -p lkjagent-xtask -- quiet
 verify`, and `docker compose run --rm verify`. Packet static scripts ran with a
-`python3` shim for `python`. The checked data DB had workspace_records=1,
-workspace_record_history=2, artifacts=6, check_results=0, tool_admissions=5,
-and observations=5.
+`python3` shim for `python`. Docker builds use explicit crate copies and BuildKit
+cache mounts; Compose exposes agent, daemon, live-campaign, shell, and check
+profiles with writable data and tmp paths. Runtime `data/logs` rows are no
+longer committed as product evidence.
 
 Focused acceptance evidence now covers owner record writes, transcript traces,
 artifact files and response-path gating, blocked-step preflight, prompt-context
@@ -108,24 +114,24 @@ admission, recovery failures, and TUI transcript identity and follow behavior.
 Scripted evidence under `tmp/agent-runs/20260708T180141Z/` records the workspace
 probe, protocol experiment matrix, and proof bundle. Live endpoint profiles under
 `tmp/live-runs/20260708T180320Z/` are honest skips because endpoint input was
-intentionally absent. After `.env` use was authorized, a 30-second-per-profile
-endpoint run under `tmp/live-runs/20260708Tliveenv/` ran without exposing secret
-values; personal-workspace and structured-artifact closed, while software-project
-and protocol-stress remained open at the time box.
+intentionally absent. After `.env` use was authorized, a 900-second-per-profile
+endpoint run under `tmp/live-runs/20260708Tstandardenv/` ran without exposing
+secret values; personal-workspace, software-project, structured-artifact, and
+protocol-stress all closed with elapsed_seconds=900.
 
 ## Known Gaps
 
 - Scripted workspace evidence covers todo, note, transcript, index, proof, and
   blocked artifact-request behavior.
-- The `.env` live run was intentionally short; it is current endpoint evidence,
-  not the standard 900-second-per-profile campaign.
-- TUI behavior is proven by reducer and transcript tests, not an interactive
-  terminal capture in this environment.
+- Standard 900-second endpoint evidence exists for four profiles; adoption remains
+  deferred until the owner accepts those metrics as default behavior.
+- TUI behavior is proven by reducer, transcript, display-width, and packet
+  capture-script tests, not an interactive operator session in this environment.
 
 ## Next Executable Step
 
-Commit the current-state and evidence ledger, preserving exact command evidence
-and residual risks for the final handoff.
+Run the final check-docs, quiet verify, and Docker Compose verify gates after
+this continuation slice, then commit the packet closure evidence and source.
 
 ## Honesty Rules
 

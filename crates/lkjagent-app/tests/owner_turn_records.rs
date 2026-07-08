@@ -23,6 +23,7 @@ fn record_like_owner_turns_write_workspace_files_without_tasks() -> TestResult<(
         "record that I paid 1200 yen",
         "note that local endpoint is offline",
         "project note for lkjagent",
+        "dev note parser cleanup belongs in the workspace harness",
         "artifact record for the report",
     ] {
         enqueue(&conn, text, "queued")?;
@@ -38,9 +39,9 @@ fn record_like_owner_turns_write_workspace_files_without_tasks() -> TestResult<(
 
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     assert_eq!(count(&conn, "tasks")?, 0);
-    assert_eq!(queue_state_count(&conn, "recorded")?, 7);
-    assert_eq!(count(&conn, "workspace_records")?, 7);
-    assert_eq!(count(&conn, "workspace_record_history")?, 7);
+    assert_eq!(queue_state_count(&conn, "recorded")?, 8);
+    assert_eq!(count(&conn, "workspace_records")?, 8);
+    assert_eq!(count(&conn, "workspace_record_history")?, 8);
     assert_eq!(index_artifacts(&conn)?, 6);
     for (kind, path_part) in [
         ("journal", "records/life/journal/"),
@@ -49,6 +50,7 @@ fn record_like_owner_turns_write_workspace_files_without_tasks() -> TestResult<(
         ("finance", "records/life/finance/"),
         ("note", "records/life/notes"),
         ("project", "records/work/projects"),
+        ("development", "records/work/development"),
         ("artifact", "artifacts/documents"),
     ] {
         assert_path(&conn, &data, kind, path_part)?;

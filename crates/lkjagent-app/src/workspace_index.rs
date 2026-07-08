@@ -14,7 +14,7 @@ const CASE_ID: &str = "workspace";
 
 pub fn rebuild(conn: &Connection, data_dir: &Path, now: &str) -> Result<String, String> {
     let rows = records(conn, None, false).map_err(|error| error.to_string())?;
-    let workspace = data_dir.join("workspace");
+    let workspace = crate::config::workspace_root(data_dir)?;
     let indexes = workspace.join("indexes");
     fs::create_dir_all(&indexes).map_err(|error| error.to_string())?;
     fs::create_dir_all(workspace.join("records")).map_err(|error| error.to_string())?;

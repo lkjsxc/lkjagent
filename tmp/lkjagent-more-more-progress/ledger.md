@@ -105,6 +105,9 @@ docs-first product architecture commit before source edits.
 | 2026-07-08 | post-live `cargo run -p lkjagent-xtask -- check-docs` | ok check-docs; EXIT=0 | `ctx_batch_execute` post_live_check_docs |
 | 2026-07-08 | post-live `cargo run -p lkjagent-xtask -- quiet verify` | ok verify; EXIT=0 | `ctx_batch_execute` post_live_quiet_verify |
 | 2026-07-08 | post-live `docker compose run --rm verify` | ok verify; EXIT=0 | `ctx_execute` post live docker verify |
+| 2026-07-08 | redesign packet focused scripts | fmt, prompt-no-json, protocol grep, TUI capture, workspace evidence, compose config, focused core/app tests all EXIT=0 | `tmp/coding-agent-runs/20260708T183000Z-workspace-runtime-redesign/final/summary.log` |
+| 2026-07-08 | redesign packet final gates | check-docs, quiet verify, and docker compose verify all EXIT=0 | `tmp/coding-agent-runs/20260708T183000Z-workspace-runtime-redesign/final/summary.log` |
+| 2026-07-08 | standard `.env` live profiles | 4 profiles ran 900 seconds each and closed; EXIT=0; elapsed_seconds=3605 total | `tmp/live-runs/20260708Tstandardenv/` |
 
 ## Acceptance Ledger
 
@@ -124,4 +127,4 @@ docs-first product architecture commit before source edits.
 | deterministic replay | 9cd8069c | `cargo run -p lkjagent-xtask -- smoke replay` and quiet verify smoke replay passed | done |
 | quiet verify | 9cd8069c | final `cargo run -p lkjagent-xtask -- quiet verify` passed after source changes | done |
 | Docker verify | 9cd8069c | final `docker compose run --rm verify` passed after source changes | done |
-| live campaigns | 9cd8069c; pending live-env commit | scripted campaign passed with workspace validation; skip files committed; `.env` endpoint run added under `tmp/live-runs/20260708Tliveenv/` with two closed and two open profiles after 30-second time boxes | done with residual standard-duration risk |
+| live campaigns | 9cd8069c; 6d0be7d8; redesign closure commit | scripted campaign passed with workspace validation; skip files committed; standard `.env` endpoint run added under `tmp/live-runs/20260708Tstandardenv/` with all four profiles closed after 900-second time boxes | done |

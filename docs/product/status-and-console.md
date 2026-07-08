@@ -24,7 +24,8 @@ evidence: blocked=0 refused=1 stale_edges=2
 ```
 
 Every field is available with the daemon stopped. Unknown token counts are
-printed as unknown rather than guessed.
+printed as unknown rather than guessed. Token rows also retain bounded raw
+provider usage metadata for proof bundles.
 
 ## Matter Display
 

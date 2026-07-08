@@ -17,7 +17,7 @@ pub(crate) fn handle_fault(
     let Some(index) = step_index(snapshot, step_id) else {
         return;
     };
-    let diagnosis = format!("{fault:?}");
+    let diagnosis = crate::parse::parse_fault_diagnosis(&fault);
     let step = &mut snapshot.steps[index];
     step.state = StepState::Active;
     step.attempts_used = step.attempts_used.saturating_add(1);

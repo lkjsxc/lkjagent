@@ -169,7 +169,7 @@ fn outcome_summary(outcome: &TurnOutcome) -> String {
         TurnOutcome::Model(_) => serde_json::json!({"outcome":"parsed"}).to_string(),
         TurnOutcome::ParseFault(fault) => serde_json::json!({
             "outcome":"parse_fault",
-            "diagnosis": format!("{fault:?}")
+            "diagnosis": lkjagent_core::parse::parse_fault_diagnosis(fault)
         })
         .to_string(),
         TurnOutcome::EndpointError(error) => serde_json::json!({

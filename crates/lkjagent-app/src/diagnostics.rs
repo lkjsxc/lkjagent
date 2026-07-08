@@ -10,6 +10,9 @@ use crate::diagnostics_support::{
 pub fn doctor(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<String, String> {
     let missing_tables = missing_tables(conn)?;
     let counts = table_counts(conn)?;
+    let workspace_root = crate::config::workspace_root(data_dir)?;
+    let prompt_cap = crate::config::prompt_max_context_tokens(data_dir)?;
+    let live_seconds = crate::config::live_campaign_seconds(data_dir)?;
     let missing_dirs = missing_dirs(data_dir);
     let endpoint = endpoint_state(data_dir);
     let unfinished = count_where(conn, "runtime_decisions", "status != 'settled'")?;
@@ -36,7 +39,9 @@ pub fn doctor(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<Strin
             "table_counts": counts,
             "lease": crate::lease_status::line(conn)?,
             "endpoint": endpoint,
-            "workspace_root": data_dir.join("workspace"),
+            "workspace_root": workspace_root.display().to_string(),
+            "prompt_max_context_tokens": prompt_cap,
+            "live_campaign_seconds": live_seconds,
             "missing_dirs": missing_dirs,
             "unfinished_decisions": unfinished,
             "orphan_prompt_refs": orphan_prompts,
@@ -58,9 +63,11 @@ pub fn doctor(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<Strin
         crate::lease_status::line(conn)?,
         format!("endpoint: {endpoint}"),
         format!(
-            "workspace: root={} missing={}",
-            data_dir.join("workspace").display(),
-            join_or_none(&missing_dirs)
+            "workspace: root={} missing={} prompt_cap={} live_seconds={}",
+            workspace_root.display(),
+            join_or_none(&missing_dirs),
+            option_number(prompt_cap),
+            option_number(live_seconds)
         ),
         format!("decisions: unfinished={unfinished}"),
         format!("prompt_refs: orphan={orphan_prompts}"),
@@ -70,7 +77,7 @@ pub fn doctor(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<Strin
 }
 
 pub fn workspace(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<String, String> {
-    let root = data_dir.join("workspace");
+    let root = crate::config::workspace_root(data_dir)?;
     let total = count_where(conn, "workspace_records", "1=1")?;
     let archived = count_where(conn, "workspace_records", "archived != 0")?;
     let artifacts = count_where(conn, "artifacts", "1=1")?;
@@ -82,7 +89,7 @@ pub fn workspace(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<St
     let missing = missing_dirs(data_dir);
     if as_json {
         return Ok(json!({
-            "root": root,
+            "root": root.display().to_string(),
             "records": { "total": total, "archived": archived },
             "artifacts": artifacts,
             "indexes": { "files": index_files },
@@ -100,6 +107,10 @@ pub fn workspace(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<St
         format!("missing: {}", join_or_none(&missing)),
     ]
     .join("\n"))
+}
+
+fn option_number(value: Option<u64>) -> String {
+    value.map_or_else(|| "unknown".to_string(), |number| number.to_string())
 }
 
 fn missing_tables(conn: &Connection) -> Result<Vec<String>, String> {

@@ -9,6 +9,7 @@ const ALLOWED_EXTERNAL: &[&str] = &[
     "serde_json",
     "toml",
     "unicode-segmentation",
+    "unicode-width",
 ];
 const FORBIDDEN_RUST: &[&str] = &[".unwrap(", ".expect(", "panic!", "todo!", "unimplemented!"];
 const FORBIDDEN_SKILL_RUST: &[&str] = &[

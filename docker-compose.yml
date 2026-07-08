@@ -46,6 +46,11 @@ services:
         bind:
           create_host_path: true
 
+  daemon:
+    profiles: ["daemon"]
+    extends:
+      service: agent
+
   verify:
     profiles: ["verify"]
     build:
@@ -86,6 +91,42 @@ services:
       context: .
       target: build
     command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "smoke", "replay"]
+
+  live-campaign:
+    profiles: ["live"]
+    build:
+      context: .
+      target: build
+    environment:
+      LKJAGENT_API_KEY: ${LKJAGENT_API_KEY:-}
+      LKJAGENT_ENDPOINT_URL: ${LKJAGENT_ENDPOINT_URL:-}
+      LKJAGENT_MODEL: ${LKJAGENT_MODEL:-}
+    volumes:
+      - type: bind
+        source: ./tmp
+        target: /src/tmp
+    command:
+      - cargo
+      - run
+      - -p
+      - lkjagent-xtask
+      - --
+      - experiment
+      - live-profiles
+      - --duration-seconds
+      - "${LKJAGENT_LIVE_SECONDS:-900}"
+
+  shell:
+    profiles: ["shell"]
+    build:
+      context: .
+      target: build
+    init: true
+    volumes:
+      - type: bind
+        source: ./tmp
+        target: /src/tmp
+    command: ["bash"]
 
   endpoint-example:
     profiles: ["endpoint"]

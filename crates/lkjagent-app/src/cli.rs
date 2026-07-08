@@ -19,7 +19,7 @@ where
     let db = invocation.data_dir.join("lkjagent.sqlite3");
     let conn = Connection::open(&db).map_err(|error| error.to_string())?;
     lkjagent_store::plan_schema::setup(&conn).map_err(|error| error.to_string())?;
-    crate::workspace_scaffold::ensure_root(&invocation.data_dir.join("workspace"))?;
+    crate::workspace_scaffold::ensure_root(&crate::config::workspace_root(&invocation.data_dir)?)?;
     match invocation.command {
         Command::Run { once } if once => {
             let mut endpoint = crate::endpoint::LlmEndpoint::new(&invocation.data_dir);

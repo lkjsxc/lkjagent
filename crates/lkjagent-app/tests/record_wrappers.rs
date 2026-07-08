@@ -67,6 +67,35 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
     assert!(finance.contains("path=records/life/finance/"));
     assert!(!finance.contains("unix:"));
     assert!(state_labels(&conn)?.contains(&"finance:review/".to_string()));
+
+    let calendar = cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "calendar",
+        "Team",
+        "review",
+    ])?;
+    assert!(calendar.contains("path=records/life/calendar/"));
+    assert!(state_labels(&conn)?.contains(&"calendar:due/".to_string()));
+
+    let note = cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "note",
+        "Useful",
+        "fact",
+    ])?;
+    assert!(note.contains("path=records/life/notes/"));
+
+    let project = cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "project",
+        "lkjagent",
+        "plan",
+    ])?;
+    assert!(project.contains("path=records/work/projects/"));
+    assert!(state_labels(&conn)?.contains(&"project:active/".to_string()));
     Ok(())
 }
 

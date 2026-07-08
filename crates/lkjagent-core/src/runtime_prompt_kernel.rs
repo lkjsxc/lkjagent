@@ -94,7 +94,14 @@ fn lane_list(plan: &ContextFramePlan) -> String {
     }
     plan.lanes
         .iter()
-        .map(|lane| format!("{}:{}", lane.name, lane.fingerprint))
+        .map(|lane| {
+            format!(
+                "{}:{} refs={}",
+                lane.name,
+                lane.fingerprint,
+                lane.source_refs.join("+")
+            )
+        })
         .collect::<Vec<_>>()
         .join(",")
 }

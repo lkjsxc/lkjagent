@@ -81,7 +81,7 @@ pub(crate) fn write_owner_trace(
     } else {
         format!("artifacts/transcripts/queue-{:06}.md", row.id)
     };
-    let workspace = data_dir.join("workspace");
+    let workspace = crate::config::workspace_root(data_dir)?;
     crate::workspace_scaffold::ensure_for_path(&workspace, &rel)?;
     fs::write(workspace.join(&rel), trace_body(row, written_at, inbox))
         .map_err(|error| error.to_string())?;

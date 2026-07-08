@@ -1,3 +1,6 @@
+use ratatui::layout::{Position, Rect};
+use unicode_width::UnicodeWidthStr;
+
 use crate::tui_types::{pane_label, run_state_label, source_label, TuiModel};
 
 const CAP: usize = 12_000;
@@ -36,6 +39,22 @@ pub fn transcript(model: &TuiModel) -> String {
         .join("\n")
 }
 
+pub(crate) fn composer_position(area: Rect, model: &TuiModel) -> Position {
+    let before = &model.composer[..model.composer_cursor.min(model.composer.len())];
+    let line_index = before.lines().count().saturating_sub(1) as u16;
+    let col = before.rsplit('\n').next().unwrap_or("").width() as u16;
+    let inner_width = area.width.saturating_sub(2);
+    let inner_height = area.height.saturating_sub(2);
+    Position::new(
+        area.x
+            .saturating_add(1)
+            .saturating_add(col.min(inner_width)),
+        area.y
+            .saturating_add(1)
+            .saturating_add(line_index.min(inner_height)),
+    )
+}
+
 fn bounded(text: &str) -> String {
     if text.len() <= CAP {
         return text.to_string();
@@ -44,4 +63,21 @@ fn bounded(text: &str) -> String {
         "{}\n[tui truncated]",
         text.chars().take(CAP - 16).collect::<String>()
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn japanese_cursor_uses_display_width() {
+        let mut model = TuiModel::new();
+        model.composer = "あいx".to_string();
+        model.composer_cursor = "あい".len();
+
+        let pos = composer_position(Rect::new(10, 5, 20, 4), &model);
+
+        assert_eq!(pos.x, 15);
+        assert_eq!(pos.y, 6);
+    }
 }

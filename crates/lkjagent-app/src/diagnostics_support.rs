@@ -18,7 +18,8 @@ pub(crate) fn endpoint_state(data_dir: &Path) -> String {
 }
 
 pub(crate) fn missing_dirs(data_dir: &Path) -> Vec<String> {
-    let root = data_dir.join("workspace");
+    let root =
+        crate::config::workspace_root(data_dir).unwrap_or_else(|_| data_dir.join("workspace"));
     [".", "records", "artifacts", "indexes"]
         .iter()
         .filter(|rel| !root.join(rel).exists())

@@ -47,6 +47,35 @@ pub enum ParseFault {
     Action(ToolCallError),
 }
 
+pub fn parse_fault_diagnosis(fault: &ParseFault) -> String {
+    match fault {
+        ParseFault::WrongBlock => "Use only the expected envelope tag for this decision.".into(),
+        ParseFault::Unclosed => "Close the expected envelope tag before sending.".into(),
+        ParseFault::Empty => "Put non-empty content inside the expected envelope.".into(),
+        ParseFault::UnknownTool => "Choose one tool from the selected tool view.".into(),
+        ParseFault::BadParams => "Use selected tool argument names and primitive values.".into(),
+        ParseFault::BadPlanLine(line) => format!("Revise plan line `{line}` to the grammar."),
+        ParseFault::Action(error) => format!(
+            "Action parse fault: {error:?}. Repair: {}",
+            action_hint(error)
+        ),
+    }
+}
+
+fn action_hint(error: &ToolCallError) -> &'static str {
+    match error {
+        ToolCallError::NoActionFound => "Return one lkjagent_action envelope.",
+        ToolCallError::MultipleActionsFound => "Return exactly one lkjagent_action envelope.",
+        ToolCallError::Attribute(_) => "Remove attributes; use child tags only.",
+        ToolCallError::DuplicateTag(_) => "Keep one value for each scalar or argument name.",
+        ToolCallError::DecisionMismatch => "Echo the current decision_id exactly.",
+        ToolCallError::ContextMismatch => "Echo the current context_fingerprint exactly.",
+        ToolCallError::ToolUnknown => "Choose one tool from the selected tool view.",
+        ToolCallError::ArgsSchemaViolation(_) => "Match the selected tool argument schema.",
+        _ => "Use the documented action envelope with balanced child tags only.",
+    }
+}
+
 pub fn parse_expected(kind: StepKind, raw: &str) -> Result<ParsedOutput, ParseFault> {
     parse_expected_with_view(kind, raw, &explore_tool_view())
 }

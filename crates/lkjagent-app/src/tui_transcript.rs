@@ -8,7 +8,7 @@ use crate::tui_types::{
 };
 
 pub fn save(data_dir: &Path, model: &TuiModel, snapshot: &TuiSnapshot) -> Result<PathBuf, String> {
-    let dir = data_dir.join("workspace/tui-transcripts");
+    let dir = crate::config::workspace_root(data_dir)?.join("tui-transcripts");
     std::fs::create_dir_all(&dir).map_err(|error| error.to_string())?;
     let path = dir.join(format!("{}.txt", stamp()));
     std::fs::write(&path, text(model, snapshot)).map_err(|error| error.to_string())?;

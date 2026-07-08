@@ -1,9 +1,9 @@
 #[rustfmt::skip]
 const EXPLICIT_WORDS: &[&str] = &["record ", "record that", "record this", "remember ", "remember that", "note that", "log that", "write down", "journal this", "diary entry", "save this note", "save this", "keep this"];
 #[rustfmt::skip]
-const TYPED_WORDS: &[&str] = &["todo", "to-do", "meeting", "calendar", "finance", "receipt", "project note", "artifact record"];
+const TYPED_WORDS: &[&str] = &["todo", "to-do", "meeting", "calendar", "finance", "receipt", "project note", "artifact record", "dev note", "development note"];
 #[rustfmt::skip]
-const PREFIXES: &[&str] = &["record that ", "record this ", "record ", "remember that ", "remember ", "note that ", "log that ", "write down ", "journal this ", "diary entry ", "save this note ", "save this ", "keep this ", "todo ", "to-do ", "project note ", "artifact record "];
+const PREFIXES: &[&str] = &["record that ", "record this ", "record ", "remember that ", "remember ", "note that ", "log that ", "write down ", "journal this ", "diary entry ", "save this note ", "save this ", "keep this ", "todo ", "to-do ", "project note ", "artifact record ", "dev note ", "development note "];
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct RecordIntent {
@@ -74,6 +74,8 @@ fn record_kind(text: &str, lower: &str) -> &'static str {
         || has_any(text, &["支払", "レシート", "家計"])
     {
         "finance"
+    } else if has_any(lower, &["dev note", "development note", "repo work"]) {
+        "development"
     } else if has_any(lower, &["project", "milestone"]) || text.contains("プロジェクト") {
         "project"
     } else if has_any(lower, &["artifact", "deliverable"]) || text.contains("成果物") {
@@ -112,6 +114,7 @@ fn record_body(kind: &str, text: &str, lower: &str) -> String {
         "calendar" => format!("Event\n\n{}\n\nDate\n\nUse the owner-provided date or this record date.", cleaned),
         "finance" => format!("Finance note\n\n{}\n\nReview\n\nKeep for monthly finance review.", cleaned),
         "project" => format!("Project note\n\n{}", cleaned),
+        "development" => format!("Development note\n\n{}", cleaned),
         "artifact" => format!("Artifact note\n\n{}", cleaned),
         "note" => format!("Note\n\n{}", cleaned),
         _ => cleaned,
@@ -151,6 +154,7 @@ fn default_title(kind: &str) -> &'static str {
         "finance" => "finance note",
         "project" => "project note",
         "artifact" => "artifact note",
+        "development" => "development note",
         "note" => "note",
         _ => "record",
     }

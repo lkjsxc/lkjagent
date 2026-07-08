@@ -16,7 +16,7 @@ fn attempts(conn: &Connection) -> Result<String, String> {
 fn token_usage(conn: &Connection) -> Result<String, String> {
     let mut statement = match conn.prepare(
         "SELECT task_id, attempt_id, input_total_tokens, input_cached_tokens,
-         input_uncached_tokens, output_tokens, cache_status FROM token_usage ORDER BY id",
+         input_uncached_tokens, output_tokens, cache_status, raw_usage_json FROM token_usage ORDER BY id",
     ) {
         Ok(statement) => statement,
         Err(error) if error.to_string().contains("no such table") => {
@@ -27,14 +27,15 @@ fn token_usage(conn: &Connection) -> Result<String, String> {
     let rows = statement
         .query_map([], |row| {
             Ok(format!(
-                "- matter={} attempt={} input_total={} input_cached={} input_uncached={} output={} cache={}",
+                "- matter={} attempt={} input_total={} input_cached={} input_uncached={} output={} cache={} raw_usage={}",
                 row.get::<_, i64>(0)?,
                 nullable(row.get::<_, Option<i64>>(1)?),
                 nullable(row.get::<_, Option<i64>>(2)?),
                 nullable(row.get::<_, Option<i64>>(3)?),
                 nullable(row.get::<_, Option<i64>>(4)?),
                 nullable(row.get::<_, Option<i64>>(5)?),
-                row.get::<_, String>(6)?
+                row.get::<_, String>(6)?,
+                row.get::<_, String>(7)?
             ))
         })
         .map_err(|error| error.to_string())?;

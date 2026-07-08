@@ -25,6 +25,7 @@ pub fn draw(frame: &mut Frame<'_>, model: &TuiModel, snapshot: &TuiSnapshot) {
     frame.render_widget(panel("Activity", activity(model, snapshot)), main[0]);
     frame.render_widget(panel("Session", side(model, snapshot)), main[1]);
     render_composer(frame, vertical[2], model);
+    frame.set_cursor_position(crate::tui_render::composer_position(vertical[2], model));
     render_footer(frame, vertical[3], model);
     if model.palette_open {
         crate::tui_palette::render(frame, area);

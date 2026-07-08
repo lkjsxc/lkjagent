@@ -10,9 +10,5 @@
 /crates/**/target
 /data/*
 !/data/README.md
-!/data/logs/
-!/data/logs/**
-!/data/workspace/
-!/data/workspace/**
 /target
 /tmp

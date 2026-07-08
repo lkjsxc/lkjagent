@@ -39,7 +39,7 @@ pub fn list(conn: &Connection, kind: Option<&str>) -> Result<String, String> {
 
 pub fn show(conn: &Connection, data_dir: &Path, id: &str) -> Result<String, String> {
     let row = record_or_alias(conn, id)?;
-    let text = fs::read_to_string(data_dir.join("workspace").join(&row.path))
+    let text = fs::read_to_string(crate::config::workspace_root(data_dir)?.join(&row.path))
         .map_err(|error| error.to_string())?;
     Ok(format!("{}\n{}", format_record_row("record", &row), text))
 }
@@ -48,7 +48,7 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
     let row = record(conn, id)
         .map_err(|error| error.to_string())?
         .ok_or_else(|| format!("record not found: {id}"))?;
-    let workspace = data_dir.join("workspace");
+    let workspace = crate::config::workspace_root(data_dir)?;
     let old = workspace.join(&row.path);
     let new_rel = archive_path(&row.kind, &row.id)?;
     let new = workspace.join(&new_rel);
@@ -82,7 +82,7 @@ pub fn link(
     let row = record(conn, id)
         .map_err(|error| error.to_string())?
         .ok_or_else(|| format!("record not found: {id}"))?;
-    let path = data_dir.join("workspace").join(&row.path);
+    let path = crate::config::workspace_root(data_dir)?.join(&row.path);
     let text = fs::read_to_string(&path).map_err(|error| error.to_string())?;
     let mut parsed = parse_record(&text)?;
     if !parsed.links.iter().any(|link| link == target) {
@@ -130,7 +130,7 @@ fn write_record(
         &record.title,
         &record.state,
     )?;
-    let workspace = data_dir.join("workspace");
+    let workspace = crate::config::workspace_root(data_dir)?;
     crate::workspace_scaffold::ensure_for_path(&workspace, &rel)?;
     let path = workspace.join(&rel);
     let text = render_record(record);

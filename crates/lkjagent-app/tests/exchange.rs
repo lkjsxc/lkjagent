@@ -58,9 +58,9 @@ fn endpoint_completion_writes_exchange_and_usage_rows() -> TestResult<()> {
     assert!(body_ref.starts_with("logs/case-1/decision-"));
     let prompt_body = fs::read_to_string(data.join(&body_ref))?;
     assert!(prompt_body.contains(&provider.2));
-    let usage: (i64, i64, i64, i64, String) = conn.query_row(
+    let usage: (i64, i64, i64, i64, String, String) = conn.query_row(
         "SELECT input_total_tokens, input_cached_tokens, input_uncached_tokens,
-         output_tokens, cache_status FROM token_usage LIMIT 1",
+         output_tokens, cache_status, raw_usage_json FROM token_usage LIMIT 1",
         [],
         |row| {
             Ok((
@@ -69,10 +69,15 @@ fn endpoint_completion_writes_exchange_and_usage_rows() -> TestResult<()> {
                 row.get(2)?,
                 row.get(3)?,
                 row.get(4)?,
+                row.get(5)?,
             ))
         },
     )?;
-    assert_eq!(usage, (13, 3, 10, 7, "known".to_string()));
+    assert_eq!(
+        (usage.0, usage.1, usage.2, usage.3, usage.4.as_str()),
+        (13, 3, 10, 7, "known")
+    );
+    assert!(usage.5.contains("cache_status"));
     let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
     assert!(status.contains("input_uncached=10 input_cached=3 input_total=13 output=7 cache=known"));
     Ok(())

@@ -155,6 +155,7 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
             input_uncached_tokens INTEGER,
             output_tokens INTEGER,
             cache_status TEXT NOT NULL DEFAULT 'unknown',
+            raw_usage_json TEXT NOT NULL DEFAULT '{}',
             created_at TEXT NOT NULL
         );
 
@@ -175,6 +176,7 @@ fn ensure_token_usage_columns(conn: &Connection) -> StoreResult<()> {
         ("input_uncached_tokens", "INTEGER"),
         ("output_tokens", "INTEGER"),
         ("cache_status", "TEXT NOT NULL DEFAULT 'unknown'"),
+        ("raw_usage_json", "TEXT NOT NULL DEFAULT '{}'"),
     ] {
         if !has_column(conn, "token_usage", name)? {
             conn.execute(

@@ -1,4 +1,0 @@
-$ cargo run -p lkjagent-app -- --data data/live-longform-structural-20260704 task list
-exit=0
-
-task 1 open manuscript 

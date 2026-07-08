@@ -80,7 +80,7 @@ fn journal_parse_fault_recovers_before_verified_close() -> TestResult<()> {
     assert!(snapshot
         .attempts
         .iter()
-        .any(|attempt| attempt.diagnosis.contains("WrongBlock")));
+        .any(|attempt| attempt.diagnosis.contains("expected envelope")));
     Ok(())
 }
 
