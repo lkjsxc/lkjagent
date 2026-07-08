@@ -75,6 +75,7 @@ fn file<'a>(files: &'a [FileFact], path: &str) -> Option<&'a str> {
 fn result(name: &str, passed: bool, measured: impl Into<String>) -> CheckResult {
     CheckResult {
         name: name.to_string(),
+        params: None,
         passed,
         measured: measured.into(),
     }

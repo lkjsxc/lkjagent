@@ -148,6 +148,8 @@ pub enum CheckSpec {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CheckResult {
     pub name: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub params: Option<CheckSpec>,
     pub passed: bool,
     pub measured: String,
 }

@@ -1,5 +1,8 @@
 use crate::engine::Command;
-use crate::model::{Event, EventKind, StepKind, StepState, TaskSnapshot, TaskState, TemplateId};
+use crate::model::{
+    CheckResult, CheckSpec, Event, EventKind, StepKind, StepState, TaskSnapshot, TaskState,
+    TemplateId,
+};
 
 pub(crate) fn close_task(snapshot: &mut TaskSnapshot, commands: &mut Vec<Command>) {
     if let Some(reason) = completion_blocker(snapshot) {
@@ -49,14 +52,40 @@ fn check_blocker(snapshot: &TaskSnapshot) -> Option<String> {
         return artifact_evidence_required(snapshot.task.template)
             .then(|| "artifact evidence missing".to_string());
     }
-    if snapshot.check_results.len() < snapshot.task.checks.len() {
-        return Some("task checks missing".to_string());
+    for spec in &snapshot.task.checks {
+        if !snapshot
+            .check_results
+            .iter()
+            .any(|result| check_matches(result, spec))
+        {
+            return Some(format!("task check missing: {}", check_name(spec)));
+        }
     }
     snapshot
         .check_results
         .iter()
         .find(|result| !result.passed)
         .map(|result| format!("task check failed: {}", result.name))
+}
+
+fn check_matches(result: &CheckResult, spec: &CheckSpec) -> bool {
+    result.passed && result.name == check_name(spec) && result.params.as_ref() == Some(spec)
+}
+
+fn check_name(spec: &CheckSpec) -> &'static str {
+    match spec {
+        CheckSpec::FileExists { .. } => "file_exists",
+        CheckSpec::MinWords { .. } => "min_words",
+        CheckSpec::MinWordsTotal { .. } => "min_words_total",
+        CheckSpec::MaxLines { .. } => "max_lines",
+        CheckSpec::FileCount { .. } => "file_count",
+        CheckSpec::Contains { .. } => "contains",
+        CheckSpec::Absent { .. } => "absent",
+        CheckSpec::ReadmeCoverage { .. } => "readme_coverage",
+        CheckSpec::LinksResolve { .. } => "links_resolve",
+        CheckSpec::Command { .. } => "command",
+        CheckSpec::Judged { .. } => "judged",
+    }
 }
 
 fn artifact_evidence_required(template: TemplateId) -> bool {

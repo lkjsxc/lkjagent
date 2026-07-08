@@ -17,7 +17,11 @@ pub(crate) fn handle_checks(
     let results = snapshot.steps[index]
         .checks
         .iter()
-        .map(|spec| evaluate(spec, files, command_facts))
+        .map(|spec| {
+            let mut result = evaluate(spec, files, command_facts);
+            result.params = Some(spec.clone());
+            result
+        })
         .collect::<Vec<_>>();
     let passed = results.iter().all(|result| result.passed);
     snapshot.check_results.extend(results.clone());

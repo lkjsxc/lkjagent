@@ -134,6 +134,7 @@ fn path_list(files: &[FileFact]) -> Vec<String> {
 fn result(name: &str, passed: bool, measured: String) -> CheckResult {
     CheckResult {
         name: name.to_string(),
+        params: None,
         passed,
         measured,
     }

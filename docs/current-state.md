@@ -156,11 +156,16 @@ runs the existing workspace-safe write edge, and a focused regression proves the
 file and artifact rows are created without endpoint output or bridge step
 execution.
 
+Bridge check results now carry their required check parameters in core state and
+through SQLite hydration. Completion requires a passed row whose check name and
+parameters match each required matter check, so unrelated or stale-by-parameter
+check rows cannot close file-work matters.
+
 ## Known Gaps
 
-- Check freshness remains bridge-limited: current check rows do not yet carry
-  decision ids, artifact fingerprints, or full parameter matching, so broader
-  freshness work remains for later state-ledger slices.
+- Check freshness remains bridge-limited: current check rows now match names and
+  parameters but do not yet carry decision ids or artifact fingerprints, so
+  broader freshness work remains for later state-ledger slices.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, blocked, active, pending, failed, or
   unsuperseded skipped bridge steps must prevent close candidates.
@@ -171,9 +176,9 @@ execution.
 
 ## Next Executable Step
 
-Implement the next native state-harness slice: fresh check rows tied to
-specified check parameters and artifact/workspace evidence, with docs, focused
-tests, quiet gates, and Docker verification.
+Implement the next completion-evidence slice: tie check rows to artifact or
+workspace fingerprints and decision ids, with docs, focused tests, quiet gates,
+and Docker verification.
 
 ## Honesty Rules
 

@@ -32,10 +32,11 @@ runnable decisions remain. Benchmarks and replay use the same check evaluator.
 
 ## Diagnosis
 
-A failed check records name, parameters, structured measured value, pass flag,
-and timestamp. Renderers may format that data as text, for example
-`min_words chapter-02.md: 312 < 500`, but the retry ladder consumes structured
-values rather than parsing prose.
+A check records name, parameters, structured measured value, pass flag, and
+timestamp. Completion matches rows back to their required check parameters
+before accepting them as evidence. Renderers may format that data as text, for
+example `min_words chapter-02.md: 312 < 500`, but the retry ladder consumes
+structured values rather than parsing prose.
 
 ## Failure This Prevents
 
