@@ -12,7 +12,7 @@ and enters the turn cycle.
 
 Each cycle has one active concern:
 
-1. deliver due owner turns;
+1. deliver due owner turns and write transcript or inbox evidence;
 2. classify the turn as answer, matter continuation, direct record, artifact,
    inspection, or system operation;
 3. hydrate the current state graph and workspace evidence;
@@ -48,7 +48,9 @@ state transition.
 
 No runnable matter and no pending owner turn means idle. Idle updates heartbeat
 data and sleeps on the queue poll interval. It does not call the endpoint,
-rewrite memory, inspect files, or self-assign work.
+rewrite memory, inspect files, or self-assign work. A matter with blocked,
+active, pending, failed, or unsuperseded skipped work is not true idle; status
+must explain the blocker or waiting question.
 
 ## Waiting
 
@@ -65,9 +67,10 @@ exists, otherwise it stays open or blocks with failed-check evidence.
 ## Record-Only Turns
 
 Record-like owner turns may bypass the endpoint. The deterministic router writes
-or updates the workspace record, refreshes record metadata and indexes, appends
-state events, and reports the path and fingerprint. If recording would be
-harmful or ambiguous, the daemon asks at most one clarification.
+or updates the workspace record, refreshes record metadata and indexes, writes
+route trace evidence, appends state events, and reports the path, record id, and
+fingerprint. If recording would be harmful or ambiguous, the daemon writes an
+inbox trace or asks at most one clarification.
 
 ## Crash Resume
 

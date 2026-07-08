@@ -13,10 +13,11 @@ the command the same way it routes `status`, `console`, and `watch`.
 
 ## Pure TUI Core
 
-The app has a pure terminal model, event reducer, grapheme-aware composer, and
-non-TTY renderer. It preserves composer input while agent, tool, state,
-artifact, resize, interrupt, approval, save, and quit events arrive. Terminal
-backends are effects at the edge.
+The app has a pure terminal model, event reducer, grapheme-aware composer,
+stable transcript-entry identity, follow/manual viewport state, and non-TTY
+renderer. It preserves composer input while agent, tool, state, artifact,
+resize, interrupt, approval, save, and quit events arrive. Terminal backends are
+effects at the edge.
 
 ## Modes
 
@@ -44,7 +45,8 @@ owner turn. Slash commands reuse the console handlers for `/status`, `/watch`,
 `/mode append` and `/mode pane` switch render modes without touching daemon
 state. `/scroll up`, `/scroll down`, `/scroll top`, `/page up`, and `/page down`
 move pane scroll state only. `/follow on` returns the transcript window to the
-latest rows; `/follow off` leaves manual scroll in place.
+latest rows; `/follow off` leaves manual scroll in place. If the viewport is in
+follow mode when a row arrives, the rendered bottom stays anchored.
 
 ## Japanese And Mixed-Width Text
 
@@ -64,6 +66,7 @@ context-resolution, record, or other row-backed command paths.
 
 Tests cover parser routing, reducer mode changes, line handling, closed-input
 exit, grapheme cursor movement, pane scroll and follow state, durable transcript
-merge, status rail fallback fields, and bounded rendering. Interactive behavior
-is proven by captured command logs under `tmp/agent-runs/` or `tmp/live-runs/`,
-with unavailable terminals recorded as an honest skip.
+merge, duplicate suppression by stable row identity, status rail fallback fields,
+and bounded rendering. Interactive behavior is proven by captured command logs
+under `tmp/agent-runs/` or `tmp/live-runs/`, with unavailable terminals recorded
+as an honest skip.

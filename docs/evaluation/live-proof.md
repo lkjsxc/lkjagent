@@ -6,7 +6,7 @@ Define the daily-use live endpoint proof and capture rules.
 
 ## Acceptance Criteria
 
-A live proof is acceptable only when the proof bundle shows:
+A scripted or live daily-use proof is acceptable only when the proof bundle shows:
 
 - the requested profile and success checks;
 - prompt frames, context lane fingerprints, and tool-view fingerprints;
@@ -17,8 +17,9 @@ A live proof is acceptable only when the proof bundle shows:
 - adoption notes that say what changed because of the evidence.
 
 The preferred profiles are personal daily capture, finance receipt flow,
-calendar meeting flow, software maintenance, workspace rebalance, protocol
-stress, TUI operator flow, and recovery flow.
+calendar meeting flow, todo capture, note capture, project work, artifact
+creation, workspace rebalance, protocol stress, TUI operator flow, and recovery
+flow.
 
 ## Duration
 
@@ -29,10 +30,10 @@ a pass.
 
 ## Capture
 
-Each run writes a stamped directory under `tmp/live-runs/` with data, prompt
-frames, request and response refs, observations, final state, metrics, and an
-adoption note. Secret-bearing raw bodies stay local or are redacted before any
-committed summary.
+Each run writes a stamped directory under `tmp/live-runs/` or `tmp/agent-runs/`
+with data, prompt frames, request and response refs, observations, final state,
+workspace tree, SQLite counts, metrics, and an adoption note. Secret-bearing raw
+bodies stay local or are redacted before any committed summary.
 
 ## Procedure
 

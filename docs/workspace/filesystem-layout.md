@@ -42,17 +42,21 @@ workspace/
 
 ## Source Rules
 
+`inbox/` contains ambiguous owner-turn traces that need owner review.
 `records/` contains owner-readable source records. `artifacts/` contains
-lkjagent-generated or assembled files. `indexes/` contains derived views that
-can be rebuilt. `archive/` keeps inactive records and artifacts without deleting
-ledger evidence. `system/` contains schemas, templates, prompts, and manifest
-rules that may enter prompts only when selected by a decision.
+lkjagent-generated or assembled files, including transcripts and proof bundles.
+`indexes/` contains derived views that can be rebuilt. `archive/` keeps inactive
+records and artifacts without deleting ledger evidence. `system/` contains
+schemas, templates, prompts, and manifest rules that may enter prompts only when
+selected by a decision.
 
 ## Path Policy
 
 All runtime filesystem effects stay under the configured workspace root after
 canonicalization. Dotfiles, secrets, large binaries, generated caches, and
-external repositories require explicit policy before prompt admission.
+external repositories require explicit policy before prompt admission. Owner-turn
+transcripts and inbox traces are workspace effects and follow the same path
+checks.
 
 ## Workspace READMEs
 

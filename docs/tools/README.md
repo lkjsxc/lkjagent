@@ -16,5 +16,6 @@ admissions, observations, and guards.
 
 ## Failure This Prevents
 
-Tools shown to the model are exactly the tools the harness can admit for the
-same persisted runtime decision.
+Tools shown to the model are exactly the operation-scoped tools the harness can
+admit for the same persisted runtime decision. The global catalog remains an
+internal registry, not prompt context.

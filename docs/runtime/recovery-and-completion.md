@@ -13,8 +13,10 @@ commits a bounded recovery event. It does not recompute a new tool view and
 pretend it rendered the old prompt.
 
 If an admission was persisted before a tool effect, resume either reruns the
-idempotent effect or records a recovery event for non-idempotent work. Recovery
-facts are durable events and may produce recovery state cells.
+idempotent effect or records a recovery event for non-idempotent work. Parse,
+admission, effect, endpoint, and check failures become durable recovery facts
+and may produce recovery state cells. Repeated identical failures escalate to a
+blocked state or a narrowed recovery decision instead of a happy response.
 
 ## Completion
 
@@ -33,7 +35,8 @@ not completion evidence.
 While plan-family rows remain as bridge storage, they are blocking evidence.
 Any blocked, active, pending, failed, or unsuperseded skipped bridge step keeps
 the matter open or blocked even if task-level checks are empty or model prose
-claims success.
+claims success. Runtime projection checks those earlier blockers before
+selecting later model work such as verify or respond steps.
 
 If an artifact changes after a passing check, the reducer suppresses dependent
 `completion:check-passed` cells or creates a fresh check requirement.

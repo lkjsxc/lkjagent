@@ -23,8 +23,9 @@ workspace evidence, and runtime state.
 
 ## Model-Visible Shape
 
-Context renders as compact XML-like cards with source handles and fingerprints.
-It does not dump JSON blobs, whole transcripts, or unbounded workspace files.
+Context renders as compact XML-like cards with source handles, lane names, and
+fingerprints. It does not dump JSON blobs, whole transcripts, raw failed model
+output, duplicate objective text, or unbounded workspace files.
 
 ## Failure This Prevents
 

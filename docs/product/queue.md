@@ -12,8 +12,10 @@ running daemon. The daemon delivers pending rows only at cycle start, so owner
 input never interrupts an endpoint call or state transaction.
 
 A turn stores the raw owner text, received time, routing flags, optional
-preferred matter ref, and delivery state. The row is evidence, not the visible
-unit of work.
+preferred matter ref, route lane, desired durability, transformation permission,
+and delivery state. The row is evidence, not the visible unit of work. The
+visible unit is the transcript, inbox trace, record, artifact, matter, or proof
+path linked from the row.
 
 ## Semantic Routing
 
@@ -30,7 +32,8 @@ rules are sufficient:
 
 Record-like phrases such as "record this", Japanese diary requests, todo-like
 text, calendar-like text, finance notes, and project notes prefer workspace
-write-through over matter creation.
+write-through over matter creation. Ambiguous save-like text writes an inbox
+trace with the route reason or asks one clarification instead of disappearing.
 
 ## Answer Routing
 
@@ -53,5 +56,6 @@ model-dependent matter.
 
 `lkjagent queue list` shows pending, delivered, answered, recorded, separate,
 and failed-routing rows with route lane, desired durability, and transformation
-permission. Matter and record views link back to the owner turn and show the
-workspace paths or decision refs produced by routing.
+permission. Matter, transcript, inbox, artifact, and record views link back to the owner
+turn and show the workspace paths, fingerprints, decision refs, or blocker
+reasons produced by routing.

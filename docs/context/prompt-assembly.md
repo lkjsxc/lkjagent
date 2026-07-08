@@ -14,11 +14,11 @@ never quoted back, except through bounded recovery-only diagnoses.
 
 Prompt assembly consumes the persisted decision id, expected envelope,
 `ToolSetView`, context item selection, named context lanes, active state
-payloads, retry or recovery policy, profile names, and budget caps. The
-resulting `PromptFrame` stores the
-decision id, prompt fingerprint, context-frame fingerprint, tool-view
-fingerprint, card plan, compact included and excluded context id reasons, and
-body or body refs.
+payloads, retry or recovery policy, profile names, and budget caps. Candidates
+are deduplicated by semantic key and fingerprint before rendering. The resulting
+`PromptFrame` stores the decision id, prompt fingerprint, context-frame
+fingerprint, tool-view fingerprint, card plan, compact included and excluded
+context id reasons, and body or body refs.
 
 ## Layout
 
@@ -45,10 +45,11 @@ with an explicit marker. Contaminated items are excluded from normal prompts.
 Contradictions render only as unresolved-conflict summaries until resolved.
 Workspace record and index context is rendered as bounded metadata with source
 fingerprints, not full file bodies. Observations are bounded before storage and
-bounded again during rendering. The final prompt region is a copyable XML-like
-output skeleton for the selected envelope and active tool view. Kernel,
-objective, state, facts, conflicts, recovery, tools, and output cards keep the
-shape stable across profiles.
+bounded again during rendering. Recovery cards render bounded diagnoses and
+invalid-excerpt hashes, not raw failed output. The final prompt region is a
+copyable XML-like output skeleton for the selected envelope and active tool
+view. Kernel, objective, state, facts, conflicts, recovery, tools, and output
+cards keep the shape stable across profiles.
 
 ## Fingerprint Contract
 
