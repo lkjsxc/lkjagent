@@ -24,10 +24,11 @@ Completion is represented by state cells such as `completion:check-pending/*`,
 native `check.run/<step>` operation. Each recorded check row emits a native
 `completion:check-passed/*` or `completion:check-failed/*` cell with evidence
 refs. Hydration suppresses passed check rows that lack matching active native
-completion cells. Closing a case requires no pending, active, blocked, failed,
-or unsuperseded skipped operation and current passing check results tied to
-artifact fingerprints and the active decision. Model prose is not completion
-evidence.
+completion cells. Blocked and close-candidate projections use native completion
+schemas, not plan-bridge schemas. Closing a case requires no pending, active,
+blocked, failed, or unsuperseded skipped operation and current passing check
+results tied to artifact fingerprints and the active decision. Model prose is
+not completion evidence.
 
 While plan-family rows remain as bridge storage, they are blocking evidence.
 Any blocked, active, pending, failed, or unsuperseded skipped bridge step keeps

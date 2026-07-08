@@ -42,11 +42,11 @@ fn open_parts(snapshot: &TaskSnapshot) -> CellParts {
             return CellParts::with_payload(
                 "completion",
                 "blocked",
-                "plan-bridge.blocked",
+                "state.completion-blocked",
                 serde_json::json!({"reason": reason}),
             );
         }
-        return CellParts::new("completion", "close-candidate", "plan-bridge.completion");
+        return CellParts::new("completion", "close-candidate", "state.completion-close");
     };
     if step.kind == StepKind::Verify && step.checks.iter().all(deterministic) {
         return CellParts::with_payload(
@@ -151,8 +151,7 @@ mod tests {
 
         assert_eq!(cell.key.namespace, "completion");
         assert_eq!(cell.key.name, "blocked");
-        assert_eq!(cell.payload_schema, "plan-bridge.blocked");
-        assert!(cell.payload_json.contains("blocked"));
+        assert_eq!(cell.payload_schema, "state.completion-blocked");
     }
 
     #[test]
@@ -182,6 +181,7 @@ mod tests {
         let cell = test_cell(&snapshot);
         assert_eq!(cell.key.namespace, "completion");
         assert_eq!(cell.key.name, "close-candidate");
+        assert_eq!(cell.payload_schema, "state.completion-close");
     }
 
     fn test_cell(snapshot: &TaskSnapshot) -> StateCell {
