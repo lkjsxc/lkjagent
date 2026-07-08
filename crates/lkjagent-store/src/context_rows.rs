@@ -1,7 +1,9 @@
 use lkjagent_core::runtime_context::ContextItem;
 use rusqlite::{params, Connection};
 
+use crate::artifact_rows::{artifacts, ArtifactRow};
 use crate::error::StoreResult;
+use crate::record_rows::{records, RecordRow};
 use crate::row_json::{json_string, json_value};
 
 pub fn insert_context_item(
@@ -50,6 +52,56 @@ pub fn context_items(conn: &Connection, case_id: &str) -> StoreResult<Vec<Contex
         items.push(json_value(&row?)?);
     }
     Ok(items)
+}
+
+pub fn insert_workspace_context(conn: &Connection, case_id: &str, now: &str) -> StoreResult<()> {
+    for row in records(conn, None, false)?.into_iter().take(5) {
+        insert_context_item(conn, case_id, &record_item(&row, now))?;
+    }
+    let rows = artifacts(conn, "workspace")?;
+    for row in rows
+        .into_iter()
+        .filter(|row| row.kind == "workspace-index")
+        .take(5)
+    {
+        insert_context_item(conn, case_id, &index_item(&row, now))?;
+    }
+    Ok(())
+}
+
+fn record_item(row: &RecordRow, now: &str) -> ContextItem {
+    let body = format!(
+        "kind={} state={} title={} path={} fp={}",
+        row.kind, row.state, row.title, row.path, row.fingerprint
+    );
+    let mut item = ContextItem::clean_fact(
+        format!("workspace-record-{}", row.id),
+        format!("workspace-record:{}", row.id),
+        bounded(&body),
+    );
+    item.source_type = "workspace_record".to_string();
+    item.source_id = row.id.clone();
+    item.source_fingerprint = row.fingerprint.clone();
+    item.created_at = now.to_string();
+    item
+}
+
+fn index_item(row: &ArtifactRow, now: &str) -> ContextItem {
+    let mut item = ContextItem::clean_fact(
+        format!("workspace-index-{}", row.id),
+        format!("workspace-index:{}", row.path),
+        format!("path={} fp={}", row.path, row.fingerprint),
+    );
+    item.source_type = "workspace_index".to_string();
+    item.source_id = row.id.clone();
+    item.source_fingerprint = row.fingerprint.clone();
+    item.artifact_refs = vec![row.id.clone()];
+    item.created_at = now.to_string();
+    item
+}
+
+fn bounded(text: &str) -> String {
+    text.chars().take(240).collect()
 }
 
 pub fn insert_context_edge(

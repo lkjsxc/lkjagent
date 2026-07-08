@@ -19,8 +19,8 @@ instructions, file evidence, check results, memory, model-authored content,
 observations, and recovery diagnoses.
 
 The renderer never dumps a transcript. It admits bounded current items, accepted
-memory, active state payloads, required artifact tails, and unresolved-conflict
-summaries.
+memory, active state payloads, required artifact tails, workspace record/index
+summaries with fingerprints, and unresolved-conflict summaries.
 
 ## Compaction
 

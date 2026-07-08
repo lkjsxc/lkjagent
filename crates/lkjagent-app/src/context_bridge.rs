@@ -7,7 +7,7 @@ use lkjagent_core::runtime_context::{
 use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
-use lkjagent_store::context_rows::{context_items, insert_context_item};
+use lkjagent_store::context_rows::{context_items, insert_context_item, insert_workspace_context};
 use lkjagent_store::event_rows::{append_and_apply_event, next_event_id};
 use rusqlite::Connection;
 
@@ -28,6 +28,7 @@ pub fn prepare_prompt_context(
     let case_id = snapshot.task.id.to_string();
     insert_context_item(conn, &case_id, &objective_item(snapshot, now))
         .map_err(|error| error.to_string())?;
+    insert_workspace_context(conn, &case_id, now).map_err(|error| error.to_string())?;
     apply_resolutions(conn, &case_id, now)?;
     let items = context_items(conn, &case_id).map_err(|error| error.to_string())?;
     let conflicts = detect_contradictions(&items);
@@ -131,8 +132,8 @@ fn render_context(
         .filter(|item| included.contains(item.id.as_str()))
     {
         lines.push(format!(
-            "{} [{}:{}] {}",
-            item.semantic_key, item.source_type, item.source_id, item.body
+            "{} [{}:{} fp={}] {}",
+            item.semantic_key, item.source_type, item.source_id, item.source_fingerprint, item.body
         ));
     }
     for conflict in conflicts {

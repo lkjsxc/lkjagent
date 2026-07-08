@@ -165,29 +165,29 @@ suppresses stale passed rows, and artifact replacement suppresses active
 check-to-artifact edges for the old artifact.
 
 Record-like owner turns now write owner-readable workspace records without
-creating tasks, refresh `workspace_records` and `workspace_record_history`, write
-README path coverage, rebuild generated record indexes, and record index artifact
-evidence. The focused owner-turn regression checks files, rows, history,
-fingerprints, README links, index contents, and index artifacts.
+creating tasks, refresh rows/history, write README path coverage, rebuild record
+indexes, and record index artifact evidence. Focused coverage checks files,
+rows, history, fingerprints, README links, index contents, and index artifacts.
+
+Prompt context now admits bounded workspace record/index metadata with source
+fingerprints and artifact refs, avoids full workspace dumps, and records admitted
+item ids in the context plan.
 
 ## Known Gaps
 
 - Check freshness still depends on transitional check rows for completion, but
-  check-to-artifact freshness now also has native state-edge evidence and stale
-  edges are suppressed when a newer artifact replaces the referenced artifact.
+  native check-to-artifact edges now record and suppress stale freshness evidence.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, blocked, active, pending, failed, or
   unsuperseded skipped bridge steps must prevent close candidates.
 - Native operation execution remains limited to generic state resolution,
-  `workspace.write_text`, and bridge-backed model, check, completion, and route
-  effects; broader native effect commands remain a follow-up state-harness
-  slice.
+  `workspace.write_text`, and bridge-backed effects; broader native effect
+  commands remain a follow-up state-harness slice.
 
 ## Next Executable Step
 
-Implement the next prompt/context slice: make prompt frames and context
-admission show bounded, non-stale workspace record/index evidence with docs,
-focused tests, quiet gates, and Docker verification.
+Implement the next tool-protocol slice: tighten XML-like action admission,
+refusal evidence, and persisted tool-view fingerprints with docs and gates.
 
 ## Honesty Rules
 

@@ -55,7 +55,7 @@ fn prompt_frame_body_ref_replays_rendered_prompt() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert_eq!(decision_fp, frames[0].context_frame_fingerprint);
-    let expected_context = "case-objective [owner:1] What is an agent?";
+    let expected_context = "case-objective [owner:1 fp=objective-1] What is an agent?";
     assert_eq!(
         frames[0].context_frame_fingerprint,
         stable_fingerprint(&expected_context).map_err(|error| error.message)?
@@ -75,6 +75,38 @@ fn prompt_frame_body_ref_replays_rendered_prompt() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert_eq!(cards, 8);
+    Ok(())
+}
+
+#[test]
+fn prompt_context_admits_workspace_record_and_index_evidence() -> TestResult<()> {
+    let data = fixture_root("prompt-workspace-context")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    enqueue(&conn, "todo buy milk", "now")?;
+    enqueue(&conn, "What should I remember?", "later")?;
+    drop(conn);
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec!["<message>Use the workspace evidence.</message>".to_string()],
+        index: 0,
+    };
+    let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;
+
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let frames = prompt_frames(&conn, "1")?;
+    assert_eq!(frames.len(), 1);
+    let body = fs::read_to_string(data.join(&frames[0].body_ref))?;
+    let json: serde_json::Value = serde_json::from_str(&body)?;
+    let system = json["system"].as_str().unwrap_or_default();
+    assert!(system.contains("workspace-record:"));
+    assert!(system.contains("workspace-index:"));
+    assert!(system.contains("fp=fnv1a64:"));
+    assert!(json["context_plan"]
+        .to_string()
+        .contains("workspace-record-"));
+    assert!(json["context_plan"]
+        .to_string()
+        .contains("workspace-index-"));
     Ok(())
 }
 
