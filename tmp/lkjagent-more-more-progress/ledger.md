@@ -102,18 +102,18 @@ docs-first product architecture commit before source edits.
 
 | Item | Commit | Evidence | Status |
 | --- | --- | --- | --- |
-| docs synced | a9a9fe08; pending evidence commit | check-docs passed after docs-first edits and after final current-state update | done |
-| workspace writes | pending evidence commit | owner_turn_records passed; campaign workspace probe records=1 and validation ok | done |
-| owner transcript | pending evidence commit | owner_turn_records and campaign transcript files `workspace/artifacts/transcripts/queue-000001.md` through `queue-000003.md` | done |
-| artifact flow | pending evidence commit | queue_routing artifact tests passed; journal_artifact passed; proof artifacts bundle captured | done |
+| docs synced | a9a9fe08; 9cd8069c | check-docs passed after docs-first edits and after final current-state update | done |
+| workspace writes | 9cd8069c | owner_turn_records passed; campaign workspace probe records=1 and validation ok | done |
+| owner transcript | 9cd8069c | owner_turn_records and campaign transcript files `workspace/artifacts/transcripts/queue-000001.md` through `queue-000003.md` | done |
+| artifact flow | 9cd8069c | queue_routing artifact tests passed; journal_artifact passed; proof artifacts bundle captured | done |
 | blocked-step guard | 2dc0c841 | completion_safety passed; runtime_cell focused test passed; docs-tree repair regression passed; quiet and Docker verify passed | done |
-| context dedupe | pending evidence commit | context_items, context_no_json, contamination, and proof context outputs passed/captured | done |
-| tool view scope | pending evidence commit | tool_views, runtime_selector, render_tool_cards, and protocol experiment matrix passed/captured | done |
-| XML action grammar | pending evidence commit | tool_call and protocol experiment matrix passed/captured | done |
-| recovery states | pending evidence commit | recovery, recovery_ladder, effect_error, endpoint, and admission_rejection tests passed | done |
-| TUI duplicate fix | pending evidence commit | tui_transcript_identity passed; identical text with different ids remains visible and durable row overrides matching ephemeral id | done |
-| TUI follow fix | pending evidence commit | workbench_viewport passed; scroll down to bottom re-enables follow and refresh preserves manual top line | done |
-| deterministic replay | pending evidence commit | `cargo run -p lkjagent-xtask -- smoke replay` and quiet verify smoke replay passed | done |
-| quiet verify | pending evidence commit | final `cargo run -p lkjagent-xtask -- quiet verify` passed after source changes | done |
-| Docker verify | pending evidence commit | final `docker compose run --rm verify` passed after source changes | done |
-| live campaigns | pending evidence commit | scripted campaign passed with workspace validation; live profiles wrote honest endpoint skip files | done |
+| context dedupe | 9cd8069c | context_items, context_no_json, contamination, and proof context outputs passed/captured | done |
+| tool view scope | 9cd8069c | tool_views, runtime_selector, render_tool_cards, and protocol experiment matrix passed/captured | done |
+| XML action grammar | 9cd8069c | tool_call and protocol experiment matrix passed/captured | done |
+| recovery states | 9cd8069c | recovery, recovery_ladder, effect_error, endpoint, and admission_rejection tests passed | done |
+| TUI duplicate fix | 9cd8069c | tui_transcript_identity passed; identical text with different ids remains visible and durable row overrides matching ephemeral id | done |
+| TUI follow fix | 9cd8069c | workbench_viewport passed; scroll down to bottom re-enables follow and refresh preserves manual top line | done |
+| deterministic replay | 9cd8069c | `cargo run -p lkjagent-xtask -- smoke replay` and quiet verify smoke replay passed | done |
+| quiet verify | 9cd8069c | final `cargo run -p lkjagent-xtask -- quiet verify` passed after source changes | done |
+| Docker verify | 9cd8069c | final `docker compose run --rm verify` passed after source changes | done |
+| live campaigns | 9cd8069c | scripted campaign passed with workspace validation; live profiles wrote honest endpoint skip files | done |
