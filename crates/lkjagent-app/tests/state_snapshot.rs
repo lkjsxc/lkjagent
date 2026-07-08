@@ -77,6 +77,28 @@ fn matter_snapshot_close_candidate_ignores_stale_plan_steps() -> TestResult<()> 
     Ok(())
 }
 
+#[test]
+fn plan_row_fallback_seeds_matter_snapshot_before_turn() -> TestResult<()> {
+    let data = fixture_root("state-seed")?;
+    let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    let mut snapshot = instantiate(4, "What is an agent?");
+    assign_step_ids(&mut snapshot);
+    persist(&mut conn, &snapshot)?;
+    drop(conn);
+    let mut endpoint = ScriptedEndpoint {
+        outputs: Vec::new(),
+        index: 0,
+    };
+
+    let loaded = run_until_idle(&data, &mut endpoint, 0)?;
+
+    assert_eq!(loaded.task.id, 4);
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    assert_eq!(matter_snapshot_rows(&conn)?, 1);
+    Ok(())
+}
+
 fn snapshot_cell(snapshot: &TaskSnapshot) -> Result<StateCell, serde_json::Error> {
     let key =
         StateKey::new("matter", format!("snapshot/{}", snapshot.task.id)).unwrap_or_else(|_| {

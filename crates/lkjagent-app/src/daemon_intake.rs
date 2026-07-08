@@ -32,9 +32,11 @@ pub fn load_runtime_snapshot<C: Clock>(
         first_snapshot_with_state(conn, "open").map_err(|e| e.to_string())?
     {
         crate::daemon_owner_routes::attach_updates(conn, &mut snapshot, clock)?;
+        persist_snapshot_cell(conn, &snapshot, &clock.now())?;
         return Ok(Some(snapshot));
     }
     if let Some(waiting) = first_snapshot_with_state(conn, "waiting").map_err(|e| e.to_string())? {
+        persist_snapshot_cell(conn, &waiting, &clock.now())?;
         return resume_loaded_waiting(conn, data_dir, waiting, clock);
     }
     intake(conn, data_dir, false, clock)
