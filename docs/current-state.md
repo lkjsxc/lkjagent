@@ -164,6 +164,12 @@ and whose artifact refs are present for artifact-backed checks. Store hydration
 suppresses stale passed rows, and artifact replacement suppresses active
 check-to-artifact edges for the old artifact.
 
+Record-like owner turns now write owner-readable workspace records without
+creating tasks, refresh `workspace_records` and `workspace_record_history`, write
+README path coverage, rebuild generated record indexes, and record index artifact
+evidence. The focused owner-turn regression checks files, rows, history,
+fingerprints, README links, index contents, and index artifacts.
+
 ## Known Gaps
 
 - Check freshness still depends on transitional check rows for completion, but
@@ -179,9 +185,9 @@ check-to-artifact edges for the old artifact.
 
 ## Next Executable Step
 
-Implement the next workspace-first slice: make record-like turns write durable
-owner-readable workspace files with row, fingerprint, README/path coverage, and
-index evidence, with docs, focused tests, quiet gates, and Docker verification.
+Implement the next prompt/context slice: make prompt frames and context
+admission show bounded, non-stale workspace record/index evidence with docs,
+focused tests, quiet gates, and Docker verification.
 
 ## Honesty Rules
 

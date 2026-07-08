@@ -45,10 +45,11 @@ central enum edits.
 
 ## Ledger Links
 
-Record writes refresh `workspace_records` metadata and
-`workspace_record_history` fingerprints. These rows are evidence and indexes,
-not turn authority. Frontmatter refs may point to owner messages, state keys,
-checks, provider exchanges, artifacts, other records, or proof bundles.
+Record writes refresh `workspace_records` metadata,
+`workspace_record_history` fingerprints, README path coverage, and generated
+record indexes. These rows and files are evidence and indexes, not turn
+authority. Frontmatter refs may point to owner messages, state keys, checks,
+provider exchanges, artifacts, other records, or proof bundles.
 
 ## Staleness
 

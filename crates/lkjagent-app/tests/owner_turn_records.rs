@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::model::TaskState;
+use lkjagent_core::workspace_record::record_fingerprint;
 use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
@@ -38,6 +39,8 @@ fn record_like_owner_turns_write_workspace_files_without_tasks() -> TestResult<(
     assert_eq!(count(&conn, "tasks")?, 0);
     assert_eq!(queue_state_count(&conn, "recorded")?, 7);
     assert_eq!(count(&conn, "workspace_records")?, 7);
+    assert_eq!(count(&conn, "workspace_record_history")?, 7);
+    assert_eq!(index_artifacts(&conn)?, 6);
     for (kind, path_part) in [
         ("journal", "records/life/journal"),
         ("todo", "records/life/todo"),
@@ -50,6 +53,8 @@ fn record_like_owner_turns_write_workspace_files_without_tasks() -> TestResult<(
         assert_path(&conn, &data, kind, path_part)?;
     }
     assert!(data.join("workspace/records/life/README.md").exists());
+    assert_contains(&data, "workspace/indexes/README.md", "open-todos.md")?;
+    assert_contains(&data, "workspace/indexes/open-todos.md", "todo buy milk")?;
     Ok(())
 }
 
@@ -65,8 +70,30 @@ fn assert_path(
         |row| row.get(0),
     )?;
     assert!(path.contains(part), "{kind}: {path}");
-    assert!(data.join("workspace").join(path).exists());
+    let full = data.join("workspace").join(&path);
+    assert!(full.exists());
+    let text = fs::read_to_string(full)?;
+    let fp: String = conn.query_row(
+        "SELECT fingerprint FROM workspace_records WHERE kind = ?1",
+        [kind],
+        |row| row.get(0),
+    )?;
+    assert_eq!(fp, record_fingerprint(&text).map_err(|e| e.message)?);
     Ok(())
+}
+
+fn assert_contains(data: &std::path::Path, rel: &str, needle: &str) -> TestResult<()> {
+    let text = fs::read_to_string(data.join(rel))?;
+    assert!(text.contains(needle), "{rel}: {needle}");
+    Ok(())
+}
+
+fn index_artifacts(conn: &Connection) -> rusqlite::Result<i64> {
+    conn.query_row(
+        "SELECT COUNT(*) FROM artifacts WHERE kind = 'workspace-index'",
+        [],
+        |row| row.get(0),
+    )
 }
 
 fn count(conn: &Connection, table: &str) -> rusqlite::Result<i64> {

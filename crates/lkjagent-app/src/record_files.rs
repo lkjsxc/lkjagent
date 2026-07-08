@@ -138,7 +138,11 @@ fn write_record(
     )?;
     upsert_record(conn, &row).map_err(|error| error.to_string())?;
     crate::record_state::upsert_record_cells(conn, record, &rel, &row.fingerprint)?;
-    Ok(format!("record: {} path={rel}", record.id))
+    let index = crate::workspace_index::rebuild(conn, data_dir, &record.updated_at)?;
+    Ok(format!(
+        "record: {} path={rel} fp={} index={index}",
+        record.id, row.fingerprint
+    ))
 }
 
 fn record_row(

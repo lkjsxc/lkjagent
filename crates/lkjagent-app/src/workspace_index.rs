@@ -35,6 +35,7 @@ pub fn rebuild(conn: &Connection, data_dir: &Path, now: &str) -> Result<String, 
     ];
     for (name, kinds) in specs {
         write_index(conn, &indexes, name, kinds, &rows, now)?;
+        crate::workspace_scaffold::refresh_for_path(&workspace, &format!("indexes/{name}.md"))?;
     }
     suppress_stale_cell(conn, now)?;
     Ok(format!("workspace indexes rebuilt: {}", specs.len()))
