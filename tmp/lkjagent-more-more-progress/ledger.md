@@ -99,6 +99,16 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - `cargo run -p lkjagent-xtask -- smoke live` -> `ok smoke live status=skipped
   reason=operator-command-required`; skip recorded in
   `tmp/agent-runs/20260708T110203Z/live-skip.txt`.
+- `cargo test -p lkjagent-app --lib workbench_render::tests` -> 3 passed after
+  adding pane bottom-follow and manual-scroll growth coverage.
+- `cargo run -p lkjagent-xtask -- check-docs` -> `ok check-docs` after the
+  bottom-follow test slice.
+- `cargo run -p lkjagent-xtask -- check-lines` -> `ok check-lines` after the
+  bottom-follow test slice.
+- `cargo run -p lkjagent-xtask -- quiet verify` -> `ok verify` after the
+  bottom-follow test slice.
+- `docker compose run --rm verify` -> `ok verify` after the bottom-follow test
+  slice.
 
 ## Failed Or Skipped Commands
 - `python tmp/lkjagent-more-more-thinking-20260708/12-scripts/repo_static_report.py .`
@@ -132,8 +142,9 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
   hiding has focused tests; broader state matrix remains open.
 - XML-like action grammar and admission have focused tests: open.
 - Recovery states handle parse, admission, effect, endpoint, and check failures: open.
-- TUI duplicate and bottom-follow regressions have tests: transcript identity
-  and duplicate-by-id focused tests passed; bottom-follow tests remain open.
+- TUI duplicate and bottom-follow regressions have tests: transcript identity,
+  duplicate-by-id, and pane bottom-follow focused tests passed; reducer-level
+  re-enable-follow coverage remains open.
 - Deterministic replay passes: open.
 - Quiet verify passes: open.
 - Docker Compose verify passes or honest skip committed: open.
@@ -148,4 +159,4 @@ Docs-first slice for workspace-first personal agent harness. Case state: objecti
 - Baseline gates may be expensive or blocked by environment.
 
 ## Next Action
-Address bottom-follow or artifact/check proof gaps.
+Commit the TUI bottom-follow test slice, then address artifact/check proof gaps.

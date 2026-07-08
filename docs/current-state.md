@@ -98,9 +98,9 @@ had no workspace records, artifacts, check results, admissions, or observations.
   still admit shell with contamination tracking.
 - Prompt context still needs packet-level no-JSON rendering and failed-output
   containment evidence beyond focused duplicate-context coverage.
-- TUI bottom-follow behavior still needs packet-level focused tests and
-  evidence; transcript identity, draft accumulation, and id-based merge now have
-  focused coverage.
+- TUI transcript identity, draft accumulation, id-based merge, and pane bottom
+  anchoring now have focused coverage. Scrolling down to re-enable follow still
+  needs reducer-level coverage.
 - Deterministic replay, quiet verify, Docker Compose verify, and live or
   scripted campaigns must run again after source changes before final claims.
 

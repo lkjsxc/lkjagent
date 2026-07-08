@@ -149,4 +149,43 @@ mod tests {
         assert!(text.contains("daemon: idle"));
         assert!(text.contains("model: see rows"));
     }
+
+    #[test]
+    fn pane_follow_stays_bottom_anchored_after_growth() {
+        let mut state = UiState::new(WorkbenchMode::Pane);
+        state.follow = true;
+        state.latest = transcript_body(25);
+        let before = render(&state);
+        state.latest = transcript_body(26);
+        let after = render(&state);
+
+        assert!(before.contains("line-25"));
+        assert!(!before.contains("line-01"));
+        assert!(after.contains("line-26"));
+        assert!(!after.contains("line-01"));
+    }
+
+    #[test]
+    fn pane_manual_scroll_stays_manual_after_growth() {
+        let mut state = UiState::new(WorkbenchMode::Pane);
+        state.follow = false;
+        state.scroll = 1;
+        state.latest = transcript_body(25);
+        let before = render(&state);
+        state.latest = transcript_body(26);
+        let after = render(&state);
+
+        assert!(before.contains("line-02"));
+        assert!(after.contains("line-02"));
+        assert!(!after.contains("line-26"));
+    }
+
+    fn transcript_body(count: usize) -> String {
+        let mut lines = vec!["== status ==".to_string(), "daemon: idle".to_string()];
+        lines.push("== transcript ==".to_string());
+        for index in 1..=count {
+            lines.push(format!("line-{index:02}"));
+        }
+        lines.join("\n")
+    }
 }
