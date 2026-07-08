@@ -106,6 +106,33 @@ pub fn explore_tool_view() -> ToolSetView {
     ToolSetView::new(explore_catalog().iter().map(descriptor_entry).collect())
 }
 
+pub fn default_explore_tool_view() -> ToolSetView {
+    tool_view_for_names(&[
+        "finish",
+        "fs.list",
+        "fs.read",
+        "fs.search",
+        "fs.tree",
+        "fs.write",
+        "memory.find",
+        "memory.save",
+        "plan.note",
+    ])
+}
+
+pub fn shell_tool_view() -> ToolSetView {
+    tool_view_for_names(&["shell.run"])
+}
+
+pub fn tool_view_for_names(names: &[&str]) -> ToolSetView {
+    let entries = explore_catalog()
+        .iter()
+        .filter(|descriptor| names.contains(&descriptor.name))
+        .map(descriptor_entry)
+        .collect();
+    ToolSetView::new(entries)
+}
+
 pub fn effect_for_tool(name: &str) -> Option<ToolEffect> {
     explore_catalog()
         .iter()

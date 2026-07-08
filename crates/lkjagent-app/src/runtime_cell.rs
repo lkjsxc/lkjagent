@@ -2,7 +2,7 @@ use lkjagent_core::engine::completion_blocker_reason;
 use lkjagent_core::model::{CheckSpec, Step, StepKind, StepState, TaskSnapshot, TaskState};
 use lkjagent_core::render::max_tokens;
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
-use lkjagent_core::runtime_tool_catalog::explore_tool_view;
+use lkjagent_core::runtime_tool_catalog::default_explore_tool_view;
 
 pub fn projected_cell(snapshot: &TaskSnapshot, now: &str) -> Result<StateCell, String> {
     let parts = cell_parts(snapshot);
@@ -111,7 +111,7 @@ fn tool_view(step: &Step) -> Vec<serde_json::Value> {
     if step.kind != StepKind::Explore {
         return Vec::new();
     }
-    explore_tool_view()
+    default_explore_tool_view()
         .entries
         .into_iter()
         .map(|entry| {

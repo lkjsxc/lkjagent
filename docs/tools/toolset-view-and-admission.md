@@ -9,11 +9,12 @@ decision.
 
 `ToolSetView` is produced from the catalog, policy layers, and active state
 vector. It contains only tools admissible for the current decision; the global
-catalog is never rendered by default. Shell-like tools are absent unless the
-selected state is explicit development, verification, or recovery work that
-requires them. Each entry renders the tool name, purpose, required arguments,
-optional arguments, `ToolFieldSpec` value classes, value rules, relevant limits,
-and one concise XML-like skeleton when budget allows.
+catalog is never rendered by default. Default explore views exclude `shell.run`.
+Shell-like tools are present only when the persisted decision carries an
+explicit shell-capable view for development, verification, or recovery work.
+Each entry renders the tool name, purpose, required arguments, optional
+arguments, `ToolFieldSpec` value classes, value rules, relevant limits, and one
+concise XML-like skeleton when budget allows.
 
 ## View Fingerprint
 

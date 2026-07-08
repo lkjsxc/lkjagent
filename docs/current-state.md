@@ -66,9 +66,11 @@ inspection, unsupported system operations, direct records, ambiguous inbox
 routing, and Japanese diary or save wording.
 
 Prompt context can admit bounded workspace record and index metadata with source
-fingerprints. Unsafe XML-like tool actions persist rejections. Status and proof
-surfaces expose cached token usage, blocked counts, stale-edge counts, prompt
-frames, tool-view fingerprints, artifact refs, check refs, and proof rows.
+fingerprints. Default explore tool views exclude `shell.run`; shell is available
+only through an explicit persisted shell-capable decision view. Unsafe XML-like
+tool actions persist rejections. Status and proof surfaces expose cached token
+usage, blocked counts, stale-edge counts, prompt frames, tool-view fingerprints,
+artifact refs, check refs, and proof rows.
 
 The terminal workbench has a pure reducer, durable transcript stream, Japanese
 and grapheme-aware composer operations, append and pane modes, row-backed status
@@ -88,9 +90,9 @@ had no workspace records, artifacts, check results, admissions, or observations.
   response paths are all present before owner-facing success.
 - Recovery state coverage is incomplete for parse, admission, effect, endpoint,
   and check failures as one coherent ladder.
-- Tool-view selection must be checked against actual state so no prompt exposes
-  the broad catalog or shell outside explicit development or verification
-  states.
+- Tool-view selection still needs broader state-by-state coverage, but focused
+  tests now prove the default explore prompt hides shell and explicit shell views
+  still admit shell with contamination tracking.
 - Prompt context still needs packet-level deduplication, non-JSON rendering, and
   failed-output containment evidence.
 - TUI duplicate suppression and bottom-follow behavior need packet-level

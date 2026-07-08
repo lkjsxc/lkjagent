@@ -2,8 +2,14 @@ use std::fs;
 use std::path::PathBuf;
 
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
-use lkjagent_store::plan_access::enqueue;
+use lkjagent_core::classify::instantiate;
+use lkjagent_core::model::{StepKind, TaskSnapshot};
+use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision};
+use lkjagent_core::runtime_tool_catalog::shell_tool_view;
+use lkjagent_store::decision_rows::insert_runtime_decision;
+use lkjagent_store::plan_access::{enqueue, insert_step_tx, insert_task};
 use lkjagent_store::plan_schema::setup;
+use lkjagent_store::state_rows::insert_case;
 use rusqlite::Connection;
 
 mod support;
@@ -14,9 +20,13 @@ type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 #[test]
 fn shell_observation_is_external_raw_context() -> TestResult<()> {
     let data = fixture_root("shell-raw")?;
-    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
-    enqueue(&conn, "Survey the workspace and report.", "now")?;
+    let mut snapshot = instantiate(1, "Survey the workspace and report.");
+    snapshot.steps[0].kind = StepKind::Explore;
+    persist(&mut conn, &snapshot)?;
+    insert_case(&conn, "1", &snapshot.task.objective, "now")?;
+    insert_runtime_decision(&conn, &shell_decision(&snapshot), "pending", "now")?;
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![shell_action("printf external_raw")],
@@ -59,6 +69,26 @@ fn sensitive_observation_body_is_redacted() -> TestResult<()> {
     assert_eq!(row.0, "SensitiveOwnerData");
     assert!(row.1.contains("token=[redacted]"));
     assert!(!row.1.contains("abc123"));
+    Ok(())
+}
+
+fn shell_decision(snapshot: &TaskSnapshot) -> RuntimeDecision {
+    RuntimeDecision::new(
+        "shell-decision",
+        "1",
+        OperationKey(format!("model.call/{}", snapshot.steps[0].id)),
+        shell_tool_view(),
+        OutputEnvelope::Action,
+    )
+}
+
+fn persist(conn: &mut Connection, snapshot: &TaskSnapshot) -> TestResult<()> {
+    insert_task(conn, &snapshot.task, None, "now")?;
+    let tx = conn.transaction()?;
+    for step in &snapshot.steps {
+        insert_step_tx(&tx, step, "now")?;
+    }
+    tx.commit()?;
     Ok(())
 }
 
