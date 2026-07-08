@@ -37,7 +37,7 @@ runtime reads only matter, state, and record rows. Required tables:
 | `workspace_path_aliases` | old path to stable entity id and new path mappings |
 | `workspace_rebalance_audit` | applied path moves with decision and validation data |
 | `artifacts` | files, roots, fingerprints, and ownership metadata |
-| `check_results` | deterministic and judged evidence |
+| `check_results` | deterministic and judged evidence with params, decision ids, and artifact refs |
 | `provider_exchanges` | endpoint request and response refs |
 | `token_usage` | nullable provider usage fields |
 | `memory` | durable owner-useful facts with FTS mirror when useful |

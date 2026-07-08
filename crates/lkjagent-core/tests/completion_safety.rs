@@ -63,7 +63,7 @@ fn blocked_bridge_projection_selects_block_instead_of_close() {
 #[test]
 fn mismatched_check_result_params_never_close_file_work() {
     let mut snapshot = checked_file_work();
-    snapshot.check_results = vec![check_result(file_exists("other.md"))];
+    snapshot.check_results = vec![check_result(file_exists("other.md"), true)];
 
     let (next, _) = apply_turn(&snapshot, &Work::CloseTask, TurnOutcome::Noop);
 
@@ -73,11 +73,21 @@ fn mismatched_check_result_params_never_close_file_work() {
 #[test]
 fn matching_check_result_params_allow_file_work_close() {
     let mut snapshot = checked_file_work();
-    snapshot.check_results = vec![check_result(file_exists("notes/out.md"))];
+    snapshot.check_results = vec![check_result(file_exists("notes/out.md"), true)];
 
     let (next, _) = apply_turn(&snapshot, &Work::CloseTask, TurnOutcome::Noop);
 
     assert_eq!(next.task.state, TaskState::Closed);
+}
+
+#[test]
+fn artifact_check_without_artifact_ref_never_closes() {
+    let mut snapshot = checked_file_work();
+    snapshot.check_results = vec![check_result(file_exists("notes/out.md"), false)];
+
+    let (next, _) = apply_turn(&snapshot, &Work::CloseTask, TurnOutcome::Noop);
+
+    assert_eq!(next.task.state, TaskState::Blocked);
 }
 
 fn checked_file_work() -> TaskSnapshot {
@@ -95,12 +105,16 @@ fn file_exists(path: &str) -> CheckSpec {
     }
 }
 
-fn check_result(spec: CheckSpec) -> CheckResult {
+fn check_result(spec: CheckSpec, refs: bool) -> CheckResult {
     CheckResult {
         name: "file_exists".to_string(),
         params: Some(spec),
         decision_id: Some("decision-check".to_string()),
         evidence_fingerprint: Some("evidence-fp".to_string()),
+        artifact_refs: refs
+            .then(|| "artifact-current".to_string())
+            .into_iter()
+            .collect(),
         passed: true,
         measured: "true".to_string(),
     }

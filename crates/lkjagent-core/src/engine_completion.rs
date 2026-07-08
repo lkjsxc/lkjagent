@@ -78,8 +78,13 @@ fn check_matches(result: &CheckResult, spec: &CheckSpec) -> bool {
     result.passed
         && decision
         && evidence
+        && refs_present(result, spec)
         && result.name == check_name(spec)
         && result.params.as_ref() == Some(spec)
+}
+
+fn refs_present(result: &CheckResult, spec: &CheckSpec) -> bool {
+    matches!(spec, CheckSpec::Command { .. }) || !result.artifact_refs.is_empty()
 }
 
 fn check_name(spec: &CheckSpec) -> &'static str {

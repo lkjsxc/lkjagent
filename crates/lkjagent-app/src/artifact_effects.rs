@@ -20,11 +20,12 @@ pub fn persist_artifacts(
     path: &str,
     body: &str,
     units: &[ArtifactUnit],
+    now: &str,
 ) -> Result<(), String> {
     let file_id = stable_artifact_id(snapshot, body)?;
     insert_artifact(
         conn,
-        &artifact_row(snapshot, &file_id, "file", path, body, None, "{}")?,
+        &artifact_row(snapshot, &file_id, path, body, None, "{}", now)?,
     )
     .map_err(|error| error.to_string())?;
     for unit in units {
@@ -38,11 +39,11 @@ pub fn persist_artifacts(
             &artifact_row(
                 snapshot,
                 &format!("{file_id}-unit-{:04}", unit.ordinal),
-                "unit",
                 path,
                 &unit.content,
                 Some(file_id.clone()),
                 &metadata,
+                now,
             )?,
         )
         .map_err(|error| error.to_string())?;
@@ -81,12 +82,17 @@ fn word_chunks(content: &str) -> Vec<String> {
 fn artifact_row(
     snapshot: &TaskSnapshot,
     id: &str,
-    kind: &str,
     path: &str,
     content: &str,
     parent_artifact_id: Option<String>,
     metadata_json: &str,
+    now: &str,
 ) -> Result<ArtifactRow, String> {
+    let kind = if parent_artifact_id.is_some() {
+        "unit"
+    } else {
+        "file"
+    };
     Ok(ArtifactRow {
         id: id.to_string(),
         case_id: snapshot.task.id.to_string(),
@@ -95,7 +101,7 @@ fn artifact_row(
         fingerprint: artifact_fingerprint(path, content).map_err(|error| error.message)?,
         parent_artifact_id,
         metadata_json: metadata_json.to_string(),
-        created_at: "turn".to_string(),
+        created_at: now.to_string(),
     })
 }
 

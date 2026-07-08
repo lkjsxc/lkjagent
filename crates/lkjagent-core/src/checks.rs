@@ -78,6 +78,7 @@ fn result(name: &str, passed: bool, measured: impl Into<String>) -> CheckResult 
         params: None,
         decision_id: None,
         evidence_fingerprint: None,
+        artifact_refs: Vec::new(),
         passed,
         measured: measured.into(),
     }

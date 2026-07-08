@@ -67,14 +67,15 @@ fn persist_command(
             for (index, result) in results.iter().enumerate() {
                 tx.execute(
                     "INSERT INTO check_results (step_id, name, params_json, decision_id,
-                     evidence_fingerprint, passed, measured, created_at)
-                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
+                     evidence_fingerprint, artifact_refs_json, passed, measured, created_at)
+                     VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
                     params![
                         *step_id as i64,
                         result.name,
                         check_params(snapshot, *step_id, index)?,
                         result.decision_id.as_ref().or(decision_id.as_ref()),
                         result.evidence_fingerprint.as_ref(),
+                        crate::artifact_rows::refs_json(&result.artifact_refs)?,
                         i64::from(result.passed),
                         result.measured,
                         now

@@ -154,6 +154,8 @@ pub struct CheckResult {
     pub decision_id: Option<String>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub evidence_fingerprint: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub artifact_refs: Vec<String>,
     pub passed: bool,
     pub measured: String,
 }

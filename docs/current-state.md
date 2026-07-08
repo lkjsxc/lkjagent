@@ -156,18 +156,18 @@ runs the existing workspace-safe write edge, and a focused regression proves the
 file and artifact rows are created without endpoint output or bridge step
 execution.
 
-Bridge check results now carry their required check parameters, decision id, and
-an evidence fingerprint over gathered workspace facts in core state and through
-SQLite hydration. Completion requires a passed row whose check name and
-parameters match each required matter check and whose decision id and evidence
-fingerprint are present, so unrelated or stale-by-parameter check rows cannot
-close file-work matters.
+Bridge check results now carry their required check parameters, decision id,
+evidence fingerprint, and artifact refs in core state and through SQLite
+hydration. Completion requires a passed row whose check name and parameters
+match each required matter check, whose decision id and evidence fingerprint are
+present, and whose artifact refs are present for artifact-backed checks.
 
 ## Known Gaps
 
-- Check freshness remains bridge-limited: current check rows carry decision ids
-  and evidence fingerprints but do not yet reference concrete artifact row ids,
-  so broader artifact-freshness work remains for later state-ledger slices.
+- Check freshness remains bridge-limited: check rows reference concrete artifact
+  row ids and hydration suppresses stale passed rows when a newer artifact row
+  replaces those refs, but artifact refs are still bridge rows rather than native
+  state-edge evidence.
 - The plan-family bridge still participates in runtime projection. Until native
   state cells fully own selection, blocked, active, pending, failed, or
   unsuperseded skipped bridge steps must prevent close candidates.
@@ -178,9 +178,9 @@ close file-work matters.
 
 ## Next Executable Step
 
-Implement the next completion-evidence slice: tie check rows to concrete
-artifact row ids and suppress stale passed-check cells when artifact fingerprints
-change, with docs, focused tests, quiet gates, and Docker verification.
+Implement the next state-ledger evidence slice: promote artifact/check freshness
+from bridge check rows into native state-edge evidence with docs, focused tests,
+quiet gates, and Docker verification.
 
 ## Honesty Rules
 

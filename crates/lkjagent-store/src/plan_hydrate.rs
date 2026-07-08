@@ -152,9 +152,9 @@ fn attempts(conn: &Connection, task_id: i64) -> StoreResult<Vec<Attempt>> {
 
 fn check_results(conn: &Connection, task_id: i64) -> StoreResult<Vec<CheckResult>> {
     let mut statement = conn.prepare(
-        "SELECT name, params_json, decision_id, evidence_fingerprint, passed, measured
-         FROM check_results WHERE step_id IN (SELECT id FROM steps WHERE task_id = ?1)
-         ORDER BY id",
+        "SELECT name, params_json, decision_id, evidence_fingerprint, artifact_refs_json,
+         passed, measured FROM check_results
+         WHERE step_id IN (SELECT id FROM steps WHERE task_id = ?1) ORDER BY id",
     )?;
     let mapped = statement.query_map(params![task_id], |row| {
         Ok(CheckResult {
@@ -162,13 +162,13 @@ fn check_results(conn: &Connection, task_id: i64) -> StoreResult<Vec<CheckResult
             params: serde_json::from_str(&row.get::<_, String>(1)?).unwrap_or(None),
             decision_id: row.get(2)?,
             evidence_fingerprint: row.get(3)?,
-            passed: row.get::<_, i64>(4)? != 0,
-            measured: row.get(5)?,
+            artifact_refs: crate::artifact_rows::parse_refs(&row.get::<_, String>(4)?),
+            passed: row.get::<_, i64>(5)? != 0,
+            measured: row.get(6)?,
         })
     })?;
-    rows(mapped)
+    crate::artifact_rows::suppress_stale_passed(conn, task_id, rows(mapped)?)
 }
-
 fn events(conn: &Connection, task_id: i64) -> StoreResult<Vec<Event>> {
     let mut statement =
         conn.prepare("SELECT kind, content FROM events WHERE task_id = ?1 ORDER BY id")?;

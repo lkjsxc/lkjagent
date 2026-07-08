@@ -159,6 +159,7 @@ fn parse_verdict(body: &str) -> Result<CheckResult, ParseFault> {
         params: None,
         decision_id: None,
         evidence_fingerprint: None,
+        artifact_refs: Vec::new(),
         passed,
         measured: lines.collect::<Vec<_>>().join(" "),
     })

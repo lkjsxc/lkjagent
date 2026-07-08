@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use lkjagent_core::engine::{apply_turn, next_work_with_decision, Command, TurnOutcome, Work};
+use lkjagent_core::engine::{apply_turn, next_work_with_decision, TurnOutcome, Work};
 use lkjagent_core::model::{TaskSnapshot, TaskState};
 use lkjagent_store::plan_commit::commit_turn;
 use lkjagent_store::plan_schema::setup;
@@ -18,7 +18,7 @@ use crate::observation_bridge::persist_observations;
 use crate::prompt_bridge::persist_prompt_frame;
 use crate::runtime_bridge::{prepare_runtime_decision, settle_runtime_decision};
 use crate::snapshot_state::persist_snapshot_cell;
-use crate::turn_effects::{dispatch_effects, gather_checks};
+use crate::turn_effects::{dispatch_effects, gather_checks, tag_check_evidence};
 
 pub use crate::model_io::{CompletionRecord, Endpoint, ScriptedEndpoint};
 
@@ -96,10 +96,9 @@ fn run_turn<E: Endpoint, C: Clock>(
                 apply_record(&mut next, &mut commands, record);
                 persist_provider_exchange(conn, &decision, record, &selected_at, &now)?;
             }
-            tag_check_decision(&mut commands, &decision.id);
-            tag_snapshot_checks(&mut next, &decision.id);
+            tag_check_evidence(conn, &mut next, &mut commands, &decision.id)?;
             persist_tool_admissions(conn, &decision, &commands, &now)?;
-            if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands) {
+            if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands, &now) {
                 let settled = settle_effect_error(conn, &snapshot, &work, error, &now)?;
                 persist_snapshot_cell(conn, &settled, &now)?;
                 settle_runtime_decision(conn, &decision, "effect_error", &now)?;
@@ -120,10 +119,9 @@ fn run_turn<E: Endpoint, C: Clock>(
     };
     let (mut next, mut commands) = apply_turn(&snapshot, &work, outcome);
     let now = clock.now();
-    tag_check_decision(&mut commands, &decision.id);
-    tag_snapshot_checks(&mut next, &decision.id);
+    tag_check_evidence(conn, &mut next, &mut commands, &decision.id)?;
     persist_tool_admissions(conn, &decision, &commands, &now)?;
-    if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands) {
+    if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands, &now) {
         let settled = settle_effect_error(conn, &snapshot, &work, error, &now)?;
         persist_snapshot_cell(conn, &settled, &now)?;
         settle_runtime_decision(conn, &decision, "effect_error", &now)?;
@@ -134,29 +132,4 @@ fn run_turn<E: Endpoint, C: Clock>(
     persist_snapshot_cell(conn, &next, &now)?;
     settle_runtime_decision(conn, &decision, "settled", &now)?;
     Ok(next)
-}
-
-fn tag_snapshot_checks(snapshot: &mut TaskSnapshot, decision_id: &str) {
-    for result in &mut snapshot.check_results {
-        if result.decision_id.is_none() {
-            result.decision_id = Some(decision_id.to_string());
-        }
-    }
-}
-
-fn tag_check_decision(commands: &mut [Command], decision_id: &str) {
-    for command in commands {
-        let Command::RecordChecks {
-            decision_id: slot,
-            results,
-            ..
-        } = command
-        else {
-            continue;
-        };
-        *slot = Some(decision_id.to_string());
-        for result in results {
-            result.decision_id = Some(decision_id.to_string());
-        }
-    }
 }

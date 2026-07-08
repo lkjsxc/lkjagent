@@ -166,6 +166,7 @@ fn turn_commit_stores_check_params_with_step_id() -> TestResult<()> {
                 params: None,
                 decision_id: None,
                 evidence_fingerprint: Some("evidence-fp".to_string()),
+                artifact_refs: Vec::new(),
                 passed: true,
                 measured: "true".to_string(),
             }],
@@ -190,7 +191,6 @@ fn turn_commit_stores_check_params_with_step_id() -> TestResult<()> {
     );
     Ok(())
 }
-
 fn event(content: &str) -> Command {
     Command::RecordEvent(Event {
         kind: EventKind::Notice,

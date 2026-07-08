@@ -110,6 +110,7 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
             params_json TEXT NOT NULL,
             decision_id TEXT,
             evidence_fingerprint TEXT,
+            artifact_refs_json TEXT NOT NULL DEFAULT '[]',
             passed INTEGER NOT NULL,
             measured TEXT NOT NULL,
             created_at TEXT NOT NULL

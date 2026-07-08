@@ -14,7 +14,13 @@ pub fn migrate(conn: &Connection) -> StoreResult<()> {
 
 pub fn migrate_checks(conn: &Connection) -> StoreResult<()> {
     ensure_column(conn, "check_results", "decision_id", "TEXT")?;
-    ensure_column(conn, "check_results", "evidence_fingerprint", "TEXT")
+    ensure_column(conn, "check_results", "evidence_fingerprint", "TEXT")?;
+    ensure_column(
+        conn,
+        "check_results",
+        "artifact_refs_json",
+        "TEXT NOT NULL DEFAULT '[]'",
+    )
 }
 
 fn ensure_column(conn: &Connection, table: &str, column: &str, spec: &str) -> StoreResult<()> {
