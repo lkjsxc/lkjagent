@@ -167,10 +167,9 @@ creating tasks, refresh rows/history, write README path coverage, rebuild record
 indexes, and record index artifact evidence. Focused coverage checks files,
 rows, history, fingerprints, README links, index contents, and index artifacts.
 
-Prompt context now admits bounded workspace record/index metadata with source
-fingerprints and artifact refs, avoids full workspace dumps, and records admitted
-item ids in the context plan. Parsed unsafe XML-like tool actions persist
-rejected `ToolAdmission` rows with refusal reason and tool-view fingerprint.
+Prompt context admits bounded workspace record/index metadata with fingerprints
+and artifact refs. Unsafe XML-like tool actions persist rejected admissions, and
+status/TUI now show blocked, refused, and stale-edge evidence counts.
 
 ## Known Gaps
 
@@ -185,8 +184,8 @@ rejected `ToolAdmission` rows with refusal reason and tool-view fingerprint.
 
 ## Next Executable Step
 
-Implement the next recovery/TUI slice: expose blocked, refused, and stale
-evidence clearly in status/TUI with docs and gates.
+Implement the next live-eval slice: refresh stale runbooks and run bounded live
+endpoint campaigns with docs and gates.
 
 ## Honesty Rules
 

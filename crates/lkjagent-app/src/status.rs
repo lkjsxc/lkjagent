@@ -115,8 +115,17 @@ fn state_ledger_lines(conn: &Connection) -> Result<String, String> {
     let observations = count_table(conn, "observations")?;
     let exchanges = count_table(conn, "provider_exchanges")?;
     let artifacts = count_table(conn, "artifacts")?;
+    let blocked = count_sql(conn, "SELECT COUNT(*) FROM tasks WHERE state = 'blocked'")?;
+    let refused = count_sql(
+        conn,
+        "SELECT COUNT(*) FROM tool_admissions WHERE status = 'Rejected'",
+    )?;
+    let stale = count_sql(
+        conn,
+        "SELECT COUNT(*) FROM state_edges WHERE status = 'Suppressed'",
+    )?;
     Ok(format!(
-        "state: active={active} conflicts={conflicts}\ndecision: {}\ncontext_lanes: {}\nadmissions: {admissions} observations: {observations} exchanges: {exchanges} artifacts: {artifacts}",
+        "state: active={active} conflicts={conflicts}\ndecision: {}\ncontext_lanes: {}\nadmissions: {admissions} observations: {observations} exchanges: {exchanges} artifacts: {artifacts}\nevidence: blocked={blocked} refused={refused} stale_edges={stale}",
         decision_line(conn)?,
         context_lanes(conn)?
     ))

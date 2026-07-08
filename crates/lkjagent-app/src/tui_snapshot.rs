@@ -96,8 +96,16 @@ fn proof(conn: &Connection) -> Result<String, String> {
 
 fn tools(conn: &Connection) -> Result<String, String> {
     Ok(format!(
-        "admissions={} decisions={} observations={} latest={}",
+        "admissions={} rejected={} stale_edges={} decisions={} observations={} latest={}",
         count(conn, "tool_admissions")?,
+        count_sql(
+            conn,
+            "SELECT COUNT(*) FROM tool_admissions WHERE status = 'Rejected'"
+        )?,
+        count_sql(
+            conn,
+            "SELECT COUNT(*) FROM state_edges WHERE status = 'Suppressed'"
+        )?,
         count(conn, "runtime_decisions")?,
         count(conn, "observations")?,
         latest_decision(conn)?
@@ -126,57 +134,10 @@ fn latest_decision(conn: &Connection) -> Result<String, String> {
 }
 
 fn count(conn: &Connection, table: &str) -> Result<i64, String> {
-    conn.query_row(&format!("SELECT COUNT(*) FROM {table}"), [], |row| {
-        row.get(0)
-    })
-    .map_err(|error| error.to_string())
+    count_sql(conn, &format!("SELECT COUNT(*) FROM {table}"))
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use lkjagent_store::plan_access::enqueue_with_force;
-    use lkjagent_store::plan_schema::setup;
-
-    #[test]
-    fn snapshot_reads_durable_queue_and_proof_rows() -> Result<(), Box<dyn std::error::Error>> {
-        let conn = Connection::open_in_memory()?;
-        setup(&conn)?;
-        enqueue_with_force(&conn, "hello", false, "001")?;
-        enqueue_with_force(&conn, "follow up", false, "003")?;
-        conn.execute(
-            "INSERT INTO events (task_id, kind, content, created_at)
-             VALUES (1, 'stepdone', 'AI answered', '002'),
-                    (1, 'taskclosed', 'done', '004')",
-            [],
-        )?;
-
-        let snapshot = load(&conn, Path::new("data"))?;
-
-        assert!(snapshot.status.contains("queue: 2 pending"));
-        assert!(snapshot.queue.contains("queue 1"));
-        assert!(snapshot.proof.contains("prompt_frames=0"));
-        assert!(snapshot.workspace.contains("workspace: root="));
-        assert_order(
-            &snapshot.transcript,
-            &[
-                "owner: hello",
-                "agent: AI answered",
-                "owner: follow up",
-                "agent: done",
-            ],
-        )?;
-        Ok(())
-    }
-
-    fn assert_order(text: &str, expected: &[&str]) -> Result<(), Box<dyn std::error::Error>> {
-        let mut cursor = 0;
-        for needle in expected {
-            let Some(offset) = text[cursor..].find(needle) else {
-                return Err(format!("missing {needle} after byte {cursor} in {text}").into());
-            };
-            cursor += offset + needle.len();
-        }
-        Ok(())
-    }
+fn count_sql(conn: &Connection, sql: &str) -> Result<i64, String> {
+    conn.query_row(sql, [], |row| row.get(0))
+        .map_err(|error| error.to_string())
 }

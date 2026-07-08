@@ -20,6 +20,7 @@ tokens: input_uncached=804 input_cached=1200 input_total=2004 output=196 cache=k
 lease: active owner=pid:123 heartbeat=unix:1780000000
 state: active=4 conflicts=0
 admissions: 3 observations: 2 exchanges: 1 artifacts: 10 records: 4
+evidence: blocked=0 refused=1 stale_edges=2
 ```
 
 Every field is available with the daemon stopped. Unknown token counts are
