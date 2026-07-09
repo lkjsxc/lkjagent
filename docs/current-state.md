@@ -70,8 +70,9 @@ blockers before later model response work.
 Record-like owner turns have focused coverage for direct workspace writes,
 record rows, history, fingerprints, README links, index contents, and index
 artifacts. Journal records now use `YYYY/MM/DD/entry.md`, TODO records use state
-paths, calendar records use dated paths, finance records use month paths, and
-record bodies are structured separately from owner-turn transcript evidence.
+paths, calendar records use dated paths, finance records use month paths and the
+`budget-month.md` index, and record bodies are structured separately from
+owner-turn transcript evidence.
 Artifact-request routing now blocks closure unless the final response names the
 artifact path after file, artifact row, and check row evidence exists. CLI send
 and daemon intake now scaffold the workspace and write owner-turn transcript or

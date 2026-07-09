@@ -39,8 +39,8 @@ fn workspace_reports_rows_and_json_shape() -> TestResult<()> {
         "--rebuild",
     ])?;
     assert!(rebuilt.contains("records: total=1 archived=0"));
-    assert!(rebuilt.contains("artifacts: total=6"));
-    assert!(rebuilt.contains("indexes: files=7"));
+    assert!(rebuilt.contains("artifacts: total=7"));
+    assert!(rebuilt.contains("indexes: files=8"));
     assert!(rebuilt.contains("missing: none"));
     let open_todos = fs::read_to_string(data.join("workspace/indexes/open-todos.md"))?;
     assert!(open_todos.contains("Buy milk"));
@@ -53,7 +53,7 @@ fn workspace_reports_rows_and_json_shape() -> TestResult<()> {
     ])?;
     let value: Value = serde_json::from_str(&json)?;
     assert_eq!(value["records"]["total"], 1);
-    assert_eq!(value["artifacts"], 6);
+    assert_eq!(value["artifacts"], 7);
     Ok(())
 }
 

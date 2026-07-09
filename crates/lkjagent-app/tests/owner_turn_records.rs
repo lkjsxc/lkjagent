@@ -42,7 +42,7 @@ fn record_like_owner_turns_write_workspace_files_without_tasks() -> TestResult<(
     assert_eq!(queue_state_count(&conn, "recorded")?, 8);
     assert_eq!(count(&conn, "workspace_records")?, 8);
     assert_eq!(count(&conn, "workspace_record_history")?, 8);
-    assert_eq!(index_artifacts(&conn)?, 6);
+    assert_eq!(index_artifacts(&conn)?, 7);
     for (kind, path_part) in [
         ("journal", "records/life/journal/"),
         ("todo", "records/life/todo/open/"),
@@ -61,6 +61,7 @@ fn record_like_owner_turns_write_workspace_files_without_tasks() -> TestResult<(
     assert!(data.join("workspace/records/life/README.md").exists());
     assert_contains(&data, "workspace/indexes/README.md", "open-todos.md")?;
     assert_contains(&data, "workspace/indexes/open-todos.md", "buy milk")?;
+    assert_contains(&data, "workspace/indexes/budget-month.md", "paid 1200 yen")?;
     assert_not_contains(
         &data,
         &format!("workspace/{journal_path}"),

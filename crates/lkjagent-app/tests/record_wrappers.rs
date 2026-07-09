@@ -67,6 +67,9 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
     assert!(finance.contains("path=records/life/finance/"));
     assert!(!finance.contains("unix:"));
     assert!(state_labels(&conn)?.contains(&"finance:review/".to_string()));
+    let budget = fs::read_to_string(data.join("workspace/indexes/budget-month.md"))?;
+    assert!(budget.contains("Pay bill"));
+    assert!(artifact_paths(&conn)?.contains(&"indexes/budget-month.md".to_string()));
 
     let calendar = cli::run([
         "--data",
@@ -108,6 +111,12 @@ fn state_labels(conn: &Connection) -> rusqlite::Result<Vec<String>> {
 
 fn edge_relations(conn: &Connection) -> rusqlite::Result<Vec<String>> {
     let mut statement = conn.prepare("SELECT relation FROM state_edges ORDER BY relation")?;
+    let rows = statement.query_map([], |row| row.get::<_, String>(0))?;
+    rows.collect()
+}
+
+fn artifact_paths(conn: &Connection) -> rusqlite::Result<Vec<String>> {
+    let mut statement = conn.prepare("SELECT path FROM artifacts ORDER BY path")?;
     let rows = statement.query_map([], |row| row.get::<_, String>(0))?;
     rows.collect()
 }

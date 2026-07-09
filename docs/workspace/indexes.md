@@ -16,18 +16,18 @@ Each generated index records:
 
 - generation time;
 - input record ids;
-- input artifact fingerprints;
-- producing decision id;
-- check results or evidence refs; and
 - stale reason when inputs changed after generation.
+
+Each generated index also has a `workspace-index` artifact row with path,
+fingerprint, input record ids, and stale reason metadata.
 
 ## Rebuild Rule
 
-Indexes are derived views. They can be deleted and rebuilt from records,
-artifacts, and ledger rows. Record writes, `lkjagent workspace --rebuild`, and
+Indexes are derived views. They can be deleted and rebuilt from workspace record
+rows. Record writes, `lkjagent workspace --rebuild`, and
 `workspace apply-rebalance` refresh record-backed indexes and record index
-artifacts. Rebalance keeps old paths resolvable while generated views point at
-canonical paths. A stale index may still be shown to the owner with a warning,
+artifact rows. Rebalance keeps old paths resolvable while generated views point
+at canonical paths. A stale index may still be shown to the owner with a warning,
 but it must not satisfy completion checks or be admitted to prompts as current
 evidence.
 

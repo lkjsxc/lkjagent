@@ -1,0 +1,22 @@
+record: rec_20260709T064410Z_pay-rent path=records/life/finance/2026/07/rec_20260709T064410Z_pay-rent.md fp=fnv1a64:9941957f0460b0e1 index=workspace indexes rebuilt: 7
+
+== budget-month ==
+---
+generated_at: 2026-07-09T06:44:10Z
+index: budget-month
+input_records: [rec_20260709T064410Z_pay-rent]
+stale_reason: none
+---
+
+# Budget Month
+
+- rec_20260709T064410Z_pay-rent [review] Pay rent (records/life/finance/2026/07/rec_20260709T064410Z_pay-rent.md)
+
+== finance files ==
+tmp/agent-runs/20260709T070000Z-finance-index/evidence/data/workspace/records/life/finance/2026/07/README.md
+tmp/agent-runs/20260709T070000Z-finance-index/evidence/data/workspace/records/life/finance/2026/07/rec_20260709T064410Z_pay-rent.md
+tmp/agent-runs/20260709T070000Z-finance-index/evidence/data/workspace/records/life/finance/2026/README.md
+tmp/agent-runs/20260709T070000Z-finance-index/evidence/data/workspace/records/life/finance/README.md
+
+== artifacts ==
+artifact index-budget-month	workspace-index	indexes/budget-month.md	{"input_records":["rec_20260709T064410Z_pay-rent"],"stale_reason":null}
