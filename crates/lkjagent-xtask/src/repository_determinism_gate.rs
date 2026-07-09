@@ -10,7 +10,8 @@ use crate::facts::collect_files;
 use crate::gate::{check_files, check_lines};
 use crate::style::check_style;
 
-const CLEAN_GATE: &str = "13-scripts/clean_checkout_gate.sh .";
+const CLEAN_GATE: &str =
+    "sh tmp/lkjagent-evidence-first-rebuild-20260710/13-scripts/clean_checkout_gate.sh .";
 const REQUIRED: &[&str] = &[
     "Cargo.lock",
     ".gitignore",

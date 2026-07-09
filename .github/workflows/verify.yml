@@ -12,4 +12,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run clean tracked-tree gate
-        run: tmp/lkjagent-evidence-first-rebuild-20260710/13-scripts/clean_checkout_gate.sh .
+        run: sh tmp/lkjagent-evidence-first-rebuild-20260710/13-scripts/clean_checkout_gate.sh .

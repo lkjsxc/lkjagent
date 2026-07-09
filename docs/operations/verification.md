@@ -47,13 +47,14 @@ unfinished, mock, placeholder, retired-authority, or release-style source.
 The canonical isolated run is:
 
 ```sh
-tmp/lkjagent-evidence-first-rebuild-20260710/13-scripts/clean_checkout_gate.sh .
+sh tmp/lkjagent-evidence-first-rebuild-20260710/13-scripts/clean_checkout_gate.sh .
 ```
 
 That anchored script requires a clean tree, exports `HEAD` with `git archive`,
 uses no ignored local files or environment build overrides, builds the verify,
 test, and lint images with `--no-cache`, and runs all three services. Pull
-requests and pushes to main call the same script directly.
+requests and pushes to main call the same script through `sh` because the
+packet preserves it as a non-executable contract file.
 
 Workgraph nodes use the shell profile so each named gate runs from the same
 locked Docker build context:
