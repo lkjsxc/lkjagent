@@ -51,10 +51,10 @@ fn console_line_handler_routes_owner_input_without_daemon_state() -> TestResult<
 #[test]
 fn record_cli_manages_generic_records_while_daemon_is_stopped() -> TestResult<()> {
     let data = fixture_root("records")?;
-
+    let data_arg = data.to_string_lossy();
     let added = cli::run([
         "--data",
-        data.to_string_lossy().as_ref(),
+        data_arg.as_ref(),
         "record",
         "add",
         "custom",
@@ -69,35 +69,36 @@ fn record_cli_manages_generic_records_while_daemon_is_stopped() -> TestResult<()
         .nth(1)
         .ok_or("missing record id")?
         .to_string();
-    assert!(cli::run(["--data", data.to_string_lossy().as_ref(), "record", "list"])?.contains(&id));
+    let old_path = added
+        .split(" path=")
+        .nth(1)
+        .unwrap_or("")
+        .split_whitespace()
+        .next()
+        .unwrap_or("");
+    assert!(cli::run(["--data", data_arg.as_ref(), "record", "list"])?.contains(&id));
+    assert!(cli::run(["--data", data_arg.as_ref(), "record", "show", &id])?.contains("body"));
     assert!(cli::run([
         "--data",
-        data.to_string_lossy().as_ref(),
-        "record",
-        "show",
-        &id
-    ])?
-    .contains("body"));
-    assert!(cli::run([
-        "--data",
-        data.to_string_lossy().as_ref(),
+        data_arg.as_ref(),
         "record",
         "link",
         &id,
-        "record:other",
+        "record:other"
     ])?
     .contains("linked record"));
-    assert!(cli::run([
-        "--data",
-        data.to_string_lossy().as_ref(),
-        "record",
-        "archive",
-        &id,
-    ])?
-    .contains("archived record"));
     assert!(
-        !cli::run(["--data", data.to_string_lossy().as_ref(), "record", "list"])?.contains(&id)
+        cli::run(["--data", data_arg.as_ref(), "record", "archive", &id])?
+            .contains("archived record")
     );
+    assert!(!cli::run(["--data", data_arg.as_ref(), "record", "list"])?.contains(&id));
+    assert!(
+        cli::run(["--data", data_arg.as_ref(), "record", "show", old_path])?
+            .contains("state=archived")
+    );
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let counts: (i64, i64) = conn.query_row("SELECT (SELECT COUNT(*) FROM workspace_path_aliases), (SELECT COUNT(*) FROM workspace_rebalance_audit)", [], |row| Ok((row.get(0)?, row.get(1)?)))?;
+    assert_eq!(counts, (1, 1));
     Ok(())
 }
 
