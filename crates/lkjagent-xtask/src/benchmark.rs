@@ -20,9 +20,7 @@ pub fn run(args: &[String], root: &Path) -> i32 {
 }
 
 pub fn validate_corpus(root: &Path) -> Result<usize, String> {
-    crate::evaluation_harness::check_source(root)
-        .map(|count| count)
-        .map_err(|failures| failures.join("\n"))
+    crate::evaluation_harness::check_source(root).map_err(|failures| failures.join("\n"))
 }
 
 fn fail(name: &str, message: &str) -> i32 {
