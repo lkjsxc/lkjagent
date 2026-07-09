@@ -35,6 +35,20 @@ docker compose run --rm bench
 docker compose run --rm replay
 ```
 
+Workgraph nodes use the shell profile so each named gate runs from the same
+locked Docker build context:
+
+```sh
+docker compose --profile shell run --rm shell \
+  cargo run --locked -p lkjagent-xtask -- gate <node-id>
+```
+
+Each node gate owns substantive assertions for its completion predicate. An
+unknown node, an empty test filter, a skipped command, or an editable pass label
+fails. Pre-freeze raw output and machine-readable results live under
+`tmp/lkjagent-progress/nodes/<node-id>/raw/` and remain distinct from final
+acceptance evidence.
+
 `docker compose run --rm verify` is the final deterministic gate. It builds the
 image from explicit Dockerfile copies, not broad `COPY . .`, and runs
 `quiet verify` without source bind mounts. The Docker context excludes runtime
