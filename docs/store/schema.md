@@ -30,7 +30,11 @@ old and new fingerprints, source events, guards, evidence, and dependencies.
 `runtime_decisions` stores matter, event, optional operation, selected cells and
 edges, operation and idempotency identity, prompt state, selected time, context,
 tool, grammar, budget, recovery, and exit fingerprints, required observations
-and checks, wake time, status, and settlement event.
+and checks, wake time, status, and settlement event. Selection time is stored as
+`selected_monotonic_ms`. Each decision also stores `tool_count`, `prompt_tokens`,
+`prompt_token_cap`, `semantic_duplicate_count`, `harness_json_count`, and
+`unresolved_material_conflict_count`. Durable `useful` and `progressed` booleans
+are derived from outcome evidence rather than model claims.
 
 `context_frames`, `prompt_cards`, and `provider_exchanges` reference one
 decision and source fingerprints. Exchanges store redacted request and response
@@ -48,8 +52,8 @@ harness origin, effectful flag, accepted or rejected status, and typed reason.
 `effect_journal` stores decision, unique non-null admission, unique idempotency
 key, state, and intended, prior, and outcome fingerprints.
 
-`observations` stores a unique effect reference, attempt outcome, bounded
-content reference, fingerprint, and contamination.
+`observations` stores a unique effect reference, status, attempt outcome,
+bounded content reference, fingerprint, and contamination.
 
 `checks` stores matter, operation, decision, stable kind and parameters, current
 and passed flags, measured result, evidence fingerprint, and artifact or
