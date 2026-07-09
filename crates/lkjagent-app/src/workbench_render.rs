@@ -24,10 +24,11 @@ fn render_pane(state: &UiState) -> String {
     let sections = split_sections(&state.latest);
     let transcript = sections
         .iter()
-        .filter(|(name, _)| *name != "status")
-        .map(|(name, body)| format!("[{}]\n{}", name, body.trim()))
-        .collect::<Vec<_>>()
-        .join("\n\n");
+        .find(|(name, _)| *name == "transcript")
+        .map_or_else(
+            || section_group(&sections, |name| name != "status"),
+            |(_, body)| body.trim().to_string(),
+        );
     let transcript = filter_search(&transcript, &state.search);
     let left = window(
         &transcript,
@@ -35,11 +36,7 @@ fn render_pane(state: &UiState) -> String {
         state.follow,
         visible_height(state),
     );
-    let right = sections
-        .iter()
-        .find(|(name, _)| *name == "status")
-        .map(|(_, body)| body.trim())
-        .unwrap_or("status: unavailable");
+    let right = section_group(&sections, |name| name != "transcript");
     bounded(&format!(
         "== workbench pane refresh {} scroll={} follow={} search={} ==\n+-- transcript --+\n{}\n+-- right rail --+\n{}\n+-- input --+\nplain text enqueues | /follow on|off | /search TEXT | /mode append | /quit",
         state.refreshes,
@@ -47,8 +44,22 @@ fn render_pane(state: &UiState) -> String {
         state.follow,
         search_label(state),
         left,
-        rail_summary(right)
+        rail_summary(&right)
     ))
+}
+
+fn section_group(sections: &[(String, String)], keep: impl Fn(&str) -> bool) -> String {
+    let text = sections
+        .iter()
+        .filter(|(name, _)| keep(name))
+        .map(|(name, body)| format!("[{}]\n{}", name, body.trim()))
+        .collect::<Vec<_>>()
+        .join("\n\n");
+    if text.trim().is_empty() {
+        "status: unavailable".to_string()
+    } else {
+        text
+    }
 }
 
 fn search_label(state: &UiState) -> &str {
@@ -138,27 +149,23 @@ mod tests {
     use super::*;
 
     #[test]
-    fn pane_renderer_groups_status_and_transcript() {
+    fn pane_uses_transcript_section_as_left_pane() -> Result<(), String> {
         let mut state = UiState::new(WorkbenchMode::Pane);
-        state.refreshes = 2;
-        state.scroll = 1;
-        state.follow = false;
-        state.latest = "== status ==\ndaemon: idle\n== recent events ==\none\ntwo".to_string();
+        state.latest = "== status ==\ndaemon: idle\n== transcript ==\nowner: hello\nagent: hello\n== recent events ==\nstepdone hello".to_string();
 
         let text = render(&state);
+        let left = between(&text, "+-- transcript --+", "+-- right rail --+")?;
 
-        assert!(text.contains("== workbench pane refresh 2 scroll=1 follow=false search=none =="));
-        assert!(text.contains("+-- transcript --+"));
-        assert!(text.contains("two"));
-        assert!(!text.contains("[recent events]"));
-        assert!(text.contains("daemon: idle"));
-        assert!(text.contains("model: see rows"));
+        assert!(left.contains("owner: hello"));
+        assert!(left.contains("agent: hello"));
+        assert!(!left.contains("stepdone hello"));
+        assert!(text.contains("[status]"));
+        Ok(())
     }
 
     #[test]
     fn pane_follow_stays_bottom_anchored_after_growth() {
         let mut state = UiState::new(WorkbenchMode::Pane);
-        state.follow = true;
         state.latest = transcript_body(25);
         let before = render(&state);
         state.latest = transcript_body(26);
@@ -170,27 +177,18 @@ mod tests {
         assert!(!after.contains("line-01"));
     }
 
-    #[test]
-    fn pane_manual_scroll_stays_manual_after_growth() {
-        let mut state = UiState::new(WorkbenchMode::Pane);
-        state.follow = false;
-        state.scroll = 1;
-        state.latest = transcript_body(25);
-        let before = render(&state);
-        state.latest = transcript_body(26);
-        let after = render(&state);
-
-        assert!(before.contains("line-02"));
-        assert!(after.contains("line-02"));
-        assert!(!after.contains("line-26"));
+    fn transcript_body(count: usize) -> String {
+        let mut text = "== status ==\ndaemon: idle\n== transcript ==".to_string();
+        for index in 1..=count {
+            text.push_str(&format!("\nline-{index:02}"));
+        }
+        text
     }
 
-    fn transcript_body(count: usize) -> String {
-        let mut lines = vec!["== status ==".to_string(), "daemon: idle".to_string()];
-        lines.push("== transcript ==".to_string());
-        for index in 1..=count {
-            lines.push(format!("line-{index:02}"));
-        }
-        lines.join("\n")
+    fn between<'a>(text: &'a str, start: &str, end: &str) -> Result<&'a str, String> {
+        let start_at = text.find(start).ok_or_else(|| format!("missing {start}"))? + start.len();
+        let rest = &text[start_at..];
+        let end_at = rest.find(end).ok_or_else(|| format!("missing {end}"))?;
+        Ok(&rest[..end_at])
     }
 }

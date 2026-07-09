@@ -65,6 +65,8 @@ daemon state. Exiting it does not stop the daemon.
 `watch` is a bounded one-shot terminal snapshot over the same store rows:
 
 - status section: daemon, queue, token, lease, state, decision, and record lines;
+- transcript section: owner turns plus terminal lkjagent messages only, without
+  duplicating internal step-completion events;
 - recent events section: the latest eight bounded event rows;
 - matter trace section: the active matter, latest matter, or `matter: none`;
 - proof rows section: prompt-frame, check, artifact, exchange, and record counts;
@@ -78,8 +80,9 @@ from the store or workspace.
 `workbench` opens a terminal operator console when stdin and stdout are TTYs.
 The console uses durable transcript rows, a grapheme-aware composer, and panes
 for transcript, matter, tool, graph, workspace, proof, queue, and log evidence.
-It renders both owner and lkjagent messages from durable rows. Non-TTY runs keep
-the line-oriented append or pane fallback.
+It renders owner and terminal lkjagent messages from durable rows. Non-TTY pane
+runs keep the same transcript separation and put diagnostics outside the
+conversation pane.
 
 ## Proof Visibility
 

@@ -11,6 +11,8 @@ pub fn watch(conn: &Connection) -> Result<String, String> {
         "watch: rerun to refresh; use log --follow to stream".to_string(),
         "== status ==".to_string(),
         status,
+        "== transcript ==".to_string(),
+        crate::tui_snapshot::transcript(conn, 40)?,
         "== recent events ==".to_string(),
         events,
         "== matter trace ==".to_string(),

@@ -49,19 +49,27 @@ pub fn load(conn: &Connection, data_dir: &Path) -> Result<TuiSnapshot, String> {
     })
 }
 
+pub fn transcript(conn: &Connection, limit: usize) -> Result<String, String> {
+    let entries = transcript_entries(conn, limit)?;
+    Ok(transcript_text(&entries))
+}
+
 fn transcript_entries(conn: &Connection, limit: usize) -> Result<Vec<TranscriptEntry>, String> {
     let mut statement = conn
         .prepare(
             "SELECT entry_id, source, content, source_path FROM (
-                 SELECT created_at AS moment, 0 AS source_order, id AS row_id,
+                 SELECT created_at AS moment, COALESCE(task_id, id) AS matter_order,
+                        0 AS source_order, id AS row_id,
                         'queue:' || id AS entry_id, 'owner' AS source, content,
                         'sqlite:queue:' || id AS source_path FROM queue
                  UNION ALL
-                 SELECT created_at AS moment, 1 AS source_order, id AS row_id,
+                 SELECT created_at AS moment, COALESCE(task_id, 0) AS matter_order,
+                        1 AS source_order, id AS row_id,
                         'event:' || id AS entry_id, kind AS source, content,
                         'sqlite:events:' || id AS source_path FROM events
-                        WHERE kind NOT IN ('owner', 'answer')
-             ) ORDER BY moment DESC, source_order DESC, row_id DESC LIMIT ?1",
+                        WHERE kind IN ('taskclosed', 'taskblocked', 'question')
+             ) ORDER BY moment DESC, matter_order DESC, source_order DESC,
+                      row_id DESC LIMIT ?1",
         )
         .map_err(|error| error.to_string())?;
     let rows = statement

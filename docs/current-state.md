@@ -98,6 +98,9 @@ transcript merge, saved transcript ids and source paths, Japanese input,
 grapheme-indexed composer movement, delete, home/end, multiline submit,
 display-width cursor placement, append and pane modes, row-backed status
 fallbacks, and focused coverage for transcript merge and rendering surfaces.
+Workbench pane mode now renders a canonical conversation transcript in the left
+pane and keeps step progress, matter trace, recent events, and proof diagnostics
+out of that transcript pane.
 
 Baseline and post-change commands for the 2026-07-08 packet passed `cargo run
 -p lkjagent-xtask -- check-docs`, `cargo run -p lkjagent-xtask -- quiet

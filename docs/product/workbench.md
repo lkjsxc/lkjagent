@@ -25,14 +25,16 @@ quit events arrive. Terminal backends are effects at the edge.
 primary screen. Plain terminal scrollback, tmux copy mode, and saved command
 output remain usable.
 
-`pane` is an explicit framed primary-screen renderer. It groups durable rows
-into transcript, right-rail, and input-hint panes without raw terminal mode or
-alternate-screen ownership unless that mode is explicitly selected and tested.
+`pane` is an explicit framed primary-screen renderer. Its left pane is the
+owner conversation transcript only. Diagnostic rows such as step progress,
+matter trace, proof counts, queue state, and recent events belong in the
+right rail or other non-transcript panes.
 
 Each refresh includes bounded sections:
 
 - status fields from `lkjagent status`;
-- durable transcript events from owner, lkjagent, tools, records, and artifacts;
+- durable owner turns and terminal lkjagent messages, deduplicated by row
+  identity and ordered by matter causality when timestamps tie;
 - the active matter trace or `matter: none`;
 - active decision, prompt, context, tool-view, workspace, and proof counts;
 - a prompt hint for owner input.
@@ -68,6 +70,7 @@ Tests cover parser routing, reducer mode changes, line handling, closed-input
 exit, grapheme cursor movement, pane scroll and follow state, scroll-down follow
 restoration, pane bottom anchoring after growth, agent delta draft commit,
 durable transcript merge, duplicate suppression by stable row identity, saved
-ids and source paths, status rail fallback fields, and bounded rendering.
+ids and source paths, canonical transcript rendering without step/task duplicate
+messages, status rail fallback fields, and bounded rendering.
 Interactive behavior is proven by captured command logs under `tmp/agent-runs/`
 or `tmp/live-runs/`, with unavailable terminals recorded as an honest skip.
