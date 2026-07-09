@@ -110,8 +110,8 @@ Open after this correction:
 - Non-record generated artifact splitting or durable justification remains open.
 - Rebalance fingerprint continuity and exact-path link repair are fixed by
   `03570fba`; transaction-backed compensation after alias/audit failure remains open.
-- Tool admission repeat-call suppression, recovery-policy hiding, budget
-  suppressors, and distinct mismatch events remain report-only findings.
+- Tool admission repeat-call suppression and recovery-policy hiding are fixed by
+  `d8cfedfb`; budget suppressors and mismatch events remain open.
 - Context XML-like normal cards, ranking, and richer conflict source refs remain
   report-only findings unless docs are narrowed or source is expanded.
 
@@ -196,5 +196,5 @@ Open after this correction:
 | live campaigns | 9cd8069c; 6d0be7d8; 44a791ec | scripted campaign passed with workspace validation; skip files committed; standard `.env` endpoint run added under `tmp/live-runs/20260708Tstandardenv/` with all four profiles closed after 900-second time boxes | done |
 | large file split | 57c39d2e | large record CLI evidence shows main size justification plus linked part files; generated artifact splitting remains open | partial |
 | rebalance safety | 03570fba | CLI evidence shows fingerprint audit and `links-repaired:1`; post-alias/audit transaction compensation remains open | partial |
-| tool admission hardening | none | repeat-call, recovery-policy, budget, and mismatch-event claims remain report-only | open |
+| tool admission hardening | d8cfedfb | repeat guard and recovery policy fingerprint tests pass; budget suppressors and mismatch events remain open | partial |
 | context contract gaps | none | XML-like normal cards, ranking, and richer conflict refs remain report-only | open |

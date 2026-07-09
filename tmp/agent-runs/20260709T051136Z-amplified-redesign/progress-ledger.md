@@ -47,8 +47,8 @@ command evidence.
   yet proven.
 - `03570fba` fixed rebalance fingerprint audit and exact old-path link repair;
   transaction-backed compensation after alias or audit write failure remains open.
-- Open: tool admission repeat-call suppression, recovery-policy hiding, budget
-  suppressors, and distinct mismatch events remain report-only findings.
+- `d8cfedfb` fixed repeat-call rejection and recovery-policy hiding; budget
+  suppressors and distinct mismatch events remain open.
 - Open: context XML-like normal cards, ranking, and richer conflict source refs
   remain report-only findings unless docs are narrowed or source is expanded.
 
