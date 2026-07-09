@@ -107,6 +107,13 @@ cache mounts; Compose exposes agent, daemon, live-campaign, shell, and check
 profiles with writable data and tmp paths. Runtime `data/logs` rows are no
 longer committed as product evidence.
 
+Runtime configuration is flat JSON only. `data/lkjagent.json` accepts scalar
+and primitive-array keys such as `endpoint_url`, `endpoint_model`,
+`workspace_root`, prompt budget, and live-campaign duration; nested objects are
+startup errors. Live-profile endpoint detection counts only environment
+variables or those flat endpoint keys, so old nested endpoint shapes no longer
+silently enable live campaigns.
+
 Focused acceptance evidence now covers owner record writes, transcript traces,
 artifact files and response-path gating, blocked-step preflight, prompt-context
 non-JSON suppression, state-selected tool views, XML action parsing and
@@ -137,9 +144,10 @@ clean `66027735`. Fresh evidence is under
 
 ## Next Executable Step
 
-Review and commit the July 9 docs, ledger, and bounded evidence delta. If the
-owner wants more live confidence, run another endpoint profile using configured
-credentials and record cost and elapsed-time evidence without exposing secrets.
+Use the amplified evidence run as the baseline for future workspace-first
+changes. If the owner wants more live confidence, run another endpoint profile
+using configured credentials and record cost and elapsed-time evidence without
+exposing secrets.
 
 ## Honesty Rules
 

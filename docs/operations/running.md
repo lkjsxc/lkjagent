@@ -20,8 +20,9 @@ file.
 | `prompt_max_context_tokens` | prompt render ceiling |
 | `live_campaign_seconds` | default live campaign duration |
 
-Older nested config keys may be read only to rewrite them into the flat file.
-Model-visible context never includes the raw JSON config blob.
+Nested objects are invalid config. Rewrite old nested files to the flat keys
+above before starting the daemon. Model-visible context never includes the raw
+JSON config blob.
 
 ## Docker Operation
 

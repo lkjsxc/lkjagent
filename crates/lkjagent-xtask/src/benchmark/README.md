@@ -2,8 +2,9 @@
 
 ## Purpose
 
-Placeholder command module while the plan-engine benchmark corpus is rebuilt.
+Define benchmark corpus validation and tiny-suite report generation for xtask.
 
 ## Table of Contents
 
-- [mod.rs](mod.rs): command stub that fails honestly until rebuilt.
+- [mod.rs](mod.rs): benchmark command dispatch, corpus gate, argument parsing,
+  and report writing.
