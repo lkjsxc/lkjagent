@@ -90,17 +90,17 @@ mod tests {
     }
 
     #[test]
-    fn smoke_key_detection_uses_flat_api_key_env() {
+    fn smoke_key_detection_uses_flat_api_key_env() -> Result<(), Box<dyn std::error::Error>> {
         let root =
             std::env::temp_dir().join(format!("lkjagent-smoke-flat-key-{}", std::process::id()));
         let _ = fs::remove_dir_all(&root);
-        fs::create_dir_all(root.join("data")).expect("data dir");
+        fs::create_dir_all(root.join("data"))?;
         fs::write(
             root.join("data/lkjagent.json"),
             r#"{"endpoint_api_key_env":"LKJAGENT_TEST_ABSENT"}"#,
-        )
-        .expect("config");
+        )?;
 
         assert!(smoke_missing_configured_key(&root));
+        Ok(())
     }
 }

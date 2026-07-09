@@ -127,7 +127,6 @@ impl RuntimeDecision {
         tool_view: ToolSetView,
         expected_envelope: OutputEnvelope,
     ) -> Self {
-        let operation = operation;
         let harness_state = derive_harness_state(None, &operation.0, expected_envelope, "default");
         Self {
             id: id.into(),
