@@ -13,8 +13,8 @@ command evidence.
 - Docs-first commit: `6a328f88` Define flat config as the runtime contract
 - Implementation/evidence commit: `c2915b48` Prove strict flat config in the amplified harness
 - Daily-use evidence commit: `72fa3e2c` Capture daily workspace family evidence
-- Ledger file: this tracked file records final closure; acceptance items name
-  stable commits below.
+- Ledger file: this tracked file is reopened. Historical checks below are
+  evidence, not final closure, until the corrective items have no open rows.
 
 ## Case State
 
@@ -30,8 +30,25 @@ command evidence.
 - Risks: packet helper scripts scan ignored historical runtime artifacts; raw
   SQLite and JSON logs were left local and not committed.
 - Evidence root: `tmp/agent-runs/20260709T051136Z-amplified-redesign/`
-- Stop condition: all final gates below are checked and no unchecked item
-  remains.
+- Stop condition: reopened after owner report. Final completion is not valid
+  until current corrective rows have no open item.
+
+## Corrective Reopen
+
+- `97a8803d` fixed the live TUI pane duplicate: copied store data showed
+  `stepdone` and `taskclosed` rows in the transcript pane before the fix; final
+  evidence shows only `owner: hello` and `agent: hello`.
+- `8a6ea73a` fixed the finance workspace gate: a finance CLI turn now writes a
+  month-grouped finance record, `indexes/budget-month.md`, and
+  `index-budget-month` artifact row evidence.
+- Open: workspace large-file split or durable justification is still not
+  implemented by the inspected workspace code.
+- Open: workspace rebalance fingerprint continuity, link repair, and rollback or
+  compensation remain report-only findings.
+- Open: tool admission repeat-call suppression, recovery-policy hiding, budget
+  suppressors, and distinct mismatch events remain report-only findings.
+- Open: context XML-like normal cards, ranking, and richer conflict source refs
+  remain report-only findings unless docs are narrowed or source is expanded.
 
 ## Acceptance Status
 
@@ -40,14 +57,13 @@ command evidence.
 - [x] Final gates pass - commit `c2915b48`; final command captures at
   `commands/20260709T052732Z-*`, `commands/20260709T052742Z-*`, and
   `commands/20260709T052808Z-docker-compose-run---rm-verify.out`.
-- [x] Workspace records proven - commits `c2915b48` and `72fa3e2c`; workspace
-  probe and daily-use workspace trees are under `evidence/probe-data/workspace/`
-  and `evidence/daily-use-data/workspace/`.
+- [x] Workspace records proven - commits `c2915b48`, `72fa3e2c`, and
+  `8a6ea73a`; finance index evidence is under
+  `tmp/agent-runs/20260709T070000Z-finance-index/`.
 - [x] Diary path proven - commit `72fa3e2c`; diary record exists at
   `evidence/daily-use-data/workspace/records/life/journal/2026/07/09/entry.md`.
-- [x] TUI duplicate regression proven - commit `c2915b48`; TUI subagent report
-  and capture analyzer evidence are `subagents/tui-engineer.md` and
-  `commands/20260709T051843Z-*-tui_log_.out`.
+- [x] TUI duplicate regression proven - corrected by `97a8803d`; evidence is
+  under `tmp/agent-runs/20260709T062335Z-reopen-tui/`.
 - [x] TUI scroll clamp proven - commit `c2915b48`; focused TUI tests are covered
   by `cargo test -p lkjagent-app --tests` and TUI report.
 - [x] Tool view parity proven - commit `c2915b48`; tool report plus protocol
@@ -88,9 +104,8 @@ command evidence.
   `6a328f88`; final `check-docs` passed.
 - [x] Source files and docs respect line limits - final `check-lines` passed;
   staged line audit showed every added evidence file below 200 lines.
-- [x] Ordinary record turns write workspace files and rows - `72fa3e2c`;
-  journal, todo, calendar, finance, and note CLI records plus redacted SQLite
-  rows are in daily-use evidence.
+- [x] Ordinary record turns write workspace files and rows - `72fa3e2c` and
+  `8a6ea73a`; finance records now include `budget-month.md` index evidence.
 - [x] Every owner turn writes transcript or inbox evidence - `c2915b48`;
   probe transcript files are under `evidence/probe-data/workspace/artifacts/transcripts/`.
 - [x] Artifact creation creates files, artifact rows, checks, and response paths
@@ -107,8 +122,8 @@ command evidence.
   protocol experiments and xtask tests.
 - [x] Recovery states handle parse, admission, effect, endpoint, and check
   failures - `c2915b48`; recovery and evaluation reports.
-- [x] TUI duplicate and bottom-follow regressions have tests - `c2915b48`;
-  TUI report, app tests, and capture analyzer.
+- [x] TUI duplicate and bottom-follow regressions have tests - `c2915b48` and
+  `97a8803d`; the latter includes rendered pane evidence from store rows.
 - [x] Deterministic replay passes - final `smoke replay` capture exits 0.
 - [x] Quiet verify passes - final `quiet verify` capture exits 0.
 - [x] Docker Compose verify passes or honest skip is committed - Docker capture
