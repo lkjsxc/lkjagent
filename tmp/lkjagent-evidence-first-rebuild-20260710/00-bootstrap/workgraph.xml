@@ -1,0 +1,128 @@
+<workgraph>
+<node>
+<id>baseline-capture</id>
+<depends>none</depends>
+<gate>baseline-capture</gate>
+<result>honest failure fixtures and repository inventory</result>
+</node>
+<node>
+<id>docs-authority</id>
+<depends>baseline-capture</depends>
+<gate>docs-authority</gate>
+<result>current truth and target authority contract</result>
+</node>
+<node>
+<id>repository-determinism</id>
+<depends>docs-authority</depends>
+<gate>repository-determinism</gate>
+<result>tracked lockfile and isolated clean Docker verification</result>
+</node>
+<node>
+<id>evaluation-harness</id>
+<depends>docs-authority</depends>
+<gate>evaluation-harness</gate>
+<result>failure fixtures scenarios clocks faults and raw evidence capture</result>
+</node>
+<node>
+<id>store-foundation</id>
+<depends>repository-determinism</depends>
+<gate>store-foundation</gate>
+<result>native schema identity sequence revision and journal contracts</result>
+</node>
+<node>
+<id>event-reducer</id>
+<depends>store-foundation</depends>
+<gate>event-reducer</gate>
+<result>typed events state cells transitions and replay</result>
+</node>
+<node>
+<id>workspace-root-transactions</id>
+<depends>store-foundation</depends>
+<gate>workspace-root-transactions</gate>
+<result>separate visible root safe paths and exactly-once effects</result>
+</node>
+<node>
+<id>workspace-records</id>
+<depends>workspace-root-transactions</depends>
+<gate>workspace-records</gate>
+<result>journal todo calendar finance note and project records</result>
+</node>
+<node>
+<id>selector-runtime-cutover</id>
+<depends>event-reducer</depends>
+<gate>selector-runtime-cutover</gate>
+<result>decision-first production runtime without old authority</result>
+</node>
+<node>
+<id>context-prompt</id>
+<depends>selector-runtime-cutover workspace-records</depends>
+<gate>context-prompt</gate>
+<result>budgeted deduplicated conflict-safe state-specific prompts</result>
+</node>
+<node>
+<id>protocol-tools</id>
+<depends>context-prompt workspace-root-transactions</depends>
+<gate>protocol-tools</gate>
+<result>small views attribute-free grammar and exact admission</result>
+</node>
+<node>
+<id>recovery-continuity</id>
+<depends>selector-runtime-cutover protocol-tools</depends>
+<gate>recovery-continuity</gate>
+<result>strategy-changing recovery long work and truthful waits</result>
+</node>
+<node>
+<id>workspace-retrieval-maintenance</id>
+<depends>workspace-records context-prompt</depends>
+<gate>workspace-retrieval-maintenance</gate>
+<result>body retrieval indexes import rebalance archive and reconciliation</result>
+</node>
+<node>
+<id>canonical-conversation-tui</id>
+<depends>store-foundation selector-runtime-cutover</depends>
+<gate>canonical-conversation-tui</gate>
+<result>exactly-once causal transcript bounded visual scrolling</result>
+</node>
+<node>
+<id>domain-experiments</id>
+<depends>recovery-continuity workspace-retrieval-maintenance</depends>
+<gate>domain-experiments</gate>
+<result>precommitted isolated and combined idea trials</result>
+</node>
+<node>
+<id>integrated-adoption-cleanup</id>
+<depends>domain-experiments canonical-conversation-tui</depends>
+<gate>integrated-adoption-cleanup</gate>
+<result>measured winner integrated losers recorded old authority removed</result>
+</node>
+<node>
+<id>docs-reconciliation</id>
+<depends>integrated-adoption-cleanup</depends>
+<gate>docs-reconciliation</gate>
+<result>implementation map current claims and retired text deletion</result>
+</node>
+<node>
+<id>source-freeze</id>
+<depends>docs-reconciliation evaluation-harness repository-determinism</depends>
+<gate>source-freeze</gate>
+<result>clean deterministic final source commit</result>
+</node>
+<node>
+<id>live-evidence</id>
+<depends>source-freeze</depends>
+<gate>live-evidence</gate>
+<result>repeated anchored fifteen-minute endpoint campaigns</result>
+</node>
+<node>
+<id>pty-evidence</id>
+<depends>source-freeze</depends>
+<gate>pty-evidence</gate>
+<result>fifteen-minute replayable terminal campaign</result>
+</node>
+<node>
+<id>evidence-commit-ci</id>
+<depends>live-evidence pty-evidence</depends>
+<gate>evidence-commit-ci</gate>
+<result>tracked evidence commit and successful public workflow</result>
+</node>
+</workgraph>
