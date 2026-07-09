@@ -53,6 +53,9 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
 
     let plan = cli::run(["--data", data_str(&data), "workspace", "plan-rebalance"])?;
     assert!(plan.contains("records/knowledge/notes/old.md -> records/life/todo/open/rec_1.md"));
+    assert!(workspace
+        .join("system/manifests/workspace-manifest.json")
+        .exists());
     let applied = cli::run(["--data", data_str(&data), "workspace", "apply-rebalance"])?;
     assert!(applied.contains("move rec_1"));
     assert!(workspace.join("records/life/todo/open/rec_1.md").exists());

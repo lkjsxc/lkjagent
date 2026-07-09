@@ -1,5 +1,4 @@
-use std::fs;
-use std::path::Path;
+use std::{fs, path::Path};
 
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_core::workspace_manifest::{
@@ -95,10 +94,11 @@ pub fn validate(
 
 fn ensure_manifest(conn: &Connection, data_dir: &Path, now: &str) -> Result<(), String> {
     let manifest = WorkspaceManifest::default_workspace();
-    let system = crate::config::workspace_root(data_dir)?.join("system");
-    fs::create_dir_all(&system).map_err(|error| error.to_string())?;
+    let manifests = crate::config::workspace_root(data_dir)?.join("system/manifests");
+    fs::create_dir_all(&manifests).map_err(|error| error.to_string())?;
     let text = serde_json::to_string_pretty(&manifest).map_err(|error| error.to_string())?;
-    fs::write(system.join("workspace-manifest.json"), text).map_err(|error| error.to_string())?;
+    fs::write(manifests.join("workspace-manifest.json"), text)
+        .map_err(|error| error.to_string())?;
     upsert_manifest(conn, &manifest, now).map_err(|error| error.to_string())
 }
 
