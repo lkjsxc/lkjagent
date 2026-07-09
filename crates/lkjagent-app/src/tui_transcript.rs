@@ -1,4 +1,4 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
 
 use crate::tui_snapshot::TuiSnapshot;
@@ -49,16 +49,18 @@ pub fn display_lines(model: &TuiModel, snapshot: &TuiSnapshot) -> Vec<String> {
 
 pub fn merged_entries(model: &TuiModel, snapshot: &TuiSnapshot) -> Vec<TranscriptEntry> {
     let mut seen = BTreeSet::new();
-    let mut shadows = BTreeMap::new();
+    let mut paths = BTreeSet::new();
     let mut entries = Vec::new();
     for entry in &snapshot.transcript_entries {
         if seen.insert(entry.id.clone()) {
-            *shadows.entry(shadow_key(entry)).or_insert(0) += 1;
+            if let Some(path) = &entry.path {
+                paths.insert(path.clone());
+            }
             entries.push(entry.clone());
         }
     }
     for entry in &model.transcript {
-        if session_local(entry) && consume_shadow(&mut shadows, entry) {
+        if shadowed_by_identity(entry, &seen, &paths) {
             continue;
         }
         if seen.insert(entry.id.clone()) {
@@ -66,10 +68,7 @@ pub fn merged_entries(model: &TuiModel, snapshot: &TuiSnapshot) -> Vec<Transcrip
         }
     }
     if let Some(draft) = &model.agent_draft {
-        if session_local(draft) && consume_shadow(&mut shadows, draft) {
-            return entries;
-        }
-        if seen.insert(draft.id.clone()) {
+        if !shadowed_by_identity(draft, &seen, &paths) && seen.insert(draft.id.clone()) {
             entries.push(draft.clone());
         }
     }
@@ -83,23 +82,28 @@ fn conversation_entry(entry: &TranscriptEntry) -> bool {
     )
 }
 
-fn consume_shadow(shadows: &mut BTreeMap<String, usize>, entry: &TranscriptEntry) -> bool {
-    let Some(count) = shadows.get_mut(&shadow_key(entry)) else {
-        return false;
+fn shadowed_by_identity(
+    entry: &TranscriptEntry,
+    ids: &BTreeSet<String>,
+    paths: &BTreeSet<String>,
+) -> bool {
+    ids.contains(&entry.id)
+        || entry
+            .path
+            .as_ref()
+            .is_some_and(|path| path != "session" && paths.contains(path))
+}
+
+pub(crate) fn attach_owner_queue_id(model: &mut TuiModel, text: &str, queue_id: i64) {
+    let Some(entry) = model.transcript.iter_mut().rev().find(|entry| {
+        entry.source == TranscriptSource::Owner
+            && entry.text.trim() == text.trim()
+            && entry.id.contains(":session:")
+    }) else {
+        return;
     };
-    if *count == 0 {
-        return false;
-    }
-    *count -= 1;
-    true
-}
-
-fn session_local(entry: &TranscriptEntry) -> bool {
-    entry.id.contains(":session:") || entry.id == "draft-agent"
-}
-
-fn shadow_key(entry: &TranscriptEntry) -> String {
-    format!("{}:{}", source_label(entry.source), entry.text.trim())
+    entry.id = format!("queue:{queue_id}");
+    entry.path = Some(format!("sqlite:queue:{queue_id}"));
 }
 
 fn transcript_entries(model: &TuiModel, snapshot: &TuiSnapshot) -> String {

@@ -100,6 +100,9 @@ fn handle_effects(
 
 fn submit(conn: &Connection, model: &mut TuiModel, text: &str) -> Result<(), String> {
     let reply = crate::console::handle_line(conn, text, &crate::clock::utc_now())?;
+    if let Some(queue_id) = queued_id(&reply.output) {
+        crate::tui_transcript::attach_owner_queue_id(model, text, queue_id);
+    }
     if !reply.output.is_empty() {
         note(model, &reply.output);
     }
@@ -108,6 +111,15 @@ fn submit(conn: &Connection, model: &mut TuiModel, text: &str) -> Result<(), Str
         *model = next;
     }
     Ok(())
+}
+
+fn queued_id(output: &str) -> Option<i64> {
+    output
+        .strip_prefix("queue: ")?
+        .split_whitespace()
+        .next()?
+        .parse()
+        .ok()
 }
 
 fn save(data_dir: &Path, model: &mut TuiModel, snapshot: &TuiSnapshot) -> Result<(), String> {

@@ -53,11 +53,14 @@ fn durable_row_overrides_matching_ephemeral_id() {
 }
 
 #[test]
-fn durable_rows_shadow_matching_session_rows_only() {
+fn durable_rows_shadow_matching_identity_only() {
     let mut model = TuiModel::new();
     model
         .transcript
-        .push(agent_entry("agent:session:1", "done", "session"));
+        .push(agent_entry("event:1", "done", "sqlite:events:1"));
+    model
+        .transcript
+        .push(owner_entry("queue:7", "same", "sqlite:queue:7"));
     model
         .transcript
         .push(owner_entry("owner:session:2", "same", "session"));
@@ -74,7 +77,10 @@ fn durable_rows_shadow_matching_session_rows_only() {
 
     let lines = lkjagent_app::tui_transcript::display_lines(&model, &snapshot);
 
-    assert_eq!(lines, vec!["agent: done", "owner: same", "owner: same"]);
+    assert_eq!(
+        lines,
+        vec!["agent: done", "owner: same", "owner: same", "owner: same"]
+    );
 }
 
 #[test]
