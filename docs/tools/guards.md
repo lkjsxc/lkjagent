@@ -20,7 +20,9 @@ selects a recovery decision. It does not render tools that admission will refuse
 
 A byte-identical tool call to the previous admitted tool call for the same state
 edge is not executed. Admission records diagnosis `repeated tool call; state the
-next different tool call or finish` and emits a bounded recovery event.
+next different tool call or finish` and emits a bounded recovery event. The
+comparison uses the canonical parsed action JSON persisted for the same runtime
+decision, and repeat attempts receive their own rejected admission row.
 
 ## Recovery Guard
 

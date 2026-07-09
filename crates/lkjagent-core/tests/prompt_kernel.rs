@@ -7,7 +7,7 @@ use lkjagent_core::runtime_prompt_kernel::build_prompt_card_plan;
 
 #[test]
 fn card_plan_has_ordered_profiles_and_fingerprints() -> Result<(), String> {
-    let decision = RuntimeDecision::new(
+    let mut decision = RuntimeDecision::new(
         "decision-1",
         "case-1",
         OperationKey("model.call".to_string()),
@@ -16,6 +16,7 @@ fn card_plan_has_ordered_profiles_and_fingerprints() -> Result<(), String> {
         ]),
         OutputEnvelope::Action,
     );
+    decision.recovery_policy = "retry-same-decision".to_string();
     let prompt = Prompt {
         system: "system".to_string(),
         user: "user".to_string(),
@@ -54,6 +55,9 @@ fn card_plan_has_ordered_profiles_and_fingerprints() -> Result<(), String> {
     );
     assert_eq!(plan.prompt_profile, "kernel-v1");
     assert!(plan.fingerprint.starts_with("fnv1a64:"));
+    let recovery = reason(&plan, "recovery")?;
+    assert!(recovery.starts_with("policy-ref=fnv1a64:"));
+    assert!(!recovery.contains("retry-same-decision"));
     Ok(())
 }
 

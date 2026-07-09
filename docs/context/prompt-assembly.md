@@ -47,10 +47,12 @@ Workspace record and index context is rendered as bounded metadata with source
 fingerprints, not full file bodies. JSON-like context bodies are replaced with a
 source-linked suppression marker before prompt rendering. Observations are
 bounded before storage and bounded again during rendering. Recovery cards render
-bounded diagnoses and invalid-excerpt hashes, not raw failed output. The final
-prompt region is a copyable XML-like output skeleton for the selected envelope
-and active tool view. Kernel, objective, state, facts, conflicts, recovery,
-tools, and output cards keep the shape stable across profiles.
+bounded diagnoses and invalid-excerpt hashes, not raw failed output. Recovery
+policy names are not rendered into normal prompt cards; cards carry only a
+stable policy fingerprint. The final prompt region is a copyable XML-like output
+skeleton for the selected envelope and active tool view. Kernel, objective,
+state, facts, conflicts, recovery, tools, and output cards keep the shape stable
+across profiles.
 
 ## Fingerprint Contract
 

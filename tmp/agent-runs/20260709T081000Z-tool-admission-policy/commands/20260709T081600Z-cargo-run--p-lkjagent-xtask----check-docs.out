@@ -1,0 +1,9 @@
+warning: unused variable: `index`
+  --> crates/lkjagent-app/src/admission_bridge.rs:17:10
+   |
+17 |     for (index, command) in commands.iter().enumerate() {
+   |          ^^^^^ help: if this is intentional, prefix it with an underscore: `_index`
+   |
+   = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+ok check-docs

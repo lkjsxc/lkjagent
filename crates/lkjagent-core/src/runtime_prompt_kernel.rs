@@ -48,7 +48,7 @@ pub fn build_prompt_card_plan(
         )?,
         card("facts", facts_reason(decision, context_plan))?,
         card("conflicts", conflict_reason(context_plan))?,
-        card("recovery", format!("policy={}", decision.recovery_policy))?,
+        card("recovery", recovery_reason(decision)?)?,
         card(
             "tools",
             format!(
@@ -114,6 +114,11 @@ fn conflict_reason(plan: &ContextFramePlan) -> String {
         .cloned()
         .collect::<Vec<_>>();
     format!("unresolved={}", entry_list(&unresolved))
+}
+
+fn recovery_reason(decision: &RuntimeDecision) -> Result<String, FingerprintError> {
+    let fingerprint = stable_fingerprint(&decision.recovery_policy)?;
+    Ok(format!("policy-ref={fingerprint}"))
 }
 
 fn entry_list(entries: &[crate::runtime_context::ContextPlanEntry]) -> String {
