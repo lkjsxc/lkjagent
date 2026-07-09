@@ -1,0 +1,1411 @@
+ Image lkjagent_clean_295398-test Building 
+ Image lkjagent_clean_295398-lint Building 
+ Image lkjagent_clean_295398-verify Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.61kB done
+#1 DONE 0.0s
+
+#2 [lint internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.32kB done
+#2 DONE 0.1s
+
+#3 [test] resolve image config for docker-image://docker.io/docker/dockerfile:1.7
+#3 DONE 0.7s
+
+#4 [verify] docker-image://docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
+#4 resolve docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e 0.0s done
+#4 CACHED
+
+#5 [test internal] load build definition from Dockerfile
+#5 transferring dockerfile: 2.32kB done
+#5 DONE 0.1s
+
+#6 [verify internal] load build definition from Dockerfile
+#6 transferring dockerfile: 2.32kB done
+#6 DONE 0.1s
+
+#7 [lint internal] load build definition from Dockerfile
+#7 transferring dockerfile: 2.32kB done
+#7 DONE 0.2s
+
+#8 [lint internal] load metadata for docker.io/library/rust:bookworm
+#8 DONE 0.6s
+
+#9 [verify internal] load .dockerignore
+#9 transferring context: 154B done
+#9 DONE 0.1s
+
+#10 [lint internal] load .dockerignore
+#10 transferring context: 154B done
+#10 DONE 0.1s
+
+#11 [test internal] load .dockerignore
+#11 transferring context: 154B done
+#11 DONE 0.2s
+
+#12 [lint build  1/18] FROM docker.io/library/rust:bookworm@sha256:7d0723df719e7f213b69dc7c8c595985c3f4b060cfbee4f7bc0e347a86fe3b6a
+#12 resolve docker.io/library/rust:bookworm@sha256:7d0723df719e7f213b69dc7c8c595985c3f4b060cfbee4f7bc0e347a86fe3b6a 0.0s done
+#12 DONE 0.0s
+
+#13 [lint build  2/18] WORKDIR /src
+#13 CACHED
+
+#14 [test build  3/18] RUN apt-get update     && apt-get install -y --no-install-recommends         curl         git         ripgrep     && rm -rf /var/lib/apt/lists/*
+#14 ...
+
+#15 [verify internal] load build context
+#15 transferring context: 1.32MB 0.0s done
+#15 DONE 0.2s
+
+#16 [test internal] load build context
+#16 transferring context: 1.32MB 0.0s done
+#16 DONE 0.2s
+
+#17 [lint internal] load build context
+#17 transferring context: 1.32MB 0.0s done
+#17 DONE 0.2s
+
+#14 [test build  3/18] RUN apt-get update     && apt-get install -y --no-install-recommends         curl         git         ripgrep     && rm -rf /var/lib/apt/lists/*
+#14 0.318 Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+#14 0.328 Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+#14 0.333 Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [48.0 kB]
+#14 0.366 Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8790 kB]
+#14 0.454 Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+#14 0.454 Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [316 kB]
+#14 0.949 Fetched 9367 kB in 1s (14.4 MB/s)
+#14 0.949 Reading package lists...
+#14 1.224 Reading package lists...
+#14 1.458 Building dependency tree...
+#14 1.557 Reading state information...
+#14 1.653 curl is already the newest version (7.88.1-10+deb12u14).
+#14 1.653 git is already the newest version (1:2.39.5-0+deb12u3).
+#14 1.653 The following NEW packages will be installed:
+#14 1.653   ripgrep
+#14 1.670 0 upgraded, 1 newly installed, 0 to remove and 1 not upgraded.
+#14 1.670 Need to get 1253 kB of archives.
+#14 1.670 After this operation, 4666 kB of additional disk space will be used.
+#14 1.670 Get:1 http://deb.debian.org/debian bookworm/main amd64 ripgrep amd64 13.0.0-4+b2 [1253 kB]
+#14 1.770 debconf: delaying package configuration, since apt-utils is not installed
+#14 1.799 Fetched 1253 kB in 0s (40.6 MB/s)
+#14 1.825 Selecting previously unselected package ripgrep.
+#14 1.825 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 23256 files and directories currently installed.)
+#14 1.833 Preparing to unpack .../ripgrep_13.0.0-4+b2_amd64.deb ...
+#14 1.838 Unpacking ripgrep (13.0.0-4+b2) ...
+#14 1.929 Setting up ripgrep (13.0.0-4+b2) ...
+#14 DONE 2.0s
+
+#18 [test build  4/18] RUN rustup component add rustfmt clippy
+#18 0.240 info: downloading component rustfmt
+#18 0.665 info: downloading component clippy
+#18 DONE 1.1s
+
+#19 [test build  5/18] COPY Cargo.toml Cargo.lock README.md ./
+#19 DONE 0.1s
+
+#20 [lint build  6/18] COPY .gitignore .dockerignore ./
+#20 DONE 0.1s
+
+#21 [lint build  7/18] COPY .github/workflows/verify.yml ./.github/workflows/verify.yml
+#21 DONE 0.1s
+
+#22 [lint build  8/18] COPY crates/lkjagent-app ./crates/lkjagent-app
+#22 DONE 0.1s
+
+#23 [verify build  9/18] COPY crates/lkjagent-core ./crates/lkjagent-core
+#23 DONE 0.1s
+
+#24 [lint build 10/18] COPY crates/lkjagent-effects ./crates/lkjagent-effects
+#24 DONE 0.1s
+
+#25 [test build 11/18] COPY crates/lkjagent-llm ./crates/lkjagent-llm
+#25 DONE 0.1s
+
+#26 [test build 12/18] COPY crates/lkjagent-store ./crates/lkjagent-store
+#26 DONE 0.1s
+
+#27 [test build 13/18] COPY crates/lkjagent-xtask ./crates/lkjagent-xtask
+#27 DONE 0.1s
+
+#28 [verify build 14/18] COPY docs ./docs
+#28 DONE 0.1s
+
+#29 [test build 15/18] COPY evaluation ./evaluation
+#29 DONE 0.1s
+
+#30 [verify build 16/18] COPY data/lkjagent.json ./data/lkjagent.json
+#30 DONE 0.1s
+
+#31 [lint build 17/18] COPY Dockerfile docker-compose.yml ./
+#31 DONE 0.1s
+
+#32 [test build 18/18] RUN --mount=type=cache,target=/usr/local/cargo/registry     --mount=type=cache,target=/usr/local/cargo/git     --mount=type=cache,target=/src/target     cargo build --locked --release -p lkjagent-app     && cp /src/target/release/lkjagent /tmp/lkjagent
+#32 0.308     Updating crates.io index
+#32 0.966  Downloading crates ...
+#32 1.000   Downloaded fallible-streaming-iterator v0.1.9
+#32 1.003   Downloaded atomic-waker v1.1.2
+#32 1.007   Downloaded darling_macro v0.23.0
+#32 1.008   Downloaded errno v0.3.14
+#32 1.009   Downloaded serde_urlencoded v0.7.1
+#32 1.011   Downloaded equivalent v1.0.2
+#32 1.012   Downloaded form_urlencoded v1.2.2
+#32 1.012   Downloaded futures-core v0.3.32
+#32 1.013   Downloaded futures-io v0.3.32
+#32 1.013   Downloaded serde_core v1.0.228
+#32 1.015   Downloaded either v1.16.0
+#32 1.016   Downloaded displaydoc v0.2.6
+#32 1.017   Downloaded find-msvc-tools v0.1.9
+#32 1.018   Downloaded foldhash v0.2.0
+#32 1.018   Downloaded fallible-iterator v0.3.0
+#32 1.019   Downloaded stable_deref_trait v1.2.1
+#32 1.019   Downloaded shlex v2.0.1
+#32 1.020   Downloaded serde_derive v1.0.228
+#32 1.021   Downloaded foldhash v0.1.5
+#32 1.022   Downloaded futures-channel v0.3.32
+#32 1.023   Downloaded futures-sink v0.3.32
+#32 1.023   Downloaded bitflags v2.13.0
+#32 1.026   Downloaded allocator-api2 v0.2.21
+#32 1.027   Downloaded base64 v0.22.1
+#32 1.029   Downloaded compact_str v0.8.2
+#32 1.031   Downloaded rustls-webpki v0.103.13
+#32 1.033   Downloaded bytes v1.12.1
+#32 1.035   Downloaded rustc-hash v2.1.3
+#32 1.035   Downloaded serde_json v1.0.150
+#32 1.040   Downloaded indoc v2.0.7
+#32 1.041   Downloaded litemap v0.8.2
+#32 1.043   Downloaded proc-macro2 v1.0.106
+#32 1.044   Downloaded pkg-config v0.3.33
+#32 1.045   Downloaded rand v0.10.2
+#32 1.047   Downloaded unicode-ident v1.0.24
+#32 1.048   Downloaded smallvec v1.15.2
+#32 1.049   Downloaded crossterm v0.28.1
+#32 1.052   Downloaded heck v0.5.0
+#32 1.053   Downloaded chacha20 v0.10.1
+#32 1.054   Downloaded icu_collections v2.2.0
+#32 1.058   Downloaded zerofrom-derive v0.1.7
+#32 1.058   Downloaded try-lock v0.2.5
+#32 1.059   Downloaded strum v0.26.3
+#32 1.059   Downloaded synstructure v0.13.2
+#32 1.060   Downloaded tinyvec_macros v0.1.1
+#32 1.060   Downloaded zerovec-derive v0.11.3
+#32 1.061   Downloaded cfg_aliases v0.2.1
+#32 1.061   Downloaded potential_utf v0.1.5
+#32 1.062   Downloaded rand_pcg v0.10.2
+#32 1.063   Downloaded http-body v1.0.1
+#32 1.063   Downloaded quinn-udp v0.5.15
+#32 1.064   Downloaded tokio-rustls v0.26.4
+#32 1.066   Downloaded unicode-segmentation v1.13.3
+#32 1.067   Downloaded percent-encoding v2.3.2
+#32 1.068   Downloaded itoa v1.0.18
+#32 1.069   Downloaded castaway v0.2.4
+#32 1.069   Downloaded rand_core v0.10.1
+#32 1.070   Downloaded futures-task v0.3.32
+#32 1.071   Downloaded quinn-proto v0.11.16
+#32 1.075   Downloaded cpufeatures v0.3.0
+#32 1.075   Downloaded tracing-core v0.1.36
+#32 1.077   Downloaded lru-slab v0.1.2
+#32 1.077   Downloaded unicode-truncate v1.1.0
+#32 1.078   Downloaded subtle v2.6.1
+#32 1.079   Downloaded sync_wrapper v1.0.2
+#32 1.079   Downloaded zerofrom v0.1.8
+#32 1.080   Downloaded scopeguard v1.2.0
+#32 1.080   Downloaded tower-service v0.3.3
+#32 1.081   Downloaded utf8_iter v1.0.4
+#32 1.081   Downloaded ident_case v1.0.1
+#32 1.081   Downloaded idna_adapter v1.2.2
+#32 1.082   Downloaded instability v0.3.12
+#32 1.083   Downloaded lru v0.12.5
+#32 1.083   Downloaded paste v1.0.15
+#32 1.085   Downloaded strsim v0.11.1
+#32 1.085   Downloaded tower-layer v0.3.3
+#32 1.086   Downloaded cc v1.2.66
+#32 1.087   Downloaded cfg-if v1.0.4
+#32 1.088   Downloaded signal-hook-mio v0.2.5
+#32 1.089   Downloaded socket2 v0.6.4
+#32 1.090   Downloaded thiserror-impl v2.0.18
+#32 1.090   Downloaded untrusted v0.9.0
+#32 1.091   Downloaded want v0.3.1
+#32 1.092   Downloaded writeable v0.6.3
+#32 1.093   Downloaded yoke-derive v0.8.2
+#32 1.093   Downloaded thiserror v2.0.18
+#32 1.097   Downloaded tinystr v0.8.3
+#32 1.098   Downloaded zmij v1.0.21
+#32 1.098   Downloaded ipnet v2.12.0
+#32 1.099   Downloaded lock_api v0.4.14
+#32 1.100   Downloaded rustversion v1.0.23
+#32 1.101   Downloaded slab v0.4.12
+#32 1.102   Downloaded cassowary v0.3.0
+#32 1.103   Downloaded getrandom v0.2.17
+#32 1.104   Downloaded getrandom v0.4.3
+#32 1.106   Downloaded hyper-rustls v0.27.9
+#32 1.107   Downloaded strum_macros v0.26.4
+#32 1.108   Downloaded yoke v0.8.3
+#32 1.109   Downloaded zeroize v1.9.0
+#32 1.110   Downloaded signal-hook-registry v1.4.8
+#32 1.110   Downloaded static_assertions v1.1.0
+#32 1.111   Downloaded tinyvec v1.11.0
+#32 1.112   Downloaded signal-hook v0.3.18
+#32 1.114   Downloaded http-body-util v0.1.3
+#32 1.115   Downloaded hashlink v0.12.1
+#32 1.116   Downloaded darling v0.23.0
+#32 1.119   Downloaded quote v1.0.46
+#32 1.120   Downloaded rustls-pki-types v1.15.0
+#32 1.121   Downloaded url v2.5.8
+#32 1.123   Downloaded parking_lot v0.12.5
+#32 1.124   Downloaded zerotrie v0.2.4
+#32 1.126   Downloaded httparse v1.10.1
+#32 1.127   Downloaded once_cell v1.21.4
+#32 1.129   Downloaded memchr v2.8.3
+#32 1.131   Downloaded log v0.4.33
+#32 1.133   Downloaded darling_core v0.23.0
+#32 1.135   Downloaded pin-project-lite v0.2.17
+#32 1.138   Downloaded parking_lot_core v0.9.12
+#32 1.139   Downloaded tower v0.5.3
+#32 1.144   Downloaded icu_provider v2.2.0
+#32 1.146   Downloaded zerovec v0.11.6
+#32 1.149   Downloaded icu_properties v2.2.0
+#32 1.150   Downloaded ryu v1.0.23
+#32 1.152   Downloaded tower-http v0.6.11
+#32 1.157   Downloaded icu_normalizer_data v2.2.0
+#32 1.158   Downloaded serde v1.0.228
+#32 1.160   Downloaded icu_normalizer v2.2.0
+#32 1.162   Downloaded quinn v0.11.11
+#32 1.163   Downloaded vcpkg v0.2.15
+#32 1.189   Downloaded syn v2.0.118
+#32 1.194   Downloaded mio v1.2.1
+#32 1.197   Downloaded webpki-roots v1.0.8
+#32 1.199   Downloaded icu_locale_core v2.2.0
+#32 1.202   Downloaded http v1.4.2
+#32 1.204   Downloaded hyper-util v0.1.20
+#32 1.207   Downloaded unicode-width v0.1.14
+#32 1.210   Downloaded tracing v0.1.44
+#32 1.219   Downloaded hashbrown v0.15.5
+#32 1.222   Downloaded rusqlite v0.40.1
+#32 1.226   Downloaded futures-util v0.3.32
+#32 1.233   Downloaded hashbrown v0.17.1
+#32 1.236   Downloaded itertools v0.13.0
+#32 1.239   Downloaded tokio v1.52.3
+#32 1.262   Downloaded icu_properties_data v2.2.0
+#32 1.268   Downloaded idna v1.1.0
+#32 1.270   Downloaded hyper v1.10.1
+#32 1.276   Downloaded reqwest v0.12.28
+#32 1.280   Downloaded rustix v0.38.44
+#32 1.292   Downloaded rustls v0.23.41
+#32 1.298   Downloaded ratatui v0.28.1
+#32 1.308   Downloaded libc v0.2.186
+#32 1.329   Downloaded ring v0.17.14
+#32 1.350   Downloaded linux-raw-sys v0.4.15
+#32 1.377   Downloaded libsqlite3-sys v0.38.1
+#32 1.434    Compiling proc-macro2 v1.0.106
+#32 1.434    Compiling unicode-ident v1.0.24
+#32 1.434    Compiling quote v1.0.46
+#32 1.434    Compiling libc v0.2.186
+#32 1.434    Compiling find-msvc-tools v0.1.9
+#32 1.434    Compiling smallvec v1.15.2
+#32 1.434    Compiling stable_deref_trait v1.2.1
+#32 1.434    Compiling shlex v2.0.1
+#32 1.436    Compiling itoa v1.0.18
+#32 1.437    Compiling cfg-if v1.0.4
+#32 1.441    Compiling log v0.4.33
+#32 1.447    Compiling bytes v1.12.1
+#32 1.447    Compiling pin-project-lite v0.2.17
+#32 1.447    Compiling futures-core v0.3.32
+#32 1.447    Compiling memchr v2.8.3
+#32 1.447    Compiling serde_core v1.0.228
+#32 1.450    Compiling writeable v0.6.3
+#32 1.450    Compiling litemap v0.8.2
+#32 1.450    Compiling icu_properties_data v2.2.0
+#32 1.452    Compiling utf8_iter v1.0.4
+#32 1.460    Compiling futures-sink v0.3.32
+#32 1.471    Compiling icu_normalizer_data v2.2.0
+#32 1.478    Compiling percent-encoding v2.3.2
+#32 1.491    Compiling once_cell v1.21.4
+#32 1.496    Compiling zeroize v1.9.0
+#32 1.505    Compiling serde v1.0.228
+#32 1.523    Compiling cc v1.2.66
+#32 1.532    Compiling bitflags v2.13.0
+#32 1.538    Compiling futures-io v0.3.32
+#32 1.551    Compiling zmij v1.0.21
+#32 1.556    Compiling slab v0.4.12
+#32 1.560    Compiling httparse v1.10.1
+#32 1.567    Compiling untrusted v0.9.0
+#32 1.572    Compiling rustversion v1.0.23
+#32 1.575    Compiling futures-task v0.3.32
+#32 1.584    Compiling rustls-pki-types v1.15.0
+#32 1.589    Compiling try-lock v0.2.5
+#32 1.605    Compiling rustls v0.23.41
+#32 1.612    Compiling tower-service v0.3.3
+#32 1.623    Compiling serde_json v1.0.150
+#32 1.636    Compiling tracing-core v0.1.36
+#32 1.640    Compiling form_urlencoded v1.2.2
+#32 1.640    Compiling futures-channel v0.3.32
+#32 1.653    Compiling want v0.3.1
+#32 1.658    Compiling pkg-config v0.3.33
+#32 1.667    Compiling strsim v0.11.1
+#32 1.669    Compiling atomic-waker v1.1.2
+#32 1.669    Compiling subtle v2.6.1
+#32 1.699    Compiling ident_case v1.0.1
+#32 1.717    Compiling ryu v1.0.23
+#32 1.735    Compiling vcpkg v0.2.15
+#32 1.738    Compiling parking_lot_core v0.9.12
+#32 1.741    Compiling signal-hook v0.3.18
+#32 1.745    Compiling sync_wrapper v1.0.2
+#32 1.751    Compiling rustix v0.38.44
+#32 1.792    Compiling ipnet v2.12.0
+#32 1.792    Compiling scopeguard v1.2.0
+#32 1.809    Compiling base64 v0.22.1
+#32 1.824    Compiling futures-util v0.3.32
+#32 1.835    Compiling foldhash v0.2.0
+#32 1.846    Compiling http v1.4.2
+#32 1.874    Compiling tracing v0.1.44
+#32 1.908    Compiling tower-layer v0.3.3
+#32 1.917    Compiling hashbrown v0.17.1
+#32 1.958    Compiling lock_api v0.4.14
+#32 1.966    Compiling webpki-roots v1.0.8
+#32 1.973    Compiling paste v1.0.15
+#32 1.982    Compiling syn v2.0.118
+#32 1.989    Compiling linux-raw-sys v0.4.15
+#32 2.001    Compiling instability v0.3.12
+#32 2.010    Compiling equivalent v1.0.2
+#32 2.019    Compiling allocator-api2 v0.2.21
+#32 2.040    Compiling foldhash v0.1.5
+#32 2.046    Compiling heck v0.5.0
+#32 2.063    Compiling either v1.16.0
+#32 2.098    Compiling unicode-segmentation v1.13.3
+#32 2.101    Compiling unicode-width v0.1.14
+#32 2.103    Compiling fallible-iterator v0.3.0
+#32 2.118    Compiling castaway v0.2.4
+#32 2.118    Compiling static_assertions v1.1.0
+#32 2.118    Compiling indoc v2.0.7
+#32 2.131    Compiling mio v1.2.1
+#32 2.133    Compiling socket2 v0.6.4
+#32 2.140    Compiling getrandom v0.2.17
+#32 2.163    Compiling errno v0.3.14
+#32 2.183    Compiling itertools v0.13.0
+#32 2.192    Compiling fallible-streaming-iterator v0.1.9
+#32 2.215    Compiling signal-hook-registry v1.4.8
+#32 2.222    Compiling compact_str v0.8.2
+#32 2.255    Compiling cassowary v0.3.0
+#32 2.267    Compiling ring v0.17.14
+#32 2.269    Compiling libsqlite3-sys v0.38.1
+#32 2.280    Compiling parking_lot v0.12.5
+#32 2.301    Compiling hashbrown v0.15.5
+#32 2.506    Compiling tokio v1.52.3
+#32 2.506    Compiling signal-hook-mio v0.2.5
+#32 2.521    Compiling hashlink v0.12.1
+#32 2.610    Compiling http-body v1.0.1
+#32 2.655    Compiling http-body-util v0.1.3
+#32 2.661    Compiling crossterm v0.28.1
+#32 2.794    Compiling lru v0.12.5
+#32 3.134    Compiling unicode-truncate v1.1.0
+#32 3.696    Compiling synstructure v0.13.2
+#32 3.696    Compiling darling_core v0.23.0
+#32 3.908    Compiling zerofrom-derive v0.1.7
+#32 3.908    Compiling yoke-derive v0.8.2
+#32 3.908    Compiling zerovec-derive v0.11.3
+#32 3.908    Compiling displaydoc v0.2.6
+#32 3.908    Compiling serde_derive v1.0.228
+#32 3.908    Compiling strum_macros v0.26.4
+#32 4.226    Compiling zerofrom v0.1.8
+#32 4.265    Compiling yoke v0.8.3
+#32 4.324    Compiling zerovec v0.11.6
+#32 4.324    Compiling zerotrie v0.2.4
+#32 4.377    Compiling hyper v1.10.1
+#32 4.378    Compiling tower v0.5.3
+#32 4.458    Compiling strum v0.26.3
+#32 4.520    Compiling darling_macro v0.23.0
+#32 4.613    Compiling darling v0.23.0
+#32 4.653    Compiling tinystr v0.8.3
+#32 4.653    Compiling potential_utf v0.1.5
+#32 4.687    Compiling icu_collections v2.2.0
+#32 4.707    Compiling icu_locale_core v2.2.0
+#32 4.782    Compiling ratatui v0.28.1
+#32 4.903    Compiling hyper-util v0.1.20
+#32 5.101    Compiling lkjagent-core v0.0.0 (/src/crates/lkjagent-core)
+#32 5.101    Compiling serde_urlencoded v0.7.1
+#32 5.110    Compiling icu_provider v2.2.0
+#32 5.243    Compiling icu_properties v2.2.0
+#32 5.243    Compiling icu_normalizer v2.2.0
+#32 5.663    Compiling idna_adapter v1.2.2
+#32 5.689    Compiling idna v1.1.0
+#32 5.835    Compiling url v2.5.8
+#32 6.090    Compiling tower-http v0.6.11
+#32 6.559    Compiling rustls-webpki v0.103.13
+#32 6.712    Compiling lkjagent-effects v0.0.0 (/src/crates/lkjagent-effects)
+#32 8.435    Compiling tokio-rustls v0.26.4
+#32 8.530    Compiling hyper-rustls v0.27.9
+#32 8.606    Compiling reqwest v0.12.28
+#32 9.356    Compiling lkjagent-llm v0.0.0 (/src/crates/lkjagent-llm)
+#32 28.25    Compiling rusqlite v0.40.1
+#32 28.62    Compiling lkjagent-store v0.0.0 (/src/crates/lkjagent-store)
+#32 28.90    Compiling lkjagent-app v0.0.0 (/src/crates/lkjagent-app)
+#32 53.90     Finished `release` profile [optimized] target(s) in 53.61s
+#32 DONE 54.0s
+
+#33 [verify] exporting to image
+#33 exporting layers
+#33 exporting layers 1.7s done
+#33 exporting manifest sha256:7b72c314ee32537836d2ad7f1fb35ae6a3e52c69cc87927fb15d8cc49dad4137 0.0s done
+#33 exporting config sha256:d6a9a7921dbdbedd62284ed011db0cb6392287dda07a0b027506609b0c8f325d 0.1s done
+#33 exporting attestation manifest sha256:785165546e12f9f06c8ad8a0940c92c03a1cc9573a066c2bf42fcc9bc12c0d5b 0.1s done
+#33 exporting manifest list sha256:477e65b26fc7fbb65647ba6d8b45378957fecb6df011556dcf9e484171de57a5
+#33 exporting manifest list sha256:477e65b26fc7fbb65647ba6d8b45378957fecb6df011556dcf9e484171de57a5 0.1s done
+#33 naming to docker.io/library/lkjagent_clean_295398-verify:latest 0.0s done
+#33 unpacking to docker.io/library/lkjagent_clean_295398-verify:latest
+#33 unpacking to docker.io/library/lkjagent_clean_295398-verify:latest 1.2s done
+#33 DONE 3.2s
+
+#34 [test] exporting to image
+#34 exporting layers 1.6s done
+#34 exporting manifest sha256:6f59913bc976a0399d3958d094907c04b40456b6c40c898d003ae560f74a8915 0.1s done
+#34 exporting config sha256:1aac623299e17c0e93e31755f18b9f53ce15c61665d73d7015a6d3e96b828ca7 0.1s done
+#34 exporting attestation manifest sha256:37eae27d04425cccfde932d397252e54fdbf9a777d89d0c57f7642c0d1cf45a7 0.1s done
+#34 exporting manifest list sha256:672847bc4e345ce444a243d66c51a67749638f7b99bee189c7c973b6617c098b 0.1s done
+#34 naming to docker.io/library/lkjagent_clean_295398-test:latest 0.0s done
+#34 unpacking to docker.io/library/lkjagent_clean_295398-test:latest 1.2s done
+#34 DONE 3.2s
+
+#35 [lint] exporting to image
+#35 exporting layers 1.6s done
+#35 exporting manifest sha256:9e307448288c3f20d1220bc7da1e1bfde21ccf3aa5583e465c5333c3ca20f71f 0.0s done
+#35 exporting config sha256:888b5800b351b7ed608ae26b6828ec4a3889966d3708da621c9a4d410554928e 0.1s done
+#35 exporting attestation manifest sha256:3ef3973cbcc6467997bd757e1565cf2a4c377fee1c6463bb7f1f64c8a326f1d2 0.1s done
+#35 exporting manifest list sha256:227ab822ad9be41751a54323894af30bd17d1d90f004da12a726f2756eb0fade 0.1s done
+#35 naming to docker.io/library/lkjagent_clean_295398-lint:latest 0.0s done
+#35 unpacking to docker.io/library/lkjagent_clean_295398-lint:latest 1.2s done
+#35 DONE 3.2s
+
+#36 [test] resolving provenance for metadata file
+#36 DONE 0.1s
+
+#37 [verify] resolving provenance for metadata file
+#37 DONE 0.1s
+
+#38 [lint] resolving provenance for metadata file
+#38 DONE 0.0s
+ Image lkjagent_clean_295398-verify Built 
+ Image lkjagent_clean_295398-test Built 
+ Image lkjagent_clean_295398-lint Built 
+ Network lkjagent_clean_295398_default Creating 
+ Network lkjagent_clean_295398_default Created 
+ Container lkjagent_clean_295398-verify-run-825df5e10e5b Creating 
+ Container lkjagent_clean_295398-verify-run-825df5e10e5b Created 
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded atomic-waker v1.1.2
+  Downloaded cfg_aliases v0.2.1
+  Downloaded cpufeatures v0.3.0
+  Downloaded bitflags v2.13.0
+  Downloaded allocator-api2 v0.2.21
+  Downloaded displaydoc v0.2.6
+  Downloaded base64 v0.22.1
+  Downloaded futures-io v0.3.32
+  Downloaded httparse v1.10.1
+  Downloaded futures-core v0.3.32
+  Downloaded bytes v1.12.1
+  Downloaded cfg-if v1.0.4
+  Downloaded darling_macro v0.23.0
+  Downloaded equivalent v1.0.2
+  Downloaded fallible-iterator v0.3.0
+  Downloaded fallible-streaming-iterator v0.1.9
+  Downloaded foldhash v0.1.5
+  Downloaded futures-sink v0.3.32
+  Downloaded either v1.16.0
+  Downloaded form_urlencoded v1.2.2
+  Downloaded proc-macro2 v1.0.106
+  Downloaded find-msvc-tools v0.1.9
+  Downloaded compact_str v0.8.2
+  Downloaded futures-channel v0.3.32
+  Downloaded darling v0.23.0
+  Downloaded errno v0.3.14
+  Downloaded darling_core v0.23.0
+  Downloaded foldhash v0.2.0
+  Downloaded chacha20 v0.10.1
+  Downloaded potential_utf v0.1.5
+  Downloaded indoc v2.0.7
+  Downloaded http-body-util v0.1.3
+  Downloaded ipnet v2.12.0
+  Downloaded lru-slab v0.1.2
+  Downloaded paste v1.0.15
+  Downloaded lru v0.12.5
+  Downloaded itoa v1.0.18
+  Downloaded crossterm v0.28.1
+  Downloaded zeroize v1.9.0
+  Downloaded rand_pcg v0.10.2
+  Downloaded idna_adapter v1.2.2
+  Downloaded http-body v1.0.1
+  Downloaded ident_case v1.0.1
+  Downloaded ryu v1.0.23
+  Downloaded cassowary v0.3.0
+  Downloaded hyper-rustls v0.27.9
+  Downloaded percent-encoding v2.3.2
+  Downloaded zerovec v0.11.6
+  Downloaded zerotrie v0.2.4
+  Downloaded zerovec-derive v0.11.3
+  Downloaded signal-hook-registry v1.4.8
+  Downloaded serde_core v1.0.228
+  Downloaded tinyvec_macros v0.1.1
+  Downloaded shlex v2.0.1
+  Downloaded instability v0.3.12
+  Downloaded rustc-hash v2.1.3
+  Downloaded castaway v0.2.4
+  Downloaded unicode-ident v1.0.24
+  Downloaded pkg-config v0.3.33
+  Downloaded zerofrom-derive v0.1.7
+  Downloaded utf8_iter v1.0.4
+  Downloaded yoke-derive v0.8.2
+  Downloaded strum v0.26.3
+  Downloaded unicode-truncate v1.1.0
+  Downloaded untrusted v0.9.0
+  Downloaded try-lock v0.2.5
+  Downloaded url v2.5.8
+  Downloaded signal-hook-mio v0.2.5
+  Downloaded strsim v0.11.1
+  Downloaded tower-layer v0.3.3
+  Downloaded tower-service v0.3.3
+  Downloaded stable_deref_trait v1.2.1
+  Downloaded sync_wrapper v1.0.2
+  Downloaded synstructure v0.13.2
+  Downloaded zerofrom v0.1.8
+  Downloaded static_assertions v1.1.0
+  Downloaded thiserror v2.0.18
+  Downloaded slab v0.4.12
+  Downloaded litemap v0.8.2
+  Downloaded lock_api v0.4.14
+  Downloaded rustversion v1.0.23
+  Downloaded tokio-rustls v0.26.4
+  Downloaded zmij v1.0.21
+  Downloaded smallvec v1.15.2
+  Downloaded strum_macros v0.26.4
+  Downloaded tinystr v0.8.3
+  Downloaded tinyvec v1.11.0
+  Downloaded tracing-core v0.1.36
+  Downloaded futures-task v0.3.32
+  Downloaded serde_urlencoded v0.7.1
+  Downloaded want v0.3.1
+  Downloaded socket2 v0.6.4
+  Downloaded unicode-segmentation v1.13.3
+  Downloaded syn v2.0.118
+  Downloaded scopeguard v1.2.0
+  Downloaded parking_lot_core v0.9.12
+  Downloaded pin-project-lite v0.2.17
+  Downloaded rand_core v0.10.1
+  Downloaded quinn-udp v0.5.15
+  Downloaded quote v1.0.46
+  Downloaded subtle v2.6.1
+  Downloaded getrandom v0.2.17
+  Downloaded getrandom v0.4.3
+  Downloaded thiserror-impl v2.0.18
+  Downloaded heck v0.5.0
+  Downloaded once_cell v1.21.4
+  Downloaded parking_lot v0.12.5
+  Downloaded rustls-pki-types v1.15.0
+  Downloaded writeable v0.6.3
+  Downloaded hashlink v0.12.1
+  Downloaded log v0.4.33
+  Downloaded icu_provider v2.2.0
+  Downloaded quinn v0.11.11
+  Downloaded icu_collections v2.2.0
+  Downloaded yoke v0.8.3
+  Downloaded icu_properties v2.2.0
+  Downloaded serde_derive v1.0.228
+  Downloaded icu_normalizer_data v2.2.0
+  Downloaded serde v1.0.228
+  Downloaded signal-hook v0.3.18
+  Downloaded icu_normalizer v2.2.0
+  Downloaded http v1.4.2
+  Downloaded icu_locale_core v2.2.0
+  Downloaded cc v1.2.66
+  Downloaded rustls-webpki v0.103.13
+  Downloaded memchr v2.8.3
+  Downloaded mio v1.2.1
+  Downloaded itertools v0.13.0
+  Downloaded rand v0.10.2
+  Downloaded tower v0.5.3
+  Downloaded hashbrown v0.15.5
+  Downloaded hyper v1.10.1
+  Downloaded hyper-util v0.1.20
+  Downloaded icu_properties_data v2.2.0
+  Downloaded idna v1.1.0
+  Downloaded futures-util v0.3.32
+  Downloaded reqwest v0.12.28
+  Downloaded rusqlite v0.40.1
+  Downloaded serde_json v1.0.150
+  Downloaded hashbrown v0.17.1
+  Downloaded tower-http v0.6.11
+  Downloaded webpki-roots v1.0.8
+  Downloaded vcpkg v0.2.15
+  Downloaded quinn-proto v0.11.16
+  Downloaded unicode-width v0.1.14
+  Downloaded rustix v0.38.44
+  Downloaded rustls v0.23.41
+  Downloaded tracing v0.1.44
+  Downloaded ratatui v0.28.1
+  Downloaded libc v0.2.186
+  Downloaded tokio v1.52.3
+  Downloaded ring v0.17.14
+  Downloaded linux-raw-sys v0.4.15
+  Downloaded libsqlite3-sys v0.38.1
+   Compiling proc-macro2 v1.0.106
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.46
+   Compiling libc v0.2.186
+   Compiling smallvec v1.15.2
+   Compiling shlex v2.0.1
+   Compiling stable_deref_trait v1.2.1
+   Compiling itoa v1.0.18
+   Compiling find-msvc-tools v0.1.9
+   Compiling cfg-if v1.0.4
+   Compiling log v0.4.33
+   Compiling pin-project-lite v0.2.17
+   Compiling bytes v1.12.1
+   Compiling memchr v2.8.3
+   Compiling futures-core v0.3.32
+   Compiling serde_core v1.0.228
+   Compiling writeable v0.6.3
+   Compiling litemap v0.8.2
+   Compiling icu_properties_data v2.2.0
+   Compiling icu_normalizer_data v2.2.0
+   Compiling futures-sink v0.3.32
+   Compiling utf8_iter v1.0.4
+   Compiling serde v1.0.228
+   Compiling percent-encoding v2.3.2
+   Compiling once_cell v1.21.4
+   Compiling cc v1.2.66
+   Compiling zeroize v1.9.0
+   Compiling bitflags v2.13.0
+   Compiling futures-io v0.3.32
+   Compiling futures-task v0.3.32
+   Compiling slab v0.4.12
+   Compiling untrusted v0.9.0
+   Compiling zmij v1.0.21
+   Compiling httparse v1.10.1
+   Compiling rustversion v1.0.23
+   Compiling serde_json v1.0.150
+   Compiling rustls-pki-types v1.15.0
+   Compiling rustls v0.23.41
+   Compiling tower-service v0.3.3
+   Compiling try-lock v0.2.5
+   Compiling tracing-core v0.1.36
+   Compiling form_urlencoded v1.2.2
+   Compiling futures-channel v0.3.32
+   Compiling ident_case v1.0.1
+   Compiling want v0.3.1
+   Compiling vcpkg v0.2.15
+   Compiling atomic-waker v1.1.2
+   Compiling strsim v0.11.1
+   Compiling ryu v1.0.23
+   Compiling parking_lot_core v0.9.12
+   Compiling signal-hook v0.3.18
+   Compiling subtle v2.6.1
+   Compiling pkg-config v0.3.33
+   Compiling sync_wrapper v1.0.2
+   Compiling futures-util v0.3.32
+   Compiling foldhash v0.2.0
+   Compiling scopeguard v1.2.0
+   Compiling http v1.4.2
+   Compiling tower-layer v0.3.3
+   Compiling base64 v0.22.1
+   Compiling rustix v0.38.44
+   Compiling ipnet v2.12.0
+   Compiling webpki-roots v1.0.8
+   Compiling hashbrown v0.17.1
+   Compiling lock_api v0.4.14
+   Compiling paste v1.0.15
+   Compiling tracing v0.1.44
+   Compiling heck v0.5.0
+   Compiling either v1.16.0
+   Compiling instability v0.3.12
+   Compiling allocator-api2 v0.2.21
+   Compiling linux-raw-sys v0.4.15
+   Compiling equivalent v1.0.2
+   Compiling foldhash v0.1.5
+   Compiling unicode-segmentation v1.13.3
+   Compiling static_assertions v1.1.0
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling fallible-iterator v0.3.0
+   Compiling syn v2.0.118
+   Compiling indoc v2.0.7
+   Compiling itertools v0.13.0
+   Compiling castaway v0.2.4
+   Compiling unicode-width v0.1.14
+   Compiling cassowary v0.3.0
+   Compiling compact_str v0.8.2
+   Compiling hashbrown v0.15.5
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.38.1
+   Compiling hashlink v0.12.1
+   Compiling http-body v1.0.1
+   Compiling mio v1.2.1
+   Compiling socket2 v0.6.4
+   Compiling getrandom v0.2.17
+   Compiling errno v0.3.14
+   Compiling http-body-util v0.1.3
+   Compiling signal-hook-registry v1.4.8
+   Compiling parking_lot v0.12.5
+   Compiling tokio v1.52.3
+   Compiling lru v0.12.5
+   Compiling signal-hook-mio v0.2.5
+   Compiling crossterm v0.28.1
+   Compiling unicode-truncate v1.1.0
+   Compiling synstructure v0.13.2
+   Compiling darling_core v0.23.0
+   Compiling rustls-webpki v0.103.13
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling zerovec-derive v0.11.3
+   Compiling displaydoc v0.2.6
+   Compiling serde_derive v1.0.228
+   Compiling strum_macros v0.26.4
+   Compiling hyper v1.10.1
+   Compiling tower v0.5.3
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.3
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling strum v0.26.3
+   Compiling hyper-util v0.1.20
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling icu_collections v2.2.0
+   Compiling darling_macro v0.23.0
+   Compiling icu_locale_core v2.2.0
+   Compiling darling v0.23.0
+   Compiling ratatui v0.28.1
+   Compiling icu_provider v2.2.0
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling lkjagent-core v0.0.0 (/src/crates/lkjagent-core)
+   Compiling serde_urlencoded v0.7.1
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling tokio-rustls v0.26.4
+   Compiling hyper-rustls v0.27.9
+   Compiling tower-http v0.6.11
+   Compiling reqwest v0.12.28
+   Compiling rusqlite v0.40.1
+   Compiling lkjagent-llm v0.0.0 (/src/crates/lkjagent-llm)
+   Compiling lkjagent-effects v0.0.0 (/src/crates/lkjagent-effects)
+   Compiling lkjagent-store v0.0.0 (/src/crates/lkjagent-store)
+   Compiling lkjagent-app v0.0.0 (/src/crates/lkjagent-app)
+   Compiling lkjagent-xtask v0.0.0 (/src/crates/lkjagent-xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.26s
+     Running `target/debug/lkjagent-xtask quiet verify`
+ok verify
+ Container lkjagent_clean_295398-test-run-13f0ac8cacd8 Creating 
+ Container lkjagent_clean_295398-test-run-13f0ac8cacd8 Created 
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded allocator-api2 v0.2.21
+  Downloaded atomic-waker v1.1.2
+  Downloaded bitflags v2.13.0
+  Downloaded bytes v1.12.1
+  Downloaded base64 v0.22.1
+  Downloaded displaydoc v0.2.6
+  Downloaded fallible-streaming-iterator v0.1.9
+  Downloaded cfg_aliases v0.2.1
+  Downloaded serde_core v1.0.228
+  Downloaded serde_derive v1.0.228
+  Downloaded serde_urlencoded v0.7.1
+  Downloaded form_urlencoded v1.2.2
+  Downloaded futures-core v0.3.32
+  Downloaded shlex v2.0.1
+  Downloaded try-lock v0.2.5
+  Downloaded errno v0.3.14
+  Downloaded fallible-iterator v0.3.0
+  Downloaded compact_str v0.8.2
+  Downloaded find-msvc-tools v0.1.9
+  Downloaded futures-channel v0.3.32
+  Downloaded want v0.3.1
+  Downloaded signal-hook v0.3.18
+  Downloaded serde_json v1.0.150
+  Downloaded stable_deref_trait v1.2.1
+  Downloaded zerofrom v0.1.8
+  Downloaded subtle v2.6.1
+  Downloaded foldhash v0.2.0
+  Downloaded darling_macro v0.23.0
+  Downloaded cc v1.2.66
+  Downloaded cpufeatures v0.3.0
+  Downloaded futures-sink v0.3.32
+  Downloaded equivalent v1.0.2
+  Downloaded darling_core v0.23.0
+  Downloaded syn v2.0.118
+  Downloaded socket2 v0.6.4
+  Downloaded tinystr v0.8.3
+  Downloaded tower-service v0.3.3
+  Downloaded unicode-truncate v1.1.0
+  Downloaded thiserror v2.0.18
+  Downloaded futures-task v0.3.32
+  Downloaded darling v0.23.0
+  Downloaded either v1.16.0
+  Downloaded thiserror-impl v2.0.18
+  Downloaded pin-project-lite v0.2.17
+  Downloaded proc-macro2 v1.0.106
+  Downloaded mio v1.2.1
+  Downloaded ryu v1.0.23
+  Downloaded crossterm v0.28.1
+  Downloaded futures-io v0.3.32
+  Downloaded foldhash v0.1.5
+  Downloaded chacha20 v0.10.1
+  Downloaded rand_core v0.10.1
+  Downloaded unicode-width v0.1.14
+  Downloaded untrusted v0.9.0
+  Downloaded static_assertions v1.1.0
+  Downloaded utf8_iter v1.0.4
+  Downloaded cfg-if v1.0.4
+  Downloaded pkg-config v0.3.33
+  Downloaded zerotrie v0.2.4
+  Downloaded tokio-rustls v0.26.4
+  Downloaded sync_wrapper v1.0.2
+  Downloaded unicode-segmentation v1.13.3
+  Downloaded zerofrom-derive v0.1.7
+  Downloaded instability v0.3.12
+  Downloaded url v2.5.8
+  Downloaded http-body v1.0.1
+  Downloaded signal-hook-mio v0.2.5
+  Downloaded tinyvec_macros v0.1.1
+  Downloaded strum v0.26.3
+  Downloaded once_cell v1.21.4
+  Downloaded strum_macros v0.26.4
+  Downloaded scopeguard v1.2.0
+  Downloaded rand_pcg v0.10.2
+  Downloaded percent-encoding v2.3.2
+  Downloaded rustls v0.23.41
+  Downloaded ipnet v2.12.0
+  Downloaded paste v1.0.15
+  Downloaded tower v0.5.3
+  Downloaded potential_utf v0.1.5
+  Downloaded idna_adapter v1.2.2
+  Downloaded synstructure v0.13.2
+  Downloaded cassowary v0.3.0
+  Downloaded tower-layer v0.3.3
+  Downloaded slab v0.4.12
+  Downloaded tinyvec v1.11.0
+  Downloaded yoke v0.8.3
+  Downloaded yoke-derive v0.8.2
+  Downloaded zerovec-derive v0.11.3
+  Downloaded zmij v1.0.21
+  Downloaded signal-hook-registry v1.4.8
+  Downloaded strsim v0.11.1
+  Downloaded unicode-ident v1.0.24
+  Downloaded writeable v0.6.3
+  Downloaded zeroize v1.9.0
+  Downloaded smallvec v1.15.2
+  Downloaded http v1.4.2
+  Downloaded ident_case v1.0.1
+  Downloaded quinn v0.11.11
+  Downloaded rand v0.10.2
+  Downloaded castaway v0.2.4
+  Downloaded reqwest v0.12.28
+  Downloaded rustc-hash v2.1.3
+  Downloaded httparse v1.10.1
+  Downloaded zerovec v0.11.6
+  Downloaded tracing-core v0.1.36
+  Downloaded webpki-roots v1.0.8
+  Downloaded indoc v2.0.7
+  Downloaded tower-http v0.6.11
+  Downloaded quinn-udp v0.5.15
+  Downloaded rustversion v1.0.23
+  Downloaded vcpkg v0.2.15
+  Downloaded tracing v0.1.44
+  Downloaded itoa v1.0.18
+  Downloaded futures-util v0.3.32
+  Downloaded lru v0.12.5
+  Downloaded heck v0.5.0
+  Downloaded rustls-pki-types v1.15.0
+  Downloaded hyper-rustls v0.27.9
+  Downloaded lru-slab v0.1.2
+  Downloaded quote v1.0.46
+  Downloaded tokio v1.52.3
+  Downloaded lock_api v0.4.14
+  Downloaded getrandom v0.2.17
+  Downloaded http-body-util v0.1.3
+  Downloaded parking_lot v0.12.5
+  Downloaded litemap v0.8.2
+  Downloaded parking_lot_core v0.9.12
+  Downloaded icu_normalizer v2.2.0
+  Downloaded memchr v2.8.3
+  Downloaded hashlink v0.12.1
+  Downloaded icu_provider v2.2.0
+  Downloaded icu_properties v2.2.0
+  Downloaded icu_normalizer_data v2.2.0
+  Downloaded getrandom v0.4.3
+  Downloaded icu_locale_core v2.2.0
+  Downloaded log v0.4.33
+  Downloaded rustls-webpki v0.103.13
+  Downloaded icu_collections v2.2.0
+  Downloaded serde v1.0.228
+  Downloaded hashbrown v0.15.5
+  Downloaded itertools v0.13.0
+  Downloaded hyper-util v0.1.20
+  Downloaded hashbrown v0.17.1
+  Downloaded idna v1.1.0
+  Downloaded icu_properties_data v2.2.0
+  Downloaded hyper v1.10.1
+  Downloaded rusqlite v0.40.1
+  Downloaded quinn-proto v0.11.16
+  Downloaded rustix v0.38.44
+  Downloaded ratatui v0.28.1
+  Downloaded libc v0.2.186
+  Downloaded ring v0.17.14
+  Downloaded linux-raw-sys v0.4.15
+  Downloaded libsqlite3-sys v0.38.1
+   Compiling proc-macro2 v1.0.106
+   Compiling unicode-ident v1.0.24
+   Compiling quote v1.0.46
+   Compiling libc v0.2.186
+   Compiling find-msvc-tools v0.1.9
+   Compiling smallvec v1.15.2
+   Compiling stable_deref_trait v1.2.1
+   Compiling shlex v2.0.1
+   Compiling itoa v1.0.18
+   Compiling cfg-if v1.0.4
+   Compiling log v0.4.33
+   Compiling bytes v1.12.1
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-core v0.3.32
+   Compiling memchr v2.8.3
+   Compiling serde_core v1.0.228
+   Compiling writeable v0.6.3
+   Compiling litemap v0.8.2
+   Compiling icu_normalizer_data v2.2.0
+   Compiling icu_properties_data v2.2.0
+   Compiling utf8_iter v1.0.4
+   Compiling futures-sink v0.3.32
+   Compiling once_cell v1.21.4
+   Compiling percent-encoding v2.3.2
+   Compiling zeroize v1.9.0
+   Compiling bitflags v2.13.0
+   Compiling serde v1.0.228
+   Compiling zmij v1.0.21
+   Compiling rustversion v1.0.23
+   Compiling futures-task v0.3.32
+   Compiling slab v0.4.12
+   Compiling rustls-pki-types v1.15.0
+   Compiling httparse v1.10.1
+   Compiling cc v1.2.66
+   Compiling untrusted v0.9.0
+   Compiling futures-io v0.3.32
+   Compiling serde_json v1.0.150
+   Compiling tower-service v0.3.3
+   Compiling try-lock v0.2.5
+   Compiling rustls v0.23.41
+   Compiling tracing-core v0.1.36
+   Compiling form_urlencoded v1.2.2
+   Compiling want v0.3.1
+   Compiling futures-channel v0.3.32
+   Compiling ryu v1.0.23
+   Compiling strsim v0.11.1
+   Compiling vcpkg v0.2.15
+   Compiling parking_lot_core v0.9.12
+   Compiling signal-hook v0.3.18
+   Compiling atomic-waker v1.1.2
+   Compiling http v1.4.2
+   Compiling subtle v2.6.1
+   Compiling pkg-config v0.3.33
+   Compiling ident_case v1.0.1
+   Compiling sync_wrapper v1.0.2
+   Compiling futures-util v0.3.32
+   Compiling tower-layer v0.3.3
+   Compiling ipnet v2.12.0
+   Compiling rustix v0.38.44
+   Compiling foldhash v0.2.0
+   Compiling scopeguard v1.2.0
+   Compiling tracing v0.1.44
+   Compiling base64 v0.22.1
+   Compiling lock_api v0.4.14
+   Compiling hashbrown v0.17.1
+   Compiling webpki-roots v1.0.8
+   Compiling either v1.16.0
+   Compiling heck v0.5.0
+   Compiling paste v1.0.15
+   Compiling linux-raw-sys v0.4.15
+   Compiling equivalent v1.0.2
+   Compiling instability v0.3.12
+   Compiling syn v2.0.118
+   Compiling allocator-api2 v0.2.21
+   Compiling foldhash v0.1.5
+   Compiling castaway v0.2.4
+   Compiling fallible-iterator v0.3.0
+   Compiling unicode-width v0.1.14
+   Compiling itertools v0.13.0
+   Compiling static_assertions v1.1.0
+   Compiling indoc v2.0.7
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling unicode-segmentation v1.13.3
+   Compiling compact_str v0.8.2
+   Compiling cassowary v0.3.0
+   Compiling http-body v1.0.1
+   Compiling mio v1.2.1
+   Compiling socket2 v0.6.4
+   Compiling getrandom v0.2.17
+   Compiling errno v0.3.14
+   Compiling http-body-util v0.1.3
+   Compiling hashbrown v0.15.5
+   Compiling signal-hook-registry v1.4.8
+   Compiling hashlink v0.12.1
+   Compiling parking_lot v0.12.5
+   Compiling tokio v1.52.3
+   Compiling signal-hook-mio v0.2.5
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.38.1
+   Compiling crossterm v0.28.1
+   Compiling lru v0.12.5
+   Compiling unicode-truncate v1.1.0
+   Compiling synstructure v0.13.2
+   Compiling darling_core v0.23.0
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling zerovec-derive v0.11.3
+   Compiling displaydoc v0.2.6
+   Compiling serde_derive v1.0.228
+   Compiling strum_macros v0.26.4
+   Compiling zerofrom v0.1.8
+   Compiling rustls-webpki v0.103.13
+   Compiling yoke v0.8.3
+   Compiling hyper v1.10.1
+   Compiling tower v0.5.3
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling strum v0.26.3
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling icu_collections v2.2.0
+   Compiling icu_locale_core v2.2.0
+   Compiling darling_macro v0.23.0
+   Compiling darling v0.23.0
+   Compiling hyper-util v0.1.20
+   Compiling ratatui v0.28.1
+   Compiling icu_provider v2.2.0
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling lkjagent-core v0.0.0 (/src/crates/lkjagent-core)
+   Compiling serde_urlencoded v0.7.1
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling tower-http v0.6.11
+   Compiling tokio-rustls v0.26.4
+   Compiling hyper-rustls v0.27.9
+   Compiling reqwest v0.12.28
+   Compiling rusqlite v0.40.1
+   Compiling lkjagent-effects v0.0.0 (/src/crates/lkjagent-effects)
+   Compiling lkjagent-llm v0.0.0 (/src/crates/lkjagent-llm)
+   Compiling lkjagent-store v0.0.0 (/src/crates/lkjagent-store)
+   Compiling lkjagent-app v0.0.0 (/src/crates/lkjagent-app)
+   Compiling lkjagent-xtask v0.0.0 (/src/crates/lkjagent-xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 8.91s
+     Running `target/debug/lkjagent-xtask quiet test`
+ok test
+ Container lkjagent_clean_295398-lint-run-497e28acd1e1 Creating 
+ Container lkjagent_clean_295398-lint-run-497e28acd1e1 Created 
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded atomic-waker v1.1.2
+  Downloaded errno v0.3.14
+  Downloaded bitflags v2.13.0
+  Downloaded either v1.16.0
+  Downloaded hyper-rustls v0.27.9
+  Downloaded allocator-api2 v0.2.21
+  Downloaded bytes v1.12.1
+  Downloaded darling_macro v0.23.0
+  Downloaded fallible-iterator v0.3.0
+  Downloaded base64 v0.22.1
+  Downloaded find-msvc-tools v0.1.9
+  Downloaded fallible-streaming-iterator v0.1.9
+  Downloaded cfg_aliases v0.2.1
+  Downloaded darling_core v0.23.0
+  Downloaded equivalent v1.0.2
+  Downloaded futures-io v0.3.32
+  Downloaded futures-sink v0.3.32
+  Downloaded cfg-if v1.0.4
+  Downloaded cassowary v0.3.0
+  Downloaded compact_str v0.8.2
+  Downloaded foldhash v0.1.5
+  Downloaded foldhash v0.2.0
+  Downloaded instability v0.3.12
+  Downloaded form_urlencoded v1.2.2
+  Downloaded futures-channel v0.3.32
+  Downloaded shlex v2.0.1
+  Downloaded chacha20 v0.10.1
+  Downloaded futures-core v0.3.32
+  Downloaded parking_lot v0.12.5
+  Downloaded itoa v1.0.18
+  Downloaded hyper-util v0.1.20
+  Downloaded futures-task v0.3.32
+  Downloaded serde_urlencoded v0.7.1
+  Downloaded lru-slab v0.1.2
+  Downloaded once_cell v1.21.4
+  Downloaded serde_derive v1.0.228
+  Downloaded serde_core v1.0.228
+  Downloaded getrandom v0.2.17
+  Downloaded idna v1.1.0
+  Downloaded potential_utf v0.1.5
+  Downloaded httparse v1.10.1
+  Downloaded lru v0.12.5
+  Downloaded scopeguard v1.2.0
+  Downloaded icu_collections v2.2.0
+  Downloaded serde_json v1.0.150
+  Downloaded tower-http v0.6.11
+  Downloaded writeable v0.6.3
+  Downloaded rustc-hash v2.1.3
+  Downloaded static_assertions v1.1.0
+  Downloaded sync_wrapper v1.0.2
+  Downloaded tinystr v0.8.3
+  Downloaded parking_lot_core v0.9.12
+  Downloaded subtle v2.6.1
+  Downloaded synstructure v0.13.2
+  Downloaded utf8_iter v1.0.4
+  Downloaded icu_normalizer_data v2.2.0
+  Downloaded ident_case v1.0.1
+  Downloaded idna_adapter v1.2.2
+  Downloaded percent-encoding v2.3.2
+  Downloaded hashlink v0.12.1
+  Downloaded tinyvec_macros v0.1.1
+  Downloaded untrusted v0.9.0
+  Downloaded zerovec-derive v0.11.3
+  Downloaded reqwest v0.12.28
+  Downloaded cpufeatures v0.3.0
+  Downloaded displaydoc v0.2.6
+  Downloaded http v1.4.2
+  Downloaded socket2 v0.6.4
+  Downloaded tower v0.5.3
+  Downloaded tokio-rustls v0.26.4
+  Downloaded try-lock v0.2.5
+  Downloaded want v0.3.1
+  Downloaded strsim v0.11.1
+  Downloaded yoke-derive v0.8.2
+  Downloaded zmij v1.0.21
+  Downloaded rusqlite v0.40.1
+  Downloaded stable_deref_trait v1.2.1
+  Downloaded tower-service v0.3.3
+  Downloaded signal-hook-mio v0.2.5
+  Downloaded zerofrom v0.1.8
+  Downloaded zerofrom-derive v0.1.7
+  Downloaded strum v0.26.3
+  Downloaded tower-layer v0.3.3
+  Downloaded pin-project-lite v0.2.17
+  Downloaded unicode-truncate v1.1.0
+  Downloaded http-body-util v0.1.3
+  Downloaded icu_provider v2.2.0
+  Downloaded rand v0.10.2
+  Downloaded thiserror-impl v2.0.18
+  Downloaded thiserror v2.0.18
+  Downloaded smallvec v1.15.2
+  Downloaded itertools v0.13.0
+  Downloaded mio v1.2.1
+  Downloaded pkg-config v0.3.33
+  Downloaded slab v0.4.12
+  Downloaded strum_macros v0.26.4
+  Downloaded darling v0.23.0
+  Downloaded zeroize v1.9.0
+  Downloaded signal-hook-registry v1.4.8
+  Downloaded rand_pcg v0.10.2
+  Downloaded rand_core v0.10.1
+  Downloaded indoc v2.0.7
+  Downloaded icu_locale_core v2.2.0
+  Downloaded yoke v0.8.3
+  Downloaded getrandom v0.4.3
+  Downloaded signal-hook v0.3.18
+  Downloaded tinyvec v1.11.0
+  Downloaded unicode-ident v1.0.24
+  Downloaded ipnet v2.12.0
+  Downloaded castaway v0.2.4
+  Downloaded tracing-core v0.1.36
+  Downloaded url v2.5.8
+  Downloaded log v0.4.33
+  Downloaded ryu v1.0.23
+  Downloaded zerotrie v0.2.4
+  Downloaded unicode-segmentation v1.13.3
+  Downloaded zerovec v0.11.6
+  Downloaded vcpkg v0.2.15
+  Downloaded webpki-roots v1.0.8
+  Downloaded hashbrown v0.15.5
+  Downloaded icu_properties_data v2.2.0
+  Downloaded litemap v0.8.2
+  Downloaded quinn-proto v0.11.16
+  Downloaded rustversion v1.0.23
+  Downloaded unicode-width v0.1.14
+  Downloaded syn v2.0.118
+  Downloaded http-body v1.0.1
+  Downloaded lock_api v0.4.14
+  Downloaded quinn-udp v0.5.15
+  Downloaded heck v0.5.0
+  Downloaded quote v1.0.46
+  Downloaded rustls-pki-types v1.15.0
+  Downloaded tracing v0.1.44
+  Downloaded tokio v1.52.3
+  Downloaded paste v1.0.15
+  Downloaded icu_properties v2.2.0
+  Downloaded proc-macro2 v1.0.106
+  Downloaded icu_normalizer v2.2.0
+  Downloaded cc v1.2.66
+  Downloaded rustls v0.23.41
+  Downloaded rustls-webpki v0.103.13
+  Downloaded serde v1.0.228
+  Downloaded quinn v0.11.11
+  Downloaded memchr v2.8.3
+  Downloaded crossterm v0.28.1
+  Downloaded rustix v0.38.44
+  Downloaded hyper v1.10.1
+  Downloaded hashbrown v0.17.1
+  Downloaded futures-util v0.3.32
+  Downloaded ratatui v0.28.1
+  Downloaded libc v0.2.186
+  Downloaded ring v0.17.14
+  Downloaded linux-raw-sys v0.4.15
+  Downloaded libsqlite3-sys v0.38.1
+   Compiling proc-macro2 v1.0.106
+   Compiling quote v1.0.46
+   Compiling unicode-ident v1.0.24
+   Compiling libc v0.2.186
+   Compiling shlex v2.0.1
+   Compiling stable_deref_trait v1.2.1
+   Compiling itoa v1.0.18
+   Compiling find-msvc-tools v0.1.9
+   Compiling smallvec v1.15.2
+   Compiling cfg-if v1.0.4
+   Compiling log v0.4.33
+   Compiling bytes v1.12.1
+   Compiling pin-project-lite v0.2.17
+   Compiling memchr v2.8.3
+   Compiling futures-core v0.3.32
+   Compiling serde_core v1.0.228
+   Compiling litemap v0.8.2
+   Compiling writeable v0.6.3
+   Compiling icu_properties_data v2.2.0
+   Compiling icu_normalizer_data v2.2.0
+   Compiling futures-sink v0.3.32
+   Compiling utf8_iter v1.0.4
+   Compiling bitflags v2.13.0
+   Compiling zeroize v1.9.0
+   Compiling percent-encoding v2.3.2
+   Compiling once_cell v1.21.4
+   Compiling cc v1.2.66
+   Compiling serde v1.0.228
+   Compiling zmij v1.0.21
+   Compiling slab v0.4.12
+   Compiling rustls-pki-types v1.15.0
+   Compiling rustversion v1.0.23
+   Compiling untrusted v0.9.0
+   Compiling futures-io v0.3.32
+   Compiling httparse v1.10.1
+   Compiling futures-task v0.3.32
+   Compiling tower-service v0.3.3
+   Compiling rustls v0.23.41
+   Compiling try-lock v0.2.5
+   Compiling serde_json v1.0.150
+   Compiling tracing-core v0.1.36
+   Compiling form_urlencoded v1.2.2
+   Compiling futures-channel v0.3.32
+   Compiling want v0.3.1
+   Compiling ryu v1.0.23
+   Compiling vcpkg v0.2.15
+   Compiling ident_case v1.0.1
+   Compiling parking_lot_core v0.9.12
+   Compiling atomic-waker v1.1.2
+   Compiling subtle v2.6.1
+   Compiling futures-util v0.3.32
+   Compiling pkg-config v0.3.33
+   Compiling strsim v0.11.1
+   Compiling signal-hook v0.3.18
+   Compiling sync_wrapper v1.0.2
+   Compiling rustix v0.38.44
+   Compiling scopeguard v1.2.0
+   Compiling http v1.4.2
+   Compiling foldhash v0.2.0
+   Compiling base64 v0.22.1
+   Compiling tower-layer v0.3.3
+   Compiling ipnet v2.12.0
+   Compiling tracing v0.1.44
+   Compiling hashbrown v0.17.1
+   Compiling lock_api v0.4.14
+   Compiling webpki-roots v1.0.8
+   Compiling allocator-api2 v0.2.21
+   Compiling either v1.16.0
+   Compiling heck v0.5.0
+   Compiling equivalent v1.0.2
+   Compiling syn v2.0.118
+   Compiling instability v0.3.12
+   Compiling foldhash v0.1.5
+   Compiling linux-raw-sys v0.4.15
+   Compiling paste v1.0.15
+   Compiling castaway v0.2.4
+   Compiling unicode-segmentation v1.13.3
+   Compiling static_assertions v1.1.0
+   Compiling unicode-width v0.1.14
+   Compiling itertools v0.13.0
+   Compiling indoc v2.0.7
+   Compiling fallible-iterator v0.3.0
+   Compiling fallible-streaming-iterator v0.1.9
+   Compiling compact_str v0.8.2
+   Compiling mio v1.2.1
+   Compiling socket2 v0.6.4
+   Compiling getrandom v0.2.17
+   Compiling errno v0.3.14
+   Compiling hashbrown v0.15.5
+   Compiling signal-hook-registry v1.4.8
+   Compiling cassowary v0.3.0
+   Compiling parking_lot v0.12.5
+   Compiling http-body v1.0.1
+   Compiling hashlink v0.12.1
+   Compiling http-body-util v0.1.3
+   Compiling tokio v1.52.3
+   Compiling ring v0.17.14
+   Compiling libsqlite3-sys v0.38.1
+   Compiling signal-hook-mio v0.2.5
+   Compiling lru v0.12.5
+   Compiling crossterm v0.28.1
+   Compiling unicode-truncate v1.1.0
+   Compiling synstructure v0.13.2
+   Compiling darling_core v0.23.0
+   Compiling zerofrom-derive v0.1.7
+   Compiling yoke-derive v0.8.2
+   Compiling zerovec-derive v0.11.3
+   Compiling displaydoc v0.2.6
+   Compiling serde_derive v1.0.228
+   Compiling strum_macros v0.26.4
+   Compiling rustls-webpki v0.103.13
+   Compiling hyper v1.10.1
+   Compiling tower v0.5.3
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.3
+   Compiling zerovec v0.11.6
+   Compiling zerotrie v0.2.4
+   Compiling strum v0.26.3
+   Compiling tinystr v0.8.3
+   Compiling potential_utf v0.1.5
+   Compiling hyper-util v0.1.20
+   Compiling darling_macro v0.23.0
+   Compiling icu_collections v2.2.0
+   Compiling icu_locale_core v2.2.0
+   Compiling darling v0.23.0
+   Compiling ratatui v0.28.1
+   Compiling icu_provider v2.2.0
+   Compiling icu_properties v2.2.0
+   Compiling icu_normalizer v2.2.0
+   Compiling serde_urlencoded v0.7.1
+   Compiling lkjagent-core v0.0.0 (/src/crates/lkjagent-core)
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling tokio-rustls v0.26.4
+   Compiling tower-http v0.6.11
+   Compiling hyper-rustls v0.27.9
+   Compiling reqwest v0.12.28
+   Compiling lkjagent-llm v0.0.0 (/src/crates/lkjagent-llm)
+   Compiling rusqlite v0.40.1
+   Compiling lkjagent-effects v0.0.0 (/src/crates/lkjagent-effects)
+   Compiling lkjagent-store v0.0.0 (/src/crates/lkjagent-store)
+   Compiling lkjagent-app v0.0.0 (/src/crates/lkjagent-app)
+   Compiling lkjagent-xtask v0.0.0 (/src/crates/lkjagent-xtask)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 9.13s
+     Running `target/debug/lkjagent-xtask check-docs`
+ok check-docs
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.06s
+     Running `target/debug/lkjagent-xtask check-lines`
+ok check-lines
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running `target/debug/lkjagent-xtask check-style`
+ok check-style
+PASS clean checkout 383a1f4d48fa5f4d100cc4bf4a72a9683a7a2721

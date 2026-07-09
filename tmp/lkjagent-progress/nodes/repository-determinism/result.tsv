@@ -1,0 +1,11 @@
+node_id	repository-determinism
+status	passed
+source_commit	383a1f4d48fa5f4d100cc4bf4a72a9683a7a2721
+completed_sequence	3
+gate_command	docker compose --profile shell run --rm shell cargo run --locked -p lkjagent-xtask -- gate repository-determinism
+gate_exit_code	0
+dependency_receipt_hashes	sha256:47d8ee63925416236f20224d30297793949c62635875a29ac7e76846cb616e78
+evidence_refs	nodes/repository-determinism/raw/31-integrated-validation.log,nodes/repository-determinism/raw/32-exact-docker-gate.log,nodes/repository-determinism/raw/33-clean-checkout.log,nodes/repository-determinism/raw/34-source-binding.tsv
+evidence_hashes	sha256:0fb08df0820539ff31ff7ddd0e24258f0f6c8f4c28f43d781a0d14eb2d609b64,sha256:45fe729b3a73c60a9939188578926987a52bc56b8e28f6a7b69a04336812091d,sha256:48607303d79df3d0ae608a7730321d3562a6e6f929d6edb568b93c8c9e6a59eb,sha256:ee04896c0e7b2d633d5b4ded7d1c7ff4c236f3720b643399587bb7fe8412facb
+verifier_ref	nodes/repository-determinism/verifier.md
+verifier_hash	sha256:0addc197b0db953a23920e4635e559e6cdd08790057b10327290161311955a78
