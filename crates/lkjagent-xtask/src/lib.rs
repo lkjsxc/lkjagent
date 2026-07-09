@@ -24,7 +24,6 @@ pub mod proof_state;
 pub mod proof_tokens;
 pub mod runner;
 pub mod smoke;
-mod smoke_config;
 pub mod structure;
 pub mod style;
 

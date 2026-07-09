@@ -14,6 +14,21 @@ pub fn missing_endpoint(data_dir: &Path) -> Vec<String> {
     .collect()
 }
 
+pub fn smoke_configured(root: &Path) -> bool {
+    let config = read_json(&root.join("data/lkjagent.json"));
+    (env_present("LKJAGENT_ENDPOINT_URL") && env_present("LKJAGENT_MODEL"))
+        || (config_present(&config, "endpoint_url") && config_present(&config, "endpoint_model"))
+}
+
+pub fn smoke_missing_configured_key(root: &Path) -> bool {
+    let config = read_json(&root.join("data/lkjagent.json"));
+    config
+        .as_ref()
+        .and_then(|value| value.get("endpoint_api_key_env"))
+        .and_then(Value::as_str)
+        .is_some_and(|name| !env_present(name))
+}
+
 pub fn force_missing() -> Vec<String> {
     vec![
         "LKJAGENT_ENDPOINT_URL or endpoint_url".to_string(),
@@ -51,8 +66,9 @@ fn config_present(config: &Option<Value>, flat: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::config_present;
+    use super::{config_present, smoke_missing_configured_key};
     use serde_json::json;
+    use std::fs;
 
     #[test]
     fn endpoint_detection_uses_flat_config_only() {
@@ -71,5 +87,20 @@ mod tests {
         assert!(!config_present(&nested, "endpoint_model"));
         assert!(config_present(&flat, "endpoint_url"));
         assert!(config_present(&flat, "endpoint_model"));
+    }
+
+    #[test]
+    fn smoke_key_detection_uses_flat_api_key_env() {
+        let root =
+            std::env::temp_dir().join(format!("lkjagent-smoke-flat-key-{}", std::process::id()));
+        let _ = fs::remove_dir_all(&root);
+        fs::create_dir_all(root.join("data")).expect("data dir");
+        fs::write(
+            root.join("data/lkjagent.json"),
+            r#"{"endpoint_api_key_env":"LKJAGENT_TEST_ABSENT"}"#,
+        )
+        .expect("config");
+
+        assert!(smoke_missing_configured_key(&root));
     }
 }

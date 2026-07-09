@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::runtime_fingerprint::{stable_fingerprint, FingerprintError};
-use crate::runtime_harness_state::{derive_harness_state, RuntimeHarnessState};
+pub use crate::runtime_operation::{derive_harness_state, RuntimeHarnessState};
 pub use crate::runtime_tool_view::{
     ToolExampleParam, ToolFieldSpec, ToolSetView, ToolValueClass, ToolViewEntry,
 };
@@ -17,6 +17,76 @@ pub enum OutputEnvelope {
     Message,
     Verdict,
     None,
+}
+
+impl RuntimeHarnessState {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Intake => "intake",
+            Self::Clarify => "clarify",
+            Self::Plan => "plan",
+            Self::Act => "act",
+            Self::Observe => "observe",
+            Self::Recover => "recover",
+            Self::Record => "record",
+            Self::Maintain => "maintain",
+            Self::Idle => "idle",
+        }
+    }
+
+    pub fn purpose(self) -> &'static str {
+        match self {
+            Self::Intake => "classify owner turn and write transcript or inbox evidence",
+            Self::Clarify => "ask or answer one bounded missing-information question",
+            Self::Plan => "produce a bounded plan or content shape before effects",
+            Self::Act => "execute selected model action, content write, or native effect",
+            Self::Observe => "run checks and evaluate completion evidence",
+            Self::Recover => "repair parse, admission, endpoint, effect, or check failure",
+            Self::Record => "write owner-readable personal or work records",
+            Self::Maintain => "rebuild indexes, rebalance paths, or collect proof",
+            Self::Idle => "wait only when no executable unresolved work exists",
+        }
+    }
+
+    pub fn prompt_fragment(self) -> String {
+        format!(
+            "Harness state: {}\nState purpose: {}\nContext policy: {}\nWorkspace policy: {}\nFailure policy: {}",
+            self.as_str(),
+            self.purpose(),
+            self.context_policy(),
+            self.workspace_policy(),
+            self.failure_policy()
+        )
+    }
+
+    fn context_policy(self) -> &'static str {
+        match self {
+            Self::Intake | Self::Record => "recent owner turn plus workspace maps",
+            Self::Plan | Self::Act => "canonical docs plus selected workspace evidence",
+            Self::Observe => "checks, artifacts, fingerprints, and proof refs",
+            Self::Recover => "bounded fault diagnosis without raw failed output",
+            Self::Clarify => "missing fact and prior question only",
+            Self::Maintain => "workspace indexes, manifests, aliases, and proof refs",
+            Self::Idle => "no model context unless new work arrives",
+        }
+    }
+
+    fn workspace_policy(self) -> &'static str {
+        match self {
+            Self::Intake => "write transcript or inbox trace",
+            Self::Record => "write record, history, fingerprint, README, and index evidence",
+            Self::Act | Self::Maintain => "path-checked workspace effects only",
+            _ => "read bounded selected workspace refs only",
+        }
+    }
+
+    fn failure_policy(self) -> &'static str {
+        match self {
+            Self::Recover => "narrow tools and retry the smallest valid envelope",
+            Self::Idle => "stay idle only with blocker, closure, or no-work evidence",
+            _ => "write recovery.failure before any happy response",
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

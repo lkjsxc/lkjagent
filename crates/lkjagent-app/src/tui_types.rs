@@ -130,6 +130,26 @@ impl TuiModel {
     }
 }
 
+pub fn visible_text(text: &str, height: usize, follow: bool, scroll: usize) -> String {
+    let lines = text.lines().collect::<Vec<_>>();
+    let start = window_start(lines.len(), height, follow, scroll);
+    lines
+        .into_iter()
+        .skip(start)
+        .take(height)
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+pub fn window_start(line_count: usize, height: usize, follow: bool, scroll: usize) -> usize {
+    let max_top = line_count.saturating_sub(height);
+    if follow {
+        max_top
+    } else {
+        scroll.min(max_top)
+    }
+}
+
 pub fn source_label(source: TranscriptSource) -> &'static str {
     match source {
         TranscriptSource::Owner => "owner",

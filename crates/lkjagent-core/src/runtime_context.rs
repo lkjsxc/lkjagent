@@ -2,9 +2,9 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
 
-pub use crate::runtime_context_pipeline::{default_context_pipeline, ContextPipelineStage};
 pub use crate::runtime_context_plan::{
-    select_context_plan, ContextFramePlan, ContextLanePlan, ContextPlanEntry,
+    default_context_pipeline, select_context_plan, ContextFramePlan, ContextLanePlan,
+    ContextPipelineStage, ContextPlanEntry,
 };
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

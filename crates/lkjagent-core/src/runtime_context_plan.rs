@@ -5,8 +5,14 @@ use serde::{Deserialize, Serialize};
 use crate::runtime_context::{
     ContaminationClass, ContextConflict, ContextItem, StalenessClass, TrustClass,
 };
-use crate::runtime_context_pipeline::{default_context_pipeline, ContextPipelineStage};
 use crate::runtime_fingerprint::stable_fingerprint;
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ContextPipelineStage {
+    pub name: String,
+    pub status: String,
+    pub evidence: String,
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ContextPlanEntry {
@@ -34,6 +40,25 @@ pub struct ContextFramePlan {
     pub lanes: Vec<ContextLanePlan>,
     #[serde(default)]
     pub pipeline: Vec<ContextPipelineStage>,
+}
+
+pub fn default_context_pipeline() -> Vec<ContextPipelineStage> {
+    [
+        ("source-discovery", "durable context items"),
+        ("scoring", "trust freshness cleanliness rank"),
+        ("deduplication", "semantic body source fingerprint key"),
+        ("contradiction-filtering", "unresolved conflict keys"),
+        ("compression", "lane summaries and source refs"),
+        ("prompt-assembly", "ordered prompt cards"),
+        ("validation", "context frame fingerprint"),
+    ]
+    .into_iter()
+    .map(|(name, evidence)| ContextPipelineStage {
+        name: name.to_string(),
+        status: "applied".to_string(),
+        evidence: evidence.to_string(),
+    })
+    .collect()
 }
 
 pub fn select_context_plan(

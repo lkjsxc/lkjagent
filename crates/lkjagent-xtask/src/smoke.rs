@@ -102,8 +102,8 @@ fn persist_snapshot(
 }
 
 fn live(root: &Path) -> i32 {
-    let configured = crate::smoke_config::configured(root);
-    if crate::smoke_config::missing_configured_key(root) {
+    let configured = crate::experiment_live_config::smoke_configured(root);
+    if crate::experiment_live_config::smoke_missing_configured_key(root) {
         println!("ok smoke live status=skipped reason=endpoint-api-key-env-absent");
     } else if configured {
         println!("ok smoke live status=skipped reason=operator-command-required");

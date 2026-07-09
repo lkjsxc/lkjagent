@@ -146,7 +146,7 @@ fn filter(text: &str, query: &str) -> String {
 }
 
 fn window(text: &str, model: &TuiModel) -> String {
-    crate::tui_window::visible_text(
+    crate::tui_types::visible_text(
         text,
         model.height.saturating_sub(10) as usize,
         model.follow,

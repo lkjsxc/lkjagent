@@ -116,6 +116,20 @@ fn display_transcript_hides_diagnostics_from_conversation() {
 }
 
 #[test]
+fn clamped_viewport_windows_do_not_show_blank_space() {
+    let text = (1..=4)
+        .map(|index| format!("line-{index}"))
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    assert_eq!(lkjagent_app::tui_state::window_start(4, 3, false, 99), 1);
+    assert_eq!(
+        lkjagent_app::tui_state::visible_text(&text, 3, false, 99),
+        "line-2\nline-3\nline-4"
+    );
+}
+
+#[test]
 fn slash_commands_submit_without_owner_transcript_echo() {
     let (model, _) = lkjagent_app::tui_state::reduce(
         TuiModel::new(),
