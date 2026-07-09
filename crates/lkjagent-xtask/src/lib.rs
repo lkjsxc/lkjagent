@@ -3,10 +3,8 @@ pub mod doc_catalog;
 pub mod doc_common;
 pub mod doc_crate_readmes;
 pub mod doc_links;
-pub mod doc_reachability;
 pub mod doc_special;
 pub mod doc_topology;
-pub mod docs;
 mod docs_authority_contract;
 pub mod docs_authority_gate;
 mod docs_authority_product;
@@ -16,31 +14,43 @@ pub mod experiment_live;
 pub mod experiment_live_config;
 pub mod experiment_protocol;
 pub mod facts;
-pub mod file_counts;
 pub mod gate;
-pub mod lines;
-pub mod model;
 pub mod node_gate;
-mod node_gate_evidence;
 pub mod proof;
 pub mod proof_checks;
 pub mod proof_records;
 pub mod proof_state;
 pub mod proof_tokens;
-pub mod runner;
+pub mod repository_determinism_gate;
 pub mod smoke;
-pub mod structure;
 pub mod style;
+
+pub mod model {
+    pub use crate::facts::{RepoFile, Violation};
+}
 
 use std::path::Path;
 
-use docs::check_docs;
+use doc_special::check_docs;
 use facts::collect_files;
-use file_counts::check_files;
-use gate::{parse_gate, Gate};
-use lines::check_lines;
-use runner::run_quiet_test;
+use gate::{check_files, check_lines, parse_gate, run_quiet_test, Gate};
 use style::check_style;
+
+pub mod docs {
+    pub use crate::doc_special::check_docs;
+}
+
+pub mod doc_reachability {
+    pub use crate::doc_special::check_reachability;
+}
+
+pub mod lines {
+    pub use crate::gate::check_lines;
+}
+
+pub mod structure {
+    pub use crate::style::{audit_structure as audit, run_structure as run};
+}
 
 pub fn run(args: &[String], root: &Path) -> i32 {
     match parse_gate(args) {

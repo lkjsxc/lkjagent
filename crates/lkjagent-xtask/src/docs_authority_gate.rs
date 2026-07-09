@@ -5,7 +5,7 @@ use crate::docs::check_docs;
 use crate::docs_authority_contract;
 use crate::docs_authority_product;
 use crate::facts::collect_files;
-use crate::lines::check_lines;
+use crate::gate::check_lines;
 use crate::model::RepoFile;
 
 const PRODUCT_BASE: &str = "ae5ff551457adce869dee6159200c85a63aab3de";

@@ -10,6 +10,8 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 RUN rustup component add rustfmt clippy
 COPY Cargo.toml Cargo.lock README.md ./
+COPY .gitignore .dockerignore ./
+COPY .github/workflows/verify.yml ./.github/workflows/verify.yml
 COPY crates/lkjagent-app ./crates/lkjagent-app
 COPY crates/lkjagent-core ./crates/lkjagent-core
 COPY crates/lkjagent-effects ./crates/lkjagent-effects
@@ -18,11 +20,12 @@ COPY crates/lkjagent-store ./crates/lkjagent-store
 COPY crates/lkjagent-xtask ./crates/lkjagent-xtask
 COPY docs ./docs
 COPY evaluation ./evaluation
+COPY data/lkjagent.json ./data/lkjagent.json
 COPY Dockerfile docker-compose.yml ./
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     --mount=type=cache,target=/src/target \
-    cargo build --release -p lkjagent-app \
+    cargo build --locked --release -p lkjagent-app \
     && cp /src/target/release/lkjagent /tmp/lkjagent
 
 FROM debian:bookworm-slim AS runtime

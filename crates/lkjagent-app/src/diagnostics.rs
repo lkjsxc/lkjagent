@@ -3,7 +3,7 @@ use std::path::Path;
 use rusqlite::{params, Connection};
 use serde_json::json;
 
-use crate::diagnostics_support::{
+use crate::config::{
     endpoint_state, file_count, join_bools, join_counts, join_or_none, missing_dirs,
 };
 

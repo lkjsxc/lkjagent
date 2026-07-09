@@ -30,6 +30,18 @@ Local Docker lint, test, and verify passed with the ignored working-copy
 because that lockfile is not tracked. Those local passes are not clean-checkout
 evidence.
 
+The configuration loader now rejects unknown keys, arrays, nested values, wrong
+scalar types, invalid ranges, and prompt-budget conflicts against the complete
+registry. The tracked example contains every anchored key. Current endpoint,
+workspace-root, prompt-cap, and live-duration consumers use the validated map;
+later owning nodes still must connect their declared settings to behavior.
+
+Repository build inputs now include the tracked lockfile, configuration,
+explicit Docker copy roots, and public clean-archive workflow. The named gate
+checks those inputs, source budgets, configuration, Docker locking, workflow,
+and nonempty fault suites. These source claims are not clean-archive acceptance;
+that requires the raw no-cache Compose run bound to the committed tree.
+
 A fresh model-free diary run writes a journal entry containing canned
 missing-detail text after the owner asks for a diary entry. This is reproduced
 failure evidence, not acceptable record behavior.

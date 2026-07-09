@@ -35,6 +35,27 @@ docker compose run --rm bench
 docker compose run --rm replay
 ```
 
+## Repository Determinism
+
+`Cargo.lock`, `Dockerfile`, `docker-compose.yml`, `.dockerignore`, workflow
+files, Cargo manifests, copied source, docs, and evaluation inputs are tracked.
+The repository gate parses Docker copy sources and rejects any untracked input.
+It also rejects non-scalar or incomplete `data/lkjagent.json`, source and docs
+over 200 lines, product source over 190 files, and banned panic, unsafe,
+unfinished, mock, placeholder, retired-authority, or release-style source.
+
+The canonical isolated run is:
+
+```sh
+sh tmp/lkjagent-evidence-first-rebuild-20260710/13-scripts/clean_checkout_gate.sh .
+```
+
+That anchored script requires a clean tree, exports `HEAD` with `git archive`,
+uses no ignored local files or environment build overrides, builds the verify,
+test, and lint images with `--no-cache`, and runs all three services. Pull
+requests and pushes to main call the same script through `sh` because the
+packet preserves it as a non-executable contract file.
+
 Workgraph nodes use the shell profile so each named gate runs from the same
 locked Docker build context:
 

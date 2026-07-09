@@ -5,6 +5,7 @@ mod artifact_effects;
 pub mod cli;
 pub mod clock;
 pub mod config;
+mod config_registry;
 pub mod console;
 pub mod state {
     use lkjagent_core::model::TaskSnapshot;
@@ -29,9 +30,7 @@ mod daemon_lock;
 mod daemon_owner_routes;
 mod daemon_route_effects;
 mod diagnostics;
-mod diagnostics_support;
 mod effect_error;
-pub mod endpoint;
 mod exchange_bridge;
 mod exchange_record;
 mod explore;
@@ -56,6 +55,10 @@ mod task_view;
 mod token_status;
 pub mod tui_event {
     pub use crate::tui_state::TuiEvent;
+}
+
+pub mod endpoint {
+    pub use crate::model_io::LlmEndpoint;
 }
 mod tui_keys;
 mod tui_palette;

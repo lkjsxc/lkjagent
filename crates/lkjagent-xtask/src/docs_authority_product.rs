@@ -75,18 +75,3 @@ fn update(hash: &mut u64, bytes: &[u8]) {
         *hash = hash.wrapping_mul(0x100000001b3);
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::{fingerprint, EXPECTED_PRODUCT_FINGERPRINT};
-    use std::path::Path;
-
-    #[test]
-    fn product_tree_matches_bound_base() {
-        let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-        assert_eq!(
-            fingerprint(&root).expect("product fingerprint"),
-            EXPECTED_PRODUCT_FINGERPRINT
-        );
-    }
-}

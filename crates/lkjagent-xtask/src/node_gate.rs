@@ -1,6 +1,6 @@
 use std::path::Path;
 
-use crate::node_gate_evidence::{expect, pairs, read};
+use crate::facts::{expect, pairs, read};
 
 const BASE: &str = "ae5ff551457adce869dee6159200c85a63aab3de";
 const RAW_PATH: &str = "tmp/lkjagent-progress/nodes/baseline-capture/raw";
@@ -9,6 +9,7 @@ pub fn check(root: &Path, identifier: &str) -> Result<(), Vec<String>> {
     match identifier {
         "baseline-capture" => check_baseline(&root.join(RAW_PATH)),
         "docs-authority" => crate::docs_authority_gate::check(root),
+        "repository-determinism" => crate::repository_determinism_gate::check(root),
         _ => Err(vec![format!("unknown node gate: {identifier}")]),
     }
 }
@@ -54,9 +55,7 @@ fn check_database(raw: &Path, failures: &mut Vec<String>) {
         expect(&pairs, key, value, failures);
     }
     let sequence = pairs.get("case2.decision_sequence").map(String::as_str);
-    if sequence.map_or(true, |value| {
-        value.matches("model.call/2004:768").count() != 2
-    }) {
+    if sequence.is_none_or(|value| value.matches("model.call/2004:768").count() != 2) {
         failures.push("case 2 does not preserve two identical capped decisions".into());
     }
 }

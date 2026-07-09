@@ -11,9 +11,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Prepare workspace bind
-        run: mkdir -p .lkjagent-workspace
-      - name: Run final gate
-        run: docker compose run --rm verify
-        env:
-          LKJAGENT_WORKSPACE: ./.lkjagent-workspace
+      - name: Run clean tracked-tree gate
+        run: sh tmp/lkjagent-evidence-first-rebuild-20260710/13-scripts/clean_checkout_gate.sh .

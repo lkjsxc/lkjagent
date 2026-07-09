@@ -9,6 +9,8 @@ and record surfaces, status, console, and workbench.
 
 - [authority-boundaries.md](authority-boundaries.md): workspace, SQLite,
   projection, model, harness, and configuration ownership.
+- [configuration-registry.md](configuration-registry.md): exact flat scalar
+  settings, bounds, precedence, reload policy, and consumers.
 - [daemon.md](daemon.md): daemon loop, quiescence, waiting, and crash resume.
 - [cli.md](cli.md): owner command surface and exit-code discipline.
 - [queue.md](queue.md): owner-turn intake, answer routing, and semantic routing.

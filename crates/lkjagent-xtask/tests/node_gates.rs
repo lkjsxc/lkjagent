@@ -16,7 +16,10 @@ fn baseline_gate_has_a_named_command_surface() {
 #[test]
 fn baseline_gate_rejects_missing_raw_evidence() -> Result<(), String> {
     let root = fixture_root("missing")?;
-    let failures = node_gate::check(&root, "baseline-capture").expect_err("gate must fail");
+    let failures = match node_gate::check(&root, "baseline-capture") {
+        Err(failures) => failures,
+        Ok(()) => return Err("gate unexpectedly passed".to_string()),
+    };
     assert!(failures
         .iter()
         .any(|line| line.contains("raw evidence directory")));

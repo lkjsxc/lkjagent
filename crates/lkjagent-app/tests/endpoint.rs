@@ -36,7 +36,7 @@ fn flat_config_exposes_workspace_and_budget_keys() -> TestResult<()> {
     let data = fixture_root("flat-config")?;
     fs::write(
         data.join("lkjagent.json"),
-        "{\"workspace_root\":\"visible-workspace\",\"prompt_max_context_tokens\":1234,\"live_campaign_seconds\":77}",
+        "{\"workspace_root\":\"visible-workspace\",\"prompt_context_tokens\":32768,\"live_campaign_seconds\":900}",
     )?;
 
     cli::run([
@@ -56,8 +56,8 @@ fn flat_config_exposes_workspace_and_budget_keys() -> TestResult<()> {
     assert!(data
         .join("visible-workspace/artifacts/transcripts/queue-000001.md")
         .exists());
-    assert!(status.contains("prompt_cap=1234"));
-    assert!(status.contains("live_seconds=77"));
+    assert!(status.contains("prompt_cap=32768"));
+    assert!(status.contains("live_seconds=900"));
     assert!(json.contains("visible-workspace"));
     Ok(())
 }

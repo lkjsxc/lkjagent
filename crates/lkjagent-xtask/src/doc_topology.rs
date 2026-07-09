@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use crate::doc_reachability::check_reachability;
+use crate::doc_special::check_reachability;
 use crate::model::{RepoFile, Violation};
 
 const DOC_FILE_LIMIT: usize = 100;

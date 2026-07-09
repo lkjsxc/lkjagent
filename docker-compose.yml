@@ -56,14 +56,14 @@ services:
     build:
       context: .
       target: build
-    command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "quiet", "verify"]
+    command: ["cargo", "run", "--locked", "-p", "lkjagent-xtask", "--", "quiet", "verify"]
 
   test:
     profiles: ["verify"]
     build:
       context: .
       target: build
-    command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "quiet", "test"]
+    command: ["cargo", "run", "--locked", "-p", "lkjagent-xtask", "--", "quiet", "test"]
 
   lint:
     profiles: ["verify"]
@@ -74,23 +74,23 @@ services:
       - /bin/sh
       - -c
       - >-
-        /usr/local/cargo/bin/cargo run -p lkjagent-xtask -- check-docs &&
-        /usr/local/cargo/bin/cargo run -p lkjagent-xtask -- check-lines &&
-        /usr/local/cargo/bin/cargo run -p lkjagent-xtask -- check-style
+        /usr/local/cargo/bin/cargo run --locked -p lkjagent-xtask -- check-docs &&
+        /usr/local/cargo/bin/cargo run --locked -p lkjagent-xtask -- check-lines &&
+        /usr/local/cargo/bin/cargo run --locked -p lkjagent-xtask -- check-style
 
   bench:
     profiles: ["verify"]
     build:
       context: .
       target: build
-    command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "benchmark", "check-corpus"]
+    command: ["cargo", "run", "--locked", "-p", "lkjagent-xtask", "--", "benchmark", "check-corpus"]
 
   replay:
     profiles: ["verify"]
     build:
       context: .
       target: build
-    command: ["cargo", "run", "-p", "lkjagent-xtask", "--", "smoke", "replay"]
+    command: ["cargo", "run", "--locked", "-p", "lkjagent-xtask", "--", "smoke", "replay"]
 
   live-campaign:
     profiles: ["live"]

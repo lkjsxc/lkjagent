@@ -6,15 +6,17 @@ use lkjagent_xtask::model::RepoFile;
 
 fn repo_files() -> Vec<RepoFile> {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-    collect_files(&root).expect("repository files")
+    match collect_files(&root) {
+        Ok(files) => files,
+        Err(error) => vec![RepoFile::new("collection-error", error)],
+    }
 }
 
 fn edit(files: &mut [RepoFile], path: &str, change: impl FnOnce(&mut String)) {
-    let file = files
-        .iter_mut()
-        .find(|file| file.path == path)
-        .expect("fixture path");
-    change(&mut file.text);
+    assert!(files.iter().any(|file| file.path == path), "missing {path}");
+    if let Some(file) = files.iter_mut().find(|file| file.path == path) {
+        change(&mut file.text);
+    }
 }
 
 #[test]
