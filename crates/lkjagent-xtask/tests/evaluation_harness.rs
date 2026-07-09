@@ -39,13 +39,14 @@ fn fault_injector_rejects_reordering_and_incomplete_replay() -> Result<(), Strin
         .get(1)
         .cloned()
         .ok_or_else(|| "second fault is missing".to_string())?;
-    let error = injector
-        .consume(
-            &second.injection_id,
-            &second.boundary,
-            &mut FakeClock::default(),
-        )
-        .expect_err("out-of-order fault must fail");
+    let error = match injector.consume(
+        &second.injection_id,
+        &second.boundary,
+        &mut FakeClock::default(),
+    ) {
+        Ok(_) => String::new(),
+        Err(error) => error,
+    };
     assert!(error.contains("fault order mismatch"));
     assert!(injector.finish().is_err());
     Ok(())

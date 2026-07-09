@@ -87,8 +87,7 @@ pub fn validate_cast(path: &Path) -> Result<PtyFacts, String> {
         last = moment;
         frames += 1;
     }
-    if frames < 3 || !input.contains('\n') || !input.chars().any(|character| !character.is_ascii())
-    {
+    if frames < 3 || !input.contains('\n') || input.is_ascii() {
         return Err("PTY cast lacks raw owner and Japanese input".into());
     }
     if output.len() < 40 || !output.contains("frame:raw-pty-output") {
