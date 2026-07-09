@@ -1,6 +1,10 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
+use lkjagent_core::workspace_record::record_fingerprint;
+use lkjagent_store::record_rows::{records, upsert_record};
+use rusqlite::Connection;
+
 pub fn ensure_root(workspace: &Path) -> Result<(), String> {
     for rel in [
         "inbox",
@@ -47,6 +51,46 @@ pub fn refresh_for_path(workspace: &Path, rel: &str) -> Result<(), String> {
         write_readme(&dir)?;
     }
     Ok(())
+}
+
+pub fn repair_record_links(
+    conn: &Connection,
+    workspace: &Path,
+    moved_id: &str,
+    old_path: &str,
+    new_path: &str,
+    now: &str,
+) -> usize {
+    let Ok(rows) = records(conn, None, true) else {
+        return 0;
+    };
+    let mut repaired = 0;
+    for mut row in rows {
+        if row.id == moved_id {
+            continue;
+        }
+        let path = workspace.join(&row.path);
+        let Ok(text) = fs::read_to_string(&path) else {
+            continue;
+        };
+        if !text.contains(old_path) {
+            continue;
+        }
+        let output = text.replace(old_path, new_path);
+        if fs::write(&path, &output).is_err() {
+            continue;
+        }
+        let Ok(fingerprint) = record_fingerprint(&output) else {
+            continue;
+        };
+        row.fingerprint = fingerprint;
+        row.updated_at = now.to_string();
+        if upsert_record(conn, &row).is_ok() {
+            let _ = refresh_for_path(workspace, &row.path);
+            repaired += 1;
+        }
+    }
+    repaired
 }
 
 fn readme_dirs(workspace: &Path, leaf: &Path) -> Vec<PathBuf> {

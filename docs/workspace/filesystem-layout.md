@@ -72,6 +72,8 @@ policy, archive root, system root, owner-facing directories, and link rules.
 Pure workspace entity validation treats record ids as stable identities and
 paths as movable locations. `workspace plan-rebalance` previews canonical moves
 and link edits. `workspace apply-rebalance` validates paths, moves files,
-updates record rows, writes aliases, repairs links when possible, and stores
-audit rows. Failed moves are rolled back when possible or compensated with an
-explicit audit row and validation warning.
+checks the current file fingerprint against the ledger row, writes aliases,
+repairs exact old-path links in record files when possible, updates touched
+record fingerprints, rebuilds indexes, and stores audit rows. If a post-move
+step fails before the ledger row is updated, the moved file is renamed back to
+its old path when possible.

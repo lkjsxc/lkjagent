@@ -5,8 +5,8 @@ use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_core::workspace_manifest::{
     validate_rebalance_move, RebalanceMove, WorkspaceManifest,
 };
-use lkjagent_core::workspace_record::record_path_at;
-use lkjagent_store::record_rows::{records, upsert_record, RecordRow};
+use lkjagent_core::workspace_record::{record_fingerprint, record_path_at};
+use lkjagent_store::record_rows::{record, records, upsert_record, RecordRow};
 use lkjagent_store::workspace_rows::{
     insert_alias, insert_rebalance_audit, upsert_manifest, PathAliasRow,
 };
@@ -23,14 +23,40 @@ pub fn apply(conn: &Connection, data_dir: &Path, json: bool, now: &str) -> Resul
     let moves = planned_moves(conn)?;
     let workspace = crate::config::workspace_root(data_dir)?;
     for item in &moves {
-        if !validate_rebalance_move(item).is_empty() {
+        let mut item = item.clone();
+        if !validate_rebalance_move(&item).is_empty() {
             return Err(format!("invalid rebalance move: {}", item.entity_id));
         }
-        move_record_file(&workspace, item)?;
+        let row = record(conn, &item.entity_id)
+            .map_err(|error| error.to_string())?
+            .ok_or_else(|| format!("record not found: {}", item.entity_id))?;
+        let old_fingerprint = file_fingerprint(&workspace, &item.old_path)?;
+        if old_fingerprint != row.fingerprint {
+            return Err(format!("fingerprint mismatch: {}", item.entity_id));
+        }
+        item.validation
+            .push(format!("fingerprint-before:{old_fingerprint}"));
+        move_record_file(&workspace, &item)?;
+        if file_fingerprint(&workspace, &item.new_path)? != old_fingerprint {
+            let _ = rollback_record_file(&workspace, &item);
+            return Err(format!("moved fingerprint mismatch: {}", item.entity_id));
+        }
         crate::workspace_scaffold::refresh_for_path(&workspace, &item.new_path)?;
-        update_record(conn, item, now)?;
-        insert_alias(conn, &alias(item, now)).map_err(|error| error.to_string())?;
-        insert_rebalance_audit(conn, &audit_id(item), item, now)
+        if let Err(error) = update_record(conn, &item, now) {
+            let _ = rollback_record_file(&workspace, &item);
+            return Err(error);
+        }
+        let repaired = crate::workspace_scaffold::repair_record_links(
+            conn,
+            &workspace,
+            &item.entity_id,
+            &item.old_path,
+            &item.new_path,
+            now,
+        );
+        item.validation.push(format!("links-repaired:{repaired}"));
+        insert_alias(conn, &alias(&item, now)).map_err(|error| error.to_string())?;
+        insert_rebalance_audit(conn, &audit_id(&item), &item, now)
             .map_err(|error| error.to_string())?;
     }
     if !moves.is_empty() {
@@ -97,10 +123,11 @@ fn move_for_row(row: &RecordRow) -> Option<RebalanceMove> {
         reason: "canonical record path".to_string(),
         validation: Vec::new(),
     };
-    item.validation = if validate_rebalance_move(&item).is_empty() {
+    let validation = validate_rebalance_move(&item);
+    item.validation = if validation.is_empty() {
         vec!["ok".to_string()]
     } else {
-        validate_rebalance_move(&item)
+        validation
     };
     Some(item)
 }
@@ -114,8 +141,21 @@ fn move_record_file(workspace: &Path, item: &RebalanceMove) -> Result<(), String
     fs::rename(old, new).map_err(|error| error.to_string())
 }
 
+fn rollback_record_file(workspace: &Path, item: &RebalanceMove) -> Result<(), String> {
+    fs::rename(
+        workspace.join(&item.new_path),
+        workspace.join(&item.old_path),
+    )
+    .map_err(|e| e.to_string())
+}
+
+fn file_fingerprint(workspace: &Path, rel: &str) -> Result<String, String> {
+    let text = fs::read_to_string(workspace.join(rel)).map_err(|error| error.to_string())?;
+    record_fingerprint(&text).map_err(|error| error.message)
+}
+
 fn update_record(conn: &Connection, item: &RebalanceMove, now: &str) -> Result<(), String> {
-    let mut row = lkjagent_store::record_rows::record(conn, &item.entity_id)
+    let mut row = record(conn, &item.entity_id)
         .map_err(|error| error.to_string())?
         .ok_or_else(|| format!("record not found: {}", item.entity_id))?;
     row.path = item.new_path.clone();

@@ -46,7 +46,10 @@ checks, context hygiene, tool descriptors, XML-like action parsing, artifact
 units, workspace manifests, and graph queries. The app crate contains bridge
 interpreters, endpoint exchange capture, record commands, workspace rebuild and
 rebalance commands, console, watch, status, workbench, row-backed inspection,
-and bounded `run --once` paths.
+and bounded `run --once` paths. Rebalance validates the file fingerprint before
+moving a record, repairs exact old-path links in record files, records alias and
+audit rows, and rolls the file move back when a post-move step fails before the
+ledger row update.
 
 Current model action parsing accepts one attribute-less `<lkjagent_action>` with
 child tags for decision id, context fingerprint, tool name, and repeated
