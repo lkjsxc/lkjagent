@@ -32,4 +32,4 @@ not part of the acceptance work.
 | Quiet verify passes | 7b2ae344 | `103300-quiet-verify-final.log` | pass |
 | Docker Compose verify passes | 7b2ae344 | `103400-docker-compose-verify-final.log` | pass |
 | Live campaigns run or honest skips committed | 44a791ec; 72fa3e2c | `tmp/live-runs/20260708Tstandardenv/`; daily-use data | pass |
-| Final handoff names commits, commands, evidence, risks | 3c3fd2ef | this file plus final response | pass |
+| Final handoff names commits, commands, evidence, risks | a761adfb | this file plus final response | pass |

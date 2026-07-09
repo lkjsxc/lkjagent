@@ -134,7 +134,8 @@ command evidence.
 - [x] Live campaigns run or honest skips are committed - tracked live evidence
   under `tmp/live-runs/20260708Tstandardenv/` plus daily-use script evidence.
 - [x] Final handoff names commits, commands, evidence paths, and residual risks
-  - see `tmp/lkjagent-more-more-progress/final-dod-check.md` and final response.
+  - see `tmp/lkjagent-more-more-progress/final-dod-check.md` from `a761adfb`
+    and final response.
 
 ## Notes
 
