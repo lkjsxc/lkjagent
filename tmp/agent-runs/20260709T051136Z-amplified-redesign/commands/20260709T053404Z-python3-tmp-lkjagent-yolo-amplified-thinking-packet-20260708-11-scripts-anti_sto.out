@@ -1,0 +1,3 @@
+command: python3 tmp/lkjagent-yolo-amplified-thinking-packet-20260708/11-scripts/anti_stop_gate.py tmp/agent-runs/20260709T051136Z-amplified-redesign/progress-ledger.md
+started: 20260709T053404Z
+ok anti-stop-gate
