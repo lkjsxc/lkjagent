@@ -26,6 +26,28 @@ fn recovery_ladder_records_failure_cells() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn recovery_failure_is_selected_before_more_model_work() -> TestResult<()> {
+    let data = fixture_root("parse-selected")?;
+    enqueue_case(&data, "Investigate workspace files")?;
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec!["<message>not an action</message>".to_string()],
+        index: 0,
+    };
+
+    run_until_idle(&data, &mut endpoint, 2)?;
+
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let operation: String = conn.query_row(
+        "SELECT operation_key FROM runtime_decisions
+         WHERE operation_key LIKE 'recovery.handle/%' LIMIT 1",
+        [],
+        |row| row.get(0),
+    )?;
+    assert!(operation.starts_with("recovery.handle/parse/"));
+    Ok(())
+}
+
 fn run_parse_failure(data: &Path) -> TestResult<()> {
     enqueue_case(data, "Investigate workspace files")?;
     let mut endpoint = ScriptedEndpoint {
@@ -104,7 +126,8 @@ fn assert_failure_cell(kind: &str, runner: fn(&Path) -> TestResult<()>) -> TestR
     let pattern = format!("recovery:{kind}/%");
     let count: i64 = conn.query_row(
         "SELECT COUNT(*) FROM state_cells
-         WHERE key_label LIKE ?1 AND payload_schema = 'recovery.failure'",
+         WHERE key_label LIKE ?1 AND payload_schema = 'recovery.failure'
+           AND status = 'Active'",
         [pattern],
         |row| row.get(0),
     )?;

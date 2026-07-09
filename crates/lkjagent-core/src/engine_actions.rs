@@ -1,4 +1,8 @@
+use crate::engine::Command;
+use crate::engine_completion::block_task;
+use crate::model::TaskSnapshot;
 use crate::parse::Action;
+use crate::runtime_decision::EffectCommand;
 
 pub(crate) fn finish_summary(action: &Action) -> Option<String> {
     if action.tool == "finish" {
@@ -13,6 +17,32 @@ pub(crate) fn memory_save(action: &Action) -> Option<(String, String)> {
         Some((param(action, "topic")?, param(action, "content")?))
     } else {
         None
+    }
+}
+
+pub(crate) fn handle_native_effect(
+    snapshot: &mut TaskSnapshot,
+    commands: &mut Vec<Command>,
+    effect: &EffectCommand,
+) {
+    match (
+        effect.name.as_str(),
+        effect.path.as_deref(),
+        effect.content.as_deref(),
+    ) {
+        ("workspace.write_text", Some(path), Some(content)) if !content.trim().is_empty() => {
+            commands.push(Command::WriteFile {
+                path: path.to_string(),
+                content: content.to_string(),
+            });
+        }
+        ("workspace.append_text", Some(path), Some(content)) if !content.trim().is_empty() => {
+            commands.push(Command::AppendFile {
+                path: path.to_string(),
+                content: content.to_string(),
+            });
+        }
+        _ => block_task(snapshot, commands, "unsupported native effect command"),
     }
 }
 

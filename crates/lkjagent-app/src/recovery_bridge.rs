@@ -95,7 +95,6 @@ pub fn record_recovery_fact(
     let key = StateKey::new("recovery", format!("{kind}/{decision_id}/{index}"))
         .map_err(|error| error.message)?;
     let mut cell = StateCell::active(key, event_id.clone());
-    cell.status = StateStatus::Resolved;
     cell.payload_schema = "recovery.failure".to_string();
     cell.payload_json = serde_json::json!({
         "kind": kind,

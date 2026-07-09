@@ -63,11 +63,12 @@ Runtime decisions carry selected state keys, derived harness states, selected
 tool views, context-frame fingerprints, expected envelopes, evidence
 requirements, and recovery policy. Prompt cards render the harness state as the
 state-specific fragment while preserving the decision row as authority. Parse,
-admission, effect, endpoint, and check failures now write
-`recovery.failure` state cells keyed by kind and decision. Parse diagnoses now
-include concrete repair guidance for envelope, action grammar, decision, context,
-tool, and argument faults. Native model-free operations support state resolution
-and workspace text effects for `workspace.write_text` and
+admission, effect, endpoint, and check failures now write active
+`recovery.failure` state cells keyed by kind and decision; the next selector pass
+routes through a recovery decision before normal model work can continue. Parse
+diagnoses now include concrete repair guidance for envelope, action grammar,
+decision, context, tool, and argument faults. Native model-free operations
+support state resolution and workspace text effects for `workspace.write_text` and
 `workspace.append_text` through path-checked workspace effects and artifact rows.
 Runtime projection and decision dispatch now preflight earlier unfinished step
 blockers before later model response work.

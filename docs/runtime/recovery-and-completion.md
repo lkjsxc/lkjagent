@@ -14,9 +14,11 @@ pretend it rendered the old prompt.
 
 If an admission was persisted before a tool effect, resume either reruns the
 idempotent effect or records a recovery event for non-idempotent work. Parse,
-admission, effect, endpoint, and check failures create durable
+admission, effect, endpoint, and check failures create active durable
 `recovery.failure` cells keyed by kind and decision before any happy response can
-hide the failure. Repeated identical failures escalate to a blocked state or a
+hide the failure. The next selector pass must choose and settle the recovery
+cell before normal model work can continue; the following model retry carries the
+bounded diagnosis. Repeated identical failures escalate to a blocked state or a
 narrowed recovery decision instead of a happy response.
 
 ## Completion

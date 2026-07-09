@@ -39,7 +39,7 @@ fn fake_endpoint_task_closes_and_resumes_from_store() -> TestResult<()> {
         ],
         index: 0,
     };
-    let partial = run_until_idle(&data, &mut first, 2)?;
+    let partial = run_until_idle(&data, &mut first, 3)?;
     assert_eq!(partial.task.state, TaskState::Open);
 
     let mut second = ScriptedEndpoint {

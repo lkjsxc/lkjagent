@@ -1,4 +1,5 @@
 use crate::checks::{CommandFact, FileFact};
+use crate::engine_actions::handle_native_effect;
 use crate::engine_checks::handle_checks;
 use crate::engine_completion::{block_task, close_task, completion_blocker};
 use crate::engine_steps::{handle_endpoint_error, handle_fault, handle_model};
@@ -79,6 +80,9 @@ pub fn next_work_with_decision(snapshot: &TaskSnapshot, decision: &RuntimeDecisi
             .unwrap_or_else(|| "completion blocked by bridge step".to_string());
         return Work::BlockTask(reason);
     }
+    if operation.starts_with("recovery.handle/") {
+        return Work::ResolveState;
+    }
     if let Some(step_id) = step_operation(operation, "check.run/") {
         return Work::RunChecks { step_id };
     }
@@ -103,7 +107,12 @@ pub fn next_work(snapshot: &TaskSnapshot) -> Work {
     if let Some(reason) = step_preflight_blocker(snapshot, step.id) {
         return Work::BlockTask(reason);
     }
-    if step.kind == StepKind::Verify && step.checks.iter().all(deterministic) {
+    if step.kind == StepKind::Verify
+        && step
+            .checks
+            .iter()
+            .all(|spec| !matches!(spec, CheckSpec::Judged { .. }))
+    {
         return Work::RunChecks { step_id: step.id };
     }
     Work::CallModel {
@@ -167,34 +176,4 @@ pub fn apply_turn(
         _ => {}
     }
     (next, commands)
-}
-
-fn handle_native_effect(
-    snapshot: &mut TaskSnapshot,
-    commands: &mut Vec<Command>,
-    effect: &EffectCommand,
-) {
-    match (
-        effect.name.as_str(),
-        effect.path.as_deref(),
-        effect.content.as_deref(),
-    ) {
-        ("workspace.write_text", Some(path), Some(content)) if !content.trim().is_empty() => {
-            commands.push(Command::WriteFile {
-                path: path.to_string(),
-                content: content.to_string(),
-            });
-        }
-        ("workspace.append_text", Some(path), Some(content)) if !content.trim().is_empty() => {
-            commands.push(Command::AppendFile {
-                path: path.to_string(),
-                content: content.to_string(),
-            });
-        }
-        _ => block_task(snapshot, commands, "unsupported native effect command"),
-    }
-}
-
-fn deterministic(spec: &CheckSpec) -> bool {
-    !matches!(spec, CheckSpec::Judged { .. })
 }
