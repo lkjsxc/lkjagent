@@ -107,7 +107,7 @@ Corrected evidence:
 
 Open after this correction:
 
-- Non-record generated artifact splitting or durable justification remains open.
+- Generated artifact splitting is fixed by `e4c17d42` with manifest and parts tests.
 - Rebalance fingerprint continuity and exact-path link repair are fixed by
   `03570fba`; transaction-backed compensation after alias/audit failure remains open.
 - Tool admission repeat-call suppression and recovery-policy hiding are fixed by
@@ -194,7 +194,7 @@ Open after this correction:
 | quiet verify | 9cd8069c | final `cargo run -p lkjagent-xtask -- quiet verify` passed after source changes | done |
 | Docker verify | 9cd8069c | final `docker compose run --rm verify` passed after source changes | done |
 | live campaigns | 9cd8069c; 6d0be7d8; 44a791ec | scripted campaign passed with workspace validation; skip files committed; standard `.env` endpoint run added under `tmp/live-runs/20260708Tstandardenv/` with all four profiles closed after 900-second time boxes | done |
-| large file split | 57c39d2e | large record CLI evidence shows main size justification plus linked part files; generated artifact splitting remains open | partial |
+| large file split | 57c39d2e; e4c17d42 | large record and generated artifact split evidence passed | done |
 | rebalance safety | 03570fba | CLI evidence shows fingerprint audit and `links-repaired:1`; post-alias/audit transaction compensation remains open | partial |
 | tool admission hardening | d8cfedfb | repeat guard and recovery policy fingerprint tests pass; budget suppressors and mismatch events remain open | partial |
 | context contract gaps | 757ca459 | ranked XML-like entry tests pass in context/prompt/app tests | done |

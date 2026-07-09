@@ -43,8 +43,8 @@ command evidence.
   `index-budget-month` artifact row evidence.
 - `57c39d2e` fixed oversized record bodies: main records now carry size
   justification and links to `.parts/part-NNN.md` files with the full body.
-- Open: non-record generated artifact splitting or durable justification is not
-  yet proven.
+- `e4c17d42` fixed non-record generated artifact splitting with manifest,
+  checked part files, unit rows, and Docker evidence.
 - `03570fba` fixed rebalance fingerprint audit and exact old-path link repair;
   transaction-backed compensation after alias or audit write failure remains open.
 - `d8cfedfb` fixed repeat-call rejection and recovery-policy hiding; budget
