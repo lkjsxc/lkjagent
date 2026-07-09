@@ -10,71 +10,64 @@ Define the durable workspace directories and their source-of-truth rules.
 workspace/
   README.md
   inbox/
-  today/
-  records/
-    life/
-      journal/
-      todo/
-      calendar/
-      finance/
-      notes/
-      routines/
-      contacts/
-    work/
-      projects/
-      development/
-    knowledge/
-      notes/
-      references/
+  life/
+    journal/
+    todo/
+    calendar/
+    finance/
+    notes/
+  knowledge/
+  projects/
   artifacts/
     documents/
     reports/
     transcripts/
     proof/
+  activity/
   indexes/
   archive/
   system/
-    schemas/
-    templates/
-    prompts/
-    manifests/
+    operations/
+    quarantine/
+    import-review/
 ```
 
 ## Source Rules
 
 `inbox/` contains ambiguous owner-turn traces that need owner review.
-`records/` contains owner-readable source records. `artifacts/` contains
+`life/`, `knowledge/`, and `projects/` contain owner-readable source.
+`artifacts/` contains
 lkjagent-generated or assembled files, including transcripts and proof bundles.
 `indexes/` contains derived views that can be rebuilt. `archive/` keeps inactive
 records and artifacts without deleting ledger evidence. `system/` contains
-schemas, templates, prompts, and manifest rules that may enter prompts only when
-selected by a decision.
+operation previews, quarantine diagnostics, and import review. System files may
+enter prompts only when selected by a decision.
 
 ## Path Policy
 
-All runtime filesystem effects stay under the configured workspace root after
-canonicalization. Dotfiles, secrets, large binaries, generated caches, and
-external repositories require explicit policy before prompt admission. Owner-turn
-transcripts and inbox traces are workspace effects and follow the same path
-checks.
+All runtime filesystem effects stay under the configured root. Reject absolute
+model paths, parent traversal, symlink escapes, control characters, reserved
+system paths, and case-collision ambiguity. Use descriptor-relative no-follow
+traversal or an equivalent race-resistant API; canonicalization alone cannot
+prevent a symlink swap.
 
 ## Workspace READMEs
 
-Each major owner-facing workspace directory has a README when the directory
-exists. The README explains purpose, record shape, allowed agent actions,
+Create only the branch required by real content. Each new owner-facing directory
+gets a README that explains purpose, record shape, allowed agent actions,
 source-of-truth rules, and index behavior. These files guide humans and may be
 admitted as bounded context with source refs and fingerprints.
 
 ## Rebalancing
 
-`workspace/system/manifests/workspace-manifest.json` records schema, root
-policy, archive root, system root, owner-facing directories, and link rules.
+An operation preview under `workspace/system/operations/` records schema, root
+policy, archive root, affected documents, target paths, and link rules.
 Pure workspace entity validation treats record ids as stable identities and
 paths as movable locations. `workspace plan-rebalance` previews canonical moves
 and link edits. `workspace apply-rebalance` validates paths, moves files,
 checks the current file fingerprint against the ledger row, writes aliases,
 repairs exact old-path links in record files when possible, updates touched
 record fingerprints, rebuilds indexes, and stores audit rows. Alias and audit
-rows are written in one store transaction. If a post-move store step fails, the
+rows are written in one store transaction. If a post-move store phase fails, the
 rebalancer restores the moved file, original record row, and exact-path link
 edits when possible.

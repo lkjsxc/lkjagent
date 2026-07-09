@@ -2,40 +2,30 @@
 
 ## Purpose
 
-Define deterministic replay over recorded exchanges.
+Define deterministic replay of baseline and campaign failures.
 
-## Replay Contract
+## Inputs
 
-Replay drives the store, effects, workspace, and checks with committed
-deterministic fixtures. It does not contact a live endpoint.
+A replay fixture contains scrubbed owner events, endpoint exchanges, clock
+steps, fault injections, initial workspace bytes, configuration fingerprint,
+and expected check measurements. It contacts no live endpoint.
 
-## Gate
+## Execution
 
-`cargo run -p lkjagent-xtask -- smoke replay` runs the replay cases. A passing
-run prints `ok smoke replay data=<path>`. The gate is part of `quiet verify`.
-Docker runs the same command through `docker compose run --rm replay`.
+Replay uses a fresh store and the production reducer, selector, parser,
+admission, effects boundary, workspace service, and checkers relevant to the
+failure. Clock and external outcomes are injected at their existing pure or
+effect interfaces.
 
-## Cases
+## Assertions
 
-The replay currently covers:
-
-- `artifact-report`: a structured report with engine-computed checks;
-- `question`: a closed direct-answer matter in the store.
-
-The replay output data directory is suitable input for
-[../operations/proof-bundles.md](../operations/proof-bundles.md).
-
-## Live Smoke
-
-`cargo run -p lkjagent-xtask -- smoke live` reports endpoint configuration
-presence and prints an explicit skip line when a live run is not requested.
-
-## Historical Fixtures
-
-Historical live-stress fixtures are raw seed material only. Matter fixtures
-distilled into the corpus are committed with the replay test that uses them.
+The gate compares events, decisions, failure lineage, admissions, effects,
+observations, checks, messages, workspace manifests, and terminal matter state.
+It rejects copied seeded history, duplicate effects, repeated failure tuples,
+stale checks, false response success, and synthetic quiescence work.
 
 ## Failure Rule
 
-A live failure becomes a replay fixture before it is fixed. The fixture is
-scrubbed, minimized, named by failure class, and landed with the test.
+A live or PTY failure becomes a red, minimized, named replay fixture before the
+source fix. Raw campaign evidence remains immutable; the fixture records its
+source hashes and redaction procedure.

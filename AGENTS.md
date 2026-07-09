@@ -7,7 +7,7 @@ Entry instructions for automated coding agents working on lkjagent.
 ## What lkjagent Is
 
 lkjagent is a durable state-ledger agent daemon in Rust for one owner and one
-local LLM. Owner messages become durable cases, events, state cells, runtime
+local LLM. Owner messages become durable matters, events, state cells, runtime
 decisions, bounded model asks, deterministic effects, and harness-computed
 completion checks.
 
@@ -28,8 +28,8 @@ completion checks.
 8. Durable state rows and persisted `RuntimeDecision` rows are the single
    control plane. Do not add a second graph authority, MCP, runtime sub-agents,
    prompt-only policy, or dispatcher-only tool registry.
-9. Completion is engine-computed through checks. The model never decides that a
-   task is done.
+9. Completion is reducer-computed through checks. The model never decides that a
+   matter is done.
 10. Commit small coherent slices with `Tested` and `Not-tested` trailers that
     match commands actually run.
 11. Use Docker Compose for final verification when a stage or behavior claims

@@ -29,7 +29,7 @@ Define the owner command surface and output discipline.
 | `lkjagent record add KIND TITLE [--body TEXT]` | create a workspace record and metadata row |
 | `lkjagent record list [KIND]` | list current records by row metadata |
 | `lkjagent record show ID` | print one record row and Markdown body |
-| `lkjagent record link ID REF` | add a frontmatter link and refresh evidence |
+| `lkjagent record link ID REF` | add a document relation and refresh evidence |
 | `lkjagent record archive ID` | move a record under archive and keep aliases |
 | `lkjagent today, journal, todo, calendar, finance, project, dev` | friendly record-backed wrappers |
 | `lkjagent help` | print usage |
@@ -47,8 +47,8 @@ Define the owner command surface and output discipline.
 ## Developer Proof Commands
 
 `cargo run -p lkjagent-xtask -- proof collect --data data --out tmp/proof-current`
-collects a bounded proof bundle. Live proof orchestration stays in xtask until
-it is factored into row-backed owner commands and help output.
+collects a bounded derived proof bundle. Final acceptance orchestration and raw
+evidence validation remain xtask responsibilities.
 
 ## Log Follow Contract
 
@@ -59,9 +59,9 @@ interrupts the process.
 
 ## Data Directory
 
-Commands accept the configured data directory consistently. Status and read-only
-inspection commands work while the daemon is stopped because they read the
-store and workspace files directly.
+Commands accept configured data and workspace roots consistently. Status and
+read-only inspection work while the daemon is stopped because they read the
+store and workspace directly.
 
 ## Acceptance Checks
 

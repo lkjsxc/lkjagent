@@ -7,9 +7,7 @@ Record design decisions that shape implementation defaults.
 ## Table of Contents
 
 - [store-fresh-start.md](store-fresh-start.md): store schema starts fresh.
-- [idle-removal.md](idle-removal.md): idle waits on the queue.
-- [personal-as-templates.md](personal-as-templates.md): personal work uses
-  generic workspace records.
+- [idle-removal.md](idle-removal.md): quiescence is derived and creates no work.
 - [single-control-plane.md](single-control-plane.md): durable state rows and
   runtime decisions direct work.
 - [checks-gated-completion.md](checks-gated-completion.md): checks close cases.

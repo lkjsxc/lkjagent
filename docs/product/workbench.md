@@ -11,9 +11,9 @@ controller.
 start or stop the daemon. The Docker entrypoint routes
 the command the same way it routes `status`, `console`, and `watch`.
 
-## Pure TUI Core
+## Pure TUI Contract
 
-The app has a pure terminal model, event reducer, grapheme-aware composer,
+The target has a pure terminal model, event reducer, grapheme-aware composer,
 stable transcript-entry identity, agent draft accumulation, id-based transcript
 merge, clamped follow/manual viewport windows, and non-TTY renderer. Transcript
 views render owner/agent conversation entries only; tool, state, system, and
@@ -27,7 +27,7 @@ save, and quit events arrive. Terminal backends are effects at the edge.
 The workbench has one pane-oriented renderer. When stdin and stdout are TTYs it
 uses the ratatui alternate-screen backend; otherwise it uses the line pane
 renderer for scripts and tests. Its left pane is the owner conversation
-transcript only. Diagnostic rows such as step progress, matter trace, proof
+transcript only. Diagnostic rows such as operation progress, matter trace, proof
 counts, queue state, and recent events belong in the right rail or other
 non-transcript panes.
 
@@ -69,15 +69,14 @@ The workbench never selects runtime decisions, mutates hidden state, stores a
 private transcript, or interprets completion. Mutations go through queue,
 context-resolution, record, or other row-backed command paths.
 
-## Evidence
+## Required Evidence
 
-Tests cover parser routing, reducer mode changes, line handling, closed-input
+Focused tests cover parser routing, reducer mode changes, line handling, input
 exit, grapheme cursor movement, pane scroll and follow state, scroll-down follow
 restoration, pane bottom anchoring after growth, agent delta draft commit,
 durable transcript merge, duplicate suppression by stable row identity, saved
 ids and source paths, slash-command non-transcription, conversation-only
 transcript display, clamped viewport windows, canonical transcript rendering
-without step/task duplicate messages, status rail fallback fields, and bounded
-rendering.
-Interactive behavior is proven by captured command logs under `tmp/agent-runs/`
-or `tmp/live-runs/`, with unavailable terminals recorded as an honest skip.
+without operation duplicates, status rail fallback fields, and bounded
+rendering. Final behavior requires the frozen-source PTY campaign defined in
+[../tui/scrolling.md](../tui/scrolling.md); a skipped terminal run is a blocker.

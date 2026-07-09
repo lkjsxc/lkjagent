@@ -2,48 +2,40 @@
 
 ## Purpose
 
-Define the chat-completions endpoint contract.
+Define one bounded OpenAI-compatible chat-completions effect.
 
-## Client
+## Configuration
 
-lkjagent calls one OpenAI-compatible chat-completions endpoint. The endpoint URL,
-model name, optional API key environment variable, timeout, and context length
-come from `data/lkjagent.json` plus environment overrides.
+Flat configuration and named environment variables provide URL, model, secret
+name, finite timeout, context limit, and optional capability settings. Effective
+non-secret configuration and capability fingerprints bind every exchange.
 
-The default timeout is a loose finite 900 seconds. It remains configurable by
-`LKJAGENT_ENDPOINT_TIMEOUT_SECONDS` and `endpoint_timeout_seconds`, and the
-active value is recorded with exchange timing evidence.
+## Request
 
-The client sends the selected decision prompt, sampling values, max token cap,
-and stop sequence. The stop sequence is the expected closing envelope tag for
-the selected decision.
+The persisted decision supplies the compiled prompt, sampling values, maximum
+output tokens, expected closing stop sequence, grammar constraint when supported,
+and deadline. An endpoint call counts against its matter budget once sent.
 
-## Completion Record
+## Result
 
-The endpoint adapter returns structured completion data to the interpreter:
+The adapter returns response bytes or a typed transport, timeout, rate-limit,
+empty, reasoning-only, output-limit, or provider outcome. It also returns
+request and response monotonic times and provider usage fields when reported.
+Missing usage stays unknown.
 
-- response content or a typed endpoint outcome;
-- request and response timestamps;
-- prompt, completion, and cached token counts when reported;
-- provider anomaly details;
-- closure mode, including whether pure closing-tag repair was applied.
+Request and response bodies enter restricted content-addressed storage.
+`provider_exchanges` records decision, attempt ordinal, request fingerprint,
+redacted refs, timing, usage, model identity, and outcome.
 
-The interpreter persists the record through `provider_exchanges`, `token_usage`,
-exchange files, and bounded event or diagnosis rows. Unknown usage fields remain
-unknown.
+## Repair Boundary
 
-## Response Handling
+A pure append of the expected closing tag may be allowed only when the parsed
+body is otherwise complete and the decision enabled that deterministic repair.
+All other malformed or truncated output becomes a runtime fault and cannot be
+partially executed.
 
-The client captures prompt, completion, and cached token usage when the endpoint
-returns them. Missing usage is recorded as unknown, not estimated as fact.
+## Retry
 
-If a completion stops before the closing tag but contains a complete body, the
-client applies `llm.closure-repair.enabled=true` only when the repair is a pure
-closing-tag append for the expected envelope.
-
-## Anomalies
-
-Empty completions, reasoning-only completions, transport failures, and length
-truncation become endpoint outcomes. They are retried by the endpoint backoff
-policy before the engine consumes an attempt. A model call that reached the
-endpoint counts against the matter budget even when parsing later fails.
+Backoff, deadlines, and alternative caps are recovery strategies selected from
+failure lineage. The endpoint adapter itself does not loop until success or hide
+an attempted exchange.

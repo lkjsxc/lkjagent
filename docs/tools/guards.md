@@ -21,16 +21,16 @@ decision evidence requirements.
 
 ## Repeat Guard
 
-A byte-identical tool call to the previous admitted tool call for the same state
-edge is not executed. Admission records diagnosis `repeated tool call; state the
-next different tool call or finish` and emits a bounded recovery event. The
-comparison uses the canonical parsed action JSON persisted for the same runtime
-decision, and repeat attempts receive their own rejected admission row.
+An identical action for the same operation, state, prompt, tool view, budget,
+and failure signature is not executed without a changed external condition.
+Admission records a bounded repeat diagnosis and recovery event. The comparison
+uses canonical typed fields persisted for the decision, and every repeat attempt
+receives its own rejected admission row.
 
 ## Recovery Guard
 
 Recovery constraints may hide non-idempotent tools or require an observation
-repair step. Hidden tools appear only in diagnostics and proof bundles, never in
+repair operation. Hidden tools appear only in diagnostics and proof, never in
 normal prompt text.
 
 ## Failure This Prevents

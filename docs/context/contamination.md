@@ -14,7 +14,7 @@ external-raw, recovery-only, and sensitive-owner-data.
 
 Normal prompts include clean current items and bounded unresolved-conflict
 summaries. They exclude failed model bodies, refused actions, stale logs,
-obsolete plans, raw large tool output, and unverified model claims.
+obsolete proposals, raw large tool output, and unverified model claims.
 
 ## Recovery Prompt Rule
 
@@ -29,8 +29,8 @@ Only the current relevant observation is normally admitted. Old observations
 remain source evidence, not transcript text. Shell observations are
 `external-raw`, failed observations are `recovery-only`, and observations with
 secret-like owner data such as tokens or passwords are `sensitive-owner-data`.
-The observation bridge redacts those token bodies before writing observation or
-context body text.
+The effects edge redacts those token bodies before writing observation or
+context candidate text.
 
 ## Failure This Prevents
 

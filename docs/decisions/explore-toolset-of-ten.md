@@ -7,8 +7,8 @@ runtime decision.
 
 ## Context
 
-A fixed explore-only tool list kept the plan engine small, but tool legality now
-has to flex by active state, evidence need, workspace boundary, owner settings,
+A fixed tool list cannot express legality by active state, evidence need,
+workspace boundary, owner settings,
 budget, retry suppression, and recovery constraints. Duplicating tool law across
 docs, prompt text, parser, and dispatcher creates drift.
 

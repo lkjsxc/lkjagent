@@ -6,15 +6,17 @@ Define durable source-tagged facts used to assemble prompts.
 
 ## Item Fields
 
-A context item stores item id, semantic key, text or structured JSON, source
-type, source id, source fingerprint, trust class, staleness class,
-contamination class, artifact refs, optional decision id, created time, and
-expiry or suppression reason when present.
+A context candidate stores item ID, semantic key and claim scope, bounded body
+or excerpt, source type, ID, path and fingerprint, trust, effective time,
+staleness, contamination, estimated tokens, relevance features, provenance
+edges, and expiry or suppression reason when present.
 
 ## Prompt Admission
 
-Prompt assembly selects items by semantic key, trust class, active state need,
-and budget. It renders compact source refs so the model can distinguish owner
+The decision derives information needs from obligations and the selected
+operation. Prompt compilation selects candidates by semantic key, trust,
+freshness, novelty, dependency value, and budget. It renders compact source refs
+so the model can distinguish owner
 instructions, file evidence, check results, memory, model-authored content,
 observations, and recovery diagnoses.
 

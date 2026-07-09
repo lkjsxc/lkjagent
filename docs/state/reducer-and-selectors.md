@@ -2,63 +2,42 @@
 
 ## Purpose
 
-Define pure state transitions and deterministic turn selection.
-
-## Event Model
-
-Events are append-only facts from queue intake, owner answers, parser results,
-tool admissions, effects, observations, checks, compaction, recovery, and
-completion attempts. Each event has a kind key, payload schema, payload JSON,
-source ref, created time, and optional decision id.
+Define pure event reduction, transition validation, and decision selection.
 
 ## Reducer
 
-The reducer is pure:
+The canonical reduction is:
 
 ```text
-RuntimeSnapshot + RuntimeEvent -> StatePatch
+RuntimeSnapshot + RuntimeEvent + CurrentTime -> RuntimeState
 ```
 
-A patch inserts, updates, suppresses, resolves, or blocks state cells. It may
-also add or suppress state edges. The store commits the event and patch in one
-transaction. Check result commits also emit native completion outcome cells in
-the same transaction as the check row. Hydration suppresses passed check rows
-without matching active outcome cells so bridge-only rows cannot close a case.
-The reducer never reads files, opens SQLite, calls the endpoint, or asks the
-wall clock.
+It appends or supersedes cells, updates typed edges, invalidates dependent
+checks and projections, advances causal sequence, and emits a transition record.
+It performs no I/O and reads no wall clock except the supplied `CurrentTime`.
 
-## Transition Guard
+## Transition Validator
 
-The pure transition guard models generic node states such as proposed, admitted,
-ready, active, waiting, blocked, recovering, verifying, succeeded, failed,
-superseded, and archived. It rejects illegal state steps, terminal-state reopen
-attempts, progress while active blocking or dependency edges remain, and success,
-failure, or supersession without evidence refs. The guard returns data for row
-commit callers; it does not execute effects or replace persisted decisions.
+Every transition names source event, prior fingerprint, next fingerprint,
+guard, and evidence. Guards reject terminal reopening without an owner event,
+completion with unsatisfied obligations, recovery without a failure lineage,
+waiting without a wake condition, effect readiness without admission, and
+current checks whose source fingerprints changed.
 
-## Selectors
+Production calls the validator before the event and patch commit atomically.
 
-Selectors read the hydrated state vector and compact state-edge evidence, create
-bounded `SelectorCandidate` values, filter candidates blocked by active
-`blocks` edges, sort them deterministically, and persist only the winning
-`RuntimeDecision` with the selected state key. The first implemented candidate
-tiers are owner intake, owner answer, recovery, effects, model calls, checks,
-completion, workspace record families, payload-defined custom operations,
-cooldown suppression, and idle. A state cell with an `operation_key` payload can
-become a candidate without adding a central enum branch. Payload-defined
-model-free operations may use `state.resolve` when the only required effect is
-settling the selected state key, or carry narrow `workspace.write_text` and
-`workspace.append_text` effect commands when the selected cell has explicit path
-and content evidence. Candidate rows are not a second control plane.
+## Selector
 
-## Fingerprints
+The canonical selection is:
 
-State-vector and snapshot fingerprints are canonical over stable bytes such as
-canonical JSON. Candidate ordering uses tier, cell priority, optional
-`deadline_at`, and state key label. Rust debug formatting is not a persisted
-fingerprint format.
+```text
+RuntimeState + Policy + CurrentTime -> RuntimeDecision
+```
 
-## Failure This Prevents
+Candidate construction follows current cells and operation edges. Eligibility
+checks dependencies, conflicts, budgets, admissions, cooldowns, context, and
+wake time. Stable priority, causal sequence, and operation ID break ties.
 
-The daemon can replay events into the same state, and tests can prove decisions
-without filesystem, endpoint, or SQLite side effects.
+The decision persists selected cells and edges, operation and idempotency,
+prompt state, all compiler fingerprints, required observations and checks,
+recovery policy, exit predicate, and next wake time before any prompt or effect.

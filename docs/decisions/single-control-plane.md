@@ -2,34 +2,32 @@
 
 ## Purpose
 
-Record the decision that durable state rows and persisted runtime decisions are
-the only runtime authority.
+Record that events, reduced state, and persisted decisions are runtime authority.
 
 ## Context
 
-The harness must direct a weak model without asking it to navigate competing
-policy surfaces. The earlier plan ledger proved the value of durable authority,
-but fixed plan-family enums cannot express arbitrary simultaneous state.
+The harness must direct bounded model work without competing policy, graph,
+prompt, or dispatcher authorities.
 
 ## Decision
 
-The state ledger is the single control plane. Runtime state is stored as durable
-case, event, state-cell, state-edge, decision, context, admission, observation,
-check, record-evidence, and artifact rows. A `RuntimeDecision` is persisted for
-each turn before prompts, endpoint calls, tool admission, effects, recovery,
-compaction, or completion.
+Runtime events reduce into durable state cells and typed edges. The pure
+selector derives one `RuntimeDecision` from current state, policy, and time.
+That decision persists before prompt compilation, endpoint calls, admission,
+effects, recovery, compaction, checks, or completion.
 
-The plan remains a state family for ordered artifact work, not the only control
-plane.
+Matters, obligations, operations, events, cells, decisions, admissions,
+observations, and checks are one causal ledger. Workspace source bytes remain
+owner content and are referenced by document identity and revision.
 
 ## Consequences
 
-Prompt rendering, parser contracts, tool-call admission, effect dispatch,
-status, resume, record commands, state-edge diagnostics, and proof bundles all
-project the same decision row. There is no prompt-only policy,
+Prompt rendering, parser contracts, tool admission, effect dispatch, status,
+resume, record commands, diagnostics, TUI views, and proof all reference the
+same decision and causal events. There is no prompt-only policy,
 dispatcher-only policy, private command state, or second graph authority.
 
 ## Rejected Alternatives
 
-A separate graph, mode layer, or hidden tool policy could disagree with the
-selected decision and make legal output impossible to identify from the prompt.
+A separate execution graph, hidden tool policy, or model-selected completion
+could disagree with the persisted decision and make recovery unauditable.

@@ -10,7 +10,7 @@ rows.
 Each provider call writes files under this directory shape:
 
 ```text
-data/logs/case-<case-id>/decision-<decision-id>/exchange-<exchange-id>/
+data/logs/matter-<matter-id>/decision-<decision-id>/exchange-<exchange-id>/
   request.json
   response.json
   outcome.json

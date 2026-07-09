@@ -1,69 +1,87 @@
-# Schema
+# Store Schema
 
 ## Purpose
 
-Define the SQLite tables needed for arbitrary state, decisions, context hygiene,
-and evidence-gated completion.
+Define the fresh native SQLite schema and the fields that carry authority.
 
-## Database
+## Matters And Operations
 
-The store file is `data/lkjagent.sqlite3`. SQLite runs with WAL and foreign keys
-enabled. Durable rows own runtime truth. Exchange files may hold large request,
-response, or artifact bodies, but rows own resumable facts and references.
+`matters` stores opaque ID, run and scenario identity, objective, lifecycle,
+priority, and created and updated causal sequences.
 
-## Table Set
+`obligations` stores opaque ID, matter ID, predicate kind and payload, required
+flag, state, current passed same-matter check reference, and invalidating event.
 
-State-ledger tables are created beside transitional plan-family tables until the
-runtime reads only matter, state, and record rows. Required tables:
+`operations` stores opaque ID, matter ID, semantic kind, typed inputs and
+outputs, budget, admission requirement, state, current flag, and unique
+idempotency key. `operation_edges` stores unique typed acyclic edges.
 
-| Table | Role |
-| --- | --- |
-| `queue` | owner turns, answer routing, and separate-matter intent |
-| `cases` | matter objective, lifecycle summary, and terminal report |
-| `runtime_events` | append-only runtime facts with optional decision id |
-| `state_cells` | current arbitrary state vector |
-| `state_history` | audit of applied state patches |
-| `runtime_decisions` | persisted `RuntimeDecision` authority rows with selected state key |
-| `prompt_frames` | prompt metadata, fingerprints, and bounded body refs |
-| `prompt_cards` | prompt-kernel card reasons and section fingerprints |
-| `tool_admissions` | parsed action, result, and view fingerprint |
-| `observations` | bounded tool or effect output tied to decisions |
-| `context_items` | source-tagged prompt candidates |
-| `context_edges` | provenance, suppression, and conflict links between context items |
-| `state_edges` | generic relation evidence, including check-to-artifact freshness refs |
-| `workspace_records` | current record metadata and fingerprints for owner-readable files |
-| `workspace_record_history` | record fingerprint history for staleness checks |
-| `workspace_manifest` | schema-numbered workspace root and directory policy |
-| `workspace_path_aliases` | old path to stable entity id and new path mappings |
-| `workspace_rebalance_audit` | applied path moves with decision and validation data |
-| `artifacts` | files, roots, fingerprints, and ownership metadata |
-| `check_results` | deterministic and judged evidence with params, decision ids, and artifact refs |
-| `provider_exchanges` | endpoint request and response refs |
-| `token_usage` | nullable provider usage fields |
-| `memory` | durable owner-useful facts with FTS mirror when useful |
-| `config` | bridge settings and daemon lease values only |
+## Runtime
 
-## Queue Route Evidence
+`runs` binds source commit, executable and configuration fingerprints, clocks,
+model identity, and scenario identity.
 
-Queue rows keep nullable deterministic route evidence: lane, desired durability,
-title seed, and transformation permission. Delivery refreshes these fields when
-waiting-answer context changes a pending turn into an existing-matter answer.
+`runtime_events` stores matter, unique run causal sequence, kind, monotonic and
+wall time, typed payload, and source identity.
 
-## JSON Columns
+`state_cells`, `state_cell_history`, and `state_edges` store concurrent facts,
+old and new fingerprints, source events, guards, evidence, and dependencies.
 
-JSON payloads include schema names and are validated at crate boundaries. Prefer
-small typed mappers over ad hoc string parsing. Nullable provider usage means the
-provider did not report the value, not zero.
+`runtime_decisions` stores matter, event, optional operation, selected cells and
+edges, operation and idempotency identity, prompt state, selected time, context,
+tool, grammar, budget, recovery, and exit fingerprints, required observations
+and checks, wake time, status, and settlement event.
 
-## Indexes
+`context_frames`, `prompt_cards`, and `provider_exchanges` reference one
+decision and source fingerprints. Exchanges store redacted request and response
+refs, usage, timing, and outcome.
 
-Index state cells by case id, key, status, priority, and conflict group. Index
-state edges by case id or workspace scope, relation, status, and endpoint refs.
-Index context items by semantic key, contamination class, trust class, and source
-fingerprint. Index runtime decisions by case id, status, and selected time. The decision JSON
-also carries the selected state key used for settlement diagnostics.
+`failure_lineages` binds operation and decisions to prompt, tool-view, budget,
+fault signature, strategy, external-condition fingerprint, next eligibility,
+and remaining budget. Its causal tuple is unique.
 
-## Failure This Prevents
+## Effects And Checks
 
-The runtime can resume and explain why a tool was rendered, admitted, refused,
-hidden, or recovered for a specific turn.
+`tool_admissions` stores decision, action ordinal and fingerprint, model or
+harness origin, effectful flag, accepted or rejected status, and typed reason.
+
+`effect_journal` stores decision, unique non-null admission, unique idempotency
+key, state, and intended, prior, and outcome fingerprints.
+
+`observations` stores a unique effect reference, attempt outcome, bounded
+content reference, fingerprint, and contamination.
+
+`checks` stores matter, operation, decision, stable kind and parameters, current
+and passed flags, measured result, evidence fingerprint, and artifact or
+document references.
+
+## Conversation And Intake
+
+`conversation_messages` stores unique logical ID and monotonic sequence, owner
+or agent role, immutable body and fingerprint, lifecycle, causal event, and
+optional replacement.
+
+`owner_turns`, `commands`, `diagnostics`, `outbox_messages`, `config`, and
+`daemon_leases` keep intake, operator surfaces, delivery, settings, and process
+ownership separate from conversation.
+
+## Workspace
+
+`workspace_documents` stores unique document ID and normalized current path,
+state, closed-registry kind, managed flag, effective date, project, and current
+revision.
+
+`workspace_revisions` stores document, optional parent, SHA-256, immutable
+content-blob reference, provider tokenizer and count, conservative count,
+admission count, and creating operation. Document and fingerprint are unique.
+
+`content_blobs` preserves exact bytes by SHA-256. `workspace_aliases`,
+`workspace_tombstones`, `workspace_relations`, `workspace_search_rows`, and
+`workspace_index_debt` reference document IDs and revision fingerprints.
+
+## Removal
+
+A fresh store creates no task, step, template, plan-family, bridge, finish, or
+synthetic-idle tables. Production selection, prompt compilation, effects,
+recovery, and completion read none of `TaskSnapshot`, task, step, template, or
+bridge projections.

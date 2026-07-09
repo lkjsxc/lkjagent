@@ -2,50 +2,37 @@
 
 ## Purpose
 
-Define parse faults, contamination rules, and retry hints for model output.
+Define parse, admission, and repair failures as durable causal data.
 
-## Fault Taxonomy
+## Parse Faults
 
-| Fault | Meaning | Retry hint |
-| --- | --- | --- |
-| `wrong_block` | missing or different selected envelope, including outside prose | restate expected tags |
-| `unclosed` | closing tag absent before EOF | close the named tag |
-| `crossed_tag` | nested tags close out of order | preserve stack order |
-| `attribute` | tag contains attributes | remove attributes and use child tags |
-| `unknown_tag` | tag is not allowed in this envelope | remove or rename the tag |
-| `duplicate_tag` | scalar tag appears more than once | keep one scalar value |
-| `empty` | expected simple block body is blank | provide required content |
-| `unknown_tool` | tool name absent from the decision view | choose a rendered tool name |
-| `bad_params` | missing, unknown, or wrong argument values | show exact argument tags |
-| `json_like` | action body starts as JSON or embeds braced data syntax | rewrite as XML-like tags |
-| `bad_plan_line` | bridge plan line is unparseable or invalid | quote failing line and grammar |
+Stable parse faults include `wrong_envelope`, `unclosed`, `crossed_tag`,
+`attribute`, `unknown_tag`, `duplicate_field`, `empty`, `outside_prose`, and
+`json_like`. Each records decision, exchange, bounded diagnosis, invalid-output
+fingerprint, and required change.
 
-Fault names are stable data, but the parser validates against the current
-`RuntimeDecision`, not a hidden global registry.
+## Admission Faults
 
-## Attempt Effect
+Stable admission faults include `stale_decision`, `stale_context`,
+`hidden_tool`, `bad_field`, `placeholder`, `path_escape`, `budget_exceeded`,
+`duplicate_effect`, and `policy_rejected`. Rejection commits without an effect
+journal row.
 
-Every parse fault records an attempt with outcome `parse_fault`, the fault name,
-decision id, a one-line diagnosis, and a `recovery.failure` state cell. The raw
-faulty output is stored in exchange logs and marked contaminated. Normal retry
-prompts include only bounded diagnosis, invalid-excerpt hash, required change,
-and the minimal corrected XML-like shape when the decision expects an action.
+## Contamination
 
-## Envelope Desk Check
+Raw failed model output stays in restricted exchange evidence and is marked
+contaminated. Normal prompts never quote it. Recovery receives only fault class,
+fingerprint, bounded diagnosis, tried strategy, and next required change.
 
-- Valid content for a write decision parses as content.
-- Leading or trailing prose outside content yields `wrong_block`.
-- A message during a write decision yields `wrong_block`.
-- A missing closing content tag yields `unclosed`.
-- Empty content yields `empty`.
-- An action with attributes yields `attribute`.
-- An action with duplicate `tool_name` yields `duplicate_tag`.
-- An action with `{ "tool_name": ... }` yields `json_like`.
-- An action with a tool absent from the decision view yields `unknown_tool`.
-- An action with an unsupported argument yields `bad_params`.
-- A bridge plan line without required fields yields `bad_plan_line`.
+## Repair
 
-## Failure This Prevents
+The first repair restates the exact expected grammar and one concrete valid
+shape bound to the current decision. Recurrence must change grammar constraint,
+tool view, field set, output unit, or strategy. The same prompt, view, budget,
+and failure signature cannot be retried unchanged.
 
-Faults become bounded data for the retry ladder, not more prompt text that
-teaches the model to repeat the faulty body.
+## Settlement
+
+Every failed attempt becomes a runtime event and failure-lineage row. Parse and
+admission failures create no effect. An effect fault settles through exactly one
+observation before recovery selection.

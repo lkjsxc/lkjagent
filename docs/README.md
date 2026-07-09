@@ -18,19 +18,18 @@ product.
    records, CLI, status, and console.
 6. [workspace/](workspace/README.md): owner-readable record tree, artifacts,
    indexes, and archive rules.
-7. [engine/](engine/README.md): plan-family helpers during the state-ledger
-   transition.
-8. [context/](context/README.md): context items, contradictions,
+7. [context/](context/README.md): context items, contradictions,
    contamination, budgets, matter briefs, and prompt frames.
-9. [protocol/](protocol/README.md): model output envelopes, XML-like actions,
+8. [protocol/](protocol/README.md): model output envelopes, XML-like actions,
    and faults tied to decisions.
-10. [tools/](tools/README.md): catalog, policy, tool views, admissions,
+9. [tools/](tools/README.md): catalog, policy, tool views, admissions,
     observations, and guards.
-11. [checks/](checks/README.md): deterministic checks and word counting.
-12. [memory/](memory/README.md): memory rows and retrieval.
-13. [store/](store/README.md): SQLite schema, exchange logs, crash resume, and
+10. [checks/](checks/README.md): deterministic checks and word counting.
+11. [memory/](memory/README.md): memory rows and retrieval.
+12. [store/](store/README.md): SQLite schema, exchange logs, crash resume, and
     state-edge rows.
-14. [llm/](llm/README.md): endpoint client, sampling, and generation budgets.
+13. [llm/](llm/README.md): endpoint client, sampling, and generation budgets.
+14. [tui/](tui/README.md): canonical transcript rendering, input, and scrolling.
 15. [operations/](operations/README.md): running, verification, and proof
     bundles.
 16. [evaluation/](evaluation/README.md): benchmarks, replay, and live proof.

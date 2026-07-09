@@ -2,67 +2,51 @@
 
 ## Purpose
 
-Define one generic Markdown record contract for personal, work, and development
-objects.
+Define the common owner-readable managed-document contract.
 
-## Shape
+## Metadata
 
-Each record is Markdown with YAML-like frontmatter followed by owner-readable
-body sections.
+Every managed Markdown file has one H1, then an attribute-free metadata block:
 
 ```text
----
-id: rec_20260705_120000_slug
-kind: todo
-title: Pay electricity bill
-state: open
-created_at: 2026-07-05T12:00:00Z
-updated_at: 2026-07-05T12:00:00Z
-tags: [home, finance]
-links: []
-state_keys: [todo:open/rec_20260705_120000_slug]
----
-
-# Pay electricity bill
-
-## Body
-
-...
+<lkjagent_record>
+<document_id>journal_20260608t120000z_k3m7q2</document_id>
+<kind>journal</kind>
+<effective_date>2026-06-08</effective_date>
+<state>active</state>
+<source_ref>activity_20260608t115900z_f4n2p8</source_ref>
+</lkjagent_record>
 ```
 
-## Identity
+Document IDs are path-independent, lowercase ASCII type prefix, UTC creation
+stamp, and random lowercase base32 suffix. Scalar fields occur once. Source and
+related-document fields may repeat. Unknown managed fields, states, duplicate
+IDs, and invalid escaping fail import.
 
-The `id` is stable and sorts by creation time. Paths are convenient storage
-locations, not identity. Pure workspace entity refs use the record id as the
-stable entity id, so a rebalance can validate path moves without changing
-ledger links. The canonical file implementation stores records under semantic
-families such as `workspace/records/life/journal/YYYY/MM/DD/entry.md`,
-`workspace/records/life/todo/open/<id>.md`,
-`workspace/records/life/calendar/YYYY/MM/DD/<id>.md`,
-`workspace/records/life/finance/YYYY/MM/<id>.md`, or
-`workspace/records/work/projects/<slug>/<id>.md`. Archived records move under
-`workspace/archive/records/...` with aliases preserved. Unknown `kind` values
-are valid records and must list, show, link, archive, and round-trip without
-central enum edits.
+## Content
 
-## Ledger Links
+Body Markdown begins after metadata and contains concise semantic sections.
+Managed content names kind, current state, effective local date, source refs,
+owner facts, generated synthesis when present, and related documents.
 
-Record writes refresh `workspace_records` metadata,
-`workspace_record_history` fingerprints, README path coverage, and generated
-record indexes. These rows and files are evidence and indexes, not turn
-authority. Frontmatter refs may point to owner messages, state keys, checks,
-provider exchanges, artifacts, other records, or proof bundles.
+Raw owner commands remain conversation or activity evidence. They are not copied
+into semantic records unless verbatim capture was requested. Capture writes
+explicit facts deterministically. Compose synthesizes from admitted sources.
 
-## Size Budget
+## Revisions
 
-Record files target about 512 prompt tokens. When a record body would push the
-Markdown file above that target, lkjagent keeps the main record small and writes
-the full body into sibling `.parts/part-NNN.md` files. The main record contains
-a size justification and links to every part. Owner data is split and linked,
-not silently truncated.
+SQLite stores immutable exact revision bytes, SHA-256, parent revision,
+tokenizer and token counts, creating operation, and admission. Document identity
+survives moves, state changes, archive, aliases, and tombstones.
 
-## Staleness
+## Size
 
-Editing a record changes its fingerprint. Reducers mark dependent indexes,
-checks, completion evidence, prompt frames, matter briefs, and state edges stale
-or superseded before selectors can refresh them.
+Managed memory and navigation pages admit at most 512 conservative tokens. Long
+artifacts split by named semantic section with an outline and manifest. External
+owner and project files keep their natural format and enter context only as
+bounded fingerprinted excerpts.
+
+## Checks
+
+Validate path family, title, metadata, non-placeholder body, sources,
+fingerprint, links, index membership, token count, and command separation.

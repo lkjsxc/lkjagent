@@ -2,27 +2,28 @@
 
 ## Purpose
 
-Record the decision that evidence checks close cases.
+Record that current deterministic checks satisfy obligations and close matters.
 
 ## Context
 
-Owner-visible completion must be backed by fresh evidence over real workspace
-state and active state cells.
+Owner-visible completion must be backed by fresh evidence over actual workspace
+bytes, effect outcomes, runtime state, and requested verification.
 
 ## Decision
 
-A case reaches terminal closure only when completion predicates from the active
-`RuntimeDecision` read current passing check rows and artifact fingerprints. The
-model may write summaries or request a finish-like operation only when the
-current decision exposes that grammar, but it cannot decide completion.
+Each required obligation names a stable evidence predicate. It becomes satisfied
+only from a passed current check for the same matter. The reducer creates a
+completion candidate after every required predicate passes and no unresolved
+operation blocks it. The model cannot create that candidate or settle it.
 
 ## Consequences
 
-Benchmarks, replay, proof bundles, status, and closure all read the same check
-results and state cells. A failed or stale check creates a diagnosis and a new
-state edge for retry, evidence gathering, owner ask, or blocked reporting.
+Evaluation, replay, proof, status, and closure read the same checks and source
+fingerprints. A failed or stale check appends an invalidation or diagnosis event
+and makes repair, evidence gathering, owner clarification, or blocked reporting
+eligible.
 
 ## Rejected Alternatives
 
-Model-invoked audits or self-reported done messages would place completion
-behind the weakest and least deterministic component.
+Model-invoked audits, readiness prose, or self-reported completion would place
+the final state behind the least deterministic component.

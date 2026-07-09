@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define the durable state vector that replaces fixed plan-only authority.
+Define the durable concurrent state vector reduced from runtime events.
 
 ## Table of Contents
 

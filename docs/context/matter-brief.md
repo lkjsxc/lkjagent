@@ -7,7 +7,7 @@ matter without replaying the full transcript.
 
 ## Shape
 
-A matter brief is an engine-maintained summary stored in durable rows and
+A matter brief is a reducer-maintained projection stored in durable rows and
 referenced by prompt-frame cards. It includes:
 
 - matter title and lifecycle state;

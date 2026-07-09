@@ -43,9 +43,9 @@ cargo run -p lkjagent-app -- send "Record that hello.md should say hello."
 cargo run -p lkjagent-app -- status
 ```
 
-`run` is long-running. `run --once` executes one bounded daemon turn for smoke
-checks and exits with a short state summary. During cutover,
-[../current-state.md](../current-state.md) states which binary is active.
+`run` is long-running. `run --once` executes one bounded daemon cycle for smoke
+checks and exits with a short state summary. Implementation gaps remain listed
+in [../current-state.md](../current-state.md).
 
 ## Fresh Trial
 

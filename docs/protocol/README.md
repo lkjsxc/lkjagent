@@ -9,8 +9,6 @@ fault taxonomy as projections of persisted runtime decisions.
 
 - [envelopes.md](envelopes.md): decision-selected block forms and active
   XML-like action envelope.
-- [plan-line-grammar.md](plan-line-grammar.md): exact plan helper grammar and
-  examples for bridge operations.
 - [faults.md](faults.md): parse faults, contamination, and retry hints.
 
 ## Core Rule

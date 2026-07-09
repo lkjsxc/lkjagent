@@ -39,7 +39,7 @@ preserved for round trip and diagnostics.
 Edges inform selector candidates, context admission, staleness, proof, and
 status. Check-to-artifact freshness edges are evidence only; completion still
 reads deterministic check rows and state cells. Edges do not execute effects,
-grant tools, close cases, or replace the persisted `RuntimeDecision` selected
+grant tools, close matters, or replace the persisted `RuntimeDecision` selected
 for a turn.
 
 ## Reducer Rule

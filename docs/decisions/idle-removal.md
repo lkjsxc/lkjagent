@@ -1,26 +1,29 @@
-# Idle Removal
+# Quiescence Is Derived
 
 ## Purpose
 
-Record the decision that idle does no autonomous maintenance.
+Record that waiting for work creates no synthetic runtime object.
 
 ## Context
 
-The daemon serves owner-queued work. Self-assigned maintenance work consumes
-endpoint budget without an owner objective.
+The daemon serves owner work and scheduled deterministic maintenance. Empty
+polls are neither progress nor evidence.
 
 ## Decision
 
-When there is no open matter and no pending queue row, the daemon updates
-heartbeat state and waits. It does not call the endpoint, inspect the workspace,
-or rewrite memory.
+Quiescence is derived when no eligible operation, due wake, pending owner turn,
+interrupted effect, or due maintenance exists. The daemon updates its lease and
+waits without an endpoint call, workspace inspection, memory rewrite, or
+self-assigned matter.
 
 ## Consequences
 
-Owner-visible work starts only from queue messages. Self-improvement work is an
-ordinary owner matter.
+Waiting owner and waiting external conditions remain durable and visible.
+Scheduled maintenance uses ordinary operations, budgets, checks, and effect
+settlement. Elapsed quiescence cannot satisfy campaign duration or matter
+completion.
 
 ## Rejected Alternatives
 
-Keeping idle maintenance would require cooldowns, directives, and a second set
-of completion rules for work the owner did not request.
+A stored idle operation or self-created maintenance matter could overwrite the
+last meaningful state and create false progress.

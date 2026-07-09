@@ -7,7 +7,9 @@ and record surfaces, status, console, and workbench.
 
 ## Table of Contents
 
-- [daemon.md](daemon.md): daemon loop, idle, waiting, and crash resume.
+- [authority-boundaries.md](authority-boundaries.md): workspace, SQLite,
+  projection, model, harness, and configuration ownership.
+- [daemon.md](daemon.md): daemon loop, quiescence, waiting, and crash resume.
 - [cli.md](cli.md): owner command surface and exit-code discipline.
 - [queue.md](queue.md): owner-turn intake, answer routing, and semantic routing.
 - [status-and-console.md](status-and-console.md): status fields, matter display,
@@ -15,7 +17,7 @@ and record surfaces, status, console, and workbench.
 - [workbench.md](workbench.md): daily-driver terminal workbench with durable
   transcript and Japanese input requirements.
 
-## Product Architecture
+## Target Product Architecture
 
 The product is workspace-first. The owner sees one readable workspace that acts
 as an auxiliary memory device: daily records, calendar notes, TODOs, finance,
@@ -44,5 +46,4 @@ until recovery or supersession evidence exists.
 ## Product Units
 
 The owner sees turns, matters, records, artifacts, transcripts, decisions,
-events, and proof. Plan-family rows are internal evidence only; they are never a
-second owner-facing task contract or completion authority.
+events, and proof. No retired projection is part of the production contract.

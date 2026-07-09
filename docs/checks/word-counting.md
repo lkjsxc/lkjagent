@@ -27,7 +27,7 @@ A mixed string with `Section`, `1`, and one Han character counts as
 
 ## Shared Use
 
-The same function is used by templates, operation checks, matter checks, status,
+The same function is used by operation checks, matter checks, status,
 benchmarks, replay, and proof bundles. A caller may not substitute a family-
 specific counter.
 

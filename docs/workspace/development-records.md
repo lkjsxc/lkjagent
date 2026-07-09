@@ -2,26 +2,36 @@
 
 ## Purpose
 
-Define records for software development, projects, and proof work.
+Define multiple-project source, decision, session, and verification records.
 
-## Families
+## Project Identity
 
-Known development `kind` values include:
+Each project has a stable ID and root under `projects/<project-id>/`. Create only
+used branches for its README, notes, decisions, sessions, artifacts, evidence,
+and named repositories or validated linked paths.
 
-- `project`: objective, state, milestones, decisions, and next actions;
-- `development`: repository work items, branches, tests, and code evidence;
-- `reference`: API notes, local design facts, and owner-approved citations;
-- `routine`: recurring verification, dependency checks, or maintenance;
-- `proof`: evidence bundle manifest and command results.
+## Records
 
-## Repository Rule
+Project notes live under `notes/YYYY/MM/`. Decisions record status, decided
+time, superseded decision, rationale, and consequences. Sessions record start,
+end, goal, work, checks, outcome, and next action. All carry the project ID.
 
-External repositories may live under `workspace/repos/` or be referenced from
-project records. Prompt admission must still use bounded context items with
-fingerprints instead of unbounded transcript or repository dumps.
+## Repository Boundary
 
-## Proof Links
+Git and filesystem effects remain bounded to the selected repository. Before an
+edit, record inspected paths and fingerprints. After it, record the diff,
+focused checks, broader Docker verification, workspace project note, and
+remaining risks.
 
-Proof records link command output refs, check rows, artifact fingerprints,
-provider exchange refs, and state-edge evidence. They explain what ran and what
-was skipped; they do not make an unrun gate pass.
+## Context Separation
+
+A project matter selects only its metadata, named repositories, relevant source
+excerpts, current operations, recent decisions, and verification evidence.
+Similar names do not permit cross-project retrieval. A readiness message cannot
+satisfy a source-change obligation.
+
+## Proof
+
+Proof records reference command output, checks, document revisions, effect and
+observation rows, provider exchanges, and source commits. They never promote an
+unrun command or skipped required capability.

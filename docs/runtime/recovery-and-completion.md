@@ -2,57 +2,40 @@
 
 ## Purpose
 
-Define crash recovery, evidence-gated closure, and runtime observability.
+Define causal recovery and check-gated matter completion.
+
+## Failure Lineage
+
+Every failure records class, normalized signature, decision, operation, state,
+context, tool-view and budget fingerprints, attempted strategy, changed
+condition, bounded diagnostic, retry count, next strategy, eligibility time,
+and remaining budget.
+
+The operation, prompt, tool view, budget, and failure signature tuple may not
+repeat without a changed external condition. Recurrence selects the next typed
+strategy or records an owner-visible block.
+
+## Recovery Ladders
+
+Output limits shrink or split semantic units. Parse failures repair the exact
+grammar before narrowing the shape. Admission failures remove hidden actions or
+correct typed fields. Effect failures inspect external state before replay or
+compensation. Check failures inspect measured results, repair source, and rerun
+the invalidated check.
 
 ## Crash Recovery
 
-On boot, recovery checks unfinished decisions before selecting new work. If a
-decision was persisted before an endpoint call but no exchange, admission, or
-observation was committed, the runtime retries the same decision when safe or
-commits a bounded recovery event. It does not recompute a new tool view and
-pretend it rendered the old prompt.
-
-If an admission was persisted before a tool effect, resume either reruns the
-idempotent effect or records a recovery event for non-idempotent work. Parse,
-admission, effect, endpoint, and check failures create active durable
-`recovery.failure` cells keyed by kind and decision before any happy response can
-hide the failure. The next selector pass must choose and settle the recovery
-cell before normal model work can continue; the following model retry carries the
-bounded diagnosis. Repeated identical failures escalate to a blocked state or a
-narrowed recovery decision instead of a happy response.
+Startup reconciles prepared effects first, then interrupted endpoint decisions,
+derived projection fingerprints, due wakes, and pending owner turns. A settled
+effect is never repeated and an uncommitted model response is never reused.
 
 ## Completion
 
-Completion is represented by state cells such as `completion:check-pending/*`,
-`completion:check-passed`, `completion:check-failed`, `completion:blocked`, and
-`completion:close-candidate`. A pending deterministic verify cell carries the
-native `check.run/<step>` operation. Each recorded check row emits a native
-`completion:check-passed/*` or `completion:check-failed/*` cell with evidence
-refs. Hydration suppresses passed check rows that lack matching active native
-completion cells. Blocked and close-candidate projections use native completion
-schemas, not plan-bridge schemas. Closing a case requires no pending, active,
-blocked, failed, or unsuperseded skipped operation and current passing check
-results tied to artifact fingerprints and the active decision. Artifact request
-closure also requires the response summary to name the artifact path. Model prose
-alone is not completion evidence.
+The reducer creates a completion candidate only after all required obligations
+have current passed checks. Any current active, pending, failed, blocked, or
+unsuperseded operation prevents it. Readiness prose, future-tense promises,
+elapsed time, and empty work lists are not evidence.
 
-While plan-family rows remain as bridge storage, they are blocking evidence.
-Any blocked, active, pending, failed, or unsuperseded skipped bridge step keeps
-the matter open or blocked even if task-level checks are empty or model prose
-claims success. Runtime projection checks those earlier blockers before
-selecting later model work such as verify or respond steps.
-
-If an artifact changes after a passing check, the reducer suppresses dependent
-`completion:check-passed` cells or creates a fresh check requirement.
-
-## Observability
-
-Status, logs, and proof bundles render case state, active state cells, decision
-ids and fingerprints, prompt-frame refs, tool-view summaries, admissions,
-observations, context conflicts, contamination suppressions, artifact
-fingerprints, check results, exchange refs, token usage, and recovery events.
-
-## Failure This Prevents
-
-A crash cannot create false completion, stale prompt authority, or unexplained
-refused-tool behavior.
+The close transaction commits final checks, completion event, lifecycle change,
+and final conversation message together. A later source change invalidates
+dependent checks and completion evidence through a new event.

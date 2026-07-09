@@ -22,7 +22,7 @@ suffixes such as
 
 Each cell stores:
 
-- case id;
+- matter id;
 - key namespace and name;
 - status: active, inactive, suppressed, resolved, or blocked;
 - priority and confidence;
@@ -38,7 +38,7 @@ Each cell stores:
 ## Schema Names
 
 Payload schema names are semantic contract labels such as `context-conflict`,
-`matter-snapshot`, or `state.model-call`. Do not add numbered suffix labels for
+`operation-budget`, or `state.model-call`. Do not add numbered suffix labels for
 project-authored schemas. Endpoint paths, hash algorithm names, and external API
 revisions may still contain numbers when those names are externally owned.
 

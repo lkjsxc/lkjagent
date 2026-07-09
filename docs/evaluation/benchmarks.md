@@ -2,40 +2,36 @@
 
 ## Purpose
 
-Define the deterministic benchmark corpus.
+Define anchored scenarios and deterministic checks independent of runtime prose.
 
-## Corpus Record
+## Scenario Shape
 
-Corpus entries live under `evaluation/corpus/<suite>/<entry>/`. Each entry has:
+Each scenario stores ID, minimum duration and owner schedule, allowed terminal
+states, required check IDs, seed fingerprint, required fault injections, and
+negative predicates. Matters use stable scenario keys so checks compare every
+declared goal with one fresh-store result.
 
-- `objective.txt`: owner request text;
-- `template.txt`: expected classifier template;
-- `checks.json`: checks from [../checks/catalog.md](../checks/catalog.md);
-- `fixtures/exchanges.txt`: scripted parse fixtures as `mode|kind|raw` lines.
+Fixtures contain exact owner turns, workspace seed bytes, endpoint exchanges,
+fault schedules, and expected measurements. They do not contain editable pass
+labels or implementation-owned success summaries.
 
-Judges are check evaluators, not separate matter-family code. Entry-specific judge
-logic is a corpus-definition error.
+## Required Families
 
-## Gate
+- daily life and recall with Japanese input and a local-day boundary;
+- two similar projects with source separation and bounded code work;
+- a 1,500-word artifact under an initial 768-token output cap;
+- protocol, admission, effect, crash, context, and no-progress faults;
+- canonical TUI identity, paging, resize, input, and restart behavior.
 
-`cargo run -p lkjagent-xtask -- bench check-corpus` validates the corpus. A
-passing run prints `ok bench check-corpus`. The gate is part of `quiet verify`.
+## Checks
 
-## Run Command
+Stable Rust checkers read raw rows and bytes. They prove obligations, paths,
+fingerprints, current check lineage, strategy changes, provider exchanges,
+workspace visibility, transcript identity, and negative predicates. Runtime
+messages never decide a checker result.
 
-`cargo run -p lkjagent-xtask -- bench run --suite tiny --data DIR` drives each
-suite entry through the app daemon with the configured endpoint and writes a
-bounded Markdown report. `DIR/lkjagent.json` or endpoint environment variables
-provide the endpoint configuration. Each entry writes an isolated artifact
-subdirectory under `DIR/entries/`.
+## Replay Gate
 
-## Coverage
-
-The tiny suite includes structured reports, docs-tree planning, file work,
-questions, journal work, truncated exchanges, and wrong-envelope exchanges.
-
-## Fixture Rule
-
-Fixtures are recorded from real runs or constructed directly from the written
-contract. Each fixture states which parse behavior it guards without endpoint
-URLs or secrets.
+Every reproduced failure lands as a minimized fixture before its fix. The
+focused node gate and Docker Compose rerun that fixture through production
+boundaries or a pure checker with the same schema.

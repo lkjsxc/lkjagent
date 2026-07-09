@@ -2,46 +2,39 @@
 
 ## Purpose
 
-Define the daily-use live endpoint proof and capture rules.
+Define final live and PTY acceptance against one frozen source commit.
 
-## Acceptance Criteria
+## Source Binding
 
-A scripted or live daily-use proof is acceptable only when the proof bundle shows:
+After `source-freeze`, derive `SOURCE` from Git and write final evidence only at
+`tmp/lkjagent-acceptance/$SOURCE`. Live, experiment, and PTY binaries must match
+the rebuilt frozen-source executable hash.
 
-- the requested profile and success checks;
-- prompt frames, context lane fingerprints, and tool-view fingerprints;
-- provider exchanges with request and response refs;
-- admitted or rejected tool calls tied to decisions;
-- observations, artifacts, checks, and final state rows;
-- workspace records or aliases touched by the profile; and
-- adoption notes that say what changed because of the evidence.
+## Campaigns
 
-The preferred profiles are personal daily capture, finance receipt flow,
-calendar meeting flow, todo capture, note capture, project work, artifact
-creation, workspace rebalance, protocol stress, TUI operator flow, and recovery
-flow.
+Run independent sessions of roughly fifteen minutes for daily life and recall,
+multiple-project development, and long artifact plus injected recovery. Send
+real owner goals throughout each session. Run a separate PTY session when it
+cannot be safely combined.
 
-## Duration
+Each campaign uses a fresh isolated store, declared workspace seed, real
+configured endpoint, predeclared owner schedule, and scenario checks. Runtime
+quanta and empty polls do not count as turns or progress.
 
-Standard live profile duration is 900 seconds when endpoint credentials are
-available. Short dry runs are allowed only to prove setup before spending live
-budget. Missing endpoint configuration writes explicit skip evidence instead of
-a pass.
+## Raw Evidence
 
-## Capture
+Capture SQLite with Online Backup, exact workspace bytes and manifest, event and
+decision traces, admissions, effects, observations, checks, process lifecycle,
+provider request and response hashes, redacted logs, metrics, executable hash,
+configuration bytes, and scenario bundle hash. PTY evidence adds input events,
+terminal recording, geometry trace, screen hashes, and replay results.
 
-Each run writes a stamped directory under `tmp/live-runs/` or `tmp/agent-runs/`
-with data, prompt frames, request and response refs, observations, final state,
-workspace tree, SQLite counts, metrics, and an adoption note. Secret-bearing raw
-bodies stay local or are redacted before any committed summary.
+## Acceptance
 
-## Procedure
+Every required matter completes or reaches its predeclared visible waiting
+state. False closure, same-strategy retry, missing exchange, stale check,
+hidden-tool effect, fabricated file, command-as-journal prose, wrong-project
+context, mostly quiescent duration, or skipped required capability fails.
 
-The operator starts the daemon, sends the profile objective, waits until the time
-box or harness-computed completion, collects proof, and records the exact gates
-or skip reason. The model never decides that the live proof passed.
-
-## Failure This Prevents
-
-Live evidence measures real daily-use behavior instead of optimizing for a
-single prose-generation benchmark.
+The controller and independent verifier recompute results from raw evidence. A
+summary, model claim, or editable receipt cannot promote a failure.

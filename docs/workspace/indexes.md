@@ -2,37 +2,40 @@
 
 ## Purpose
 
-Define generated workspace views and how they stay honest.
+Define useful navigation, body search, staleness, and rebuild behavior.
 
-## Index Files
+## Navigation
 
-Generated index files live under `workspace/indexes/`. Typical examples include
-`today.md`, `agenda.md`, `open-todos.md`, `active-projects.md`, and
-`budget-month.md`.
+Derived pages include today, open TODOs, agenda, finance month, active projects,
+recent changes, and proof runs. Shard by date, project, topic, or state before a
+managed page exceeds its token budget.
 
-## Required Metadata
+Each page records generation time, input document IDs and revision fingerprints,
+and stale reason. It owns no source fact and cannot satisfy an obligation while
+stale.
 
-Each generated index records:
+## Search
 
-- generation time;
-- input record ids;
-- stale reason when inputs changed after generation.
+Index current Markdown bodies, titles, dates, kinds, project, state, relations,
+and revision fingerprints. Support exact document and path lookup, lexical and
+trigram body search, and date, project, kind, and state filters. Search rows are
+unique by document, revision, field, and byte range.
 
-Each generated index also has a `workspace-index` artifact row with path,
-fingerprint, input record ids, and stale reason metadata.
+## Retrieval
 
-## Rebuild Rule
+Discover before ranking. Retrieve relevant bounded body excerpts rather than a
+fixed recent metadata window. Validate the current revision fingerprint before
+prompt admission and record selected and excluded source refs.
 
-Indexes are derived views. They can be deleted and rebuilt from workspace record
-rows. Record writes, `lkjagent workspace --rebuild`, and
-`workspace apply-rebalance` refresh record-backed indexes and record index
-artifact rows. Rebalance keeps old paths resolvable while generated views point
-at canonical paths. A stale index may still be shown to the owner with a warning,
-but it must not satisfy completion checks or be admitted to prompts as current
-evidence.
+## External Changes
 
-## Search Rule
+A debounced scanner detects stable new, changed, moved, and deleted files.
+Valid managed files update document and search projections. Large owner source
+stays in place. Malformed managed content receives a visible import-review or
+quarantine diagnostic without overwriting original bytes.
 
-Full-text search may index records and artifacts, but every search result shown
-to the model must be admitted as bounded context with source refs, fingerprint,
-trust class, contamination class, and staleness status.
+## Validation
+
+Compare index membership and search fingerprints with current documents. Missing,
+stale, duplicate, wrongly classified, or unresolved debt rows fail workspace
+validation. All projections are rebuildable from source files and revisions.

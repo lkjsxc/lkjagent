@@ -57,6 +57,7 @@ retaining `Cargo.lock`.
 
 ## Claims
 
-Any claim that runtime behavior is implemented names the focused test, quiet
-gate, and Docker gate that ran. Unavailable Docker or live endpoints are
-recorded as honest skips with exact command and error, not as passes.
+Any implementation claim names the focused test, quiet gate, and Docker gate
+that ran. Unavailable Docker, endpoint, terminal, or public CI capability is a
+blocker for dependent nodes. Record the exact command and raw error; never
+record a skip as a pass.

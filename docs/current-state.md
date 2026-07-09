@@ -2,186 +2,149 @@
 
 ## Purpose
 
-Keep an honest ledger that separates the target contract, behavior proven in
-this checkout, and open implementation gaps.
+Separate observed behavior in this checkout from the target contract and the
+work still required to make them agree.
 
-## Target Contract
+## Evidence Boundary
 
-lkjagent is a workspace-first personal agent harness for one owner, one local
-LLM, one visible workspace, and one SQLite ledger. Durable rows and persisted
-`RuntimeDecision` rows are the single control plane. Workspace files are the
-owner-readable memory surface; they never replace ledger authority.
+The supplied product source is commit
+`ae5ff551457adce869dee6159200c85a63aab3de`. The immutable rebuild packet is
+anchored at `1b615a76c03dfd58dfd2986f017563bd6789e832`. Baseline raw evidence and
+its reviewed receipt live under
+`tmp/lkjagent-progress/nodes/baseline-capture/`.
 
-Every owner turn writes visible evidence: a transcript entry for ordinary turns
-or an inbox trace when routing is ambiguous. Record-like turns write Markdown
-under canonical workspace family paths: dated journal entries, state-grouped
-TODOs, dated calendar notes, month-grouped finance notes, and readable work or
-knowledge records. The owner command is route evidence; the record body is a
-structured owner-readable note unless verbatim storage is explicit. Recording
-also upserts workspace record rows, fingerprint history, README coverage, index
-artifacts, state cells, and queue route evidence. Artifact turns create concrete
-workspace paths, artifact rows, checks, and response paths before any success
-report.
+The supplied SQLite store has three tasks, thirteen steps, ten decisions, and
+six provider exchanges. The task states are closed, blocked, and closed. The
+blocked world-history task has an active write asking for at least 1,500 words
+at `./history_narrative.md`. Two decisions repeat that operation with the same
+768-token output cap and endpoint-limit diagnosis. The store has zero tool
+admissions, observations, artifacts, and workspace records for those matters.
 
-The model-visible interface is compact XML-like text with source refs. Tool
-calls use one attribute-less `<lkjagent_action>` envelope selected by the active
-runtime decision. Prompts render selected context lanes, selected tool views,
-and bounded recovery diagnoses; they do not render JSON, whole transcripts, raw
-failed output, or the global tool catalog.
+The four tracked 900-second summaries say `ran` and `closed`, but the matching
+live databases were not committed. They are bounded historical fixtures, not
+proof that the underlying matters completed. A preserved transcript records an
+`fs.tree` prefix error, but its live database is also absent.
 
-Completion is engine-computed from fresh state, artifacts, checks, observations,
-and blocker evidence. A later response cannot run after earlier blocked, active,
-failed, pending, or unsuperseded skipped work without repair or supersession
+Local Docker lint, test, and verify passed with the ignored working-copy
+`Cargo.lock`. The packet clean-checkout script fails in an isolated worktree
+because that lockfile is not tracked. Those local passes are not clean-checkout
 evidence.
 
-## Proven In Current Checkout
+A fresh model-free diary run writes a journal entry containing canned
+missing-detail text after the owner asks for a diary entry. This is reproduced
+failure evidence, not acceptable record behavior.
 
-The store persists cases, owner queue rows, runtime events, state cells, state
-edges, runtime decisions, context items, prompt frames, tool admissions,
-observations, provider exchanges, token usage, checks, artifacts, workspace
-records, record history, path aliases, rebalance audits, and proof data.
+## Baseline Failures
 
-The core crate contains pure reducers, selectors, transition guards, completion
-checks, context hygiene, tool descriptors, XML-like action parsing, artifact
-units, workspace manifests, and graph queries. The app crate contains bridge
-interpreters, endpoint exchange capture, record commands, workspace rebuild and
-rebalance commands, console, watch, status, workbench, row-backed inspection,
-and bounded `run --once` paths. Rebalance validates the file fingerprint before
-moving a record, repairs exact old-path links in record files, records alias and
-audit rows, and rolls the file move back when a post-move step fails before the
-ledger row update. `record archive` also writes old-path aliases and audit rows,
-and `workspace validate` reports stale record fingerprints.
+| Failure | Status | Raw evidence |
+| --- | --- | --- |
+| repeated impossible history request | reproduced | `raw/12-sqlite-facts.tsv`, `raw/13-request-facts.tsv` |
+| empty effect and workspace lineage | reproduced | `raw/12-sqlite-facts.tsv` |
+| clean checkout lacks tracked lockfile | reproduced | `raw/31-clean-checkout.log` |
+| diary writes canned missing details | reproduced | `raw/17-diary-run-once.log`, `raw/18-diary-after-run-manifest.tsv` |
+| live and readiness closure | bounded | `raw/14-live-summary-facts.tsv` |
+| relative-root tree failure | bounded | `raw/19-relative-root-historical.log` |
 
-Current model action parsing accepts one attribute-less `<lkjagent_action>` with
-child tags for decision id, context fingerprint, tool name, and repeated
-arguments. It preserves multiline and Japanese values, bounds argument value
-size, and rejects JSON-shaped bodies, attributes, unknown tags, duplicate
-scalars, duplicate argument names, stale decisions, context mismatches, unknown
-tools, bad primitive classes, unclosed tags, crossed tags, bad entities, empty
-executable values, and placeholder-like executable values.
+All paths are relative to
+`tmp/lkjagent-progress/nodes/baseline-capture/`. Bounded means the preserved
+summary or transcript exists but its matching live database does not.
 
-Runtime decisions carry selected state keys, derived harness states, selected
-tool views, context-frame fingerprints, expected envelopes, evidence
-requirements, and recovery policy. Prompt cards render the harness state as the
-state-specific fragment while preserving the decision row as authority. Parse,
-admission, effect, endpoint, and check failures now write active
-`recovery.failure` state cells keyed by kind and decision; the next selector pass
-routes through a recovery decision before normal model work can continue.
-Repeated same-kind recovery failures escalate through `completion:blocked` so
-the engine blocks instead of cycling indefinitely. Parse
-diagnoses now include concrete repair guidance for envelope, action grammar,
-decision, context, tool, and argument faults. Native model-free operations
-support state resolution and workspace text effects for `workspace.write_text` and
-`workspace.append_text` through path-checked workspace effects and artifact rows.
-Runtime projection and decision dispatch now preflight earlier unfinished step
-blockers before later model response work.
+## Current Implementation
 
-Record-like owner turns have focused coverage for direct workspace writes,
-record rows, history, fingerprints, README links, index contents, and index
-artifacts. Journal records now use `YYYY/MM/DD/entry.md`, TODO records use state
-paths, calendar records use dated paths, finance records use month paths and the
-`budget-month.md` index, and record bodies are structured separately from
-owner-turn transcript evidence. Oversize record bodies are split into linked
-`.parts/part-NNN.md` files with a size justification in the main record.
-Multi-unit generated artifact bodies use the same owner-readable pattern: the
-requested path holds a compact manifest, and the full body lives in checked part
-files with unit artifact rows. Artifact-request routing now blocks closure unless
-the final response names the artifact path after file, artifact row, and check
-row evidence exists. CLI send and daemon intake now scaffold the workspace and
-write owner-turn transcript or inbox trace files. Owner-turn routing has focused
-coverage for existing-matter answers, continuations, artifact requests,
-inspection, unsupported system operations, direct records, ambiguous inbox
-routing, Japanese diary or save wording, and todo, calendar, finance, note,
-project, and development wrapper writes.
+The checkout contains useful state cells, state edges, runtime decisions,
+context rows, prompt cards, tool admissions, observations, checks, artifacts,
+workspace records, and TUI reducers. These rows and pure helpers are inputs to
+the rebuild, not proof that the native authority loop is complete.
 
-Prompt context can admit bounded workspace record and index metadata with source
-fingerprints, record named pipeline stages, suppress duplicate clean context
-items by semantic key, body, source type, and source fingerprint, and replace
-JSON-like context bodies with source-linked suppression markers before prompt
-rendering. Prompt card facts now carry compact lane fingerprints, pipeline stage
-status, and source refs. Default explore tool views
-exclude `shell.run`; shell is available only through an explicit persisted
-shell-capable decision view. Unsafe XML-like tool actions persist rejections.
-Status and proof surfaces expose cached and uncached token usage separately,
-raw provider usage metadata, blocked counts, stale-edge counts, prompt frames,
-tool-view fingerprints, artifact refs, check refs, and proof rows.
+Production still hydrates `TaskSnapshot`, task rows, step rows, fixed templates,
+and bridge projections. Context may be prepared before the final decision.
+Generic parsed messages and finish actions can settle steps without objective
+effect evidence. Recovery can repeat the same impossible model call. The live
+runner can count idle polls and replace the last real state with a synthetic
+closed snapshot.
 
-The terminal workbench has a pure reducer, durable transcript stream with stable
-queue/event ids, agent draft accumulation for streaming deltas, id-based
-transcript merge, saved transcript ids and source paths, Japanese input,
-grapheme-indexed composer movement, delete, home/end, multiline submit,
-display-width cursor placement, a pane-oriented workbench renderer,
-row-backed status fallbacks, and focused coverage for transcript merge and
-rendering surfaces. The workbench uses ratatui only on TTY, falls back to a line
-pane renderer otherwise, and the help text names Home/End as composer movement.
-Workbench pane mode renders a canonical conversation transcript in the left pane
-and keeps step progress, matter trace, recent events, tool/state/system/error
-messages, and proof diagnostics out of that transcript pane. Slash commands do
-not echo as owner transcript messages, and TTY viewport windows clamp manual
-scroll to the rendered pane bottom instead of showing blank space.
+Workspace behavior is split across record commands, template writes, direct
+filesystem tools, and native text effects. They do not share one transaction,
+idempotency, indexing, or recovery contract. Startup eagerly creates empty
+navigation. Retrieval does not yet search and rank the full visible workspace.
 
-Baseline and post-change commands for the 2026-07-08 packet passed `cargo run
--p lkjagent-xtask -- check-docs`, `cargo run -p lkjagent-xtask -- quiet
-verify`, and `docker compose run --rm verify`. Packet static scripts ran with a
-`python3` shim for `python`. Docker builds use explicit crate copies and BuildKit
-cache mounts; Compose exposes agent, daemon, live-campaign, shell, and check
-profiles with writable data and tmp paths. Runtime `data/logs` rows are no
-longer committed as product evidence.
+The TUI derives ordinary conversation from queue and selected event rows rather
+than one canonical conversation table. Historical reducer tests do not replace
+a final PTY campaign against frozen source.
 
-Runtime configuration is flat JSON only. `data/lkjagent.json` accepts scalar
-and primitive-array keys such as `endpoint_url`, `endpoint_model`,
-`workspace_root`, prompt budget, and live-campaign duration; nested objects are
-startup errors. Live-profile and smoke endpoint detection count only environment variables or
-those flat endpoint keys, so old nested endpoint shapes no longer silently enable
-live campaigns or smoke-live skips.
+## Target Authority
 
-Focused acceptance evidence now covers owner record writes, transcript traces,
-artifact files and response-path gating, blocked-step preflight, prompt-context
-non-JSON suppression, state-selected tool views, XML action parsing and
-admission, recovery failures, and TUI transcript identity and follow behavior.
-Scripted evidence under `tmp/agent-runs/20260708T180141Z/` records the workspace
-probe, protocol experiment matrix, and proof bundle. Live endpoint profiles under
-`tmp/live-runs/20260708T180320Z/` are honest skips because endpoint input was
-intentionally absent. After `.env` use was authorized, a 900-second-per-profile
-endpoint run under `tmp/live-runs/20260708Tstandardenv/` ran without exposing
-secret values; personal-workspace, software-project, structured-artifact, and
-protocol-stress all closed with elapsed_seconds=900.
+The target pure core is:
 
-The July 9 continuation reran packet static inspection, `check-docs`,
-`check-lines`, all `lkjagent-core` and `lkjagent-app` integration tests,
-deterministic smoke replay, a scripted workspace probe, proof collection,
-protocol experiments, `quiet verify`, and `docker compose run --rm verify` from
-clean `66027735`. Fresh evidence is under
-`tmp/coding-agent-runs/20260709T041854Z-more-more-continuation/`.
-Later corrective slices add generated-artifact part manifests, rebalance
-compensation, ranked XML-like context card entries, and tool admission hardening
-for repeated calls, recovery-hidden tools, budget suppression, and
-tool-view mismatch reasons. A later TUI slice shadows matching `session:*`
-transcript rows once durable queue or event rows arrive. Evidence for these
-slices is under `tmp/agent-runs/20260709T0*/`.
+```text
+RuntimeSnapshot + RuntimeEvent + CurrentTime -> RuntimeState
+RuntimeState + Policy + CurrentTime -> RuntimeDecision
+```
 
-## Known Gaps
+The effects edge is:
 
-- Scripted workspace evidence covers todo, note, transcript, index, proof, and
-  blocked artifact-request behavior.
-- Standard 900-second endpoint evidence exists for four profiles; adoption remains
-  deferred until the owner accepts those metrics as default behavior.
-- TUI behavior is proven by reducer, transcript, display-width, and packet
-  capture-script tests, not an interactive operator session in this environment.
+```text
+RuntimeDecision -> EffectResult
+EffectResult -> RuntimeEvent
+```
 
-## Next Executable Step
+Durable events reduce to concurrent state cells. A selector persists one
+decision before prompt compilation or a native effect. The same row owns
+context, tool view, grammar, budgets, recovery, checks, and exit predicates.
+The model may author bounded content or propose an admitted operation; it never
+chooses completion.
 
-Use the amplified evidence run as the baseline for future workspace-first
-changes. If the owner wants more live confidence, run another endpoint profile
-using configured credentials and record cost and elapsed-time evidence without
-exposing secrets.
+The target store and constraints are defined in
+[store/schema.md](store/schema.md) and
+[store/schema-constraints.md](store/schema-constraints.md). The runtime and
+effects transaction is defined in
+[store/effect-journal.md](store/effect-journal.md). Completion requires fresh
+checks for every required obligation and no unresolved blocking operation.
+
+## Removal Map
+
+| Current authority | Target replacement | Status |
+| --- | --- | --- |
+| `TaskSnapshot` hydration | event-reduced `RuntimeState` | open |
+| task and step tables | matters, obligations, operations, and events | open |
+| fixed template rows | reducer-created obligations and operations | open |
+| bridge projections | direct native store writes | open |
+| plan-line model protocol | admitted operation envelopes | open |
+| generic finish shortcut | harness checks and exit predicates | open |
+| synthetic idle task | daemon quiescence with wake conditions | open |
+| split workspace writers | one effect journal and path service | open |
+| synthesized TUI transcript | canonical conversation messages | open |
+
+These surfaces may be read only by an offline fixture converter while focused
+regressions are extracted. Production selection, rendering, admission, effects,
+recovery, and completion must stop reading them.
+
+## Open Program
+
+The dependency order is repository determinism and evaluation fixtures, native
+store identity, event reduction, workspace transactions, native selection,
+context and protocol cutover, recovery continuity, retrieval, canonical TUI,
+experiments, cleanup, source freeze, and final live and PTY evidence.
+
+No downstream item is complete merely because a narrow test or historical log
+passes. Each named workgraph node requires its locked Docker gate, raw output,
+machine-readable result, separate review, and hash-bound receipt.
+
+## Contract To Source Gaps
+
+| Contract | Current source | First proving node |
+| --- | --- | --- |
+| native fresh store | `crates/lkjagent-store/src/plan_*` | store-foundation |
+| event reducer | `crates/lkjagent-core/src/engine*` | event-reducer |
+| decision-first loop | `crates/lkjagent-app/src/runtime_bridge.rs` | selector-runtime-cutover |
+| workspace transaction | split app and effects writers | workspace-foundation |
+| canonical transcript | queue and event projections | tui-core |
+| final campaigns | summary-oriented xtask runners | live-acceptance |
 
 ## Honesty Rules
 
-- A behavior is implemented only when code, focused tests, and passing gates
-  exist in the current checkout.
-- Checked-in run logs can be failure fixtures or historical proof, not current
-  gate results.
-- Missing evidence never proves absence; verify before claiming.
-- When docs and code disagree, fixing the disagreement is the first request.
-- Never claim a gate passed without running it.
+- Target prose is not an implementation claim.
+- A historical summary is not current raw evidence.
+- Missing raw data creates a bound, not a pass.
+- A command that did not run did not pass.
+- Completion belongs to checks computed from durable facts.

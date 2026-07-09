@@ -10,7 +10,7 @@ visibility that make daemon progress observable.
 `lkjagent status` prints stable fields derived from the store:
 
 ```text
-daemon: working | idle | waiting | stopped
+daemon: working | quiescent | waiting | stopped
 matter: daily-capture open title="July notes" budget 47/200
 decision: matter-daily-capture-decision-0007 model.call status=pending ctx=9ac4 tools=aa12
 last: record_written path=workspace/records/life/journal/2026/07/07/entry.md
@@ -39,8 +39,7 @@ provider usage metadata for proof bundles.
 - proof refs: prompt-frame count, check totals, artifact fingerprints, and
   exchange refs.
 
-Plan-family rows may appear as bridge evidence, never as the only runtime
-authority.
+Status reads native matter, operation, event, state, and evidence rows only.
 
 ## Event Log
 
@@ -65,8 +64,8 @@ daemon state. Exiting it does not stop the daemon.
 `watch` is a bounded one-shot terminal snapshot over the same store rows:
 
 - status section: daemon, queue, token, lease, state, decision, and record lines;
-- transcript section: owner turns plus terminal lkjagent messages only, without
-  duplicating internal step-completion events;
+- transcript section: canonical owner and agent messages only, without
+  duplicating internal operation events;
 - recent events section: the latest eight bounded event rows;
 - matter trace section: the active matter, latest matter, or `matter: none`;
 - proof rows section: prompt-frame, check, artifact, exchange, and record counts;

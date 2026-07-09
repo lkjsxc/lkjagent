@@ -2,44 +2,40 @@
 
 ## Purpose
 
-Define transaction boundaries and daemon boot recovery for the state ledger.
+Define transaction boundaries and deterministic recovery from durable rows.
 
-## Turn Transactions
+## Event Transaction
 
-The store commits events and their state patches together in one transaction.
-Duplicate runtime event ids are ignored before reduction, so a replay cannot
-apply a second patch from an event row that was not inserted. Prompt frames,
-decisions, admissions, observations, checks, exchange refs, and usage rows carry
-the same decision id when they belong to one turn. A gate that did not commit a
-row did not happen.
+Appending a runtime event, validating its transition, writing the state patch,
+and recording old and new fingerprints is one database transaction. A partial
+event or partial state patch is impossible.
 
-## Before Endpoint Calls
+## Effect Transactions
 
-Persist `RuntimeDecision` and `PromptFrame` before calling the endpoint. A crash
-after prompt rendering but before model response resumes from the persisted
-decision and either retries the same call or records a bounded endpoint-loss
-recovery event.
+Before an external or workspace effect, commit the selected decision, accepted
+admission, operation lease, and prepared journal intent. Perform the staged
+effect outside that transaction. Then commit outcome, observation, event and
+state patch, current checks, outbox message, and settlement.
 
-## Before Tool Execution
+Rejected admissions commit their reason without a journal row.
 
-Persist `ToolAdmission` before running a tool. A crash after admission but
-before observation resumes from the admission and either reruns idempotent work
-or records a recovery event for non-idempotent work.
+## Startup
 
-## Boot
+One daemon obtains the write lease, enables foreign keys, WAL, busy timeout,
+and full synchronous settlement, then processes:
 
-At boot the daemon opens the store, enables WAL and foreign keys, reclaims a
-stale lease when allowed, searches for unfinished decisions, settles recovery
-when needed, hydrates a `RuntimeSnapshot` from rows, and only then selects new
-work.
+1. prepared or applying effects;
+2. interrupted endpoint decisions;
+3. stale derived projections;
+4. due wake conditions;
+5. pending owner turns.
 
-## Failure Boundary
+Recovery compares intended, prior, actual, and outcome fingerprints. It commits
+recovered, compensated, or failed state and exactly one settling observation.
+It never repeats a committed semantic effect.
 
-Resume reads durable rows and ignores config snapshots, orphan exchange bodies,
-and prompt-only state. It cannot mark completion without committed fresh check
-rows.
+## Evidence Snapshot
 
-## Failure This Prevents
-
-Crashes cannot create false completion, stale prompt authority, or unexplained
-refused-tool behavior.
+Acceptance captures SQLite with Online Backup at a quiesced read boundary. A
+workspace manifest from that boundary binds current document IDs, revisions,
+paths, and byte fingerprints.

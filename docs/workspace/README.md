@@ -15,22 +15,23 @@ ledger.
   finance, contacts, references, and routines.
 - [development-records.md](development-records.md): projects, repositories,
   software work, and proof artifacts.
+- [transaction-protocol.md](transaction-protocol.md): atomic writes,
+  settlement, idempotency, recovery, and path identity.
 
 ## Core Contract
 
 The workspace is the local file tree the owner can read and edit as auxiliary
-memory. The default root is `data/workspace`; configuration or Docker may expose
-the same contract as a plain `workspace/` directory. SQLite is the runtime ledger
-and decision authority. Records, transcripts, inbox traces, artifacts, indexes,
-state cells, edges, checks, and proof rows reference each other through stable ids
-and fingerprints. Neither files nor prose prompts become a second control plane.
+memory. Runtime data and workspace content use separate configured roots. Compose
+mounts them at `/data` and `/workspace`. SQLite is the runtime ledger and
+decision authority. Documents, conversation, artifacts, indexes, state, checks,
+and proof reference stable IDs and fingerprints. Neither files nor prompts
+become a second control plane.
 
 ## Write-Through Rule
 
 Anything the owner asks lkjagent to record is written under the configured
-workspace root before success is reported. `send` and daemon intake ensure the
-workspace root exists and every owner turn writes either transcript evidence or
-an inbox trace. A successful recording report names the path, fingerprint, record
-id, and index state. A failure report says no file was written and records the
-reason. Artifact-like turns are not successful until the artifact file, artifact
-row, check row, and final response path evidence all exist.
+workspace root before success is reported. Create only the branch needed by real
+content. A successful recording report names document ID, path, revision,
+fingerprint, and index state. A failure records that no file was written and why.
+Artifact work is incomplete until final bytes, revision, effect observation,
+checks, manifest, and response path evidence agree.

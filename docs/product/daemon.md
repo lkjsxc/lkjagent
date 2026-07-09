@@ -44,17 +44,18 @@ Blocked, closed, and archived states are terminal for automatic progress. A
 later owner turn may create a new matter or explicitly reopen through a checked
 state transition.
 
-## Idle
+## Quiescence
 
-No runnable matter and no pending owner turn means idle. Idle updates heartbeat
-data and sleeps on the queue poll interval. It does not call the endpoint,
-rewrite memory, inspect files, or self-assign work. A matter with blocked,
-active, pending, failed, or unsuperseded skipped work is not true idle; status
-must explain the blocker or waiting question.
+No eligible operation, due wake, interrupted effect, maintenance item, or
+pending owner turn means quiescence. The daemon updates heartbeat data and
+sleeps on the queue poll interval. It does not call the endpoint, rewrite
+memory, inspect files, or self-assign work. A matter with blocked, active,
+pending, failed, or unsuperseded work is not quiescent; status must explain the
+blocker or waiting question.
 
 ## Waiting
 
-A waiting matter parks like idle, but status prints the pending question. The
+A waiting matter parks, but status prints the pending question. The
 next owner turn is attached as the answer unless the owner asks for a separate
 new matter. Answer routing is recorded as an event and relation edge.
 

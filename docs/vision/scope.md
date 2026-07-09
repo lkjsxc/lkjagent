@@ -17,8 +17,8 @@ Define the product boundary so every feature has a clear place or no place.
   bounds, active state affordances, case constraints, retry suppressors,
   evidence needs, and recovery constraints.
 - Workspace file work inside the mounted repository or owner workspace.
-- Plan templates as initial events and state cells for docs trees, file work,
-  questions, journal entries, structured artifacts, and generic exploration.
+- Intent compilation into matters, obligations, semantic operations, and typed
+  dependency edges.
 - Durable context items with source fingerprints, trust, staleness,
   contamination class, contradiction handling, and bounded prompt admission.
 - Deterministic checks for file existence, word counts, link resolution, README
@@ -32,8 +32,7 @@ Define the product boundary so every feature has a clear place or no place.
 - Multi-user operation, remote hosting, web UI, messaging gateways, MCP, and
   runtime sub-agents.
 - Permission prompts inside the daemon.
-- Idle self-maintenance. With no open state requiring work and no pending queue
-  item, the daemon waits.
+- Unscheduled self-maintenance. A quiescent daemon waits for a durable wake.
 - Dedicated personal-records tables or tools. Personal records are workspace
   files produced through normal state, tool, and check flows.
 - Model-selected completion. Completion is a harness-computed state edge guarded
