@@ -37,6 +37,8 @@ pub fn render_prompt_for_decision_with_attempts(
     decision: &RuntimeDecision,
 ) -> Prompt {
     let mut prompt = render_prompt(task, steps, step);
+    let state = decision.harness_state.prompt_fragment();
+    prompt.system = truncate(&format!("{}\n{state}", prompt.system), HARD_CAP);
     if let Some(max_tokens) = decision.model_budget_tokens {
         prompt.max_tokens = max_tokens;
     }

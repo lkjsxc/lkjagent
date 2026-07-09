@@ -16,10 +16,13 @@ recovery, and completion.
 
 ## Runtime Contract
 
-Each cycle projects fresh durable state before choosing work. Earlier blocked,
-active, failed, pending, or unsuperseded skipped cells are preflight blockers for
-later model response work. Recovery or supersession evidence must settle the
-blocker before the selector can project a happy response or close candidate.
+Each cycle projects fresh durable state before choosing work. The selected
+`RuntimeDecision` stores a derived harness state such as `intake`, `act`,
+`recover`, or `idle`; prompt cards and tool exposure are projections of that same
+row. Earlier blocked, active, failed, pending, or unsuperseded skipped cells are
+preflight blockers for later model response work. Recovery or supersession
+evidence must settle the blocker before the selector can project a happy response
+or close candidate.
 
 ## Failure This Prevents
 

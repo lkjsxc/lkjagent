@@ -44,6 +44,7 @@ fn tool_call_card(decision: &RuntimeDecision) -> String {
         "- Do not write prose before or after the block.".to_string(),
         "- Tags have no attributes and the body is not JSON.".to_string(),
         format!("- decision_id: {}", decision.id),
+        format!("- harness_state: {}", decision.harness_state.as_str()),
         format!(
             "- context_fingerprint: {}",
             decision.context_frame_fingerprint

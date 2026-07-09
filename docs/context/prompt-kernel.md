@@ -11,7 +11,8 @@ Prompt assembly renders cards in this order:
 
 1. kernel: product invariant, case id, decision id, and profile names;
 2. objective: owner request, active operation, and success checks;
-3. state: active cells, blockers, deadlines, and stale evidence needs;
+3. state: derived harness state, active cells, blockers, deadlines, and stale
+   evidence needs;
 4. facts: clean context items with ids, sources, and inclusion reasons;
 5. conflicts: unresolved contradictions and resolution options;
 6. recovery: bounded repair diagnosis when retrying or recovering;

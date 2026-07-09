@@ -42,8 +42,11 @@ pub fn build_prompt_card_plan(
         card(
             "state",
             format!(
-                "snapshot={} state={}",
-                decision.snapshot_fingerprint, decision.state_vector_fingerprint
+                "harness_state={} purpose={} snapshot={} state={}",
+                decision.harness_state.as_str(),
+                decision.harness_state.purpose(),
+                decision.snapshot_fingerprint,
+                decision.state_vector_fingerprint
             ),
         )?,
         card("facts", facts_reason(decision, context_plan))?,

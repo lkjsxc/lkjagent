@@ -31,6 +31,7 @@ pub mod runtime_decision;
 pub mod runtime_event;
 pub mod runtime_fingerprint;
 pub mod runtime_graph_query;
+pub mod runtime_harness_state;
 pub mod runtime_operation;
 pub mod runtime_prompt_kernel;
 pub mod runtime_selector;

@@ -59,9 +59,11 @@ scalars, duplicate argument names, stale decisions, context mismatches, unknown
 tools, bad primitive classes, unclosed tags, crossed tags, bad entities, empty
 executable values, and placeholder-like executable values.
 
-Runtime decisions carry selected state keys, selected tool views, context-frame
-fingerprints, expected envelopes, evidence requirements, and recovery policy.
-Parse, admission, effect, endpoint, and check failures now write
+Runtime decisions carry selected state keys, derived harness states, selected
+tool views, context-frame fingerprints, expected envelopes, evidence
+requirements, and recovery policy. Prompt cards render the harness state as the
+state-specific fragment while preserving the decision row as authority. Parse,
+admission, effect, endpoint, and check failures now write
 `recovery.failure` state cells keyed by kind and decision. Parse diagnoses now
 include concrete repair guidance for envelope, action grammar, decision, context,
 tool, and argument faults. Native model-free operations support state resolution

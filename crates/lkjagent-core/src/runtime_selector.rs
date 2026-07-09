@@ -49,6 +49,7 @@ pub fn select_runtime_decision(
             .push("tool-budget:suppressed".to_string());
     }
     decision.recovery_policy = operation.recovery_policy;
+    decision.refresh_harness_state();
     Ok(decision)
 }
 

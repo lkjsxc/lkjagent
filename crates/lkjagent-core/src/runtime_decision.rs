@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::runtime_fingerprint::{stable_fingerprint, FingerprintError};
+use crate::runtime_harness_state::{derive_harness_state, RuntimeHarnessState};
 pub use crate::runtime_tool_view::{
     ToolExampleParam, ToolFieldSpec, ToolSetView, ToolValueClass, ToolViewEntry,
 };
@@ -33,6 +34,8 @@ pub struct RuntimeDecision {
     pub case_id: String,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub selected_state_key: Option<String>,
+    #[serde(default = "default_harness_state")]
+    pub harness_state: RuntimeHarnessState,
     pub operation: OperationKey,
     pub snapshot_fingerprint: String,
     pub state_vector_fingerprint: String,
@@ -54,10 +57,13 @@ impl RuntimeDecision {
         tool_view: ToolSetView,
         expected_envelope: OutputEnvelope,
     ) -> Self {
+        let operation = operation;
+        let harness_state = derive_harness_state(None, &operation.0, expected_envelope, "default");
         Self {
             id: id.into(),
             case_id: case_id.into(),
             selected_state_key: None,
+            harness_state,
             operation,
             snapshot_fingerprint: String::new(),
             state_vector_fingerprint: String::new(),
@@ -71,6 +77,15 @@ impl RuntimeDecision {
         }
     }
 
+    pub fn refresh_harness_state(&mut self) {
+        self.harness_state = derive_harness_state(
+            self.selected_state_key.as_deref(),
+            &self.operation.0,
+            self.expected_envelope,
+            &self.recovery_policy,
+        );
+    }
+
     pub fn tool_view_fingerprint(&self) -> Result<String, FingerprintError> {
         self.tool_view.fingerprint()
     }
@@ -78,4 +93,8 @@ impl RuntimeDecision {
     pub fn fingerprint(&self) -> Result<String, FingerprintError> {
         stable_fingerprint(self)
     }
+}
+
+fn default_harness_state() -> RuntimeHarnessState {
+    RuntimeHarnessState::Idle
 }

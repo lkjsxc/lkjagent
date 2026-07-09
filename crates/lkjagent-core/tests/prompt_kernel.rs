@@ -55,6 +55,9 @@ fn card_plan_has_ordered_profiles_and_fingerprints() -> Result<(), String> {
     );
     assert_eq!(plan.prompt_profile, "kernel-v1");
     assert!(plan.fingerprint.starts_with("fnv1a64:"));
+    let state = reason(&plan, "state")?;
+    assert!(state.contains("harness_state=act"));
+    assert!(state.contains("execute selected model action"));
     let recovery = reason(&plan, "recovery")?;
     assert!(recovery.starts_with("policy-ref=fnv1a64:"));
     assert!(!recovery.contains("retry-same-decision"));

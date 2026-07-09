@@ -57,6 +57,7 @@ fn explore_decision_renders_tool_call_contract() {
         &decision,
     );
     assert!(prompt.system.contains("Expected: lkjagent_action"));
+    assert!(prompt.system.contains("Harness state: act"));
     assert!(prompt
         .system
         .contains("Return exactly one <lkjagent_action>"));
