@@ -4,9 +4,9 @@ use std::time::Duration;
 
 use rusqlite::Connection;
 
-use crate::workbench_state::{reduce, UiEvent, UiState, WorkbenchMode};
+use crate::workbench_state::{reduce, UiEvent, UiState};
 
-pub fn run(conn: &Connection, mode: WorkbenchMode) -> Result<String, String> {
+pub fn run(conn: &Connection) -> Result<String, String> {
     let (sender, receiver) = mpsc::channel();
     std::thread::spawn(move || {
         let stdin = std::io::stdin();
@@ -17,7 +17,7 @@ pub fn run(conn: &Connection, mode: WorkbenchMode) -> Result<String, String> {
         }
     });
     let mut stdout = std::io::stdout();
-    run_with_input(conn, receiver, &mut stdout, mode, Duration::from_secs(2))?;
+    run_with_input(conn, receiver, &mut stdout, Duration::from_secs(2))?;
     Ok(String::new())
 }
 
@@ -25,18 +25,14 @@ pub fn run_with_input<W>(
     conn: &Connection,
     input: Receiver<String>,
     output: &mut W,
-    mode: WorkbenchMode,
     refresh_every: Duration,
 ) -> Result<(), String>
 where
     W: Write,
 {
-    let mut state = UiState::new(mode);
-    writeln!(
-        output,
-        "lkjagent workbench: type text, /mode append, /mode pane, /quit"
-    )
-    .map_err(|error| error.to_string())?;
+    let mut state = UiState::new();
+    writeln!(output, "lkjagent workbench: type text, /quit exits")
+        .map_err(|error| error.to_string())?;
     loop {
         state = refresh(conn, state, output)?;
         match input.recv_timeout(refresh_every) {
@@ -57,9 +53,9 @@ where
     Ok(())
 }
 
-pub fn render_once(conn: &Connection, mode: WorkbenchMode) -> Result<String, String> {
+pub fn render_once(conn: &Connection) -> Result<String, String> {
     let state = reduce(
-        UiState::new(mode),
+        UiState::new(),
         UiEvent::Refresh(crate::inspect::watch(conn)?),
     );
     Ok(crate::workbench_render::render(&state))
@@ -118,18 +114,12 @@ mod tests {
         drop(sender);
         let mut output = Vec::new();
 
-        run_with_input(
-            &conn,
-            receiver,
-            &mut output,
-            WorkbenchMode::Append,
-            Duration::from_millis(1),
-        )?;
+        run_with_input(&conn, receiver, &mut output, Duration::from_millis(1))?;
 
         let text = String::from_utf8(output)?;
         assert!(text.contains("lkjagent workbench"));
-        assert!(text.contains("== workbench refresh"));
-        assert!(text.contains("== status =="));
+        assert!(text.contains("== workbench pane refresh"));
+        assert!(text.contains("[status]"));
         Ok(())
     }
 
@@ -143,13 +133,7 @@ mod tests {
         drop(sender);
         let mut output = Vec::new();
 
-        run_with_input(
-            &conn,
-            receiver,
-            &mut output,
-            WorkbenchMode::Append,
-            Duration::from_millis(1),
-        )?;
+        run_with_input(&conn, receiver, &mut output, Duration::from_millis(1))?;
 
         let text = String::from_utf8(output)?;
         assert!(text.contains("queue: 1 new=false"));
@@ -158,32 +142,19 @@ mod tests {
     }
 
     #[test]
-    fn mode_command_switches_to_pane_renderer() -> Result<(), Box<dyn std::error::Error>> {
+    fn workbench_commands_update_pane_state() -> Result<(), Box<dyn std::error::Error>> {
         let conn = Connection::open_in_memory()?;
         setup(&conn)?;
         let (sender, receiver) = mpsc::channel();
-        for line in [
-            "/mode pane",
-            "/scroll down",
-            "/follow on",
-            "/search daemon",
-            "/quit",
-        ] {
+        for line in ["/scroll down", "/follow on", "/search daemon", "/quit"] {
             sender.send(line.to_string())?;
         }
         drop(sender);
         let mut output = Vec::new();
 
-        run_with_input(
-            &conn,
-            receiver,
-            &mut output,
-            WorkbenchMode::Append,
-            Duration::from_millis(1),
-        )?;
+        run_with_input(&conn, receiver, &mut output, Duration::from_millis(1))?;
 
         let text = String::from_utf8(output)?;
-        assert!(text.contains("workbench: mode=pane"));
         assert!(text.contains("workbench: scroll=0"));
         assert!(text.contains("workbench: follow=true"));
         assert!(text.contains("workbench: search=daemon"));

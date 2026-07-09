@@ -1,8 +1,7 @@
-use crate::workbench_state::{reduce, UiEvent, UiState, WorkbenchMode};
+use crate::workbench_state::{reduce, UiEvent, UiState};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WorkbenchCommand {
-    Mode(WorkbenchMode),
     Scroll(isize),
     Top,
     Follow(bool),
@@ -11,10 +10,6 @@ pub enum WorkbenchCommand {
 
 pub fn apply(state: &mut UiState, command: WorkbenchCommand) -> String {
     match command {
-        WorkbenchCommand::Mode(mode) => {
-            *state = reduce(state.clone(), UiEvent::Mode(mode));
-            format!("workbench: mode={}", mode.as_str())
-        }
         WorkbenchCommand::Scroll(delta) => {
             *state = reduce(state.clone(), UiEvent::Scroll(delta));
             format!("workbench: scroll={}", state.scroll)
@@ -36,9 +31,6 @@ pub fn apply(state: &mut UiState, command: WorkbenchCommand) -> String {
 
 pub fn parse(line: &str) -> Result<Option<WorkbenchCommand>, String> {
     let trimmed = line.trim();
-    if let Some(rest) = trimmed.strip_prefix("/mode") {
-        return mode(rest.trim()).map(Some);
-    }
     if let Some(rest) = trimmed.strip_prefix("/scroll") {
         return scroll(rest.trim()).map(Some);
     }
@@ -52,13 +44,6 @@ pub fn parse(line: &str) -> Result<Option<WorkbenchCommand>, String> {
         return search(rest.trim()).map(Some);
     }
     Ok(None)
-}
-
-fn mode(value: &str) -> Result<WorkbenchCommand, String> {
-    if value.is_empty() {
-        return Err("/mode requires append or pane".to_string());
-    }
-    WorkbenchMode::parse(value).map(WorkbenchCommand::Mode)
 }
 
 fn scroll(value: &str) -> Result<WorkbenchCommand, String> {
@@ -99,11 +84,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parses_mode_and_scroll_commands() {
-        assert_eq!(
-            parse("/mode pane"),
-            Ok(Some(WorkbenchCommand::Mode(WorkbenchMode::Pane)))
-        );
+    fn parses_scroll_follow_and_search_commands() {
+        assert_eq!(parse("/mode pane"), Ok(None));
         assert_eq!(parse("/scroll down"), Ok(Some(WorkbenchCommand::Scroll(1))));
         assert_eq!(parse("/page up"), Ok(Some(WorkbenchCommand::Scroll(-10))));
         assert_eq!(

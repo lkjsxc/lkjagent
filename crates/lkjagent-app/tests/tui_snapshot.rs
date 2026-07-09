@@ -2,7 +2,6 @@ use std::path::Path;
 
 use lkjagent_app::tui_snapshot::load;
 use lkjagent_app::workbench;
-use lkjagent_app::workbench_state::WorkbenchMode;
 use lkjagent_store::plan_access::enqueue_with_force;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
@@ -60,12 +59,12 @@ fn transcript_hides_internal_step_duplicate_messages() -> TestResult<()> {
 }
 
 #[test]
-fn pane_mode_keeps_diagnostics_out_of_transcript_pane() -> TestResult<()> {
+fn workbench_keeps_diagnostics_out_of_transcript_pane() -> TestResult<()> {
     let conn = Connection::open_in_memory()?;
     setup(&conn)?;
     insert_duplicate_message_fixture(&conn)?;
 
-    let text = workbench::render_once(&conn, WorkbenchMode::Pane)?;
+    let text = workbench::render_once(&conn)?;
     let transcript = between(&text, "+-- transcript --+", "+-- right rail --+")?;
 
     assert!(transcript.contains("owner: hello"));

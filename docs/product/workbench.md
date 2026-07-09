@@ -7,8 +7,8 @@ controller.
 
 ## Command
 
-`lkjagent workbench [--mode append|pane]` attaches to the configured data
-directory. It does not start or stop the daemon. The Docker entrypoint routes
+`lkjagent workbench` attaches to the configured data directory. It does not
+start or stop the daemon. The Docker entrypoint routes
 the command the same way it routes `status`, `console`, and `watch`.
 
 ## Pure TUI Core
@@ -22,17 +22,14 @@ commands are commands, not owner transcript messages. The reducer preserves
 composer input while agent, tool, state, artifact, resize, interrupt, approval,
 save, and quit events arrive. Terminal backends are effects at the edge.
 
-## Modes
+## Renderer
 
-`append` is the default safest mode. It prints immutable refresh cards through
-the line renderer even when stdin and stdout are TTYs. Plain terminal scrollback,
-tmux copy mode, and saved command output remain usable.
-
-`pane` is an explicit framed primary-screen renderer. When stdin and stdout are
-TTYs, `pane` uses the ratatui alternate-screen backend; otherwise it uses the
-line pane renderer. Its left pane is the owner conversation transcript only.
-Diagnostic rows such as step progress, matter trace, proof counts, queue state,
-and recent events belong in the right rail or other non-transcript panes.
+The workbench has one pane-oriented renderer. When stdin and stdout are TTYs it
+uses the ratatui alternate-screen backend; otherwise it uses the line pane
+renderer for scripts and tests. Its left pane is the owner conversation
+transcript only. Diagnostic rows such as step progress, matter trace, proof
+counts, queue state, and recent events belong in the right rail or other
+non-transcript panes.
 
 Each refresh includes bounded sections:
 
@@ -51,9 +48,8 @@ Each refresh includes bounded sections:
 Owner input remains available while progress refreshes. Plain text enqueues an
 owner turn. Slash commands reuse the console handlers for `/status`, `/watch`,
 `/log`, `/queue`, `/matter`, `/record`, `/send TEXT`, `/new TEXT`, and `/quit`.
-`/mode append` and `/mode pane` switch render modes without touching daemon
-state. `/scroll up`, `/scroll down`, `/scroll top`, `/page up`, and `/page down`
-move pane scroll state only. `/follow on` returns the transcript window to the
+`/scroll up`, `/scroll down`, `/scroll top`, `/page up`, and `/page down` move
+pane scroll state only. `/follow on` returns the transcript window to the
 latest rows; `/follow off` leaves manual scroll in place. If the viewport is in
 follow mode when a row arrives, the rendered bottom stays anchored. Manual scroll
 is clamped to the rendered pane length so the owner cannot scroll into endless

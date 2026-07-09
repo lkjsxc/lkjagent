@@ -1,27 +1,4 @@
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum WorkbenchMode {
-    Append,
-    Pane,
-}
-
-impl WorkbenchMode {
-    pub fn parse(value: &str) -> Result<Self, String> {
-        match value {
-            "append" => Ok(Self::Append),
-            "pane" => Ok(Self::Pane),
-            other => Err(format!("unknown workbench mode: {other}")),
-        }
-    }
-
-    pub fn as_str(self) -> &'static str {
-        match self {
-            Self::Append => "append",
-            Self::Pane => "pane",
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Viewport {
     Follow,
     Manual { top_line: usize },
@@ -29,7 +6,6 @@ pub enum Viewport {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UiState {
-    pub mode: WorkbenchMode,
     pub refreshes: u64,
     pub scroll: usize,
     pub follow: bool,
@@ -41,9 +17,8 @@ pub struct UiState {
 }
 
 impl UiState {
-    pub fn new(mode: WorkbenchMode) -> Self {
+    pub fn new() -> Self {
         Self {
-            mode,
             refreshes: 0,
             scroll: 0,
             follow: true,
@@ -56,10 +31,15 @@ impl UiState {
     }
 }
 
+impl Default for UiState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum UiEvent {
     Refresh(String),
-    Mode(WorkbenchMode),
     Scroll(isize),
     Top,
     Follow(bool),
@@ -74,7 +54,6 @@ pub fn reduce(mut state: UiState, event: UiEvent) -> UiState {
             state.refreshes = state.refreshes.saturating_add(1);
             normalize_viewport(&mut state);
         }
-        UiEvent::Mode(mode) => state.mode = mode,
         UiEvent::Scroll(delta) => scroll_viewport(&mut state, delta),
         UiEvent::Top => set_viewport(&mut state, Viewport::Manual { top_line: 0 }),
         UiEvent::Follow(enabled) => {

@@ -1,26 +1,8 @@
-use crate::workbench_state::{visible_height, UiState, WorkbenchMode};
+use crate::workbench_state::{visible_height, UiState};
 
 const CAP: usize = 12_000;
 
 pub fn render(state: &UiState) -> String {
-    match state.mode {
-        WorkbenchMode::Append => render_append(state),
-        WorkbenchMode::Pane => render_pane(state),
-    }
-}
-
-fn render_append(state: &UiState) -> String {
-    bounded(&format!(
-        "== workbench refresh {} mode={} follow={} search={} ==\n{}\ninput: plain text enqueues; /mode pane switches layout; /search TEXT filters; /quit exits workbench",
-        state.refreshes,
-        state.mode.as_str(),
-        state.follow,
-        search_label(state),
-        state.latest
-    ))
-}
-
-fn render_pane(state: &UiState) -> String {
     let sections = split_sections(&state.latest);
     let transcript = sections
         .iter()
@@ -38,7 +20,7 @@ fn render_pane(state: &UiState) -> String {
     );
     let right = section_group(&sections, |name| name != "transcript");
     bounded(&format!(
-        "== workbench pane refresh {} scroll={} follow={} search={} ==\n+-- transcript --+\n{}\n+-- right rail --+\n{}\n+-- input --+\nplain text enqueues | /follow on|off | /search TEXT | /mode append | /quit",
+        "== workbench pane refresh {} scroll={} follow={} search={} ==\n+-- transcript --+\n{}\n+-- right rail --+\n{}\n+-- input --+\nplain text enqueues | /follow on|off | /search TEXT | /quit",
         state.refreshes,
         state.scroll,
         state.follow,
@@ -150,7 +132,7 @@ mod tests {
 
     #[test]
     fn pane_uses_transcript_section_as_left_pane() -> Result<(), String> {
-        let mut state = UiState::new(WorkbenchMode::Pane);
+        let mut state = UiState::new();
         state.latest = "== status ==\ndaemon: idle\n== transcript ==\nowner: hello\nagent: hello\n== recent events ==\nstepdone hello".to_string();
 
         let text = render(&state);
@@ -165,7 +147,7 @@ mod tests {
 
     #[test]
     fn pane_follow_stays_bottom_anchored_after_growth() {
-        let mut state = UiState::new(WorkbenchMode::Pane);
+        let mut state = UiState::new();
         state.latest = transcript_body(25);
         let before = render(&state);
         state.latest = transcript_body(26);

@@ -3,7 +3,6 @@ use std::path::PathBuf;
 use crate::arg_helpers::{
     no_args, parse_context, parse_json_flag, parse_log, parse_matter, parse_memory, parse_queue,
 };
-use crate::workbench_state::WorkbenchMode;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Invocation {
@@ -23,9 +22,7 @@ pub enum Command {
     },
     Status,
     Console,
-    Workbench {
-        mode: WorkbenchMode,
-    },
+    Workbench,
     Doctor {
         json: bool,
     },
@@ -135,18 +132,7 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
 }
 
 fn parse_workbench(rest: Vec<String>) -> Result<Command, String> {
-    match rest.as_slice() {
-        [] => Ok(Command::Workbench {
-            mode: WorkbenchMode::Append,
-        }),
-        [flag, value] if flag == "--mode" => Ok(Command::Workbench {
-            mode: WorkbenchMode::parse(value)?,
-        }),
-        [flag] if flag == "--pane" => Ok(Command::Workbench {
-            mode: WorkbenchMode::Pane,
-        }),
-        _ => Err("workbench accepts --mode append|pane".to_string()),
-    }
+    no_args(rest, Command::Workbench)
 }
 
 fn parse_run(rest: Vec<String>) -> Result<Command, String> {

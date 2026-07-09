@@ -110,10 +110,10 @@ The terminal workbench has a pure reducer, durable transcript stream with stable
 queue/event ids, agent draft accumulation for streaming deltas, id-based
 transcript merge, saved transcript ids and source paths, Japanese input,
 grapheme-indexed composer movement, delete, home/end, multiline submit,
-display-width cursor placement, append and pane modes, row-backed status
-fallbacks, and focused coverage for transcript merge and rendering surfaces.
-TTY append mode stays on the line renderer, pane mode uses ratatui only on TTY,
-and the help text names Home/End as composer movement.
+display-width cursor placement, a pane-oriented workbench renderer,
+row-backed status fallbacks, and focused coverage for transcript merge and
+rendering surfaces. The workbench uses ratatui only on TTY, falls back to a line
+pane renderer otherwise, and the help text names Home/End as composer movement.
 Workbench pane mode renders a canonical conversation transcript in the left pane
 and keeps step progress, matter trace, recent events, tool/state/system/error
 messages, and proof diagnostics out of that transcript pane. Slash commands do

@@ -48,7 +48,7 @@ where
         }
         Command::Status => status(&conn),
         Command::Console => crate::console::run(&conn),
-        Command::Workbench { mode } => crate::workbench::run(&conn, &invocation.data_dir, mode),
+        Command::Workbench => crate::workbench::run(&conn, &invocation.data_dir),
         Command::Doctor { json } => crate::diagnostics::doctor(&conn, &invocation.data_dir, json),
         Command::Workspace { json, rebuild } => {
             if rebuild {
@@ -128,7 +128,7 @@ pub fn help() -> String {
         "  send TEXT [--new]",
         "  status",
         "  console",
-        "  workbench [--mode append|pane]",
+        "  workbench",
         "  doctor [--json]",
         "  workspace [--json] [--rebuild]",
         "  workspace plan-rebalance|apply-rebalance|validate [--json]",

@@ -1,17 +1,15 @@
-use lkjagent_app::workbench_state::{reduce, UiEvent, UiState, Viewport, WorkbenchMode};
+use lkjagent_app::workbench_state::{reduce, UiEvent, UiState, Viewport};
 
 #[test]
-fn reducer_tracks_mode_refresh_and_scroll() {
-    let state = UiState::new(WorkbenchMode::Append);
+fn reducer_tracks_refresh_and_scroll() {
+    let state = UiState::new();
     let state = reduce(state, UiEvent::Refresh("body".to_string()));
-    let state = reduce(state, UiEvent::Mode(WorkbenchMode::Pane));
     let state = reduce(state, UiEvent::Scroll(4));
     let state = reduce(state, UiEvent::Scroll(-1));
     let state = reduce(state, UiEvent::Top);
     let state = reduce(state, UiEvent::Follow(true));
     let state = reduce(state, UiEvent::Search("daemon".to_string()));
 
-    assert_eq!(state.mode, WorkbenchMode::Pane);
     assert_eq!(state.refreshes, 1);
     assert_eq!(state.scroll, 0);
     assert!(!state.follow);
@@ -22,7 +20,7 @@ fn reducer_tracks_mode_refresh_and_scroll() {
 
 #[test]
 fn scroll_down_to_bottom_reenables_follow() {
-    let mut state = UiState::new(WorkbenchMode::Pane);
+    let mut state = UiState::new();
     state.height = 14;
     state = reduce(state, UiEvent::Refresh(lines(8)));
     state = reduce(state, UiEvent::Scroll(-1));
@@ -38,7 +36,7 @@ fn scroll_down_to_bottom_reenables_follow() {
 
 #[test]
 fn refresh_preserves_manual_top_line() {
-    let mut state = UiState::new(WorkbenchMode::Pane);
+    let mut state = UiState::new();
     state.height = 14;
     state = reduce(state, UiEvent::Refresh(lines(8)));
     state = reduce(state, UiEvent::Scroll(-2));

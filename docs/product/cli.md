@@ -12,7 +12,7 @@ Define the owner command surface and output discipline.
 | `lkjagent send TEXT [--new]` | enqueue an owner turn and print its row id |
 | `lkjagent status` | print daemon, matter, budgets, queue, and tokens |
 | `lkjagent console` | read owner input and `/help` while the daemon works |
-| `lkjagent workbench [--mode append|pane]` | show progress while accepting owner input |
+| `lkjagent workbench` | show progress while accepting owner input |
 | `lkjagent log [--limit N] [--follow]` | print bounded transcript events and optionally follow |
 | `lkjagent matter list` | list active matters by title, state, and dates |
 | `lkjagent matter show REF` | show matter events, decisions, checks, and workspace refs |
