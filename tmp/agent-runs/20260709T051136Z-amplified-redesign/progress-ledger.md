@@ -41,8 +41,10 @@ command evidence.
 - `8a6ea73a` fixed the finance workspace gate: a finance CLI turn now writes a
   month-grouped finance record, `indexes/budget-month.md`, and
   `index-budget-month` artifact row evidence.
-- Open: workspace large-file split or durable justification is still not
-  implemented by the inspected workspace code.
+- `57c39d2e` fixed oversized record bodies: main records now carry size
+  justification and links to `.parts/part-NNN.md` files with the full body.
+- Open: non-record generated artifact splitting or durable justification is not
+  yet proven.
 - Open: workspace rebalance fingerprint continuity, link repair, and rollback or
   compensation remain report-only findings.
 - Open: tool admission repeat-call suppression, recovery-policy hiding, budget
@@ -130,8 +132,8 @@ command evidence.
   exits 0.
 - [x] Live campaigns run or honest skips are committed - tracked live evidence
   under `tmp/live-runs/20260708Tstandardenv/` plus daily-use script evidence.
-- [x] Final handoff names commits, commands, evidence paths, and residual risks
-  - this ledger and final response.
+- [ ] Final handoff names commits, commands, evidence paths, and residual risks
+  - blocked until all corrective rows close.
 
 ## Notes
 

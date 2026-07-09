@@ -85,8 +85,8 @@ Fresh evidence root:
 
 Verification commit: `98e16b48`.
 
-Current next action: none for this continuation branch unless the owner requests
-fresh live endpoint evidence.
+Current next action: continue corrective acceptance rows until every reopened
+item has commit and command evidence.
 
 ## 2026-07-09 Corrective Reopen
 
@@ -101,10 +101,13 @@ Corrected evidence:
 - `8a6ea73a`: finance turns now create `indexes/budget-month.md` and an
   `index-budget-month` artifact row; command evidence is under
   `tmp/agent-runs/20260709T070000Z-finance-index/`.
+- `57c39d2e`: oversized record bodies are split into linked
+  `.parts/part-NNN.md` files; evidence is under
+  `tmp/agent-runs/20260709T071500Z-record-size/`.
 
 Open after this correction:
 
-- Workspace large-file split or durable justification remains unimplemented.
+- Non-record generated artifact splitting or durable justification remains open.
 - Rebalance fingerprint continuity, link repair, and rollback or compensation
   remain unimplemented or unaudited.
 - Tool admission repeat-call suppression, recovery-policy hiding, budget
@@ -191,7 +194,7 @@ Open after this correction:
 | quiet verify | 9cd8069c | final `cargo run -p lkjagent-xtask -- quiet verify` passed after source changes | done |
 | Docker verify | 9cd8069c | final `docker compose run --rm verify` passed after source changes | done |
 | live campaigns | 9cd8069c; 6d0be7d8; 44a791ec | scripted campaign passed with workspace validation; skip files committed; standard `.env` endpoint run added under `tmp/live-runs/20260708Tstandardenv/` with all four profiles closed after 900-second time boxes | done |
-| large file split | none | no source proof found in corrective audit | open |
+| large file split | 57c39d2e | large record CLI evidence shows main size justification plus linked part files; generated artifact splitting remains open | partial |
 | rebalance safety | none | fingerprint continuity, link repair, and rollback or compensation remain report-only | open |
 | tool admission hardening | none | repeat-call, recovery-policy, budget, and mismatch-event claims remain report-only | open |
 | context contract gaps | none | XML-like normal cards, ranking, and richer conflict refs remain report-only | open |
