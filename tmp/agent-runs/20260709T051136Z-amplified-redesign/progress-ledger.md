@@ -133,8 +133,8 @@ command evidence.
   exits 0.
 - [x] Live campaigns run or honest skips are committed - tracked live evidence
   under `tmp/live-runs/20260708Tstandardenv/` plus daily-use script evidence.
-- [ ] Final handoff names commits, commands, evidence paths, and residual risks
-  - blocked until all corrective rows close.
+- [x] Final handoff names commits, commands, evidence paths, and residual risks
+  - see `tmp/lkjagent-more-more-progress/final-dod-check.md` and final response.
 
 ## Notes
 
