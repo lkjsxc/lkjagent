@@ -26,6 +26,7 @@ pub mod runtime_artifact;
 pub mod runtime_candidate;
 pub mod runtime_completion;
 pub mod runtime_context;
+pub mod runtime_context_pipeline;
 mod runtime_context_plan;
 pub mod runtime_decision;
 pub mod runtime_event;

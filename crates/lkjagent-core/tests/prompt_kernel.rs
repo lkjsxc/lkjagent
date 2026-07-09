@@ -1,5 +1,7 @@
 use lkjagent_core::render::Prompt;
-use lkjagent_core::runtime_context::{ContextFramePlan, ContextLanePlan, ContextPlanEntry};
+use lkjagent_core::runtime_context::{
+    default_context_pipeline, ContextFramePlan, ContextLanePlan, ContextPlanEntry,
+};
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
 };
@@ -31,6 +33,7 @@ fn card_plan_has_ordered_profiles_and_fingerprints() -> Result<(), String> {
             included: Vec::new(),
             excluded: Vec::new(),
             lanes: Vec::new(),
+            pipeline: default_context_pipeline(),
         },
     )
     .map_err(|error| error.message)?;
@@ -97,6 +100,7 @@ fn card_reasons_list_context_selection_audit() -> Result<(), String> {
                 excluded_item_ids: Vec::new(),
                 fingerprint: "lane-fp".to_string(),
             }],
+            pipeline: default_context_pipeline(),
         },
     )
     .map_err(|error| error.message)?;
@@ -111,6 +115,8 @@ fn card_reasons_list_context_selection_audit() -> Result<(), String> {
     assert!(facts.contains("<reason>unresolved-conflict</reason>"));
     assert!(facts.contains("relevant-records:lane-fp"));
     assert!(facts.contains("refs=record:records/life/notes/a.md"));
+    assert!(facts.contains("pipeline=source-discovery:applied"));
+    assert!(facts.contains("validation:applied"));
     let conflicts = reason(&plan, "conflicts")?;
     assert!(conflicts.contains("<id>ctx-conflict</id>"));
     assert!(conflicts.contains("<source_ref>test:source@fp</source_ref>"));

@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::runtime_context::{
     ContaminationClass, ContextConflict, ContextItem, StalenessClass, TrustClass,
 };
+use crate::runtime_context_pipeline::{default_context_pipeline, ContextPipelineStage};
 use crate::runtime_fingerprint::stable_fingerprint;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -31,6 +32,8 @@ pub struct ContextFramePlan {
     pub excluded: Vec<ContextPlanEntry>,
     #[serde(default)]
     pub lanes: Vec<ContextLanePlan>,
+    #[serde(default)]
+    pub pipeline: Vec<ContextPipelineStage>,
 }
 
 pub fn select_context_plan(
@@ -45,6 +48,7 @@ pub fn select_context_plan(
         included: Vec::new(),
         excluded: Vec::new(),
         lanes: Vec::new(),
+        pipeline: default_context_pipeline(),
     };
     let mut seen = BTreeSet::new();
     for (index, item) in items.iter().enumerate() {

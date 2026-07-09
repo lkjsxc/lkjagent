@@ -92,10 +92,11 @@ routing, Japanese diary or save wording, and todo, calendar, finance, note,
 project, and development wrapper writes.
 
 Prompt context can admit bounded workspace record and index metadata with source
-fingerprints, suppress duplicate clean context items by semantic key, body,
-source type, and source fingerprint, and replace JSON-like context bodies with
-source-linked suppression markers before prompt rendering. Prompt card facts now
-carry compact lane fingerprints and source refs. Default explore tool views
+fingerprints, record named pipeline stages, suppress duplicate clean context
+items by semantic key, body, source type, and source fingerprint, and replace
+JSON-like context bodies with source-linked suppression markers before prompt
+rendering. Prompt card facts now carry compact lane fingerprints, pipeline stage
+status, and source refs. Default explore tool views
 exclude `shell.run`; shell is available only through an explicit persisted
 shell-capable decision view. Unsafe XML-like tool actions persist rejections.
 Status and proof surfaces expose cached and uncached token usage separately,
