@@ -9,6 +9,7 @@ pub fn apply_key(model: &mut TuiModel, key: KeyEvent) -> Vec<TuiEffect> {
     match key.code {
         KeyCode::Enter => apply_event(model, TuiEvent::UserSubmit),
         KeyCode::Backspace => apply_event(model, TuiEvent::UserBackspace),
+        KeyCode::Delete => apply_event(model, TuiEvent::UserDelete),
         KeyCode::Left => apply_event(model, TuiEvent::UserMoveComposer(-1)),
         KeyCode::Right => apply_event(model, TuiEvent::UserMoveComposer(1)),
         KeyCode::Esc => apply_event(model, TuiEvent::UserCloseModal),
@@ -16,8 +17,8 @@ pub fn apply_key(model: &mut TuiModel, key: KeyEvent) -> Vec<TuiEffect> {
         KeyCode::Down => apply_event(model, TuiEvent::UserScroll(1)),
         KeyCode::PageUp => apply_event(model, TuiEvent::UserScroll(-10)),
         KeyCode::PageDown => apply_event(model, TuiEvent::UserScroll(10)),
-        KeyCode::Home => apply_event(model, TuiEvent::UserScroll(-1000)),
-        KeyCode::End => apply_event(model, TuiEvent::UserFollow(true)),
+        KeyCode::Home => apply_event(model, TuiEvent::UserComposerHome),
+        KeyCode::End => apply_event(model, TuiEvent::UserComposerEnd),
         KeyCode::F(n) => apply_pane(model, n),
         KeyCode::Char(c) => apply_event(model, TuiEvent::UserInsertChar(c)),
         _ => vec![TuiEffect::Redraw],
@@ -55,4 +56,31 @@ fn apply_event(model: &mut TuiModel, event: TuiEvent) -> Vec<TuiEffect> {
     let (next, effects) = reduce(model.clone(), event);
     *model = next;
     effects
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn home_end_and_delete_edit_composer() {
+        let mut model = TuiModel::new();
+        apply_key(
+            &mut model,
+            KeyEvent::new(KeyCode::Char('あ'), KeyModifiers::NONE),
+        );
+        apply_key(
+            &mut model,
+            KeyEvent::new(KeyCode::Char('🙂'), KeyModifiers::NONE),
+        );
+        apply_key(&mut model, KeyEvent::new(KeyCode::Home, KeyModifiers::NONE));
+        apply_key(
+            &mut model,
+            KeyEvent::new(KeyCode::Delete, KeyModifiers::NONE),
+        );
+        apply_key(&mut model, KeyEvent::new(KeyCode::End, KeyModifiers::NONE));
+
+        assert_eq!(model.composer, "🙂");
+        assert_eq!(model.composer_cursor, 1);
+    }
 }

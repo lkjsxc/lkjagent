@@ -94,10 +94,10 @@ tool-view fingerprints, artifact refs, check refs, and proof rows.
 
 The terminal workbench has a pure reducer, durable transcript stream with stable
 queue/event ids, agent draft accumulation for streaming deltas, id-based
-transcript merge, saved transcript ids and source paths, Japanese and
-grapheme-aware composer operations, display-width cursor placement, append and
-pane modes, row-backed status fallbacks, and focused coverage for transcript
-merge and rendering surfaces.
+transcript merge, saved transcript ids and source paths, Japanese input,
+grapheme-indexed composer movement, delete, home/end, multiline submit,
+display-width cursor placement, append and pane modes, row-backed status
+fallbacks, and focused coverage for transcript merge and rendering surfaces.
 
 Baseline and post-change commands for the 2026-07-08 packet passed `cargo run
 -p lkjagent-xtask -- check-docs`, `cargo run -p lkjagent-xtask -- quiet

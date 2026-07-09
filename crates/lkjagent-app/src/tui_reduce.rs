@@ -10,7 +10,10 @@ pub fn reduce(mut model: TuiModel, event: TuiEvent) -> (TuiModel, Vec<TuiEffect>
         TuiEvent::UserInsertChar(character) => insert_text(&mut model, &character.to_string()),
         TuiEvent::UserComposerNewline => insert_text(&mut model, "\n"),
         TuiEvent::UserBackspace => backspace(&mut model),
+        TuiEvent::UserDelete => delete(&mut model),
         TuiEvent::UserMoveComposer(delta) => move_cursor(&mut model, delta),
+        TuiEvent::UserComposerHome => model.composer_cursor = 0,
+        TuiEvent::UserComposerEnd => model.composer_cursor = grapheme_count(&model.composer),
         TuiEvent::UserSubmit => submit_composer(&mut model, &mut effects),
         TuiEvent::UserInterrupt => interrupt(&mut model, &mut effects),
         TuiEvent::UserApproveTool => approve_tool(&mut model, &mut effects),
@@ -75,60 +78,67 @@ pub fn reduce(mut model: TuiModel, event: TuiEvent) -> (TuiModel, Vec<TuiEffect>
 
 fn set_composer(model: &mut TuiModel, text: String) {
     model.composer = text;
-    model.composer_cursor = model.composer.len();
+    model.composer_cursor = grapheme_count(&model.composer);
 }
 
 fn insert_text(model: &mut TuiModel, text: &str) {
     clamp_cursor(model);
-    model.composer.insert_str(model.composer_cursor, text);
-    model.composer_cursor += text.len();
+    let byte = byte_cursor(model);
+    model.composer.insert_str(byte, text);
+    model.composer_cursor += grapheme_count(text);
 }
 
 fn backspace(model: &mut TuiModel) {
     clamp_cursor(model);
-    let start = previous_grapheme(&model.composer, model.composer_cursor);
-    if start == model.composer_cursor {
+    if model.composer_cursor == 0 {
         return;
     }
-    model
-        .composer
-        .replace_range(start..model.composer_cursor, "");
-    model.composer_cursor = start;
+    let end = byte_cursor(model);
+    model.composer_cursor -= 1;
+    let start = byte_cursor(model);
+    model.composer.replace_range(start..end, "");
+}
+
+fn delete(model: &mut TuiModel) {
+    clamp_cursor(model);
+    let count = grapheme_count(&model.composer);
+    if model.composer_cursor >= count {
+        return;
+    }
+    let start = byte_cursor(model);
+    let end = byte_index(&model.composer, model.composer_cursor + 1);
+    model.composer.replace_range(start..end, "");
 }
 
 fn move_cursor(model: &mut TuiModel, delta: isize) {
     clamp_cursor(model);
-    let mut cursor = model.composer_cursor;
-    for _ in 0..delta.unsigned_abs() {
-        cursor = if delta.is_negative() {
-            previous_grapheme(&model.composer, cursor)
-        } else {
-            next_grapheme(&model.composer, cursor)
-        };
-    }
-    model.composer_cursor = cursor;
+    model.composer_cursor = if delta.is_negative() {
+        model.composer_cursor.saturating_sub(delta.unsigned_abs())
+    } else {
+        model
+            .composer_cursor
+            .saturating_add(delta as usize)
+            .min(grapheme_count(&model.composer))
+    };
 }
 
 fn clamp_cursor(model: &mut TuiModel) {
-    while model.composer_cursor > 0 && !model.composer.is_char_boundary(model.composer_cursor) {
-        model.composer_cursor -= 1;
-    }
-    model.composer_cursor = model.composer_cursor.min(model.composer.len());
+    model.composer_cursor = model.composer_cursor.min(grapheme_count(&model.composer));
 }
 
-fn previous_grapheme(text: &str, cursor: usize) -> usize {
+fn byte_cursor(model: &TuiModel) -> usize {
+    byte_index(&model.composer, model.composer_cursor)
+}
+
+fn byte_index(text: &str, cursor: usize) -> usize {
     text.grapheme_indices(true)
-        .take_while(|(index, _)| *index < cursor)
+        .nth(cursor)
         .map(|(index, _)| index)
-        .last()
-        .unwrap_or(0)
+        .unwrap_or(text.len())
 }
 
-fn next_grapheme(text: &str, cursor: usize) -> usize {
-    text.grapheme_indices(true)
-        .map(|(index, graph)| index + graph.len())
-        .find(|end| *end > cursor)
-        .unwrap_or(text.len())
+fn grapheme_count(text: &str) -> usize {
+    text.graphemes(true).count()
 }
 
 fn submit_composer(model: &mut TuiModel, effects: &mut Vec<TuiEffect>) {

@@ -1,4 +1,5 @@
 use ratatui::layout::{Position, Rect};
+use unicode_segmentation::UnicodeSegmentation;
 use unicode_width::UnicodeWidthStr;
 
 use crate::tui_types::{pane_label, run_state_label, source_label, TuiModel};
@@ -40,7 +41,11 @@ pub fn transcript(model: &TuiModel) -> String {
 }
 
 pub(crate) fn composer_position(area: Rect, model: &TuiModel) -> Position {
-    let before = &model.composer[..model.composer_cursor.min(model.composer.len())];
+    let before = model
+        .composer
+        .graphemes(true)
+        .take(model.composer_cursor)
+        .collect::<String>();
     let line_index = before.lines().count().saturating_sub(1) as u16;
     let col = before.rsplit('\n').next().unwrap_or("").width() as u16;
     let inner_width = area.width.saturating_sub(2);
@@ -73,7 +78,7 @@ mod tests {
     fn japanese_cursor_uses_display_width() {
         let mut model = TuiModel::new();
         model.composer = "あいx".to_string();
-        model.composer_cursor = "あい".len();
+        model.composer_cursor = 2;
 
         let pos = composer_position(Rect::new(10, 5, 20, 4), &model);
 

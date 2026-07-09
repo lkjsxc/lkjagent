@@ -50,11 +50,11 @@ follow mode when a row arrives, the rendered bottom stays anchored.
 
 ## Japanese And Mixed-Width Text
 
-The composer stores UTF-8 text plus a byte cursor that is clamped to Unicode
-grapheme boundaries. Insert, backspace, left, right, multiline, and submit
-operations do not split Japanese characters, emoji graphemes, or IME-composed
-text. Tests cover Japanese strings, emoji, ASCII, newline handling, and durable
-transcript saves.
+The composer stores UTF-8 text plus a grapheme cursor index. Insert, delete,
+backspace, left, right, home, end, multiline, and submit operations do not split
+Japanese characters, emoji graphemes, or IME-composed text. Cursor placement uses
+Unicode display width instead of byte counts. Tests cover Japanese strings,
+emoji, ASCII, newline handling, display width, and durable transcript saves.
 
 ## Authority Limits
 

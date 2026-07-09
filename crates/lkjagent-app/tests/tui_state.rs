@@ -9,11 +9,12 @@ use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
+
 #[test]
 fn composer_survives_streaming_agent_events() {
     let (model, _) = reduce(TuiModel::new(), TuiEvent::UserInputChanged("draft".into()));
     let (model, _) = reduce(model, TuiEvent::AgentTextDelta("working".into()));
-
     assert_eq!(model.composer, "draft");
     assert_eq!(model.run_state, TuiRunState::Running);
     assert_eq!(
@@ -26,7 +27,6 @@ fn composer_survives_streaming_agent_events() {
 fn submit_clears_composer_and_emits_owner_effect() {
     let (model, _) = reduce(TuiModel::new(), TuiEvent::UserInputChanged("hello".into()));
     let (model, effects) = reduce(model, TuiEvent::UserSubmit);
-
     assert_eq!(model.composer, "");
     assert!(effects.contains(&TuiEffect::SubmitOwnerMessage("hello".into())));
     assert_eq!(model.transcript[0].text, "hello");
@@ -60,7 +60,6 @@ fn tool_approval_preserves_composer_until_submit() {
         },
     );
     let (model, effects) = reduce(model, TuiEvent::UserApproveTool);
-
     assert_eq!(model.composer, "note");
     assert_eq!(model.run_state, TuiRunState::ToolRunning);
     assert!(
@@ -94,7 +93,20 @@ fn japanese_composer_moves_cursor_by_grapheme() {
     let (model, _) = reduce(model, TuiEvent::UserInsertChar('X'));
 
     assert_eq!(model.composer, "あいXう");
-    assert!(model.composer.is_char_boundary(model.composer_cursor));
+    assert_eq!(model.composer_cursor, 3);
+    let (model, _) = reduce(model, TuiEvent::UserComposerHome);
+    assert_eq!(model.composer_cursor, 0);
+    let (model, _) = reduce(model, TuiEvent::UserComposerEnd);
+    assert_eq!(model.composer_cursor, 4);
+
+    let (model, _) = reduce(TuiModel::new(), TuiEvent::UserInputChanged("あ🙂い".into()));
+    let (model, _) = reduce(model, TuiEvent::UserComposerHome);
+    let (model, _) = reduce(model, TuiEvent::UserMoveComposer(1));
+    let (model, _) = reduce(model, TuiEvent::UserDelete);
+    assert_eq!(
+        (model.composer.as_str(), model.composer_cursor),
+        ("あい", 1)
+    );
 }
 
 #[test]
@@ -102,7 +114,6 @@ fn backspace_removes_whole_emoji_grapheme() {
     let (model, _) = reduce(TuiModel::new(), TuiEvent::UserInputChanged("👨‍👩‍👧‍👦a".into()));
     let (model, _) = reduce(model, TuiEvent::UserMoveComposer(-1));
     let (model, _) = reduce(model, TuiEvent::UserBackspace);
-
     assert_eq!(model.composer, "a");
     assert_eq!(model.composer_cursor, 0);
 }
@@ -121,7 +132,16 @@ fn multiline_composer_keeps_newlines() {
 }
 
 #[test]
-fn transcript_save_persists_japanese_entries() -> Result<(), Box<dyn std::error::Error>> {
+fn ime_composed_text_preserves_boundaries() {
+    let text = "か\u{3099}な".to_string();
+    let (model, _) = reduce(TuiModel::new(), TuiEvent::UserInputChanged(text.clone()));
+
+    assert_eq!(model.composer, text);
+    assert_eq!(model.composer_cursor, 2);
+}
+
+#[test]
+fn transcript_save_persists_japanese_entries() -> TestResult<()> {
     let data = std::env::temp_dir().join(format!("lkjagent-tui-{}", std::process::id()));
     if data.exists() {
         fs::remove_dir_all(&data)?;
@@ -155,8 +175,7 @@ fn non_tty_render_shows_state_without_raw_terminal_control() {
 }
 
 #[test]
-fn tui_snapshot_shows_durable_agent_message_after_daemon_turn(
-) -> Result<(), Box<dyn std::error::Error>> {
+fn tui_snapshot_shows_durable_agent_message_after_daemon_turn() -> TestResult<()> {
     let data = std::env::temp_dir().join(format!("lkjagent-tui-agent-{}", std::process::id()));
     if data.exists() {
         fs::remove_dir_all(&data)?;
