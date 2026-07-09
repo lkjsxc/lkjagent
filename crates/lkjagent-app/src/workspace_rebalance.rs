@@ -1,5 +1,3 @@
-use std::{fs, path::Path};
-
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_core::workspace_manifest::{
     validate_rebalance_move, RebalanceMove, WorkspaceManifest,
@@ -8,13 +6,12 @@ use lkjagent_core::workspace_record::{record_fingerprint, record_path_at};
 use lkjagent_store::record_rows::{record, records, upsert_record, RecordRow};
 use lkjagent_store::workspace_rows::{insert_alias_and_audit, upsert_manifest, PathAliasRow};
 use rusqlite::Connection;
-
+use std::{fs, path::Path};
 pub fn plan(conn: &Connection, data_dir: &Path, json: bool, now: &str) -> Result<String, String> {
     ensure_manifest(conn, data_dir, now)?;
     let moves = planned_moves(conn)?;
     render_plan(&moves, json)
 }
-
 pub fn apply(conn: &Connection, data_dir: &Path, json: bool, now: &str) -> Result<String, String> {
     ensure_manifest(conn, data_dir, now)?;
     let moves = planned_moves(conn)?;
@@ -65,7 +62,6 @@ pub fn apply(conn: &Connection, data_dir: &Path, json: bool, now: &str) -> Resul
     }
     render_plan(&moves, json)
 }
-
 pub fn validate(
     conn: &Connection,
     data_dir: &Path,
@@ -75,23 +71,35 @@ pub fn validate(
     ensure_manifest(conn, data_dir, now)?;
     let rows = records(conn, None, true).map_err(|error| error.to_string())?;
     let workspace = crate::config::workspace_root(data_dir)?;
-    let missing = rows
-        .iter()
-        .filter(|row| !workspace.join(&row.path).exists())
-        .map(|row| row.id.clone())
-        .collect::<Vec<_>>();
+    let mut missing = Vec::new();
+    let mut stale = Vec::new();
+    for row in &rows {
+        if !workspace.join(&row.path).exists() {
+            missing.push(row.id.clone());
+            continue;
+        }
+        match file_fingerprint(&workspace, &row.path) {
+            Ok(found) if found == row.fingerprint => {}
+            _ => stale.push(row.id.clone()),
+        }
+    }
     if json {
+        let valid = missing.is_empty() && stale.is_empty();
         return Ok(
-            serde_json::json!({"valid": missing.is_empty(), "missing": missing}).to_string(),
+            serde_json::json!({"valid": valid, "missing": missing, "stale": stale}).to_string(),
         );
     }
-    if missing.is_empty() {
-        Ok("workspace validate: ok".to_string())
-    } else {
-        Ok(format!("workspace validate: missing {}", missing.join(",")))
+    match (missing.is_empty(), stale.is_empty()) {
+        (true, true) => Ok("workspace validate: ok".to_string()),
+        (false, true) => Ok(format!("workspace validate: missing {}", missing.join(","))),
+        (true, false) => Ok(format!("workspace validate: stale {}", stale.join(","))),
+        (false, false) => Ok(format!(
+            "workspace validate: missing {} stale {}",
+            missing.join(","),
+            stale.join(",")
+        )),
     }
 }
-
 fn ensure_manifest(conn: &Connection, data_dir: &Path, now: &str) -> Result<(), String> {
     let manifest = WorkspaceManifest::default_workspace();
     let manifests = crate::config::workspace_root(data_dir)?.join("system/manifests");
@@ -101,7 +109,6 @@ fn ensure_manifest(conn: &Connection, data_dir: &Path, now: &str) -> Result<(), 
         .map_err(|error| error.to_string())?;
     upsert_manifest(conn, &manifest, now).map_err(|error| error.to_string())
 }
-
 fn planned_moves(conn: &Connection) -> Result<Vec<RebalanceMove>, String> {
     let rows = records(conn, None, false).map_err(|error| error.to_string())?;
     Ok(rows
@@ -109,7 +116,6 @@ fn planned_moves(conn: &Connection) -> Result<Vec<RebalanceMove>, String> {
         .filter_map(|row| move_for_row(&row))
         .collect())
 }
-
 fn move_for_row(row: &RecordRow) -> Option<RebalanceMove> {
     let new_path = record_path_at(&row.kind, &row.id, &row.updated_at, &row.title, &row.state)
         .unwrap_or_else(|_| format!("records/knowledge/notes/{}/{}.md", row.kind, row.id));
@@ -133,7 +139,6 @@ fn move_for_row(row: &RecordRow) -> Option<RebalanceMove> {
     };
     Some(item)
 }
-
 fn move_record_file(workspace: &Path, item: &RebalanceMove) -> Result<(), String> {
     let old = workspace.join(&item.old_path);
     let new = workspace.join(&item.new_path);
@@ -142,7 +147,6 @@ fn move_record_file(workspace: &Path, item: &RebalanceMove) -> Result<(), String
     }
     fs::rename(old, new).map_err(|error| error.to_string())
 }
-
 fn rollback_record_file(workspace: &Path, item: &RebalanceMove) -> Result<(), String> {
     fs::rename(
         workspace.join(&item.new_path),
@@ -150,12 +154,10 @@ fn rollback_record_file(workspace: &Path, item: &RebalanceMove) -> Result<(), St
     )
     .map_err(|e| e.to_string())
 }
-
 fn file_fingerprint(workspace: &Path, rel: &str) -> Result<String, String> {
     let text = fs::read_to_string(workspace.join(rel)).map_err(|error| error.to_string())?;
     record_fingerprint(&text).map_err(|error| error.message)
 }
-
 fn update_record(conn: &Connection, item: &RebalanceMove, now: &str) -> Result<(), String> {
     let mut row = record(conn, &item.entity_id)
         .map_err(|error| error.to_string())?
@@ -164,7 +166,6 @@ fn update_record(conn: &Connection, item: &RebalanceMove, now: &str) -> Result<(
     row.updated_at = now.to_string();
     upsert_record(conn, &row).map_err(|error| error.to_string())
 }
-
 fn alias(item: &RebalanceMove, now: &str) -> PathAliasRow {
     PathAliasRow {
         old_path: item.old_path.clone(),
@@ -175,13 +176,11 @@ fn alias(item: &RebalanceMove, now: &str) -> PathAliasRow {
         created_at: now.to_string(),
     }
 }
-
 fn audit_id(item: &RebalanceMove) -> String {
     stable_fingerprint(item)
         .map(|value| format!("rebalance-{value}"))
         .unwrap_or_else(|_| format!("rebalance-{}", item.entity_id))
 }
-
 fn render_plan(moves: &[RebalanceMove], json: bool) -> Result<String, String> {
     if json {
         return serde_json::to_string(moves).map_err(|error| error.to_string());
@@ -191,7 +190,6 @@ fn render_plan(moves: &[RebalanceMove], json: bool) -> Result<String, String> {
     }
     Ok(moves.iter().map(move_line).collect::<Vec<_>>().join("\n"))
 }
-
 fn move_line(item: &RebalanceMove) -> String {
     format!(
         "move {} {} -> {}",

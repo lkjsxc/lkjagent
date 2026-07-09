@@ -109,6 +109,12 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
     assert_eq!(alias, "records/life/todo/open/rec_1.md");
     let valid = cli::run(["--data", data_str(&data), "workspace", "validate"])?;
     assert_eq!(valid, "workspace validate: ok");
+    fs::write(
+        workspace.join("records/life/todo/open/rec_1.md"),
+        format!("{body}\nchanged"),
+    )?;
+    let stale = cli::run(["--data", data_str(&data), "workspace", "validate"])?;
+    assert_eq!(stale, "workspace validate: stale rec_1");
     Ok(())
 }
 
