@@ -1,0 +1,2 @@
+command	docker compose --profile shell run --rm shell cargo run --locked -p lkjagent-xtask -- gate baseline-capture
+exit_code	2

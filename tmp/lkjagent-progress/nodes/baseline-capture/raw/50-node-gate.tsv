@@ -1,0 +1,3 @@
+command	docker compose --profile shell run --rm shell cargo run --locked -p lkjagent-xtask -- gate baseline-capture
+source_commit	9f851ffd7961e39c66a6ade3e3672423e3e9e9b8
+exit_code	2

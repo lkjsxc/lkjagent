@@ -1,0 +1,7 @@
+failure	status	evidence_ref	boundary
+output-cap-identical-retry	reproduced	raw/12-sqlite-facts.tsv,raw/13-request-facts.tsv	Persisted case 2 contains two identical output-cap diagnoses for the same 1500-word write and 768-token cap.
+live-closed-after-blocked	bounded	raw/11-source-facts.tsv,raw/14-live-summary-facts.tsv	Tracked summaries report ran and closed, but the raw profile databases were not committed and cannot prove the persisted contradiction.
+readiness-message-false-close	bounded	raw/11-source-facts.tsv	Base source routes a generic parsed message directly to finish_message; no preserved endpoint fixture isolates readiness prose.
+relative-workspace-tree-prefix	bounded	raw/11-source-facts.tsv,raw/19-relative-root-historical.log	Base source explains the preserved error observation, but the historical profile database is absent.
+diary-canned-content	reproduced	raw/17-diary-run-once.tsv,raw/18-diary-after-run-manifest.tsv	A fresh model-free diary command created a semantic record containing the canned missing-detail sentence.
+clean-checkout-missing-lockfile	reproduced	raw/31-clean-checkout.tsv,raw/31-clean-checkout.log	The packet clean-checkout script fails in an isolated worktree because Cargo.lock is not tracked.

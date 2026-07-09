@@ -1,0 +1,8 @@
+fact	path	line	evidence
+diary-canned	crates/lkjagent-core/src/owner_record.rs	106	        cleaned = "No specific diary details were provided.".to_string();
+relative-root-strip	crates/lkjagent-effects/src/workspace.rs	146	        .strip_prefix(root)
+synthetic-idle-snapshot	crates/lkjagent-app/src/daemon_intake.rs	44	pub fn idle_snapshot() -> TaskSnapshot {
+live-idle-loop	crates/lkjagent-xtask/src/experiment_live.rs	81	        match run_until_idle(&data, &mut endpoint, 1) {
+live-turn-count	crates/lkjagent-xtask/src/experiment_live.rs	83	                turns += 1;
+readiness-message-close	crates/lkjagent-core/src/engine_steps.rs	90	        ParsedOutput::Message(summary) => finish_message(snapshot, commands, index, summary),
+finish-action-close	crates/lkjagent-core/src/engine_steps.rs	84	            Some(summary) => finish_message(snapshot, commands, index, summary),

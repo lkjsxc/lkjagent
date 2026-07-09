@@ -1,0 +1,2 @@
+command	cargo test --locked -p lkjagent-xtask --test node_gates
+exit_code	101

@@ -1,0 +1,2 @@
+command	cargo run --locked -p lkjagent-app -- --data tmp/lkjagent-progress/nodes/baseline-capture/raw/diary-fixture-data send <redacted-japanese-diary-command>
+exit_code	0

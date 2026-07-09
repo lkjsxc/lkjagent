@@ -1,0 +1,3 @@
+command	sh tmp/lkjagent-evidence-first-rebuild-20260710/13-scripts/clean_checkout_gate.sh <isolated-worktree>
+base_commit	e0aa715e
+exit_code	1

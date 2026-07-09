@@ -1,0 +1,13 @@
+metric	value
+attempt1.request_sha256	6217a0885a8b1904f515aaf7d00988f769b7f01ea61075a8680ba2f3556139f7
+attempt1.decision_id	case-2-decision-0002
+attempt1.max_tokens	768
+attempt1.requires_1500_words	true
+attempt1.output_path_same	true
+attempt2.request_sha256	d43d74be765cb314d53ac187f34de2edf46f07152b9b821d629532be5093dc60
+attempt2.decision_id	case-2-decision-0004
+attempt2.max_tokens	768
+attempt2.requires_1500_words	true
+attempt2.output_path_same	true
+identical_max_tokens	true
+identical_stop	true

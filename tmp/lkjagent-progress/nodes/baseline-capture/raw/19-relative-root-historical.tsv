@@ -1,0 +1,3 @@
+command	git show <base>:tmp/agent-runs/20260708T115614Z/transcript.txt | rg -m 1 fs.tree-prefix-not-found
+git_show_exit_code	0
+match_exit_code	0

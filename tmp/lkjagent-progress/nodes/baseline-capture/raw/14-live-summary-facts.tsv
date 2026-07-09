@@ -1,0 +1,5 @@
+artifact	profile	status	state	elapsed_seconds	turns	prompt_frames	provider_exchanges
+historical-summary	personal-workspace	ran	closed	900	4401	0	0
+historical-summary	software-project	ran	closed	900	4054	4	4
+historical-summary	structured-artifact	ran	closed	900	4290	2	2
+historical-summary	protocol-stress	ran	closed	900	3755	12	12

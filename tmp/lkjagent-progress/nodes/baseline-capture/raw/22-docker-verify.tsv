@@ -1,0 +1,2 @@
+command	docker compose --profile verify run --rm verify
+exit_code	0

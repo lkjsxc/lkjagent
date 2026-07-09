@@ -1,0 +1,15 @@
+error[E0432]: unresolved import `lkjagent_xtask::node_gate`
+ --> crates/lkjagent-xtask/tests/node_gates.rs:5:5
+  |
+5 | use lkjagent_xtask::node_gate;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^ no `node_gate` in the root
+
+error[E0599]: no variant, associated function, or constant named `Node` found for enum `Gate` in the current scope
+  --> crates/lkjagent-xtask/tests/node_gates.rs:12:18
+   |
+12 |         Ok(Gate::Node(name)) if name == "baseline-capture"
+   |                  ^^^^ variant, associated function, or constant not found in `Gate`
+
+Some errors have detailed explanations: E0432, E0599.
+For more information about an error, try `rustc --explain E0432`.
+error: could not compile `lkjagent-xtask` (test "node_gates") due to 2 previous errors

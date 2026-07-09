@@ -1,0 +1,11 @@
+node_id	baseline-capture
+status	passed
+source_commit	9f851ffd7961e39c66a6ade3e3672423e3e9e9b8
+completed_sequence	1
+gate_command	docker compose --profile shell run --rm shell cargo run --locked -p lkjagent-xtask -- gate baseline-capture
+gate_exit_code	0
+dependency_receipt_hashes	
+evidence_refs	nodes/baseline-capture/raw/52-node-gate.log,nodes/baseline-capture/raw/40-critical-failures.tsv,nodes/baseline-capture/raw/41-source-binding.tsv
+evidence_hashes	sha256:1c49964ee8274e21b62d41de5d773c8a6ddab42289ea1f119e3f95b9a5db96a8,sha256:fae10f623821d8b20b4e27afea36df08076a8ca5af3661121204e8e6acda850c,sha256:b0269b68f765aef2a9a06e55f54128f4d3a4c65a2c09c753f27cf545b6cde604
+verifier_ref	nodes/baseline-capture/verifier.md
+verifier_hash	sha256:9ce6ddc8bfc7a87231e27422887ce5504ca99c12371f8a0a565dd4ace2faaa6a

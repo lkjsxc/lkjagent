@@ -1,0 +1,12 @@
+integrity	ok
+table	matters	missing
+table	obligations	missing
+table	operations	missing
+table	runtime_events	33
+table	runtime_decisions	10
+table	effect_journal	missing
+table	tool_admissions	0
+table	observations	0
+table	checks	missing
+table	workspace_documents	missing
+table	conversation_messages	missing
