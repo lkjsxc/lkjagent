@@ -133,7 +133,13 @@ fn write_record(
     let workspace = crate::config::workspace_root(data_dir)?;
     crate::workspace_scaffold::ensure_for_path(&workspace, &rel)?;
     let path = workspace.join(&rel);
-    let text = render_record(record);
+    let prepared = crate::record_identity::prepare_record_text(&rel, record);
+    for part in &prepared.parts {
+        crate::workspace_scaffold::ensure_for_path(&workspace, &part.rel)?;
+        fs::write(workspace.join(&part.rel), &part.text).map_err(|error| error.to_string())?;
+        crate::workspace_scaffold::refresh_for_path(&workspace, &part.rel)?;
+    }
+    let text = prepared.main_text;
     fs::write(&path, &text).map_err(|error| error.to_string())?;
     crate::workspace_scaffold::refresh_for_path(&workspace, &rel)?;
     let row = record_row(

@@ -72,7 +72,8 @@ record rows, history, fingerprints, README links, index contents, and index
 artifacts. Journal records now use `YYYY/MM/DD/entry.md`, TODO records use state
 paths, calendar records use dated paths, finance records use month paths and the
 `budget-month.md` index, and record bodies are structured separately from
-owner-turn transcript evidence.
+owner-turn transcript evidence. Oversize record bodies are split into linked
+`.parts/part-NNN.md` files with a size justification in the main record.
 Artifact-request routing now blocks closure unless the final response names the
 artifact path after file, artifact row, and check row evidence exists. CLI send
 and daemon intake now scaffold the workspace and write owner-turn transcript or

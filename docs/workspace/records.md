@@ -53,6 +53,14 @@ record indexes. These rows and files are evidence and indexes, not turn
 authority. Frontmatter refs may point to owner messages, state keys, checks,
 provider exchanges, artifacts, other records, or proof bundles.
 
+## Size Budget
+
+Record files target about 512 prompt tokens. When a record body would push the
+Markdown file above that target, lkjagent keeps the main record small and writes
+the full body into sibling `.parts/part-NNN.md` files. The main record contains
+a size justification and links to every part. Owner data is split and linked,
+not silently truncated.
+
 ## Staleness
 
 Editing a record changes its fingerprint. Reducers mark dependent indexes,

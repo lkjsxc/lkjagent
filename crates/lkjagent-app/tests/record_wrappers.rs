@@ -102,6 +102,35 @@ fn friendly_wrappers_write_generic_records() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn large_record_body_is_split_into_linked_parts() -> TestResult<()> {
+    let data = fixture_root("record-large-body")?;
+    let body = "alpha ".repeat(500);
+
+    let added = cli::run([
+        "--data",
+        data.to_string_lossy().as_ref(),
+        "record",
+        "add",
+        "note",
+        "Large",
+        "note",
+        "--body",
+        body.as_str(),
+    ])?;
+    let id = added.split_whitespace().nth(1).ok_or("missing id")?;
+    let root = data.join("workspace/records/life/notes");
+    let main = fs::read_to_string(root.join(format!("{id}.md")))?;
+    let first = fs::read_to_string(root.join(format!("{id}.parts/part-001.md")))?;
+
+    assert!(main.contains("Size justification"));
+    assert!(main.contains(&format!("{id}.parts/part-001.md")));
+    assert!(!main.contains(&body[..80]));
+    assert!(first.contains("alpha alpha"));
+    assert!(root.join(format!("{id}.parts/part-002.md")).exists());
+    Ok(())
+}
+
 fn state_labels(conn: &Connection) -> rusqlite::Result<Vec<String>> {
     let mut statement = conn.prepare("SELECT key_label FROM state_cells ORDER BY key_label")?;
     let rows = statement.query_map([], |row| row.get::<_, String>(0))?;
