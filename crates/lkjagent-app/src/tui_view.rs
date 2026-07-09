@@ -129,7 +129,7 @@ fn help() -> String {
         "Ctrl+Q quit | Ctrl+C interrupt | Ctrl+P palette | Ctrl+S save transcript",
         "Ctrl+L search using composer | Ctrl+J newline | Enter submit",
         "F1 transcript | F2 matters | F3 tools | F4 graph | F5 workspace | F6 help",
-        "Up/Down scroll | PageUp/PageDown page | Home top | End follow",
+        "Up/Down scroll | PageUp/PageDown page | Home/End move composer",
     ]
     .join("\n")
 }
@@ -167,6 +167,13 @@ fn into_lines(text: String) -> Vec<Line<'static>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn help_matches_key_bindings() {
+        let text = help();
+        assert!(text.contains("Home/End move composer"));
+        assert!(!text.contains("Home top"));
+    }
 
     #[test]
     fn transcript_uses_durable_snapshot_agent_messages() {

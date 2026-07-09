@@ -24,14 +24,15 @@ save, and quit events arrive. Terminal backends are effects at the edge.
 
 ## Modes
 
-`append` is the default safest mode. It prints immutable refresh cards to the
-primary screen. Plain terminal scrollback, tmux copy mode, and saved command
-output remain usable.
+`append` is the default safest mode. It prints immutable refresh cards through
+the line renderer even when stdin and stdout are TTYs. Plain terminal scrollback,
+tmux copy mode, and saved command output remain usable.
 
-`pane` is an explicit framed primary-screen renderer. Its left pane is the
-owner conversation transcript only. Diagnostic rows such as step progress,
-matter trace, proof counts, queue state, and recent events belong in the
-right rail or other non-transcript panes.
+`pane` is an explicit framed primary-screen renderer. When stdin and stdout are
+TTYs, `pane` uses the ratatui alternate-screen backend; otherwise it uses the
+line pane renderer. Its left pane is the owner conversation transcript only.
+Diagnostic rows such as step progress, matter trace, proof counts, queue state,
+and recent events belong in the right rail or other non-transcript panes.
 
 Each refresh includes bounded sections:
 
