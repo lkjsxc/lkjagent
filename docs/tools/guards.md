@@ -15,6 +15,9 @@ are denied by admission before any effect runs. The guard name is
 A runtime decision carries the remaining tool, token, and retry budgets relevant
 to the active state. Budget exhaustion suppresses tools in the `ToolSetView` or
 selects a recovery decision. It does not render tools that admission will refuse.
+State payloads use flat key `tool_budget_remaining`. When it is `0`, selector
+builds an empty `ToolSetView` and records `tool-budget:suppressed` in the
+decision evidence requirements.
 
 ## Repeat Guard
 

@@ -82,6 +82,29 @@ fn tool_field_specs_drive_value_class_admission() -> Result<(), String> {
     Ok(())
 }
 
+#[test]
+fn missing_tool_records_prompt_admission_mismatch() -> Result<(), String> {
+    let decision = RuntimeDecision::new(
+        "decision-1",
+        "case-1",
+        OperationKey("model.call".to_string()),
+        ToolSetView::new(vec![
+            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new())
+        ]),
+        OutputEnvelope::Action,
+    );
+
+    let result = admit_action(&decision, &action("shell.run", "cmd", "date"))
+        .map_err(|error| error.message)?;
+
+    assert_eq!(result.status, AdmissionStatus::Rejected);
+    assert_eq!(
+        result.reason,
+        "tool-view mismatch: shell.run absent from decision view"
+    );
+    Ok(())
+}
+
 fn action(tool: &str, field: &str, value: &str) -> ModelAction {
     action_params(tool, vec![(field, value)])
 }

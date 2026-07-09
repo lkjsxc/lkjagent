@@ -37,6 +37,17 @@ pub fn select_runtime_decision(
     decision
         .evidence_requirements
         .insert(0, format!("selector:{}", candidate.reason));
+    if candidate
+        .state_key
+        .as_ref()
+        .and_then(|key| snapshot.cells.get(key))
+        .map(|cell| payload_tool_budget_exhausted(&payload_value(cell)))
+        .unwrap_or(false)
+    {
+        decision
+            .evidence_requirements
+            .push("tool-budget:suppressed".to_string());
+    }
     decision.recovery_policy = operation.recovery_policy;
     Ok(decision)
 }
@@ -83,6 +94,9 @@ pub(crate) fn payload_envelope(payload: &Value) -> OutputEnvelope {
 }
 
 pub(crate) fn payload_tool_view(payload: &Value) -> ToolSetView {
+    if payload_tool_budget_exhausted(payload) {
+        return ToolSetView::empty();
+    }
     let entries = payload
         .get("tool_view")
         .and_then(Value::as_array)
@@ -100,6 +114,10 @@ pub(crate) fn payload_number(payload: &Value, key: &str) -> Option<u32> {
         .get(key)
         .and_then(Value::as_u64)
         .and_then(|value| u32::try_from(value).ok())
+}
+
+pub(crate) fn payload_tool_budget_exhausted(payload: &Value) -> bool {
+    payload_number(payload, "tool_budget_remaining") == Some(0)
 }
 
 pub(crate) fn payload_tier(payload: &Value, default: u8) -> u8 {

@@ -39,7 +39,8 @@ validation, path canonicalization, budget remaining, state suppressors, and
 recovery constraints. Admitted and rejected parsed actions persist
 `ToolAdmission` rows with the decision id, action tool, status, reason, parsed
 action, and tool-view fingerprint before effects run. A prompt/admission
-mismatch is a high-severity runtime event.
+mismatch is rejected with a `tool-view mismatch:` reason and is a high-severity
+runtime event.
 
 ## Fault Handling
 

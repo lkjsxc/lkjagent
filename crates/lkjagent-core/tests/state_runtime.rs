@@ -61,7 +61,10 @@ fn rendered_tool_view_and_admission_match() {
     assert_eq!(admitted.status, AdmissionStatus::Admitted);
     assert_eq!(admitted.tool_view_fingerprint, tool_fingerprint(&decision));
     assert_eq!(rejected.status, AdmissionStatus::Rejected);
-    assert_eq!(rejected.reason, "tool absent from decision view");
+    assert_eq!(
+        rejected.reason,
+        "tool-view mismatch: shell.run absent from decision view"
+    );
     assert!(!decision
         .tool_view
         .tool_names()

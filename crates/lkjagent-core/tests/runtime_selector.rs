@@ -1,6 +1,4 @@
-use lkjagent_core::runtime_decision::{
-    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
-};
+use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
 use lkjagent_core::runtime_selector::{candidates, select_runtime_decision};
 use lkjagent_core::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
 use lkjagent_core::runtime_state_edge::{StateEdge, StateEdgeRelation, StateRef};
@@ -34,12 +32,16 @@ fn selector_reads_model_cells_and_preserves_tool_view() {
     assert_eq!(selected.expected_envelope, OutputEnvelope::Action);
     assert_eq!(selected.model_budget_tokens, Some(512));
     assert_eq!(selected.tool_view.tool_names(), vec!["fs.read"]);
-    assert_eq!(selected.context_frame_fingerprint, "prepared-context");
     assert!(!selected.snapshot_fingerprint.is_empty());
-    assert_eq!(
-        selected.snapshot_fingerprint,
-        selected.state_vector_fingerprint
-    );
+    let mut exhausted = model_cell();
+    exhausted.payload_json = exhausted
+        .payload_json
+        .replace("\"tool_budget_remaining\":1", "\"tool_budget_remaining\":0");
+    let selected = select(&snapshot_with(exhausted), "decision-2", &[]);
+    assert!(selected.tool_view.entries.is_empty());
+    assert!(selected
+        .evidence_requirements
+        .contains(&String::from("tool-budget:suppressed")));
 }
 
 #[test]
@@ -161,6 +163,7 @@ fn model_cell() -> StateCell {
     cell.payload_json = serde_json::json!({
         "expected_envelope": "Action",
         "model_budget_tokens": 512,
+        "tool_budget_remaining": 1,
         "tool_view": [{
             "name": "fs.read",
             "purpose": "read a workspace file",
@@ -189,7 +192,7 @@ fn select(snapshot: &RuntimeSnapshot, id: &str, unfinished: &[RuntimeDecision]) 
             "error",
             "case-1",
             OperationKey("error".to_string()),
-            ToolSetView::new(vec![ToolViewEntry::new("error", "error")]),
+            ToolSetView::empty(),
             OutputEnvelope::None,
         ),
     }

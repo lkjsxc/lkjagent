@@ -142,6 +142,11 @@ deterministic smoke replay, a scripted workspace probe, proof collection,
 protocol experiments, `quiet verify`, and `docker compose run --rm verify` from
 clean `66027735`. Fresh evidence is under
 `tmp/coding-agent-runs/20260709T041854Z-more-more-continuation/`.
+Later corrective slices add generated-artifact part manifests, rebalance
+compensation, ranked XML-like context card entries, and tool admission hardening
+for repeated calls, recovery-hidden tools, budget suppression, and
+tool-view mismatch reasons. Evidence for these slices is under
+`tmp/agent-runs/20260709T0*/`.
 
 ## Known Gaps
 

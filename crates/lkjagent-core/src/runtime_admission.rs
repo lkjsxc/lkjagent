@@ -52,7 +52,12 @@ fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<
     }
     let entry = match decision.tool_view.entry(&action.tool) {
         Some(entry) => entry,
-        None => return Some("tool absent from decision view".to_string()),
+        None => {
+            return Some(format!(
+                "tool-view mismatch: {} absent from decision view",
+                action.tool
+            ))
+        }
     };
     for required in &entry.required_params {
         if !action.params.contains_key(required) {

@@ -118,6 +118,31 @@ mod tests {
         Ok(())
     }
 
+    #[test]
+    fn mismatch_reason_persists_for_hidden_tool() -> Result<(), String> {
+        let conn = Connection::open_in_memory().map_err(|error| error.to_string())?;
+        setup(&conn).map_err(|error| error.to_string())?;
+        let decision = RuntimeDecision::new(
+            "decision-1",
+            "case-1",
+            OperationKey("model.call/1".to_string()),
+            ToolSetView::new(vec![
+                ToolViewEntry::new("fs.read", "read").with_params(vec!["path"], Vec::new())
+            ]),
+            OutputEnvelope::Action,
+        );
+        let command = Command::RunExplore(action("shell.run", "cmd", "date"));
+
+        let error = match persist_tool_admissions(&conn, &decision, &[command], "now") {
+            Ok(()) => return Err("mismatch admitted".to_string()),
+            Err(error) => error,
+        };
+
+        assert!(error.contains("tool-view mismatch"));
+        assert!(result_json(&conn)?.contains("tool-view mismatch"));
+        Ok(())
+    }
+
     fn action(tool: &str, name: &str, value: &str) -> Action {
         Action {
             tool: tool.to_string(),
@@ -131,6 +156,13 @@ mod tests {
             [status],
             |row| row.get(0),
         )
+        .map_err(|error| error.to_string())
+    }
+
+    fn result_json(conn: &Connection) -> Result<String, String> {
+        conn.query_row("SELECT result_json FROM tool_admissions", [], |row| {
+            row.get(0)
+        })
         .map_err(|error| error.to_string())
     }
 }
