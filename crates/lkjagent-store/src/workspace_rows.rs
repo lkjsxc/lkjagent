@@ -52,6 +52,20 @@ pub fn insert_alias(conn: &Connection, row: &PathAliasRow) -> StoreResult<()> {
     Ok(())
 }
 
+pub fn insert_alias_and_audit(
+    conn: &Connection,
+    alias: &PathAliasRow,
+    audit_id: &str,
+    item: &RebalanceMove,
+    created_at: &str,
+) -> StoreResult<()> {
+    let tx = conn.unchecked_transaction()?;
+    insert_alias(&tx, alias)?;
+    insert_rebalance_audit(&tx, audit_id, item, created_at)?;
+    tx.commit()?;
+    Ok(())
+}
+
 pub fn resolve_alias(conn: &Connection, old_path: &str) -> StoreResult<Option<PathAliasRow>> {
     let row = conn.query_row(
         "SELECT old_path, entity_id, entity_kind, new_path, decision_id, created_at

@@ -109,6 +109,57 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
     Ok(())
 }
 
+#[test]
+fn workspace_rebalance_restores_record_when_audit_write_fails() -> TestResult<()> {
+    let data = fixture_root("rebalance-audit-fail")?;
+    let workspace = data.join("workspace");
+    fs::create_dir_all(workspace.join("records/knowledge/notes"))?;
+    let body = record_body();
+    fs::write(workspace.join("records/knowledge/notes/old.md"), &body)?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    upsert_record(
+        &conn,
+        &RecordRow {
+            id: "rec_1".to_string(),
+            kind: "todo".to_string(),
+            title: "Move me".to_string(),
+            state: "open".to_string(),
+            path: "records/knowledge/notes/old.md".to_string(),
+            fingerprint: record_fingerprint(&body)
+                .map_err(|error| std::io::Error::other(error.message))?,
+            archived: false,
+            updated_at: "old".to_string(),
+        },
+    )?;
+    conn.execute(
+        "CREATE TRIGGER fail_rebalance_audit
+         BEFORE INSERT ON workspace_rebalance_audit
+         BEGIN SELECT RAISE(FAIL, 'audit blocked'); END",
+        [],
+    )?;
+    drop(conn);
+
+    let result = cli::run(["--data", data_str(&data), "workspace", "apply-rebalance"]);
+
+    assert!(result.is_err());
+    assert!(workspace.join("records/knowledge/notes/old.md").exists());
+    assert!(!workspace.join("records/life/todo/open/rec_1.md").exists());
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let path: String = conn.query_row(
+        "SELECT path FROM workspace_records WHERE id = 'rec_1'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(path, "records/knowledge/notes/old.md");
+    let aliases: i64 =
+        conn.query_row("SELECT COUNT(*) FROM workspace_path_aliases", [], |row| {
+            row.get(0)
+        })?;
+    assert_eq!(aliases, 0);
+    Ok(())
+}
+
 fn record_body() -> String {
     "---\nid: rec_1\nkind: todo\ntitle: Move me\nstate: open\ncreated_at: old\nupdated_at: old\ntags: []\nlinks: []\nstate_keys: []\n---\n\n# Move me\n".to_string()
 }

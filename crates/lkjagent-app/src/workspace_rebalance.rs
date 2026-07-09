@@ -7,9 +7,7 @@ use lkjagent_core::workspace_manifest::{
 };
 use lkjagent_core::workspace_record::{record_fingerprint, record_path_at};
 use lkjagent_store::record_rows::{record, records, upsert_record, RecordRow};
-use lkjagent_store::workspace_rows::{
-    insert_alias, insert_rebalance_audit, upsert_manifest, PathAliasRow,
-};
+use lkjagent_store::workspace_rows::{insert_alias_and_audit, upsert_manifest, PathAliasRow};
 use rusqlite::Connection;
 
 pub fn plan(conn: &Connection, data_dir: &Path, json: bool, now: &str) -> Result<String, String> {
@@ -55,9 +53,13 @@ pub fn apply(conn: &Connection, data_dir: &Path, json: bool, now: &str) -> Resul
             now,
         );
         item.validation.push(format!("links-repaired:{repaired}"));
-        insert_alias(conn, &alias(&item, now)).map_err(|error| error.to_string())?;
-        insert_rebalance_audit(conn, &audit_id(&item), &item, now)
-            .map_err(|error| error.to_string())?;
+        if let Err(error) =
+            insert_alias_and_audit(conn, &alias(&item, now), &audit_id(&item), &item, now)
+                .map_err(|error| error.to_string())
+        {
+            crate::workspace_scaffold::restore_rebalance_move(conn, &workspace, &item, &row, now);
+            return Err(error);
+        }
     }
     if !moves.is_empty() {
         crate::workspace_index::rebuild(conn, data_dir, now)?;
@@ -187,14 +189,12 @@ fn render_plan(moves: &[RebalanceMove], json: bool) -> Result<String, String> {
     if moves.is_empty() {
         return Ok("rebalance plan: no moves".to_string());
     }
-    Ok(moves
-        .iter()
-        .map(|item| {
-            format!(
-                "move {} {} -> {}",
-                item.entity_id, item.old_path, item.new_path
-            )
-        })
-        .collect::<Vec<_>>()
-        .join("\n"))
+    Ok(moves.iter().map(move_line).collect::<Vec<_>>().join("\n"))
+}
+
+fn move_line(item: &RebalanceMove) -> String {
+    format!(
+        "move {} {} -> {}",
+        item.entity_id, item.old_path, item.new_path
+    )
 }
