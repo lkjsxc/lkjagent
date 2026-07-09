@@ -10,11 +10,7 @@ pub mod docs;
 mod docs_authority_contract;
 pub mod docs_authority_gate;
 mod docs_authority_product;
-pub mod experiment;
-pub mod experiment_cases;
-pub mod experiment_live;
-pub mod experiment_live_config;
-pub mod experiment_protocol;
+pub mod evaluation_harness;
 pub mod facts;
 pub mod file_counts;
 pub mod gate;
@@ -22,13 +18,7 @@ pub mod lines;
 pub mod model;
 pub mod node_gate;
 mod node_gate_evidence;
-pub mod proof;
-pub mod proof_checks;
-pub mod proof_records;
-pub mod proof_state;
-pub mod proof_tokens;
 pub mod runner;
-pub mod smoke;
 pub mod structure;
 pub mod style;
 
@@ -53,9 +43,9 @@ pub fn run(args: &[String], root: &Path) -> i32 {
         Ok(Gate::QuietVerify) => run_verify(root),
         Ok(Gate::Node(identifier)) => run_node_gate(root, &identifier),
         Ok(Gate::Benchmark(rest)) => benchmark::run(&rest, root),
-        Ok(Gate::Experiment(rest)) => experiment::run(&rest, root),
-        Ok(Gate::Proof(rest)) => proof::run(&rest, root),
-        Ok(Gate::Smoke(rest)) => smoke::run(&rest, root),
+        Ok(Gate::Experiment(_)) => evaluation_harness::reject_unbound_command("experiment"),
+        Ok(Gate::Proof(_)) => evaluation_harness::reject_unbound_command("proof"),
+        Ok(Gate::Smoke(rest)) => evaluation_harness::run_smoke(&rest, root),
         Ok(Gate::Structure(rest)) => structure::run(&rest, root),
         Err(lines) => {
             print_failure(&lines);
@@ -161,7 +151,7 @@ fn run_verify(root: &Path) -> i32 {
         ]);
         return 1;
     }
-    if let Err(error) = smoke::run_replay(root) {
+    if let Err(error) = evaluation_harness::run_replay(root) {
         print_failure(&[
             "smoke replay failed".to_string(),
             "exit status: 1".to_string(),

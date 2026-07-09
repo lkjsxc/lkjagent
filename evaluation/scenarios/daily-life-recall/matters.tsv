@@ -1,0 +1,4 @@
+scenario_key	expected_terminal
+daily-journal	completed
+mixed-record-update	completed
+older-fact-recall	completed

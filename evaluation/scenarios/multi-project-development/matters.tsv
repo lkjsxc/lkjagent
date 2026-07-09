@@ -1,0 +1,4 @@
+scenario_key	expected_terminal
+project-source-inspection	completed
+bounded-source-edit	completed
+restart-continuity	completed

@@ -1,0 +1,11 @@
+check_id	checker
+context-project-isolation	context-source
+project-separation	workspace-root
+source-edit-verified	command-log
+workspace-visible	workspace-file
+source-fingerprints	source-manifest
+allowed-path-diff	git-diff
+nonempty-test-logs	command-log
+canonical-continuity	conversation-ledger
+wrong-project-excluded	context-exclusion
+no-readiness-close	matter-checks
