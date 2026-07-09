@@ -47,3 +47,11 @@ as complete, skipped commands, zero-test filters, and generated placeholders.
 The node gate must prove each fixture is rejected for its mechanical defect.
 It also proves one computed fixture succeeds, so a validator that rejects
 everything cannot pass.
+
+## Command Authority
+
+`bench check-corpus` validates the anchored scenario sources. `smoke replay`
+runs the complete deterministic harness. Summary-only experiment, proof, live
+benchmark, and live smoke commands return failure because they cannot bind raw
+evidence to a frozen source. Final live work uses the acceptance campaign
+scripts and evidence root.
