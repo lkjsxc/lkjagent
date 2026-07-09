@@ -19,6 +19,8 @@ This directory holds the repository gate dispatcher, checks, and command runner.
   baseline truth, schema, and retired-page assertions.
 - [docs-authority-gate.rs](docs_authority_gate.rs): docs node composition and
   product source no-diff check.
+- [docs-authority-product.rs](docs_authority_product.rs): Git-free product tree
+  fingerprint used by the Docker node gate.
 - [facts.rs](facts.rs): repository fact collection.
 - [file-counts.rs](file_counts.rs): workspace file budget gate.
 - [lib.rs](lib.rs): public gate entrypoint.

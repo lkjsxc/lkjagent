@@ -9,6 +9,7 @@ pub mod doc_topology;
 pub mod docs;
 mod docs_authority_contract;
 pub mod docs_authority_gate;
+mod docs_authority_product;
 pub mod experiment;
 pub mod experiment_cases;
 pub mod experiment_live;

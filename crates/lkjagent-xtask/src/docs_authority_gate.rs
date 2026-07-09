@@ -3,6 +3,7 @@ use std::process::Command;
 
 use crate::docs::check_docs;
 use crate::docs_authority_contract;
+use crate::docs_authority_product;
 use crate::facts::collect_files;
 use crate::lines::check_lines;
 use crate::model::RepoFile;
@@ -24,9 +25,13 @@ const PRODUCT_PATHS: &[&str] = &[
 pub fn check(root: &Path) -> Result<(), Vec<String>> {
     let files = collect_files(root).map_err(|error| vec![error])?;
     let mut failures = check_contract(&files);
-    match changed_product_paths(root) {
-        Ok(paths) => failures.extend(check_changed_paths(&paths)),
-        Err(error) => failures.push(error),
+    if root.join(".git").is_dir() {
+        match changed_product_paths(root) {
+            Ok(paths) => failures.extend(check_changed_paths(&paths)),
+            Err(error) => failures.push(error),
+        }
+    } else {
+        failures.extend(docs_authority_product::check(root));
     }
     if failures.is_empty() {
         Ok(())
