@@ -49,8 +49,8 @@ command evidence.
   transaction-backed compensation after alias or audit write failure remains open.
 - `d8cfedfb` fixed repeat-call rejection and recovery-policy hiding; budget
   suppressors and distinct mismatch events remain open.
-- Open: context XML-like normal cards, ranking, and richer conflict source refs
-  remain report-only findings unless docs are narrowed or source is expanded.
+- `757ca459` fixed context XML-like card entries, ranking, and richer conflict
+  refs with context, prompt, app, quiet, and Docker evidence.
 
 ## Acceptance Status
 

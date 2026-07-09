@@ -112,8 +112,8 @@ Open after this correction:
   `03570fba`; transaction-backed compensation after alias/audit failure remains open.
 - Tool admission repeat-call suppression and recovery-policy hiding are fixed by
   `d8cfedfb`; budget suppressors and mismatch events remain open.
-- Context XML-like normal cards, ranking, and richer conflict source refs remain
-  report-only findings unless docs are narrowed or source is expanded.
+- Context XML-like card entries, ranking, and richer conflict refs are fixed by
+  `757ca459`; remaining context issues are not reopened in this ledger.
 
 ## Packet Read Log
 
@@ -197,4 +197,4 @@ Open after this correction:
 | large file split | 57c39d2e | large record CLI evidence shows main size justification plus linked part files; generated artifact splitting remains open | partial |
 | rebalance safety | 03570fba | CLI evidence shows fingerprint audit and `links-repaired:1`; post-alias/audit transaction compensation remains open | partial |
 | tool admission hardening | d8cfedfb | repeat guard and recovery policy fingerprint tests pass; budget suppressors and mismatch events remain open | partial |
-| context contract gaps | none | XML-like normal cards, ranking, and richer conflict refs remain report-only | open |
+| context contract gaps | 757ca459 | ranked XML-like entry tests pass in context/prompt/app tests | done |
