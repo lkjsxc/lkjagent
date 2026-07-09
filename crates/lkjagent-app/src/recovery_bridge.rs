@@ -5,7 +5,7 @@ use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey, StateStatus};
 use lkjagent_store::decision_rows::settle_decision;
 use lkjagent_store::event_rows::{append_and_apply_event, next_event_id};
-use rusqlite::Connection;
+use rusqlite::{params, Connection};
 
 pub fn recover_or_reuse(
     conn: &Connection,
@@ -91,11 +91,21 @@ pub fn record_recovery_fact(
     index: usize,
     now: &str,
 ) -> Result<(), String> {
+    let prior = prior_failure_count(conn, case_id, kind)?;
     let event_id = next_event_id(conn, case_id, "recovery").map_err(|error| error.to_string())?;
-    let key = StateKey::new("recovery", format!("{kind}/{decision_id}/{index}"))
-        .map_err(|error| error.message)?;
+    let key = if prior > 0 {
+        StateKey::new("completion", "blocked")
+    } else {
+        StateKey::new("recovery", format!("{kind}/{decision_id}/{index}"))
+    }
+    .map_err(|error| error.message)?;
     let mut cell = StateCell::active(key, event_id.clone());
-    cell.payload_schema = "recovery.failure".to_string();
+    cell.payload_schema = if prior > 0 {
+        "completion.blocked"
+    } else {
+        "recovery.failure"
+    }
+    .to_string();
     cell.payload_json = serde_json::json!({
         "kind": kind,
         "decision_id": decision_id,
@@ -112,13 +122,24 @@ pub fn record_recovery_fact(
     let event = RuntimeEvent {
         id: event_id,
         case_id: case_id.to_string(),
-        kind: "recovery.failure".to_string(),
+        kind: cell.payload_schema.clone(),
         payload: RuntimeEventPayload::UpsertCell(Box::new(cell)),
         source: "recovery-bridge".to_string(),
         created_at: now.to_string(),
         decision_id: Some(decision_id.to_string()),
     };
     append_and_apply_event(conn, &event).map_err(|error| error.to_string())
+}
+
+fn prior_failure_count(conn: &Connection, case_id: &str, kind: &str) -> Result<i64, String> {
+    let pattern = format!("recovery:{kind}/%");
+    conn.query_row(
+        "SELECT COUNT(*) FROM state_cells
+         WHERE case_id = ?1 AND key_label LIKE ?2 AND payload_schema = 'recovery.failure'",
+        params![case_id, pattern],
+        |row| row.get(0),
+    )
+    .map_err(|error| error.to_string())
 }
 
 fn record_recovery_cell(

@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 
 use lkjagent_app::daemon::{run_until_idle, CompletionRecord, Endpoint, ScriptedEndpoint};
 use lkjagent_core::classify::instantiate;
-use lkjagent_core::model::{StepState, TaskSnapshot};
+use lkjagent_core::model::{StepState, TaskSnapshot, TaskState};
 use lkjagent_core::render::Prompt;
 use lkjagent_store::plan_access::{enqueue, insert_step_tx, insert_task};
 use lkjagent_store::plan_schema::setup;
@@ -23,6 +23,32 @@ fn recovery_ladder_records_failure_cells() -> TestResult<()> {
     assert_failure_cell("admission", run_admission_failure)?;
     assert_failure_cell("effect", run_effect_failure)?;
     assert_failure_cell("check", run_check_failure)?;
+    Ok(())
+}
+
+#[test]
+fn repeated_parse_failure_escalates_to_blocked_task() -> TestResult<()> {
+    let data = fixture_root("parse-repeat")?;
+    enqueue_case(&data, "Investigate workspace files")?;
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec![
+            "<message>not an action</message>".to_string(),
+            "<message>not an action</message>".to_string(),
+        ],
+        index: 0,
+    };
+
+    let snapshot = run_until_idle(&data, &mut endpoint, 4)?;
+
+    assert_eq!(snapshot.task.state, TaskState::Blocked);
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let blocked: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM state_cells
+         WHERE key_label = 'completion:blocked' AND payload_schema = 'completion.blocked'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(blocked, 1);
     Ok(())
 }
 
