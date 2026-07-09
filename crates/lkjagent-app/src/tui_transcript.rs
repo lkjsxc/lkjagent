@@ -42,6 +42,7 @@ pub fn text(model: &TuiModel, snapshot: &TuiSnapshot) -> String {
 pub fn display_lines(model: &TuiModel, snapshot: &TuiSnapshot) -> Vec<String> {
     merged_entries(model, snapshot)
         .into_iter()
+        .filter(conversation_entry)
         .map(|entry| format!("{}: {}", source_label(entry.source), entry.text.trim()))
         .collect()
 }
@@ -73,6 +74,13 @@ pub fn merged_entries(model: &TuiModel, snapshot: &TuiSnapshot) -> Vec<Transcrip
         }
     }
     entries
+}
+
+fn conversation_entry(entry: &TranscriptEntry) -> bool {
+    matches!(
+        entry.source,
+        TranscriptSource::Owner | TranscriptSource::Agent
+    )
 }
 
 fn consume_shadow(shadows: &mut BTreeMap<String, usize>, entry: &TranscriptEntry) -> bool {

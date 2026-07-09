@@ -146,19 +146,12 @@ fn filter(text: &str, query: &str) -> String {
 }
 
 fn window(text: &str, model: &TuiModel) -> String {
-    let lines = text.lines().collect::<Vec<_>>();
-    let height = model.height.saturating_sub(10) as usize;
-    let start = if model.follow {
-        lines.len().saturating_sub(height)
-    } else {
-        model.scroll.min(lines.len())
-    };
-    lines
-        .into_iter()
-        .skip(start)
-        .take(height)
-        .collect::<Vec<_>>()
-        .join("\n")
+    crate::tui_window::visible_text(
+        text,
+        model.height.saturating_sub(10) as usize,
+        model.follow,
+        model.scroll,
+    )
 }
 
 fn first_lines(text: &str, count: usize) -> String {

@@ -70,6 +70,7 @@ mod tui_terminal;
 pub mod tui_transcript;
 mod tui_types;
 mod tui_view;
+mod tui_window;
 mod turn_effects;
 mod watch_view;
 pub mod workbench;

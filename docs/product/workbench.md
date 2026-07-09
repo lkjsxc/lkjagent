@@ -15,9 +15,12 @@ the command the same way it routes `status`, `console`, and `watch`.
 
 The app has a pure terminal model, event reducer, grapheme-aware composer,
 stable transcript-entry identity, agent draft accumulation, id-based transcript
-merge, follow/manual viewport state, and non-TTY renderer. It preserves composer
-input while agent, tool, state, artifact, resize, interrupt, approval, save, and
-quit events arrive. Terminal backends are effects at the edge.
+merge, clamped follow/manual viewport windows, and non-TTY renderer. Transcript
+views render owner/agent conversation entries only; tool, state, system, and
+error diagnostics stay in status, side, or saved diagnostic surfaces. Slash
+commands are commands, not owner transcript messages. The reducer preserves
+composer input while agent, tool, state, artifact, resize, interrupt, approval,
+save, and quit events arrive. Terminal backends are effects at the edge.
 
 ## Modes
 
@@ -50,7 +53,9 @@ owner turn. Slash commands reuse the console handlers for `/status`, `/watch`,
 state. `/scroll up`, `/scroll down`, `/scroll top`, `/page up`, and `/page down`
 move pane scroll state only. `/follow on` returns the transcript window to the
 latest rows; `/follow off` leaves manual scroll in place. If the viewport is in
-follow mode when a row arrives, the rendered bottom stays anchored.
+follow mode when a row arrives, the rendered bottom stays anchored. Manual scroll
+is clamped to the rendered pane length so the owner cannot scroll into endless
+blank space.
 
 ## Japanese And Mixed-Width Text
 
@@ -72,7 +77,9 @@ Tests cover parser routing, reducer mode changes, line handling, closed-input
 exit, grapheme cursor movement, pane scroll and follow state, scroll-down follow
 restoration, pane bottom anchoring after growth, agent delta draft commit,
 durable transcript merge, duplicate suppression by stable row identity, saved
-ids and source paths, canonical transcript rendering without step/task duplicate
-messages, status rail fallback fields, and bounded rendering.
+ids and source paths, slash-command non-transcription, conversation-only
+transcript display, clamped viewport windows, canonical transcript rendering
+without step/task duplicate messages, status rail fallback fields, and bounded
+rendering.
 Interactive behavior is proven by captured command logs under `tmp/agent-runs/`
 or `tmp/live-runs/`, with unavailable terminals recorded as an honest skip.

@@ -91,6 +91,46 @@ fn saved_transcript_includes_ids_and_paths() {
     assert!(text.contains("owner: hello"));
 }
 
+#[test]
+fn display_transcript_hides_diagnostics_from_conversation() {
+    let mut model = TuiModel::new();
+    model.transcript.push(entry(
+        "tool:session:1",
+        TranscriptSource::Tool,
+        "state: queue debug",
+        "session",
+    ));
+    model.transcript.push(entry(
+        "state:session:2",
+        TranscriptSource::State,
+        "state: queue: 1",
+        "session",
+    ));
+    model
+        .transcript
+        .push(agent_entry("agent:session:3", "visible", "session"));
+
+    let lines = lkjagent_app::tui_transcript::display_lines(&model, &TuiSnapshot::empty());
+
+    assert_eq!(lines, vec!["agent: visible"]);
+}
+
+#[test]
+fn slash_commands_submit_without_owner_transcript_echo() {
+    let (model, _) = lkjagent_app::tui_state::reduce(
+        TuiModel::new(),
+        lkjagent_app::tui_event::TuiEvent::UserInputChanged("/status".into()),
+    );
+    let (model, effects) =
+        lkjagent_app::tui_state::reduce(model, lkjagent_app::tui_event::TuiEvent::UserSubmit);
+
+    assert!(matches!(
+        effects.iter().find(|effect| matches!(effect, lkjagent_app::tui_state::TuiEffect::SubmitOwnerMessage(_))),
+        Some(lkjagent_app::tui_state::TuiEffect::SubmitOwnerMessage(text)) if text == "/status"
+    ));
+    assert!(model.transcript.is_empty());
+}
+
 fn agent_entry(id: &str, text: &str, path: &str) -> TranscriptEntry {
     entry(id, TranscriptSource::Agent, text, path)
 }

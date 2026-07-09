@@ -149,7 +149,9 @@ fn submit_composer(model: &mut TuiModel, effects: &mut Vec<TuiEffect>) {
     model.composer.clear();
     model.composer_cursor = 0;
     model.palette_open = false;
-    push_entry(model, TranscriptSource::Owner, text.clone());
+    if !text.starts_with('/') {
+        push_entry(model, TranscriptSource::Owner, text.clone());
+    }
     effects.push(TuiEffect::SubmitOwnerMessage(text));
 }
 
