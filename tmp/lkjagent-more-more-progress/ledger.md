@@ -108,8 +108,8 @@ Corrected evidence:
 Open after this correction:
 
 - Non-record generated artifact splitting or durable justification remains open.
-- Rebalance fingerprint continuity, link repair, and rollback or compensation
-  remain unimplemented or unaudited.
+- Rebalance fingerprint continuity and exact-path link repair are fixed by
+  `03570fba`; transaction-backed compensation after alias/audit failure remains open.
 - Tool admission repeat-call suppression, recovery-policy hiding, budget
   suppressors, and distinct mismatch events remain report-only findings.
 - Context XML-like normal cards, ranking, and richer conflict source refs remain
@@ -195,6 +195,6 @@ Open after this correction:
 | Docker verify | 9cd8069c | final `docker compose run --rm verify` passed after source changes | done |
 | live campaigns | 9cd8069c; 6d0be7d8; 44a791ec | scripted campaign passed with workspace validation; skip files committed; standard `.env` endpoint run added under `tmp/live-runs/20260708Tstandardenv/` with all four profiles closed after 900-second time boxes | done |
 | large file split | 57c39d2e | large record CLI evidence shows main size justification plus linked part files; generated artifact splitting remains open | partial |
-| rebalance safety | none | fingerprint continuity, link repair, and rollback or compensation remain report-only | open |
+| rebalance safety | 03570fba | CLI evidence shows fingerprint audit and `links-repaired:1`; post-alias/audit transaction compensation remains open | partial |
 | tool admission hardening | none | repeat-call, recovery-policy, budget, and mismatch-event claims remain report-only | open |
 | context contract gaps | none | XML-like normal cards, ranking, and richer conflict refs remain report-only | open |

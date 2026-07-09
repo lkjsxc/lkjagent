@@ -45,8 +45,8 @@ command evidence.
   justification and links to `.parts/part-NNN.md` files with the full body.
 - Open: non-record generated artifact splitting or durable justification is not
   yet proven.
-- Open: workspace rebalance fingerprint continuity, link repair, and rollback or
-  compensation remain report-only findings.
+- `03570fba` fixed rebalance fingerprint audit and exact old-path link repair;
+  transaction-backed compensation after alias or audit write failure remains open.
 - Open: tool admission repeat-call suppression, recovery-policy hiding, budget
   suppressors, and distinct mismatch events remain report-only findings.
 - Open: context XML-like normal cards, ranking, and richer conflict source refs
