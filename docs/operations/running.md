@@ -4,25 +4,18 @@
 
 Define day-to-day operation for the daemon and owner CLI.
 
-## Environment
+## Configuration
 
 Configuration lives in flat `data/lkjagent.json` plus environment overrides.
 Secrets are passed by environment variables and are not written to the config
 file.
 
-| Key | Meaning |
-| --- | --- |
-| `endpoint_url` | OpenAI-compatible chat-completions URL |
-| `endpoint_model` | model name sent to the endpoint |
-| `endpoint_api_key_env` | environment variable that holds the key |
-| `endpoint_timeout_seconds` | finite endpoint timeout |
-| `workspace_root` | workspace directory relative to data root |
-| `prompt_max_context_tokens` | prompt render ceiling |
-| `live_campaign_seconds` | default live campaign duration |
-
-Nested objects are invalid config. Rewrite old nested files to the flat keys
-above before starting the daemon. Model-visible context never includes the raw
-JSON config blob.
+The exact key, type, range, default, reload, and consumer contract is in
+[../product/configuration-registry.md](../product/configuration-registry.md).
+The tracked example contains every registry key. Missing required structure,
+unknown keys, arrays, nested values, wrong scalar types, invalid ranges, and
+cross-key conflicts fail startup. Model-visible context never includes the raw
+JSON config blob or secret values.
 
 ## Docker Operation
 

@@ -30,6 +30,12 @@ Local Docker lint, test, and verify passed with the ignored working-copy
 because that lockfile is not tracked. Those local passes are not clean-checkout
 evidence.
 
+The configuration loader rejects nested objects but still accepts unknown keys
+and scalar arrays, implements only a subset of the anchored registry, and does
+not enforce all type, range, or cross-key guards. The tracked complete example
+is absent. Repository-determinism remains open until its failing regressions,
+locked source gate, and clean archive Docker run pass.
+
 A fresh model-free diary run writes a journal entry containing canned
 missing-detail text after the owner asks for a diary entry. This is reproduced
 failure evidence, not acceptable record behavior.
