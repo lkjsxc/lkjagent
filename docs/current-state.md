@@ -49,7 +49,8 @@ rebalance commands, console, watch, status, workbench, row-backed inspection,
 and bounded `run --once` paths. Rebalance validates the file fingerprint before
 moving a record, repairs exact old-path links in record files, records alias and
 audit rows, and rolls the file move back when a post-move step fails before the
-ledger row update.
+ledger row update. `record archive` also writes old-path aliases and audit rows,
+and `workspace validate` reports stale record fingerprints.
 
 Current model action parsing accepts one attribute-less `<lkjagent_action>` with
 child tags for decision id, context fingerprint, tool name, and repeated
@@ -65,7 +66,9 @@ requirements, and recovery policy. Prompt cards render the harness state as the
 state-specific fragment while preserving the decision row as authority. Parse,
 admission, effect, endpoint, and check failures now write active
 `recovery.failure` state cells keyed by kind and decision; the next selector pass
-routes through a recovery decision before normal model work can continue. Parse
+routes through a recovery decision before normal model work can continue.
+Repeated same-kind recovery failures escalate through `completion:blocked` so
+the engine blocks instead of cycling indefinitely. Parse
 diagnoses now include concrete repair guidance for envelope, action grammar,
 decision, context, tool, and argument faults. Native model-free operations
 support state resolution and workspace text effects for `workspace.write_text` and
@@ -109,6 +112,8 @@ transcript merge, saved transcript ids and source paths, Japanese input,
 grapheme-indexed composer movement, delete, home/end, multiline submit,
 display-width cursor placement, append and pane modes, row-backed status
 fallbacks, and focused coverage for transcript merge and rendering surfaces.
+TTY append mode stays on the line renderer, pane mode uses ratatui only on TTY,
+and the help text names Home/End as composer movement.
 Workbench pane mode renders a canonical conversation transcript in the left pane
 and keeps step progress, matter trace, recent events, tool/state/system/error
 messages, and proof diagnostics out of that transcript pane. Slash commands do
