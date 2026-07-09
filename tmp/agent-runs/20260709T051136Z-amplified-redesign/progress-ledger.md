@@ -35,9 +35,9 @@ command evidence.
 
 ## Corrective Reopen
 
-- `97a8803d` fixed the live TUI pane duplicate: copied store data showed
-  `stepdone` and `taskclosed` rows in the transcript pane before the fix; final
-  evidence shows only `owner: hello` and `agent: hello`.
+- `97a8803d` and `7b2ae344` fixed TUI duplicates: copied store data no longer
+  puts diagnostic rows in the transcript pane, and session-local rows are
+  shadowed when matching durable rows arrive.
 - `8a6ea73a` fixed the finance workspace gate: a finance CLI turn now writes a
   month-grouped finance record, `indexes/budget-month.md`, and
   `index-budget-month` artifact row evidence.
@@ -64,8 +64,9 @@ command evidence.
   `tmp/agent-runs/20260709T070000Z-finance-index/`.
 - [x] Diary path proven - commit `72fa3e2c`; diary record exists at
   `evidence/daily-use-data/workspace/records/life/journal/2026/07/09/entry.md`.
-- [x] TUI duplicate regression proven - corrected by `97a8803d`; evidence is
-  under `tmp/agent-runs/20260709T062335Z-reopen-tui/`.
+- [x] TUI duplicate regression proven - corrected by `97a8803d` and
+  `7b2ae344`; evidence is under `tmp/agent-runs/20260709T062335Z-reopen-tui/`
+  and `tmp/agent-runs/20260709T101500Z-tui-session-shadow/`.
 - [x] TUI scroll clamp proven - commit `c2915b48`; focused TUI tests are covered
   by `cargo test -p lkjagent-app --tests` and TUI report.
 - [x] Tool view parity proven - commit `c2915b48`; tool report plus protocol
@@ -124,8 +125,8 @@ command evidence.
   protocol experiments and xtask tests.
 - [x] Recovery states handle parse, admission, effect, endpoint, and check
   failures - `c2915b48`; recovery and evaluation reports.
-- [x] TUI duplicate and bottom-follow regressions have tests - `c2915b48` and
-  `97a8803d`; the latter includes rendered pane evidence from store rows.
+- [x] TUI duplicate and bottom-follow regressions have tests - `c2915b48`,
+  `97a8803d`, and `7b2ae344`; evidence includes pane rows and session shadowing.
 - [x] Deterministic replay passes - final `smoke replay` capture exits 0.
 - [x] Quiet verify passes - final `quiet verify` capture exits 0.
 - [x] Docker Compose verify passes or honest skip is committed - Docker capture

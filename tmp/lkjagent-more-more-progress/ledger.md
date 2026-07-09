@@ -180,7 +180,7 @@ Open after this correction:
 | Item | Commit | Evidence | Status |
 | --- | --- | --- | --- |
 | docs synced | a9a9fe08; 9cd8069c | check-docs passed after docs-first edits and after final current-state update | done |
-| workspace writes | 9cd8069c; 8a6ea73a | owner_turn_records passed; finance index evidence includes `budget-month.md` and `index-budget-month` row | partial |
+| workspace writes | 9cd8069c; 72fa3e2c; 8a6ea73a | owner_turn_records, workspace_evidence, daily-use data, and finance index evidence all passed | done |
 | owner transcript | 9cd8069c | owner_turn_records and campaign transcript files `workspace/artifacts/transcripts/queue-000001.md` through `queue-000003.md` | done |
 | artifact flow | 9cd8069c | queue_routing artifact tests passed; journal_artifact passed; proof artifacts bundle captured | done |
 | blocked-step guard | 2dc0c841 | completion_safety passed; runtime_cell focused test passed; docs-tree repair regression passed; quiet and Docker verify passed | done |
@@ -188,7 +188,7 @@ Open after this correction:
 | tool view scope | 9cd8069c | tool_views, runtime_selector, render_tool_cards, and protocol experiment matrix passed/captured | done |
 | XML action grammar | 9cd8069c | tool_call and protocol experiment matrix passed/captured | done |
 | recovery states | 9cd8069c | recovery, recovery_ladder, effect_error, endpoint, and admission_rejection tests passed | done |
-| TUI duplicate fix | 9cd8069c; 97a8803d | rendered pane evidence from copied store rows shows diagnostics no longer enter transcript pane | partial |
+| TUI duplicate fix | 9cd8069c; 97a8803d; 7b2ae344 | pane evidence plus session-shadow TUI tests under `tmp/agent-runs/20260709T101500Z-tui-session-shadow/` | done |
 | TUI follow fix | 9cd8069c | workbench_viewport passed; scroll down to bottom re-enables follow and refresh preserves manual top line | done |
 | deterministic replay | 9cd8069c | `cargo run -p lkjagent-xtask -- smoke replay` and quiet verify smoke replay passed | done |
 | quiet verify | 9cd8069c | final `cargo run -p lkjagent-xtask -- quiet verify` passed after source changes | done |
