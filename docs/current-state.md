@@ -77,14 +77,16 @@ paths, calendar records use dated paths, finance records use month paths and the
 `budget-month.md` index, and record bodies are structured separately from
 owner-turn transcript evidence. Oversize record bodies are split into linked
 `.parts/part-NNN.md` files with a size justification in the main record.
-Artifact-request routing now blocks closure unless the final response names the
-artifact path after file, artifact row, and check row evidence exists. CLI send
-and daemon intake now scaffold the workspace and write owner-turn transcript or
-inbox trace files. Owner-turn routing has focused coverage for existing-matter
-answers, continuations, artifact requests, inspection, unsupported system
-operations, direct records, ambiguous inbox routing, Japanese diary or save
-wording, and todo, calendar, finance, note, project, and development wrapper
-writes.
+Multi-unit generated artifact bodies use the same owner-readable pattern: the
+requested path holds a compact manifest, and the full body lives in checked part
+files with unit artifact rows. Artifact-request routing now blocks closure unless
+the final response names the artifact path after file, artifact row, and check
+row evidence exists. CLI send and daemon intake now scaffold the workspace and
+write owner-turn transcript or inbox trace files. Owner-turn routing has focused
+coverage for existing-matter answers, continuations, artifact requests,
+inspection, unsupported system operations, direct records, ambiguous inbox
+routing, Japanese diary or save wording, and todo, calendar, finance, note,
+project, and development wrapper writes.
 
 Prompt context can admit bounded workspace record and index metadata with source
 fingerprints, suppress duplicate clean context items by semantic key, body,

@@ -36,6 +36,12 @@ The assembled file gets its own artifact fingerprint. Case closure requires
 fresh checks that match current artifact fingerprints; model prose alone is not
 completion evidence.
 
+When generated artifact content spans multiple units, the requested artifact path
+stores a short owner-readable manifest with size justification, full-body
+fingerprint, and `.parts/` references. The full generated body is written to
+checked `part-NNN.md` files beside the requested path. Parent artifact rows point
+to the manifest path, and unit artifact rows point to the part paths.
+
 ## Long Artifact Rule
 
 Large reports or document packs are generated as bounded units with source refs,
@@ -49,6 +55,8 @@ current artifact state.
   fingerprints.
 - `lkjagent-app` write effects assemble checked units and persist file plus unit
   artifact fingerprints.
+- Large generated artifacts leave a compact manifest plus checked part files
+  instead of one oversized owner-facing file.
 - `lkjagent-core` completion tests require fresh artifact fingerprints for
   closing evidence.
 

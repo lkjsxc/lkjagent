@@ -110,6 +110,7 @@ fn write_assembled(
     body: &str,
 ) -> Result<(String, Vec<lkjagent_core::runtime_artifact::ArtifactUnit>), String> {
     let (assembled, units) = crate::artifact_effects::assemble_content(path, body)?;
+    crate::artifact_effects::sync_part_files(workspace, path, &units)?;
     lkjagent_effects::workspace::write(workspace, path, &assembled)
         .map_err(|error| error.to_string())?;
     Ok((assembled, units))
