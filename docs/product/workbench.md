@@ -35,6 +35,8 @@ Each refresh includes bounded sections:
 - status fields from `lkjagent status`;
 - durable owner turns and terminal lkjagent messages, deduplicated by row
   identity and ordered by matter causality when timestamps tie;
+- pending `session:*` transcript rows are shadowed by matching durable rows after
+  refresh, while distinct durable rows with identical text remain visible;
 - the active matter trace or `matter: none`;
 - active decision, prompt, context, tool-view, workspace, and proof counts;
 - a prompt hint for owner input.

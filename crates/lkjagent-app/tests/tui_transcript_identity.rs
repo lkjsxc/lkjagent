@@ -53,6 +53,31 @@ fn durable_row_overrides_matching_ephemeral_id() {
 }
 
 #[test]
+fn durable_rows_shadow_matching_session_rows_only() {
+    let mut model = TuiModel::new();
+    model
+        .transcript
+        .push(agent_entry("agent:session:1", "done", "session"));
+    model
+        .transcript
+        .push(owner_entry("owner:session:2", "same", "session"));
+    let mut snapshot = TuiSnapshot::empty();
+    snapshot
+        .transcript_entries
+        .push(agent_entry("event:1", "done", "sqlite:events:1"));
+    snapshot
+        .transcript_entries
+        .push(owner_entry("queue:7", "same", "sqlite:queue:7"));
+    snapshot
+        .transcript_entries
+        .push(owner_entry("queue:8", "same", "sqlite:queue:8"));
+
+    let lines = lkjagent_app::tui_transcript::display_lines(&model, &snapshot);
+
+    assert_eq!(lines, vec!["agent: done", "owner: same", "owner: same"]);
+}
+
+#[test]
 fn saved_transcript_includes_ids_and_paths() {
     let mut snapshot = TuiSnapshot::empty();
     snapshot

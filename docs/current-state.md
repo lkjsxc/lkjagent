@@ -145,8 +145,9 @@ clean `66027735`. Fresh evidence is under
 Later corrective slices add generated-artifact part manifests, rebalance
 compensation, ranked XML-like context card entries, and tool admission hardening
 for repeated calls, recovery-hidden tools, budget suppression, and
-tool-view mismatch reasons. Evidence for these slices is under
-`tmp/agent-runs/20260709T0*/`.
+tool-view mismatch reasons. A later TUI slice shadows matching `session:*`
+transcript rows once durable queue or event rows arrive. Evidence for these
+slices is under `tmp/agent-runs/20260709T0*/`.
 
 ## Known Gaps
 

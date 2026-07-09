@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use crate::tui_snapshot::TuiSnapshot;
@@ -48,22 +48,50 @@ pub fn display_lines(model: &TuiModel, snapshot: &TuiSnapshot) -> Vec<String> {
 
 pub fn merged_entries(model: &TuiModel, snapshot: &TuiSnapshot) -> Vec<TranscriptEntry> {
     let mut seen = BTreeSet::new();
+    let mut shadows = BTreeMap::new();
     let mut entries = Vec::new();
-    for entry in snapshot
-        .transcript_entries
-        .iter()
-        .chain(model.transcript.iter())
-    {
+    for entry in &snapshot.transcript_entries {
+        if seen.insert(entry.id.clone()) {
+            *shadows.entry(shadow_key(entry)).or_insert(0) += 1;
+            entries.push(entry.clone());
+        }
+    }
+    for entry in &model.transcript {
+        if session_local(entry) && consume_shadow(&mut shadows, entry) {
+            continue;
+        }
         if seen.insert(entry.id.clone()) {
             entries.push(entry.clone());
         }
     }
     if let Some(draft) = &model.agent_draft {
+        if session_local(draft) && consume_shadow(&mut shadows, draft) {
+            return entries;
+        }
         if seen.insert(draft.id.clone()) {
             entries.push(draft.clone());
         }
     }
     entries
+}
+
+fn consume_shadow(shadows: &mut BTreeMap<String, usize>, entry: &TranscriptEntry) -> bool {
+    let Some(count) = shadows.get_mut(&shadow_key(entry)) else {
+        return false;
+    };
+    if *count == 0 {
+        return false;
+    }
+    *count -= 1;
+    true
+}
+
+fn session_local(entry: &TranscriptEntry) -> bool {
+    entry.id.contains(":session:") || entry.id == "draft-agent"
+}
+
+fn shadow_key(entry: &TranscriptEntry) -> String {
+    format!("{}:{}", source_label(entry.source), entry.text.trim())
 }
 
 fn transcript_entries(model: &TuiModel, snapshot: &TuiSnapshot) -> String {
