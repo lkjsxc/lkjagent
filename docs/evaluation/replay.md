@@ -17,12 +17,22 @@ admission, effects boundary, workspace service, and checkers relevant to the
 failure. Clock and external outcomes are injected at their existing pure or
 effect interfaces.
 
+Fake time is a monotonic sequence supplied by the fixture. Typed faults are
+identified by injection ID and boundary, consumed exactly once in declared
+order, and may advance fake time. A monotonic regression, skipped faults, or a
+second consumption fails replay before outcome comparison.
+
 ## Assertions
 
 The gate compares events, decisions, failure lineage, admissions, effects,
 observations, checks, messages, workspace manifests, and terminal matter state.
 It rejects copied seeded history, duplicate effects, repeated failure tuples,
 stale checks, false response success, and synthetic quiescence work.
+
+Snapshot tests write a live SQLite source, take a quiesced Online Backup, then
+mutate the source. The backup must retain only pre-boundary rows and pass its
+own integrity check. File manifests are rebuilt from current bytes rather than
+copied from expected rows.
 
 ## Failure Rule
 

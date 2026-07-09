@@ -10,6 +10,8 @@ campaigns, and independent acceptance.
 - [benchmarks.md](benchmarks.md): anchored scenarios, fixtures, and independent
   checkers.
 - [replay.md](replay.md): failure-derived deterministic replay.
+- [harness.md](harness.md): fake time, fault schedules, raw capture, manifests,
+  PTY recording, and false-positive rejection.
 - [live-proof.md](live-proof.md): frozen-source campaigns, raw evidence, and
   terminal conditions.
 - [protocol-experiments.md](protocol-experiments.md): controlled factor matrix,

@@ -29,6 +29,15 @@ provider request and response hashes, redacted logs, metrics, executable hash,
 configuration bytes, and scenario bundle hash. PTY evidence adds input events,
 terminal recording, geometry trace, screen hashes, and replay results.
 
+The backup is taken at a quiesced read boundary. The sorted workspace manifest
+records normalized path, document ID, revision ID, and SHA-256. A raw manifest
+then binds the database, workspace manifest, scenario bundle, command logs, and
+PTY cast. Acceptance recomputes every named fingerprint.
+
+The PTY cast uses asciinema JSON with ordered input and output frames.
+Replay must observe nonempty output and owner input, including Japanese text;
+a trace that describes geometry without raw cast frames is insufficient.
+
 ## Acceptance
 
 Every required matter completes or reaches its predeclared visible waiting
