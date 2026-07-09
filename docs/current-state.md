@@ -119,6 +119,13 @@ endpoint run under `tmp/live-runs/20260708Tstandardenv/` ran without exposing
 secret values; personal-workspace, software-project, structured-artifact, and
 protocol-stress all closed with elapsed_seconds=900.
 
+The July 9 continuation reran packet static inspection, `check-docs`,
+`check-lines`, all `lkjagent-core` and `lkjagent-app` integration tests,
+deterministic smoke replay, a scripted workspace probe, proof collection,
+protocol experiments, `quiet verify`, and `docker compose run --rm verify` from
+clean `66027735`. Fresh evidence is under
+`tmp/coding-agent-runs/20260709T041854Z-more-more-continuation/`.
+
 ## Known Gaps
 
 - Scripted workspace evidence covers todo, note, transcript, index, proof, and
@@ -130,8 +137,9 @@ protocol-stress all closed with elapsed_seconds=900.
 
 ## Next Executable Step
 
-Run the final check-docs, quiet verify, and Docker Compose verify gates after
-this continuation slice, then commit the packet closure evidence and source.
+Review and commit the July 9 docs, ledger, and bounded evidence delta. If the
+owner wants more live confidence, run another endpoint profile using configured
+credentials and record cost and elapsed-time evidence without exposing secrets.
 
 ## Honesty Rules
 

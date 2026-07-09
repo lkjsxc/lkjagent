@@ -56,12 +56,44 @@ Candidate files:
 Next action: run baseline static and deterministic gates, then make the required
 docs-first product architecture commit before source edits.
 
+## 2026-07-09 Continuation State
+
+Start time: 2026-07-09T04:18:54Z.
+
+Clean HEAD: `66027735`.
+
+Current branch objective: verify the already-implemented workspace-first packet
+closure against the July 9 checkout, refresh stale docs and ledger text, rerun
+static inspection, focused acceptance tests, quiet verify, Docker Compose verify,
+and daily-use evidence, then commit only the fresh docs or evidence delta.
+
+Current assumptions:
+
+- The docs-first architecture commit required by the packet exists as `a9a9fe08`.
+- Source implementation commits through `66027735` must be verified before any
+  further implementation is attempted.
+- No source edit is justified until fresh evidence finds a failing acceptance
+  item.
+
+Current result: fresh July 9 verification passed without source edits. The only
+failed commands were expected surface issues: `python` is absent, the probe
+script default `BIN` adds an extra `--`, and `live-profiles --help` is not a
+supported help command.
+
+Fresh evidence root:
+`tmp/coding-agent-runs/20260709T041854Z-more-more-continuation/`.
+
+Current next action: commit the July 9 docs, ledger, and bounded evidence delta.
+
 ## Packet Read Log
 
 - Read `docs/README.md` and `docs/current-state.md`.
 - Indexed and inspected `tmp/lkjagent-more-more-thinking-20260708/`.
 - Read acceptance gate files, first-90-minutes guidance, current evidence notes,
   north-star state-ledger and workspace docs, and implementation worktracks.
+- On 2026-07-09, read the remaining packet sections: tool protocol, workspace
+  OS, TUI workbench, subagent prompts, evaluation, scripts, templates, idea bank,
+  quality manifest, and raw evidence excerpts.
 
 ## Command Evidence
 
@@ -108,6 +140,10 @@ docs-first product architecture commit before source edits.
 | 2026-07-08 | redesign packet focused scripts | fmt, prompt-no-json, protocol grep, TUI capture, workspace evidence, compose config, focused core/app tests all EXIT=0 | `tmp/coding-agent-runs/20260708T183000Z-workspace-runtime-redesign/final/summary.log` |
 | 2026-07-08 | redesign packet final gates | check-docs, quiet verify, and docker compose verify all EXIT=0 | `tmp/coding-agent-runs/20260708T183000Z-workspace-runtime-redesign/final/summary.log` |
 | 2026-07-08 | standard `.env` live profiles | 4 profiles ran 900 seconds each and closed; EXIT=0; elapsed_seconds=3605 total | `tmp/live-runs/20260708Tstandardenv/` |
+| 2026-07-09 | static and docs gates | `python` failed absent; `python3` static and SQLite scripts passed; check-docs and check-lines passed | `tmp/coding-agent-runs/20260709T041854Z-more-more-continuation/baseline/` |
+| 2026-07-09 | focused acceptance tests | `cargo test -p lkjagent-core --tests` and `cargo test -p lkjagent-app --tests` passed | `tmp/coding-agent-runs/20260709T041854Z-more-more-continuation/focused/` |
+| 2026-07-09 | replay, probe, proof, protocol | smoke replay passed; workspace probe passed with python shim; proof bundle and protocol experiments written | `tmp/coding-agent-runs/20260709T041854Z-more-more-continuation/` |
+| 2026-07-09 | final deterministic gates | `cargo run -p lkjagent-xtask -- quiet verify` and `docker compose run --rm verify` passed | `tmp/coding-agent-runs/20260709T041854Z-more-more-continuation/final/` |
 
 ## Acceptance Ledger
 
