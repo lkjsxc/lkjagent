@@ -11,6 +11,8 @@ Integration tests for lkjagent-app.
 - [context-cli.rs](context_cli.rs): owner context resolution command tests.
 - [context-items.rs](context_items.rs): durable context hygiene tests.
 - [contamination.rs](contamination.rs): contamination classification tests.
+- [configuration-contract.rs](configuration_contract.rs): exact scalar keys,
+  ranges, cross-key guards, and tracked example.
 - [docs-tree.rs](docs_tree.rs): documentation tree app flows.
 - [effect-error.rs](effect_error.rs): effect failure settlement tests.
 - [endpoint.rs](endpoint.rs): endpoint adapter integration seam.

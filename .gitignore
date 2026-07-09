@@ -6,9 +6,9 @@
 /.env
 /.lkjagent-models
 /.lkjagent-workspace
-/Cargo.lock
 /crates/**/target
 /data/*
 !/data/README.md
+!/data/lkjagent.json
 /target
 /tmp

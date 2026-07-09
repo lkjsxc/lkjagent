@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::model::{RepoFile, Violation};
 
 const ALLOWED_EXTERNAL: &[&str] = &[
@@ -119,4 +121,56 @@ fn dependency_name(line: &str) -> Option<&str> {
         .next()
         .map(str::trim)
         .filter(|name| !name.is_empty())
+}
+
+const CURRENT_CRATES: &[&str] = &[
+    "lkjagent-core",
+    "lkjagent-store",
+    "lkjagent-llm",
+    "lkjagent-effects",
+    "lkjagent-app",
+    "lkjagent-xtask",
+];
+const REMOVED_CRATES: &[&str] = &[
+    "lkjagent-runtime",
+    "lkjagent-graph",
+    "lkjagent-tools",
+    "lkjagent-cli",
+    "lkjagent-context",
+    "lkjagent-protocol",
+    "lkjagent-benchmark",
+];
+
+pub fn run_structure(args: &[String], root: &Path) -> i32 {
+    if !args.is_empty() && args != ["audit"] {
+        return structure_failure("use: structure audit");
+    }
+    match audit_structure(root) {
+        Ok(()) => {
+            println!("ok structure audit");
+            0
+        }
+        Err(error) => structure_failure(&error),
+    }
+}
+
+pub fn audit_structure(root: &Path) -> Result<(), String> {
+    for name in CURRENT_CRATES {
+        if !root.join("crates").join(name).is_dir() {
+            return Err(format!("missing crate {name}"));
+        }
+    }
+    for name in REMOVED_CRATES {
+        if root.join("crates").join(name).exists() {
+            return Err(format!("removed crate still present {name}"));
+        }
+    }
+    Ok(())
+}
+
+fn structure_failure(message: &str) -> i32 {
+    eprintln!("structure audit failed");
+    eprintln!("exit status: 1");
+    eprintln!("{message}");
+    1
 }

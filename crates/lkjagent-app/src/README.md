@@ -13,6 +13,9 @@ Map lkjagent-app source modules.
 - [args.rs](args.rs): CLI parser.
 - [cli.rs](cli.rs): command execution.
 - [clock.rs](clock.rs): timestamp seam for runtime and deterministic tests.
+- [config.rs](config.rs): file and environment loading plus direct consumers.
+- [config-registry.rs](config_registry.rs): exact scalar types, bounds, and
+  cross-key guards.
 - [console.rs](console.rs): normal-screen owner command loop.
 - [context-admin.rs](context_admin.rs): owner conflict-resolution commands.
 - [context-bridge.rs](context_bridge.rs): durable context item prompt projection.
@@ -21,14 +24,13 @@ Map lkjagent-app source modules.
 - [daemon-intake.rs](daemon_intake.rs): owner-turn intake, direct records, and waiting-answer resume.
 - [daemon-lock.rs](daemon_lock.rs): heartbeat config-row daemon lease.
 - [effect-error.rs](effect_error.rs): effect failure settlement.
-- [endpoint.rs](endpoint.rs): endpoint adapter wrapper.
 - [exchange-bridge.rs](exchange_bridge.rs): provider exchange row persistence.
 - [exchange-record.rs](exchange_record.rs): exchange log file rendering.
 - [explore.rs](explore.rs): bounded explore action dispatcher.
 - [inspect.rs](inspect.rs): row-backed CLI inspection renderers.
 - [lease-status.rs](lease_status.rs): owner-visible lease freshness line.
 - [model-call.rs](model_call.rs): endpoint call, exchange log, and usage handling.
-- [model-io.rs](model_io.rs): endpoint trait and scripted completion record.
+- [model-io.rs](model_io.rs): endpoint trait, live adapter, and scripted record.
 - [observation-bridge.rs](observation_bridge.rs): effect observation rows.
 - [prompt-bridge.rs](prompt_bridge.rs): prompt-frame rows before model calls.
 - [record-args.rs](record_args.rs): record subcommand parsing.

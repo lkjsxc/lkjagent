@@ -11,26 +11,22 @@ This directory holds the repository gate dispatcher, checks, and command runner.
 - [doc-common.rs](doc_common.rs): shared Markdown shape checks.
 - [doc-crate-readmes.rs](doc_crate_readmes.rs): crate README coverage checks.
 - [doc-links.rs](doc_links.rs): Markdown link checks.
-- [doc-reachability.rs](doc_reachability.rs): docs reachability checks.
-- [doc-special.rs](doc_special.rs): repository-specific documentation checks.
+- [doc-special.rs](doc_special.rs): repository-specific composition and
+  reachability checks.
 - [doc-topology.rs](doc_topology.rs): README topology checks.
-- [docs.rs](docs.rs): check-docs composition.
 - [docs-authority-contract.rs](docs_authority_contract.rs): native contract,
   baseline truth, schema, and retired-page assertions.
 - [docs-authority-gate.rs](docs_authority_gate.rs): docs node composition and
   product source no-diff check.
 - [docs-authority-product.rs](docs_authority_product.rs): Git-free product tree
   fingerprint used by the Docker node gate.
-- [facts.rs](facts.rs): repository fact collection.
-- [file-counts.rs](file_counts.rs): workspace file budget gate.
+- [facts.rs](facts.rs): repository facts, shared check data, and evidence reads.
+- [gate.rs](gate.rs): command parsing, size budgets, and quiet command runner.
 - [lib.rs](lib.rs): public gate entrypoint.
-- [lines.rs](lines.rs): check-lines implementation.
 - [main.rs](main.rs): binary entrypoint.
-- [model.rs](model.rs): shared check data.
 - [node-gate.rs](node_gate.rs): workgraph node gate router and baseline checks.
-- [node-gate-evidence.rs](node_gate_evidence.rs): baseline evidence readers.
 - [proof.rs](proof.rs): proof bundle command.
-- [runner.rs](runner.rs): quiet command execution.
+- [repository-determinism-gate.rs](repository_determinism_gate.rs): tracked
+  build inputs, exact configuration, Docker, workflow, and focused suites.
 - [smoke.rs](smoke.rs): smoke replay and live commands.
-- [structure/](structure/README.md): structure audit commands.
-- [style.rs](style.rs): check-style implementation.
+- [style.rs](style.rs): style, dependency, and structure audits.

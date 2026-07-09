@@ -1,3 +1,19 @@
+use std::path::Path;
+use std::process::Command;
+
+use crate::model::{RepoFile, Violation};
+
+const DOC_FILE_LIMIT: usize = 100;
+const PRODUCT_SOURCE_LIMIT: usize = 190;
+const PRODUCT_CRATES: &[&str] = &[
+    "lkjagent-core",
+    "lkjagent-store",
+    "lkjagent-llm",
+    "lkjagent-effects",
+    "lkjagent-app",
+    "lkjagent-xtask",
+];
+
 pub enum Gate {
     CheckDocs,
     CheckLines,
@@ -12,6 +28,114 @@ pub enum Gate {
     Proof(Vec<String>),
     Smoke(Vec<String>),
     Structure(Vec<String>),
+}
+
+pub fn check_lines(files: &[RepoFile]) -> Vec<Violation> {
+    files
+        .iter()
+        .filter(|file| !file.path.starts_with("data/logs/") && !file.path.starts_with("tmp/"))
+        .filter_map(|file| {
+            let count = file.line_count();
+            (count > 200).then(|| {
+                Violation::new(
+                    &file.path,
+                    "line limit",
+                    format!("has {count} lines, limit is 200; split by ownership"),
+                )
+            })
+        })
+        .collect()
+}
+
+pub fn check_files(files: &[RepoFile]) -> Vec<Violation> {
+    let mut violations = Vec::new();
+    let docs = files
+        .iter()
+        .filter(|file| file.path.starts_with("docs/") && file.path.ends_with(".md"))
+        .count();
+    if docs > DOC_FILE_LIMIT {
+        violations.push(Violation::new(
+            "docs",
+            "file budget",
+            format!("has {docs} markdown files, limit is {DOC_FILE_LIMIT}"),
+        ));
+    }
+    let source = files
+        .iter()
+        .filter(|file| product_source(&file.path))
+        .count();
+    if source > PRODUCT_SOURCE_LIMIT {
+        violations.push(Violation::new(
+            "crates",
+            "file budget",
+            format!("has {source} product source files, limit is {PRODUCT_SOURCE_LIMIT}"),
+        ));
+    }
+    violations
+}
+
+fn product_source(path: &str) -> bool {
+    PRODUCT_CRATES
+        .iter()
+        .any(|name| path.starts_with(&format!("crates/{name}/src/")))
+        && path.ends_with(".rs")
+}
+
+pub fn run_quiet_test(root: &Path) -> Result<(), Vec<String>> {
+    run_step(root, "cargo fmt --check", &["fmt", "--check"])?;
+    run_step(
+        root,
+        "cargo clippy --workspace --all-targets -- -D warnings",
+        &[
+            "clippy",
+            "--workspace",
+            "--all-targets",
+            "--",
+            "-D",
+            "warnings",
+        ],
+    )?;
+    run_step(root, "cargo test --workspace", &["test", "--workspace"])?;
+    Ok(())
+}
+
+fn run_step(root: &Path, label: &str, args: &[&str]) -> Result<(), Vec<String>> {
+    let output = Command::new("cargo")
+        .args(args)
+        .current_dir(root)
+        .output()
+        .map_err(|error| {
+            vec![
+                format!("quiet test failed at {label}"),
+                "exit status: 1".to_string(),
+                format!("could not start command: {error}"),
+            ]
+        })?;
+    if output.status.success() {
+        return Ok(());
+    }
+    let status = output.status.code().map_or_else(
+        || "terminated by signal".to_string(),
+        |code| code.to_string(),
+    );
+    let mut lines = vec![
+        format!("quiet test failed at {label}"),
+        format!("exit status: {status}"),
+    ];
+    lines.extend(tail(&String::from_utf8_lossy(&output.stdout)));
+    lines.extend(tail(&String::from_utf8_lossy(&output.stderr)));
+    Err(lines)
+}
+
+fn tail(text: &str) -> Vec<String> {
+    let lines = text.lines().collect::<Vec<_>>();
+    let start = lines.len().saturating_sub(20);
+    lines
+        .into_iter()
+        .skip(start)
+        .filter(|line| !line.trim().is_empty())
+        .map(str::to_string)
+        .collect()
 }
 
 pub fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
