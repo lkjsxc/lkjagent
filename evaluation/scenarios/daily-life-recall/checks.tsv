@@ -1,0 +1,11 @@
+check_id	checker
+journal-path-date	workspace-path
+journal-body-semantic	workspace-body
+multi-intent-decomposition	operation-ledger
+old-record-recall	context-source
+todo-roundtrip	workspace-record
+command-separation	workspace-body
+semantic-date-stability	state-cell
+index-membership	workspace-index
+navigation-debt-zero	operation-ledger
+workspace-direct-read	workspace-file

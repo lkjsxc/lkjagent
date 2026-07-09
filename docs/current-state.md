@@ -42,6 +42,13 @@ checks those inputs, source budgets, configuration, Docker locking, workflow,
 and nonempty fault suites. These source claims are not clean-archive acceptance;
 that requires the raw no-cache Compose run bound to the committed tree.
 
+The evaluation harness now owns three source-bound scenario bundles, a fake
+clock, typed fault schedules, SQLite Online Backup capture, workspace and raw
+manifests, and real PTY input and output capture. Its negative fixtures reject
+idle, blocked, skipped, zero-test, and generated-placeholder evidence. These
+are harness capabilities and regression proofs, not final live or PTY campaign
+results; final evidence remains open until it runs against frozen source.
+
 A fresh model-free diary run writes a journal entry containing canned
 missing-detail text after the owner asks for a diary entry. This is reproduced
 failure evidence, not acceptable record behavior.

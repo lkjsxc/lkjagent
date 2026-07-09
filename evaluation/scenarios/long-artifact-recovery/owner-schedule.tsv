@@ -1,0 +1,6 @@
+offset_seconds	intent	text_fingerprint	owner_text
+0	outline	sha256:f6b18eb00bde660da15183e6d03867908b450832f6d6139a67562335ae5b8d52	Create an outline and named semantic units.
+180	incremental-work	sha256:64f2d38c49286523612e7ccb89ceca0c825a58b3225b5fc86ca9bce62a81f6a6	Write sections incrementally while other work continues.
+420	output-recovery	sha256:07c1c362bb9a7202fc84edb229688fd1f87da62c6bbc9130866a96238666ab3a	Recover from the output cap by changing strategy.
+660	revise-unit	sha256:568380f532f7b26302a188642ebe0cbc42342426891f7d2b99837d657bdef9f1	Revise one section and invalidate dependent checks.
+840	verify-artifact	sha256:a92c45b9e387b053de454a3921937ed2a105033d1a6ba9bf77b5e7ed54152673	Verify final bytes, links, manifest, and response paths.

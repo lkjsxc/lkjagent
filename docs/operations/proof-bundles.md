@@ -39,3 +39,8 @@ input remains a failure regardless of summary text.
 Raw evidence is committed after the frozen source commit. Public CI validates
 the evidence commit. The final material receipt is committed next, followed by
 a separate four-file verifier commit and its public verification workflow.
+
+Harness-generated manifests are not pass receipts. They are sorted indexes of
+raw paths and SHA-256 values. Gates reopen the SQLite Online Backup, rehash
+workspace and PTY bytes, and recompute scenario bundles before deriving any
+result.

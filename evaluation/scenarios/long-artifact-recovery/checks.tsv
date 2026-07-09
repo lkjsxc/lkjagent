@@ -1,0 +1,10 @@
+check_id	checker
+artifact-units-complete	workspace-manifest
+all-files-verified	workspace-file
+output-limit-recovered	failure-lineage
+strategy-changed	runtime-decision
+final-byte-length	workspace-body
+source-linked-claims	artifact-source
+check-invalidation	check-lineage
+no-early-response	conversation-ledger
+immutable-unit-resume	artifact-lineage

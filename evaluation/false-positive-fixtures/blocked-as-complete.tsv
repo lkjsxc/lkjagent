@@ -1,0 +1,19 @@
+fixture_id	blocked-as-complete
+expected_error	claimed terminal contradicts raw terminal
+actual_terminal	blocked
+claimed_terminal	completed
+duration_seconds	900
+decision_span_seconds	700
+decision_count	8
+useful_decision_count	5
+progress_decision_count	3
+required_check_count	5
+passed_check_count	5
+command_exit	0
+test_count	4
+skipped	false
+generated_placeholder	false
+raw_artifact_count	8
+snapshot_method	sqlite-online-backup
+source_commit	1111111111111111111111111111111111111111
+scenario_fingerprint	sha256:1111111111111111111111111111111111111111111111111111111111111111
