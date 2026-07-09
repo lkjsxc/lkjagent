@@ -66,6 +66,50 @@ fn incomplete_schema_fails() {
 }
 
 #[test]
+fn missing_decision_or_observation_field_fails() {
+    for token in [
+        "`selected_monotonic_ms`",
+        "`tool_count`",
+        "`prompt_tokens`",
+        "`prompt_token_cap`",
+        "`semantic_duplicate_count`",
+        "`harness_json_count`",
+        "`unresolved_material_conflict_count`",
+        "`useful` and `progressed` booleans",
+        "effect reference, status",
+    ] {
+        let mut files = repo_files();
+        edit(&mut files, "docs/store/schema.md", |text| {
+            *text = text.replacen(token, "removed-contract-token", 1);
+        });
+        assert!(!check_contract(&files).is_empty(), "missing {token} passed");
+    }
+}
+
+#[test]
+fn missing_schema_constraint_fails() {
+    for token in [
+        "rejects any second run",
+        "check constraint",
+        "unique selection sequence",
+        "partial unique index permits only one current terminal outcome",
+        "`active`",
+        "`invalid`",
+        "`archived`",
+        "`tombstoned`",
+        "only non-tombstoned rows require current",
+        "`managed` controls header and token admission",
+        "Exactly one active index-debt row exists",
+    ] {
+        let mut files = repo_files();
+        edit(&mut files, "docs/store/schema-constraints.md", |text| {
+            *text = text.replacen(token, "removed-contract-token", 1);
+        });
+        assert!(!check_contract(&files).is_empty(), "missing {token} passed");
+    }
+}
+
+#[test]
 fn broken_root_topology_fails() {
     let mut files = repo_files();
     edit(&mut files, "docs/README.md", |text| {

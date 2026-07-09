@@ -36,41 +36,15 @@ const RETIRED_PAGES: &[&str] = &[
     "docs/protocol/plan-line-grammar.md",
 ];
 
-const SCHEMA_TABLES: &[&str] = &[
-    "matters",
-    "obligations",
-    "operations",
-    "operation_edges",
-    "runs",
-    "runtime_events",
-    "state_cells",
-    "state_cell_history",
-    "state_edges",
-    "runtime_decisions",
-    "context_frames",
-    "prompt_cards",
-    "provider_exchanges",
-    "failure_lineages",
-    "tool_admissions",
-    "effect_journal",
-    "observations",
-    "checks",
-    "conversation_messages",
-    "owner_turns",
-    "commands",
-    "diagnostics",
-    "outbox_messages",
-    "config",
-    "daemon_leases",
-    "workspace_documents",
-    "workspace_revisions",
-    "content_blobs",
-    "workspace_aliases",
-    "workspace_tombstones",
-    "workspace_relations",
-    "workspace_search_rows",
+const SCHEMA_TABLES: &str = concat!(
+    "matters obligations operations operation_edges runs runtime_events state_cells ",
+    "state_cell_history state_edges runtime_decisions context_frames prompt_cards ",
+    "provider_exchanges failure_lineages tool_admissions effect_journal observations ",
+    "checks conversation_messages owner_turns commands diagnostics outbox_messages ",
+    "config daemon_leases workspace_documents workspace_revisions content_blobs ",
+    "workspace_aliases workspace_tombstones workspace_relations workspace_search_rows ",
     "workspace_index_debt",
-];
+);
 
 pub(crate) fn check(files: &[RepoFile], failures: &mut Vec<String>) {
     check_pages(files, failures);
@@ -153,7 +127,7 @@ fn check_schema(files: &[RepoFile], failures: &mut Vec<String>) {
     let Some(text) = find(files, "docs/store/schema.md") else {
         return;
     };
-    for table in SCHEMA_TABLES {
+    for table in SCHEMA_TABLES.split_ascii_whitespace() {
         if !text.contains(table) {
             failures.push(format!("store schema is missing table {table}"));
         }
@@ -169,7 +143,37 @@ fn check_schema(files: &[RepoFile], failures: &mut Vec<String>) {
             "unique non-null admission",
             "unique logical ID and monotonic sequence",
             "provider tokenizer and count",
+            "`selected_monotonic_ms`",
+            "`tool_count`",
+            "`prompt_tokens`",
+            "`prompt_token_cap`",
+            "`semantic_duplicate_count`",
+            "`harness_json_count`",
+            "`unresolved_material_conflict_count`",
+            "`useful` and `progressed` booleans",
+            "effect reference, status",
             "A fresh store creates no task, step, template, plan-family, bridge",
+        ],
+        failures,
+    );
+    let Some(constraints) = find(files, "docs/store/schema-constraints.md") else {
+        return;
+    };
+    require_all(
+        constraints,
+        "schema-constraints",
+        &[
+            "rejects any second run",
+            "check constraint",
+            "unique selection sequence",
+            "partial unique index permits only one current terminal outcome",
+            "`active`",
+            "`invalid`",
+            "`archived`",
+            "`tombstoned`",
+            "only non-tombstoned rows require current",
+            "`managed` controls header and token admission",
+            "Exactly one active index-debt row exists",
         ],
         failures,
     );
