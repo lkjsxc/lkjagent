@@ -6,10 +6,11 @@ const BASE: &str = "ae5ff551457adce869dee6159200c85a63aab3de";
 const RAW_PATH: &str = "tmp/lkjagent-progress/nodes/baseline-capture/raw";
 
 pub fn check(root: &Path, identifier: &str) -> Result<(), Vec<String>> {
-    if identifier != "baseline-capture" {
-        return Err(vec![format!("unknown node gate: {identifier}")]);
+    match identifier {
+        "baseline-capture" => check_baseline(&root.join(RAW_PATH)),
+        "docs-authority" => crate::docs_authority_gate::check(root),
+        _ => Err(vec![format!("unknown node gate: {identifier}")]),
     }
-    check_baseline(&root.join(RAW_PATH))
 }
 
 fn check_baseline(raw: &Path) -> Result<(), Vec<String>> {

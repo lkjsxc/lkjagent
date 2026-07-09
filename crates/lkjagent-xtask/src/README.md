@@ -15,12 +15,18 @@ This directory holds the repository gate dispatcher, checks, and command runner.
 - [doc-special.rs](doc_special.rs): repository-specific documentation checks.
 - [doc-topology.rs](doc_topology.rs): README topology checks.
 - [docs.rs](docs.rs): check-docs composition.
+- [docs-authority-contract.rs](docs_authority_contract.rs): native contract,
+  baseline truth, schema, and retired-page assertions.
+- [docs-authority-gate.rs](docs_authority_gate.rs): docs node composition and
+  product source no-diff check.
 - [facts.rs](facts.rs): repository fact collection.
 - [file-counts.rs](file_counts.rs): workspace file budget gate.
 - [lib.rs](lib.rs): public gate entrypoint.
 - [lines.rs](lines.rs): check-lines implementation.
 - [main.rs](main.rs): binary entrypoint.
 - [model.rs](model.rs): shared check data.
+- [node-gate.rs](node_gate.rs): workgraph node gate router and baseline checks.
+- [node-gate-evidence.rs](node_gate_evidence.rs): baseline evidence readers.
 - [proof.rs](proof.rs): proof bundle command.
 - [runner.rs](runner.rs): quiet command execution.
 - [smoke.rs](smoke.rs): smoke replay and live commands.

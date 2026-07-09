@@ -7,6 +7,8 @@ pub mod doc_reachability;
 pub mod doc_special;
 pub mod doc_topology;
 pub mod docs;
+mod docs_authority_contract;
+pub mod docs_authority_gate;
 pub mod experiment;
 pub mod experiment_cases;
 pub mod experiment_live;
