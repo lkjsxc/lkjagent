@@ -13,7 +13,8 @@ command evidence.
 - Docs-first commit: `6a328f88` Define flat config as the runtime contract
 - Implementation/evidence commit: `c2915b48` Prove strict flat config in the amplified harness
 - Daily-use evidence commit: `72fa3e2c` Capture daily workspace family evidence
-- Ledger commit: final ledger-only commit after this file is staged
+- Ledger file: this tracked file records final closure; acceptance items name
+  stable commits below.
 
 ## Case State
 
