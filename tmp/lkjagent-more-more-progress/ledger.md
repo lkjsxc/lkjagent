@@ -110,8 +110,8 @@ Open after this correction:
 - Generated artifact splitting is fixed by `e4c17d42` with manifest and parts tests.
 - Rebalance fingerprint, link repair, and alias/audit compensation are fixed by
   `03570fba` and `d2c69544`.
-- Tool admission repeat-call suppression and recovery-policy hiding are fixed by
-  `d8cfedfb`; budget suppressors and mismatch events remain open.
+- Tool admission repeat-call suppression, recovery-policy hiding, budget
+  suppressors, and mismatch reasons are fixed by `d8cfedfb` and `e99919ef`.
 - Context XML-like card entries, ranking, and richer conflict refs are fixed by
   `757ca459`; remaining context issues are not reopened in this ledger.
 
@@ -196,5 +196,5 @@ Open after this correction:
 | live campaigns | 9cd8069c; 6d0be7d8; 44a791ec | scripted campaign passed with workspace validation; skip files committed; standard `.env` endpoint run added under `tmp/live-runs/20260708Tstandardenv/` with all four profiles closed after 900-second time boxes | done |
 | large file split | 57c39d2e; e4c17d42 | large record and generated artifact split evidence passed | done |
 | rebalance safety | 03570fba; d2c69544 | fingerprint, link repair, and alias/audit rollback evidence passed | done |
-| tool admission hardening | d8cfedfb | repeat guard and recovery policy fingerprint tests pass; budget suppressors and mismatch events remain open | partial |
+| tool admission hardening | d8cfedfb; e99919ef | repeat/recovery tests plus `tmp/agent-runs/20260709T094000Z-tool-budget-mismatch/` budget and mismatch gates | done |
 | context contract gaps | 757ca459 | ranked XML-like entry tests pass in context/prompt/app tests | done |
