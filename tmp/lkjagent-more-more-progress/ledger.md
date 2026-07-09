@@ -83,7 +83,10 @@ supported help command.
 Fresh evidence root:
 `tmp/coding-agent-runs/20260709T041854Z-more-more-continuation/`.
 
-Current next action: commit the July 9 docs, ledger, and bounded evidence delta.
+Verification commit: `98e16b48`.
+
+Current next action: none for this continuation branch unless the owner requests
+fresh live endpoint evidence.
 
 ## Packet Read Log
 
