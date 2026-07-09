@@ -124,9 +124,9 @@ longer committed as product evidence.
 Runtime configuration is flat JSON only. `data/lkjagent.json` accepts scalar
 and primitive-array keys such as `endpoint_url`, `endpoint_model`,
 `workspace_root`, prompt budget, and live-campaign duration; nested objects are
-startup errors. Live-profile endpoint detection counts only environment
-variables or those flat endpoint keys, so old nested endpoint shapes no longer
-silently enable live campaigns.
+startup errors. Live-profile and smoke endpoint detection count only environment variables or
+those flat endpoint keys, so old nested endpoint shapes no longer silently enable
+live campaigns or smoke-live skips.
 
 Focused acceptance evidence now covers owner record writes, transcript traces,
 artifact files and response-path gating, blocked-step preflight, prompt-context

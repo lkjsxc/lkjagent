@@ -102,9 +102,8 @@ fn persist_snapshot(
 }
 
 fn live(root: &Path) -> i32 {
-    let configured = (env_present("LKJAGENT_ENDPOINT_URL") && env_present("LKJAGENT_MODEL"))
-        || config_present(root);
-    if missing_configured_key(root) {
+    let configured = crate::smoke_config::configured(root);
+    if crate::smoke_config::missing_configured_key(root) {
         println!("ok smoke live status=skipped reason=endpoint-api-key-env-absent");
     } else if configured {
         println!("ok smoke live status=skipped reason=operator-command-required");
@@ -112,42 +111,6 @@ fn live(root: &Path) -> i32 {
         println!("ok smoke live status=skipped reason=endpoint-config-absent");
     }
     0
-}
-
-fn env_present(name: &str) -> bool {
-    std::env::var(name).is_ok_and(|value| !value.trim().is_empty())
-}
-
-fn config_present(root: &Path) -> bool {
-    let endpoint = config_endpoint(root);
-    endpoint
-        .get("url")
-        .and_then(serde_json::Value::as_str)
-        .is_some_and(|url| !url.is_empty())
-        && endpoint
-            .get("model")
-            .and_then(serde_json::Value::as_str)
-            .is_some_and(|model| !model.is_empty())
-}
-
-fn missing_configured_key(root: &Path) -> bool {
-    config_endpoint(root)
-        .get("api-key-env")
-        .and_then(serde_json::Value::as_str)
-        .is_some_and(|name| !env_present(name))
-}
-
-fn config_endpoint(root: &Path) -> serde_json::Value {
-    let Ok(text) = fs::read_to_string(root.join("data/lkjagent.json")) else {
-        return serde_json::Value::Null;
-    };
-    let Ok(value) = serde_json::from_str::<serde_json::Value>(&text) else {
-        return serde_json::Value::Null;
-    };
-    value
-        .get("endpoint")
-        .cloned()
-        .unwrap_or(serde_json::Value::Null)
 }
 
 fn fail(name: &str, message: &str) -> i32 {
