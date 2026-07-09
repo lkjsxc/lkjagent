@@ -1,0 +1,3 @@
+exit_code	0
+command	docker compose --profile shell build shell
+source_commit	0799fca7887dc7661706bf7a4dd53ad71b1bcc64

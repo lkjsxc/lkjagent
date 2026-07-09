@@ -1,0 +1,90 @@
+ Image lkjagent-shell Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 537B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 2.17kB done
+#2 DONE 0.0s
+
+#3 resolve image config for docker-image://docker.io/docker/dockerfile:1.7
+#3 DONE 0.6s
+
+#4 docker-image://docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e
+#4 resolve docker.io/docker/dockerfile:1.7@sha256:a57df69d0ea827fb7266491f2813635de6f17269be881f696fbfdf2d83dda33e 0.0s done
+#4 CACHED
+
+#5 [internal] load metadata for docker.io/library/rust:bookworm
+#5 DONE 0.7s
+
+#6 [internal] load .dockerignore
+#6 transferring context: 132B done
+#6 DONE 0.0s
+
+#7 [build  1/15] FROM docker.io/library/rust:bookworm@sha256:7d0723df719e7f213b69dc7c8c595985c3f4b060cfbee4f7bc0e347a86fe3b6a
+#7 resolve docker.io/library/rust:bookworm@sha256:7d0723df719e7f213b69dc7c8c595985c3f4b060cfbee4f7bc0e347a86fe3b6a 0.0s done
+#7 DONE 0.0s
+
+#8 [internal] load build context
+#8 transferring context: 42.06kB done
+#8 DONE 0.0s
+
+#9 [build  3/15] RUN apt-get update     && apt-get install -y --no-install-recommends         curl         git         ripgrep     && rm -rf /var/lib/apt/lists/*
+#9 CACHED
+
+#10 [build  6/15] COPY crates/lkjagent-app ./crates/lkjagent-app
+#10 CACHED
+
+#11 [build  4/15] RUN rustup component add rustfmt clippy
+#11 CACHED
+
+#12 [build  5/15] COPY Cargo.toml Cargo.lock README.md ./
+#12 CACHED
+
+#13 [build  9/15] COPY crates/lkjagent-llm ./crates/lkjagent-llm
+#13 CACHED
+
+#14 [build  2/15] WORKDIR /src
+#14 CACHED
+
+#15 [build  8/15] COPY crates/lkjagent-effects ./crates/lkjagent-effects
+#15 CACHED
+
+#16 [build  7/15] COPY crates/lkjagent-core ./crates/lkjagent-core
+#16 CACHED
+
+#17 [build 10/15] COPY crates/lkjagent-store ./crates/lkjagent-store
+#17 CACHED
+
+#18 [build 11/15] COPY crates/lkjagent-xtask ./crates/lkjagent-xtask
+#18 DONE 0.1s
+
+#19 [build 12/15] COPY docs ./docs
+#19 DONE 0.1s
+
+#20 [build 13/15] COPY evaluation ./evaluation
+#20 DONE 0.1s
+
+#21 [build 14/15] COPY Dockerfile docker-compose.yml ./
+#21 DONE 0.1s
+
+#22 [build 15/15] RUN --mount=type=cache,target=/usr/local/cargo/registry     --mount=type=cache,target=/usr/local/cargo/git     --mount=type=cache,target=/src/target     cargo build --release -p lkjagent-app     && cp /src/target/release/lkjagent /tmp/lkjagent
+#22 0.269     Finished `release` profile [optimized] target(s) in 0.07s
+#22 DONE 0.3s
+
+#23 exporting to image
+#23 exporting layers
+#23 exporting layers 0.5s done
+#23 exporting manifest sha256:50272e5337a2d437615dab349d1f2d04285812f0fc6fabe8d4e7e9a46e6d2ac0 0.0s done
+#23 exporting config sha256:2d4929bd7ecd3b4c3c7ca5c45dc8a3e44783f2ab2425ee6c7c5aea103ae0abb8 0.0s done
+#23 exporting attestation manifest sha256:00fe2a08e3b9a80b5713b1b0a076524f9353068d6d7f7ec7b7c1bf28b5c3f547 0.0s done
+#23 exporting manifest list sha256:4dfad9827b63c37452d57eb4ca64990b3a13ee35bc94fc3f5611063f38eccc68 0.0s done
+#23 naming to docker.io/library/lkjagent-shell:latest
+#23 naming to docker.io/library/lkjagent-shell:latest done
+#23 unpacking to docker.io/library/lkjagent-shell:latest
+#23 unpacking to docker.io/library/lkjagent-shell:latest 0.2s done
+#23 DONE 0.9s
+
+#24 resolving provenance for metadata file
+#24 DONE 0.0s
+ Image lkjagent-shell Built 

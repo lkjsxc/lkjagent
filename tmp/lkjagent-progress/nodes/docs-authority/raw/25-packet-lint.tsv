@@ -1,0 +1,3 @@
+command	python3 /home/lkjsxc/workspace/lkjagent/tmp/lkjagent-evidence-first-rebuild-20260710/13-scripts/packet_lint.py /home/lkjsxc/workspace/lkjagent/tmp/lkjagent-evidence-first-rebuild-20260710
+source_commit	bcb88088c5667453ecd4fe54411b2a9582087135
+exit_code	0

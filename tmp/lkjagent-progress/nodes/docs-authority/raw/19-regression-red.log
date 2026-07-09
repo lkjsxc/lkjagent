@@ -1,0 +1,27 @@
+
+running 3 tests
+missing_schema_constraint_fails --- FAILED
+. 2/3
+missing_decision_or_observation_field_fails --- FAILED
+
+failures:
+
+---- missing_schema_constraint_fails stdout ----
+
+thread 'missing_schema_constraint_fails' (46863) panicked at crates/lkjagent-xtask/tests/docs_authority_gate.rs:105:9:
+missing rejects any second run passed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- missing_decision_or_observation_field_fails stdout ----
+
+thread 'missing_decision_or_observation_field_fails' (46862) panicked at crates/lkjagent-xtask/tests/docs_authority_gate.rs:85:9:
+missing `selected_monotonic_ms` passed
+
+
+failures:
+    missing_decision_or_observation_field_fails
+    missing_schema_constraint_fails
+
+test result: FAILED. 1 passed; 2 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.03s
+
+error: test failed, to rerun pass `-p lkjagent-xtask --test docs_authority_gate`

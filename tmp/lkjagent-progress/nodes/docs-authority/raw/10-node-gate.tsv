@@ -1,0 +1,3 @@
+exit_code	1
+command	docker compose --profile shell run --rm shell cargo run --locked -p lkjagent-xtask -- gate docs-authority
+source_commit	b1991770465c7c396d317ae2da413a0a7ba0ee37

@@ -1,0 +1,5 @@
+ok check-docs
+ok check-lines
+ok check-style
+ok gate docs-authority
+fmt=0 check_docs=0 check_lines=0 check_style=0 local_node=0

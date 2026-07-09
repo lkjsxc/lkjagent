@@ -1,0 +1,11 @@
+node_id	docs-authority
+status	passed
+source_commit	bcb88088c5667453ecd4fe54411b2a9582087135
+completed_sequence	2
+gate_command	docker compose --profile shell run --rm shell cargo run --locked -p lkjagent-xtask -- gate docs-authority
+gate_exit_code	0
+dependency_receipt_hashes	sha256:d30d432b32d5687caee916d15905426e4bbc6f7d82fbdf80c68aff131bcf507a
+evidence_refs	nodes/docs-authority/raw/21-node-gate.log,nodes/docs-authority/raw/22-focused-tests.log,nodes/docs-authority/raw/23-static-gates.log,nodes/docs-authority/raw/24-source-binding.tsv,nodes/docs-authority/raw/25-packet-lint.log
+evidence_hashes	sha256:b848c5565409b985395193b5e2f610f919823ebcbb1e7cfd80488411471898c2,sha256:610e1d14254d1270be5bbc9e217520da3056e933067f4b7fa645c05b78ee1a50,sha256:1faebe7c28a27af30cd17fa801b6f78599f57b573a40fd183d7f49f6a6370751,sha256:05a1b2864511ed346b9143d4ef4d7a625aa37d206334243e849adb51d8992778,sha256:479908cc67c8344b39507c7409743450606f412794cc0b9f33c76eb46bf1b989
+verifier_ref	nodes/docs-authority/verifier.md
+verifier_hash	sha256:bbd602b7ae959af1600705ab98c3db4791e4512dbde0d24ab33bdbe52ac189ee

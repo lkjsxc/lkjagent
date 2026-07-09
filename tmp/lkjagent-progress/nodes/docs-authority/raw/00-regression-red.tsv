@@ -1,0 +1,2 @@
+exit_code	101
+command	cargo test --locked -p lkjagent-xtask --test docs_authority_gate

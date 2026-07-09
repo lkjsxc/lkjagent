@@ -1,0 +1,3 @@
+command	cargo test --locked -p lkjagent-xtask --test docs_authority_gate missing_
+source_commit	ea1b58e810f3f0ed3f1980a6e4547280912c63f0
+exit_code	101

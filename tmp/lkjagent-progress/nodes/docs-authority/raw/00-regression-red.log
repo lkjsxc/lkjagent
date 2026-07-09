@@ -1,0 +1,8 @@
+error[E0432]: unresolved import `lkjagent_xtask::docs_authority_gate`
+ --> crates/lkjagent-xtask/tests/docs_authority_gate.rs:3:21
+  |
+3 | use lkjagent_xtask::docs_authority_gate::{check_changed_paths, check_contract};
+  |                     ^^^^^^^^^^^^^^^^^^^ could not find `docs_authority_gate` in `lkjagent_xtask`
+
+For more information about this error, try `rustc --explain E0432`.
+error: could not compile `lkjagent-xtask` (test "docs_authority_gate") due to 1 previous error

@@ -1,0 +1,3 @@
+command	cargo fmt --all -- --check && cargo test --locked -p lkjagent-xtask && check-docs && check-lines && check-style && gate docs-authority
+source_commit	bcb88088c5667453ecd4fe54411b2a9582087135
+exit_code	0
