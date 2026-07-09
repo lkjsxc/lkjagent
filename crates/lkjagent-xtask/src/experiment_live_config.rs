@@ -5,12 +5,12 @@ use serde_json::Value;
 pub fn missing_endpoint(data_dir: &Path) -> Vec<String> {
     let config = read_json(&data_dir.join("lkjagent.json"));
     [
-        ("LKJAGENT_ENDPOINT_URL", "endpoint_url", "url"),
-        ("LKJAGENT_MODEL", "endpoint_model", "model"),
+        ("LKJAGENT_ENDPOINT_URL", "endpoint_url"),
+        ("LKJAGENT_MODEL", "endpoint_model"),
     ]
     .into_iter()
-    .filter(|(env, flat, nested)| !env_present(env) && !config_present(&config, flat, nested))
-    .map(|(env, flat, _)| format!("{env} or {flat}"))
+    .filter(|(env, flat)| !env_present(env) && !config_present(&config, flat))
+    .map(|(env, flat)| format!("{env} or {flat}"))
     .collect()
 }
 
@@ -41,14 +41,35 @@ fn env_present(name: &str) -> bool {
     std::env::var(name).is_ok_and(|value| !value.trim().is_empty())
 }
 
-fn config_present(config: &Option<Value>, flat: &str, nested: &str) -> bool {
+fn config_present(config: &Option<Value>, flat: &str) -> bool {
     config
         .as_ref()
-        .and_then(|value| value.get(flat).or_else(|| nested_endpoint(value, nested)))
+        .and_then(|value| value.get(flat))
         .and_then(Value::as_str)
         .is_some_and(|value| !value.trim().is_empty())
 }
 
-fn nested_endpoint<'a>(value: &'a Value, key: &str) -> Option<&'a Value> {
-    value.get("endpoint")?.get(key)
+#[cfg(test)]
+mod tests {
+    use super::config_present;
+    use serde_json::json;
+
+    #[test]
+    fn endpoint_detection_uses_flat_config_only() {
+        let nested = Some(json!({
+            "endpoint": {
+                "url": "http://127.0.0.1",
+                "model": "local"
+            }
+        }));
+        let flat = Some(json!({
+            "endpoint_url": "http://127.0.0.1",
+            "endpoint_model": "local"
+        }));
+
+        assert!(!config_present(&nested, "endpoint_url"));
+        assert!(!config_present(&nested, "endpoint_model"));
+        assert!(config_present(&flat, "endpoint_url"));
+        assert!(config_present(&flat, "endpoint_model"));
+    }
 }

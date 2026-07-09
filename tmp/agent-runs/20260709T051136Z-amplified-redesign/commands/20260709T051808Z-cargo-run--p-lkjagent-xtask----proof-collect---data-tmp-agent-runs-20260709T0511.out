@@ -1,0 +1,3 @@
+command: cargo run -p lkjagent-xtask -- proof collect --data tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data --out tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/proof
+started: 20260709T051808Z
+ok proof collect artifact=./tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/proof/summary.md

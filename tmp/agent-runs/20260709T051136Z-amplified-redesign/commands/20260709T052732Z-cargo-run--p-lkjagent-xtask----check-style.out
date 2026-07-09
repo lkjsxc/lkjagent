@@ -1,0 +1,3 @@
+command: cargo run -p lkjagent-xtask -- check-style
+started: 20260709T052732Z
+ok check-style

@@ -1,0 +1,33 @@
+command: bash -lc printf "/quit\n" | cargo run -p lkjagent-app -- --data tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data workbench --mode pane
+started: 20260709T051827Z
+lkjagent workbench: type text, /mode append, /mode pane, /quit
+== workbench pane refresh 1 scroll=0 follow=true search=none ==
++-- transcript --+
+[recent events]
+none
+
+[matter trace]
+matter 1 Open
+1 Explore Active explore attempts=1 actions=0 checks=0
+2 Respond Pending respond attempts=0 actions=0 checks=0
+
+[proof rows]
+proof: prompt_frames=1 checks=0 artifacts=6 exchanges=1
++-- right rail --+
+daemon: working
+matter: 1 Open Generic budget 0/200
+operation: 1/2 Explore attempt 1/3
+last: none
+question: none
+queue: 1 pending
+tokens: input_uncached=unknown input_cached=unknown input_total=unknown output=unknown cache=unknown
+lease: unknown owner=pid:775950 heartbeat=2026-07-09T05:17:39Z
+state: active=2 conflicts=0
+decision: case-1-decision-0001 model.call/1001 status=settled ctx=fnv1a64:7628f542 tools=fnv1a64:2652f961
+context_lanes: context=fnv1a64:7628f542d303b54e included=case-1-objective:clean-current,workspace-index-index-active-projects:clean-current,workspace-index-index-agenda:clean-current,workspace-index-index-experiments:clean-current,workspace-index-index-open-todos:clean-current,workspace-index-index-proof-runs:clean-current,workspace-record-rec_20260709T051739Z_todo-renew-passport:clean-current excluded=none lanes=relevant-records:fnv1a64:1fd944b6f0dbda5f refs=owner:1+workspace_index:index-active-projects+workspace_index:index-agenda+workspace_index:index-experiments+workspace_index:index-open-todos+workspace_index:index-proof-runs+workspace_record:rec_20260709T051739Z_todo-renew-passport,excluded-context-notes:fnv1a64:671724984cca8ff3 refs=
+admissions: 0 observations: 0 exchanges: 1 artifacts: 6
+faults: see rows
+repo: see rows
++-- input --+
+plain text enqueues | /follow on|off | /search TEXT | /mode append | /quit
+console: bye

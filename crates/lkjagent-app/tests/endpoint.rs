@@ -13,25 +13,21 @@ type TestResult<T> = Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 #[test]
 fn llm_endpoint_uses_configured_chat_endpoint() -> TestResult<()> {
+    let _env = EndpointEnvGuard::unset();
     let listener = TcpListener::bind("127.0.0.1:0")?;
     let url = format!("http://{}", listener.local_addr()?);
     let data = fixture_root("endpoint")?;
     fs::write(
         data.join("lkjagent.json"),
-        format!("{{\"endpoint\":{{\"url\":\"{url}\",\"model\":\"local\",\"timeout-seconds\":5}}}}"),
+        format!(
+            "{{\"endpoint_url\":\"{url}\",\"endpoint_model\":\"local\",\"endpoint_timeout_seconds\":5}}"
+        ),
     )?;
-    std::env::set_var("LKJAGENT_ENDPOINT_URL", &url);
-    std::env::set_var("LKJAGENT_MODEL", "local");
     let handle = thread::spawn(move || serve_once(listener));
     let mut endpoint = LlmEndpoint::new(&data);
     let text = endpoint.complete(&prompt(), 0)?.content;
     handle.join().map_err(|_| "server thread failed")??;
     assert_eq!(text, "<message>hello</message>");
-    let migrated = fs::read_to_string(data.join("lkjagent.json"))?;
-    assert!(migrated.contains("endpoint_url"));
-    assert!(migrated.contains("endpoint_model"));
-    assert!(migrated.contains("endpoint_timeout_seconds"));
-    assert!(!migrated.contains("\"endpoint\""));
     Ok(())
 }
 
@@ -63,6 +59,23 @@ fn flat_config_exposes_workspace_and_budget_keys() -> TestResult<()> {
     assert!(status.contains("prompt_cap=1234"));
     assert!(status.contains("live_seconds=77"));
     assert!(json.contains("visible-workspace"));
+    Ok(())
+}
+
+#[test]
+fn nested_config_is_rejected() -> TestResult<()> {
+    let data = fixture_root("nested-config")?;
+    fs::write(
+        data.join("lkjagent.json"),
+        "{\"endpoint\":{\"url\":\"http://127.0.0.1\",\"model\":\"local\"}}",
+    )?;
+
+    let error = match cli::run(["--data", data.to_string_lossy().as_ref(), "doctor"]) {
+        Ok(output) => return Err(format!("nested config was accepted: {output}").into()),
+        Err(error) => error,
+    };
+
+    assert!(error.contains("must not be nested"));
     Ok(())
 }
 
@@ -102,4 +115,40 @@ fn fixture_root(name: &str) -> TestResult<PathBuf> {
     }
     fs::create_dir_all(&path)?;
     Ok(path)
+}
+
+struct EndpointEnvGuard {
+    url: Option<String>,
+    model: Option<String>,
+    timeout: Option<String>,
+}
+
+impl EndpointEnvGuard {
+    fn unset() -> Self {
+        let guard = Self {
+            url: std::env::var("LKJAGENT_ENDPOINT_URL").ok(),
+            model: std::env::var("LKJAGENT_MODEL").ok(),
+            timeout: std::env::var("LKJAGENT_ENDPOINT_TIMEOUT_SECONDS").ok(),
+        };
+        std::env::remove_var("LKJAGENT_ENDPOINT_URL");
+        std::env::remove_var("LKJAGENT_MODEL");
+        std::env::remove_var("LKJAGENT_ENDPOINT_TIMEOUT_SECONDS");
+        guard
+    }
+}
+
+impl Drop for EndpointEnvGuard {
+    fn drop(&mut self) {
+        restore_env("LKJAGENT_ENDPOINT_URL", &self.url);
+        restore_env("LKJAGENT_MODEL", &self.model);
+        restore_env("LKJAGENT_ENDPOINT_TIMEOUT_SECONDS", &self.timeout);
+    }
+}
+
+fn restore_env(name: &str, value: &Option<String>) {
+    if let Some(value) = value {
+        std::env::set_var(name, value);
+    } else {
+        std::env::remove_var(name);
+    }
 }

@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use lkjagent_llm::client::{ClientConfig, DEFAULT_TIMEOUT_SECONDS};
-use serde_json::{Map, Value};
+use serde_json::Value;
 
 pub fn load_client(data_dir: &Path) -> Result<ClientConfig, String> {
     let value = load_flat_config(data_dir)?;
@@ -51,48 +51,29 @@ pub(crate) fn load_flat_config(data_dir: &Path) -> Result<Value, String> {
     }
     let text = std::fs::read_to_string(&path).map_err(|error| error.to_string())?;
     let parsed: Value = serde_json::from_str(&text).map_err(|error| error.to_string())?;
-    let flat = flatten(parsed);
-    if flat != serde_json::from_str::<Value>(&text).map_err(|error| error.to_string())? {
-        let body = serde_json::to_string_pretty(&flat).map_err(|error| error.to_string())?;
-        std::fs::write(&path, format!("{body}\n")).map_err(|error| error.to_string())?;
-    }
-    Ok(flat)
+    validate_flat_config(&parsed)?;
+    Ok(parsed)
 }
 
-fn flatten(value: Value) -> Value {
-    let Value::Object(mut map) = value else {
-        return value;
+fn validate_flat_config(value: &Value) -> Result<(), String> {
+    let Value::Object(map) = value else {
+        return Err("lkjagent.json must be a flat JSON object".to_string());
     };
-    if let Some(Value::Object(endpoint)) = map.remove("endpoint") {
-        copy_string(&mut map, &endpoint, "url", "endpoint_url");
-        copy_string(&mut map, &endpoint, "model", "endpoint_model");
-        copy_string(&mut map, &endpoint, "api-key-env", "endpoint_api_key_env");
-        copy_number(
-            &mut map,
-            &endpoint,
-            "timeout-seconds",
-            "endpoint_timeout_seconds",
-        );
+    for (key, value) in map {
+        if key.trim().is_empty() {
+            return Err("lkjagent.json keys must not be empty".to_string());
+        }
+        match value {
+            Value::Object(_) => {
+                return Err(format!("lkjagent.json key '{key}' must not be nested"));
+            }
+            Value::Array(items) if items.iter().any(|item| item.is_object() || item.is_array()) => {
+                return Err(format!("lkjagent.json key '{key}' array must be flat"));
+            }
+            _ => {}
+        }
     }
-    Value::Object(map)
-}
-
-fn copy_string(map: &mut Map<String, Value>, old: &Map<String, Value>, from: &str, to: &str) {
-    if map.contains_key(to) {
-        return;
-    }
-    if let Some(value) = old.get(from).and_then(Value::as_str) {
-        map.insert(to.to_string(), Value::String(value.to_string()));
-    }
-}
-
-fn copy_number(map: &mut Map<String, Value>, old: &Map<String, Value>, from: &str, to: &str) {
-    if map.contains_key(to) {
-        return;
-    }
-    if let Some(value) = old.get(from).and_then(Value::as_u64) {
-        map.insert(to.to_string(), Value::Number(value.into()));
-    }
+    Ok(())
 }
 
 fn env_or_value(env: &str, section: &Value, key: &str) -> Result<Option<String>, String> {

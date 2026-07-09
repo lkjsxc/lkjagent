@@ -1,0 +1,3 @@
+command: cargo run -p lkjagent-xtask -- smoke replay
+started: 20260709T051756Z
+ok smoke replay data=./tmp/smoke-replay-data

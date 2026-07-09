@@ -1,0 +1,3 @@
+command: cargo run -p lkjagent-xtask -- quiet verify
+started: 20260709T052659Z
+ok verify

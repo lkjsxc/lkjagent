@@ -1,0 +1,3 @@
+command: cargo run -p lkjagent-xtask -- check-lines
+started: 20260709T052732Z
+ok check-lines

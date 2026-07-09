@@ -1,0 +1,3 @@
+command: python3 tmp/lkjagent-yolo-amplified-thinking-packet-20260708/11-scripts/tui_log_analyzer.py tmp/agent-runs/20260709T051136Z-amplified-redesign/commands/20260709T051827Z-bash--lc-printf--quitn--cargo-run--p-lkjagent-app------data-tmp-agent-runs-20260.out
+started: 20260709T051843Z
+ok tui-log-analyzer

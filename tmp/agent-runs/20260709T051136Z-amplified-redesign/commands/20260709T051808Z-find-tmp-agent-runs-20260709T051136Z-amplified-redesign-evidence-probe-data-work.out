@@ -1,0 +1,25 @@
+command: find tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace -maxdepth 6 -type f
+started: 20260709T051808Z
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/indexes/agenda.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/indexes/today.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/indexes/README.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/indexes/proof-runs.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/indexes/experiments.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/indexes/open-todos.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/indexes/active-projects.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/records/life/todo/README.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/records/life/todo/open/rec_20260709T051739Z_todo-renew-passport.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/records/life/todo/open/README.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/records/life/README.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/records/README.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/inbox/README.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/artifacts/proof/README.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/artifacts/README.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/artifacts/transcripts/README.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/artifacts/transcripts/queue-000002.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/artifacts/transcripts/queue-000003.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/artifacts/transcripts/queue-000001.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/README.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/system/README.md
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/system/workspace-manifest.json
+tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace/system/manifests/README.md

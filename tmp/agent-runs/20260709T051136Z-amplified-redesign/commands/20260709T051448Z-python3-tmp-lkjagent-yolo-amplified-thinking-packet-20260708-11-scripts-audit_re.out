@@ -1,0 +1,4 @@
+command: python3 tmp/lkjagent-yolo-amplified-thinking-packet-20260708/11-scripts/audit_repo.py .
+started: 20260709T051448Z
+line-limit	437	tmp/coding-agent-runs/20260707T080318Z-workspace-runtime-redesign/repository-baseline.md
+line-limit	424	tmp/coding-agent-runs/20260707T080318Z-workspace-runtime-redesign/baseline.md

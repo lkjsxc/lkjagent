@@ -1,0 +1,3 @@
+command: cargo run -p lkjagent-xtask -- experiment protocol --all --out-dir tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/protocol-experiments
+started: 20260709T051756Z
+ok experiment out=./tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/protocol-experiments/adoption.md

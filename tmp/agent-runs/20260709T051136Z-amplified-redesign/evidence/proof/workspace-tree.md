@@ -1,0 +1,25 @@
+# Workspace Tree
+
+- file indexes/agenda.md
+- file indexes/today.md
+- file indexes/README.md
+- file indexes/proof-runs.md
+- file indexes/experiments.md
+- file indexes/open-todos.md
+- file indexes/active-projects.md
+- file records/life/todo/README.md
+- file records/life/todo/open/rec_20260709T051739Z_todo-renew-passport.md
+- file records/life/todo/open/README.md
+- file records/life/README.md
+- file records/README.md
+- file inbox/README.md
+- file artifacts/proof/README.md
+- file artifacts/README.md
+- file artifacts/transcripts/README.md
+- file artifacts/transcripts/queue-000002.md
+- file artifacts/transcripts/queue-000003.md
+- file artifacts/transcripts/queue-000001.md
+- file README.md
+- file system/README.md
+- file system/workspace-manifest.json
+- file system/manifests/README.md
