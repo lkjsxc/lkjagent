@@ -6,6 +6,7 @@ pub enum Gate {
     QuietTest,
     QuietVerify,
     HygieneCheck,
+    Node(String),
     Benchmark(Vec<String>),
     Experiment(Vec<String>),
     Proof(Vec<String>),
@@ -22,6 +23,7 @@ pub fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
         [one] if one == "hygiene-check" => Ok(Gate::HygieneCheck),
         [first, second] if first == "quiet" && second == "test" => Ok(Gate::QuietTest),
         [first, second] if first == "quiet" && second == "verify" => Ok(Gate::QuietVerify),
+        [first, node] if first == "gate" => Ok(Gate::Node(node.clone())),
         [first, rest @ ..] if first == "benchmark" || first == "bench" => {
             Ok(Gate::Benchmark(rest.to_vec()))
         }
@@ -32,7 +34,7 @@ pub fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
         _ => Err(vec![
             "xtask failed".to_string(),
             "exit status: 2".to_string(),
-            "use: check-docs | check-lines | check-files | check-style | hygiene-check | quiet test | quiet verify | bench ... | experiment ... | proof ... | smoke ... | structure ...".to_string(),
+            "use: check-docs | check-lines | check-files | check-style | hygiene-check | quiet test | quiet verify | gate NODE | bench ... | experiment ... | proof ... | smoke ... | structure ...".to_string(),
         ]),
     }
 }

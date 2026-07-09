@@ -17,6 +17,8 @@ pub mod file_counts;
 pub mod gate;
 pub mod lines;
 pub mod model;
+pub mod node_gate;
+mod node_gate_evidence;
 pub mod proof;
 pub mod proof_checks;
 pub mod proof_records;
@@ -46,6 +48,7 @@ pub fn run(args: &[String], root: &Path) -> i32 {
         Ok(Gate::HygieneCheck) => run_hygiene(root),
         Ok(Gate::QuietTest) => run_command_gate(root, "test"),
         Ok(Gate::QuietVerify) => run_verify(root),
+        Ok(Gate::Node(identifier)) => run_node_gate(root, &identifier),
         Ok(Gate::Benchmark(rest)) => benchmark::run(&rest, root),
         Ok(Gate::Experiment(rest)) => experiment::run(&rest, root),
         Ok(Gate::Proof(rest)) => proof::run(&rest, root),
@@ -83,6 +86,21 @@ fn run_command_gate(root: &Path, ok_name: &'static str) -> i32 {
             0
         }
         Err(lines) => {
+            print_failure(&lines);
+            1
+        }
+    }
+}
+
+fn run_node_gate(root: &Path, identifier: &str) -> i32 {
+    match node_gate::check(root, identifier) {
+        Ok(()) => {
+            println!("ok gate {identifier}");
+            0
+        }
+        Err(mut lines) => {
+            lines.insert(0, "exit status: 1".to_string());
+            lines.insert(0, format!("gate {identifier} failed"));
             print_failure(&lines);
             1
         }
