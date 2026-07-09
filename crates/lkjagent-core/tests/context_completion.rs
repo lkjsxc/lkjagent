@@ -32,6 +32,8 @@ fn context_plan_records_inclusion_and_suppression_reasons() {
     let plan = select_context_plan(&[clean, stale, bad], &[]);
 
     assert_eq!(plan.included[0].reason, "clean-current");
+    assert_eq!(plan.included[0].rank, 550);
+    assert_eq!(plan.included[0].source_ref, "test:none@none");
     assert_eq!(plan.excluded[0].reason, "staleness:Stale");
     assert_eq!(plan.excluded[1].reason, "contamination:ExternalRaw");
     assert_eq!(plan.lanes[0].name, "relevant-records");

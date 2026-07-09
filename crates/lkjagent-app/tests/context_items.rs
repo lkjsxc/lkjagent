@@ -63,12 +63,14 @@ fn context_prompt_excludes_contaminated_and_creates_conflict_cell() -> TestResul
     )?;
     assert_eq!(edges, 1);
     let facts = prompt_card_reason(&conn, "facts")?;
-    assert!(facts.contains("ctx-bad:contamination:FailedModelOutput"));
-    assert!(facts.contains("ctx-a:unresolved-conflict"));
-    assert!(facts.contains("ctx-b:unresolved-conflict"));
+    assert!(facts.contains("<id>ctx-bad</id>"));
+    assert!(facts.contains("<reason>contamination:FailedModelOutput</reason>"));
+    assert!(facts.contains("<id>ctx-a</id>"));
+    assert!(facts.contains("<reason>unresolved-conflict</reason>"));
     let conflicts = prompt_card_reason(&conn, "conflicts")?;
-    assert!(conflicts.contains("ctx-a:unresolved-conflict"));
-    assert!(conflicts.contains("ctx-b:unresolved-conflict"));
+    assert!(conflicts.contains("<id>ctx-a</id>"));
+    assert!(conflicts.contains("<id>ctx-b</id>"));
+    assert!(conflicts.contains("<source_ref>"));
     Ok(())
 }
 

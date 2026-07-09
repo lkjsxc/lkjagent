@@ -125,12 +125,26 @@ fn entry_list(entries: &[crate::runtime_context::ContextPlanEntry]) -> String {
     if entries.is_empty() {
         return "none".to_string();
     }
-    let mut values = entries
-        .iter()
-        .map(|entry| format!("{}:{}", entry.item_id, entry.reason))
-        .collect::<Vec<_>>();
+    let mut values = entries.iter().map(entry_xml).collect::<Vec<_>>();
     values.sort();
     values.join(",")
+}
+
+fn entry_xml(entry: &crate::runtime_context::ContextPlanEntry) -> String {
+    format!(
+        "<context_item><id>{}</id><reason>{}</reason><rank>{}</rank><source_ref>{}</source_ref></context_item>",
+        escape_xml(&entry.item_id),
+        escape_xml(&entry.reason),
+        entry.rank,
+        escape_xml(&entry.source_ref)
+    )
+}
+
+fn escape_xml(value: &str) -> String {
+    value
+        .replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;")
 }
 
 fn card(kind: &str, reason: String) -> Result<PromptCard, FingerprintError> {

@@ -99,12 +99,18 @@ fn card_reasons_list_context_selection_audit() -> Result<(), String> {
     .map_err(|error| error.message)?;
 
     let facts = reason(&plan, "facts")?;
-    assert!(facts.contains("ctx-good:clean-current"));
-    assert!(facts.contains("ctx-bad:contamination:FailedModelOutput"));
-    assert!(facts.contains("ctx-conflict:unresolved-conflict"));
+    assert!(facts.contains("<context_item>"));
+    assert!(facts.contains("<id>ctx-good</id>"));
+    assert!(facts.contains("<reason>clean-current</reason>"));
+    assert!(facts.contains("<rank>7</rank>"));
+    assert!(facts.contains("<source_ref>test:source@fp</source_ref>"));
+    assert!(facts.contains("<reason>contamination:FailedModelOutput</reason>"));
+    assert!(facts.contains("<reason>unresolved-conflict</reason>"));
     assert!(facts.contains("relevant-records:lane-fp"));
     assert!(facts.contains("refs=record:records/life/notes/a.md"));
-    assert!(reason(&plan, "conflicts")?.contains("ctx-conflict:unresolved-conflict"));
+    let conflicts = reason(&plan, "conflicts")?;
+    assert!(conflicts.contains("<id>ctx-conflict</id>"));
+    assert!(conflicts.contains("<source_ref>test:source@fp</source_ref>"));
     Ok(())
 }
 
@@ -112,6 +118,8 @@ fn entry(item_id: &str, reason: &str) -> ContextPlanEntry {
     ContextPlanEntry {
         item_id: item_id.to_string(),
         reason: reason.to_string(),
+        rank: 7,
+        source_ref: "test:source@fp".to_string(),
     }
 }
 

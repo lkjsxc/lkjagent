@@ -2,13 +2,17 @@ use std::collections::BTreeSet;
 
 use serde::{Deserialize, Serialize};
 
-use crate::runtime_context::{ContaminationClass, ContextConflict, ContextItem, StalenessClass};
+use crate::runtime_context::{
+    ContaminationClass, ContextConflict, ContextItem, StalenessClass, TrustClass,
+};
 use crate::runtime_fingerprint::stable_fingerprint;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ContextPlanEntry {
     pub item_id: String,
     pub reason: String,
+    pub rank: i32,
+    pub source_ref: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -43,13 +47,14 @@ pub fn select_context_plan(
         lanes: Vec::new(),
     };
     let mut seen = BTreeSet::new();
-    for item in items {
+    for (index, item) in items.iter().enumerate() {
         match suppression_reason(item, &conflict_keys) {
-            Some(reason) => plan.excluded.push(plan_entry(item, &reason)),
+            Some(reason) => plan.excluded.push(plan_entry(item, &reason, index)),
             None if !seen.insert(dedup_key(item)) => {
-                plan.excluded.push(plan_entry(item, "duplicate-context"));
+                plan.excluded
+                    .push(plan_entry(item, "duplicate-context", index));
             }
-            None => plan.included.push(plan_entry(item, "clean-current")),
+            None => plan.included.push(plan_entry(item, "clean-current", index)),
         }
     }
     plan.lanes = build_lanes(items, &plan);
@@ -118,9 +123,39 @@ fn dedup_key(item: &ContextItem) -> String {
     )
 }
 
-fn plan_entry(item: &ContextItem, reason: &str) -> ContextPlanEntry {
+fn plan_entry(item: &ContextItem, reason: &str, index: usize) -> ContextPlanEntry {
     ContextPlanEntry {
         item_id: item.id.clone(),
         reason: reason.to_string(),
+        rank: item_rank(item, index),
+        source_ref: source_ref(item),
     }
+}
+
+fn item_rank(item: &ContextItem, index: usize) -> i32 {
+    let trust = match item.trust {
+        TrustClass::Owner => 500,
+        TrustClass::Measured => 400,
+        TrustClass::Memory => 300,
+        TrustClass::Recovery => 250,
+        TrustClass::Model => 100,
+        TrustClass::External => 50,
+    };
+    let freshness = i32::from(item.staleness == StalenessClass::Current) * 100;
+    let cleanliness = i32::from(item.contamination == ContaminationClass::Clean) * 50;
+    trust + freshness + cleanliness - index as i32
+}
+
+fn source_ref(item: &ContextItem) -> String {
+    let id = if item.source_id.is_empty() {
+        "none"
+    } else {
+        &item.source_id
+    };
+    let fp = if item.source_fingerprint.is_empty() {
+        "none"
+    } else {
+        &item.source_fingerprint
+    };
+    format!("{}:{id}@{fp}", item.source_type)
 }

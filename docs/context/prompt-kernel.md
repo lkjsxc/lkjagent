@@ -23,8 +23,9 @@ Prompt assembly renders cards in this order:
 Each card has a deterministic fingerprint over canonical data. The prompt frame
 stores card ids, section fingerprints, included context ids, excluded context ids
 with reasons, and the final context-frame fingerprint. `prompt_cards.reason`
-keeps compact `item_id:reason` pairs queryable, while provider exchange rows and
-proof bundles carry the same frame fingerprint.
+keeps compact attribute-less XML-like context entries queryable. Each entry
+contains id, reason, rank, and fingerprint-bearing source ref; provider exchange
+rows and proof bundles carry the same frame fingerprint.
 
 ## Profiles
 
@@ -36,9 +37,9 @@ admission, tests, and proof evidence agree.
 ## Exclusions
 
 Contaminated, stale, recovery-only, and owner-sensitive items are excluded from
-normal fact cards. Conflict cards summarize contradictions without replaying raw
-failed output. Repair cards quote bounded fault facts, not the full failed model
-body.
+normal fact cards. Conflict cards summarize contradictions with the same ranked
+source-ref entries without replaying raw failed output. Repair cards quote
+bounded fault facts, not the full failed model body.
 
 ## Acceptance Checks
 
