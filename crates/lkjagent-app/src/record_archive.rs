@@ -24,7 +24,7 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
     {
         return Ok(format!("archived record: {id}"));
     }
-    let bytes = fs::read(&old).map_err(|error| error.to_string())?;
+    let bytes = crate::record_files::archive_source_bytes(&old, &row.fingerprint)?;
     prepare_or_load_operation(
         conn,
         &OperationDraft {
@@ -41,7 +41,7 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
     if let Some(parent) = new.parent() {
         fs::create_dir_all(parent).map_err(|error| error.to_string())?;
     }
-    if let Err(error) = fs::rename(&old, &new) {
+    if let Err(error) = crate::record_files::move_if_absent(&old, &new) {
         compensate_operation(conn, &operation_id, &error.to_string(), now)
             .map_err(|error| error.to_string())?;
         return Err(error.to_string());
@@ -129,7 +129,7 @@ fn rollback(conn: &Connection, rollback: Rollback<'_>, error: String) -> Result<
     remove_alias_and_audit(conn, &rollback.original.path, rollback.audit_id)
         .map_err(|error| error.to_string())?;
     upsert_record(conn, rollback.original).map_err(|error| error.to_string())?;
-    fs::rename(rollback.new, rollback.old).map_err(|error| error.to_string())?;
+    crate::record_files::move_if_absent(rollback.new, rollback.old)?;
     let text = fs::read_to_string(rollback.old).map_err(|error| error.to_string())?;
     let record = parse_record(&text)?;
     crate::record_state::upsert_record_cells(

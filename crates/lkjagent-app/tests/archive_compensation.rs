@@ -2,6 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use lkjagent_app::cli;
+use lkjagent_core::workspace_record::archive_path;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
@@ -52,6 +53,62 @@ fn archive_restores_file_and_row_when_audit_fails() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert_eq!(phase, "compensated");
+    Ok(())
+}
+
+#[test]
+fn archive_rejects_changed_source_bytes() -> TestResult<()> {
+    let data = fixture_root("archive-stale-source")?;
+    let data_arg = data.to_string_lossy();
+    let added = cli::run([
+        "--data",
+        data_arg.as_ref(),
+        "record",
+        "add",
+        "custom",
+        "Archive",
+        "Stale",
+        "--body",
+        "body",
+    ])?;
+    let id = field(&added, "record: ")?;
+    let old_path = field(&added, "path=")?;
+    fs::write(data.join("workspace").join(&old_path), "owner changed")?;
+    let result = cli::run(["--data", data_arg.as_ref(), "record", "archive", &id]);
+    assert!(result
+        .as_deref()
+        .is_err_and(|error| error.contains("fingerprint changed")));
+    assert!(data.join("workspace").join(old_path).exists());
+    Ok(())
+}
+
+#[test]
+fn archive_preserves_occupied_destination() -> TestResult<()> {
+    let data = fixture_root("archive-owner-destination")?;
+    let data_arg = data.to_string_lossy();
+    let added = cli::run([
+        "--data",
+        data_arg.as_ref(),
+        "record",
+        "add",
+        "custom",
+        "Archive",
+        "Destination",
+        "--body",
+        "body",
+    ])?;
+    let id = field(&added, "record: ")?;
+    let old_path = field(&added, "path=")?;
+    let destination = archive_path("custom", &id)?;
+    let full = data.join("workspace").join(&destination);
+    fs::create_dir_all(
+        full.parent()
+            .ok_or_else(|| std::io::Error::other("missing destination parent"))?,
+    )?;
+    fs::write(&full, "owner destination")?;
+    assert!(cli::run(["--data", data_arg.as_ref(), "record", "archive", &id]).is_err());
+    assert_eq!(fs::read_to_string(full)?, "owner destination");
+    assert!(data.join("workspace").join(old_path).exists());
     Ok(())
 }
 
