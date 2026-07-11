@@ -55,9 +55,11 @@ placeholder-looking executable values such as `...`, `PATH`, `TODO`, `VALUE`,
 Before protocol-tool evidence can pass, its named Docker gate must execute
 nonempty behavioral suites for parser faults, decision and view binding, field
 bounds, path containment, repeated admissions, typed recovery, and exact
-admission-to-effect lineage. The corpus includes Japanese and multiline values,
-XML entities, truncation, stale decisions, unknown and duplicate fields, and
-wrong primitive values. A printed metric or an editable label is not evidence.
+admission-to-effect lineage. It also rejects a special `finish` catalog entry:
+a typed report cannot settle an operation or completion. The corpus includes
+Japanese and multiline values, XML entities, truncation, stale decisions,
+unknown and duplicate fields, and wrong primitive values. A printed metric or
+an editable label is not evidence.
 
 ## Failure This Prevents
 
