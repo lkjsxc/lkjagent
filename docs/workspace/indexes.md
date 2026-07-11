@@ -34,6 +34,14 @@ Valid managed files update document and search projections. Large owner source
 stays in place. Malformed managed content receives a visible import-review or
 quarantine diagnostic without overwriting original bytes.
 
+## Gate Coverage
+
+Before workspace-retrieval-maintenance evidence can pass, its named Docker gate
+must execute nonempty behavioral suites for body discovery before ranking,
+filters, bounded excerpts, fingerprint drift, external edits, index predicates,
+rebuild equivalence, archive, and rebalance compensation. A generated fixture,
+zero-test filter, or summary line is not evidence.
+
 ## Validation
 
 Compare index membership and search fingerprints with current documents. Missing,

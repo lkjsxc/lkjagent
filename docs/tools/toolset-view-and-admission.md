@@ -50,6 +50,15 @@ the exact required XML-like action shape. Empty executable values and
 placeholder-looking executable values such as `...`, `PATH`, `TODO`, `VALUE`,
 `FIELD_VALUE`, `<path>`, or `[path]` are rejected before effects.
 
+## Gate Coverage
+
+Before protocol-tool evidence can pass, its named Docker gate must execute
+nonempty behavioral suites for parser faults, decision and view binding, field
+bounds, path containment, repeated admissions, typed recovery, and exact
+admission-to-effect lineage. The corpus includes Japanese and multiline values,
+XML entities, truncation, stale decisions, unknown and duplicate fields, and
+wrong primitive values. A printed metric or an editable label is not evidence.
+
 ## Failure This Prevents
 
 A model tool call cannot sneak through a dispatcher path that was absent from

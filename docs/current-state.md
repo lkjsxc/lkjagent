@@ -87,6 +87,12 @@ filesystem tools, and native text effects. They do not share one transaction,
 idempotency, indexing, or recovery contract. Startup eagerly creates empty
 navigation. Retrieval does not yet search and rank the full visible workspace.
 
+The current xtask dispatcher rejects the `protocol-tools` and
+`workspace-retrieval-maintenance` node names. Their exact Compose baseline runs
+therefore have no current substantive node suite. The raw failures are retained
+under their respective pre-freeze progress roots; both nodes remain open until
+named suites exercise their governing contracts.
+
 The TUI derives ordinary conversation from queue and selected event rows rather
 than one canonical conversation table. Historical reducer tests do not replace
 a final PTY campaign against frozen source.
