@@ -8,7 +8,7 @@ pub const APPLICATION_TABLES: &[&str] = &[
     "runtime_decisions", "prompt_frames", "prompt_cards", "tool_admissions", "observations",
     "context_items", "context_edges", "state_edges", "workspace_records", "workspace_record_history",
     "workspace_manifest", "workspace_path_aliases", "workspace_rebalance_audit", "artifacts",
-    "provider_exchanges", "workspace_operations", "workspace_search_chunks", "workspace_search_lexical", "workspace_search_trigram",
+    "provider_exchanges", "effect_journal", "workspace_operations", "workspace_search_chunks", "workspace_search_lexical", "workspace_search_trigram",
 ];
 pub fn setup(conn: &Connection) -> StoreResult<()> {
     conn.execute_batch(
@@ -141,9 +141,16 @@ fn setup_tail(conn: &Connection) -> StoreResult<()> {
             key TEXT PRIMARY KEY,
             value TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS effect_journal (
+            id TEXT PRIMARY KEY, admission_id TEXT NOT NULL UNIQUE REFERENCES tool_admissions(id), decision_id TEXT NOT NULL,
+            idempotency_key TEXT NOT NULL UNIQUE, command_ordinal INTEGER NOT NULL, target_path TEXT, effect_name TEXT NOT NULL, state TEXT NOT NULL,
+            prior_fingerprint TEXT NOT NULL, intended_fingerprint TEXT NOT NULL, observation_id TEXT UNIQUE REFERENCES observations(id),
+            outcome_fingerprint TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+        );
         ",
     )?;
     ensure_token_usage_columns(conn)?;
+    crate::plan_migrations::migrate_effect_journal(conn)?;
     crate::plan_migrations::migrate_checks(conn)?;
     state_schema::setup(conn)
 }

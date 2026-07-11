@@ -1,40 +1,71 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, fs, path::Path};
 
 use lkjagent_core::engine::Command;
 use lkjagent_core::parse::Action;
 use lkjagent_core::runtime_admission::{admit_action, AdmissionStatus, ModelAction, ToolAdmission};
 use lkjagent_core::runtime_decision::RuntimeDecision;
-use lkjagent_store::admission_rows::insert_tool_admission;
+use lkjagent_core::runtime_fingerprint::stable_fingerprint;
+use lkjagent_store::admission_rows::{
+    insert_admission_and_prepare, insert_tool_admission, EffectPreparation, PreparedEffect,
+};
 use rusqlite::{params, Connection};
+
+type Admission = (ToolAdmission, String, Option<ModelAction>);
+type AdmissionResult = Result<Option<Admission>, String>;
+type Fingerprints = Result<(String, String), String>;
 
 pub fn persist_tool_admissions(
     conn: &Connection,
+    workspace: &Path,
     decision: &RuntimeDecision,
     commands: &[Command],
     now: &str,
-) -> Result<(), String> {
+) -> Result<Vec<PreparedEffect>, String> {
     let mut ordinal = existing_admission_count(conn, &decision.id)?;
+    let mut prepared = Vec::new();
     for command in commands {
-        let Command::RunExplore(action) = command else {
+        let Some((mut admission, parsed, model_action)) = admission_for_command(decision, command)?
+        else {
             continue;
         };
-        let model_action = model_action(action);
-        let mut admission = admit_action(decision, &model_action).map_err(|error| error.message)?;
-        let parsed = serde_json::to_string(&model_action).map_err(|error| error.to_string())?;
-        if admission.status == AdmissionStatus::Admitted
+        if model_action.is_some()
+            && admission.status == AdmissionStatus::Admitted
             && repeated_admitted_action(conn, &decision.id, &parsed)?
         {
             admission = repeated_admission(&admission);
         }
         ordinal += 1;
         let id = format!("{}-admission-{ordinal:04}", decision.id);
-        insert_tool_admission(conn, &id, &decision.case_id, &admission, &parsed, now)
-            .map_err(|error| error.to_string())?;
         if admission.status == AdmissionStatus::Rejected {
+            insert_tool_admission(conn, &id, &decision.case_id, &admission, &parsed, now)
+                .map_err(|error| error.to_string())?;
             return Err(format!("admission rejected: {}", admission.reason));
         }
+        let journal_id = format!("{id}-effect");
+        let idempotency_key = format!("{}:{ordinal}", decision.id);
+        let (prior_fingerprint, intended_fingerprint) =
+            effect_fingerprints(workspace, command, &parsed)?;
+        let preparation = EffectPreparation {
+            id: &id,
+            case_id: &decision.case_id,
+            admission: &admission,
+            parsed_action_json: &parsed,
+            journal_id: &journal_id,
+            idempotency_key: &idempotency_key,
+            command_ordinal: ordinal,
+            target_path: match command {
+                Command::WriteFile { path, .. } | Command::AppendFile { path, .. } => Some(path),
+                _ => None,
+            },
+            prior_fingerprint: &prior_fingerprint,
+            intended_fingerprint: &intended_fingerprint,
+            created_at: now,
+        };
+        prepared.push(
+            insert_admission_and_prepare(conn, &preparation).map_err(|error| error.to_string())?,
+        );
     }
-    Ok(())
+    Ok(prepared)
 }
 
 fn existing_admission_count(conn: &Connection, decision_id: &str) -> Result<i64, String> {
@@ -70,6 +101,84 @@ fn repeated_admission(admission: &ToolAdmission) -> ToolAdmission {
     rejected
 }
 
+fn admission_for_command(decision: &RuntimeDecision, command: &Command) -> AdmissionResult {
+    match command {
+        Command::RunExplore(action) => {
+            let action = model_action(action);
+            let admission = admit_action(decision, &action).map_err(|error| error.message)?;
+            let parsed = serde_json::to_string(&action).map_err(|error| error.to_string())?;
+            Ok(Some((admission, parsed, Some(action))))
+        }
+        Command::WriteFile { .. } => harness_admission(decision, command, "native.write_file"),
+        Command::AppendFile { .. } => harness_admission(decision, command, "native.append_file"),
+        Command::RecordAttempt(_)
+        | Command::RecordEvent(_)
+        | Command::RecordMemory { .. }
+        | Command::RecordChecks { .. }
+        | Command::AddSteps(_) => Ok(None),
+    }
+}
+
+fn harness_admission(decision: &RuntimeDecision, command: &Command, tool: &str) -> AdmissionResult {
+    let admission = ToolAdmission {
+        decision_id: decision.id.clone(),
+        tool_view_fingerprint: decision
+            .tool_view_fingerprint()
+            .map_err(|error| error.message)?,
+        action_tool: tool.to_string(),
+        status: AdmissionStatus::Admitted,
+        reason: "harness admitted".to_string(),
+    };
+    let parsed =
+        serde_json::to_string(&format!("{command:?}")).map_err(|error| error.to_string())?;
+    Ok(Some((admission, parsed, None)))
+}
+
+fn effect_fingerprints(workspace: &Path, command: &Command, parsed: &str) -> Fingerprints {
+    match command {
+        Command::WriteFile { path, content } => write_fingerprints(workspace, path, content, false),
+        Command::AppendFile { path, content } => write_fingerprints(workspace, path, content, true),
+        _ => Ok((
+            fingerprint_text("not-applicable")?,
+            fingerprint_text(parsed)?,
+        )),
+    }
+}
+
+fn write_fingerprints(workspace: &Path, path: &str, content: &str, append: bool) -> Fingerprints {
+    let full =
+        lkjagent_effects::workspace::resolve(workspace, path).map_err(|error| error.to_string())?;
+    let (prior, prior_fingerprint) = if full.exists() {
+        match fs::read(&full) {
+            Ok(bytes) => {
+                let fingerprint =
+                    stable_fingerprint(&Some(bytes.clone())).map_err(|error| error.message)?;
+                (Some(bytes), fingerprint)
+            }
+            Err(error) => (None, fingerprint_text(&format!("unreadable:{error}"))?),
+        }
+    } else {
+        (
+            None,
+            stable_fingerprint(&Option::<Vec<u8>>::None).map_err(|error| error.message)?,
+        )
+    };
+    let body = if append {
+        let prior = prior
+            .as_deref()
+            .and_then(|bytes| std::str::from_utf8(bytes).ok())
+            .unwrap_or_default();
+        format!("{prior}{content}")
+    } else {
+        content.to_string()
+    };
+    let (intended, _) = crate::artifact_effects::assemble_content(path, &body)?;
+    Ok((prior_fingerprint, fingerprint_text(&intended)?))
+}
+
+fn fingerprint_text(value: &str) -> Result<String, String> {
+    stable_fingerprint(&value).map_err(|error| error.message)
+}
 fn model_action(action: &Action) -> ModelAction {
     ModelAction {
         tool: action.tool.clone(),
@@ -79,89 +188,5 @@ fn model_action(action: &Action) -> ModelAction {
             .filter(|(name, _)| name != "tool_name")
             .map(|(name, value)| (name.clone(), value.clone()))
             .collect::<BTreeMap<_, _>>(),
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use lkjagent_core::runtime_decision::{
-        OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
-    };
-    use lkjagent_store::plan_schema::setup;
-
-    #[test]
-    fn repeat_guard_rejects_previously_admitted_action() -> Result<(), String> {
-        let conn = Connection::open_in_memory().map_err(|error| error.to_string())?;
-        setup(&conn).map_err(|error| error.to_string())?;
-        let decision = RuntimeDecision::new(
-            "decision-1",
-            "case-1",
-            OperationKey("model.call/1".to_string()),
-            ToolSetView::new(vec![
-                ToolViewEntry::new("fs.read", "read").with_params(vec!["path"], Vec::new())
-            ]),
-            OutputEnvelope::Action,
-        );
-        let command = Command::RunExplore(action("fs.read", "path", "README.md"));
-
-        persist_tool_admissions(&conn, &decision, std::slice::from_ref(&command), "now")?;
-        let error = match persist_tool_admissions(&conn, &decision, &[command], "later") {
-            Ok(()) => return Err("repeat admitted".to_string()),
-            Err(error) => error,
-        };
-
-        assert!(error.contains("repeated tool call"));
-        assert_eq!(admission_count(&conn, "Admitted")?, 1);
-        assert_eq!(admission_count(&conn, "Rejected")?, 1);
-        Ok(())
-    }
-
-    #[test]
-    fn mismatch_reason_persists_for_hidden_tool() -> Result<(), String> {
-        let conn = Connection::open_in_memory().map_err(|error| error.to_string())?;
-        setup(&conn).map_err(|error| error.to_string())?;
-        let decision = RuntimeDecision::new(
-            "decision-1",
-            "case-1",
-            OperationKey("model.call/1".to_string()),
-            ToolSetView::new(vec![
-                ToolViewEntry::new("fs.read", "read").with_params(vec!["path"], Vec::new())
-            ]),
-            OutputEnvelope::Action,
-        );
-        let command = Command::RunExplore(action("shell.run", "cmd", "date"));
-
-        let error = match persist_tool_admissions(&conn, &decision, &[command], "now") {
-            Ok(()) => return Err("mismatch admitted".to_string()),
-            Err(error) => error,
-        };
-
-        assert!(error.contains("tool-view mismatch"));
-        assert!(result_json(&conn)?.contains("tool-view mismatch"));
-        Ok(())
-    }
-
-    fn action(tool: &str, name: &str, value: &str) -> Action {
-        Action {
-            tool: tool.to_string(),
-            params: vec![(name.to_string(), value.to_string())],
-        }
-    }
-
-    fn admission_count(conn: &Connection, status: &str) -> Result<i64, String> {
-        conn.query_row(
-            "SELECT COUNT(*) FROM tool_admissions WHERE status = ?1",
-            [status],
-            |row| row.get(0),
-        )
-        .map_err(|error| error.to_string())
-    }
-
-    fn result_json(conn: &Connection) -> Result<String, String> {
-        conn.query_row("SELECT result_json FROM tool_admissions", [], |row| {
-            row.get(0)
-        })
-        .map_err(|error| error.to_string())
     }
 }

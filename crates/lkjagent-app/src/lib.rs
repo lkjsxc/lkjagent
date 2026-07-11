@@ -1,4 +1,5 @@
 mod admission_bridge;
+pub use admission_bridge::persist_tool_admissions;
 mod arg_helpers;
 pub mod args;
 mod artifact_effects;

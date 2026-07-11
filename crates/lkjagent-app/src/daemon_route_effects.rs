@@ -3,9 +3,9 @@ use lkjagent_core::engine::Command;
 use lkjagent_core::model::{
     CheckSpec, Event, EventKind, Step, StepKind, StepState, TaskSnapshot, TaskState, TemplateId,
 };
+use lkjagent_store::plan_access::QueueRow;
 use lkjagent_store::plan_access::{insert_step_tx, insert_task};
 use lkjagent_store::plan_commit::commit_turn;
-use lkjagent_store::plan_rows::QueueRow;
 use rusqlite::Connection;
 
 use crate::snapshot_state::persist_snapshot_cell;

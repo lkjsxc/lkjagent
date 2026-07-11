@@ -7,12 +7,13 @@ use lkjagent_effects::observation::observation;
 use lkjagent_store::memory::{search_memory, MemoryRow};
 use rusqlite::Connection;
 
-pub fn run(conn: &Connection, workspace: &Path, snapshot: &mut TaskSnapshot, action: &Action) {
-    let result = dispatch(conn, workspace, action);
-    let rendered = match result {
-        Ok(content) => observation("ok", &content),
-        Err(error) => observation("error", &error),
-    };
+pub fn run(
+    conn: &Connection,
+    workspace: &Path,
+    snapshot: &mut TaskSnapshot,
+    action: &Action,
+) -> Result<(), String> {
+    let rendered = observation("ok", &dispatch(conn, workspace, action)?);
     if let Some(step) = snapshot
         .steps
         .iter_mut()
@@ -21,6 +22,7 @@ pub fn run(conn: &Connection, workspace: &Path, snapshot: &mut TaskSnapshot, act
         let action_state = action_state(&step.inputs);
         step.inputs = format!("{action_state}latest_observation=\n{rendered}");
     }
+    Ok(())
 }
 
 fn action_state(inputs: &str) -> String {

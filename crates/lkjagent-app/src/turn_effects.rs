@@ -51,7 +51,7 @@ pub fn dispatch_effects(
                     conn, snapshot, path, &body, &units, now,
                 )?;
             }
-            Command::RunExplore(action) => crate::explore::run(conn, workspace, snapshot, action),
+            Command::RunExplore(action) => crate::explore::run(conn, workspace, snapshot, action)?,
             Command::RecordAttempt(_)
             | Command::RecordEvent(_)
             | Command::RecordMemory { .. }

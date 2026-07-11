@@ -7,7 +7,7 @@ use rusqlite::{params, Connection};
 use crate::error::StoreResult;
 use crate::memory::insert_memory_tx;
 use crate::plan_access::insert_step_tx;
-use crate::plan_rows::{OrphanExchange, StoredEvent};
+use crate::plan_access::{OrphanExchange, StoredEvent};
 
 pub fn commit_commands(
     conn: &mut Connection,

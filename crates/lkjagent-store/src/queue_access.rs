@@ -2,7 +2,7 @@ use lkjagent_core::owner_turn::{route_turn, RouteContext};
 use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
-use crate::plan_rows::QueueRow;
+use crate::plan_access::QueueRow;
 
 pub fn enqueue(conn: &Connection, content: &str, now: &str) -> StoreResult<i64> {
     enqueue_with_force(conn, content, false, now)

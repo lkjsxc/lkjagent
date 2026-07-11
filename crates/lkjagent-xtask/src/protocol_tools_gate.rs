@@ -1,4 +1,5 @@
 use std::path::Path;
+use std::process::Command;
 
 use crate::node_suites::{check as check_suites, Suite};
 
@@ -78,8 +79,98 @@ const SUITES: &[Suite] = &[
         target: "tool_views",
         minimum_tests: 1,
     },
+    Suite {
+        package: "lkjagent-app",
+        target: "effect_journal",
+        minimum_tests: 1,
+    },
+    Suite {
+        package: "lkjagent-app",
+        target: "effect_recovery",
+        minimum_tests: 1,
+    },
+];
+
+const REQUIRED: &[(&str, &str, &str)] = &[
+    (
+        "lkjagent-core",
+        "generic_flow",
+        "generic_explore_requires_a_persisted_decision",
+    ),
+    (
+        "lkjagent-core",
+        "parse_contract",
+        "generic_explore_rejects_every_action_shape",
+    ),
+    (
+        "lkjagent-app",
+        "admission_bridge",
+        "native_workspace_effect_has_harness_admission_and_prepared_journal",
+    ),
+    (
+        "lkjagent-app",
+        "native_append_effect",
+        "payload_workspace_append_effect_appends_file_and_artifact",
+    ),
+    (
+        "lkjagent-app",
+        "effect_journal",
+        "accepted_explore_effect_has_prepared_journal_and_linked_observation",
+    ),
+    (
+        "lkjagent-app",
+        "effect_journal",
+        "settlement_binds_one_immutable_observation",
+    ),
+    (
+        "lkjagent-app",
+        "effect_journal",
+        "startup_settles_unresolved_effects_once_without_replay",
+    ),
+    (
+        "lkjagent-app",
+        "effect_recovery",
+        "startup_recovers_applying_write_when_target_matches_intended_bytes",
+    ),
 ];
 
 pub fn check(root: &Path) -> Result<(), Vec<String>> {
-    check_suites(root, "protocol-tools", SUITES)
+    let mut failures = check_suites(root, "protocol-tools", SUITES)
+        .err()
+        .unwrap_or_default();
+    failures.extend(
+        REQUIRED
+            .iter()
+            .filter_map(|(package, target, test)| run(root, package, target, test)),
+    );
+    if failures.is_empty() {
+        Ok(())
+    } else {
+        Err(failures)
+    }
+}
+
+fn run(root: &Path, package: &str, target: &str, test: &str) -> Option<String> {
+    let output = match Command::new("cargo")
+        .args([
+            "test", "--locked", "-p", package, "--test", target, "--", test,
+        ])
+        .current_dir(root)
+        .output()
+    {
+        Ok(output) => output,
+        Err(error) => return Some(format!("required protocol test could not start: {error}")),
+    };
+    let text = format!(
+        "{}\n{}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    if output.status.success() && text.contains("test result: ok. 1 passed;") {
+        None
+    } else {
+        Some(format!(
+            "required protocol test {package}:{target}:{test} did not pass"
+        ))
+    }
 }

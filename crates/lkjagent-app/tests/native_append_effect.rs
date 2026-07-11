@@ -45,6 +45,15 @@ fn payload_workspace_append_effect_appends_file_and_artifact() -> TestResult<()>
     );
     assert_eq!(cell_status(&conn)?, "Suppressed");
     assert_eq!(count_rows(&conn, "artifacts")?, 2);
+    let journal: (String, String) = conn.query_row(
+        "SELECT effect_journal.state, observations.content FROM effect_journal
+         JOIN observations ON observations.id = effect_journal.observation_id",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?)),
+    )?;
+    assert_eq!(journal.0, "committed");
+    assert!(journal.1.contains("path=native/effect.md"));
+    assert!(journal.1.contains("fingerprint=fnv1a64:"));
     Ok(())
 }
 

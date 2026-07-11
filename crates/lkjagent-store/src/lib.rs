@@ -2,6 +2,7 @@ pub mod admission_rows;
 pub mod artifact_rows;
 pub mod context_rows;
 pub mod decision_rows;
+pub mod effect_recovery;
 pub mod error;
 pub mod event_rows;
 pub mod exchange_rows;
@@ -15,7 +16,6 @@ pub mod plan_inspect {
 }
 mod plan_migrations;
 pub mod plan_names;
-pub mod plan_rows;
 pub mod plan_schema;
 pub mod plan_turn;
 pub mod prompt_rows;

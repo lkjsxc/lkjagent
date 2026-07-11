@@ -3,9 +3,9 @@ use std::path::Path;
 
 use lkjagent_core::engine::Command;
 use lkjagent_core::model::{Event, EventKind, StepState, TaskSnapshot};
+use lkjagent_store::plan_access::QueueRow;
 use lkjagent_store::plan_access::{deliver_matter_update, mark_recorded, next_pending};
 use lkjagent_store::plan_commit::commit_turn;
-use lkjagent_store::plan_rows::QueueRow;
 use rusqlite::Connection;
 
 use crate::clock::Clock;

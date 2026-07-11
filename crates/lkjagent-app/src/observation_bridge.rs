@@ -1,76 +1,125 @@
-use lkjagent_core::engine::Command;
+use std::path::Path;
+
 use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::runtime_context::{
     contamination_for_observation, redact_sensitive_owner_data, ContaminationClass, ContextItem,
     TrustClass,
 };
 use lkjagent_core::runtime_decision::RuntimeDecision;
+use lkjagent_core::runtime_fingerprint::stable_fingerprint;
+use lkjagent_store::admission_rows::PreparedEffect;
 use lkjagent_store::context_rows::insert_context_item;
-use lkjagent_store::observation_rows::{insert_observation, ObservationRow};
+use lkjagent_store::observation_rows::{settle_effect_observation, ObservationRow};
 use rusqlite::Connection;
 
 pub fn persist_observations(
-    conn: &Connection,
+    conn: &mut Connection,
+    workspace: &Path,
     decision: &RuntimeDecision,
     snapshot: &TaskSnapshot,
-    commands: &[Command],
+    effects: &[PreparedEffect],
     now: &str,
 ) -> Result<(), String> {
-    for (index, command) in commands.iter().enumerate() {
-        match command {
-            Command::RunExplore(action) => {
-                insert(conn, decision, index, &action.tool, snapshot, now)?
-            }
-            Command::WriteFile { path, .. } => insert(conn, decision, index, path, snapshot, now)?,
-            Command::AppendFile { path, .. } => insert(conn, decision, index, path, snapshot, now)?,
-            Command::RecordAttempt(_)
-            | Command::RecordEvent(_)
-            | Command::RecordMemory { .. }
-            | Command::RecordChecks { .. }
-            | Command::AddSteps(_) => {}
-        }
+    for (index, effect) in effects.iter().enumerate() {
+        insert(conn, workspace, decision, index, effect, snapshot, now)?;
+    }
+    Ok(())
+}
+
+pub fn persist_failed_observations(
+    conn: &mut Connection,
+    decision: &RuntimeDecision,
+    effects: &[PreparedEffect],
+    error: &str,
+    now: &str,
+) -> Result<(), String> {
+    for (index, effect) in effects.iter().enumerate() {
+        let row = observation(decision, index, effect, "error", error, "Clean", now);
+        settle_effect_observation(conn, &effect.journal_id, "failed", &row)
+            .map_err(|error| error.to_string())?;
     }
     Ok(())
 }
 
 fn insert(
-    conn: &Connection,
+    conn: &mut Connection,
+    workspace: &Path,
     decision: &RuntimeDecision,
     index: usize,
-    effect_name: &str,
+    effect: &PreparedEffect,
     snapshot: &TaskSnapshot,
     now: &str,
 ) -> Result<(), String> {
-    let raw_content = latest_observation(snapshot);
-    let status = observation_status(&raw_content);
-    let contamination = contamination_for_observation(effect_name, status, &raw_content);
+    let (status, raw_content) = effect_outcome(workspace, effect, snapshot);
+    let contamination = contamination_for_observation(&effect.effect_name, status, &raw_content);
     let content = stored_content(&raw_content, contamination);
-    let id = format!("{}-observation-{:04}", decision.id, index + 1);
-    insert_observation(
-        conn,
-        &ObservationRow {
-            id: id.clone(),
-            case_id: decision.case_id.clone(),
-            decision_id: decision.id.clone(),
-            admission_id: Some(format!("{}-admission-{:04}", decision.id, index + 1)),
-            effect_name: effect_name.to_string(),
-            status: status.to_string(),
-            content: content.clone(),
-            artifact_refs_json: "[]".to_string(),
-            contamination_class: format!("{:?}", contamination),
-            created_at: now.to_string(),
-        },
-    )
-    .map_err(|error| error.to_string())?;
+    let row = observation(
+        decision,
+        index,
+        effect,
+        status,
+        &content,
+        &format!("{:?}", contamination),
+        now,
+    );
+    let state = if status == "ok" {
+        "committed"
+    } else {
+        "failed"
+    };
+    settle_effect_observation(conn, &effect.journal_id, state, &row)
+        .map_err(|error| error.to_string())?;
     if !content.is_empty() {
         insert_context_item(
             conn,
             &decision.case_id,
-            &context_item(&id, effect_name, content, contamination, now),
+            &context_item(&row.id, &effect.effect_name, content, contamination, now),
         )
         .map_err(|error| error.to_string())?;
     }
     Ok(())
+}
+
+fn observation(
+    decision: &RuntimeDecision,
+    index: usize,
+    effect: &PreparedEffect,
+    status: &str,
+    content: &str,
+    contamination: &str,
+    now: &str,
+) -> ObservationRow {
+    ObservationRow {
+        id: format!("{}-observation-{:04}", decision.id, index + 1),
+        case_id: decision.case_id.clone(),
+        decision_id: decision.id.clone(),
+        admission_id: Some(effect.admission_id.clone()),
+        effect_name: effect.effect_name.clone(),
+        status: status.to_string(),
+        content: content.to_string(),
+        artifact_refs_json: "[]".to_string(),
+        contamination_class: contamination.to_string(),
+        created_at: now.to_string(),
+    }
+}
+
+fn effect_outcome(
+    workspace: &Path,
+    effect: &PreparedEffect,
+    snapshot: &TaskSnapshot,
+) -> (&'static str, String) {
+    let Some(path) = effect.target_path.as_deref() else {
+        let content = latest_observation(snapshot);
+        return (observation_status(&content), content);
+    };
+    match lkjagent_effects::workspace::resolve(workspace, path)
+        .map_err(|error| error.to_string())
+        .and_then(|full| std::fs::read(full).map_err(|error| error.to_string()))
+        .and_then(|bytes| stable_fingerprint(&bytes).map_err(|error| error.message))
+    {
+        Ok(fingerprint) => ("ok", format!("path={path}\nfingerprint={fingerprint}")),
+        Err(error) => ("error", format!("postcondition unavailable: {error}")),
+    }
 }
 
 fn stored_content(content: &str, contamination: ContaminationClass) -> String {
