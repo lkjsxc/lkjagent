@@ -38,7 +38,9 @@ The PTY recorder writes asciinema JSON input and output frames with ordered
 monotonic offsets. Replay reads the cast, rebuilds frame state, and binds its
 receipt to the cast and scenario fingerprints. Empty output, absent owner
 input, invented trace-only geometry, unordered time, or missing Japanese input
-fails the recorder check.
+fails the recorder check. The fixture separates its acceptance and completion
+writes so scheduler-dependent PTY read coalescing cannot erase the required
+raw frame boundary.
 
 ## False Positives
 
