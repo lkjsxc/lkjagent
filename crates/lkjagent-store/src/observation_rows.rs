@@ -1,6 +1,8 @@
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
-use rusqlite::{params, Connection};
+use rusqlite::{params, Connection, OptionalExtension};
 
+use crate::admission_rows::effect_targets;
+use crate::artifact_rows::{insert_artifact, refs_json, ArtifactRow};
 use crate::error::{StoreError, StoreResult};
 
 pub struct ObservationRow {
@@ -46,6 +48,14 @@ pub fn settle_effect_observation(
     let outcome = stable_fingerprint(&(state, &row.status, &row.content))
         .map_err(|error| StoreError::InvalidState(error.message))?;
     let tx = conn.transaction()?;
+    if state == "committed" {
+        let expected_refs = refs_json(&insert_effect_artifacts(&tx, journal_id)?)?;
+        if row.artifact_refs_json != expected_refs {
+            return Err(StoreError::InvalidState(
+                "observation artifact refs do not match durable intents".to_string(),
+            ));
+        }
+    }
     tx.execute(
         "INSERT INTO observations
          (id, case_id, decision_id, admission_id, effect_name, status, content,
@@ -75,4 +85,79 @@ pub fn settle_effect_observation(
     }
     tx.commit()?;
     Ok(())
+}
+
+pub fn insert_effect_artifacts(conn: &Connection, journal_id: &str) -> StoreResult<Vec<String>> {
+    let mut artifacts = effect_targets(conn, journal_id)?
+        .into_iter()
+        .flat_map(|target| target.artifacts)
+        .collect::<Vec<_>>();
+    artifacts.sort_by_key(|row| row.parent_artifact_id.is_some());
+    let mut refs = Vec::new();
+    for artifact in artifacts {
+        insert_exact_artifact(conn, &artifact)?;
+        if artifact.parent_artifact_id.is_none() {
+            refs.push(artifact.id);
+        }
+    }
+    refs.sort();
+    refs.dedup();
+    Ok(refs)
+}
+
+fn insert_exact_artifact(conn: &Connection, intended: &ArtifactRow) -> StoreResult<()> {
+    if let Some(parent) = &intended.parent_artifact_id {
+        let case_id = conn
+            .query_row(
+                "SELECT case_id FROM artifacts WHERE id = ?1",
+                [parent],
+                |row| row.get::<_, String>(0),
+            )
+            .optional()?;
+        if case_id.as_deref() != Some(&intended.case_id) {
+            return Err(StoreError::InvalidState(format!(
+                "artifact parent is missing or cross-case for {}",
+                intended.id
+            )));
+        }
+    }
+    let existing = conn
+        .query_row(
+            "SELECT id, case_id, kind, path, fingerprint, parent_artifact_id,
+             metadata_json, created_at FROM artifacts WHERE id = ?1",
+            [&intended.id],
+            |row| {
+                Ok(ArtifactRow {
+                    id: row.get(0)?,
+                    case_id: row.get(1)?,
+                    kind: row.get(2)?,
+                    path: row.get(3)?,
+                    fingerprint: row.get(4)?,
+                    parent_artifact_id: row.get(5)?,
+                    metadata_json: row.get(6)?,
+                    created_at: row.get(7)?,
+                })
+            },
+        )
+        .optional()?;
+    match existing {
+        None => insert_artifact(conn, intended),
+        Some(row) if same_artifact(&row, intended) => Ok(()),
+        Some(_) => Err(StoreError::InvalidState(format!(
+            "artifact intent conflicts for {}",
+            intended.id
+        ))),
+    }
+}
+
+pub use crate::row_support::target_fingerprint;
+
+fn same_artifact(left: &ArtifactRow, right: &ArtifactRow) -> bool {
+    left.id == right.id
+        && left.case_id == right.case_id
+        && left.kind == right.kind
+        && left.path == right.path
+        && left.fingerprint == right.fingerprint
+        && left.parent_artifact_id == right.parent_artifact_id
+        && left.metadata_json == right.metadata_json
 }

@@ -45,48 +45,21 @@ pub fn settle_dispatch_failure(
     let pending = effects
         .get(succeeded..)
         .ok_or_else(|| "dispatch pending range is invalid".to_string())?;
-    persist_failed_observations(
-        conn,
-        decision,
-        pending,
-        usize::from(failure.failed_current),
-        succeeded,
-        &failure.error,
-        now,
-    )
+    persist_failed_observations(conn, decision, pending, failure, now)
 }
 
-fn persist_failed_observations(
-    conn: &mut Connection,
-    decision: &RuntimeDecision,
-    effects: &[PreparedEffect],
-    attempted: usize,
-    offset: usize,
-    error: &str,
-    now: &str,
-) -> Result<(), String> {
-    let attempted = effects
-        .get(..attempted)
-        .ok_or_else(|| "dispatch attempted too many effects".to_string())?;
+#[rustfmt::skip]
+fn persist_failed_observations(conn: &mut Connection, decision: &RuntimeDecision,
+    effects: &[PreparedEffect], failure: &DispatchFailure, now: &str) -> Result<(), String> {
+    let attempted_count = usize::from(failure.failed_current && !failure.recovery_required);
+    let attempted = effects.get(..attempted_count).ok_or_else(|| "dispatch attempted too many effects".to_string())?;
     for (index, effect) in attempted.iter().enumerate() {
-        let row = observation(
-            decision,
-            offset + index,
-            effect,
-            "error",
-            error,
-            "Clean",
-            now,
-        );
-        settle_effect_observation(conn, &effect.journal_id, "failed", &row)
-            .map_err(|error| error.to_string())?;
+        let row = observation(decision, failure.completed + index, effect, "error", &failure.error, "Clean", now)?;
+        settle_effect_observation(conn, &effect.journal_id, "failed", &row).map_err(|error| error.to_string())?;
     }
-    for effect in effects
-        .get(attempted.len()..)
-        .ok_or_else(|| "dispatch effect range is invalid".to_string())?
-    {
-        mark_journal(conn, &effect.journal_id, "compensated", now)
-            .map_err(|error| error.to_string())?;
+    let preserved = usize::from(failure.failed_current && failure.recovery_required);
+    for effect in effects.get(attempted.len() + preserved..).ok_or_else(|| "dispatch effect range is invalid".to_string())? {
+        mark_journal(conn, &effect.journal_id, "compensated", now).map_err(|error| error.to_string())?;
     }
     Ok(())
 }
@@ -111,7 +84,7 @@ fn insert(
         &content,
         &format!("{:?}", contamination),
         now,
-    );
+    )?;
     let state = if status == "ok" {
         "committed"
     } else {
@@ -127,30 +100,22 @@ fn insert(
         )
         .map_err(|error| error.to_string())?;
     }
-    Ok(())
+    if status == "ok" {
+        Ok(())
+    } else {
+        Err(format!("effect postcondition failed: {raw_content}"))
+    }
 }
 
-fn observation(
-    decision: &RuntimeDecision,
-    index: usize,
-    effect: &PreparedEffect,
-    status: &str,
-    content: &str,
-    contamination: &str,
-    now: &str,
-) -> ObservationRow {
-    ObservationRow {
-        id: format!("{}-observation-{:04}", decision.id, index + 1),
-        case_id: decision.case_id.clone(),
-        decision_id: decision.id.clone(),
-        admission_id: Some(effect.admission_id.clone()),
-        effect_name: effect.effect_name.clone(),
-        status: status.to_string(),
-        content: content.to_string(),
-        artifact_refs_json: "[]".to_string(),
-        contamination_class: contamination.to_string(),
-        created_at: now.to_string(),
-    }
+#[rustfmt::skip]
+fn observation(decision: &RuntimeDecision, index: usize, effect: &PreparedEffect, status: &str,
+    content: &str, contamination: &str, now: &str) -> Result<ObservationRow, String> {
+    let artifact_refs_json = if status == "ok" { artifact_refs(effect)? } else { "[]".to_string() };
+    Ok(ObservationRow { id: format!("{}-observation-{:04}", decision.id, index + 1),
+        case_id: decision.case_id.clone(), decision_id: decision.id.clone(),
+        admission_id: Some(effect.admission_id.clone()), effect_name: effect.effect_name.clone(),
+        status: status.to_string(), content: content.to_string(), artifact_refs_json,
+        contamination_class: contamination.to_string(), created_at: now.to_string() })
 }
 
 fn effect_outcome(
@@ -158,6 +123,12 @@ fn effect_outcome(
     effect: &PreparedEffect,
     snapshot: &TaskSnapshot,
 ) -> (&'static str, String) {
+    if !effect.targets.is_empty() {
+        return match verify_targets(workspace, effect) {
+            Ok(content) => ("ok", content),
+            Err(content) => ("error", content),
+        };
+    }
     let Some(path) = effect.target_path.as_deref() else {
         let content = latest_observation(snapshot);
         return (observation_status(&content), content);
@@ -173,6 +144,25 @@ fn effect_outcome(
         Ok(fingerprint) => ("error", format!("postcondition mismatch: {fingerprint}")),
         Err(error) => ("error", format!("postcondition unavailable: {error}")),
     }
+}
+
+#[rustfmt::skip]
+fn verify_targets(workspace: &Path, effect: &PreparedEffect) -> Result<String, String> {
+    for target in &effect.targets {
+        let fingerprint = lkjagent_store::observation_rows::target_fingerprint(workspace, target)
+            .map_err(|error| error.to_string())?;
+        if fingerprint != target.intended_fingerprint { return Err(format!("postcondition mismatch: {} {fingerprint}", target.path)); }
+    }
+    let path = effect.target_path.as_deref().unwrap_or("bundle");
+    Ok(format!("path={path}\ntargets={} bundle_fingerprint={}", effect.targets.len(), effect.intended_fingerprint))
+}
+
+#[rustfmt::skip]
+fn artifact_refs(effect: &PreparedEffect) -> Result<String, String> {
+    let mut refs = effect.targets.iter().flat_map(|target| &target.artifacts)
+        .filter(|artifact| artifact.parent_artifact_id.is_none()).map(|artifact| artifact.id.clone()).collect::<Vec<_>>();
+    refs.sort(); refs.dedup();
+    lkjagent_store::artifact_rows::refs_json(&refs).map_err(|error| error.to_string())
 }
 
 fn stored_content(content: &str, contamination: ContaminationClass) -> String {

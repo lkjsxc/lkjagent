@@ -51,6 +51,9 @@ harness origin, effectful flag, accepted or rejected status, and typed reason.
 
 `effect_journal` stores decision, command ordinal, unique non-null admission,
 unique idempotency key, state, and intended, prior, and outcome fingerprints.
+`effect_target_revisions` stores ordered role, normalized path, exact optional
+prior and intended bytes, fingerprints, closed part membership, and artifact-row
+intents for a journal.
 Observations reference exactly one journal row; rejected admissions have none.
 
 `observations` stores a unique effect reference, status, attempt outcome,

@@ -1,8 +1,9 @@
 use lkjagent_core::runtime_admission::ToolAdmission;
 use rusqlite::{params, Connection};
 
+use crate::artifact_rows::ArtifactRow;
 use crate::error::{StoreError, StoreResult};
-use crate::row_json::json_string;
+use crate::row_support::json_string;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PreparedEffect {
@@ -13,6 +14,19 @@ pub struct PreparedEffect {
     pub prior_fingerprint: String,
     pub intended_fingerprint: String,
     pub effect_name: String,
+    pub targets: Vec<EffectTargetRevision>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct EffectTargetRevision {
+    pub target_ordinal: i64,
+    pub role: String,
+    pub path: String,
+    pub prior_bytes: Option<Vec<u8>>,
+    pub intended_bytes: Option<Vec<u8>>,
+    pub prior_fingerprint: String,
+    pub intended_fingerprint: String,
+    pub artifacts: Vec<ArtifactRow>,
 }
 
 pub struct EffectPreparation<'a> {
@@ -26,16 +40,25 @@ pub struct EffectPreparation<'a> {
     pub target_path: Option<&'a str>,
     pub prior_fingerprint: &'a str,
     pub intended_fingerprint: &'a str,
+    pub targets: &'a [EffectTargetRevision],
     pub created_at: &'a str,
 }
 
-pub fn insert_admission_and_prepare(
-    conn: &Connection,
-    preparation: &EffectPreparation<'_>,
-) -> StoreResult<PreparedEffect> {
-    let result_json = json_string(preparation.admission)?;
+#[rustfmt::skip]
+pub fn insert_admission_and_prepare(conn: &Connection, preparation: &EffectPreparation<'_>) -> StoreResult<PreparedEffect> {
+    if !conn.is_autocommit() {
+        return insert_preparation(conn, preparation);
+    }
     let tx = conn.unchecked_transaction()?;
-    tx.execute(
+    let effect = insert_preparation(&tx, preparation)?;
+    tx.commit()?;
+    Ok(effect)
+}
+
+#[rustfmt::skip]
+fn insert_preparation(conn: &Connection, preparation: &EffectPreparation<'_>) -> StoreResult<PreparedEffect> {
+    let result_json = json_string(preparation.admission)?;
+    conn.execute(
         "INSERT INTO tool_admissions
          (id, case_id, decision_id, tool_view_fingerprint, action_tool, status,
           parsed_action_json, result_json, created_at)
@@ -52,7 +75,7 @@ pub fn insert_admission_and_prepare(
             preparation.created_at
         ],
     )?;
-    tx.execute(
+    conn.execute(
         "INSERT INTO effect_journal
          (id, admission_id, decision_id, idempotency_key, command_ordinal, target_path, effect_name, state,
           prior_fingerprint, intended_fingerprint, created_at, updated_at)
@@ -70,7 +93,25 @@ pub fn insert_admission_and_prepare(
             preparation.created_at
         ],
     )?;
-    tx.commit()?;
+    for target in preparation.targets {
+        conn.execute(
+            "INSERT INTO effect_target_revisions
+             (journal_id, target_ordinal, role, path, prior_bytes, intended_bytes,
+              prior_fingerprint, intended_fingerprint, artifacts_json)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)",
+            params![
+                preparation.journal_id,
+                target.target_ordinal,
+                target.role,
+                target.path,
+                target.prior_bytes,
+                target.intended_bytes,
+                target.prior_fingerprint,
+                target.intended_fingerprint,
+                json_string(&target.artifacts)?,
+            ],
+        )?;
+    }
     Ok(PreparedEffect {
         admission_id: preparation.id.to_string(),
         journal_id: preparation.journal_id.to_string(),
@@ -79,7 +120,27 @@ pub fn insert_admission_and_prepare(
         prior_fingerprint: preparation.prior_fingerprint.to_string(),
         intended_fingerprint: preparation.intended_fingerprint.to_string(),
         effect_name: preparation.admission.action_tool.clone(),
+        targets: preparation.targets.to_vec(),
     })
+}
+
+#[rustfmt::skip]
+pub fn effect_targets(conn: &Connection, journal_id: &str) -> StoreResult<Vec<EffectTargetRevision>> {
+    let mut statement = conn.prepare(
+        "SELECT target_ordinal, role, path, prior_bytes, intended_bytes,
+         prior_fingerprint, intended_fingerprint, artifacts_json
+         FROM effect_target_revisions WHERE journal_id = ?1 ORDER BY target_ordinal")?;
+    let rows = statement.query_map([journal_id], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?,
+        row.get(3)?, row.get(4)?, row.get(5)?, row.get(6)?, row.get::<_, String>(7)?)))?;
+    let mut targets = Vec::new();
+    for row in rows {
+        let (target_ordinal, role, path, prior_bytes, intended_bytes,
+            prior_fingerprint, intended_fingerprint, artifacts_json) = row?;
+        let artifacts = serde_json::from_str(&artifacts_json).map_err(|error| StoreError::Sql(error.to_string()))?;
+        targets.push(EffectTargetRevision { target_ordinal, role, path, prior_bytes, intended_bytes,
+            prior_fingerprint, intended_fingerprint, artifacts });
+    }
+    Ok(targets)
 }
 
 pub fn mark_journal(conn: &Connection, id: &str, state: &str, now: &str) -> StoreResult<()> {

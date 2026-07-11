@@ -5,7 +5,7 @@ use lkjagent_core::runtime_state_edge::{
 use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
-use crate::row_json::{json_string, json_value};
+use crate::row_support::{json_string, json_value};
 
 pub fn insert_state_edge(
     conn: &Connection,

@@ -34,7 +34,12 @@ stores may retain many runs, but every diagnostic query is explicitly scoped.
 Only accepted admissions may own effects. Effect admission and idempotency keys
 are unique and non-null. Exactly one immutable observation settles each attempted
 effect, and a partial unique index permits only one current terminal outcome.
-Rejected admissions have no effect row.
+Target ordinals and paths are unique within an effect. A generated bundle may
+settle successfully only when every exact target and closed part membership
+matches intended presence or absence. Root refs come from durable intents, and
+child intents require a present same-case parent. Artifacts, refs, observation,
+and journal state settle in the same transaction. Rejected admissions have no
+effect row.
 
 ## Conversation
 

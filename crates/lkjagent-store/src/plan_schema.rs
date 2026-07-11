@@ -8,14 +8,28 @@ pub const APPLICATION_TABLES: &[&str] = &[
     "runtime_decisions", "prompt_frames", "prompt_cards", "tool_admissions", "observations",
     "context_items", "context_edges", "state_edges", "workspace_records", "workspace_record_history",
     "workspace_manifest", "workspace_path_aliases", "workspace_rebalance_audit", "artifacts",
-    "provider_exchanges", "effect_journal", "workspace_operations", "workspace_operation_revisions", "workspace_search_chunks", "workspace_search_lexical", "workspace_search_trigram",
+    "provider_exchanges", "effect_journal", "effect_target_revisions", "workspace_operations", "workspace_operation_revisions", "workspace_search_chunks", "workspace_search_lexical", "workspace_search_trigram",
 ];
 pub fn setup(conn: &Connection) -> StoreResult<()> {
     conn.execute_batch(
-        "
-        PRAGMA foreign_keys = ON;
-        PRAGMA journal_mode = WAL;
-        CREATE TABLE IF NOT EXISTS queue (
+        "PRAGMA foreign_keys = ON;
+         PRAGMA journal_mode = WAL;
+         PRAGMA synchronous = FULL;
+         PRAGMA busy_timeout = 5000;
+         BEGIN EXCLUSIVE;",
+    )?;
+    let result = setup_exclusive(conn);
+    match result {
+        Ok(()) => conn.execute_batch("COMMIT;").map_err(Into::into),
+        Err(error) => {
+            let _rollback = conn.execute_batch("ROLLBACK;");
+            Err(error)
+        }
+    }
+}
+fn setup_exclusive(conn: &Connection) -> StoreResult<()> {
+    conn.execute_batch(
+        "CREATE TABLE IF NOT EXISTS queue (
             id INTEGER PRIMARY KEY,
             content TEXT NOT NULL,
             state TEXT NOT NULL,

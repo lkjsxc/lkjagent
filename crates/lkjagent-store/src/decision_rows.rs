@@ -2,7 +2,7 @@ use lkjagent_core::runtime_decision::RuntimeDecision;
 use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
-use crate::row_json::{fingerprint_error, json_string, json_value};
+use crate::row_support::{fingerprint_error, json_string, json_value};
 
 pub fn next_decision_id(conn: &Connection, case_id: &str) -> StoreResult<String> {
     let count: i64 = conn.query_row(

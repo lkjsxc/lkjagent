@@ -44,6 +44,7 @@ fn startup_recovers_applying_write_when_target_matches_intended_bytes() -> TestR
             target_path: Some("note.md"),
             prior_fingerprint: &prior,
             intended_fingerprint: &intended,
+            targets: &[],
             created_at: "now",
         },
     )?;

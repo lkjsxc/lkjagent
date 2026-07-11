@@ -52,7 +52,7 @@ const SUITES: &[Suite] = &[
     Suite {
         package: "lkjagent-app",
         target: "native_append_effect",
-        minimum_tests: 1,
+        minimum_tests: 2,
     },
     Suite {
         package: "lkjagent-app",
@@ -75,11 +75,24 @@ const SUITES: &[Suite] = &[
         minimum_tests: 1,
     },
     Suite { package: "lkjagent-app", target: "shell_check_journal", minimum_tests: 2 },
+    Suite { package: "lkjagent-app", target: "artifact_bundle_recovery", minimum_tests: 2 },
+    Suite { package: "lkjagent-app", target: "artifact_settlement", minimum_tests: 2 },
+    Suite { package: "lkjagent-app", target: "artifact_identity", minimum_tests: 3 },
+    Suite { package: "lkjagent-app", target: "effect_dispatch", minimum_tests: 2 },
     Suite { package: "lkjagent-effects", target: "effects", minimum_tests: 5 },
 ];
 
 #[rustfmt::skip]
 const REQUIRED: &[(&str, &str, &str)] = &[
+    ("lkjagent-app", "artifact_bundle_recovery", "complete_bundle_recovery_settles_artifacts_and_refs"),
+    ("lkjagent-app", "artifact_bundle_recovery", "partial_and_conflicting_bundles_fail_without_artifacts"),
+    ("lkjagent-app", "artifact_settlement", "mismatched_observation_refs_roll_back_artifact_settlement"),
+    ("lkjagent-app", "artifact_settlement", "orphan_artifact_intent_rolls_back_settlement"),
+    ("lkjagent-app", "artifact_identity", "equal_content_at_different_paths_has_distinct_artifact_identity"),
+    ("lkjagent-app", "artifact_identity", "overlapping_bundle_targets_are_rejected_before_admission"),
+    ("lkjagent-app", "artifact_identity", "later_planning_failure_rolls_back_turn_admissions"),
+    ("lkjagent-app", "effect_dispatch", "partial_bundle_failure_restores_prior_targets"),
+    ("lkjagent-app", "native_append_effect", "multipart_append_reassembles_owned_parts_before_appending"),
     ("lkjagent-core", "generic_flow", "duplicate_command_checks_use_ordinal_outcomes"),
     ("lkjagent-effects", "effects", "shell_bounds_only_its_background_and_detached_descendants"),
     (
@@ -109,8 +122,8 @@ const REQUIRED: &[(&str, &str, &str)] = &[
     ),
     (
         "lkjagent-app",
-        "lib",
-        "effect_dispatch::tests::prior_failure_reports_completed_effects",
+        "effect_dispatch",
+        "prior_failure_reports_completed_effects",
     ),
     (
         "lkjagent-app",

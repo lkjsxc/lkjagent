@@ -22,7 +22,7 @@ pub mod prompt_rows;
 mod queue_access;
 pub mod record_rows;
 mod record_schema;
-mod row_json;
+pub mod row_support;
 pub mod state_edge_rows;
 mod state_edge_schema;
 pub mod state_rows;

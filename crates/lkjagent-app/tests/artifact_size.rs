@@ -16,9 +16,10 @@ fn long_generated_artifact_writes_manifest_and_checked_parts() -> TestResult<()>
     enqueue(&conn, "create an artifact report from these notes", "now")?;
     drop(conn);
     let body = long_body(900);
+    let authored = format!("# Long Artifact\n\n{body}");
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![
-            format!("<content># Long Artifact\n\n{body}</content>"),
+            format!("<content>{authored}</content>"),
             "<message>artifact ready: artifacts/requests/matter-1.md</message>".to_string(),
         ],
         index: 0,
@@ -39,6 +40,15 @@ fn long_generated_artifact_writes_manifest_and_checked_parts() -> TestResult<()>
     assert!(workspace
         .join("artifacts/requests/matter-1.parts/part-002.md")
         .exists());
+    let mut parts = fs::read_dir(workspace.join("artifacts/requests/matter-1.parts"))?
+        .collect::<Result<Vec<_>, _>>()?;
+    parts.sort_by_key(|entry| entry.path());
+    let reconstructed = parts
+        .iter()
+        .map(|entry| fs::read_to_string(entry.path()))
+        .collect::<Result<Vec<_>, _>>()?
+        .concat();
+    assert_eq!(reconstructed, authored);
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     let parent_metadata: String = conn.query_row(
         "SELECT metadata_json FROM artifacts WHERE kind = 'file' LIMIT 1",
@@ -52,14 +62,25 @@ fn long_generated_artifact_writes_manifest_and_checked_parts() -> TestResult<()>
         |row| row.get(0),
     )?;
     assert!(unit_part_paths >= 2);
+    let targets: i64 =
+        conn.query_row("SELECT COUNT(*) FROM effect_target_revisions", [], |row| {
+            row.get(0)
+        })?;
+    let refs: String = conn.query_row(
+        "SELECT artifact_refs_json FROM observations
+         WHERE effect_name = 'native.write_file' LIMIT 1",
+        [],
+        |row| row.get(0),
+    )?;
+    assert!(targets >= 3);
+    assert_ne!(refs, "[]");
     Ok(())
 }
 
 fn long_body(words: usize) -> String {
     (0..words)
-        .map(|index| format!("word{index}"))
-        .collect::<Vec<_>>()
-        .join(" ")
+        .map(|index| format!("{}word{index}", if index % 75 == 0 { "\n  " } else { " " }))
+        .collect::<String>()
 }
 
 fn fixture_root(name: &str) -> TestResult<PathBuf> {

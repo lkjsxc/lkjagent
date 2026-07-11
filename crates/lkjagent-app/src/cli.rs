@@ -107,7 +107,7 @@ where
             case_id,
             semantic_key,
             winning_item_id,
-        } => crate::context_admin::resolve_conflict(
+        } => crate::context_resolution_bridge::resolve_conflict(
             &conn,
             &case_id,
             &semantic_key,

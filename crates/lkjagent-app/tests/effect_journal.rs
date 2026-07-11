@@ -95,7 +95,7 @@ fn startup_settles_unresolved_effects_once_without_replay() -> TestResult<()> {
         .collect::<Result<Vec<_>, _>>()?;
     let observations: i64 =
         conn.query_row("SELECT COUNT(*) FROM observations", [], |row| row.get(0))?;
-    assert_eq!(states, ["failed", "recovered"]);
+    assert_eq!(states, ["failed", "failed"]);
     assert_eq!(observations, 2);
     Ok(())
 }
@@ -159,6 +159,7 @@ fn prepare(conn: &Connection, id: &str, ordinal: i64) -> TestResult<()> {
             target_path: None,
             prior_fingerprint: "prior",
             intended_fingerprint: "intended",
+            targets: &[],
             created_at: "now",
         },
     )?;

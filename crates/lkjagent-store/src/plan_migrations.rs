@@ -29,7 +29,14 @@ pub fn migrate_effect_journal(conn: &Connection) -> StoreResult<()> {
         "CREATE UNIQUE INDEX IF NOT EXISTS effect_journal_decision_ordinal
          ON effect_journal(decision_id, command_ordinal);
          CREATE UNIQUE INDEX IF NOT EXISTS effect_journal_observation
-         ON effect_journal(observation_id) WHERE observation_id IS NOT NULL;",
+         ON effect_journal(observation_id) WHERE observation_id IS NOT NULL;
+         CREATE TABLE IF NOT EXISTS effect_target_revisions (
+           journal_id TEXT NOT NULL REFERENCES effect_journal(id),
+           target_ordinal INTEGER NOT NULL, role TEXT NOT NULL, path TEXT NOT NULL,
+           prior_bytes BLOB, intended_bytes BLOB, prior_fingerprint TEXT NOT NULL,
+           intended_fingerprint TEXT NOT NULL, artifacts_json TEXT NOT NULL DEFAULT '[]',
+           PRIMARY KEY(journal_id, target_ordinal), UNIQUE(journal_id, path)
+         );",
     )?;
     Ok(())
 }

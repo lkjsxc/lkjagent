@@ -102,16 +102,9 @@ fn run_admission_failure(data: &Path) -> TestResult<()> {
 }
 
 fn run_effect_failure(data: &Path) -> TestResult<()> {
-    fs::create_dir_all(data.join("workspace/blocked-dir"))?;
-    let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    setup(&conn)?;
-    let mut snapshot = instantiate(1, "Add a journal note about recovery.");
-    snapshot.steps[0].output_path = Some("blocked-dir".to_string());
-    persist(&mut conn, &snapshot)?;
-    insert_case(&conn, "1", &snapshot.task.objective, "before")?;
-    drop(conn);
+    enqueue_case(data, "Investigate workspace files")?;
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<content>real content</content>".to_string()],
+        outputs: vec![action_pairs("fs.read", &[("path", "missing.md")])],
         index: 0,
     };
     run_until_idle(data, &mut endpoint, 1)?;

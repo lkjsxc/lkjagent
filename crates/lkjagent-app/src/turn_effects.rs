@@ -45,7 +45,7 @@ fn prepare_shell_checks(conn: &Connection, decision: &RuntimeDecision, commands:
         let prior = stable_fingerprint(&(command, "prepared")).map_err(|error| error.message)?;
         let intended = stable_fingerprint(&(command, "attempted")).map_err(|error| error.message)?;
         let id = format!("{}-admission-{ordinal:04}", decision.id);
-        effects.push(insert_admission_and_prepare(conn, &EffectPreparation { id: &id, case_id: &decision.case_id, admission: &admission, parsed_action_json: &parsed, journal_id: &format!("{id}-effect"), idempotency_key: &format!("{}:{ordinal}", decision.id), command_ordinal: ordinal, target_path: None, prior_fingerprint: &prior, intended_fingerprint: &intended, created_at: now }).map_err(|error| error.to_string())?);
+        effects.push(insert_admission_and_prepare(conn, &EffectPreparation { id: &id, case_id: &decision.case_id, admission: &admission, parsed_action_json: &parsed, journal_id: &format!("{id}-effect"), idempotency_key: &format!("{}:{ordinal}", decision.id), command_ordinal: ordinal, target_path: None, prior_fingerprint: &prior, intended_fingerprint: &intended, targets: &[], created_at: now }).map_err(|error| error.to_string())?);
     }
     Ok(effects)
 }

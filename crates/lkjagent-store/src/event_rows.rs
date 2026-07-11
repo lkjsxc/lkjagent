@@ -4,7 +4,7 @@ use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
 use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
-use crate::row_json::json_string;
+use crate::row_support::json_string;
 use crate::state_rows::{hydrate_snapshot, persist_state_patch};
 
 pub fn next_event_id(conn: &Connection, case_id: &str, prefix: &str) -> StoreResult<String> {

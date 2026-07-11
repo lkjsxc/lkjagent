@@ -1,14 +1,17 @@
-use lkjagent_core::model::TaskSnapshot;
+use lkjagent_core::engine::{Command, Work};
+use lkjagent_core::model::{Attempt, AttemptOutcome, Event, EventKind, StepState, TaskSnapshot};
 use lkjagent_core::runtime_decision::RuntimeDecision;
 use lkjagent_core::runtime_selector::select_runtime_decision;
 use lkjagent_store::decision_rows::{
     insert_runtime_decision, next_decision_id, settle_decision, unfinished_decisions,
 };
+use lkjagent_store::plan_commit::commit_turn;
 use lkjagent_store::state_rows::{hydrate_snapshot, insert_case};
 use rusqlite::Connection;
 
-use crate::recovery_bridge::recover_or_reuse;
+use crate::recovery_bridge::{record_recovery_fact, recover_or_reuse};
 use crate::runtime_projection::{ensure_runtime_cell, suppress_decision_cell};
+use crate::snapshot_state::persist_snapshot_cell;
 
 pub fn prepare_runtime_decision(
     conn: &Connection,
@@ -31,6 +34,69 @@ pub fn prepare_runtime_decision(
         .map_err(|error| error.message)?;
     insert_runtime_decision(conn, &decision, "pending", now).map_err(|error| error.to_string())?;
     Ok(decision)
+}
+
+pub fn settle_effect_error(
+    conn: &mut Connection,
+    snapshot: &TaskSnapshot,
+    work: &Work,
+    error: String,
+    now: &str,
+) -> Result<TaskSnapshot, String> {
+    let mut failed = snapshot.clone();
+    let mut commands = Vec::new();
+    if let Work::CallModel { step_id, prompt } = work {
+        if let Some(step) = failed.steps.iter_mut().find(|step| step.id == *step_id) {
+            let ordinal = step.actions_used + step.attempts_used + 1;
+            step.state = StepState::Active;
+            step.attempts_used = step.attempts_used.saturating_add(1);
+            failed.task.budget_used = failed.task.budget_used.saturating_add(1);
+            let attempt = Attempt {
+                step_id: *step_id,
+                ordinal,
+                prompt_fingerprint: prompt.fingerprint.clone(),
+                outcome: AttemptOutcome::EffectError,
+                diagnosis: error.clone(),
+                tokens_in: 0,
+                tokens_out: 0,
+                cached_tokens: 0,
+                cache_status: "unknown".to_string(),
+            };
+            failed.attempts.push(attempt.clone());
+            commands.push(Command::RecordAttempt(attempt));
+        }
+    }
+    let event = Event {
+        kind: EventKind::Notice,
+        content: format!("effect_error: {error}"),
+    };
+    failed.events.push(event.clone());
+    commands.push(Command::RecordEvent(event));
+    commit_turn(conn, &failed, &commands, now).map_err(|error| error.to_string())?;
+    Ok(failed)
+}
+
+pub fn settle_effect_failure(
+    conn: &mut Connection,
+    snapshot: &TaskSnapshot,
+    work: &Work,
+    decision: &RuntimeDecision,
+    error: String,
+    now: &str,
+) -> Result<TaskSnapshot, String> {
+    let settled = settle_effect_error(conn, snapshot, work, error.clone(), now)?;
+    record_recovery_fact(
+        conn,
+        &decision.case_id,
+        &decision.id,
+        "effect",
+        &error,
+        0,
+        now,
+    )?;
+    persist_snapshot_cell(conn, &settled, now)?;
+    settle_runtime_decision(conn, decision, "effect_error", now)?;
+    Ok(settled)
 }
 
 pub fn settle_runtime_decision(

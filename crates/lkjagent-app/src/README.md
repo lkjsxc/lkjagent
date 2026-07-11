@@ -9,7 +9,8 @@ Map lkjagent-app source modules.
 - [main.rs](main.rs): binary entrypoint.
 - [lib.rs](lib.rs): public library entry.
 - [admission-bridge.rs](admission_bridge.rs): decision-specific admission rows.
-- [artifact-effects.rs](artifact_effects.rs): checked unit assembly and artifact rows.
+- [artifact-effects.rs](artifact_effects.rs): checked unit assembly and manifest rendering.
+- [artifact-plan.rs](artifact_plan.rs): exact generated-artifact target and ownership plans.
 - [args.rs](args.rs): CLI parser.
 - [cli.rs](cli.rs): command execution.
 - [clock.rs](clock.rs): timestamp seam for runtime and deterministic tests.
@@ -17,14 +18,13 @@ Map lkjagent-app source modules.
 - [config-registry.rs](config_registry.rs): exact scalar types, bounds, and
   cross-key guards.
 - [console.rs](console.rs): normal-screen owner command loop.
-- [context-admin.rs](context_admin.rs): owner conflict-resolution commands.
 - [context-bridge.rs](context_bridge.rs): durable context item prompt projection.
-- [context-resolution-bridge.rs](context_resolution_bridge.rs): conflict lineage rows.
+- [context-resolution-bridge.rs](context_resolution_bridge.rs): owner conflict commands and lineage rows.
 - [daemon.rs](daemon.rs): row-backed turn-cycle interpreter and scripted endpoint seam.
 - [daemon-intake.rs](daemon_intake.rs): owner-turn intake, direct records, and waiting-answer resume.
 - [daemon-lock.rs](daemon_lock.rs): heartbeat config-row daemon lease.
-- [effect-dispatch.rs](effect_dispatch.rs): ordered effect dispatch and prior validation.
-- [effect-error.rs](effect_error.rs): effect failure settlement.
+- [effect-dispatch.rs](effect_dispatch.rs): ordered effect dispatch and compensation.
+- [effect-files.rs](effect_files.rs): descriptor-relative atomic artifact target writes.
 - [exchange-bridge.rs](exchange_bridge.rs): provider exchange and prompt-frame persistence.
 - [exchange-record.rs](exchange_record.rs): exchange log file rendering.
 - [explore.rs](explore.rs): bounded explore action dispatcher.
@@ -44,7 +44,7 @@ Map lkjagent-app source modules.
 - [workspace-scaffold.rs](workspace_scaffold.rs): README and directory scaffold writes.
 - [recovery-bridge.rs](recovery_bridge.rs): unfinished decision reuse and
   recovery settlement.
-- [runtime-bridge.rs](runtime_bridge.rs): state-ledger decision preparation.
+- [runtime-bridge.rs](runtime_bridge.rs): decision preparation and effect failure settlement.
 - [runtime-cell.rs](runtime_cell.rs): operation cell projection payloads.
 - [runtime-projection.rs](runtime_projection.rs): plan bridge projection events.
 - [snapshot-state.rs](snapshot_state.rs): matter snapshot state-cell mirror.

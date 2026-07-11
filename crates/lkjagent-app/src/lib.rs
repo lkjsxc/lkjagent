@@ -3,6 +3,7 @@ pub use admission_bridge::persist_tool_admissions;
 mod arg_helpers;
 pub mod args;
 mod artifact_effects;
+mod artifact_plan;
 pub mod cli;
 pub mod clock;
 pub mod config;
@@ -22,7 +23,6 @@ pub mod state {
         }
     }
 }
-mod context_admin;
 mod context_bridge;
 mod context_resolution_bridge;
 pub mod daemon;
@@ -31,8 +31,8 @@ mod daemon_lock;
 mod daemon_owner_routes;
 mod daemon_route_effects;
 mod diagnostics;
-mod effect_dispatch;
-mod effect_error;
+pub mod effect_dispatch;
+mod effect_files;
 mod exchange_bridge;
 mod exchange_record;
 mod explore;

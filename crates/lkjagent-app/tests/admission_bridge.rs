@@ -44,9 +44,10 @@ fn repeat_guard_rejects_previously_admitted_action() -> TestResult<()> {
 fn native_workspace_effect_has_harness_admission_and_prepared_journal() -> TestResult<()> {
     let conn = Connection::open_in_memory()?;
     setup(&conn)?;
+    let workspace = fixture_root("native")?;
     let prepared = persist_tool_admissions(
         &conn,
-        Path::new("."),
+        &workspace,
         &decision(),
         &[Command::WriteFile {
             path: "notes.md".to_string(),
@@ -61,6 +62,10 @@ fn native_workspace_effect_has_harness_admission_and_prepared_journal() -> TestR
         |row| Ok((row.get(0)?, row.get(1)?)),
     )?;
     assert_eq!(prepared.len(), 1);
+    assert!(prepared[0]
+        .targets
+        .iter()
+        .any(|target| target.role == "parts-membership"));
     assert_eq!(
         row,
         ("native.write_file".to_string(), "prepared".to_string())
@@ -69,8 +74,24 @@ fn native_workspace_effect_has_harness_admission_and_prepared_journal() -> TestR
 }
 
 #[test]
+#[rustfmt::skip]
+fn unmanaged_part_collision_rejects_bundle_admission() -> TestResult<()> {
+    let conn = Connection::open_in_memory()?;
+    setup(&conn)?;
+    let workspace = fixture_root("collision")?;
+    fs::create_dir_all(workspace.join("notes.parts"))?;
+    fs::write(workspace.join("notes.parts/part-001.md"), "owner")?;
+    let content = (0..500).map(|index| format!("word{index}")).collect::<Vec<_>>().join(" ");
+    let result = persist_tool_admissions(&conn, &workspace, &decision(),
+        &[Command::WriteFile { path: "notes.md".to_string(), content }], "now");
+    assert!(result.is_err());
+    assert_eq!(fs::read_to_string(workspace.join("notes.parts/part-001.md"))?, "owner");
+    Ok(())
+}
+
+#[test]
 fn model_workspace_write_prepares_target_fingerprints() -> TestResult<()> {
-    let workspace = fixture_root()?;
+    let workspace = fixture_root("model-write")?;
     let conn = Connection::open_in_memory()?;
     setup(&conn)?;
     let prepared = persist_tool_admissions(
@@ -148,9 +169,11 @@ fn write_decision() -> RuntimeDecision {
     )
 }
 
-fn fixture_root() -> TestResult<PathBuf> {
-    let path =
-        std::env::temp_dir().join(format!("lkjagent-admission-write-{}", std::process::id()));
+fn fixture_root(name: &str) -> TestResult<PathBuf> {
+    let path = std::env::temp_dir().join(format!(
+        "lkjagent-admission-write-{name}-{}",
+        std::process::id()
+    ));
     if path.exists() {
         fs::remove_dir_all(&path)?;
     }

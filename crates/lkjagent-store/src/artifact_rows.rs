@@ -3,7 +3,7 @@ use rusqlite::{params, Connection};
 
 use crate::error::{StoreError, StoreResult};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct ArtifactRow {
     pub id: String,
     pub case_id: String,

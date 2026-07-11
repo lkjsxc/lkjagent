@@ -12,13 +12,13 @@ use crate::clock::{Clock, SystemClock};
 use crate::context_bridge::{prepare_prompt_context, snapshot_with_prompt_context};
 use crate::daemon_intake::{idle_snapshot, load_runtime_snapshot};
 use crate::effect_dispatch::{dispatch_effects, mark_effects};
-use crate::effect_error::settle as settle_effect_error;
 use crate::endpoint::LlmEndpoint;
 use crate::exchange_bridge::{persist_prompt_frame, persist_provider_exchange};
 use crate::model_call::{apply_record, call};
 use crate::observation_bridge::{persist_observations, settle_dispatch_failure};
 use crate::recovery_bridge::{record_command_recovery_facts, record_recovery_fact};
-use crate::runtime_bridge::{prepare_runtime_decision, settle_runtime_decision};
+#[rustfmt::skip]
+use crate::runtime_bridge::{prepare_runtime_decision, settle_effect_error, settle_effect_failure, settle_runtime_decision};
 use crate::snapshot_state::persist_snapshot_cell;
 use crate::turn_effects::{gather_checks, tag_check_evidence};
 
@@ -136,27 +136,20 @@ fn run_turn<E: Endpoint, C: Clock>(
                 };
             mark_effects(conn, &prepared, "applying", &now)?;
             if let Err(failure) =
-                dispatch_effects(conn, workspace, &mut next, &commands, &prepared, &now)
+                dispatch_effects(conn, workspace, &mut next, &commands, &prepared)
             {
                 settle_dispatch_failure(
                     conn, workspace, &decision, &next, &prepared, &failure, &now,
                 )?;
-                let settled =
-                    settle_effect_error(conn, &snapshot, &work, failure.error.clone(), &now)?;
-                record_recovery_fact(
-                    conn,
-                    &decision.case_id,
-                    &decision.id,
-                    "effect",
-                    &failure.error,
-                    0,
-                    &now,
-                )?;
-                persist_snapshot_cell(conn, &settled, &now)?;
-                settle_runtime_decision(conn, &decision, "effect_error", &now)?;
-                return Ok(settled);
+                return settle_effect_failure(
+                    conn, &snapshot, &work, &decision, failure.error, &now,
+                );
             }
-            persist_observations(conn, workspace, &decision, &next, &prepared, &now)?;
+            if let Err(error) =
+                persist_observations(conn, workspace, &decision, &next, &prepared, &now)
+            {
+                return settle_effect_failure(conn, &snapshot, &work, &decision, error, &now);
+            }
             commit_turn(conn, &next, &commands, &now).map_err(|error| error.to_string())?;
             record_command_recovery_facts(conn, &next, &commands, &decision.id, &now)?;
             persist_snapshot_cell(conn, &next, &now)?;
@@ -175,23 +168,15 @@ fn run_turn<E: Endpoint, C: Clock>(
     tag_check_evidence(conn, &mut next, &mut commands, &decision.id)?;
     let prepared = persist_tool_admissions(conn, workspace, &decision, &commands, &now)?;
     mark_effects(conn, &prepared, "applying", &now)?;
-    if let Err(failure) = dispatch_effects(conn, workspace, &mut next, &commands, &prepared, &now) {
+    if let Err(failure) = dispatch_effects(conn, workspace, &mut next, &commands, &prepared) {
         settle_dispatch_failure(conn, workspace, &decision, &next, &prepared, &failure, &now)?;
-        let settled = settle_effect_error(conn, &snapshot, &work, failure.error.clone(), &now)?;
-        record_recovery_fact(
-            conn,
-            &decision.case_id,
-            &decision.id,
-            "effect",
-            &failure.error,
-            0,
-            &now,
-        )?;
-        persist_snapshot_cell(conn, &settled, &now)?;
-        settle_runtime_decision(conn, &decision, "effect_error", &now)?;
-        return Ok(settled);
+        return settle_effect_failure(
+            conn, &snapshot, &work, &decision, failure.error, &now,
+        );
     }
-    persist_observations(conn, workspace, &decision, &next, &prepared, &now)?;
+    if let Err(error) = persist_observations(conn, workspace, &decision, &next, &prepared, &now) {
+        return settle_effect_failure(conn, &snapshot, &work, &decision, error, &now);
+    }
     commit_turn(conn, &next, &commands, &now).map_err(|error| error.to_string())?;
     record_command_recovery_facts(conn, &next, &commands, &decision.id, &now)?;
     persist_snapshot_cell(conn, &next, &now)?;

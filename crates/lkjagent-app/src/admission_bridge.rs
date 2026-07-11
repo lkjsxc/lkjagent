@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::{collections::BTreeSet, fs, path::Path};
 
 use lkjagent_core::engine::Command;
 use lkjagent_core::runtime_admission::{admit_action, AdmissionStatus, ModelAction, ToolAdmission};
@@ -20,8 +20,10 @@ pub fn persist_tool_admissions(
     commands: &[Command],
     now: &str,
 ) -> Result<Vec<PreparedEffect>, String> {
-    let mut ordinal = existing_admission_count(conn, &decision.id)?;
-    let mut prepared = Vec::new();
+    crate::artifact_effects::validate_bundle_commands(commands)?;
+    let base = existing_admission_count(conn, &decision.id)?;
+    let mut seen = BTreeSet::new();
+    let mut staged = Vec::new();
     for command in commands {
         let Some((mut admission, parsed, model_action)) = admission_for_command(decision, command)?
         else {
@@ -29,21 +31,30 @@ pub fn persist_tool_admissions(
         };
         if model_action.is_some()
             && admission.status == AdmissionStatus::Admitted
-            && repeated_admitted_action(conn, &decision.id, &parsed)?
+            && (repeated_admitted_action(conn, &decision.id, &parsed)?
+                || !seen.insert(parsed.clone()))
         {
             admission = repeated_admission(&admission);
         }
-        ordinal += 1;
-        let id = format!("{}-admission-{ordinal:04}", decision.id);
+        let ordinal = base + i64::try_from(staged.len() + 1).map_err(|error| error.to_string())?;
         if admission.status == AdmissionStatus::Rejected {
+            let id = format!("{}-admission-{ordinal:04}", decision.id);
             insert_tool_admission(conn, &id, &decision.case_id, &admission, &parsed, now)
                 .map_err(|error| error.to_string())?;
             return Err(format!("admission rejected: {}", admission.reason));
         }
+        let plan = effect_plan(conn, workspace, &decision.case_id, command, &parsed, now)?;
+        staged.push((admission, parsed, plan));
+    }
+    let tx = conn
+        .unchecked_transaction()
+        .map_err(|error| error.to_string())?;
+    let mut prepared = Vec::new();
+    for (index, (admission, parsed, plan)) in staged.into_iter().enumerate() {
+        let ordinal = base + i64::try_from(index + 1).map_err(|error| error.to_string())?;
+        let id = format!("{}-admission-{ordinal:04}", decision.id);
         let journal_id = format!("{id}-effect");
         let idempotency_key = format!("{}:{ordinal}", decision.id);
-        let (prior_fingerprint, intended_fingerprint) =
-            effect_fingerprints(workspace, command, &parsed)?;
         let preparation = EffectPreparation {
             id: &id,
             case_id: &decision.case_id,
@@ -52,21 +63,17 @@ pub fn persist_tool_admissions(
             journal_id: &journal_id,
             idempotency_key: &idempotency_key,
             command_ordinal: ordinal,
-            target_path: match command {
-                Command::WriteFile { path, .. } | Command::AppendFile { path, .. } => Some(path),
-                Command::RunExplore(action) => {
-                    crate::explore::write_target(action).map(|(path, _)| path)
-                }
-                _ => None,
-            },
-            prior_fingerprint: &prior_fingerprint,
-            intended_fingerprint: &intended_fingerprint,
+            target_path: plan.target_path.as_deref(),
+            prior_fingerprint: &plan.prior_fingerprint,
+            intended_fingerprint: &plan.intended_fingerprint,
+            targets: &plan.targets,
             created_at: now,
         };
         prepared.push(
-            insert_admission_and_prepare(conn, &preparation).map_err(|error| error.to_string())?,
+            insert_admission_and_prepare(&tx, &preparation).map_err(|error| error.to_string())?,
         );
     }
+    tx.commit().map_err(|error| error.to_string())?;
     Ok(prepared)
 }
 
@@ -136,65 +143,57 @@ fn harness_admission(decision: &RuntimeDecision, command: &Command, tool: &str) 
     Ok(Some((admission, parsed, None)))
 }
 
-fn effect_fingerprints(workspace: &Path, command: &Command, parsed: &str) -> Fingerprints {
+fn effect_plan(
+    conn: &Connection,
+    workspace: &Path,
+    case_id: &str,
+    command: &Command,
+    parsed: &str,
+    now: &str,
+) -> Result<crate::artifact_plan::WritePlan, String> {
     match command {
         Command::WriteFile { path, content } => {
-            write_fingerprints(workspace, path, content, false, true)
+            crate::artifact_plan::plan_write(conn, workspace, case_id, path, content, false, now)
         }
         Command::AppendFile { path, content } => {
-            write_fingerprints(workspace, path, content, true, true)
+            crate::artifact_plan::plan_write(conn, workspace, case_id, path, content, true, now)
         }
         Command::RunExplore(action) => match crate::explore::write_target(action) {
-            Some((path, content)) => write_fingerprints(workspace, path, content, false, false),
-            None => crate::explore::semantic_fingerprints(parsed),
+            Some((path, content)) => {
+                simple_plan(Some(path), write_fingerprints(workspace, path, content))
+            }
+            None => simple_plan(None, crate::explore::semantic_fingerprints(parsed)),
         },
-        _ => crate::explore::semantic_fingerprints(parsed),
+        _ => simple_plan(None, crate::explore::semantic_fingerprints(parsed)),
     }
 }
 
-fn write_fingerprints(
-    workspace: &Path,
-    path: &str,
-    content: &str,
-    append: bool,
-    assemble: bool,
-) -> Fingerprints {
+fn simple_plan(
+    target_path: Option<&str>,
+    fingerprints: Fingerprints,
+) -> Result<crate::artifact_plan::WritePlan, String> {
+    let (prior_fingerprint, intended_fingerprint) = fingerprints?;
+    Ok(crate::artifact_plan::WritePlan {
+        target_path: target_path.map(str::to_string),
+        prior_fingerprint,
+        intended_fingerprint,
+        targets: Vec::new(),
+    })
+}
+
+fn write_fingerprints(workspace: &Path, path: &str, content: &str) -> Fingerprints {
     let full =
         lkjagent_effects::workspace::resolve(workspace, path).map_err(|error| error.to_string())?;
-    let (prior, prior_fingerprint) = if full.exists() {
+    let prior_fingerprint = if full.exists() {
         match fs::read(&full) {
-            Ok(bytes) => {
-                let fingerprint =
-                    stable_fingerprint(&Some(bytes.clone())).map_err(|error| error.message)?;
-                (Some(bytes), fingerprint)
-            }
-            Err(error) => (
-                None,
-                crate::explore::fingerprint_text(&format!("unreadable:{error}"))?,
-            ),
+            Ok(bytes) => stable_fingerprint(&Some(bytes)).map_err(|error| error.message)?,
+            Err(error) => crate::explore::fingerprint_text(&format!("unreadable:{error}"))?,
         }
     } else {
-        (
-            None,
-            stable_fingerprint(&Option::<Vec<u8>>::None).map_err(|error| error.message)?,
-        )
-    };
-    let body = if append {
-        let prior = prior
-            .as_deref()
-            .and_then(|bytes| std::str::from_utf8(bytes).ok())
-            .unwrap_or_default();
-        format!("{prior}{content}")
-    } else {
-        content.to_string()
-    };
-    let intended = if assemble {
-        crate::artifact_effects::assemble_content(path, &body)?.0
-    } else {
-        body
+        stable_fingerprint(&Option::<Vec<u8>>::None).map_err(|error| error.message)?
     };
     Ok((
         prior_fingerprint,
-        crate::explore::fingerprint_text(&intended)?,
+        crate::explore::fingerprint_text(content)?,
     ))
 }
