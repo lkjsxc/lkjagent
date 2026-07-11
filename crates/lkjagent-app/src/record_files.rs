@@ -1,10 +1,8 @@
-use lkjagent_core::workspace_manifest::RebalanceMove;
 use lkjagent_core::workspace_record::{
-    archive_path, default_state_for_kind, parse_record, record_fingerprint, record_path_at,
-    render_record, state_keys_for_record, WorkspaceRecord,
+    default_state_for_kind, parse_record, record_fingerprint, record_path_at, render_record,
+    state_keys_for_record, WorkspaceRecord,
 };
 use lkjagent_store::record_rows::{record, records, upsert_record, RecordRow};
-use lkjagent_store::workspace_rows::{insert_alias_and_audit, PathAliasRow};
 use rusqlite::Connection;
 use std::{fs, path::Path};
 pub fn add(
@@ -41,32 +39,6 @@ pub fn show(conn: &Connection, data_dir: &Path, id: &str) -> Result<String, Stri
     Ok(format!("{}\n{}", format_record_row("record", &row), text))
 }
 
-pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Result<String, String> {
-    let row = record(conn, id)
-        .map_err(|error| error.to_string())?
-        .ok_or_else(|| format!("record not found: {id}"))?;
-    let workspace = crate::config::workspace_root(data_dir)?;
-    let old = workspace.join(&row.path);
-    let new_rel = archive_path(&row.kind, &row.id)?;
-    let new = workspace.join(&new_rel);
-    if let Some(parent) = new.parent() {
-        fs::create_dir_all(parent).map_err(|error| error.to_string())?;
-    }
-    fs::rename(old, &new).map_err(|error| error.to_string())?;
-    let text = fs::read_to_string(&new).map_err(|error| error.to_string())?;
-    let archived = record_row(
-        (&row.id, &row.kind, &row.title, "archived"),
-        &new_rel,
-        &text,
-        true,
-        now,
-    )?;
-    upsert_record(conn, &archived).map_err(|error| error.to_string())?;
-    archive_rows(conn, &row, &new_rel, now)?;
-    crate::record_state::suppress_record_cells(conn, &row, now)?;
-    Ok(format!("archived record: {id}"))
-}
-
 pub fn link(
     conn: &Connection,
     data_dir: &Path,
@@ -96,28 +68,6 @@ pub fn link(
     upsert_record(conn, &updated).map_err(|error| error.to_string())?;
     crate::record_state::upsert_record_cells(conn, &parsed, &row.path, &updated.fingerprint)?;
     Ok(format!("linked record: {id} -> {target}"))
-}
-
-fn archive_rows(conn: &Connection, row: &RecordRow, path: &str, now: &str) -> Result<(), String> {
-    let item = RebalanceMove {
-        entity_id: row.id.clone(),
-        entity_kind: "record".to_string(),
-        old_path: row.path.clone(),
-        new_path: path.to_string(),
-        decision_id: "record.archive".to_string(),
-        reason: "record archived".to_string(),
-        validation: vec!["archive:true".to_string()],
-    };
-    let alias = PathAliasRow {
-        old_path: row.path.clone(),
-        entity_id: row.id.clone(),
-        entity_kind: "record".to_string(),
-        new_path: path.to_string(),
-        decision_id: "record.archive".to_string(),
-        created_at: now.to_string(),
-    };
-    insert_alias_and_audit(conn, &alias, &format!("archive-{}", row.id), &item, now)
-        .map_err(|error| error.to_string())
 }
 
 fn record_or_alias(conn: &Connection, id: &str) -> Result<RecordRow, String> {

@@ -41,6 +41,7 @@ mod model_call;
 mod model_io;
 mod observation_bridge;
 mod prompt_bridge;
+mod record_archive;
 mod record_args;
 mod record_files;
 mod record_identity;

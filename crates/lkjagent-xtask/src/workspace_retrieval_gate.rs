@@ -29,6 +29,11 @@ const SUITES: &[Suite] = &[
         minimum_tests: 4,
     },
     Suite {
+        package: "lkjagent-app",
+        target: "archive_compensation",
+        minimum_tests: 1,
+    },
+    Suite {
         package: "lkjagent-store",
         target: "workspace_rows",
         minimum_tests: 1,

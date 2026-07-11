@@ -91,6 +91,8 @@ Workspace behavior is split across record commands, template writes, direct
 filesystem tools, and native text effects. They do not share one transaction,
 idempotency, indexing, or recovery contract. Startup eagerly creates empty
 navigation. Retrieval does not yet search and rank the full visible workspace.
+Archive now restores the original file and row when its audit settlement fails;
+other workspace mutation paths still lack one shared transaction.
 
 The xtask dispatcher now runs named nonempty suites for `protocol-tools` and
 `workspace-retrieval-maintenance` and rejects a suite that reports too few tests.

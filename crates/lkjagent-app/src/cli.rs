@@ -112,9 +112,12 @@ where
             &target,
             &crate::clock::utc_now(),
         ),
-        Command::RecordArchive { id } => {
-            crate::record_files::archive(&conn, &invocation.data_dir, &id, &crate::clock::utc_now())
-        }
+        Command::RecordArchive { id } => crate::record_archive::archive(
+            &conn,
+            &invocation.data_dir,
+            &id,
+            &crate::clock::utc_now(),
+        ),
         Command::Memory { query } => crate::inspect::memory(&conn, &query),
         Command::Watch => crate::inspect::watch(&conn),
         Command::Help => Ok(help()),

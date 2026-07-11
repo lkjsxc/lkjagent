@@ -52,6 +52,24 @@ pub fn insert_alias(conn: &Connection, row: &PathAliasRow) -> StoreResult<()> {
     Ok(())
 }
 
+pub fn remove_alias_and_audit(
+    conn: &Connection,
+    old_path: &str,
+    audit_id: &str,
+) -> StoreResult<()> {
+    let tx = conn.unchecked_transaction()?;
+    tx.execute(
+        "DELETE FROM workspace_path_aliases WHERE old_path = ?1",
+        [old_path],
+    )?;
+    tx.execute(
+        "DELETE FROM workspace_rebalance_audit WHERE id = ?1",
+        [audit_id],
+    )?;
+    tx.commit()?;
+    Ok(())
+}
+
 pub fn insert_alias_and_audit(
     conn: &Connection,
     alias: &PathAliasRow,
