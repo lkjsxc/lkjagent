@@ -106,10 +106,10 @@ record title and body chunks for lexical and trigram search with kind, state,
 project, and date filters, stable rebuild rows, bounded excerpts, and drift
 exclusion. Navigation now excludes closed TODO rows and avoids generated
 page timestamps. Retrieval still does not cover the full visible workspace or
-an external-change scanner. The store can preserve exact operation bytes and
-reuse idempotency keys. Archive startup uses preimages to settle only matching
-moved bytes, and settled retries validate target bytes; conflicts block startup.
-Rebalance still uses prepared rows without revisions and recovery remains incomplete.
+an external-change scanner. Archive and rebalance persist exact operation bytes
+and reuse idempotency keys. Their startup recovery settles matching moved bytes;
+conflicts block startup without overwriting owner paths. Rebalance recovery still
+leaves operations without move bytes, unstarted, multi-move, and broader writer recovery incomplete.
 
 The xtask dispatcher now runs named nonempty suites for `protocol-tools` and
 `workspace-retrieval-maintenance` and rejects a suite that reports too few tests.

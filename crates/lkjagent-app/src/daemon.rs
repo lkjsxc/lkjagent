@@ -61,6 +61,10 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     for operation in lkjagent_store::workspace_rows::prepared_operations(&conn)
         .map_err(|error| error.to_string())?
     {
+        if operation.kind == "rebalance" {
+            crate::workspace_rebalance_apply::recover_prepared(&conn, data_dir, &operation, &now)?;
+            continue;
+        }
         if operation.kind != "archive" {
             continue;
         }

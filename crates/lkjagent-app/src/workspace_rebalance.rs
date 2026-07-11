@@ -3,7 +3,7 @@ use lkjagent_core::workspace_manifest::{
 };
 use lkjagent_core::workspace_record::{record_fingerprint, record_path_at};
 use lkjagent_store::record_rows::{records, RecordRow};
-use lkjagent_store::workspace_rows::upsert_manifest;
+use lkjagent_store::workspace_rows::{upsert_manifest, OperationRevision};
 use rusqlite::Connection;
 use std::{
     fs,
@@ -99,12 +99,34 @@ pub(crate) fn file_fingerprint(workspace: &Path, rel: &str) -> Result<String, St
     record_fingerprint(&text).map_err(|error| error.message)
 }
 
+pub(crate) fn verified_file_bytes(
+    workspace: &Path,
+    rel: &str,
+    expected: &str,
+) -> Result<Vec<u8>, String> {
+    let bytes = fs::read(workspace.join(rel)).map_err(|error| error.to_string())?;
+    let text = String::from_utf8(bytes.clone()).map_err(|error| error.to_string())?;
+    if record_fingerprint(&text).map_err(|error| error.message)? == expected {
+        Ok(bytes)
+    } else {
+        Err(format!("fingerprint mismatch: {rel}"))
+    }
+}
+
+#[rustfmt::skip]
+pub(crate) fn operation_revisions(item: &RebalanceMove, bytes: &[u8]) -> Result<Vec<OperationRevision>, String> {
+    let fingerprint = lkjagent_core::runtime_fingerprint::stable_fingerprint(&bytes).map_err(|error| error.message)?;
+    let row = |role: &str, path: &str| OperationRevision { role: role.to_string(), path: path.to_string(), bytes: bytes.to_vec(), fingerprint: fingerprint.clone() };
+    Ok(vec![row("prior", &item.old_path), row("intended", &item.new_path)])
+}
+
+#[rustfmt::skip]
 pub(crate) fn operation_preimage(row: &RecordRow) -> String {
-    serde_json::json!({"id": row.id, "path": row.path, "fingerprint": row.fingerprint}).to_string()
+    serde_json::json!({"id": row.id, "kind": row.kind, "title": row.title, "state": row.state, "path": row.path, "fingerprint": row.fingerprint, "archived": row.archived}).to_string()
 }
 
 pub(crate) fn operation_intended(item: &RebalanceMove) -> String {
-    serde_json::json!({"id": item.entity_id, "path": item.new_path}).to_string()
+    serde_json::json!({"id": item.entity_id, "path": item.new_path, "move": item}).to_string()
 }
 pub(crate) fn render_plan(moves: &[RebalanceMove], json: bool) -> Result<String, String> {
     if json {

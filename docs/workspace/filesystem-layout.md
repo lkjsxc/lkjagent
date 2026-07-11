@@ -67,7 +67,7 @@ paths as movable locations. `workspace plan-rebalance` previews canonical moves
 and link edits. `workspace apply-rebalance` validates paths, moves files,
 checks the current file fingerprint against the ledger row, writes aliases,
 repairs exact old-path links in record files when possible, updates touched
-record fingerprints, rebuilds indexes, and stores audit rows. Alias and audit
-rows are written in one store transaction. If a post-move store phase fails, the
-rebalancer restores the moved file, original record row, and exact-path link
-edits when possible.
+record fingerprints, rebuilds indexes, and stores audit rows. Each move records
+immutable prior and intended bytes before a Linux no-clobber move. Alias and audit
+rows are written in one store transaction. Startup and apply settle only a matching
+moved file with an absent prior path; conflicts remain prepared. Multi-move recovery remains open.

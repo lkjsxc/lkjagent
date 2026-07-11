@@ -3,32 +3,13 @@ use std::process::Command;
 
 use crate::node_suites::{check as check_suites, Suite};
 
+#[rustfmt::skip]
 const SUITES: &[Suite] = &[
-    Suite {
-        package: "lkjagent-app",
-        target: "explore",
-        minimum_tests: 3,
-    },
-    Suite {
-        package: "lkjagent-app",
-        target: "workspace_evidence",
-        minimum_tests: 3,
-    },
-    Suite {
-        package: "lkjagent-app",
-        target: "workspace_rebalance",
-        minimum_tests: 2,
-    },
-    Suite {
-        package: "lkjagent-app",
-        target: "record_wrappers",
-        minimum_tests: 2,
-    },
-    Suite {
-        package: "lkjagent-app",
-        target: "cli_rows",
-        minimum_tests: 4,
-    },
+    Suite { package: "lkjagent-app", target: "explore", minimum_tests: 3 },
+    Suite { package: "lkjagent-app", target: "workspace_evidence", minimum_tests: 3 },
+    Suite { package: "lkjagent-app", target: "workspace_rebalance", minimum_tests: 2 },
+    Suite { package: "lkjagent-app", target: "record_wrappers", minimum_tests: 2 },
+    Suite { package: "lkjagent-app", target: "cli_rows", minimum_tests: 4 },
     Suite {
         package: "lkjagent-app",
         target: "archive_compensation",
@@ -84,8 +65,15 @@ const SUITES: &[Suite] = &[
         target: "workspace_rebalance_compensation",
         minimum_tests: 1,
     },
+    Suite {
+        package: "lkjagent-app",
+        target: "workspace_rebalance_recovery",
+        minimum_tests: 3,
+    },
+    Suite { package: "lkjagent-app", target: "workspace_rebalance_retry", minimum_tests: 1 },
 ];
 
+#[rustfmt::skip]
 const REQUIRED: &[(&str, &str)] = &[
     (
         "workspace_search",
@@ -139,6 +127,19 @@ const REQUIRED: &[(&str, &str)] = &[
         "workspace_rebalance_compensation",
         "rebalance_restores_files_rows_search_and_indexes_when_rebuild_fails",
     ),
+    (
+        "workspace_rebalance_recovery",
+        "rebalance_startup_settles_moved_exact_revisions",
+    ),
+    (
+        "workspace_rebalance_recovery",
+        "rebalance_startup_preserves_conflicting_target",
+    ),
+    (
+        "workspace_rebalance_recovery",
+        "rebalance_startup_compensates_when_index_rebuild_fails",
+    ),
+    ("workspace_rebalance_retry", "apply_rebalance_resumes_moved_prepared_operation"),
 ];
 
 pub fn check(root: &Path) -> Result<(), Vec<String>> {
