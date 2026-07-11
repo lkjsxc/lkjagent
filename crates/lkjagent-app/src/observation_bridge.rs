@@ -37,7 +37,7 @@ pub fn settle_dispatch_failure(
     failure: &DispatchFailure,
     now: &str,
 ) -> Result<(), String> {
-    let succeeded = failure.attempted.saturating_sub(1);
+    let succeeded = failure.completed;
     let completed = effects
         .get(..succeeded)
         .ok_or_else(|| "dispatch success count is invalid".to_string())?;
@@ -49,7 +49,7 @@ pub fn settle_dispatch_failure(
         conn,
         decision,
         pending,
-        failure.attempted.min(1),
+        usize::from(failure.failed_current),
         succeeded,
         &failure.error,
         now,

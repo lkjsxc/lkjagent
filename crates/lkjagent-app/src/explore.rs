@@ -1,7 +1,8 @@
-use std::path::Path;
+use std::{collections::BTreeMap, path::Path};
 
 use lkjagent_core::model::{StepState, TaskSnapshot};
 use lkjagent_core::parse::Action;
+use lkjagent_core::runtime_admission::ModelAction;
 use lkjagent_core::runtime_tool_catalog::{effect_for_tool, ToolEffect};
 use lkjagent_effects::observation::observation;
 use lkjagent_store::memory::{search_memory, MemoryRow};
@@ -118,6 +119,36 @@ fn render_memory(row: &MemoryRow) -> String {
         "memory {} matter={} {} {}",
         row.id, task, row.topic, row.content
     )
+}
+
+pub(crate) fn model_action(action: &Action) -> ModelAction {
+    ModelAction {
+        tool: action.tool.clone(),
+        params: action
+            .params
+            .iter()
+            .filter(|(name, _)| name != "tool_name")
+            .map(|(name, value)| (name.clone(), value.clone()))
+            .collect::<BTreeMap<_, _>>(),
+    }
+}
+
+pub(crate) fn fingerprint_text(value: &str) -> Result<String, String> {
+    lkjagent_core::runtime_fingerprint::stable_fingerprint(&value).map_err(|error| error.message)
+}
+
+pub(crate) fn semantic_fingerprints(parsed: &str) -> Result<(String, String), String> {
+    Ok((
+        fingerprint_text("not-applicable")?,
+        fingerprint_text(parsed)?,
+    ))
+}
+
+pub(crate) fn write_target(action: &Action) -> Option<(&str, &str)> {
+    if action.tool != "fs.write" {
+        return None;
+    }
+    Some((param(action, "path").ok()?, param(action, "content").ok()?))
 }
 
 fn param<'a>(action: &'a Action, name: &str) -> Result<&'a str, String> {

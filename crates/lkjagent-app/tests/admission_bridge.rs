@@ -1,4 +1,7 @@
-use std::path::Path;
+use std::{
+    fs,
+    path::{Path, PathBuf},
+};
 
 use lkjagent_app::persist_tool_admissions;
 use lkjagent_core::engine::Command;
@@ -66,6 +69,40 @@ fn native_workspace_effect_has_harness_admission_and_prepared_journal() -> TestR
 }
 
 #[test]
+fn model_workspace_write_prepares_target_fingerprints() -> TestResult<()> {
+    let workspace = fixture_root()?;
+    let conn = Connection::open_in_memory()?;
+    setup(&conn)?;
+    let prepared = persist_tool_admissions(
+        &conn,
+        &workspace,
+        &write_decision(),
+        &[Command::RunExplore(Action {
+            tool: "fs.write".to_string(),
+            params: vec![
+                ("path".to_string(), "note.md".to_string()),
+                ("content".to_string(), "body".to_string()),
+            ],
+        })],
+        "now",
+    )?;
+    let row: (String, String) = conn.query_row(
+        "SELECT target_path, intended_fingerprint FROM effect_journal",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?)),
+    )?;
+    assert_eq!(
+        prepared
+            .first()
+            .and_then(|effect| effect.target_path.as_deref()),
+        Some("note.md")
+    );
+    assert_eq!(row.0, "note.md");
+    assert!(row.1.starts_with("fnv1a64:"));
+    Ok(())
+}
+
+#[test]
 fn mismatch_reason_persists_for_hidden_tool() -> TestResult<()> {
     let conn = Connection::open_in_memory()?;
     setup(&conn)?;
@@ -98,6 +135,27 @@ fn decision() -> RuntimeDecision {
         ]),
         OutputEnvelope::Action,
     )
+}
+
+fn write_decision() -> RuntimeDecision {
+    RuntimeDecision::new(
+        "write-decision",
+        "case-1",
+        OperationKey("model.call/1".to_string()),
+        ToolSetView::new(vec![ToolViewEntry::new("fs.write", "write")
+            .with_params(vec!["path", "content"], Vec::new())]),
+        OutputEnvelope::Action,
+    )
+}
+
+fn fixture_root() -> TestResult<PathBuf> {
+    let path =
+        std::env::temp_dir().join(format!("lkjagent-admission-write-{}", std::process::id()));
+    if path.exists() {
+        fs::remove_dir_all(&path)?;
+    }
+    fs::create_dir_all(&path)?;
+    Ok(path)
 }
 
 fn action(tool: &str, name: &str, value: &str) -> Action {

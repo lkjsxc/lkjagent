@@ -8,7 +8,8 @@ use rusqlite::Connection;
 
 pub struct DispatchFailure {
     pub error: String,
-    pub attempted: usize,
+    pub completed: usize,
+    pub failed_current: bool,
 }
 
 pub fn dispatch_effects(
@@ -26,12 +27,21 @@ pub fn dispatch_effects(
         }
         let effect = effects.get(attempted).ok_or_else(|| DispatchFailure {
             error: "prepared effect is missing".to_string(),
-            attempted,
+            completed: attempted,
+            failed_current: false,
         })?;
-        validate_prior(workspace, effect).map_err(|error| DispatchFailure { error, attempted })?;
+        validate_prior(workspace, effect).map_err(|error| DispatchFailure {
+            error,
+            completed: attempted,
+            failed_current: true,
+        })?;
+        let completed = attempted;
         attempted += 1;
-        apply(conn, workspace, snapshot, command, now)
-            .map_err(|error| DispatchFailure { error, attempted })?;
+        apply(conn, workspace, snapshot, command, now).map_err(|error| DispatchFailure {
+            error,
+            completed,
+            failed_current: true,
+        })?;
     }
     Ok(())
 }
@@ -130,18 +140,28 @@ fn persist_write(
 mod tests {
     use super::*;
     use lkjagent_core::classify::instantiate;
+    use lkjagent_core::parse::Action;
 
     #[test]
-    fn changed_prior_blocks_workspace_write() -> Result<(), String> {
+    fn prior_failure_reports_completed_effects() -> Result<(), String> {
         let workspace = std::env::temp_dir().join(format!("lkjagent-prior-{}", std::process::id()));
         std::fs::create_dir_all(&workspace).map_err(|error| error.to_string())?;
         std::fs::write(workspace.join("note.md"), "changed").map_err(|error| error.to_string())?;
         let mut snapshot = instantiate(1, "write note");
         let conn = Connection::open_in_memory().map_err(|error| error.to_string())?;
+        let first = PreparedEffect {
+            admission_id: "first-admission".to_string(),
+            journal_id: "first-journal".to_string(),
+            command_ordinal: 1,
+            target_path: None,
+            prior_fingerprint: String::new(),
+            intended_fingerprint: String::new(),
+            effect_name: "plan.note".to_string(),
+        };
         let effect = PreparedEffect {
             admission_id: "admission".to_string(),
             journal_id: "journal".to_string(),
-            command_ordinal: 1,
+            command_ordinal: 2,
             target_path: Some("note.md".to_string()),
             prior_fingerprint: stable_fingerprint(&Some(b"before".to_vec()))
                 .map_err(|error| error.message)?,
@@ -152,17 +172,24 @@ mod tests {
             &conn,
             &workspace,
             &mut snapshot,
-            &[Command::WriteFile {
-                path: "note.md".to_string(),
-                content: "after".to_string(),
-            }],
-            &[effect],
+            &[
+                Command::RunExplore(Action {
+                    tool: "plan.note".to_string(),
+                    params: vec![("note".to_string(), "done".to_string())],
+                }),
+                Command::WriteFile {
+                    path: "note.md".to_string(),
+                    content: "after".to_string(),
+                },
+            ],
+            &[first, effect],
             "now",
         ) {
             Err(failure) => failure,
             Ok(()) => return Err("changed prior was dispatched".to_string()),
         };
-        assert_eq!(failure.attempted, 0);
+        assert_eq!(failure.completed, 1);
+        assert!(failure.failed_current);
         assert_eq!(
             std::fs::read_to_string(workspace.join("note.md")).map_err(|error| error.to_string())?,
             "changed"

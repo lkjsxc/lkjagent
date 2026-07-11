@@ -1,7 +1,6 @@
-use std::{collections::BTreeMap, fs, path::Path};
+use std::{fs, path::Path};
 
 use lkjagent_core::engine::Command;
-use lkjagent_core::parse::Action;
 use lkjagent_core::runtime_admission::{admit_action, AdmissionStatus, ModelAction, ToolAdmission};
 use lkjagent_core::runtime_decision::RuntimeDecision;
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
@@ -55,6 +54,9 @@ pub fn persist_tool_admissions(
             command_ordinal: ordinal,
             target_path: match command {
                 Command::WriteFile { path, .. } | Command::AppendFile { path, .. } => Some(path),
+                Command::RunExplore(action) => {
+                    crate::explore::write_target(action).map(|(path, _)| path)
+                }
                 _ => None,
             },
             prior_fingerprint: &prior_fingerprint,
@@ -104,7 +106,7 @@ fn repeated_admission(admission: &ToolAdmission) -> ToolAdmission {
 fn admission_for_command(decision: &RuntimeDecision, command: &Command) -> AdmissionResult {
     match command {
         Command::RunExplore(action) => {
-            let action = model_action(action);
+            let action = crate::explore::model_action(action);
             let admission = admit_action(decision, &action).map_err(|error| error.message)?;
             let parsed = serde_json::to_string(&action).map_err(|error| error.to_string())?;
             Ok(Some((admission, parsed, Some(action))))
@@ -136,16 +138,27 @@ fn harness_admission(decision: &RuntimeDecision, command: &Command, tool: &str) 
 
 fn effect_fingerprints(workspace: &Path, command: &Command, parsed: &str) -> Fingerprints {
     match command {
-        Command::WriteFile { path, content } => write_fingerprints(workspace, path, content, false),
-        Command::AppendFile { path, content } => write_fingerprints(workspace, path, content, true),
-        _ => Ok((
-            fingerprint_text("not-applicable")?,
-            fingerprint_text(parsed)?,
-        )),
+        Command::WriteFile { path, content } => {
+            write_fingerprints(workspace, path, content, false, true)
+        }
+        Command::AppendFile { path, content } => {
+            write_fingerprints(workspace, path, content, true, true)
+        }
+        Command::RunExplore(action) => match crate::explore::write_target(action) {
+            Some((path, content)) => write_fingerprints(workspace, path, content, false, false),
+            None => crate::explore::semantic_fingerprints(parsed),
+        },
+        _ => crate::explore::semantic_fingerprints(parsed),
     }
 }
 
-fn write_fingerprints(workspace: &Path, path: &str, content: &str, append: bool) -> Fingerprints {
+fn write_fingerprints(
+    workspace: &Path,
+    path: &str,
+    content: &str,
+    append: bool,
+    assemble: bool,
+) -> Fingerprints {
     let full =
         lkjagent_effects::workspace::resolve(workspace, path).map_err(|error| error.to_string())?;
     let (prior, prior_fingerprint) = if full.exists() {
@@ -155,7 +168,10 @@ fn write_fingerprints(workspace: &Path, path: &str, content: &str, append: bool)
                     stable_fingerprint(&Some(bytes.clone())).map_err(|error| error.message)?;
                 (Some(bytes), fingerprint)
             }
-            Err(error) => (None, fingerprint_text(&format!("unreadable:{error}"))?),
+            Err(error) => (
+                None,
+                crate::explore::fingerprint_text(&format!("unreadable:{error}"))?,
+            ),
         }
     } else {
         (
@@ -172,21 +188,13 @@ fn write_fingerprints(workspace: &Path, path: &str, content: &str, append: bool)
     } else {
         content.to_string()
     };
-    let (intended, _) = crate::artifact_effects::assemble_content(path, &body)?;
-    Ok((prior_fingerprint, fingerprint_text(&intended)?))
-}
-
-fn fingerprint_text(value: &str) -> Result<String, String> {
-    stable_fingerprint(&value).map_err(|error| error.message)
-}
-fn model_action(action: &Action) -> ModelAction {
-    ModelAction {
-        tool: action.tool.clone(),
-        params: action
-            .params
-            .iter()
-            .filter(|(name, _)| name != "tool_name")
-            .map(|(name, value)| (name.clone(), value.clone()))
-            .collect::<BTreeMap<_, _>>(),
-    }
+    let intended = if assemble {
+        crate::artifact_effects::assemble_content(path, &body)?.0
+    } else {
+        body
+    };
+    Ok((
+        prior_fingerprint,
+        crate::explore::fingerprint_text(&intended)?,
+    ))
 }

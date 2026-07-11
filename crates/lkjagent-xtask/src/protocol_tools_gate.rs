@@ -109,8 +109,18 @@ const REQUIRED: &[(&str, &str, &str)] = &[
     ),
     (
         "lkjagent-app",
+        "admission_bridge",
+        "model_workspace_write_prepares_target_fingerprints",
+    ),
+    (
+        "lkjagent-app",
         "native_append_effect",
         "payload_workspace_append_effect_appends_file_and_artifact",
+    ),
+    (
+        "lkjagent-app",
+        "lib",
+        "effect_dispatch::tests::prior_failure_reports_completed_effects",
     ),
     (
         "lkjagent-app",
@@ -151,13 +161,14 @@ pub fn check(root: &Path) -> Result<(), Vec<String>> {
 }
 
 fn run(root: &Path, package: &str, target: &str, test: &str) -> Option<String> {
-    let output = match Command::new("cargo")
-        .args([
-            "test", "--locked", "-p", package, "--test", target, "--", test,
-        ])
-        .current_dir(root)
-        .output()
-    {
+    let mut args = vec!["test", "--locked", "-p", package];
+    if target == "lib" {
+        args.push("--lib");
+    } else {
+        args.extend(["--test", target]);
+    }
+    args.extend(["--", test]);
+    let output = match Command::new("cargo").args(args).current_dir(root).output() {
         Ok(output) => output,
         Err(error) => return Some(format!("required protocol test could not start: {error}")),
     };

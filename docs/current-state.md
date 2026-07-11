@@ -91,8 +91,9 @@ Persisted views discard catalog-excluded entries, and admission rejects them.
 Decision-free generic Explore parsing and work selection now block rather than
 synthesizing a catalog-wide action view. Model actions and harness writes
 atomically persist admissions and effect journals before dispatch; one immutable
-observation settles each attempt. Native writes validate prior fingerprints
-before dispatch and intended fingerprints before commit. Startup settles prepared
+observation settles each attempt. Native main files validate prior fingerprints
+before dispatch and intended fingerprints before commit; generated parts remain
+outside this reconciliation. Startup settles prepared
 rows without replay and compares applying native file targets. Matching intended
 bytes recover. Prior, conflicts, and non-file effects fail. Multi-file recovery,
 shell-check journaling, and atomic settlement across context, state, checks,
