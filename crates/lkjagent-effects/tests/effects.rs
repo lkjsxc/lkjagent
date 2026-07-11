@@ -171,6 +171,20 @@ fn missing_tree_checks_return_failed_results_not_io_errors() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+#[rustfmt::skip]
+fn shell_does_not_inherit_endpoint_credentials() -> TestResult<()> {
+    if std::env::var_os("LKJAGENT_SECRET_TEST_CHILD").is_some() {
+        let root = fixture_root("shell-secret")?;
+        let report = shell::run(&root, "test -z \"${LKJAGENT_API_KEY+x}\" && printf clean", 5)?;
+        assert_eq!(report.output, "clean"); return Ok(());
+    }
+    let status = Command::new(std::env::current_exe()?)
+        .args(["--exact", "shell_does_not_inherit_endpoint_credentials", "--nocapture"])
+        .env("LKJAGENT_SECRET_TEST_CHILD", "1").env("LKJAGENT_API_KEY", "must-not-escape").status()?;
+    assert!(status.success()); Ok(())
+}
+
 fn fixture_root(name: &str) -> TestResult<PathBuf> {
     let path = std::env::temp_dir().join(format!("lkjagent-effects-{name}-{}", std::process::id()));
     if path.exists() {

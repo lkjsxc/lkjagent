@@ -1,4 +1,3 @@
-pub mod benchmark;
 pub mod doc_catalog;
 pub mod doc_common;
 pub mod doc_crate_readmes;
@@ -7,7 +6,7 @@ pub mod doc_special;
 pub mod doc_topology;
 mod docs_authority_contract;
 pub mod docs_authority_gate;
-mod docs_authority_product;
+mod domain_experiments_gate;
 pub mod evaluation_harness;
 pub mod facts;
 pub mod gate;
@@ -56,8 +55,8 @@ pub fn run(args: &[String], root: &Path) -> i32 {
         Ok(Gate::QuietTest) => run_command_gate(root, "test"),
         Ok(Gate::QuietVerify) => run_verify(root),
         Ok(Gate::Node(identifier)) => run_node_gate(root, &identifier),
-        Ok(Gate::Benchmark(rest)) => benchmark::run(&rest, root),
-        Ok(Gate::Experiment(_)) => evaluation_harness::reject_unbound_command("experiment"),
+        Ok(Gate::Benchmark(rest)) => evaluation_harness::run_benchmark(&rest, root),
+        Ok(Gate::Experiment(rest)) => evaluation_harness::run_experiment(&rest, root),
         Ok(Gate::Proof(_)) => evaluation_harness::reject_unbound_command("proof"),
         Ok(Gate::Smoke(rest)) => evaluation_harness::run_smoke(&rest, root),
         Ok(Gate::Structure(rest)) => structure::run(&rest, root),
@@ -157,7 +156,7 @@ fn run_verify(root: &Path) -> i32 {
             return report_static(name, violations);
         }
     }
-    if let Err(error) = benchmark::validate_corpus(root) {
+    if let Err(error) = evaluation_harness::validate_corpus(root) {
         print_failure(&[
             "bench check-corpus failed".to_string(),
             "exit status: 1".to_string(),

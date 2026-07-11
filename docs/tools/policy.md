@@ -26,6 +26,11 @@ status, logs, proof bundles, and recovery decisions.
 Workspace policy canonicalizes paths before admission. Absolute paths and `..`
 escapes are denied even if another layer would otherwise allow the tool.
 
+## Credential Rule
+
+Shell children never inherit `LKJAGENT_API_KEY`. Endpoint credentials remain at
+the model-call edge and cannot become shell output or durable observations.
+
 ## Evidence Rule
 
 When a state cell requires evidence, the tool view exposes only operations that

@@ -29,8 +29,8 @@ label is never an input to the decision.
 At a quiesced read boundary the recorder uses the SQLite Online Backup API to
 create `run.sqlite3`. It then writes a sorted workspace manifest containing
 normalized path, document ID, revision ID, and SHA-256 for every current file.
-The raw manifest binds the scenario bundle, database, workspace manifest, PTY
-cast when present, and all command logs.
+Each run manifest binds all raw files. A campaign manifest also binds the exact
+binary, build log, source and plan records, matrix, adoption rows, and run trees.
 
 ## PTY Recording
 
@@ -53,7 +53,15 @@ everything cannot pass.
 ## Command Authority
 
 `bench check-corpus` validates the anchored scenario sources. `smoke replay`
-runs the complete deterministic harness. Summary-only experiment, proof, live
-benchmark, and live smoke commands return failure because they cannot bind raw
-evidence to a frozen source. Final live work uses the acceptance campaign
-scripts and evidence root.
+runs the complete deterministic harness. `experiment run` requires clean source
+inputs, an unchanged strict-ancestor plan, and a detached offline release build
+with isolated Cargo configuration and remapped paths. A Git-backed gate compares
+the rebuilt binary exactly; the Git-free Docker gate rebuilds the same source bytes.
+The runner records fresh-store production-endpoint probes and conditionally
+adds repeats four and five when the first three outcomes differ. Failed attempts
+retain logs and snapshots; explicit resume archives failures and skips completed
+tuple rows without reusing their stores. `gate
+domain-experiments` recomputes input, exchange, database, complete table export,
+workspace, metric, and manifest claims. Probe rows explicitly mark the fault
+schedule, recovery hypotheses, semantic success, and live floor when unexercised
+or unmeasured; final fault and live work owns those predicates.

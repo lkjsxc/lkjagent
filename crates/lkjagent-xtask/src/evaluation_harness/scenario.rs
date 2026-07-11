@@ -70,7 +70,7 @@ fn check_one(path: &Path, id: &str, faults: &BTreeSet<String>) -> Result<Scenari
     }
     check_matters(path, id, &mut failures);
     check_schedule(path, id, &mut failures);
-    super::scenario_seed::check(path, id, &mut failures);
+    super::check_scenario_seed(path, id, &mut failures);
     let checks = check_checks(path, id, &mut failures);
     let fingerprint = bundle(path, &mut failures);
     if failures.is_empty() {

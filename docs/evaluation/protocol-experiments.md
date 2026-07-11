@@ -24,16 +24,33 @@ combinations, at least three integrated candidates, and the final winner against
 baseline. Each cell uses the same model, seeds, owner schedule, budgets, fault
 schedule, and scenario checks except for declared factors.
 
-Noisy cells require at least three independent live runs and five when the first
-three disagree. Deterministic parser, store, filesystem, and TUI invariants use
-replay.
+Noisy cells require three independent endpoint runs and five when the first
+three semantic outcome fingerprints differ. The fingerprint covers parse
+outcome, action identity and admission, observations, blockers, and recovery.
+Latency and token variance remain metrics rather than changing classification.
+Deterministic parser, store, filesystem, and TUI invariants use replay.
+
+## Trial Boundary
+
+Domain trials use each anchored seed and first scheduled owner goal with a fresh
+store, a clean locked build, the production endpoint adapter, and an Online
+Backup snapshot. The runner isolates Cargo and runtime configuration, retains
+raw and recursively redacted exchanges, exports every durable table and
+workspace identity, and binds all bytes in run and campaign manifests. It
+allows bounded native setup but exactly one provider exchange per run, then
+measures that completed endpoint response. Fault-schedule and recovery
+branches remain explicitly unexercised unless durable events prove otherwise;
+task success, semantic checks, and the 840-second floor remain unmeasured. Such
+rows are conditional on fault and frozen live campaigns. A parse or admission
+failure can reject an idea, but probe evidence can never adopt it.
 
 ## Metrics
 
-Measure obligation pass rate, false closes, unsupported claims, recovery
-strategy changes, prompt tokens and duplication, cache reuse, parse and
-admission success, effect count, latency, PTY identity, and cost. Per-scenario
-results cannot be hidden by an aggregate.
+Probe rows recompute endpoint calls, parse result, action identity, admission,
+tokens when reported, latency, observations, blockers, and recovery events.
+Recall, unsupported claims, repeated failure, recovery time, semantic checks,
+and task success carry `not-measured` rather than invented values until their
+scheduled branches run. Per-scenario results cannot be hidden by an aggregate.
 
 ## Adoption
 

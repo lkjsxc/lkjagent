@@ -20,6 +20,7 @@ fn released_nodes_route_to_named_suites() -> Result<(), String> {
         "protocol-tools",
         "recovery-continuity",
         "workspace-retrieval-maintenance",
+        "domain-experiments",
     ] {
         let failures = match node_gate::check(&root, identifier) {
             Ok(()) => return Err("an empty fixture executed a node suite".to_string()),

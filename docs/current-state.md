@@ -41,14 +41,15 @@ checks those inputs, source budgets, configuration, Docker locking, workflow,
 and nonempty fault suites. These source claims are not clean-archive acceptance;
 that requires the raw no-cache Compose run bound to the committed tree.
 
-The evaluation harness now owns three source-bound scenario bundles, a fake
-clock, typed fault schedules, SQLite Online Backup capture, workspace and raw
-manifests, and real PTY input and output capture. Its negative fixtures reject
-idle, blocked, skipped, zero-test, and generated-placeholder evidence. These
-are harness capabilities and regression proofs, not final live or PTY campaign
-results; final evidence remains open until it runs against frozen source. The
-PTY fixture separates acceptance and completion writes to keep the raw frame
-floor stable across scheduler timing.
+The evaluation harness owns three source-bound scenario bundles, a fake clock,
+typed faults, Online Backup capture, workspace/run/campaign manifests, and PTY
+capture. Its negative fixtures reject idle, blocked, skipped, zero-test, and
+generated-placeholder evidence. The predeclared domain runner now requires clean
+source, a strict-ancestor plan, a reproducible isolated build, production
+exchange logs, recomputed probe metrics, and three-or-five repeats. No endpoint
+campaign has run; fault/recovery branches, task success, and live floors remain
+explicitly unmeasured. The PTY
+fixture still is regression evidence rather than a final frozen-source campaign.
 
 A fresh model-free diary run writes a journal entry containing canned
 missing-detail text after the owner asks for a diary entry. This is reproduced
@@ -88,9 +89,9 @@ now use direct fields inside one input block and reject name/value wrappers.
 The parser bounds scalars and fields at 4,096 bytes and actions at 16,384 bytes;
 decision field specs persist/render tighter byte and canonical count ranges.
 Persisted views discard catalog-excluded entries; admission rejects them.
-Decision-free generic Explore parsing and work selection now block rather than
-synthesizing a catalog-wide action view. Model actions, harness writes, and shell
-command checks persist admissions and effect journals before dispatch; one bounded
+Decision-free generic Explore parsing and work selection now block. Shell
+children drop endpoint credentials. Model actions, harness writes, and command
+checks persist admissions and effect journals before dispatch; one bounded
 immutable observation settles each attempt. Generated revisions retain exact main/part bytes,
 closed membership, and stale absence; drift blocks mutation and append rebuilds
 owned units. After dispatch, artifact rows and refs, observations, context, checks, state and
@@ -113,10 +114,11 @@ Unstarted groups need explicit apply; moving and projecting groups resume forwar
 Archive compensation reuses its exact key under lock; exact projection rollback remains open.
 
 The xtask dispatcher runs named nonempty suites for `protocol-tools`,
-`workspace-retrieval-maintenance`, and `recovery-continuity`, rejecting empty runs.
-Protocol and workspace receipts bind their reviewed source, not later recovery commits.
-Recovery remains open pending complete coverage, review, and source-bound evidence.
-Baseline failures remain under the pre-freeze progress roots.
+`workspace-retrieval-maintenance`, `recovery-continuity`, and `domain-experiments`.
+Recovery has sequence-14 reviewed source-bound evidence. The domain gate is red
+until a real conditional probe matrix exists; its source and plan binding, build,
+exchange, database, workspace, metrics, repeat escalation, and manifests are
+mechanically checked. Earlier receipts do not bind later commits.
 
 The TUI derives ordinary conversation from queue and selected event rows rather
 than one canonical conversation table. Historical reducer tests do not replace
@@ -152,7 +154,6 @@ effects transaction is defined in
 checks for every required obligation and no unresolved blocking operation.
 
 ## Removal Map
-
 | Current authority | Target replacement | Status |
 | --- | --- | --- |
 | `TaskSnapshot` hydration | event-reduced `RuntimeState` | open |
@@ -181,7 +182,6 @@ passes. Each named workgraph node requires its locked Docker gate, raw output,
 machine-readable result, separate review, and hash-bound receipt.
 
 ## Contract To Source Gaps
-
 | Contract | Current source | First proving node |
 | --- | --- | --- |
 | native fresh store | `crates/lkjagent-store/src/plan_*` | store-foundation |

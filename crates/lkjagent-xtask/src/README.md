@@ -6,7 +6,6 @@ This directory holds the repository gate dispatcher, checks, and command runner.
 
 ## Table of Contents
 
-- [benchmark.rs](benchmark.rs): anchored scenario corpus command.
 - [doc-catalog.rs](doc_catalog.rs): documentation catalog checks.
 - [doc-common.rs](doc_common.rs): shared Markdown shape checks.
 - [doc-crate-readmes.rs](doc_crate_readmes.rs): crate README coverage checks.
@@ -16,11 +15,11 @@ This directory holds the repository gate dispatcher, checks, and command runner.
 - [doc-topology.rs](doc_topology.rs): README topology checks.
 - [docs-authority-contract.rs](docs_authority_contract.rs): native contract,
   baseline truth, schema, and retired-page assertions.
-- [docs-authority-gate.rs](docs_authority_gate.rs): docs node composition and
-  product source no-diff check.
-- [docs-authority-product.rs](docs_authority_product.rs): Git-free product tree
-  fingerprint used by the Docker node gate.
-- [evaluation-harness/](evaluation_harness/README.md): deterministic scenarios,
+- [docs-authority-gate.rs](docs_authority_gate.rs): docs composition, source
+  no-diff checks, and the Git-free Docker product fingerprint.
+- [domain_experiments_gate.rs](domain_experiments_gate.rs): candidate matrix and source validator.
+- [domain_experiments_gate/README.md](domain_experiments_gate/README.md): run, manifest, exchange, and metric checks.
+- [evaluation-harness/](evaluation_harness/README.md): scenarios, benchmark dispatch,
   raw capture, PTY replay, and false-positive checks.
 - [facts.rs](facts.rs): repository facts, shared check data, and evidence reads.
 - [gate.rs](gate.rs): command parsing, size budgets, and quiet command runner.

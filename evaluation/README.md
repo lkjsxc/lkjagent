@@ -8,6 +8,8 @@ by mechanical evaluation gates.
 ## Contents
 
 - `experiment-plan.tsv`: outcome-free cells, controls, repeats, and threshold hash.
+- `experiment-runner.py`: public command for source-bound endpoint probes.
+- `experiment_runner/`: build, run, evidence, resume, and manifest modules.
 - `fault-schedule.tsv`: ordered deterministic fault injections.
 - `scenarios/`: anchored goals, schedules, checks, and seed bytes.
 - `false-positive-fixtures/`: evidence summaries that must be rejected.

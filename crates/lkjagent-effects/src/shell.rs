@@ -54,6 +54,7 @@ fn run_supervised(
         .arg("-lc")
         .arg(command)
         .current_dir(root)
+        .env_remove("LKJAGENT_API_KEY")
         .env("LKJAGENT_SHELL_SCOPE", scope)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
