@@ -25,11 +25,13 @@ strings.
 ## Parser
 
 The parser receives the expected envelope and view from the decision. Action
-turns must use exactly one dedicated `lkjagent_action` block. Unknown blocks,
-attributes, prose outside the block, duplicate scalar tags, stale decision ids,
-missing arguments, unknown arguments, wrong primitive classes, JSON-looking
-bodies, and tools absent from the view produce structured faults. Unknown means
-absent from the decision view, not absent from a hidden global list.
+turns must use exactly one dedicated `lkjagent_action` block and one `input`
+block containing direct decision-approved field tags. Name/value argument
+wrappers, unknown blocks, attributes, prose outside the block, duplicate scalar
+tags, stale decision ids, missing arguments, wrong primitive classes,
+JSON-looking bodies, and tools absent from the view produce structured faults.
+Unknown means absent from the decision view, not absent from a hidden global
+list.
 
 ## Admission
 

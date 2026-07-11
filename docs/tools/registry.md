@@ -40,11 +40,10 @@ The runtime renders safe filled XML-like action examples only when the active
 `ToolSetView` carries example parameters. Schema-only XML-like skeletons are
 labelled non-copyable and remain rejected by admission when placeholders are
 unchanged. A copyable read example contains `<decision_id>`,
-`<context_fingerprint>`, `<tool_name>fs.read</tool_name>`, and `<argument>`
-tags for path `README.md` and count `20`.
-
-If no tools are available, the decision renders an output contract that does not
-ask for a tool call.
+`<context_fingerprint>`, `<tool_name>fs.read</tool_name>`, and one `<input>`
+block with direct field tags for path `README.md` and count `20`. Name/value
+argument wrappers are not part of the model protocol. If no tools are available,
+the decision renders an output contract that does not ask for a tool call.
 
 ## Failure This Prevents
 
