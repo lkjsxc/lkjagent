@@ -9,7 +9,7 @@ pub const STATE_LEDGER_TABLES: &[&str] = &[
     "context_edges", "state_edges", "workspace_records", "workspace_record_history",
     "workspace_manifest", "workspace_path_aliases", "workspace_rebalance_audit",
     "artifacts", "provider_exchanges", "workspace_search_chunks", "workspace_search_lexical",
-    "workspace_search_trigram", "workspace_operations", "effect_journal",
+    "workspace_search_trigram", "workspace_operations", "workspace_operation_revisions", "effect_journal",
 ];
 pub fn setup(conn: &Connection) -> StoreResult<()> {
     conn.execute_batch(

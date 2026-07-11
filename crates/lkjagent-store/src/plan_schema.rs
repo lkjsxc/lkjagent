@@ -8,7 +8,7 @@ pub const APPLICATION_TABLES: &[&str] = &[
     "runtime_decisions", "prompt_frames", "prompt_cards", "tool_admissions", "observations",
     "context_items", "context_edges", "state_edges", "workspace_records", "workspace_record_history",
     "workspace_manifest", "workspace_path_aliases", "workspace_rebalance_audit", "artifacts",
-    "provider_exchanges", "effect_journal", "workspace_operations", "workspace_search_chunks", "workspace_search_lexical", "workspace_search_trigram",
+    "provider_exchanges", "effect_journal", "workspace_operations", "workspace_operation_revisions", "workspace_search_chunks", "workspace_search_lexical", "workspace_search_trigram",
 ];
 pub fn setup(conn: &Connection) -> StoreResult<()> {
     conn.execute_batch(

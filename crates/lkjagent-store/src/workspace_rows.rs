@@ -2,6 +2,10 @@ use lkjagent_core::workspace_manifest::{RebalanceMove, WorkspaceManifest};
 use rusqlite::{params, Connection};
 
 use crate::error::{StoreError, StoreResult};
+pub use crate::record_schema::{
+    compensate_operation, operation_revisions, prepare_or_load_operation, prepared_operations,
+    settle_operation, OperationDraft, OperationPreparation, OperationRevision, OperationRow,
+};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PathAliasRow {
@@ -48,6 +52,42 @@ pub fn insert_alias(conn: &Connection, row: &PathAliasRow) -> StoreResult<()> {
             row.decision_id,
             row.created_at,
         ],
+    )?;
+    Ok(())
+}
+
+pub fn setup_operations(conn: &Connection) -> StoreResult<()> {
+    conn.execute_batch(
+        "
+        CREATE TABLE IF NOT EXISTS workspace_operations (
+            id TEXT PRIMARY KEY, idempotency_key TEXT NOT NULL UNIQUE, kind TEXT NOT NULL,
+            phase TEXT NOT NULL, preimage_json TEXT NOT NULL, intended_json TEXT NOT NULL,
+            error TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS workspace_operation_revisions (
+            operation_id TEXT NOT NULL, role TEXT NOT NULL, path TEXT NOT NULL,
+            bytes BLOB NOT NULL, fingerprint TEXT NOT NULL,
+            PRIMARY KEY(operation_id, role), FOREIGN KEY(operation_id) REFERENCES workspace_operations(id)
+        );
+        ",
+    )?;
+    Ok(())
+}
+
+pub fn prepare_operation(
+    conn: &Connection,
+    id: &str,
+    key: &str,
+    kind: &str,
+    preimage: &str,
+    intended: &str,
+    now: &str,
+) -> StoreResult<()> {
+    conn.execute(
+        "INSERT INTO workspace_operations
+         (id, idempotency_key, kind, phase, preimage_json, intended_json, created_at, updated_at)
+         VALUES (?1, ?2, ?3, 'prepared', ?4, ?5, ?6, ?6)",
+        params![id, key, kind, preimage, intended, now],
     )?;
     Ok(())
 }
@@ -119,67 +159,6 @@ pub fn insert_rebalance_audit(
             json(&item.validation)?,
             created_at,
         ],
-    )?;
-    Ok(())
-}
-
-pub fn setup_operations(conn: &Connection) -> StoreResult<()> {
-    conn.execute_batch(
-        "
-        CREATE TABLE IF NOT EXISTS workspace_operations (
-            id TEXT PRIMARY KEY,
-            idempotency_key TEXT NOT NULL UNIQUE,
-            kind TEXT NOT NULL,
-            phase TEXT NOT NULL,
-            preimage_json TEXT NOT NULL,
-            intended_json TEXT NOT NULL,
-            error TEXT,
-            created_at TEXT NOT NULL,
-            updated_at TEXT NOT NULL
-        );
-        ",
-    )?;
-    Ok(())
-}
-pub fn prepare_operation(
-    conn: &Connection,
-    id: &str,
-    idempotency_key: &str,
-    kind: &str,
-    preimage_json: &str,
-    intended_json: &str,
-    now: &str,
-) -> StoreResult<()> {
-    conn.execute(
-        "INSERT INTO workspace_operations
-         (id, idempotency_key, kind, phase, preimage_json, intended_json, created_at, updated_at)
-         VALUES (?1, ?2, ?3, 'prepared', ?4, ?5, ?6, ?6)",
-        params![id, idempotency_key, kind, preimage_json, intended_json, now],
-    )?;
-    Ok(())
-}
-pub fn settle_operation(conn: &Connection, id: &str, now: &str) -> StoreResult<()> {
-    set_operation_phase(conn, id, "settled", None, now)
-}
-pub fn compensate_operation(
-    conn: &Connection,
-    id: &str,
-    error: &str,
-    now: &str,
-) -> StoreResult<()> {
-    set_operation_phase(conn, id, "compensated", Some(error), now)
-}
-
-fn set_operation_phase(
-    conn: &Connection,
-    id: &str,
-    phase: &str,
-    error: Option<&str>,
-    now: &str,
-) -> StoreResult<()> {
-    conn.execute(
-        "UPDATE workspace_operations SET phase = ?2, error = ?3, updated_at = ?4 WHERE id = ?1",
-        params![id, phase, error, now],
     )?;
     Ok(())
 }
