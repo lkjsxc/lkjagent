@@ -92,7 +92,7 @@ fn git_paths(root: &Path, prefix: &[&str]) -> Result<Vec<String>, String> {
         .collect())
 }
 
-const EXPECTED_PRODUCT_FINGERPRINT: &str = "fnv1a64:411fbd4b0f37a0d9";
+const EXPECTED_PRODUCT_FINGERPRINT: &str = "fnv1a64:fe15a18a4a66923b";
 const FINGERPRINT_DIRS: &[&str] = &[
     "crates/lkjagent-app",
     "crates/lkjagent-core",
@@ -151,11 +151,18 @@ fn collect(root: &Path, path: &Path, paths: &mut Vec<PathBuf>) -> Result<(), Str
         let child = entry.map_err(|error| error.to_string())?.path();
         if child.is_dir() {
             collect(root, &child, paths)?;
-        } else if child.is_file() {
+        } else if child.is_file() && authored(&child) {
             paths.push(child);
         }
     }
     Ok(())
+}
+
+fn authored(path: &Path) -> bool {
+    matches!(
+        path.extension().and_then(|value| value.to_str()),
+        Some("rs" | "md" | "txt" | "tsv" | "json" | "toml" | "py" | "lock" | "yml")
+    )
 }
 
 fn update(hash: &mut u64, bytes: &[u8]) {

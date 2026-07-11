@@ -35,7 +35,7 @@ registry. The tracked example contains every anchored key. Current endpoint,
 workspace-root, prompt-cap, and live-duration consumers use the validated map;
 later owning nodes still must connect their declared settings to behavior.
 
-Repository build inputs now include the tracked lockfile, configuration,
+Repository build inputs include the tracked lockfile, Cargo policy, configuration,
 explicit Docker copy roots, and public clean-archive workflow. The named gate
 checks those inputs, source budgets, configuration, Docker locking, workflow,
 and nonempty fault suites. These source claims are not clean-archive acceptance;
@@ -48,9 +48,9 @@ generated-placeholder evidence. The predeclared domain runner now requires clean
 source, a strict-ancestor plan, a reproducible isolated build, production
 exchange logs, recomputed metrics, and three-or-five repeats. Attempts at
 `853c647a` and `f425d78f` exposed a no-decision close and invalid config. Runs at
-`2f0da5e1` and `891e9882` completed 103 rows; their gates then exposed source-sort
-drift and verifier-created SQLite sidecars. No matrix is accepted; fault, task,
-live, and PTY predicates remain absent.
+`2f0da5e1` and `891e9882` exposed source-sort drift and verifier sidecars. The
+103-row `d2dab90f` run passed locally; Docker then exposed omitted Cargo policy
+and ignored database files. No matrix is accepted; live and PTY predicates remain absent.
 
 A fresh model-free diary run writes a journal entry containing canned
 missing-detail text after the owner asks for a diary entry. This is reproduced

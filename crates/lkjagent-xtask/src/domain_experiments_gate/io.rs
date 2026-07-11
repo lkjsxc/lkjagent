@@ -72,12 +72,6 @@ pub(super) fn hash(bytes: &[u8]) -> String {
     crate::evaluation_harness::sha256(bytes)
 }
 
-pub(super) fn reported(value: Option<&Value>) -> String {
-    value
-        .and_then(Value::as_u64)
-        .map_or_else(|| "not-reported".into(), |item| item.to_string())
-}
-
 #[rustfmt::skip]
 pub(super) fn overlay(mut base: Value, factors: &BTreeMap<String, Value>) -> Result<Value, String> {
     let map=base.as_object_mut().ok_or("baseline config is not an object")?; for (key,value) in factors{map.insert(key.clone(),value.clone());} Ok(base)
@@ -164,7 +158,8 @@ pub(super) fn source_hash(root: &Path) -> Result<String, String> {
             .current_dir(root).output().map_err(err)?; if !output.status.success() { return Err("git ls-files failed".into()); }
         output.stdout.split(|byte|*byte==0).filter(|name|!name.is_empty()).map(|name|root.join(String::from_utf8_lossy(name).as_ref())).collect() }
         else { let mut found=Vec::new(); for name in SOURCE_PATHS { let path=root.join(name); if !path.exists(){continue;}
-            if path.is_symlink(){return Err("source input is a symlink".into());} else if path.is_dir(){found.extend(walk(&path)?);}else{found.push(path);} } found };
+            if path.is_symlink(){return Err("source input is a symlink".into());} else if path.is_dir(){found.extend(walk(&path)?.into_iter().filter(|item|
+                matches!(item.extension().and_then(|value|value.to_str()),Some("rs"|"md"|"txt"|"tsv"|"json"|"toml"|"py"|"lock"|"yml"))));}else{found.push(path);} } found };
     paths.sort_by_key(|path|path.strip_prefix(root).unwrap_or(path).to_string_lossy().into_owned());
     let mut bytes=Vec::new(); for path in paths { if path.is_symlink(){return Err("source input is a symlink".into());}
         let name=path.strip_prefix(root).map_err(err)?.to_string_lossy().replace('\\', "/"); bytes.extend_from_slice(name.as_bytes()); bytes.push(0);

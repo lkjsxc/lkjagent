@@ -7,8 +7,8 @@ use serde_json::Value;
 
 use super::attestation;
 use super::io::{
-    err, field, file_hash, hash, inside, overlay, pairs, raw_manifest, reported, scenario_hash,
-    table, valid_hash,
+    err, field, file_hash, hash, inside, overlay, pairs, raw_manifest, scenario_hash, table,
+    valid_hash,
 };
 use super::Cell;
 
@@ -162,6 +162,12 @@ pub(super) fn validate(
     attestation::validate_workspace(&conn, &run_dir, run_id)?;
     attestation::validate_exports(&conn, &run_dir, run_id)?;
     Ok(())
+}
+
+fn reported(value: Option<&Value>) -> String {
+    value
+        .and_then(Value::as_u64)
+        .map_or_else(|| "not-reported".into(), |item| item.to_string())
 }
 
 #[rustfmt::skip]

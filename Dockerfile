@@ -11,6 +11,7 @@ RUN apt-get update \
 RUN rustup component add rustfmt clippy
 COPY Cargo.toml Cargo.lock README.md ./
 COPY .gitignore .dockerignore ./
+COPY .cargo ./.cargo
 COPY .github/workflows/verify.yml ./.github/workflows/verify.yml
 COPY crates/lkjagent-app ./crates/lkjagent-app
 COPY crates/lkjagent-core ./crates/lkjagent-core

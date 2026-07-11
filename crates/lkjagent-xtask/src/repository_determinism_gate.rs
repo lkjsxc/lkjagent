@@ -124,6 +124,9 @@ pub fn check_docker(root: &Path) -> Vec<String> {
     if !dockerfile.contains("cargo build --locked") {
         failures.push("Docker release build is not locked".to_string());
     }
+    if !dockerfile.contains("COPY .cargo ./.cargo") {
+        failures.push("Docker build omits tracked Cargo policy".to_string());
+    }
     let compose = read(root.join("docker-compose.yml"), &mut failures);
     for line in compose
         .lines()
