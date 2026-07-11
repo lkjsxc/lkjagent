@@ -46,13 +46,11 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
 ) -> Result<TaskSnapshot, String> {
     let workspace = crate::config::workspace_root(data_dir)?;
     let logs = data_dir.join("logs");
-    crate::workspace_scaffold::ensure_root(&workspace)?;
     let mut conn =
         Connection::open(data_dir.join("lkjagent.sqlite3")).map_err(|error| error.to_string())?;
     setup(&conn).map_err(|error| error.to_string())?;
     let now = clock.now();
     crate::daemon_lock::claim(&mut conn, &now)?;
-    recover_unsettled_effects(&mut conn, &workspace, &now).map_err(|error| error.to_string())?;
     for operation in lkjagent_store::workspace_rows::prepared_operations(&conn)
         .map_err(|error| error.to_string())?
     {
@@ -69,6 +67,8 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
             .ok_or_else(|| format!("workspace operation {} has no record id", operation.id))?;
         crate::record_archive::archive(&conn, data_dir, &id, &now)?;
     }
+    crate::workspace_scaffold::ensure_root(&workspace)?;
+    recover_unsettled_effects(&mut conn, &workspace, &now).map_err(|error| error.to_string())?;
     let _reconciled = crate::workspace_search::rebuild(&conn, &workspace)?;
     let mut snapshot = match load_runtime_snapshot(&mut conn, data_dir, clock)? {
         Some(snapshot) if matches!(snapshot.task.state, TaskState::Open | TaskState::Waiting) => {

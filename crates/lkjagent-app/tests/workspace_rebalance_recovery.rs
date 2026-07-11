@@ -60,35 +60,30 @@ fn rebalance_startup_settles_moved_exact_revisions() -> TestResult<()> {
 }
 
 #[test]
+#[rustfmt::skip]
 fn rebalance_startup_preserves_conflicting_target() -> TestResult<()> {
     let setup = prepared_move()?;
-    fs::write(setup.workspace.join(NEW), "owner bytes")?;
-    let mut endpoint = ScriptedEndpoint {
-        outputs: vec![],
-        index: 0,
-    };
-    let error = run_until_idle(&setup.data, &mut endpoint, 1)
-        .err()
-        .ok_or_else(|| std::io::Error::other("rebalance startup unexpectedly succeeded"))?;
+    let owner = setup.data.join("owner.md"); fs::write(&owner, "owner bytes")?;
+    fs::remove_file(setup.workspace.join(NEW))?;
+    std::os::unix::fs::symlink(&owner, setup.workspace.join(NEW))?;
+    let mut endpoint = ScriptedEndpoint { outputs: vec![], index: 0 };
+    let error = run_until_idle(&setup.data, &mut endpoint, 1).err().ok_or_else(|| std::io::Error::other("rebalance startup unexpectedly succeeded"))?;
     assert!(error.contains("target conflicts"));
+    assert!(fs::symlink_metadata(setup.workspace.join(NEW))?.file_type().is_symlink());
     assert_eq!(fs::read(setup.workspace.join(NEW))?, b"owner bytes");
     let conn = Connection::open(setup.data.join("lkjagent.sqlite3"))?;
-    let phase: String = conn.query_row(
-        "SELECT phase FROM workspace_operations WHERE id = ?1",
-        [OPERATION],
-        |row| row.get(0),
-    )?;
+    let phase: String = conn.query_row("SELECT phase FROM workspace_operations WHERE id = ?1", [OPERATION], |row| row.get(0))?;
     assert_eq!(phase, "prepared");
     Ok(())
 }
 
 #[test]
-fn rebalance_startup_compensates_when_index_rebuild_fails() -> TestResult<()> {
+fn rebalance_startup_preserves_moved_bytes_when_settlement_projection_fails() -> TestResult<()> {
     let setup = prepared_move()?;
     let conn = Connection::open(setup.data.join("lkjagent.sqlite3"))?;
     conn.execute_batch(
-        "CREATE TRIGGER fail_recovery_index BEFORE INSERT ON artifacts
-         WHEN NEW.id LIKE 'index-%' BEGIN SELECT RAISE(FAIL, 'index blocked'); END;",
+        "CREATE TRIGGER fail_recovery_projection BEFORE INSERT ON workspace_rebalance_audit
+         BEGIN SELECT RAISE(FAIL, 'audit blocked'); END;",
     )?;
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
@@ -102,9 +97,9 @@ fn rebalance_startup_compensates_when_index_rebuild_fails() -> TestResult<()> {
         [OPERATION],
         |row| row.get(0),
     )?;
-    assert_eq!(phase, "compensated");
-    assert!(setup.workspace.join(OLD).exists());
-    assert!(!setup.workspace.join(NEW).exists());
+    assert_eq!(phase, "prepared");
+    assert!(!setup.workspace.join(OLD).exists());
+    assert!(setup.workspace.join(NEW).exists());
     Ok(())
 }
 
@@ -170,7 +165,7 @@ fn revision(role: &str, path: &str, bytes: &[u8], fingerprint: &str) -> Operatio
 }
 
 fn preimage(row: &RecordRow) -> String {
-    serde_json::json!({"id": row.id, "kind": row.kind, "title": row.title, "state": row.state, "path": row.path, "fingerprint": row.fingerprint, "archived": row.archived}).to_string()
+    serde_json::json!({"id": row.id, "kind": row.kind, "title": row.title, "state": row.state, "path": row.path, "fingerprint": row.fingerprint, "archived": row.archived, "updated_at": row.updated_at}).to_string()
 }
 
 fn record_body() -> String {

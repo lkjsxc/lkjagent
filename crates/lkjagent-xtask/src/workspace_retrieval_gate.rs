@@ -64,7 +64,7 @@ const SUITES: &[Suite] = &[
         target: "workspace_rebalance_recovery",
         minimum_tests: 3,
     },
-    Suite { package: "lkjagent-app", target: "workspace_rebalance_retry", minimum_tests: 1 },
+    Suite { package: "lkjagent-app", target: "workspace_rebalance_retry", minimum_tests: 5 },
 ];
 
 #[rustfmt::skip]
@@ -73,6 +73,10 @@ const REQUIRED: &[(&str, &str)] = &[
     ("workspace_inventory", "managed_external_edit_and_move_update_record_projection"),
     ("workspace_search_freshness", "stale_first_page_does_not_hide_current_lower_ranked_hit"),
     ("workspace_search_freshness", "case_insensitive_match_is_centered_in_excerpt"),
+    ("workspace_rebalance_retry", "missing_intended_revision_blocks_without_moving_source"),
+    ("workspace_rebalance_retry", "owner_row_change_blocks_unstarted_resume"),
+    ("workspace_rebalance_retry", "invalid_persisted_move_blocks_before_filesystem_change"),
+    ("workspace_rebalance_retry", "explicit_apply_preserves_dangling_target_conflict"),
     (
         "workspace_search",
         "workspace_search_discovers_body_filters_and_rejects_drift",
@@ -107,7 +111,7 @@ const REQUIRED: &[(&str, &str)] = &[
     ),
     (
         "prepared_operation_startup",
-        "startup_skips_non_archive_prepared_operation",
+        "startup_blocks_malformed_rebalance_operation",
     ),
     (
         "archive_settled_integrity",
@@ -135,9 +139,9 @@ const REQUIRED: &[(&str, &str)] = &[
     ),
     (
         "workspace_rebalance_recovery",
-        "rebalance_startup_compensates_when_index_rebuild_fails",
+        "rebalance_startup_preserves_moved_bytes_when_settlement_projection_fails",
     ),
-    ("workspace_rebalance_retry", "apply_rebalance_resumes_moved_prepared_operation"),
+    ("workspace_rebalance_retry", "explicit_apply_resumes_exact_unstarted_operation"),
 ];
 
 pub fn check(root: &Path) -> Result<(), Vec<String>> {

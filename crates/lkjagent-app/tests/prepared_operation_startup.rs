@@ -11,7 +11,7 @@ use rusqlite::Connection;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn startup_skips_non_archive_prepared_operation() -> TestResult<()> {
+fn startup_blocks_malformed_rebalance_operation() -> TestResult<()> {
     let data = fixture_root()?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
@@ -34,7 +34,10 @@ fn startup_skips_non_archive_prepared_operation() -> TestResult<()> {
         outputs: vec![],
         index: 0,
     };
-    run_until_idle(&data, &mut endpoint, 1)?;
+    let error = run_until_idle(&data, &mut endpoint, 1)
+        .err()
+        .ok_or("malformed rebalance unexpectedly skipped")?;
+    assert!(error.contains("intended move missing"));
 
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     let phase: String = conn.query_row(

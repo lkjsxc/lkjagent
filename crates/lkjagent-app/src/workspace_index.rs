@@ -1,4 +1,3 @@
-use std::fs;
 use std::path::Path;
 
 use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
@@ -15,10 +14,13 @@ type Selector = fn(&RecordRow, &str) -> bool;
 
 pub fn rebuild(conn: &Connection, data_dir: &Path, now: &str) -> Result<String, String> {
     let workspace = crate::config::workspace_root(data_dir)?;
-    let indexes = workspace.join("indexes");
-    fs::create_dir_all(&indexes).map_err(|error| error.to_string())?;
-    fs::create_dir_all(workspace.join("records")).map_err(|error| error.to_string())?;
-    fs::create_dir_all(workspace.join("artifacts")).map_err(|error| error.to_string())?;
+    for rel in [
+        "indexes/.directory",
+        "records/.directory",
+        "artifacts/.directory",
+    ] {
+        let _ = crate::effect_files::open_parent(&workspace, rel, true)?;
+    }
     crate::workspace_scaffold::refresh_for_path(&workspace, "records/README.md")?;
     crate::workspace_scaffold::refresh_for_path(&workspace, "artifacts/README.md")?;
     crate::workspace_scaffold::refresh_for_path(&workspace, "indexes/README.md")?;
@@ -34,7 +36,7 @@ pub fn rebuild(conn: &Connection, data_dir: &Path, now: &str) -> Result<String, 
         ("experiments", experiment),
     ];
     for (name, select) in specs {
-        write_index(conn, &indexes, name, select, &rows, now)?;
+        write_index(conn, &workspace, name, select, &rows, now)?;
         crate::workspace_scaffold::refresh_for_path(&workspace, &format!("indexes/{name}.md"))?;
     }
     suppress_stale_cell(conn, now)?;
@@ -46,7 +48,7 @@ pub fn rebuild(conn: &Connection, data_dir: &Path, now: &str) -> Result<String, 
 
 fn write_index(
     conn: &Connection,
-    indexes: &Path,
+    workspace: &Path,
     name: &str,
     select: Selector,
     rows: &[RecordRow],
@@ -57,8 +59,8 @@ fn write_index(
         .filter(|row| select(row, now))
         .collect::<Vec<_>>();
     let body = index_body(name, &selected);
-    let path = indexes.join(format!("{name}.md"));
-    fs::write(&path, &body).map_err(|error| error.to_string())?;
+    let path = format!("indexes/{name}.md");
+    crate::effect_files::write_bytes(workspace, &path, body.as_bytes())?;
     let fingerprint = stable_fingerprint(&body).map_err(|error| error.message)?;
     insert_artifact(
         conn,

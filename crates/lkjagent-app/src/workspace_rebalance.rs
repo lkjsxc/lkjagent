@@ -95,7 +95,7 @@ fn move_for_row(row: &RecordRow) -> Option<RebalanceMove> {
     Some(item)
 }
 pub(crate) fn file_fingerprint(workspace: &Path, rel: &str) -> Result<String, String> {
-    let text = fs::read_to_string(workspace.join(rel)).map_err(|error| error.to_string())?;
+    let text = crate::effect_files::read_text(workspace, rel)?;
     record_fingerprint(&text).map_err(|error| error.message)
 }
 
@@ -104,7 +104,7 @@ pub(crate) fn verified_file_bytes(
     rel: &str,
     expected: &str,
 ) -> Result<Vec<u8>, String> {
-    let bytes = fs::read(workspace.join(rel)).map_err(|error| error.to_string())?;
+    let bytes = crate::effect_files::read_bytes(workspace, rel)?;
     let text = String::from_utf8(bytes.clone()).map_err(|error| error.to_string())?;
     if record_fingerprint(&text).map_err(|error| error.message)? == expected {
         Ok(bytes)
@@ -122,7 +122,21 @@ pub(crate) fn operation_revisions(item: &RebalanceMove, bytes: &[u8]) -> Result<
 
 #[rustfmt::skip]
 pub(crate) fn operation_preimage(row: &RecordRow) -> String {
-    serde_json::json!({"id": row.id, "kind": row.kind, "title": row.title, "state": row.state, "path": row.path, "fingerprint": row.fingerprint, "archived": row.archived}).to_string()
+    serde_json::json!({"id": row.id, "kind": row.kind, "title": row.title, "state": row.state, "path": row.path, "fingerprint": row.fingerprint, "archived": row.archived, "updated_at": row.updated_at}).to_string()
+}
+
+#[rustfmt::skip]
+pub(crate) fn validated_revisions<'a>(rows: &'a [OperationRevision], item: &RebalanceMove, expected: &str) -> Result<(&'a OperationRevision, &'a OperationRevision), String> {
+    let prior = rows.iter().find(|row| row.role == "prior").ok_or_else(|| "rebalance prior revision missing".to_string())?;
+    let intended = rows.iter().find(|row| row.role == "intended").ok_or_else(|| "rebalance intended revision missing".to_string())?; if rows.len() != 2 { return Err("rebalance move must have exactly two revisions".to_string()); }
+    if prior.path != item.old_path || intended.path != item.new_path { return Err("rebalance revision paths conflict".to_string()); }
+    for row in rows {
+        let fingerprint = lkjagent_core::runtime_fingerprint::stable_fingerprint(&row.bytes).map_err(|error| error.message)?;
+        if fingerprint != row.fingerprint { return Err("rebalance revision fingerprint changed".to_string()); }
+    }
+    if prior.bytes != intended.bytes || prior.fingerprint != intended.fingerprint { return Err("rebalance move revisions contain different bytes".to_string()); }
+    let text = std::str::from_utf8(&prior.bytes).map_err(|error| error.to_string())?; if record_fingerprint(text).map_err(|error| error.message)? != expected { return Err("rebalance revision content conflicts with record preimage".to_string()); }
+    Ok((prior, intended))
 }
 
 pub(crate) fn operation_intended(item: &RebalanceMove) -> String {

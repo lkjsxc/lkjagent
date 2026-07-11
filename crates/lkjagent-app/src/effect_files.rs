@@ -9,22 +9,26 @@ use rustix::fs::{AtFlags, Mode, OFlags, RenameFlags};
 static NEXT_TEMP: AtomicU64 = AtomicU64::new(1);
 
 pub fn read_text(workspace: &Path, path: &str) -> Result<String, String> {
-    let (parent, name) = open_parent(workspace, path, false)?;
-    let flags = OFlags::RDONLY | OFlags::CLOEXEC | OFlags::NOFOLLOW;
-    let fd = rustix::fs::openat(&parent, &name, flags, Mode::empty()).map_err(io_error)?;
-    let mut file = std::fs::File::from(fd);
-    let mut text = String::new();
-    file.read_to_string(&mut text)
-        .map_err(|error| error.to_string())?;
-    Ok(text)
+    String::from_utf8(read_bytes(workspace, path)?).map_err(|error| error.to_string())
 }
 
-pub fn apply_revision(
-    workspace: &Path,
-    path: &str,
-    expected: &Option<Vec<u8>>,
-    intended: &Option<Vec<u8>>,
-) -> Result<(), String> {
+#[rustfmt::skip]
+pub fn read_bytes(workspace: &Path, path: &str) -> Result<Vec<u8>, String> {
+    let (parent, name) = open_parent(workspace, path, false)?;
+    let flags = OFlags::RDONLY | OFlags::CLOEXEC | OFlags::NOFOLLOW | OFlags::NONBLOCK;
+    let fd = rustix::fs::openat(&parent, &name, flags, Mode::empty()).map_err(io_error)?;
+    let mut file = std::fs::File::from(fd);
+    if !file.metadata().map_err(|error| error.to_string())?.is_file() { return Err("effect target is not a regular file".to_string()); }
+    let mut bytes = Vec::new(); file.read_to_end(&mut bytes).map_err(|error| error.to_string())?; Ok(bytes)
+}
+
+#[rustfmt::skip]
+pub fn write_bytes(workspace: &Path, path: &str, bytes: &[u8]) -> Result<(), String> {
+    let (parent, name) = open_parent(workspace, path, true)?; match read_at(&parent, &name)? { Some(prior) => replace_existing(&parent, &name, &prior, bytes), None => create_new(&parent, &name, bytes) }
+}
+
+#[rustfmt::skip]
+pub fn apply_revision(workspace: &Path, path: &str, expected: &Option<Vec<u8>>, intended: &Option<Vec<u8>>) -> Result<(), String> {
     let (parent, name) = open_parent(workspace, path, intended.is_some())?;
     match (expected, intended) {
         (None, None) => ensure_absent(&parent, &name),
@@ -34,35 +38,34 @@ pub fn apply_revision(
     }
 }
 
-fn open_parent(workspace: &Path, path: &str, create: bool) -> Result<(OwnedFd, OsString), String> {
+#[rustfmt::skip]
+pub(crate) fn open_parent(workspace: &Path, path: &str, create: bool) -> Result<(OwnedFd, OsString), String> {
     let mut parts = Vec::new();
-    for part in Path::new(path).components() {
-        match part {
-            Component::Normal(value) => parts.push(value.to_os_string()),
-            _ => return Err("effect path is not normalized".to_string()),
-        }
-    }
-    let name = parts
-        .pop()
-        .ok_or_else(|| "effect path has no file name".to_string())?;
+    for part in Path::new(path).components() { match part { Component::Normal(value) => parts.push(value.to_os_string()), _ => return Err("effect path is not normalized".to_string()) } }
+    let name = parts.pop().ok_or_else(|| "effect path has no file name".to_string())?;
     let flags = OFlags::RDONLY | OFlags::DIRECTORY | OFlags::CLOEXEC | OFlags::NOFOLLOW;
     let mut parent = rustix::fs::open(workspace, flags, Mode::empty()).map_err(io_error)?;
-    for part in parts {
-        parent = match rustix::fs::openat(&parent, &part, flags, Mode::empty()) {
-            Ok(fd) => fd,
-            Err(rustix::io::Errno::NOENT) if create => {
-                let mode = Mode::RWXU | Mode::RGRP | Mode::XGRP | Mode::ROTH | Mode::XOTH;
-                match rustix::fs::mkdirat(&parent, &part, mode) {
-                    Ok(()) => rustix::fs::fsync(&parent).map_err(io_error)?,
-                    Err(rustix::io::Errno::EXIST) => {}
-                    Err(error) => return Err(error.to_string()),
-                }
-                rustix::fs::openat(&parent, &part, flags, Mode::empty()).map_err(io_error)?
-            }
-            Err(error) => return Err(error.to_string()),
-        };
-    }
+    for part in parts { parent = match rustix::fs::openat(&parent, &part, flags, Mode::empty()) {
+        Ok(fd) => fd,
+        Err(rustix::io::Errno::NOENT) if create => {
+            let mode = Mode::RWXU | Mode::RGRP | Mode::XGRP | Mode::ROTH | Mode::XOTH;
+            match rustix::fs::mkdirat(&parent, &part, mode) { Ok(()) => rustix::fs::fsync(&parent).map_err(io_error)?, Err(rustix::io::Errno::EXIST) => {}, Err(error) => return Err(error.to_string()) }
+            rustix::fs::openat(&parent, &part, flags, Mode::empty()).map_err(io_error)?
+        }
+        Err(error) => return Err(error.to_string()),
+    }; }
     Ok((parent, name))
+}
+
+#[rustfmt::skip]
+pub fn path_occupied(workspace: &Path, path: &str) -> Result<bool, String> {
+    let mut parts = Vec::new();
+    for part in Path::new(path).components() { match part { Component::Normal(value) => parts.push(value.to_os_string()), _ => return Err("effect path is not normalized".to_string()) } }
+    let name = parts.pop().ok_or_else(|| "effect path has no file name".to_string())?;
+    let flags = OFlags::RDONLY | OFlags::DIRECTORY | OFlags::CLOEXEC | OFlags::NOFOLLOW;
+    let mut parent = rustix::fs::open(workspace, flags, Mode::empty()).map_err(io_error)?;
+    for part in parts { parent = match rustix::fs::openat(&parent, &part, flags, Mode::empty()) { Ok(fd) => fd, Err(rustix::io::Errno::NOENT) => return Ok(false), Err(error) => return Err(error.to_string()) }; }
+    match rustix::fs::statat(&parent, &name, AtFlags::SYMLINK_NOFOLLOW) { Ok(_) => Ok(true), Err(rustix::io::Errno::NOENT) => Ok(false), Err(error) => Err(error.to_string()) }
 }
 
 fn ensure_absent(parent: &OwnedFd, name: &OsString) -> Result<(), String> {
@@ -172,18 +175,16 @@ fn stage(parent: &OwnedFd, bytes: &[u8]) -> Result<OsString, String> {
     Err("effect temporary file names are exhausted".to_string())
 }
 
+#[rustfmt::skip]
 fn read_at(parent: &OwnedFd, name: &OsString) -> Result<Option<Vec<u8>>, String> {
-    let flags = OFlags::RDONLY | OFlags::CLOEXEC | OFlags::NOFOLLOW;
+    let flags = OFlags::RDONLY | OFlags::CLOEXEC | OFlags::NOFOLLOW | OFlags::NONBLOCK;
     match rustix::fs::openat(parent, name, flags, Mode::empty()) {
         Ok(fd) => {
-            let mut bytes = Vec::new();
-            std::fs::File::from(fd)
-                .read_to_end(&mut bytes)
-                .map_err(|error| error.to_string())?;
-            Ok(Some(bytes))
+            let mut file = std::fs::File::from(fd);
+            if !file.metadata().map_err(|error| error.to_string())?.is_file() { return Err("effect target is not a regular file".to_string()); }
+            let mut bytes = Vec::new(); file.read_to_end(&mut bytes).map_err(|error| error.to_string())?; Ok(Some(bytes))
         }
-        Err(rustix::io::Errno::NOENT) => Ok(None),
-        Err(error) => Err(error.to_string()),
+        Err(rustix::io::Errno::NOENT) => Ok(None), Err(error) => Err(error.to_string()),
     }
 }
 

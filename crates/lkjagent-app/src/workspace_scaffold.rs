@@ -16,7 +16,7 @@ pub fn ensure_root(workspace: &Path) -> Result<(), String> {
     ] {
         fs::create_dir_all(workspace.join(rel)).map_err(|error| error.to_string())?;
     }
-    write_readme(workspace)?;
+    write_readme(workspace, workspace)?;
     for rel in [
         "inbox",
         "records",
@@ -27,7 +27,7 @@ pub fn ensure_root(workspace: &Path) -> Result<(), String> {
         "system",
         "system/manifests",
     ] {
-        write_readme(&workspace.join(rel))?;
+        write_readme(workspace, &workspace.join(rel))?;
     }
     Ok(())
 }
@@ -45,10 +45,10 @@ pub fn ensure_for_path(workspace: &Path, rel: &str) -> Result<(), String> {
 pub fn refresh_for_path(workspace: &Path, rel: &str) -> Result<(), String> {
     let path = workspace.join(rel);
     let Some(parent) = path.parent() else {
-        return write_readme(workspace);
+        return write_readme(workspace, workspace);
     };
     for dir in readme_dirs(workspace, parent) {
-        write_readme(&dir)?;
+        write_readme(workspace, &dir)?;
     }
     Ok(())
 }
@@ -69,20 +69,19 @@ pub fn repair_record_links(
         if row.id == moved_id {
             continue;
         }
-        let path = workspace.join(&row.path);
-        let Ok(text) = fs::read_to_string(&path) else {
+        let Ok(text) = crate::effect_files::read_text(workspace, &row.path) else {
             continue;
         };
         if !text.contains(old_path) {
             continue;
         }
         let output = text.replace(old_path, new_path);
-        if fs::write(&path, &output).is_err() {
-            continue;
-        }
         let Ok(fingerprint) = record_fingerprint(&output) else {
             continue;
         };
+        if crate::effect_files::write_bytes(workspace, &row.path, output.as_bytes()).is_err() {
+            continue;
+        }
         row.fingerprint = fingerprint;
         row.updated_at = now.to_string();
         if upsert_record(conn, &row).is_ok() {
@@ -108,7 +107,7 @@ fn readme_dirs(workspace: &Path, leaf: &Path) -> Vec<PathBuf> {
     dirs
 }
 
-fn write_readme(dir: &Path) -> Result<(), String> {
+fn write_readme(workspace: &Path, dir: &Path) -> Result<(), String> {
     let title = title(
         dir.file_name()
             .and_then(|value| value.to_str())
@@ -129,7 +128,14 @@ fn write_readme(dir: &Path) -> Result<(), String> {
         lines.extend(children);
     }
     lines.push(String::new());
-    fs::write(dir.join("README.md"), lines.join("\n")).map_err(|error| error.to_string())
+    let rel = dir
+        .join("README.md")
+        .strip_prefix(workspace)
+        .map_err(|error| error.to_string())?
+        .to_str()
+        .ok_or_else(|| "README path is not UTF-8".to_string())?
+        .to_string();
+    crate::effect_files::write_bytes(workspace, &rel, lines.join("\n").as_bytes())
 }
 
 fn child_links(dir: &Path) -> Result<Vec<String>, String> {

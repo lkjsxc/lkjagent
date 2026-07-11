@@ -155,6 +155,18 @@ pub(crate) fn archive_source_bytes(path: &Path, fingerprint: &str) -> Result<Vec
 
 #[cfg(target_os = "linux")]
 #[rustfmt::skip]
+pub(crate) fn move_relative_if_absent(workspace: &Path, from: &str, to: &str) -> Result<(), String> {
+    let (from_parent, from_name) = crate::effect_files::open_parent(workspace, from, false)?;
+    let (to_parent, to_name) = crate::effect_files::open_parent(workspace, to, true)?;
+    rustix::fs::renameat_with(&from_parent, &from_name, &to_parent, &to_name, rustix::fs::RenameFlags::NOREPLACE).map_err(|error| error.to_string())?;
+    rustix::fs::fsync(&from_parent).map_err(|error| error.to_string())?; rustix::fs::fsync(&to_parent).map_err(|error| error.to_string())
+}
+#[cfg(not(target_os = "linux"))]
+#[rustfmt::skip]
+pub(crate) fn move_relative_if_absent(_: &Path, _: &str, _: &str) -> Result<(), String> { Err("no-clobber workspace move requires Linux".to_string()) }
+
+#[cfg(target_os = "linux")]
+#[rustfmt::skip]
 pub(crate) fn move_if_absent(from: &Path, to: &Path) -> Result<(), String> {
     rustix::fs::renameat_with(rustix::fs::CWD, from, rustix::fs::CWD, to, rustix::fs::RenameFlags::NOREPLACE).map_err(|error| error.to_string())
 }
