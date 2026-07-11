@@ -153,30 +153,20 @@ pub(crate) fn archive_source_bytes(path: &Path, fingerprint: &str) -> Result<Vec
     }
 }
 
+#[cfg(target_os = "linux")]
+#[rustfmt::skip]
 pub(crate) fn move_if_absent(from: &Path, to: &Path) -> Result<(), String> {
-    if to.exists() {
-        return Err(format!("archive destination exists: {}", to.display()));
-    }
-    fs::rename(from, to).map_err(|error| error.to_string())
+    rustix::fs::renameat_with(rustix::fs::CWD, from, rustix::fs::CWD, to, rustix::fs::RenameFlags::NOREPLACE).map_err(|error| error.to_string())
 }
+#[cfg(not(target_os = "linux"))]
+#[rustfmt::skip]
+pub(crate) fn move_if_absent(_: &Path, _: &Path) -> Result<(), String> { Err("no-clobber archive move requires Linux".to_string()) }
 
-pub(crate) fn archive_revisions(
-    old_path: &str,
-    new_path: &str,
-    bytes: &[u8],
-) -> Result<Vec<OperationRevision>, String> {
-    let fingerprint = lkjagent_core::runtime_fingerprint::stable_fingerprint(&bytes)
-        .map_err(|error| error.message)?;
-    let revision = |role: &str, path: &str| OperationRevision {
-        role: role.to_string(),
-        path: path.to_string(),
-        bytes: bytes.to_vec(),
-        fingerprint: fingerprint.clone(),
-    };
-    Ok(vec![
-        revision("prior", old_path),
-        revision("intended", new_path),
-    ])
+#[rustfmt::skip]
+pub(crate) fn archive_revisions(old_path: &str, new_path: &str, bytes: &[u8]) -> Result<Vec<OperationRevision>, String> {
+    let fingerprint = lkjagent_core::runtime_fingerprint::stable_fingerprint(&bytes).map_err(|error| error.message)?;
+    let revision = |role: &str, path: &str| OperationRevision { role: role.to_string(), path: path.to_string(), bytes: bytes.to_vec(), fingerprint: fingerprint.clone() };
+    Ok(vec![revision("prior", old_path), revision("intended", new_path)])
 }
 
 #[rustfmt::skip]

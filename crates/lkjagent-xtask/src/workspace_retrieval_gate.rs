@@ -37,7 +37,22 @@ const SUITES: &[Suite] = &[
     Suite {
         package: "lkjagent-app",
         target: "archive_recovery",
+        minimum_tests: 2,
+    },
+    Suite {
+        package: "lkjagent-app",
+        target: "archive_link_recovery",
+        minimum_tests: 2,
+    },
+    Suite {
+        package: "lkjagent-app",
+        target: "prepared_operation_startup",
         minimum_tests: 1,
+    },
+    Suite {
+        package: "lkjagent-app",
+        target: "archive_settled_integrity",
+        minimum_tests: 2,
     },
     Suite {
         package: "lkjagent-store",
@@ -86,6 +101,30 @@ const REQUIRED: &[(&str, &str)] = &[
     (
         "archive_recovery",
         "archive_resumes_prepared_operation_after_file_move",
+    ),
+    (
+        "archive_recovery",
+        "archive_startup_preserves_conflicting_target",
+    ),
+    (
+        "archive_link_recovery",
+        "archive_startup_preserves_linked_duplicate",
+    ),
+    (
+        "archive_link_recovery",
+        "archive_startup_keeps_target_after_partial_row_settlement",
+    ),
+    (
+        "prepared_operation_startup",
+        "startup_skips_non_archive_prepared_operation",
+    ),
+    (
+        "archive_settled_integrity",
+        "archive_rejects_drifted_settled_target",
+    ),
+    (
+        "archive_settled_integrity",
+        "archive_rejects_reoccupied_settled_prior_path",
     ),
     (
         "workspace_index_predicates",

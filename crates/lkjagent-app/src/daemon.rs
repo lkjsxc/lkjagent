@@ -61,15 +61,14 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     for operation in lkjagent_store::workspace_rows::prepared_operations(&conn)
         .map_err(|error| error.to_string())?
     {
-        let Some(id) = serde_json::from_str::<serde_json::Value>(&operation.preimage_json)
+        if operation.kind != "archive" {
+            continue;
+        }
+        let id = serde_json::from_str::<serde_json::Value>(&operation.preimage_json)
             .ok()
             .and_then(|value| value.get("id")?.as_str().map(str::to_string))
-        else {
-            continue;
-        };
-        if operation.kind == "archive" {
-            let _ = crate::record_archive::archive(&conn, data_dir, &id, &now);
-        }
+            .ok_or_else(|| format!("workspace operation {} has no record id", operation.id))?;
+        crate::record_archive::archive(&conn, data_dir, &id, &now)?;
     }
     let mut snapshot = match load_runtime_snapshot(&mut conn, data_dir, clock)? {
         Some(snapshot) if matches!(snapshot.task.state, TaskState::Open | TaskState::Waiting) => {

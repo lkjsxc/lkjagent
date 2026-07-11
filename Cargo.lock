@@ -661,6 +661,7 @@ dependencies = [
  "lkjagent-store",
  "ratatui",
  "rusqlite",
+ "rustix",
  "serde_json",
  "unicode-segmentation",
  "unicode-width",

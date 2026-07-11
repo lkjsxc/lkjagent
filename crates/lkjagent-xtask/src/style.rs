@@ -7,6 +7,7 @@ const ALLOWED_EXTERNAL: &[&str] = &[
     "ratatui",
     "reqwest",
     "rusqlite",
+    "rustix",
     "serde",
     "serde_json",
     "toml",

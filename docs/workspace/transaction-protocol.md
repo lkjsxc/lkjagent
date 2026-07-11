@@ -26,17 +26,19 @@ effect observation.
 
 ## Archive And Rebalance Compensation
 
-Archive and rebalance commit a prepared operation and immutable file preimages
-before a filesystem move. Their operation group includes files, rows, aliases,
-audits, search rows, generated indexes, and state effects. If any settlement
-or recovery step fails, compensation restores every preimage or records a
-visible unresolved operation; it never reports a partial archive or rebalance.
+Archive commits a prepared operation and immutable file preimages before its
+filesystem move. Its operation group includes files, rows, aliases, audits,
+search rows, generated indexes, and state effects. Rebalance still uses
+metadata-only prepared rows. Archive compensation restores verified preimages
+or leaves the operation prepared rather than overwriting owner bytes.
 
 ## Recovery
 
-Startup reconciles temporary files, target bytes, manifest, and effect state.
-It completes, compensates, or records failure without duplicating document
-identity. Owner edits are never overwritten when the prior fingerprint changed.
+Startup resumes a prepared archive only when its moved target exactly matches
+the intended bytes and its prior path is absent; settled retries validate bytes.
+A conflict or duplicate blocks startup and leaves the operation prepared. Recovery
+for rebalance, temporary files, manifests, and every writer remains open.
+Archive moves use Linux no-clobber renames; unsupported hosts fail without moving bytes.
 
 ## Paths
 
