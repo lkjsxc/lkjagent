@@ -110,7 +110,7 @@ Persistent malformed-file diagnostics and debounced scheduling remain open.
 Archive and rebalance persist exact operation bytes and reuse idempotency keys.
 Prepared rebalance groups commit all members and revisions before moving any file.
 Unstarted groups need explicit apply; moving and projecting groups resume forward.
-Conflicts stay active without overwrite; key reuse and exact projection rollback remain open.
+Archive compensation reuses its exact key under lock; exact projection rollback remains open.
 
 The xtask dispatcher now runs named nonempty suites for `protocol-tools` and
 `workspace-retrieval-maintenance` and rejects a suite that reports too few tests.

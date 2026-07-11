@@ -49,7 +49,10 @@ then resumes exact source-only members and accepts exact target-only members.
 All targets precede `projecting`, whose idempotent projections retry forward.
 Link repair changes exact structured link entries and leaves prose untouched.
 Move conflicts and post-rename sync errors retain the active group phase.
-Compensated-key reuse, exact projection rollback, temporary-file, manifest, and
+A compensated archive revalidates its full row and source revision, then reuses
+its operation key. Direct archive and rebalance apply claim the durable daemon
+lock for the command lifetime before workspace effects. Exact projection rollback,
+temporary-file, manifest, and
 broader writer recovery remain open. Archive and
 rebalance moves use Linux no-clobber renames; unsupported hosts fail without moving bytes.
 

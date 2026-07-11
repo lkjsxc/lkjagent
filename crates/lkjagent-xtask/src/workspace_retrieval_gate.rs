@@ -10,7 +10,7 @@ const SUITES: &[Suite] = &[
     Suite { package: "lkjagent-app", target: "workspace_rebalance", minimum_tests: 2 },
     Suite { package: "lkjagent-app", target: "record_wrappers", minimum_tests: 2 },
     Suite { package: "lkjagent-app", target: "cli_rows", minimum_tests: 4 },
-    Suite { package: "lkjagent-app", target: "archive_compensation", minimum_tests: 2 },
+    Suite { package: "lkjagent-app", target: "archive_compensation", minimum_tests: 5 },
     Suite {
         package: "lkjagent-app",
         target: "archive_recovery",

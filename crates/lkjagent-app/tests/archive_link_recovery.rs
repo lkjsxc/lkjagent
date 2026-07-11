@@ -5,6 +5,7 @@ use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_core::workspace_record::archive_path;
+use lkjagent_store::record_rows::record;
 use lkjagent_store::workspace_rows::{
     prepare_or_load_operation, OperationDraft, OperationRevision,
 };
@@ -39,23 +40,30 @@ fn archive_startup_preserves_linked_duplicate() -> TestResult<()> {
             .ok_or_else(|| std::io::Error::other("missing parent"))?,
     )?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    let fingerprint: String = conn.query_row(
-        "SELECT fingerprint FROM workspace_records WHERE id = ?1",
-        [&id],
-        |row| row.get(0),
-    )?;
+    let row = record(&conn, &id)?.ok_or("record missing")?;
+    let fingerprint = row.fingerprint.clone();
+    let preimage = serde_json::to_string(&row)?;
     let operation_id = format!("workspace-archive-{id}");
     let revision_fingerprint =
         stable_fingerprint(&bytes).map_err(|error| std::io::Error::other(error.message))?;
+    let intended =
+        serde_json::json!({"id": id, "path": destination, "state": "archived"}).to_string();
     let revisions = vec![
         revision("prior", &old_path, &bytes, &revision_fingerprint),
         revision("intended", &destination, &bytes, &revision_fingerprint),
     ];
-    prepare_or_load_operation(&conn, &OperationDraft {
-        id: &operation_id, key: &format!("archive:{id}:{fingerprint}"), kind: "archive",
-        preimage: &serde_json::json!({"id": id, "path": old_path, "fingerprint": fingerprint, "state": "open", "archived": false}).to_string(),
-        intended: "{}", revisions: &revisions, now: "now",
-    })?;
+    prepare_or_load_operation(
+        &conn,
+        &OperationDraft {
+            id: &operation_id,
+            key: &format!("archive:{id}:{fingerprint}"),
+            kind: "archive",
+            preimage: &preimage,
+            intended: &intended,
+            revisions: &revisions,
+            now: "now",
+        },
+    )?;
     fs::hard_link(&old, &new)?;
     drop(conn);
 

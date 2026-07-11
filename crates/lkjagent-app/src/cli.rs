@@ -17,10 +17,17 @@ where
     }
     fs::create_dir_all(&invocation.data_dir).map_err(|error| error.to_string())?;
     let db = invocation.data_dir.join("lkjagent.sqlite3");
-    let conn = Connection::open(&db).map_err(|error| error.to_string())?;
+    let mut conn = Connection::open(&db).map_err(|error| error.to_string())?;
     lkjagent_store::plan_schema::setup(&conn).map_err(|error| error.to_string())?;
     crate::workspace_scaffold::ensure_root(&crate::config::workspace_root(&invocation.data_dir)?)?;
-    match invocation.command {
+    let exclusive = matches!(
+        &invocation.command,
+        Command::RecordArchive { .. } | Command::WorkspaceApplyRebalance { .. }
+    );
+    if exclusive {
+        crate::daemon_lock::claim(&mut conn, &crate::clock::utc_now())?;
+    }
+    let result = match invocation.command {
         Command::Run { once } if once => {
             let mut endpoint = crate::endpoint::LlmEndpoint::new(&invocation.data_dir);
             let snapshot = run_until_idle(&invocation.data_dir, &mut endpoint, 1)?;
@@ -140,6 +147,16 @@ where
         Command::Memory { query } => crate::inspect::memory(&conn, &query),
         Command::Watch => crate::inspect::watch(&conn),
         Command::Help => Ok(help()),
+    };
+    let released = if exclusive {
+        crate::daemon_lock::release(&conn)
+    } else {
+        Ok(())
+    };
+    match (result, released) {
+        (Err(error), _) => Err(error),
+        (Ok(value), Ok(())) => Ok(value),
+        (Ok(_), Err(error)) => Err(error),
     }
 }
 

@@ -126,7 +126,7 @@ pub fn operation_for_key(conn: &Connection, key: &str) -> StoreResult<Option<Ope
 pub fn prepared_operations(conn: &Connection) -> StoreResult<Vec<OperationRow>> {
     let mut statement = conn.prepare(
         "SELECT id, idempotency_key, kind, phase, preimage_json, intended_json, error
-         FROM workspace_operations WHERE phase = 'prepared' ORDER BY created_at, id",
+         FROM workspace_operations WHERE phase IN ('prepared', 'moving') ORDER BY created_at, id",
     )?;
     let rows = statement.query_map([], operation_row)?;
     Ok(rows.collect::<Result<Vec<_>, _>>()?)

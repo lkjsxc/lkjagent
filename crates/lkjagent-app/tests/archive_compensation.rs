@@ -9,20 +9,11 @@ use rusqlite::Connection;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
+#[rustfmt::skip]
 fn archive_restores_file_and_row_when_audit_fails() -> TestResult<()> {
     let data = fixture_root("archive-compensation")?;
     let data_arg = data.to_string_lossy();
-    let added = cli::run([
-        "--data",
-        data_arg.as_ref(),
-        "record",
-        "add",
-        "custom",
-        "Archive",
-        "Compensation",
-        "--body",
-        "body",
-    ])?;
+    let added = cli::run(["--data", data_arg.as_ref(), "record", "add", "custom", "Archive", "Compensation", "--body", "body"])?;
     let id = field(&added, "record: ")?;
     let old_path = field(&added, "path=")?;
     let workspace = data.join("workspace");
@@ -53,6 +44,14 @@ fn archive_restores_file_and_row_when_audit_fails() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert_eq!(phase, "compensated");
+    conn.execute("DROP TRIGGER fail_archive_audit", [])?; drop(conn);
+    cli::run(["--data", data_arg.as_ref(), "record", "archive", &id])?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let phase: String = conn.query_row("SELECT phase FROM workspace_operations WHERE kind = 'archive'", [], |row| row.get(0))?;
+    let operations: i64 = conn.query_row("SELECT COUNT(*) FROM workspace_operations WHERE kind = 'archive'", [], |row| row.get(0))?;
+    assert_eq!(phase, "settled"); assert_eq!(operations, 1);
+    assert!(!workspace.join(&old_path).exists());
+    assert!(workspace.join(archive_path("custom", &id)?).exists());
     Ok(())
 }
 
@@ -77,7 +76,7 @@ fn archive_rejects_changed_source_bytes() -> TestResult<()> {
     let result = cli::run(["--data", data_arg.as_ref(), "record", "archive", &id]);
     assert!(result
         .as_deref()
-        .is_err_and(|error| error.contains("fingerprint changed")));
+        .is_err_and(|error| error.contains("fingerprint")));
     assert!(data.join("workspace").join(old_path).exists());
     Ok(())
 }

@@ -6,6 +6,7 @@ use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_core::workspace_record::archive_path;
+use lkjagent_store::record_rows::record;
 use lkjagent_store::workspace_rows::{
     prepare_or_load_operation, OperationDraft, OperationRevision,
 };
@@ -16,6 +17,7 @@ type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 static NEXT_FIXTURE: AtomicUsize = AtomicUsize::new(0);
 
 #[test]
+#[rustfmt::skip]
 fn archive_resumes_prepared_operation_after_file_move() -> TestResult<()> {
     let data = fixture_root()?;
     let data_arg = data.to_string_lossy();
@@ -42,15 +44,14 @@ fn archive_resumes_prepared_operation_after_file_move() -> TestResult<()> {
             .ok_or_else(|| std::io::Error::other("missing parent"))?,
     )?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    let fingerprint: String = conn.query_row(
-        "SELECT fingerprint FROM workspace_records WHERE id = ?1",
-        [&id],
-        |row| row.get(0),
-    )?;
+    let row = record(&conn, &id)?.ok_or("record missing")?;
+    let fingerprint = row.fingerprint.clone();
+    let preimage = serde_json::to_string(&row)?;
     let operation_id = format!("workspace-archive-{id}");
     let key = format!("archive:{id}:{fingerprint}");
     let revision_fingerprint =
         stable_fingerprint(&bytes).map_err(|error| std::io::Error::other(error.message))?;
+    let intended = serde_json::json!({"id": id, "path": destination, "state": "archived"}).to_string();
     let revisions = vec![
         revision("prior", &old_path, &bytes, &revision_fingerprint),
         revision("intended", &destination, &bytes, &revision_fingerprint),
@@ -61,27 +62,23 @@ fn archive_resumes_prepared_operation_after_file_move() -> TestResult<()> {
             id: &operation_id,
             key: &key,
             kind: "archive",
-            preimage: &serde_json::json!({"id": id, "path": old_path, "fingerprint": fingerprint, "state": "open", "archived": false}).to_string(),
-            intended: "{}",
+            preimage: &preimage,
+            intended: &intended,
             revisions: &revisions,
             now: "now",
         },
     )?;
+    conn.execute("UPDATE workspace_records SET title = 'owner title' WHERE id = ?1", [&id])?; drop(conn);
+    let mut endpoint = ScriptedEndpoint { outputs: vec![], index: 0 };
+    let error = run_until_idle(&data, &mut endpoint, 1).err().ok_or("changed row accepted")?;
+    assert!(error.contains("record preimage changed")); assert!(old.exists());
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    conn.execute("UPDATE workspace_records SET title = ?1 WHERE id = ?2", [&row.title, &id])?; drop(conn);
     fs::rename(&old, &new)?;
-    drop(conn);
-
-    let mut endpoint = ScriptedEndpoint {
-        outputs: vec![],
-        index: 0,
-    };
     run_until_idle(&data, &mut endpoint, 1)?;
 
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    let phase: String = conn.query_row(
-        "SELECT phase FROM workspace_operations WHERE id = ?1",
-        [&operation_id],
-        |row| row.get(0),
-    )?;
+    let phase: String = conn.query_row("SELECT phase FROM workspace_operations WHERE id = ?1", [&operation_id], |row| row.get(0))?;
     assert_eq!(phase, "settled");
     assert!(new.exists());
     assert!(!old.exists());
@@ -115,14 +112,14 @@ fn archive_startup_preserves_conflicting_target() -> TestResult<()> {
             .ok_or_else(|| std::io::Error::other("missing parent"))?,
     )?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    let fingerprint: String = conn.query_row(
-        "SELECT fingerprint FROM workspace_records WHERE id = ?1",
-        [&id],
-        |row| row.get(0),
-    )?;
+    let row = record(&conn, &id)?.ok_or("record missing")?;
+    let fingerprint = row.fingerprint.clone();
+    let preimage = serde_json::to_string(&row)?;
     let operation_id = format!("workspace-archive-{id}");
     let revision_fingerprint =
         stable_fingerprint(&bytes).map_err(|error| std::io::Error::other(error.message))?;
+    let intended =
+        serde_json::json!({"id": id, "path": destination, "state": "archived"}).to_string();
     let revisions = vec![
         revision("prior", &old_path, &bytes, &revision_fingerprint),
         revision("intended", &destination, &bytes, &revision_fingerprint),
@@ -133,8 +130,8 @@ fn archive_startup_preserves_conflicting_target() -> TestResult<()> {
             id: &operation_id,
             key: &format!("archive:{id}:{fingerprint}"),
             kind: "archive",
-            preimage: &serde_json::json!({"id": id, "path": old_path, "fingerprint": fingerprint, "state": "open", "archived": false}).to_string(),
-            intended: "{}",
+            preimage: &preimage,
+            intended: &intended,
             revisions: &revisions,
             now: "now",
         },

@@ -143,14 +143,6 @@ fn record_row(
     })
 }
 
-#[rustfmt::skip]
-pub(crate) fn archive_source_bytes(path: &Path, fingerprint: &str) -> Result<Vec<u8>, String> {
-    let bytes = fs::read(path).map_err(|error| error.to_string())?;
-    let text = String::from_utf8(bytes.clone()).map_err(|error| error.to_string())?;
-    if record_fingerprint(&text).map_err(|error| error.message)? == fingerprint { Ok(bytes) }
-    else { Err("archive source fingerprint changed".to_string()) }
-}
-
 #[cfg(target_os = "linux")]
 #[rustfmt::skip]
 pub(crate) fn move_relative_if_absent(workspace: &Path, from: &str, to: &str) -> Result<(), String> {
@@ -170,15 +162,6 @@ pub(crate) fn sync_relative_move(workspace: &Path, from: &str, to: &str) -> Resu
 #[rustfmt::skip]
 pub(crate) fn move_relative_if_absent(_: &Path, _: &str, _: &str) -> Result<(), String> { Err("no-clobber workspace move requires Linux".to_string()) }
 
-#[cfg(target_os = "linux")]
-#[rustfmt::skip]
-pub(crate) fn move_if_absent(from: &Path, to: &Path) -> Result<(), String> {
-    rustix::fs::renameat_with(rustix::fs::CWD, from, rustix::fs::CWD, to, rustix::fs::RenameFlags::NOREPLACE).map_err(|error| error.to_string())
-}
-#[cfg(not(target_os = "linux"))]
-#[rustfmt::skip]
-pub(crate) fn move_if_absent(_: &Path, _: &Path) -> Result<(), String> { Err("no-clobber archive move requires Linux".to_string()) }
-
 #[rustfmt::skip]
 pub(crate) fn archive_revisions(old_path: &str, new_path: &str, bytes: &[u8]) -> Result<Vec<OperationRevision>, String> {
     let fingerprint = lkjagent_core::runtime_fingerprint::stable_fingerprint(&bytes).map_err(|error| error.message)?;
@@ -188,7 +171,7 @@ pub(crate) fn archive_revisions(old_path: &str, new_path: &str, bytes: &[u8]) ->
 
 #[rustfmt::skip]
 pub(crate) fn archive_preimage(row: &RecordRow) -> String {
-    serde_json::json!({"id": row.id, "path": row.path, "fingerprint": row.fingerprint, "state": row.state, "archived": row.archived}).to_string()
+    serde_json::json!({"id": row.id, "kind": row.kind, "title": row.title, "state": row.state, "path": row.path, "fingerprint": row.fingerprint, "archived": row.archived, "updated_at": row.updated_at}).to_string()
 }
 
 #[rustfmt::skip]
