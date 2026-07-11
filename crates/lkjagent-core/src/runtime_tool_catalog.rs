@@ -107,17 +107,7 @@ pub fn explore_tool_view() -> ToolSetView {
 }
 
 pub fn default_explore_tool_view() -> ToolSetView {
-    tool_view_for_names(&[
-        "finish",
-        "fs.list",
-        "fs.read",
-        "fs.search",
-        "fs.tree",
-        "fs.write",
-        "memory.find",
-        "memory.save",
-        "plan.note",
-    ])
+    tool_view_for_names(&["fs.read", "fs.search", "memory.find", "plan.note"])
 }
 
 pub fn shell_tool_view() -> ToolSetView {

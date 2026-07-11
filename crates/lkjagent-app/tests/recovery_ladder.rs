@@ -94,10 +94,7 @@ fn run_endpoint_failure(data: &Path) -> TestResult<()> {
 fn run_admission_failure(data: &Path) -> TestResult<()> {
     enqueue_case(data, "Investigate workspace files")?;
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec![action_pairs(
-            "fs.write",
-            &[("path", "notes/out.md"), ("content", "TODO")],
-        )],
+        outputs: vec![action_pairs("fs.read", &[("path", "../secret")])],
         index: 0,
     };
     run_until_idle(data, &mut endpoint, 1)?;

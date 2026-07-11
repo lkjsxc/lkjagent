@@ -15,6 +15,11 @@ const SUITES: &[Suite] = &[
     },
     Suite {
         package: "lkjagent-core",
+        target: "default_tool_view",
+        minimum_tests: 1,
+    },
+    Suite {
+        package: "lkjagent-core",
         target: "tool_call",
         minimum_tests: 7,
     },

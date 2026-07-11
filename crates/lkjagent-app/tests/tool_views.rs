@@ -13,7 +13,7 @@ use support::finish;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn default_explore_prompt_hides_shell_tool() -> TestResult<()> {
+fn default_explore_prompt_hides_shell_and_finish_tools() -> TestResult<()> {
     let data = fixture_root("default-explore-view")?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
@@ -32,7 +32,7 @@ fn default_explore_prompt_hides_shell_tool() -> TestResult<()> {
         .unwrap_or("");
 
     assert!(prompt.contains("fs.read"));
-    assert!(prompt.contains("finish"));
+    assert!(!prompt.contains("finish"));
     assert!(!prompt.contains("shell.run"));
     assert!(!prompt.contains("run a bounded shell command"));
     Ok(())

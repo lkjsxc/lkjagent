@@ -68,7 +68,7 @@ fn tail(text: &str) -> String {
         .lines()
         .filter(|line| !line.trim().is_empty())
         .collect::<Vec<_>>();
-    let start = lines.len().saturating_sub(8);
+    let start = lines.len().saturating_sub(20);
     lines[start..].join(" | ")
 }
 
