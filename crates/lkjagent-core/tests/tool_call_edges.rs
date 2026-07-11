@@ -17,7 +17,7 @@ fn accepts_japanese_and_large_bounded_values() -> Result<(), String> {
         "保存しました。次の確認を待っています。"
     );
 
-    let large = "あ".repeat(4096);
+    let large = "あ".repeat(1365);
     let parsed = parse_tool_call(&action("plan.note", &[('s', &large)]), &decision())
         .map_err(|error| format!("large value failed: {error:?}"))?;
     assert_eq!(parsed.args["note"], large);
@@ -26,7 +26,7 @@ fn accepts_japanese_and_large_bounded_values() -> Result<(), String> {
 
 #[test]
 fn rejects_unbounded_action_values() -> Result<(), String> {
-    let too_large = "x".repeat(8193);
+    let too_large = "あ".repeat(1366);
     let error = match parse_tool_call(&action("plan.note", &[('s', &too_large)]), &decision()) {
         Ok(_) => return Err("oversize value should fail".to_string()),
         Err(error) => error,

@@ -8,6 +8,7 @@ use crate::runtime_tool_fields::parse_fields;
 
 pub const ACTION_OPEN: &str = "<lkjagent_action>";
 pub const ACTION_CLOSE: &str = "</lkjagent_action>";
+const MAX_ACTION_BYTES: usize = 16_384;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ToolCall {
@@ -36,6 +37,9 @@ pub enum ToolCallError {
 }
 
 pub fn parse_tool_call(raw: &str, decision: &RuntimeDecision) -> Result<ToolCall, ToolCallError> {
+    if raw.len() > MAX_ACTION_BYTES {
+        return Err(schema("action too large".to_string()));
+    }
     let body = action_body(raw)?.trim();
     if body.starts_with('{') || body.starts_with('[') {
         return Err(ToolCallError::JsonLike);

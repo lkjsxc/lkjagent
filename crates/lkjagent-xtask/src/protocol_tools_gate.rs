@@ -11,7 +11,7 @@ const SUITES: &[Suite] = &[
     Suite {
         package: "lkjagent-core",
         target: "direct_action_grammar",
-        minimum_tests: 2,
+        minimum_tests: 4,
     },
     Suite {
         package: "lkjagent-core",

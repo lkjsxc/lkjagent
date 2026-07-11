@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use crate::runtime_action_xml::{decode_entities, next_element};
 use crate::runtime_tool_call::ToolCallError;
 
-const MAX_VALUE_CHARS: usize = 8192;
+const MAX_FIELD_BYTES: usize = 4096;
 
 #[derive(Default)]
 pub struct Fields {
@@ -44,7 +44,7 @@ fn insert_input(args: &mut BTreeMap<String, String>, body: &str) -> Result<(), T
             return Err(ToolCallError::DuplicateTag(format!("input/{tag}")));
         }
         let value = decode_entities(inner)?;
-        if value.chars().count() > MAX_VALUE_CHARS {
+        if value.len() > MAX_FIELD_BYTES {
             return Err(ToolCallError::ArgsSchemaViolation(format!(
                 "value too large for {tag}"
             )));
@@ -59,6 +59,11 @@ fn insert_once(
     tag: &str,
     value: String,
 ) -> Result<(), ToolCallError> {
+    if value.len() > MAX_FIELD_BYTES {
+        return Err(ToolCallError::ArgsSchemaViolation(format!(
+            "scalar too large for {tag}"
+        )));
+    }
     if scalars.insert(tag.to_string(), value).is_some() {
         return Err(ToolCallError::DuplicateTag(tag.into()));
     }

@@ -27,6 +27,35 @@ fn requires_one_input_block() -> Result<(), String> {
     Ok(())
 }
 
+#[test]
+fn rejects_oversized_action_bytes() -> Result<(), String> {
+    let raw = "x".repeat(16_385);
+    let error = match parse_tool_call(&raw, &decision()) {
+        Ok(_) => return Err("oversized action accepted".to_string()),
+        Err(error) => error,
+    };
+    assert!(
+        matches!(error, ToolCallError::ArgsSchemaViolation(message) if message == "action too large")
+    );
+    Ok(())
+}
+
+#[test]
+fn rejects_oversized_scalar_bytes() -> Result<(), String> {
+    let identifier = "d".repeat(4097);
+    let raw = format!(
+        "<lkjagent_action><decision_id>{identifier}</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>fs.read</tool_name><input><path>README.md</path></input></lkjagent_action>"
+    );
+    let error = match parse_tool_call(&raw, &decision()) {
+        Ok(_) => return Err("oversized scalar accepted".to_string()),
+        Err(error) => error,
+    };
+    assert!(
+        matches!(error, ToolCallError::ArgsSchemaViolation(message) if message == "scalar too large for decision_id")
+    );
+    Ok(())
+}
+
 fn decision() -> RuntimeDecision {
     let mut decision = RuntimeDecision::new(
         "dec-1",
