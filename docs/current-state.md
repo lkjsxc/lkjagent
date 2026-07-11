@@ -79,9 +79,9 @@ the rebuild, not proof that the native authority loop is complete.
 Production still hydrates `TaskSnapshot`, task rows, step rows, fixed templates,
 and bridge projections. Context may be prepared before the final decision.
 Generic parsed messages can settle steps without objective effect evidence.
-Recovery facts now bind the causal no-repeat tuple and advance typed per-class
-strategies; timed endpoint eligibility and progress windows remain open. The live
-runner can replace the last real state with a synthetic closed snapshot. Default Explore
+Recovery facts bind causal no-repeat tuples and advance typed per-class strategies.
+Endpoint faults call once, obey retry/backoff, and persist waits; progress windows remain open.
+The live runner can replace the last real state with a synthetic closed snapshot. Default Explore
 decisions now render only read, search, memory find, and note tools, hiding shell
 and finish; completion remains an open authority gap. Action cards and the decision parser
 now use direct fields inside one input block and reject name/value wrappers.
@@ -112,11 +112,11 @@ Prepared rebalance groups commit all members and revisions before moving any fil
 Unstarted groups need explicit apply; moving and projecting groups resume forward.
 Archive compensation reuses its exact key under lock; exact projection rollback remains open.
 
-The xtask dispatcher now runs named nonempty suites for `protocol-tools` and
-`workspace-retrieval-maintenance` and rejects a suite that reports too few tests.
-This is focused gate wiring, not evidence that either broad contract is complete.
-Both nodes remain open pending coverage, review, and source-bound receipts.
-Their baseline failures remain under the pre-freeze progress roots.
+The xtask dispatcher runs named nonempty suites for `protocol-tools`,
+`workspace-retrieval-maintenance`, and `recovery-continuity`, rejecting empty runs.
+Protocol and workspace receipts bind their reviewed source, not later recovery commits.
+Recovery remains open pending complete coverage, review, and source-bound evidence.
+Baseline failures remain under the pre-freeze progress roots.
 
 The TUI derives ordinary conversation from queue and selected event rows rather
 than one canonical conversation table. Historical reducer tests do not replace

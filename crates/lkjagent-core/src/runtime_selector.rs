@@ -1,4 +1,6 @@
-use crate::runtime_candidate::{selected_candidate, selector_candidates, SelectorCandidate};
+use crate::runtime_candidate::{
+    selected_candidate, selected_candidate_at, selector_candidates, SelectorCandidate,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -10,49 +12,37 @@ use crate::runtime_operation::RuntimeOperation;
 use crate::runtime_state::{RuntimeSnapshot, StateCell};
 use crate::runtime_tool_catalog::{descriptor_entry, explore_catalog};
 
-pub fn select_runtime_decision(
-    snapshot: &RuntimeSnapshot,
-    decision_id: &str,
-    context_frame_fingerprint: &str,
-    unfinished: &[RuntimeDecision],
-) -> Result<RuntimeDecision, FingerprintError> {
-    if let Some(decision) = unfinished.first() {
-        return Ok(decision.clone());
-    }
-    let candidate = selected_candidate(snapshot);
+#[rustfmt::skip]
+pub fn select_runtime_decision(snapshot: &RuntimeSnapshot, decision_id: &str,
+    context: &str, unfinished: &[RuntimeDecision]) -> Result<RuntimeDecision, FingerprintError> {
+    if let Some(decision) = unfinished.first() { return Ok(decision.clone()); }
+    decision_from(snapshot, decision_id, context, selected_candidate(snapshot))
+}
+
+#[rustfmt::skip]
+pub fn select_runtime_decision_at(snapshot: &RuntimeSnapshot, decision_id: &str,
+    context: &str, unfinished: &[RuntimeDecision], now: &str) -> Result<RuntimeDecision, FingerprintError> {
+    if let Some(decision) = unfinished.first() { return Ok(decision.clone()); }
+    decision_from(snapshot, decision_id, context, selected_candidate_at(snapshot, now))
+}
+
+#[rustfmt::skip]
+fn decision_from(snapshot: &RuntimeSnapshot, decision_id: &str, context: &str,
+    candidate: SelectorCandidate) -> Result<RuntimeDecision, FingerprintError> {
     let operation = candidate.operation;
-    let mut decision = RuntimeDecision::new(
-        decision_id,
-        snapshot.case_id.clone(),
-        OperationKey(operation.key),
-        operation.tool_view,
-        operation.expected_envelope,
-    );
+    let mut decision = RuntimeDecision::new(decision_id, snapshot.case_id.clone(),
+        OperationKey(operation.key), operation.tool_view, operation.expected_envelope);
     decision.selected_state_key = candidate.state_key.as_ref().map(|key| key.as_label());
     decision.effect_command = operation.effect_command;
-    let snapshot_fingerprint = snapshot.fingerprint()?;
-    decision.snapshot_fingerprint = snapshot_fingerprint.clone();
-    decision.state_vector_fingerprint = snapshot_fingerprint;
-    decision.context_frame_fingerprint = context_frame_fingerprint.to_string();
-    decision.model_budget_tokens = operation.model_budget_tokens;
+    let fingerprint = snapshot.fingerprint()?;
+    decision.snapshot_fingerprint = fingerprint.clone(); decision.state_vector_fingerprint = fingerprint;
+    decision.context_frame_fingerprint = context.to_string(); decision.model_budget_tokens = operation.model_budget_tokens;
     decision.evidence_requirements = operation.evidence_requirements;
-    decision
-        .evidence_requirements
-        .insert(0, format!("selector:{}", candidate.reason));
-    if candidate
-        .state_key
-        .as_ref()
-        .and_then(|key| snapshot.cells.get(key))
-        .map(|cell| payload_tool_budget_exhausted(&payload_value(cell)))
-        .unwrap_or(false)
-    {
-        decision
-            .evidence_requirements
-            .push("tool-budget:suppressed".to_string());
-    }
-    decision.recovery_policy = operation.recovery_policy;
-    decision.refresh_harness_state();
-    Ok(decision)
+    decision.evidence_requirements.insert(0, format!("selector:{}", candidate.reason));
+    let exhausted = candidate.state_key.as_ref().and_then(|key| snapshot.cells.get(key))
+        .map(|cell| payload_tool_budget_exhausted(&payload_value(cell))).unwrap_or(false);
+    if exhausted { decision.evidence_requirements.push("tool-budget:suppressed".to_string()); }
+    decision.recovery_policy = operation.recovery_policy; decision.refresh_harness_state(); Ok(decision)
 }
 
 pub fn select_operation(snapshot: &RuntimeSnapshot) -> RuntimeOperation {

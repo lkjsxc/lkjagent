@@ -86,7 +86,7 @@ fn check_current_state(files: &[RepoFile], failures: &mut Vec<String>) {
             "bounded",
             "Production still hydrates",
             "Context may be prepared before the final decision",
-            "Recovery facts now bind the causal no-repeat tuple",
+            "Recovery facts bind causal no-repeat tuples",
             "final live and PTY evidence",
         ],
         failures,

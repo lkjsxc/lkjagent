@@ -13,6 +13,7 @@ Map lkjagent-core source modules.
   descriptors and views.
 - [runtime-event.rs](runtime_event.rs): events, patches, reducer, and patch
   application.
+- [runtime-eligibility.rs](runtime_eligibility.rs): due cells and next wakes.
 - [runtime-decision.rs](runtime_decision.rs): runtime decisions, envelopes, and
   tool-set views.
 - [runtime-operation.rs](runtime_operation.rs): selected runtime operation
@@ -38,6 +39,7 @@ Map lkjagent-core source modules.
 - [render.rs](render.rs): prompt renderer and fingerprints.
 - [engine.rs](engine.rs): public next work and turn application seam.
 - [engine-completion.rs](engine_completion.rs): task closure and event helpers.
+- [engine-actions.rs](engine_actions.rs): action, message, and plan settlement helpers.
 - [engine-steps.rs](engine_steps.rs): internal step settlement helpers.
 - [plan.rs](plan.rs): materialize validated plan lines into steps.
 - [checks.rs](checks.rs): pure check evaluation over supplied facts.

@@ -14,9 +14,13 @@ fn baseline_gate_has_a_named_command_surface() {
 }
 
 #[test]
-fn protocol_and_retrieval_nodes_route_to_named_suites() -> Result<(), String> {
+fn released_nodes_route_to_named_suites() -> Result<(), String> {
     let root = fixture_root("named")?;
-    for identifier in ["protocol-tools", "workspace-retrieval-maintenance"] {
+    for identifier in [
+        "protocol-tools",
+        "recovery-continuity",
+        "workspace-retrieval-maintenance",
+    ] {
         let failures = match node_gate::check(&root, identifier) {
             Ok(()) => return Err("an empty fixture executed a node suite".to_string()),
             Err(failures) => failures,

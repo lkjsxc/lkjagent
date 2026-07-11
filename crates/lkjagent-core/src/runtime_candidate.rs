@@ -26,96 +26,66 @@ struct CandidateScore {
 }
 
 pub fn selector_candidates(snapshot: &RuntimeSnapshot) -> Vec<SelectorCandidate> {
-    let mut candidates = snapshot
-        .active_cells()
-        .into_iter()
-        .filter_map(cell_candidate)
-        .map(|candidate| selector::apply_edge_blocks(snapshot, candidate))
-        .collect::<Vec<_>>();
-    if candidates.is_empty() {
-        candidates.push(idle_candidate());
-    }
-    candidates.sort_by(|left, right| left.score.cmp(&right.score));
-    candidates
+    selector_candidates_for(snapshot, None)
+}
+
+pub fn selector_candidates_at(snapshot: &RuntimeSnapshot, now: &str) -> Vec<SelectorCandidate> {
+    selector_candidates_for(snapshot, Some(now))
 }
 
 #[rustfmt::skip]
-pub fn selected_candidate(snapshot: &RuntimeSnapshot) -> SelectorCandidate {
-    selector_candidates(snapshot).into_iter().find(|candidate| candidate.blocked_by.is_empty()).unwrap_or_else(idle_candidate)
+fn selector_candidates_for(snapshot: &RuntimeSnapshot, now: Option<&str>) -> Vec<SelectorCandidate> {
+    let mut candidates = snapshot.active_cells().into_iter()
+        .filter(|cell| crate::runtime_eligibility::cell_is_due(cell, now)).filter_map(cell_candidate)
+        .map(|item| selector::apply_edge_blocks(snapshot, item)).collect::<Vec<_>>();
+    if candidates.is_empty() {
+        let fallback = if crate::runtime_eligibility::has_invalid_cooldown(snapshot) { blocked_candidate(&[]) }
+            else { now.and_then(|value| crate::runtime_eligibility::next_wake(snapshot, value)).map_or_else(idle_candidate, wait_candidate) };
+        candidates.push(fallback);
+    }
+    candidates.sort_by(|left, right| left.score.cmp(&right.score)); candidates
 }
 
+pub fn selected_candidate(snapshot: &RuntimeSnapshot) -> SelectorCandidate {
+    select_candidate(selector_candidates(snapshot))
+}
+
+pub fn selected_candidate_at(snapshot: &RuntimeSnapshot, now: &str) -> SelectorCandidate {
+    select_candidate(selector_candidates_at(snapshot, now))
+}
+
+#[rustfmt::skip]
+fn select_candidate(candidates: Vec<SelectorCandidate>) -> SelectorCandidate {
+    candidates.iter().find(|item| item.blocked_by.is_empty()).cloned()
+        .unwrap_or_else(|| blocked_candidate(&candidates))
+}
+
+#[rustfmt::skip]
 fn cell_candidate(cell: &StateCell) -> Option<SelectorCandidate> {
     let body = selector::payload_value(cell);
-    if cell.cooldown_until.is_some() {
-        return Some(candidate(cell, RuntimeOperation::idle(), 98, "cooldown"));
-    }
     if let Some(operation) = operation_from_payload(&body) {
-        return Some(candidate(
-            cell,
-            operation,
-            selector::payload_tier(&body, 80),
-            "payload",
-        ));
+        return Some(candidate(cell, operation, selector::payload_tier(&body, 80), "payload"));
     }
     match (cell.key.namespace.as_str(), cell.key.name.as_str()) {
         ("case", "owner-intake") => Some(model_free(cell, "owner.intake", 10, "owner intake")),
         ("case", "waiting-answer") => Some(model_free(cell, "owner.answer", 20, "owner answer")),
-        ("completion", "blocked") => Some(model_free(
-            cell,
-            "completion.blocked",
-            65,
-            "completion blocked",
-        )),
-        ("completion", "close-candidate") => Some(model_free(
-            cell,
-            "completion.close",
-            70,
-            "completion candidate",
-        )),
+        ("completion", "blocked") => Some(model_free(cell, "completion.blocked", 65, "completion blocked")),
+        ("completion", "close-candidate") => Some(model_free(cell, "completion.close", 70, "completion candidate")),
         _ => namespace_candidate(cell, &body),
     }
 }
 
+#[rustfmt::skip]
 fn namespace_candidate(cell: &StateCell, body: &Value) -> Option<SelectorCandidate> {
     match cell.key.namespace.as_str() {
-        "recovery" => Some(model_free(
-            cell,
-            &format!("recovery.handle/{}", cell.key.name),
-            30,
-            "recovery",
-        )),
-        "effect" => Some(model_free(
-            cell,
-            &format!("effect.run/{}", cell.key.name),
-            40,
-            "effect",
-        )),
-        "model" => Some(candidate(
-            cell,
-            RuntimeOperation::model_call(
-                format!("model.call/{}", cell.key.name),
-                selector::payload_envelope(body),
-                selector::payload_tool_view(body),
-                selector::payload_number(body, "model_budget_tokens"),
-                evidence(cell),
-            ),
-            50,
-            "model",
-        )),
-        "check" => Some(model_free(
-            cell,
-            &format!("check.run/{}", cell.key.name),
-            60,
-            "check",
-        )),
-        _ => workspace_family_operation(&cell.key.namespace).map(|(operation, tier, reason)| {
-            model_free(
-                cell,
-                &format!("{operation}/{}", cell.key.name),
-                tier,
-                reason,
-            )
-        }),
+        "recovery" => Some(model_free(cell, &format!("recovery.handle/{}", cell.key.name), 30, "recovery")),
+        "effect" => Some(model_free(cell, &format!("effect.run/{}", cell.key.name), 40, "effect")),
+        "model" => Some(candidate(cell, RuntimeOperation::model_call(format!("model.call/{}", cell.key.name),
+            selector::payload_envelope(body), selector::payload_tool_view(body),
+            selector::payload_number(body, "model_budget_tokens"), evidence(cell)), 50, "model")),
+        "check" => Some(model_free(cell, &format!("check.run/{}", cell.key.name), 60, "check")),
+        _ => workspace_family_operation(&cell.key.namespace)
+            .map(|(operation, tier, reason)| model_free(cell, &format!("{operation}/{}", cell.key.name), tier, reason)),
     }
 }
 
@@ -166,16 +136,47 @@ fn candidate(
 }
 
 fn idle_candidate() -> SelectorCandidate {
+    synthetic(
+        RuntimeOperation::idle(),
+        "no executable state candidate",
+        "runtime:idle",
+        100,
+    )
+}
+
+fn wait_candidate(due: &str) -> SelectorCandidate {
+    synthetic(
+        RuntimeOperation::model_free("runtime.wait", vec![format!("wake:{due}")]),
+        &format!("waiting until {due}"),
+        "runtime:wait",
+        99,
+    )
+}
+
+fn blocked_candidate(items: &[SelectorCandidate]) -> SelectorCandidate {
+    let evidence = items
+        .iter()
+        .flat_map(|item| item.blocked_by.clone())
+        .collect();
+    synthetic(
+        RuntimeOperation::model_free("completion.blocked", evidence),
+        "all state candidates are blocked",
+        "completion:blocked",
+        65,
+    )
+}
+
+fn synthetic(operation: RuntimeOperation, reason: &str, key: &str, tier: u8) -> SelectorCandidate {
     SelectorCandidate {
-        operation: RuntimeOperation::idle(),
+        operation,
         state_key: None,
-        reason: "no executable state candidate".to_string(),
+        reason: reason.to_string(),
         blocked_by: Vec::new(),
         score: CandidateScore {
-            tier: 100,
+            tier,
             priority_rank: 0,
             deadline: "~".to_string(),
-            key: "runtime:idle".to_string(),
+            key: key.to_string(),
         },
     }
 }

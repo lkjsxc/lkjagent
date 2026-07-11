@@ -3,7 +3,7 @@ use std::path::Path;
 use lkjagent_core::engine::{Command, Work};
 use lkjagent_core::model::{Attempt, AttemptOutcome, Event, EventKind, StepState, TaskSnapshot};
 use lkjagent_core::runtime_decision::RuntimeDecision;
-use lkjagent_core::runtime_selector::select_runtime_decision;
+use lkjagent_core::runtime_selector::select_runtime_decision_at;
 use lkjagent_store::admission_rows::PreparedEffect;
 use lkjagent_store::decision_rows::{
     insert_runtime_decision, next_decision_id, settle_decision, unfinished_decisions,
@@ -34,22 +34,29 @@ pub fn prepare_runtime_decision(
     snapshot: &TaskSnapshot,
     context_frame_fingerprint: &str,
     now: &str,
-) -> Result<RuntimeDecision, String> {
+) -> Result<Option<RuntimeDecision>, String> {
     let case_id = snapshot.task.id.to_string();
     insert_case(conn, &case_id, &snapshot.task.objective, now)
         .map_err(|error| error.to_string())?;
     let unfinished = unfinished_decisions(conn, &case_id).map_err(|error| error.to_string())?;
     if let Some(decision) = recover_or_reuse(conn, &unfinished, now)? {
-        return Ok(decision);
+        return Ok(Some(decision));
     }
     let mut state_snapshot = hydrate_snapshot(conn, &case_id).map_err(|error| error.to_string())?;
     ensure_runtime_cell(conn, snapshot, &state_snapshot, now)?;
     state_snapshot = hydrate_snapshot(conn, &case_id).map_err(|error| error.to_string())?;
     let id = next_decision_id(conn, &case_id).map_err(|error| error.to_string())?;
-    let decision = select_runtime_decision(&state_snapshot, &id, context_frame_fingerprint, &[])
-        .map_err(|error| error.message)?;
+    let decision =
+        select_runtime_decision_at(&state_snapshot, &id, context_frame_fingerprint, &[], now)
+            .map_err(|error| error.message)?;
+    if matches!(
+        decision.operation.0.as_str(),
+        "runtime.idle" | "runtime.wait"
+    ) {
+        return Ok(None);
+    }
     insert_runtime_decision(conn, &decision, "pending", now).map_err(|error| error.to_string())?;
-    Ok(decision)
+    Ok(Some(decision))
 }
 
 pub fn settle_effect_error(

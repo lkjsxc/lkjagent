@@ -14,6 +14,7 @@ pub mod gate;
 pub mod node_gate;
 mod node_suites;
 mod protocol_tools_gate;
+mod recovery_continuity_gate;
 pub mod repository_determinism_gate;
 pub mod style;
 mod workspace_retrieval_gate;

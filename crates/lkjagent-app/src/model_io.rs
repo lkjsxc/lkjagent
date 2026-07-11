@@ -1,10 +1,8 @@
-use std::path::{Path, PathBuf};
-use std::time::Duration;
-
 use lkjagent_core::render::Prompt;
 use lkjagent_llm::client::complete;
 use lkjagent_llm::message::Message;
 use lkjagent_llm::wire::{CallSpec, Completion};
+use std::path::{Path, PathBuf};
 
 use crate::config::load_client;
 
@@ -101,17 +99,9 @@ impl Endpoint for LlmEndpoint {
             Message::system(prompt.system.clone()),
             Message::user(prompt.user.clone()),
         ];
-        let mut last_error = String::new();
-        for offset in 0..5 {
-            match complete(&config, &messages, &spec, attempt.saturating_add(offset)) {
-                Ok(completion) => return Ok(record(completion)),
-                Err(error) => {
-                    last_error = error.to_string();
-                    std::thread::sleep(Duration::from_secs(3));
-                }
-            }
-        }
-        Err(last_error)
+        complete(&config, &messages, &spec, attempt)
+            .map(record)
+            .map_err(|error| error.to_string())
     }
 
     fn timeout_seconds(&self) -> Option<u64> {

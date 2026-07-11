@@ -9,8 +9,6 @@ mod engine_actions;
 mod engine_checks;
 mod engine_completion;
 mod engine_extend;
-mod engine_messages;
-mod engine_plan;
 mod engine_steps;
 
 pub mod model;
@@ -31,6 +29,7 @@ pub mod runtime_completion {
 pub mod runtime_context;
 mod runtime_context_plan;
 pub mod runtime_decision;
+pub mod runtime_eligibility;
 pub mod runtime_event;
 pub mod runtime_fingerprint;
 pub mod runtime_graph_query;

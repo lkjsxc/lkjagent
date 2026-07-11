@@ -9,7 +9,8 @@ Define visible waiting and daemon-level quiescence without synthetic work.
 `waiting-owner` contains one bounded question and the matter relation that the
 answer will settle. `waiting-external` contains a due time or observable wake
 condition. Both remain durable, visible states and may coexist with other
-runnable matters.
+runnable matters. Future cooldown cells remain active but ineligible; no runtime
+decision or model call is created until their persisted UTC instant is due.
 
 ## Candidate Priority
 

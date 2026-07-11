@@ -12,6 +12,7 @@ pub fn check(root: &Path, identifier: &str) -> Result<(), Vec<String>> {
         "repository-determinism" => crate::repository_determinism_gate::check(root),
         "evaluation-harness" => crate::evaluation_harness::check(root),
         "protocol-tools" => crate::protocol_tools_gate::check(root),
+        "recovery-continuity" => crate::recovery_continuity_gate::check(root),
         "workspace-retrieval-maintenance" => crate::workspace_retrieval_gate::check(root),
         _ => Err(vec![format!("unknown node gate: {identifier}")]),
     }

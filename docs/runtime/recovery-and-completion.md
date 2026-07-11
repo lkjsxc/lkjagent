@@ -26,6 +26,10 @@ the invalidated check.
 
 ## Crash Recovery
 
+One provider call belongs to one decision. Retryable endpoint faults persist a
+configured exponential eligibility instant; retry exhaustion persists an
+observable external wait rather than sleeping inside a provider call.
+
 Startup reconciles prepared effects first, then interrupted endpoint decisions,
 derived projection fingerprints, due wakes, and pending owner turns. A settled
 effect is never repeated and an uncommitted model response is never reused.

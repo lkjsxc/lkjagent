@@ -1,9 +1,10 @@
 use crate::engine::Command;
-use crate::engine_actions::{action_fingerprint, memory_save};
+use crate::engine_actions::{
+    action_fingerprint, block_unexpected_message, finish_message, finish_plan, memory_save,
+    wait_for_answer,
+};
 use crate::engine_completion::record_event;
 use crate::engine_extend::{add_steps, insert_after, split_after_fault};
-use crate::engine_messages::{block_unexpected_message, finish_message, wait_for_answer};
-use crate::engine_plan::finish_plan;
 use crate::model::*;
 use crate::parse::{Action, ParseFault, ParsedOutput};
 use crate::render::Prompt;

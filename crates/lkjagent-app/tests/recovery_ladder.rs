@@ -52,19 +52,6 @@ fn repeated_parse_failure_advances_without_premature_block() -> TestResult<()> {
 }
 
 #[test]
-#[rustfmt::skip]
-fn endpoint_ladder_exhaustion_blocks_with_owner_action() -> TestResult<()> {
-    let data = fixture_root("endpoint-exhausted")?; enqueue_case(&data, "Investigate workspace files")?;
-    let mut endpoint = FailingEndpoint; let snapshot = run_until_idle(&data, &mut endpoint, 7)?;
-    assert_eq!(snapshot.task.state, TaskState::Blocked);
-    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    let payload: String = conn.query_row("SELECT payload_json FROM state_cells
-        WHERE payload_schema = 'completion.blocked'", [], |row| row.get(0))?;
-    assert!(payload.contains("owner_action")); assert!(payload.contains("recovery ladder exhausted"));
-    Ok(())
-}
-
-#[test]
 fn recovery_failure_selects_a_changed_strategy_before_more_model_work() -> TestResult<()> {
     let data = fixture_root("parse-selected")?;
     enqueue_case(&data, "Investigate workspace files")?;

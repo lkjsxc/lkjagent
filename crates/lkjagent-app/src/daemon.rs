@@ -21,11 +21,10 @@ use crate::turn_effects::{gather_checks, tag_check_evidence};
 pub use crate::model_io::{CompletionRecord, Endpoint, ScriptedEndpoint};
 pub fn run_daemon(data_dir: &Path) -> Result<(), String> {
     let mut endpoint = LlmEndpoint::new(data_dir);
+    let wake = crate::config::runtime_timing(data_dir)?.queue_wake_milliseconds;
     loop {
-        let snapshot = run_until_idle(data_dir, &mut endpoint, 1)?;
-        if !matches!(snapshot.task.state, TaskState::Open) {
-            std::thread::sleep(std::time::Duration::from_secs(2));
-        }
+        let _snapshot = run_until_idle(data_dir, &mut endpoint, 1)?;
+        std::thread::sleep(std::time::Duration::from_millis(wake));
     }
 }
 
@@ -49,6 +48,7 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     let mut conn =
         Connection::open(data_dir.join("lkjagent.sqlite3")).map_err(|error| error.to_string())?;
     setup(&conn).map_err(|error| error.to_string())?;
+    let _timing = crate::config::persist_runtime_timing(&conn, data_dir)?;
     let now = clock.now();
     crate::daemon_lock::claim(&mut conn, &now)?;
     let groups = lkjagent_store::workspace_rows::active_rebalance_groups(&conn)
@@ -89,7 +89,18 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
         if !matches!(snapshot.task.state, TaskState::Open) {
             break;
         }
-        snapshot = run_turn(&mut conn, &workspace, &logs, snapshot, endpoint, clock)?;
+        let Some(next) = run_turn(
+            &mut conn,
+            &workspace,
+            &logs,
+            snapshot.clone(),
+            endpoint,
+            clock,
+        )?
+        else {
+            break;
+        };
+        snapshot = next;
     }
     Ok(snapshot)
 }
@@ -102,10 +113,10 @@ fn run_turn<E: Endpoint, C: Clock>(
     snapshot: TaskSnapshot,
     endpoint: &mut E,
     clock: &mut C,
-) -> Result<TaskSnapshot, String> {
+) -> Result<Option<TaskSnapshot>, String> {
     let selected_at = clock.now();
     let context = prepare_prompt_context(conn, &snapshot, &selected_at)?;
-    let decision = prepare_runtime_decision(conn, &snapshot, &context.fingerprint, &selected_at)?;
+    let Some(decision) = prepare_runtime_decision(conn, &snapshot, &context.fingerprint, &selected_at)? else { return Ok(None); };
     let prompt_snapshot = snapshot_with_prompt_context(&snapshot, &context);
     let work = next_work_with_decision(&prompt_snapshot, &decision);
     let mut check_effects = Vec::new();
@@ -125,7 +136,7 @@ fn run_turn<E: Endpoint, C: Clock>(
                 conn, workspace, &snapshot, &work, &decision, &commands, &now,
             )? {
                 AdmissionOutcome::Prepared(prepared) => prepared,
-                AdmissionOutcome::Failed(settled) => return Ok(settled),
+                AdmissionOutcome::Failed(settled) => return Ok(Some(settled)),
             };
             mark_effects(conn, &prepared, "applying", &now)?;
             let dispatch = dispatch_effects(conn, workspace, &mut next, &commands, &prepared);
@@ -134,8 +145,8 @@ fn run_turn<E: Endpoint, C: Clock>(
                 effects: &prepared, checks: &[], commands: &commands, now: &now,
             };
             return match dispatch {
-                Ok(()) => settle_dispatched_turn(conn, &turn),
-                Err(failure) => settle_failed_dispatch(conn, &turn, &failure),
+                Ok(()) => settle_dispatched_turn(conn, &turn).map(Some),
+                Err(failure) => settle_failed_dispatch(conn, &turn, &failure).map(Some),
             };
         }
         Work::RunChecks { step_id } => {
@@ -162,7 +173,7 @@ fn run_turn<E: Endpoint, C: Clock>(
             conn, workspace, &snapshot, &work, &decision, &commands, &now,
         )? {
             AdmissionOutcome::Prepared(prepared) => prepared,
-            AdmissionOutcome::Failed(settled) => return Ok(settled),
+            AdmissionOutcome::Failed(settled) => return Ok(Some(settled)),
         }
     };
     if !prepared.is_empty() { mark_effects(conn, &prepared, "applying", &now)?; }
@@ -172,7 +183,7 @@ fn run_turn<E: Endpoint, C: Clock>(
         effects: &prepared, checks: &check_effects, commands: &commands, now: &now,
     };
     match dispatch {
-        Ok(()) => settle_dispatched_turn(conn, &turn),
-        Err(failure) => settle_failed_dispatch(conn, &turn, &failure),
+        Ok(()) => settle_dispatched_turn(conn, &turn).map(Some),
+        Err(failure) => settle_failed_dispatch(conn, &turn, &failure).map(Some),
     }
 }

@@ -2,6 +2,7 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use lkjagent_llm::client::ClientConfig;
+use rusqlite::Connection;
 use serde_json::{Map, Value};
 
 use crate::config_registry::{number, validate};
@@ -35,28 +36,49 @@ pub(crate) fn workspace_root(data_dir: &Path) -> Result<PathBuf, String> {
     })
 }
 
+#[rustfmt::skip]
+pub(crate) struct RuntimeTiming {
+    pub endpoint_retry_limit: u64, pub endpoint_backoff_milliseconds: u64, pub queue_wake_milliseconds: u64,
+}
+
+#[rustfmt::skip]
+pub(crate) fn runtime_timing(data_dir: &Path) -> Result<RuntimeTiming, String> {
+    let values = load_flat_config(data_dir)?;
+    Ok(RuntimeTiming { endpoint_retry_limit: number(&values, "endpoint_retry_limit"),
+        endpoint_backoff_milliseconds: number(&values, "endpoint_backoff_milliseconds"),
+        queue_wake_milliseconds: number(&values, "queue_wake_milliseconds") })
+}
+
+#[rustfmt::skip]
+pub(crate) fn persist_runtime_timing(conn: &Connection, data_dir: &Path) -> Result<RuntimeTiming, String> {
+    let timing = runtime_timing(data_dir)?;
+    for (key, value) in [("runtime.endpoint_retry_limit", timing.endpoint_retry_limit),
+        ("runtime.endpoint_backoff_milliseconds", timing.endpoint_backoff_milliseconds)] {
+        conn.execute("INSERT INTO config (key, value) VALUES (?1, ?2)
+            ON CONFLICT(key) DO UPDATE SET value = excluded.value", (key, value.to_string()))
+            .map_err(|error| error.to_string())?;
+    }
+    Ok(timing)
+}
+
+#[rustfmt::skip]
 pub(crate) fn workspace_scan_timing(data_dir: &Path) -> Result<(u64, u64), String> {
     let values = load_flat_config(data_dir)?;
-    Ok((
-        number(&values, "workspace_scan_debounce_milliseconds"),
-        number(&values, "workspace_reconcile_seconds"),
-    ))
+    Ok((number(&values, "workspace_scan_debounce_milliseconds"), number(&values, "workspace_reconcile_seconds")))
 }
 
+#[rustfmt::skip]
 pub(crate) fn prompt_max_context_tokens(data_dir: &Path) -> Result<Option<u64>, String> {
     let values = load_flat_config(data_dir)?;
-    Ok(Some(
-        env_integer("LKJAGENT_PROMPT_CONTEXT_TOKENS", 2048, 262144)?
-            .unwrap_or_else(|| number(&values, "prompt_context_tokens")),
-    ))
+    Ok(Some(env_integer("LKJAGENT_PROMPT_CONTEXT_TOKENS", 2048, 262144)?
+        .unwrap_or_else(|| number(&values, "prompt_context_tokens"))))
 }
 
+#[rustfmt::skip]
 pub(crate) fn live_campaign_seconds(data_dir: &Path) -> Result<Option<u64>, String> {
     let values = load_flat_config(data_dir)?;
-    Ok(Some(
-        env_integer("LKJAGENT_LIVE_CAMPAIGN_SECONDS", 840, 7200)?
-            .unwrap_or_else(|| number(&values, "live_campaign_seconds")),
-    ))
+    Ok(Some(env_integer("LKJAGENT_LIVE_CAMPAIGN_SECONDS", 840, 7200)?
+        .unwrap_or_else(|| number(&values, "live_campaign_seconds"))))
 }
 
 pub(crate) fn load_flat_config(data_dir: &Path) -> Result<Map<String, Value>, String> {
@@ -135,12 +157,9 @@ pub(crate) fn file_count(path: &Path) -> usize {
     std::fs::read_dir(path).map_or(0, |entries| entries.filter_map(Result::ok).count())
 }
 
+#[rustfmt::skip]
 pub(crate) fn join_or_none(values: &[String]) -> String {
-    if values.is_empty() {
-        "none".to_string()
-    } else {
-        values.join(",")
-    }
+    if values.is_empty() { "none".to_string() } else { values.join(",") }
 }
 
 pub(crate) fn join_counts(values: &[(String, i64)]) -> String {
