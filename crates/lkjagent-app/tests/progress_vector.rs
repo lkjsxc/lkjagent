@@ -128,10 +128,12 @@ fn changed_progress_releases_suspend_then_exhausts_to_visible_block() -> TestRes
     let conn = Connection::open_in_memory()?; setup(&conn)?;
     insert_case(&conn, "case-1", "Keep making useful progress", "t0")?;
     conn.execute("INSERT INTO config (key, value) VALUES ('runtime.no_progress_window', '1')", [])?;
-    for (index, policy) in ["default", "inspect-state", "split-work", "replan", "clarify"].iter().enumerate() {
+    for (index, policy) in ["default", "default", "inspect-state", "inspect-state", "split-work",
+        "split-work", "replan", "replan", "clarify", "clarify"].iter().enumerate() {
         let id = format!("decision-{}", index + 1); let item = decision(&id, policy);
         insert_runtime_decision(&conn, &item, "pending", &format!("t{}", index + 1))?;
         progress_bridge::record(&conn, &item, &format!("t{}", index + 1))?;
+        if index == 0 { let count: i64 = conn.query_row("SELECT COUNT(*) FROM state_cells WHERE payload_schema = 'recovery.no-progress'", [], |row| row.get(0))?; assert_eq!(count, 0); }
     }
     let suspend: String = conn.query_row("SELECT status FROM state_cells
         WHERE payload_schema = 'recovery.no-progress' AND json_extract(payload_json, '$.next_strategy') = 'suspend'",
@@ -146,15 +148,23 @@ fn changed_progress_releases_suspend_then_exhausts_to_visible_block() -> TestRes
     upsert_state_cell(&conn, "case-1", &index)?;
     let snapshot = hydrate_snapshot(&conn, "case-1")?;
     assert_eq!(selected_candidate_at(&snapshot, "t6").operation.key, "index.rebuild/navigation");
-    let mut changed = decision("decision-6", "changed-external-condition");
+    let mut changed = decision("decision-11", "changed-external-condition");
     changed.operation = OperationKey("index.rebuild/navigation".to_string());
-    insert_runtime_decision(&conn, &changed, "pending", "t6")?; progress_bridge::record(&conn, &changed, "t6")?;
+    insert_runtime_decision(&conn, &changed, "pending", "t11")?; progress_bridge::record(&conn, &changed, "t11")?;
     let (suspend, blocked): (String, i64) = conn.query_row("SELECT
         (SELECT status FROM state_cells WHERE payload_schema = 'recovery.no-progress'
             AND json_extract(payload_json, '$.next_strategy') = 'suspend'),
         (SELECT COUNT(*) FROM state_cells WHERE payload_schema = 'completion.blocked' AND status = 'Active')",
         [], |row| Ok((row.get(0)?, row.get(1)?)))?;
-    assert_eq!(suspend, "Suppressed"); assert_eq!(blocked, 1); Ok(())
+    assert_eq!(suspend, "Suppressed"); assert_eq!(blocked, 0);
+    for index in 12..=13 {
+        let item = decision(&format!("decision-{index}"), "post-wake");
+        insert_runtime_decision(&conn, &item, "pending", &format!("t{index}"))?;
+        progress_bridge::record(&conn, &item, &format!("t{index}"))?;
+    }
+    let blocked: i64 = conn.query_row("SELECT COUNT(*) FROM state_cells
+        WHERE payload_schema = 'completion.blocked' AND status = 'Active'", [], |row| row.get(0))?;
+    assert_eq!(blocked, 1); Ok(())
 }
 
 fn insert_observation(

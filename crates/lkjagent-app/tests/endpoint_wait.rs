@@ -50,7 +50,7 @@ fn endpoint_retries_wait_until_due_then_stop_at_configured_limit() -> TestResult
         [],
         |row| Ok((row.get(0)?, row.get(1)?)),
     )?;
-    assert!(payload.contains("endpoint configuration or owner retry"));
+    assert!(payload.contains("endpoint configuration fingerprint change"));
     assert!(payload.contains("\"operation_key\":\"runtime.wait\""));
     assert_eq!(decisions, 3);
     let blocked: i64 = conn.query_row(
@@ -59,6 +59,28 @@ fn endpoint_retries_wait_until_due_then_stop_at_configured_limit() -> TestResult
         |row| row.get(0),
     )?;
     assert_eq!(blocked, 0);
+    drop(conn);
+
+    fs::write(
+        data.join("lkjagent.json"),
+        r#"{
+        "endpoint_timeout_seconds":301,
+        "endpoint_retry_limit":2,
+        "endpoint_backoff_milliseconds":50,
+        "queue_wake_milliseconds":50
+    }"#,
+    )?;
+    let mut clock = FixedClock::new("2026-07-11T10:00:01Z");
+    run_until_idle_with_clock(&data, &mut endpoint, 4, &mut clock)?;
+    assert_eq!(endpoint.calls, 4);
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let (released, active): (i64, i64) = conn.query_row("SELECT
+        (SELECT COUNT(*) FROM state_cells WHERE status = 'Suppressed' AND source_event_id IN
+            (SELECT id FROM runtime_events WHERE source = 'endpoint-recovery')),
+        (SELECT COUNT(*) FROM state_cells WHERE status = 'Active' AND payload_schema = 'recovery.failure'
+            AND json_extract(payload_json, '$.next_strategy') = 'wait-external')",
+        [], |row| Ok((row.get(0)?, row.get(1)?)))?;
+    assert_eq!((released, active), (1, 1));
     Ok(())
 }
 

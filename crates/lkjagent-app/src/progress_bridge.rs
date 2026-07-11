@@ -86,28 +86,16 @@ fn append_progress(conn: &Connection, decision: &RuntimeDecision, vector: &Progr
     append(conn, decision, cell, event_id, now)
 }
 
-fn repeated(
-    conn: &Connection,
-    case_id: &str,
-    fingerprint: &str,
-    window: u64,
-) -> Result<bool, String> {
-    let limit = i64::try_from(window).map_err(|error| error.to_string())?;
-    let mut statement = conn
-        .prepare(
-            "SELECT json_extract(payload_json, '$.fingerprint') FROM state_cells
-        WHERE case_id = ?1 AND payload_schema = 'runtime.progress' ORDER BY rowid DESC LIMIT ?2",
-        )
+#[rustfmt::skip]
+fn repeated(conn: &Connection, case_id: &str, fingerprint: &str, window: u64) -> Result<bool, String> {
+    let required = window.max(2); let limit = i64::try_from(required).map_err(|error| error.to_string())?;
+    let mut statement = conn.prepare("SELECT json_extract(payload_json, '$.fingerprint') FROM state_cells
+        WHERE case_id = ?1 AND payload_schema = 'runtime.progress' ORDER BY rowid DESC LIMIT ?2")
         .map_err(|error| error.to_string())?;
-    let values = statement
-        .query_map(params![case_id, limit], |row| row.get::<_, String>(0))
-        .map_err(|error| error.to_string())?
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|error| error.to_string())?;
-    Ok(
-        values.len() == usize::try_from(window).map_err(|error| error.to_string())?
-            && values.iter().all(|value| value == fingerprint),
-    )
+    let values = statement.query_map(params![case_id, limit], |row| row.get::<_, String>(0))
+        .map_err(|error| error.to_string())?.collect::<Result<Vec<_>, _>>().map_err(|error| error.to_string())?;
+    Ok(values.len() == usize::try_from(required).map_err(|error| error.to_string())?
+        && values.iter().all(|value| value == fingerprint))
 }
 
 fn append_no_progress(

@@ -29,14 +29,17 @@ prompt bound, output budget, eligibility instant, or operation key.
 
 Each settled decision records a canonical vector of obligations, passed checks,
 artifacts, clean source evidence, dependency edges, wake conditions, and strategy. A
-configured window of equal vectors emits a typed strategy change. A changed
-artifact, check, wake, evidence source, or strategy resets that window.
+configured window of equal vectors emits a typed strategy change. Even a
+one-decision setting requires two equal observations; one changed vector cannot
+be called stasis. A changed artifact, check, wake, evidence source, or strategy
+resets the window.
 
 ## Crash Recovery
 
 One provider call belongs to one decision. Retryable endpoint faults persist a
 configured exponential eligibility instant; retry exhaustion persists an
-observable external wait rather than sleeping inside a provider call.
+external wait bound to a nonsecret endpoint-configuration fingerprint. A later
+fingerprint change durably suppresses the wait and permits exactly one new call.
 
 Startup reconciles prepared effects before endpoint decisions, projections, and due wakes.
 A dispatching provider-exchange intent commits before network I/O. If startup

@@ -20,7 +20,9 @@ One cycle performs these ordered actions:
 
 The next cycle starts from committed rows. At most one endpoint call occurs per
 cycle. Deterministic intake, inspection, check, recovery, and maintenance may
-require none.
+require none. The per-invocation cycle bound is not a matter-work bound: open
+state resumes from durable rows across invocations. Useful progress may span
+more than four decisions and ends only through checks, a wait, or a blocker.
 
 ## Selection
 

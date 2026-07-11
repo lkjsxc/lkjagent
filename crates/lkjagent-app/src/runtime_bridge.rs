@@ -38,6 +38,7 @@ pub fn prepare_runtime_decision(
     let case_id = snapshot.task.id.to_string();
     insert_case(conn, &case_id, &snapshot.task.objective, now)
         .map_err(|error| error.to_string())?;
+    crate::endpoint_recovery::release_changed_waits(conn, &case_id, now)?;
     let unfinished = unfinished_decisions(conn, &case_id).map_err(|error| error.to_string())?;
     let (interrupted, budget_blocked) = match recover_or_reuse(conn, &unfinished, now) {
         Ok(Some(decision)) => {

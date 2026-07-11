@@ -73,6 +73,7 @@ pub fn record_recovery_fact(conn: &Connection, case_id: &str, decision_id: &str,
             exhausted: false, wait_external: true };
     }
     let eligible_at = endpoint_eligibility(conn, class, &plan, prior, now)?;
+    let endpoint_condition = (class == FailureClass::Endpoint).then(|| config_text(conn, "runtime.endpoint_condition_fingerprint")).transpose()?;
     let prompt = prompt_fingerprint(conn, &decision)?;
     let tool_view = decision.tool_view_fingerprint().map_err(|error| error.message)?;
     let budget = stable_fingerprint(&(decision.model_budget_tokens, &decision.evidence_requirements))
@@ -106,8 +107,8 @@ pub fn record_recovery_fact(conn: &Connection, case_id: &str, decision_id: &str,
         "tool_view": decision.tool_view.entries, "model_budget_tokens": recovery_budget(decision.model_budget_tokens, plan.next_strategy),
         "recovery_policy": strategy, "evidence_requirements": decision.evidence_requirements,
         "owner_action": if plan.exhausted { "inspect preserved failure evidence and choose a changed condition" } else { "" },
-        "timed_retry_remaining": eligible_at.is_some(),
-        "wake_condition": if plan.wait_external { "endpoint configuration or owner retry" } else { "" },
+        "timed_retry_remaining": eligible_at.is_some(), "endpoint_condition_fingerprint": endpoint_condition,
+        "wake_condition": if plan.wait_external { "endpoint configuration fingerprint change" } else { "" },
     }).to_string();
     cell.evidence_refs = vec![EvidenceRef { source_type: "runtime_decision".to_string(),
         source_id: decision_id.to_string(), fingerprint: tuple }];
@@ -155,13 +156,14 @@ fn recovery_budget(current: Option<u32>, strategy: Option<RecoveryStrategy>) -> 
         { current.map(|value| (value / 2).max(128)) } else { current }
 }
 
+#[rustfmt::skip]
+fn config_text(conn: &Connection, key: &str) -> Result<String, String> {
+    conn.query_row("SELECT value FROM config WHERE key = ?1", [key], |row| row.get(0)).map_err(|error| error.to_string())
+}
+
+#[rustfmt::skip]
 fn config_number(conn: &Connection, key: &str) -> Result<u64, String> {
-    let value: String = conn
-        .query_row("SELECT value FROM config WHERE key = ?1", [key], |row| {
-            row.get(0)
-        })
-        .map_err(|error| error.to_string())?;
-    value.parse::<u64>().map_err(|error| error.to_string())
+    config_text(conn, key)?.parse::<u64>().map_err(|error| error.to_string())
 }
 
 fn endpoint_eligibility(

@@ -6,7 +6,7 @@ Map lkjagent-core source modules.
 
 ## Table of Contents
 
-- [lib.rs](lib.rs): public module exports.
+- [lib.rs](lib.rs): public exports and canonical FNV-1a fingerprints.
 - [runtime-state.rs](runtime_state.rs): state keys, cells, snapshots, and
   state-vector fingerprints.
 - [runtime-tool-catalog.rs](runtime_tool_catalog.rs): canonical tool
@@ -32,8 +32,6 @@ Map lkjagent-core source modules.
 - [runtime-strategy.rs](runtime_strategy.rs): strategy-specific prompt changes and bounds.
 - [runtime-context.rs](runtime_context.rs): context items, contamination, and
   contradiction detection.
-- [runtime-fingerprint.rs](runtime_fingerprint.rs): stable FNV-1a fingerprints
-  over canonical JSON.
 - [model.rs](model.rs): current task, step, attempt, check, and command data.
 - [parse.rs](parse.rs): envelope and plan-line parser.
 - [prompt-policy.rs](prompt_policy.rs): prompt envelopes, policies, and budgets.

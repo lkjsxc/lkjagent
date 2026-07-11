@@ -33,6 +33,7 @@ mod daemon_route_effects;
 mod diagnostics;
 pub mod effect_dispatch;
 mod effect_files;
+mod endpoint_recovery;
 mod exchange_bridge;
 mod exchange_record;
 mod explore;

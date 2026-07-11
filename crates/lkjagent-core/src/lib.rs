@@ -31,7 +31,30 @@ mod runtime_context_plan;
 pub mod runtime_decision;
 pub mod runtime_eligibility;
 pub mod runtime_event;
-pub mod runtime_fingerprint;
+pub mod runtime_fingerprint {
+    use serde::Serialize;
+
+    #[derive(Debug, Clone, PartialEq, Eq)]
+    pub struct FingerprintError {
+        pub message: String,
+    }
+
+    pub fn stable_fingerprint<T: Serialize>(value: &T) -> Result<String, FingerprintError> {
+        serde_json::to_vec(value)
+            .map(|bytes| format!("fnv1a64:{:016x}", fnv1a64(&bytes)))
+            .map_err(|error| FingerprintError {
+                message: error.to_string(),
+            })
+    }
+
+    fn fnv1a64(bytes: &[u8]) -> u64 {
+        const OFFSET: u64 = 0xcbf29ce484222325;
+        const PRIME: u64 = 0x00000100000001b3;
+        bytes.iter().fold(OFFSET, |hash, byte| {
+            (hash ^ u64::from(*byte)).wrapping_mul(PRIME)
+        })
+    }
+}
 pub mod runtime_graph_query;
 pub mod runtime_operation;
 pub mod runtime_prompt_kernel;

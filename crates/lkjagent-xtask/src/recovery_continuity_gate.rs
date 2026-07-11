@@ -16,7 +16,7 @@ const SUITES: &[Suite] = &[
     Suite { package: "lkjagent-app", target: "recovery", minimum_tests: 2 },
     Suite { package: "lkjagent-app", target: "effect_recovery", minimum_tests: 1 },
     Suite { package: "lkjagent-app", target: "prepared_operation_startup", minimum_tests: 1 },
-    Suite { package: "lkjagent-app", target: "matter_continuation", minimum_tests: 1 },
+    Suite { package: "lkjagent-app", target: "matter_continuation", minimum_tests: 2 },
     Suite { package: "lkjagent-app", target: "resume", minimum_tests: 2 },
     Suite { package: "lkjagent-llm", target: "backoff", minimum_tests: 1 },
 ];
@@ -42,6 +42,7 @@ const REQUIRED: &[(&str, &str, &str)] = &[
     ("lkjagent-app", "runtime_wait", "future_recovery_wait_makes_no_decision_or_model_call_until_due"),
     ("lkjagent-app", "recovery", "unfinished_decision_with_exchange_blocks_without_provider_replay"),
     ("lkjagent-app", "effect_recovery", "startup_recovers_applying_write_when_target_matches_intended_bytes"),
+    ("lkjagent-app", "matter_continuation", "six_useful_model_decisions_continue_without_a_turn_cap"),
     ("lkjagent-llm", "backoff", "exponential_backoff_caps_at_fifteen_minutes"),
 ];
 

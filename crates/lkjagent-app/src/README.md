@@ -25,6 +25,7 @@ Map lkjagent-app source modules.
 - [daemon-lock.rs](daemon_lock.rs): heartbeat config-row daemon lease.
 - [effect-dispatch.rs](effect_dispatch.rs): ordered effect dispatch and compensation.
 - [effect-files.rs](effect_files.rs): descriptor-relative atomic artifact target writes.
+- [endpoint-recovery.rs](endpoint_recovery.rs): endpoint condition fingerprints and wait release.
 - [exchange-bridge.rs](exchange_bridge.rs): provider exchange and prompt-frame persistence.
 - [exchange-record.rs](exchange_record.rs): exchange log file rendering.
 - [explore.rs](explore.rs): bounded explore action dispatcher.
