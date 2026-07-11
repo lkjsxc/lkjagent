@@ -31,7 +31,7 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
             if fs::read(&new).map_err(|error| error.to_string())? != intended.bytes { return Err("settled archive target changed".to_string()); }
             return Ok(format!("archived record: {id}"));
         }
-        if new.exists() { return resume_moved(conn, data_dir, &row, (&new_rel, &new), (&audit_id, &operation.id), now); }
+        if new.exists() { return resume_moved(conn, data_dir, &row, (&new_rel, &new), (&audit_id, &operation.id, &operation.preimage_json), now); }
     }
     let bytes = crate::record_files::archive_source_bytes(&old, &row.fingerprint)?;
     prepare_or_load_operation(conn, &OperationDraft { id: &operation_id, key: &key, kind: "archive", preimage: &crate::record_files::archive_preimage(&row), intended: &crate::record_files::archive_intended(&row, &new_rel), revisions: &crate::record_files::archive_revisions(&row.path, &new_rel, &bytes)?, now }).map_err(|error| error.to_string())?;
@@ -48,9 +48,10 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
 }
 
 #[rustfmt::skip]
-fn resume_moved(conn: &Connection, data_dir: &Path, original: &RecordRow, target: (&str, &Path), operation: (&str, &str), now: &str) -> Result<String, String> {
+fn resume_moved(conn: &Connection, data_dir: &Path, original: &RecordRow, target: (&str, &Path), operation: (&str, &str, &str), now: &str) -> Result<String, String> {
     let (path, target) = target;
-    let (audit_id, operation_id) = operation;
+    let (audit_id, operation_id, preimage) = operation;
+    let original = prepared_original(original, preimage)?;
     let revisions = operation_revisions(conn, operation_id).map_err(|error| error.to_string())?;
     let intended = revisions.iter().find(|revision| revision.role == "intended").ok_or_else(|| "archive intended revision missing".to_string())?;
     let prior = revisions.iter().find(|revision| revision.role == "prior").ok_or_else(|| "archive prior revision missing".to_string())?;
@@ -59,9 +60,37 @@ fn resume_moved(conn: &Connection, data_dir: &Path, original: &RecordRow, target
     let source = crate::config::workspace_root(data_dir)?.join(&prior.path);
     if source != target && source.exists() { return Err("archive prior path remains occupied".to_string()); }
     let text = String::from_utf8(bytes).map_err(|error| error.to_string())?;
-    let archived = archived_row(original, path, &text, now)?;
-    settle(conn, data_dir, original, &archived, audit_id, operation_id, now)?;
+    let archived = archived_row(&original, path, &text, now)?;
+    settle(conn, data_dir, &original, &archived, audit_id, operation_id, now)?;
     Ok(format!("archived record: {}", original.id))
+}
+
+fn prepared_original(row: &RecordRow, preimage: &str) -> Result<RecordRow, String> {
+    let value: serde_json::Value =
+        serde_json::from_str(preimage).map_err(|error| error.to_string())?;
+    let field = |name| {
+        value
+            .get(name)
+            .and_then(serde_json::Value::as_str)
+            .ok_or_else(|| format!("archive preimage missing {name}"))
+    };
+    let id = field("id")?;
+    if id != row.id {
+        return Err("archive preimage record mismatch".to_string());
+    }
+    Ok(RecordRow {
+        id: id.to_string(),
+        kind: row.kind.clone(),
+        title: row.title.clone(),
+        state: field("state")?.to_string(),
+        path: field("path")?.to_string(),
+        fingerprint: field("fingerprint")?.to_string(),
+        archived: value
+            .get("archived")
+            .and_then(serde_json::Value::as_bool)
+            .ok_or_else(|| "archive preimage missing archived".to_string())?,
+        updated_at: row.updated_at.clone(),
+    })
 }
 
 fn settle(

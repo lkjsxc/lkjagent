@@ -13,7 +13,7 @@ use rusqlite::Connection;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn archive_startup_preserves_linked_duplicate() -> TestResult<()> {
+fn archive_recovery_restores_preimage_alias_and_cells() -> TestResult<()> {
     let data = fixture_root()?;
     let data_arg = data.to_string_lossy();
     let added = cli::run([
@@ -21,9 +21,9 @@ fn archive_startup_preserves_linked_duplicate() -> TestResult<()> {
         data_arg.as_ref(),
         "record",
         "add",
-        "custom",
-        "Linked",
-        "Archive",
+        "todo",
+        "Partial",
+        "Settlement",
         "--body",
         "body",
     ])?;
@@ -31,7 +31,7 @@ fn archive_startup_preserves_linked_duplicate() -> TestResult<()> {
     let old_path = field(&added, "path=")?;
     let workspace = data.join("workspace");
     let old = workspace.join(&old_path);
-    let destination = archive_path("custom", &id)?;
+    let destination = archive_path("todo", &id)?;
     let new = workspace.join(&destination);
     let bytes = fs::read(&old)?;
     fs::create_dir_all(
@@ -56,26 +56,39 @@ fn archive_startup_preserves_linked_duplicate() -> TestResult<()> {
         preimage: &serde_json::json!({"id": id, "path": old_path, "fingerprint": fingerprint, "state": "open", "archived": false}).to_string(),
         intended: "{}", revisions: &revisions, now: "now",
     })?;
-    fs::hard_link(&old, &new)?;
+    fs::rename(&old, &new)?;
+    conn.execute(
+        "UPDATE workspace_records SET path = ?1, state = 'archived', archived = 1 WHERE id = ?2",
+        [&destination, &id],
+    )?;
     drop(conn);
 
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![],
         index: 0,
     };
-    let error = run_until_idle(&data, &mut endpoint, 1)
-        .err()
-        .ok_or_else(|| std::io::Error::other("duplicate startup unexpectedly succeeded"))?;
-    assert!(error.contains("prior path remains occupied"));
+    run_until_idle(&data, &mut endpoint, 1)?;
+
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     let phase: String = conn.query_row(
         "SELECT phase FROM workspace_operations WHERE id = ?1",
         [&operation_id],
         |row| row.get(0),
     )?;
-    assert_eq!(phase, "prepared");
+    let alias: String = conn.query_row(
+        "SELECT new_path FROM workspace_path_aliases WHERE old_path = ?1",
+        [&old_path],
+        |row| row.get(0),
+    )?;
+    let status: String = conn.query_row(
+        "SELECT status FROM state_cells WHERE key_label = ?1",
+        [format!("todo:open/{id}")],
+        |row| row.get(0),
+    )?;
+    assert_eq!(phase, "settled");
+    assert_eq!(alias, destination);
+    assert_eq!(status, "Suppressed");
     assert!(new.exists());
-    assert!(old.exists());
     Ok(())
 }
 
@@ -98,7 +111,8 @@ fn field(output: &str, marker: &str) -> Result<String, String> {
 }
 
 fn fixture_root() -> TestResult<PathBuf> {
-    let path = std::env::temp_dir().join(format!("lkjagent-archive-link-{}", std::process::id()));
+    let path =
+        std::env::temp_dir().join(format!("lkjagent-archive-partial-{}", std::process::id()));
     if path.exists() {
         fs::remove_dir_all(&path)?;
     }

@@ -34,8 +34,9 @@ or leaves the operation prepared rather than overwriting owner bytes.
 
 ## Recovery
 
-Startup resumes a prepared archive only when its moved target exactly matches
-the intended bytes and its prior path is absent; settled retries validate bytes.
+Startup uses the immutable preimage to resume an archive only when its moved
+target exactly matches intended bytes and its prior path is absent. Settled
+retries validate bytes.
 A conflict or duplicate blocks startup and leaves the operation prepared. Recovery
 for rebalance, temporary files, manifests, and every writer remains open.
 Archive moves use Linux no-clobber renames; unsupported hosts fail without moving bytes.

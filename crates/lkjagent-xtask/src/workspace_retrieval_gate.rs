@@ -42,7 +42,12 @@ const SUITES: &[Suite] = &[
     Suite {
         package: "lkjagent-app",
         target: "archive_link_recovery",
-        minimum_tests: 2,
+        minimum_tests: 1,
+    },
+    Suite {
+        package: "lkjagent-app",
+        target: "archive_partial_settlement",
+        minimum_tests: 1,
     },
     Suite {
         package: "lkjagent-app",
@@ -111,8 +116,8 @@ const REQUIRED: &[(&str, &str)] = &[
         "archive_startup_preserves_linked_duplicate",
     ),
     (
-        "archive_link_recovery",
-        "archive_startup_keeps_target_after_partial_row_settlement",
+        "archive_partial_settlement",
+        "archive_recovery_restores_preimage_alias_and_cells",
     ),
     (
         "prepared_operation_startup",

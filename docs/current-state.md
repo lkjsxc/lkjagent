@@ -107,9 +107,9 @@ project, and date filters, stable rebuild rows, bounded excerpts, and drift
 exclusion. Navigation now excludes closed TODO rows and avoids generated
 page timestamps. Retrieval still does not cover the full visible workspace or
 an external-change scanner. The store can preserve exact operation bytes and
-reuse idempotency keys. Archive startup settles only matching moved bytes and
-settled retries validate target bytes; conflicts block startup. Rebalance still
-uses prepared rows without revisions and recovery remains incomplete elsewhere.
+reuse idempotency keys. Archive startup uses preimages to settle only matching
+moved bytes, and settled retries validate target bytes; conflicts block startup.
+Rebalance still uses prepared rows without revisions and recovery remains incomplete.
 
 The xtask dispatcher now runs named nonempty suites for `protocol-tools` and
 `workspace-retrieval-maintenance` and rejects a suite that reports too few tests.
