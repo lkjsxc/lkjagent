@@ -4,8 +4,9 @@ use lkjagent_core::workspace_manifest::RebalanceMove;
 use lkjagent_core::workspace_record::{archive_path, parse_record, record_fingerprint};
 use lkjagent_store::record_rows::{record, upsert_record, RecordRow};
 use lkjagent_store::workspace_rows::{
-    compensate_operation, insert_alias_and_audit, operation_for_key, prepare_or_load_operation,
-    remove_alias_and_audit, settle_operation, OperationDraft, PathAliasRow,
+    compensate_operation, insert_alias_and_audit, operation_for_key, operation_revisions,
+    prepare_or_load_operation, remove_alias_and_audit, settle_operation, OperationDraft,
+    PathAliasRow,
 };
 use rusqlite::Connection;
 
@@ -20,9 +21,20 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
     let audit_id = format!("archive-{}", row.id);
     let operation_id = format!("workspace-{audit_id}");
     let key = format!("archive:{}:{}", row.id, row.fingerprint);
-    if matches!(operation_for_key(conn, &key).map_err(|error| error.to_string())?, Some(row) if row.phase == "settled")
-    {
-        return Ok(format!("archived record: {id}"));
+    if let Some(operation) = operation_for_key(conn, &key).map_err(|error| error.to_string())? {
+        if operation.phase == "settled" {
+            return Ok(format!("archived record: {id}"));
+        }
+        if !old.exists() && new.exists() {
+            return resume_moved(
+                conn,
+                data_dir,
+                &row,
+                (&new_rel, &new),
+                (&audit_id, &operation.id),
+                now,
+            );
+        }
     }
     let bytes = crate::record_files::archive_source_bytes(&old, &row.fingerprint)?;
     prepare_or_load_operation(
@@ -109,6 +121,20 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
     Ok(format!("archived record: {id}"))
 }
 
+#[rustfmt::skip]
+fn resume_moved(conn: &Connection, data_dir: &Path, original: &RecordRow, target: (&str, &Path), operation: (&str, &str), now: &str) -> Result<String, String> {
+    let (path, target) = target;
+    let (audit_id, operation_id) = operation;
+    let revisions = operation_revisions(conn, operation_id).map_err(|error| error.to_string())?;
+    let intended = revisions.iter().find(|revision| revision.role == "intended").ok_or_else(|| "archive intended revision missing".to_string())?;
+    let bytes = fs::read(target).map_err(|error| error.to_string())?;
+    if bytes != intended.bytes { return Err("archive target conflicts with intended revision".to_string()); }
+    let text = String::from_utf8(bytes).map_err(|error| error.to_string())?;
+    let archived = archived_row(original, path, &text, now)?;
+    settle(conn, data_dir, original, &archived, audit_id, operation_id, now)?;
+    Ok(format!("archived record: {}", original.id))
+}
+
 fn settle(
     conn: &Connection,
     data_dir: &Path,
@@ -154,47 +180,14 @@ struct Rollback<'a> {
     now: &'a str,
 }
 
-fn archived_row(
-    original: &RecordRow,
-    path: &str,
-    text: &str,
-    now: &str,
-) -> Result<RecordRow, String> {
-    Ok(RecordRow {
-        id: original.id.clone(),
-        kind: original.kind.clone(),
-        title: original.title.clone(),
-        state: "archived".to_string(),
-        path: path.to_string(),
-        fingerprint: record_fingerprint(text).map_err(|error| error.message)?,
-        archived: true,
-        updated_at: now.to_string(),
-    })
+#[rustfmt::skip]
+fn archived_row(original: &RecordRow, path: &str, text: &str, now: &str) -> Result<RecordRow, String> {
+    Ok(RecordRow { id: original.id.clone(), kind: original.kind.clone(), title: original.title.clone(), state: "archived".to_string(), path: path.to_string(), fingerprint: record_fingerprint(text).map_err(|error| error.message)?, archived: true, updated_at: now.to_string() })
 }
 
-fn archive_rows(
-    conn: &Connection,
-    row: &RecordRow,
-    path: &str,
-    audit_id: &str,
-    now: &str,
-) -> Result<(), String> {
-    let item = RebalanceMove {
-        entity_id: row.id.clone(),
-        entity_kind: "record".to_string(),
-        old_path: row.path.clone(),
-        new_path: path.to_string(),
-        decision_id: "record.archive".to_string(),
-        reason: "record archived".to_string(),
-        validation: vec!["archive:true".to_string()],
-    };
-    let alias = PathAliasRow {
-        old_path: row.path.clone(),
-        entity_id: row.id.clone(),
-        entity_kind: "record".to_string(),
-        new_path: path.to_string(),
-        decision_id: "record.archive".to_string(),
-        created_at: now.to_string(),
-    };
+#[rustfmt::skip]
+fn archive_rows(conn: &Connection, row: &RecordRow, path: &str, audit_id: &str, now: &str) -> Result<(), String> {
+    let item = RebalanceMove { entity_id: row.id.clone(), entity_kind: "record".to_string(), old_path: row.path.clone(), new_path: path.to_string(), decision_id: "record.archive".to_string(), reason: "record archived".to_string(), validation: vec!["archive:true".to_string()] };
+    let alias = PathAliasRow { old_path: row.path.clone(), entity_id: row.id.clone(), entity_kind: "record".to_string(), new_path: path.to_string(), decision_id: "record.archive".to_string(), created_at: now.to_string() };
     insert_alias_and_audit(conn, &alias, audit_id, &item, now).map_err(|error| error.to_string())
 }

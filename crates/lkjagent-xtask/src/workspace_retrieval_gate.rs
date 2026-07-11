@@ -35,6 +35,11 @@ const SUITES: &[Suite] = &[
         minimum_tests: 2,
     },
     Suite {
+        package: "lkjagent-app",
+        target: "archive_recovery",
+        minimum_tests: 1,
+    },
+    Suite {
         package: "lkjagent-store",
         target: "workspace_rows",
         minimum_tests: 1,
@@ -77,6 +82,10 @@ const REQUIRED: &[(&str, &str)] = &[
     (
         "archive_compensation",
         "archive_restores_indexes_when_state_suppression_fails",
+    ),
+    (
+        "archive_recovery",
+        "archive_resumes_prepared_operation_after_file_move",
     ),
     (
         "workspace_index_predicates",
