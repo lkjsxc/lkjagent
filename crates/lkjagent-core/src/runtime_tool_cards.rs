@@ -16,7 +16,14 @@ pub(crate) fn render_tool_view(view: &ToolSetView) -> String {
                     } else {
                         "optional"
                     };
-                    format!("{}:{need}:{:?}", spec.name, spec.value_class)
+                    let count = match (spec.minimum, spec.maximum) {
+                        (Some(min), Some(max)) => format!(":count={min}..{max}"),
+                        _ => String::new(),
+                    };
+                    format!(
+                        "{}:{need}:{:?}:bytes={}..{}{}",
+                        spec.name, spec.value_class, spec.min_bytes, spec.max_bytes, count
+                    )
                 })
                 .collect::<Vec<_>>()
                 .join(",");

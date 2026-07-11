@@ -75,23 +75,21 @@ fn tool_field_specs_drive_value_class_admission() -> Result<(), String> {
         OutputEnvelope::Action,
     );
     let entry = decision.tool_view.entry("fs.read").ok_or("missing tool")?;
-    assert_eq!(
-        entry.field_spec("path").map(|spec| spec.value_class),
-        Some(ToolValueClass::WorkspacePath)
-    );
-    assert_eq!(
-        entry.field_spec("count").map(|spec| spec.value_class),
-        Some(ToolValueClass::Count)
-    );
-
-    let bad = admit_action(
-        &decision,
-        &action_params("fs.read", vec![("path", "README.md"), ("count", "many")]),
-    )
-    .map_err(|error| error.message)?;
-
-    assert_eq!(bad.status, AdmissionStatus::Rejected);
-    assert_eq!(bad.reason, "invalid count for count");
+    let path = entry.field_spec("path").ok_or("missing path field")?;
+    assert_eq!(path.value_class, ToolValueClass::WorkspacePath);
+    assert_eq!((path.min_bytes, path.max_bytes), (1, 1024));
+    let count = entry.field_spec("count").ok_or("missing count field")?;
+    assert_eq!(count.value_class, ToolValueClass::Count);
+    assert_eq!((count.minimum, count.maximum), (Some(1), Some(120)));
+    for value in ["many", "01", "0", "121"] {
+        let bad = admit_action(
+            &decision,
+            &action_params("fs.read", vec![("path", "README.md"), ("count", value)]),
+        )
+        .map_err(|error| error.message)?;
+        assert_eq!(bad.status, AdmissionStatus::Rejected, "value={value}");
+        assert_eq!(bad.reason, "invalid count for count");
+    }
     Ok(())
 }
 

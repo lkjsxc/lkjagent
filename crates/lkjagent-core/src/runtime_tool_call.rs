@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use serde_json::{Number, Value};
 
 use crate::runtime_action_xml::ActionXmlError;
-use crate::runtime_decision::{RuntimeDecision, ToolValueClass};
+use crate::runtime_decision::{RuntimeDecision, ToolFieldSpec, ToolValueClass};
 use crate::runtime_tool_fields::parse_fields;
 
 pub const ACTION_OPEN: &str = "<lkjagent_action>";
@@ -63,10 +63,7 @@ pub fn parse_tool_call(raw: &str, decision: &RuntimeDecision) -> Result<ToolCall
         let Some(spec) = entry.field_spec(&name) else {
             return Err(schema(format!("unknown arg {name}")));
         };
-        args.insert(
-            name.clone(),
-            value_for_class(&name, spec.value_class, &text)?,
-        );
+        args.insert(name.clone(), value_for_spec(&name, spec, &text)?);
     }
     for required in &entry.required_params {
         if !args.contains_key(required) {
@@ -106,13 +103,15 @@ fn required<'a>(map: &'a BTreeMap<String, String>, key: &str) -> Result<&'a str,
         .ok_or_else(|| schema(format!("missing {key}")))
 }
 
-fn value_for_class(name: &str, class: ToolValueClass, text: &str) -> Result<Value, ToolCallError> {
-    match class {
-        ToolValueClass::Count => text
-            .trim()
-            .parse::<u64>()
-            .map(|n| Value::Number(Number::from(n)))
-            .map_err(|_| schema(format!("wrong primitive for {name}"))),
+fn value_for_spec(name: &str, spec: &ToolFieldSpec, text: &str) -> Result<Value, ToolCallError> {
+    if !spec.accepts_size(text) {
+        return Err(schema(format!("value size out of bounds for {name}")));
+    }
+    match spec.value_class {
+        ToolValueClass::Count => spec
+            .canonical_count(text)
+            .map(|number| Value::Number(Number::from(number)))
+            .ok_or_else(|| schema(format!("wrong primitive for {name}"))),
         _ => Ok(Value::String(text.to_string())),
     }
 }

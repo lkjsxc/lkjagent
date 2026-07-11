@@ -1,7 +1,7 @@
 use lkjagent_core::runtime_decision::RuntimeDecision;
 use rusqlite::{params, Connection};
 
-use crate::error::StoreResult;
+use crate::error::{StoreError, StoreResult};
 use crate::row_support::{fingerprint_error, json_string, json_value};
 
 pub fn next_decision_id(conn: &Connection, case_id: &str) -> StoreResult<String> {
@@ -62,7 +62,13 @@ pub fn unfinished_decisions(conn: &Connection, case_id: &str) -> StoreResult<Vec
     let rows = statement.query_map([case_id], |row| row.get::<_, String>(0))?;
     let mut decisions = Vec::new();
     for row in rows {
-        decisions.push(json_value(&row?)?);
+        let decision: RuntimeDecision = json_value(&row?)?;
+        if !decision.tool_view.has_current_constraints() {
+            return Err(StoreError::InvalidState(
+                "pending decision tool constraints are stale".to_string(),
+            ));
+        }
+        decisions.push(decision);
     }
     Ok(decisions)
 }

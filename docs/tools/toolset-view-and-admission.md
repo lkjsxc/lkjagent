@@ -32,6 +32,8 @@ block containing direct decision-approved field tags. Name/value argument
 wrappers, unknown blocks, attributes, prose outside the block, duplicate scalar
 tags, stale decision ids, missing arguments, wrong primitive classes,
 JSON-looking bodies, and tools absent from the view produce structured faults.
+Count tags use unsigned canonical decimal without whitespace or leading zero and
+must remain inside the field spec's persisted and rendered minimum and maximum.
 Unknown means absent from the decision view, not absent from a hidden global
 list.
 

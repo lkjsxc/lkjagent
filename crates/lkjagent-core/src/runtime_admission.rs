@@ -3,7 +3,7 @@ use std::path::{Component, Path};
 
 use serde::{Deserialize, Serialize};
 
-use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolValueClass};
+use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolFieldSpec, ToolValueClass};
 use crate::runtime_fingerprint::FingerprintError;
 use crate::runtime_tool_catalog::effect_for_tool;
 
@@ -75,7 +75,7 @@ fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<
         if placeholder_value(value) {
             return Some(format!("placeholder value for {name}"));
         }
-        if let Some(reason) = value_class_rejection(name, value, spec.value_class) {
+        if let Some(reason) = value_class_rejection(name, value, spec) {
             return Some(reason);
         }
     }
@@ -97,15 +97,18 @@ fn wrapped_placeholder(value: &str, open: char, close: char) -> bool {
     value.starts_with(open) && value.ends_with(close) && value.len() > 2
 }
 
-fn value_class_rejection(name: &str, value: &str, class: ToolValueClass) -> Option<String> {
+fn value_class_rejection(name: &str, value: &str, spec: &ToolFieldSpec) -> Option<String> {
     if value.trim().is_empty() {
         return Some(format!("empty value for {name}"));
     }
-    match class {
+    if !spec.accepts_size(value) {
+        return Some(format!("value size out of bounds for {name}"));
+    }
+    match spec.value_class {
         ToolValueClass::WorkspacePath if !workspace_relative_path(value) => {
             Some("path escapes workspace".to_string())
         }
-        ToolValueClass::Count if value.parse::<u64>().is_err() => {
+        ToolValueClass::Count if spec.canonical_count(value).is_none() => {
             Some(format!("invalid count for {name}"))
         }
         _ => None,
@@ -113,10 +116,15 @@ fn value_class_rejection(name: &str, value: &str, class: ToolValueClass) -> Opti
 }
 
 pub fn workspace_relative_path(path: &str) -> bool {
+    if path.is_empty() || path.len() > 1024 || path.chars().any(char::is_control) {
+        return false;
+    }
     let path = Path::new(path);
     if path.is_absolute() {
         return false;
     }
-    path.components()
-        .all(|component| matches!(component, Component::Normal(_) | Component::CurDir))
+    path == Path::new(".")
+        || path
+            .components()
+            .all(|component| matches!(component, Component::Normal(_)))
 }

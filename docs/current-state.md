@@ -10,8 +10,7 @@ work still required to make them agree.
 The supplied product source is commit
 `ae5ff551457adce869dee6159200c85a63aab3de`. The immutable rebuild packet is
 anchored at `1b615a76c03dfd58dfd2986f017563bd6789e832`. Baseline raw evidence and
-its reviewed receipt live under
-`tmp/lkjagent-progress/nodes/baseline-capture/`.
+its reviewed receipt live under `tmp/lkjagent-progress/nodes/baseline-capture/`.
 
 The supplied SQLite store has three tasks, thirteen steps, ten decisions, and
 six provider exchanges. The task states are closed, blocked, and closed. The
@@ -86,8 +85,9 @@ closed snapshot. Default Explore decisions now render only read, search, memory
 find, and note tools, hiding shell and finish; completion handlers outside the
 selected view remain an open authority gap. Action cards and the decision parser
 now use direct fields inside one input block and reject name/value wrappers.
-The parser bounds scalars and fields at 4,096 bytes and actions at 16,384 bytes.
-Persisted views discard catalog-excluded entries, and admission rejects them.
+The parser bounds scalars and fields at 4,096 bytes and actions at 16,384 bytes;
+decision field specs persist/render tighter byte and canonical count ranges.
+Persisted views discard catalog-excluded entries; admission rejects them.
 Decision-free generic Explore parsing and work selection now block rather than
 synthesizing a catalog-wide action view. Model actions, harness writes, and shell
 command checks persist admissions and effect journals before dispatch; one bounded
@@ -95,8 +95,8 @@ immutable observation settles each attempt. Generated revisions retain exact mai
 closed membership, and stale absence; drift blocks mutation and append rebuilds
 owned units. After dispatch, artifact rows and refs, observations, context, checks, state and
 plan rows, recovery facts, snapshots, and decision status settle atomically;
-shell outcomes wait for that boundary. Prepared bundles
-fail; partial, conflicting, or unexpected-member bundles stay applying and block
+shell outcomes wait for that boundary. Prepared bundles fail; partial,
+conflicting, or unexpected-member bundles stay applying and block
 startup without replay. Complete applying bundles recover. Pending decisions
 with durable evidence block; external bytes and broader writers remain outside.
 

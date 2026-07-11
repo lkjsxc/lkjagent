@@ -89,6 +89,8 @@ const REQUIRED: &[(&str, &str, &str)] = &[
     ("lkjagent-app", "effect_dispatch", "partial_bundle_failure_restores_prior_targets"),
     ("lkjagent-app", "native_append_effect", "multipart_append_reassembles_owned_parts_before_appending"),
     ("lkjagent-core", "generic_flow", "duplicate_command_checks_use_ordinal_outcomes"),
+    ("lkjagent-core", "tool_call_edges", "count_values_are_canonical_and_within_persisted_bounds"),
+    ("lkjagent-app", "recovery", "pending_decision_with_stale_field_bounds_fails_closed"),
     ("lkjagent-effects", "effects", "shell_bounds_only_its_background_and_detached_descendants"),
     (
         "lkjagent-core",

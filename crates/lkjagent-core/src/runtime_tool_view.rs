@@ -3,12 +3,33 @@ use serde::{Deserialize, Serialize};
 use crate::runtime_fingerprint::{stable_fingerprint, FingerprintError};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[rustfmt::skip]
 pub struct ToolFieldSpec {
-    pub name: String,
-    pub required: bool,
-    pub value_class: ToolValueClass,
+    pub name: String, pub required: bool, pub value_class: ToolValueClass,
+    #[serde(default)] pub min_bytes: usize,
+    #[serde(default = "default_max_bytes")] pub max_bytes: usize,
+    #[serde(default)] pub minimum: Option<u64>, #[serde(default)] pub maximum: Option<u64>,
 }
 
+impl ToolFieldSpec {
+    pub fn accepts_size(&self, value: &str) -> bool {
+        (self.min_bytes..=self.max_bytes).contains(&value.len())
+    }
+
+    #[rustfmt::skip]
+    pub fn canonical_count(&self, value: &str) -> Option<u64> {
+        if self.value_class != ToolValueClass::Count || value.is_empty()
+            || value.len() > 1 && value.starts_with('0')
+            || !value.bytes().all(|byte| byte.is_ascii_digit()) { return None; }
+        let count = value.parse::<u64>().ok()?;
+        if self.minimum.is_some_and(|minimum| count < minimum)
+            || self.maximum.is_some_and(|maximum| count > maximum) { None } else { Some(count) }
+    }
+}
+
+fn default_max_bytes() -> usize {
+    4096
+}
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ToolExampleParam {
     pub name: String,
@@ -106,6 +127,12 @@ impl ToolSetView {
     pub fn fingerprint(&self) -> Result<String, FingerprintError> {
         stable_fingerprint(self)
     }
+
+    pub fn has_current_constraints(&self) -> bool {
+        self.entries.iter().all(|entry| {
+            entry.field_specs == field_specs(&entry.required_params, &entry.optional_params)
+        })
+    }
 }
 
 fn sorted_strings(values: Vec<&str>) -> Vec<String> {
@@ -136,20 +163,32 @@ fn field_specs(required: &[String], optional: &[String]) -> Vec<ToolFieldSpec> {
     specs
 }
 
+#[rustfmt::skip]
 fn field_spec(name: &str, required: bool) -> ToolFieldSpec {
-    ToolFieldSpec {
-        name: name.to_string(),
-        required,
-        value_class: value_class(name),
-    }
+    let value_class = value_class(name);
+    let (min_bytes, max_bytes) = if value_class == ToolValueClass::WorkspacePath { (1, 1024) }
+        else if value_class == ToolValueClass::Count { (1, 20) } else { (usize::from(required), 4096) };
+    let (minimum, maximum) = count_bounds(name);
+    ToolFieldSpec { name: name.to_string(), required, value_class, min_bytes, max_bytes, minimum, maximum }
 }
 
 fn value_class(name: &str) -> ToolValueClass {
     match name {
         "path" => ToolValueClass::WorkspacePath,
         "command" => ToolValueClass::ShellCommand,
-        "count" | "limit" | "budget" => ToolValueClass::Count,
+        "count" | "offset" | "depth" | "limit" | "budget" => ToolValueClass::Count,
         "query" => ToolValueClass::Query,
         _ => ToolValueClass::Text,
+    }
+}
+
+fn count_bounds(name: &str) -> (Option<u64>, Option<u64>) {
+    match name {
+        "count" => (Some(1), Some(120)),
+        "offset" => (Some(0), Some(1_000_000)),
+        "depth" => (Some(1), Some(16)),
+        "limit" => (Some(1), Some(100)),
+        "budget" => (Some(1), Some(4096)),
+        _ => (None, None),
     }
 }

@@ -25,6 +25,24 @@ fn accepts_japanese_and_large_bounded_values() -> Result<(), String> {
 }
 
 #[test]
+fn count_values_are_canonical_and_within_persisted_bounds() -> Result<(), String> {
+    for value in ["01", "0", "121", "+1", " 1"] {
+        let error = match parse_tool_call(&read_count(value), &decision()) {
+            Ok(_) => return Err(format!("invalid count accepted: {value}")),
+            Err(error) => error,
+        };
+        assert!(
+            matches!(error, ToolCallError::ArgsSchemaViolation(_)),
+            "value={value}"
+        );
+    }
+    let parsed = parse_tool_call(&read_count("120"), &decision())
+        .map_err(|error| format!("bounded count failed: {error:?}"))?;
+    assert_eq!(parsed.args["count"], 120);
+    Ok(())
+}
+
+#[test]
 fn rejects_unbounded_action_values() -> Result<(), String> {
     let too_large = "あ".repeat(1366);
     let error = match parse_tool_call(&action("plan.note", &[('s', &too_large)]), &decision()) {
@@ -60,6 +78,10 @@ fn action(tool: &str, args: &[(char, &str)]) -> String {
     }
     out.push_str("</input></lkjagent_action>");
     out
+}
+
+fn read_count(value: &str) -> String {
+    format!("<lkjagent_action><decision_id>dec-1</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>fs.read</tool_name><input><path>README.md</path><count>{value}</count></input></lkjagent_action>")
 }
 
 fn field(name: char) -> &'static str {

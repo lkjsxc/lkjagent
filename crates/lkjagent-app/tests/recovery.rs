@@ -5,7 +5,7 @@ use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
-use lkjagent_store::decision_rows::insert_runtime_decision;
+use lkjagent_store::decision_rows::{insert_runtime_decision, unfinished_decisions};
 use lkjagent_store::exchange_rows::{insert_provider_exchange, ProviderExchangeRow};
 use lkjagent_store::plan_access::{insert_step_tx, insert_task};
 use lkjagent_store::plan_schema::setup;
@@ -56,6 +56,31 @@ fn unfinished_decision_with_exchange_blocks_without_provider_replay() -> TestRes
     assert_eq!(old_status, "pending");
     assert_eq!(pending, 2);
     assert_eq!(total, 2);
+    Ok(())
+}
+
+#[test]
+fn pending_decision_with_stale_field_bounds_fails_closed() -> TestResult<()> {
+    let data = fixture_root("stale-field-bounds")?;
+    let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    let snapshot = instantiate(1, "What is an agent?");
+    persist(&mut conn, &snapshot)?;
+    insert_case(&conn, "1", &snapshot.task.objective, "before")?;
+    let mut decision = pending_decision(&snapshot, "decision-stale");
+    decision.tool_view = lkjagent_core::runtime_tool_catalog::tool_view_for_names(&["fs.read"]);
+    decision.tool_view.entries[0]
+        .field_specs
+        .iter_mut()
+        .find(|spec| spec.name == "count")
+        .ok_or("count field missing")?
+        .maximum = None;
+    insert_runtime_decision(&conn, &decision, "pending", "before")?;
+    let error = match unfinished_decisions(&conn, "1") {
+        Ok(_) => return Err("stale bounds accepted".into()),
+        Err(error) => error,
+    };
+    assert!(error.to_string().contains("tool constraints are stale"));
     Ok(())
 }
 
