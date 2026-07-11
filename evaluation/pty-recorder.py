@@ -21,7 +21,7 @@ def main() -> int:
         "/bin/sh",
         "-c",
         "IFS= read -r line; printf 'accepted:%s\\n' \"$line\"; "
-        "printf 'frame:raw-pty-output\\n'",
+        "sleep 0.02; printf 'frame:raw-pty-output\\n'",
     ]
     process = subprocess.Popen(
         command,
