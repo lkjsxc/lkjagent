@@ -81,39 +81,33 @@ pub(super) fn validate(
         .map_err(err)?;
     let (decisions, exchanges, real, _parse, _admissions, _admitted, observations, blockers) =
         facts;
-    let (first_decision, first_outcome, first_ref): (String, String, String) = conn.query_row("SELECT decision_id, outcome_json, exchange_ref
-        FROM provider_exchanges WHERE finished_at IS NOT NULL AND outcome_json NOT LIKE '%endpoint_error%'
-        ORDER BY started_at, id LIMIT 1", [], |item| Ok((item.get(0)?, item.get(1)?, item.get(2)?))).map_err(err)?;
-    let mut first_statement = conn.prepare("SELECT action_tool, status FROM tool_admissions
-        WHERE decision_id = ?1 ORDER BY created_at, id").map_err(err)?;
-    let first_actions = first_statement.query_map([&first_decision], |item| Ok((item.get::<_,String>(0)?, item.get::<_,String>(1)?)))
-        .map_err(err)?.collect::<Result<Vec<_>,_>>().map_err(err)?;
-    let first_admissions = first_actions.len(); let first_admitted = first_actions.iter().filter(|(_,status)| status=="Admitted").count();
-    let first_action_text = first_actions.iter().map(|(tool,status)| format!("{tool}:{status}")).collect::<Vec<_>>().join(",");
-    let first_parse = !first_outcome.contains("parse_fault");
-    if decisions < 1 || exchanges != 1 || real != 1 {
-        return Err(format!("{run_id} lacks real completed exchange"));
-    }
-    attestation::validate_exchange_logs(&conn, &run_dir, run_id)?;
-    let response: Value = serde_json::from_str(&fs::read_to_string(run_dir.join("data").join(&first_ref).join("response.json")).map_err(err)?).map_err(err)?;
-    let timing: Value = serde_json::from_str(&fs::read_to_string(run_dir.join("data").join(&first_ref).join("timing.json")).map_err(err)?).map_err(err)?;
-    let recovery_events: i64 = conn.query_row("SELECT COUNT(*) FROM runtime_events WHERE kind LIKE '%recovery%'", [], |item| item.get(0)).map_err(err)?;
-    let no_progress_events: i64 = conn.query_row("SELECT COUNT(*) FROM state_cells WHERE payload_schema='recovery.no-progress'", [], |item| item.get(0)).map_err(err)?;
-    let expected_outcome = if !first_parse {
-        "probe-parse-fault"
-    } else if first_admissions > 0 && first_admitted == 0 {
-        "probe-admission-rejected"
-    } else if first_admitted > 0 {
-        "probe-admitted"
-    } else {
-        "probe-message"
-    };
+    let no_exchange=exchanges==0;
+    if !((no_exchange && real==0) || (exchanges==1 && real==1 && decisions>0)) {
+        return Err(format!("{run_id} has ambiguous provider exchange")); }
+    let (first_outcome,first_ref,first_actions)=if no_exchange { ("none".into(),String::new(),Vec::new()) } else {
+        let (decision,outcome,reference):(String,String,String)=conn.query_row("SELECT decision_id,outcome_json,exchange_ref FROM provider_exchanges
+            ORDER BY started_at,id LIMIT 1",[],|item|Ok((item.get(0)?,item.get(1)?,item.get(2)?))).map_err(err)?;
+        let mut statement=conn.prepare("SELECT action_tool,status FROM tool_admissions WHERE decision_id=?1 ORDER BY created_at,id").map_err(err)?;
+        let actions=statement.query_map([decision],|item|Ok((item.get::<_,String>(0)?,item.get::<_,String>(1)?)))
+            .map_err(err)?.collect::<Result<Vec<_>,_>>().map_err(err)?; (outcome,reference,actions) };
+    let first_admissions=first_actions.len(); let first_admitted=first_actions.iter().filter(|(_,status)|status=="Admitted").count();
+    let first_action_text=first_actions.iter().map(|(tool,status)|format!("{tool}:{status}")).collect::<Vec<_>>().join(",");
+    let first_parse=!first_outcome.contains("parse_fault"); attestation::validate_exchange_logs(&conn,&run_dir,run_id)?;
+    let response:Value=if no_exchange { serde_json::json!({}) } else { serde_json::from_str(&fs::read_to_string(
+        run_dir.join("data").join(&first_ref).join("response.json")).map_err(err)?).map_err(err)? };
+    let timing:Value=if no_exchange { serde_json::json!({}) } else { serde_json::from_str(&fs::read_to_string(
+        run_dir.join("data").join(&first_ref).join("timing.json")).map_err(err)?).map_err(err)? };
+    let recovery_events:i64=conn.query_row("SELECT COUNT(*) FROM runtime_events WHERE kind LIKE '%recovery%'",[],|item|item.get(0)).map_err(err)?;
+    let no_progress_events:i64=conn.query_row("SELECT COUNT(*) FROM state_cells WHERE payload_schema='recovery.no-progress'",[],|item|item.get(0)).map_err(err)?;
+    let expected_outcome=if no_exchange { "probe-no-exchange" } else if !first_parse { "probe-parse-fault" }
+        else if first_admissions>0 && first_admitted==0 { "probe-admission-rejected" }
+        else if first_admitted>0 { "probe-admitted" } else { "probe-message" };
     let material = format!("{expected_outcome}\0{first_outcome}\0{first_action_text}\0{observations}\0{blockers}\0{recovery_events}\0{no_progress_events}");
     if field(row, "outcome") != expected_outcome || field(row, "outcome_fingerprint") != hash(material.as_bytes()) {
         return Err(format!("{run_id} outcome mismatch"));
     }
     let provider = pairs(&run_dir.join("provider-manifest.tsv"))?;
-    if field(&provider, "transport") != "http"
+    if field(&provider, "transport") != if no_exchange { "http-not-used" } else { "http" }
         || field(&provider, "real_requests").parse::<i64>().ok() != Some(exchanges)
         || !valid_hash(field(&provider, "endpoint_sha256"))
         || !valid_hash(field(&provider, "model_sha256"))
@@ -130,8 +124,8 @@ pub(super) fn validate(
     ));
     let result = pairs(&run_dir.join("result.tsv"))?;
     if field(&result, "snapshot_method") != "sqlite-online-backup"
-        || field(&result, "status") != "conditional"
-        || field(&result, "reason") != "requires-fault-and-frozen-live-campaign"
+        || field(&result, "status") != if no_exchange { "rejected" } else { "conditional" }
+        || field(&result, "reason") != if no_exchange { "no-provider-exchange" } else { "requires-fault-and-frozen-live-campaign" }
         || field(&result, "source_commit") != source
         || field(&result, "run_id") != run_id
         || field(&result, "runner_log_sha256") != file_hash(&run_dir.join("runner.log"))?
@@ -145,7 +139,7 @@ pub(super) fn validate(
         return Err(format!("{run_id} runner redaction invalid")); }
     let metrics = pairs(&run_dir.join("metrics.tsv"))?;
     if field(&metrics, "provider_exchanges").parse::<i64>().ok() != Some(exchanges)
-        || field(&metrics, "first_pass_parse").parse::<i64>().ok() != Some(i64::from(first_parse))
+        || field(&metrics, "first_pass_parse") != if no_exchange { "not-applicable" } else if first_parse { "1" } else { "0" }
         || field(&metrics, "first_pass_admission") != if first_admissions == 0 { "not-applicable" }
             else if first_admitted > 0 { "1" } else { "0" }
         || field(&metrics, "endpoint_calls").parse::<i64>().ok() != Some(exchanges)

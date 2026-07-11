@@ -46,10 +46,10 @@ typed faults, Online Backup capture, workspace/run/campaign manifests, and PTY
 capture. Its negative fixtures reject idle, blocked, skipped, zero-test, and
 generated-placeholder evidence. The predeclared domain runner now requires clean
 source, a strict-ancestor plan, a reproducible isolated build, production
-exchange logs, recomputed probe metrics, and three-or-five repeats. No endpoint
-campaign has run; fault/recovery branches, task success, and live floors remain
-explicitly unmeasured. The PTY
-fixture still is regression evidence rather than a final frozen-source campaign.
+exchange logs, recomputed metrics, and three-or-five repeats. A partial campaign
+at `853c647a` retained three daily probes, then stopped when a project goal closed
+without a decision or provider exchange. The full matrix remains absent; fault,
+recovery, task, live, and PTY predicates remain unmeasured.
 
 A fresh model-free diary run writes a journal entry containing canned
 missing-detail text after the owner asks for a diary entry. This is reproduced

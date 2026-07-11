@@ -173,9 +173,11 @@ def main() -> int:
     adoption = []
     for cell in cells:
         outcomes = {row["outcome"] for row in rows if row["cell_id"] == cell["cell_id"]}
-        rejected = bool(outcomes & {"probe-parse-fault", "probe-admission-rejected"})
-        adoption.append({"cell_id": cell["cell_id"], "decision": "rejected" if rejected else "conditional",
-            "rationale": "probe-protocol-failure" if rejected else "requires-fault-and-frozen-live-campaign"})
+        no_exchange = "probe-no-exchange" in outcomes
+        rejected = no_exchange or bool(outcomes & {"probe-parse-fault", "probe-admission-rejected"})
+        rationale = "no-provider-exchange" if no_exchange else "probe-protocol-failure" if rejected \
+            else "requires-fault-and-frozen-live-campaign"
+        adoption.append({"cell_id": cell["cell_id"], "decision": "rejected" if rejected else "conditional", "rationale": rationale})
     write_table(campaign / "adoption.tsv", ["cell_id", "decision", "rationale"], adoption)
     manifest(campaign, "campaign-manifest.tsv")
     print(f"PASS experiment runs={len(rows)} source={source}"); return 0

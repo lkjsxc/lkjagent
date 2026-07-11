@@ -40,6 +40,8 @@ def counts(db: Path) -> dict[str, object]:
 
 
 def outcome(facts: dict[str, object]) -> str:
+    if facts["exchanges"] == 0:
+        return "probe-no-exchange"
     if not facts["first_parse"]:
         return "probe-parse-fault"
     if facts["first_admissions"] and not facts["first_admitted"]:
@@ -54,7 +56,7 @@ def reported(value: object) -> object:
 
 
 def outcome_fingerprint(facts: dict[str, object]) -> str:
-    value = "\0".join((outcome(facts), str(facts["first_outcome"]), str(facts["first_actions"]),
+    value = "\0".join((outcome(facts), str(facts.get("first_outcome", "none")), str(facts.get("first_actions", "")),
         str(facts["observations"]), str(facts["blockers"]), str(facts["recovery_events"]), str(facts["no_progress_events"])))
     return sha(value.encode())
 
@@ -76,8 +78,11 @@ def _one_run(root: Path, campaign: Path, binary: Path, source: str,
         facts = counts(data / "lkjagent.sqlite3")
         if facts["exchanges"] > 0:
             break
-    if facts.get("exchanges") != 1 or facts.get("real") != 1:
-        raise RuntimeError(f"no real completed exchange for {run_id}")
+    if facts.get("exchanges") not in (0, 1) or facts.get("real") != facts.get("exchanges"):
+        raise RuntimeError(f"ambiguous provider exchange for {run_id}")
+    no_exchange = facts["exchanges"] == 0
+    if no_exchange:
+        (data / "logs").mkdir(exist_ok=True)
     backup = run / "run.sqlite3"
     with sqlite3.connect(data / "lkjagent.sqlite3") as source_db, sqlite3.connect(backup) as target:
         source_db.backup(target)
@@ -89,15 +94,16 @@ def _one_run(root: Path, campaign: Path, binary: Path, source: str,
     endpoint = os.environ.get("LKJAGENT_ENDPOINT_URL", str(config.get("endpoint_url", "")))
     model = os.environ.get("LKJAGENT_MODEL", str(config.get("endpoint_model", "")))
     controls = {key: value for key, value in safe_env().items() if key != "LKJAGENT_API_KEY"}
-    pairs(run / "provider-manifest.tsv", [("transport", "http"), ("endpoint_sha256", sha(endpoint.encode())),
+    pairs(run / "provider-manifest.tsv", [("transport", "http-not-used" if no_exchange else "http"), ("endpoint_sha256", sha(endpoint.encode())),
         ("model_sha256", sha(model.encode())), ("environment_sha256", sha(json.dumps(controls, sort_keys=True).encode())),
         ("real_requests", facts["exchanges"]), ("credential_present", str(bool(os.environ.get("LKJAGENT_API_KEY"))).lower())])
-    response = json.loads((data / str(facts["first_ref"]) / "response.json").read_text())
-    timing = json.loads((data / str(facts["first_ref"]) / "timing.json").read_text()); usage = response.get("usage", {})
+    response = {} if no_exchange else json.loads((data / str(facts["first_ref"]) / "response.json").read_text())
+    timing = {} if no_exchange else json.loads((data / str(facts["first_ref"]) / "timing.json").read_text())
+    usage = response.get("usage", {})
     pairs(run / "metrics.tsv", [("provider_exchanges", facts["exchanges"]), ("endpoint_calls", facts["exchanges"]),
-        ("first_pass_parse", facts["first_parse"]),
-        ("first_pass_admission", "not-applicable" if facts["first_admissions"] == 0 else int(facts["first_admitted"] > 0)),
-        ("action_identity", facts["first_actions"] or "none"), ("prompt_tokens", reported(usage.get("prompt_tokens"))),
+        ("first_pass_parse", "not-applicable" if no_exchange else facts["first_parse"]),
+        ("first_pass_admission", "not-applicable" if no_exchange or facts["first_admissions"] == 0 else int(facts["first_admitted"] > 0)),
+        ("action_identity", facts.get("first_actions") or "none"), ("prompt_tokens", reported(usage.get("prompt_tokens"))),
         ("completion_tokens", reported(usage.get("completion_tokens"))), ("cached_tokens", reported(usage.get("cached_tokens"))),
         ("duration_ms", reported(timing.get("duration_ms"))), ("observations", facts["observations"]),
         ("unexpected_blockers", facts["blockers"]), ("recovery_events", facts["recovery_events"]),
@@ -105,7 +111,8 @@ def _one_run(root: Path, campaign: Path, binary: Path, source: str,
         ("fault_schedule_exercised", 0), ("required_source_recall", "not-measured"), ("unsupported_claims", "not-measured"),
         ("repeated_failure", "not-measured"), ("recovery_time_ms", "not-measured"), ("primary_task_success", "not-measured"),
         ("semantic_checks", "not-measured"), ("full_live_floor_measured", 0)])
-    pairs(run / "result.tsv", [("status", "conditional"), ("reason", "requires-fault-and-frozen-live-campaign"),
+    pairs(run / "result.tsv", [("status", "rejected" if no_exchange else "conditional"),
+        ("reason", "no-provider-exchange" if no_exchange else "requires-fault-and-frozen-live-campaign"),
         ("snapshot_method", "sqlite-online-backup"), ("source_commit", source),
         ("run_id", run_id), ("runner_log_sha256", file_sha(log_path))])
     row = {"cell_id": cell["cell_id"], "scenario_id": scenario, "repeat": str(repeat), "run_id": run_id,

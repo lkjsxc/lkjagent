@@ -37,8 +37,10 @@ store, a clean locked build, the production endpoint adapter, and an Online
 Backup snapshot. The runner isolates Cargo and runtime configuration, retains
 raw and recursively redacted exchanges, exports every durable table and
 workspace identity, and binds all bytes in run and campaign manifests. It
-allows bounded native setup but exactly one provider exchange per run, then
-measures that completed endpoint response. Fault-schedule and recovery
+allows bounded native setup and at most one provider exchange per run. A goal
+that closes before any decision or exchange is retained as a rejected
+`no-provider-exchange` outcome rather than fabricated endpoint evidence. A made
+exchange must complete successfully. Fault-schedule and recovery
 branches remain explicitly unexercised unless durable events prove otherwise;
 task success, semantic checks, and the 840-second floor remain unmeasured. Such
 rows are conditional on fault and frozen live campaigns. A parse or admission

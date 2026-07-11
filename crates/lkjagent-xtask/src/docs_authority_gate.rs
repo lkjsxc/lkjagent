@@ -92,7 +92,7 @@ fn git_paths(root: &Path, prefix: &[&str]) -> Result<Vec<String>, String> {
         .collect())
 }
 
-const EXPECTED_PRODUCT_FINGERPRINT: &str = "fnv1a64:ac36561d94dc9d06";
+const EXPECTED_PRODUCT_FINGERPRINT: &str = "fnv1a64:fc0a3e3ada40d91d";
 const FINGERPRINT_DIRS: &[&str] = &[
     "crates/lkjagent-app",
     "crates/lkjagent-core",

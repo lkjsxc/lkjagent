@@ -174,10 +174,11 @@ fn adoption(root: &Path, cells: &[Cell], failures: &mut Vec<String>) -> Result<(
     if rows.len() != cells.len() { failures.push("adoption contains undeclared rows".into()); }
     for cell in cells {
         let matches = rows.iter().filter(|row| field(row, "cell_id") == cell.id).collect::<Vec<_>>();
-        let rejected = matrix.iter().filter(|row| field(row, "cell_id") == cell.id)
-            .any(|row| matches!(field(row, "outcome"), "probe-parse-fault" | "probe-admission-rejected"));
-        let expected = if rejected { ("rejected", "probe-protocol-failure") }
-            else { ("conditional", "requires-fault-and-frozen-live-campaign") };
+        let outcomes=matrix.iter().filter(|row|field(row,"cell_id")==cell.id).map(|row|field(row,"outcome")).collect::<BTreeSet<_>>();
+        let no_exchange=outcomes.contains("probe-no-exchange");
+        let rejected=no_exchange || outcomes.iter().any(|outcome|matches!(*outcome,"probe-parse-fault"|"probe-admission-rejected"));
+        let expected=if no_exchange { ("rejected","no-provider-exchange") } else if rejected { ("rejected","probe-protocol-failure") }
+            else { ("conditional","requires-fault-and-frozen-live-campaign") };
         if matches.len() != 1 || field(matches[0], "decision") != expected.0
             || field(matches[0], "rationale") != expected.1 { failures.push(format!("{} adoption missing", cell.id)); }
     }
