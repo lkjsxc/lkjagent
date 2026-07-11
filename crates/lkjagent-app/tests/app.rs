@@ -21,7 +21,7 @@ fn help_matches_documented_command_tree() -> TestResult<()> {
 }
 
 #[test]
-fn non_actions_block_explore_work() -> TestResult<()> {
+fn non_actions_advance_recovery_without_closing_work() -> TestResult<()> {
     let data = fixture_root("daemon")?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
@@ -35,8 +35,15 @@ fn non_actions_block_explore_work() -> TestResult<()> {
         ],
         index: 0,
     };
-    let blocked = run_until_idle(&data, &mut endpoint, 4)?;
-    assert_eq!(blocked.task.state, TaskState::Blocked);
+    let recovered = run_until_idle(&data, &mut endpoint, 4)?;
+    assert_eq!(recovered.task.state, TaskState::Open);
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let strategies: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM state_cells WHERE payload_schema = 'recovery.failure'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert!(strategies >= 2);
     Ok(())
 }
 

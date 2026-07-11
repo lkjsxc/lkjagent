@@ -26,7 +26,8 @@ Map lkjagent-core source modules.
 - [runtime-admission.rs](runtime_admission.rs): action admission and workspace
   path policy.
 - [runtime-artifact.rs](runtime_artifact.rs): checked artifact units,
-  deterministic assembly, and fingerprints.
+  deterministic assembly, fingerprints, and word counts.
+- [runtime-recovery.rs](runtime_recovery.rs): typed fault classes and strategy ladders.
 - [runtime-context.rs](runtime_context.rs): context items, contamination, and
   contradiction detection.
 - [runtime-fingerprint.rs](runtime_fingerprint.rs): stable FNV-1a fingerprints
@@ -40,6 +41,5 @@ Map lkjagent-core source modules.
 - [engine-steps.rs](engine_steps.rs): internal step settlement helpers.
 - [plan.rs](plan.rs): materialize validated plan lines into steps.
 - [checks.rs](checks.rs): pure check evaluation over supplied facts.
-- [words.rs](words.rs): shared word counting.
 - [workspace-record.rs](workspace_record.rs): generic Markdown record format.
 - [classify.rs](classify.rs): objective classification and starter templates.

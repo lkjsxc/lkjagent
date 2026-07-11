@@ -1,5 +1,5 @@
 use crate::model::{CheckResult, CheckSpec};
-use crate::words::count_words;
+use crate::runtime_artifact::count_words;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FileFact {

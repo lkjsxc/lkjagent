@@ -16,6 +16,7 @@ fn rendered_filled_tool_example_parses_and_admits() -> Result<(), String> {
         OutputEnvelope::Action,
     );
     decision.context_frame_fingerprint = "ctx-1".to_string();
+    decision.recovery_policy = "correct-primitive".to_string();
     let prompt = render_prompt_for_decision(
         &snapshot.task,
         &snapshot.steps,
@@ -44,6 +45,7 @@ fn rendered_filled_tool_example_parses_and_admits() -> Result<(), String> {
     assert!(prompt.user.contains("<lkjagent_action>"));
     assert!(prompt.user.contains("<input>"));
     assert!(prompt.user.contains("<path>README.md</path>"));
+    assert!(prompt.user.contains("recovery_policy: correct-primitive"));
     assert_eq!(admission.status, AdmissionStatus::Admitted);
     Ok(())
 }

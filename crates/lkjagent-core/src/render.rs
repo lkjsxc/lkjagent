@@ -126,8 +126,8 @@ fn recovery_frame(
     let repair = repair_shape(decision, tag);
     Some(truncate(
         &format!(
-            "Recovery frame:\ndecision={} attempt={} fault={} invalid_excerpt_hash={}\nOutput only a corrected envelope or ask plainly for missing information.\n{}",
-            decision.id, attempt.ordinal, attempt.diagnosis, excerpt_hash, repair
+            "Recovery frame:\ndecision={} strategy={} attempt={} fault={} invalid_excerpt_hash={}\nOutput only a corrected envelope or ask plainly for missing information.\n{}",
+            decision.id, decision.recovery_policy, attempt.ordinal, attempt.diagnosis, excerpt_hash, repair
         ),
         RETRY_FRAME,
     ))

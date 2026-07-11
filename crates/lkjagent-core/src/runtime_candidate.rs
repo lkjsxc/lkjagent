@@ -124,24 +124,17 @@ fn workspace_family_operation(namespace: &str) -> Option<(&'static str, u8, &'st
     WORKSPACE_FAMILIES.iter().find(|(name, _, _, _)| *name == namespace).map(|(_, operation, tier, reason)| (*operation, *tier, *reason))
 }
 
+#[rustfmt::skip]
 fn operation_from_payload(body: &Value) -> Option<RuntimeOperation> {
-    let key = selector::payload_text(body, "operation_key")?;
-    let expected = selector::payload_envelope(body);
-    if expected == OutputEnvelope::None {
-        Some(RuntimeOperation::model_free_effect(
-            key,
-            selector::payload_evidence_requirements(body),
-            selector::payload_effect_command(body),
-        ))
+    let key = selector::payload_text(body, "operation_key")?; let expected = selector::payload_envelope(body);
+    let mut operation = if expected == OutputEnvelope::None {
+        RuntimeOperation::model_free_effect(key, selector::payload_evidence_requirements(body), selector::payload_effect_command(body))
     } else {
-        Some(RuntimeOperation::model_call(
-            key,
-            expected,
-            selector::payload_tool_view(body),
-            selector::payload_number(body, "model_budget_tokens"),
-            selector::payload_evidence_requirements(body),
-        ))
-    }
+        RuntimeOperation::model_call(key, expected, selector::payload_tool_view(body),
+            selector::payload_number(body, "model_budget_tokens"), selector::payload_evidence_requirements(body))
+    };
+    if let Some(policy) = selector::payload_text(body, "recovery_policy") { operation.recovery_policy = policy.to_string(); }
+    Some(operation)
 }
 
 #[rustfmt::skip]

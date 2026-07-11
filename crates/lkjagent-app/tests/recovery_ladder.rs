@@ -27,7 +27,7 @@ fn recovery_ladder_records_failure_cells() -> TestResult<()> {
 }
 
 #[test]
-fn repeated_parse_failure_escalates_to_blocked_task() -> TestResult<()> {
+fn repeated_parse_failure_advances_without_premature_block() -> TestResult<()> {
     let data = fixture_root("parse-repeat")?;
     enqueue_case(&data, "Investigate workspace files")?;
     let mut endpoint = ScriptedEndpoint {
@@ -40,20 +40,32 @@ fn repeated_parse_failure_escalates_to_blocked_task() -> TestResult<()> {
 
     let snapshot = run_until_idle(&data, &mut endpoint, 4)?;
 
-    assert_eq!(snapshot.task.state, TaskState::Blocked);
+    assert_eq!(snapshot.task.state, TaskState::Open);
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    let blocked: i64 = conn.query_row(
-        "SELECT COUNT(*) FROM state_cells
-         WHERE key_label = 'completion:blocked' AND payload_schema = 'completion.blocked'",
-        [],
-        |row| row.get(0),
-    )?;
-    assert_eq!(blocked, 1);
+    let (repair, example, blocked): (i64, i64, i64) = conn.query_row(
+        "SELECT COUNT(*) FILTER (WHERE json_extract(payload_json, '$.next_strategy') = 'grammar-repair'),
+         COUNT(*) FILTER (WHERE json_extract(payload_json, '$.next_strategy') = 'concrete-example'),
+         COUNT(*) FILTER (WHERE payload_schema = 'completion.blocked') FROM state_cells",
+        [], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))?;
+    assert_eq!((repair, example, blocked), (1, 1, 0));
     Ok(())
 }
 
 #[test]
-fn recovery_failure_is_selected_before_more_model_work() -> TestResult<()> {
+#[rustfmt::skip]
+fn endpoint_ladder_exhaustion_blocks_with_owner_action() -> TestResult<()> {
+    let data = fixture_root("endpoint-exhausted")?; enqueue_case(&data, "Investigate workspace files")?;
+    let mut endpoint = FailingEndpoint; let snapshot = run_until_idle(&data, &mut endpoint, 7)?;
+    assert_eq!(snapshot.task.state, TaskState::Blocked);
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let payload: String = conn.query_row("SELECT payload_json FROM state_cells
+        WHERE payload_schema = 'completion.blocked'", [], |row| row.get(0))?;
+    assert!(payload.contains("owner_action")); assert!(payload.contains("recovery ladder exhausted"));
+    Ok(())
+}
+
+#[test]
+fn recovery_failure_selects_a_changed_strategy_before_more_model_work() -> TestResult<()> {
     let data = fixture_root("parse-selected")?;
     enqueue_case(&data, "Investigate workspace files")?;
     let mut endpoint = ScriptedEndpoint {
@@ -64,13 +76,15 @@ fn recovery_failure_is_selected_before_more_model_work() -> TestResult<()> {
     run_until_idle(&data, &mut endpoint, 2)?;
 
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    let operation: String = conn.query_row(
-        "SELECT operation_key FROM runtime_decisions
-         WHERE operation_key LIKE 'recovery.handle/%' LIMIT 1",
+    let (operation, policy, json): (String, String, String) = conn.query_row(
+        "SELECT operation_key, recovery_policy, decision_json FROM runtime_decisions
+         WHERE recovery_policy = 'grammar-repair' LIMIT 1",
         [],
-        |row| row.get(0),
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
     )?;
-    assert!(operation.starts_with("recovery.handle/parse/"));
+    assert!(operation.starts_with("model.call/"));
+    assert_eq!(policy, "grammar-repair");
+    assert!(json.contains("\"harness_state\":\"recover\""));
     Ok(())
 }
 
@@ -135,19 +149,23 @@ impl Endpoint for FailingEndpoint {
     }
 }
 
+#[rustfmt::skip]
 fn assert_failure_cell(kind: &str, runner: fn(&Path) -> TestResult<()>) -> TestResult<()> {
-    let data = fixture_root(kind)?;
-    runner(&data)?;
+    let data = fixture_root(kind)?; runner(&data)?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     let pattern = format!("recovery:{kind}/%");
-    let count: i64 = conn.query_row(
-        "SELECT COUNT(*) FROM state_cells
-         WHERE key_label LIKE ?1 AND payload_schema = 'recovery.failure'
-           AND status = 'Active'",
-        [pattern],
-        |row| row.get(0),
-    )?;
+    let count: i64 = conn.query_row("SELECT COUNT(*) FROM state_cells
+        WHERE key_label LIKE ?1 AND payload_schema = 'recovery.failure' AND status = 'Active'",
+        [pattern], |row| row.get(0))?;
     assert_eq!(count, 1, "kind={kind}");
+    let payload: String = conn.query_row("SELECT payload_json FROM state_cells
+        WHERE payload_schema = 'recovery.failure' LIMIT 1", [], |row| row.get(0))?;
+    let value: serde_json::Value = serde_json::from_str(&payload)?;
+    for field in ["normalized_signature", "operation", "prompt_fingerprint", "state_vector_fingerprint",
+        "context_fingerprint", "tool_view_fingerprint", "budget_fingerprint", "attempted_strategy",
+        "changed_condition", "diagnostic", "retry_count", "next_strategy", "remaining_budget", "tuple_fingerprint"] {
+        assert!(value.get(field).is_some(), "kind={kind} field={field}");
+    }
     Ok(())
 }
 

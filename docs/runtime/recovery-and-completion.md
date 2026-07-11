@@ -12,8 +12,9 @@ condition, bounded diagnostic, retry count, next strategy, eligibility time,
 and remaining budget.
 
 The operation, prompt, tool view, budget, and failure signature tuple may not
-repeat without a changed external condition. Recurrence selects the next typed
-strategy or records an owner-visible block.
+repeat without a changed external condition. Each structured failure cell names
+a matching immutable runtime event. Recurrence selects the next typed strategy
+or records an owner-visible block with preserved evidence and an owner action.
 
 ## Recovery Ladders
 

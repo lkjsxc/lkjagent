@@ -79,11 +79,11 @@ the rebuild, not proof that the native authority loop is complete.
 Production still hydrates `TaskSnapshot`, task rows, step rows, fixed templates,
 and bridge projections. Context may be prepared before the final decision.
 Generic parsed messages can settle steps without objective effect evidence.
-Recovery can repeat the same impossible model call. The live
-runner can count idle polls and replace the last real state with a synthetic
-closed snapshot. Default Explore decisions now render only read, search, memory
-find, and note tools, hiding shell and finish; completion handlers outside the
-selected view remain an open authority gap. Action cards and the decision parser
+Recovery facts now bind the causal no-repeat tuple and advance typed per-class
+strategies; timed endpoint eligibility and progress windows remain open. The live
+runner can replace the last real state with a synthetic closed snapshot. Default Explore
+decisions now render only read, search, memory find, and note tools, hiding shell
+and finish; completion remains an open authority gap. Action cards and the decision parser
 now use direct fields inside one input block and reject name/value wrappers.
 The parser bounds scalars and fields at 4,096 bytes and actions at 16,384 bytes;
 decision field specs persist/render tighter byte and canonical count ranges.

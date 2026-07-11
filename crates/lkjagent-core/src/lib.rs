@@ -36,6 +36,7 @@ pub mod runtime_fingerprint;
 pub mod runtime_graph_query;
 pub mod runtime_operation;
 pub mod runtime_prompt_kernel;
+pub mod runtime_recovery;
 pub mod runtime_selector;
 pub mod runtime_state;
 pub mod runtime_state_edge;
@@ -46,7 +47,6 @@ mod runtime_tool_fields;
 pub mod runtime_tool_view;
 pub mod runtime_transition;
 pub mod templates;
-pub mod words;
 pub mod workspace_entity {
     pub use crate::workspace_manifest::{
         preserve_identity_after_move, validate_entity, WorkspaceEntity, WorkspaceEntityIssue,

@@ -1,7 +1,6 @@
 use serde::{Deserialize, Serialize};
 
 use crate::runtime_fingerprint::{stable_fingerprint, FingerprintError};
-use crate::words::count_words;
 
 pub const DEFAULT_UNIT_TARGET_TOKENS: u32 = 512;
 
@@ -92,6 +91,21 @@ fn error(message: &str) -> ArtifactError {
     ArtifactError {
         message: message.to_string(),
     }
+}
+
+pub fn count_words(text: &str) -> usize {
+    let latin = text
+        .split_whitespace()
+        .filter(|token| token.chars().any(|c| c.is_ascii_alphanumeric()))
+        .count();
+    let cjk = text
+        .chars()
+        .filter(|c| {
+            matches!(
+        *c as u32, 0x3400..=0x9fff | 0x3040..=0x30ff | 0xf900..=0xfaff)
+        })
+        .count();
+    latin + cjk
 }
 
 fn fingerprint_error(error: FingerprintError) -> ArtifactError {
