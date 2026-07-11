@@ -57,8 +57,9 @@ placeholder-looking executable values such as `...`, `PATH`, `TODO`, `VALUE`,
 ## Gate Coverage
 
 Before protocol-tool evidence can pass, its named Docker gate must execute
-nonempty behavioral suites for parser faults, decision and view binding, field
-bounds, path containment, repeated admissions, typed recovery, and exact
+nonempty behavioral suites for parser faults, decision and view binding, UTF-8
+byte bounds for every scalar, direct field, and full action, path containment,
+repeated admissions, typed recovery, and exact
 admission-to-effect lineage. It also rejects a special `finish` catalog entry:
 a typed report cannot settle an operation or completion. The corpus includes
 Japanese and multiline values, XML entities, truncation, stale decisions,
