@@ -61,7 +61,7 @@ fn workspace_manifest_aliases_and_rebalance_audit_round_trip(
 
 #[test]
 fn operation_revisions_are_exact_and_idempotent() -> Result<(), Box<dyn std::error::Error>> {
-    let mut conn = Connection::open_in_memory()?;
+    let conn = Connection::open_in_memory()?;
     setup(&conn)?;
     let revisions = vec![
         OperationRevision {
@@ -78,7 +78,7 @@ fn operation_revisions_are_exact_and_idempotent() -> Result<(), Box<dyn std::err
         },
     ];
     let first = prepare_or_load_operation(
-        &mut conn,
+        &conn,
         &OperationDraft {
             id: "operation-1",
             key: "key-1",
@@ -90,7 +90,7 @@ fn operation_revisions_are_exact_and_idempotent() -> Result<(), Box<dyn std::err
         },
     )?;
     let second = prepare_or_load_operation(
-        &mut conn,
+        &conn,
         &OperationDraft {
             id: "operation-2",
             key: "key-1",

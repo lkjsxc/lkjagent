@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection};
+use rusqlite::{params, Connection, OptionalExtension};
 
 use crate::error::StoreResult;
 
@@ -64,10 +64,10 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
 }
 
 pub fn prepare_or_load_operation(
-    conn: &mut Connection,
+    conn: &Connection,
     draft: &OperationDraft<'_>,
 ) -> StoreResult<OperationPreparation> {
-    let tx = conn.transaction()?;
+    let tx = conn.unchecked_transaction()?;
     let inserted = tx.execute(
         "INSERT OR IGNORE INTO workspace_operations
          (id, idempotency_key, kind, phase, preimage_json, intended_json, created_at, updated_at)
@@ -110,6 +110,17 @@ pub fn prepare_or_load_operation(
     };
     tx.commit()?;
     Ok(OperationPreparation::Prepared(row))
+}
+
+pub fn operation_for_key(conn: &Connection, key: &str) -> StoreResult<Option<OperationRow>> {
+    Ok(conn
+        .query_row(
+            "SELECT id, idempotency_key, kind, phase, preimage_json, intended_json, error
+             FROM workspace_operations WHERE idempotency_key = ?1",
+            [key],
+            operation_row,
+        )
+        .optional()?)
 }
 
 pub fn prepared_operations(conn: &Connection) -> StoreResult<Vec<OperationRow>> {

@@ -56,6 +56,41 @@ fn archive_restores_file_and_row_when_audit_fails() -> TestResult<()> {
 }
 
 #[test]
+fn archive_reuses_settled_operation_without_second_move() -> TestResult<()> {
+    let data = fixture_root("archive-idempotent")?;
+    let data_arg = data.to_string_lossy();
+    let added = cli::run([
+        "--data",
+        data_arg.as_ref(),
+        "record",
+        "add",
+        "custom",
+        "Archive",
+        "Again",
+        "--body",
+        "body",
+    ])?;
+    let id = field(&added, "record: ")?;
+    let first = cli::run(["--data", data_arg.as_ref(), "record", "archive", &id])?;
+    let second = cli::run(["--data", data_arg.as_ref(), "record", "archive", &id])?;
+    assert_eq!(first, second);
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let rows: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM workspace_operations WHERE kind = 'archive'",
+        [],
+        |row| row.get(0),
+    )?;
+    let revisions: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM workspace_operation_revisions",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(rows, 1);
+    assert_eq!(revisions, 2);
+    Ok(())
+}
+
+#[test]
 fn archive_restores_indexes_when_state_suppression_fails() -> TestResult<()> {
     let data = fixture_root("archive-index-compensation")?;
     let data_arg = data.to_string_lossy();

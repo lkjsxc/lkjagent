@@ -3,6 +3,7 @@ use lkjagent_core::workspace_record::{
     state_keys_for_record, WorkspaceRecord,
 };
 use lkjagent_store::record_rows::{record, records, upsert_record, RecordRow};
+use lkjagent_store::workspace_rows::OperationRevision;
 use rusqlite::Connection;
 use std::{fs, path::Path};
 pub fn add(
@@ -140,6 +141,29 @@ fn record_row(
         archived,
         updated_at: updated_at.to_string(),
     })
+}
+
+pub(crate) fn archive_revisions(
+    old_path: &str,
+    new_path: &str,
+    bytes: &[u8],
+) -> Result<Vec<OperationRevision>, String> {
+    let fingerprint = lkjagent_core::runtime_fingerprint::stable_fingerprint(&bytes)
+        .map_err(|error| error.message)?;
+    Ok(vec![
+        OperationRevision {
+            role: "prior".to_string(),
+            path: old_path.to_string(),
+            bytes: bytes.to_vec(),
+            fingerprint: fingerprint.clone(),
+        },
+        OperationRevision {
+            role: "intended".to_string(),
+            path: new_path.to_string(),
+            bytes: bytes.to_vec(),
+            fingerprint,
+        },
+    ])
 }
 
 pub(crate) fn archive_preimage(row: &RecordRow) -> String {

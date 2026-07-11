@@ -1,12 +1,11 @@
-use std::fs;
-use std::path::Path;
+use std::{fs, path::Path};
 
 use lkjagent_core::workspace_manifest::RebalanceMove;
 use lkjagent_core::workspace_record::{archive_path, parse_record, record_fingerprint};
 use lkjagent_store::record_rows::{record, upsert_record, RecordRow};
 use lkjagent_store::workspace_rows::{
-    compensate_operation, insert_alias_and_audit, prepare_operation, remove_alias_and_audit,
-    settle_operation, PathAliasRow,
+    compensate_operation, insert_alias_and_audit, operation_for_key, prepare_or_load_operation,
+    remove_alias_and_audit, settle_operation, OperationDraft, PathAliasRow,
 };
 use rusqlite::Connection;
 
@@ -20,14 +19,23 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
     let new = workspace.join(&new_rel);
     let audit_id = format!("archive-{}", row.id);
     let operation_id = format!("workspace-{audit_id}");
-    prepare_operation(
+    let key = format!("archive:{}:{}", row.id, row.fingerprint);
+    if matches!(operation_for_key(conn, &key).map_err(|error| error.to_string())?, Some(row) if row.phase == "settled")
+    {
+        return Ok(format!("archived record: {id}"));
+    }
+    let bytes = fs::read(&old).map_err(|error| error.to_string())?;
+    prepare_or_load_operation(
         conn,
-        &operation_id,
-        &format!("archive:{}:{}", row.id, row.fingerprint),
-        "archive",
-        &crate::record_files::archive_preimage(&row),
-        &crate::record_files::archive_intended(&row, &new_rel),
-        now,
+        &OperationDraft {
+            id: &operation_id,
+            key: &key,
+            kind: "archive",
+            preimage: &crate::record_files::archive_preimage(&row),
+            intended: &crate::record_files::archive_intended(&row, &new_rel),
+            revisions: &crate::record_files::archive_revisions(&row.path, &new_rel, &bytes)?,
+            now,
+        },
     )
     .map_err(|error| error.to_string())?;
     if let Some(parent) = new.parent() {
@@ -43,7 +51,15 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
         Err(error) => {
             return rollback(
                 conn,
-                Rollback::new(data_dir, &old, &new, &row, &audit_id, &operation_id, now),
+                Rollback {
+                    data_dir,
+                    old: &old,
+                    new: &new,
+                    original: &row,
+                    audit_id: &audit_id,
+                    operation_id: &operation_id,
+                    now,
+                },
                 error.to_string(),
             )
         }
@@ -53,7 +69,15 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
         Err(error) => {
             return rollback(
                 conn,
-                Rollback::new(data_dir, &old, &new, &row, &audit_id, &operation_id, now),
+                Rollback {
+                    data_dir,
+                    old: &old,
+                    new: &new,
+                    original: &row,
+                    audit_id: &audit_id,
+                    operation_id: &operation_id,
+                    now,
+                },
                 error,
             )
         }
@@ -128,28 +152,6 @@ struct Rollback<'a> {
     audit_id: &'a str,
     operation_id: &'a str,
     now: &'a str,
-}
-
-impl<'a> Rollback<'a> {
-    fn new(
-        data_dir: &'a Path,
-        old: &'a Path,
-        new: &'a Path,
-        original: &'a RecordRow,
-        audit_id: &'a str,
-        operation_id: &'a str,
-        now: &'a str,
-    ) -> Self {
-        Self {
-            data_dir,
-            old,
-            new,
-            original,
-            audit_id,
-            operation_id,
-            now,
-        }
-    }
 }
 
 fn archived_row(

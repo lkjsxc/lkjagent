@@ -3,8 +3,9 @@ use rusqlite::{params, Connection};
 
 use crate::error::{StoreError, StoreResult};
 pub use crate::record_schema::{
-    compensate_operation, operation_revisions, prepare_or_load_operation, prepared_operations,
-    settle_operation, OperationDraft, OperationPreparation, OperationRevision, OperationRow,
+    compensate_operation, operation_for_key, operation_revisions, prepare_or_load_operation,
+    prepared_operations, settle_operation, OperationDraft, OperationPreparation, OperationRevision,
+    OperationRow,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq)]
