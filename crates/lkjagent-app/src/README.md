@@ -40,7 +40,7 @@ Map lkjagent-app source modules.
 - [workspace-index.rs](workspace_index.rs): semantic navigation page rebuild.
 - [workspace-rebalance.rs](workspace_rebalance.rs): rebalance planning and validation.
 - [workspace-rebalance-apply.rs](workspace_rebalance_apply.rs): grouped rebalance apply and compensation.
-- [workspace-search.rs](workspace_search.rs): managed-record SQLite search rebuild and retrieval.
+- [workspace-search.rs](workspace_search.rs): visible Markdown inventory, rebuild, and bounded retrieval.
 - [workspace-scaffold.rs](workspace_scaffold.rs): README and directory scaffold writes.
 - [recovery-bridge.rs](recovery_bridge.rs): unfinished decision reuse and
   recovery settlement.

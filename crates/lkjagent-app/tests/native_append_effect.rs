@@ -34,7 +34,12 @@ fn payload_workspace_append_effect_appends_file_and_artifact() -> TestResult<()>
         "First Second"
     );
     assert_eq!(cell_status(&conn)?, "Suppressed");
-    assert_eq!(count_rows(&conn, "artifacts")?, 2);
+    let effect_artifacts: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM artifacts WHERE kind <> 'workspace-index'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(effect_artifacts, 2);
     let journal: (String, String) = conn.query_row(
         "SELECT effect_journal.state, observations.content FROM effect_journal
          JOIN observations ON observations.id = effect_journal.observation_id",
@@ -156,14 +161,6 @@ fn cell_status(conn: &Connection) -> TestResult<String> {
         [],
         |row| row.get(0),
     )?)
-}
-
-fn count_rows(conn: &Connection, table: &str) -> TestResult<i64> {
-    Ok(
-        conn.query_row(&format!("SELECT COUNT(*) FROM {table}"), [], |row| {
-            row.get(0)
-        })?,
-    )
 }
 
 fn fixture_root(name: &str) -> TestResult<PathBuf> {

@@ -32,7 +32,12 @@ fn db_blocked_bridge_shape_becomes_blocked_not_closed() -> TestResult<()> {
     assert_eq!(task_state(&conn)?, "blocked");
     assert_eq!(count(&conn, "check_results")?, 0);
     assert_eq!(count(&conn, "workspace_records")?, 0);
-    assert_eq!(count(&conn, "artifacts")?, 0);
+    let task_artifacts: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM artifacts WHERE kind <> 'workspace-index'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(task_artifacts, 0);
     assert_eq!(count(&conn, "tool_admissions")?, 0);
     assert_eq!(count(&conn, "observations")?, 0);
     assert_eq!(task_closed_events(&conn)?, 0);

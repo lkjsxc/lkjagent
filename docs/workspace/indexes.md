@@ -16,26 +16,36 @@ stale.
 
 ## Search
 
-Index current Markdown bodies, titles, dates, kinds, project, state, relations,
-and revision fingerprints. Support exact document and path lookup, lexical and
-trigram body search, and date, project, kind, and state filters. Search rows are
-unique by document, revision, field, and byte range. Filters compose with AND;
-lexical ranking uses deterministic BM25 ties broken by document ID and chunk
-range.
+Index visible Markdown bodies, titles, dates, kinds, project, state, relations,
+and revision fingerprints. Body and title chunks contain at most 2,048 UTF-8
+bytes and overlap by 128 bytes so boundary terms remain searchable. Support exact
+document and path lookup, lexical and trigram search, and
+date, project, kind, and state filters. Search rows are unique by document,
+revision, field, and byte range. Filters compose with AND; BM25 ties break by
+document ID, field, byte range, and chunk ID.
 
 ## Retrieval
 
 Discover before ranking. Retrieve relevant bounded UTF-8 body excerpts rather
-than a fixed recent metadata window. Validate the current bytes and revision
-fingerprint before prompt admission; exclude drifted rows and record selected
-and excluded source refs.
+than a fixed recent metadata window. Validate current bytes before admission;
+paginate past drifted rows until 50 current hits or exhaustion, and record
+selected and excluded source refs.
 
 ## External Changes
 
-A debounced scanner detects stable new, changed, moved, and deleted files.
-Valid managed files update document and search projections. Large owner source
-stays in place. Malformed managed content receives a visible import-review or
-quarantine diagnostic without overwriting original bytes.
+Daemon entry and explicit rebuild perform a sorted complete reconciliation that
+detects new, changed, moved, and deleted Markdown. It scans root Markdown plus
+`inbox/`, `life/`, `knowledge/`, `projects/`, `artifacts/`, and `activity/`, while
+excluding hidden paths and the root `indexes/`, `archive/`, and `system/` trees.
+Descriptor-relative no-follow reads exclude symlinks. Valid managed files update
+document and search projections in the same transaction; generic Markdown gets
+a deterministic path identity. Missing managed sources become archived `missing`
+projections, known malformed sources become archived `import-review` projections,
+and restoration reactivates source metadata. Daemon reconciliation marks
+navigation stale after managed changes; explicit rebuild regenerates and clears
+that marker. Large owner source stays in place. Debounced incremental scheduling
+and diagnostics for standalone malformed content
+remain required before this contract is complete.
 
 ## Gate Coverage
 
@@ -49,7 +59,7 @@ zero-test filter, or summary line is not evidence.
 
 Compare index membership and search fingerprints with current documents. Missing,
 stale, duplicate, wrongly classified, or unresolved debt rows fail workspace
-validation. Rebuilding the same source inventory twice produces identical
-canonical rows, rankings, excerpts, and fingerprints; generated timestamps are
-not search inputs. All projections are rebuildable from source files and
-revisions.
+validation. Chunks are at most 2,048 bytes and rendered excerpts at most 240
+bytes. Rebuilding the same source inventory twice produces identical canonical
+rows, rankings, excerpts, and fingerprints; generated timestamps are not search
+inputs. All projections are rebuildable from source files and revisions.

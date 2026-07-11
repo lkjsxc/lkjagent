@@ -10,11 +10,7 @@ const SUITES: &[Suite] = &[
     Suite { package: "lkjagent-app", target: "workspace_rebalance", minimum_tests: 2 },
     Suite { package: "lkjagent-app", target: "record_wrappers", minimum_tests: 2 },
     Suite { package: "lkjagent-app", target: "cli_rows", minimum_tests: 4 },
-    Suite {
-        package: "lkjagent-app",
-        target: "archive_compensation",
-        minimum_tests: 2,
-    },
+    Suite { package: "lkjagent-app", target: "archive_compensation", minimum_tests: 2 },
     Suite {
         package: "lkjagent-app",
         target: "archive_recovery",
@@ -50,11 +46,9 @@ const SUITES: &[Suite] = &[
         target: "record_rows",
         minimum_tests: 1,
     },
-    Suite {
-        package: "lkjagent-app",
-        target: "workspace_search",
-        minimum_tests: 2,
-    },
+    Suite { package: "lkjagent-app", target: "workspace_search", minimum_tests: 2 },
+    Suite { package: "lkjagent-app", target: "workspace_inventory", minimum_tests: 2 },
+    Suite { package: "lkjagent-app", target: "workspace_search_freshness", minimum_tests: 2 },
     Suite {
         package: "lkjagent-app",
         target: "workspace_index_predicates",
@@ -75,6 +69,10 @@ const SUITES: &[Suite] = &[
 
 #[rustfmt::skip]
 const REQUIRED: &[(&str, &str)] = &[
+    ("workspace_inventory", "visible_external_files_reconcile_with_bounded_equivalent_results"),
+    ("workspace_inventory", "managed_external_edit_and_move_update_record_projection"),
+    ("workspace_search_freshness", "stale_first_page_does_not_hide_current_lower_ranked_hit"),
+    ("workspace_search_freshness", "case_insensitive_match_is_centered_in_excerpt"),
     (
         "workspace_search",
         "workspace_search_discovers_body_filters_and_rejects_drift",

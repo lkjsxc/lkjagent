@@ -52,10 +52,15 @@ fn late_decision_failure_rolls_back_turn_settlement() -> TestResult<()> {
         [],
         |row| row.get(0),
     )?;
+    let effect_artifacts: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM artifacts WHERE kind <> 'workspace-index'",
+        [],
+        |row| row.get(0),
+    )?;
     assert_eq!(
         (
             count("observations")?,
-            count("artifacts")?,
+            effect_artifacts,
             count("attempts")?,
             context
         ),

@@ -72,16 +72,24 @@ pub fn setup(conn: &Connection) -> StoreResult<()> {
 }
 
 pub fn replace_chunks(conn: &Connection, chunks: &[SearchChunk]) -> StoreResult<()> {
-    let tx = conn.unchecked_transaction()?;
-    tx.execute("DELETE FROM workspace_search_lexical", [])?;
-    tx.execute("DELETE FROM workspace_search_trigram", [])?;
-    tx.execute("DELETE FROM workspace_search_chunks", [])?;
-    for chunk in chunks {
-        insert_chunk(&tx, chunk)?;
-        insert_fts(&tx, "workspace_search_lexical", chunk)?;
-        insert_fts(&tx, "workspace_search_trigram", chunk)?;
+    if !conn.is_autocommit() {
+        return replace_rows(conn, chunks);
     }
+    let tx = conn.unchecked_transaction()?;
+    replace_rows(&tx, chunks)?;
     tx.commit()?;
+    Ok(())
+}
+
+fn replace_rows(conn: &Connection, chunks: &[SearchChunk]) -> StoreResult<()> {
+    conn.execute("DELETE FROM workspace_search_lexical", [])?;
+    conn.execute("DELETE FROM workspace_search_trigram", [])?;
+    conn.execute("DELETE FROM workspace_search_chunks", [])?;
+    for chunk in chunks {
+        insert_chunk(conn, chunk)?;
+        insert_fts(conn, "workspace_search_lexical", chunk)?;
+        insert_fts(conn, "workspace_search_trigram", chunk)?;
+    }
     Ok(())
 }
 
@@ -96,7 +104,7 @@ pub fn canonical_rows(conn: &Connection) -> StoreResult<Vec<SearchChunk>> {
     rows.collect::<Result<Vec<_>, _>>().map_err(Into::into)
 }
 
-fn insert_chunk(tx: &rusqlite::Transaction<'_>, chunk: &SearchChunk) -> StoreResult<()> {
+fn insert_chunk(tx: &Connection, chunk: &SearchChunk) -> StoreResult<()> {
     tx.execute(
         "INSERT INTO workspace_search_chunks (
          id, document_id, revision_fingerprint, path, field, start_byte, end_byte,
@@ -120,7 +128,7 @@ fn insert_chunk(tx: &rusqlite::Transaction<'_>, chunk: &SearchChunk) -> StoreRes
     Ok(())
 }
 
-fn insert_fts(tx: &rusqlite::Transaction<'_>, table: &str, chunk: &SearchChunk) -> StoreResult<()> {
+fn insert_fts(tx: &Connection, table: &str, chunk: &SearchChunk) -> StoreResult<()> {
     let statement = format!("INSERT INTO {table} (chunk_id, content) VALUES (?1, ?2)");
     tx.execute(&statement, params![chunk.id, chunk.content])?;
     Ok(())

@@ -8,6 +8,17 @@ use rustix::fs::{AtFlags, Mode, OFlags, RenameFlags};
 
 static NEXT_TEMP: AtomicU64 = AtomicU64::new(1);
 
+pub fn read_text(workspace: &Path, path: &str) -> Result<String, String> {
+    let (parent, name) = open_parent(workspace, path, false)?;
+    let flags = OFlags::RDONLY | OFlags::CLOEXEC | OFlags::NOFOLLOW;
+    let fd = rustix::fs::openat(&parent, &name, flags, Mode::empty()).map_err(io_error)?;
+    let mut file = std::fs::File::from(fd);
+    let mut text = String::new();
+    file.read_to_string(&mut text)
+        .map_err(|error| error.to_string())?;
+    Ok(text)
+}
+
 pub fn apply_revision(
     workspace: &Path,
     path: &str,

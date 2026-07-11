@@ -102,13 +102,13 @@ with durable evidence block; external bytes and broader writers remain outside.
 
 Workspace behavior is split across record commands, template writes, direct
 filesystem tools, and native text effects. They do not share one transaction,
-idempotency, indexing, or recovery contract. SQLite now indexes current managed
-record title and body chunks for lexical and trigram search with kind, state,
-project, and date filters, stable rebuild rows, bounded excerpts, and drift
-exclusion. Navigation now excludes closed TODO rows and avoids generated
-page timestamps. Retrieval still does not cover the full visible workspace or
-an external-change scanner. Archive and rebalance persist exact operation bytes
-and reuse idempotency keys. Their startup recovery settles matching moved bytes;
+idempotency, indexing, or recovery contract. A sorted inventory now scans visible
+Markdown at daemon entry and rebuild, excludes internal roots and symlinks, and
+atomically updates or tombstones managed records plus bounded search chunks.
+Generic and managed external changes converge to stable searchable rows, rankings, and excerpts.
+Persistent malformed-file diagnostics and debounced scheduling remain open.
+Archive and rebalance persist exact operation bytes and reuse idempotency keys.
+Their startup recovery settles matching moved bytes;
 conflicts block startup without overwriting owner paths. Rebalance recovery still
 leaves operations without move bytes, unstarted, multi-move, and broader writer recovery incomplete.
 

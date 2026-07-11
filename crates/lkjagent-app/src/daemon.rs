@@ -69,6 +69,7 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
             .ok_or_else(|| format!("workspace operation {} has no record id", operation.id))?;
         crate::record_archive::archive(&conn, data_dir, &id, &now)?;
     }
+    let _reconciled = crate::workspace_search::rebuild(&conn, &workspace)?;
     let mut snapshot = match load_runtime_snapshot(&mut conn, data_dir, clock)? {
         Some(snapshot) if matches!(snapshot.task.state, TaskState::Open | TaskState::Waiting) => {
             snapshot

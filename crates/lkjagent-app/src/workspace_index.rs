@@ -14,16 +14,16 @@ const CASE_ID: &str = "workspace";
 type Selector = fn(&RecordRow, &str) -> bool;
 
 pub fn rebuild(conn: &Connection, data_dir: &Path, now: &str) -> Result<String, String> {
-    let rows = records(conn, None, false).map_err(|error| error.to_string())?;
     let workspace = crate::config::workspace_root(data_dir)?;
     let indexes = workspace.join("indexes");
     fs::create_dir_all(&indexes).map_err(|error| error.to_string())?;
     fs::create_dir_all(workspace.join("records")).map_err(|error| error.to_string())?;
     fs::create_dir_all(workspace.join("artifacts")).map_err(|error| error.to_string())?;
-    let search = crate::workspace_search::rebuild(conn, &workspace)?;
     crate::workspace_scaffold::refresh_for_path(&workspace, "records/README.md")?;
     crate::workspace_scaffold::refresh_for_path(&workspace, "artifacts/README.md")?;
     crate::workspace_scaffold::refresh_for_path(&workspace, "indexes/README.md")?;
+    let search = crate::workspace_search::rebuild(conn, &workspace)?;
+    let rows = records(conn, None, false).map_err(|error| error.to_string())?;
     let specs: [(&str, Selector); 7] = [
         ("today", today),
         ("agenda", agenda),

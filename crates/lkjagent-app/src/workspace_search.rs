@@ -1,13 +1,18 @@
-mod query;
+mod inventory;
 
-use std::fs;
 use std::path::Path;
 
-use lkjagent_core::runtime_fingerprint::stable_fingerprint;
-use lkjagent_core::workspace_record::{parse_record, record_fingerprint};
-use lkjagent_store::record_rows::records;
-use lkjagent_store::workspace_search::{replace_chunks, SearchChunk, SearchFilter, SearchMode};
+use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
+use lkjagent_core::runtime_state::{StateCell, StateKey};
+use lkjagent_store::event_rows::{append_and_apply_event, next_event_id};
+use lkjagent_store::state_rows::insert_case;
+use lkjagent_store::workspace_search::{
+    search as store_search, SearchFilter, SearchHit, SearchMode,
+};
 use rusqlite::Connection;
+
+const EXCERPT_BYTES: usize = 240;
+const EXCERPT_CONTENT_BYTES: usize = EXCERPT_BYTES - 6;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Request {
@@ -39,102 +44,123 @@ impl Request {
 }
 
 pub fn rebuild(conn: &Connection, workspace: &Path) -> Result<String, String> {
-    let rows = records(conn, None, false).map_err(|error| error.to_string())?;
-    let mut chunks = Vec::new();
-    let mut excluded = 0;
-    for row in rows {
-        match chunks_for_row(workspace, &row) {
-            Ok(mut current) => chunks.append(&mut current),
-            Err(_) => excluded += 1,
-        }
-    }
-    chunks.sort_by(|left, right| left.id.cmp(&right.id));
-    replace_chunks(conn, &chunks).map_err(|error| error.to_string())?;
-    Ok(format!(
-        "workspace search rebuilt: indexed={} excluded_drifted={excluded}",
-        chunks.len()
-    ))
+    inventory::rebuild(conn, workspace)
+}
+
+fn mark_navigation_stale(conn: &Connection, now: &str) -> Result<(), String> {
+    let case_id = "workspace";
+    insert_case(conn, case_id, "workspace records", now).map_err(|error| error.to_string())?;
+    let event_id =
+        next_event_id(conn, case_id, "index-stale").map_err(|error| error.to_string())?;
+    let mut cell = StateCell::active(
+        StateKey::new("index", "stale/records").map_err(|error| error.message)?,
+        event_id.clone(),
+    );
+    cell.payload_schema = "workspace.index-stale".to_string();
+    cell.payload_json = serde_json::json!({"reason":"external managed source change"}).to_string();
+    cell.created_at = now.to_string();
+    cell.updated_at = now.to_string();
+    append_and_apply_event(
+        conn,
+        &RuntimeEvent {
+            id: event_id,
+            case_id: case_id.to_string(),
+            kind: "state.cell.upsert".to_string(),
+            payload: RuntimeEventPayload::UpsertCell(Box::new(cell)),
+            source: "workspace-scanner".to_string(),
+            created_at: now.to_string(),
+            decision_id: None,
+        },
+    )
+    .map_err(|error| error.to_string())
 }
 
 pub fn search(conn: &Connection, workspace: &Path, request: &Request) -> Result<String, String> {
-    query::run(conn, workspace, request)
-}
-
-fn chunks_for_row(
-    workspace: &Path,
-    row: &lkjagent_store::record_rows::RecordRow,
-) -> Result<Vec<SearchChunk>, String> {
-    let text = fs::read_to_string(workspace.join(&row.path)).map_err(|error| error.to_string())?;
-    let fingerprint = record_fingerprint(&text).map_err(|error| error.message)?;
-    let record = parse_record(&text)?;
-    if fingerprint != row.fingerprint || !matches_row(&record, row) {
-        return Err("workspace record drifted".to_string());
+    let (filter, mode) = (request.filter(), request.mode()?);
+    let (mut accepted, mut excluded, mut offset) = (Vec::new(), 0, 0);
+    while accepted.len() < 50 {
+        let hits = store_search(conn, &request.query, &filter, mode, 50, offset)
+            .map_err(|error| error.to_string())?;
+        if hits.is_empty() {
+            break;
+        }
+        offset += hits.len();
+        for hit in hits {
+            if current(workspace, &hit) {
+                accepted.push(render(&hit, &request.query));
+            } else {
+                excluded += 1;
+            }
+            if accepted.len() == 50 {
+                break;
+            }
+        }
     }
-    let project = record
-        .tags
-        .iter()
-        .find_map(|tag| tag.strip_prefix("project:").map(str::to_string))
-        .unwrap_or_default();
-    let date = record
-        .created_at
-        .split('T')
-        .next()
-        .unwrap_or_default()
-        .to_string();
-    Ok(vec![
-        chunk(
-            row,
-            "title",
-            0,
-            record.title.len(),
-            &record.title,
-            &project,
-            &date,
-        )?,
-        chunk(
-            row,
-            "body",
-            0,
-            record.body.len(),
-            &record.body,
-            &project,
-            &date,
-        )?,
-    ])
+    if accepted.is_empty() {
+        return Ok(no_matches(excluded));
+    }
+    if excluded > 0 {
+        accepted.push(format!("excluded_drifted={excluded}"));
+    }
+    Ok(accepted.join("\n"))
 }
 
-fn matches_row(
-    record: &lkjagent_core::workspace_record::WorkspaceRecord,
-    row: &lkjagent_store::record_rows::RecordRow,
-) -> bool {
-    record.id == row.id && record.kind == row.kind && record.state == row.state
+fn current(workspace: &Path, hit: &SearchHit) -> bool {
+    let Ok(text) = inventory::read_visible(workspace, &hit.chunk.path) else {
+        return false;
+    };
+    lkjagent_core::workspace_record::record_fingerprint(&text)
+        .is_ok_and(|fingerprint| fingerprint == hit.chunk.revision_fingerprint)
 }
 
-fn chunk(
-    row: &lkjagent_store::record_rows::RecordRow,
-    field: &str,
-    start_byte: usize,
-    end_byte: usize,
-    content: &str,
-    project: &str,
-    date: &str,
-) -> Result<SearchChunk, String> {
-    let seed = format!(
-        "{}\0{}\0{field}\0{start_byte}\0{end_byte}",
-        row.id, row.fingerprint
-    );
-    Ok(SearchChunk {
-        id: stable_fingerprint(&seed).map_err(|error| error.message)?,
-        document_id: row.id.clone(),
-        revision_fingerprint: row.fingerprint.clone(),
-        path: row.path.clone(),
-        field: field.to_string(),
-        start_byte,
-        end_byte,
-        kind: row.kind.clone(),
-        state: row.state.clone(),
-        project: project.to_string(),
-        effective_date: date.to_string(),
-        content: content.to_string(),
-    })
+fn render(hit: &SearchHit, query: &str) -> String {
+    format!(
+        "path={} document={} field={} kind={} state={} score={:.6}\n{}",
+        hit.chunk.path,
+        hit.chunk.document_id,
+        hit.chunk.field,
+        hit.chunk.kind,
+        hit.chunk.state,
+        hit.score,
+        excerpt(&hit.chunk.content, query),
+    )
+}
+
+fn no_matches(excluded: usize) -> String {
+    if excluded == 0 {
+        "no matches".to_string()
+    } else {
+        format!("no matches\nexcluded_drifted={excluded}")
+    }
+}
+
+fn excerpt(content: &str, query: &str) -> String {
+    let needle = query.split_whitespace().next().unwrap_or_default();
+    let index = match_index(content, needle).unwrap_or(0);
+    let start = floor_boundary(content, index.saturating_sub(EXCERPT_CONTENT_BYTES / 3));
+    let end = floor_boundary(content, (start + EXCERPT_CONTENT_BYTES).min(content.len()));
+    let prefix = if start > 0 { "..." } else { "" };
+    let suffix = if end < content.len() { "..." } else { "" };
+    format!("{prefix}{}{suffix}", &content[start..end])
+}
+
+fn match_index(content: &str, needle: &str) -> Option<usize> {
+    if content.is_ascii() && needle.is_ascii() {
+        return content
+            .to_ascii_lowercase()
+            .find(&needle.to_ascii_lowercase());
+    }
+    let folded = needle.to_lowercase();
+    content
+        .char_indices()
+        .map(|(index, _)| index)
+        .chain(std::iter::once(content.len()))
+        .find(|index| content[*index..].to_lowercase().starts_with(&folded))
+}
+
+fn floor_boundary(text: &str, mut index: usize) -> usize {
+    while index > 0 && !text.is_char_boundary(index) {
+        index -= 1;
+    }
+    index
 }

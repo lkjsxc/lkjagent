@@ -11,6 +11,7 @@ pub fn search(
     filter: &SearchFilter,
     mode: SearchMode,
     limit: usize,
+    offset: usize,
 ) -> StoreResult<Vec<SearchHit>> {
     let table = table(mode);
     let mut values = vec![Value::Text(fts_query(text)?)];
@@ -20,6 +21,7 @@ pub fn search(
     predicate(&mut predicates, &mut values, "project", &filter.project);
     predicate(&mut predicates, &mut values, "effective_date", &filter.date);
     values.push(Value::Integer(limit.min(50) as i64));
+    values.push(Value::Integer(offset as i64));
     let where_clause = if predicates.is_empty() {
         String::new()
     } else {
@@ -31,7 +33,7 @@ pub fn search(
          c.content, bm25({table})
          FROM {table} JOIN workspace_search_chunks c ON c.id = {table}.chunk_id
          WHERE {table} MATCH ? {where_clause}
-         ORDER BY bm25({table}), c.document_id, c.start_byte, c.end_byte LIMIT ?"
+         ORDER BY bm25({table}), c.document_id, c.field, c.start_byte, c.end_byte, c.id LIMIT ? OFFSET ?"
     );
     let mut statement = conn.prepare(&sql)?;
     let rows = statement.query_map(params_from_iter(values.iter()), row)?;

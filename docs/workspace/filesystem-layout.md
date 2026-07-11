@@ -49,7 +49,9 @@ All runtime filesystem effects stay under the configured root. Reject absolute
 model paths, parent traversal, symlink escapes, control characters, reserved
 system paths, and case-collision ambiguity. Use descriptor-relative no-follow
 traversal or an equivalent race-resistant API; canonicalization alone cannot
-prevent a symlink swap.
+prevent a symlink swap. Search inventory likewise rejects hidden paths, root
+system/index/archive trees, non-UTF-8 names, non-ASCII cased names, case
+collisions, and symlinks. Uncased Unicode names remain valid.
 
 ## Workspace READMEs
 
