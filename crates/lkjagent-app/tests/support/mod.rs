@@ -36,14 +36,11 @@ pub fn action_for(decision: &str, context: &str, tool: &str, params: &[(&str, &s
         xml(context),
         xml(tool)
     );
+    out.push_str("<input>");
     for (name, value) in params {
-        out.push_str(&format!(
-            "<argument><name>{}</name><value>{}</value></argument>",
-            xml(name),
-            xml(value)
-        ));
+        out.push_str(&format!("<{}>{}</{}>", xml(name), xml(value), xml(name)));
     }
-    out.push_str("</lkjagent_action>");
+    out.push_str("</input></lkjagent_action>");
     out
 }
 

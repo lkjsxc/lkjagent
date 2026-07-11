@@ -63,8 +63,8 @@ fn explore_decision_renders_tool_call_contract() {
         .contains("Return exactly one <lkjagent_action>"));
     assert!(prompt.user.contains("<tool_name>fs.read</tool_name>"));
     assert!(prompt.user.contains("Schema-only shape, not copyable:"));
-    assert!(prompt.user.contains("<name>path</name>"));
-    assert!(prompt.user.contains("<value>FIELD_VALUE</value>"));
+    assert!(prompt.user.contains("<input>"));
+    assert!(prompt.user.contains("<path>FIELD_VALUE</path>"));
     assert_eq!(prompt.stop, "</lkjagent_action>");
 }
 

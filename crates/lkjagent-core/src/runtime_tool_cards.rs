@@ -108,12 +108,11 @@ fn action_xml(decision: &RuntimeDecision, tool_name: &str, args: &[(&str, &str)]
         ),
         format!("<tool_name>{}</tool_name>", escape_xml(tool_name)),
     ];
+    lines.push("<input>".to_string());
     for (name, value) in args {
-        lines.push("<argument>".to_string());
-        lines.push(format!("<name>{}</name>", escape_xml(name)));
-        lines.push(format!("<value>{}</value>", escape_xml(value)));
-        lines.push("</argument>".to_string());
+        lines.push(format!("<{name}>{}</{name}>", escape_xml(value)));
     }
+    lines.push("</input>".to_string());
     lines.push("</lkjagent_action>".to_string());
     lines
 }

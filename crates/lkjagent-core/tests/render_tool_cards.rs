@@ -42,8 +42,8 @@ fn rendered_filled_tool_example_parses_and_admits() -> Result<(), String> {
     .map_err(|error| error.message)?;
 
     assert!(prompt.user.contains("<lkjagent_action>"));
-    assert!(prompt.user.contains("<name>path</name>"));
-    assert!(prompt.user.contains("<value>README.md</value>"));
+    assert!(prompt.user.contains("<input>"));
+    assert!(prompt.user.contains("<path>README.md</path>"));
     assert_eq!(admission.status, AdmissionStatus::Admitted);
     Ok(())
 }

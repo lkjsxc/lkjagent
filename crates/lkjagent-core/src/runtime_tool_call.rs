@@ -1,13 +1,13 @@
-use std::collections::{BTreeMap, BTreeSet};
+use std::collections::BTreeMap;
 
 use serde_json::{Number, Value};
 
-use crate::runtime_action_xml::{decode_entities, next_element, ActionXmlError};
+use crate::runtime_action_xml::ActionXmlError;
 use crate::runtime_decision::{RuntimeDecision, ToolValueClass};
+use crate::runtime_tool_fields::parse_fields;
 
 pub const ACTION_OPEN: &str = "<lkjagent_action>";
 pub const ACTION_CLOSE: &str = "</lkjagent_action>";
-const MAX_VALUE_CHARS: usize = 8192;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct ToolCall {
@@ -77,12 +77,6 @@ pub fn parse_tool_call(raw: &str, decision: &RuntimeDecision) -> Result<ToolCall
     })
 }
 
-#[derive(Default)]
-struct Fields {
-    scalars: BTreeMap<String, String>,
-    args: BTreeMap<String, String>,
-}
-
 fn action_body(raw: &str) -> Result<&str, ToolCallError> {
     let trimmed = raw.trim();
     let opens = trimmed.matches("<lkjagent_action").count();
@@ -100,60 +94,6 @@ fn action_body(raw: &str) -> Result<&str, ToolCallError> {
         return Err(ToolCallError::EnvelopeMalformed);
     }
     Ok(&trimmed[ACTION_OPEN.len()..trimmed.len() - ACTION_CLOSE.len()])
-}
-
-fn parse_fields(body: &str) -> Result<Fields, ToolCallError> {
-    let mut at = 0;
-    let mut fields = Fields::default();
-    while let Some((tag, inner)) = next_element(body, &mut at, true)? {
-        match tag {
-            "decision_id" | "context_fingerprint" | "tool_name" => {
-                insert_once(&mut fields.scalars, tag, decode_entities(inner.trim())?)?;
-            }
-            "argument" => insert_argument(&mut fields.args, inner)?,
-            other => return Err(ToolCallError::UnknownTag(other.into())),
-        }
-    }
-    Ok(fields)
-}
-
-fn insert_argument(args: &mut BTreeMap<String, String>, body: &str) -> Result<(), ToolCallError> {
-    let mut at = 0;
-    let mut seen = BTreeSet::new();
-    let (mut name, mut value) = (None, None);
-    while let Some((tag, inner)) = next_element(body, &mut at, false)? {
-        if !matches!(tag, "name" | "value") {
-            return Err(ToolCallError::UnknownTag(tag.into()));
-        }
-        if !seen.insert(tag.to_string()) {
-            return Err(ToolCallError::DuplicateTag(tag.into()));
-        }
-        if tag == "name" {
-            name = Some(decode_entities(inner.trim())?);
-        } else {
-            value = Some(decode_entities(inner)?);
-        }
-    }
-    let name = name.ok_or_else(|| schema("missing arg name".into()))?;
-    let value = value.ok_or_else(|| schema("missing arg value".into()))?;
-    if value.chars().count() > MAX_VALUE_CHARS {
-        return Err(schema(format!("value too large for {name}")));
-    }
-    if args.insert(name.clone(), value).is_some() {
-        return Err(ToolCallError::DuplicateTag(format!("argument/{name}")));
-    }
-    Ok(())
-}
-
-fn insert_once(
-    scalars: &mut BTreeMap<String, String>,
-    tag: &str,
-    value: String,
-) -> Result<(), ToolCallError> {
-    if scalars.insert(tag.to_string(), value).is_some() {
-        return Err(ToolCallError::DuplicateTag(tag.into()));
-    }
-    Ok(())
 }
 
 fn required<'a>(map: &'a BTreeMap<String, String>, key: &str) -> Result<&'a str, ToolCallError> {

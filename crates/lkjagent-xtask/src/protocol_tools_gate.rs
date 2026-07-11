@@ -10,6 +10,11 @@ const SUITES: &[Suite] = &[
     },
     Suite {
         package: "lkjagent-core",
+        target: "direct_action_grammar",
+        minimum_tests: 2,
+    },
+    Suite {
+        package: "lkjagent-core",
         target: "parse_diagnosis",
         minimum_tests: 2,
     },

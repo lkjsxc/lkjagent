@@ -107,11 +107,11 @@ fn explore_accepts_only_exact_action_blocks() {
         parse_expected(StepKind::Explore, &missing_tool),
         Err(ParseFault::Action(ToolCallError::ArgsSchemaViolation(_)))
     ));
-    let duplicate = "<lkjagent_action><decision_id>decision-1</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>fs.read</tool_name><argument><name>path</name><value>a</value></argument><argument><name>path</name><value>b</value></argument></lkjagent_action>";
+    let duplicate = "<lkjagent_action><decision_id>decision-1</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>fs.read</tool_name><input><path>a</path><path>b</path></input></lkjagent_action>";
     assert_eq!(
         parse_expected(StepKind::Explore, duplicate),
         Err(ParseFault::Action(ToolCallError::DuplicateTag(
-            "argument/path".into(),
+            "input/path".into(),
         )))
     );
 }
@@ -120,11 +120,10 @@ fn action(decision_id: &str, tool: &str, args: &[(&str, &str)], context: &str) -
     let mut out = format!(
         "<lkjagent_action><decision_id>{decision_id}</decision_id><context_fingerprint>{context}</context_fingerprint><tool_name>{tool}</tool_name>"
     );
+    out.push_str("<input>");
     for (name, value) in args {
-        out.push_str(&format!(
-            "<argument><name>{name}</name><value>{value}</value></argument>"
-        ));
+        out.push_str(&format!("<{name}>{value}</{name}>"));
     }
-    out.push_str("</lkjagent_action>");
+    out.push_str("</input></lkjagent_action>");
     out
 }

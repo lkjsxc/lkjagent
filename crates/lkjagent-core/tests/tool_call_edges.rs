@@ -50,14 +50,12 @@ fn action(tool: &str, args: &[(char, &str)]) -> String {
     let mut out = format!(
         "<lkjagent_action><decision_id>dec-1</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>{tool}</tool_name>"
     );
+    out.push_str("<input>");
     for (name, value) in args {
-        out.push_str(&format!(
-            "<argument><name>{}</name><value>{}</value></argument>",
-            field(*name),
-            value
-        ));
+        let field = field(*name);
+        out.push_str(&format!("<{field}>{value}</{field}>"));
     }
-    out.push_str("</lkjagent_action>");
+    out.push_str("</input></lkjagent_action>");
     out
 }
 

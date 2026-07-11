@@ -62,10 +62,10 @@ fn rejects_attributes_json_and_duplicate_scalars() -> TestResult<()> {
 
 #[test]
 fn rejects_crossed_tags_unknown_tags_and_duplicate_args() -> TestResult<()> {
-    let crossed = "<lkjagent_action><argument><name>path</value></argument></lkjagent_action>";
+    let crossed = "<lkjagent_action><input><path>value</content></input></lkjagent_action>";
     assert_eq!(
         parse_err(crossed, "crossed")?,
-        ToolCallError::CrossedTag("name".into())
+        ToolCallError::CrossedTag("path".into())
     );
     let unknown = "<lkjagent_action><extra>x</extra></lkjagent_action>";
     assert_eq!(
@@ -80,7 +80,7 @@ fn rejects_crossed_tags_unknown_tags_and_duplicate_args() -> TestResult<()> {
     );
     assert_eq!(
         parse_err(&duplicate, "duplicate arg")?,
-        ToolCallError::DuplicateTag("argument/summary".into())
+        ToolCallError::DuplicateTag("input/summary".into())
     );
     Ok(())
 }
@@ -180,11 +180,10 @@ fn action(tool: &str, args: &[(&str, &str)], decision_id: &str, context: &str) -
     let mut out = format!(
         "<lkjagent_action><decision_id>{decision_id}</decision_id><context_fingerprint>{context}</context_fingerprint><tool_name>{tool}</tool_name>"
     );
+    out.push_str("<input>");
     for (name, value) in args {
-        out.push_str(&format!(
-            "<argument><name>{name}</name><value>{value}</value></argument>"
-        ));
+        out.push_str(&format!("<{name}>{value}</{name}>"));
     }
-    out.push_str("</lkjagent_action>");
+    out.push_str("</input></lkjagent_action>");
     out
 }
