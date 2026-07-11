@@ -165,7 +165,8 @@ pub(super) fn source_hash(root: &Path) -> Result<String, String> {
         output.stdout.split(|byte|*byte==0).filter(|name|!name.is_empty()).map(|name|root.join(String::from_utf8_lossy(name).as_ref())).collect() }
         else { let mut found=Vec::new(); for name in SOURCE_PATHS { let path=root.join(name); if !path.exists(){continue;}
             if path.is_symlink(){return Err("source input is a symlink".into());} else if path.is_dir(){found.extend(walk(&path)?);}else{found.push(path);} } found };
-    paths.sort(); let mut bytes=Vec::new(); for path in paths { if path.is_symlink(){return Err("source input is a symlink".into());}
+    paths.sort_by_key(|path|path.strip_prefix(root).unwrap_or(path).to_string_lossy().into_owned());
+    let mut bytes=Vec::new(); for path in paths { if path.is_symlink(){return Err("source input is a symlink".into());}
         let name=path.strip_prefix(root).map_err(err)?.to_string_lossy().replace('\\', "/"); bytes.extend_from_slice(name.as_bytes()); bytes.push(0);
         bytes.extend(fs::read(path).map_err(err)?); bytes.push(0); } Ok(hash(&bytes))
 }

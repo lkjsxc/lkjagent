@@ -46,11 +46,11 @@ typed faults, Online Backup capture, workspace/run/campaign manifests, and PTY
 capture. Its negative fixtures reject idle, blocked, skipped, zero-test, and
 generated-placeholder evidence. The predeclared domain runner now requires clean
 source, a strict-ancestor plan, a reproducible isolated build, production
-exchange logs, recomputed metrics, and three-or-five repeats. Preserved attempts
-at `853c647a` and `f425d78f` exposed honest failures: one goal closed without a
-provider decision; the next retained 72 rows before an invalid lane budget, then
-found a transient SQLite sidecar at campaign manifest capture. The full matrix
-and fault, recovery, task, live, and PTY predicates remain absent.
+exchange logs, recomputed metrics, and three-or-five repeats. Attempts at
+`853c647a` and `f425d78f` exposed a no-decision close, invalid config, and sidecar.
+A third at `2f0da5e1` completed 103 rows, but its gate found cross-language source
+sort drift. No matrix is accepted; fault, task, live, and PTY predicates remain
+absent.
 
 A fresh model-free diary run writes a journal entry containing canned
 missing-detail text after the owner asks for a diary entry. This is reproduced
