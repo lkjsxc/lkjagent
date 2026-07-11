@@ -24,11 +24,13 @@ document revision and path, appends the runtime event and state patch, marks
 dependent search or index projections dirty, runs checks, and commits the
 effect observation.
 
-## Archive Compensation
+## Archive And Rebalance Compensation
 
-Archive stages its move before settling the record, alias, audit, state, and
-index effects. If a settlement write fails, it restores the original path and
-current row rather than reporting an archive that only partly happened.
+Archive and rebalance commit a prepared operation and immutable file preimages
+before a filesystem move. Their operation group includes files, rows, aliases,
+audits, search rows, generated indexes, and state effects. If any settlement
+or recovery step fails, compensation restores every preimage or records a
+visible unresolved operation; it never reports a partial archive or rebalance.
 
 ## Recovery
 

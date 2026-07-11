@@ -19,13 +19,16 @@ stale.
 Index current Markdown bodies, titles, dates, kinds, project, state, relations,
 and revision fingerprints. Support exact document and path lookup, lexical and
 trigram body search, and date, project, kind, and state filters. Search rows are
-unique by document, revision, field, and byte range.
+unique by document, revision, field, and byte range. Filters compose with AND;
+lexical ranking uses deterministic BM25 ties broken by document ID and chunk
+range.
 
 ## Retrieval
 
-Discover before ranking. Retrieve relevant bounded body excerpts rather than a
-fixed recent metadata window. Validate the current revision fingerprint before
-prompt admission and record selected and excluded source refs.
+Discover before ranking. Retrieve relevant bounded UTF-8 body excerpts rather
+than a fixed recent metadata window. Validate the current bytes and revision
+fingerprint before prompt admission; exclude drifted rows and record selected
+and excluded source refs.
 
 ## External Changes
 
@@ -46,4 +49,7 @@ zero-test filter, or summary line is not evidence.
 
 Compare index membership and search fingerprints with current documents. Missing,
 stale, duplicate, wrongly classified, or unresolved debt rows fail workspace
-validation. All projections are rebuildable from source files and revisions.
+validation. Rebuilding the same source inventory twice produces identical
+canonical rows, rankings, excerpts, and fingerprints; generated timestamps are
+not search inputs. All projections are rebuildable from source files and
+revisions.
