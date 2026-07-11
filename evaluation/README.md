@@ -7,6 +7,7 @@ by mechanical evaluation gates.
 
 ## Contents
 
+- `experiment-plan.tsv`: outcome-free cells, controls, repeats, and threshold hash.
 - `fault-schedule.tsv`: ordered deterministic fault injections.
 - `scenarios/`: anchored goals, schedules, checks, and seed bytes.
 - `false-positive-fixtures/`: evidence summaries that must be rejected.

@@ -4,6 +4,13 @@
 
 Define controlled context, prompt, grammar, tool-view, and recovery experiments.
 
+## Precommitment
+
+[evaluation/experiment-plan.tsv](../../evaluation/experiment-plan.tsv) declares
+outcome-free hypotheses, exact factors, cells, controls, scenarios, repeats,
+metrics, and the anchored threshold hash. Its commit must be a strict ancestor
+of every tested candidate commit. A later plan or undeclared factor is invalid.
+
 ## Factors
 
 Factors include retrieval strategy, lane budgets, compaction, stable-prefix
