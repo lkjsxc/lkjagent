@@ -98,6 +98,14 @@ pub(crate) fn file_fingerprint(workspace: &Path, rel: &str) -> Result<String, St
     let text = fs::read_to_string(workspace.join(rel)).map_err(|error| error.to_string())?;
     record_fingerprint(&text).map_err(|error| error.message)
 }
+
+pub(crate) fn operation_preimage(row: &RecordRow) -> String {
+    serde_json::json!({"id": row.id, "path": row.path, "fingerprint": row.fingerprint}).to_string()
+}
+
+pub(crate) fn operation_intended(item: &RebalanceMove) -> String {
+    serde_json::json!({"id": item.entity_id, "path": item.new_path}).to_string()
+}
 pub(crate) fn render_plan(moves: &[RebalanceMove], json: bool) -> Result<String, String> {
     if json {
         return serde_json::to_string(moves).map_err(|error| error.to_string());

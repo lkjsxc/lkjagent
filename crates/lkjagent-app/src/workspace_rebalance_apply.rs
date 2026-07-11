@@ -5,7 +5,8 @@ use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_core::workspace_manifest::{validate_rebalance_move, RebalanceMove};
 use lkjagent_store::record_rows::{record, upsert_record, RecordRow};
 use lkjagent_store::workspace_rows::{
-    insert_alias_and_audit, remove_alias_and_audit, PathAliasRow,
+    compensate_operation, insert_alias_and_audit, prepare_operation, remove_alias_and_audit,
+    settle_operation, PathAliasRow,
 };
 use rusqlite::Connection;
 
@@ -49,7 +50,22 @@ fn apply_one(
     }
     item.validation
         .push(format!("fingerprint-before:{fingerprint}"));
-    move_file(workspace, &item)?;
+    let operation_id = operation_id(&item);
+    prepare_operation(
+        conn,
+        &operation_id,
+        &format!("rebalance:{}:{fingerprint}", item.entity_id),
+        "rebalance",
+        &crate::workspace_rebalance::operation_preimage(&original),
+        &crate::workspace_rebalance::operation_intended(&item),
+        now,
+    )
+    .map_err(|error| error.to_string())?;
+    if let Err(error) = move_file(workspace, &item) {
+        compensate_operation(conn, &operation_id, &error, now)
+            .map_err(|error| error.to_string())?;
+        return Err(error);
+    }
     match crate::workspace_rebalance::file_fingerprint(workspace, &item.new_path) {
         Ok(found) if found == fingerprint => {}
         Ok(_) => {
@@ -81,6 +97,12 @@ fn apply_one(
     if let Err(error) =
         insert_alias_and_audit(conn, &alias(&item, now), &audit_id(&item), &item, now)
             .map_err(|error| error.to_string())
+    {
+        restore_one(conn, workspace, &item, &original, now)?;
+        return Err(error);
+    }
+    if let Err(error) =
+        settle_operation(conn, &operation_id, now).map_err(|error| error.to_string())
     {
         restore_one(conn, workspace, &item, &original, now)?;
         return Err(error);
@@ -126,6 +148,8 @@ fn restore_one(
         fs::rename(new, workspace.join(&item.old_path)).map_err(|value| value.to_string())?;
     }
     upsert_record(conn, original).map_err(|value| value.to_string())?;
+    compensate_operation(conn, &operation_id(item), "rebalance compensated", now)
+        .map_err(|value| value.to_string())?;
     Ok(())
 }
 
@@ -159,9 +183,14 @@ fn alias(item: &RebalanceMove, now: &str) -> PathAliasRow {
 }
 
 fn audit_id(item: &RebalanceMove) -> String {
-    stable_fingerprint(item)
+    let identity = format!("{}\0{}\0{}", item.entity_id, item.old_path, item.new_path);
+    stable_fingerprint(&identity)
         .map(|value| format!("rebalance-{value}"))
         .unwrap_or_else(|_| format!("rebalance-{}", item.entity_id))
+}
+
+fn operation_id(item: &RebalanceMove) -> String {
+    format!("workspace-{}", audit_id(item))
 }
 
 struct Applied {

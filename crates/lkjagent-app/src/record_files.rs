@@ -142,6 +142,21 @@ fn record_row(
     })
 }
 
+pub(crate) fn archive_preimage(row: &RecordRow) -> String {
+    serde_json::json!({
+        "id": row.id,
+        "path": row.path,
+        "fingerprint": row.fingerprint,
+        "state": row.state,
+        "archived": row.archived,
+    })
+    .to_string()
+}
+
+pub(crate) fn archive_intended(row: &RecordRow, path: &str) -> String {
+    serde_json::json!({"id": row.id, "path": path, "state": "archived"}).to_string()
+}
+
 fn format_record_row(prefix: &str, row: &RecordRow) -> String {
     format!(
         "{prefix} {} kind={} state={} title={} path={} fp={}",

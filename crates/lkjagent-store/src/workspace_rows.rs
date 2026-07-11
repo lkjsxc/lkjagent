@@ -123,6 +123,67 @@ pub fn insert_rebalance_audit(
     Ok(())
 }
 
+pub fn setup_operations(conn: &Connection) -> StoreResult<()> {
+    conn.execute_batch(
+        "
+        CREATE TABLE IF NOT EXISTS workspace_operations (
+            id TEXT PRIMARY KEY,
+            idempotency_key TEXT NOT NULL UNIQUE,
+            kind TEXT NOT NULL,
+            phase TEXT NOT NULL,
+            preimage_json TEXT NOT NULL,
+            intended_json TEXT NOT NULL,
+            error TEXT,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        );
+        ",
+    )?;
+    Ok(())
+}
+pub fn prepare_operation(
+    conn: &Connection,
+    id: &str,
+    idempotency_key: &str,
+    kind: &str,
+    preimage_json: &str,
+    intended_json: &str,
+    now: &str,
+) -> StoreResult<()> {
+    conn.execute(
+        "INSERT INTO workspace_operations
+         (id, idempotency_key, kind, phase, preimage_json, intended_json, created_at, updated_at)
+         VALUES (?1, ?2, ?3, 'prepared', ?4, ?5, ?6, ?6)",
+        params![id, idempotency_key, kind, preimage_json, intended_json, now],
+    )?;
+    Ok(())
+}
+pub fn settle_operation(conn: &Connection, id: &str, now: &str) -> StoreResult<()> {
+    set_operation_phase(conn, id, "settled", None, now)
+}
+pub fn compensate_operation(
+    conn: &Connection,
+    id: &str,
+    error: &str,
+    now: &str,
+) -> StoreResult<()> {
+    set_operation_phase(conn, id, "compensated", Some(error), now)
+}
+
+fn set_operation_phase(
+    conn: &Connection,
+    id: &str,
+    phase: &str,
+    error: Option<&str>,
+    now: &str,
+) -> StoreResult<()> {
+    conn.execute(
+        "UPDATE workspace_operations SET phase = ?2, error = ?3, updated_at = ?4 WHERE id = ?1",
+        params![id, phase, error, now],
+    )?;
+    Ok(())
+}
+
 fn json<T: serde::Serialize>(value: &T) -> StoreResult<String> {
     serde_json::to_string(value).map_err(|error| StoreError::InvalidState(error.to_string()))
 }

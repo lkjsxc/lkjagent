@@ -46,6 +46,12 @@ fn archive_restores_file_and_row_when_audit_fails() -> TestResult<()> {
     )?;
     assert_eq!(row.0, old_path);
     assert_eq!(row.1, 0);
+    let phase: String = conn.query_row(
+        "SELECT phase FROM workspace_operations WHERE kind = 'archive'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(phase, "compensated");
     Ok(())
 }
 

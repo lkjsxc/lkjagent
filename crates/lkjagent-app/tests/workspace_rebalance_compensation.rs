@@ -62,6 +62,12 @@ fn rebalance_restores_files_rows_search_and_indexes_when_rebuild_fails() -> Test
             row.get(0)
         })?;
     assert!(chunks > 0);
+    let phase: String = conn.query_row(
+        "SELECT phase FROM workspace_operations WHERE kind = 'rebalance'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(phase, "compensated");
     Ok(())
 }
 
