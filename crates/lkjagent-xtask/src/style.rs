@@ -10,6 +10,7 @@ const ALLOWED_EXTERNAL: &[&str] = &[
     "rustix",
     "serde",
     "serde_json",
+    "sha2",
     "toml",
     "unicode-segmentation",
     "unicode-width",

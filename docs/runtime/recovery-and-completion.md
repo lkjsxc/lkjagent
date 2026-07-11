@@ -38,8 +38,10 @@ resets the window.
 
 One provider call belongs to one decision. Retryable endpoint faults persist a
 configured exponential eligibility instant; retry exhaustion persists an
-external wait bound to a nonsecret endpoint-configuration fingerprint. A later
-fingerprint change durably suppresses the wait and permits exactly one new call.
+external wait bound to a nonsecret endpoint-configuration fingerprint. The
+credential contributes only a domain-separated SHA-256 token, never its bytes.
+The daemon lock orders config and fingerprint updates. A later fingerprint
+change durably suppresses the wait and permits one new call.
 
 Startup reconciles prepared effects before endpoint decisions, projections, and due wakes.
 A dispatching provider-exchange intent commits before network I/O. If startup

@@ -35,7 +35,7 @@ cap.
 ## Dependency Allowlist
 
 Product crates may use `crossterm`, `ratatui`, `reqwest`, `rusqlite`, `rustix`,
-`serde`, `serde_json`, `toml`, `unicode-segmentation`, and `unicode-width`.
+`serde`, `serde_json`, `sha2`, `toml`, `unicode-segmentation`, and `unicode-width`.
 New external crates require updating this contract and the `check-style`
 allowlist in the same change.
 

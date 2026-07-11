@@ -50,10 +50,10 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     let mut conn =
         Connection::open(data_dir.join("lkjagent.sqlite3")).map_err(|error| error.to_string())?;
     setup(&conn).map_err(|error| error.to_string())?;
-    let _timing = crate::config::persist_runtime_timing(&conn, data_dir)?;
-    crate::endpoint_recovery::persist_condition(&conn, data_dir)?;
     let now = clock.now();
     crate::daemon_lock::claim(&mut conn, &now)?;
+    let _timing = crate::config::persist_runtime_timing(&conn, data_dir)?;
+    crate::endpoint_recovery::persist_condition(&conn, data_dir)?;
     let groups = lkjagent_store::workspace_rows::active_rebalance_groups(&conn)
         .map_err(|error| error.to_string())?;
     if groups.len() > 1 {

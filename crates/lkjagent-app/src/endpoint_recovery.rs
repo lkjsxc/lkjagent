@@ -5,6 +5,7 @@ use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_core::runtime_state::StateKey;
 use lkjagent_store::event_rows::{append_and_apply_event, next_event_id};
 use rusqlite::Connection;
+use sha2::{Digest, Sha256};
 
 const CONDITION_KEY: &str = "runtime.endpoint_condition_fingerprint";
 
@@ -24,11 +25,12 @@ pub fn persist_condition(conn: &Connection, data_dir: &Path) -> Result<String, S
             |row| row.get(0),
         )
         .map_err(|error| error.to_string())?;
+    let credential = credential_token(config.api_key.as_deref());
     let fingerprint = stable_fingerprint(&(
         config.base_url,
         config.model,
         config.timeout.as_millis(),
-        config.api_key.is_some(),
+        credential,
         retry,
         backoff,
     ))
@@ -40,6 +42,16 @@ pub fn persist_condition(conn: &Connection, data_dir: &Path) -> Result<String, S
     )
     .map_err(|error| error.to_string())?;
     Ok(fingerprint)
+}
+
+fn credential_token(value: Option<&str>) -> String {
+    let Some(value) = value else {
+        return "absent".to_string();
+    };
+    let mut digest = Sha256::new();
+    digest.update(b"lkjagent:endpoint-credential:v1\0");
+    digest.update(value.as_bytes());
+    format!("sha256:{:x}", digest.finalize())
 }
 
 pub fn release_changed_waits(conn: &Connection, case_id: &str, now: &str) -> Result<usize, String> {
