@@ -22,6 +22,11 @@ pub fn settle_effect_observation(
     state: &str,
     row: &ObservationRow,
 ) -> StoreResult<()> {
+    if !matches!(state, "committed" | "failed") {
+        return Err(StoreError::InvalidState(format!(
+            "invalid journal settlement {state}"
+        )));
+    }
     let expected: (String, String, String, String) = conn.query_row(
         "SELECT journal.admission_id, journal.decision_id, admissions.case_id, journal.effect_name
          FROM effect_journal AS journal JOIN tool_admissions AS admissions

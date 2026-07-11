@@ -1,25 +1,48 @@
-use rusqlite::{params, Connection};
+use rusqlite::{params, Connection, OptionalExtension, TransactionBehavior};
 
 const OWNER_KEY: &str = "daemon.lock.owner";
 const HEARTBEAT_KEY: &str = "daemon.lock.heartbeat";
 const STALE_SECONDS: u64 = 300;
 
-pub fn claim(conn: &Connection, now: &str) -> Result<(), String> {
-    let owner = owner_id();
-    let held_by = config_value(conn, OWNER_KEY)?;
-    let heartbeat = config_value(conn, HEARTBEAT_KEY)?;
-    if held_by
-        .as_deref()
-        .is_some_and(|held| held != owner.as_str())
-        && !stale(&heartbeat, now)
-    {
+pub fn claim(conn: &mut Connection, now: &str) -> Result<(), String> {
+    claim_as(conn, &owner_id(), now)
+}
+
+fn claim_as(conn: &mut Connection, owner: &str, now: &str) -> Result<(), String> {
+    let tx = conn
+        .transaction_with_behavior(TransactionBehavior::Immediate)
+        .map_err(|error| error.to_string())?;
+    let held_by: Option<String> = tx
+        .query_row(
+            "SELECT value FROM config WHERE key = ?1",
+            [OWNER_KEY],
+            |row| row.get(0),
+        )
+        .optional()
+        .map_err(|error| error.to_string())?;
+    let heartbeat: Option<String> = tx
+        .query_row(
+            "SELECT value FROM config WHERE key = ?1",
+            [HEARTBEAT_KEY],
+            |row| row.get(0),
+        )
+        .optional()
+        .map_err(|error| error.to_string())?;
+    if held_by.as_deref().is_some_and(|held| held != owner) && !stale(&heartbeat, now) {
         return Err(format!(
             "daemon lock held by {}",
             held_by.unwrap_or_default()
         ));
     }
-    set_config(conn, OWNER_KEY, &owner)?;
-    set_config(conn, HEARTBEAT_KEY, now)
+    for (key, value) in [(OWNER_KEY, owner), (HEARTBEAT_KEY, now)] {
+        tx.execute(
+            "INSERT INTO config (key, value) VALUES (?1, ?2)
+             ON CONFLICT(key) DO UPDATE SET value = excluded.value",
+            params![key, value],
+        )
+        .map_err(|error| error.to_string())?;
+    }
+    tx.commit().map_err(|error| error.to_string())
 }
 
 fn stale(heartbeat: &Option<String>, now: &str) -> bool {
@@ -37,32 +60,35 @@ fn stale(heartbeat: &Option<String>, now: &str) -> bool {
 
 fn unix_seconds(value: &str) -> Option<u64> {
     let rest = value.strip_prefix("unix:")?;
-    let seconds = rest.split('.').next()?;
-    seconds.parse().ok()
+    rest.split('.').next()?.parse().ok()
 }
 
 fn owner_id() -> String {
     format!("pid:{}", std::process::id())
 }
 
-fn config_value(conn: &Connection, key: &str) -> Result<Option<String>, String> {
-    let mut statement = conn
-        .prepare("SELECT value FROM config WHERE key = ?1")
-        .map_err(|error| error.to_string())?;
-    let value = statement.query_row(params![key], |row| row.get(0));
-    match value {
-        Ok(value) => Ok(Some(value)),
-        Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
-        Err(error) => Err(error.to_string()),
-    }
-}
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-fn set_config(conn: &Connection, key: &str, value: &str) -> Result<(), String> {
-    conn.execute(
-        "INSERT INTO config (key, value) VALUES (?1, ?2)
-         ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-        params![key, value],
-    )
-    .map_err(|error| error.to_string())?;
-    Ok(())
+    #[test]
+    fn live_foreign_owner_cannot_replace_lock() -> Result<(), String> {
+        let mut conn = Connection::open_in_memory().map_err(|error| error.to_string())?;
+        conn.execute(
+            "CREATE TABLE config (key TEXT PRIMARY KEY, value TEXT NOT NULL)",
+            [],
+        )
+        .map_err(|error| error.to_string())?;
+        claim_as(&mut conn, "first", "unix:1000.0")?;
+        assert!(claim_as(&mut conn, "second", "unix:1001.0").is_err());
+        let owner: String = conn
+            .query_row(
+                "SELECT value FROM config WHERE key = ?1",
+                [OWNER_KEY],
+                |row| row.get(0),
+            )
+            .map_err(|error| error.to_string())?;
+        assert_eq!(owner, "first");
+        Ok(())
+    }
 }
