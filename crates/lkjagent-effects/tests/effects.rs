@@ -1,5 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
+use std::process::Command;
+use std::time::{Duration, Instant};
 
 use lkjagent_core::model::CheckSpec;
 use lkjagent_effects::checks::run_check;
@@ -51,6 +53,48 @@ fn workspace_shell_observation_and_exchange_work() -> TestResult<()> {
         },
     )?;
     assert_eq!(fs::read_to_string(paths.request)?, "{}");
+    Ok(())
+}
+
+#[test]
+fn shell_bounds_only_its_background_and_detached_descendants() -> TestResult<()> {
+    let root = fixture_root("shell-background")?;
+    let mut unrelated = Command::new("sleep").arg("5").spawn()?;
+    fs::write(
+        root.join("chain.sh"),
+        "#!/bin/sh\nif [ \"$1\" -eq 0 ]; then echo $$ > detached.pid; sleep 5; else sh \"$0\" $(( $1 - 1 )) & wait; fi\n",
+    )?;
+    let detached = "setsid sh chain.sh 12 & while [ ! -s detached.pid ]; do :; done";
+    for command in ["sleep 5 &", detached] {
+        let started = Instant::now();
+        let report = shell::run(&root, command, 1)?;
+        assert!(started.elapsed() < Duration::from_secs(3));
+        assert!(report.timed_out);
+        assert!(!report.success());
+    }
+    let pid = fs::read_to_string(root.join("detached.pid"))?;
+    let status = fs::read_to_string(PathBuf::from(format!("/proc/{}/status", pid.trim())))
+        .unwrap_or_default();
+    assert!(status.is_empty() || status.contains("State:\tZ"));
+    let escaped = "env -u LKJAGENT_SHELL_SCOPE setsid sh -c 'echo $$ > escaped.pid; sleep 5' & while [ ! -s escaped.pid ]; do :; done";
+    let started = Instant::now();
+    let report = shell::run(&root, escaped, 1)?;
+    assert!(started.elapsed() < Duration::from_secs(2));
+    assert!(report.timed_out);
+    let escaped_pid = fs::read_to_string(root.join("escaped.pid"))?;
+    assert!(Command::new("kill")
+        .arg("-KILL")
+        .arg(escaped_pid.trim())
+        .status()?
+        .success());
+    let started = Instant::now();
+    let hot = shell::run(&root, "while :; do printf 0123456789; done", 1)?;
+    assert!(started.elapsed() < Duration::from_secs(2));
+    assert!(hot.timed_out);
+    assert!(hot.output.len() <= shell::SHELL_OUTPUT_BYTES);
+    assert!(unrelated.try_wait()?.is_none());
+    unrelated.kill()?;
+    unrelated.wait()?;
     Ok(())
 }
 

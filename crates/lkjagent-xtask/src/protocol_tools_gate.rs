@@ -3,27 +3,12 @@ use std::process::Command;
 
 use crate::node_suites::{check as check_suites, Suite};
 
+#[rustfmt::skip]
 const SUITES: &[Suite] = &[
-    Suite {
-        package: "lkjagent-core",
-        target: "parse_contract",
-        minimum_tests: 6,
-    },
-    Suite {
-        package: "lkjagent-core",
-        target: "direct_action_grammar",
-        minimum_tests: 4,
-    },
-    Suite {
-        package: "lkjagent-core",
-        target: "parse_diagnosis",
-        minimum_tests: 2,
-    },
-    Suite {
-        package: "lkjagent-core",
-        target: "default_tool_view",
-        minimum_tests: 1,
-    },
+    Suite { package: "lkjagent-core", target: "parse_contract", minimum_tests: 6 },
+    Suite { package: "lkjagent-core", target: "direct_action_grammar", minimum_tests: 4 },
+    Suite { package: "lkjagent-core", target: "parse_diagnosis", minimum_tests: 2 },
+    Suite { package: "lkjagent-core", target: "default_tool_view", minimum_tests: 1 },
     Suite {
         package: "lkjagent-core",
         target: "tool_call",
@@ -89,9 +74,14 @@ const SUITES: &[Suite] = &[
         target: "effect_recovery",
         minimum_tests: 1,
     },
+    Suite { package: "lkjagent-app", target: "shell_check_journal", minimum_tests: 2 },
+    Suite { package: "lkjagent-effects", target: "effects", minimum_tests: 5 },
 ];
 
+#[rustfmt::skip]
 const REQUIRED: &[(&str, &str, &str)] = &[
+    ("lkjagent-core", "generic_flow", "duplicate_command_checks_use_ordinal_outcomes"),
+    ("lkjagent-effects", "effects", "shell_bounds_only_its_background_and_detached_descendants"),
     (
         "lkjagent-core",
         "generic_flow",
@@ -141,6 +131,16 @@ const REQUIRED: &[(&str, &str, &str)] = &[
         "lkjagent-app",
         "effect_recovery",
         "startup_recovers_applying_write_when_target_matches_intended_bytes",
+    ),
+    (
+        "lkjagent-app",
+        "shell_check_journal",
+        "shell_checks_have_prepared_journals_and_bounded_observations",
+    ),
+    (
+        "lkjagent-app",
+        "shell_check_journal",
+        "invalid_shell_check_records_failed_fact_and_journal",
     ),
 ];
 

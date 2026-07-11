@@ -66,7 +66,7 @@ fn sensitive_observation_body_is_redacted() -> TestResult<()> {
         |row| Ok((row.get(0)?, row.get(1)?)),
     )?;
     assert_eq!(row.0, "SensitiveOwnerData");
-    assert!(row.1.contains("token=[redacted]"));
+    assert!(row.1.contains("[sensitive owner data redacted]"));
     assert!(!row.1.contains("abc123"));
     Ok(())
 }

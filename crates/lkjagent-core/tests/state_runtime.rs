@@ -87,7 +87,11 @@ fn observation_contamination_classifies_sensitive_and_external_raw() {
     );
     assert_eq!(
         redact_sensitive_owner_data("token=abc password=secret ok"),
-        "token=[redacted] password=[redacted] ok"
+        "[sensitive owner data redacted]"
+    );
+    assert_eq!(
+        redact_sensitive_owner_data("value=\"token=secret\" ok"),
+        "[sensitive owner data redacted]"
     );
 }
 

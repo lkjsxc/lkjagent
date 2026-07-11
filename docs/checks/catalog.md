@@ -22,7 +22,15 @@ The check count is `checks.catalog.count=11`.
 | `command` | `cmd` | command exits success before timeout |
 | `judged` | `criterion`, `path` | verify verdict is pass |
 
-`checks.command.timeout-seconds=30` bounds command checks.
+`checks.command.timeout-seconds=30` bounds command checks. Each command check has
+a harness admission and prepared effect journal before execution, then one bounded
+observation. Each shell tree carries a unique Linux process scope. Background and
+session-detached descendants in that scope are frozen and killed through PID file
+descriptors. Pipe capture is nonblocking, and a 500 ms userspace cleanup deadline
+is checked during process discovery and pipe draining, so a descendant that
+discards the scope cannot hold the check open. Command checks
+are trusted catalog entries; containment is not claimed after deliberate scope
+removal. Repeated command text consumes outcomes by declaration ordinal.
 `checks.judged.max-tokens=300` bounds judged verify output.
 
 ## Placement

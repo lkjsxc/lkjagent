@@ -10,3 +10,4 @@ workspace = true
 
 [dependencies]
 lkjagent-core = { path = "../lkjagent-core" }
+rustix = { version = "0.38.44", features = ["fs", "process"] }

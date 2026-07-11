@@ -89,14 +89,13 @@ now use direct fields inside one input block and reject name/value wrappers.
 The parser bounds scalars and fields at 4,096 bytes and actions at 16,384 bytes.
 Persisted views discard catalog-excluded entries, and admission rejects them.
 Decision-free generic Explore parsing and work selection now block rather than
-synthesizing a catalog-wide action view. Model actions and harness writes
-atomically persist admissions and effect journals before dispatch; one immutable
-observation settles each attempt. Native main files validate prior fingerprints
-before dispatch and intended fingerprints before commit; generated parts remain
-outside this reconciliation. Startup settles prepared
-rows without replay and compares applying native file targets. Matching intended
-bytes recover. Prior, conflicts, and non-file effects fail. Multi-file recovery,
-shell-check journaling, and atomic settlement across context, state, checks,
+synthesizing a catalog-wide action view. Model actions, harness writes, and shell
+command checks persist admissions and effect journals before dispatch; one bounded
+immutable observation settles each attempt. Native main files validate prior and
+intended fingerprints; generated parts remain outside this reconciliation.
+Startup settles prepared rows without replay and compares applying native file
+targets. Matching intended bytes recover; prior, conflicts, and non-file effects
+fail. Multi-file recovery and atomic settlement across context, state, checks,
 snapshots, and decisions remain open.
 
 Workspace behavior is split across record commands, template writes, direct

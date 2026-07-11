@@ -680,6 +680,7 @@ name = "lkjagent-effects"
 version = "0.0.0"
 dependencies = [
  "lkjagent-core",
+ "rustix",
 ]
 
 [[package]]

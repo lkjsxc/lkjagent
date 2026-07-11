@@ -14,13 +14,15 @@ pub(crate) fn handle_checks(
     let Some(index) = snapshot.steps.iter().position(|step| step.id == step_id) else {
         return;
     };
+    let mut command_index = 0;
     let results = snapshot.steps[index]
         .checks
         .iter()
         .map(|spec| {
-            let mut result = evaluate(spec, files, command_facts);
+            let facts = facts_for_spec(spec, command_facts, &mut command_index);
+            let mut result = evaluate(spec, files, facts);
             result.params = Some(spec.clone());
-            result.evidence_fingerprint = evidence_fingerprint(spec, files, command_facts, &result);
+            result.evidence_fingerprint = evidence_fingerprint(spec, files, facts, &result);
             result
         })
         .collect::<Vec<_>>();
@@ -42,6 +44,19 @@ pub(crate) fn handle_checks(
     } else {
         handle_failed(snapshot, commands, index, files, &results);
     }
+}
+
+fn facts_for_spec<'a>(
+    spec: &crate::model::CheckSpec,
+    facts: &'a [CommandFact],
+    index: &mut usize,
+) -> &'a [CommandFact] {
+    if !matches!(spec, crate::model::CheckSpec::Command { .. }) {
+        return facts;
+    }
+    let selected = facts.get(*index);
+    *index += 1;
+    selected.map_or(&[], std::slice::from_ref)
 }
 
 fn evidence_fingerprint(

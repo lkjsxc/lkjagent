@@ -102,20 +102,11 @@ pub fn select_normal_context(items: &[ContextItem]) -> Vec<ContextItem> {
 }
 
 pub fn redact_sensitive_owner_data(body: &str) -> String {
-    body.split_whitespace()
-        .map(redact_token)
-        .collect::<Vec<_>>()
-        .join(" ")
-}
-
-fn redact_token(token: &str) -> String {
-    let lower = token.to_ascii_lowercase();
-    for pattern in ["password=", "secret=", "token=", "api_key=", "apikey="] {
-        if lower.starts_with(pattern) {
-            return format!("{pattern}[redacted]");
-        }
+    if has_sensitive_owner_data(body) {
+        "[sensitive owner data redacted]".to_string()
+    } else {
+        body.to_string()
     }
-    token.to_string()
 }
 
 pub fn contamination_for_observation(
@@ -138,9 +129,28 @@ pub fn contamination_for_observation(
 
 fn has_sensitive_owner_data(body: &str) -> bool {
     let lower = body.to_ascii_lowercase();
-    ["password=", "secret=", "token=", "api_key=", "apikey="]
-        .iter()
-        .any(|pattern| lower.contains(pattern))
+    [
+        "password=",
+        "password:",
+        "secret=",
+        "secret:",
+        "token=",
+        "token:",
+        "api_key=",
+        "api_key:",
+        "apikey=",
+        "apikey:",
+        "\"password\"",
+        "\"secret\"",
+        "\"token\"",
+        "\"api_key\"",
+        "\"apikey\"",
+        "\"authorization\"",
+        "authorization: bearer",
+        "authorization=bearer",
+    ]
+    .iter()
+    .any(|pattern| lower.contains(pattern))
 }
 
 pub fn detect_contradictions(items: &[ContextItem]) -> Vec<ContextConflict> {

@@ -1,3 +1,4 @@
+use lkjagent_core::checks::CommandFact;
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::engine::{
     apply_turn, next_work, next_work_with_decision, Command, TurnOutcome, Work,
@@ -41,6 +42,20 @@ fn planned_write_steps_keep_word_checks() {
         step.checks.as_slice(),
         [CheckSpec::MinWords { path, n }] if path == "notes/out.md" && *n == 25
     )));
+}
+
+#[test]
+#[rustfmt::skip]
+fn duplicate_command_checks_use_ordinal_outcomes() -> Result<(), String> {
+    let mut snapshot = instantiate(6, "observe duplicate command checks");
+    let step = snapshot.steps.first_mut().ok_or_else(|| "missing step".to_string())?;
+    step.checks = vec![CheckSpec::Command { cmd: "stateful".to_string() }, CheckSpec::Command { cmd: "stateful".to_string() }];
+    let step_id = step.id;
+    let facts = vec![CommandFact { cmd: "stateful".to_string(), success: false }, CommandFact { cmd: "stateful".to_string(), success: true }];
+    let (_, commands) = apply_turn(&snapshot, &Work::RunChecks { step_id }, TurnOutcome::Checks(Vec::new(), facts));
+    let results = commands.iter().find_map(|command| match command { Command::RecordChecks { results, .. } => Some(results), _ => None }).ok_or_else(|| "missing check results".to_string())?;
+    assert_eq!(results.iter().map(|result| result.passed).collect::<Vec<_>>(), [false, true]);
+    Ok(())
 }
 
 #[test]

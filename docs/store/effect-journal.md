@@ -7,8 +7,9 @@ Define admission, execution, settlement, and crash recovery for every effect.
 ## Admission
 
 Every external or workspace effect has exactly one accepted model or harness
-admission. Admissions are unique by decision and action ordinal. A rejected
-admission records a typed reason and creates no effect row.
+admission. This includes harness-run shell command checks, which prepare before
+`/bin/sh` starts. Admissions are unique by decision and action ordinal. A
+rejected admission records a typed reason and creates no effect row.
 
 ## Journal States
 
@@ -33,5 +34,6 @@ observation, state event and patch, checks, outbox message, and settlement.
 
 Startup reads prepared or applying effects and compares actual external state
 with intended and prior fingerprints. An unresolved applying row is recovery
-work, never permission to replay blindly. It commits recovery, compensation, or
-a typed failure without repeating a settled semantic effect.
+work, never permission to replay blindly. Applying non-file effects, including
+shell checks, fail rather than execute again. Recovery commits a terminal
+observation without repeating a settled semantic effect.

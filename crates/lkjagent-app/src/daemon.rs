@@ -23,7 +23,6 @@ use crate::snapshot_state::persist_snapshot_cell;
 use crate::turn_effects::{gather_checks, tag_check_evidence};
 
 pub use crate::model_io::{CompletionRecord, Endpoint, ScriptedEndpoint};
-
 pub fn run_daemon(data_dir: &Path) -> Result<(), String> {
     let mut endpoint = LlmEndpoint::new(data_dir);
     loop {
@@ -90,6 +89,7 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     Ok(snapshot)
 }
 
+#[rustfmt::skip]
 fn run_turn<E: Endpoint, C: Clock>(
     conn: &mut Connection,
     workspace: &Path,
@@ -163,7 +163,7 @@ fn run_turn<E: Endpoint, C: Clock>(
             settle_runtime_decision(conn, &decision, "settled", &now)?;
             return Ok(next);
         }
-        Work::RunChecks { step_id } => gather_checks(workspace, &snapshot, *step_id)?,
+        Work::RunChecks { step_id } => gather_checks(conn, workspace, &snapshot, *step_id, &decision, &clock.now())?,
         Work::CloseTask
         | Work::ResolveState
         | Work::RunNativeEffect(_)
