@@ -149,7 +149,9 @@ fn strategy_text(strategy: RecoveryStrategy) -> Result<String, String> {
 
 #[rustfmt::skip]
 fn recovery_budget(current: Option<u32>, strategy: Option<RecoveryStrategy>) -> Option<u32> {
-    if matches!(strategy, Some(RecoveryStrategy::ReduceUnit | RecoveryStrategy::NarrowOutput | RecoveryStrategy::SmallerPrompt))
+    if matches!(strategy, Some(RecoveryStrategy::ReduceUnit | RecoveryStrategy::NarrowOutput |
+        RecoveryStrategy::ContinueBoundary | RecoveryStrategy::SplitSection |
+        RecoveryStrategy::AlternateSampling | RecoveryStrategy::SmallerPrompt))
         { current.map(|value| (value / 2).max(128)) } else { current }
 }
 

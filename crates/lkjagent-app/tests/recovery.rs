@@ -33,10 +33,8 @@ fn unfinished_decision_with_exchange_blocks_without_provider_replay() -> TestRes
         outputs: vec!["<message>done</message>".to_string()],
         index: 0,
     };
-    let error = run_until_idle(&data, &mut endpoint, 1)
-        .err()
-        .ok_or("unfinished decision unexpectedly replayed")?;
-    assert!(error.contains("automatic replay blocked"));
+    let blocked = run_until_idle(&data, &mut endpoint, 1)?;
+    assert_eq!(blocked.task.state, lkjagent_core::model::TaskState::Blocked);
     assert_eq!(endpoint.index, 0);
 
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
@@ -53,9 +51,9 @@ fn unfinished_decision_with_exchange_blocks_without_provider_replay() -> TestRes
     let total: i64 = conn.query_row("SELECT COUNT(*) FROM runtime_decisions", [], |row| {
         row.get(0)
     })?;
-    assert_eq!(old_status, "pending");
-    assert_eq!(pending, 2);
-    assert_eq!(total, 2);
+    assert_eq!(old_status, "interrupted");
+    assert_eq!(pending, 0);
+    assert_eq!(total, 3);
     Ok(())
 }
 

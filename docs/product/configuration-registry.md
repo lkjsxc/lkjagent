@@ -28,6 +28,10 @@ Type is `string`, `integer`, or `boolean`. Bounds are inclusive. Reload is
 | endpoint_backoff_milliseconds | integer | 50..60000; 500 | hot | provider |
 | queue_wake_milliseconds | integer | 50..60000; 500 | hot | daemon |
 | no_progress_window | integer | 1..10; 3 | hot | selector |
+| case_token_budget | integer | 1024..1000000000; 10000000 | hot | runtime |
+| case_active_milliseconds | integer | 1000..31536000000; 604800000 | hot | runtime |
+| case_effect_budget | integer | 1..1000000; 10000 | hot | runtime |
+| case_recovery_budget | integer | 1..100000; 100 | hot | runtime |
 | live_campaign_seconds | integer | 840..7200; 900 | restart | evaluation |
 
 ## Prompt And Context

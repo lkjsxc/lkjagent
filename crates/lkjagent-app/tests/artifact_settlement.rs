@@ -72,10 +72,8 @@ fn late_decision_failure_rolls_back_turn_settlement() -> TestResult<()> {
     conn.execute_batch("DROP TRIGGER fail_turn_settlement")?;
     drop(conn);
     let calls = endpoint.index;
-    let restart = run_until_idle(&data, &mut endpoint, 1)
-        .err()
-        .ok_or("interrupted effect unexpectedly replayed")?;
-    assert!(restart.contains("automatic replay blocked"));
+    let restart = run_until_idle(&data, &mut endpoint, 1)?;
+    assert_eq!(restart.task.state, lkjagent_core::model::TaskState::Blocked);
     assert_eq!(endpoint.index, calls);
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     let recovered: String =

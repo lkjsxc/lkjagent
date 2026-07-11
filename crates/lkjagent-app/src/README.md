@@ -44,8 +44,10 @@ Map lkjagent-app source modules.
 - [workspace-search.rs](workspace_search.rs): visible Markdown inventory, rebuild, and bounded retrieval.
 - [workspace-scaffold.rs](workspace_scaffold.rs): README and directory scaffold writes.
 - [workspace-scan.rs](workspace_scan.rs): durable inventory debounce scheduling.
+- [progress-bridge.rs](progress_bridge.rs): durable progress vectors and no-progress adaptation.
 - [recovery-bridge.rs](recovery_bridge.rs): unfinished decision reuse and
   recovery settlement.
+- [runtime-budget.rs](runtime_budget.rs): separate durable case budget measurement and blocking.
 - [runtime-bridge.rs](runtime_bridge.rs): decision preparation and effect failure settlement.
 - [runtime-cell.rs](runtime_cell.rs): operation cell projection payloads.
 - [runtime-projection.rs](runtime_projection.rs): plan bridge projection events.

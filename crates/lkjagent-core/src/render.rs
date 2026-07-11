@@ -5,6 +5,7 @@ use crate::model::{Attempt, Step, Task};
 pub use crate::prompt_policy::max_tokens;
 use crate::prompt_policy::{envelope_tag, expected_block, protocol, protocol_for_envelope};
 use crate::runtime_decision::{OutputEnvelope, RuntimeDecision};
+use crate::runtime_strategy::{instruction, prompt_cap};
 use crate::runtime_tool_cards::{protocol_card, render_tool_view};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -20,12 +21,9 @@ const HARD_CAP: usize = 8_000;
 const STEP_FRAME: usize = 4_000;
 const RETRY_FRAME: usize = 250;
 
-pub fn render_prompt_for_decision(
-    task: &Task,
-    steps: &[Step],
-    step: &Step,
-    decision: &RuntimeDecision,
-) -> Prompt {
+#[rustfmt::skip]
+pub fn render_prompt_for_decision(task: &Task, steps: &[Step], step: &Step,
+    decision: &RuntimeDecision) -> Prompt {
     render_prompt_for_decision_with_attempts(task, steps, &[], step, decision)
 }
 
@@ -65,6 +63,9 @@ pub fn render_prompt_for_decision_with_attempts(
             HARD_CAP,
         );
     }
+    if let Some(change) = instruction(&decision.recovery_policy) {
+        prompt.user = format!("{}\n\nStrategy change: {change}", prompt.user);
+    }
     prompt.user = truncate(
         &format!("{}\n\n{}", prompt.user, protocol_card(decision)),
         HARD_CAP,
@@ -72,6 +73,7 @@ pub fn render_prompt_for_decision_with_attempts(
     if let Some(frame) = recovery_frame(decision, attempts, step.id) {
         prompt.user = truncate(&format!("{}\n\n{frame}", prompt.user), HARD_CAP);
     }
+    prompt.user = truncate(&prompt.user, prompt_cap(&decision.recovery_policy));
     prompt.fingerprint = fingerprint(&prompt.system, &prompt.user);
     prompt
 }

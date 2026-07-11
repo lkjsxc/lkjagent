@@ -22,7 +22,15 @@ Output limits shrink or split semantic units. Parse failures repair the exact
 grammar before narrowing the shape. Admission failures remove hidden actions or
 correct typed fields. Effect failures inspect external state before replay or
 compensation. Check failures inspect measured results, repair source, and rerun
-the invalidated check.
+the invalidated check. Each selected strategy changes a rendered instruction,
+prompt bound, output budget, eligibility instant, or operation key.
+
+## Progress Windows
+
+Each settled decision records a canonical vector of obligations, passed checks,
+artifacts, clean source evidence, dependency edges, wake conditions, and strategy. A
+configured window of equal vectors emits a typed strategy change. A changed
+artifact, check, wake, evidence source, or strategy resets that window.
 
 ## Crash Recovery
 
@@ -30,9 +38,18 @@ One provider call belongs to one decision. Retryable endpoint faults persist a
 configured exponential eligibility instant; retry exhaustion persists an
 observable external wait rather than sleeping inside a provider call.
 
-Startup reconciles prepared effects first, then interrupted endpoint decisions,
-derived projection fingerprints, due wakes, and pending owner turns. A settled
-effect is never repeated and an uncommitted model response is never reused.
+Startup reconciles prepared effects before endpoint decisions, projections, and due wakes.
+A dispatching provider-exchange intent commits before network I/O. If startup
+finds that sent-request boundary unfinished, it suppresses the source operation,
+marks the decision interrupted, and emits a durable owner-visible blocker. It
+never repeats the call or reuses an uncommitted response.
+
+## Case Budgets
+
+Token usage, active decision milliseconds, effect observations, and recovery
+cost have independent configured limits. Durable rows compute consumption. An
+exhausted dimension suppresses runnable work and records its used and limit
+values in `completion.blocked`; it does not masquerade as successful completion.
 
 ## Completion
 

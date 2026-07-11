@@ -1,4 +1,73 @@
+use serde::{Deserialize, Serialize};
+
+use crate::runtime_fingerprint::{stable_fingerprint, FingerprintError};
 use crate::runtime_state::{RuntimeSnapshot, StateCell};
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct RuntimeBudget {
+    pub tokens: u64,
+    pub active_milliseconds: u64,
+    pub effects: u64,
+    pub recovery_cost: u64,
+}
+
+impl RuntimeBudget {
+    pub fn reached(&self, limits: &Self) -> Vec<&'static str> {
+        [
+            ("tokens", self.tokens >= limits.tokens),
+            (
+                "active-milliseconds",
+                self.active_milliseconds >= limits.active_milliseconds,
+            ),
+            ("effects", self.effects >= limits.effects),
+            ("recovery-cost", self.recovery_cost >= limits.recovery_cost),
+        ]
+        .into_iter()
+        .filter_map(|(name, reached)| reached.then_some(name))
+        .collect()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ProgressVector {
+    pub obligations: Vec<String>,
+    pub passed_checks: Vec<String>,
+    pub artifacts: Vec<String>,
+    pub source_evidence: Vec<String>,
+    pub wake_conditions: Vec<String>,
+    pub recovery_strategy: String,
+}
+
+pub fn no_progress_strategy(prior: usize) -> Option<&'static str> {
+    [
+        "inspect-state",
+        "split-work",
+        "replan",
+        "clarify",
+        "suspend",
+    ]
+    .get(prior)
+    .copied()
+}
+
+impl ProgressVector {
+    pub fn canonicalize(&mut self) {
+        for values in [
+            &mut self.obligations,
+            &mut self.passed_checks,
+            &mut self.artifacts,
+            &mut self.source_evidence,
+            &mut self.wake_conditions,
+        ] {
+            values.sort();
+            values.dedup();
+        }
+    }
+
+    pub fn fingerprint(&self) -> Result<String, FingerprintError> {
+        stable_fingerprint(self)
+    }
+}
 
 pub fn cell_is_due(cell: &StateCell, now: Option<&str>) -> bool {
     match (cell.cooldown_until.as_deref(), now) {

@@ -39,11 +39,26 @@ pub fn prepare_runtime_decision(
     insert_case(conn, &case_id, &snapshot.task.objective, now)
         .map_err(|error| error.to_string())?;
     let unfinished = unfinished_decisions(conn, &case_id).map_err(|error| error.to_string())?;
-    if let Some(decision) = recover_or_reuse(conn, &unfinished, now)? {
-        return Ok(Some(decision));
-    }
+    let (interrupted, budget_blocked) = match recover_or_reuse(conn, &unfinished, now) {
+        Ok(Some(decision)) => {
+            if !crate::runtime_budget::enforce(conn, &case_id, now, &unfinished)? {
+                return Ok(Some(decision));
+            }
+            (false, true)
+        }
+        Ok(None) => (
+            false,
+            crate::runtime_budget::enforce(conn, &case_id, now, &[])?,
+        ),
+        Err(reason) => {
+            crate::exchange_bridge::block_interrupted_decisions(conn, &unfinished, &reason, now)?;
+            (true, false)
+        }
+    };
     let mut state_snapshot = hydrate_snapshot(conn, &case_id).map_err(|error| error.to_string())?;
-    ensure_runtime_cell(conn, snapshot, &state_snapshot, now)?;
+    if !interrupted && !budget_blocked {
+        ensure_runtime_cell(conn, snapshot, &state_snapshot, now)?;
+    }
     state_snapshot = hydrate_snapshot(conn, &case_id).map_err(|error| error.to_string())?;
     let id = next_decision_id(conn, &case_id).map_err(|error| error.to_string())?;
     let decision =
@@ -168,6 +183,7 @@ pub fn settle_failed_dispatch(conn: &Connection, turn: &TurnSettlement<'_>,
 #[rustfmt::skip]
 pub fn settle_runtime_decision(conn: &Connection, decision: &RuntimeDecision,
     status: &str, now: &str) -> Result<(), String> {
+    crate::progress_bridge::record(conn, decision, now)?;
     let changed = settle_decision(conn, &decision.id, status, now).map_err(|error| error.to_string())?;
     if changed != 1 { return Err(format!("decision settlement updated {changed} rows")); }
     let actual: String = conn.query_row("SELECT status FROM runtime_decisions WHERE id = ?1",

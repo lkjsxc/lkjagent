@@ -20,6 +20,16 @@ const RULES: &[(&str, Rule)] = &[
     ("endpoint_backoff_milliseconds", integer(50, 60000, 500)),
     ("queue_wake_milliseconds", integer(50, 60000, 500)),
     ("no_progress_window", integer(1, 10, 3)),
+    (
+        "case_token_budget",
+        integer(1024, 1_000_000_000, 10_000_000),
+    ),
+    (
+        "case_active_milliseconds",
+        integer(1000, 31_536_000_000, 604_800_000),
+    ),
+    ("case_effect_budget", integer(1, 1_000_000, 10_000)),
+    ("case_recovery_budget", integer(1, 100_000, 100)),
     ("live_campaign_seconds", integer(840, 7200, 900)),
     ("prompt_context_tokens", integer(2048, 262144, 16384)),
     ("prompt_output_reserve_tokens", integer(256, 32768, 2048)),

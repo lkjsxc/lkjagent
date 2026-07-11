@@ -44,7 +44,7 @@ fn tracked_example_matches_the_registry() -> TestResult<()> {
     let example: serde_json::Value =
         serde_json::from_str(&fs::read_to_string(root.join("data/lkjagent.json"))?)?;
     let object = example.as_object().ok_or("example root is not an object")?;
-    assert_eq!(object.len(), 34);
+    assert_eq!(object.len(), 38);
     assert!(object.values().all(is_scalar));
     config::load_client(&root.join("data"))?;
     Ok(())

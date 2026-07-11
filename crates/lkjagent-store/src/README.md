@@ -10,10 +10,9 @@ Map lkjagent-store source modules.
 - [admission-rows.rs](admission_rows.rs): tool admission row helpers.
 - [artifact-rows.rs](artifact_rows.rs): artifact ref and fingerprint rows.
 - [context-rows.rs](context_rows.rs): context item row helpers.
-- [decision-rows.rs](decision_rows.rs): runtime decision row helpers.
+- [decision-rows.rs](decision_rows.rs): runtime decision and provider exchange rows.
 - [event-rows.rs](event_rows.rs): runtime event append and reducer apply helpers.
 - [effect-recovery.rs](effect_recovery.rs): unresolved effect reconciliation.
-- [exchange-rows.rs](exchange_rows.rs): provider exchange row helpers.
 - [memory.rs](memory.rs): duplicate-suppressed memory writes and search.
 - [observation-rows.rs](observation_rows.rs): bounded observation rows.
 - [plan-schema.rs](plan_schema.rs): plan and state-ledger schema setup.

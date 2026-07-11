@@ -5,7 +5,9 @@ pub mod decision_rows;
 pub mod effect_recovery;
 pub mod error;
 pub mod event_rows;
-pub mod exchange_rows;
+pub mod exchange_rows {
+    pub use crate::decision_rows::{insert_provider_exchange, ProviderExchangeRow};
+}
 pub mod memory;
 pub mod observation_rows;
 pub mod plan_access;

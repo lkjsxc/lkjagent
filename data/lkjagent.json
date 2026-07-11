@@ -1,6 +1,10 @@
 {
   "activity_retention_days": 3650,
   "archive_after_days": 3650,
+  "case_active_milliseconds": 604800000,
+  "case_effect_budget": 10000,
+  "case_recovery_budget": 100,
+  "case_token_budget": 10000000,
   "context_evidence_tokens": 8192,
   "context_history_tokens": 2048,
   "context_objective_tokens": 512,

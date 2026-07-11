@@ -1,8 +1,66 @@
 use lkjagent_core::runtime_candidate::selected_candidate_at;
+use lkjagent_core::runtime_eligibility::{no_progress_strategy, ProgressVector, RuntimeBudget};
 use lkjagent_core::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
 use lkjagent_core::runtime_state_edge::{StateEdge, StateEdgeRelation, StateRef};
 
 type TestResult = Result<(), String>;
+
+#[test]
+fn case_budgets_are_independent_dimensions() {
+    let limits = RuntimeBudget {
+        tokens: 10,
+        active_milliseconds: 20,
+        effects: 3,
+        recovery_cost: 4,
+    };
+    let used = RuntimeBudget {
+        tokens: 10,
+        active_milliseconds: 19,
+        effects: 1,
+        recovery_cost: 4,
+    };
+    assert_eq!(used.reached(&limits), vec!["tokens", "recovery-cost"]);
+    let active = RuntimeBudget {
+        tokens: 0,
+        active_milliseconds: 20,
+        effects: 3,
+        recovery_cost: 0,
+    };
+    assert_eq!(
+        active.reached(&limits),
+        vec!["active-milliseconds", "effects"]
+    );
+}
+
+#[test]
+fn progress_vectors_bind_facts_and_strategy() -> TestResult {
+    let mut base = ProgressVector {
+        obligations: vec!["b".into(), "a".into()],
+        passed_checks: vec![],
+        artifacts: vec![],
+        source_evidence: vec![],
+        wake_conditions: vec![],
+        recovery_strategy: "default".into(),
+    };
+    base.canonicalize();
+    let fingerprint = base.fingerprint().map_err(|error| error.message)?;
+    let mut changed = base.clone();
+    changed.recovery_strategy = "inspect-state".into();
+    assert_ne!(
+        fingerprint,
+        changed.fingerprint().map_err(|error| error.message)?
+    );
+    changed = base.clone();
+    changed.artifacts.push("artifact:next".into());
+    assert_ne!(
+        fingerprint,
+        changed.fingerprint().map_err(|error| error.message)?
+    );
+    assert_eq!(no_progress_strategy(0), Some("inspect-state"));
+    assert_eq!(no_progress_strategy(4), Some("suspend"));
+    assert_eq!(no_progress_strategy(5), None);
+    Ok(())
+}
 
 #[test]
 fn future_cell_waits_without_consuming_it_and_due_cell_runs() -> TestResult {

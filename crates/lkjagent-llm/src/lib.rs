@@ -2,7 +2,9 @@ pub mod backoff {
     pub use crate::client::{delay_for_attempt, delays, BACKOFF_CAP};
 }
 pub mod client;
-pub mod closure;
+pub mod closure {
+    pub use crate::message::{restore_stop_suffix, ClosureMode};
+}
 pub mod error;
 pub mod message;
 pub mod wire;

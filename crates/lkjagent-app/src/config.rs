@@ -38,7 +38,9 @@ pub(crate) fn workspace_root(data_dir: &Path) -> Result<PathBuf, String> {
 
 #[rustfmt::skip]
 pub(crate) struct RuntimeTiming {
-    pub endpoint_retry_limit: u64, pub endpoint_backoff_milliseconds: u64, pub queue_wake_milliseconds: u64,
+    pub endpoint_retry_limit: u64, pub endpoint_backoff_milliseconds: u64,
+    pub queue_wake_milliseconds: u64, pub no_progress_window: u64,
+    pub case_budgets: [u64; 4],
 }
 
 #[rustfmt::skip]
@@ -46,14 +48,22 @@ pub(crate) fn runtime_timing(data_dir: &Path) -> Result<RuntimeTiming, String> {
     let values = load_flat_config(data_dir)?;
     Ok(RuntimeTiming { endpoint_retry_limit: number(&values, "endpoint_retry_limit"),
         endpoint_backoff_milliseconds: number(&values, "endpoint_backoff_milliseconds"),
-        queue_wake_milliseconds: number(&values, "queue_wake_milliseconds") })
+        queue_wake_milliseconds: number(&values, "queue_wake_milliseconds"),
+        no_progress_window: number(&values, "no_progress_window"), case_budgets: [
+            number(&values, "case_token_budget"), number(&values, "case_active_milliseconds"),
+            number(&values, "case_effect_budget"), number(&values, "case_recovery_budget")] })
 }
 
 #[rustfmt::skip]
 pub(crate) fn persist_runtime_timing(conn: &Connection, data_dir: &Path) -> Result<RuntimeTiming, String> {
     let timing = runtime_timing(data_dir)?;
     for (key, value) in [("runtime.endpoint_retry_limit", timing.endpoint_retry_limit),
-        ("runtime.endpoint_backoff_milliseconds", timing.endpoint_backoff_milliseconds)] {
+        ("runtime.endpoint_backoff_milliseconds", timing.endpoint_backoff_milliseconds),
+        ("runtime.no_progress_window", timing.no_progress_window),
+        ("runtime.case_token_budget", timing.case_budgets[0]),
+        ("runtime.case_active_milliseconds", timing.case_budgets[1]),
+        ("runtime.case_effect_budget", timing.case_budgets[2]),
+        ("runtime.case_recovery_budget", timing.case_budgets[3])] {
         conn.execute("INSERT INTO config (key, value) VALUES (?1, ?2)
             ON CONFLICT(key) DO UPDATE SET value = excluded.value", (key, value.to_string()))
             .map_err(|error| error.to_string())?;
@@ -144,13 +154,11 @@ pub(crate) fn endpoint_state(data_dir: &Path) -> String {
     format!("url={url} model={model} credential={credential}")
 }
 
+#[rustfmt::skip]
 pub(crate) fn missing_dirs(data_dir: &Path) -> Vec<String> {
     let root = workspace_root(data_dir).unwrap_or_else(|_| data_dir.join("workspace"));
-    [".", "records", "artifacts", "indexes"]
-        .iter()
-        .filter(|rel| !root.join(rel).exists())
-        .map(|rel| format!("workspace/{rel}"))
-        .collect()
+    [".", "records", "artifacts", "indexes"].iter().filter(|rel| !root.join(rel).exists())
+        .map(|rel| format!("workspace/{rel}")).collect()
 }
 
 pub(crate) fn file_count(path: &Path) -> usize {
@@ -158,24 +166,18 @@ pub(crate) fn file_count(path: &Path) -> usize {
 }
 
 #[rustfmt::skip]
-pub(crate) fn join_or_none(values: &[String]) -> String {
-    if values.is_empty() { "none".to_string() } else { values.join(",") }
-}
+pub(crate) fn join_or_none(values: &[String]) -> String { if values.is_empty() { "none".to_string() } else { values.join(",") } }
 
+#[rustfmt::skip]
 pub(crate) fn join_counts(values: &[(String, i64)]) -> String {
-    values
-        .iter()
-        .map(|(name, count)| format!("{name}={count}"))
-        .collect::<Vec<_>>()
-        .join(",")
+    values.iter().map(|(name, count)| format!("{name}={count}"))
+        .collect::<Vec<_>>().join(",")
 }
 
+#[rustfmt::skip]
 pub(crate) fn join_bools(values: &[(&str, bool)]) -> String {
-    values
-        .iter()
-        .map(|(name, present)| format!("{name}={present}"))
-        .collect::<Vec<_>>()
-        .join(",")
+    values.iter().map(|(name, present)| format!("{name}={present}"))
+        .collect::<Vec<_>>().join(",")
 }
 
 fn source(env: &str, section: Option<&Map<String, Value>>, key: &str) -> &'static str {

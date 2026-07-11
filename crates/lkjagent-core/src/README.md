@@ -29,6 +29,7 @@ Map lkjagent-core source modules.
 - [runtime-artifact.rs](runtime_artifact.rs): checked artifact units,
   deterministic assembly, fingerprints, and word counts.
 - [runtime-recovery.rs](runtime_recovery.rs): typed fault classes and strategy ladders.
+- [runtime-strategy.rs](runtime_strategy.rs): strategy-specific prompt changes and bounds.
 - [runtime-context.rs](runtime_context.rs): context items, contamination, and
   contradiction detection.
 - [runtime-fingerprint.rs](runtime_fingerprint.rs): stable FNV-1a fingerprints

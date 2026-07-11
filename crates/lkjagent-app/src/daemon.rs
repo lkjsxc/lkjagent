@@ -11,7 +11,9 @@ use crate::context_bridge::{prepare_prompt_context, snapshot_with_prompt_context
 use crate::daemon_intake::{idle_snapshot, load_runtime_snapshot};
 use crate::effect_dispatch::{dispatch_effects, mark_effects};
 use crate::endpoint::LlmEndpoint;
-use crate::exchange_bridge::{persist_prompt_frame, persist_provider_exchange};
+use crate::exchange_bridge::{
+    persist_prompt_frame, persist_provider_exchange, persist_provider_exchange_intent,
+};
 use crate::model_call::{apply_record, call};
 #[rustfmt::skip]
 use crate::runtime_bridge::{prepare_runtime_decision, prepare_turn_admissions,
@@ -124,6 +126,7 @@ fn run_turn<E: Endpoint, C: Clock>(
     let outcome = match &work {
         Work::CallModel { step_id, prompt } => {
             persist_prompt_frame(conn, logs, &decision, prompt, &context, &selected_at)?;
+            persist_provider_exchange_intent(conn, &decision, prompt, endpoint.timeout_seconds(), &selected_at)?;
             let (outcome, record) = call(logs, &snapshot, *step_id, prompt, &decision, endpoint)?;
             let (mut next, mut commands) = apply_turn(&snapshot, &work, outcome);
             let now = clock.now();

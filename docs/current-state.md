@@ -79,8 +79,8 @@ the rebuild, not proof that the native authority loop is complete.
 Production still hydrates `TaskSnapshot`, task rows, step rows, fixed templates,
 and bridge projections. Context may be prepared before the final decision.
 Generic parsed messages can settle steps without objective effect evidence.
-Recovery facts bind causal no-repeat tuples and advance typed per-class strategies.
-Endpoint faults call once, obey retry/backoff, and persist waits; progress windows remain open.
+Recovery tuples and progress windows persist; strategies change prompt, budget, or operation.
+Provider intents block ambiguous replay; exact waits and four separate case budgets are durable.
 The live runner can replace the last real state with a synthetic closed snapshot. Default Explore
 decisions now render only read, search, memory find, and note tools, hiding shell
 and finish; completion remains an open authority gap. Action cards and the decision parser
