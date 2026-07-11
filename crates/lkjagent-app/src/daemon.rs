@@ -77,7 +77,7 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     }
     crate::workspace_scaffold::ensure_root(&workspace)?;
     recover_unsettled_effects(&mut conn, &workspace, &now).map_err(|error| error.to_string())?;
-    let _reconciled = crate::workspace_search::rebuild(&conn, &workspace)?;
+    let _reconciled = crate::workspace_search::reconcile_entry(&conn, &workspace, data_dir)?;
     let mut snapshot = match load_runtime_snapshot(&mut conn, data_dir, clock)? {
         Some(snapshot) if matches!(snapshot.task.state, TaskState::Open | TaskState::Waiting) => {
             snapshot

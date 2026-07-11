@@ -88,16 +88,8 @@ fn visible_external_files_reconcile_with_bounded_equivalent_results() -> TestRes
 fn managed_external_edit_and_move_update_record_projection() -> TestResult<()> {
     let data = fixture_root("managed")?;
     let data_arg = data.to_string_lossy();
-    let added = cli::run([
-        "--data",
-        data_arg.as_ref(),
-        "record",
-        "add",
-        "todo",
-        "Original",
-        "--body",
-        "old managed body",
-    ])?;
+    let added = cli::run(["--data", data_arg.as_ref(), "record", "add", "todo", "Original",
+        "--body", "old managed body"])?;
     let id = field(&added, "record: ")?;
     let old_path = field(&added, "path=")?;
     let workspace = data.join("workspace");
@@ -149,6 +141,20 @@ fn managed_external_edit_and_move_update_record_projection() -> TestResult<()> {
     assert_eq!(stale, 1); drop(conn); rebuild(&data)?;
     let todos = fs::read_to_string(workspace.join("indexes/open-todos.md"))?;
     assert!(!todos.contains("Externally Moved"));
+    let broken = workspace.join("knowledge/standalone-broken.md");
+    fs::create_dir_all(broken.parent().ok_or("broken parent missing")?)?;
+    fs::write(&broken, "---\r\nid: broken\r\n---\r\n\r\ninvalid")?; reconcile_startup(&data)?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let diagnostic: (String, String) = conn.query_row("SELECT status, payload_json FROM state_cells WHERE payload_schema = 'workspace.import-diagnostic' AND payload_json LIKE '%standalone-broken.md%'", [], |row| Ok((row.get(0)?, row.get(1)?)))?;
+    assert_eq!(diagnostic.0, "Active"); assert!(diagnostic.1.contains("standalone-broken.md"));
+    let history: i64 = conn.query_row("SELECT COUNT(*) FROM state_history WHERE key_label LIKE 'workspace:diagnostic/%'", [], |row| row.get(0))?; drop(conn);
+    reconcile_startup(&data)?; let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let unchanged: i64 = conn.query_row("SELECT COUNT(*) FROM state_history WHERE key_label LIKE 'workspace:diagnostic/%'", [], |row| row.get(0))?;
+    assert_eq!(unchanged, history); drop(conn);
+    fs::write(&broken, "# Repaired\n\nvalid markdown")?; reconcile_startup(&data)?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let status: String = conn.query_row("SELECT status FROM state_cells WHERE payload_schema = 'workspace.import-diagnostic' AND payload_json LIKE '%standalone-broken.md%'", [], |row| row.get(0))?;
+    assert_eq!(status, "Resolved");
     Ok(())
 }
 
@@ -166,7 +172,7 @@ fn search(data: &Path, query: &str, extra: &[&str]) -> Result<String, String> {
 
 #[rustfmt::skip]
 fn reconcile_startup(data: &Path) -> TestResult<()> {
-    let mut endpoint = ScriptedEndpoint { outputs: Vec::new(), index: 0 };
+    std::thread::sleep(std::time::Duration::from_millis(60)); let mut endpoint = ScriptedEndpoint { outputs: Vec::new(), index: 0 };
     run_until_idle(data, &mut endpoint, 0)?; Ok(())
 }
 
@@ -181,13 +187,12 @@ fn field(output: &str, marker: &str) -> Result<String, String> {
         .map(str::to_string).ok_or_else(|| format!("missing {marker} in {output}"))
 }
 
+#[rustfmt::skip]
 fn fixture_root(name: &str) -> TestResult<PathBuf> {
-    let path =
-        std::env::temp_dir().join(format!("lkjagent-inventory-{name}-{}", std::process::id()));
-    if path.exists() {
-        fs::remove_dir_all(&path)?;
-    }
-    fs::create_dir_all(&path)?;
+    let path = std::env::temp_dir().join(format!("lkjagent-inventory-{name}-{}", std::process::id()));
+    if path.exists() { fs::remove_dir_all(&path)?; }
+    fs::create_dir_all(&path)?; fs::write(path.join("lkjagent.json"),
+        r#"{"workspace_scan_debounce_milliseconds":50,"workspace_reconcile_seconds":30}"#)?;
     let conn = Connection::open(path.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
     Ok(path)

@@ -24,7 +24,7 @@ pub fn read_bytes(workspace: &Path, path: &str) -> Result<Vec<u8>, String> {
 
 #[rustfmt::skip]
 pub fn write_bytes(workspace: &Path, path: &str, bytes: &[u8]) -> Result<(), String> {
-    let (parent, name) = open_parent(workspace, path, true)?; match read_at(&parent, &name)? { Some(prior) => replace_existing(&parent, &name, &prior, bytes), None => create_new(&parent, &name, bytes) }
+    let (parent, name) = open_parent(workspace, path, true)?; match read_at(&parent, &name)? { Some(prior) if prior == bytes => Ok(()), Some(prior) => replace_existing(&parent, &name, &prior, bytes), None => create_new(&parent, &name, bytes) }
 }
 
 #[rustfmt::skip]

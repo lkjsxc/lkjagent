@@ -48,7 +48,7 @@ const SUITES: &[Suite] = &[
     },
     Suite { package: "lkjagent-app", target: "workspace_search", minimum_tests: 2 },
     Suite { package: "lkjagent-app", target: "workspace_inventory", minimum_tests: 2 },
-    Suite { package: "lkjagent-app", target: "workspace_search_freshness", minimum_tests: 2 },
+    Suite { package: "lkjagent-app", target: "workspace_search_freshness", minimum_tests: 3 },
     Suite {
         package: "lkjagent-app",
         target: "workspace_index_predicates",
@@ -74,6 +74,7 @@ const REQUIRED: &[(&str, &str)] = &[
     ("workspace_inventory", "managed_external_edit_and_move_update_record_projection"),
     ("workspace_search_freshness", "stale_first_page_does_not_hide_current_lower_ranked_hit"),
     ("workspace_search_freshness", "case_insensitive_match_is_centered_in_excerpt"),
+    ("workspace_search_freshness", "unchanged_inventory_is_debounced_until_manifest_changes"),
     ("workspace_rebalance_retry", "missing_intended_revision_blocks_without_moving_source"),
     ("workspace_rebalance_retry", "owner_row_change_blocks_unstarted_resume"),
     ("workspace_rebalance_retry", "invalid_persisted_move_blocks_before_filesystem_change"),

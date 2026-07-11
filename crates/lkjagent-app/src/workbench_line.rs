@@ -81,8 +81,8 @@ fn handle_line<W>(
 where
     W: Write,
 {
-    if let Some(command) = crate::workbench_commands::parse(line)? {
-        let message = crate::workbench_commands::apply(state, command);
+    if let Some(command) = crate::workbench::parse(line)? {
+        let message = crate::workbench::apply(state, command);
         writeln!(
             output,
             "{message}\n{}",

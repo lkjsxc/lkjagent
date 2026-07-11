@@ -106,7 +106,7 @@ idempotency, indexing, or recovery contract. A sorted inventory now scans visibl
 Markdown at daemon entry and rebuild, excludes internal roots and symlinks, and
 atomically updates or tombstones managed records plus bounded search chunks.
 Generic and managed external changes converge to stable searchable rows, rankings, and excerpts.
-Persistent malformed-file diagnostics and debounced scheduling remain open.
+Managed-looking parse failures persist diagnostics; unchanged manifests debounce entry scans.
 Archive and rebalance persist exact operation bytes and reuse idempotency keys.
 Prepared rebalance groups commit all members and revisions before moving any file.
 Unstarted groups need explicit apply; moving and projecting groups resume forward.

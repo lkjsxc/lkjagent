@@ -1,5 +1,7 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
+#[cfg(unix)]
+use std::os::unix::fs::MetadataExt;
 use std::path::{Component, Path};
 
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
@@ -12,16 +14,10 @@ const CHUNK_BYTES: usize = 2_048;
 const CHUNK_OVERLAP: usize = 128;
 const EXCLUDED_ROOTS: &[&str] = &["archive", "indexes", "system"];
 
+#[rustfmt::skip]
 struct Document {
-    id: String,
-    fingerprint: String,
-    path: String,
-    title: String,
-    body: String,
-    kind: String,
-    state: String,
-    project: String,
-    date: String,
+    id: String, fingerprint: String, path: String, title: String, body: String,
+    kind: String, state: String, project: String, date: String,
 }
 
 type InventoryDocument = (Document, Option<RecordRow>);
@@ -34,19 +30,19 @@ pub fn rebuild(conn: &Connection, workspace: &Path) -> Result<String, String> {
     let known_paths = existing.values()
         .map(|row| row.path.to_ascii_lowercase()).collect::<BTreeSet<_>>();
     let (mut chunks, mut managed, mut ids) = (Vec::new(), Vec::new(), BTreeMap::new());
-    let mut invalid_paths = BTreeSet::new();
+    let (mut invalid_paths, mut diagnostics) = (BTreeSet::new(), Vec::new());
     for path in paths {
         let key = path.to_ascii_lowercase();
         let text = match read_visible(workspace, &path) {
             Ok(text) => text,
-            Err(_) => { invalid_paths.insert(key); excluded += 1; continue; }
+            Err(error) => { invalid_paths.insert(key); diagnostics.push((path, error)); excluded += 1; continue; }
         };
         let (document, row) = match document(&path, text) {
             Ok(document) => document,
-            Err(_) => { invalid_paths.insert(key); excluded += 1; continue; }
+            Err(error) => { invalid_paths.insert(key); diagnostics.push((path, error)); excluded += 1; continue; }
         };
         if row.is_none() && known_paths.contains(&key) {
-            invalid_paths.insert(key); excluded += 1; continue;
+            invalid_paths.insert(key); diagnostics.push((path, "managed path lost identity".to_string())); excluded += 1; continue;
         }
         if let Some(prior) = ids.insert(document.id.clone(), path.clone()) {
             return Err(format!("duplicate workspace document id at {prior} and {path}"));
@@ -71,9 +67,10 @@ pub fn rebuild(conn: &Connection, workspace: &Path) -> Result<String, String> {
         }
     }
     replace_chunks(&tx, &chunks).map_err(|error| error.to_string())?;
+    super::sync_diagnostics(&tx, &diagnostics, &crate::clock::utc_now())?;
     if synced > 0 { super::mark_navigation_stale(&tx, &crate::clock::utc_now())?; }
     tx.commit().map_err(|error| error.to_string())?;
-    Ok(format!("workspace search rebuilt: indexed={} documents={} synced={synced} missing={missing} excluded={excluded}", chunks.len(), ids.len()))
+    Ok(format!("workspace search rebuilt: indexed={} documents={} synced={synced} missing={missing} excluded={excluded} diagnostics={}", chunks.len(), ids.len(), diagnostics.len()))
 }
 
 #[rustfmt::skip]
@@ -81,14 +78,14 @@ fn markdown_paths(workspace: &Path) -> Result<(Vec<String>, usize), String> {
     let mut pending = vec![workspace.to_path_buf()];
     let (mut paths, mut excluded) = (Vec::new(), 0);
     while let Some(dir) = pending.pop() {
-        let mut entries = fs::read_dir(&dir).map_err(|error| error.to_string())?
-            .collect::<Result<Vec<_>, _>>().map_err(|error| error.to_string())?;
+        let read = match fs::read_dir(&dir) { Ok(read) => read, Err(error) if error.kind() == std::io::ErrorKind::NotFound => continue, Err(error) => return Err(error.to_string()) };
+        let mut entries = read.collect::<Result<Vec<_>, _>>().map_err(|error| error.to_string())?;
         entries.sort_by_key(|entry| entry.file_name());
         for entry in entries {
             let full = entry.path();
             let relative = full.strip_prefix(workspace).map_err(|error| error.to_string())?;
             if !visible(relative) { continue; }
-            let metadata = fs::symlink_metadata(&full).map_err(|error| error.to_string())?;
+            let metadata = match fs::symlink_metadata(&full) { Ok(metadata) => metadata, Err(error) if error.kind() == std::io::ErrorKind::NotFound => { excluded += 1; continue; }, Err(error) => return Err(error.to_string()) };
             if metadata.file_type().is_symlink() { excluded += 1; continue; }
             if metadata.is_dir() { pending.push(full); continue; }
             if metadata.is_file() && extension(relative) {
@@ -106,11 +103,23 @@ fn markdown_paths(workspace: &Path) -> Result<(Vec<String>, usize), String> {
     Ok((paths, excluded))
 }
 
+#[rustfmt::skip]
+pub(crate) fn source_manifest(workspace: &Path) -> Result<String, String> {
+    let (paths, excluded) = markdown_paths(workspace)?; let mut rows = Vec::new();
+    let root = fs::canonicalize(workspace).map_err(|error| error.to_string())?; let root_metadata = fs::symlink_metadata(&root).map_err(|error| error.to_string())?;
+    #[cfg(unix)] let root_identity = format!("{}:{}:{}:{}", root_metadata.dev(), root_metadata.ino(), root_metadata.ctime(), root_metadata.ctime_nsec());
+    #[cfg(not(unix))] let root_identity = format!("{}:{:?}", root_metadata.len(), root_metadata.modified().map_err(|error| error.to_string())?);
+    for path in paths { let metadata = match fs::symlink_metadata(workspace.join(&path)) { Ok(metadata) => metadata, Err(error) if error.kind() == std::io::ErrorKind::NotFound => { rows.push((path, 0, "missing".to_string())); continue; }, Err(error) => return Err(error.to_string()) };
+        #[cfg(unix)] let identity = format!("{}:{}:{}:{}:{}:{}", metadata.dev(), metadata.ino(), metadata.mtime(), metadata.mtime_nsec(), metadata.ctime(), metadata.ctime_nsec());
+        #[cfg(not(unix))] let identity = format!("{}:{:?}", metadata.len(), metadata.modified().map_err(|error| error.to_string())?);
+        rows.push((path, metadata.len(), identity)); }
+    serde_json::to_string(&(root, root_identity, rows, excluded)).map_err(|error| error.to_string())
+}
+
+#[rustfmt::skip]
 pub(super) fn read_visible(workspace: &Path, path: &str) -> Result<String, String> {
     let relative = Path::new(path);
-    if !visible(relative) || relative.is_absolute() {
-        return Err("workspace path is not visible".to_string());
-    }
+    if !visible(relative) || relative.is_absolute() { return Err("workspace path is not visible".to_string()); }
     crate::effect_files::read_text(workspace, path)
 }
 
@@ -126,15 +135,10 @@ fn visible(path: &Path) -> bool {
     !names.is_empty() && !EXCLUDED_ROOTS.iter().any(|root| names[0].eq_ignore_ascii_case(root))
 }
 
+#[rustfmt::skip]
 fn collision_key(path: &str) -> Result<String, String> {
-    if path
-        .chars()
-        .any(|ch| !ch.is_ascii() && (ch.is_lowercase() || ch.is_uppercase()))
-    {
-        return Err(format!(
-            "workspace path has non-ASCII case ambiguity: {path}"
-        ));
-    }
+    if path.chars().any(|ch| !ch.is_ascii() && (ch.is_lowercase() || ch.is_uppercase())) {
+        return Err(format!("workspace path has non-ASCII case ambiguity: {path}")); }
     Ok(path.to_ascii_lowercase())
 }
 
@@ -169,8 +173,10 @@ fn document(path: &str, text: String) -> Result<InventoryDocument, String> {
 
 #[rustfmt::skip]
 fn managed_candidate(text: &str) -> bool {
-    let Some(rest) = text.strip_prefix("---\n") else { return false; };
-    rest.split("\n---\n").next().unwrap_or(rest).lines().any(|line| line.starts_with("id: "))
+    let rest = text.strip_prefix("---\n").or_else(|| text.strip_prefix("---\r\n"));
+    let Some(rest) = rest else { return false; };
+    rest.lines().take_while(|line| line.trim_end_matches('\r') != "---")
+        .any(|line| line.trim_start().starts_with("id:"))
 }
 
 #[rustfmt::skip]

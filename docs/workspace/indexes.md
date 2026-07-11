@@ -43,9 +43,11 @@ a deterministic path identity. Missing managed sources become archived `missing`
 projections, known malformed sources become archived `import-review` projections,
 and restoration reactivates source metadata. Daemon reconciliation marks
 navigation stale after managed changes; explicit rebuild regenerates and clears
-that marker. Large owner source stays in place. Debounced incremental scheduling
-and diagnostics for standalone malformed content
-remain required before this contract is complete.
+that marker. Malformed managed-looking files create durable active state diagnostics;
+repair or removal resolves them. Daemon entry compares a durable sorted
+path-size-modification manifest: unchanged inventory skips projection writes,
+while changed metadata reconciles immediately. Explicit rebuild always scans.
+Large owner source stays in place.
 
 ## Gate Coverage
 

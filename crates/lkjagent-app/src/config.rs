@@ -35,6 +35,14 @@ pub(crate) fn workspace_root(data_dir: &Path) -> Result<PathBuf, String> {
     })
 }
 
+pub(crate) fn workspace_scan_timing(data_dir: &Path) -> Result<(u64, u64), String> {
+    let values = load_flat_config(data_dir)?;
+    Ok((
+        number(&values, "workspace_scan_debounce_milliseconds"),
+        number(&values, "workspace_reconcile_seconds"),
+    ))
+}
+
 pub(crate) fn prompt_max_context_tokens(data_dir: &Path) -> Result<Option<u64>, String> {
     let values = load_flat_config(data_dir)?;
     Ok(Some(

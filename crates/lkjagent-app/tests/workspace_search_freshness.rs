@@ -1,6 +1,7 @@
 use std::{fs, path::PathBuf};
 
 use lkjagent_app::cli;
+use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_store::plan_schema::setup;
 use lkjagent_store::workspace_search::canonical_rows;
 use rusqlite::Connection;
@@ -59,6 +60,41 @@ fn stale_first_page_does_not_hide_current_lower_ranked_hit() -> TestResult<()> {
     ])?;
     assert!(found.contains(&format!("path={keep}")));
     assert!(found.contains("excluded_drifted=59"));
+    Ok(())
+}
+
+#[test]
+fn unchanged_inventory_is_debounced_until_manifest_changes() -> TestResult<()> {
+    let data = fixture_root("debounce")?;
+    fs::write(
+        data.join("lkjagent.json"),
+        r#"{"workspace_scan_debounce_milliseconds":50,"workspace_reconcile_seconds":30}"#,
+    )?;
+    let source = data.join("workspace/knowledge/debounce.md");
+    fs::create_dir_all(source.parent().ok_or("source parent missing")?)?;
+    fs::write(&source, "# Before\n\nstable inventory")?;
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec![],
+        index: 0,
+    };
+    run_until_idle(&data, &mut endpoint, 0)?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    conn.execute_batch(
+        "CREATE TRIGGER fail_redundant_scan BEFORE DELETE ON workspace_search_chunks
+        BEGIN SELECT RAISE(FAIL, 'scan should be debounced'); END;",
+    )?;
+    drop(conn);
+    run_until_idle(&data, &mut endpoint, 0)?;
+    fs::write(&source, "# After\n\nchanged inventory")?;
+    std::thread::sleep(std::time::Duration::from_millis(60));
+    assert!(run_until_idle(&data, &mut endpoint, 0).is_err());
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    conn.execute("DROP TRIGGER fail_redundant_scan", [])?;
+    drop(conn);
+    run_until_idle(&data, &mut endpoint, 0)?;
+    let arg = data.to_string_lossy();
+    let found = cli::run(["--data", arg.as_ref(), "workspace", "search", "changed"])?;
+    assert!(found.contains("knowledge/debounce.md"));
     Ok(())
 }
 

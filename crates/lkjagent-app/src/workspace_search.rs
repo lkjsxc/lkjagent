@@ -1,9 +1,11 @@
-mod inventory;
+pub(crate) mod inventory;
 
+use std::collections::BTreeMap;
 use std::path::Path;
 
 use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
-use lkjagent_core::runtime_state::{StateCell, StateKey};
+use lkjagent_core::runtime_fingerprint::stable_fingerprint;
+use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey, StateStatus};
 use lkjagent_store::event_rows::{append_and_apply_event, next_event_id};
 use lkjagent_store::state_rows::insert_case;
 use lkjagent_store::workspace_search::{
@@ -25,54 +27,78 @@ pub struct Request {
 }
 
 impl Request {
+    #[rustfmt::skip]
     pub fn filter(&self) -> SearchFilter {
-        SearchFilter {
-            kind: self.kind.clone(),
-            state: self.state.clone(),
-            project: self.project.clone(),
-            date: self.date.clone(),
-        }
+        SearchFilter { kind: self.kind.clone(), state: self.state.clone(), project: self.project.clone(), date: self.date.clone() }
     }
 
+    #[rustfmt::skip]
     pub fn mode(&self) -> Result<SearchMode, String> {
-        match self.mode.as_str() {
-            "lexical" => Ok(SearchMode::Lexical),
-            "trigram" => Ok(SearchMode::Trigram),
-            _ => Err("workspace search mode must be lexical or trigram".to_string()),
-        }
+        match self.mode.as_str() { "lexical" => Ok(SearchMode::Lexical), "trigram" => Ok(SearchMode::Trigram),
+            _ => Err("workspace search mode must be lexical or trigram".to_string()) }
     }
 }
 
 pub fn rebuild(conn: &Connection, workspace: &Path) -> Result<String, String> {
-    inventory::rebuild(conn, workspace)
+    crate::workspace_scan::rebuild(conn, workspace)
 }
 
+pub fn reconcile_entry(
+    conn: &Connection,
+    workspace: &Path,
+    data_dir: &Path,
+) -> Result<String, String> {
+    crate::workspace_scan::reconcile_entry(conn, workspace, data_dir)
+}
+
+#[rustfmt::skip]
 fn mark_navigation_stale(conn: &Connection, now: &str) -> Result<(), String> {
-    let case_id = "workspace";
-    insert_case(conn, case_id, "workspace records", now).map_err(|error| error.to_string())?;
-    let event_id =
-        next_event_id(conn, case_id, "index-stale").map_err(|error| error.to_string())?;
-    let mut cell = StateCell::active(
-        StateKey::new("index", "stale/records").map_err(|error| error.message)?,
-        event_id.clone(),
-    );
+    let case_id = "workspace"; insert_case(conn, case_id, "workspace records", now).map_err(|error| error.to_string())?;
+    let event_id = next_event_id(conn, case_id, "index-stale").map_err(|error| error.to_string())?;
+    let mut cell = StateCell::active(StateKey::new("index", "stale/records").map_err(|error| error.message)?, event_id.clone());
     cell.payload_schema = "workspace.index-stale".to_string();
     cell.payload_json = serde_json::json!({"reason":"external managed source change"}).to_string();
-    cell.created_at = now.to_string();
-    cell.updated_at = now.to_string();
-    append_and_apply_event(
-        conn,
-        &RuntimeEvent {
-            id: event_id,
-            case_id: case_id.to_string(),
-            kind: "state.cell.upsert".to_string(),
-            payload: RuntimeEventPayload::UpsertCell(Box::new(cell)),
-            source: "workspace-scanner".to_string(),
-            created_at: now.to_string(),
-            decision_id: None,
-        },
-    )
-    .map_err(|error| error.to_string())
+    cell.created_at = now.to_string(); cell.updated_at = now.to_string();
+    append_and_apply_event(conn, &RuntimeEvent { id: event_id, case_id: case_id.to_string(),
+        kind: "state.cell.upsert".to_string(), payload: RuntimeEventPayload::UpsertCell(Box::new(cell)),
+        source: "workspace-scanner".to_string(), created_at: now.to_string(), decision_id: None })
+        .map_err(|error| error.to_string())
+}
+
+#[rustfmt::skip]
+fn sync_diagnostics(conn: &Connection, diagnostics: &[(String, String)], now: &str) -> Result<(), String> {
+    insert_case(conn, "workspace", "workspace records", now).map_err(|error| error.to_string())?;
+    let mut statement = conn.prepare("SELECT key_label, cell_json FROM state_cells
+        WHERE case_id = 'workspace' AND key_label LIKE 'workspace:diagnostic/%'").map_err(|error| error.to_string())?;
+    let rows = statement.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))).map_err(|error| error.to_string())?;
+    let mut existing = BTreeMap::new();
+    for row in rows { let (label, json) = row.map_err(|error| error.to_string())?;
+        existing.insert(label, serde_json::from_str::<StateCell>(&json).map_err(|error| error.to_string())?); }
+    let persist = |mut cell: StateCell| -> Result<(), String> {
+        let event_id = next_event_id(conn, "workspace", "diagnostic").map_err(|error| error.to_string())?;
+        cell.source_event_id = event_id.clone(); cell.updated_at = now.to_string();
+        append_and_apply_event(conn, &RuntimeEvent { id: event_id, case_id: "workspace".to_string(),
+            kind: "workspace.diagnostic".to_string(), payload: RuntimeEventPayload::UpsertCell(Box::new(cell)),
+            source: "workspace-scanner".to_string(), created_at: now.to_string(), decision_id: None })
+            .map_err(|error| error.to_string())
+    };
+    for (path, error) in diagnostics {
+        let identity = path.as_bytes().iter().map(|byte| format!("{byte:02x}")).collect::<String>();
+        let key = StateKey::new("workspace", format!("diagnostic/{identity}")).map_err(|error| error.message)?;
+        let label = key.as_label(); let prior = existing.remove(&label);
+        let payload = serde_json::json!({"path":path,"error":error}).to_string();
+        let evidence = vec![EvidenceRef { source_type: "workspace-path".to_string(), source_id: path.clone(),
+            fingerprint: stable_fingerprint(error).map_err(|error| error.message)? }];
+        if prior.as_ref().is_some_and(|cell| cell.status == StateStatus::Active
+            && cell.payload_json == payload && cell.evidence_refs == evidence) { continue; }
+        let mut cell = prior.unwrap_or_else(|| StateCell::active(key, "workspace-diagnostic-pending"));
+        cell.status = StateStatus::Active; cell.payload_schema = "workspace.import-diagnostic".to_string();
+        cell.payload_json = payload; cell.evidence_refs = evidence;
+        if cell.created_at.is_empty() { cell.created_at = now.to_string(); } persist(cell)?;
+    }
+    for (_, mut cell) in existing { if cell.status == StateStatus::Active {
+        cell.status = StateStatus::Resolved; persist(cell)?; } }
+    Ok(())
 }
 
 pub fn search(conn: &Connection, workspace: &Path, request: &Request) -> Result<String, String> {
@@ -126,12 +152,9 @@ fn render(hit: &SearchHit, query: &str) -> String {
     )
 }
 
+#[rustfmt::skip]
 fn no_matches(excluded: usize) -> String {
-    if excluded == 0 {
-        "no matches".to_string()
-    } else {
-        format!("no matches\nexcluded_drifted={excluded}")
-    }
+    if excluded == 0 { "no matches".to_string() } else { format!("no matches\nexcluded_drifted={excluded}") }
 }
 
 fn excerpt(content: &str, query: &str) -> String {
