@@ -10,6 +10,7 @@ use rusqlite::Connection;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
+#[rustfmt::skip]
 fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<()> {
     let data = fixture_root("rebalance")?;
     let workspace = data.join("workspace");
@@ -67,8 +68,8 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
     let index = fs::read_to_string(workspace.join("indexes/open-todos.md"))?;
     assert!(index.contains("rec_1 [open] Move me (records/life/todo/open/rec_1.md)"));
     let repaired_link = fs::read_to_string(workspace.join("records/life/notes/rec_2.md"))?;
-    assert!(repaired_link.contains("records/life/todo/open/rec_1.md"));
-    assert!(!repaired_link.contains("records/knowledge/notes/old.md"));
+    let expected_link = linked.replacen("links: [records/knowledge/notes/old.md]", "links: [records/life/todo/open/rec_1.md]", 1);
+    assert_eq!(repaired_link, expected_link);
 
     let shown = cli::run([
         "--data",
@@ -119,7 +120,7 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
 }
 
 #[test]
-fn workspace_rebalance_restores_record_when_audit_write_fails() -> TestResult<()> {
+fn workspace_rebalance_leaves_projection_retryable_when_audit_write_fails() -> TestResult<()> {
     let data = fixture_root("rebalance-audit-fail")?;
     let workspace = data.join("workspace");
     fs::create_dir_all(workspace.join("records/knowledge/notes"))?;
@@ -152,20 +153,26 @@ fn workspace_rebalance_restores_record_when_audit_write_fails() -> TestResult<()
     let result = cli::run(["--data", data_str(&data), "workspace", "apply-rebalance"]);
 
     assert!(result.is_err());
-    assert!(workspace.join("records/knowledge/notes/old.md").exists());
-    assert!(!workspace.join("records/life/todo/open/rec_1.md").exists());
+    assert!(!workspace.join("records/knowledge/notes/old.md").exists());
+    assert!(workspace.join("records/life/todo/open/rec_1.md").exists());
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     let path: String = conn.query_row(
         "SELECT path FROM workspace_records WHERE id = 'rec_1'",
         [],
         |row| row.get(0),
     )?;
-    assert_eq!(path, "records/knowledge/notes/old.md");
+    assert_eq!(path, "records/life/todo/open/rec_1.md");
     let aliases: i64 =
         conn.query_row("SELECT COUNT(*) FROM workspace_path_aliases", [], |row| {
             row.get(0)
         })?;
     assert_eq!(aliases, 0);
+    let phase: String = conn.query_row(
+        "SELECT phase FROM workspace_operations WHERE kind = 'rebalance-group'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(phase, "projecting");
     Ok(())
 }
 

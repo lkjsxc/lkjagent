@@ -100,7 +100,7 @@ pub fn memory(conn: &Connection, query: &str) -> Result<String, String> {
 }
 
 pub fn watch(conn: &Connection) -> Result<String, String> {
-    crate::watch_view::watch(conn)
+    crate::snapshot_state::watch(conn)
 }
 
 fn transform(value: Option<i64>) -> &'static str {

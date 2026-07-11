@@ -31,10 +31,21 @@ fn workspace_manifest_aliases_and_rebalance_audit_round_trip(
             created_at: "now".to_string(),
         },
     )?;
-    assert_eq!(
-        resolve_alias(&conn, "records/note/old.md")?.map(|row| row.entity_id),
-        Some("rec_1".to_string())
-    );
+    let retry = PathAliasRow {
+        old_path: "records/note/old.md".to_string(),
+        entity_id: "rec_1".to_string(),
+        entity_kind: "record".to_string(),
+        new_path: "records/note/rec_1.md".to_string(),
+        decision_id: "decision-1".to_string(),
+        created_at: "later".to_string(),
+    };
+    insert_alias(&conn, &retry)?;
+    let resolved = resolve_alias(&conn, "records/note/old.md")?.ok_or("alias missing")?;
+    assert_eq!(resolved.entity_id, "rec_1");
+    assert_eq!(resolved.created_at, "now");
+    let mut conflict = retry;
+    conflict.new_path = "records/note/other.md".to_string();
+    assert!(insert_alias(&conn, &conflict).is_err());
 
     insert_rebalance_audit(
         &conn,

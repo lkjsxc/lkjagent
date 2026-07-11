@@ -51,6 +51,14 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     setup(&conn).map_err(|error| error.to_string())?;
     let now = clock.now();
     crate::daemon_lock::claim(&mut conn, &now)?;
+    let groups = lkjagent_store::workspace_rows::active_rebalance_groups(&conn)
+        .map_err(|error| error.to_string())?;
+    if groups.len() > 1 {
+        return Err("multiple active rebalance groups".to_string());
+    }
+    for operation in groups {
+        crate::workspace_rebalance_group::recover_startup(&conn, data_dir, &operation, &now)?;
+    }
     for operation in lkjagent_store::workspace_rows::prepared_operations(&conn)
         .map_err(|error| error.to_string())?
     {

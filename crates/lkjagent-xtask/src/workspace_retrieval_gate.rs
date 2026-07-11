@@ -57,7 +57,7 @@ const SUITES: &[Suite] = &[
     Suite {
         package: "lkjagent-app",
         target: "workspace_rebalance_compensation",
-        minimum_tests: 1,
+        minimum_tests: 2,
     },
     Suite {
         package: "lkjagent-app",
@@ -65,6 +65,7 @@ const SUITES: &[Suite] = &[
         minimum_tests: 3,
     },
     Suite { package: "lkjagent-app", target: "workspace_rebalance_retry", minimum_tests: 5 },
+    Suite { package: "lkjagent-app", target: "workspace_rebalance_group", minimum_tests: 3 },
 ];
 
 #[rustfmt::skip]
@@ -77,6 +78,9 @@ const REQUIRED: &[(&str, &str)] = &[
     ("workspace_rebalance_retry", "owner_row_change_blocks_unstarted_resume"),
     ("workspace_rebalance_retry", "invalid_persisted_move_blocks_before_filesystem_change"),
     ("workspace_rebalance_retry", "explicit_apply_preserves_dangling_target_conflict"),
+    ("workspace_rebalance_group", "multi_move_group_settles_with_exact_membership"),
+    ("workspace_rebalance_group", "group_preparation_is_atomic_before_first_move"),
+    ("workspace_rebalance_group", "started_group_resumes_partial_moves_but_unstarted_group_blocks"),
     (
         "workspace_search",
         "workspace_search_discovers_body_filters_and_rejects_drift",
@@ -127,8 +131,9 @@ const REQUIRED: &[(&str, &str)] = &[
     ),
     (
         "workspace_rebalance_compensation",
-        "rebalance_restores_files_rows_search_and_indexes_when_rebuild_fails",
+        "rebalance_retries_group_projection_when_index_rebuild_fails",
     ),
+    ("workspace_rebalance_compensation", "rebalance_preserves_owner_readme_and_keeps_group_projecting"),
     (
         "workspace_rebalance_recovery",
         "rebalance_startup_settles_moved_exact_revisions",

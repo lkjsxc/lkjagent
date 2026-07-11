@@ -30,8 +30,9 @@ effect observation.
 Archive and rebalance commit a prepared operation with immutable prior and
 intended file bytes before a filesystem move. Archive compensation restores
 verified preimages or leaves an operation prepared rather than overwriting owner
-bytes. Rebalance stores exact file and record preimages, but exact rollback of
-link history, scaffold files, search, index artifacts, and multi-move groups
+bytes. Rebalance stores exact file and record preimages. One group operation
+atomically prepares every ordered member and revision before its first move.
+Exact rollback of link history, scaffold files, search, and index artifacts
 remains open; recovery therefore prefers verified forward settlement.
 
 ## Recovery
@@ -43,9 +44,13 @@ startup until explicit `apply-rebalance`; that command revalidates both revision
 before moving. Missing revisions, malformed intent, changed source bytes, a
 conflict, or a duplicate block without moving owner bytes. A startup projection
 failure leaves matching moved bytes and the operation prepared for forward retry.
-Move conflicts and post-rename sync errors also remain prepared for explicit retry.
-Multi-move groups, compensated-key reuse, exact normal-apply projection rollback,
-temporary-file, manifest, and broader writer recovery remain open. Archive and
+An unstarted group blocks startup. Explicit apply changes it to `moving`; startup
+then resumes exact source-only members and accepts exact target-only members.
+All targets precede `projecting`, whose idempotent projections retry forward.
+Link repair changes exact structured link entries and leaves prose untouched.
+Move conflicts and post-rename sync errors retain the active group phase.
+Compensated-key reuse, exact projection rollback, temporary-file, manifest, and
+broader writer recovery remain open. Archive and
 rebalance moves use Linux no-clobber renames; unsupported hosts fail without moving bytes.
 
 ## Paths

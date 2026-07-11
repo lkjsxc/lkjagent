@@ -29,7 +29,7 @@ Map lkjagent-app source modules.
 - [exchange-record.rs](exchange_record.rs): exchange log file rendering.
 - [explore.rs](explore.rs): bounded explore action dispatcher.
 - [inspect.rs](inspect.rs): row-backed CLI inspection renderers.
-- [lease-status.rs](lease_status.rs): owner-visible lease freshness line.
+- [lease-status.rs](lease_status.rs): lease freshness and token usage lines.
 - [model-call.rs](model_call.rs): endpoint call, exchange log, and usage handling.
 - [model-io.rs](model_io.rs): endpoint trait, live adapter, and scripted record.
 - [observation-bridge.rs](observation_bridge.rs): effect observation rows.
@@ -39,7 +39,8 @@ Map lkjagent-app source modules.
 - [record-identity.rs](record_identity.rs): canonical record ids and kind aliases.
 - [workspace-index.rs](workspace_index.rs): semantic navigation page rebuild.
 - [workspace-rebalance.rs](workspace_rebalance.rs): rebalance planning and validation.
-- [workspace-rebalance-apply.rs](workspace_rebalance_apply.rs): grouped rebalance apply and compensation.
+- [workspace-rebalance-apply.rs](workspace_rebalance_apply.rs): legacy single-move recovery.
+- [workspace-rebalance-group.rs](workspace_rebalance_group.rs): durable grouped rebalance apply.
 - [workspace-search.rs](workspace_search.rs): visible Markdown inventory, rebuild, and bounded retrieval.
 - [workspace-scaffold.rs](workspace_scaffold.rs): README and directory scaffold writes.
 - [recovery-bridge.rs](recovery_bridge.rs): unfinished decision reuse and
@@ -47,7 +48,7 @@ Map lkjagent-app source modules.
 - [runtime-bridge.rs](runtime_bridge.rs): decision preparation and effect failure settlement.
 - [runtime-cell.rs](runtime_cell.rs): operation cell projection payloads.
 - [runtime-projection.rs](runtime_projection.rs): plan bridge projection events.
-- [snapshot-state.rs](snapshot_state.rs): matter snapshot state-cell mirror.
+- [snapshot-state.rs](snapshot_state.rs): matter snapshot mirror and watch view.
 - [lib.rs](lib.rs): public state module for snapshot hydration from normalized rows.
 - [status.rs](status.rs): status, matter, and watch rendering helpers.
 - [turn-effects.rs](turn_effects.rs): deterministic check and evidence effects.

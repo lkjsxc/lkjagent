@@ -5,10 +5,7 @@ use lkjagent_core::workspace_record::{record_fingerprint, record_path_at};
 use lkjagent_store::record_rows::{records, RecordRow};
 use lkjagent_store::workspace_rows::{upsert_manifest, OperationRevision};
 use rusqlite::Connection;
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::path::Path;
 pub fn plan(conn: &Connection, data_dir: &Path, json: bool, now: &str) -> Result<String, String> {
     ensure_manifest(conn, data_dir, now)?;
     let moves = planned_moves(conn)?;
@@ -57,11 +54,13 @@ pub fn validate(
 }
 pub(crate) fn ensure_manifest(conn: &Connection, data_dir: &Path, now: &str) -> Result<(), String> {
     let manifest = WorkspaceManifest::default_workspace();
-    let manifests = crate::config::workspace_root(data_dir)?.join("system/manifests");
-    fs::create_dir_all(&manifests).map_err(|error| error.to_string())?;
+    let workspace = crate::config::workspace_root(data_dir)?;
     let text = serde_json::to_string_pretty(&manifest).map_err(|error| error.to_string())?;
-    fs::write(manifests.join("workspace-manifest.json"), text)
-        .map_err(|error| error.to_string())?;
+    crate::effect_files::write_bytes(
+        &workspace,
+        "system/manifests/workspace-manifest.json",
+        text.as_bytes(),
+    )?;
     upsert_manifest(conn, &manifest, now).map_err(|error| error.to_string())
 }
 pub(crate) fn planned_moves(conn: &Connection) -> Result<Vec<RebalanceMove>, String> {
@@ -114,18 +113,6 @@ pub(crate) fn verified_file_bytes(
 }
 
 #[rustfmt::skip]
-pub(crate) fn operation_revisions(item: &RebalanceMove, bytes: &[u8]) -> Result<Vec<OperationRevision>, String> {
-    let fingerprint = lkjagent_core::runtime_fingerprint::stable_fingerprint(&bytes).map_err(|error| error.message)?;
-    let row = |role: &str, path: &str| OperationRevision { role: role.to_string(), path: path.to_string(), bytes: bytes.to_vec(), fingerprint: fingerprint.clone() };
-    Ok(vec![row("prior", &item.old_path), row("intended", &item.new_path)])
-}
-
-#[rustfmt::skip]
-pub(crate) fn operation_preimage(row: &RecordRow) -> String {
-    serde_json::json!({"id": row.id, "kind": row.kind, "title": row.title, "state": row.state, "path": row.path, "fingerprint": row.fingerprint, "archived": row.archived, "updated_at": row.updated_at}).to_string()
-}
-
-#[rustfmt::skip]
 pub(crate) fn validated_revisions<'a>(rows: &'a [OperationRevision], item: &RebalanceMove, expected: &str) -> Result<(&'a OperationRevision, &'a OperationRevision), String> {
     let prior = rows.iter().find(|row| row.role == "prior").ok_or_else(|| "rebalance prior revision missing".to_string())?;
     let intended = rows.iter().find(|row| row.role == "intended").ok_or_else(|| "rebalance intended revision missing".to_string())?; if rows.len() != 2 { return Err("rebalance move must have exactly two revisions".to_string()); }
@@ -139,9 +126,6 @@ pub(crate) fn validated_revisions<'a>(rows: &'a [OperationRevision], item: &Reba
     Ok((prior, intended))
 }
 
-pub(crate) fn operation_intended(item: &RebalanceMove) -> String {
-    serde_json::json!({"id": item.entity_id, "path": item.new_path, "move": item}).to_string()
-}
 pub(crate) fn render_plan(moves: &[RebalanceMove], json: bool) -> Result<String, String> {
     if json {
         return serde_json::to_string(moves).map_err(|error| error.to_string());
@@ -156,45 +140,4 @@ fn move_line(item: &RebalanceMove) -> String {
         "move {} {} -> {}",
         item.entity_id, item.old_path, item.new_path
     )
-}
-
-const INDEXES: &[&str] = &[
-    "today",
-    "agenda",
-    "open-todos",
-    "budget-month",
-    "active-projects",
-    "proof-runs",
-    "experiments",
-];
-
-pub(crate) struct IndexSnapshot(Vec<(PathBuf, Option<Vec<u8>>)>);
-
-impl IndexSnapshot {
-    pub(crate) fn capture(workspace: &Path) -> Result<Self, String> {
-        let mut files = Vec::new();
-        for name in INDEXES {
-            let path = workspace.join("indexes").join(format!("{name}.md"));
-            let bytes = match fs::read(&path) {
-                Ok(bytes) => Some(bytes),
-                Err(error) if error.kind() == std::io::ErrorKind::NotFound => None,
-                Err(error) => return Err(error.to_string()),
-            };
-            files.push((path, bytes));
-        }
-        Ok(Self(files))
-    }
-
-    pub(crate) fn restore(&self) -> Result<(), String> {
-        for (path, bytes) in &self.0 {
-            match bytes {
-                Some(bytes) => fs::write(path, bytes).map_err(|error| error.to_string())?,
-                None if path.exists() => {
-                    fs::remove_file(path).map_err(|error| error.to_string())?
-                }
-                None => {}
-            }
-        }
-        Ok(())
-    }
 }

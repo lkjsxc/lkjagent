@@ -54,7 +54,6 @@ mod runtime_projection;
 mod snapshot_state;
 pub mod status;
 mod task_view;
-mod token_status;
 pub mod tui_event {
     pub use crate::tui_state::TuiEvent;
 }
@@ -63,7 +62,6 @@ pub mod endpoint {
     pub use crate::model_io::LlmEndpoint;
 }
 mod tui_keys;
-mod tui_palette;
 mod tui_reduce;
 pub mod tui_render;
 pub mod tui_snapshot;
@@ -76,7 +74,6 @@ pub mod tui_transcript;
 mod tui_types;
 mod tui_view;
 pub mod turn_effects;
-mod watch_view;
 pub mod workbench;
 mod workbench_commands;
 mod workbench_line;
@@ -85,5 +82,6 @@ pub mod workbench_state;
 mod workspace_index;
 mod workspace_rebalance;
 mod workspace_rebalance_apply;
+mod workspace_rebalance_group;
 mod workspace_scaffold;
 mod workspace_search;

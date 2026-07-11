@@ -1,9 +1,11 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use lkjagent_core::workspace_record::record_fingerprint;
+use lkjagent_core::workspace_record::{parse_record, record_fingerprint};
 use lkjagent_store::record_rows::{records, upsert_record};
 use rusqlite::Connection;
+
+const README_PURPOSE: &str = "Purpose: owner-readable workspace directory managed by lkjagent.";
 
 pub fn ensure_root(workspace: &Path) -> Result<(), String> {
     for rel in [
@@ -53,43 +55,50 @@ pub fn refresh_for_path(workspace: &Path, rel: &str) -> Result<(), String> {
     Ok(())
 }
 
-pub fn repair_record_links(
-    conn: &Connection,
-    workspace: &Path,
-    moved_id: &str,
-    old_path: &str,
-    new_path: &str,
-    now: &str,
-) -> usize {
-    let Ok(rows) = records(conn, None, true) else {
-        return 0;
-    };
+#[rustfmt::skip]
+pub fn repair_record_links(conn: &Connection, workspace: &Path, moved_id: &str,
+    old_path: &str, new_path: &str, now: &str) -> Result<usize, String> {
+    let rows = records(conn, None, true).map_err(|error| error.to_string())?;
     let mut repaired = 0;
     for mut row in rows {
-        if row.id == moved_id {
-            continue;
+        if row.id == moved_id { continue; }
+        if row.archived && !crate::effect_files::path_occupied(workspace, &row.path)? { continue; }
+        let text = crate::effect_files::read_text(workspace, &row.path)?;
+        let current = record_fingerprint(&text).map_err(|error| error.message)?;
+        if current != row.fingerprint {
+            let output = patch_link(&text, old_path, new_path)?
+                .ok_or_else(|| format!("linked record changed: {}", row.id))?;
+            if record_fingerprint(&output).map_err(|error| error.message)? != row.fingerprint { return Err(format!("linked record changed: {}", row.id)); }
+            crate::effect_files::write_bytes(workspace, &row.path, output.as_bytes())?;
+            refresh_for_path(workspace, &row.path)?; repaired += 1; continue;
         }
-        let Ok(text) = crate::effect_files::read_text(workspace, &row.path) else {
-            continue;
-        };
-        if !text.contains(old_path) {
-            continue;
-        }
-        let output = text.replace(old_path, new_path);
-        let Ok(fingerprint) = record_fingerprint(&output) else {
-            continue;
-        };
-        if crate::effect_files::write_bytes(workspace, &row.path, output.as_bytes()).is_err() {
-            continue;
-        }
-        row.fingerprint = fingerprint;
+        let Some(output) = patch_link(&text, old_path, new_path)? else { continue; };
+        row.fingerprint = record_fingerprint(&output).map_err(|error| error.message)?;
         row.updated_at = now.to_string();
-        if upsert_record(conn, &row).is_ok() {
-            let _ = refresh_for_path(workspace, &row.path);
-            repaired += 1;
-        }
+        upsert_record(conn, &row).map_err(|error| error.to_string())?;
+        crate::effect_files::write_bytes(workspace, &row.path, output.as_bytes())?;
+        refresh_for_path(workspace, &row.path)?; repaired += 1;
     }
-    repaired
+    Ok(repaired)
+}
+
+#[rustfmt::skip]
+fn patch_link(text: &str, old_path: &str, new_path: &str) -> Result<Option<String>, String> {
+    let mut parsed = parse_record(text)?;
+    let mut changed = false;
+    for link in &mut parsed.links {
+        if link == old_path { *link = new_path.to_string(); changed = true; }
+    }
+    if !changed { return Ok(None); }
+    let front = text.strip_prefix("---\n").ok_or_else(|| "record frontmatter missing".to_string())?;
+    let end = front.find("\n---\n").ok_or_else(|| "record frontmatter is unterminated".to_string())? + 4;
+    let area = &text[..end];
+    let starts = area.match_indices("\nlinks:").map(|(offset, _)| offset + 1).collect::<Vec<_>>();
+    if starts.len() != 1 { return Err("record links field is ambiguous".to_string()); }
+    let start = starts[0];
+    let line_end = text[start..].find('\n').map(|offset| start + offset).ok_or_else(|| "record links field is unterminated".to_string())?;
+    let line = format!("links: [{}]", parsed.links.join(", "));
+    Ok(Some(format!("{}{}{}", &text[..start], line, &text[line_end..])))
 }
 
 fn readme_dirs(workspace: &Path, leaf: &Path) -> Vec<PathBuf> {
@@ -108,6 +117,18 @@ fn readme_dirs(workspace: &Path, leaf: &Path) -> Vec<PathBuf> {
 }
 
 fn write_readme(workspace: &Path, dir: &Path) -> Result<(), String> {
+    let path = dir.join("README.md");
+    let rel = path
+        .strip_prefix(workspace)
+        .map_err(|error| error.to_string())?
+        .to_str()
+        .ok_or_else(|| "README path is not UTF-8".to_string())?
+        .to_string();
+    if crate::effect_files::path_occupied(workspace, &rel)?
+        && !crate::effect_files::read_text(workspace, &rel)?.contains(README_PURPOSE)
+    {
+        return Err(format!("owner README conflicts: {rel}"));
+    }
     let title = title(
         dir.file_name()
             .and_then(|value| value.to_str())
@@ -116,7 +137,7 @@ fn write_readme(workspace: &Path, dir: &Path) -> Result<(), String> {
     let mut lines = vec![
         format!("# {title}"),
         String::new(),
-        "Purpose: owner-readable workspace directory managed by lkjagent.".to_string(),
+        README_PURPOSE.to_string(),
         String::new(),
         "## Children".to_string(),
         String::new(),
@@ -128,13 +149,6 @@ fn write_readme(workspace: &Path, dir: &Path) -> Result<(), String> {
         lines.extend(children);
     }
     lines.push(String::new());
-    let rel = dir
-        .join("README.md")
-        .strip_prefix(workspace)
-        .map_err(|error| error.to_string())?
-        .to_str()
-        .ok_or_else(|| "README path is not UTF-8".to_string())?
-        .to_string();
     crate::effect_files::write_bytes(workspace, &rel, lines.join("\n").as_bytes())
 }
 

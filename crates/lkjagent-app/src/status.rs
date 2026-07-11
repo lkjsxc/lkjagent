@@ -8,7 +8,7 @@ pub fn status(conn: &Connection) -> Result<String, String> {
     let snapshot = load_snapshot(conn).map_err(|error| error.to_string())?;
     let pending =
         lkjagent_store::plan_hydrate::pending_count(conn).map_err(|error| error.to_string())?;
-    let tokens = crate::token_status::token_line(conn)?;
+    let tokens = crate::lease_status::token_line(conn)?;
     let ledger = state_ledger_lines(conn)?;
     let lease = lease_status::line(conn)?;
     Ok(match snapshot {

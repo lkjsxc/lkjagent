@@ -28,7 +28,7 @@ pub fn draw(frame: &mut Frame<'_>, model: &TuiModel, snapshot: &TuiSnapshot) {
     frame.set_cursor_position(crate::tui_render::composer_position(vertical[2], model));
     render_footer(frame, vertical[3], model);
     if model.palette_open {
-        crate::tui_palette::render(frame, area);
+        crate::tui_render::render_palette(frame, area);
     }
 }
 

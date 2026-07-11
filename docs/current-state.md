@@ -108,9 +108,9 @@ atomically updates or tombstones managed records plus bounded search chunks.
 Generic and managed external changes converge to stable searchable rows, rankings, and excerpts.
 Persistent malformed-file diagnostics and debounced scheduling remain open.
 Archive and rebalance persist exact operation bytes and reuse idempotency keys.
-Moved exact revisions settle; unstarted exact revisions require explicit apply.
-Missing revisions, drift, move/sync errors, and owner conflicts stay prepared without overwrite.
-Multi-move groups, key reuse, exact projection rollback, and broader writers remain incomplete.
+Prepared rebalance groups commit all members and revisions before moving any file.
+Unstarted groups need explicit apply; moving and projecting groups resume forward.
+Conflicts stay active without overwrite; key reuse and exact projection rollback remain open.
 
 The xtask dispatcher now runs named nonempty suites for `protocol-tools` and
 `workspace-retrieval-maintenance` and rejects a suite that reports too few tests.

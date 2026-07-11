@@ -60,3 +60,64 @@ pub fn persist_snapshot_cell(
 fn key(case_id: &str) -> Result<StateKey, String> {
     StateKey::new("matter", format!("snapshot/{case_id}")).map_err(|error| error.message)
 }
+
+pub fn watch(conn: &Connection) -> Result<String, String> {
+    let status = crate::status::status(conn)?;
+    let events = crate::log_view::log(conn, 8)?;
+    Ok([
+        "watch: rerun to refresh; use log --follow to stream".to_string(),
+        "== status ==".to_string(),
+        status,
+        "== transcript ==".to_string(),
+        crate::tui_snapshot::transcript(conn, 40)?,
+        "== recent events ==".to_string(),
+        events,
+        "== matter trace ==".to_string(),
+        matter_trace(conn)?,
+        "== proof rows ==".to_string(),
+        proof_line(conn)?,
+    ]
+    .join("\n"))
+}
+
+fn matter_trace(conn: &Connection) -> Result<String, String> {
+    if let Some(snapshot) = crate::state::load_snapshot(conn).map_err(|error| error.to_string())? {
+        return Ok(crate::status::task_show(&snapshot));
+    }
+    let Some(id) = latest_task_id(conn)? else {
+        return Ok("matter: none".to_string());
+    };
+    lkjagent_store::plan_hydrate::snapshot_by_id(conn, id)
+        .map_err(|error| error.to_string())?
+        .map_or_else(
+            || Ok("matter: none".to_string()),
+            |snapshot| Ok(crate::status::task_show(&snapshot)),
+        )
+}
+
+fn latest_task_id(conn: &Connection) -> Result<Option<i64>, String> {
+    match conn.query_row("SELECT id FROM tasks ORDER BY id DESC LIMIT 1", [], |row| {
+        row.get(0)
+    }) {
+        Ok(id) => Ok(Some(id)),
+        Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
+        Err(error) => Err(error.to_string()),
+    }
+}
+
+fn proof_line(conn: &Connection) -> Result<String, String> {
+    Ok(format!(
+        "proof: prompt_frames={} checks={} artifacts={} exchanges={}",
+        count(conn, "prompt_frames")?,
+        count(conn, "check_results")?,
+        count(conn, "artifacts")?,
+        count(conn, "provider_exchanges")?
+    ))
+}
+
+fn count(conn: &Connection, table: &str) -> Result<i64, String> {
+    conn.query_row(&format!("SELECT COUNT(*) FROM {table}"), [], |row| {
+        row.get(0)
+    })
+    .map_err(|error| error.to_string())
+}

@@ -143,14 +143,12 @@ fn record_row(
     })
 }
 
+#[rustfmt::skip]
 pub(crate) fn archive_source_bytes(path: &Path, fingerprint: &str) -> Result<Vec<u8>, String> {
     let bytes = fs::read(path).map_err(|error| error.to_string())?;
     let text = String::from_utf8(bytes.clone()).map_err(|error| error.to_string())?;
-    if record_fingerprint(&text).map_err(|error| error.message)? == fingerprint {
-        Ok(bytes)
-    } else {
-        Err("archive source fingerprint changed".to_string())
-    }
+    if record_fingerprint(&text).map_err(|error| error.message)? == fingerprint { Ok(bytes) }
+    else { Err("archive source fingerprint changed".to_string()) }
 }
 
 #[cfg(target_os = "linux")]
@@ -159,6 +157,13 @@ pub(crate) fn move_relative_if_absent(workspace: &Path, from: &str, to: &str) ->
     let (from_parent, from_name) = crate::effect_files::open_parent(workspace, from, false)?;
     let (to_parent, to_name) = crate::effect_files::open_parent(workspace, to, true)?;
     rustix::fs::renameat_with(&from_parent, &from_name, &to_parent, &to_name, rustix::fs::RenameFlags::NOREPLACE).map_err(|error| error.to_string())?;
+    sync_relative_move(workspace, from, to)
+}
+
+#[rustfmt::skip]
+pub(crate) fn sync_relative_move(workspace: &Path, from: &str, to: &str) -> Result<(), String> {
+    let (from_parent, _) = crate::effect_files::open_parent(workspace, from, false)?;
+    let (to_parent, _) = crate::effect_files::open_parent(workspace, to, false)?;
     rustix::fs::fsync(&from_parent).map_err(|error| error.to_string())?; rustix::fs::fsync(&to_parent).map_err(|error| error.to_string())
 }
 #[cfg(not(target_os = "linux"))]
@@ -186,13 +191,10 @@ pub(crate) fn archive_preimage(row: &RecordRow) -> String {
     serde_json::json!({"id": row.id, "path": row.path, "fingerprint": row.fingerprint, "state": row.state, "archived": row.archived}).to_string()
 }
 
-pub(crate) fn archive_intended(row: &RecordRow, path: &str) -> String {
-    serde_json::json!({"id": row.id, "path": path, "state": "archived"}).to_string()
-}
+#[rustfmt::skip]
+pub(crate) fn archive_intended(row: &RecordRow, path: &str) -> String { serde_json::json!({"id": row.id, "path": path, "state": "archived"}).to_string() }
 
+#[rustfmt::skip]
 fn format_record_row(prefix: &str, row: &RecordRow) -> String {
-    format!(
-        "{prefix} {} kind={} state={} title={} path={} fp={}",
-        row.id, row.kind, row.state, row.title, row.path, row.fingerprint
-    )
+    format!("{prefix} {} kind={} state={} title={} path={} fp={}", row.id, row.kind, row.state, row.title, row.path, row.fingerprint)
 }

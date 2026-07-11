@@ -2,7 +2,7 @@ use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct RecordRow {
     pub id: String,
     pub kind: String,

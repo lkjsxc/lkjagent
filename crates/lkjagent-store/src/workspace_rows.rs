@@ -40,21 +40,17 @@ pub fn upsert_manifest(
     Ok(())
 }
 
+#[rustfmt::skip]
 pub fn insert_alias(conn: &Connection, row: &PathAliasRow) -> StoreResult<()> {
-    conn.execute(
-        "INSERT OR REPLACE INTO workspace_path_aliases
+    let changed = conn.execute(
+        "INSERT INTO workspace_path_aliases
          (old_path, entity_id, entity_kind, new_path, decision_id, created_at)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
-        params![
-            row.old_path,
-            row.entity_id,
-            row.entity_kind,
-            row.new_path,
-            row.decision_id,
-            row.created_at,
-        ],
-    )?;
-    Ok(())
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6)
+         ON CONFLICT(old_path) DO UPDATE SET old_path=excluded.old_path
+         WHERE entity_id=excluded.entity_id AND entity_kind=excluded.entity_kind
+         AND new_path=excluded.new_path AND decision_id=excluded.decision_id",
+        params![row.old_path, row.entity_id, row.entity_kind, row.new_path, row.decision_id, row.created_at])?;
+    if changed == 1 { Ok(()) } else { Err(StoreError::InvalidState("path alias conflicts".to_string())) }
 }
 
 pub fn setup_operations(conn: &Connection) -> StoreResult<()> {
@@ -75,20 +71,35 @@ pub fn setup_operations(conn: &Connection) -> StoreResult<()> {
     Ok(())
 }
 
-pub fn prepare_operation(
+#[rustfmt::skip]
+pub fn active_rebalance_groups(conn: &Connection) -> StoreResult<Vec<OperationRow>> {
+    let mut statement = conn.prepare(
+        "SELECT id, idempotency_key, kind, phase, preimage_json, intended_json, error
+         FROM workspace_operations WHERE kind = 'rebalance-group'
+         AND phase NOT IN ('settled', 'compensated') ORDER BY created_at, id")?;
+    let rows = statement.query_map([], |row| Ok(OperationRow { id: row.get(0)?,
+        idempotency_key: row.get(1)?, kind: row.get(2)?, phase: row.get(3)?,
+        preimage_json: row.get(4)?, intended_json: row.get(5)?, error: row.get(6)? }))?;
+    Ok(rows.collect::<Result<Vec<_>, _>>()?)
+}
+
+#[rustfmt::skip]
+pub fn transition_operation(conn: &Connection, id: &str, from: &str, to: &str,
+    now: &str) -> StoreResult<()> {
+    let changed = conn.execute("UPDATE workspace_operations SET phase = ?3, error = NULL,
+        updated_at = ?4 WHERE id = ?1 AND phase = ?2", params![id, from, to, now])?;
+    if changed == 1 { Ok(()) } else { Err(StoreError::InvalidState(format!("operation phase changed: {id}"))) }
+}
+
+pub fn update_operation_error(
     conn: &Connection,
     id: &str,
-    key: &str,
-    kind: &str,
-    preimage: &str,
-    intended: &str,
+    error: &str,
     now: &str,
 ) -> StoreResult<()> {
     conn.execute(
-        "INSERT INTO workspace_operations
-         (id, idempotency_key, kind, phase, preimage_json, intended_json, created_at, updated_at)
-         VALUES (?1, ?2, ?3, 'prepared', ?4, ?5, ?6, ?6)",
-        params![id, key, kind, preimage, intended, now],
+        "UPDATE workspace_operations SET error = ?2, updated_at = ?3 WHERE id = ?1",
+        params![id, error, now],
     )?;
     Ok(())
 }
@@ -139,29 +150,21 @@ pub fn resolve_alias(conn: &Connection, old_path: &str) -> StoreResult<Option<Pa
     }
 }
 
-pub fn insert_rebalance_audit(
-    conn: &Connection,
-    id: &str,
-    item: &RebalanceMove,
-    created_at: &str,
-) -> StoreResult<()> {
-    conn.execute(
-        "INSERT OR REPLACE INTO workspace_rebalance_audit
+#[rustfmt::skip]
+pub fn insert_rebalance_audit(conn: &Connection, id: &str, item: &RebalanceMove,
+    created_at: &str) -> StoreResult<()> {
+    let changed = conn.execute(
+        "INSERT INTO workspace_rebalance_audit
          (id, entity_id, entity_kind, old_path, new_path, decision_id,
           validation_json, created_at)
-         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)",
-        params![
-            id,
-            item.entity_id,
-            item.entity_kind,
-            item.old_path,
-            item.new_path,
-            item.decision_id,
-            json(&item.validation)?,
-            created_at,
-        ],
-    )?;
-    Ok(())
+         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+         ON CONFLICT(id) DO UPDATE SET id=excluded.id
+         WHERE entity_id=excluded.entity_id AND entity_kind=excluded.entity_kind
+         AND old_path=excluded.old_path AND new_path=excluded.new_path
+         AND decision_id=excluded.decision_id",
+        params![id, item.entity_id, item.entity_kind, item.old_path, item.new_path,
+            item.decision_id, json(&item.validation)?, created_at])?;
+    if changed == 1 { Ok(()) } else { Err(StoreError::InvalidState("rebalance audit conflicts".to_string())) }
 }
 
 fn json<T: serde::Serialize>(value: &T) -> StoreResult<String> {
