@@ -66,8 +66,7 @@ fn repeated_admitted_action(
 fn repeated_admission(admission: &ToolAdmission) -> ToolAdmission {
     let mut rejected = admission.clone();
     rejected.status = AdmissionStatus::Rejected;
-    rejected.reason =
-        "repeated tool call; state the next different tool call or finish".to_string();
+    rejected.reason = "repeated tool call; state the next different tool call".to_string();
     rejected
 }
 

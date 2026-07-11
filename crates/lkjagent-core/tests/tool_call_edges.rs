@@ -5,31 +5,34 @@ use lkjagent_core::runtime_tool_catalog::explore_tool_view;
 #[test]
 fn accepts_japanese_and_large_bounded_values() -> Result<(), String> {
     let japanese = parse_tool_call(
-        &action("finish", &[('s', "保存しました。次の確認を待っています。")]),
+        &action(
+            "plan.note",
+            &[('s', "保存しました。次の確認を待っています。")],
+        ),
         &decision(),
     )
     .map_err(|error| format!("japanese value failed: {error:?}"))?;
     assert_eq!(
-        japanese.args["summary"],
+        japanese.args["note"],
         "保存しました。次の確認を待っています。"
     );
 
     let large = "あ".repeat(4096);
-    let parsed = parse_tool_call(&action("finish", &[('s', &large)]), &decision())
+    let parsed = parse_tool_call(&action("plan.note", &[('s', &large)]), &decision())
         .map_err(|error| format!("large value failed: {error:?}"))?;
-    assert_eq!(parsed.args["summary"], large);
+    assert_eq!(parsed.args["note"], large);
     Ok(())
 }
 
 #[test]
 fn rejects_unbounded_action_values() -> Result<(), String> {
     let too_large = "x".repeat(8193);
-    let error = match parse_tool_call(&action("finish", &[('s', &too_large)]), &decision()) {
+    let error = match parse_tool_call(&action("plan.note", &[('s', &too_large)]), &decision()) {
         Ok(_) => return Err("oversize value should fail".to_string()),
         Err(error) => error,
     };
     assert!(
-        matches!(error, ToolCallError::ArgsSchemaViolation(message) if message == "value too large for summary")
+        matches!(error, ToolCallError::ArgsSchemaViolation(message) if message == "value too large for note")
     );
     Ok(())
 }
@@ -61,7 +64,7 @@ fn action(tool: &str, args: &[(char, &str)]) -> String {
 
 fn field(name: char) -> &'static str {
     match name {
-        's' => "summary",
+        's' => "note",
         _ => "content",
     }
 }

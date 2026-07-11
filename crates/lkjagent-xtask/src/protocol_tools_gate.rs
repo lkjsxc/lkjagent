@@ -39,9 +39,24 @@ const SUITES: &[Suite] = &[
         minimum_tests: 4,
     },
     Suite {
+        package: "lkjagent-core",
+        target: "generic_flow",
+        minimum_tests: 9,
+    },
+    Suite {
         package: "lkjagent-app",
         target: "admission_rejection",
         minimum_tests: 1,
+    },
+    Suite {
+        package: "lkjagent-app",
+        target: "app",
+        minimum_tests: 6,
+    },
+    Suite {
+        package: "lkjagent-app",
+        target: "contamination",
+        minimum_tests: 2,
     },
     Suite {
         package: "lkjagent-app",

@@ -17,8 +17,10 @@ fn baseline_gate_has_a_named_command_surface() {
 fn protocol_and_retrieval_nodes_route_to_named_suites() -> Result<(), String> {
     let root = fixture_root("named")?;
     for identifier in ["protocol-tools", "workspace-retrieval-maintenance"] {
-        let failures = node_gate::check(&root, identifier)
-            .expect_err("an empty fixture cannot execute a node suite");
+        let failures = match node_gate::check(&root, identifier) {
+            Ok(()) => return Err("an empty fixture executed a node suite".to_string()),
+            Err(failures) => failures,
+        };
         if failures
             .iter()
             .any(|line| line == &format!("unknown node gate: {identifier}"))

@@ -1,7 +1,8 @@
 use crate::engine::Command;
-use crate::engine_actions::{action_fingerprint, finish_summary, memory_save};
+use crate::engine_actions::{action_fingerprint, memory_save};
 use crate::engine_completion::record_event;
 use crate::engine_extend::{add_steps, insert_after, split_after_fault};
+use crate::engine_messages::{block_unexpected_message, finish_message, wait_for_answer};
 use crate::engine_plan::finish_plan;
 use crate::model::*;
 use crate::parse::{Action, ParseFault, ParsedOutput};
@@ -66,7 +67,7 @@ pub(crate) fn handle_model(
         return;
     };
     if let ParsedOutput::Action(action) = &parsed {
-        if finish_summary(action).is_none() && repeated_action(&snapshot.steps[index], action) {
+        if repeated_action(&snapshot.steps[index], action) {
             let attempt = guard_repeated_action(&mut snapshot.steps[index], commands, prompt);
             snapshot.attempts.push(attempt);
             return;
@@ -80,14 +81,16 @@ pub(crate) fn handle_model(
             finish_content(&mut snapshot.steps[index], commands, content)
         }
         ParsedOutput::Plan(lines) => finish_plan(snapshot, commands, index, lines),
-        ParsedOutput::Action(action) => match finish_summary(&action) {
-            Some(summary) => finish_message(snapshot, commands, index, summary),
-            None => keep_exploring(&mut snapshot.steps[index], commands, action),
-        },
+        ParsedOutput::Action(action) => {
+            keep_exploring(&mut snapshot.steps[index], commands, action)
+        }
         ParsedOutput::Message(summary) if snapshot.steps[index].kind == StepKind::Ask => {
             wait_for_answer(snapshot, commands, index, summary);
         }
-        ParsedOutput::Message(summary) => finish_message(snapshot, commands, index, summary),
+        ParsedOutput::Message(summary) if snapshot.steps[index].kind == StepKind::Respond => {
+            finish_message(snapshot, commands, index, summary);
+        }
+        ParsedOutput::Message(_) => block_unexpected_message(snapshot, commands, index),
         ParsedOutput::Verdict(result) => finish_verdict(snapshot, commands, index, result),
     }
 }
@@ -122,7 +125,7 @@ fn keep_exploring(step: &mut Step, commands: &mut Vec<Command>, action: Action) 
 }
 
 fn guard_repeated_action(step: &mut Step, commands: &mut Vec<Command>, prompt: &Prompt) -> Attempt {
-    let diagnosis = "repeated action; state the next different action or finish";
+    let diagnosis = "repeated action; state the next different action";
     step.state = StepState::Active;
     step.attempts_used = step.attempts_used.saturating_add(1);
     let attempt = attempt(step, prompt, AttemptOutcome::ParseFault, diagnosis);
@@ -139,28 +142,6 @@ fn repeated_action(step: &Step, action: &Action) -> bool {
         return false;
     };
     previous == action_fingerprint(action)
-}
-
-fn finish_message(
-    snapshot: &mut TaskSnapshot,
-    commands: &mut Vec<Command>,
-    index: usize,
-    summary: String,
-) {
-    snapshot.steps[index].state = StepState::Done;
-    snapshot.task.summary = summary.clone();
-    record_event(commands, EventKind::StepDone, summary);
-}
-
-fn wait_for_answer(
-    snapshot: &mut TaskSnapshot,
-    commands: &mut Vec<Command>,
-    index: usize,
-    question: String,
-) {
-    snapshot.task.state = TaskState::Waiting;
-    snapshot.steps[index].state = StepState::Active;
-    record_event(commands, EventKind::Question, question);
 }
 
 fn finish_verdict(

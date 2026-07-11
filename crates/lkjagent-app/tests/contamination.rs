@@ -47,18 +47,17 @@ fn shell_observation_is_external_raw_context() -> TestResult<()> {
 #[test]
 fn sensitive_observation_body_is_redacted() -> TestResult<()> {
     let data = fixture_root("sensitive")?;
+    fs::create_dir_all(data.join("workspace"))?;
+    fs::write(data.join("workspace/secret.txt"), "token=abc123")?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
     enqueue(&conn, "Survey the workspace and report.", "now")?;
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec![
-            action_chars("fs.write", &[('p', "secret.txt"), ('c', "token=abc123")]),
-            action_chars("fs.read", &[('p', "secret.txt")]),
-        ],
+        outputs: vec![action_chars("fs.read", &[('p', "secret.txt")])],
         index: 0,
     };
-    let _snapshot = run_until_idle(&data, &mut endpoint, 2)?;
+    let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     let row: (String, String) = conn.query_row(
         "SELECT contamination_class, body FROM context_items

@@ -9,6 +9,7 @@ mod engine_actions;
 mod engine_checks;
 mod engine_completion;
 mod engine_extend;
+mod engine_messages;
 mod engine_plan;
 mod engine_steps;
 

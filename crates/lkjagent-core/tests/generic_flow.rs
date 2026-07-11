@@ -9,7 +9,7 @@ use lkjagent_core::runtime_decision::{
 };
 
 #[test]
-fn generic_task_closes_after_eight_plus_turns_with_faults() {
+fn generic_message_blocks_explore_after_eight_plus_turns() {
     let mut snapshot = instantiate(1, "Survey the workspace and report.");
     let mut all_commands = Vec::new();
 
@@ -20,7 +20,6 @@ fn generic_task_closes_after_eight_plus_turns_with_faults() {
         action("fs.search", "query", "release"),
         action("memory.find", "query", "workspace"),
         action("plan.note", "note", "ready to summarize"),
-        action("finish", "summary", "found enough evidence"),
         TurnOutcome::Model(ParsedOutput::Message("Survey complete.".to_string())),
         TurnOutcome::Noop,
     ];
@@ -32,14 +31,14 @@ fn generic_task_closes_after_eight_plus_turns_with_faults() {
         snapshot = next;
     }
 
-    assert_eq!(snapshot.task.state, TaskState::Closed);
-    assert!(snapshot.attempts.len() >= 8);
-    assert!(
+    assert_eq!(snapshot.task.state, TaskState::Blocked);
+    assert!(snapshot.attempts.len() >= 7);
+    assert_eq!(
         all_commands
             .iter()
             .filter(|cmd| matches!(cmd, Command::RunExplore(_)))
-            .count()
-            == 4
+            .count(),
+        4
     );
     assert!(all_commands
         .iter()

@@ -16,10 +16,6 @@ pub fn memory_save(topic: &str, content: &str) -> String {
     action_pairs("memory.save", &[("topic", topic), ("content", content)])
 }
 
-pub fn finish(summary: &str) -> String {
-    action_pairs("finish", &[("summary", summary)])
-}
-
 pub fn action_pairs(tool: &str, params: &[(&str, &str)]) -> String {
     action_for(
         "__DECISION_ID__",

@@ -6,18 +6,25 @@ use lkjagent_core::runtime_tool_call::{parse_tool_call, ToolCallError};
 #[test]
 fn rejects_name_value_argument_wrappers() -> Result<(), String> {
     let raw = "<lkjagent_action><decision_id>dec-1</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>fs.read</tool_name><argument><name>path</name><value>README.md</value></argument></lkjagent_action>";
-    let error = parse_tool_call(raw, &decision()).expect_err("name/value wrapper accepted");
+    let error = match parse_tool_call(raw, &decision()) {
+        Ok(_) => return Err("name/value wrapper accepted".to_string()),
+        Err(error) => error,
+    };
     assert_eq!(error, ToolCallError::UnknownTag("argument".to_string()));
     Ok(())
 }
 
 #[test]
-fn requires_one_input_block() {
+fn requires_one_input_block() -> Result<(), String> {
     let raw = "<lkjagent_action><decision_id>dec-1</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>fs.read</tool_name></lkjagent_action>";
-    let error = parse_tool_call(raw, &decision()).expect_err("missing input accepted");
+    let error = match parse_tool_call(raw, &decision()) {
+        Ok(_) => return Err("missing input accepted".to_string()),
+        Err(error) => error,
+    };
     assert!(
         matches!(error, ToolCallError::ArgsSchemaViolation(message) if message == "missing input")
     );
+    Ok(())
 }
 
 fn decision() -> RuntimeDecision {

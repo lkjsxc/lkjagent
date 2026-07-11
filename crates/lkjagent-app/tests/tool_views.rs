@@ -7,9 +7,6 @@ use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
-mod support;
-use support::finish;
-
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -21,7 +18,7 @@ fn default_explore_prompt_hides_shell_and_finish_tools() -> TestResult<()> {
     drop(conn);
 
     let mut endpoint = CapturingEndpoint {
-        output: finish("done"),
+        output: "<message>done</message>".to_string(),
         prompts: Vec::new(),
     };
     let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;

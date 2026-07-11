@@ -73,14 +73,14 @@ fn rejects_crossed_tags_unknown_tags_and_duplicate_args() -> TestResult<()> {
         ToolCallError::UnknownTag("extra".into())
     );
     let duplicate = action(
-        "finish",
-        &[("summary", "a"), ("summary", "b")],
+        "fs.read",
+        &[("path", "a.md"), ("path", "b.md")],
         "dec-1",
         "ctx-1",
     );
     assert_eq!(
         parse_err(&duplicate, "duplicate arg")?,
-        ToolCallError::DuplicateTag("input/summary".into())
+        ToolCallError::DuplicateTag("input/path".into())
     );
     Ok(())
 }
@@ -89,14 +89,14 @@ fn rejects_crossed_tags_unknown_tags_and_duplicate_args() -> TestResult<()> {
 fn rejects_stale_decision_context_and_unknown_tool() -> TestResult<()> {
     assert_eq!(
         parse_err(
-            &action("finish", &[("summary", "done")], "dec-old", "ctx-1"),
+            &action("fs.read", &[("path", "a.md")], "dec-old", "ctx-1"),
             "stale"
         )?,
         ToolCallError::DecisionMismatch
     );
     assert_eq!(
         parse_err(
-            &action("finish", &[("summary", "done")], "dec-1", "ctx-old"),
+            &action("fs.read", &[("path", "a.md")], "dec-1", "ctx-old"),
             "ctx"
         )?,
         ToolCallError::ContextMismatch
@@ -115,8 +115,8 @@ fn rejects_stale_decision_context_and_unknown_tool() -> TestResult<()> {
 fn rejects_unknown_missing_and_wrong_primitive_args() -> TestResult<()> {
     let err = parse_err(
         &action(
-            "finish",
-            &[("summary", "done"), ("other", "x")],
+            "fs.read",
+            &[("path", "a.md"), ("other", "x")],
             "dec-1",
             "ctx-1",
         ),

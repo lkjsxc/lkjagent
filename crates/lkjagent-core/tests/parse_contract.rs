@@ -82,27 +82,27 @@ fn decision_action_parser_uses_only_the_decision_tool_view() {
 
 #[test]
 fn explore_accepts_only_exact_action_blocks() {
-    let finish = action("decision-1", "finish", &[("summary", "done")], "ctx-1");
+    let read = action("decision-1", "fs.read", &[("path", "README.md")], "ctx-1");
     assert!(matches!(
-        parse_expected(StepKind::Explore, &finish),
-        Ok(ParsedOutput::Action(action)) if action.tool == "finish"
+        parse_expected(StepKind::Explore, &read),
+        Ok(ParsedOutput::Action(action)) if action.tool == "fs.read"
     ));
     assert_eq!(
         parse_expected(
             StepKind::Explore,
-            "<action><tool_name>finish</tool_name></action>",
+            "<action><tool_name>fs.read</tool_name></action>",
         ),
         Err(ParseFault::Action(ToolCallError::NoActionFound))
     );
     assert_eq!(
-        parse_expected(StepKind::Explore, "<finish>done</finish>"),
+        parse_expected(StepKind::Explore, "<report>done</report>"),
         Err(ParseFault::Action(ToolCallError::NoActionFound))
     );
     assert_eq!(
         parse_expected(StepKind::Explore, "<ask>Which file?</ask>"),
         Err(ParseFault::Action(ToolCallError::NoActionFound))
     );
-    let missing_tool = action("decision-1", "finish", &[], "ctx-1");
+    let missing_tool = action("decision-1", "fs.read", &[], "ctx-1");
     assert!(matches!(
         parse_expected(StepKind::Explore, &missing_tool),
         Err(ParseFault::Action(ToolCallError::ArgsSchemaViolation(_)))

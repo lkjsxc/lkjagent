@@ -71,7 +71,6 @@ fn dispatch(conn: &Connection, workspace: &Path, action: &Action) -> Result<Stri
         ToolEffect::MemoryFind => memory_find(conn, param(action, "query")?),
         ToolEffect::MemorySave => Ok(format!("saved topic={}", param(action, "topic")?)),
         ToolEffect::PlanNote => Ok(format!("noted: {}", param(action, "note")?)),
-        ToolEffect::Finish => Ok(param(action, "summary")?.to_string()),
     }
 }
 

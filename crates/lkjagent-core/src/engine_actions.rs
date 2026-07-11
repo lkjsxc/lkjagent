@@ -4,14 +4,6 @@ use crate::model::TaskSnapshot;
 use crate::parse::Action;
 use crate::runtime_decision::EffectCommand;
 
-pub(crate) fn finish_summary(action: &Action) -> Option<String> {
-    if action.tool == "finish" {
-        Some(param(action, "summary").unwrap_or_else(|| "explore finished".to_string()))
-    } else {
-        None
-    }
-}
-
 pub(crate) fn memory_save(action: &Action) -> Option<(String, String)> {
     if action.tool == "memory.save" {
         Some((param(action, "topic")?, param(action, "content")?))

@@ -77,8 +77,8 @@ the rebuild, not proof that the native authority loop is complete.
 
 Production still hydrates `TaskSnapshot`, task rows, step rows, fixed templates,
 and bridge projections. Context may be prepared before the final decision.
-Generic parsed messages and finish actions can settle steps without objective
-effect evidence. Recovery can repeat the same impossible model call. The live
+Generic parsed messages can settle steps without objective effect evidence.
+Recovery can repeat the same impossible model call. The live
 runner can count idle polls and replace the last real state with a synthetic
 closed snapshot. Default Explore decisions now render only read, search, memory
 find, and note tools, hiding shell and finish; completion handlers outside the

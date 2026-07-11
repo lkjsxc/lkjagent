@@ -11,7 +11,6 @@ pub enum ToolEffect {
     MemoryFind,
     MemorySave,
     PlanNote,
-    Finish,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -87,13 +86,6 @@ const EXPLORE_CATALOG: &[ToolDescriptor] = &[
         "record an exploration note",
         ToolEffect::PlanNote,
         &["note"],
-        &[],
-    ),
-    descriptor(
-        "finish",
-        "finish exploration",
-        ToolEffect::Finish,
-        &["summary"],
         &[],
     ),
 ];
