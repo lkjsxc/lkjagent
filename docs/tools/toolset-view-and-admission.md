@@ -14,7 +14,9 @@ Shell-like tools are present only when the persisted decision carries an
 explicit shell-capable view for development, verification, or recovery work.
 Each entry renders the tool name, purpose, required arguments, optional
 arguments, `ToolFieldSpec` value classes, value rules, relevant limits, and one
-concise XML-like skeleton when budget allows.
+concise XML-like skeleton when budget allows. Persisted views retain only
+canonical catalog entries. Admission rejects a removed action, including
+`finish`, even when malformed stored data names it.
 
 ## View Fingerprint
 
