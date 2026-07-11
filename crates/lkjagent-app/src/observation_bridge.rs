@@ -2,15 +2,17 @@ use std::path::Path;
 
 use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::runtime_context::{
-    contamination_for_observation, redact_sensitive_owner_data, ContaminationClass, ContextItem,
-    TrustClass,
+    contamination_for_observation, redact_sensitive_owner_data, ContaminationClass,
 };
 use lkjagent_core::runtime_decision::RuntimeDecision;
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
-use lkjagent_store::admission_rows::PreparedEffect;
+use lkjagent_store::admission_rows::{mark_journal, PreparedEffect};
 use lkjagent_store::context_rows::insert_context_item;
 use lkjagent_store::observation_rows::{settle_effect_observation, ObservationRow};
 use rusqlite::Connection;
+
+use crate::context_bridge::observation_context_item;
+use crate::effect_dispatch::DispatchFailure;
 
 pub fn persist_observations(
     conn: &mut Connection,
@@ -26,16 +28,64 @@ pub fn persist_observations(
     Ok(())
 }
 
-pub fn persist_failed_observations(
+pub fn settle_dispatch_failure(
+    conn: &mut Connection,
+    workspace: &Path,
+    decision: &RuntimeDecision,
+    snapshot: &TaskSnapshot,
+    effects: &[PreparedEffect],
+    failure: &DispatchFailure,
+    now: &str,
+) -> Result<(), String> {
+    let succeeded = failure.attempted.saturating_sub(1);
+    let completed = effects
+        .get(..succeeded)
+        .ok_or_else(|| "dispatch success count is invalid".to_string())?;
+    persist_observations(conn, workspace, decision, snapshot, completed, now)?;
+    let pending = effects
+        .get(succeeded..)
+        .ok_or_else(|| "dispatch pending range is invalid".to_string())?;
+    persist_failed_observations(
+        conn,
+        decision,
+        pending,
+        failure.attempted.min(1),
+        succeeded,
+        &failure.error,
+        now,
+    )
+}
+
+fn persist_failed_observations(
     conn: &mut Connection,
     decision: &RuntimeDecision,
     effects: &[PreparedEffect],
+    attempted: usize,
+    offset: usize,
     error: &str,
     now: &str,
 ) -> Result<(), String> {
-    for (index, effect) in effects.iter().enumerate() {
-        let row = observation(decision, index, effect, "error", error, "Clean", now);
+    let attempted = effects
+        .get(..attempted)
+        .ok_or_else(|| "dispatch attempted too many effects".to_string())?;
+    for (index, effect) in attempted.iter().enumerate() {
+        let row = observation(
+            decision,
+            offset + index,
+            effect,
+            "error",
+            error,
+            "Clean",
+            now,
+        );
         settle_effect_observation(conn, &effect.journal_id, "failed", &row)
+            .map_err(|error| error.to_string())?;
+    }
+    for effect in effects
+        .get(attempted.len()..)
+        .ok_or_else(|| "dispatch effect range is invalid".to_string())?
+    {
+        mark_journal(conn, &effect.journal_id, "compensated", now)
             .map_err(|error| error.to_string())?;
     }
     Ok(())
@@ -73,7 +123,7 @@ fn insert(
         insert_context_item(
             conn,
             &decision.case_id,
-            &context_item(&row.id, &effect.effect_name, content, contamination, now),
+            &observation_context_item(&row.id, &effect.effect_name, content, contamination, now),
         )
         .map_err(|error| error.to_string())?;
     }
@@ -114,10 +164,13 @@ fn effect_outcome(
     };
     match lkjagent_effects::workspace::resolve(workspace, path)
         .map_err(|error| error.to_string())
-        .and_then(|full| std::fs::read(full).map_err(|error| error.to_string()))
-        .and_then(|bytes| stable_fingerprint(&bytes).map_err(|error| error.message))
+        .and_then(|full| std::fs::read_to_string(full).map_err(|error| error.to_string()))
+        .and_then(|body| stable_fingerprint(&body).map_err(|error| error.message))
     {
-        Ok(fingerprint) => ("ok", format!("path={path}\nfingerprint={fingerprint}")),
+        Ok(fingerprint) if fingerprint == effect.intended_fingerprint => {
+            ("ok", format!("path={path}\nfingerprint={fingerprint}"))
+        }
+        Ok(fingerprint) => ("error", format!("postcondition mismatch: {fingerprint}")),
         Err(error) => ("error", format!("postcondition unavailable: {error}")),
     }
 }
@@ -128,28 +181,6 @@ fn stored_content(content: &str, contamination: ContaminationClass) -> String {
     } else {
         content.to_string()
     }
-}
-
-fn context_item(
-    id: &str,
-    effect_name: &str,
-    content: String,
-    contamination: ContaminationClass,
-    now: &str,
-) -> ContextItem {
-    let mut item = ContextItem::clean_fact(
-        format!("context-{id}"),
-        format!("observation/{effect_name}"),
-        content,
-    );
-    item.source_type = "observation".to_string();
-    item.source_id = id.to_string();
-    item.source_fingerprint = format!("observation:{id}");
-    item.trust = TrustClass::Measured;
-    item.contamination = contamination;
-    item.decision_id = id.split("-observation-").next().map(str::to_string);
-    item.created_at = now.to_string();
-    item
 }
 
 fn latest_observation(snapshot: &TaskSnapshot) -> String {

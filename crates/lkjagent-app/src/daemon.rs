@@ -2,7 +2,6 @@ use std::path::Path;
 
 use lkjagent_core::engine::{apply_turn, next_work_with_decision, TurnOutcome, Work};
 use lkjagent_core::model::{TaskSnapshot, TaskState};
-use lkjagent_store::admission_rows::{mark_journal, PreparedEffect};
 use lkjagent_store::effect_recovery::recover_unsettled_effects;
 use lkjagent_store::plan_commit::commit_turn;
 use lkjagent_store::plan_schema::setup;
@@ -12,16 +11,16 @@ use crate::admission_bridge::persist_tool_admissions;
 use crate::clock::{Clock, SystemClock};
 use crate::context_bridge::{prepare_prompt_context, snapshot_with_prompt_context};
 use crate::daemon_intake::{idle_snapshot, load_runtime_snapshot};
+use crate::effect_dispatch::{dispatch_effects, mark_effects};
 use crate::effect_error::settle as settle_effect_error;
 use crate::endpoint::LlmEndpoint;
-use crate::exchange_bridge::persist_provider_exchange;
+use crate::exchange_bridge::{persist_prompt_frame, persist_provider_exchange};
 use crate::model_call::{apply_record, call};
-use crate::observation_bridge::{persist_failed_observations, persist_observations};
-use crate::prompt_bridge::persist_prompt_frame;
+use crate::observation_bridge::{persist_observations, settle_dispatch_failure};
 use crate::recovery_bridge::{record_command_recovery_facts, record_recovery_fact};
 use crate::runtime_bridge::{prepare_runtime_decision, settle_runtime_decision};
 use crate::snapshot_state::persist_snapshot_cell;
-use crate::turn_effects::{dispatch_effects, gather_checks, tag_check_evidence};
+use crate::turn_effects::{gather_checks, tag_check_evidence};
 
 pub use crate::model_io::{CompletionRecord, Endpoint, ScriptedEndpoint};
 
@@ -50,18 +49,19 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     max_turns: usize,
     clock: &mut C,
 ) -> Result<TaskSnapshot, String> {
-    let db = data_dir.join("lkjagent.sqlite3");
     let workspace = crate::config::workspace_root(data_dir)?;
     let logs = data_dir.join("logs");
     crate::workspace_scaffold::ensure_root(&workspace)?;
-    let mut conn = Connection::open(db).map_err(|error| error.to_string())?;
+    let mut conn =
+        Connection::open(data_dir.join("lkjagent.sqlite3")).map_err(|error| error.to_string())?;
     setup(&conn).map_err(|error| error.to_string())?;
-    let heartbeat = clock.now();
-    crate::daemon_lock::claim(&conn, &heartbeat)?;
-    recover_unsettled_effects(&mut conn, &workspace, &heartbeat)
-        .map_err(|error| error.to_string())?;
+    let now = clock.now();
+    crate::daemon_lock::claim(&conn, &now)?;
+    recover_unsettled_effects(&mut conn, &workspace, &now).map_err(|error| error.to_string())?;
     let mut snapshot = match load_runtime_snapshot(&mut conn, data_dir, clock)? {
-        Some(snapshot) if runnable(&snapshot) => snapshot,
+        Some(snapshot) if matches!(snapshot.task.state, TaskState::Open | TaskState::Waiting) => {
+            snapshot
+        }
         Some(snapshot) => return Ok(snapshot),
         None => return Ok(idle_snapshot()),
     };
@@ -72,10 +72,6 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
         snapshot = run_turn(&mut conn, &workspace, &logs, snapshot, endpoint, clock)?;
     }
     Ok(snapshot)
-}
-
-fn runnable(snapshot: &TaskSnapshot) -> bool {
-    matches!(snapshot.task.state, TaskState::Open | TaskState::Waiting)
 }
 
 fn run_turn<E: Endpoint, C: Clock>(
@@ -123,15 +119,20 @@ fn run_turn<E: Endpoint, C: Clock>(
                     }
                 };
             mark_effects(conn, &prepared, "applying", &now)?;
-            if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands, &now) {
-                persist_failed_observations(conn, &decision, &prepared, &error, &now)?;
-                let settled = settle_effect_error(conn, &snapshot, &work, error.clone(), &now)?;
+            if let Err(failure) =
+                dispatch_effects(conn, workspace, &mut next, &commands, &prepared, &now)
+            {
+                settle_dispatch_failure(
+                    conn, workspace, &decision, &next, &prepared, &failure, &now,
+                )?;
+                let settled =
+                    settle_effect_error(conn, &snapshot, &work, failure.error.clone(), &now)?;
                 record_recovery_fact(
                     conn,
                     &decision.case_id,
                     &decision.id,
                     "effect",
-                    &error,
+                    &failure.error,
                     0,
                     &now,
                 )?;
@@ -158,15 +159,15 @@ fn run_turn<E: Endpoint, C: Clock>(
     tag_check_evidence(conn, &mut next, &mut commands, &decision.id)?;
     let prepared = persist_tool_admissions(conn, workspace, &decision, &commands, &now)?;
     mark_effects(conn, &prepared, "applying", &now)?;
-    if let Err(error) = dispatch_effects(conn, workspace, &mut next, &commands, &now) {
-        persist_failed_observations(conn, &decision, &prepared, &error, &now)?;
-        let settled = settle_effect_error(conn, &snapshot, &work, error.clone(), &now)?;
+    if let Err(failure) = dispatch_effects(conn, workspace, &mut next, &commands, &prepared, &now) {
+        settle_dispatch_failure(conn, workspace, &decision, &next, &prepared, &failure, &now)?;
+        let settled = settle_effect_error(conn, &snapshot, &work, failure.error.clone(), &now)?;
         record_recovery_fact(
             conn,
             &decision.case_id,
             &decision.id,
             "effect",
-            &error,
+            &failure.error,
             0,
             &now,
         )?;
@@ -180,16 +181,4 @@ fn run_turn<E: Endpoint, C: Clock>(
     persist_snapshot_cell(conn, &next, &now)?;
     settle_runtime_decision(conn, &decision, "settled", &now)?;
     Ok(next)
-}
-
-fn mark_effects(
-    conn: &Connection,
-    effects: &[PreparedEffect],
-    state: &str,
-    now: &str,
-) -> Result<(), String> {
-    for effect in effects {
-        mark_journal(conn, &effect.journal_id, state, now).map_err(|error| error.to_string())?;
-    }
-    Ok(())
 }

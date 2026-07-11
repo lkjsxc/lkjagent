@@ -2,7 +2,8 @@ use std::collections::BTreeSet;
 
 use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::runtime_context::{
-    detect_contradictions, select_context_plan, ContextConflict, ContextFramePlan, ContextItem,
+    detect_contradictions, select_context_plan, ContaminationClass, ContextConflict,
+    ContextFramePlan, ContextItem, TrustClass,
 };
 use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
@@ -57,6 +58,28 @@ pub fn snapshot_with_prompt_context(
             .push_str(&format!("\ncontext_items:\n{}", context.text));
     }
     next
+}
+
+pub fn observation_context_item(
+    id: &str,
+    effect_name: &str,
+    content: String,
+    contamination: ContaminationClass,
+    now: &str,
+) -> ContextItem {
+    let mut item = ContextItem::clean_fact(
+        format!("context-{id}"),
+        format!("observation/{effect_name}"),
+        content,
+    );
+    item.source_type = "observation".to_string();
+    item.source_id = id.to_string();
+    item.source_fingerprint = format!("observation:{id}");
+    item.trust = TrustClass::Measured;
+    item.contamination = contamination;
+    item.decision_id = id.split("-observation-").next().map(str::to_string);
+    item.created_at = now.to_string();
+    item
 }
 
 fn objective_item(snapshot: &TaskSnapshot, now: &str) -> ContextItem {

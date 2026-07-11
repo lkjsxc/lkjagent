@@ -1,4 +1,4 @@
-use std::{fs, path::Path};
+use std::path::Path;
 
 use lkjagent_core::checks::{CommandFact, FileFact};
 use lkjagent_core::engine::{Command, TurnOutcome};
@@ -30,38 +30,6 @@ pub fn gather_checks(
     Ok(TurnOutcome::Checks(files, commands))
 }
 
-pub fn dispatch_effects(
-    conn: &Connection,
-    workspace: &Path,
-    snapshot: &mut TaskSnapshot,
-    commands: &[Command],
-    now: &str,
-) -> Result<(), String> {
-    for command in commands {
-        match command {
-            Command::WriteFile { path, content } => {
-                let (body, units) = write_content(workspace, path, content)?;
-                crate::artifact_effects::persist_artifacts(
-                    conn, snapshot, path, &body, &units, now,
-                )?;
-            }
-            Command::AppendFile { path, content } => {
-                let (body, units) = append_content(workspace, path, content)?;
-                crate::artifact_effects::persist_artifacts(
-                    conn, snapshot, path, &body, &units, now,
-                )?;
-            }
-            Command::RunExplore(action) => crate::explore::run(conn, workspace, snapshot, action)?,
-            Command::RecordAttempt(_)
-            | Command::RecordEvent(_)
-            | Command::RecordMemory { .. }
-            | Command::RecordChecks { .. }
-            | Command::AddSteps(_) => {}
-        }
-    }
-    Ok(())
-}
-
 fn shell_ok(workspace: &Path, cmd: &str) -> Result<bool, String> {
     Ok(lkjagent_effects::shell::run(workspace, cmd, 30)
         .map_err(|e| e.to_string())?
@@ -78,42 +46,6 @@ fn dedupe_files(files: &mut Vec<FileFact>) {
             true
         }
     });
-}
-
-fn write_content(
-    workspace: &Path,
-    path: &str,
-    content: &str,
-) -> Result<(String, Vec<lkjagent_core::runtime_artifact::ArtifactUnit>), String> {
-    let body = content.to_string();
-    write_assembled(workspace, path, &body)
-}
-
-fn append_content(
-    workspace: &Path,
-    path: &str,
-    content: &str,
-) -> Result<(String, Vec<lkjagent_core::runtime_artifact::ArtifactUnit>), String> {
-    let full = lkjagent_effects::workspace::resolve(workspace, path).map_err(|e| e.to_string())?;
-    let mut body = if full.exists() {
-        fs::read_to_string(full).map_err(|e| e.to_string())?
-    } else {
-        String::new()
-    };
-    body.push_str(content);
-    write_assembled(workspace, path, &body)
-}
-
-fn write_assembled(
-    workspace: &Path,
-    path: &str,
-    body: &str,
-) -> Result<(String, Vec<lkjagent_core::runtime_artifact::ArtifactUnit>), String> {
-    let (assembled, units) = crate::artifact_effects::assemble_content(path, body)?;
-    crate::artifact_effects::sync_part_files(workspace, path, &units)?;
-    lkjagent_effects::workspace::write(workspace, path, &assembled)
-        .map_err(|error| error.to_string())?;
-    Ok((assembled, units))
 }
 
 pub fn tag_check_evidence(

@@ -1,7 +1,7 @@
 use lkjagent_core::runtime_admission::ToolAdmission;
 use rusqlite::{params, Connection};
 
-use crate::error::StoreResult;
+use crate::error::{StoreError, StoreResult};
 use crate::row_json::json_string;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -10,6 +10,8 @@ pub struct PreparedEffect {
     pub journal_id: String,
     pub command_ordinal: i64,
     pub target_path: Option<String>,
+    pub prior_fingerprint: String,
+    pub intended_fingerprint: String,
     pub effect_name: String,
 }
 
@@ -74,16 +76,34 @@ pub fn insert_admission_and_prepare(
         journal_id: preparation.journal_id.to_string(),
         command_ordinal: preparation.command_ordinal,
         target_path: preparation.target_path.map(str::to_string),
+        prior_fingerprint: preparation.prior_fingerprint.to_string(),
+        intended_fingerprint: preparation.intended_fingerprint.to_string(),
         effect_name: preparation.admission.action_tool.clone(),
     })
 }
 
 pub fn mark_journal(conn: &Connection, id: &str, state: &str, now: &str) -> StoreResult<()> {
-    conn.execute(
-        "UPDATE effect_journal SET state = ?2, updated_at = ?3 WHERE id = ?1",
-        params![id, state, now],
+    let expected = match state {
+        "applying" => "prepared",
+        "compensated" => "applying",
+        _ => {
+            return Err(StoreError::InvalidState(format!(
+                "invalid journal transition to {state}"
+            )))
+        }
+    };
+    let changed = conn.execute(
+        "UPDATE effect_journal SET state = ?2, updated_at = ?3
+         WHERE id = ?1 AND state = ?4 AND observation_id IS NULL",
+        params![id, state, now, expected],
     )?;
-    Ok(())
+    if changed == 1 {
+        Ok(())
+    } else {
+        Err(StoreError::InvalidState(
+            "journal transition was not available".to_string(),
+        ))
+    }
 }
 
 pub fn insert_tool_admission(
