@@ -107,6 +107,9 @@ pub fn next_work(snapshot: &TaskSnapshot) -> Work {
     if let Some(reason) = step_preflight_blocker(snapshot, step.id) {
         return Work::BlockTask(reason);
     }
+    if step.kind == StepKind::Explore {
+        return Work::BlockTask("Explore requires a persisted runtime decision".to_string());
+    }
     if step.kind == StepKind::Verify
         && step
             .checks

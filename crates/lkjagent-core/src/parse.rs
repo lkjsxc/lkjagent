@@ -1,9 +1,8 @@
 use serde_json::Value;
 
 use crate::model::{CheckResult, StepKind};
-use crate::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
+use crate::runtime_decision::{OutputEnvelope, RuntimeDecision};
 use crate::runtime_tool_call::{parse_tool_call, ToolCallError};
-use crate::runtime_tool_catalog::explore_tool_view;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ParsedOutput {
@@ -43,6 +42,7 @@ pub enum ParseFault {
     Empty,
     UnknownTool,
     BadParams,
+    DecisionRequired,
     BadPlanLine(String),
     Action(ToolCallError),
 }
@@ -54,6 +54,7 @@ pub fn parse_fault_diagnosis(fault: &ParseFault) -> String {
         ParseFault::Empty => "Put non-empty content inside the expected envelope.".into(),
         ParseFault::UnknownTool => "Choose one tool from the selected tool view.".into(),
         ParseFault::BadParams => "Use selected tool argument names and primitive values.".into(),
+        ParseFault::DecisionRequired => "Wait for the persisted runtime decision.".into(),
         ParseFault::BadPlanLine(line) => format!("Revise plan line `{line}` to the grammar."),
         ParseFault::Action(error) => format!(
             "Action parse fault: {error:?}. Repair: {}",
@@ -77,20 +78,12 @@ fn action_hint(error: &ToolCallError) -> &'static str {
 }
 
 pub fn parse_expected(kind: StepKind, raw: &str) -> Result<ParsedOutput, ParseFault> {
-    parse_expected_with_view(kind, raw, &explore_tool_view())
-}
-
-pub fn parse_expected_with_view(
-    kind: StepKind,
-    raw: &str,
-    view: &ToolSetView,
-) -> Result<ParsedOutput, ParseFault> {
     match kind {
         StepKind::Write | StepKind::Revise => block(raw, "content").map(ParsedOutput::Content),
         StepKind::Plan => {
             crate::parse_plan::parse_plan(&block(raw, "plan")?).map(ParsedOutput::Plan)
         }
-        StepKind::Explore => parse_action(raw, &synthetic_action_decision(view)),
+        StepKind::Explore => Err(ParseFault::DecisionRequired),
         StepKind::Respond | StepKind::Ask => block(raw, "message").map(ParsedOutput::Message),
         StepKind::Verify => parse_verdict(&block(raw, "verdict")?).map(ParsedOutput::Verdict),
     }
@@ -159,18 +152,6 @@ fn param_value(value: &Value) -> String {
         Value::String(text) => text.clone(),
         other => other.to_string(),
     }
-}
-
-fn synthetic_action_decision(view: &ToolSetView) -> RuntimeDecision {
-    let mut decision = RuntimeDecision::new(
-        "decision-1",
-        "case-1",
-        OperationKey("model.call".to_string()),
-        view.clone(),
-        OutputEnvelope::Action,
-    );
-    decision.context_frame_fingerprint = "ctx-1".to_string();
-    decision
 }
 
 fn parse_verdict(body: &str) -> Result<CheckResult, ParseFault> {

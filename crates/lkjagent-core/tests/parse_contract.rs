@@ -3,7 +3,6 @@ use lkjagent_core::parse::{parse_expected, parse_expected_for_decision, ParseFau
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
 };
-use lkjagent_core::runtime_tool_call::ToolCallError;
 
 #[test]
 fn parses_docs_plan_examples() {
@@ -43,7 +42,7 @@ fn reports_docs_fault_examples() {
     let action = action("decision-1", "graph.state", &[], "ctx-1");
     assert_eq!(
         parse_expected(StepKind::Explore, &action),
-        Err(ParseFault::UnknownTool)
+        Err(ParseFault::DecisionRequired)
     );
     assert_eq!(
         parse_expected(StepKind::Write, "note <content>x</content>"),
@@ -81,39 +80,17 @@ fn decision_action_parser_uses_only_the_decision_tool_view() {
 }
 
 #[test]
-fn explore_accepts_only_exact_action_blocks() {
-    let read = action("decision-1", "fs.read", &[("path", "README.md")], "ctx-1");
-    assert!(matches!(
-        parse_expected(StepKind::Explore, &read),
-        Ok(ParsedOutput::Action(action)) if action.tool == "fs.read"
-    ));
-    assert_eq!(
-        parse_expected(
-            StepKind::Explore,
-            "<action><tool_name>fs.read</tool_name></action>",
-        ),
-        Err(ParseFault::Action(ToolCallError::NoActionFound))
-    );
-    assert_eq!(
-        parse_expected(StepKind::Explore, "<report>done</report>"),
-        Err(ParseFault::Action(ToolCallError::NoActionFound))
-    );
-    assert_eq!(
-        parse_expected(StepKind::Explore, "<ask>Which file?</ask>"),
-        Err(ParseFault::Action(ToolCallError::NoActionFound))
-    );
-    let missing_tool = action("decision-1", "fs.read", &[], "ctx-1");
-    assert!(matches!(
-        parse_expected(StepKind::Explore, &missing_tool),
-        Err(ParseFault::Action(ToolCallError::ArgsSchemaViolation(_)))
-    ));
-    let duplicate = "<lkjagent_action><decision_id>decision-1</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>fs.read</tool_name><input><path>a</path><path>b</path></input></lkjagent_action>";
-    assert_eq!(
-        parse_expected(StepKind::Explore, duplicate),
-        Err(ParseFault::Action(ToolCallError::DuplicateTag(
-            "input/path".into(),
-        )))
-    );
+fn generic_explore_rejects_every_action_shape() {
+    for raw in [
+        action("decision-1", "fs.read", &[("path", "README.md")], "ctx-1"),
+        "<action><tool_name>fs.read</tool_name></action>".to_string(),
+        "<report>done</report>".to_string(),
+    ] {
+        assert_eq!(
+            parse_expected(StepKind::Explore, &raw),
+            Err(ParseFault::DecisionRequired)
+        );
+    }
 }
 
 fn action(decision_id: &str, tool: &str, args: &[(&str, &str)], context: &str) -> String {

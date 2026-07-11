@@ -88,6 +88,8 @@ selected view remain an open authority gap. Action cards and the decision parser
 now use direct fields inside one input block and reject name/value wrappers.
 The parser bounds scalars and fields at 4,096 bytes and actions at 16,384 bytes.
 Persisted views discard catalog-excluded entries, and admission rejects them.
+Decision-free generic Explore parsing and work selection now block rather than
+synthesizing a catalog-wide action view.
 
 Workspace behavior is split across record commands, template writes, direct
 filesystem tools, and native text effects. They do not share one transaction,

@@ -3,65 +3,28 @@ use lkjagent_core::engine::{
     apply_turn, next_work, next_work_with_decision, Command, TurnOutcome, Work,
 };
 use lkjagent_core::model::{CheckSpec, StepState, TaskState};
-use lkjagent_core::parse::{Action, ParseFault, ParsedOutput};
+use lkjagent_core::parse::ParsedOutput;
 use lkjagent_core::runtime_decision::{
     EffectCommand, OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView,
 };
 
 #[test]
-fn generic_message_blocks_explore_after_eight_plus_turns() {
-    let mut snapshot = instantiate(1, "Survey the workspace and report.");
-    let mut all_commands = Vec::new();
-
-    let outcomes = vec![
-        TurnOutcome::ParseFault(ParseFault::WrongBlock),
-        TurnOutcome::ParseFault(ParseFault::Empty),
-        action("fs.read", "path", "README.md"),
-        action("fs.search", "query", "release"),
-        action("memory.find", "query", "workspace"),
-        action("plan.note", "note", "ready to summarize"),
-        TurnOutcome::Model(ParsedOutput::Message("Survey complete.".to_string())),
-        TurnOutcome::Noop,
-    ];
-
-    for outcome in outcomes {
-        let work = next_work(&snapshot);
-        let (next, commands) = apply_turn(&snapshot, &work, outcome);
-        all_commands.extend(commands);
-        snapshot = next;
-    }
-
-    assert_eq!(snapshot.task.state, TaskState::Blocked);
-    assert!(snapshot.attempts.len() >= 7);
-    assert_eq!(
-        all_commands
-            .iter()
-            .filter(|cmd| matches!(cmd, Command::RunExplore(_)))
-            .count(),
-        4
-    );
-    assert!(all_commands
-        .iter()
-        .any(|cmd| matches!(cmd, Command::RecordEvent(_))));
+fn generic_explore_requires_a_persisted_decision() {
+    let snapshot = instantiate(1, "Survey the workspace and report.");
+    assert!(matches!(
+        next_work(&snapshot),
+        Work::BlockTask(reason) if reason == "Explore requires a persisted runtime decision"
+    ));
 }
 
 #[test]
-fn repeated_explore_action_is_not_executed() {
-    let snapshot = instantiate(3, "Survey the workspace and report.");
+fn generic_explore_blocked_turn_emits_no_effect_command() {
+    let snapshot = instantiate(2, "Survey the workspace and report.");
     let work = next_work(&snapshot);
-    let (snapshot, _) = apply_turn(&snapshot, &work, action("fs.read", "path", "README.md"));
-    let work = next_work(&snapshot);
-    let (snapshot, commands) = apply_turn(&snapshot, &work, action("fs.read", "path", "README.md"));
-    assert_eq!(snapshot.steps[0].actions_used, 1);
-    assert_eq!(snapshot.steps[0].attempts_used, 1);
+    let (_, commands) = apply_turn(&snapshot, &work, TurnOutcome::Noop);
     assert!(!commands
         .iter()
-        .any(|cmd| matches!(cmd, Command::RunExplore(_))));
-    assert!(commands.iter().any(|cmd| matches!(
-        cmd,
-        Command::RecordAttempt(attempt)
-            if attempt.diagnosis.contains("repeated action")
-    )));
+        .any(|command| matches!(command, Command::RunExplore(_))));
 }
 
 #[test]
@@ -102,13 +65,6 @@ fn decision(operation: &str, envelope: OutputEnvelope) -> RuntimeDecision {
         ToolSetView::empty(),
         envelope,
     )
-}
-
-fn action(tool: &str, name: &str, value: &str) -> TurnOutcome {
-    TurnOutcome::Model(ParsedOutput::Action(Action {
-        tool: tool.to_string(),
-        params: vec![(name.to_string(), value.to_string())],
-    }))
 }
 
 #[test]
