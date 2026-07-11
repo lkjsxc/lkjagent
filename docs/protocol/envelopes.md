@@ -43,6 +43,8 @@ bounded question rather than settling the matter.
 The pure parser accepts one complete expected envelope or returns a typed fault
 with a bounded diagnosis. It never executes partial output, repairs values,
 normalizes conflicting shapes, or treats prose outside the envelope as success.
+Action parsing has no generic Explore fallback: it requires the persisted
+runtime decision that owns the decision ID, context fingerprint, and tool view.
 
 Placeholder values such as `...`, `PATH`, `TODO`, `VALUE`, `<path>`, or `[path]`
 are non-executable and fail admission before any effect.

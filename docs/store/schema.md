@@ -49,8 +49,9 @@ and remaining budget. Its causal tuple is unique.
 `tool_admissions` stores decision, action ordinal and fingerprint, model or
 harness origin, effectful flag, accepted or rejected status, and typed reason.
 
-`effect_journal` stores decision, unique non-null admission, unique idempotency
-key, state, and intended, prior, and outcome fingerprints.
+`effect_journal` stores decision, command ordinal, unique non-null admission,
+unique idempotency key, state, and intended, prior, and outcome fingerprints.
+Observations reference exactly one journal row; rejected admissions have none.
 
 `observations` stores a unique effect reference, status, attempt outcome,
 bounded content reference, fingerprint, and contamination.

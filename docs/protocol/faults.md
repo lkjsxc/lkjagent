@@ -13,9 +13,10 @@ fingerprint, and required change.
 
 ## Admission Faults
 
-Stable admission faults include `stale_decision`, `stale_context`,
-`hidden_tool`, `bad_field`, `placeholder`, `path_escape`, `budget_exceeded`,
-`duplicate_effect`, and `policy_rejected`. Rejection commits without an effect
+Stable admission faults include `decision_required`, `stale_decision`,
+`stale_context`, `hidden_tool`, `bad_field`, `placeholder`, `path_escape`,
+`budget_exceeded`, `duplicate_effect`, and `policy_rejected`. A decision-free
+Explore action is `decision_required`. Rejection commits without an effect
 journal row.
 
 ## Contamination
