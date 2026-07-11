@@ -12,21 +12,34 @@ fn rejects_placeholder_values_before_effects() -> Result<(), String> {
         "case-1",
         OperationKey("model.call".to_string()),
         ToolSetView::new(vec![
-            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new()),
-            ToolViewEntry::new("finish", "finish").with_params(vec!["summary"], Vec::new()),
+            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new())
         ]),
         OutputEnvelope::Action,
     );
 
     let path = admit_action(&decision, &action("fs.read", "path", "FIELD_VALUE"))
         .map_err(|error| error.message)?;
-    let summary = admit_action(&decision, &action("finish", "summary", "TODO"))
-        .map_err(|error| error.message)?;
-
     assert_eq!(path.status, AdmissionStatus::Rejected);
     assert_eq!(path.reason, "placeholder value for path");
-    assert_eq!(summary.status, AdmissionStatus::Rejected);
-    assert_eq!(summary.reason, "placeholder value for summary");
+    Ok(())
+}
+
+#[test]
+fn catalog_excluded_view_entry_is_not_admitted() -> Result<(), String> {
+    let decision = RuntimeDecision::new(
+        "decision-1",
+        "case-1",
+        OperationKey("model.call".to_string()),
+        ToolSetView::new(vec![
+            ToolViewEntry::new("finish", "removed action").with_params(vec!["summary"], Vec::new())
+        ]),
+        OutputEnvelope::Action,
+    );
+    let result = admit_action(&decision, &action("finish", "summary", "done"))
+        .map_err(|error| error.message)?;
+
+    assert_eq!(result.status, AdmissionStatus::Rejected);
+    assert_eq!(result.reason, "tool catalog excludes finish");
     Ok(())
 }
 

@@ -36,24 +36,24 @@ fn decision_fingerprint_is_stable_for_canonical_tool_view() {
         "decision-1",
         "case-1",
         OperationKey("model.call".to_string()),
-        ToolSetView::new(vec![finish_tool(), read_tool()]),
+        ToolSetView::new(vec![search_tool(), read_tool()]),
         OutputEnvelope::Action,
     );
     let right = RuntimeDecision::new(
         "decision-1",
         "case-1",
         OperationKey("model.call".to_string()),
-        ToolSetView::new(vec![read_tool(), finish_tool()]),
+        ToolSetView::new(vec![read_tool(), search_tool()]),
         OutputEnvelope::Action,
     );
 
     assert_eq!(decision_fingerprint(&left), decision_fingerprint(&right));
-    assert_eq!(left.tool_view.tool_names(), vec!["finish", "fs.read"]);
+    assert_eq!(left.tool_view.tool_names(), vec!["fs.read", "fs.search"]);
 }
 
 #[test]
 fn rendered_tool_view_and_admission_match() {
-    let decision = decision_with_tools(vec![read_tool(), finish_tool()]);
+    let decision = decision_with_tools(vec![read_tool()]);
     let read_action = action("fs.read", vec![("path", "docs/current-state.md")]);
     let admitted = admit(&decision, &read_action);
     let rejected = admit(&decision, &action("shell.run", vec![("command", "pwd")]));
@@ -135,8 +135,8 @@ fn read_tool() -> ToolViewEntry {
     ToolViewEntry::new("fs.read", "read a workspace file").with_params(vec!["path"], vec!["count"])
 }
 
-fn finish_tool() -> ToolViewEntry {
-    ToolViewEntry::new("finish", "finish exploration").with_params(vec!["summary"], Vec::new())
+fn search_tool() -> ToolViewEntry {
+    ToolViewEntry::new("fs.search", "search workspace").with_params(vec!["query"], vec!["path"])
 }
 
 fn decision_with_tools(entries: Vec<ToolViewEntry>) -> RuntimeDecision {

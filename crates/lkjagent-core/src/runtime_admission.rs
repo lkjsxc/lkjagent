@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolValueClass};
 use crate::runtime_fingerprint::FingerprintError;
+use crate::runtime_tool_catalog::effect_for_tool;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ModelAction {
@@ -49,6 +50,9 @@ pub fn admit_action(
 fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<String> {
     if decision.expected_envelope != OutputEnvelope::Action {
         return Some("decision does not admit actions".to_string());
+    }
+    if effect_for_tool(&action.tool).is_none() {
+        return Some(format!("tool catalog excludes {}", action.tool));
     }
     let entry = match decision.tool_view.entry(&action.tool) {
         Some(entry) => entry,

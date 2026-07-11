@@ -7,6 +7,7 @@ use crate::runtime_decision::{
 use crate::runtime_fingerprint::FingerprintError;
 use crate::runtime_operation::RuntimeOperation;
 use crate::runtime_state::{RuntimeSnapshot, StateCell};
+use crate::runtime_tool_catalog::{descriptor_entry, explore_catalog};
 
 pub fn select_runtime_decision(
     snapshot: &RuntimeSnapshot,
@@ -141,13 +142,11 @@ pub(crate) fn payload_effect_command(payload: &Value) -> Option<EffectCommand> {
 }
 
 fn tool_entry(value: &Value) -> Option<ToolViewEntry> {
-    let mut entry = ToolViewEntry::new(
-        payload_text(value, "name")?,
-        payload_text(value, "purpose").unwrap_or(""),
-    );
-    entry.required_params = strings(value.get("required_params"));
-    entry.optional_params = strings(value.get("optional_params"));
-    Some(entry)
+    let name = payload_text(value, "name")?;
+    explore_catalog()
+        .iter()
+        .find(|descriptor| descriptor.name == name)
+        .map(descriptor_entry)
 }
 
 fn strings(value: Option<&Value>) -> Vec<String> {

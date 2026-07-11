@@ -84,6 +84,7 @@ closed snapshot. Default Explore decisions now render only read, search, memory
 find, and note tools, hiding shell and finish; completion handlers outside the
 selected view remain an open authority gap. Action cards and the decision parser
 now use direct fields inside one input block and reject name/value wrappers.
+Persisted views discard catalog-excluded entries, and admission rejects them.
 
 Workspace behavior is split across record commands, template writes, direct
 filesystem tools, and native text effects. They do not share one transaction,
