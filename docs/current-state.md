@@ -81,8 +81,8 @@ Generic parsed messages and finish actions can settle steps without objective
 effect evidence. Recovery can repeat the same impossible model call. The live
 runner can count idle polls and replace the last real state with a synthetic
 closed snapshot. Default Explore decisions now render only read, search, memory
-find, and note tools, hiding shell and finish; legacy completion handlers remain
-an open authority gap.
+find, and note tools, hiding shell and finish; completion handlers outside the
+selected view remain an open authority gap.
 
 Workspace behavior is split across record commands, template writes, direct
 filesystem tools, and native text effects. They do not share one transaction,

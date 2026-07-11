@@ -24,6 +24,11 @@ const SUITES: &[Suite] = &[
         minimum_tests: 2,
     },
     Suite {
+        package: "lkjagent-app",
+        target: "cli_rows",
+        minimum_tests: 4,
+    },
+    Suite {
         package: "lkjagent-store",
         target: "workspace_rows",
         minimum_tests: 1,

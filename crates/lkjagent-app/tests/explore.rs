@@ -1,7 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
 
-use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, CompletionRecord, Endpoint, ScriptedEndpoint};
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::model::{StepKind, TaskSnapshot, TaskState};
@@ -16,39 +15,31 @@ use lkjagent_store::state_rows::insert_case;
 use rusqlite::Connection;
 
 mod support;
-use support::{action_chars, action_for, finish, memory_save};
+use support::{action_chars, action_for, action_pairs};
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn explore_registry_runs_bounded_workspace_tools() -> TestResult<()> {
+fn explore_registry_runs_small_workspace_view() -> TestResult<()> {
     let data = fixture_root("registry")?;
+    fs::create_dir_all(data.join("workspace"))?;
+    fs::write(data.join("workspace/probe.txt"), "hello release")?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
     enqueue(&conn, "Survey the workspace and report.", "now")?;
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![
-            action_chars("fs.write", &[('p', "probe.txt"), ('c', "hello release")]),
             action_chars("fs.read", &[('p', "probe.txt")]),
-            memory_save("probe", "hello release"),
-            finish("read probe"),
-            "<message>done</message>".to_string(),
+            action_chars("fs.search", &[('q', "release")]),
+            action_pairs("plan.note", &[("note", "probe reviewed")]),
         ],
         index: 0,
     };
-    let snapshot = run_until_idle(&data, &mut endpoint, 6)?;
-    assert_eq!(snapshot.task.state, TaskState::Closed);
-    assert!(data.join("workspace/probe.txt").exists());
+    let snapshot = run_until_idle(&data, &mut endpoint, 3)?;
+    assert_eq!(snapshot.task.state, TaskState::Open);
     assert!(snapshot.steps[0].inputs.contains("<observation>"));
-    assert!(snapshot.steps[0].inputs.contains("saved topic=probe"));
-    assert!(cli::run([
-        "--data",
-        data.to_string_lossy().as_ref(),
-        "memory",
-        "release"
-    ])?
-    .contains("hello release"));
+    assert!(snapshot.steps[0].inputs.contains("noted: probe reviewed"));
     Ok(())
 }
 
@@ -115,18 +106,21 @@ fn memory_find_reads_durable_rows() -> TestResult<()> {
     let data = fixture_root("memory-find")?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
+    conn.execute(
+        "INSERT INTO memory (topic, content, created_at) VALUES ('probe', 'hello release', 'now')",
+        [],
+    )?;
     enqueue(&conn, "Survey memory and report.", "now")?;
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec![
-            memory_save("probe", "hello release"),
-            action_chars("memory.find", &[('q', "release")]),
-        ],
+        outputs: vec![action_chars("memory.find", &[('q', "release")])],
         index: 0,
     };
-    let snapshot = run_until_idle(&data, &mut endpoint, 2)?;
+    let snapshot = run_until_idle(&data, &mut endpoint, 1)?;
     assert_eq!(snapshot.task.state, TaskState::Open);
-    assert!(snapshot.steps[0].inputs.contains("memory 1 matter=1 probe"));
+    assert!(snapshot.steps[0]
+        .inputs
+        .contains("memory 1 matter=none probe"));
     assert!(snapshot.steps[0].inputs.contains("hello release"));
     Ok(())
 }
