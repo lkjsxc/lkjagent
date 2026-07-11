@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use lkjagent_core::model::{Step, Task, TaskState};
 use rusqlite::{params, Connection, Transaction};
 
@@ -90,6 +92,33 @@ pub fn set_task_state(
         params![state_name(state), now, task_id],
     )?;
     Ok(())
+}
+
+pub fn application_tables(conn: &Connection) -> StoreResult<BTreeSet<String>> {
+    let mut statement = conn.prepare(
+        "SELECT name FROM sqlite_master
+         WHERE type IN ('table', 'virtual table') AND name NOT LIKE 'sqlite_%'
+         ORDER BY name",
+    )?;
+    let rows = statement.query_map([], |row| row.get::<_, String>(0))?;
+    let mut output = BTreeSet::new();
+    for row in rows {
+        let name = row?;
+        if !fts_shadow(&name) {
+            output.insert(name);
+        }
+    }
+    Ok(output)
+}
+
+fn fts_shadow(name: &str) -> bool {
+    [
+        "memory_fts_",
+        "workspace_search_lexical_",
+        "workspace_search_trigram_",
+    ]
+    .iter()
+    .any(|prefix| name.starts_with(prefix))
 }
 
 fn state_name(state: TaskState) -> &'static str {

@@ -3,7 +3,6 @@ use std::time::Duration;
 use reqwest::blocking::Client;
 use reqwest::header::CONTENT_TYPE;
 
-use crate::backoff::delay_for_attempt;
 use crate::error::{ClientError, ClientResult, EndpointFailure};
 use crate::message::Message;
 use crate::wire::{
@@ -11,6 +10,21 @@ use crate::wire::{
 };
 
 pub const DEFAULT_TIMEOUT_SECONDS: u64 = 900;
+pub const BACKOFF_CAP: Duration = Duration::from_secs(900);
+
+pub fn delay_for_attempt(attempt: u32) -> Duration {
+    let seconds = match 1_u64.checked_shl(attempt) {
+        Some(value) => value,
+        None => BACKOFF_CAP.as_secs(),
+    };
+    Duration::from_secs(seconds.min(BACKOFF_CAP.as_secs()))
+}
+
+pub fn delays(count: usize) -> Vec<Duration> {
+    (0..count)
+        .map(|attempt| delay_for_attempt(attempt as u32))
+        .collect()
+}
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ClientConfig {

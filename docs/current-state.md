@@ -91,10 +91,14 @@ Persisted views discard catalog-excluded entries, and admission rejects them.
 
 Workspace behavior is split across record commands, template writes, direct
 filesystem tools, and native text effects. They do not share one transaction,
-idempotency, indexing, or recovery contract. Startup eagerly creates empty
-navigation. Retrieval does not yet search and rank the full visible workspace.
-Archive now restores the original file and row when its audit settlement fails;
-other workspace mutation paths still lack one shared transaction.
+idempotency, indexing, or recovery contract. SQLite now indexes current managed
+record title and body chunks for lexical and trigram search with kind, state,
+project, and date filters, stable rebuild rows, bounded excerpts, and drift
+exclusion. Navigation now excludes closed TODO rows and avoids generated
+page timestamps. Retrieval still does not cover the full visible workspace or
+an external-change scanner. Archive and rebalance now compensate tested audit,
+state, index, search, file, and row failures, but lack durable prepared
+operation groups and crash recovery across every mutation path.
 
 The xtask dispatcher now runs named nonempty suites for `protocol-tools` and
 `workspace-retrieval-maintenance` and rejects a suite that reports too few tests.

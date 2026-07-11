@@ -1,36 +1,14 @@
 use crate::error::StoreResult;
 use crate::state_schema;
 use rusqlite::Connection;
+#[rustfmt::skip]
 pub const APPLICATION_TABLES: &[&str] = &[
-    "queue",
-    "tasks",
-    "steps",
-    "attempts",
-    "check_results",
-    "events",
-    "memory",
-    "memory_fts",
-    "token_usage",
-    "config",
-    "cases",
-    "runtime_events",
-    "state_cells",
-    "state_history",
-    "runtime_decisions",
-    "prompt_frames",
-    "prompt_cards",
-    "tool_admissions",
-    "observations",
-    "context_items",
-    "context_edges",
-    "state_edges",
-    "workspace_records",
-    "workspace_record_history",
-    "workspace_manifest",
-    "workspace_path_aliases",
-    "workspace_rebalance_audit",
-    "artifacts",
-    "provider_exchanges",
+    "queue", "tasks", "steps", "attempts", "check_results", "events", "memory", "memory_fts",
+    "token_usage", "config", "cases", "runtime_events", "state_cells", "state_history",
+    "runtime_decisions", "prompt_frames", "prompt_cards", "tool_admissions", "observations",
+    "context_items", "context_edges", "state_edges", "workspace_records", "workspace_record_history",
+    "workspace_manifest", "workspace_path_aliases", "workspace_rebalance_audit", "artifacts",
+    "provider_exchanges", "workspace_search_chunks", "workspace_search_lexical", "workspace_search_trigram",
 ];
 pub fn setup(conn: &Connection) -> StoreResult<()> {
     conn.execute_batch(

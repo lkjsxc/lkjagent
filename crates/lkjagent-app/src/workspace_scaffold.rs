@@ -1,9 +1,8 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use lkjagent_core::workspace_manifest::RebalanceMove;
 use lkjagent_core::workspace_record::record_fingerprint;
-use lkjagent_store::record_rows::{records, upsert_record, RecordRow};
+use lkjagent_store::record_rows::{records, upsert_record};
 use rusqlite::Connection;
 
 pub fn ensure_root(workspace: &Path) -> Result<(), String> {
@@ -92,28 +91,6 @@ pub fn repair_record_links(
         }
     }
     repaired
-}
-
-pub fn restore_rebalance_move(
-    conn: &Connection,
-    workspace: &Path,
-    item: &RebalanceMove,
-    original: &RecordRow,
-    now: &str,
-) {
-    let _ = repair_record_links(
-        conn,
-        workspace,
-        &item.entity_id,
-        &item.new_path,
-        &item.old_path,
-        now,
-    );
-    let _ = fs::rename(
-        workspace.join(&item.new_path),
-        workspace.join(&item.old_path),
-    );
-    let _ = upsert_record(conn, original);
 }
 
 fn readme_dirs(workspace: &Path, leaf: &Path) -> Vec<PathBuf> {

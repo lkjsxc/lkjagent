@@ -10,7 +10,9 @@ pub mod observation_rows;
 pub mod plan_access;
 pub mod plan_commit;
 pub mod plan_hydrate;
-pub mod plan_inspect;
+pub mod plan_inspect {
+    pub use crate::plan_access::application_tables;
+}
 mod plan_migrations;
 pub mod plan_names;
 pub mod plan_rows;
@@ -27,3 +29,4 @@ pub mod state_rows;
 pub mod state_schema;
 pub mod token_usage;
 pub mod workspace_rows;
+pub mod workspace_search;

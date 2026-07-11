@@ -83,4 +83,6 @@ mod workbench_render;
 pub mod workbench_state;
 mod workspace_index;
 mod workspace_rebalance;
+mod workspace_rebalance_apply;
 mod workspace_scaffold;
+mod workspace_search;

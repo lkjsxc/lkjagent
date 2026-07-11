@@ -11,6 +11,7 @@ use lkjagent_store::state_rows::insert_case;
 use rusqlite::Connection;
 
 const CASE_ID: &str = "workspace";
+type Selector = fn(&RecordRow, &str) -> bool;
 
 pub fn rebuild(conn: &Connection, data_dir: &Path, now: &str) -> Result<String, String> {
     let rows = records(conn, None, false).map_err(|error| error.to_string())?;
@@ -19,39 +20,43 @@ pub fn rebuild(conn: &Connection, data_dir: &Path, now: &str) -> Result<String, 
     fs::create_dir_all(&indexes).map_err(|error| error.to_string())?;
     fs::create_dir_all(workspace.join("records")).map_err(|error| error.to_string())?;
     fs::create_dir_all(workspace.join("artifacts")).map_err(|error| error.to_string())?;
+    let search = crate::workspace_search::rebuild(conn, &workspace)?;
     crate::workspace_scaffold::refresh_for_path(&workspace, "records/README.md")?;
     crate::workspace_scaffold::refresh_for_path(&workspace, "artifacts/README.md")?;
     crate::workspace_scaffold::refresh_for_path(&workspace, "indexes/README.md")?;
-    let specs = [
-        ("today", &["today", "journal"][..]),
-        ("agenda", &["calendar"][..]),
-        ("open-todos", &["todo"][..]),
-        ("budget-month", &["finance"][..]),
-        ("active-projects", &["project"][..]),
-        ("proof-runs", &["proof"][..]),
-        ("experiments", &["experiment"][..]),
+    let specs: [(&str, Selector); 7] = [
+        ("today", today),
+        ("agenda", agenda),
+        ("open-todos", open_todo),
+        ("budget-month", finance),
+        ("active-projects", active_project),
+        ("proof-runs", proof),
+        ("experiments", experiment),
     ];
-    for (name, kinds) in specs {
-        write_index(conn, &indexes, name, kinds, &rows, now)?;
+    for (name, select) in specs {
+        write_index(conn, &indexes, name, select, &rows, now)?;
         crate::workspace_scaffold::refresh_for_path(&workspace, &format!("indexes/{name}.md"))?;
     }
     suppress_stale_cell(conn, now)?;
-    Ok(format!("workspace indexes rebuilt: {}", specs.len()))
+    Ok(format!(
+        "workspace indexes rebuilt: {}; {search}",
+        specs.len()
+    ))
 }
 
 fn write_index(
     conn: &Connection,
     indexes: &Path,
     name: &str,
-    kinds: &[&str],
+    select: Selector,
     rows: &[RecordRow],
     now: &str,
 ) -> Result<(), String> {
     let selected = rows
         .iter()
-        .filter(|row| kinds.iter().any(|kind| *kind == row.kind))
+        .filter(|row| select(row, now))
         .collect::<Vec<_>>();
-    let body = index_body(name, &selected, now);
+    let body = index_body(name, &selected);
     let path = indexes.join(format!("{name}.md"));
     fs::write(&path, &body).map_err(|error| error.to_string())?;
     let fingerprint = stable_fingerprint(&body).map_err(|error| error.message)?;
@@ -75,10 +80,9 @@ fn write_index(
     .map_err(|error| error.to_string())
 }
 
-fn index_body(name: &str, rows: &[&RecordRow], now: &str) -> String {
+fn index_body(name: &str, rows: &[&RecordRow]) -> String {
     let mut lines = vec![
         "---".to_string(),
-        format!("generated_at: {now}"),
         format!("index: {name}"),
         format!(
             "input_records: [{}]",
@@ -104,6 +108,46 @@ fn index_body(name: &str, rows: &[&RecordRow], now: &str) -> String {
     }
     lines.push(String::new());
     lines.join("\n")
+}
+
+fn today(row: &RecordRow, now: &str) -> bool {
+    matches!(row.kind.as_str(), "today" | "journal") && same_date(&row.updated_at, now)
+}
+
+fn agenda(row: &RecordRow, now: &str) -> bool {
+    row.kind == "calendar" && actionable(&row.state) && row.updated_at.as_str() >= date(now)
+}
+
+fn open_todo(row: &RecordRow, _now: &str) -> bool {
+    row.kind == "todo" && actionable(&row.state)
+}
+
+fn active_project(row: &RecordRow, _now: &str) -> bool {
+    row.kind == "project" && row.state == "active"
+}
+
+fn finance(row: &RecordRow, _now: &str) -> bool {
+    row.kind == "finance"
+}
+
+fn proof(row: &RecordRow, _now: &str) -> bool {
+    row.kind == "proof"
+}
+
+fn experiment(row: &RecordRow, _now: &str) -> bool {
+    row.kind == "experiment"
+}
+
+fn actionable(state: &str) -> bool {
+    matches!(state, "open" | "ready" | "due")
+}
+
+fn same_date(value: &str, now: &str) -> bool {
+    value.split('T').next() == now.split('T').next()
+}
+
+fn date(value: &str) -> &str {
+    value.split('T').next().unwrap_or_default()
 }
 
 fn suppress_stale_cell(conn: &Connection, now: &str) -> Result<(), String> {

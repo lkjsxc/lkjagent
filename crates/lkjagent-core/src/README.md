@@ -22,15 +22,13 @@ Map lkjagent-core source modules.
 - [runtime-candidate.rs](runtime_candidate.rs): selector candidate generation,
   scoring, and edge blocking.
 - [runtime-selector.rs](runtime_selector.rs): pure state-vector decision
-  selection.
+  selection and fresh-evidence closure checks.
 - [runtime-admission.rs](runtime_admission.rs): action admission and workspace
   path policy.
 - [runtime-artifact.rs](runtime_artifact.rs): checked artifact units,
   deterministic assembly, and fingerprints.
 - [runtime-context.rs](runtime_context.rs): context items, contamination, and
   contradiction detection.
-- [runtime-completion.rs](runtime_completion.rs): fresh evidence rules for
-  closure.
 - [runtime-fingerprint.rs](runtime_fingerprint.rs): stable FNV-1a fingerprints
   over canonical JSON.
 - [model.rs](model.rs): current task, step, attempt, check, and command data.

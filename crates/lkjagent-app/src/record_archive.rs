@@ -2,7 +2,7 @@ use std::fs;
 use std::path::Path;
 
 use lkjagent_core::workspace_manifest::RebalanceMove;
-use lkjagent_core::workspace_record::{archive_path, record_fingerprint};
+use lkjagent_core::workspace_record::{archive_path, parse_record, record_fingerprint};
 use lkjagent_store::record_rows::{record, upsert_record, RecordRow};
 use lkjagent_store::workspace_rows::{
     insert_alias_and_audit, remove_alias_and_audit, PathAliasRow,
@@ -26,7 +26,18 @@ pub fn archive(conn: &Connection, data_dir: &Path, id: &str, now: &str) -> Resul
     let audit_id = format!("archive-{}", row.id);
     let settled = settle(conn, data_dir, &row, &archived, &audit_id, now);
     if let Err(error) = settled {
-        return rollback(conn, &old, &new, &row, &audit_id, error);
+        return rollback(
+            conn,
+            Rollback {
+                data_dir,
+                old: &old,
+                new: &new,
+                original: &row,
+                audit_id: &audit_id,
+                now,
+            },
+            error,
+        );
     }
     Ok(format!("archived record: {id}"))
 }
@@ -45,18 +56,30 @@ fn settle(
     crate::record_state::suppress_record_cells(conn, original, now)
 }
 
-fn rollback(
-    conn: &Connection,
-    old: &Path,
-    new: &Path,
-    original: &RecordRow,
-    audit_id: &str,
-    error: String,
-) -> Result<String, String> {
-    remove_alias_and_audit(conn, &original.path, audit_id).map_err(|error| error.to_string())?;
-    upsert_record(conn, original).map_err(|error| error.to_string())?;
-    fs::rename(new, old).map_err(|error| error.to_string())?;
+fn rollback(conn: &Connection, rollback: Rollback<'_>, error: String) -> Result<String, String> {
+    remove_alias_and_audit(conn, &rollback.original.path, rollback.audit_id)
+        .map_err(|error| error.to_string())?;
+    upsert_record(conn, rollback.original).map_err(|error| error.to_string())?;
+    fs::rename(rollback.new, rollback.old).map_err(|error| error.to_string())?;
+    let text = fs::read_to_string(rollback.old).map_err(|error| error.to_string())?;
+    let record = parse_record(&text)?;
+    crate::record_state::upsert_record_cells(
+        conn,
+        &record,
+        &rollback.original.path,
+        &rollback.original.fingerprint,
+    )?;
+    crate::workspace_index::rebuild(conn, rollback.data_dir, rollback.now)?;
     Err(error)
+}
+
+struct Rollback<'a> {
+    data_dir: &'a Path,
+    old: &'a Path,
+    new: &'a Path,
+    original: &'a RecordRow,
+    audit_id: &'a str,
+    now: &'a str,
 }
 
 fn archived_row(

@@ -49,6 +49,38 @@ fn archive_restores_file_and_row_when_audit_fails() -> TestResult<()> {
     Ok(())
 }
 
+#[test]
+fn archive_restores_indexes_when_state_suppression_fails() -> TestResult<()> {
+    let data = fixture_root("archive-index-compensation")?;
+    let data_arg = data.to_string_lossy();
+    let added = cli::run([
+        "--data",
+        data_arg.as_ref(),
+        "record",
+        "add",
+        "todo",
+        "Restore",
+        "--body",
+        "body",
+    ])?;
+    let id = field(&added, "record: ")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    conn.execute_batch(
+        "CREATE TRIGGER fail_archive_suppress
+         BEFORE INSERT ON runtime_events
+         WHEN NEW.source = 'workspace-record' AND NEW.kind = 'state.cell.suppress'
+         BEGIN SELECT RAISE(FAIL, 'suppress blocked'); END;",
+    )?;
+    drop(conn);
+
+    let result = cli::run(["--data", data_arg.as_ref(), "record", "archive", &id]);
+
+    assert!(result.is_err());
+    let index = fs::read_to_string(data.join("workspace/indexes/open-todos.md"))?;
+    assert!(index.contains(&id));
+    Ok(())
+}
+
 fn field(output: &str, marker: &str) -> Result<String, String> {
     output
         .split(marker)

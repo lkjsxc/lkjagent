@@ -13,7 +13,7 @@ fn doctor_reports_schema_and_scaffolded_workspace() -> TestResult<()> {
     let output = cli::run(["--data", data.to_string_lossy().as_ref(), "doctor"])?;
 
     assert!(output.contains("doctor: ok"));
-    assert!(output.contains("schema: tables=29 missing=none"));
+    assert!(output.contains("schema: tables=32 missing=none"));
     assert!(output.contains("endpoint: url="));
     assert!(output.contains("workspace: root="));
     assert!(output.contains("prompt_refs: orphan=0"));

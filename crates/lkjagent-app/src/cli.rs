@@ -60,6 +60,25 @@ where
             }
             crate::diagnostics::workspace(&conn, &invocation.data_dir, json)
         }
+        Command::WorkspaceSearch {
+            query,
+            kind,
+            state,
+            project,
+            date,
+            mode,
+        } => crate::workspace_search::search(
+            &conn,
+            &crate::config::workspace_root(&invocation.data_dir)?,
+            &crate::workspace_search::Request {
+                query,
+                kind,
+                state,
+                project,
+                date,
+                mode,
+            },
+        ),
         Command::WorkspacePlanRebalance { json } => crate::workspace_rebalance::plan(
             &conn,
             &invocation.data_dir,
@@ -133,7 +152,7 @@ pub fn help() -> String {
         "  console",
         "  workbench",
         "  doctor [--json]",
-        "  workspace [--json] [--rebuild]",
+        "  workspace [--json] [--rebuild] | search QUERY [--kind KIND] [--state STATE] [--project PROJECT] [--date DATE] [--mode lexical|trigram]",
         "  workspace plan-rebalance|apply-rebalance|validate [--json]",
         "  log [--limit N] [--follow]",
         "  matter list | matter show REF",

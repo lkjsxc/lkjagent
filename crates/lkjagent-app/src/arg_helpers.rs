@@ -60,6 +60,7 @@ pub(crate) fn parse_log(rest: Vec<String>) -> Result<Command, String> {
 
 pub(crate) fn parse_workspace(rest: Vec<String>) -> Result<Command, String> {
     match rest.as_slice() {
+        [cmd, values @ ..] if cmd == "search" => parse_workspace_search(values),
         [cmd, flags @ ..] if cmd == "plan-rebalance" => Ok(Command::WorkspacePlanRebalance {
             json: only_json(flags)?,
         }),
@@ -71,6 +72,38 @@ pub(crate) fn parse_workspace(rest: Vec<String>) -> Result<Command, String> {
         }),
         _ => parse_workspace_report(rest),
     }
+}
+
+fn parse_workspace_search(values: &[String]) -> Result<Command, String> {
+    let Some(query) = values.first() else {
+        return Err(workspace_usage());
+    };
+    let mut kind = None;
+    let mut state = None;
+    let mut project = None;
+    let mut date = None;
+    let mut mode = "lexical".to_string();
+    let mut index = 1;
+    while index < values.len() {
+        let value = values.get(index + 1).ok_or_else(workspace_usage)?;
+        match values[index].as_str() {
+            "--kind" => kind = Some(value.clone()),
+            "--state" => state = Some(value.clone()),
+            "--project" => project = Some(value.clone()),
+            "--date" => date = Some(value.clone()),
+            "--mode" => mode = value.clone(),
+            _ => return Err(workspace_usage()),
+        }
+        index += 2;
+    }
+    Ok(Command::WorkspaceSearch {
+        query: query.clone(),
+        kind,
+        state,
+        project,
+        date,
+        mode,
+    })
 }
 
 fn parse_workspace_report(rest: Vec<String>) -> Result<Command, String> {
@@ -95,7 +128,7 @@ fn only_json(flags: &[String]) -> Result<bool, String> {
 }
 
 fn workspace_usage() -> String {
-    "use workspace [--json] [--rebuild] | plan-rebalance [--json] | apply-rebalance [--json] | validate [--json]".to_string()
+    "use workspace [--json] [--rebuild] | search QUERY [--kind KIND] [--state STATE] [--project PROJECT] [--date DATE] [--mode lexical|trigram] | plan-rebalance [--json] | apply-rebalance [--json] | validate [--json]".to_string()
 }
 
 pub(crate) fn parse_json_flag(command: &str, rest: Vec<String>) -> Result<bool, String> {

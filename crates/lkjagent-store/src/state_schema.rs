@@ -8,7 +8,8 @@ pub const STATE_LEDGER_TABLES: &[&str] = &[
     "prompt_frames", "prompt_cards", "tool_admissions", "observations", "context_items",
     "context_edges", "state_edges", "workspace_records", "workspace_record_history",
     "workspace_manifest", "workspace_path_aliases", "workspace_rebalance_audit",
-    "artifacts", "provider_exchanges",
+    "artifacts", "provider_exchanges", "workspace_search_chunks", "workspace_search_lexical",
+    "workspace_search_trigram",
 ];
 pub fn setup(conn: &Connection) -> StoreResult<()> {
     conn.execute_batch(
@@ -188,5 +189,6 @@ CREATE TABLE IF NOT EXISTS artifacts (
     )?;
     crate::state_edge_schema::setup(conn)?;
     crate::record_schema::setup(conn)?;
+    crate::workspace_search::setup(conn)?;
     Ok(())
 }

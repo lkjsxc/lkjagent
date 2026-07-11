@@ -25,7 +25,9 @@ mod runtime_action_xml;
 pub mod runtime_admission;
 pub mod runtime_artifact;
 pub mod runtime_candidate;
-pub mod runtime_completion;
+pub mod runtime_completion {
+    pub use crate::runtime_selector::{can_close, CheckEvidence, CompletionRequirement};
+}
 pub mod runtime_context;
 mod runtime_context_plan;
 pub mod runtime_decision;

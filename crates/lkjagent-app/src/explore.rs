@@ -55,12 +55,7 @@ fn dispatch(conn: &Connection, workspace: &Path, action: &Action) -> Result<Stri
             number(action, "depth").unwrap_or(2),
         )
         .map_err(|error| error.to_string()),
-        ToolEffect::FsSearch => lkjagent_effects::workspace::search(
-            workspace,
-            param_default(action, "path", "."),
-            param(action, "query")?,
-        )
-        .map_err(|error| error.to_string()),
+        ToolEffect::FsSearch => indexed_search(conn, workspace, action),
         ToolEffect::FsWrite => lkjagent_effects::workspace::write(
             workspace,
             param(action, "path")?,
@@ -72,6 +67,24 @@ fn dispatch(conn: &Connection, workspace: &Path, action: &Action) -> Result<Stri
         ToolEffect::MemorySave => Ok(format!("saved topic={}", param(action, "topic")?)),
         ToolEffect::PlanNote => Ok(format!("noted: {}", param(action, "note")?)),
     }
+}
+
+fn indexed_search(conn: &Connection, workspace: &Path, action: &Action) -> Result<String, String> {
+    if param_default(action, "path", ".") != "." {
+        return Err("fs.search only supports the workspace root".to_string());
+    }
+    crate::workspace_search::search(
+        conn,
+        workspace,
+        &crate::workspace_search::Request {
+            query: param(action, "query")?.to_string(),
+            kind: None,
+            state: None,
+            project: None,
+            date: None,
+            mode: "lexical".to_string(),
+        },
+    )
 }
 
 fn shell(workspace: &Path, command: &str) -> Result<String, String> {

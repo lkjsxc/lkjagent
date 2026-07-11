@@ -30,6 +30,14 @@ pub enum Command {
         json: bool,
         rebuild: bool,
     },
+    WorkspaceSearch {
+        query: String,
+        kind: Option<String>,
+        state: Option<String>,
+        project: Option<String>,
+        date: Option<String>,
+        mode: String,
+    },
     WorkspacePlanRebalance {
         json: bool,
     },
