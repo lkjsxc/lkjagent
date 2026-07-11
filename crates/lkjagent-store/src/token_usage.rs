@@ -1,9 +1,9 @@
-use rusqlite::{params, Transaction};
+use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
 
 pub fn insert_usage_tx(
-    tx: &Transaction<'_>,
+    tx: &Connection,
     matter_id: i64,
     attempt_id: i64,
     attempt: &lkjagent_core::model::Attempt,

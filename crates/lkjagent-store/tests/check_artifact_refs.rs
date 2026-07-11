@@ -23,7 +23,7 @@ fn hydrated_checks_suppress_stale_artifact_refs() -> TestResult<()> {
     tx.commit()?;
     insert_file_artifact(&conn, "artifact-old", "old-fingerprint", "001")?;
     commit_turn(
-        &mut conn,
+        &conn,
         &snapshot,
         &[record_checks(&snapshot, "artifact-old")],
         "002",

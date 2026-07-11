@@ -1,7 +1,6 @@
+use crate::node_suites::{check as check_suites, Suite};
 use std::path::Path;
 use std::process::Command;
-
-use crate::node_suites::{check as check_suites, Suite};
 
 #[rustfmt::skip]
 const SUITES: &[Suite] = &[
@@ -9,11 +8,7 @@ const SUITES: &[Suite] = &[
     Suite { package: "lkjagent-core", target: "direct_action_grammar", minimum_tests: 4 },
     Suite { package: "lkjagent-core", target: "parse_diagnosis", minimum_tests: 2 },
     Suite { package: "lkjagent-core", target: "default_tool_view", minimum_tests: 1 },
-    Suite {
-        package: "lkjagent-core",
-        target: "tool_call",
-        minimum_tests: 7,
-    },
+    Suite { package: "lkjagent-core", target: "tool_call", minimum_tests: 7 },
     Suite {
         package: "lkjagent-core",
         target: "tool_call_edges",
@@ -34,11 +29,8 @@ const SUITES: &[Suite] = &[
         target: "persisted_tool_view",
         minimum_tests: 1,
     },
-    Suite {
-        package: "lkjagent-app",
-        target: "admission_rejection",
-        minimum_tests: 1,
-    },
+    Suite { package: "lkjagent-app", target: "admission_rejection", minimum_tests: 1 },
+    Suite { package: "lkjagent-app", target: "admission_settlement", minimum_tests: 1 },
     Suite {
         package: "lkjagent-app",
         target: "app",
@@ -74,9 +66,10 @@ const SUITES: &[Suite] = &[
         target: "effect_recovery",
         minimum_tests: 1,
     },
-    Suite { package: "lkjagent-app", target: "shell_check_journal", minimum_tests: 2 },
+    Suite { package: "lkjagent-app", target: "shell_check_journal", minimum_tests: 3 },
+    Suite { package: "lkjagent-app", target: "shell_check_preflight", minimum_tests: 2 },
     Suite { package: "lkjagent-app", target: "artifact_bundle_recovery", minimum_tests: 2 },
-    Suite { package: "lkjagent-app", target: "artifact_settlement", minimum_tests: 2 },
+    Suite { package: "lkjagent-app", target: "artifact_settlement", minimum_tests: 3 },
     Suite { package: "lkjagent-app", target: "artifact_identity", minimum_tests: 3 },
     Suite { package: "lkjagent-app", target: "effect_dispatch", minimum_tests: 2 },
     Suite { package: "lkjagent-effects", target: "effects", minimum_tests: 5 },
@@ -84,10 +77,12 @@ const SUITES: &[Suite] = &[
 
 #[rustfmt::skip]
 const REQUIRED: &[(&str, &str, &str)] = &[
+    ("lkjagent-app", "admission_settlement", "rejected_admission_rolls_back_with_late_failure"),
     ("lkjagent-app", "artifact_bundle_recovery", "complete_bundle_recovery_settles_artifacts_and_refs"),
     ("lkjagent-app", "artifact_bundle_recovery", "partial_and_conflicting_bundles_fail_without_artifacts"),
     ("lkjagent-app", "artifact_settlement", "mismatched_observation_refs_roll_back_artifact_settlement"),
     ("lkjagent-app", "artifact_settlement", "orphan_artifact_intent_rolls_back_settlement"),
+    ("lkjagent-app", "artifact_settlement", "late_decision_failure_rolls_back_turn_settlement"),
     ("lkjagent-app", "artifact_identity", "equal_content_at_different_paths_has_distinct_artifact_identity"),
     ("lkjagent-app", "artifact_identity", "overlapping_bundle_targets_are_rejected_before_admission"),
     ("lkjagent-app", "artifact_identity", "later_planning_failure_rolls_back_turn_admissions"),
@@ -145,16 +140,11 @@ const REQUIRED: &[(&str, &str, &str)] = &[
         "effect_recovery",
         "startup_recovers_applying_write_when_target_matches_intended_bytes",
     ),
-    (
-        "lkjagent-app",
-        "shell_check_journal",
-        "shell_checks_have_prepared_journals_and_bounded_observations",
-    ),
-    (
-        "lkjagent-app",
-        "shell_check_journal",
-        "invalid_shell_check_records_failed_fact_and_journal",
-    ),
+    ("lkjagent-app", "shell_check_journal", "shell_checks_have_prepared_journals_and_bounded_observations"),
+    ("lkjagent-app", "shell_check_journal", "invalid_shell_check_records_failed_fact_and_journal"),
+    ("lkjagent-app", "shell_check_journal", "late_turn_failure_rolls_back_shell_observation_and_check"),
+    ("lkjagent-app", "shell_check_preflight", "file_preflight_failure_prevents_earlier_shell_execution"),
+    ("lkjagent-app", "shell_check_preflight", "direct_multi_check_settlement_rolls_back_earlier_rows"),
 ];
 
 pub fn check(root: &Path) -> Result<(), Vec<String>> {

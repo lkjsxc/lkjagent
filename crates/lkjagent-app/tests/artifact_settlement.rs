@@ -1,3 +1,6 @@
+use std::{fs, path::PathBuf};
+
+use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::runtime_admission::{AdmissionStatus, ToolAdmission};
 use lkjagent_core::runtime_fingerprint::stable_fingerprint;
 use lkjagent_store::admission_rows::{
@@ -5,29 +8,95 @@ use lkjagent_store::admission_rows::{
 };
 use lkjagent_store::artifact_rows::ArtifactRow;
 use lkjagent_store::observation_rows::{settle_effect_observation, ObservationRow};
+use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
+fn late_decision_failure_rolls_back_turn_settlement() -> TestResult<()> {
+    let data = fixture_root("atomic-turn-settlement")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    setup(&conn)?;
+    enqueue(&conn, "create an artifact report from these notes", "now")?;
+    conn.execute_batch(
+        "CREATE TRIGGER fail_turn_settlement AFTER UPDATE OF status ON runtime_decisions
+         WHEN NEW.status <> 'pending' BEGIN UPDATE runtime_decisions
+         SET status = 'pending', settled_at = NULL WHERE id = NEW.id; END;",
+    )?;
+    drop(conn);
+    let body = (0..900)
+        .map(|index| format!(" word{index}"))
+        .collect::<String>();
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec![format!("<content># Atomic report\n\n{body}</content>")],
+        index: 0,
+    };
+    let error = run_until_idle(&data, &mut endpoint, 1)
+        .err()
+        .ok_or("artifact turn unexpectedly settled")?;
+    assert!(error.contains("decision settlement status remained pending"));
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let state: String = conn.query_row("SELECT state FROM effect_journal", [], |row| row.get(0))?;
+    let decision: String =
+        conn.query_row("SELECT status FROM runtime_decisions", [], |row| row.get(0))?;
+    let count = |table: &str| -> rusqlite::Result<i64> {
+        conn.query_row(&format!("SELECT COUNT(*) FROM {table}"), [], |row| {
+            row.get(0)
+        })
+    };
+    assert_eq!((state.as_str(), decision.as_str()), ("applying", "pending"));
+    let context: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM context_items WHERE source_type = 'observation'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(
+        (
+            count("observations")?,
+            count("artifacts")?,
+            count("attempts")?,
+            context
+        ),
+        (0, 0, 0, 0),
+    );
+    assert!(data
+        .join("workspace/artifacts/requests/matter-1.md")
+        .exists());
+    conn.execute_batch("DROP TRIGGER fail_turn_settlement")?;
+    drop(conn);
+    let calls = endpoint.index;
+    let restart = run_until_idle(&data, &mut endpoint, 1)
+        .err()
+        .ok_or("interrupted effect unexpectedly replayed")?;
+    assert!(restart.contains("automatic replay blocked"));
+    assert_eq!(endpoint.index, calls);
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let recovered: String =
+        conn.query_row("SELECT state FROM effect_journal", [], |row| row.get(0))?;
+    assert_eq!(recovered, "recovered");
+    Ok(())
+}
+
+#[test]
 fn mismatched_observation_refs_roll_back_artifact_settlement() -> TestResult<()> {
-    let mut conn = Connection::open_in_memory()?;
+    let conn = Connection::open_in_memory()?;
     setup(&conn)?;
     prepare(&conn, vec![artifact("parent", None)])?;
     let row = observation("[]");
-    assert!(settle_effect_observation(&mut conn, "journal", "committed", &row).is_err());
+    assert!(settle_effect_observation(&conn, "journal", "committed", &row).is_err());
     assert_unsettled(&conn)?;
     Ok(())
 }
 
 #[test]
 fn orphan_artifact_intent_rolls_back_settlement() -> TestResult<()> {
-    let mut conn = Connection::open_in_memory()?;
+    let conn = Connection::open_in_memory()?;
     setup(&conn)?;
     prepare(&conn, vec![artifact("child", Some("missing-parent"))])?;
     let row = observation("[]");
-    assert!(settle_effect_observation(&mut conn, "journal", "committed", &row).is_err());
+    assert!(settle_effect_observation(&conn, "journal", "committed", &row).is_err());
     assert_unsettled(&conn)?;
     Ok(())
 }
@@ -99,6 +168,15 @@ fn observation(refs: &str) -> ObservationRow {
         contamination_class: "Clean".to_string(),
         created_at: "now".to_string(),
     }
+}
+
+fn fixture_root(name: &str) -> TestResult<PathBuf> {
+    let path = std::env::temp_dir().join(format!("lkjagent-{name}-{}", std::process::id()));
+    if path.exists() {
+        fs::remove_dir_all(&path)?;
+    }
+    fs::create_dir_all(&path)?;
+    Ok(path)
 }
 
 fn assert_unsettled(conn: &Connection) -> TestResult<()> {

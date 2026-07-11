@@ -43,7 +43,7 @@ pub fn insert_state_edge(
 }
 
 pub fn insert_check_artifact_edges_tx(
-    tx: &rusqlite::Transaction<'_>,
+    tx: &Connection,
     task_id: i64,
     check_id: i64,
     result: &CheckResult,
@@ -57,7 +57,7 @@ pub fn insert_check_artifact_edges_tx(
 }
 
 fn insert_state_edge_tx(
-    tx: &rusqlite::Transaction<'_>,
+    tx: &Connection,
     case_id: Option<&str>,
     edge: &StateEdge,
 ) -> StoreResult<()> {

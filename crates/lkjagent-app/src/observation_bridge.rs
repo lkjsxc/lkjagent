@@ -15,21 +15,24 @@ use crate::context_bridge::observation_context_item;
 use crate::effect_dispatch::DispatchFailure;
 
 pub fn persist_observations(
-    conn: &mut Connection,
+    conn: &Connection,
     workspace: &Path,
     decision: &RuntimeDecision,
     snapshot: &TaskSnapshot,
     effects: &[PreparedEffect],
     now: &str,
-) -> Result<(), String> {
+) -> Result<Option<String>, String> {
+    let mut failure = None;
     for (index, effect) in effects.iter().enumerate() {
-        insert(conn, workspace, decision, index, effect, snapshot, now)?;
+        if let Some(error) = insert(conn, workspace, decision, index, effect, snapshot, now)? {
+            failure.get_or_insert(error);
+        }
     }
-    Ok(())
+    Ok(failure)
 }
 
 pub fn settle_dispatch_failure(
-    conn: &mut Connection,
+    conn: &Connection,
     workspace: &Path,
     decision: &RuntimeDecision,
     snapshot: &TaskSnapshot,
@@ -41,7 +44,7 @@ pub fn settle_dispatch_failure(
     let completed = effects
         .get(..succeeded)
         .ok_or_else(|| "dispatch success count is invalid".to_string())?;
-    persist_observations(conn, workspace, decision, snapshot, completed, now)?;
+    let _postcondition = persist_observations(conn, workspace, decision, snapshot, completed, now)?;
     let pending = effects
         .get(succeeded..)
         .ok_or_else(|| "dispatch pending range is invalid".to_string())?;
@@ -49,7 +52,7 @@ pub fn settle_dispatch_failure(
 }
 
 #[rustfmt::skip]
-fn persist_failed_observations(conn: &mut Connection, decision: &RuntimeDecision,
+fn persist_failed_observations(conn: &Connection, decision: &RuntimeDecision,
     effects: &[PreparedEffect], failure: &DispatchFailure, now: &str) -> Result<(), String> {
     let attempted_count = usize::from(failure.failed_current && !failure.recovery_required);
     let attempted = effects.get(..attempted_count).ok_or_else(|| "dispatch attempted too many effects".to_string())?;
@@ -65,14 +68,14 @@ fn persist_failed_observations(conn: &mut Connection, decision: &RuntimeDecision
 }
 
 fn insert(
-    conn: &mut Connection,
+    conn: &Connection,
     workspace: &Path,
     decision: &RuntimeDecision,
     index: usize,
     effect: &PreparedEffect,
     snapshot: &TaskSnapshot,
     now: &str,
-) -> Result<(), String> {
+) -> Result<Option<String>, String> {
     let (status, raw_content) = effect_outcome(workspace, effect, snapshot);
     let contamination = contamination_for_observation(&effect.effect_name, status, &raw_content);
     let content = stored_content(&raw_content, contamination);
@@ -100,11 +103,7 @@ fn insert(
         )
         .map_err(|error| error.to_string())?;
     }
-    if status == "ok" {
-        Ok(())
-    } else {
-        Err(format!("effect postcondition failed: {raw_content}"))
-    }
+    Ok((status != "ok").then(|| format!("effect postcondition failed: {raw_content}")))
 }
 
 #[rustfmt::skip]

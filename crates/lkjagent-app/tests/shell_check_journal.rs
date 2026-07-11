@@ -1,16 +1,54 @@
 use std::fs;
 use std::path::PathBuf;
 
-use lkjagent_app::turn_effects::gather_checks;
+use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
+use lkjagent_app::turn_effects::{gather_checks, settle_check_effects};
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::engine::TurnOutcome;
-use lkjagent_core::model::CheckSpec;
+use lkjagent_core::model::{CheckSpec, StepKind};
 use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
+use lkjagent_store::plan_access::{insert_step_tx, insert_task};
 use lkjagent_store::plan_schema::setup;
+use lkjagent_store::state_rows::{insert_case, upsert_state_cell};
 use rusqlite::Connection;
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 type JournalRow = (String, String, String, String, String);
+
+#[test]
+#[rustfmt::skip]
+fn late_turn_failure_rolls_back_shell_observation_and_check() -> TestResult<()> {
+    let data = fixture_root("atomic-shell")?;
+    let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?; setup(&conn)?;
+    let mut snapshot = instantiate(3, "run one atomic command check");
+    let step = snapshot.steps.first_mut().ok_or("missing step")?;
+    step.kind = StepKind::Verify;
+    step.checks = vec![CheckSpec::Command { cmd: "printf atomic-shell".to_string() }];
+    insert_task(&conn, &snapshot.task, None, "now")?;
+    let tx = conn.transaction()?;
+    for step in &snapshot.steps { insert_step_tx(&tx, step, "now")?; }
+    tx.commit()?; insert_case(&conn, "3", &snapshot.task.objective, "now")?;
+    let key = lkjagent_core::runtime_state::StateKey::new("matter", "snapshot/3")
+        .map_err(|error| std::io::Error::other(error.message))?;
+    let mut cell = lkjagent_core::runtime_state::StateCell::active(key, "snapshot-event");
+    cell.payload_schema = "matter-snapshot".to_string(); cell.payload_json = serde_json::to_string(&snapshot)?;
+    cell.created_at = "now".to_string(); cell.updated_at = "now".to_string();
+    upsert_state_cell(&conn, "3", &cell)?;
+    conn.execute_batch("CREATE TRIGGER fail_shell_turn BEFORE UPDATE OF status ON runtime_decisions
+        WHEN NEW.status <> OLD.status BEGIN SELECT RAISE(FAIL, 'forced shell settlement failure'); END;")?;
+    drop(conn);
+    let mut endpoint = ScriptedEndpoint { outputs: Vec::new(), index: 0 };
+    let error = run_until_idle(&data, &mut endpoint, 1)
+        .err().ok_or("shell turn unexpectedly settled")?;
+    assert!(error.contains("forced shell settlement failure"));
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let state: String = conn.query_row("SELECT state FROM effect_journal", [], |row| row.get(0))?;
+    let decision: String = conn.query_row("SELECT status FROM runtime_decisions", [], |row| row.get(0))?;
+    let observations: i64 = conn.query_row("SELECT COUNT(*) FROM observations", [], |row| row.get(0))?;
+    let checks: i64 = conn.query_row("SELECT COUNT(*) FROM check_results", [], |row| row.get(0))?;
+    assert_eq!((state.as_str(), decision.as_str(), observations, checks), ("applying", "pending", 0, 0));
+    Ok(())
+}
 
 #[test]
 fn shell_checks_have_prepared_journals_and_bounded_observations() -> TestResult<()> {
@@ -38,7 +76,7 @@ fn shell_checks_have_prepared_journals_and_bounded_observations() -> TestResult<
     ];
     let step_id = step.id;
 
-    let outcome = gather_checks(
+    let gathered = gather_checks(
         &mut conn,
         &workspace,
         &snapshot,
@@ -46,8 +84,16 @@ fn shell_checks_have_prepared_journals_and_bounded_observations() -> TestResult<
         &decision("settled"),
         "now",
     )?;
-
-    let TurnOutcome::Checks(_, facts) = outcome else {
+    let applying: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM effect_journal WHERE state = 'applying'",
+        [],
+        |row| row.get(0),
+    )?;
+    let observations: i64 =
+        conn.query_row("SELECT COUNT(*) FROM observations", [], |row| row.get(0))?;
+    assert_eq!((applying, observations), (4, 0));
+    settle_check_effects(&conn, &gathered.effects)?;
+    let TurnOutcome::Checks(_, facts) = gathered.outcome else {
         return Err("checks did not produce facts".into());
     };
     assert_eq!(
@@ -85,7 +131,7 @@ fn invalid_shell_check_records_failed_fact_and_journal() -> TestResult<()> {
     }];
     let step_id = step.id;
 
-    let outcome = gather_checks(
+    let gathered = gather_checks(
         &mut conn,
         &workspace,
         &snapshot,
@@ -93,8 +139,8 @@ fn invalid_shell_check_records_failed_fact_and_journal() -> TestResult<()> {
         &decision("invalid"),
         "now",
     )?;
-
-    let TurnOutcome::Checks(_, facts) = outcome else {
+    settle_check_effects(&conn, &gathered.effects)?;
+    let TurnOutcome::Checks(_, facts) = gathered.outcome else {
         return Err("invalid check did not produce a fact".into());
     };
     assert_eq!(facts.len(), 1);

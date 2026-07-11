@@ -39,6 +39,9 @@ pub fn insert_event(conn: &Connection, event: &RuntimeEvent) -> StoreResult<bool
 }
 
 pub fn append_and_apply_event(conn: &Connection, event: &RuntimeEvent) -> StoreResult<()> {
+    if !conn.is_autocommit() {
+        return append_and_apply_event_tx(conn, event);
+    }
     conn.execute_batch("BEGIN IMMEDIATE")?;
     let result = append_and_apply_event_tx(conn, event);
     if result.is_ok() {

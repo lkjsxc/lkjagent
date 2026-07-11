@@ -1,7 +1,7 @@
 use std::collections::BTreeSet;
 
 use lkjagent_core::model::{Step, Task, TaskState};
-use rusqlite::{params, Connection, Transaction};
+use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
 
@@ -78,7 +78,7 @@ pub fn insert_task(
     Ok(())
 }
 
-pub fn insert_step_tx(tx: &Transaction<'_>, step: &Step, now: &str) -> StoreResult<()> {
+pub fn insert_step_tx(tx: &Connection, step: &Step, now: &str) -> StoreResult<()> {
     let checks = serde_json::to_string(&step.checks)
         .map_err(|error| crate::error::StoreError::Sql(error.to_string()))?;
     tx.execute(

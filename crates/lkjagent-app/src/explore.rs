@@ -90,12 +90,12 @@ fn indexed_search(conn: &Connection, workspace: &Path, action: &Action) -> Resul
     )
 }
 
+#[rustfmt::skip]
 fn shell(workspace: &Path, command: &str) -> Result<String, String> {
     let report = lkjagent_effects::shell::run(workspace, command, 30).map_err(|e| e.to_string())?;
-    Ok(format!(
-        "exit={:?} timed_out={}\n{}",
-        report.exit_code, report.timed_out, report.output
-    ))
+    if !report.success() { return Err(format!("shell command failed: exit={:?} timed_out={}",
+        report.exit_code, report.timed_out)); }
+    Ok(format!("exit={:?} timed_out={}\n{}", report.exit_code, report.timed_out, report.output))
 }
 
 fn memory_find(conn: &Connection, query: &str) -> Result<String, String> {
@@ -178,4 +178,20 @@ fn number(action: &Action, name: &str) -> Result<usize, String> {
         return Ok(0);
     };
     value.parse::<usize>().map_err(|error| error.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    #[rustfmt::skip]
+    fn nonzero_shell_report_is_an_effect_error() -> Result<(), String> {
+        let root = std::env::temp_dir().join(format!("lkjagent-shell-status-{}", std::process::id()));
+        std::fs::create_dir_all(&root).map_err(|error| error.to_string())?;
+        let conn = Connection::open_in_memory().map_err(|error| error.to_string())?;
+        let mut snapshot = lkjagent_core::classify::instantiate(1, "test shell status");
+        let action = Action { tool: "shell.run".to_string(), params: vec![("command".to_string(), "exit 7".to_string())] };
+        let error = run(&conn, &root, &mut snapshot, &action).err().ok_or("shell unexpectedly succeeded")?;
+        assert!(error.contains("exit=Some(7)")); Ok(())
+    }
 }

@@ -91,14 +91,14 @@ Persisted views discard catalog-excluded entries, and admission rejects them.
 Decision-free generic Explore parsing and work selection now block rather than
 synthesizing a catalog-wide action view. Model actions, harness writes, and shell
 command checks persist admissions and effect journals before dispatch; one bounded
-immutable observation settles each attempt. Native generated artifacts prepare
-exact main, owned part, closed membership, and stale-part-absence revisions.
-Unmanaged or drifted part names block before mutation; multipart append rebuilds
-from owned units. Artifact rows and refs settle atomically with the observation.
-Prepared bundles fail; partial, conflicting, or unexpected-member bundles stay
-applying and block startup without replay. Complete applying bundles recover.
-Multipart records and the wider
-context, state, check, snapshot, and decision transaction remain open.
+immutable observation settles each attempt. Generated revisions retain exact main/part bytes,
+closed membership, and stale absence; drift blocks mutation and append rebuilds
+owned units. After dispatch, artifact rows and refs, observations, context, checks, state and
+plan rows, recovery facts, snapshots, and decision status settle atomically;
+shell outcomes wait for that boundary. Prepared bundles
+fail; partial, conflicting, or unexpected-member bundles stay applying and block
+startup without replay. Complete applying bundles recover. Pending decisions
+with durable evidence block; external bytes and broader writers remain outside.
 
 Workspace behavior is split across record commands, template writes, direct
 filesystem tools, and native text effects. They do not share one transaction,

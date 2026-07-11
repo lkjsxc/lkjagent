@@ -103,14 +103,14 @@ fn startup_settles_unresolved_effects_once_without_replay() -> TestResult<()> {
 #[test]
 fn settlement_binds_one_immutable_observation() -> TestResult<()> {
     let data = fixture_root("effect-journal-settlement")?;
-    let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
     prepare(&conn, "once", 1)?;
     mark_journal(&conn, "once-effect", "applying", "now")?;
     let first = observation("first", "once-admission");
-    settle_effect_observation(&mut conn, "once-effect", "committed", &first)?;
+    settle_effect_observation(&conn, "once-effect", "committed", &first)?;
     let second = observation("second", "once-admission");
-    assert!(settle_effect_observation(&mut conn, "once-effect", "committed", &second).is_err());
+    assert!(settle_effect_observation(&conn, "once-effect", "committed", &second).is_err());
     let count: i64 = conn.query_row("SELECT COUNT(*) FROM observations", [], |row| row.get(0))?;
     let bound: String = conn.query_row(
         "SELECT observation_id FROM effect_journal WHERE id = 'once-effect'",

@@ -19,7 +19,7 @@ pub struct ObservationRow {
 }
 
 pub fn settle_effect_observation(
-    conn: &mut Connection,
+    conn: &Connection,
     journal_id: &str,
     state: &str,
     row: &ObservationRow,
@@ -47,16 +47,31 @@ pub fn settle_effect_observation(
     }
     let outcome = stable_fingerprint(&(state, &row.status, &row.content))
         .map_err(|error| StoreError::InvalidState(error.message))?;
-    let tx = conn.transaction()?;
+    if !conn.is_autocommit() {
+        return settle_rows(conn, journal_id, state, row, &outcome);
+    }
+    let tx = conn.unchecked_transaction()?;
+    settle_rows(&tx, journal_id, state, row, &outcome)?;
+    tx.commit()?;
+    Ok(())
+}
+
+fn settle_rows(
+    conn: &Connection,
+    journal_id: &str,
+    state: &str,
+    row: &ObservationRow,
+    outcome: &str,
+) -> StoreResult<()> {
     if state == "committed" {
-        let expected_refs = refs_json(&insert_effect_artifacts(&tx, journal_id)?)?;
+        let expected_refs = refs_json(&insert_effect_artifacts(conn, journal_id)?)?;
         if row.artifact_refs_json != expected_refs {
             return Err(StoreError::InvalidState(
                 "observation artifact refs do not match durable intents".to_string(),
             ));
         }
     }
-    tx.execute(
+    conn.execute(
         "INSERT INTO observations
          (id, case_id, decision_id, admission_id, effect_name, status, content,
           artifact_refs_json, contamination_class, created_at)
@@ -74,7 +89,7 @@ pub fn settle_effect_observation(
             row.created_at
         ],
     )?;
-    let changed = tx.execute(
+    let changed = conn.execute(
         "UPDATE effect_journal SET state = ?2, observation_id = ?3,
          outcome_fingerprint = ?4, updated_at = ?5
          WHERE id = ?1 AND state = 'applying' AND observation_id IS NULL",
@@ -83,7 +98,6 @@ pub fn settle_effect_observation(
     if changed != 1 {
         return Err(rusqlite::Error::QueryReturnedNoRows.into());
     }
-    tx.commit()?;
     Ok(())
 }
 

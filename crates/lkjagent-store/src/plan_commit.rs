@@ -7,25 +7,30 @@ use crate::memory::insert_memory_tx;
 use crate::plan_access::insert_step_tx;
 
 pub fn commit_turn(
-    conn: &mut Connection,
+    conn: &Connection,
     snapshot: &TaskSnapshot,
     commands: &[Command],
     now: &str,
 ) -> StoreResult<()> {
-    let tx = conn.transaction()?;
-    for command in commands {
-        persist_command(&tx, snapshot, command, now)?;
+    if !conn.is_autocommit() {
+        return commit_rows(conn, snapshot, commands, now);
     }
-    update_task(&tx, &snapshot.task, now)?;
-    for step in &snapshot.steps {
-        update_step(&tx, step, now)?;
-    }
+    let tx = conn.unchecked_transaction()?;
+    commit_rows(&tx, snapshot, commands, now)?;
     tx.commit()?;
     Ok(())
 }
 
+#[rustfmt::skip]
+fn commit_rows(conn: &Connection, snapshot: &TaskSnapshot, commands: &[Command], now: &str) -> StoreResult<()> {
+    for command in commands { persist_command(conn, snapshot, command, now)?; }
+    update_task(conn, &snapshot.task, now)?;
+    for step in &snapshot.steps { update_step(conn, step, now)?; }
+    Ok(())
+}
+
 fn persist_command(
-    tx: &rusqlite::Transaction<'_>,
+    tx: &Connection,
     snapshot: &TaskSnapshot,
     command: &Command,
     now: &str,
@@ -105,7 +110,7 @@ fn persist_command(
     Ok(())
 }
 
-fn update_task(tx: &rusqlite::Transaction<'_>, task: &Task, now: &str) -> StoreResult<()> {
+fn update_task(tx: &Connection, task: &Task, now: &str) -> StoreResult<()> {
     tx.execute(
         "UPDATE tasks SET state = ?1, brief = ?2, budget_used = ?3, budget = ?4,
          summary = ?5, updated_at = ?6 WHERE id = ?7",
@@ -122,7 +127,7 @@ fn update_task(tx: &rusqlite::Transaction<'_>, task: &Task, now: &str) -> StoreR
     Ok(())
 }
 
-fn update_step(tx: &rusqlite::Transaction<'_>, step: &Step, now: &str) -> StoreResult<()> {
+fn update_step(tx: &Connection, step: &Step, now: &str) -> StoreResult<()> {
     let checks =
         serde_json::to_string(&step.checks).map_err(|error| StoreError::Sql(error.to_string()))?;
     tx.execute(
@@ -158,7 +163,7 @@ fn check_params(snapshot: &TaskSnapshot, step_id: u64, index: usize) -> StoreRes
 }
 
 fn insert_event(
-    tx: &rusqlite::Transaction<'_>,
+    tx: &Connection,
     task_id: i64,
     kind: EventKind,
     content: &str,

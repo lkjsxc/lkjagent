@@ -3,11 +3,9 @@ use std::path::Path;
 use lkjagent_core::engine::{apply_turn, next_work_with_decision, TurnOutcome, Work};
 use lkjagent_core::model::{TaskSnapshot, TaskState};
 use lkjagent_store::effect_recovery::recover_unsettled_effects;
-use lkjagent_store::plan_commit::commit_turn;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
-use crate::admission_bridge::persist_tool_admissions;
 use crate::clock::{Clock, SystemClock};
 use crate::context_bridge::{prepare_prompt_context, snapshot_with_prompt_context};
 use crate::daemon_intake::{idle_snapshot, load_runtime_snapshot};
@@ -15,11 +13,9 @@ use crate::effect_dispatch::{dispatch_effects, mark_effects};
 use crate::endpoint::LlmEndpoint;
 use crate::exchange_bridge::{persist_prompt_frame, persist_provider_exchange};
 use crate::model_call::{apply_record, call};
-use crate::observation_bridge::{persist_observations, settle_dispatch_failure};
-use crate::recovery_bridge::{record_command_recovery_facts, record_recovery_fact};
 #[rustfmt::skip]
-use crate::runtime_bridge::{prepare_runtime_decision, settle_effect_error, settle_effect_failure, settle_runtime_decision};
-use crate::snapshot_state::persist_snapshot_cell;
+use crate::runtime_bridge::{prepare_runtime_decision, prepare_turn_admissions,
+    settle_dispatched_turn, settle_failed_dispatch, AdmissionOutcome, TurnSettlement};
 use crate::turn_effects::{gather_checks, tag_check_evidence};
 
 pub use crate::model_io::{CompletionRecord, Endpoint, ScriptedEndpoint};
@@ -103,6 +99,8 @@ fn run_turn<E: Endpoint, C: Clock>(
     let decision = prepare_runtime_decision(conn, &snapshot, &context.fingerprint, &selected_at)?;
     let prompt_snapshot = snapshot_with_prompt_context(&snapshot, &context);
     let work = next_work_with_decision(&prompt_snapshot, &decision);
+    let mut check_effects = Vec::new();
+    let mut check_refs = None;
     let outcome = match &work {
         Work::CallModel { step_id, prompt } => {
             persist_prompt_frame(conn, logs, &decision, prompt, &context, &selected_at)?;
@@ -113,50 +111,30 @@ fn run_turn<E: Endpoint, C: Clock>(
                 apply_record(&mut next, &mut commands, record);
                 persist_provider_exchange(conn, &decision, record, &selected_at, &now)?;
             }
-            tag_check_evidence(conn, &mut next, &mut commands, &decision.id)?;
-            let prepared =
-                match persist_tool_admissions(conn, workspace, &decision, &commands, &now) {
-                    Ok(prepared) => prepared,
-                    Err(error) => {
-                        let settled =
-                            settle_effect_error(conn, &snapshot, &work, error.clone(), &now)?;
-                        record_recovery_fact(
-                            conn,
-                            &decision.case_id,
-                            &decision.id,
-                            "admission",
-                            &error,
-                            0,
-                            &now,
-                        )?;
-                        persist_snapshot_cell(conn, &settled, &now)?;
-                        settle_runtime_decision(conn, &decision, "admission_error", &now)?;
-                        return Ok(settled);
-                    }
-                };
+            tag_check_evidence(conn, &mut next, &mut commands, &decision.id, None)?;
+            let prepared = match prepare_turn_admissions(
+                conn, workspace, &snapshot, &work, &decision, &commands, &now,
+            )? {
+                AdmissionOutcome::Prepared(prepared) => prepared,
+                AdmissionOutcome::Failed(settled) => return Ok(settled),
+            };
             mark_effects(conn, &prepared, "applying", &now)?;
-            if let Err(failure) =
-                dispatch_effects(conn, workspace, &mut next, &commands, &prepared)
-            {
-                settle_dispatch_failure(
-                    conn, workspace, &decision, &next, &prepared, &failure, &now,
-                )?;
-                return settle_effect_failure(
-                    conn, &snapshot, &work, &decision, failure.error, &now,
-                );
-            }
-            if let Err(error) =
-                persist_observations(conn, workspace, &decision, &next, &prepared, &now)
-            {
-                return settle_effect_failure(conn, &snapshot, &work, &decision, error, &now);
-            }
-            commit_turn(conn, &next, &commands, &now).map_err(|error| error.to_string())?;
-            record_command_recovery_facts(conn, &next, &commands, &decision.id, &now)?;
-            persist_snapshot_cell(conn, &next, &now)?;
-            settle_runtime_decision(conn, &decision, "settled", &now)?;
-            return Ok(next);
+            let dispatch = dispatch_effects(conn, workspace, &mut next, &commands, &prepared);
+            let turn = TurnSettlement {
+                workspace, snapshot: &snapshot, next: &next, work: &work, decision: &decision,
+                effects: &prepared, checks: &[], commands: &commands, now: &now,
+            };
+            return match dispatch {
+                Ok(()) => settle_dispatched_turn(conn, &turn),
+                Err(failure) => settle_failed_dispatch(conn, &turn, &failure),
+            };
         }
-        Work::RunChecks { step_id } => gather_checks(conn, workspace, &snapshot, *step_id, &decision, &clock.now())?,
+        Work::RunChecks { step_id } => {
+            let gathered = gather_checks(conn, workspace, &snapshot, *step_id, &decision, &clock.now())?;
+            check_effects = gathered.effects;
+            check_refs = Some(gathered.refs);
+            gathered.outcome
+        }
         Work::CloseTask
         | Work::ResolveState
         | Work::RunNativeEffect(_)
@@ -165,21 +143,27 @@ fn run_turn<E: Endpoint, C: Clock>(
     };
     let (mut next, mut commands) = apply_turn(&snapshot, &work, outcome);
     let now = clock.now();
-    tag_check_evidence(conn, &mut next, &mut commands, &decision.id)?;
-    let prepared = persist_tool_admissions(conn, workspace, &decision, &commands, &now)?;
-    mark_effects(conn, &prepared, "applying", &now)?;
-    if let Err(failure) = dispatch_effects(conn, workspace, &mut next, &commands, &prepared) {
-        settle_dispatch_failure(conn, workspace, &decision, &next, &prepared, &failure, &now)?;
-        return settle_effect_failure(
-            conn, &snapshot, &work, &decision, failure.error, &now,
-        );
+    tag_check_evidence(
+        conn, &mut next, &mut commands, &decision.id, check_refs.as_deref(),
+    )?;
+    let prepared = if matches!(&work, Work::RunChecks { .. }) {
+        Vec::new()
+    } else {
+        match prepare_turn_admissions(
+            conn, workspace, &snapshot, &work, &decision, &commands, &now,
+        )? {
+            AdmissionOutcome::Prepared(prepared) => prepared,
+            AdmissionOutcome::Failed(settled) => return Ok(settled),
+        }
+    };
+    if !prepared.is_empty() { mark_effects(conn, &prepared, "applying", &now)?; }
+    let dispatch = dispatch_effects(conn, workspace, &mut next, &commands, &prepared);
+    let turn = TurnSettlement {
+        workspace, snapshot: &snapshot, next: &next, work: &work, decision: &decision,
+        effects: &prepared, checks: &check_effects, commands: &commands, now: &now,
+    };
+    match dispatch {
+        Ok(()) => settle_dispatched_turn(conn, &turn),
+        Err(failure) => settle_failed_dispatch(conn, &turn, &failure),
     }
-    if let Err(error) = persist_observations(conn, workspace, &decision, &next, &prepared, &now) {
-        return settle_effect_failure(conn, &snapshot, &work, &decision, error, &now);
-    }
-    commit_turn(conn, &next, &commands, &now).map_err(|error| error.to_string())?;
-    record_command_recovery_facts(conn, &next, &commands, &decision.id, &now)?;
-    persist_snapshot_cell(conn, &next, &now)?;
-    settle_runtime_decision(conn, &decision, "settled", &now)?;
-    Ok(next)
 }

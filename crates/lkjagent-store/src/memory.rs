@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection, Transaction};
+use rusqlite::{params, Connection};
 
 use crate::error::StoreResult;
 
@@ -11,7 +11,7 @@ pub struct MemoryRow {
 }
 
 pub fn insert_memory_tx(
-    tx: &Transaction<'_>,
+    tx: &Connection,
     topic: &str,
     content: &str,
     task_id: i64,

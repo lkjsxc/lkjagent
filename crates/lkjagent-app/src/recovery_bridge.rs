@@ -2,27 +2,31 @@ use lkjagent_core::engine::Command;
 use lkjagent_core::model::{AttemptOutcome, TaskSnapshot};
 use lkjagent_core::runtime_decision::RuntimeDecision;
 use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
-use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey, StateStatus};
-use lkjagent_store::decision_rows::settle_decision;
+use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
 use lkjagent_store::event_rows::{append_and_apply_event, next_event_id};
 use rusqlite::{params, Connection};
 
 pub fn recover_or_reuse(
     conn: &Connection,
     unfinished: &[RuntimeDecision],
-    now: &str,
+    _now: &str,
 ) -> Result<Option<RuntimeDecision>, String> {
+    if unfinished.len() > 1 {
+        return Err(format!(
+            "multiple pending decisions ({}) make replay authority ambiguous; automatic replay blocked",
+            unfinished.len()
+        ));
+    }
     for decision in unfinished {
         let evidence_count = external_evidence_count(conn, &decision.id)?;
         if evidence_count > 0 {
-            settle_decision(conn, &decision.id, "recovered", now)
-                .map_err(|error| error.to_string())?;
-            record_recovery_cell(conn, decision, evidence_count, now)?;
-        } else {
-            return Ok(Some(decision.clone()));
+            return Err(format!(
+                "pending decision {} has {evidence_count} durable evidence rows; automatic replay blocked",
+                decision.id
+            ));
         }
     }
-    Ok(None)
+    Ok(unfinished.first().cloned())
 }
 
 pub fn record_command_recovery_facts(
@@ -140,38 +144,6 @@ fn prior_failure_count(conn: &Connection, case_id: &str, kind: &str) -> Result<i
         |row| row.get(0),
     )
     .map_err(|error| error.to_string())
-}
-
-fn record_recovery_cell(
-    conn: &Connection,
-    decision: &RuntimeDecision,
-    evidence_count: i64,
-    now: &str,
-) -> Result<(), String> {
-    let event_id =
-        next_event_id(conn, &decision.case_id, "recovery").map_err(|error| error.to_string())?;
-    let key = StateKey::new("recovery", format!("recovered/{}", decision.id))
-        .map_err(|error| error.message)?;
-    let mut cell = StateCell::active(key, event_id.clone());
-    cell.status = StateStatus::Resolved;
-    cell.payload_schema = "recovery.report".to_string();
-    cell.payload_json = serde_json::json!({
-        "decision_id": decision.id,
-        "evidence_count": evidence_count,
-    })
-    .to_string();
-    cell.created_at = now.to_string();
-    cell.updated_at = now.to_string();
-    let event = RuntimeEvent {
-        id: event_id,
-        case_id: decision.case_id.clone(),
-        kind: "recovery.report".to_string(),
-        payload: RuntimeEventPayload::UpsertCell(Box::new(cell)),
-        source: "recovery-bridge".to_string(),
-        created_at: now.to_string(),
-        decision_id: Some(decision.id.clone()),
-    };
-    append_and_apply_event(conn, &event).map_err(|error| error.to_string())
 }
 
 fn external_evidence_count(conn: &Connection, decision_id: &str) -> Result<i64, String> {

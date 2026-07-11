@@ -13,13 +13,21 @@ type Admission = (ToolAdmission, String, Option<ModelAction>);
 type AdmissionResult = Result<Option<Admission>, String>;
 type Fingerprints = Result<(String, String), String>;
 
-pub fn persist_tool_admissions(
-    conn: &Connection,
-    workspace: &Path,
-    decision: &RuntimeDecision,
-    commands: &[Command],
-    now: &str,
-) -> Result<Vec<PreparedEffect>, String> {
+#[rustfmt::skip]
+pub fn persist_tool_admissions(conn: &Connection, workspace: &Path, decision: &RuntimeDecision,
+    commands: &[Command], now: &str) -> Result<Vec<PreparedEffect>, String> {
+    if !conn.is_autocommit() { return persist_admissions(conn, workspace, decision, commands, now); }
+    conn.execute_batch("BEGIN IMMEDIATE").map_err(|error| error.to_string())?;
+    let result = persist_admissions(conn, workspace, decision, commands, now);
+    let commit = result.is_ok() || matches!(result.as_ref(), Err(error) if error.starts_with("admission rejected:"));
+    let sql = if commit { "COMMIT" } else { "ROLLBACK" };
+    conn.execute_batch(sql).map_err(|error| error.to_string())?;
+    result
+}
+
+#[rustfmt::skip]
+fn persist_admissions(conn: &Connection, workspace: &Path, decision: &RuntimeDecision,
+    commands: &[Command], now: &str) -> Result<Vec<PreparedEffect>, String> {
     crate::artifact_effects::validate_bundle_commands(commands)?;
     let base = existing_admission_count(conn, &decision.id)?;
     let mut seen = BTreeSet::new();
@@ -40,15 +48,12 @@ pub fn persist_tool_admissions(
         if admission.status == AdmissionStatus::Rejected {
             let id = format!("{}-admission-{ordinal:04}", decision.id);
             insert_tool_admission(conn, &id, &decision.case_id, &admission, &parsed, now)
-                .map_err(|error| error.to_string())?;
+                .map_err(|error| format!("admission persistence failed: {error}"))?;
             return Err(format!("admission rejected: {}", admission.reason));
         }
         let plan = effect_plan(conn, workspace, &decision.case_id, command, &parsed, now)?;
         staged.push((admission, parsed, plan));
     }
-    let tx = conn
-        .unchecked_transaction()
-        .map_err(|error| error.to_string())?;
     let mut prepared = Vec::new();
     for (index, (admission, parsed, plan)) in staged.into_iter().enumerate() {
         let ordinal = base + i64::try_from(index + 1).map_err(|error| error.to_string())?;
@@ -56,24 +61,17 @@ pub fn persist_tool_admissions(
         let journal_id = format!("{id}-effect");
         let idempotency_key = format!("{}:{ordinal}", decision.id);
         let preparation = EffectPreparation {
-            id: &id,
-            case_id: &decision.case_id,
-            admission: &admission,
-            parsed_action_json: &parsed,
-            journal_id: &journal_id,
-            idempotency_key: &idempotency_key,
-            command_ordinal: ordinal,
-            target_path: plan.target_path.as_deref(),
-            prior_fingerprint: &plan.prior_fingerprint,
-            intended_fingerprint: &plan.intended_fingerprint,
-            targets: &plan.targets,
-            created_at: now,
+            id: &id, case_id: &decision.case_id, admission: &admission,
+            parsed_action_json: &parsed, journal_id: &journal_id,
+            idempotency_key: &idempotency_key, command_ordinal: ordinal,
+            target_path: plan.target_path.as_deref(), prior_fingerprint: &plan.prior_fingerprint,
+            intended_fingerprint: &plan.intended_fingerprint, targets: &plan.targets, created_at: now,
         };
         prepared.push(
-            insert_admission_and_prepare(&tx, &preparation).map_err(|error| error.to_string())?,
+            insert_admission_and_prepare(conn, &preparation)
+                .map_err(|error| format!("admission persistence failed: {error}"))?,
         );
     }
-    tx.commit().map_err(|error| error.to_string())?;
     Ok(prepared)
 }
 
@@ -83,7 +81,7 @@ fn existing_admission_count(conn: &Connection, decision_id: &str) -> Result<i64,
         [decision_id],
         |row| row.get(0),
     )
-    .map_err(|error| error.to_string())
+    .map_err(|error| format!("admission persistence failed: {error}"))
 }
 
 fn repeated_admitted_action(
@@ -99,7 +97,7 @@ fn repeated_admitted_action(
             params![decision_id, parsed],
             |row| row.get(0),
         )
-        .map_err(|error| error.to_string())?;
+        .map_err(|error| format!("admission persistence failed: {error}"))?;
     Ok(found != 0)
 }
 

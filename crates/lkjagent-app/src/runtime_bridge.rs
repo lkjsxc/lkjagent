@@ -1,7 +1,10 @@
+use std::path::Path;
+
 use lkjagent_core::engine::{Command, Work};
 use lkjagent_core::model::{Attempt, AttemptOutcome, Event, EventKind, StepState, TaskSnapshot};
 use lkjagent_core::runtime_decision::RuntimeDecision;
 use lkjagent_core::runtime_selector::select_runtime_decision;
+use lkjagent_store::admission_rows::PreparedEffect;
 use lkjagent_store::decision_rows::{
     insert_runtime_decision, next_decision_id, settle_decision, unfinished_decisions,
 };
@@ -9,9 +12,22 @@ use lkjagent_store::plan_commit::commit_turn;
 use lkjagent_store::state_rows::{hydrate_snapshot, insert_case};
 use rusqlite::Connection;
 
-use crate::recovery_bridge::{record_recovery_fact, recover_or_reuse};
+use crate::admission_bridge::persist_tool_admissions;
+use crate::effect_dispatch::DispatchFailure;
+use crate::observation_bridge::{persist_observations, settle_dispatch_failure};
+use crate::recovery_bridge::{
+    record_command_recovery_facts, record_recovery_fact, recover_or_reuse,
+};
 use crate::runtime_projection::{ensure_runtime_cell, suppress_decision_cell};
 use crate::snapshot_state::persist_snapshot_cell;
+use crate::turn_effects::{settle_check_effects, PendingCheckEffect};
+
+#[rustfmt::skip]
+pub struct TurnSettlement<'a> {
+    pub workspace: &'a Path, pub snapshot: &'a TaskSnapshot, pub next: &'a TaskSnapshot,
+    pub work: &'a Work, pub decision: &'a RuntimeDecision, pub effects: &'a [PreparedEffect],
+    pub checks: &'a [PendingCheckEffect], pub commands: &'a [Command], pub now: &'a str,
+}
 
 pub fn prepare_runtime_decision(
     conn: &Connection,
@@ -37,7 +53,7 @@ pub fn prepare_runtime_decision(
 }
 
 pub fn settle_effect_error(
-    conn: &mut Connection,
+    conn: &Connection,
     snapshot: &TaskSnapshot,
     work: &Work,
     error: String,
@@ -76,35 +92,79 @@ pub fn settle_effect_error(
     Ok(failed)
 }
 
-pub fn settle_effect_failure(
-    conn: &mut Connection,
-    snapshot: &TaskSnapshot,
-    work: &Work,
-    decision: &RuntimeDecision,
-    error: String,
-    now: &str,
-) -> Result<TaskSnapshot, String> {
+pub enum AdmissionOutcome {
+    Prepared(Vec<PreparedEffect>),
+    Failed(TaskSnapshot),
+}
+
+#[rustfmt::skip]
+pub fn prepare_turn_admissions(conn: &Connection, workspace: &Path, snapshot: &TaskSnapshot,
+    work: &Work, decision: &RuntimeDecision, commands: &[Command], now: &str,
+) -> Result<AdmissionOutcome, String> {
+    let tx = conn.unchecked_transaction().map_err(|error| error.to_string())?;
+    let prepared = match persist_tool_admissions(&tx, workspace, decision, commands, now) {
+        Ok(prepared) => prepared,
+        Err(error) if error.starts_with("admission persistence failed:") => return Err(error),
+        Err(error) => {
+            let settled = settle_failure_rows(&tx, snapshot, work, decision, error,
+                ("admission", "admission_error"), now)?;
+            tx.commit().map_err(|error| error.to_string())?;
+            return Ok(AdmissionOutcome::Failed(settled));
+        }
+    };
+    tx.commit().map_err(|error| error.to_string())?;
+    Ok(AdmissionOutcome::Prepared(prepared))
+}
+
+#[rustfmt::skip]
+fn settle_failure_rows(conn: &Connection, snapshot: &TaskSnapshot, work: &Work,
+    decision: &RuntimeDecision, error: String, kind: (&str, &str),
+    now: &str) -> Result<TaskSnapshot, String> {
     let settled = settle_effect_error(conn, snapshot, work, error.clone(), now)?;
-    record_recovery_fact(
-        conn,
-        &decision.case_id,
-        &decision.id,
-        "effect",
-        &error,
-        0,
-        now,
-    )?;
+    record_recovery_fact(conn, &decision.case_id, &decision.id, kind.0, &error, 0, now)?;
     persist_snapshot_cell(conn, &settled, now)?;
-    settle_runtime_decision(conn, decision, "effect_error", now)?;
+    settle_runtime_decision(conn, decision, kind.1, now)?;
     Ok(settled)
 }
 
-pub fn settle_runtime_decision(
-    conn: &Connection,
-    decision: &RuntimeDecision,
-    status: &str,
-    now: &str,
-) -> Result<(), String> {
-    settle_decision(conn, &decision.id, status, now).map_err(|error| error.to_string())?;
+#[rustfmt::skip]
+pub fn settle_dispatched_turn(conn: &Connection, turn: &TurnSettlement<'_>) -> Result<TaskSnapshot, String> {
+    let tx = conn.unchecked_transaction().map_err(|error| error.to_string())?;
+    settle_check_effects(&tx, turn.checks)?;
+    let postcondition = persist_observations(&tx, turn.workspace, turn.decision,
+        turn.next, turn.effects, turn.now)?;
+    let settled = if let Some(error) = postcondition {
+        settle_failure_rows(&tx, turn.snapshot, turn.work, turn.decision, error,
+            ("effect", "effect_error"), turn.now)?
+    } else {
+        commit_turn(&tx, turn.next, turn.commands, turn.now).map_err(|error| error.to_string())?;
+        record_command_recovery_facts(&tx, turn.next, turn.commands, &turn.decision.id, turn.now)?;
+        persist_snapshot_cell(&tx, turn.next, turn.now)?;
+        settle_runtime_decision(&tx, turn.decision, "settled", turn.now)?;
+        turn.next.clone()
+    };
+    tx.commit().map_err(|error| error.to_string())?; Ok(settled)
+}
+
+#[rustfmt::skip]
+pub fn settle_failed_dispatch(conn: &Connection, turn: &TurnSettlement<'_>,
+    failure: &DispatchFailure) -> Result<TaskSnapshot, String> {
+    let tx = conn.unchecked_transaction().map_err(|error| error.to_string())?;
+    settle_check_effects(&tx, turn.checks)?;
+    settle_dispatch_failure(&tx, turn.workspace, turn.decision, turn.next,
+        turn.effects, failure, turn.now)?;
+    let settled = settle_failure_rows(&tx, turn.snapshot, turn.work, turn.decision,
+        failure.error.clone(), ("effect", "effect_error"), turn.now)?;
+    tx.commit().map_err(|error| error.to_string())?; Ok(settled)
+}
+
+#[rustfmt::skip]
+pub fn settle_runtime_decision(conn: &Connection, decision: &RuntimeDecision,
+    status: &str, now: &str) -> Result<(), String> {
+    let changed = settle_decision(conn, &decision.id, status, now).map_err(|error| error.to_string())?;
+    if changed != 1 { return Err(format!("decision settlement updated {changed} rows")); }
+    let actual: String = conn.query_row("SELECT status FROM runtime_decisions WHERE id = ?1",
+        [&decision.id], |row| row.get(0)).map_err(|error| error.to_string())?;
+    if actual != status { return Err(format!("decision settlement status remained {actual}")); }
     suppress_decision_cell(conn, decision, now)
 }

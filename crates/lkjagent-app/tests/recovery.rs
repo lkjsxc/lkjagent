@@ -15,15 +15,17 @@ use rusqlite::Connection;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn unfinished_decision_with_exchange_is_recovered_before_new_selection() -> TestResult<()> {
+fn unfinished_decision_with_exchange_blocks_without_provider_replay() -> TestResult<()> {
     let data = fixture_root("exchange-recovery")?;
     let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
     let snapshot = instantiate(1, "What is an agent?");
     persist(&mut conn, &snapshot)?;
     insert_case(&conn, "1", &snapshot.task.objective, "before")?;
+    let empty = pending_decision(&snapshot, "decision-empty");
+    insert_runtime_decision(&conn, &empty, "pending", "before-1")?;
     let old = pending_decision(&snapshot, "decision-old");
-    insert_runtime_decision(&conn, &old, "pending", "before")?;
+    insert_runtime_decision(&conn, &old, "pending", "before-2")?;
     insert_provider_exchange(&conn, &exchange_row(&old))?;
     drop(conn);
 
@@ -31,7 +33,11 @@ fn unfinished_decision_with_exchange_is_recovered_before_new_selection() -> Test
         outputs: vec!["<message>done</message>".to_string()],
         index: 0,
     };
-    let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;
+    let error = run_until_idle(&data, &mut endpoint, 1)
+        .err()
+        .ok_or("unfinished decision unexpectedly replayed")?;
+    assert!(error.contains("automatic replay blocked"));
+    assert_eq!(endpoint.index, 0);
 
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     let old_status: String = conn.query_row(
@@ -47,17 +53,9 @@ fn unfinished_decision_with_exchange_is_recovered_before_new_selection() -> Test
     let total: i64 = conn.query_row("SELECT COUNT(*) FROM runtime_decisions", [], |row| {
         row.get(0)
     })?;
-    assert_eq!(old_status, "recovered");
-    assert_eq!(pending, 0);
+    assert_eq!(old_status, "pending");
+    assert_eq!(pending, 2);
     assert_eq!(total, 2);
-    let recovery: (String, String) = conn.query_row(
-        "SELECT status, payload_schema FROM state_cells
-         WHERE key_label = 'recovery:recovered/decision-old'",
-        [],
-        |row| Ok((row.get(0)?, row.get(1)?)),
-    )?;
-    assert_eq!(recovery.0, "Resolved");
-    assert_eq!(recovery.1, "recovery.report");
     Ok(())
 }
 

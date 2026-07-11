@@ -119,7 +119,7 @@ fn turn_transaction_rolls_back_uncommitted_rows() -> TestResult<()> {
 
 #[test]
 fn memory_writes_are_deduplicated_and_searchable() -> TestResult<()> {
-    let mut conn = Connection::open_in_memory()?;
+    let conn = Connection::open_in_memory()?;
     setup(&conn)?;
     let snapshot = instantiate(12, "Remember release facts.");
     insert_task(&conn, &snapshot.task, None, "now")?;
@@ -127,8 +127,8 @@ fn memory_writes_are_deduplicated_and_searchable() -> TestResult<()> {
         topic: "probe".to_string(),
         content: "release memory survives".to_string(),
     };
-    commit_turn(&mut conn, &snapshot, std::slice::from_ref(&memory), "later")?;
-    commit_turn(&mut conn, &snapshot, &[memory], "again")?;
+    commit_turn(&conn, &snapshot, std::slice::from_ref(&memory), "later")?;
+    commit_turn(&conn, &snapshot, &[memory], "again")?;
     let count: i64 = conn.query_row("SELECT COUNT(*) FROM memory", [], |row| row.get(0))?;
     assert_eq!(count, 1);
     let rows = search_memory(&conn, "release", 10)?;
@@ -155,7 +155,7 @@ fn turn_commit_stores_check_params_with_step_id() -> TestResult<()> {
         .map(|step| step.id)
         .unwrap_or(2);
     commit_turn(
-        &mut conn,
+        &conn,
         &snapshot,
         &[Command::RecordChecks {
             step_id,
