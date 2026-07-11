@@ -47,6 +47,7 @@ pub(super) fn validate(
     { return Err(format!("{run_id} input hash mismatch")); }
     if field(row,"outcome")=="probe-config-rejected" {
         return validate_config_rejected(&run_dir,row,source,run_id,provider_controls); }
+    raw_manifest(&run_dir)?;
     let db = run_dir.join("run.sqlite3");
     if db.is_symlink() { return Err("database is a symlink".into()); }
     if !stores.insert(file_hash(&db)?) { return Err("copied campaign database".into()); }
@@ -160,7 +161,6 @@ pub(super) fn validate(
     }
     attestation::validate_workspace(&conn, &run_dir, run_id)?;
     attestation::validate_exports(&conn, &run_dir, run_id)?;
-    raw_manifest(&run_dir)?;
     Ok(())
 }
 

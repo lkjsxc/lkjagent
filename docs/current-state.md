@@ -47,10 +47,10 @@ capture. Its negative fixtures reject idle, blocked, skipped, zero-test, and
 generated-placeholder evidence. The predeclared domain runner now requires clean
 source, a strict-ancestor plan, a reproducible isolated build, production
 exchange logs, recomputed metrics, and three-or-five repeats. Attempts at
-`853c647a` and `f425d78f` exposed a no-decision close, invalid config, and sidecar.
-A third at `2f0da5e1` completed 103 rows, but its gate found cross-language source
-sort drift. No matrix is accepted; fault, task, live, and PTY predicates remain
-absent.
+`853c647a` and `f425d78f` exposed a no-decision close and invalid config. Runs at
+`2f0da5e1` and `891e9882` completed 103 rows; their gates then exposed source-sort
+drift and verifier-created SQLite sidecars. No matrix is accepted; fault, task,
+live, and PTY predicates remain absent.
 
 A fresh model-free diary run writes a journal entry containing canned
 missing-detail text after the owner asks for a diary entry. This is reproduced
