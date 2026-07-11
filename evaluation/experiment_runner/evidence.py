@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 from .io import file_sha, sha, write_table
 
 
 def workspace_manifest(db: Path, workspace: Path, destination: Path) -> None:
-    with sqlite3.connect(db) as conn:
+    with closing(sqlite3.connect(db)) as conn:
         managed = {row[2]: (row[0], row[1]) for row in conn.execute("SELECT id, fingerprint, path FROM workspace_records")}
     rows = []; pending = [workspace]
     while pending:
@@ -33,7 +34,7 @@ def export_rows(db: Path, run: Path) -> None:
         "admissions.tsv": ("admission_id\tdecision_id\ttool\tstatus\tcreated_at\n", "SELECT id,decision_id,action_tool,status,created_at FROM tool_admissions ORDER BY created_at,id"),
         "observations.tsv": ("observation_id\tdecision_id\teffect\tstatus\tcreated_at\n", "SELECT id,decision_id,effect_name,status,created_at FROM observations ORDER BY created_at,id"),
     }
-    with sqlite3.connect(db) as conn:
+    with closing(sqlite3.connect(db)) as conn:
         for name, (header, query) in specs.items():
             rows = conn.execute(query).fetchall()
             (run / name).write_text(header + "".join("\t".join(str(value).replace("\t", " ").replace("\n", " ") for value in row) + "\n" for row in rows), encoding="utf-8")

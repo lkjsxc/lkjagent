@@ -7,7 +7,8 @@ use serde_json::Value;
 
 use super::attestation;
 use super::io::{
-    err, field, file_hash, hash, inside, pairs, raw_manifest, scenario_hash, table, valid_hash,
+    err, field, file_hash, hash, inside, overlay, pairs, raw_manifest, reported, scenario_hash,
+    table, valid_hash,
 };
 use super::Cell;
 
@@ -43,9 +44,9 @@ pub(super) fn validate(
     if field(row, "scenario_sha256")
         != scenario_hash(&root.join("evaluation/scenarios").join(scenario))?
         || field(row, "executable_sha256") != executable_hash
-    {
-        return Err(format!("{run_id} input hash mismatch"));
-    }
+    { return Err(format!("{run_id} input hash mismatch")); }
+    if field(row,"outcome")=="probe-config-rejected" {
+        return validate_config_rejected(&run_dir,row,source,run_id,provider_controls); }
     let db = run_dir.join("run.sqlite3");
     if db.is_symlink() { return Err("database is a symlink".into()); }
     if !stores.insert(file_hash(&db)?) { return Err("copied campaign database".into()); }
@@ -133,10 +134,7 @@ pub(super) fn validate(
     {
         return Err(format!("{run_id} result overclaims"));
     }
-    let redacted_runner = fs::read_to_string(run_dir.join("runner-redacted.log")).map_err(err)?;
-    if redacted_runner.lines().any(|line| !(line.is_empty() || line.starts_with("$ ") || line.starts_with("exit=")
-        || line.starts_with("[redacted sha256:") && line.ends_with(']') && line.len()==82)) {
-        return Err(format!("{run_id} runner redaction invalid")); }
+    attestation::validate_runner_redaction(&run_dir,run_id)?;
     let metrics = pairs(&run_dir.join("metrics.tsv"))?;
     if field(&metrics, "provider_exchanges").parse::<i64>().ok() != Some(exchanges)
         || field(&metrics, "first_pass_parse") != if no_exchange { "not-applicable" } else if first_parse { "1" } else { "0" }
@@ -166,15 +164,29 @@ pub(super) fn validate(
     Ok(())
 }
 
-fn reported(value: Option<&Value>) -> String {
-    value
-        .and_then(Value::as_u64)
-        .map_or_else(|| "not-reported".into(), |item| item.to_string())
-}
-
 #[rustfmt::skip]
-fn overlay(mut base: Value, factors: &BTreeMap<String, Value>) -> Result<Value, String> {
-    let map = base.as_object_mut().ok_or("baseline config is not an object")?;
-    for (key, value) in factors { map.insert(key.clone(), value.clone()); }
-    Ok(base)
+fn validate_config_rejected(run:&Path,row:&BTreeMap<String,String>,source:&str,run_id:&str,controls:&mut BTreeSet<String>)->Result<(),String>{
+    if run.join("run.sqlite3").exists() { return Err(format!("{run_id} rejected config has database")); }
+    let log=fs::read_to_string(run.join("runner.log")).map_err(err)?;
+    if !log.contains("context lane caps exceed the prompt remainder") || !log.contains("exit=1") { return Err(format!("{run_id} config rejection differs")); }
+    attestation::validate_runner_redaction(run,run_id)?; let provider=pairs(&run.join("provider-manifest.tsv"))?;
+    if field(&provider,"transport")!="config-rejected" || field(&provider,"real_requests")!="0"
+        || !valid_hash(field(&provider,"endpoint_sha256")) || !valid_hash(field(&provider,"model_sha256"))
+        || !valid_hash(field(&provider,"environment_sha256")) { return Err(format!("{run_id} rejected provider manifest invalid")); }
+    controls.insert(format!("{}:{}:{}:{}",field(&provider,"endpoint_sha256"),field(&provider,"model_sha256"),
+        field(&provider,"environment_sha256"),field(&provider,"credential_present")));
+    let result=pairs(&run.join("result.tsv"))?;
+    if field(&result,"status")!="rejected" || field(&result,"reason")!="configuration-rejected"
+        || field(&result,"snapshot_method")!="none" || field(&result,"source_commit")!=source || field(&result,"run_id")!=run_id
+        || field(&result,"runner_log_sha256")!=file_hash(&run.join("runner.log"))? { return Err(format!("{run_id} rejected result differs")); }
+    let metrics=pairs(&run.join("metrics.tsv"))?; let expected=[("provider_exchanges","0"),("endpoint_calls","0"),("first_pass_parse","not-applicable"),
+        ("first_pass_admission","not-applicable"),("action_identity","none"),("prompt_tokens","not-reported"),("completion_tokens","not-reported"),
+        ("cached_tokens","not-reported"),("duration_ms","not-reported"),("observations","0"),("unexpected_blockers","0"),("recovery_events","0"),
+        ("no_progress_events","0"),("recovery_factor_exercised","0"),("fault_schedule_exercised","0"),("required_source_recall","not-measured"),
+        ("unsupported_claims","not-measured"),("repeated_failure","not-measured"),("recovery_time_ms","not-measured"),("primary_task_success","not-measured"),
+        ("semantic_checks","not-measured"),("full_live_floor_measured","0")];
+    if metrics.len()!=expected.len() || expected.iter().any(|(key,value)|field(&metrics,key)!=*value)
+        || field(row,"outcome_fingerprint")!=hash(format!("probe-config-rejected\0{}",field(row,"config_sha256")).as_bytes()) {
+        return Err(format!("{run_id} rejected metrics differ")); }
+    raw_manifest(run)
 }

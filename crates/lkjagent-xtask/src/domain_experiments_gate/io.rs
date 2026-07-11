@@ -3,19 +3,9 @@ use std::fs;
 use std::path::{Component, Path, PathBuf};
 use std::process::Command;
 
-const SOURCE_PATHS: &[&str] = &[
-    "Cargo.toml",
-    "Cargo.lock",
-    ".cargo",
-    "rust-toolchain",
-    "rust-toolchain.toml",
-    "crates",
-    "docs",
-    "evaluation",
-    "Dockerfile",
-    "docker-compose.yml",
-    "data/lkjagent.json",
-];
+#[rustfmt::skip]
+const SOURCE_PATHS:&[&str]=&["Cargo.toml","Cargo.lock",".cargo","rust-toolchain","rust-toolchain.toml",
+    "crates","docs","evaluation","Dockerfile","docker-compose.yml","data/lkjagent.json"];
 
 use serde_json::Value;
 
@@ -80,6 +70,17 @@ pub(super) fn file_hash(path: &Path) -> Result<String, String> {
 
 pub(super) fn hash(bytes: &[u8]) -> String {
     crate::evaluation_harness::sha256(bytes)
+}
+
+pub(super) fn reported(value: Option<&Value>) -> String {
+    value
+        .and_then(Value::as_u64)
+        .map_or_else(|| "not-reported".into(), |item| item.to_string())
+}
+
+#[rustfmt::skip]
+pub(super) fn overlay(mut base: Value, factors: &BTreeMap<String, Value>) -> Result<Value, String> {
+    let map=base.as_object_mut().ok_or("baseline config is not an object")?; for (key,value) in factors{map.insert(key.clone(),value.clone());} Ok(base)
 }
 
 pub(super) fn valid_hash(value: &str) -> bool {

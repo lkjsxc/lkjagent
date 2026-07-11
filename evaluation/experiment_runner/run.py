@@ -5,10 +5,13 @@ import os
 import shutil
 import sqlite3
 import uuid
+from contextlib import closing
 from pathlib import Path
 
 from .evidence import export_rows, raw_manifest, redact_logs, redact_runner, workspace_manifest
 from .io import command, file_sha, pairs, safe_env, sha, table, tree_sha, write_table
+
+CONFIG_REJECTION = "context lane caps exceed the prompt remainder"
 
 
 def owner_text(root: Path, scenario: str) -> str:
@@ -17,7 +20,7 @@ def owner_text(root: Path, scenario: str) -> str:
 
 
 def counts(db: Path) -> dict[str, object]:
-    with sqlite3.connect(db) as conn:
+    with closing(sqlite3.connect(db)) as conn:
         row = conn.execute("""SELECT
           (SELECT COUNT(*) FROM runtime_decisions), (SELECT COUNT(*) FROM provider_exchanges),
           (SELECT COUNT(*) FROM provider_exchanges WHERE finished_at IS NOT NULL AND outcome_json NOT LIKE '%endpoint_error%'),
@@ -61,6 +64,33 @@ def outcome_fingerprint(facts: dict[str, object]) -> str:
     return sha(value.encode())
 
 
+def config_rejected(root: Path, run: Path, data: Path, binary: Path, source: str,
+                    cell: dict[str, str], scenario: str, repeat: int, run_id: str,
+                    config_bytes: str, log_path: Path) -> dict[str, str]:
+    (data / "logs").mkdir(exist_ok=True); redact_logs(data, run); redact_runner(log_path)
+    config=json.loads(config_bytes); endpoint=os.environ.get("LKJAGENT_ENDPOINT_URL",str(config.get("endpoint_url","")))
+    model=os.environ.get("LKJAGENT_MODEL",str(config.get("endpoint_model","")))
+    controls = {key: value for key, value in safe_env().items() if key != "LKJAGENT_API_KEY"}
+    pairs(run / "provider-manifest.tsv", [("transport", "config-rejected"), ("endpoint_sha256", sha(endpoint.encode())),
+        ("model_sha256", sha(model.encode())), ("environment_sha256", sha(json.dumps(controls, sort_keys=True).encode())),
+        ("real_requests", 0), ("credential_present", str(bool(os.environ.get("LKJAGENT_API_KEY"))).lower())])
+    metrics = [("provider_exchanges", 0), ("endpoint_calls", 0), ("first_pass_parse", "not-applicable"),
+        ("first_pass_admission", "not-applicable"), ("action_identity", "none"), ("prompt_tokens", "not-reported"),
+        ("completion_tokens", "not-reported"), ("cached_tokens", "not-reported"), ("duration_ms", "not-reported"),
+        ("observations", 0), ("unexpected_blockers", 0), ("recovery_events", 0), ("no_progress_events", 0),
+        ("recovery_factor_exercised", 0), ("fault_schedule_exercised", 0), ("required_source_recall", "not-measured"),
+        ("unsupported_claims", "not-measured"), ("repeated_failure", "not-measured"), ("recovery_time_ms", "not-measured"),
+        ("primary_task_success", "not-measured"), ("semantic_checks", "not-measured"), ("full_live_floor_measured", 0)]
+    pairs(run / "metrics.tsv", metrics); pairs(run / "result.tsv", [("status", "rejected"),
+        ("reason", "configuration-rejected"), ("snapshot_method", "none"), ("source_commit", source),
+        ("run_id", run_id), ("runner_log_sha256", file_sha(log_path))])
+    config_hash=sha(config_bytes.encode()); fingerprint=sha(f"probe-config-rejected\0{config_hash}".encode())
+    row={"cell_id":cell["cell_id"],"scenario_id":scenario,"repeat":str(repeat),"run_id":run_id,"source_commit":source,
+        "config_sha256":config_hash,"scenario_sha256":tree_sha(root / "evaluation/scenarios" / scenario),
+        "executable_sha256":file_sha(binary),"run_ref":f"runs/{run_id}","outcome":"probe-config-rejected","outcome_fingerprint":fingerprint}
+    write_table(run / "matrix-row.tsv",list(row),[row]); raw_manifest(run); return row
+
+
 def _one_run(root: Path, campaign: Path, binary: Path, source: str,
              cell: dict[str, str], scenario: str, repeat: int, base: dict[str, object], run_id: str) -> dict[str, str]:
     run = campaign / "runs" / run_id; data, workspace = run / "data", run / "workspace"
@@ -70,6 +100,8 @@ def _one_run(root: Path, campaign: Path, binary: Path, source: str,
     (run / "config.json").write_text(config_bytes, encoding="utf-8"); (data / "lkjagent.json").write_text(config_bytes, encoding="utf-8")
     log: list[str] = []; log_path = run / "runner.log"; env = safe_env()
     if command([str(binary), "--data", str(data), "send", "--new", owner_text(root, scenario)], log, log_path, env):
+        if CONFIG_REJECTION in log_path.read_text():
+            return config_rejected(root,run,data,binary,source,cell,scenario,repeat,run_id,config_bytes,log_path)
         raise RuntimeError(f"send failed for {run_id}")
     facts: dict[str, object] = {}
     for _native_step in range(6):
@@ -84,9 +116,9 @@ def _one_run(root: Path, campaign: Path, binary: Path, source: str,
     if no_exchange:
         (data / "logs").mkdir(exist_ok=True)
     backup = run / "run.sqlite3"
-    with sqlite3.connect(data / "lkjagent.sqlite3") as source_db, sqlite3.connect(backup) as target:
+    with closing(sqlite3.connect(data / "lkjagent.sqlite3")) as source_db, closing(sqlite3.connect(backup)) as target:
         source_db.backup(target)
-    with sqlite3.connect(backup) as conn:
+    with closing(sqlite3.connect(backup)) as conn:
         if conn.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
             raise RuntimeError(f"backup integrity failed for {run_id}")
     export_rows(backup, run); workspace_manifest(backup, workspace, run / "workspace-manifest.tsv")
@@ -141,7 +173,7 @@ def one_run(root: Path, campaign: Path, binary: Path, source: str,
             redact_runner(run / "runner.log")
         if source_db.is_file():
             try:
-                with sqlite3.connect(source_db) as source_conn, sqlite3.connect(run / "failure.sqlite3") as target:
+                with closing(sqlite3.connect(source_db)) as source_conn, closing(sqlite3.connect(run / "failure.sqlite3")) as target:
                     source_conn.backup(target)
             except sqlite3.Error as backup_error: pairs(run / "backup-failure.tsv", [("error", str(backup_error))])
         raw_manifest(run); raise

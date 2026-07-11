@@ -110,6 +110,13 @@ fn sql_value(row: &Row<'_>, index: usize) -> Result<Value, String> {
 }
 
 #[rustfmt::skip]
+pub(super) fn validate_runner_redaction(run:&Path,run_id:&str)->Result<(),String>{
+    let redacted=fs::read_to_string(run.join("runner-redacted.log")).map_err(err)?;
+    if redacted.lines().any(|line|!(line.is_empty()||line.starts_with("$ ")||line.starts_with("exit=")
+        || line.starts_with("[redacted sha256:")&&line.ends_with(']')&&line.len()==82)){return Err(format!("{run_id} runner redaction invalid"));} Ok(())
+}
+
+#[rustfmt::skip]
 pub(super) fn validate_exchange_logs(conn: &Connection, run: &Path, run_id: &str) -> Result<(), String> {
     let raw = file_map(&run.join("data/logs"))?; let redacted = file_map(&run.join("logs-redacted"))?;
     if raw.keys().collect::<BTreeSet<_>>() != redacted.keys().collect::<BTreeSet<_>>() { return Err(format!("{run_id} redacted log coverage mismatch")); }
