@@ -1,4 +1,0 @@
-# Campaign 20260708T180102Z
-
-## Static
-tmp/lkjagent-more-more-thinking-20260708/12-scripts/run_campaigns.sh: line 10: python: command not found

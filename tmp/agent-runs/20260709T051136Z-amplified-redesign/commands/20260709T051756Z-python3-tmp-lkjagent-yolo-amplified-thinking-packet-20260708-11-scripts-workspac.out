@@ -1,3 +1,0 @@
-command: python3 tmp/lkjagent-yolo-amplified-thinking-packet-20260708/11-scripts/workspace_shape_gate.py tmp/agent-runs/20260709T051136Z-amplified-redesign/evidence/probe-data/workspace
-started: 20260709T051756Z
-ok workspace-shape

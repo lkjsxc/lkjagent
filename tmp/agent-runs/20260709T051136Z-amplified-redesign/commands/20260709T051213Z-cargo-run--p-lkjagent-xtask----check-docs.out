@@ -1,3 +1,0 @@
-command: cargo run -p lkjagent-xtask -- check-docs
-started: 20260709T051213Z
-ok check-docs

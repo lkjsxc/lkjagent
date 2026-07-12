@@ -1,9 +1,0 @@
-record: rec_20260709T070925Z_linker path=records/life/notes/rec_20260709T070925Z_linker.md fp=fnv1a64:58c7ce5f132818e0 index=workspace indexes rebuilt: 7
-move rec_20260709T070925Z_move-me records/knowledge/notes/old.md -> records/life/todo/open/rec_20260709T070925Z_move-me.md
-move rec_20260709T070925Z_move-me records/knowledge/notes/old.md -> records/life/todo/open/rec_20260709T070925Z_move-me.md
-workspace validate: ok
-alias [('records/knowledge/notes/old.md', 'records/life/todo/open/rec_20260709T070925Z_move-me.md')]
-audit [('["ok","fingerprint-before:fnv1a64:3724bfc696986b20","links-repaired:1"]',)]
-note-path ('rec_20260709T070925Z_linker', 'records/life/notes/rec_20260709T070925Z_linker.md')
-link-has-old False
-link-has-new True

@@ -1,3 +1,0 @@
-command: cargo run -p lkjagent-xtask -- check-files
-started: 20260709T052732Z
-ok check-files

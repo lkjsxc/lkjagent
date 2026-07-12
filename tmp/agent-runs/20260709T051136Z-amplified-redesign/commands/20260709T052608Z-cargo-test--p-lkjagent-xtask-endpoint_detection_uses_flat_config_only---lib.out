@@ -1,7 +1,0 @@
-command: cargo test -p lkjagent-xtask endpoint_detection_uses_flat_config_only --lib
-started: 20260709T052608Z
-
-running 1 test
-.
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.00s
-

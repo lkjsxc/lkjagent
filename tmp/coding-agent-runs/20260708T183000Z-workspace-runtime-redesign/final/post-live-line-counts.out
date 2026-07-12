@@ -1,8 +1,0 @@
-144	docs/current-state.md
-130	tmp/lkjagent-more-more-progress/ledger.md
-50	docs/repository/line-and-file-limits.md
-90	docs/product/status-and-console.md
-195	crates/lkjagent-core/src/parse.rs
-198	crates/lkjagent-xtask/src/proof.rs
-59	Dockerfile
-147	docker-compose.yml

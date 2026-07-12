@@ -1,9 +1,0 @@
-144	docs/current-state.md
-127	tmp/lkjagent-more-more-progress/ledger.md
-195	crates/lkjagent-core/src/parse.rs
-156	crates/lkjagent-core/src/runtime_prompt_kernel.rs
-199	crates/lkjagent-app/src/model_call.rs
-198	crates/lkjagent-xtask/src/proof.rs
-59	Dockerfile
-147	docker-compose.yml
-11	data/README.md
