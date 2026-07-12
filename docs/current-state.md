@@ -55,7 +55,10 @@ native store transactions cover intake, exchange, effect, observation, checks,
 and close. Exact edit and create effects stage expected and intended bytes,
 fsync, preserve mode, reject races, and recover every tested crash boundary.
 Unknown executable payload schemas remain inert. These pieces pass the isolated
-workspace test suite but do not yet form the production authority loop.
+workspace test suite but do not yet form the production authority loop. A
+configured public probe at source `cb27f80114cc263db515242def059c91bcc2abef`
+produced one durable provider exchange; its sanitized hash-only evidence is
+tracked as connectivity evidence with `semantic_status=not-evaluated`.
 
 ## Active Source Gaps
 
@@ -107,7 +110,7 @@ claims, and the close transaction owns the canonical final message.
 | effects-safe-read | complete | opened-root listing, search, and revision reads pass safety tests |
 | protocol-compact | complete | strict decision-bound tool/final parser passes contract tests |
 | store-native | complete | exact 18-table schema reopens and rejects altered or retired stores |
-| llm-wiring | active | mechanics pass; a real public endpoint probe has not run in this checkout |
+| llm-wiring | complete | configured public probe produced one provider exchange; semantics were not evaluated |
 | evaluation-runner | complete | confined commands validate the tracked blocked baseline without synthetic success |
 | tool-registry | complete | one descriptor projection drives prompt, parser, admission, and effects |
 | reducer-selector | complete | direct state reduction and deterministic selection pass core and bridge-continuity tests |
