@@ -9,6 +9,7 @@ pub mod exchange_rows {
     pub use crate::decision_rows::{insert_provider_exchange, ProviderExchangeRow};
 }
 pub mod memory;
+pub mod native_schema;
 pub mod observation_rows;
 pub mod plan_access;
 pub mod plan_commit;
@@ -26,7 +27,6 @@ pub mod record_rows;
 mod record_schema;
 pub mod row_support;
 pub mod state_edge_rows;
-mod state_edge_schema;
 pub mod state_rows;
 pub mod state_schema;
 pub mod token_usage;

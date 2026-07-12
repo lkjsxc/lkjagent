@@ -14,6 +14,7 @@ Map lkjagent-store source modules.
 - [event-rows.rs](event_rows.rs): runtime event append and reducer apply helpers.
 - [effect-recovery.rs](effect_recovery.rs): unresolved effect reconciliation.
 - [memory.rs](memory.rs): duplicate-suppressed memory writes and search.
+- [native-schema.rs](native_schema.rs): isolated fresh direct-runtime SQLite schema.
 - [observation-rows.rs](observation_rows.rs): bounded observation rows.
 - [plan-schema.rs](plan_schema.rs): plan and state-ledger schema setup.
 - [plan-names.rs](plan_names.rs): database enum name parsing.
@@ -26,6 +27,7 @@ Map lkjagent-store source modules.
 - [record-rows.rs](record_rows.rs): workspace record metadata and history rows.
 - [row-support.rs](row_support.rs): shared row encoding and safe effect-target reads.
 - [state-rows.rs](state_rows.rs): state cell row helpers and hydration.
+- [state-edge-rows.rs](state_edge_rows.rs): legacy state-edge row access.
 - [state-schema.rs](state_schema.rs): state-ledger table and index setup.
 - [workspace-rows.rs](workspace_rows.rs): manifests, aliases, audits, and operation access.
 - [workspace-search.rs](workspace_search.rs): SQLite search projection schema,
