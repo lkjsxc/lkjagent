@@ -48,9 +48,11 @@ adopted.
 ## Final Message
 
 Only a respond decision accepts `<final>`. Mandatory admission rejects
-future-tense readiness and unchecked path, effect, command, or verification
-claims. The owner-visible output always includes a harness-rendered factual
-receipt. If model wording remains invalid, the receipt alone is persisted.
+future-tense readiness and command or test claims unsupported by this file-only
+runtime. Respond is unreachable until required path, effect, and verification
+checks pass. The owner-visible row always carries a harness-rendered factual
+receipt. If model wording remains invalid, factual fallback wording is persisted
+with that receipt.
 
 ## Close
 

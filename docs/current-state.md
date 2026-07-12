@@ -101,9 +101,9 @@ schedule has not yet run.
 The public compiler attaches its context plan and frame fingerprints and stores
 one native context-item row for every included owner or measured source. List and
 search observations remain orienting evidence until a read produces current
-source bytes. Final model wording is not yet checked for unsupported claims,
-although close and the owner receipt remain check-derived. These are bounded
-follow-up gaps, not task/step fallback.
+source bytes. Final admission rejects future-tense and unsupported command or
+test claims; richer claim-to-path comparison remains a bounded follow-up. Close
+and the owner receipt remain check-derived. These are source gaps, not fallback.
 
 The native `conversation_messages` table is canonical for public turns, but the
 TUI still synthesizes owner and agent messages from retired queue and event rows,

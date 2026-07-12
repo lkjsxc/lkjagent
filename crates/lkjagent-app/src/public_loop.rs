@@ -67,7 +67,7 @@ pub fn run_once(data:&Path,endpoint:&mut dyn Endpoint)->R<String>{
  let answer=match endpoint.complete(&compiled.prompt,0){Ok(v)=>v,Err(x)=>{store.provider_outcome(&xid,"failed",x.as_bytes(),(0,0),millis(),b"error",b"endpoint",b"not-parsed").map_err(e)?; return fault(&mut store,&did,&m.id,ModelFaultKind::Stale,&x)}};
  let raw=bounded(answer.content.as_bytes(),16_384); store.provider_outcome(&xid,"succeeded",raw,(answer.prompt_tokens.unwrap_or(0) as i64,answer.completion_tokens.unwrap_or(0) as i64),millis(),answer.finish_reason.as_bytes(),answer.anomaly.as_deref().unwrap_or("").as_bytes(),b"strict-parse-follows").map_err(e)?;
  let parsed=match lkjagent_core::parse::parse_expected_for_decision(&decision,&answer.content){Ok(v)=>v,Err(x)=>{let text=format!("{x:?}");if decision.expected_envelope==lkjagent_core::runtime_decision::OutputEnvelope::Message&&output_faults(&db,&m.id)>0{return close(&mut store,&m.id,&did,"Completed with current harness checks.")}let outcome=fault(&mut store,&did,&m.id,if text.contains("UnknownTool"){ModelFaultKind::Hidden}else{ModelFaultKind::Malformed},&text)?;if answer.content.trim_start().starts_with("<final>"){if let Some((path,revision))=current_source(&store){let _=store.reuse_checked_revision(&m.id,&source_decision(&db,&m.id).unwrap_or_else(||did.to_string()),path.as_bytes(),&revision).map_err(e)?;}}return Ok(outcome)}};
- match parsed { ParsedOutput::Action(a)=>match dispatch(data,&db,&mut store,&m.id,&did,&decision,&a.tool,&a.params,&answer.content){Ok(v)=>Ok(v),Err(x)=>fault(&mut store,&did,&m.id,ModelFaultKind::Stale,&x)}, ParsedOutput::Message(body)=>close(&mut store,&m.id,&did,&body), _=>fault(&mut store,&did,&m.id,ModelFaultKind::Malformed,"wrong compact envelope") }
+ match parsed { ParsedOutput::Action(a)=>match dispatch(data,&db,&mut store,&m.id,&did,&decision,&a.tool,&a.params,&answer.content){Ok(v)=>Ok(v),Err(x)=>fault(&mut store,&did,&m.id,ModelFaultKind::Stale,&x)}, ParsedOutput::Message(body) if final_claims_allowed(&body)=>close(&mut store,&m.id,&did,&body), ParsedOutput::Message(_)=>fault(&mut store,&did,&m.id,ModelFaultKind::Malformed,"unsupported future or command claim in final wording"), _=>fault(&mut store,&did,&m.id,ModelFaultKind::Malformed,"wrong compact envelope") }
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -130,6 +130,8 @@ fn source_revision(store:&NativeStore,path:&str)->R<String>{current_source(store
 fn context(id:&str,key:&str,body:String,trust:TrustClass,kind:&str,source:&str)->ContextItem{ContextItem{id:id.into(),semantic_key:key.into(),body,source_type:kind.into(),source_id:source.into(),source_fingerprint:stable_fingerprint(&source).unwrap_or_default(),trust,staleness:StalenessClass::Current,contamination:ContaminationClass::Clean,artifact_refs:vec![],decision_id:None,created_at:String::new()}}
 #[rustfmt::skip]
 fn trust(value:TrustClass)->&'static str{match value{TrustClass::Owner=>"owner",TrustClass::Measured=>"workspace",TrustClass::External=>"provider",_=>"tool"}}
+#[rustfmt::skip]
+fn final_claims_allowed(body:&str)->bool{let lower=body.to_ascii_lowercase();!["i will ","will update","will create","going to ","ready to ","command ran","command passed","tests passed","test suite passed"].iter().any(|claim|lower.contains(claim))}
 
 #[rustfmt::skip]
 pub fn doctor(data:&Path,json_output:bool)->R<String>{fs::create_dir_all(data).map_err(e)?;let db=data.join("lkjagent.sqlite3");let store=NativeStore::open(&db).map_err(e)?;let p=store.restart_projection().map_err(e)?;let c=Connection::open(&db).map_err(e)?;
