@@ -70,9 +70,10 @@ The direct five-tool descriptor catalog, parser, admission view, and effect keys
 now agree, but the production prompt renderer still reaches them through the
 retired task bridge. The direct edit transaction is safe in isolation; the public
 owner path still invokes the existing whole-file writer and does not select the direct
-edit from native state. The app cutover must connect persisted native decisions,
-tool admissions, exact effects, automatic checks, and final close without a
-second task or step authority.
+edit from native state. The automatic native check reducer now consumes settled
+successful direct edit and create observations, but the app cutover must connect
+persisted native decisions, tool admissions, exact effects, that reducer, and
+final close without a second task or step authority.
 
 There is no `conversation_messages` table. The TUI synthesizes owner and agent
 messages from queue and selected event rows, then merges local drafts. It has two
@@ -116,6 +117,7 @@ claims, and the close transaction owns the canonical final message.
 | reducer-selector | complete | direct state reduction and deterministic selection pass core and bridge-continuity tests |
 | store-transactions | complete | native intake through close boundaries pass restart tests |
 | exact-edits | complete | crash-safe exact edit and create pass race, mode, symlink, and crash tests |
+| automatic-checks | complete | settled direct edit and create observations produce idempotent byte, content, and collateral checks |
 | context-compiler | complete | selected decisions bind escaped deduplicated sources under lane and agent-file budgets |
 | conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
 | workspace-root | complete | data and workspace roots are separate, lazy, diagnosed, and Compose-mounted |

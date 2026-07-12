@@ -56,6 +56,11 @@ latest owner bytes, mode, journal state, and no residue.
 ## Observation And Checks
 
 Settlement rereads the target through the same path service, stores immutable
-revision/receipt, emits one bounded observation, schedules native checks, and
-settles the decision. A failed check returns to modification or recovery; it
-cannot be converted into model success prose.
+revision and receipt, emits one bounded observation, and settles the decision.
+The app check reducer consumes only that committed successful observation. It
+rereads the target through the already opened descriptor capability, compares
+bytes and mode with the effect target and revision, checks required content and
+allowed target paths, then durably reduces the matching obligations. Repeating
+the reducer at the same source revision adds no rows. A failed or stale check
+returns to modification or recovery; it cannot be converted into model success
+prose.

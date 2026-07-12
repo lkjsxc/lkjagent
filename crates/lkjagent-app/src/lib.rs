@@ -4,6 +4,7 @@ mod arg_helpers;
 pub mod args;
 mod artifact_effects;
 mod artifact_plan;
+pub mod automatic_checks;
 pub mod cli;
 pub mod clock;
 pub mod config;
