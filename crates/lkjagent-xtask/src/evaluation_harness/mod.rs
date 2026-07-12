@@ -5,177 +5,91 @@ mod hash {
     pub fn bytes(input: &[u8]) -> String {
         format!("sha256:{:x}", Sha256::digest(input))
     }
-    pub fn valid(value: &str) -> bool {
-        value.len() == 71
-            && value.starts_with("sha256:")
-            && value[7..]
-                .bytes()
-                .all(|byte| byte.is_ascii_hexdigit() && !byte.is_ascii_uppercase())
-    }
 }
 mod pty;
 mod scenario;
 mod snapshot;
 
-use std::fs;
-use std::path::{Component, Path};
-
 pub use clock::{FakeClock, FaultInjector};
 pub use evidence::{fixture_errors, validate, Facts};
 pub use hash::bytes as sha256;
 pub use pty::validate_cast;
+pub use scenario::endpoint_file;
+use std::path::Path;
 
+#[rustfmt::skip]
 pub fn check(root: &Path) -> Result<(), Vec<String>> {
-    let scenarios = source_scenarios(root)?;
-    let scenario_fingerprint = fingerprint(&scenarios);
-    let capture = snapshot::create(root).map_err(|error| vec![error])?;
-    let pty = pty::record(root, &capture, &scenario_fingerprint).map_err(|error| vec![error])?;
-    if pty.frame_count < 3 || !hash::valid(&pty.cast_fingerprint) {
-        return Err(vec!["PTY recorder did not return bound raw frames".into()]);
-    }
-    let raw_count = snapshot::write_raw_manifest(&capture, &scenario_fingerprint)
-        .map_err(|error| vec![error])?;
-    snapshot::validate_raw_manifest(&capture, &scenario_fingerprint)
-        .map_err(|error| vec![error])?;
-    let failures = evidence::check_fixtures(root, &scenario_fingerprint, raw_count);
-    if failures.is_empty() {
-        Ok(())
-    } else {
-        Err(failures)
-    }
+    let faults = clock::exercise(&root.join("evaluation/fault-schedule.tsv"))?;
+    let scenarios = scenario::check(root, &faults)?;
+    for item in &scenarios { scenario::validate_seed(item).map_err(|error| vec![error])?; }
+    if scenarios.len() != scenario::ALIASES.len() { return Err(vec!["tracked scenario coverage differs".into()]); }
+    if pty::reject().is_ok() { return Err(vec!["incomplete PTY scenario was accepted".into()]); }
+    check_false_positives(root)
 }
-
-pub fn check_source(root: &Path) -> Result<usize, Vec<String>> {
-    source_scenarios(root).map(|scenarios| scenarios.len())
-}
-
-fn source_scenarios(root: &Path) -> Result<Vec<scenario::Scenario>, Vec<String>> {
-    let fault_ids = clock::exercise(&root.join("evaluation/fault-schedule.tsv"))?;
-    let scenarios = scenario::check(root, &fault_ids)?;
-    for scenario in &scenarios {
-        if scenario.required_check_count < 9 {
-            return Err(vec![format!(
-                "scenario {} has too few independent checks",
-                scenario.id
-            )]);
+#[rustfmt::skip]
+fn check_false_positives(root: &Path) -> Result<(), Vec<String>> {
+    let directory = root.join("evaluation/false-positive-fixtures");
+    let expected = [("idle-as-complete.tsv", "useful decision floor not met"),
+        ("blocked-as-complete.tsv", "claimed terminal contradicts raw terminal"),
+        ("skipped-command.tsv", "required command was skipped"),
+        ("zero-test-filter.tsv", "test count must be positive"),
+        ("generated-placeholder.tsv", "generated placeholder is not evidence")];
+    let mut errors = Vec::new();
+    for (name, message) in expected {
+        match fixture_errors(&directory.join(name)) {
+            Ok(found) if found == [message] => {}, Ok(found) => errors.push(format!("fixture {name} rejected as {found:?}")),
+            Err(error) => errors.push(error),
         }
     }
-    Ok(scenarios)
+    if errors.is_empty() { Ok(()) } else { Err(errors) }
 }
+#[rustfmt::skip]
+pub fn check_source(root: &Path) -> Result<usize, Vec<String>> { check(root).map(|()| scenario::ALIASES.len()) }
+#[rustfmt::skip]
+pub fn validate_corpus(root: &Path) -> Result<usize, String> { check_source(root).map_err(|errors| errors.join("\n")) }
+#[rustfmt::skip]
+pub fn run_replay(root: &Path) -> Result<(), String> { check(root).map_err(|errors| errors.join("\n")) }
 
-fn fingerprint(scenarios: &[scenario::Scenario]) -> String {
-    let mut source = Vec::new();
-    for scenario in scenarios {
-        source.extend_from_slice(scenario.id.as_bytes());
-        source.push(0);
-        source.extend_from_slice(scenario.fingerprint.as_bytes());
-        source.push(0);
+#[rustfmt::skip]
+pub fn run_evidence(args: &[String], root: &Path) -> i32 {
+    let source = match args {
+        [check, campaign, name] if check == "check" && campaign == "--campaign" && name == "baseline" => None,
+        [check, campaign, name, flag, source] if check == "check" && campaign == "--campaign" && name == "baseline" && flag == "--source" => Some(source.as_str()),
+        _ => return fail_code("evidence", "use: evidence check --campaign baseline [--source FULL_COMMIT]", 2),
+    };
+    match evidence::check_baseline(root, source) {
+        Ok(line) => { println!("{line}"); 0 }, Err(errors) => fail("evidence check", &errors.join("\n")),
     }
-    hash::bytes(&source)
 }
-
+#[rustfmt::skip]
+pub fn run_campaign(args: &[String], root: &Path) -> i32 {
+    let (probe, alias, endpoint) = match args {
+        [command, alias, flag, file] if (command == "run" || command == "probe-endpoint") && flag == "--endpoint-file" =>
+            (command == "probe-endpoint", alias.as_str(), Path::new(file)),
+        _ => return fail_code("campaign", "use: campaign run|probe-endpoint TRACKED_ALIAS --endpoint-file FILE", 2),
+    };
+    match pty::campaign(root, alias, endpoint, probe) {
+        Ok(message) => { println!("{message}"); 0 },
+        Err(error) => fail(if probe { "campaign probe-endpoint" } else { "campaign run" }, &error),
+    }
+}
+#[rustfmt::skip]
 pub fn run_smoke(args: &[String], root: &Path) -> i32 {
-    match args {
-        [] => report_smoke(root),
-        [command] if command == "replay" => report_smoke(root),
-        [command] if command == "live" => fail(
-            "smoke live",
-            "live evidence requires the frozen-source acceptance campaign",
-        ),
-        _ => fail("smoke", "use: smoke replay"),
-    }
+    let supported = args.is_empty() || matches!(args, [value] if value == "replay");
+    if !supported { return fail_code("smoke", "use: smoke replay", 2); }
+    match run_replay(root) { Ok(()) => { println!("ok smoke replay semantic_status=not-evaluated"); 0 }, Err(e) => fail("smoke replay", &e) }
 }
-
-pub fn run_replay(root: &Path) -> Result<(), String> {
-    check(root).map_err(|failures| failures.join("\n"))
-}
-
-fn report_smoke(root: &Path) -> i32 {
-    match run_replay(root) {
-        Ok(()) => {
-            println!("ok smoke replay");
-            0
-        }
-        Err(error) => fail("smoke replay", &error),
-    }
-}
-
+#[rustfmt::skip]
 pub fn run_benchmark(args: &[String], root: &Path) -> i32 {
-    match args {
-        [command] if command == "check-corpus" => match check_source(root) {
-            Ok(_) => {
-                println!("ok bench check-corpus");
-                0
-            }
-            Err(failures) => fail("bench check-corpus", &failures.join("\n")),
-        },
-        [command, ..] if command == "run" => fail(
-            "benchmark run",
-            "live benchmark summary lacks raw source-bound evaluation authority",
-        ),
-        _ => fail("benchmark", "use: bench check-corpus"),
-    }
+    match args { [x] if x == "check-corpus" => match validate_corpus(root) {
+        Ok(_) => { println!("ok bench check-corpus semantic_status=not-evaluated"); 0 }, Err(e) => fail("bench check-corpus", &e),
+    }, _ => fail("benchmark", "live benchmark semantics are not implemented") }
 }
-
-pub fn validate_corpus(root: &Path) -> Result<usize, String> {
-    check_source(root).map_err(|failures| failures.join("\n"))
-}
-
-pub(super) fn check_scenario_seed(path: &Path, id: &str, failures: &mut Vec<String>) {
-    let manifest = path.join("seed-manifest.tsv");
-    let text = fs::read_to_string(&manifest).unwrap_or_else(|error| {
-        failures.push(format!("could not read {}: {error}", manifest.display()));
-        String::new()
-    });
-    let mut rows = 0;
-    for row in text.lines().skip(1) {
-        rows += 1;
-        let fields = row.split('\t').collect::<Vec<_>>();
-        let safe = fields.first().is_some_and(|value| {
-            !value.is_empty()
-                && Path::new(value)
-                    .components()
-                    .all(|part| matches!(part, Component::Normal(_)))
-        });
-        if fields.len() != 4 || !safe {
-            failures.push(format!("scenario {id} seed row is malformed"));
-            continue;
-        }
-        let seed = path.join("seed").join(fields[0]);
-        let bytes = fs::read(&seed).unwrap_or_default();
-        if bytes.is_empty() || hash::bytes(&bytes) != fields[3] || seed.is_symlink() {
-            failures.push(format!("scenario {id} seed differs: {}", fields[0]));
-        }
-    }
-    if rows < 2 {
-        failures.push(format!("scenario {id} has fewer than two seed files"));
-    }
-}
-
-pub fn run_experiment(args: &[String], root: &Path) -> i32 {
-    if args.first().map(String::as_str) != Some("run") {
-        return fail("experiment", "use: experiment run");
-    }
-    let status = std::process::Command::new("python3")
-        .arg(root.join("evaluation/experiment-runner.py"))
-        .arg(root)
-        .status();
-    match status {
-        Ok(status) => status.code().unwrap_or(1),
-        Err(error) => fail("experiment run", &error.to_string()),
-    }
-}
-
-pub fn reject_unbound_command(name: &str) -> i32 {
-    fail(
-        name,
-        "summary-only command lacks source-bound authority; use anchored source scenarios",
-    )
-}
-
-fn fail(name: &str, message: &str) -> i32 {
-    eprintln!("{name} failed");
-    eprintln!("exit status: 1");
-    eprintln!("{message}");
-    1
-}
+#[rustfmt::skip]
+pub fn run_experiment(_args: &[String], _root: &Path) -> i32 { fail("experiment", "stale scripted semantic paths are rejected") }
+#[rustfmt::skip]
+pub fn reject_unbound_command(name: &str) -> i32 { fail(name, "summary-only command lacks source-bound authority") }
+#[rustfmt::skip]
+fn fail(name: &str, message: &str) -> i32 { fail_code(name, message, 1) }
+#[rustfmt::skip]
+fn fail_code(name: &str, message: &str, code: i32) -> i32 { eprintln!("{name} failed\nexit status: {code}\n{message}"); code }

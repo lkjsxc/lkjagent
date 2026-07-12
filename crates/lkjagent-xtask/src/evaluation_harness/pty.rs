@@ -1,131 +1,114 @@
+use super::{clock, hash, scenario, snapshot};
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::thread;
+use std::time::{Duration, Instant};
 
-use serde_json::Value;
-
-use super::hash;
-use super::snapshot::Capture;
-
+#[derive(Debug)]
 pub struct PtyFacts {
     pub cast_fingerprint: String,
     pub frame_count: usize,
 }
+#[rustfmt::skip]
+pub fn validate_cast(_path: &Path) -> Result<PtyFacts, String> { Err("PTY scenario is incomplete; generic PTY evidence is not supported".into()) }
+#[rustfmt::skip]
+pub fn reject() -> Result<(), String> { Err("PTY scenario is incomplete; canned terminal output is forbidden".into()) }
 
-pub fn record(repo: &Path, capture: &Capture, scenario: &str) -> Result<PtyFacts, String> {
-    let cast = capture.root.join("terminal.cast");
-    let output = Command::new("python3")
-        .env("PYTHONDONTWRITEBYTECODE", "1")
-        .arg(repo.join("evaluation/pty-recorder.py"))
-        .arg(&cast)
-        .output()
-        .map_err(|error| format!("run PTY recorder: {error}"))?;
-    let log = String::from_utf8_lossy(&output.stdout).to_string();
-    fs::write(capture.root.join("pty-recorder.log"), &log).map_err(|error| error.to_string())?;
-    if !output.status.success()
-        || !log.contains("input_frames\t1")
-        || !log.lines().any(|line| line.starts_with("output_frames\t"))
-    {
-        return Err(format!(
-            "PTY recorder failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ));
+#[rustfmt::skip]
+pub fn campaign(root: &Path, alias: &str, endpoint: &Path, probe: bool) -> Result<String, String> {
+    let scenario = scenario::load(root, alias)?; scenario::validate_seed(&scenario)?;
+    let endpoint = scenario::endpoint_file(endpoint)?;
+    let source = exact_clean_head(root)?; let binary_source = build(root)?;
+    let capture = snapshot::create()?;
+    fs::copy(binary_source, &capture.binary).map_err(|error| error.to_string())?;
+    snapshot::copy_seed(&scenario.path.join("seed"), &capture.workspace)?;
+    let before = snapshot::manifest(&capture.workspace)?;
+    let env = runtime_env(&capture, &endpoint); let first = &scenario.turns[0].1;
+    public(&capture, &env, &["send", "--new", first], Duration::from_secs(30))?;
+    if probe {
+        let run = public_output(&capture, &env, &["run", "--once"], Duration::from_secs(1900))?;
+        let status = public_output(&capture, &env, &["status"], Duration::from_secs(30))?;
+        let (message, provider) = finish(root, &source, &scenario, &capture, &before, &[run, status], "probe")?;
+        return if provider == 0 { Err(message) } else {
+            Ok(format!("ok campaign probe-endpoint source={source} provider_exchange_count={provider} semantic_status=not-evaluated")) };
     }
-    let facts = validate_cast(&cast)?;
-    write_replay(capture, scenario, &facts)?;
-    validate_replay(capture, scenario, &facts)?;
-    Ok(facts)
+    run_schedule(root, &source, &scenario, &capture, &before, &env)?;
+    Ok(format!("ok campaign source={source} scenario={alias} semantic_status=not-evaluated"))
 }
-
-pub fn validate_cast(path: &Path) -> Result<PtyFacts, String> {
-    let bytes = fs::read(path).map_err(|error| error.to_string())?;
-    let text = std::str::from_utf8(&bytes).map_err(|error| error.to_string())?;
-    let mut lines = text.lines();
-    let header: Value = serde_json::from_str(
-        lines
-            .next()
-            .ok_or_else(|| "PTY cast header is missing".to_string())?,
-    )
-    .map_err(|error| error.to_string())?;
-    if header.get("version").and_then(Value::as_u64) != Some(2)
-        || header
-            .get("width")
-            .and_then(Value::as_u64)
-            .is_none_or(|value| value < 20)
-        || header
-            .get("height")
-            .and_then(Value::as_u64)
-            .is_none_or(|value| value < 5)
-    {
-        return Err("PTY cast header is invalid".into());
-    }
-    let mut last = 0.0_f64;
-    let mut frames = 0;
-    let mut input = String::new();
-    let mut output = String::new();
-    for line in lines {
-        let frame: Value = serde_json::from_str(line).map_err(|error| error.to_string())?;
-        let fields = frame
-            .as_array()
-            .filter(|fields| fields.len() == 3)
-            .ok_or_else(|| "PTY cast frame is malformed".to_string())?;
-        let moment = fields[0]
-            .as_f64()
-            .filter(|moment| *moment >= last)
-            .ok_or_else(|| "PTY cast frame time is unordered".to_string())?;
-        let kind = fields[1]
-            .as_str()
-            .ok_or_else(|| "PTY cast frame kind is invalid".to_string())?;
-        let body = fields[2]
-            .as_str()
-            .ok_or_else(|| "PTY cast frame body is invalid".to_string())?;
-        match kind {
-            "i" => input.push_str(body),
-            "o" => output.push_str(body),
-            _ => return Err("PTY cast frame kind is unsupported".into()),
+#[rustfmt::skip]
+fn run_schedule(root: &Path, source: &str, scenario: &scenario::Scenario, capture: &snapshot::Capture,
+    before: &str, env: &BTreeMap<String,String>) -> Result<(), String> {
+    let started = Instant::now(); let binary = capture.binary.clone(); let cwd = capture.root.clone(); let daemon_env = env.clone();
+    thread::scope(|scope| -> Result<(), String> {
+        let daemon = scope.spawn(move || clock::command(&binary, &["--data".into(), cwd.join("data").display().to_string(), "run".into()],
+            &cwd, &daemon_env, Duration::from_secs(903)));
+        for (offset, text) in scenario.turns.iter().skip(1) {
+            wait_until(started, Duration::from_secs(*offset)); public(capture, env, &["send", text], Duration::from_secs(30))?;
         }
-        last = moment;
-        frames += 1;
-    }
-    if frames < 3 || !input.contains('\n') || input.is_ascii() {
-        return Err("PTY cast lacks raw owner and Japanese input".into());
-    }
-    if output.len() < 40 || !output.contains("frame:raw-pty-output") {
-        return Err("PTY cast lacks substantive raw output".into());
-    }
-    Ok(PtyFacts {
-        cast_fingerprint: hash::bytes(&bytes),
-        frame_count: frames,
+        wait_until(started, Duration::from_secs(901));
+        let status = public_output(capture, env, &["status"], Duration::from_secs(30))?;
+        let daemon = daemon.join().map_err(|_| "daemon capture thread failed")??;
+        if !daemon.timed_out || status.code != Some(0) { return Err("daemon was not alive through the bounded observation".into()); }
+        finish(root, source, scenario, capture, before, &[status], "run").map(|_| ())
     })
 }
-
-fn write_replay(capture: &Capture, scenario: &str, facts: &PtyFacts) -> Result<(), String> {
-    let body = format!(
-        "scenario_fingerprint\t{scenario}\ncast_fingerprint\t{}\nframe_count\t{}\n\
-         screen_mismatch_count\t0\ngeometry_mismatch_count\t0\ntransition_mismatch_count\t0\n",
-        facts.cast_fingerprint, facts.frame_count
-    );
-    fs::write(capture.root.join("terminal-replay.tsv"), body).map_err(|error| error.to_string())
+#[rustfmt::skip]
+fn exact_clean_head(root: &Path) -> Result<String, String> {
+    let output = Command::new("git").args(["status", "--porcelain", "--untracked-files=no"]).current_dir(root).output().map_err(|e| e.to_string())?;
+    if !output.status.success() || !output.stdout.is_empty() { return Err("campaign requires a clean exact HEAD".into()); }
+    let output = Command::new("git").args(["rev-parse", "HEAD"]).current_dir(root).output().map_err(|e| e.to_string())?;
+    let source = String::from_utf8(output.stdout).map_err(|e| e.to_string())?.trim().to_string();
+    if source.len() != 40 { return Err("HEAD did not resolve to a full commit".into()); } Ok(source)
 }
-
-fn validate_replay(capture: &Capture, scenario: &str, facts: &PtyFacts) -> Result<(), String> {
-    let path: PathBuf = capture.root.join("terminal-replay.tsv");
-    let text = fs::read_to_string(path).map_err(|error| error.to_string())?;
-    let values = text
-        .lines()
-        .filter_map(|line| line.split_once('\t'))
-        .collect::<std::collections::BTreeMap<_, _>>();
-    for (key, expected) in [
-        ("scenario_fingerprint", scenario.to_string()),
-        ("cast_fingerprint", facts.cast_fingerprint.clone()),
-        ("frame_count", facts.frame_count.to_string()),
-        ("screen_mismatch_count", "0".into()),
-        ("geometry_mismatch_count", "0".into()),
-        ("transition_mismatch_count", "0".into()),
-    ] {
-        if values.get(key).copied() != Some(expected.as_str()) {
-            return Err(format!("PTY replay binding differs: {key}"));
-        }
-    }
-    Ok(())
+#[rustfmt::skip]
+fn build(root: &Path) -> Result<PathBuf, String> {
+    let target = std::env::var("CARGO_TARGET_DIR")
+        .map_err(|_| "campaign requires an explicit CARGO_TARGET_DIR")?;
+    let target = PathBuf::from(target);
+    if !target.is_absolute() { return Err("campaign CARGO_TARGET_DIR must be absolute".into()); }
+    let mut env = BTreeMap::new();
+    env.insert("CARGO_TARGET_DIR".into(), target.display().to_string());
+    env.insert("CARGO_INCREMENTAL".into(), "0".into());
+    env.insert("PATH".into(), std::env::var("PATH").map_err(|_| "PATH is unavailable")?);
+    let args = ["build", "--locked", "--release", "-p", "lkjagent-app"].map(str::to_string);
+    let output = clock::command(Path::new("cargo"), &args, root, &env, Duration::from_secs(3600))?;
+    if output.code != Some(0) || output.timed_out { return Err("clean exact HEAD release build failed".into()); }
+    Ok(target.join("release/lkjagent"))
 }
+#[rustfmt::skip]
+fn runtime_env(capture: &snapshot::Capture, endpoint: &BTreeMap<String,String>) -> BTreeMap<String,String> {
+    let mut env = endpoint.clone(); env.insert("LKJAGENT_WORKSPACE_ROOT".into(), capture.workspace.display().to_string());
+    env.insert("HOME".into(), capture.root.display().to_string()); env
+}
+#[rustfmt::skip]
+fn public(capture: &snapshot::Capture, env: &BTreeMap<String,String>, args: &[&str], timeout: Duration) -> Result<(), String> {
+    let output = public_output(capture, env, args, timeout)?;
+    if output.code == Some(0) && !output.timed_out { Ok(()) } else { Err("copied public command failed".into()) }
+}
+#[rustfmt::skip]
+fn public_output(capture: &snapshot::Capture, env: &BTreeMap<String,String>, args: &[&str], timeout: Duration) -> Result<clock::Output,String> {
+    let mut bound = vec!["--data".into(), capture.data.display().to_string()]; bound.extend(args.iter().map(|arg| (*arg).to_string()));
+    clock::command(&capture.binary, &bound, &capture.root, env, timeout)
+}
+#[rustfmt::skip]
+fn wait_until(start: Instant, duration: Duration) { while start.elapsed() < duration { thread::sleep(Duration::from_millis(20)); } }
+#[rustfmt::skip]
+fn finish(root: &Path, source: &str, scenario: &scenario::Scenario, capture: &snapshot::Capture, before: &str,
+    outputs: &[clock::Output], mode: &str) -> Result<(String,u64),String> {
+    let after = snapshot::manifest(&capture.workspace)?;
+    let facts = snapshot::sqlite_facts(root, &capture.data.join("lkjagent.sqlite3"), &capture.raw.join("state.sqlite3"))?;
+    let provider = table_count(&facts, "provider_exchanges");
+    let activity = ["runtime_decisions", "effect_journal", "check_results"].iter().map(|name| table_count(&facts, name)).sum::<u64>();
+    let binary = hash::bytes(&fs::read(&capture.binary).map_err(|e| e.to_string())?); let mut command_bytes = Vec::new();
+    for output in outputs { command_bytes.extend_from_slice(&output.stdout); command_bytes.push(0); command_bytes.extend_from_slice(&output.stderr);
+        command_bytes.push(0); command_bytes.extend_from_slice(format!("{:?}:{}:{}", output.code, output.elapsed.as_millis(), output.timed_out).as_bytes()); }
+    let sanitized = format!("field\tvalue\nsource_commit\t{source}\nscenario\t{}\nscenario_sha256\t{}\nbinary_sha256\t{binary}\nmode\t{mode}\nsemantic_status\tnot-evaluated\nprovider_exchange_count\t{provider}\nactivity_count\t{activity}\ncommand_count\t{}\ncommand_capture_sha256\t{}\nworkspace_before_sha256\t{}\nworkspace_after_sha256\t{}\nworkspace_diff_sha256\t{}\n", scenario.id, scenario.fingerprint, outputs.len(), hash::bytes(&command_bytes), hash::bytes(before.as_bytes()), hash::bytes(after.as_bytes()), hash::bytes(snapshot::diff(before, &after).as_bytes()));
+    let directory = root.join("evaluation/evidence").join(source); fs::create_dir_all(&directory).map_err(|e| e.to_string())?;
+    fs::write(directory.join(format!("campaign-{}-{mode}.tsv", scenario.id)), &sanitized).map_err(|e| e.to_string())?;
+    Ok((format!("endpoint probe unsupported: sanitized durable facts provider_exchange_count={provider} activity_count={activity} semantic_status=not-evaluated"), provider))
+}
+#[rustfmt::skip]
+fn table_count(facts: &str, table: &str) -> u64 { facts.lines().skip(1).find_map(|line| {
+    let (name,count)=line.split_once('\t')?; (name==table).then(|| count.parse().unwrap_or(0)) }).unwrap_or(0) }

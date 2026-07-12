@@ -29,6 +29,8 @@ pub enum Gate {
     Proof(Vec<String>),
     Smoke(Vec<String>),
     Structure(Vec<String>),
+    Evidence(Vec<String>),
+    Campaign(Vec<String>),
 }
 
 pub fn check_lines(files: &[RepoFile]) -> Vec<Violation> {
@@ -157,10 +159,12 @@ pub fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
         [first, rest @ ..] if first == "proof" => Ok(Gate::Proof(rest.to_vec())),
         [first, rest @ ..] if first == "smoke" => Ok(Gate::Smoke(rest.to_vec())),
         [first, rest @ ..] if first == "structure" => Ok(Gate::Structure(rest.to_vec())),
+        [first, rest @ ..] if first == "evidence" => Ok(Gate::Evidence(rest.to_vec())),
+        [first, rest @ ..] if first == "campaign" => Ok(Gate::Campaign(rest.to_vec())),
         _ => Err(vec![
             "xtask failed".to_string(),
             "exit status: 2".to_string(),
-            "use: acceptance verify ... | check-docs | check-lines | check-files | check-style | hygiene-check | quiet test | quiet verify | gate NODE | bench ... | experiment ... | proof ... | smoke ... | structure ...".to_string(),
+            "use: acceptance verify ... | check-docs | check-lines | check-files | check-style | hygiene-check | quiet test | quiet verify | gate NODE | bench ... | experiment ... | proof ... | smoke ... | structure ... | evidence check --campaign baseline [--source FULL_COMMIT] | campaign probe-endpoint|run ...".to_string(),
         ]),
     }
 }

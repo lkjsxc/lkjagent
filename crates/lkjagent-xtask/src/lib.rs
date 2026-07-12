@@ -54,6 +54,8 @@ pub fn run(args: &[String], root: &Path) -> i32 {
         Ok(Gate::Proof(_)) => evaluation_harness::reject_unbound_command("proof"),
         Ok(Gate::Smoke(rest)) => evaluation_harness::run_smoke(&rest, root),
         Ok(Gate::Structure(rest)) => structure::run(&rest, root),
+        Ok(Gate::Evidence(rest)) => evaluation_harness::run_evidence(&rest, root),
+        Ok(Gate::Campaign(rest)) => evaluation_harness::run_campaign(&rest, root),
         Err(lines) => {
             print_failure(&lines);
             2

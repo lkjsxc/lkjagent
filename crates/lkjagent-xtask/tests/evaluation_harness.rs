@@ -1,15 +1,58 @@
 use std::fs;
+use std::os::unix::fs::symlink;
 use std::path::{Path, PathBuf};
 
 use lkjagent_xtask::evaluation_harness::{
-    fixture_errors, sha256, validate, validate_cast, Facts, FakeClock, FaultInjector,
+    endpoint_file, fixture_errors, sha256, validate_cast, FakeClock, FaultInjector,
 };
-use lkjagent_xtask::node_gate;
+use lkjagent_xtask::{node_gate, run};
 
 #[test]
-fn repository_satisfies_evaluation_harness_contract() {
-    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+fn repository_satisfies_evaluation_runner_contract() {
+    let root = repository_root();
     assert_eq!(node_gate::check(&root, "evaluation-harness"), Ok(()));
+}
+
+#[test]
+fn absent_baseline_evidence_fails_honestly() {
+    let root = repository_root();
+    let args = words(&[
+        "evidence",
+        "check",
+        "--campaign",
+        "baseline",
+        "--source",
+        "97e00698f348fc2435d47a107b5b8453c98b9d1f",
+    ]);
+    assert_eq!(run(&args, &root), 1);
+}
+
+#[test]
+fn acceptance_negative_rejects_unimplemented_and_unconfined_commands() {
+    let root = repository_root();
+    assert_eq!(run(&words(&["benchmark", "live"]), &root), 1);
+    assert_eq!(run(&words(&["experiment", "run"]), &root), 1);
+    assert_eq!(run(&words(&["proof"]), &root), 1);
+    assert_eq!(run(&words(&["campaign", "run", "/bin/sh"]), &root), 2);
+}
+
+#[test]
+fn campaign_parser_rejects_commands_and_owner_text() {
+    let root = repository_root();
+    assert_eq!(run(&words(&["campaign", "run", "/bin/sh"]), &root), 2);
+    assert_eq!(
+        run(
+            &words(&[
+                "campaign",
+                "run",
+                "daily-life-recall",
+                "--owner-text",
+                "fake"
+            ]),
+            &root
+        ),
+        2
+    );
 }
 
 #[test]
@@ -38,15 +81,15 @@ fn fault_injector_rejects_reordering_and_incomplete_replay() -> Result<(), Strin
         .faults()
         .get(1)
         .cloned()
-        .ok_or_else(|| "second fault is missing".to_string())?;
-    let error = match injector.consume(
-        &second.injection_id,
-        &second.boundary,
-        &mut FakeClock::default(),
-    ) {
-        Ok(_) => String::new(),
-        Err(error) => error,
-    };
+        .ok_or("second fault is missing")?;
+    let error = injector
+        .consume(
+            &second.injection_id,
+            &second.boundary,
+            &mut FakeClock::default(),
+        )
+        .err()
+        .ok_or("out-of-order fault was accepted")?;
     assert!(error.contains("fault order mismatch"));
     assert!(injector.finish().is_err());
     Ok(())
@@ -74,37 +117,54 @@ fn every_false_positive_fixture_has_one_mechanical_failure() -> Result<(), Strin
 }
 
 #[test]
-fn computed_success_is_not_an_editable_pass_label() {
-    let mut facts = Facts::computed(
-        "sha256:1111111111111111111111111111111111111111111111111111111111111111",
-        7,
-    );
-    assert_eq!(validate(&facts), Vec::<String>::new());
-    facts.set("skipped", "true");
-    assert_eq!(validate(&facts), ["required command was skipped"]);
+fn endpoint_file_is_shell_free_bounded_and_secret_opaque() -> Result<(), String> {
+    let path = temporary("endpoint.env");
+    fs::write(&path, "LKJAGENT_ENDPOINT_URL=http://127.0.0.1:9\nLKJAGENT_MODEL=local\nLKJAGENT_API_KEY=private-test-value\n")
+        .map_err(|error| error.to_string())?;
+    let values = endpoint_file(&path)?;
+    assert_eq!(values.len(), 3);
+    fs::write(&path, "LKJAGENT_MODEL=$(printf bad)\n").map_err(|error| error.to_string())?;
+    let error = endpoint_file(&path)
+        .err()
+        .ok_or("unsafe endpoint value was accepted")?;
+    assert!(error.contains("unsafe value syntax"));
+    fs::remove_file(path).map_err(|error| error.to_string())
 }
 
 #[test]
-fn trace_only_pty_fixture_is_rejected() -> Result<(), String> {
+fn endpoint_file_rejects_unknown_duplicate_and_symlink() -> Result<(), String> {
+    let path = temporary("bad.env");
+    fs::write(&path, "OTHER=value\n").map_err(|error| error.to_string())?;
+    assert!(endpoint_file(&path).is_err());
+    fs::write(&path, "LKJAGENT_MODEL=a\nLKJAGENT_MODEL=b\n").map_err(|error| error.to_string())?;
+    assert!(endpoint_file(&path).is_err());
+    let link = temporary("link.env");
+    symlink(&path, &link).map_err(|error| error.to_string())?;
+    assert!(endpoint_file(&link).is_err());
+    fs::remove_file(link).map_err(|error| error.to_string())?;
+    fs::remove_file(path).map_err(|error| error.to_string())
+}
+
+#[test]
+fn generic_pty_fixture_is_rejected() -> Result<(), String> {
     let path = temporary("empty.cast");
-    fs::write(&path, "{\"version\":2,\"width\":80,\"height\":24}\n")
-        .map_err(|error| error.to_string())?;
-    let error = match validate_cast(&path) {
-        Err(error) => error,
-        Ok(_) => return Err("empty cast was accepted".into()),
-    };
-    fs::remove_file(path).map_err(|error| error.to_string())?;
-    assert!(error.contains("raw owner and Japanese input"));
-    Ok(())
+    fs::write(&path, "{\"version\":2}\n").map_err(|error| error.to_string())?;
+    let error = validate_cast(&path)
+        .err()
+        .ok_or("generic PTY fixture was accepted")?;
+    assert!(error.contains("incomplete"));
+    fs::remove_file(path).map_err(|error| error.to_string())
 }
 
 fn repository_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
-
 fn temporary(name: &str) -> PathBuf {
     std::env::temp_dir().join(format!(
         "lkjagent-evaluation-test-{}-{name}",
         std::process::id()
     ))
+}
+fn words(items: &[&str]) -> Vec<String> {
+    items.iter().map(|item| (*item).to_string()).collect()
 }
