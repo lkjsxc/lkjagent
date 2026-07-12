@@ -4,7 +4,9 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::atomic::{AtomicU64, Ordering};
 
-use lkjagent_xtask::acceptance::scan_history;
+use lkjagent_xtask::acceptance::{inspect_attachment, scan_history};
+
+const SOURCE: &str = "2222222222222222222222222222222222222222";
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
@@ -27,6 +29,14 @@ fn git(root: &Path, args: &[&str]) -> Result<String, Box<dyn Error>> {
         return Err(format!("git command failed: {args:?}").into());
     }
     Ok(String::from_utf8(output.stdout)?.trim().to_string())
+}
+
+#[test]
+fn acceptance_negative_allows_only_checker_result_status_rows() {
+    let bytes = b"predicate_id\tcategory\tderived_status\tevidence_path\tmeasured_value\tchecker_sha256\tpredicate_schema_sha256\nA01\tchecker\tpass\tfacts.tsv\tderived\t1111\t2222\n";
+    let claimed = inspect_attachment(Path::new("claimed.tsv"), bytes, SOURCE);
+    assert!(claimed.iter().any(|error| error.contains("editable pass")));
+    assert!(inspect_attachment(Path::new("result.tsv"), bytes, SOURCE).is_empty());
 }
 
 #[test]

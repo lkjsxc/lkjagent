@@ -23,7 +23,8 @@ exports, process log, redacted provider data, derived result, and raw manifest.
 
 `result.tsv` is checker-generated. It records predicate ID, category, derived
 status, evidence path, measured value, checker hash, and predicate-schema hash.
-An input pass label is ignored.
+An input pass label is rejected outside `result.tsv`. Result statuses are allowed
+only so the checker can write them; verification ignores and recomputes them.
 
 ## Acceptance Command
 

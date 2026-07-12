@@ -15,7 +15,7 @@ pub fn inspect(path: &Path, bytes: &[u8], source: &str) -> Vec<String> {
     };
     let fields = pairs(text);
     let mut errors = markers::source_errors(path, text, source);
-    if pass_label(&fields) || tabular_pass(text) {
+    if !checker_result(path) && (pass_label(&fields) || tabular_pass(text)) {
         errors.push(format!("{label}: editable pass input is forbidden"));
     }
     if fake_terminal(&fields) {
@@ -33,6 +33,12 @@ pub fn inspect(path: &Path, bytes: &[u8], source: &str) -> Vec<String> {
     }
     errors.extend(campaign_errors(&fields, &label));
     errors
+}
+
+fn checker_result(path: &Path) -> bool {
+    path.file_name()
+        .and_then(|name| name.to_str())
+        .is_some_and(|name| name == "result.tsv")
 }
 
 fn pairs(text: &str) -> HashMap<String, String> {
