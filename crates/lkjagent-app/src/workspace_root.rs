@@ -2,7 +2,6 @@ use std::fs;
 use std::path::{Component, Path, PathBuf};
 
 use lkjagent_core::workspace_record::{parse_record, record_fingerprint};
-use lkjagent_effects::workspace::OpenedWorkspace;
 use lkjagent_store::record_rows::{records, upsert_record};
 use rusqlite::Connection;
 
@@ -20,11 +19,17 @@ pub fn resolve(data_root: &Path, configured: &str) -> Result<PathBuf, String> {
     Ok(root)
 }
 
-pub fn open(root: &Path) -> Result<OpenedWorkspace, String> {
+pub fn open(root: &Path) -> Result<PathBuf, String> {
     if !root.exists() {
-        fs::create_dir(root).map_err(|error| format!("create workspace root: {error}"))?;
+        fs::create_dir_all(root).map_err(|error| format!("create workspace root: {error}"))?;
     }
-    OpenedWorkspace::open(root).map_err(|error| format!("open workspace root: {error}"))
+    let metadata =
+        fs::symlink_metadata(root).map_err(|error| format!("open workspace root: {error}"))?;
+    if metadata.file_type().is_symlink() || !metadata.is_dir() {
+        return Err("open workspace root: root must be a real directory".to_string());
+    }
+    root.canonicalize()
+        .map_err(|error| format!("open workspace root: {error}"))
 }
 
 pub fn ensure_for_path(workspace: &Path, rel: &str) -> Result<(), String> {
@@ -37,8 +42,7 @@ pub fn ensure_for_path(workspace: &Path, rel: &str) -> Result<(), String> {
 }
 
 pub fn refresh_for_path(workspace: &Path, _rel: &str) -> Result<(), String> {
-    let _opened = OpenedWorkspace::open(workspace)
-        .map_err(|error| format!("open workspace root: {error}"))?;
+    let _opened = open(workspace)?;
     Ok(())
 }
 
@@ -50,8 +54,7 @@ pub fn repair_record_links(
     new_path: &str,
     now: &str,
 ) -> Result<usize, String> {
-    let _opened = OpenedWorkspace::open(workspace)
-        .map_err(|error| format!("open workspace root: {error}"))?;
+    let _opened = open(workspace)?;
     let rows = records(conn, None, true).map_err(|error| error.to_string())?;
     let mut repaired = 0;
     for mut row in rows {
