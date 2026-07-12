@@ -1,174 +1,190 @@
-use std::fs;
+use super::hash;
+use rusqlite::Connection;
+use std::collections::BTreeMap;
+use std::fs::{self, Permissions};
+use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::atomic::{AtomicU64, Ordering};
-
-use rusqlite::Connection;
-
-use super::hash;
-
-static NEXT_CAPTURE: AtomicU64 = AtomicU64::new(1);
+static SERIAL: AtomicU64 = AtomicU64::new(1);
 
 pub struct Capture {
     pub root: PathBuf,
+    pub data: PathBuf,
+    pub workspace: PathBuf,
+    pub raw: PathBuf,
+    pub binary: PathBuf,
 }
-
 impl Drop for Capture {
     fn drop(&mut self) {
         let _ = fs::remove_dir_all(&self.root);
     }
 }
-
-pub fn create(repo: &Path) -> Result<Capture, String> {
-    let serial = NEXT_CAPTURE.fetch_add(1, Ordering::Relaxed);
+pub fn create() -> Result<Capture, String> {
     let root = std::env::temp_dir().join(format!(
-        "lkjagent-evaluation-capture-{}-{serial}",
-        std::process::id()
+        "lkjagent-evaluation-{}-{}",
+        std::process::id(),
+        SERIAL.fetch_add(1, Ordering::Relaxed)
     ));
     if root.exists() {
-        fs::remove_dir_all(&root).map_err(|error| error.to_string())?;
+        return Err("fresh capture root already exists".into());
     }
-    fs::create_dir_all(root.join("workspace/project/src")).map_err(|error| error.to_string())?;
-    fs::write(
-        root.join("workspace/note.md"),
-        "# Verified Note\n\nraw bytes\n",
-    )
-    .map_err(|error| error.to_string())?;
-    fs::write(
-        root.join("workspace/project/src/lib.rs"),
-        "pub fn captured() -> bool { true }\n",
-    )
-    .map_err(|error| error.to_string())?;
-    let source_path = root.join("source.sqlite3");
-    let backup_path = root.join("run.sqlite3");
-    let source = Connection::open(&source_path).map_err(|error| error.to_string())?;
-    source
-        .execute_batch(
-            "PRAGMA journal_mode=WAL;
-             CREATE TABLE raw_events(sequence INTEGER PRIMARY KEY, kind TEXT NOT NULL);
-             INSERT INTO raw_events VALUES(1, 'session.start');
-             INSERT INTO raw_events VALUES(2, 'owner.turn');",
-        )
-        .map_err(|error| error.to_string())?;
-    let output = Command::new("python3")
-        .env("PYTHONDONTWRITEBYTECODE", "1")
-        .arg(repo.join("evaluation/sqlite-online-backup.py"))
-        .arg(&source_path)
-        .arg(&backup_path)
-        .output()
-        .map_err(|error| format!("run SQLite backup helper: {error}"))?;
-    let log = String::from_utf8_lossy(&output.stdout).to_string();
-    fs::write(root.join("snapshot.log"), &log).map_err(|error| error.to_string())?;
-    if !output.status.success()
-        || !log.contains("snapshot_method\tsqlite-online-backup")
-        || !log.contains("integrity\tok")
-    {
-        return Err(format!(
-            "SQLite Online Backup failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        ));
-    }
-    source
-        .execute("INSERT INTO raw_events VALUES(3, 'post.boundary')", [])
-        .map_err(|error| error.to_string())?;
-    let backup = Connection::open(&backup_path).map_err(|error| error.to_string())?;
-    let backup_count: i64 = backup
-        .query_row("SELECT COUNT(*) FROM raw_events", [], |row| row.get(0))
-        .map_err(|error| error.to_string())?;
-    let source_count: i64 = source
-        .query_row("SELECT COUNT(*) FROM raw_events", [], |row| row.get(0))
-        .map_err(|error| error.to_string())?;
-    let integrity: String = backup
-        .query_row("PRAGMA integrity_check", [], |row| row.get(0))
-        .map_err(|error| error.to_string())?;
-    if backup_count != 2 || source_count != 3 || integrity != "ok" {
-        return Err("SQLite backup did not preserve the quiesced boundary".into());
-    }
-    write_workspace_manifest(&root)?;
-    Ok(Capture { root })
-}
-
-fn write_workspace_manifest(root: &Path) -> Result<(), String> {
+    let data = root.join("data");
     let workspace = root.join("workspace");
+    let raw = root.join("raw");
+    let bin = root.join("bin");
+    for path in [&root, &data, &workspace, &raw, &bin] {
+        fs::create_dir(path).map_err(|error| error.to_string())?;
+        fs::set_permissions(path, Permissions::from_mode(0o700))
+            .map_err(|error| error.to_string())?;
+    }
+    Ok(Capture {
+        root,
+        data,
+        workspace,
+        raw,
+        binary: bin.join("lkjagent"),
+    })
+}
+pub fn copy_seed(source: &Path, target: &Path) -> Result<(), String> {
+    for entry in fs::read_dir(source).map_err(|error| error.to_string())? {
+        let entry = entry.map_err(|error| error.to_string())?;
+        let kind = entry.file_type().map_err(|error| error.to_string())?;
+        if kind.is_symlink() {
+            return Err("scenario seed contains a symlink".into());
+        }
+        let destination = target.join(entry.file_name());
+        if kind.is_dir() {
+            fs::create_dir(&destination).map_err(|error| error.to_string())?;
+            copy_seed(&entry.path(), &destination)?;
+        } else if kind.is_file() {
+            fs::copy(entry.path(), destination).map_err(|error| error.to_string())?;
+        }
+    }
+    Ok(())
+}
+pub fn manifest(root: &Path) -> Result<String, String> {
     let mut files = Vec::new();
-    collect(&workspace, &mut files)?;
-    files.sort();
-    let mut body = String::from("path\tdocument_id\trevision_id\tsha256\n");
-    for path in files {
-        let relative = path
-            .strip_prefix(&workspace)
-            .map_err(|error| error.to_string())?
-            .to_string_lossy()
-            .replace('\\', "/");
-        let fingerprint = hash::bytes(&fs::read(&path).map_err(|error| error.to_string())?);
+    collect(root, root, &mut files)?;
+    files.sort_by(|left, right| left.0.cmp(&right.0));
+    let mut body = String::from("path\tbytes\tsha256\n");
+    for (path, bytes) in files {
         body.push_str(&format!(
-            "{relative}\tdoc-{}\trev-1\t{fingerprint}\n",
-            &fingerprint[7..19]
+            "{}\t{}\t{}\n",
+            path,
+            bytes.len(),
+            hash::bytes(&bytes)
         ));
     }
-    fs::write(root.join("workspace-manifest.tsv"), body).map_err(|error| error.to_string())
+    Ok(body)
 }
-
-fn collect(path: &Path, files: &mut Vec<PathBuf>) -> Result<(), String> {
+pub fn diff(before: &str, after: &str) -> String {
+    let prior = rows(before);
+    let next = rows(after);
+    let mut body = String::from("path\tchange\tbefore_sha256\tafter_sha256\n");
+    for path in prior
+        .keys()
+        .chain(next.keys())
+        .collect::<std::collections::BTreeSet<_>>()
+    {
+        let left = prior.get(*path);
+        let right = next.get(*path);
+        if left != right {
+            let change = match (left, right) {
+                (None, _) => "added",
+                (_, None) => "removed",
+                _ => "changed",
+            };
+            body.push_str(&format!(
+                "{path}\t{change}\t{}\t{}\n",
+                left.copied().unwrap_or("absent"),
+                right.copied().unwrap_or("absent")
+            ));
+        }
+    }
+    body
+}
+fn rows(text: &str) -> BTreeMap<&str, &str> {
+    text.lines()
+        .skip(1)
+        .filter_map(|line| {
+            let mut fields = line.split('\t');
+            Some((fields.next()?, fields.nth(1)?))
+        })
+        .collect()
+}
+fn collect(base: &Path, path: &Path, files: &mut Vec<(String, Vec<u8>)>) -> Result<(), String> {
     for entry in fs::read_dir(path).map_err(|error| error.to_string())? {
         let entry = entry.map_err(|error| error.to_string())?;
         let kind = entry.file_type().map_err(|error| error.to_string())?;
         if kind.is_symlink() {
             return Err(format!(
-                "workspace manifest refuses symlink: {}",
+                "manifest refuses symlink: {}",
                 entry.path().display()
             ));
         }
         if kind.is_dir() {
-            collect(&entry.path(), files)?;
+            collect(base, &entry.path(), files)?;
         } else if kind.is_file() {
-            files.push(entry.path());
+            let relative = entry
+                .path()
+                .strip_prefix(base)
+                .map_err(|e| e.to_string())?
+                .to_string_lossy()
+                .replace('\\', "/");
+            files.push((relative, fs::read(entry.path()).map_err(|e| e.to_string())?));
         }
     }
     Ok(())
 }
-
-pub fn write_raw_manifest(capture: &Capture, scenario: &str) -> Result<usize, String> {
-    let names = [
-        "run.sqlite3",
-        "snapshot.log",
-        "workspace-manifest.tsv",
-        "terminal.cast",
-        "terminal-replay.tsv",
-        "pty-recorder.log",
-    ];
-    let mut body = format!("artifact\tsha256\nscenario-bundle\t{scenario}\n");
-    for name in names {
-        let bytes = fs::read(capture.root.join(name)).map_err(|error| error.to_string())?;
-        if bytes.is_empty() {
-            return Err(format!("raw artifact is empty: {name}"));
-        }
-        body.push_str(&format!("{name}\t{}\n", hash::bytes(&bytes)));
+pub fn sqlite_facts(repo: &Path, database: &Path, backup: &Path) -> Result<String, String> {
+    if !database.is_file() {
+        return Err("public runtime did not create SQLite state".into());
     }
-    fs::write(capture.root.join("raw-manifest.tsv"), body).map_err(|error| error.to_string())?;
-    Ok(names.len() + 1)
-}
-
-pub fn validate_raw_manifest(capture: &Capture, scenario: &str) -> Result<(), String> {
-    let text = fs::read_to_string(capture.root.join("raw-manifest.tsv"))
+    let output = Command::new("python3")
+        .env_clear()
+        .env("PYTHONDONTWRITEBYTECODE", "1")
+        .arg(repo.join("evaluation/sqlite-online-backup.py"))
+        .arg(database)
+        .arg(backup)
+        .output()
+        .map_err(|error| format!("start SQLite Online Backup: {error}"))?;
+    if !output.status.success()
+        || output.stdout.len() > 16_384
+        || output.stderr.len() > 16_384
+        || !String::from_utf8_lossy(&output.stdout)
+            .contains("snapshot_method\tsqlite-online-backup")
+    {
+        return Err("SQLite Online Backup failed".into());
+    }
+    let stable = Connection::open(backup).map_err(|error| error.to_string())?;
+    let integrity: String = stable
+        .query_row("PRAGMA integrity_check", [], |row| row.get(0))
         .map_err(|error| error.to_string())?;
-    let mut rows = 0;
-    for line in text.lines().skip(1) {
-        rows += 1;
-        let (name, expected) = line
-            .split_once('\t')
-            .ok_or_else(|| "raw manifest row is malformed".to_string())?;
-        let found = if name == "scenario-bundle" {
-            scenario.to_string()
-        } else {
-            hash::bytes(&fs::read(capture.root.join(name)).map_err(|error| error.to_string())?)
-        };
-        if expected != found {
-            return Err(format!("raw manifest fingerprint differs: {name}"));
+    if integrity != "ok" {
+        return Err("SQLite backup integrity check failed".into());
+    }
+    let mut names = stable.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name")
+        .map_err(|error| error.to_string())?;
+    let tables = names
+        .query_map([], |row| row.get::<_, String>(0))
+        .map_err(|e| e.to_string())?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| e.to_string())?;
+    let mut body = String::from("table\trow_count\n");
+    for table in tables {
+        if !table
+            .bytes()
+            .all(|byte| byte.is_ascii_alphanumeric() || byte == b'_')
+        {
+            return Err("unsafe SQLite table name".into());
         }
+        let count: i64 = stable
+            .query_row(&format!("SELECT COUNT(*) FROM {table}"), [], |row| {
+                row.get(0)
+            })
+            .map_err(|error| error.to_string())?;
+        body.push_str(&format!("{table}\t{count}\n"));
     }
-    if rows < 7 {
-        return Err("raw manifest has fewer than seven bound artifacts".into());
-    }
-    Ok(())
+    Ok(body)
 }

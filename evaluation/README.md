@@ -9,21 +9,23 @@ source-bound evidence for lkjagent.
 
 - `workgraph.tsv`: dependency and command plan without editable status.
 - `acceptance.tsv`: required predicates without outcome labels.
-- `experiment-plan.tsv`: concrete model-sensitive cells committed before runs.
-- `fault-schedule.tsv`: deterministic fault timing for supported scenarios.
+- `experiment-plan.tsv`: outcome-free cells, controls, repeats, and threshold hash.
+- `fault-schedule.tsv`: ordered deterministic fault injections.
 
 ## Fixtures And Runners
 
-- `scenarios/`: declared workspace seeds, owner schedules, and expected checks.
-- `false-positive-fixtures/`: evidence that every checker must reject.
+- `scenarios/`: anchored goals, schedules, checks, and seed bytes.
+- `false-positive-fixtures/`: evidence summaries that must be rejected.
 - `corpus/`: deterministic parser and check inputs.
 - `experiment_runner/`: current experiment support pending direct-loop cutover.
-- `sqlite-online-backup.py`: online SQLite capture helper.
-- `pty-recorder.py`: terminal capture helper.
+- `sqlite-online-backup.py`: quiesced SQLite Online Backup recorder.
+- `pty-recorder.py`: raw pseudo-terminal input and output recorder.
+- [`../crates/lkjagent-xtask/src/evaluation_harness/`](../crates/lkjagent-xtask/src/evaluation_harness/README.md): confined public production runner and evidence validator.
 
 ## Evidence
 
-Sanitized synthetic evidence is committed below `evaluation/evidence/<source>/`.
-Private raw runs stay ignored. Plans are inputs, not completion evidence. Result
-rows are derived by the acceptance checker described in
+Sanitized evidence is committed below `evaluation/evidence/<source>/`. Private
+raw captures use disposable mode-0700 roots outside the repository. Scripted or
+local mechanics remain `semantic_status=not-evaluated`; plans are inputs, not
+completion evidence. Result rows remain derived by the acceptance checker in
 `../docs/evaluation/live-proof.md`.
