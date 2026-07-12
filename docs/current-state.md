@@ -122,7 +122,7 @@ rebuilt from native rows.
 Configuration and Compose now separate the runtime data root from one visible
 workspace root. The workspace is created only by an actual workspace operation,
 startup no longer writes scaffold files, and diagnostics report both roots. The
-flat registry now accepts only seven keys with current consumers.
+flat registry now accepts only six keys with current consumers.
 
 ## Direct Contract
 

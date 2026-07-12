@@ -37,7 +37,7 @@ fn flat_config_exposes_separate_workspace_and_budget_keys() -> TestResult<()> {
     let data = fixture_root("flat-config")?;
     fs::write(
         data.join("lkjagent.json"),
-        "{\"workspace_root\":\"../visible-workspace\",\"prompt_context_tokens\":32768,\"live_campaign_seconds\":900}",
+        "{\"workspace_root\":\"../visible-workspace\",\"prompt_context_tokens\":32768}",
     )?;
 
     let status = cli::run(["--data", data.to_string_lossy().as_ref(), "doctor"])?;
@@ -54,7 +54,6 @@ fn flat_config_exposes_separate_workspace_and_budget_keys() -> TestResult<()> {
         .join("visible-workspace")
         .exists());
     assert!(status.contains("prompt_cap=32768"));
-    assert!(status.contains("live_seconds=900"));
     assert!(json.contains("visible-workspace"));
     Ok(())
 }

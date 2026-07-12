@@ -23,7 +23,6 @@ fn rejects_ranges_and_workspace_controls() -> TestResult<()> {
     for (name, extra) in [
         ("timeout-low", r#""endpoint_timeout_seconds":0"#),
         ("prompt-low", r#""prompt_context_tokens":2047"#),
-        ("campaign-low", r#""live_campaign_seconds":839"#),
         ("workspace-control", r#""workspace_root":"bad\nroot""#),
     ] {
         let data = fixture(name, &format!("{{{base},{extra}}}", base = endpoint()))?;
@@ -52,7 +51,7 @@ fn tracked_example_matches_the_registry() -> TestResult<()> {
     let text = fs::read_to_string(root.join("config/lkjagent.example.json"))?;
     let example: serde_json::Value = serde_json::from_str(&text)?;
     let object = example.as_object().ok_or("example root is not an object")?;
-    assert_eq!(object.len(), 7);
+    assert_eq!(object.len(), 6);
     assert!(object.values().all(is_scalar));
     config::validate_document(&text)?;
     Ok(())
