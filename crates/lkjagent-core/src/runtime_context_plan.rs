@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use serde::{Deserialize, Serialize};
 
 use crate::runtime_context::{
-    ContaminationClass, ContextConflict, ContextItem, StalenessClass, TrustClass,
+    normalized_body, ContaminationClass, ContextConflict, ContextItem, StalenessClass, TrustClass,
 };
 use crate::runtime_fingerprint::stable_fingerprint;
 
@@ -146,10 +146,7 @@ fn lane_fingerprint(plan: &ContextLanePlan) -> String {
 }
 
 fn dedup_key(item: &ContextItem) -> String {
-    format!(
-        "{}\n{}\n{}\n{}",
-        item.semantic_key, item.body, item.source_type, item.source_fingerprint
-    )
+    format!("{}\n{}", item.semantic_key, normalized_body(&item.body))
 }
 
 fn plan_entry(item: &ContextItem, reason: &str, index: usize) -> ContextPlanEntry {
