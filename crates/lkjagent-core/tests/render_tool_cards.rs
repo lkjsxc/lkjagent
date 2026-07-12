@@ -21,8 +21,17 @@ fn rendered_plan_example_is_parser_valid() -> Result<(), String> {
         &snapshot.steps[0],
         &decision,
     );
+    assert!(prompt
+        .system
+        .contains("only action prefixes are write, explore, and respond"));
+    assert!(prompt
+        .system
+        .contains("never emit plan, verify, or check actions"));
     assert!(prompt.system.contains("relative to the workspace root"));
     assert!(prompt.user.contains("one action on each physical line"));
+    assert!(prompt
+        .user
+        .contains("Never emit plan, verify, or check actions"));
     assert!(prompt
         .user
         .contains("never PATH, TITLE, GOAL, SUMMARY, or N"));

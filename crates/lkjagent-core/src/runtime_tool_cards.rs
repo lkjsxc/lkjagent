@@ -51,7 +51,7 @@ pub(crate) fn plan_example() -> &'static str {
 
 fn plan_card() -> String {
     format!(
-        "Output contract for this turn:\n- Return exactly one <plan> block.\n- Do not write prose before or after the block.\n- Put one action on each physical line.\n- Use concrete objective-grounded values, never PATH, TITLE, GOAL, SUMMARY, or N.\n- Write paths are relative to the workspace root.\n- Do not start a path with /, ./, or ../; do not use . or .. path components.\n- Close with </plan>.\n\nFilled parser-valid example:\n{}",
+        "Output contract for this turn:\n- Return exactly one <plan> block.\n- Do not write prose before or after the block.\n- Put one action on each physical line.\n- Start every line with write, explore, or respond only.\n- Never emit plan, verify, or check actions; harness step labels are not output actions.\n- Use concrete objective-grounded values, never PATH, TITLE, GOAL, SUMMARY, or N.\n- Write paths are relative to the workspace root.\n- Do not start a path with /, ./, or ../; do not use . or .. path components.\n- Close with </plan>.\n\nFilled parser-valid example:\n{}",
         plan_example()
     )
 }

@@ -34,8 +34,10 @@ and total size recorded by the current decision.
 ## Plan Shape
 
 The bounded planner accepts one `plan` block with one action on each
-physical line. A write line contains a workspace-root-relative path, concrete
-title, and positive word target. An explore line contains a concrete goal and
+physical line. Only `write`, `explore`, and `respond` are action prefixes;
+harness plan, verify, and check labels are context, not output actions. A write
+line contains a workspace-root-relative path, concrete title, and positive word
+target. An explore line contains a concrete goal and
 positive budget. A respond line contains a concrete owner-facing summary.
 Paths cannot be absolute, start with `./` or `../`, contain empty components,
 backslashes, or `.` or `..` components. `PATH`, `TITLE`, `GOAL`, `SUMMARY`, and

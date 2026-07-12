@@ -16,7 +16,7 @@ pub fn max_tokens(kind: StepKind) -> u32 {
 
 pub fn protocol(kind: StepKind) -> &'static str {
     match kind {
-        StepKind::Plan => "Return exactly one <plan> block with one action per physical line. Use concrete values, not placeholders. Write paths are relative to the workspace root: never start them with /, ./, or ../ and never use . or .. path components. Valid line forms are shown in the filled example.",
+        StepKind::Plan => "Return exactly one <plan> block with one action per physical line. The only action prefixes are write, explore, and respond; never emit plan, verify, or check actions. Harness step labels are context, not actions to copy. Use concrete values, not placeholders. Write paths are relative to the workspace root: never start them with /, ./, or ../ and never use . or .. path components. Copy the syntax of the filled example.",
         StepKind::Write | StepKind::Revise => "Return exactly <content> prose </content>. Write the requested file body only. No analysis outside the block.",
         StepKind::Explore => "Return exactly one <lkjagent_action> block with child tags for one allowed tool. Echo decision_id and context_fingerprint exactly. Replace placeholder values before sending.",
         StepKind::Respond | StepKind::Ask => "Return exactly <message>owner-facing answer</message>. Use gathered facts only.",
