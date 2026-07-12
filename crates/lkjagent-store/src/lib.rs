@@ -2,6 +2,7 @@ pub mod admission_rows;
 pub mod artifact_rows;
 pub mod context_rows;
 pub mod decision_rows;
+pub mod direct_transactions;
 pub mod effect_recovery;
 pub mod event_rows;
 

@@ -7,7 +7,7 @@ use crate::native_schema;
 pub use crate::native_schema::{FinalClose, MessageIdentity};
 
 pub struct NativeStore {
-    connection: Connection,
+    pub(crate) connection: Connection,
 }
 
 #[rustfmt::skip]
@@ -125,20 +125,6 @@ impl NativeStore {
         self.atomic(|tx| changed(tx.execute("UPDATE provider_exchanges SET status=?1,response_ref=?2,input_tokens=?3,output_tokens=?4,finished_monotonic_ms=?5,finish_reason=?6,anomaly=?7,parse_result=?8 WHERE id=?9 AND status='sent'", params![status,response,usage.0,usage.1,finished,finish,anomaly,parsed,id])?, "provider outcome conflict"))
     }
 
-    pub fn prepare_effect(&mut self, value: &Effect<'_>) -> StoreResult<()> {
-        if value.targets.is_empty() {
-            return Err(StoreError::InvalidState("effect has no targets".into()));
-        }
-        self.atomic(|tx| {
-            let complete: i64 = tx.query_row("SELECT count(*) FROM runtime_decisions WHERE id=?1 AND compiler_status='complete'", [value.decision], |r| r.get(0))?;
-            if complete != 1 { return Err(StoreError::InvalidState("decision compilation is incomplete".into())); }
-            tx.execute("INSERT INTO tool_admissions(id,decision_id,action_ordinal,action_fingerprint,origin,effectful,status,reason,parsed_call,tool_spec,journal_id) VALUES(?1,?2,?3,?4,'model',1,'accepted',?5,?6,?7,?8)", params![value.admission,value.decision,value.action_ordinal,value.action_fingerprint,value.reason,value.parsed_call,value.tool_spec,value.journal])?;
-            tx.execute("INSERT INTO effect_journal(id,admission_id,decision_id,command_ordinal,idempotency_key,status,intended_fingerprint,prior_fingerprint) VALUES(?1,?2,?3,?4,?5,'prepared',?6,?7)", params![value.journal,value.admission,value.decision,value.action_ordinal,value.idempotency,value.intended_fingerprint,value.prior_fingerprint])?;
-            for (ordinal,row) in value.targets.iter().enumerate() { tx.execute("INSERT INTO effect_targets(journal_id,ordinal,normalized_path,prior_bytes,intended_bytes,operation,prior_mode,intended_mode,stage_identity) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9)", params![value.journal,ordinal as i64,row.path,row.prior,row.intended,row.operation,row.prior_mode,row.intended_mode,row.stage_identity])?; }
-            Ok(())
-        })
-    }
-
     pub fn effect_phase(&mut self, id: &str, expected: &str, next: &str) -> StoreResult<()> {
         if !effect_transition(expected,next) { return Err(StoreError::InvalidState("effect phase transition".into())); }
         self.atomic(|tx| changed(tx.execute("UPDATE effect_journal SET status=?1 WHERE id=?2 AND status=?3", params![next,id,expected])?, "effect phase conflict"))
@@ -147,7 +133,7 @@ impl NativeStore {
     pub fn settle_effect(&mut self, value: &Settlement<'_>) -> StoreResult<()> {
         self.atomic(|tx| {
             tx.execute("INSERT INTO runtime_events(id,matter_id,causal_sequence,kind,monotonic_ms,wall_time,payload,source_kind,source_id) VALUES(?1,?2,?3,'effect-observed',?4,?5,?6,'effect',?7)", params![value.event,value.matter,value.event_sequence,value.monotonic_ms,value.wall_time,value.event_payload,value.journal])?;
-            tx.execute("INSERT INTO observations(id,journal_id,status,attempt_outcome,content_ref,fingerprint,contamination,event_id) VALUES(?1,?2,?3,?4,?5,?6,'clean',?7)", params![value.observation,value.journal,value.status,value.outcome,value.content_ref,value.fingerprint,value.event])?;
+            tx.execute("INSERT INTO observations(id,journal_id,decision_id,status,attempt_outcome,content_ref,fingerprint,contamination,event_id) VALUES(?1,?2,(SELECT decision_id FROM effect_journal WHERE id=?2),?3,?4,?5,?6,'clean',?7)", params![value.observation,value.journal,value.status,value.outcome,value.content_ref,value.fingerprint,value.event])?;
             tx.execute("INSERT INTO workspace_documents(id,current_path,status,managed) VALUES(?1,?2,'active',1) ON CONFLICT(id) DO NOTHING", params![value.document,value.path])?;
             tx.execute("INSERT INTO workspace_revisions(id,document_id,parent_id,sha256,content,effect_id,created_event_id) VALUES(?1,?2,?3,?4,?5,?6,?7)", params![value.revision,value.document,value.parent,value.sha256,value.content,value.journal,value.event])?;
             tx.execute("UPDATE workspace_documents SET current_revision_id=?1,current_path=?2 WHERE id=?3", params![value.revision,value.path,value.document])?;
@@ -160,7 +146,7 @@ impl NativeStore {
         self.atomic(|tx| native_schema::close(tx, value))
     }
 
-    fn atomic<T>(&mut self, operation: impl FnOnce(&Transaction<'_>) -> StoreResult<T>) -> StoreResult<T> {
+    pub(crate) fn atomic<T>(&mut self, operation: impl FnOnce(&Transaction<'_>) -> StoreResult<T>) -> StoreResult<T> {
         let tx = self.connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
         match operation(&tx).and_then(|value| { tx.commit()?; Ok(value) }) {
             Ok(value) => Ok(value), Err(error) => Err(classify(error)),

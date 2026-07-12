@@ -74,8 +74,8 @@ fn durable_boundaries_effect_cardinality() -> Result<(), Box<dyn Error>> {
     );
     rejected(&connection, "INSERT INTO observations(id,journal_id,status,attempt_outcome,content_ref,fingerprint,contamination) VALUES('o','missing','succeeded',x'01',x'02',x'03','clean')");
     connection.execute_batch(
-        "BEGIN; INSERT INTO observations(id,journal_id,status,attempt_outcome,content_ref,
-         fingerprint,contamination,event_id) VALUES('o','j','succeeded',x'01',x'02',x'03','clean','e');
+        "BEGIN; INSERT INTO observations(id,journal_id,decision_id,status,attempt_outcome,content_ref,
+         fingerprint,contamination,event_id) VALUES('o','j','d','succeeded',x'01',x'02',x'03','clean','e');
          UPDATE effect_journal SET status='settled',observation_id='o' WHERE id='j'; COMMIT;",
     )?;
     rejected(&connection, "INSERT INTO observations(id,journal_id,status,attempt_outcome,content_ref,fingerprint,contamination) VALUES('o2','j','failed',x'01',x'02',x'03','clean')");
