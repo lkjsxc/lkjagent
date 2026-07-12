@@ -53,7 +53,7 @@ pub fn run(data: &Path, endpoint: &mut dyn Endpoint) -> R<()> {
 #[rustfmt::skip]
 pub fn run_once(data:&Path,endpoint:&mut dyn Endpoint)->R<String>{
  fs::create_dir_all(data).map_err(e)?; let db=data.join("lkjagent.sqlite3"); let mut store=NativeStore::open(&db).map_err(e)?;
- if let Some(exchange)=store.ambiguous_providers().map_err(e)?.into_iter().next(){store.provider_phase(&exchange,"sent","ambiguous").map_err(e)?;return Err(format!("blocked: ambiguous provider exchange {exchange}"));}
+ for exchange in store.ambiguous_providers().map_err(e)?{store.provider_phase(&exchange,"sent","ambiguous").map_err(e)?;}
  let p=store.restart_projection().map_err(e)?; let Some(m)=p.matter else{return Ok("idle: no open matter".into())};
  if !p.effects.is_empty(){return Err(format!("blocked: unfinished effect {}:{}",p.effects[0].id,p.effects[0].status))}
  if !p.decisions.is_empty(){return Err(format!("blocked: unfinished decision {}:{}",p.decisions[0].id,p.decisions[0].status))}

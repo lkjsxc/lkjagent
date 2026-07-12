@@ -111,7 +111,7 @@ impl NativeStore {
 
     pub fn ambiguous_providers(&self) -> StoreResult<Vec<String>> {
         let mut query = self.connection.prepare(
-            "SELECT id FROM provider_exchanges WHERE status IN ('sent','ambiguous') ORDER BY id",
+            "SELECT id FROM provider_exchanges WHERE status='sent' ORDER BY id",
         )?;
         let rows = query.query_map([], |row| row.get(0))?;
         Ok(rows.collect::<Result<Vec<_>, _>>()?)

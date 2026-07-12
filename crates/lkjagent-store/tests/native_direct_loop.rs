@@ -95,6 +95,36 @@ fn model_fault_has_no_admission_and_repeated_operation_is_allowed() -> Result<()
 }
 
 #[test]
+fn restart_projection_skips_blocked_matter_for_runnable_owner_turn() -> Result<(), Box<dyn Error>> {
+    let db = path("fair")?;
+    let mut store = NativeStore::open(&db)?;
+    store.owner_intake(&intake())?;
+    store.select_decision(&decision("d1", "e2", 2))?;
+    #[rustfmt::skip]
+    let second = Intake { matter:"m2", objective:b"second", turn:"t2", queue_sequence:2,
+        raw_text:b"second owner", message_fingerprint:b"owner-fp-2", event:"m2-e1",
+        event_sequence:1, event_payload:b"intake", monotonic_ms:2, wall_time:"now",
+        obligations:&[], cells:&[] };
+    store.owner_intake(&second)?;
+    let projection = store.restart_projection()?;
+    assert_eq!(
+        projection.matter.as_ref().map(|row| row.id.as_str()),
+        Some("m2")
+    );
+    assert!(projection.decisions.is_empty());
+    let connection = Connection::open(&db)?;
+    assert_eq!(
+        connection.query_row(
+            "SELECT status FROM runtime_decisions WHERE id='d1'",
+            [],
+            |row| row.get::<_, String>(0)
+        )?,
+        "selected"
+    );
+    Ok(())
+}
+
+#[test]
 fn exact_prepare_derives_open_checks_without_passing_them() -> Result<(), Box<dyn Error>> {
     let db = path("prepare")?;
     let mut store = NativeStore::open(&db)?;
