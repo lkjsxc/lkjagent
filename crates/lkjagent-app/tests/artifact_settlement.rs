@@ -12,6 +12,8 @@ use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -179,6 +181,7 @@ fn fixture_root(name: &str) -> TestResult<PathBuf> {
         fs::remove_dir_all(&path)?;
     }
     fs::create_dir_all(&path)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }
 

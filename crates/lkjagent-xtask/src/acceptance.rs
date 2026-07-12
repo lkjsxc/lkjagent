@@ -94,7 +94,7 @@ pub fn scan_history(root: &Path) -> Vec<String> {
 
 fn static_derivations(root: &Path, errors: &mut Vec<String>) -> BTreeSet<String> {
     let mut derived = BTreeSet::new();
-    if crate::docs_authority_gate::check(root).is_ok() {
+    if crate::node_gate::check_docs_authority(root).is_ok() {
         derived.insert("D02".to_string());
     }
     if let Ok(files) = crate::facts::collect_files(root) {

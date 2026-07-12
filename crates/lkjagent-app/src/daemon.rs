@@ -39,14 +39,14 @@ pub fn run_until_idle<E: Endpoint>(
     run_until_idle_with_clock(data_dir, endpoint, max_turns, &mut clock)
 }
 
+#[rustfmt::skip]
 pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     data_dir: &Path,
     endpoint: &mut E,
     max_turns: usize,
     clock: &mut C,
 ) -> Result<TaskSnapshot, String> {
-    let workspace = crate::config::workspace_root(data_dir)?;
-    let logs = data_dir.join("logs");
+    let (workspace, logs) = (crate::config::workspace_root(data_dir)?, data_dir.join("logs"));
     let mut conn =
         Connection::open(data_dir.join("lkjagent.sqlite3")).map_err(|error| error.to_string())?;
     setup(&conn).map_err(|error| error.to_string())?;
@@ -80,8 +80,7 @@ pub fn run_until_idle_with_clock<E: Endpoint, C: Clock>(
     }
     if workspace.exists() {
         let _opened = crate::workspace_root::open(&workspace)?;
-        recover_unsettled_effects(&mut conn, &workspace, &now)
-            .map_err(|error| error.to_string())?;
+        recover_unsettled_effects(&mut conn, &workspace, &now).map_err(|error| error.to_string())?;
         let _reconciled = crate::workspace_search::reconcile_entry(&conn, &workspace, data_dir)?;
     }
     let mut snapshot = match load_runtime_snapshot(&mut conn, data_dir, clock)? {

@@ -11,8 +11,8 @@ use lkjagent_store::effect_recovery::recover_unsettled_effects;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+mod support;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
-
 #[test]
 fn complete_bundle_recovery_settles_artifacts_and_refs() -> TestResult<()> {
     let data = fixture_root("complete")?;
@@ -195,5 +195,6 @@ fn fixture_root(name: &str) -> TestResult<PathBuf> {
     fs::create_dir_all(path.join("workspace"))?;
     let conn = Connection::open(path.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }

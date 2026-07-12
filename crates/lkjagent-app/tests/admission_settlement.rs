@@ -61,5 +61,6 @@ fn fixture_root() -> TestResult<PathBuf> {
         fs::remove_dir_all(&path)?;
     }
     fs::create_dir_all(&path)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }

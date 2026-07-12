@@ -9,6 +9,8 @@ use lkjagent_store::plan_access::{enqueue, insert_step_tx, insert_task};
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -129,5 +131,6 @@ fn fixture_root(name: &str) -> TestResult<PathBuf> {
     fs::create_dir_all(&path)?;
     let conn = Connection::open(path.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }

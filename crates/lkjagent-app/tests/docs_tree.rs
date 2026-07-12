@@ -8,6 +8,8 @@ use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -26,7 +28,7 @@ fn docs_tree_fake_endpoint_closes_and_effect_checks_pass() -> TestResult<()> {
             "<final><message>docs tree complete</message></final>".to_string(),
         ],
     )?;
-    let root = data.join("workspace");
+    let root = support::workspace(&data);
     let readme = lkjagent_core::model::CheckSpec::ReadmeCoverage {
         root: "docs/daemon".to_string(),
     };
@@ -55,7 +57,7 @@ fn docs_tree_dangling_link_materializes_revise_then_closes() -> TestResult<()> {
             "<final><message>docs tree repaired</message></final>".to_string(),
         ],
     )?;
-    let readme = fs::read_to_string(data.join("workspace/docs/daemon/README.md"))?;
+    let readme = fs::read_to_string(support::workspace(&data).join("docs/daemon/README.md"))?;
     assert!(readme.contains("setup.md"));
     assert!(!readme.contains("missing.md"));
     Ok(())
@@ -92,5 +94,6 @@ fn fixture_root(name: &str) -> TestResult<PathBuf> {
         fs::remove_dir_all(&path)?;
     }
     fs::create_dir_all(&path)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }

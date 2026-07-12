@@ -1,8 +1,8 @@
 use std::path::Path;
 
-use lkjagent_xtask::docs_authority_gate::check_contract;
 use lkjagent_xtask::facts::collect_files;
 use lkjagent_xtask::model::RepoFile;
+use lkjagent_xtask::node_gate::check_contract;
 
 fn repo_files() -> Vec<RepoFile> {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");

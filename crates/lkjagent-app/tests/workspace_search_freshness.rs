@@ -6,6 +6,8 @@ use lkjagent_store::plan_schema::setup;
 use lkjagent_store::workspace_search::canonical_rows;
 use rusqlite::Connection;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -70,6 +72,7 @@ fn unchanged_inventory_is_debounced_until_manifest_changes() -> TestResult<()> {
         data.join("lkjagent.json"),
         r#"{"workspace_scan_debounce_milliseconds":50,"workspace_reconcile_seconds":30}"#,
     )?;
+    support::retain_workspace_config(&data)?;
     let source = data.join("workspace/knowledge/debounce.md");
     fs::create_dir_all(source.parent().ok_or("source parent missing")?)?;
     fs::write(&source, "# Before\n\nstable inventory")?;
@@ -109,5 +112,6 @@ fn fixture_root(name: &str) -> TestResult<PathBuf> {
     fs::create_dir_all(&path)?;
     let conn = Connection::open(path.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }

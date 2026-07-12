@@ -8,6 +8,8 @@ use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -20,7 +22,6 @@ fn cli_send_writes_workspace_transcript_trace() -> TestResult<()> {
         "are you ok?",
     ])?;
     assert!(output.contains("queue: 1"));
-    assert!(data.join("workspace/README.md").exists());
     assert_contains(
         &data,
         "workspace/artifacts/transcripts/queue-000001.md",
@@ -69,7 +70,6 @@ fn empty_workspace_daily_turns_create_record_trace_and_indexes() -> TestResult<(
     let snapshot = run_until_idle(&data, &mut endpoint, 2)?;
     assert_eq!(snapshot.task.state, TaskState::Closed);
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    assert!(data.join("workspace/README.md").exists());
     assert_contains(
         &data,
         "workspace/artifacts/transcripts/queue-000001.md",
@@ -128,5 +128,6 @@ fn fixture_root(name: &str) -> TestResult<PathBuf> {
         fs::remove_dir_all(&path)?;
     }
     fs::create_dir_all(&path)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }

@@ -14,7 +14,7 @@ fn repository_satisfies_evaluation_runner_contract() {
 }
 
 #[test]
-fn absent_baseline_evidence_fails_honestly() {
+fn tracked_blocked_baseline_evidence_validates_honestly() {
     let root = repository_root();
     let args = words(&[
         "evidence",
@@ -23,6 +23,20 @@ fn absent_baseline_evidence_fails_honestly() {
         "baseline",
         "--source",
         "97e00698f348fc2435d47a107b5b8453c98b9d1f",
+    ]);
+    assert_eq!(run(&args, &root), 0);
+}
+
+#[test]
+fn absent_baseline_evidence_fails_honestly() {
+    let root = repository_root();
+    let args = words(&[
+        "evidence",
+        "check",
+        "--campaign",
+        "baseline",
+        "--source",
+        "0000000000000000000000000000000000000000",
     ]);
     assert_eq!(run(&args, &root), 1);
 }
