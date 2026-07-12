@@ -1,6 +1,6 @@
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::engine::Command;
-use lkjagent_core::model::{CheckResult, Event, EventKind, StepKind, TaskState};
+use lkjagent_core::model::{CheckResult, StepKind, TaskState};
 use lkjagent_store::memory::search_memory;
 use lkjagent_store::plan_access::{
     attach_answer, deliver_next, enqueue, enqueue_with_force, insert_step_tx, insert_task,
@@ -9,7 +9,6 @@ use lkjagent_store::plan_access::{
 use lkjagent_store::plan_commit::commit_turn;
 use lkjagent_store::plan_inspect::application_tables;
 use lkjagent_store::plan_schema::{setup, APPLICATION_TABLES};
-use lkjagent_store::plan_turn::{commit_commands, events, orphan_exchanges};
 use rusqlite::Connection;
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -70,50 +69,6 @@ fn fifo_queue_and_waiting_answer_routing() -> TestResult<()> {
     set_task_state(&conn, 7, TaskState::Waiting, "wait")?;
     let answer = attach_answer(&conn, 7, "answer", "answer-time")?;
     assert!(answer > second);
-    Ok(())
-}
-
-#[test]
-fn task_closed_event_updates_task_row() -> TestResult<()> {
-    let mut conn = Connection::open_in_memory()?;
-    setup(&conn)?;
-    let snapshot = instantiate(10, "What is here?");
-    insert_task(&conn, &snapshot.task, None, "now")?;
-    commit_commands(
-        &mut conn,
-        10,
-        &[Command::RecordEvent(Event {
-            kind: EventKind::TaskClosed,
-            content: "done".to_string(),
-        })],
-        "later",
-    )?;
-    let state: String = conn.query_row("SELECT state FROM tasks WHERE id = 10", [], |row| {
-        row.get(0)
-    })?;
-    assert_eq!(state, "closed");
-    Ok(())
-}
-
-#[test]
-fn turn_transaction_rolls_back_uncommitted_rows() -> TestResult<()> {
-    let mut conn = Connection::open_in_memory()?;
-    setup(&conn)?;
-    let snapshot = instantiate(9, "Survey and report.");
-    insert_task(&conn, &snapshot.task, None, "now")?;
-    commit_commands(&mut conn, 9, &[event("one")], "t1")?;
-    commit_commands(&mut conn, 9, &[event("two")], "t2")?;
-    {
-        let tx = conn.transaction()?;
-        tx.execute(
-            "INSERT INTO events (task_id, kind, content, created_at) VALUES (9, 'notice', 'lost', 't3')",
-            [],
-        )?;
-    }
-    let rows = events(&conn)?;
-    assert_eq!(rows.len(), 2);
-    let orphans = orphan_exchanges(&["a".to_string(), "b".to_string()], &["a".to_string()]);
-    assert_eq!(orphans.len(), 1);
     Ok(())
 }
 
@@ -189,10 +144,4 @@ fn turn_commit_stores_check_params_with_step_id() -> TestResult<()> {
     assert!(state_cell.0.starts_with("completion:check-passed/"));
     assert!(state_cell.1.contains("check_result") && state_cell.2.contains("file_exists"));
     Ok(())
-}
-fn event(content: &str) -> Command {
-    Command::RecordEvent(Event {
-        kind: EventKind::Notice,
-        content: content.to_string(),
-    })
 }

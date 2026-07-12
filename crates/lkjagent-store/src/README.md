@@ -22,7 +22,7 @@ Map lkjagent-store source modules.
 - [plan-access.rs](plan_access.rs): queue, task, step, row, and schema inspection accessors.
 - [plan-hydrate.rs](plan_hydrate.rs): snapshot hydration from normalized rows.
 - [plan-commit.rs](plan_commit.rs): atomic turn state commits.
-- [plan-turn.rs](plan_turn.rs): command transaction helpers.
+- [transactions.rs](transactions.rs): atomic native store boundaries.
 - [prompt-rows.rs](prompt_rows.rs): prompt frame row helpers.
 - [record-schema.rs](record_schema.rs): workspace record and operation revision setup.
 - [record-rows.rs](record_rows.rs): workspace record metadata and history rows.

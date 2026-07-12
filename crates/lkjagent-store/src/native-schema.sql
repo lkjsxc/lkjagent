@@ -12,7 +12,9 @@ CREATE TABLE owner_turns (
 CREATE TABLE conversation_messages (
  id TEXT PRIMARY KEY, sequence INTEGER NOT NULL UNIQUE, role TEXT NOT NULL CHECK(role IN ('owner','agent')),
  body BLOB NOT NULL, body_fingerprint BLOB NOT NULL, lifecycle TEXT NOT NULL CHECK(lifecycle IN ('active','replaced','withdrawn')),
- cause_event_id TEXT, replacement_id TEXT UNIQUE REFERENCES conversation_messages(id));
+ matter_id TEXT NOT NULL REFERENCES matters(id), owner_turn_id TEXT UNIQUE REFERENCES owner_turns(id),
+ cause_event_id TEXT REFERENCES runtime_events(id), replacement_id TEXT UNIQUE REFERENCES conversation_messages(id),
+ CHECK((role='owner' AND owner_turn_id IS NOT NULL) OR (role='agent' AND owner_turn_id IS NULL)));
 CREATE TABLE obligations (
  id TEXT PRIMARY KEY, matter_id TEXT NOT NULL REFERENCES matters(id), predicate_kind TEXT NOT NULL, predicate_payload BLOB NOT NULL,
  required INTEGER NOT NULL CHECK(required IN (0,1)), status TEXT NOT NULL CHECK(status IN ('open','passed','invalidated')),
@@ -31,15 +33,22 @@ CREATE TABLE runtime_decisions (
  id TEXT PRIMARY KEY, matter_id TEXT NOT NULL REFERENCES matters(id), event_id TEXT NOT NULL UNIQUE REFERENCES runtime_events(id),
  operation_key BLOB NOT NULL, idempotency_key BLOB NOT NULL UNIQUE, selected_monotonic_ms INTEGER NOT NULL CHECK(selected_monotonic_ms>=0),
  selected_state BLOB NOT NULL, context_spec BLOB NOT NULL, tool_spec BLOB NOT NULL, grammar_spec BLOB NOT NULL,
- budget_spec BLOB NOT NULL, recovery_spec BLOB NOT NULL, exit_spec BLOB NOT NULL, compiler_status TEXT NOT NULL CHECK(compiler_status IN ('compiled','rejected')),
- compiler_attachments BLOB NOT NULL, status TEXT NOT NULL CHECK(status IN ('selected','admitted','running','settled','failed')),
- settlement_event_id TEXT UNIQUE REFERENCES runtime_events(id), UNIQUE(matter_id,operation_key));
-CREATE TRIGGER immutable_decision_spec BEFORE UPDATE OF matter_id,event_id,operation_key,idempotency_key,selected_monotonic_ms,selected_state,context_spec,tool_spec,grammar_spec,budget_spec,recovery_spec,exit_spec,compiler_status,compiler_attachments ON runtime_decisions BEGIN SELECT RAISE(ABORT,'immutable decision specification'); END;
+ budget_spec BLOB NOT NULL, recovery_spec BLOB NOT NULL, check_spec BLOB NOT NULL, exit_spec BLOB NOT NULL, compiler_status TEXT NOT NULL CHECK(compiler_status IN ('compiling','complete','rejected')),
+ compiler_attachments BLOB, rendered_frame BLOB, context_fingerprint BLOB, tool_fingerprint BLOB,
+ status TEXT NOT NULL CHECK(status IN ('selected','admitted','running','settled','failed')),
+ settlement_event_id TEXT UNIQUE REFERENCES runtime_events(id), UNIQUE(matter_id,operation_key),
+ CHECK((compiler_status='compiling' AND compiler_attachments IS NULL AND rendered_frame IS NULL) OR
+       (compiler_status='complete' AND compiler_attachments IS NOT NULL AND rendered_frame IS NOT NULL) OR compiler_status='rejected'));
+CREATE TRIGGER immutable_decision_spec BEFORE UPDATE OF matter_id,event_id,operation_key,idempotency_key,selected_monotonic_ms,selected_state,context_spec,tool_spec,grammar_spec,budget_spec,recovery_spec,check_spec,exit_spec ON runtime_decisions BEGIN SELECT RAISE(ABORT,'immutable decision specification'); END;
+CREATE TRIGGER compilation_once BEFORE UPDATE OF compiler_status,compiler_attachments,rendered_frame,context_fingerprint,tool_fingerprint ON runtime_decisions WHEN OLD.compiler_status!='compiling' BEGIN SELECT RAISE(ABORT,'immutable compilation'); END;
 CREATE TABLE provider_exchanges (
  id TEXT PRIMARY KEY, decision_id TEXT NOT NULL UNIQUE REFERENCES runtime_decisions(id), request_ref BLOB NOT NULL,
  response_ref BLOB, input_tokens INTEGER CHECK(input_tokens>=0), output_tokens INTEGER CHECK(output_tokens>=0),
  started_monotonic_ms INTEGER NOT NULL CHECK(started_monotonic_ms>=0), finished_monotonic_ms INTEGER,
- status TEXT NOT NULL CHECK(status IN ('started','succeeded','failed')), CHECK(finished_monotonic_ms IS NULL OR finished_monotonic_ms>=started_monotonic_ms));
+ finish_reason BLOB, anomaly BLOB, parse_result BLOB,
+ status TEXT NOT NULL CHECK(status IN ('intended','sent','succeeded','failed','ambiguous')),
+ CHECK(finished_monotonic_ms IS NULL OR finished_monotonic_ms>=started_monotonic_ms),
+ CHECK((status IN ('intended','sent','ambiguous') AND finished_monotonic_ms IS NULL) OR status IN ('succeeded','failed')));
 CREATE TABLE context_items (
  id TEXT PRIMARY KEY, decision_id TEXT NOT NULL REFERENCES runtime_decisions(id), source_kind TEXT NOT NULL, source_id BLOB NOT NULL,
  source_revision BLOB NOT NULL, semantic_key BLOB NOT NULL, trust TEXT NOT NULL CHECK(trust IN ('owner','workspace','tool','provider')),
@@ -55,18 +64,22 @@ CREATE TABLE tool_admissions (
 CREATE TABLE effect_journal (
  id TEXT PRIMARY KEY, admission_id TEXT NOT NULL UNIQUE, decision_id TEXT NOT NULL REFERENCES runtime_decisions(id),
  command_ordinal INTEGER NOT NULL CHECK(command_ordinal>=0), idempotency_key BLOB NOT NULL UNIQUE,
- status TEXT NOT NULL CHECK(status IN ('admitted','staged','attempted','settled','failed')),
+ status TEXT NOT NULL CHECK(status IN ('prepared','staging','exchange-ready','exchanging','exchanged','observing','compensating','compensated','settled','failed','blocked')),
  intended_fingerprint BLOB NOT NULL, prior_fingerprint BLOB, outcome_fingerprint BLOB, observation_id TEXT UNIQUE,
- CHECK((status IN ('attempted','settled','failed') AND observation_id IS NOT NULL) OR (status IN ('admitted','staged') AND observation_id IS NULL)),
+ CHECK((status IN ('settled','failed','blocked') AND observation_id IS NOT NULL) OR (status NOT IN ('settled','failed','blocked') AND observation_id IS NULL)),
  FOREIGN KEY(admission_id,id) REFERENCES tool_admissions(id,journal_id) DEFERRABLE INITIALLY DEFERRED,
  UNIQUE(admission_id,id), UNIQUE(id,observation_id));
 CREATE TABLE effect_targets (
  journal_id TEXT NOT NULL REFERENCES effect_journal(id), ordinal INTEGER NOT NULL CHECK(ordinal>=0), normalized_path BLOB NOT NULL,
- prior_bytes BLOB, intended_bytes BLOB, mode TEXT NOT NULL CHECK(mode IN ('create','replace','delete')),
- stage_identity BLOB NOT NULL, PRIMARY KEY(journal_id,ordinal), UNIQUE(journal_id,normalized_path));
+ prior_bytes BLOB, intended_bytes BLOB, operation TEXT NOT NULL CHECK(operation IN ('create','replace','delete')),
+ prior_mode INTEGER, intended_mode INTEGER, stage_identity BLOB NOT NULL,
+ CHECK((operation='create' AND prior_bytes IS NULL) OR operation!='create'),
+ CHECK((operation='delete' AND intended_bytes IS NULL) OR operation!='delete'),
+ PRIMARY KEY(journal_id,ordinal), UNIQUE(journal_id,normalized_path));
 CREATE TABLE observations (
  id TEXT PRIMARY KEY, journal_id TEXT NOT NULL UNIQUE, status TEXT NOT NULL CHECK(status IN ('succeeded','failed','unknown')),
  attempt_outcome BLOB NOT NULL, content_ref BLOB NOT NULL, fingerprint BLOB NOT NULL, contamination TEXT NOT NULL CHECK(contamination IN ('clean','untrusted')),
+ event_id TEXT NOT NULL UNIQUE REFERENCES runtime_events(id),
  FOREIGN KEY(journal_id,id) REFERENCES effect_journal(id,observation_id) DEFERRABLE INITIALLY DEFERRED, UNIQUE(journal_id,id));
 CREATE TABLE checks (
  id TEXT PRIMARY KEY, matter_id TEXT NOT NULL, obligation_id TEXT NOT NULL, decision_id TEXT NOT NULL REFERENCES runtime_decisions(id),

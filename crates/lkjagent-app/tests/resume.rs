@@ -8,7 +8,6 @@ use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecis
 use lkjagent_store::decision_rows::insert_runtime_decision;
 use lkjagent_store::plan_access::{enqueue, insert_step_tx, insert_task};
 use lkjagent_store::plan_schema::setup;
-use lkjagent_store::plan_turn::set_config;
 use lkjagent_store::state_rows::insert_case;
 use rusqlite::Connection;
 
@@ -151,6 +150,15 @@ fn persist(conn: &mut Connection, snapshot: &lkjagent_core::model::TaskSnapshot)
         insert_step_tx(&tx, step, "now")?;
     }
     tx.commit()?;
+    Ok(())
+}
+
+fn set_config(conn: &Connection, key: &str, value: &str) -> TestResult<()> {
+    conn.execute(
+        "INSERT INTO config(key,value) VALUES(?1,?2)
+         ON CONFLICT(key) DO UPDATE SET value=excluded.value",
+        [key, value],
+    )?;
     Ok(())
 }
 

@@ -20,7 +20,6 @@ pub mod plan_inspect {
 mod plan_migrations;
 pub mod plan_names;
 pub mod plan_schema;
-pub mod plan_turn;
 pub mod prompt_rows;
 mod queue_access;
 pub mod record_rows;
@@ -30,5 +29,6 @@ pub mod state_edge_rows;
 pub mod state_rows;
 pub mod state_schema;
 pub mod token_usage;
+pub mod transactions;
 pub mod workspace_rows;
 pub mod workspace_search;

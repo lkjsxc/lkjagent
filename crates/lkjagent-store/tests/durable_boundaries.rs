@@ -104,8 +104,8 @@ fn durable_boundaries_exact_specs_and_unknown_cells() -> Result<(), Box<dyn Erro
     connection.execute(
         "INSERT INTO runtime_decisions(id,matter_id,event_id,operation_key,idempotency_key,
          selected_monotonic_ms,selected_state,context_spec,tool_spec,grammar_spec,budget_spec,
-         recovery_spec,exit_spec,compiler_status,compiler_attachments,status)
-         VALUES('d','m','e',?1,?2,2,?3,?4,?5,?6,?7,?8,?9,'compiled',?10,'selected')",
+         recovery_spec,check_spec,exit_spec,compiler_status,compiler_attachments,rendered_frame,status)
+         VALUES('d','m','e',?1,?2,2,?3,?4,?5,?6,?7,?8,?9,x'0b','complete',?10,x'01','selected')",
         params![
             b"operation",
             b"idem",

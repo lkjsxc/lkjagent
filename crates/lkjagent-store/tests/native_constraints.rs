@@ -14,9 +14,9 @@ fn seeded() -> StoreResult<Connection> {
          payload,source_kind,source_id) VALUES('e','m',1,'owner',1,'now',x'02','owner','turn');
          INSERT INTO runtime_decisions(id,matter_id,event_id,operation_key,idempotency_key,
          selected_monotonic_ms,selected_state,context_spec,tool_spec,grammar_spec,budget_spec,
-         recovery_spec,exit_spec,compiler_status,compiler_attachments,status)
-         VALUES('d','m','e',x'01',x'02',1,x'03',x'04',x'05',x'06',x'07',x'08',x'09',
-         'compiled',x'0a','selected');",
+         recovery_spec,check_spec,exit_spec,compiler_status,compiler_attachments,rendered_frame,status)
+         VALUES('d','m','e',x'01',x'02',1,x'03',x'04',x'05',x'06',x'07',x'08',x'09',x'0a',
+         'complete',x'0b',x'0c','selected');",
     )?;
     Ok(connection)
 }
@@ -35,7 +35,7 @@ fn accepted_effect(connection: &Connection) -> StoreResult<()> {
          effectful,status,reason,parsed_call,tool_spec,journal_id)
          VALUES('a','d',0,x'01','model',1,'accepted',x'02',x'03',x'04','j');
          INSERT INTO effect_journal(id,admission_id,decision_id,command_ordinal,idempotency_key,
-         status,intended_fingerprint) VALUES('j','a','d',0,x'05','admitted',x'06'); COMMIT;",
+         status,intended_fingerprint) VALUES('j','a','d',0,x'05','prepared',x'06'); COMMIT;",
     )?;
     Ok(())
 }
@@ -49,11 +49,11 @@ fn durable_boundaries_unique_check_and_orphans() -> Result<(), Box<dyn Error>> {
     rejected(&connection, "INSERT INTO runtime_events(id,matter_id,causal_sequence,kind,monotonic_ms,wall_time,payload,source_kind,source_id) VALUES('orphan','missing',2,'x',2,'now',x'01','x','x')");
     rejected(&connection, "INSERT INTO state_cells(matter_id,namespace,cell_key,payload,status,source_event_id,fingerprint) VALUES('m',x'01',x'02',x'03','unknown','e',x'04')");
     rejected(&connection, "INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,lifecycle) VALUES('a',1,'system',x'01',x'02','active')");
-    connection.execute("INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,lifecycle) VALUES('a',1,'owner',x'01',x'02','active')", [])?;
-    rejected(&connection, "INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,lifecycle) VALUES('b',1,'agent',x'01',x'03','active')");
-    rejected(&connection, "INSERT INTO provider_exchanges(id,decision_id,request_ref,started_monotonic_ms,status) VALUES('p','missing',x'01',0,'started')");
-    connection.execute("INSERT INTO provider_exchanges(id,decision_id,request_ref,started_monotonic_ms,status) VALUES('p','d',x'01',0,'started')", [])?;
-    rejected(&connection, "INSERT INTO provider_exchanges(id,decision_id,request_ref,started_monotonic_ms,status) VALUES('p2','d',x'02',0,'started')");
+    connection.execute("INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,lifecycle,matter_id) VALUES('a',1,'agent',x'01',x'02','active','m')", [])?;
+    rejected(&connection, "INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,lifecycle,matter_id) VALUES('b',1,'agent',x'01',x'03','active','m')");
+    rejected(&connection, "INSERT INTO provider_exchanges(id,decision_id,request_ref,started_monotonic_ms,status) VALUES('p','missing',x'01',0,'intended')");
+    connection.execute("INSERT INTO provider_exchanges(id,decision_id,request_ref,started_monotonic_ms,status) VALUES('p','d',x'01',0,'intended')", [])?;
+    rejected(&connection, "INSERT INTO provider_exchanges(id,decision_id,request_ref,started_monotonic_ms,status) VALUES('p2','d',x'02',0,'intended')");
     rejected(
         &connection,
         "UPDATE runtime_decisions SET context_spec=x'ff' WHERE id='d'",
@@ -66,20 +66,20 @@ fn durable_boundaries_unique_check_and_orphans() -> Result<(), Box<dyn Error>> {
 fn durable_boundaries_effect_cardinality() -> Result<(), Box<dyn Error>> {
     let connection = seeded()?;
     accepted_effect(&connection)?;
-    rejected(&connection, "INSERT INTO effect_journal(id,admission_id,decision_id,command_ordinal,idempotency_key,status,intended_fingerprint) VALUES('j2','a','d',1,x'07','admitted',x'08')");
+    rejected(&connection, "INSERT INTO effect_journal(id,admission_id,decision_id,command_ordinal,idempotency_key,status,intended_fingerprint) VALUES('j2','a','d',1,x'07','prepared',x'08')");
     rejected(
         &connection,
-        "UPDATE effect_journal SET status='attempted' WHERE id='j'",
+        "UPDATE effect_journal SET status='settled' WHERE id='j'",
     );
     rejected(&connection, "INSERT INTO observations(id,journal_id,status,attempt_outcome,content_ref,fingerprint,contamination) VALUES('o','missing','succeeded',x'01',x'02',x'03','clean')");
     connection.execute_batch(
         "BEGIN; INSERT INTO observations(id,journal_id,status,attempt_outcome,content_ref,
-         fingerprint,contamination) VALUES('o','j','succeeded',x'01',x'02',x'03','clean');
-         UPDATE effect_journal SET status='attempted',observation_id='o' WHERE id='j'; COMMIT;",
+         fingerprint,contamination,event_id) VALUES('o','j','succeeded',x'01',x'02',x'03','clean','e');
+         UPDATE effect_journal SET status='settled',observation_id='o' WHERE id='j'; COMMIT;",
     )?;
     rejected(&connection, "INSERT INTO observations(id,journal_id,status,attempt_outcome,content_ref,fingerprint,contamination) VALUES('o2','j','failed',x'01',x'02',x'03','clean')");
-    connection.execute("INSERT INTO effect_targets(journal_id,ordinal,normalized_path,intended_bytes,mode,stage_identity) VALUES('j',0,?1,?2,'create',?3)", params![b"a", b"bytes", b"stage"])?;
-    rejected(&connection, "INSERT INTO effect_targets(journal_id,ordinal,normalized_path,mode,stage_identity) VALUES('j',1,x'61','delete',x'01')");
+    connection.execute("INSERT INTO effect_targets(journal_id,ordinal,normalized_path,intended_bytes,operation,stage_identity) VALUES('j',0,?1,?2,'create',?3)", params![b"a", b"bytes", b"stage"])?;
+    rejected(&connection, "INSERT INTO effect_targets(journal_id,ordinal,normalized_path,operation,stage_identity) VALUES('j',1,x'61','delete',x'01')");
     Ok(())
 }
 
