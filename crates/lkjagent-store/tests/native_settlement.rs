@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use lkjagent_store::transactions::{
-    Decision, Effect, Intake, NativeStore, Obligation, Settlement, Target,
+    Decision, Effect, FinalClose, Intake, NativeStore, Obligation, Settlement, Target,
 };
 use rusqlite::Connection;
 
@@ -21,8 +21,6 @@ fn intake() -> Intake<'static> {
         turn: "t",
         queue_sequence: 1,
         raw_text: b"owner",
-        message: "owner-msg",
-        message_sequence: 1,
         message_fingerprint: b"owner-fp",
         event: "e1",
         event_sequence: 1,
@@ -32,6 +30,13 @@ fn intake() -> Intake<'static> {
         obligations: &OBLIGATIONS,
         cells: &[],
     }
+}
+
+#[rustfmt::skip]
+fn close() -> FinalClose<'static> {
+    FinalClose { matter: "m", body: b"done", body_fingerprint: b"final-fp",
+        receipt: b"checks: passed", receipt_fingerprint: b"receipt-fp", event: "close",
+        event_sequence: 4, monotonic_ms: 4, wall_time: "now", payload: b"close" }
 }
 
 fn decision() -> Decision<'static> {
@@ -88,20 +93,7 @@ fn durable_boundaries_settlement_links_revision_and_close_guards() -> Result<(),
         prior_fingerprint: None,
         targets: &[target],
     })?;
-    assert!(store
-        .close_matter(
-            "m",
-            "final",
-            2,
-            b"done",
-            b"final-fp",
-            "close",
-            4,
-            4,
-            "now",
-            b"close"
-        )
-        .is_err());
+    assert!(store.close_matter(&close()).is_err());
     for (old, new) in [
         ("prepared", "staging"),
         ("staging", "exchange-ready"),
@@ -137,20 +129,7 @@ fn durable_boundaries_settlement_links_revision_and_close_guards() -> Result<(),
         "UPDATE obligations SET current_check_id='failed' WHERE id='o'",
         [],
     )?;
-    assert!(store
-        .close_matter(
-            "m",
-            "final",
-            2,
-            b"done",
-            b"final-fp",
-            "close",
-            4,
-            4,
-            "now",
-            b"close"
-        )
-        .is_err());
+    assert!(store.close_matter(&close()).is_err());
     connection.execute("UPDATE checks SET current=0 WHERE id='failed'", [])?;
     connection.execute("INSERT INTO checks(id,matter_id,obligation_id,decision_id,kind,parameters,current,passed,measured,evidence_fingerprint,source_revision,checked_event_id) VALUES('passed','m','o','d','exact',x'01',1,1,x'01',x'02',x'02','e3')", [])?;
     connection.execute(
@@ -158,35 +137,14 @@ fn durable_boundaries_settlement_links_revision_and_close_guards() -> Result<(),
         [],
     )?;
     connection.execute_batch("CREATE TRIGGER fail_final BEFORE INSERT ON conversation_messages WHEN NEW.role='agent' BEGIN SELECT RAISE(ABORT,'injected final'); END;")?;
-    assert!(store
-        .close_matter(
-            "m",
-            "final",
-            2,
-            b"done",
-            b"final-fp",
-            "close",
-            4,
-            4,
-            "now",
-            b"close"
-        )
-        .is_err());
+    assert!(store.close_matter(&close()).is_err());
     let state: (String, i64) = connection.query_row("SELECT lifecycle,(SELECT count(*) FROM runtime_events WHERE id='close') FROM matters WHERE id='m'", [], |r| Ok((r.get(0)?, r.get(1)?)))?;
     assert_eq!(state, ("open".into(), 0));
     connection.execute_batch("DROP TRIGGER fail_final")?;
-    store.close_matter(
-        "m",
-        "final",
-        2,
-        b"done",
-        b"final-fp",
-        "close",
-        4,
-        4,
-        "now",
-        b"close",
-    )?;
+    let final_message = store.close_matter(&close())?;
+    assert_eq!(final_message.id, "completion-event/close");
+    assert_eq!(final_message.sequence, 2);
+    assert_eq!(store.close_matter(&close())?, final_message);
     let linked: (String, String, String, String) = connection.query_row(
         "SELECT j.status,o.event_id,r.effect_id,d.status FROM effect_journal j JOIN observations o ON o.id=j.observation_id JOIN workspace_revisions r ON r.effect_id=j.id JOIN runtime_decisions d ON d.id=j.decision_id",
         [], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?;
@@ -194,7 +152,7 @@ fn durable_boundaries_settlement_links_revision_and_close_guards() -> Result<(),
         linked,
         ("settled".into(), "e3".into(), "j".into(), "settled".into())
     );
-    let closed: (String, i64, i64) = connection.query_row("SELECT lifecycle,(SELECT count(*) FROM conversation_messages WHERE id='final'),(SELECT count(*) FROM runtime_events WHERE id='close') FROM matters WHERE id='m'", [], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?;
-    assert_eq!(closed, ("closed".into(), 1, 1));
+    let closed: (String, i64, i64, Vec<u8>) = connection.query_row("SELECT lifecycle,(SELECT count(*) FROM conversation_message_checks WHERE message_id='completion-event/close'),(SELECT count(*) FROM runtime_events WHERE id='close'),(SELECT receipt FROM conversation_messages WHERE id='completion-event/close') FROM matters WHERE id='m'", [], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?;
+    assert_eq!(closed, ("closed".into(), 1, 1, b"checks: passed".to_vec()));
     Ok(())
 }

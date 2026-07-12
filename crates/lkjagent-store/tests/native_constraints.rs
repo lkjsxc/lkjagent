@@ -49,8 +49,9 @@ fn durable_boundaries_unique_check_and_orphans() -> Result<(), Box<dyn Error>> {
     rejected(&connection, "INSERT INTO runtime_events(id,matter_id,causal_sequence,kind,monotonic_ms,wall_time,payload,source_kind,source_id) VALUES('orphan','missing',2,'x',2,'now',x'01','x','x')");
     rejected(&connection, "INSERT INTO state_cells(matter_id,namespace,cell_key,payload,status,source_event_id,fingerprint) VALUES('m',x'01',x'02',x'03','unknown','e',x'04')");
     rejected(&connection, "INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,lifecycle) VALUES('a',1,'system',x'01',x'02','active')");
-    connection.execute("INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,lifecycle,matter_id) VALUES('a',1,'agent',x'01',x'02','active','m')", [])?;
-    rejected(&connection, "INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,lifecycle,matter_id) VALUES('b',1,'agent',x'01',x'03','active','m')");
+    connection.execute("INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,receipt,receipt_fingerprint,lifecycle,matter_id) VALUES('a',1,'agent',x'01',x'02',x'03',x'04','active','m')", [])?;
+    rejected(&connection, "INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,receipt,receipt_fingerprint,lifecycle,matter_id) VALUES('b',1,'agent',x'01',x'03',x'04',x'05','active','m')");
+    rejected(&connection, "INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,receipt,receipt_fingerprint,lifecycle,matter_id) VALUES('b',2,'owner',x'01',x'03',x'04',x'05','active','m')");
     rejected(&connection, "INSERT INTO provider_exchanges(id,decision_id,request_ref,started_monotonic_ms,status) VALUES('p','missing',x'01',0,'intended')");
     connection.execute("INSERT INTO provider_exchanges(id,decision_id,request_ref,started_monotonic_ms,status) VALUES('p','d',x'01',0,'intended')", [])?;
     rejected(&connection, "INSERT INTO provider_exchanges(id,decision_id,request_ref,started_monotonic_ms,status) VALUES('p2','d',x'02',0,'intended')");

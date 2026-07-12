@@ -5,6 +5,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use lkjagent_store::error::StoreError;
 use lkjagent_store::native_schema;
+use lkjagent_store::transactions::{Intake, NativeStore};
 use rusqlite::Connection;
 
 fn path(label: &str) -> Result<PathBuf, Box<dyn Error>> {
@@ -29,6 +30,28 @@ fn durable_boundaries_reopens_exact_native_schema() -> Result<(), Box<dyn Error>
     let reopened = native_schema::open(&path)?;
     let matters: i64 = reopened.query_row("SELECT count(*) FROM matters", [], |row| row.get(0))?;
     assert_eq!(matters, 1);
+    drop(reopened);
+    fs::remove_file(path)?;
+    Ok(())
+}
+
+#[test]
+#[rustfmt::skip]
+fn durable_boundaries_conversation_sequence_continues_after_reopen() -> Result<(), Box<dyn Error>> {
+    let path = path("conversation-reopen")?;
+    let mut store = NativeStore::open(&path)?;
+    let first = Intake { matter: "m1", objective: b"one", turn: "t1", queue_sequence: 1,
+        raw_text: b"one", message_fingerprint: b"fp1", event: "e1", event_sequence: 1,
+        event_payload: b"one", monotonic_ms: 1, wall_time: "now", obligations: &[], cells: &[] };
+    assert_eq!(store.owner_intake(&first)?.sequence, 1);
+    drop(store);
+    let mut reopened = NativeStore::open(&path)?;
+    let second = Intake { matter: "m2", objective: b"two", turn: "t2", queue_sequence: 2,
+        raw_text: b"two", message_fingerprint: b"fp2", event: "e2", event_sequence: 1,
+        event_payload: b"two", monotonic_ms: 2, wall_time: "now", obligations: &[], cells: &[] };
+    assert_eq!(reopened.owner_intake(&second)?.sequence, 2);
+    let page = native_schema::conversation(&Connection::open(&path)?, Some(2), 10)?;
+    assert_eq!(page.iter().map(|row| row.id.as_str()).collect::<Vec<_>>(), ["owner-turn/t1"]);
     drop(reopened);
     fs::remove_file(path)?;
     Ok(())

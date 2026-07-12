@@ -10,11 +10,13 @@ CREATE TABLE owner_turns (
  id TEXT PRIMARY KEY, queue_sequence INTEGER NOT NULL UNIQUE, raw_text BLOB NOT NULL,
  delivery TEXT NOT NULL CHECK(delivery IN ('queued','delivered','failed')), matter_id TEXT REFERENCES matters(id), created_at TEXT NOT NULL);
 CREATE TABLE conversation_messages (
- id TEXT PRIMARY KEY, sequence INTEGER NOT NULL UNIQUE, role TEXT NOT NULL CHECK(role IN ('owner','agent')),
- body BLOB NOT NULL, body_fingerprint BLOB NOT NULL, lifecycle TEXT NOT NULL CHECK(lifecycle IN ('active','replaced','withdrawn')),
+ id TEXT PRIMARY KEY, sequence INTEGER NOT NULL UNIQUE CHECK(sequence>0), role TEXT NOT NULL CHECK(role IN ('owner','agent')),
+ body BLOB NOT NULL, body_fingerprint BLOB NOT NULL, receipt BLOB, receipt_fingerprint BLOB,
+ lifecycle TEXT NOT NULL CHECK(lifecycle IN ('active','replaced','withdrawn')),
  matter_id TEXT NOT NULL REFERENCES matters(id), owner_turn_id TEXT UNIQUE REFERENCES owner_turns(id),
  cause_event_id TEXT REFERENCES runtime_events(id), replacement_id TEXT UNIQUE REFERENCES conversation_messages(id),
- CHECK((role='owner' AND owner_turn_id IS NOT NULL) OR (role='agent' AND owner_turn_id IS NULL)));
+ CHECK((role='owner' AND owner_turn_id IS NOT NULL AND receipt IS NULL AND receipt_fingerprint IS NULL) OR
+       (role='agent' AND owner_turn_id IS NULL AND receipt IS NOT NULL AND receipt_fingerprint IS NOT NULL)));
 CREATE TABLE obligations (
  id TEXT PRIMARY KEY, matter_id TEXT NOT NULL REFERENCES matters(id), predicate_kind TEXT NOT NULL, predicate_payload BLOB NOT NULL,
  required INTEGER NOT NULL CHECK(required IN (0,1)), status TEXT NOT NULL CHECK(status IN ('open','passed','invalidated')),
@@ -85,8 +87,13 @@ CREATE TABLE checks (
  id TEXT PRIMARY KEY, matter_id TEXT NOT NULL, obligation_id TEXT NOT NULL, decision_id TEXT NOT NULL REFERENCES runtime_decisions(id),
  kind TEXT NOT NULL, parameters BLOB NOT NULL, current INTEGER NOT NULL CHECK(current IN (0,1)), passed INTEGER NOT NULL CHECK(passed IN (0,1)),
  measured BLOB NOT NULL, evidence_fingerprint BLOB NOT NULL, source_revision BLOB NOT NULL, checked_event_id TEXT NOT NULL REFERENCES runtime_events(id),
- FOREIGN KEY(obligation_id,matter_id) REFERENCES obligations(id,matter_id), UNIQUE(obligation_id,source_revision,kind), UNIQUE(id,obligation_id));
+ FOREIGN KEY(obligation_id,matter_id) REFERENCES obligations(id,matter_id), UNIQUE(obligation_id,source_revision,kind),
+ UNIQUE(id,obligation_id), UNIQUE(id,evidence_fingerprint));
 CREATE UNIQUE INDEX one_current_check_per_obligation ON checks(obligation_id) WHERE current=1;
+CREATE TABLE conversation_message_checks (
+ message_id TEXT NOT NULL REFERENCES conversation_messages(id), check_id TEXT NOT NULL,
+ evidence_fingerprint BLOB NOT NULL, PRIMARY KEY(message_id,check_id),
+ FOREIGN KEY(check_id,evidence_fingerprint) REFERENCES checks(id,evidence_fingerprint));
 CREATE TABLE workspace_documents (
  id TEXT PRIMARY KEY, current_path BLOB NOT NULL UNIQUE, status TEXT NOT NULL CHECK(status IN ('active','closed','deleted')),
  managed INTEGER NOT NULL CHECK(managed IN (0,1)), current_revision_id TEXT, UNIQUE(current_revision_id,id),
