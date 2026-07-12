@@ -2,14 +2,13 @@
 
 ## Purpose
 
-This directory holds fixture tests for repository gate violation messages.
+Map focused repository checker and evaluation tests.
 
 ## Table of Contents
 
+- [acceptance_negative.rs](acceptance_negative.rs): acceptance false positives.
+- [docs_authority_gate.rs](docs_authority_gate.rs): compact contract mutations.
+- [evaluation_harness.rs](evaluation_harness.rs): deterministic harness checks.
 - [facts.rs](facts.rs): repository file collection fixtures.
-- [evaluation-harness.rs](evaluation_harness.rs): deterministic harness and
-  false-positive fixtures.
-- [gates.rs](gates.rs): gate fixture tests.
-- [repository-determinism-gate.rs](repository_determinism_gate.rs): tracked
-  input, configuration, Docker, and workflow fault fixtures.
-- [structure-audit.rs](structure_audit.rs): structure audit fixtures.
+- [gates.rs](gates.rs): generic gate fixture tests.
+- [structure_audit.rs](structure_audit.rs): structure audit fixtures.

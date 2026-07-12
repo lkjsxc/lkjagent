@@ -1,22 +1,15 @@
-pub mod doc_catalog;
+pub mod acceptance;
 pub mod doc_common;
-pub mod doc_crate_readmes;
 pub mod doc_links;
 pub mod doc_special;
 pub mod doc_topology;
 mod docs_authority_contract;
 pub mod docs_authority_gate;
-mod domain_experiments_gate;
 pub mod evaluation_harness;
 pub mod facts;
 pub mod gate;
 pub mod node_gate;
-mod node_suites;
-mod protocol_tools_gate;
-mod recovery_continuity_gate;
-pub mod repository_determinism_gate;
 pub mod style;
-mod workspace_retrieval_gate;
 
 pub mod model {
     pub use crate::facts::{RepoFile, Violation};
@@ -55,6 +48,7 @@ pub fn run(args: &[String], root: &Path) -> i32 {
         Ok(Gate::QuietTest) => run_command_gate(root, "test"),
         Ok(Gate::QuietVerify) => run_verify(root),
         Ok(Gate::Node(identifier)) => run_node_gate(root, &identifier),
+        Ok(Gate::Acceptance(rest)) => acceptance::run(&rest, root),
         Ok(Gate::Benchmark(rest)) => evaluation_harness::run_benchmark(&rest, root),
         Ok(Gate::Experiment(rest)) => evaluation_harness::run_experiment(&rest, root),
         Ok(Gate::Proof(_)) => evaluation_harness::reject_unbound_command("proof"),

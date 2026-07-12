@@ -1,0 +1,4 @@
+fixture_id	acceptance-scripted-semantic
+semantic_required	true
+endpoint_mode	scripted
+exchange_count	3

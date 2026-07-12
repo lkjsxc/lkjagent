@@ -1,0 +1,2 @@
+cell	stage	envelope	tool_view	example	edit_form	context	observation	prefix	recovery	verification	scenarios	min_repeats	max_repeats	escalation
+A	early	TBD	state-narrow	none	exact-text	required-only	compact	stable-first	fault-only	automatic	S9	0	bad	unknown

@@ -15,6 +15,7 @@ const PRODUCT_CRATES: &[&str] = &[
 ];
 
 pub enum Gate {
+    Acceptance(Vec<String>),
     CheckDocs,
     CheckLines,
     CheckFiles,
@@ -140,6 +141,7 @@ fn tail(text: &str) -> Vec<String> {
 
 pub fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
     match args {
+        [first, rest @ ..] if first == "acceptance" => Ok(Gate::Acceptance(rest.to_vec())),
         [one] if one == "check-docs" || one == "docs-check" => Ok(Gate::CheckDocs),
         [one] if one == "check-lines" => Ok(Gate::CheckLines),
         [one] if one == "check-files" => Ok(Gate::CheckFiles),
@@ -158,7 +160,7 @@ pub fn parse_gate(args: &[String]) -> Result<Gate, Vec<String>> {
         _ => Err(vec![
             "xtask failed".to_string(),
             "exit status: 2".to_string(),
-            "use: check-docs | check-lines | check-files | check-style | hygiene-check | quiet test | quiet verify | gate NODE | bench ... | experiment ... | proof ... | smoke ... | structure ...".to_string(),
+            "use: acceptance verify ... | check-docs | check-lines | check-files | check-style | hygiene-check | quiet test | quiet verify | gate NODE | bench ... | experiment ... | proof ... | smoke ... | structure ...".to_string(),
         ]),
     }
 }

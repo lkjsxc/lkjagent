@@ -10,11 +10,11 @@ fn repo_files() -> Vec<RepoFile> {
 }
 
 fn edit(files: &mut [RepoFile], path: &str, change: impl FnOnce(&mut String)) {
-    let file = files
-        .iter_mut()
-        .find(|file| file.path == path)
-        .unwrap_or_else(|| panic!("missing {path}"));
-    change(&mut file.text);
+    let file = files.iter_mut().find(|file| file.path == path);
+    assert!(file.is_some(), "missing {path}");
+    if let Some(file) = file {
+        change(&mut file.text);
+    }
 }
 
 fn remove(files: &mut [RepoFile], path: &str, token: &str) {
@@ -86,11 +86,11 @@ fn focused_runtime_and_effect_facts_are_required() {
 }
 
 #[test]
-fn current_state_evidence_boundary_and_next_node_are_required() {
+fn current_state_evidence_boundary_and_work_state_are_required() {
     for token in [
         "`5604ec89af3ba9dbfb287bd869971781fdcf2fad`",
         "A synthetic 901-second run",
-        "| acceptance-checker | next |",
+        "| acceptance-checker | complete |",
     ] {
         let mut files = repo_files();
         remove(&mut files, "docs/current-state.md", token);
@@ -117,7 +117,7 @@ fn acceptance_checker_contract_is_required() {
     remove(
         &mut files,
         "docs/evaluation/live-proof.md",
-        "contracted but not implemented",
+        "nine negative fixtures",
     );
     assert_fails_with(&files, "missing focused contract text");
 }

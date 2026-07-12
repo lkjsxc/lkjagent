@@ -81,10 +81,10 @@ claims, and the close transaction owns the canonical final message.
 
 | Node | State | Evidence |
 | --- | --- | --- |
-| docs-reset | active | compact contracts and tracked plans in this change |
-| acceptance-checker | next | command and negative fixtures are not implemented |
-| baseline-tracked | blocked | waits for checker and current-source rerun |
-| interfaces | blocked | depends on acceptance checker |
+| docs-reset | complete | compact contracts, plans, and authority gate pass |
+| acceptance-checker | complete | source-bound incomplete mode rejects nine negative fixtures |
+| baseline-tracked | next | checker is ready for a sanitized current-source rerun |
+| interfaces | ready | acceptance checker dependency is satisfied |
 | public file edit | blocked | depends on native store, effects, protocol, and loop |
 | final campaigns | blocked | no frozen binary, live task proof, or PTY proof |
 

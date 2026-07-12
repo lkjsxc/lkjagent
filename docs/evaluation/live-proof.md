@@ -13,6 +13,10 @@ evaluation/evidence/<source>/<campaign>/<run-id>/
 ```
 
 Private raw data stays ignored. Every attachment is verified with `git ls-files`.
+`SOURCE` is a full frozen commit and must remain an ancestor of HEAD. Commits after
+that source may change only `evaluation/evidence/SOURCE/`; any product, plan, or
+other path change makes the evidence stale.
+
 A bundle includes command log, source/status, binary/config/plan hashes,
 workspace before/after manifests, diff, compressed SQLite backup, stable table
 exports, process log, redacted provider data, derived result, and raw manifest.
@@ -28,11 +32,13 @@ cargo run --locked -p lkjagent-xtask -- acceptance verify \
   --source SOURCE --evidence evaluation/evidence/SOURCE
 ```
 
-The command is contracted but not implemented in the current source. Its next
-workgraph node adds a nonzero incomplete mode and negative fixtures before other
-product source changes.
+The command now has a nonzero incomplete mode. It validates source binding,
+tracked plans and attachments, final workgraph ancestry, concrete experiment
+cells, secret patterns, and nine negative fixtures. Until predicate derivations
+and source-bound evidence exist, it reports every required row as missing and
+cannot return success.
 
-The checker reads plans, Git history/trailers, tracked files, command exits,
+The checker will read plans, Git history/trailers, tracked files, command exits,
 source/binary/image hashes, SQLite, workspace manifests, prompt/tool audits,
 experiments, campaigns, PTY traces, secret scan, and independent review. It
 recomputes every required row in `../../evaluation/acceptance.tsv`.

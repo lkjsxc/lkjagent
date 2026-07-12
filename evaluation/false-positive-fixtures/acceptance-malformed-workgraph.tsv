@@ -1,0 +1,4 @@
+id	wave	depends	owner	completion_predicate	focused_command	real_command	required
+base	0	none	parent	base exists	none	none	yes
+orphan	0	none	parent	orphan exists	none	none	yes
+final-acceptance	1	base,base,missing	parent	final derived	none	none	yes
