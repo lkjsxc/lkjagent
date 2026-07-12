@@ -13,10 +13,10 @@ This directory holds the repository gate dispatcher, checks, and command runner.
 - [doc-special.rs](doc_special.rs): repository-specific composition and
   reachability checks.
 - [doc-topology.rs](doc_topology.rs): README topology checks.
-- [docs-authority-contract.rs](docs_authority_contract.rs): native contract,
-  baseline truth, schema, and retired-page assertions.
-- [docs-authority-gate.rs](docs_authority_gate.rs): docs composition, source
-  no-diff checks, and the Git-free Docker product fingerprint.
+- [docs-authority-contract.rs](docs_authority_contract.rs): compact page map,
+  focused facts, tracked plans, and retired-authority assertions.
+- [docs-authority-gate.rs](docs_authority_gate.rs): docs composition and compact
+  authority contract checks.
 - [domain_experiments_gate.rs](domain_experiments_gate.rs): candidate matrix and source validator.
 - [domain_experiments_gate/README.md](domain_experiments_gate/README.md): run, manifest, exchange, and metric checks.
 - [evaluation-harness/](evaluation_harness/README.md): scenarios, benchmark dispatch,

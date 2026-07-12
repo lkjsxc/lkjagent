@@ -1,134 +1,123 @@
 use std::path::Path;
 
-use lkjagent_xtask::docs_authority_gate::{check_changed_paths, check_contract};
+use lkjagent_xtask::docs_authority_gate::check_contract;
 use lkjagent_xtask::facts::collect_files;
 use lkjagent_xtask::model::RepoFile;
 
 fn repo_files() -> Vec<RepoFile> {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-    match collect_files(&root) {
-        Ok(files) => files,
-        Err(error) => vec![RepoFile::new("collection-error", error)],
-    }
+    collect_files(&root).unwrap_or_else(|error| vec![RepoFile::new("collection-error", error)])
 }
 
 fn edit(files: &mut [RepoFile], path: &str, change: impl FnOnce(&mut String)) {
-    assert!(files.iter().any(|file| file.path == path), "missing {path}");
-    if let Some(file) = files.iter_mut().find(|file| file.path == path) {
-        change(&mut file.text);
-    }
+    let file = files
+        .iter_mut()
+        .find(|file| file.path == path)
+        .unwrap_or_else(|| panic!("missing {path}"));
+    change(&mut file.text);
+}
+
+fn remove(files: &mut [RepoFile], path: &str, token: &str) {
+    edit(files, path, |text| {
+        assert!(text.contains(token), "missing test token {token} in {path}");
+        *text = text.replacen(token, "removed-contract-text", 1);
+    });
+}
+
+fn assert_fails_with(files: &[RepoFile], expected: &str) {
+    let failures = check_contract(files);
+    assert!(
+        failures.iter().any(|failure| failure.contains(expected)),
+        "expected {expected:?} in {failures:#?}"
+    );
 }
 
 #[test]
-fn current_docs_satisfy_authority_contract() {
+fn current_docs_satisfy_compact_authority_contract() {
     assert_eq!(check_contract(&repo_files()), Vec::<String>::new());
 }
 
 #[test]
-fn missing_contract_page_fails() {
+fn every_compact_page_is_required() {
     let mut files = repo_files();
-    files.retain(|file| file.path != "docs/store/effect-journal.md");
-    assert!(check_contract(&files)
-        .iter()
-        .any(|failure| failure.contains("effect-journal.md")));
+    files.retain(|file| file.path != "docs/workspace/effects.md");
+    assert_fails_with(&files, "compact authority page is missing");
 }
 
 #[test]
-fn retired_authority_page_fails() {
+fn removed_authority_page_is_rejected() {
     let mut files = repo_files();
     files.push(RepoFile::new(
-        "docs/engine/README.md",
-        "# Engine\n\n## Purpose\n\nRetired authority.\n",
+        "docs/runtime/authority-model.md",
+        "# Old Authority\n\n## Purpose\n\nCompete with the direct loop.\n",
     ));
-    assert!(check_contract(&files)
-        .iter()
-        .any(|failure| failure.contains("retired page")));
+    assert_fails_with(&files, "outside the compact 47-page authority map");
 }
 
 #[test]
-fn false_live_promotion_fails() {
+fn removed_authority_name_is_rejected_in_active_contract() {
     let mut files = repo_files();
-    edit(&mut files, "docs/current-state.md", |text| {
-        text.push_str("\nAll four live profiles ran and closed successfully.\n");
+    edit(&mut files, "docs/runtime/loop.md", |text| {
+        text.push_str("\nTaskSnapshot selects the next action.\n");
     });
-    assert!(check_contract(&files)
-        .iter()
-        .any(|failure| failure.contains("false live claim")));
+    assert_fails_with(&files, "retired authority name remains");
 }
 
 #[test]
-fn incomplete_schema_fails() {
-    let mut files = repo_files();
-    edit(&mut files, "docs/store/schema.md", |text| {
-        *text = text.replace("effect_journal", "effects");
-    });
-    assert!(check_contract(&files)
-        .iter()
-        .any(|failure| failure.contains("effect_journal")));
-}
-
-#[test]
-fn missing_decision_or_observation_field_fails() {
-    for token in [
-        "`selected_monotonic_ms`",
-        "`tool_count`",
-        "`prompt_tokens`",
-        "`prompt_token_cap`",
-        "`semantic_duplicate_count`",
-        "`harness_json_count`",
-        "`unresolved_material_conflict_count`",
-        "`useful` and `progressed` booleans",
-        "effect reference, status",
+fn focused_runtime_and_effect_facts_are_required() {
+    for (path, token) in [
+        ("AGENTS.md", "persisted `RuntimeDecision` rows"),
+        (
+            "docs/context/assembly.md",
+            "selector first persists immutable operation",
+        ),
+        ("docs/tools/registry.md", "`create_file`"),
+        ("docs/protocol/envelopes.md", "decision IDs"),
+        ("docs/product/daemon.md", "separate capabilities"),
+        ("docs/workspace/effects.md", "prior/intended bytes"),
+        ("docs/product/tui.md", "`conversation_messages`"),
+        ("docs/runtime/completion.md", "native checks automatically"),
+        ("docs/runtime/completion.md", "harness-rendered"),
     ] {
         let mut files = repo_files();
-        edit(&mut files, "docs/store/schema.md", |text| {
-            *text = text.replacen(token, "removed-contract-token", 1);
-        });
-        assert!(!check_contract(&files).is_empty(), "missing {token} passed");
+        remove(&mut files, path, token);
+        assert_fails_with(&files, "missing focused contract text");
     }
 }
 
 #[test]
-fn missing_schema_constraint_fails() {
+fn current_state_evidence_boundary_and_next_node_are_required() {
     for token in [
-        "rejects any second run",
-        "check constraint",
-        "unique selection sequence",
-        "partial unique index permits only one current terminal outcome",
-        "`active`",
-        "`invalid`",
-        "`archived`",
-        "`tombstoned`",
-        "only non-tombstoned rows require current",
-        "`managed` controls header and token admission",
-        "Exactly one active index-debt row exists",
+        "`5604ec89af3ba9dbfb287bd869971781fdcf2fad`",
+        "A synthetic 901-second run",
+        "| acceptance-checker | next |",
     ] {
         let mut files = repo_files();
-        edit(&mut files, "docs/store/schema-constraints.md", |text| {
-            *text = text.replacen(token, "removed-contract-token", 1);
-        });
-        assert!(!check_contract(&files).is_empty(), "missing {token} passed");
+        remove(&mut files, "docs/current-state.md", token);
+        assert_fails_with(&files, "missing focused contract text");
     }
 }
 
 #[test]
-fn broken_root_topology_fails() {
-    let mut files = repo_files();
-    edit(&mut files, "docs/README.md", |text| {
-        *text = text.replace(
-            "14. [tui/](tui/README.md): canonical transcript rendering, input, and scrolling.\n",
-            "",
-        );
-    });
-    assert!(check_contract(&files)
-        .iter()
-        .any(|failure| failure.contains("link child 'tui'")));
+fn all_three_tracked_plans_are_required() {
+    for path in [
+        "evaluation/workgraph.tsv",
+        "evaluation/acceptance.tsv",
+        "evaluation/experiment-plan.tsv",
+    ] {
+        let mut files = repo_files();
+        files.retain(|file| file.path != path);
+        assert_fails_with(&files, "required contract input is missing");
+    }
 }
 
 #[test]
-fn product_source_drift_fails() {
-    let changed = vec!["crates/lkjagent-app/src/daemon.rs".to_string()];
-    assert!(check_changed_paths(&changed)
-        .iter()
-        .any(|failure| failure.contains("behavior-identical")));
+fn acceptance_checker_contract_is_required() {
+    let mut files = repo_files();
+    remove(
+        &mut files,
+        "docs/evaluation/live-proof.md",
+        "contracted but not implemented",
+    );
+    assert_fails_with(&files, "missing focused contract text");
 }

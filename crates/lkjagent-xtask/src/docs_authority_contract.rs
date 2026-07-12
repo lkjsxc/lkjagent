@@ -1,190 +1,145 @@
+use std::collections::BTreeSet;
+
 use crate::model::RepoFile;
 
-const REQUIRED_PAGES: &[&str] = &[
+const ACTIVE_PAGES: &[&str] = &[
+    "docs/README.md",
+    "docs/agent/README.md",
+    "docs/agent/handoff.md",
+    "docs/agent/working-here.md",
+    "docs/context/README.md",
+    "docs/context/assembly.md",
+    "docs/context/sources.md",
     "docs/current-state.md",
-    "docs/product/authority-boundaries.md",
-    "docs/runtime/authority-model.md",
-    "docs/runtime/matters-and-obligations.md",
-    "docs/runtime/operation-graph.md",
-    "docs/runtime/waiting-and-quiescence.md",
-    "docs/state/reducer-and-selectors.md",
+    "docs/evaluation/README.md",
+    "docs/evaluation/experiments.md",
+    "docs/evaluation/live-proof.md",
+    "docs/evaluation/scenarios.md",
+    "docs/operations/README.md",
+    "docs/operations/running.md",
+    "docs/operations/verification.md",
+    "docs/product/README.md",
+    "docs/product/cli.md",
+    "docs/product/configuration.md",
+    "docs/product/daemon.md",
+    "docs/product/tui.md",
+    "docs/protocol/README.md",
+    "docs/protocol/envelopes.md",
+    "docs/protocol/faults.md",
+    "docs/repository/README.md",
+    "docs/repository/documentation-standards.md",
+    "docs/repository/functional-style.md",
+    "docs/runtime/README.md",
+    "docs/runtime/completion.md",
+    "docs/runtime/loop.md",
+    "docs/runtime/recovery.md",
+    "docs/state/README.md",
+    "docs/state/cells.md",
+    "docs/state/transitions.md",
+    "docs/store/README.md",
     "docs/store/schema.md",
-    "docs/store/schema-constraints.md",
-    "docs/store/effect-journal.md",
-    "docs/workspace/transaction-protocol.md",
-    "docs/tui/README.md",
-    "docs/tui/transcript-model.md",
-    "docs/tui/scrolling.md",
+    "docs/store/transactions.md",
+    "docs/tools/README.md",
+    "docs/tools/admission.md",
+    "docs/tools/registry.md",
+    "docs/vision/README.md",
+    "docs/vision/north-star.md",
+    "docs/vision/principles.md",
+    "docs/vision/scope.md",
+    "docs/workspace/README.md",
+    "docs/workspace/effects.md",
+    "docs/workspace/layout.md",
+    "docs/workspace/records.md",
+];
+const _: [(); 47] = [(); ACTIVE_PAGES.len()];
+
+const RETIRED_NAMES: &[&str] = &[
+    "TaskSnapshot",
+    "StepKind",
+    "plan-family",
+    "matter bridge",
+    "bridge projection",
+    "bridge cells",
+    "fixed template",
 ];
 
-const RETIRED_PAGES: &[&str] = &[
-    "docs/decisions/personal-as-templates.md",
-    "docs/engine/README.md",
-    "docs/engine/completion.md",
-    "docs/engine/matter-bridge.md",
-    "docs/engine/plan-and-steps.md",
-    "docs/engine/retry-and-escalation.md",
-    "docs/engine/step-kinds.md",
-    "docs/engine/templates/README.md",
-    "docs/engine/templates/docs-tree.md",
-    "docs/engine/templates/file-work.md",
-    "docs/engine/templates/generic.md",
-    "docs/engine/templates/journal.md",
-    "docs/engine/templates/question.md",
-    "docs/engine/turn-cycle.md",
-    "docs/evaluation/prose-trial.md",
-    "docs/protocol/plan-line-grammar.md",
+#[rustfmt::skip]
+const REQUIREMENTS: &[(&str, &[&str])] = &[
+    ("AGENTS.md", &["Durable state rows and persisted `RuntimeDecision` rows are the single control", "Completion is reducer-computed through fresh checks"]),
+    ("docs/vision/principles.md", &["Durable authority: state cells and persisted decisions own runtime behavior"]),
+    ("docs/context/assembly.md", &["selector first persists immutable operation", "atomically attaches rendered cards and fingerprints", "It cannot change the operation"]),
+    ("docs/tools/registry.md", &["## Initial Catalog", "`list_directory`", "`search_text`", "`read_file`", "`edit_file`", "`create_file`"]),
+    ("docs/protocol/envelopes.md", &["does not echo decision IDs, context fingerprints, tool fingerprints", "or JSON arguments", "or JSON argument object"]),
+    ("docs/product/daemon.md", &["Runtime data and visible workspace are separate capabilities", "host data at `/data`", "host workspace at `/workspace`"]),
+    ("docs/workspace/effects.md", &["exact prior/intended bytes", "expected/intended mode", "target and stage `(bytes, mode)` pairs"]),
+    ("docs/product/tui.md", &["The TUI reads `conversation_messages`", "ordered by monotonic sequence and logical ID"]),
+    ("docs/runtime/completion.md", &["schedules native checks automatically", "harness-rendered factual receipt", "receipt alone is persisted"]),
+    ("docs/current-state.md", &["`5604ec89af3ba9dbfb287bd869971781fdcf2fad`", "`28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`", "A synthetic 901-second run", "one blocked task, three blocked steps, and zero runtime", "unsupported executor before any model call", "| docs-reset | active |", "| acceptance-checker | next |"]),
+    ("docs/evaluation/README.md", &["workgraph.tsv", "acceptance.tsv", "experiment-plan.tsv"]),
+    ("evaluation/workgraph.tsv", &["id\twave\tdepends", "acceptance-checker\t0\tdocs-reset"]),
+    ("evaluation/acceptance.tsv", &["id\tcategory\tpredicate", "A01\tchecker", "D02\tdocs"]),
+    ("evaluation/experiment-plan.tsv", &["cell\tstage\tenvelope", "K\tintegrated"]),
+    ("docs/evaluation/live-proof.md", &["acceptance verify", "--source SOURCE --evidence evaluation/evidence/SOURCE", "contracted but not implemented", "nonzero incomplete mode", "negative fixtures"]),
 ];
-
-const SCHEMA_TABLES: &str = concat!(
-    "matters obligations operations operation_edges runs runtime_events state_cells ",
-    "state_cell_history state_edges runtime_decisions context_frames prompt_cards ",
-    "provider_exchanges failure_lineages tool_admissions effect_journal observations ",
-    "checks conversation_messages owner_turns commands diagnostics outbox_messages ",
-    "config daemon_leases workspace_documents workspace_revisions content_blobs ",
-    "workspace_aliases workspace_tombstones workspace_relations workspace_search_rows ",
-    "workspace_index_debt",
-);
 
 pub(crate) fn check(files: &[RepoFile], failures: &mut Vec<String>) {
-    check_pages(files, failures);
-    check_current_state(files, failures);
-    check_authority(files, failures);
-    check_schema(files, failures);
-}
-
-fn check_pages(files: &[RepoFile], failures: &mut Vec<String>) {
-    for path in REQUIRED_PAGES {
-        if find(files, path).is_none() {
-            failures.push(format!("required authority page is missing: {path}"));
-        }
-    }
-    for path in RETIRED_PAGES {
-        if find(files, path).is_some() {
-            failures.push(format!("retired page remains: {path}"));
-        }
+    check_page_map(files, failures);
+    check_retired_names(files, failures);
+    for (path, tokens) in REQUIREMENTS {
+        require_all(files, path, tokens, failures);
     }
 }
 
-fn check_current_state(files: &[RepoFile], failures: &mut Vec<String>) {
-    let Some(text) = find(files, "docs/current-state.md") else {
-        return;
-    };
-    require_all(
-        text,
-        "current-state",
-        &[
-            "three tasks, thirteen steps, ten decisions",
-            "zero tool",
-            "admissions, observations, artifacts, and workspace records",
-            "raw/12-sqlite-facts.tsv",
-            "raw/31-clean-checkout.log",
-            "raw/17-diary-run-once.log",
-            "raw/14-live-summary-facts.tsv",
-            "raw/19-relative-root-historical.log",
-            "reproduced",
-            "bounded",
-            "Production still hydrates",
-            "Context may be prepared before the final decision",
-            "Recovery tuples and progress windows persist",
-            "final live and PTY evidence",
-        ],
-        failures,
-    );
-    let lower = text.to_ascii_lowercase();
-    for claim in [
-        "all four live profiles ran and closed successfully",
-        "proven in current checkout",
-        "interactive behavior is proven",
-    ] {
-        if lower.contains(claim) {
-            failures.push(format!("false live claim remains: {claim}"));
+fn check_page_map(files: &[RepoFile], failures: &mut Vec<String>) {
+    let expected = ACTIVE_PAGES.iter().copied().collect::<BTreeSet<_>>();
+    let actual = files
+        .iter()
+        .filter(|file| file.path.starts_with("docs/") && file.path.ends_with(".md"))
+        .map(|file| file.path.as_str())
+        .collect::<BTreeSet<_>>();
+    for path in expected.difference(&actual) {
+        failures.push(format!("compact authority page is missing: {path}"));
+    }
+    for path in actual.difference(&expected) {
+        failures.push(format!(
+            "page is outside the compact 47-page authority map: {path}"
+        ));
+    }
+}
+
+fn check_retired_names(files: &[RepoFile], failures: &mut Vec<String>) {
+    for file in files.iter().filter(|file| authority_page(&file.path)) {
+        let lower = file.text.to_ascii_lowercase();
+        for name in RETIRED_NAMES {
+            if lower.contains(&name.to_ascii_lowercase()) {
+                failures.push(format!(
+                    "retired authority name remains in {}: {name}",
+                    file.path
+                ));
+            }
         }
     }
 }
 
-fn check_authority(files: &[RepoFile], failures: &mut Vec<String>) {
-    let Some(text) = find(files, "docs/runtime/authority-model.md") else {
-        return;
-    };
-    require_all(
-        text,
-        "authority-model",
-        &[
-            "RuntimeSnapshot + RuntimeEvent + CurrentTime -> RuntimeState",
-            "RuntimeState + Policy + CurrentTime -> RuntimeDecision",
-            "RuntimeDecision -> EffectResult",
-            "EffectResult -> RuntimeEvent",
-            "commits before prompt compilation or effect execution",
-            "TaskSnapshot",
-            "plan-family",
-        ],
-        failures,
-    );
+fn authority_page(path: &str) -> bool {
+    path.starts_with("docs/") && !matches!(path, "docs/current-state.md" | "docs/store/schema.md")
 }
 
-fn check_schema(files: &[RepoFile], failures: &mut Vec<String>) {
-    let Some(text) = find(files, "docs/store/schema.md") else {
+fn require_all(files: &[RepoFile], path: &str, tokens: &[&str], failures: &mut Vec<String>) {
+    let Some(text) = find(files, path) else {
+        failures.push(format!("required contract input is missing: {path}"));
         return;
     };
-    for table in SCHEMA_TABLES.split_ascii_whitespace() {
-        if !text.contains(table) {
-            failures.push(format!("store schema is missing table {table}"));
-        }
-    }
-    require_all(
-        text,
-        "store-schema",
-        &[
-            "predicate kind and payload",
-            "unique typed acyclic edges",
-            "selected cells and",
-            "required observations",
-            "unique non-null admission",
-            "unique logical ID and monotonic sequence",
-            "provider tokenizer and count",
-            "`selected_monotonic_ms`",
-            "`tool_count`",
-            "`prompt_tokens`",
-            "`prompt_token_cap`",
-            "`semantic_duplicate_count`",
-            "`harness_json_count`",
-            "`unresolved_material_conflict_count`",
-            "`useful` and `progressed` booleans",
-            "effect reference, status",
-            "A fresh store creates no task, step, template, plan-family, bridge",
-        ],
-        failures,
-    );
-    let Some(constraints) = find(files, "docs/store/schema-constraints.md") else {
-        return;
-    };
-    require_all(
-        constraints,
-        "schema-constraints",
-        &[
-            "rejects any second run",
-            "check constraint",
-            "unique selection sequence",
-            "partial unique index permits only one current terminal outcome",
-            "`active`",
-            "`invalid`",
-            "`archived`",
-            "`tombstoned`",
-            "only non-tombstoned rows require current",
-            "`managed` controls header and token admission",
-            "Exactly one active index-debt row exists",
-        ],
-        failures,
-    );
-}
-
-fn require_all(text: &str, owner: &str, tokens: &[&str], failures: &mut Vec<String>) {
+    let normalized = normalize(text);
     for token in tokens {
-        if !text.contains(token) {
-            failures.push(format!("{owner} is missing contract text: {token}"));
+        if !normalized.contains(&normalize(token)) {
+            failures.push(format!("{path} is missing focused contract text: {token}"));
         }
     }
+}
+
+fn normalize(text: &str) -> String {
+    text.split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
 fn find<'a>(files: &'a [RepoFile], path: &str) -> Option<&'a str> {
