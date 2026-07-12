@@ -1,9 +1,10 @@
 use std::path::Path;
 
-use rusqlite::{params, Connection, Transaction, TransactionBehavior};
+use rusqlite::{params, Connection, OptionalExtension, Transaction, TransactionBehavior};
 
 use crate::error::{StoreError, StoreResult};
 use crate::native_schema;
+pub use crate::native_schema::{FinalClose, MessageIdentity};
 
 pub struct NativeStore {
     connection: Connection,
@@ -12,10 +13,10 @@ pub struct NativeStore {
 #[rustfmt::skip]
 pub struct Intake<'a> {
     pub matter: &'a str, pub objective: &'a [u8], pub turn: &'a str,
-    pub queue_sequence: i64, pub raw_text: &'a [u8], pub message: &'a str,
-    pub message_sequence: i64, pub message_fingerprint: &'a [u8], pub event: &'a str,
-    pub event_sequence: i64, pub event_payload: &'a [u8], pub monotonic_ms: i64,
-    pub wall_time: &'a str, pub obligations: &'a [Obligation<'a>], pub cells: &'a [Cell<'a>],
+    pub queue_sequence: i64, pub raw_text: &'a [u8], pub message_fingerprint: &'a [u8],
+    pub event: &'a str, pub event_sequence: i64, pub event_payload: &'a [u8],
+    pub monotonic_ms: i64, pub wall_time: &'a str, pub obligations: &'a [Obligation<'a>],
+    pub cells: &'a [Cell<'a>],
 }
 pub struct Obligation<'a>(pub &'a str, pub &'a str, pub &'a [u8], pub bool);
 pub struct Cell<'a>(pub &'a [u8], pub &'a [u8], pub &'a [u8], pub &'a [u8]);
@@ -63,15 +64,20 @@ impl NativeStore {
         })
     }
 
-    pub fn owner_intake(&mut self, value: &Intake<'_>) -> StoreResult<()> {
+    pub fn owner_intake(&mut self, value: &Intake<'_>) -> StoreResult<MessageIdentity> {
         self.atomic(|tx| {
+            let id = format!("owner-turn/{}", value.turn);
+            if let Some(sequence) = tx.query_row("SELECT sequence FROM conversation_messages WHERE id=?1 AND role='owner' AND body=?2 AND body_fingerprint=?3 AND matter_id=?4 AND owner_turn_id=?5 AND cause_event_id=?6", params![id,value.raw_text,value.message_fingerprint,value.matter,value.turn,value.event], |r| r.get(0)).optional()? {
+                return Ok(MessageIdentity { id, sequence });
+            }
+            let sequence = next_message_sequence(tx)?;
             tx.execute("INSERT INTO matters(id,objective,lifecycle,priority,created_sequence,updated_sequence) VALUES(?1,?2,'open',0,?3,?3)", params![value.matter,value.objective,value.event_sequence])?;
             tx.execute("INSERT INTO owner_turns(id,queue_sequence,raw_text,delivery,matter_id,created_at) VALUES(?1,?2,?3,'delivered',?4,?5)", params![value.turn,value.queue_sequence,value.raw_text,value.matter,value.wall_time])?;
             tx.execute("INSERT INTO runtime_events(id,matter_id,causal_sequence,kind,monotonic_ms,wall_time,payload,source_kind,source_id) VALUES(?1,?2,?3,'owner-intake',?4,?5,?6,'owner-turn',?7)", params![value.event,value.matter,value.event_sequence,value.monotonic_ms,value.wall_time,value.event_payload,value.turn])?;
-            tx.execute("INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,lifecycle,matter_id,owner_turn_id,cause_event_id) VALUES(?1,?2,'owner',?3,?4,'active',?5,?6,?7)", params![value.message,value.message_sequence,value.raw_text,value.message_fingerprint,value.matter,value.turn,value.event])?;
+            tx.execute("INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,lifecycle,matter_id,owner_turn_id,cause_event_id) VALUES(?1,?2,'owner',?3,?4,'active',?5,?6,?7)", params![id,sequence,value.raw_text,value.message_fingerprint,value.matter,value.turn,value.event])?;
             for row in value.obligations { tx.execute("INSERT INTO obligations(id,matter_id,predicate_kind,predicate_payload,required,status) VALUES(?1,?2,?3,?4,?5,'open')", params![row.0,value.matter,row.1,row.2,i64::from(row.3)])?; }
             for row in value.cells { tx.execute("INSERT INTO state_cells(matter_id,namespace,cell_key,payload,status,source_event_id,fingerprint) VALUES(?1,?2,?3,?4,'active',?5,?6)", params![value.matter,row.0,row.1,row.2,value.event,row.3])?; }
-            Ok(())
+            Ok(MessageIdentity { id, sequence })
         })
     }
 
@@ -150,27 +156,22 @@ impl NativeStore {
         })
     }
 
-    #[allow(clippy::too_many_arguments)]
-    pub fn close_matter(&mut self, matter: &str, message: &str, sequence: i64, body: &[u8],
-        fingerprint: &[u8], event: &str, event_sequence: i64, monotonic: i64, wall: &str,
-        payload: &[u8]) -> StoreResult<()> {
-        self.atomic(|tx| {
-            let blockers: i64 = tx.query_row("SELECT (SELECT count(*) FROM effect_journal j JOIN runtime_decisions d ON d.id=j.decision_id WHERE d.matter_id=?1 AND j.status NOT IN ('settled','compensated'))+(SELECT count(*) FROM runtime_decisions WHERE matter_id=?1 AND status NOT IN ('settled','failed'))+(SELECT count(*) FROM obligations o LEFT JOIN checks c ON c.id=o.current_check_id WHERE o.matter_id=?1 AND o.required=1 AND (o.status!='passed' OR c.current!=1 OR c.passed!=1))", [matter], |r| r.get(0))?;
-            if blockers != 0 { return Err(StoreError::InvalidState("matter has blocking operation, effect, or check".into())); }
-            tx.execute("INSERT INTO runtime_events(id,matter_id,causal_sequence,kind,monotonic_ms,wall_time,payload,source_kind,source_id) VALUES(?1,?2,?3,'matter-completed',?4,?5,?6,'harness',?7)", params![event,matter,event_sequence,monotonic,wall,payload,message])?;
-            tx.execute("INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,lifecycle,matter_id,cause_event_id) VALUES(?1,?2,'agent',?3,?4,'active',?5,?6)", params![message,sequence,body,fingerprint,matter,event])?;
-            changed(tx.execute("UPDATE matters SET lifecycle='closed',closure_event_id=?1,closure_checks_passed=1,unsettled_effects=0,updated_sequence=?2 WHERE id=?3 AND lifecycle='open'", params![event,event_sequence,matter])?, "matter cannot close")
-        })
+    pub fn close_matter(&mut self, value: &FinalClose<'_>) -> StoreResult<MessageIdentity> {
+        self.atomic(|tx| native_schema::close(tx, value))
     }
 
-    fn atomic(&mut self, operation: impl FnOnce(&Transaction<'_>) -> StoreResult<()>) -> StoreResult<()> {
+    fn atomic<T>(&mut self, operation: impl FnOnce(&Transaction<'_>) -> StoreResult<T>) -> StoreResult<T> {
         let tx = self.connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
-        match operation(&tx).and_then(|()| tx.commit().map_err(Into::into)) {
-            Ok(()) => Ok(()), Err(error) => Err(classify(error)),
+        match operation(&tx).and_then(|value| { tx.commit()?; Ok(value) }) {
+            Ok(value) => Ok(value), Err(error) => Err(classify(error)),
         }
     }
 }
 
+#[rustfmt::skip]
+fn next_message_sequence(tx: &Transaction<'_>) -> StoreResult<i64> {
+    Ok(tx.query_row("SELECT coalesce(max(sequence),0)+1 FROM conversation_messages", [], |r| r.get(0))?)
+}
 fn changed(count: usize, message: &str) -> StoreResult<()> {
     if count == 1 {
         Ok(())

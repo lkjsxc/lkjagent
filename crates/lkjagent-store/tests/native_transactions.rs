@@ -19,8 +19,8 @@ static CELLS: [Cell<'static>; 1] = [Cell(b"case", b"objective", b"value", b"fp")
 #[rustfmt::skip]
 fn intake() -> Intake<'static> {
     Intake { matter: "m", objective: b"objective", turn: "t", queue_sequence: 1,
-        raw_text: b"owner", message: "msg", message_sequence: 1, message_fingerprint: b"mf",
-        event: "e1", event_sequence: 1, event_payload: b"intake", monotonic_ms: 1,
+        raw_text: b"owner", message_fingerprint: b"mf", event: "e1",
+        event_sequence: 1, event_payload: b"intake", monotonic_ms: 1,
         wall_time: "now", obligations: &OBLIGATIONS, cells: &CELLS }
 }
 
@@ -41,14 +41,14 @@ fn compile(store: &mut NativeStore) -> Result<(), StoreError> {
 }
 
 #[test]
+#[rustfmt::skip]
 fn durable_boundaries_intake_is_atomic_and_idempotency_is_typed() -> Result<(), Box<dyn Error>> {
     let db = path("intake")?;
     let mut store = NativeStore::open(&db)?;
-    store.owner_intake(&intake())?;
-    assert!(matches!(
-        store.owner_intake(&intake()),
-        Err(StoreError::InvalidState(_))
-    ));
+    let first = store.owner_intake(&intake())?;
+    assert_eq!(first.id, "owner-turn/t");
+    assert_eq!(first.sequence, 1);
+    assert_eq!(store.owner_intake(&intake())?, first);
     let mut orphan = decision();
     orphan.id = "orphan";
     orphan.event = "orphan-event";
@@ -58,6 +58,11 @@ fn durable_boundaries_intake_is_atomic_and_idempotency_is_typed() -> Result<(), 
         Err(StoreError::NotFound(_))
     ));
     drop(store);
+    let mut reopened = NativeStore::open(&db)?;
+    assert_eq!(reopened.owner_intake(&intake())?, first);
+    let messages = lkjagent_store::native_schema::conversation(&Connection::open(&db)?, None, 10)?;
+    assert_eq!((messages[0].id.as_str(), messages[0].sequence), ("owner-turn/t", 1));
+    drop(reopened);
     let connection = Connection::open(&db)?;
     for table in [
         "matters",

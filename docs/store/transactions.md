@@ -7,8 +7,12 @@ Define atomic boundaries around intake, decisions, providers, effects, and close
 ## Owner Intake
 
 One transaction inserts owner turn, canonical owner message, runtime event,
-matter, obligations, and initial state. The message identity is available to CLI
-and TUI immediately.
+matter, obligations, and initial state. The store derives the stable logical ID
+from owner-turn identity and allocates the next positive conversation sequence
+under an immediate write transaction. An exact retry, including after database
+reopen, returns that identity and sequence without another row. A conflicting
+reuse fails without partial intake. No task or generic event row is projected
+into conversation.
 
 ## Decision Compilation
 
@@ -35,9 +39,13 @@ external state blocks without overwrite.
 
 ## Close
 
-One transaction commits final canonical message, completion event, projection
-updates, obligation state, and matter lifecycle. Message persistence failure does
-not repeat completed file effects.
+One transaction verifies required current passed checks and settled runtime
+work, allocates the next conversation sequence, and commits the completion event,
+final canonical message, exact receipt bytes and fingerprint, check-evidence
+bindings, replacement projection, and matter lifecycle. The stable final logical
+ID is derived from the completion event. An exact retry after commit or database
+reopen returns the existing identity and sequence; changed bytes conflict rather
+than duplicate. Message persistence failure does not repeat completed effects.
 
 ## SQLite Policy
 
