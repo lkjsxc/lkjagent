@@ -1,0 +1,13 @@
+field	value
+scenario_id	exact-file-edit
+minimum_duration_seconds	840
+minimum_owner_turns	5
+minimum_owner_span_seconds	840
+minimum_decision_span_seconds	600
+minimum_decisions	5
+minimum_useful_decisions	5
+minimum_progress_decisions	2
+allowed_terminal_states	completed
+source_binding	required-run-source-commit
+required_fault_ids	none
+negative_predicates	unchanged-requested-bytes,collateral-file,scaffold-file,missing-durable-lineage,missing-second-turn-close

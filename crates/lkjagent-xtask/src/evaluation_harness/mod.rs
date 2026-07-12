@@ -14,7 +14,7 @@ pub use clock::{FakeClock, FaultInjector};
 pub use evidence::{fixture_errors, validate, Facts};
 pub use hash::bytes as sha256;
 pub use pty::validate_cast;
-pub use scenario::endpoint_file;
+pub use scenario::{endpoint_file, validate as validate_scenario};
 use std::path::Path;
 
 #[rustfmt::skip]

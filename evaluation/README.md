@@ -14,7 +14,8 @@ source-bound evidence for lkjagent.
 
 ## Fixtures And Runners
 
-- `scenarios/`: anchored goals, schedules, checks, and seed bytes.
+- `scenarios/`: anchored goals, schedules, checks, and seed bytes. The tracked
+  `exact-file-edit` alias serves both endpoint probes and bounded campaigns.
 - `false-positive-fixtures/`: evidence summaries that must be rejected.
 - `corpus/`: deterministic parser and check inputs.
 - `experiment_runner/`: current experiment support pending direct-loop cutover.

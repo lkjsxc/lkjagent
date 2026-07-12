@@ -5,8 +5,9 @@ use std::path::{Path, PathBuf};
 
 use super::hash;
 
-pub const ALIASES: [&str; 3] = [
+pub const ALIASES: [&str; 4] = [
     "daily-life-recall",
+    "exact-file-edit",
     "multi-project-development",
     "long-artifact-recovery",
 ];
@@ -133,6 +134,11 @@ pub fn endpoint_file(path: &Path) -> Result<BTreeMap<String, String>, String> {
         return Err("endpoint file has no allowed keys".into());
     }
     Ok(values)
+}
+
+pub fn validate(root: &Path, alias: &str) -> Result<(), String> {
+    let scenario = load(root, alias)?;
+    validate_seed(&scenario)
 }
 
 pub fn validate_seed(scenario: &Scenario) -> Result<(), String> {
