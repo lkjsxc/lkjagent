@@ -41,13 +41,6 @@ pub(crate) fn prompt_max_context_tokens(data_dir: &Path) -> Result<Option<u64>, 
         .unwrap_or_else(|| number(&values, "prompt_context_tokens"))))
 }
 
-#[rustfmt::skip]
-pub(crate) fn live_campaign_seconds(data_dir: &Path) -> Result<Option<u64>, String> {
-    let values = load_flat_config(data_dir)?;
-    Ok(Some(env_integer("LKJAGENT_LIVE_CAMPAIGN_SECONDS", 840, 7200)?
-        .unwrap_or_else(|| number(&values, "live_campaign_seconds"))))
-}
-
 pub(crate) fn load_flat_config(data_dir: &Path) -> Result<Map<String, Value>, String> {
     let path = data_dir.join("lkjagent.json");
     if !path.exists() {

@@ -3,7 +3,6 @@
   "endpoint_model": "local-model",
   "endpoint_timeout_seconds": 300,
   "endpoint_url": "http://127.0.0.1:8080",
-  "live_campaign_seconds": 900,
   "prompt_context_tokens": 16384,
   "workspace_root": "../workspace"
 }

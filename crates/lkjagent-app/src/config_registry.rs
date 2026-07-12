@@ -11,7 +11,6 @@ const RULES: &[(&str, Rule)] = &[
     ("endpoint_model", Rule::Text),
     ("endpoint_api_key_env", Rule::Text),
     ("endpoint_timeout_seconds", integer(1, 1800, 300)),
-    ("live_campaign_seconds", integer(840, 7200, 900)),
     ("prompt_context_tokens", integer(2048, 262144, 16384)),
     ("workspace_root", Rule::Text),
 ];

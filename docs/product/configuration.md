@@ -21,21 +21,20 @@ the file, SQLite, prompts, status, logs, or evidence.
   "endpoint_model": "local-model",
   "endpoint_timeout_seconds": 300,
   "endpoint_url": "http://127.0.0.1:8080",
-  "live_campaign_seconds": 900,
   "prompt_context_tokens": 16384,
   "workspace_root": "../workspace"
 }
 ```
 
 This is the current registry. Endpoint transport consumes the endpoint keys,
-doctor and the evaluation boundary consume the prompt/campaign bounds, and
-workspace operations consume the root. Unknown future keys fail closed.
+the prompt compiler and doctor consume the context bound, and workspace
+operations consume the root. Unknown future keys fail closed.
 
 ## Precedence
 
 Narrow environment overrides for endpoint, model, timeout, key, prompt bound,
-campaign duration, and deployment root win over file values; file values win
-over documented defaults.
+and deployment root win over file values; file values win over documented
+defaults.
 
 ## Endpoint Request
 
