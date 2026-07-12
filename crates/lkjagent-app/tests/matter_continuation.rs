@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::classify::instantiate;
-use lkjagent_core::model::{StepKind, StepState};
+use lkjagent_core::model::{StepKind, StepState, TaskState};
 use lkjagent_store::plan_access::{enqueue, insert_step_tx, insert_task};
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
@@ -43,6 +43,29 @@ fn continuation_turn_attaches_to_open_matter() -> TestResult<()> {
     ])?;
     assert!(show.contains("route=existing_matter durability=matter_update"));
     assert!(show.contains("matter=1"));
+    Ok(())
+}
+
+#[test]
+fn english_inspect_goal_requires_provider_work() -> TestResult<()> {
+    let data = fixture_root("queue-inspect-goal")?;
+    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
+    enqueue(
+        &conn,
+        "Inspect project-orbit and cite current source.",
+        "now",
+    )?;
+    drop(conn);
+    let mut endpoint = ScriptedEndpoint {
+        outputs: vec![
+            "<plan>\nrespond | Gather source evidence before answering\n</plan>".to_string(),
+        ],
+        index: 0,
+    };
+    let snapshot = run_until_idle(&data, &mut endpoint, 1)?;
+    assert_eq!(endpoint.index, 1);
+    assert_ne!(snapshot.task.state, TaskState::Closed);
+    assert!(!snapshot.task.summary.starts_with("inspection:"));
     Ok(())
 }
 

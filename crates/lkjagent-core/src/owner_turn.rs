@@ -18,7 +18,11 @@ pub struct TurnRoute {
 
 const CONTINUATION_WORDS: &[&str] = &["continue", "also", "same matter", "this matter", "append"];
 #[rustfmt::skip]
-const INSPECTION_WORDS: &[&str] = &["status", "show", "list", "inspect", "current state", "queue", "matter"];
+const INSPECTION_COMMANDS: &[&str] = &[
+    "status", "current status", "current state", "show status", "show the status",
+    "show current status", "show the current status", "show queue", "list queue", "queue",
+    "show matters", "list matters", "what is the current status", "what is the current state",
+];
 #[rustfmt::skip]
 const SYSTEM_WORDS: &[&str] = &["run test", "cargo test", "cargo fmt", "clippy", "docker compose", "verify"];
 
@@ -72,7 +76,28 @@ fn continuation(text: &str, lower: &str) -> bool {
 }
 
 fn inspection(text: &str, lower: &str) -> bool {
-    has_any(lower, INSPECTION_WORDS) || has_any(text, &["状態", "見せて", "一覧", "確認"])
+    let english = normalized_command(lower);
+    let japanese = normalized_command(text);
+    INSPECTION_COMMANDS.contains(&english.as_str())
+        || [
+            "状態",
+            "現在の状態",
+            "状態を見せて",
+            "現在の状態を見せて",
+            "キュー",
+            "キューを見せて",
+            "案件一覧",
+            "案件の一覧",
+        ]
+        .contains(&japanese.as_str())
+}
+
+fn normalized_command(text: &str) -> String {
+    text.trim()
+        .trim_end_matches(['.', '?', '!', '。', '？', '！'])
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 fn system_operation(text: &str, lower: &str) -> bool {

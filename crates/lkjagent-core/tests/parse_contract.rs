@@ -26,6 +26,29 @@ fn accepts_extended_respond_plan_action() {
 }
 
 #[test]
+fn rejects_unsafe_or_placeholder_plan_values() {
+    for line in [
+        "write ../outline.md | Outline | words=300",
+        "write ./outline.md | Outline | words=300",
+        "write PATH | Outline | words=300",
+        "write artifacts/outline.md | TITLE | words=300",
+        "write artifacts/outline.md | Outline | words=0",
+        "explore | GOAL | budget=3",
+        "explore | Read sources | budget=0",
+        "respond | SUMMARY",
+    ] {
+        let raw = format!("<plan>{line}</plan>");
+        assert!(
+            matches!(
+                parse_expected(StepKind::Plan, &raw),
+                Err(ParseFault::BadPlanLine(_))
+            ),
+            "accepted {line}"
+        );
+    }
+}
+
+#[test]
 fn reports_docs_fault_examples() {
     assert_eq!(
         parse_expected(StepKind::Write, "<message>x</message>"),

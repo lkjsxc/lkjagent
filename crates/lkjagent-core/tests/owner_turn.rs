@@ -74,13 +74,45 @@ fn routes_artifact_inspection_and_system_operation() -> Result<(), String> {
         RouteContext::default(),
     )?;
     assert_route(&artifact, "artifact_request", "runtime_decision", true);
-    let inspection = route("show the current status", RouteContext::default())?;
-    assert_route(&inspection, "inspection", "read_only_report", false);
+    for text in [
+        "status",
+        "show the current status",
+        "What is the current state?",
+    ] {
+        let inspection = route(text, RouteContext::default())?;
+        assert_route(&inspection, "inspection", "read_only_report", false);
+    }
     let operation = route(
         "run cargo test and report failures",
         RouteContext::default(),
     )?;
     assert_route(&operation, "system_operation", "runtime_decision", false);
+    Ok(())
+}
+
+#[test]
+fn english_work_is_not_misrouted_as_status_inspection() -> Result<(), String> {
+    for text in [
+        "Inspect project-orbit and cite current source.",
+        "Answer about project-orbital without cross-project facts.",
+        "Edit one bounded Rust behavior and run focused checks.",
+        "Restart and resume without duplicate effects.",
+        "Report the exact diff, checks, project note, and risks.",
+        "Show differences between these projects.",
+        "List the changes required in lib.rs.",
+    ] {
+        let route = route(text, RouteContext::default())?;
+        assert_ne!(route.lane, "inspection", "{text}");
+    }
+    Ok(())
+}
+
+#[test]
+fn japanese_status_and_work_remain_distinct() -> Result<(), String> {
+    let status = route("現在の状態を見せて。", RouteContext::default())?;
+    assert_route(&status, "inspection", "read_only_report", false);
+    let work = route("資料を確認して要点を報告して", RouteContext::default())?;
+    assert_ne!(work.lane, "inspection");
     Ok(())
 }
 

@@ -63,3 +63,13 @@ complete integrated configuration that passes every floor and improves primary
 task success or protected efficiency without a material regression. Record
 rejected and conditional factors with source commit, configuration fingerprint,
 raw evidence hashes, and rationale.
+
+The source-bound campaign at `24c237cb888105792bee3b2901915b1e8c4017cb`
+completed 103 runs and passed the experiment evidence gate as workgraph sequence
+15. All nine cells were rejected, so no factor or integrated candidate was
+adopted. The outcomes were 24 admitted probes, 24 no-exchange probes, 36 parse
+faults, four message probes, and 15 configuration rejections. Every
+non-configuration multi-project run missed the provider exchange, and most
+long-artifact runs failed the strict plan grammar. Integrated-recall violated
+the existing prompt-budget guard. This is accepted failure evidence, not
+English product acceptance; English repairs precede multilingual smoke evidence.

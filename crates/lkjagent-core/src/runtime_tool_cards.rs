@@ -40,8 +40,20 @@ pub(crate) fn render_tool_view(view: &ToolSetView) -> String {
 pub(crate) fn protocol_card(decision: &RuntimeDecision) -> String {
     match decision.expected_envelope {
         OutputEnvelope::Action => tool_call_card(decision),
+        OutputEnvelope::Plan => plan_card(),
         envelope => generic_card(envelope),
     }
+}
+
+pub(crate) fn plan_example() -> &'static str {
+    "<plan>\nwrite artifacts/task-output.md | Task output | words=300\nexplore | Read the relevant workspace source | budget=3\nrespond | Report created paths and checks\n</plan>"
+}
+
+fn plan_card() -> String {
+    format!(
+        "Output contract for this turn:\n- Return exactly one <plan> block.\n- Do not write prose before or after the block.\n- Put one action on each physical line.\n- Use concrete objective-grounded values, never PATH, TITLE, GOAL, SUMMARY, or N.\n- Write paths are relative to the workspace root.\n- Do not start a path with /, ./, or ../; do not use . or .. path components.\n- Close with </plan>.\n\nFilled parser-valid example:\n{}",
+        plan_example()
+    )
 }
 
 fn tool_call_card(decision: &RuntimeDecision) -> String {

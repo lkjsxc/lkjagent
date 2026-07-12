@@ -6,7 +6,7 @@ pub use crate::prompt_policy::max_tokens;
 use crate::prompt_policy::{envelope_tag, expected_block, protocol, protocol_for_envelope};
 use crate::runtime_decision::{OutputEnvelope, RuntimeDecision};
 use crate::runtime_strategy::{instruction, prompt_cap};
-use crate::runtime_tool_cards::{protocol_card, render_tool_view};
+use crate::runtime_tool_cards::{plan_example, protocol_card, render_tool_view};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Prompt {
@@ -18,8 +18,6 @@ pub struct Prompt {
 }
 
 const HARD_CAP: usize = 8_000;
-const STEP_FRAME: usize = 4_000;
-const RETRY_FRAME: usize = 250;
 
 #[rustfmt::skip]
 pub fn render_prompt_for_decision(task: &Task, steps: &[Step], step: &Step,
@@ -94,12 +92,12 @@ pub fn render_prompt(task: &Task, steps: &[Step], step: &Step) -> Prompt {
                 "\nRetry diagnosis: attempt {} must change shape or scope.",
                 step.attempts_used
             ),
-            RETRY_FRAME,
+            250,
         )
     } else {
         String::new()
     };
-    let frame = truncate(&step_frame(step), STEP_FRAME);
+    let frame = truncate(&step_frame(step), 4_000);
     let user = truncate(
         &format!("Plan:\n{digest}\n\nStep:\n{frame}{retry}"),
         HARD_CAP,
@@ -131,11 +129,14 @@ fn recovery_frame(
             "Recovery frame:\ndecision={} strategy={} attempt={} fault={} invalid_excerpt_hash={}\nOutput only a corrected envelope or ask plainly for missing information.\n{}",
             decision.id, decision.recovery_policy, attempt.ordinal, attempt.diagnosis, excerpt_hash, repair
         ),
-        RETRY_FRAME,
+        250,
     ))
 }
 
 fn repair_shape(decision: &RuntimeDecision, tag: &str) -> String {
+    if decision.expected_envelope == OutputEnvelope::Plan {
+        return format!("Corrected parser-valid plan example:\n{}", plan_example());
+    }
     if decision.expected_envelope != OutputEnvelope::Action {
         return format!("Next expected envelope: <{tag}>...</{tag}>");
     }

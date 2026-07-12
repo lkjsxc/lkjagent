@@ -31,6 +31,18 @@ The renderer uses stable field order. Admission accepts only the decision ID,
 context fingerprint, visible tool, required typed fields, field constraints,
 and total size recorded by the current decision.
 
+## Plan Shape
+
+The bounded planner accepts one `plan` block with one action on each
+physical line. A write line contains a workspace-root-relative path, concrete
+title, and positive word target. An explore line contains a concrete goal and
+positive budget. A respond line contains a concrete owner-facing summary.
+Paths cannot be absolute, start with `./` or `../`, contain empty components,
+backslashes, or `.` or `..` components. `PATH`, `TITLE`, `GOAL`, `SUMMARY`, and
+numeric placeholders are faults. The renderer supplies a filled example that
+passes this same parser. Plan lines remain a bridge to native operations, not a
+second completion authority.
+
 ## Content And Messages
 
 Content bodies preserve multiline UTF-8 and escaped XML entities. A content

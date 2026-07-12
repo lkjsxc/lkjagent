@@ -114,7 +114,6 @@ fn rendered_placeholder_shape_parses_but_is_rejected() -> Result<(), String> {
 fn generic_decision_envelopes_render_protocol_cards() {
     for (envelope, tag) in [
         (OutputEnvelope::Content, "content"),
-        (OutputEnvelope::Plan, "plan"),
         (OutputEnvelope::Message, "message"),
         (OutputEnvelope::Verdict, "verdict"),
     ] {

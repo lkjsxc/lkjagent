@@ -21,37 +21,34 @@ admissions, observations, artifacts, and workspace records for those matters.
 
 The four tracked 900-second summaries say `ran` and `closed`, but the matching
 live databases were not committed. They are bounded historical fixtures, not
-proof that the underlying matters completed. A preserved transcript records an
-`fs.tree` prefix error, but its live database is also absent.
+proof that the underlying matters completed.
 
 Local Docker lint, test, and verify passed with the ignored working-copy
 `Cargo.lock`. The packet clean-checkout script fails in an isolated worktree
 because that lockfile is not tracked. Those local passes are not clean-checkout
 evidence.
 
-The configuration loader now rejects unknown keys, arrays, nested values, wrong
-scalar types, invalid ranges, and prompt-budget conflicts against the complete
-registry. The tracked example contains every anchored key. Current endpoint,
-workspace-root, prompt-cap, and live-duration consumers use the validated map;
-later owning nodes still must connect their declared settings to behavior.
+The configuration loader rejects unknown keys, non-scalar values, invalid
+ranges, and prompt-budget conflicts. The tracked example is complete. Runtime
+wiring remains incomplete and is an honest cleanup blocker.
 
-Repository build inputs include the tracked lockfile, Cargo policy, configuration,
-explicit Docker copy roots, and public clean-archive workflow. The named gate
-checks those inputs, source budgets, configuration, Docker locking, workflow,
-and nonempty fault suites. These source claims are not clean-archive acceptance;
-that requires the raw no-cache Compose run bound to the committed tree.
+Repository build inputs include the lockfile, Cargo policy, configuration,
+Docker roots, and clean-archive workflow. The gate checks those inputs, source
+budgets, locking, and fault suites; acceptance still requires raw no-cache
+Compose evidence bound to the committed tree.
 
 The evaluation harness owns three source-bound scenario bundles, a fake clock,
 typed faults, Online Backup capture, workspace/run/campaign manifests, and PTY
 capture. Its negative fixtures reject idle, blocked, skipped, zero-test, and
-generated-placeholder evidence. The predeclared domain runner now requires clean
+generated-placeholder evidence. The predeclared domain runner requires clean
 source, a strict-ancestor plan, a reproducible isolated build, production
-exchange logs, recomputed metrics, and three-or-five repeats. Attempts at
-`853c647a` and `f425d78f` exposed a no-decision close and invalid config. Runs at
-`2f0da5e1` and `891e9882` exposed source-sort drift and verifier sidecars. The
-`d2dab90f` exposed Docker source omissions. The 103-row `905d662a` run passed
-locally; Docker then exposed host-absolute workspace config. No matrix is
-accepted; live and PTY predicates remain absent.
+exchange logs, recomputed metrics, and three-or-five repeats. The final 103-run
+campaign at `24c237cb888105792bee3b2901915b1e8c4017cb` passed local, Docker,
+and detached-clean-source gates as sequence 15. All nine cells were rejected.
+English multi-project goals exposed a broad inspection shortcut, long-artifact
+responses exposed ambiguous plan guidance, and integrated-recall failed the
+prompt-budget guard. This accepts the failure evidence, not product behavior;
+live and PTY predicates remain absent.
 
 A fresh model-free diary run writes a journal entry containing canned
 missing-detail text after the owner asks for a diary entry. This is reproduced
@@ -90,8 +87,11 @@ now use direct fields inside one input block and reject name/value wrappers.
 The parser bounds scalars and fields at 4,096 bytes and actions at 16,384 bytes;
 decision field specs persist/render tighter byte and canonical count ranges.
 Persisted views discard catalog-excluded entries; admission rejects them.
-Decision-free generic Explore parsing and work selection now block. Shell
-children drop endpoint credentials. Model actions, harness writes, and command
+Decision-free generic Explore parsing and work selection now block. English
+work containing inspection verbs no longer takes the exact status-command
+shortcut. Plan prompts provide one parser-valid filled example, define
+workspace-root-relative paths, and reject unsafe paths or placeholder values.
+Shell children drop endpoint credentials. Model actions, harness writes, and command
 checks persist admissions and effect journals before dispatch; one bounded
 immutable observation settles each attempt. Generated revisions retain exact main/part bytes,
 closed membership, and stale absence; drift blocks mutation and append rebuilds
@@ -116,14 +116,14 @@ Archive compensation reuses its exact key under lock; exact projection rollback 
 
 The xtask dispatcher runs named nonempty suites for `protocol-tools`,
 `workspace-retrieval-maintenance`, `recovery-continuity`, and `domain-experiments`.
-Recovery has sequence-14 reviewed source-bound evidence. The domain gate is red
-until a real conditional probe matrix exists; its source and plan binding, build,
-exchange, database, workspace, metrics, repeat escalation, and manifests are
-mechanically checked. Earlier receipts do not bind later commits.
+Recovery has sequence-14 reviewed evidence, and domain experiments have
+sequence-15 reviewed evidence. The domain gate checks source and plan binding,
+build, exchange, database, workspace, metrics, repeat escalation, and manifests.
+No experiment candidate was adopted. Integrated adoption cleanup is released;
+earlier receipts do not bind its later source.
 
-The TUI derives ordinary conversation from queue and selected event rows rather
-than one canonical conversation table. Historical reducer tests do not replace
-a final PTY campaign against frozen source.
+The TUI derives conversation from queue and selected events, not one canonical
+table. Reducer tests do not replace a final PTY campaign against frozen source.
 
 ## Target Authority
 
