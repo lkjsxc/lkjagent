@@ -6,7 +6,7 @@ Map lkjagent-store source modules.
 
 ## Table of Contents
 
-- [lib.rs](lib.rs): module exports.
+- [lib.rs](lib.rs): module exports and native store errors.
 - [admission-rows.rs](admission_rows.rs): tool admission row helpers.
 - [artifact-rows.rs](artifact_rows.rs): artifact ref and fingerprint rows.
 - [context-rows.rs](context_rows.rs): context item row helpers.
