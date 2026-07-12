@@ -48,6 +48,13 @@ lifecycle counts, the active matter, unfinished decisions, exchanges and
 effects, checks readiness, and canonical conversation identities. It does not
 synthesize task or queue events.
 
+## Doctor Command
+
+Doctor opens only the native 18-table store, validates it, and reports resolved
+roots, workspace presence, endpoint source labels, matter and unfinished-decision
+counts, and configured prompt/campaign bounds. It creates no workspace and never
+prints credential values.
+
 ## Exit Codes
 
 Zero means the command itself completed. It does not mean every matter closed.
