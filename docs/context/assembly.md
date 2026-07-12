@@ -23,7 +23,10 @@ fingerprints before provider intent. It cannot change the operation.
 Previous system messages are not replayed. The objective is not copied through a
 brief, context item, and step instruction. The latest bounded list or search
 observation is a measured evidence card in the next orient prompt, so inspection
-can narrow toward a revision-bearing read instead of repeating blindly.
+can narrow toward a revision-bearing read instead of repeating blindly. Once a
+managed document exists, a listing also reopens that target and emits its current
+revision as measured source, moving selection from orientation to modification
+without claiming completion.
 
 ## Lanes
 
