@@ -17,9 +17,11 @@ Private raw data stays ignored. Every attachment is verified with `git ls-files`
 that source may change only `evaluation/evidence/SOURCE/`; any product, plan, or
 other path change makes the evidence stale.
 
-A bundle includes command log, source/status, binary/config/plan hashes,
-workspace before/after manifests, diff, compressed SQLite backup, stable table
-exports, process log, redacted provider data, derived result, and raw manifest.
+The current exact-file campaign retains only source, scenario, binary, command,
+and workspace hashes plus derived non-secret counts and semantic facts. Its raw
+workspace, SQLite backup, process output, and endpoint configuration stay in a
+mode-0700 temporary root and are deleted after derivation. Richer campaign
+bundles remain required only when their corresponding evaluator exists.
 
 `result.tsv` is checker-generated. It records predicate ID, category, derived
 status, evidence path, measured value, checker hash, and predicate-schema hash.
@@ -58,6 +60,11 @@ at least 900 seconds: file, recovery, daily life/recall, multiple projects/repor
 and PTY. Each uses fresh roots, real endpoint, production public commands,
 predeclared owner schedule, and corresponding durable work. Sleeping duration is
 not progress.
+
+The exact-file evaluator requires the declared final SHA-256, one workspace file,
+five closed owner turns and five final messages, current passed checks, one edit
+effect, durable admissions and provider exchanges, and exactly 18 native tables.
+A failed or unavailable semantic evaluator makes `campaign run` nonzero.
 
 The frozen campaigns use one no-cache clean-source binary without product changes
 between runs.

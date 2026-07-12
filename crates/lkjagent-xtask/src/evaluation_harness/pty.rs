@@ -30,12 +30,12 @@ pub fn campaign(root: &Path, alias: &str, endpoint: &Path, probe: bool) -> Resul
     if probe {
         let run = public_output(&capture, &env, &["run", "--once"], Duration::from_secs(1900))?;
         let status = public_output(&capture, &env, &["status"], Duration::from_secs(30))?;
-        let (message, provider) = finish(root, &source, &scenario, &capture, &before, &[run, status], "probe")?;
+        let (message, provider, _) = finish(root, &source, &scenario, &capture, &before, &[run, status], "probe")?;
         return if provider == 0 { Err(message) } else {
             Ok(format!("ok campaign probe-endpoint source={source} provider_exchange_count={provider} semantic_status=not-evaluated")) };
     }
     run_schedule(root, &source, &scenario, &capture, &before, &env)?;
-    Ok(format!("ok campaign source={source} scenario={alias} semantic_status=not-evaluated"))
+    Ok(format!("ok campaign source={source} scenario={alias} semantic_status=evaluated outcome=passed"))
 }
 #[rustfmt::skip]
 fn run_schedule(root: &Path, source: &str, scenario: &scenario::Scenario, capture: &snapshot::Capture,
@@ -51,7 +51,8 @@ fn run_schedule(root: &Path, source: &str, scenario: &scenario::Scenario, captur
         let status = public_output(capture, env, &["status"], Duration::from_secs(30))?;
         let daemon = daemon.join().map_err(|_| "daemon capture thread failed")??;
         if !daemon.timed_out || status.code != Some(0) { return Err("daemon was not alive through the bounded observation".into()); }
-        finish(root, source, scenario, capture, before, &[status], "run").map(|_| ())
+        let (message, _, passed) = finish(root, source, scenario, capture, before, &[status], "run")?;
+        if passed { Ok(()) } else { Err(message) }
     })
 }
 #[rustfmt::skip]
@@ -96,18 +97,33 @@ fn public_output(capture: &snapshot::Capture, env: &BTreeMap<String,String>, arg
 fn wait_until(start: Instant, duration: Duration) { while start.elapsed() < duration { thread::sleep(Duration::from_millis(20)); } }
 #[rustfmt::skip]
 fn finish(root: &Path, source: &str, scenario: &scenario::Scenario, capture: &snapshot::Capture, before: &str,
-    outputs: &[clock::Output], mode: &str) -> Result<(String,u64),String> {
+    outputs: &[clock::Output], mode: &str) -> Result<(String,u64,bool),String> {
     let after = snapshot::manifest(&capture.workspace)?;
     let facts = snapshot::sqlite_facts(root, &capture.data.join("lkjagent.sqlite3"), &capture.raw.join("state.sqlite3"))?;
     let provider = table_count(&facts, "provider_exchanges");
-    let activity = ["runtime_decisions", "effect_journal", "check_results"].iter().map(|name| table_count(&facts, name)).sum::<u64>();
+    let activity = ["runtime_decisions", "effect_journal", "checks"].iter().map(|name| table_count(&facts, name)).sum::<u64>();
     let binary = hash::bytes(&fs::read(&capture.binary).map_err(|e| e.to_string())?); let mut command_bytes = Vec::new();
     for output in outputs { command_bytes.extend_from_slice(&output.stdout); command_bytes.push(0); command_bytes.extend_from_slice(&output.stderr);
         command_bytes.push(0); command_bytes.extend_from_slice(format!("{:?}:{}:{}", output.code, output.elapsed.as_millis(), output.timed_out).as_bytes()); }
-    let sanitized = format!("field\tvalue\nsource_commit\t{source}\nscenario\t{}\nscenario_sha256\t{}\nbinary_sha256\t{binary}\nmode\t{mode}\nsemantic_status\tnot-evaluated\nprovider_exchange_count\t{provider}\nactivity_count\t{activity}\ncommand_count\t{}\ncommand_capture_sha256\t{}\nworkspace_before_sha256\t{}\nworkspace_after_sha256\t{}\nworkspace_diff_sha256\t{}\n", scenario.id, scenario.fingerprint, outputs.len(), hash::bytes(&command_bytes), hash::bytes(before.as_bytes()), hash::bytes(after.as_bytes()), hash::bytes(snapshot::diff(before, &after).as_bytes()));
+    let semantic = if mode=="run" { exact_semantics(scenario,capture,&after,&facts)? } else { None };
+    let (semantic_status,outcome,detail,passed)=semantic.map_or(("not-evaluated","not-evaluated","probe-only".into(),false),|(ok,detail)|("evaluated",if ok{"passed"}else{"failed"},detail,ok));
+    let sanitized = format!("field\tvalue\nsource_commit\t{source}\nscenario\t{}\nscenario_sha256\t{}\nbinary_sha256\t{binary}\nmode\t{mode}\nsemantic_status\t{semantic_status}\noutcome\t{outcome}\nsemantic_detail\t{detail}\nprovider_exchange_count\t{provider}\nactivity_count\t{activity}\ncommand_count\t{}\ncommand_capture_sha256\t{}\nworkspace_before_sha256\t{}\nworkspace_after_sha256\t{}\nworkspace_diff_sha256\t{}\n", scenario.id, scenario.fingerprint, outputs.len(), hash::bytes(&command_bytes), hash::bytes(before.as_bytes()), hash::bytes(after.as_bytes()), hash::bytes(snapshot::diff(before, &after).as_bytes()));
     let directory = root.join("evaluation/evidence").join(source); fs::create_dir_all(&directory).map_err(|e| e.to_string())?;
     fs::write(directory.join(format!("campaign-{}-{mode}.tsv", scenario.id)), &sanitized).map_err(|e| e.to_string())?;
-    Ok((format!("endpoint probe unsupported: sanitized durable facts provider_exchange_count={provider} activity_count={activity} semantic_status=not-evaluated"), provider))
+    Ok((format!("sanitized durable facts provider_exchange_count={provider} activity_count={activity} semantic_status={semantic_status} outcome={outcome} detail={detail}"), provider, passed))
+}
+#[rustfmt::skip]
+fn exact_semantics(scenario:&scenario::Scenario,capture:&snapshot::Capture,after:&str,facts:&str)->Result<Option<(bool,String)>,String>{
+ if scenario.id!="exact-file-edit"{return Ok(None)}
+ let checks=fs::read_to_string(scenario.path.join("checks.tsv")).map_err(|e|e.to_string())?;
+ let expected=checks.lines().skip(1).find_map(|line|{let f=line.split('\t').collect::<Vec<_>>();(f.get(1)==Some(&"workspace-file-sha256")).then(||f.get(2).copied()).flatten()}).ok_or("exact scenario byte check missing")?;
+ let (path,sha)=expected.split_once('=').ok_or("exact scenario byte check malformed")?;
+ let file_ok=after.lines().skip(1).any(|line|{let f=line.split('\t').collect::<Vec<_>>();f.first()==Some(&path)&&f.get(2)==Some(&sha)});
+ let database=rusqlite::Connection::open(capture.raw.join("state.sqlite3")).map_err(|e|e.to_string())?;
+ let (closed,owner,agent,passed):(i64,i64,i64,i64)=database.query_row("SELECT (SELECT count(*) FROM matters WHERE lifecycle='closed'),(SELECT count(*) FROM conversation_messages WHERE role='owner'),(SELECT count(*) FROM conversation_messages WHERE role='agent'),(SELECT count(*) FROM checks WHERE current=1 AND passed=1)",[],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?))).map_err(|e|e.to_string())?;
+ let one_file=after.lines().count()==2;let schema=facts.lines().skip(1).count();let effects=table_count(facts,"effect_journal");let admissions=table_count(facts,"tool_admissions");let provider=table_count(facts,"provider_exchanges");
+ let ok=file_ok&&one_file&&closed>=5&&owner>=5&&agent>=5&&passed>=6&&effects==1&&admissions>0&&provider>0&&schema==18;
+ Ok(Some((ok,format!("file_exact={file_ok};one_file={one_file};closed={closed};owner={owner};agent={agent};passed_checks={passed};effects={effects};admissions={admissions};providers={provider};tables={schema}"))))
 }
 #[rustfmt::skip]
 fn table_count(facts: &str, table: &str) -> u64 { facts.lines().skip(1).find_map(|line| {
