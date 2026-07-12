@@ -47,7 +47,6 @@ pub struct ConversationMessage {
     pub body_fingerprint: Vec<u8>, pub receipt: Option<Vec<u8>>, pub receipt_fingerprint: Option<Vec<u8>>,
     pub lifecycle: String, pub matter_id: String, pub cause_event_id: Option<String>, pub replacement_id: Option<String>,
 }
-
 #[rustfmt::skip]
 pub fn conversation(
     connection: &Connection,
@@ -74,7 +73,6 @@ pub fn conversation(
     messages.reverse();
     Ok(messages)
 }
-
 #[rustfmt::skip]
 pub(crate) fn close(tx: &Transaction<'_>, value: &FinalClose<'_>) -> StoreResult<MessageIdentity> {
     let id = format!("completion-event/{}", value.event); let receipt = completion_receipt(tx, value.matter)?;
@@ -103,7 +101,6 @@ fn completion_receipt(tx: &Transaction<'_>, matter: &str) -> StoreResult<Vec<u8>
 fn changed(count: usize, message: &str) -> StoreResult<()> {
     if count == 1 { Ok(()) } else { Err(StoreError::InvalidState(message.into())) }
 }
-
 pub fn setup(connection: &Connection) -> StoreResult<()> {
     match schema_state(connection)? {
         SchemaState::Empty => create_fresh(connection),

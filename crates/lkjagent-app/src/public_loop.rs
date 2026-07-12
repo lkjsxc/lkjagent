@@ -67,8 +67,12 @@ pub fn run_once(data:&Path,endpoint:&mut dyn Endpoint)->R<String>{
 #[allow(clippy::too_many_arguments)]
 #[rustfmt::skip]
 fn dispatch(data:&Path,db:&Path,store:&mut NativeStore,matter:&str,did:&str,d:&RuntimeDecision,tool:&str,args:&[(String,String)],raw:&str)->R<String>{
+ let action=lkjagent_core::runtime_admission::ModelAction{tool:tool.into(),params:args.iter().cloned().collect()};
+ let admission=lkjagent_core::runtime_admission::admit_action(d,&action).map_err(e)?;
+ if admission.status!=lkjagent_core::runtime_admission::AdmissionStatus::Admitted{return Err(format!("admission rejected: {}",admission.reason))}
+ let effect=lkjagent_core::runtime_admission::admitted_effect_key(d,&admission).map_err(str::to_string)?;
  let entry=d.tool_view.entry(tool).ok_or("persisted tool entry missing")?; let root=crate::config::workspace_root(data)?; let root=crate::workspace_root::open(&root)?; let ws=OpenedWorkspace::open(&root).map_err(e)?; let get=|n:&str|args.iter().find(|x|x.0==n).map(|x|x.1.as_str()); let path=get("path").ok_or("path missing")?;
- match entry.effect_key.0.as_str(){
+ match effect.0.as_str(){
   "workspace.read"=>{let page=ws.read_file(path,get("offset").and_then(|v|v.parse().ok()).unwrap_or(1),get("count").and_then(|v|v.parse().ok()).unwrap_or(200)).map_err(e)?; let observed=ws.observe_edit_target(path).map_err(e)?; let lkjagent_effects::workspace_edit::ObservedTarget::Present(file)=observed else{return Err("read target absent".into())}; let body=json!({"path":path,"revision":file.revision,"bytes":String::from_utf8_lossy(&file.bytes),"page":format!("{page:?}")}).to_string(); direct(store,matter,did,raw,entry,DirectTool::Read,b"source",b"current",body.as_bytes(),&sha(&file.bytes))},
   "workspace.list"=>{let out=format!("{:?}",ws.list_directory(path,get("offset").and_then(|v|v.parse().ok()).unwrap_or(0),get("count").and_then(|v|v.parse().ok()).unwrap_or(20)).map_err(e)?); let fp=sha(out.as_bytes()); direct(store,matter,did,raw,entry,DirectTool::List,b"observation",b"current",out.as_bytes(),&fp)},
   "workspace.search"=>{let out=format!("{:?}",ws.search_text(path,get("query").ok_or("query missing")?).map_err(e)?); let fp=sha(out.as_bytes()); direct(store,matter,did,raw,entry,DirectTool::Search,b"observation",b"current",out.as_bytes(),&fp)},
