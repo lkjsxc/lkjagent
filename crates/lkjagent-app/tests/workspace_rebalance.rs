@@ -7,6 +7,8 @@ use lkjagent_store::plan_schema::setup;
 use lkjagent_store::record_rows::{upsert_record, RecordRow};
 use rusqlite::Connection;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -61,10 +63,6 @@ fn workspace_rebalance_plans_applies_audits_and_resolves_alias() -> TestResult<(
     assert!(applied.contains("move rec_1"));
     assert!(workspace.join("records/life/todo/open/rec_1.md").exists());
     assert!(!workspace.join("records/knowledge/notes/old.md").exists());
-    let todo_readme = fs::read_to_string(workspace.join("records/life/todo/README.md"))?;
-    assert!(todo_readme.contains("[open](open/)"));
-    let life_readme = fs::read_to_string(workspace.join("records/life/README.md"))?;
-    assert!(life_readme.contains("[todo](todo/)"));
     let index = fs::read_to_string(workspace.join("indexes/open-todos.md"))?;
     assert!(index.contains("rec_1 [open] Move me (records/life/todo/open/rec_1.md)"));
     let repaired_link = fs::read_to_string(workspace.join("records/life/notes/rec_2.md"))?;
@@ -196,5 +194,6 @@ fn fixture_root(name: &str) -> TestResult<PathBuf> {
         fs::remove_dir_all(&path)?;
     }
     fs::create_dir_all(&path)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }

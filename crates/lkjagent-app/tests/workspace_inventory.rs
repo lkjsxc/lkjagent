@@ -11,8 +11,8 @@ use lkjagent_store::record_rows::record;
 use lkjagent_store::workspace_search::canonical_rows;
 use rusqlite::Connection;
 
+mod support;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
-
 #[test]
 fn visible_external_files_reconcile_with_bounded_equivalent_results() -> TestResult<()> {
     let data = fixture_root("visible")?;
@@ -195,5 +195,6 @@ fn fixture_root(name: &str) -> TestResult<PathBuf> {
         r#"{"workspace_scan_debounce_milliseconds":50,"workspace_reconcile_seconds":30}"#)?;
     let conn = Connection::open(path.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }

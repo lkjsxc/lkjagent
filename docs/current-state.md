@@ -75,9 +75,11 @@ There is no `conversation_messages` table. The TUI synthesizes owner and agent
 messages from queue and selected event rows, then merges local drafts. It has two
 viewport implementations and does not measure wrapped display rows consistently.
 
-The runtime data root and visible workspace are not separate in Compose. Startup
-creates a broad tree. Record routing can write canned diary text without a model.
-Several accepted configuration keys still have no production consumer.
+Configuration and Compose now separate the runtime data root from one visible
+workspace root. The workspace is created only by an actual workspace operation,
+startup no longer writes scaffold files, and diagnostics report both roots.
+Record routing can still write canned diary text without a model, and several
+accepted configuration keys still have no production consumer.
 
 ## Direct Contract
 
@@ -105,12 +107,13 @@ claims, and the close transaction owns the canonical final message.
 | effects-safe-read | complete | opened-root listing, search, and revision reads pass safety tests |
 | protocol-compact | complete | strict decision-bound tool/final parser passes contract tests |
 | store-native | complete | exact 18-table schema reopens and rejects altered or retired stores |
-| llm-wiring | active | mechanics pass; real public endpoint probe waits for evaluation runner |
+| llm-wiring | active | mechanics pass; a real public endpoint probe has not run in this checkout |
+| evaluation-runner | complete | confined commands validate the tracked blocked baseline without synthetic success |
 | tool-registry | complete | one descriptor projection drives prompt, parser, admission, and effects |
 | reducer-selector | complete | direct state reduction and deterministic selection pass core and bridge-continuity tests |
 | store-transactions | complete | native intake through close boundaries pass restart tests |
 | exact-edits | complete | crash-safe exact edit and create pass race, mode, symlink, and crash tests |
-| workspace-root | active | separate-root integration is under isolated verification |
+| workspace-root | complete | data and workspace roots are separate, lazy, diagnosed, and Compose-mounted |
 | public file edit | blocked | depends on context assembly and production app-loop cutover |
 | final campaigns | blocked | no frozen binary, live task proof, or PTY proof |
 

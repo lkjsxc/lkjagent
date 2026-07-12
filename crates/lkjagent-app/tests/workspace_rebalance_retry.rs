@@ -12,6 +12,7 @@ use lkjagent_store::workspace_rows::{
 };
 use rusqlite::Connection;
 
+mod support;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 const OLD: &str = "records/knowledge/notes/old.md";
 const NEW: &str = "records/life/todo/open/rec_1.md";
@@ -188,6 +189,7 @@ fn fixture_root(suffix: &str) -> TestResult<PathBuf> {
         fs::remove_dir_all(&path)?;
     }
     fs::create_dir_all(&path)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }
 

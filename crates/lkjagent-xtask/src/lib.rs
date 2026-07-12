@@ -4,7 +4,6 @@ pub mod doc_links;
 pub mod doc_special;
 pub mod doc_topology;
 mod docs_authority_contract;
-pub mod docs_authority_gate;
 pub mod evaluation_harness;
 pub mod facts;
 pub mod gate;

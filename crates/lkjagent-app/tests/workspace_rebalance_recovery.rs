@@ -13,6 +13,8 @@ use lkjagent_store::workspace_rows::{
 };
 use rusqlite::Connection;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 static NEXT_FIXTURE: AtomicUsize = AtomicUsize::new(0);
@@ -182,6 +184,7 @@ fn fixture_root() -> TestResult<PathBuf> {
         fs::remove_dir_all(&path)?;
     }
     fs::create_dir_all(&path)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }
 

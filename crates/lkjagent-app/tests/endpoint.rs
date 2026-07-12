@@ -9,6 +9,8 @@ use lkjagent_app::daemon::Endpoint;
 use lkjagent_app::endpoint::LlmEndpoint;
 use lkjagent_core::render::Prompt;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 #[test]
@@ -32,19 +34,13 @@ fn llm_endpoint_uses_configured_chat_endpoint() -> TestResult<()> {
 }
 
 #[test]
-fn flat_config_exposes_workspace_and_budget_keys() -> TestResult<()> {
+fn flat_config_exposes_separate_workspace_and_budget_keys() -> TestResult<()> {
     let data = fixture_root("flat-config")?;
     fs::write(
         data.join("lkjagent.json"),
-        "{\"workspace_root\":\"visible-workspace\",\"prompt_context_tokens\":32768,\"live_campaign_seconds\":900}",
+        "{\"workspace_root\":\"../visible-workspace\",\"prompt_context_tokens\":32768,\"live_campaign_seconds\":900}",
     )?;
 
-    cli::run([
-        "--data",
-        data.to_string_lossy().as_ref(),
-        "send",
-        "todo check flat config workspace",
-    ])?;
     let status = cli::run(["--data", data.to_string_lossy().as_ref(), "doctor"])?;
     let json = cli::run([
         "--data",
@@ -53,8 +49,10 @@ fn flat_config_exposes_workspace_and_budget_keys() -> TestResult<()> {
         "--json",
     ])?;
 
-    assert!(data
-        .join("visible-workspace/artifacts/transcripts/queue-000001.md")
+    assert!(!data
+        .parent()
+        .ok_or("data parent missing")?
+        .join("visible-workspace")
         .exists());
     assert!(status.contains("prompt_cap=32768"));
     assert!(status.contains("live_seconds=900"));
@@ -109,12 +107,14 @@ fn prompt() -> Prompt {
 }
 
 fn fixture_root(name: &str) -> TestResult<PathBuf> {
-    let path = std::env::temp_dir().join(format!("lkjagent-app-{name}-{}", std::process::id()));
-    if path.exists() {
-        fs::remove_dir_all(&path)?;
+    let parent = std::env::temp_dir().join(format!("lkjagent-app-{name}-{}", std::process::id()));
+    if parent.exists() {
+        fs::remove_dir_all(&parent)?;
     }
-    fs::create_dir_all(&path)?;
-    Ok(path)
+    let data = parent.join("data");
+    fs::create_dir_all(&data)?;
+    support::isolate_workspace(&data)?;
+    Ok(data)
 }
 
 struct EndpointEnvGuard {

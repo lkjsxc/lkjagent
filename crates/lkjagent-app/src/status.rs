@@ -14,6 +14,7 @@ pub fn status_with_roots(conn: &Connection, data_dir: &Path) -> Result<String, S
     status_inner(conn, Some(data_dir))
 }
 
+#[rustfmt::skip]
 fn status_inner(conn: &Connection, data_dir: Option<&Path>) -> Result<String, String> {
     let snapshot = load_snapshot(conn).map_err(|error| error.to_string())?;
     let pending =
@@ -22,25 +23,12 @@ fn status_inner(conn: &Connection, data_dir: Option<&Path>) -> Result<String, St
     let ledger = state_ledger_lines(conn)?;
     let lease = lease_status::line(conn)?;
     let roots = match data_dir {
-        Some(data_dir) => {
-            let workspace = crate::config::workspace_root(data_dir)?;
-            format!(
-                "roots: data={} workspace={} workspace_present={}",
-                data_dir.display(),
-                workspace.display(),
-                workspace.is_dir()
-            )
-        }
+        Some(data_dir) => { let workspace = crate::config::workspace_root(data_dir)?;
+            format!("roots: data={} workspace={} workspace_present={}", data_dir.display(), workspace.display(), workspace.is_dir()) }
         None => "roots: unavailable".to_string(),
     };
     Ok(match snapshot {
-        Some(snapshot) => format!(
-            "{}\n{}\n{}\n{}",
-            render_status_with(&snapshot, pending, &tokens),
-            lease,
-            roots,
-            ledger
-        ),
+        Some(snapshot) => format!("{}\n{}\n{}\n{}", render_status_with(&snapshot, pending, &tokens), lease, roots, ledger),
         None => format!(
             "daemon: idle\nmatter: none\noperation: none\nlast: none\nquestion: none\nqueue: {pending} pending\ntokens: {tokens}\n{lease}\n{roots}\n{ledger}"
         ),

@@ -7,6 +7,8 @@ use lkjagent_store::plan_schema::setup;
 use lkjagent_store::record_rows::{upsert_record, RecordRow};
 use rusqlite::Connection;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -95,7 +97,7 @@ fn rebalance_retries_group_projection_when_index_rebuild_fails() -> TestResult<(
 }
 
 #[test]
-fn rebalance_preserves_owner_readme_and_keeps_group_projecting() -> TestResult<()> {
+fn rebalance_preserves_owner_readme_without_projection() -> TestResult<()> {
     let data = fixture_root("rebalance-owner-readme")?;
     let workspace = data.join("workspace");
     let old = "records/knowledge/notes/old.md";
@@ -121,7 +123,8 @@ fn rebalance_preserves_owner_readme_and_keeps_group_projecting() -> TestResult<(
         },
     )?;
     drop(conn);
-    assert!(cli::run(["--data", data_str(&data), "workspace", "apply-rebalance"]).is_err());
+    let applied = cli::run(["--data", data_str(&data), "workspace", "apply-rebalance"])?;
+    assert!(applied.contains("move rec_1"));
     assert_eq!(fs::read_to_string(&owner)?, "# Owner\n\nDo not replace.\n");
     assert!(workspace.join("records/life/todo/open/rec_1.md").exists());
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
@@ -130,7 +133,7 @@ fn rebalance_preserves_owner_readme_and_keeps_group_projecting() -> TestResult<(
         [],
         |row| row.get(0),
     )?;
-    assert_eq!(phase, "projecting");
+    assert_eq!(phase, "settled");
     Ok(())
 }
 
@@ -148,5 +151,6 @@ fn fixture_root(name: &str) -> TestResult<PathBuf> {
         fs::remove_dir_all(&path)?;
     }
     fs::create_dir_all(&path)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }

@@ -9,6 +9,8 @@ use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 const CHILD_DATA: &str = "LKJAGENT_CREDENTIAL_CHILD_DATA";
 
@@ -24,6 +26,7 @@ fn credential_rotation_wakes_once_without_persisting_the_secret() -> TestResult<
         "queue_wake_milliseconds":50
     }"#,
     )?;
+    support::retain_workspace_config(&data)?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
     enqueue(&conn, "Recover after credential rotation", "before")?;
@@ -97,5 +100,6 @@ fn fixture_root() -> TestResult<PathBuf> {
         fs::remove_dir_all(&path)?;
     }
     fs::create_dir_all(&path)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }

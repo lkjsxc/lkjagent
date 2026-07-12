@@ -10,6 +10,8 @@ use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -23,6 +25,7 @@ fn endpoint_retries_wait_until_due_then_stop_at_configured_limit() -> TestResult
         "queue_wake_milliseconds":50
     }"#,
     )?;
+    support::retain_workspace_config(&data)?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
     enqueue(&conn, "What is an agent?", "before")?;
@@ -70,6 +73,7 @@ fn endpoint_retries_wait_until_due_then_stop_at_configured_limit() -> TestResult
         "queue_wake_milliseconds":50
     }"#,
     )?;
+    support::retain_workspace_config(&data)?;
     let mut clock = FixedClock::new("2026-07-11T10:00:01Z");
     run_until_idle_with_clock(&data, &mut endpoint, 4, &mut clock)?;
     assert_eq!(endpoint.calls, 4);
@@ -178,5 +182,6 @@ fn fixture_root() -> TestResult<PathBuf> {
         fs::remove_dir_all(&path)?;
     }
     fs::create_dir_all(&path)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }

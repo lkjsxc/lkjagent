@@ -14,6 +14,8 @@ const OLD_B: &str = "records/knowledge/notes/b.md";
 const NEW_A: &str = "records/life/todo/open/rec_a.md";
 const NEW_B: &str = "records/life/todo/open/rec_b.md";
 static NEXT: AtomicU64 = AtomicU64::new(1);
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -137,7 +139,7 @@ fn fixture(name: &str) -> TestResult<Fixture> {
     if data.exists() {
         fs::remove_dir_all(&data)?;
     }
-    let workspace = data.join("workspace");
+    let workspace = support::isolate_workspace(&data)?;
     fs::create_dir_all(workspace.join("records/knowledge/notes"))?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;

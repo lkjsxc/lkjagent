@@ -9,6 +9,8 @@ use lkjagent_store::plan_access::enqueue;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
+mod support;
+
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
@@ -58,8 +60,6 @@ fn record_like_owner_turns_write_workspace_files_without_tasks() -> TestResult<(
     let journal_path = record_path(&conn, "journal")?;
     assert!(journal_path.ends_with("/entry.md"), "{journal_path}");
     assert!(!journal_path.contains("unix:"), "{journal_path}");
-    assert!(data.join("workspace/records/life/README.md").exists());
-    assert_contains(&data, "workspace/indexes/README.md", "open-todos.md")?;
     assert_contains(&data, "workspace/indexes/open-todos.md", "buy milk")?;
     assert_contains(&data, "workspace/indexes/budget-month.md", "paid 1200 yen")?;
     assert_not_contains(
@@ -165,5 +165,6 @@ fn fixture_root(name: &str) -> TestResult<PathBuf> {
         fs::remove_dir_all(&path)?;
     }
     fs::create_dir_all(&path)?;
+    support::isolate_workspace(&path)?;
     Ok(path)
 }
