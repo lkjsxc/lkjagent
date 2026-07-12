@@ -1,7 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use serde::{Deserialize, Serialize};
-
 pub use crate::runtime_context_plan::{
     default_context_pipeline, select_context_plan, ContextFramePlan, ContextLanePlan,
     ContextPipelineStage, ContextPlanEntry,
@@ -167,7 +166,7 @@ pub fn detect_contradictions(items: &[ContextItem]) -> Vec<ContextConflict> {
         bodies_by_key
             .entry(item.semantic_key.clone())
             .or_default()
-            .entry(item.body.clone())
+            .entry(normalized_body(&item.body))
             .or_default()
             .insert(item.id.clone());
     }
@@ -175,6 +174,12 @@ pub fn detect_contradictions(items: &[ContextItem]) -> Vec<ContextConflict> {
         .into_iter()
         .filter_map(|(semantic_key, bodies)| conflict_from_bodies(semantic_key, bodies))
         .collect()
+}
+
+#[rustfmt::skip]
+pub(crate) fn normalized_body(body: &str) -> String {
+    body.chars().map(|value| if value.is_alphanumeric() { value.to_ascii_lowercase() } else { ' ' })
+        .collect::<String>().split_whitespace().collect::<Vec<_>>().join(" ")
 }
 
 fn conflict_from_bodies(
