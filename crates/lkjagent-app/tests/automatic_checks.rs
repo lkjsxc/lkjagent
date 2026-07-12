@@ -17,6 +17,10 @@ fn committed_edit_schedules_checks_once_and_closes() -> TestResult<()> {
     assert!(close(&db).is_err(), "premature final must remain blocked");
     let reduced = reduce_committed_edit(&mut connection, &workspace, "j", 4, "now")?;
     assert_eq!((reduced.scheduled, reduced.passed), (3, 3));
+    assert_eq!(
+        scalar(&connection, "SELECT count(*) FROM state_cells WHERE namespace='check' AND cell_key='current-passed' AND status='active'")?,
+        1
+    );
     let repeated = reduce_committed_edit(&mut connection, &workspace, "j", 5, "later")?;
     assert_eq!((repeated.scheduled, repeated.passed), (0, 0));
     drop(connection);
@@ -50,6 +54,10 @@ fn later_bytes_invalidate_checks_and_block_final() -> TestResult<()> {
     fs::write(root.join("workspace/notes/a.md"), "gamma is current\n")?;
     let stale = reduce_committed_edit(&mut connection, &workspace, "j", 5, "later")?;
     assert_eq!((stale.scheduled, stale.passed), (3, 1));
+    assert_eq!(
+        scalar(&connection, "SELECT count(*) FROM state_cells WHERE namespace='check' AND cell_key='failed' AND status='active'")?,
+        1
+    );
     assert_eq!(
         scalar(&connection, "SELECT count(*) FROM checks WHERE current=1")?,
         3
