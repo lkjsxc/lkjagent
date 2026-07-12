@@ -62,6 +62,15 @@ fourth matter repeated directory listings. Current source gives listing the same
 required completion intent and reopens the managed target as measured source,
 which advances selection without reusing checks or claiming completion.
 
+A fourth tracked 903-second run at source
+`f5535af5a8b2237dfbaabfb9678ccb93954707fa` derived exact bytes, one file, 18
+tables, 23 provider exchanges, six admissions, one effect, nine checks, five
+owner messages, and three checked closes. It failed only because the evaluator
+required all five scheduled matters to close, although the declared checks bind
+the edit, second-turn verification, and retrieval continuity. Current source
+requires those three closes while retaining the two later owner turns as honest
+sustained intake.
+
 A synthetic 901-second run against the parent product source seeded
 `notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
 verification, and truthful report. The daemon stayed alive and owner intake
