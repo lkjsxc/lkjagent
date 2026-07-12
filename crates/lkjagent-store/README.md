@@ -2,11 +2,11 @@
 
 ## Purpose
 
-SQLite persistence crate for plan-family rows and state-ledger rows.
+SQLite persistence crate for the native 18-table direct state ledger.
 
 Doc contract: ../../docs/store/README.md
 
 ## Table of Contents
 
-- [src/](src/README.md): source modules.
-- [tests/](tests/README.md): integration tests.
+- [src/](src/README.md): compiled native store modules.
+- [tests/](tests/README.md): native durability tests.

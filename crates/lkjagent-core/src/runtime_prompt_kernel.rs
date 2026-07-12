@@ -3,8 +3,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::prompt::Prompt;
 use crate::prompt_policy::protocol_for_envelope;
-use crate::render::Prompt;
 use crate::runtime_context::{
     normalized_body, ContextFramePlan, ContextItem, ContextPlanEntry, TrustClass,
 };

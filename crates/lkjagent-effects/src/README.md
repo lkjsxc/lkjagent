@@ -2,15 +2,16 @@
 
 ## Purpose
 
-Map lkjagent-effects source modules.
+Map the workspace effects compiled for the direct runtime.
 
 ## Table of Contents
 
-- [lib.rs](lib.rs): public errors, exports, and bounded observation formatting.
-- [workspace.rs](workspace.rs): legacy path operations and capability exports.
-- [workspace-capability.rs](workspace_capability.rs): opened root and safe reads.
-- [workspace-edit.rs](workspace_edit.rs): descriptor-relative edit transitions.
+- [lib.rs](lib.rs): effect errors and workspace exports.
+- [workspace.rs](workspace.rs): opened workspace operations.
+- [workspace-capability.rs](workspace_capability.rs): root-relative safe reads.
+- [workspace-edit.rs](workspace_edit.rs): exact edit transitions.
 - [workspace-edit-types.rs](workspace_edit_types.rs): edit evidence and phases.
 - [workspace-scan.rs](workspace_scan.rs): bounded listing and text search.
-- [shell.rs](shell.rs): bounded shell runner.
-- [checks.rs](checks.rs): check fact gathering and evaluation.
+
+Retired shell and legacy check adapter files remain in this directory but are
+excluded from `lib.rs`.

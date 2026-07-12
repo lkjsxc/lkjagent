@@ -2,44 +2,26 @@
 
 ## Purpose
 
-Map lkjagent-core source modules.
+Map the direct-runtime core modules.
 
 ## Table of Contents
 
-- [lib.rs](lib.rs): public exports and canonical FNV-1a fingerprints.
-- [runtime-state.rs](runtime_state.rs): state keys, cells, snapshots, and
-  state-vector fingerprints.
-- [runtime-tool-catalog.rs](runtime_tool_catalog.rs): canonical tool
-  descriptors and views.
-- [runtime-event.rs](runtime_event.rs): identity- and sequence-checked direct reducer.
-- [runtime-eligibility.rs](runtime_eligibility.rs): due cells and next wakes.
-- [runtime-decision.rs](runtime_decision.rs): runtime decisions, envelopes, and
-  tool-set views.
-- [runtime-operation.rs](runtime_operation.rs): selected runtime operation
-  payload.
-- [runtime-prompt-kernel.rs](runtime_prompt_kernel.rs): structured prompt card
-  plan and fingerprints.
-- [runtime-candidate.rs](runtime_candidate.rs): selector candidate generation,
-  scoring, and edge blocking.
-- [runtime-selector.rs](runtime_selector.rs): deterministic direct selection,
-  typed waits and blocks, and guarded idle closure.
-- [runtime-admission.rs](runtime_admission.rs): action admission and workspace
-  path policy.
-- [runtime-artifact.rs](runtime_artifact.rs): checked artifact units,
-  deterministic assembly, fingerprints, and word counts.
-- [runtime-recovery.rs](runtime_recovery.rs): typed fault classes and strategy ladders.
-- [runtime-strategy.rs](runtime_strategy.rs): strategy-specific prompt changes and bounds.
-- [runtime-context.rs](runtime_context.rs): context items, contamination, and
-  contradiction detection.
-- [model.rs](model.rs): current task, step, attempt, check, and command data.
-- [parse.rs](parse.rs): envelope and plan-line parser.
-- [prompt-policy.rs](prompt_policy.rs): prompt envelopes, policies, and budgets.
-- [render.rs](render.rs): prompt renderer and fingerprints.
-- [engine.rs](engine.rs): public next work and turn application seam.
-- [engine-completion.rs](engine_completion.rs): task closure and event helpers.
-- [engine-actions.rs](engine_actions.rs): action, message, and plan settlement helpers.
-- [engine-steps.rs](engine_steps.rs): internal step settlement helpers.
-- [plan.rs](plan.rs): materialize validated plan lines into steps.
-- [checks.rs](checks.rs): pure check evaluation over supplied facts.
-- [workspace-record.rs](workspace_record.rs): generic Markdown record format.
-- [classify.rs](classify.rs): objective classification and starter templates.
+- [lib.rs](lib.rs): public exports and canonical fingerprints.
+- [prompt.rs](prompt.rs): transport prompt value.
+- [parse.rs](parse.rs): decision-bound tool-call and final parsing.
+- [prompt-policy.rs](prompt_policy.rs): direct output grammar text.
+- [runtime-state.rs](runtime_state.rs): state cells and snapshots.
+- [runtime-event.rs](runtime_event.rs): direct reducer.
+- [runtime-decision.rs](runtime_decision.rs): persisted decisions and envelopes.
+- [runtime-operation.rs](runtime_operation.rs): runtime state and selections.
+- [runtime-selector.rs](runtime_selector.rs): deterministic direct selection.
+- [runtime-prompt-kernel.rs](runtime_prompt_kernel.rs): prompt compiler.
+- [runtime-tool-catalog.rs](runtime_tool_catalog.rs): five native descriptors.
+- [runtime-tool-call.rs](runtime_tool_call.rs): compact XML grammar.
+- [runtime-admission.rs](runtime_admission.rs): action admission.
+- [runtime-context.rs](runtime_context.rs): context selection and contamination.
+- [runtime-artifact.rs](runtime_artifact.rs): checked artifact units.
+- [runtime-recovery.rs](runtime_recovery.rs): fault and recovery ladders.
+
+Artifact and workspace record helpers remain exported separately; this slice did
+not claim their deletion.

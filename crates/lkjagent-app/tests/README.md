@@ -1,27 +1,15 @@
-# Tests
+# Application Tests
 
 ## Purpose
 
-Integration tests for lkjagent-app.
+Map integration coverage for the compiled direct application surface.
 
 ## Table of Contents
 
-- [app.rs](app.rs): CLI help, scripted endpoint, and template tests.
-- [args.rs](args.rs): bounded public argument parser tests.
-- [cli.rs](cli.rs): removed command rejection and filesystem isolation tests.
-- [context-items.rs](context_items.rs): durable context hygiene tests.
-- [contamination.rs](contamination.rs): contamination classification tests.
-- [configuration-contract.rs](configuration_contract.rs): exact scalar keys,
-  ranges, cross-key guards, and tracked example.
-- [docs-tree.rs](docs_tree.rs): documentation tree app flows.
-- [effect-error.rs](effect_error.rs): effect failure settlement tests.
-- [endpoint.rs](endpoint.rs): endpoint adapter integration seam.
-- [exchange.rs](exchange.rs): exchange refs and token usage persistence.
-- [explore.rs](explore.rs): bounded explore registry behavior.
-- [journal-artifact.rs](journal_artifact.rs): journal artifact app flows.
-- [prompt-frame.rs](prompt_frame.rs): prompt-frame body replay tests.
-- [public-loop.rs](public_loop.rs): native public loop and exact-edit tests.
-- [recovery.rs](recovery.rs): unfinished decision recovery tests.
-- [resume.rs](resume.rs): row-first resume, waiting answer, and decision reuse tests.
-- [state-snapshot.rs](state_snapshot.rs): state-cell snapshot hydration tests.
-- [workspace-root.rs](workspace_root.rs): configured workspace capability tests.
+- [args.rs](args.rs): closed public command grammar.
+- [automatic-checks.rs](automatic_checks.rs): native post-edit checks and invalidation.
+- [cli.rs](cli.rs): retired command rejection before storage creation.
+- [configuration-contract.rs](configuration_contract.rs): scalar configuration validation.
+- [endpoint.rs](endpoint.rs): configured transport and direct diagnostics.
+- [public-loop.rs](public_loop.rs): exact edit, restart, conversation, and stale guards.
+- [workspace-root.rs](workspace_root.rs): lazy separate workspace capability.

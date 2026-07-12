@@ -11,7 +11,7 @@ fn persisted_view_discards_catalog_excluded_entries() -> Result<(), String> {
         "tool_budget_remaining": 1,
         "tool_view": [
             {"name": "finish", "purpose": "removed", "required_params": ["summary"]},
-            {"name": "fs.read", "purpose": "read", "required_params": ["path"]}
+            {"name": "read_file", "purpose": "read", "required_params": ["path"]}
         ]
     })
     .to_string();
@@ -21,6 +21,6 @@ fn persisted_view_discards_catalog_excluded_entries() -> Result<(), String> {
     let decision = select_runtime_decision(&snapshot, "decision-1", "ctx-1", &[])
         .map_err(|error| error.message)?;
 
-    assert_eq!(decision.tool_view.tool_names(), vec!["fs.read"]);
+    assert_eq!(decision.tool_view.tool_names(), vec!["read_file"]);
     Ok(())
 }
