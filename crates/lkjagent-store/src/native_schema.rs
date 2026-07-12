@@ -86,7 +86,7 @@ pub(crate) fn close(tx: &Transaction<'_>, value: &FinalClose<'_>) -> StoreResult
     tx.execute("INSERT INTO runtime_events(id,matter_id,causal_sequence,kind,monotonic_ms,wall_time,payload,source_kind,source_id) VALUES(?1,?2,?3,'matter-completed',?4,?5,?6,'harness',?7)", params![value.event,value.matter,value.event_sequence,value.monotonic_ms,value.wall_time,value.payload,id])?;
     tx.execute("UPDATE runtime_decisions SET status='settled',settlement_event_id=?1 WHERE id=?2 AND matter_id=?3 AND status='selected'", params![value.event,value.decision,value.matter])?;
     tx.execute("INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,receipt,receipt_fingerprint,lifecycle,matter_id,cause_event_id) VALUES(?1,?2,'agent',?3,?4,?5,?6,'active',?7,?8)", params![id,sequence,value.body,value.body_fingerprint,receipt,receipt_fingerprint,value.matter,value.event])?;
-    tx.execute("UPDATE conversation_messages SET lifecycle='replaced',replacement_id=?1 WHERE matter_id=?2 AND role='agent' AND lifecycle='active' AND id<>?1", params![id,value.matter])?;
+    tx.execute("UPDATE conversation_messages SET lifecycle='replaced',replacement_id=?1 WHERE matter_id=?2 AND role='agent' AND lifecycle='active' AND id<>?1", params![id,value.matter])?; tx.execute("UPDATE state_cells SET status='suppressed' WHERE matter_id=?1 AND CAST(namespace AS TEXT)='recovery' AND status='active'", [value.matter])?;
     changed(tx.execute("UPDATE matters SET lifecycle='closed',closure_event_id=?1,closure_checks_passed=1,unsettled_effects=0,updated_sequence=?2 WHERE id=?3 AND lifecycle='open'", params![value.event,value.event_sequence,value.matter])?, "matter cannot close")?;
     Ok(MessageIdentity { id, sequence })
 }
