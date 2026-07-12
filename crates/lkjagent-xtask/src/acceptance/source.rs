@@ -26,6 +26,8 @@ const FACTS: &[Fact] = &[
     fact("R06", "crates/lkjagent-core/src/runtime_event.rs", &["pub fn reduce(", "ReduceFault::CausalSequence"]),
     fact("R06", "crates/lkjagent-core/src/runtime_selector.rs", &["pub fn select(", "Selection::Idle"]),
     fact("R06", "crates/lkjagent-core/tests/runtime_reducer_selector.rs", &["reducer_preserves_unknown_and_invalidates_old_revision", "direct_transitions_do_not_add_model_review"]),
+    fact("R10", "crates/lkjagent-store/src/direct_transactions.rs", &["ORDER BY CASE WHEN EXISTS", "d.status NOT IN ('settled','failed')"]),
+    fact("R10", "crates/lkjagent-store/tests/native_direct_loop.rs", &["restart_projection_skips_blocked_matter_for_runnable_owner_turn", "Some(\"m2\")"]),
     fact("P01", "crates/lkjagent-core/src/runtime_tool_call.rs", &["pub fn parse_model_value", "MODEL_ENVELOPES", "exact_children"]),
     fact("P01", "crates/lkjagent-core/tests/direct_action_grammar.rs", &["contract_tables_reject_roots_prose_and_legacy_actions", "\\\"tool\\\":\\\"read_file\\\""]),
     fact("P02", "crates/lkjagent-core/tests/direct_action_grammar.rs", &["<decision_id>x</decision_id>", "ToolCallError::UnknownTag"]),
