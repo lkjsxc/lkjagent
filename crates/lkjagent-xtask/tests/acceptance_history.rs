@@ -5,7 +5,7 @@ use std::process::Command;
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use lkjagent_xtask::acceptance::{
-    inspect_attachment, scan_history, source_contract_files, source_contracts,
+    derive_attachment, inspect_attachment, scan_history, source_contract_files, source_contracts,
 };
 
 const SOURCE: &str = "2222222222222222222222222222222222222222";
@@ -39,6 +39,23 @@ fn acceptance_negative_allows_only_checker_result_status_rows() {
     let claimed = inspect_attachment(Path::new("claimed.tsv"), bytes, SOURCE);
     assert!(claimed.iter().any(|error| error.contains("editable pass")));
     assert!(inspect_attachment(Path::new("result.tsv"), bytes, SOURCE).is_empty());
+}
+
+#[test]
+fn exact_campaign_derivation_requires_all_semantic_facts() {
+    let body = format!("field\tvalue\nsource_commit\t{SOURCE}\nscenario\texact-file-edit\nmode\trun\nsemantic_status\tevaluated\noutcome\tpassed\nsemantic_detail\tfile_exact=true;one_file=true;closed=4;owner=5;agent=4;passed_checks=12;effects=1;admissions=10;providers=24;tables=18\n");
+    let path = Path::new("campaign-exact-file-edit-run.tsv");
+    let derived = derive_attachment(path, body.as_bytes(), SOURCE);
+    assert_eq!(
+        derived,
+        ["F01", "F07", "F08", "W02"]
+            .into_iter()
+            .map(str::to_string)
+            .collect()
+    );
+    let altered = body.replace("file_exact=true", "file_exact=false");
+    let derived = derive_attachment(path, altered.as_bytes(), SOURCE);
+    assert_eq!(derived, ["F08"].into_iter().map(str::to_string).collect());
 }
 
 #[test]

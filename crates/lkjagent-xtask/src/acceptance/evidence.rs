@@ -1,7 +1,18 @@
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 use std::path::Path;
 
 use super::{markers, secret};
+
+#[rustfmt::skip]
+pub fn derivations(path:&Path,bytes:&[u8],source:&str)->BTreeSet<String>{
+ let mut out=BTreeSet::new();let Ok(text)=std::str::from_utf8(bytes)else{return out};let fields=pairs(text);
+ if path.file_name().and_then(|x|x.to_str())!=Some("campaign-exact-file-edit-run.tsv")||fields.get("source_commit").map(String::as_str)!=Some(source)||fields.get("scenario").map(String::as_str)!=Some("exact-file-edit")||fields.get("mode").map(String::as_str)!=Some("run")||fields.get("semantic_status").map(String::as_str)!=Some("evaluated")||fields.get("outcome").map(String::as_str)!=Some("passed"){return out}
+ let detail=fields.get("semantic_detail").map(|v|v.split(';').filter_map(|x|x.split_once('=')).collect::<HashMap<_,_>>()).unwrap_or_default();
+ let n=|key:&str|detail.get(key).and_then(|v|v.parse::<u64>().ok()).unwrap_or(0);
+ if detail.get("file_exact")==Some(&"true")&&detail.get("one_file")==Some(&"true")&&n("effects")==1&&n("admissions")>0&&n("providers")>0&&n("tables")==18 { out.extend(["F01","F07","W02"].map(str::to_string)); }
+ if n("closed")>=3&&n("owner")>=5&&n("agent")>=3&&n("passed_checks")>=6 { out.insert("F08".into()); }
+ out
+}
 
 pub fn inspect(path: &Path, bytes: &[u8], source: &str) -> Vec<String> {
     let label = path.to_string_lossy();

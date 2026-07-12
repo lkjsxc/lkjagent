@@ -136,7 +136,7 @@ claims, and the close transaction owns the canonical final message.
 | Node | State | Evidence |
 | --- | --- | --- |
 | docs-reset | complete | compact contracts, plans, and authority gate pass |
-| acceptance-checker | complete | rejects nine fixtures and derives seventeen source or static predicates |
+| acceptance-checker | complete | rejects nine fixtures and derives source, static, and exact-campaign predicates |
 | baseline-tracked | complete | tracked 901-second run has zero non-missing checker errors |
 | interfaces | complete | closed vocabularies and direct five-tool descriptors pass core tests |
 | effects-safe-read | complete | opened-root listing, search, and revision reads pass safety tests |
