@@ -2,17 +2,9 @@
 
 ## Purpose
 
-Define SQLite persistence, exchange refs, state hydration, transactions, and
-crash resume.
+Map the lean SQLite authority and external-effect transaction boundaries.
 
 ## Table of Contents
 
-- [schema.md](schema.md): exact fresh native tables and required fields.
-- [schema-constraints.md](schema-constraints.md): identity, lineage, integrity,
-  conversation, workspace, and database rules.
-- [effect-journal.md](effect-journal.md): effect admission, two transactions,
-  settlement, and recovery.
-- [exchange-logs.md](exchange-logs.md): file log layout for large provider
-  bodies and exchange refs.
-- [crash-and-resume.md](crash-and-resume.md): decision-first transaction and
-  recovery rules.
+- [schema.md](schema.md): active identities, constraints, and retired rows.
+- [transactions.md](transactions.md): intake, decisions, effects, and close.

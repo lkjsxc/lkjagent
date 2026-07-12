@@ -2,31 +2,38 @@
 
 ## Purpose
 
-Define the Rust style contract for pure cores and effect adapters.
+Define pure product logic and narrow effect boundaries.
 
-## Core Rules
+## Core
 
-- Business logic is pure functions over plain data.
-- Effects are returned as values or interpreted by adapters at crate edges.
-- Product crates contain no panic paths or placeholder macros.
-- Illegal states are represented with enums and validated constructors.
-- Plain structs and free functions beat trait hierarchies unless a seam is
-  needed for real tests.
-- No global mutable state or singleton runtime state.
-- Newtypes protect meanings that must not mix, such as ids, token counts, and
-  byte offsets.
+Reduction, selection, prompt assembly, parsing, admission, check evaluation, and
+completion are pure functions over plain typed values. Inputs contain explicit
+current time, config, state, and source facts. Outputs contain commands or events,
+not hidden effects.
 
-## Crate Shape
+Use immutable values and total matches. Preserve unknown extensible state. Stable
+ordering and fingerprints do not depend on hash-map or database insertion order.
 
-| Module | Holds |
-| --- | --- |
-| `model` | data types and enums |
-| pure modules | transitions, rendering, parsing, checks, planning |
-| `adapter` | filesystem, SQLite, HTTP, shell, or clock interpreters |
-| `error` | error enums and conversions |
+## Edges
+
+SQLite, files, clocks, endpoint calls, shells, terminal IO, and process lifecycle
+belong in edge crates or app orchestration. External intent is durable before an
+effect. Results return as typed values and become events.
+
+## Errors
+
+Product crates return typed errors. They do not panic, unwrap, expect, use unsafe
+code, or silently substitute success. Bounded diagnostics retain causal identity
+without leaking secrets or failed bodies into model context.
+
+## Source Shape
+
+Each source file is at most 200 lines and owns one cohesive behavior. Splitting
+creates real module boundaries rather than forwarding wrappers. Delete unused
+paths rather than hiding them behind flags.
 
 ## Tests
 
-Pure cores get table-driven tests. Adapters get narrow tests against real local
-resources such as temp directories and in-memory SQLite. A bug fix lands with
-the test that would have caught it.
+Prefer compact table tests at contract boundaries and real black-box task proof.
+A test double may prove deterministic mechanics but cannot serve as semantic
+acceptance or product behavior.

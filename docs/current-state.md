@@ -2,199 +2,97 @@
 
 ## Purpose
 
-Separate observed behavior in this checkout from the target contract and the
-work still required to make them agree.
+Separate observed behavior in this checkout from the direct-runtime contract and
+name the next executable work.
 
 ## Evidence Boundary
 
-The supplied product source is commit
-`ae5ff551457adce869dee6159200c85a63aab3de`. The immutable rebuild packet is
-anchored at `1b615a76c03dfd58dfd2986f017563bd6789e832`. Baseline raw evidence and
-its reviewed receipt live under `tmp/lkjagent-progress/nodes/baseline-capture/`.
+This reset is based on product source
+`5604ec89af3ba9dbfb287bd869971781fdcf2fad`. Its parent product source is
+`28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`; the only later tree change removes
+tracked files below `tmp/`. Product crates, active docs, Cargo inputs, and Docker
+inputs are otherwise identical.
 
-The supplied SQLite store has three tasks, thirteen steps, ten decisions, and
-six provider exchanges. The task states are closed, blocked, and closed. The
-blocked world-history task has an active write asking for at least 1,500 words
-at `./history_narrative.md`. Two decisions repeat that operation with the same
-768-token output cap and endpoint-limit diagnosis. The store has zero tool
-admissions, observations, artifacts, and workspace records for those matters.
+A synthetic 901-second run against the parent product source seeded
+`notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
+verification, and truthful report. The daemon stayed alive and owner intake
+returned success, but the file remained unchanged.
 
-The four tracked 900-second summaries say `ran` and `closed`, but the matching
-live databases were not committed. They are bounded historical fixtures, not
-proof that the underlying matters completed.
+The fresh store had one blocked task, three blocked steps, and zero runtime
+decisions, provider exchanges, admissions, effects, observations, checks,
+artifacts, or workspace records. Startup also created nine README files and one
+transcript unrelated to the requested edit.
 
-Local Docker lint, test, and verify passed with the ignored working-copy
-`Cargo.lock`. The packet clean-checkout script fails in an isolated worktree
-because that lockfile is not tracked. Those local passes are not clean-checkout
-evidence.
+The causal defect is current source: `owner_turn.rs` treats the substring
+`verify` as a system operation, and `daemon_route_effects.rs` blocks that lane as
+an unsupported executor before any model call. The raw run remains local and
+ignored until the tracked acceptance checker can validate a sanitized bundle.
+This summary is evidence of failure, not endpoint success.
 
-Runtime config is optional in the selected data directory; the complete tracked
-example is `config/lkjagent.example.json`. Docker builds exclude mutable `data/`.
-Runtime wiring remains incomplete and is an honest cleanup blocker.
+## Implemented Primitives
 
-Repository build inputs include the lockfile, Cargo policy, configuration,
-Docker roots, and clean-archive workflow. The gate checks those inputs, source
-budgets, locking, and fault suites; acceptance still requires raw no-cache
-Compose evidence bound to the committed tree.
+The source contains useful low-level pieces:
 
-The evaluation harness owns three source-bound scenario bundles, a fake clock,
-typed faults, Online Backup capture, workspace/run/campaign manifests, and PTY
-capture. Its negative fixtures reject idle, blocked, skipped, zero-test, and
-generated-placeholder evidence. The predeclared domain runner requires clean
-source, a strict-ancestor plan, a reproducible isolated build, production
-exchange logs, recomputed metrics, and three-or-five repeats. The final 103-run
-campaign at `24c237cb888105792bee3b2901915b1e8c4017cb` passed local, Docker,
-and detached-clean-source gates as sequence 15. All nine cells were rejected.
-English multi-project goals exposed a broad inspection shortcut, long-artifact
-responses exposed ambiguous plan guidance, and integrated-recall failed the
-prompt-budget guard. This accepts the failure evidence, not product behavior;
-live and PTY predicates remain absent.
+- arbitrary state cells, events, edges, and runtime decisions;
+- strict attribute-free action parsing and bounded tool field specs;
+- provider intent and response logging;
+- tool admissions, effect journals, target revisions, and observations;
+- descriptor-relative no-follow file traversal and staged replacement pieces;
+- deterministic checks, workspace inventory, and TUI composer reducers;
+- flat JSON configuration validation and Docker build separation from data.
 
-A fresh model-free diary run writes a journal entry containing canned
-missing-detail text after the owner asks for a diary entry. This is reproduced
-failure evidence, not acceptable record behavior.
+These pieces do not yet form the direct authority loop.
 
-## Baseline Failures
-| Failure | Status | Raw evidence |
-| --- | --- | --- |
-| repeated impossible history request | reproduced | `raw/12-sqlite-facts.tsv`, `raw/13-request-facts.tsv` |
-| empty effect and workspace lineage | reproduced | `raw/12-sqlite-facts.tsv` |
-| clean checkout lacks tracked lockfile | reproduced | `raw/31-clean-checkout.log` |
-| diary writes canned missing details | reproduced | `raw/17-diary-run-once.log`, `raw/18-diary-after-run-manifest.tsv` |
-| live and readiness closure | bounded | `raw/14-live-summary-facts.tsv` |
-| relative-root tree failure | bounded | `raw/19-relative-root-historical.log` |
-
-All paths are relative to
-`tmp/lkjagent-progress/nodes/baseline-capture/`. Bounded means the preserved
-summary or transcript exists but its matching live database does not.
-
-## Current Implementation
-
-The checkout contains useful state cells, state edges, runtime decisions,
-context rows, prompt cards, tool admissions, observations, checks, artifacts,
-workspace records, and TUI reducers. These rows and pure helpers are inputs to
-the rebuild, not proof that the native authority loop is complete.
+## Active Source Gaps
 
 Production still hydrates `TaskSnapshot`, task rows, step rows, fixed templates,
-and bridge projections. Context may be prepared before the final decision.
-Generic parsed messages can settle steps without objective effect evidence.
-Recovery tuples and progress windows persist; strategies change prompt, budget, or operation.
-Provider intents block ambiguous replay; exact waits and four separate case budgets are durable.
-The live runner can replace the last real state with a synthetic closed snapshot. Default Explore
-decisions now render only read, search, memory find, and note tools, hiding shell
-and finish; completion remains an open authority gap. Action cards and the decision parser
-now use direct fields inside one input block and reject name/value wrappers.
-The parser bounds scalars and fields at 4,096 bytes and actions at 16,384 bytes;
-decision field specs persist/render tighter byte and canonical count ranges.
-Persisted views discard catalog-excluded entries; admission rejects them.
-Decision-free generic Explore parsing and work selection now block. English
-work containing inspection verbs no longer takes the exact status-command
-shortcut. Plan prompts provide one parser-valid filled example, define
-workspace-root-relative paths, and reject unsafe paths or placeholder values.
-Shell children drop endpoint credentials. Model actions, harness writes, and command
-checks persist admissions and effect journals before dispatch; one bounded
-immutable observation settles each attempt. Generated revisions retain exact main/part bytes,
-closed membership, and stale absence; drift blocks mutation and append rebuilds
-owned units. After dispatch, artifact rows and refs, observations, context, checks, state and
-plan rows, recovery facts, snapshots, and decision status settle atomically;
-shell outcomes wait for that boundary. Prepared bundles fail; partial,
-conflicting, or unexpected-member bundles stay applying and block
-startup without replay. Complete applying bundles recover. Pending decisions
-with durable evidence block; external bytes and broader writers remain outside.
+and bridge cells. Context is prepared before final decision selection. The daemon
+maps decisions back into the retired step engine and writes both authorities.
 
-Workspace behavior is split across record commands, template writes, direct
-filesystem tools, and native text effects. They do not share one transaction,
-idempotency, indexing, or recovery contract. A sorted inventory now scans visible
-Markdown at daemon entry and rebuild, excludes internal roots and symlinks, and
-atomically updates or tombstones managed records plus bounded search chunks.
-Generic and managed external changes converge to stable searchable rows, rankings, and excerpts.
-Managed-looking parse failures persist diagnostics; unchanged manifests debounce entry scans.
-Archive and rebalance persist exact operation bytes and reuse idempotency keys.
-Prepared rebalance groups commit all members and revisions before moving any file.
-Unstarted groups need explicit apply; moving and projecting groups resume forward.
-Archive compensation reuses its exact key under lock; exact projection rollback remains open.
+The default model tool view hides write, list, tree, shell, and any valid review
+transition. Whole-file model writes use a direct writer that bypasses exact target
+revisions. Replacement staging changes file mode and validates captured bytes
+after exchange, so it is not yet safe for the target edit path.
 
-The xtask dispatcher runs named nonempty suites for `protocol-tools`,
-`workspace-retrieval-maintenance`, `recovery-continuity`, and `domain-experiments`.
-Recovery has sequence-14 reviewed evidence, and domain experiments have
-sequence-15 reviewed evidence. The domain gate checks source and plan binding,
-build, exchange, database, workspace, metrics, repeat escalation, and manifests.
-No experiment candidate was adopted. Integrated adoption cleanup is released;
-earlier receipts do not bind its later source.
+There is no `conversation_messages` table. The TUI synthesizes owner and agent
+messages from queue and selected event rows, then merges local drafts. It has two
+viewport implementations and does not measure wrapped display rows consistently.
 
-The TUI derives conversation from queue and selected events, not one canonical
-table. Reducer tests do not replace a final PTY campaign against frozen source.
+The runtime data root and visible workspace are not separate in Compose. Startup
+creates a broad tree. Record routing can write canned diary text without a model.
+Several accepted configuration keys still have no production consumer.
 
-## Target Authority
+## Direct Contract
 
-The target pure core is:
+The target core is:
 
 ```text
 RuntimeSnapshot + RuntimeEvent + CurrentTime -> RuntimeState
 RuntimeState + Policy + CurrentTime -> RuntimeDecision
 ```
 
-The effects edge is:
+The selected decision persists exact state, tool, grammar, context-need,
+recovery, check, and exit specs. Context attaches to that immutable selection
+before provider intent. The effect edge is admitted and journaled. Fresh native
+checks follow committed edits automatically. Final wording cannot add unchecked
+claims, and the close transaction owns the canonical final message.
 
-```text
-RuntimeDecision -> EffectResult
-EffectResult -> RuntimeEvent
-```
+## Work State
 
-Durable events reduce to concurrent state cells. A selector persists one
-decision before prompt compilation or a native effect. The same row owns
-context, tool view, grammar, budgets, recovery, checks, and exit predicates.
-The model may author bounded content or propose an admitted operation; it never
-chooses completion.
-
-The target store and constraints are defined in
-[store/schema.md](store/schema.md) and
-[store/schema-constraints.md](store/schema-constraints.md). The runtime and
-effects transaction is defined in
-[store/effect-journal.md](store/effect-journal.md). Completion requires fresh
-checks for every required obligation and no unresolved blocking operation.
-
-## Removal Map
-| Current authority | Target replacement | Status |
+| Node | State | Evidence |
 | --- | --- | --- |
-| `TaskSnapshot` hydration | event-reduced `RuntimeState` | open |
-| task and step tables | matters, obligations, operations, and events | open |
-| fixed template rows | reducer-created obligations and operations | open |
-| bridge projections | direct native store writes | open |
-| plan-line model protocol | admitted operation envelopes | open |
-| generic finish shortcut | harness checks and exit predicates | open |
-| synthetic idle task | daemon quiescence with wake conditions | open |
-| split workspace writers | one effect journal and path service | open |
-| synthesized TUI transcript | canonical conversation messages | open |
-
-These surfaces may be read only by an offline fixture converter while focused
-regressions are extracted. Production selection, rendering, admission, effects,
-recovery, and completion must stop reading them.
-
-## Open Program
-
-The dependency order is repository determinism and evaluation fixtures, native
-store identity, event reduction, workspace transactions, native selection,
-context and protocol cutover, recovery continuity, retrieval, canonical TUI,
-experiments, cleanup, source freeze, and final live and PTY evidence.
-
-No downstream item is complete merely because a narrow test or historical log
-passes. Each named workgraph node requires its locked Docker gate, raw output,
-machine-readable result, separate review, and hash-bound receipt.
-
-## Contract To Source Gaps
-| Contract | Current source | First proving node |
-| --- | --- | --- |
-| native fresh store | `crates/lkjagent-store/src/plan_*` | store-foundation |
-| event reducer | `crates/lkjagent-core/src/engine*` | event-reducer |
-| decision-first loop | `crates/lkjagent-app/src/runtime_bridge.rs` | selector-runtime-cutover |
-| workspace transaction | split app and effects writers | workspace-foundation |
-| canonical transcript | queue and event projections | tui-core |
-| final campaigns | summary-oriented xtask runners | live-acceptance |
+| docs-reset | active | compact contracts and tracked plans in this change |
+| acceptance-checker | next | command and negative fixtures are not implemented |
+| baseline-tracked | blocked | waits for checker and current-source rerun |
+| interfaces | blocked | depends on acceptance checker |
+| public file edit | blocked | depends on native store, effects, protocol, and loop |
+| final campaigns | blocked | no frozen binary, live task proof, or PTY proof |
 
 ## Honesty Rules
+
 - Target prose is not an implementation claim.
-- A historical summary is not current raw evidence.
-- Missing raw data creates a bound, not a pass.
+- Process health and elapsed time are not task completion.
+- A historical summary is not current-source acceptance evidence.
 - A command that did not run did not pass.
-- Completion belongs to checks computed from durable facts.
+- Missing raw data creates a blocker, not a success.
+- Completion belongs to fresh checks reduced from durable facts.

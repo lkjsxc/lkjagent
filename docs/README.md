@@ -2,38 +2,26 @@
 
 ## Purpose
 
-Map the lkjagent contract. Read these directories in order when changing the
-product.
+Map the active lkjagent contract in one dependency-oriented order.
 
-## Read Order
+## Table of Contents
 
-1. [current-state.md](current-state.md): what is specified, implemented, and
-   open now.
-2. [vision/](vision/README.md): mission, invariants, and scope.
-3. [state/](state/README.md): state cells, state edges, reducers,
-   selectors, and arbitrary state keys.
-4. [runtime/](runtime/README.md): durable runtime decisions, loop, recovery, and
-   completion.
-5. [product/](product/README.md): daemon lifecycle, owner turns, matters,
-   records, CLI, status, and console.
-6. [workspace/](workspace/README.md): owner-readable record tree, artifacts,
-   indexes, and archive rules.
-7. [context/](context/README.md): context items, contradictions,
-   contamination, budgets, matter briefs, and prompt frames.
-8. [protocol/](protocol/README.md): model output envelopes, XML-like actions,
-   and faults tied to decisions.
-9. [tools/](tools/README.md): catalog, policy, tool views, admissions,
-    observations, and guards.
-10. [checks/](checks/README.md): deterministic checks and word counting.
-11. [memory/](memory/README.md): memory rows and retrieval.
-12. [store/](store/README.md): SQLite schema, exchange logs, crash resume, and
-    state-edge rows.
-13. [llm/](llm/README.md): endpoint client, sampling, and generation budgets.
-14. [tui/](tui/README.md): canonical transcript rendering, input, and scrolling.
-15. [operations/](operations/README.md): running, verification, and proof
-    bundles.
-16. [evaluation/](evaluation/README.md): benchmarks, replay, and live proof.
-17. [repository/](repository/README.md): layout, file limits, docs rules, style,
-    and commits.
-18. [agent/](agent/README.md): instructions for coding agents.
-19. [decisions/](decisions/README.md): recorded design decisions.
+- [current-state.md](current-state.md): observed source, evidence limits, and open work.
+- [vision/](vision/README.md): product mission, principles, and scope.
+- [state/](state/README.md): concurrent cells and pure transitions.
+- [runtime/](runtime/README.md): decision loop, recovery, and completion.
+- [product/](product/README.md): CLI, daemon, TUI, and configuration.
+- [workspace/](workspace/README.md): visible layout, effects, records, and reports.
+- [context/](context/README.md): source selection and prompt assembly.
+- [protocol/](protocol/README.md): model envelopes and typed faults.
+- [tools/](tools/README.md): canonical descriptors and admission.
+- [store/](store/README.md): SQLite schema and transaction boundaries.
+- [evaluation/](evaluation/README.md): scenarios, experiments, and live proof.
+- [operations/](operations/README.md): running and verification commands.
+- [repository/](repository/README.md): documentation and source standards.
+- [agent/](agent/README.md): coding-agent workflow and handoff rules.
+
+## Canonical Order
+
+The only canonical read order is in `../AGENTS.md`. Directory READMEs map direct
+children and do not create competing orders.

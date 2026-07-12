@@ -2,33 +2,39 @@
 
 ## Purpose
 
-Define the required shape and topology for authored Markdown.
+Define the shape and ownership of active project documentation.
 
 ## File Shape
 
 - ASCII prose only.
-- First line is one `# Title`.
-- The first section is `## Purpose`.
-- Filenames are kebab-case.
-- Lines stay within `repository.markdown.line-width=100` characters.
-- No `## Status` sections outside [../current-state.md](../current-state.md).
+- Kebab-case filename.
+- One H1 on the first line.
+- `## Purpose` is the first section.
+- Prose lines are at most 100 characters.
+- Authored files are at most 200 lines.
+- Tables have at most six columns.
+- Status belongs only in `../current-state.md`.
 
 ## Directory Shape
 
-Every docs directory has one README table of contents and at least two children.
-The README links every direct child with a one-line description. Every docs page
-is reachable from [../README.md](../README.md) within
-`repository.docs.max-link-depth=3` links.
-
-## Content Rules
-
-State the current contract directly. Do not preserve reference copies, history
-narration, release shorthand, migration framing, open markers, or dead links.
-Every tracked Markdown link resolves to a tracked repository path or an allowed
-external target. Examples must be real paths, commands, fixtures, or protocol
-blocks.
+Every docs directory has one README with `## Table of Contents` and at least two
+other direct children. The README links every direct child with one description.
+Every page is reachable from `../README.md` within the configured link depth.
 
 ## Ownership
 
-One rule has one owning page. Other pages link instead of restating. When docs
-and code disagree, update the contract and ledger before claiming success.
+One behavior has one owning page. Other pages link rather than restating the
+rule. Target contracts use direct present-tense requirements;
+`../current-state.md` distinguishes source gaps and evidence.
+
+## Active History
+
+Delete superseded descriptions when behavior changes. Git history retains prior
+text. Do not preserve retired demos, commands, diagrams, or competing read orders
+in the active tree.
+
+## Checks
+
+`check-docs`, `check-lines`, and `check-files` verify shape, links, topology,
+limits, and file budgets. A docs change runs the applicable commands and records
+actual output.

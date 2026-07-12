@@ -2,84 +2,54 @@
 
 ## Purpose
 
-Define gate commands and the quiet output contract.
+Define few substantive suites, Docker commands, and honest evidence rules.
 
-## Quiet Contract
+## Focused Suites
 
-A passing gate prints exactly one line: `ok ` followed by the gate name. A
-failing gate prints the failing step, exit status, and bounded output tail. A
-gate that did not run did not pass.
-
-## Gates
-
-All local gates run as `cargo run -p lkjagent-xtask -- <gate>`.
-
-| Gate | Checks |
-| --- | --- |
-| `check-docs` | docs shape, topology, links, ASCII, bans, docs count |
-| `check-lines` | per-file line cap |
-| `check-files` | product source and docs file-count budgets |
-| `check-style` | panic-path scan and dependency allowlist |
-| `bench check-corpus` | deterministic corpus shape, fixtures, and check validation |
-| `smoke replay` | deterministic replay through store, effects, and checks |
-| `quiet test` | fmt, clippy, and workspace tests |
-| `quiet verify` | check-docs, check-lines, check-files, check-style, quiet test |
-
-## Docker Gates
+The target program reuses these substantive suites rather than adding one shallow
+gate per workgraph row:
 
 ```sh
+cargo test --locked -p lkjagent-core contract_tables
+cargo test --locked -p lkjagent-effects workspace_safety
+cargo test --locked -p lkjagent-store durable_boundaries
+cargo test --locked -p lkjagent-app product_flows
+cargo test --locked -p lkjagent-app tui_contract
+cargo test --locked -p lkjagent-xtask acceptance_negative
+```
+
+Most named filters are not implemented yet. `../current-state.md` owns that gap.
+Current deterministic commands remain:
+
+```sh
+cargo run --locked -p lkjagent-xtask -- check-docs
+cargo run --locked -p lkjagent-xtask -- check-lines
+cargo run --locked -p lkjagent-xtask -- check-files
+cargo run --locked -p lkjagent-xtask -- check-style
+cargo run --locked -p lkjagent-xtask -- quiet test
+cargo run --locked -p lkjagent-xtask -- quiet verify
+```
+
+## Docker
+
+```sh
+docker compose build --no-cache verify test lint
 docker compose run --rm verify
 docker compose run --rm test
 docker compose run --rm lint
-docker compose run --rm bench
-docker compose run --rm replay
 ```
 
-## Repository Determinism
+Final proof runs from a clean locked export with no source bind mount and records
+source, image, and binary hashes.
 
-`Cargo.lock`, `Dockerfile`, `docker-compose.yml`, `.dockerignore`, workflow
-files, Cargo manifests, copied source, docs, and evaluation inputs are tracked.
-The repository gate parses Docker copy sources and rejects any untracked input.
-It also rejects a non-scalar or incomplete `config/lkjagent.example.json`, a
-Docker build that reads mutable runtime `data/`, source and docs over 200 lines,
-product source over 190 files, and banned panic, unsafe, unfinished, mock,
-placeholder, retired-authority, or release-style source.
+## Semantic Gates
 
-The canonical isolated run is:
-
-```sh
-sh tmp/lkjagent-evidence-first-rebuild-20260710/13-scripts/clean_checkout_gate.sh .
-```
-
-That anchored script requires a clean tree, exports `HEAD` with `git archive`,
-uses no ignored local files or environment build overrides, builds the verify,
-test, and lint images with `--no-cache`, and runs all three services. Pull
-requests and pushes to main call the same script through `sh` because the
-packet preserves it as a non-executable contract file.
-
-Workgraph nodes use the shell profile so each named gate runs from the same
-locked Docker build context:
-
-```sh
-docker compose --profile shell run --rm shell \
-  cargo run --locked -p lkjagent-xtask -- gate <node-id>
-```
-
-Each node gate owns substantive assertions for its completion predicate. An
-unknown node, an empty test filter, a skipped command, or an editable pass label
-fails. Pre-freeze raw output and machine-readable results live under
-`tmp/lkjagent-progress/nodes/<node-id>/raw/` and remain distinct from final
-acceptance evidence.
-
-`docker compose run --rm verify` is the final deterministic gate. It builds the
-image from explicit Dockerfile copies, not broad `COPY . .`, and runs
-`quiet verify` without source bind mounts. The Docker context excludes runtime
-data, logs, tmp evidence, target output, local model files, and secrets while
-retaining `Cargo.lock`.
+Parser tests and scripted responses may exercise mechanics but cannot pass model
+semantics. Public file, recovery, daily, project, report, and TUI behavior require
+the configured real endpoint. PTY requirements use raw terminal frames.
 
 ## Claims
 
-Any implementation claim names the focused test, quiet gate, and Docker gate
-that ran. Unavailable Docker, endpoint, terminal, or public CI capability is a
-blocker for dependent nodes. Record the exact command and raw error; never
-record a skip as a pass.
+A command that did not run did not pass. Nonzero output is failure evidence, not
+a tested trailer. A historical receipt does not bind changed source. Final
+success requires the acceptance command in `../evaluation/live-proof.md`.

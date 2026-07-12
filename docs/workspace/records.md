@@ -1,52 +1,58 @@
-# Records
+# Workspace Records
 
 ## Purpose
 
-Define the common owner-readable managed-document contract.
+Define grounded records, sourced memory, activity projections, and reports.
 
-## Metadata
+## Record Tool
 
-Every managed Markdown file has one H1, then an attribute-free metadata block:
+After ordinary editing works, the record phase exposes the normal descriptor-
+derived `write_record` tool with family, title, and body fields. The harness
+chooses canonical family, date/state path, token cap, and checks. There is no
+separate record grammar or direct writer.
 
-```text
-<lkjagent_record>
-<document_id>journal_20260608t120000z_k3m7q2</document_id>
-<kind>journal</kind>
-<effective_date>2026-06-08</effective_date>
-<state>active</state>
-<source_ref>activity_20260608t115900z_f4n2p8</source_ref>
-</lkjagent_record>
-```
+## Journal
 
-Document IDs are path-independent, lowercase ASCII type prefix, UTC creation
-stamp, and random lowercase base32 suffix. Scalar fields occur once. Source and
-related-document fields may repeat. Unknown managed fields, states, duplicate
-IDs, and invalid escaping fail import.
+A diary request writes `life/journal/YYYY/MM/DD/entry.md` using configured
+timezone. The model authors bounded reflection from selected same-day owner and
+workspace facts. It cannot copy the command as the entry, invent events, use a
+Unix-time path, or substitute canned missing-detail text.
 
-## Content
+Sparse evidence may produce a short honest reflection that states uncertainty.
+Success requires provider lineage, revision, fresh check, and factual path receipt.
 
-Body Markdown begins after metadata and contains concise semantic sections.
-Managed content names kind, current state, effective local date, source refs,
-owner facts, generated synthesis when present, and related documents.
+## Other Families
 
-Raw owner commands remain conversation or activity evidence. They are not copied
-into semantic records unless verbatim capture was requested. Capture writes
-explicit facts deterministically. Compose synthesizes from admitted sources.
+Add one complete family at a time: TODO by open/done state, calendar by date,
+finance by month, ordinary note by semantic slug, then project note below one
+project root. Each uses the common effect, revision, observation, and check path.
 
-## Revisions
+## Memory
 
-SQLite stores immutable exact revision bytes, SHA-256, parent revision,
-tokenizer and token counts, creating operation, and admission. Document identity
-survives moves, state changes, archive, aliases, and tombstones.
+Memory begins as sourced owner-readable Markdown below `knowledge/`. Store only
+explicit owner facts/preferences, durable project facts, or verified paths needed
+later. Each entry names source identity and effective date when known.
 
-## Size
+Do not store secrets, failed model claims, transient faults, or duplicated
+objective prose. A later current owner correction wins. Acceptance requires one
+fact to influence a fresh matter exactly once.
 
-Managed memory and navigation pages admit at most 512 conservative tokens. Long
-artifacts split by named semantic section with an outline and manifest. External
-owner and project files keep their natural format and enter context only as
-bounded fingerprinted excerpts.
+## Activity
 
-## Checks
+Canonical conversation and runtime rows may project bounded readable receipts to
+`activity/conversations` and `activity/sessions`. Projections name logical IDs,
+causal sequence, changed paths, and checks, but contain no raw prompt, failed
+body, secret, or state JSON. They are evidence, not control authority.
 
-Validate path family, title, metadata, non-placeholder body, sources,
-fingerprint, links, index membership, token count, and command separation.
+## Reports
+
+A short report uses one real file below `artifacts/documents` or
+`artifacts/reports`. Longer output uses meaningful semantic children plus a
+README map, each below the token cap. No empty or placeholder part exists.
+Checks cover paths, links, order, fingerprints, sources, and final receipt.
+
+## Maintenance
+
+Only an explicit or write-derived obligation may update affected README files,
+split agent-owned content, remove exact duplicate memory, or detect revision
+drift. Path indexes, archive policy, and richer retrieval wait for measured need.

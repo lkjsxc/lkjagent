@@ -2,49 +2,43 @@
 
 ## Purpose
 
-Define day-to-day operation for the daemon and owner CLI.
+Define safe direct and Compose operation with separate roots.
+
+## Direct
+
+```sh
+cargo run --locked -p lkjagent-app -- --data data send --new "OWNER TEXT"
+cargo run --locked -p lkjagent-app -- --data data run
+cargo run --locked -p lkjagent-app -- --data data status
+cargo run --locked -p lkjagent-app -- --data data workbench
+```
+
+The current CLI accepts these commands. Its bridge limitations are recorded in
+`../current-state.md` until direct cutover.
 
 ## Configuration
 
-Runtime configuration is optional. When present, it is the flat
-`lkjagent.json` inside the selected data directory. Defaults and environment
-overrides are sufficient for a fresh data directory. Secrets are passed by
-environment variables and are not written to the config file.
+Place flat `lkjagent.json` below the selected data root. Keep the key in the
+environment named by `endpoint_api_key_env`. Never print effective secret bytes.
+Use a fresh isolated data root for trials; the supplied store has ambiguous and
+retired authority rows.
 
-The exact key, type, range, default, reload, and consumer contract is in
-[../product/configuration-registry.md](../product/configuration-registry.md).
-The tracked `config/lkjagent.example.json` contains every registry key and is
-an immutable repository example, not runtime data. In a supplied configuration,
-missing required structure, unknown keys, arrays, nested values, wrong scalar
-types, invalid ranges, and cross-key conflicts fail startup. Model-visible
-context never includes the raw JSON config blob or secret values.
+## Compose
 
-## Docker Operation
+The target Compose contract mounts host data through `LKJAGENT_DATA_DIR` and host
+workspace through `LKJAGENT_WORKSPACE_DIR`. Data appears at `/data`; owner files
+appear at `/workspace`. The current Compose file still mounts only `/data` and is
+an open cutover item.
 
-```sh
-docker compose up -d agent
-docker compose run --rm agent lkjagent status
-docker compose run --rm agent lkjagent send "Record that hello.md should say hello."
-docker compose run --rm agent lkjagent log --limit 20
-docker compose run --rm agent lkjagent watch
-```
+## Lifecycle
 
-## Direct Operation
+Start the endpoint before the agent when Compose owns both. Health requires
+process, store, workspace, and endpoint readiness; PID alone is insufficient.
+Stop the daemon at an effect/provider boundary, capture Online Backup and logs,
+then remove isolated containers without deleting host evidence.
 
-```sh
-cargo run -p lkjagent-app -- run
-cargo run -p lkjagent-app -- run --once
-cargo run -p lkjagent-app -- send "Record that hello.md should say hello."
-cargo run -p lkjagent-app -- status
-```
+## Existing Data
 
-`run` is long-running. `run --once` executes one bounded daemon cycle for smoke
-checks and exits with a short state summary. Implementation gaps remain listed
-in [../current-state.md](../current-state.md).
-
-## Fresh Trial
-
-For a fresh trial, stop the daemon, move or remove the data directory, start the
-agent service, send one owner turn, and inspect `status`, `matter show`,
-`record list`, and the workspace files. The store and workspace are ordinary
-files under `data/`.
+Do not run the fresh direct schema against old task/step stores. Preserve old
+bytes for offline evidence and choose another data root. No product converter is
+part of the active runtime.

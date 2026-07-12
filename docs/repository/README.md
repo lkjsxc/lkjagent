@@ -2,16 +2,9 @@
 
 ## Purpose
 
-Define repository layout, file budgets, documentation shape, Rust style, and
-commit protocol.
+Map documentation and functional source standards.
 
 ## Table of Contents
 
-- [layout.md](layout.md): path ownership map.
-- [line-and-file-limits.md](line-and-file-limits.md): line cap and file-count
-  budgets.
-- [documentation-standards.md](documentation-standards.md): Markdown shape and
-  topology.
-- [functional-style.md](functional-style.md): pure core and effect edge rules.
-- [commit-protocol.md](commit-protocol.md): commit message, cadence, and
-  attribution cleanup guardrails.
+- [documentation-standards.md](documentation-standards.md): docs shape and ownership.
+- [functional-style.md](functional-style.md): core, effects, errors, and source shape.

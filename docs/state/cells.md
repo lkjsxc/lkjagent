@@ -1,79 +1,37 @@
-# Cells
+# State Cells
 
 ## Purpose
 
-Define the durable state cell shape and unknown-key behavior.
+Define the durable facts from which runtime work is selected.
 
-## State Key
+## Cell Shape
 
-A state key is data, not a closed enum:
+A cell stores a stable namespace/name key, status, priority, confidence, typed
+payload schema, evidence references, source event, timestamps, optional wake,
+and optional conflict group. Unknown namespaces and payloads survive reduction.
 
-```text
-StateKey = namespace + ":" + name
-```
+Active cells require source evidence. A missing source, stale file revision, or
+invalidated check cannot remain silently active.
 
-Suggested namespaces include `matter`, `record`, `owner`, `tool`, `context`,
-`artifact`, `recovery`, `completion`, `todo`, `calendar`, `finance`,
-`routine`, `index`, `proof`, `dev`, and `project`. Names may contain scoped
-suffixes such as
-`context:conflict/target-root` when the semantic key matters.
+## Initial Dimensions
 
-## Cell Fields
+- `matter`: open, waiting, blocked, or closed.
+- `phase`: orient, modify, review, respond, or idle.
+- `need`: target, source revision, edit, check, response, or owner fact.
+- `fault`: protocol, admission, stale file, effect, endpoint, check, or stasis.
+- `wake`: immediate, time, owner input, file change, or config change.
 
-Each cell stores:
+These dimensions are ordinary cells, not a second hard-coded workflow authority.
+A selector derives one operation from their current combination.
 
-- matter id;
-- key namespace and name;
-- status: active, inactive, suppressed, resolved, or blocked;
-- priority and confidence;
-- payload schema name;
-- payload JSON;
-- evidence refs;
-- source event id;
-- created and updated times;
-- optional expiry or cooldown;
-- optional conflict group; and
-- optional parent or lineage key.
+## Authority
 
-## Schema Names
+Matter lifecycle and obligation state are reducer-derived projections. They may
+support owner views but cannot select work independently of the state snapshot.
+Prompts and dispatchers cannot invent state absent from durable rows.
 
-Payload schema names are semantic contract labels such as `context-conflict`,
-`operation-budget`, or `state.model-call`. Do not add numbered suffix labels for
-project-authored schemas. Endpoint paths, hash algorithm names, and external API
-revisions may still contain numbers when those names are externally owned.
+## Evidence
 
-## Workspace Families
-
-Record-backed helpers use data keys, not private tables:
-
-```text
-todo:open/<id>
-calendar:due/<id>
-finance:review/<id>
-routine:ready/<id>
-index:stale/<name>
-proof:collect/<run>
-dev:repo-work/<id>
-project:active/<id>
-```
-
-These cells may carry payload hints such as `deadline_at`, `selector_tier`, or
-`operation_key`. They remain ordinary state rows and do not create another work
-engine.
-
-## Unknown Keys
-
-Storage, hydration, diagnostics, and reducer plumbing must preserve unknown
-state keys. Known helpers may decode common payload schemas, but a new state
-cell must not require editing a central enum merely to survive a round trip.
-
-## Evidence Rule
-
-Every active cell records why it exists. Evidence may be an owner message, a
-check result, an artifact fingerprint, a context item, a tool observation, or a
-recovery event. Cells without evidence are invalid for completion decisions.
-
-## Failure This Prevents
-
-A future capability can add `tool:fs-read-needed` or `context:conflict-open`
-without replacing the runtime authority model.
+Evidence references name source kind, stable source ID, and fingerprint. File
+facts use SHA-256 revisions. A later source change emits an invalidation event and
+suppresses dependent checks or context before the next decision.

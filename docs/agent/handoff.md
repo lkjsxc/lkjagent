@@ -2,28 +2,38 @@
 
 ## Purpose
 
-Define the final report format for a coding-agent session.
+Define the factual report for completed, blocked, or interrupted work.
 
-## Final Report
+## Every Handoff
 
-Name, in order:
+- Source branch and commit.
+- Objective and behavior changed.
+- Exact files and owning docs changed.
+- Exact commands run, exits, and evidence paths.
+- Commands not run and reasons.
+- Current workgraph node and dependencies.
+- Uncommitted changes, worktrees, and processes.
+- Risks, blockers, and first next command.
 
-- what changed and why;
-- docs updated, as paths;
-- implementation and tests touched, as paths;
-- commands run, with actual results;
-- commands not run, with reasons;
-- the next executable step.
+## Successful Final Handoff
 
-## Rules
+Also include source/evidence commit hashes, selected model profile, deleted
+retired authority, runtime states/tool views, context audit, workspace/record/
+memory/report behavior, TUI proof, Docker commands, ten campaign manifests,
+tracked attachment proof, reachable-history secret scan, independent review, and
+final acceptance output.
 
-`Tested` in the report must match commands that actually ran. Quiet gates are
-quoted by their `ok ...` line or failing tail. A failure handoff names the exact
-evidence, ranked hypothesis, and first file or command the next agent should
-inspect.
+Do not summarize commands as "all tests". Name them and their actual results.
+Model claims are not evidence.
 
-## Continuity
+## Blocked Handoff
 
-Anything the next agent must know goes into repository files, usually
-[../current-state.md](../current-state.md), evaluation fixtures, or request docs.
-The chat transcript is not the durable handoff.
+Use the label `blocked`. Name the external or safety condition, first failing
+command, exit and raw path, affected nodes, independent work completed afterward,
+and exact resume condition. Do not use readiness or completion language.
+
+## Partial Session
+
+If the coding harness ends while eligible work remains, report the last commit,
+current diff, first eligible node, and next command. Do not create final evidence
+or imply program completion.

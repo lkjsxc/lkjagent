@@ -1,11 +1,10 @@
-# Agent
+# Agent Workflow
 
 ## Purpose
 
-Define how coding agents work in this repository.
+Map coding-agent execution and handoff rules.
 
 ## Table of Contents
 
-- [working-here.md](working-here.md): read order, routing, and case state.
-- [honest-state.md](honest-state.md): the truth rule.
-- [handoff.md](handoff.md): final report and evidence format.
+- [working-here.md](working-here.md): case state, workgraph, commits, and review.
+- [handoff.md](handoff.md): successful, blocked, and partial reports.

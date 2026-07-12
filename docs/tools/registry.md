@@ -1,51 +1,44 @@
-# Registry
+# Tool Registry
 
 ## Purpose
 
-Define the canonical descriptor fields for the tool catalog.
+Define one descriptor source for every prompt, parser, admission, and effect.
 
-## Catalog Rule
+## Descriptor
 
-There is one tool catalog. Docs, prompt rendering, parser shape checks,
-tool-call admission, dispatcher wiring, and tests derive from the same
-descriptor set. Fixed explore-only lists are helper views, not independent law.
+A descriptor owns stable name, purpose, field order, required flags, value
+classes, byte/count bounds, safe example, state affordances, admission rules,
+stable effect key, result bound, and denial code.
 
-## Descriptor Fields
+Prompt cards, parser validation, persisted decision projection, admission,
+dispatch, generated docs, and contract tests consume the same descriptor.
 
-Each descriptor stores:
+## Initial Catalog
 
-- stable tool name;
-- one-line purpose;
-- input fields as `ToolFieldSpec` values with name, required flag, value class,
-  and limits;
-- safe example parameters when the prompt may show a copyable filled call;
-- observation contract and output bound;
-- effect boundary;
-- workspace path requirements;
-- timeout or count budget;
-- state affordance predicates;
-- safety notes; and
-- denial diagnostics for status, not prompt text.
+- `list_directory`: bounded no-follow directory listing.
+- `search_text`: bounded UTF-8 search below one path.
+- `read_file`: numbered page plus current SHA-256 revision.
+- `edit_file`: exact single-match replacement against an observed revision.
+- `create_file`: create one observed-absent UTF-8 file without overwrite.
 
-## Field Value Classes
+Shell, file delete/move, whole-file overwrite, record writing, and memory tools
+are absent until their complete state/effect/check path exists.
 
-The catalog assigns each field a value class before rendering a `ToolSetView`.
-Current classes are text, workspace path, shell command, count, and query.
-Admission uses the same field spec to reject placeholder values, path escapes,
-and non-numeric count values before effects.
+## State Views
 
-## Prompt Form
+- Orient: list, search, read.
+- Modify: read, edit, create.
+- Review: native checks and no model tools.
+- Respond: no tools and final grammar only.
+- Protocol recovery: smallest useful subset of the intended state.
+- Stale-file recovery: read, then edit after a fresh revision.
+- Wait and idle: no model call.
 
-The runtime renders safe filled XML-like action examples only when the active
-`ToolSetView` carries example parameters. Schema-only XML-like skeletons are
-labelled non-copyable and remain rejected by admission when placeholders are
-unchanged. A copyable read example contains `<decision_id>`,
-`<context_fingerprint>`, `<tool_name>fs.read</tool_name>`, and one `<input>`
-block with direct field tags for path `README.md` and count `20`. Name/value
-argument wrappers are not part of the model protocol. If no tools are available,
-the decision renders an output contract that does not ask for a tool call.
+The global catalog is never rendered. Hidden names do not appear in examples or
+denial prose.
 
-## Failure This Prevents
+## Persisted Projection
 
-A tool list cannot drift between documentation, prompt text, parser validation,
-and effect dispatch.
+A decision stores exact immutable descriptor projections, not only names or a
+hash. Admission uses that stored shape. If the executable cannot honor its effect
+key after restart, the decision blocks instead of changing meaning.

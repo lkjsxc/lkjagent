@@ -2,11 +2,10 @@
 
 ## Purpose
 
-This directory states the product north star, the ranked principles, and the
-scope boundaries for lkjagent.
+Map the mission, ranked principles, and product boundary.
 
 ## Table of Contents
 
-- [north-star.md](north-star.md): the mission and measured success target.
-- [principles.md](principles.md): the ranked invariants that shape every change.
-- [scope.md](scope.md): what belongs in the product and what does not.
+- [north-star.md](north-star.md): owner-visible mission and success.
+- [principles.md](principles.md): ranked invariants for every change.
+- [scope.md](scope.md): active product boundary and deferred behavior.

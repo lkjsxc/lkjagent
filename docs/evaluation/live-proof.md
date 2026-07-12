@@ -2,48 +2,68 @@
 
 ## Purpose
 
-Define final live and PTY acceptance against one frozen source commit.
+Define tracked source-bound evidence and the only successful stopping condition.
 
-## Source Binding
+## Evidence Root
 
-After `source-freeze`, derive `SOURCE` from Git and write final evidence only at
-`tmp/lkjagent-acceptance/$SOURCE`. Live, experiment, and PTY binaries must match
-the rebuilt frozen-source executable hash.
+Sanitized synthetic bundles live at:
+
+```text
+evaluation/evidence/<source>/<campaign>/<run-id>/
+```
+
+Private raw data stays ignored. Every attachment is verified with `git ls-files`.
+A bundle includes command log, source/status, binary/config/plan hashes,
+workspace before/after manifests, diff, compressed SQLite backup, stable table
+exports, process log, redacted provider data, derived result, and raw manifest.
+
+`result.tsv` is checker-generated. It records predicate ID, category, derived
+status, evidence path, measured value, checker hash, and predicate-schema hash.
+An input pass label is ignored.
+
+## Acceptance Command
+
+```text
+cargo run --locked -p lkjagent-xtask -- acceptance verify \
+  --source SOURCE --evidence evaluation/evidence/SOURCE
+```
+
+The command is contracted but not implemented in the current source. Its next
+workgraph node adds a nonzero incomplete mode and negative fixtures before other
+product source changes.
+
+The checker reads plans, Git history/trailers, tracked files, command exits,
+source/binary/image hashes, SQLite, workspace manifests, prompt/tool audits,
+experiments, campaigns, PTY traces, secret scan, and independent review. It
+recomputes every required row in `../../evaluation/acceptance.tsv`.
 
 ## Campaigns
 
-Run independent sessions of roughly fifteen minutes for daily life and recall,
-multiple-project development, and long artifact plus injected recovery. Send
-real owner goals throughout each session. Run a separate PTY session when it
-cannot be safely combined.
+Five meaningful development campaigns and five frozen-source campaigns each run
+at least 900 seconds: file, recovery, daily life/recall, multiple projects/report,
+and PTY. Each uses fresh roots, real endpoint, production public commands,
+predeclared owner schedule, and corresponding durable work. Sleeping duration is
+not progress.
 
-Each campaign uses a fresh isolated store, declared workspace seed, real
-configured endpoint, predeclared owner schedule, and scenario checks. Runtime
-quanta and empty polls do not count as turns or progress.
+The frozen campaigns use one no-cache clean-source binary without product changes
+between runs.
 
-## Raw Evidence
+## PTY
 
-Capture SQLite with Online Backup, exact workspace bytes and manifest, event and
-decision traces, admissions, effects, observations, checks, process lifecycle,
-provider request and response hashes, redacted logs, metrics, executable hash,
-configuration bytes, and scenario bundle hash. PTY evidence adds input events,
-terminal recording, geometry trace, screen hashes, and replay results.
+PTY evidence stores raw input/output frames, dimensions, timestamps, composer
+events, canonical message IDs/sequences, viewport mode/anchor/max-top, and screen
+hashes. A textual description without frames and IDs fails.
 
-The backup is taken at a quiesced read boundary. The sorted workspace manifest
-records normalized path, document ID, revision ID, and SHA-256. A raw manifest
-then binds the database, workspace manifest, scenario bundle, command logs, and
-PTY cast. Acceptance recomputes every named fingerprint.
+## Secret Safety
 
-The PTY cast uses asciinema JSON with ordered input and output frames.
-Replay must observe nonempty output and owner input, including Japanese text;
-a trace that describes geometry without raw cast frames is insufficient.
+Capture strips authorization headers. Pre-commit scans the index against actual
+loaded secrets without printing them. Final verification scans every reachable
+Git object for current/known prior secret fingerprints, authorization patterns,
+high-confidence credentials, and private owner content. Reports contain only
+path/object hash.
 
-## Acceptance
+## Independent Review
 
-Every required matter completes or reaches its predeclared visible waiting
-state. False closure, same-strategy retry, missing exchange, stale check,
-hidden-tool effect, fabricated file, command-as-journal prose, wrong-project
-context, mostly quiescent duration, or skipped required capability fails.
-
-The controller and independent verifier recompute results from raw evidence. A
-summary, model claim, or editable receipt cannot promote a failure.
+After final Docker and campaign evidence, a read-only reviewer recomputes all
+predicates and reports blockers. Resolve findings and regenerate affected
+evidence. Success requires clean review followed by checker exit zero.

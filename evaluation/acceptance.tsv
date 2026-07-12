@@ -1,0 +1,93 @@
+id	category	predicate	evidence_class	required
+D01	docs	current-state source and evidence boundary match final commit	source-and-doc-scan	yes
+D02	docs	active docs contain no retired authority contradictory roots or old controller	doc-gate	yes
+D03	docs	all documented required commands execute as described	doc-command-check	yes
+D04	docs	English ASCII kebab H1 Purpose README topology links and line rules pass	doc-gate	yes
+D05	history	tracked contract plans and checker precede product source changes	git-history-check	yes
+D06	history	material commits are small coherent and have honest tested trailers	git-history-and-command-check	yes
+S01	source	all authored source and docs files are at most 200 lines	repository-gate	yes
+S02	source	legacy task step template plan bridge routing production matches are zero	retired-authority-scan	yes
+S03	source	one reducer registry parser file effect and viewport implementation exist	architecture-scan	yes
+S04	source	accepted config keys all have production consumers	config-consumer-report	yes
+S05	source	panic unsafe placeholder mock product fake gate and dormant profiles are absent	style-and-source-scan	yes
+S06	source	rejected candidate code is gone and outcome interactions remain documented	profile-source-and-ledger-check	yes
+A01	checker	fake editable pass and missing evidence fixtures fail	acceptance-negative-suite	yes
+A02	checker	stale source binary profile and checker hashes fail	acceptance-negative-suite	yes
+A03	checker	mock semantic endpoint placeholder and unchanged output fixtures fail	acceptance-negative-suite	yes
+A04	checker	short quiet and missing-turn campaign fixtures fail	acceptance-negative-suite	yes
+A05	checker	untracked attachment and reachable-history secret fixtures fail without printing bytes	acceptance-negative-suite	yes
+F01	file	public real model reads and exactly edits existing UTF-8 file	workspace-bytes-and-db	yes
+F02	file	public real model creates one absent file without overwrite or scaffold	workspace-bytes-and-db	yes
+F03	file	traversal symlink and special-file attempts mutate no bytes	safety-suite-and-manifest	yes
+F04	file	stale zero-match and multiple-match edits mutate no unsafe bytes	safety-suite-and-manifest	yes
+F05	file	receipt binds prior new hashes preserved mode and actual diff	database-and-workspace	yes
+F06	file	every effect crash phase settles restores or blocks without residue	crash-matrix	yes
+F07	file	initial edit changes only requested workspace path	workspace-manifest	yes
+F08	file	public daemon completes a second owner turn after checked edit	conversation-and-event-trace	yes
+R01	runtime	owner intake atomically creates turn message event and initial state	database-transaction-check	yes
+R02	runtime	every provider call and effect has prior persisted decision	database-relational-check	yes
+R03	runtime	decision persists exact tool grammar context recovery check and exit specs	decision-payload-check	yes
+R04	runtime	selection precedes compiler attachment and provider intent without operation change	decision-sequence-check	yes
+R05	runtime	prompt grammar tool view admission and dispatch bind same stored spec	database-and-prompt-check	yes
+R06	runtime	matter and obligation statuses are reducer projections not selectors	architecture-and-event-check	yes
+R07	runtime	state changes rebuild prompt and state-specific tools	rendered-profile-check	yes
+R08	runtime	orient modify review respond recovery wait and idle paths execute	database-event-trace	yes
+R09	runtime	work exceeds four turns and resumes after restart	sustained-run-trace	yes
+R10	runtime	blocked matter does not starve unrelated runnable matter	scheduling-scenario	yes
+R11	runtime	crash recovery never reinterprets stale pending decision spec	crash-scenario	yes
+P01	protocol	JSON is absent as action encoding but escaped JSON read edit create round-trips	prompt-parser-workspace-roundtrip	yes
+P02	protocol	model does not echo decision or context fingerprints	prompt-and-response-check	yes
+P03	protocol	hidden tools never render or execute	tool-view-relational-check	yes
+P04	protocol	premature final and readiness never become owner final	conversation-and-event-check	yes
+P05	protocol	required checks run automatically without model proposal	decision-and-check-trace	yes
+P06	protocol	final claims have receipt admission and factual fallback	final-message-check	yes
+P07	protocol	native provider tool-call JSON is never successful content	provider-anomaly-check	yes
+C01	context	current owner objective body occurs exactly once	prompt-audit	yes
+C02	context	each source revision body occurs once across prompt regions	prompt-audit	yes
+C03	context	repeated reads are not material contradictions	context-scenario	yes
+C04	context	current owner and file facts supersede stale memory and summary	correction-scenario	yes
+C05	context	wrong-project evidence is absent	multi-project-prompt-audit	yes
+C06	context	failed output secrets and raw harness JSON objects are absent	contamination-audit	yes
+C07	context	configured lane and total budgets reach compiler	config-and-prompt-audit	yes
+X01	recovery	parse admission file effect endpoint check and stasis faults are typed	event-trace	yes
+X02	recovery	retries change a stored factor or external condition	decision-sequence-check	yes
+X03	recovery	length faults are distinct from connection faults	fault-classification-check	yes
+X04	recovery	exhaustion is visible resumable block and not idle or success	budget-scenario	yes
+K01	completion	checks bind current matter obligation parameters and file hash	check-relational-check	yes
+K02	completion	later file change invalidates dependent check	invalidation-scenario	yes
+K03	completion	close commits final message and has no unsettled effect	close-transaction-check	yes
+W01	workspace	separate root and Compose host variable are active before public edit	root-mount-check	yes
+W02	workspace	startup creates no full empty scaffold	fresh-workspace-manifest	yes
+W03	workspace	READMEs are explicit effect targets following real content	workspace-effect-check	yes
+W04	workspace	agent-owned records follow lazy paths and token cap	workspace-check	yes
+W05	workspace	diary uses timezone date path and grounded model-authored body	journal-scenario	yes
+W06	workspace	memory affects later matter once and correction wins	recall-scenario	yes
+W07	workspace	conversation and session receipts are bounded projections not authority	activity-scenario	yes
+W08	workspace	short and semantic reports are checked linked bounded and nonplaceholder	artifact-scenario	yes
+T01	tui	owner and final messages render once in causal order	message-db-screen-check	yes
+T02	tui	frame conversation activity and status use one store read transaction	store-read-trace	yes
+T03	tui	conversation excludes queue state tool and error chatter	pty-screen-check	yes
+T04	tui	activity IDs remain stable and polling does not duplicate	activity-screen-check	yes
+T05	tui	follow shows newest wrapped row and restores at bottom	viewport-and-pty-check	yes
+T06	tui	manual anchor survives append resize search and shrink	viewport-and-pty-check	yes
+T07	tui	composer clears after commit and survives refresh activity resize search and slow call	pty-input-trace	yes
+T08	tui	Japanese input remains responsive during slow call	pty-input-trace	yes
+T09	tui	no blank overscroll exists while matching messages exist	pty-screen-check	yes
+T10	tui	PTY rows bind logical IDs through resize bottom search-clear and post-submit restart	pty-manifest-check	yes
+E01	evidence	few substantive deterministic suites pass on frozen source	command-log	yes
+E02	evidence	locked no-cache clean-export Docker build test lint verify pass	command-log-and-image-hash	yes
+E03	evidence	concrete tracked profile plan is strict ancestor of repeated outcomes	experiment-plan-and-results	yes
+E04	evidence	one winner passes floors loser code is removed interactions retained	experiment-results-and-source	yes
+E05	evidence	development file campaign has 900 seconds meaningful scheduled work	campaign-manifest	yes
+E06	evidence	development recovery campaign has 900 seconds meaningful scheduled work	campaign-manifest	yes
+E07	evidence	development life campaign has 900 seconds meaningful scheduled work	campaign-manifest	yes
+E08	evidence	development project campaign has 900 seconds meaningful scheduled work	campaign-manifest	yes
+E09	evidence	development PTY campaign has 900 seconds meaningful scheduled work	campaign-manifest	yes
+E10	evidence	frozen file campaign has 900 seconds meaningful scheduled work	campaign-manifest	yes
+E11	evidence	frozen recovery campaign has 900 seconds meaningful scheduled work	campaign-manifest	yes
+E12	evidence	frozen life campaign has 900 seconds meaningful scheduled work	campaign-manifest	yes
+E13	evidence	frozen project campaign has 900 seconds meaningful scheduled work	campaign-manifest	yes
+E14	evidence	frozen PTY campaign has 900 seconds meaningful scheduled work	campaign-manifest	yes
+E15	evidence	sanitized synthetic evidence and compressed DB are tracked	git-files-and-manifest	yes
+E16	evidence	reachable Git history and index contain no current/known secret authorization or private data	history-secret-scan	yes
+E17	evidence	independent reviewer recomputes every required predicate	independent-review	yes

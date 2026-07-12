@@ -3,7 +3,7 @@
 ## Purpose
 
 This crate owns endpoint HTTP client code.
-Doc contract: [../../docs/llm/README.md](../../docs/llm/README.md).
+Doc contract: [../../docs/product/configuration.md](../../docs/product/configuration.md).
 
 ## Table of Contents
 

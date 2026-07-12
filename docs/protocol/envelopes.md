@@ -1,64 +1,48 @@
-# Envelopes
+# Model Envelopes
 
 ## Purpose
 
-Define decision-bound, attribute-free model output grammars.
+Define compact model output bound to one outstanding persisted decision.
 
-## Selection
+## Binding
 
-One persisted decision accepts exactly one envelope family, stop sequence, and
-optional tool view. Content operations use `content`, tool operations use
-`lkjagent_action`, owner reports or questions use `message`, and bounded judges
-use `verdict`. The selected family follows semantic operation data rather than a
-second dispatcher enum.
+One provider exchange belongs to one `RuntimeDecision`. The model does not echo
+decision IDs, context fingerprints, tool fingerprints, or JSON arguments. The
+harness binds returned content to the outstanding exchange.
 
-## Action Shape
+## Tool Call
 
 ```text
-<lkjagent_action>
-<decision_id>matter-42-decision-7</decision_id>
-<context_fingerprint>fnv1a64:84a9c6f20c3130e1</context_fingerprint>
-<tool_name>workspace_read</tool_name>
+<tool_call>
+<tool>edit_file</tool>
 <input>
-<path>projects/lkjagent/README.md</path>
-<max_tokens>384</max_tokens>
+<path>notes/sample.md</path>
+<old_text>alpha</old_text>
+<new_text>beta</new_text>
 </input>
-</lkjagent_action>
+</tool_call>
 ```
 
-Tags have no attributes, comments, CDATA, processing instructions, or JSON.
-The renderer uses stable field order. Admission accepts only the decision ID,
-context fingerprint, visible tool, required typed fields, field constraints,
-and total size recorded by the current decision.
+The action has one root, no prose outside it, no attributes, comments, CDATA, or
+JSON argument object. Dynamic text uses XML entities. A workspace file may itself
+contain JSON; it round-trips as escaped field or observation text.
 
-## Plan Shape
+## Final
 
-The bounded planner accepts one `plan` block with one action on each
-physical line. Only `write`, `explore`, and `respond` are action prefixes;
-harness plan, verify, and check labels are context, not output actions. A write
-line contains a workspace-root-relative path, concrete title, and positive word
-target. An explore line contains a concrete goal and
-positive budget. A respond line contains a concrete owner-facing summary.
-Paths cannot be absolute, start with `./` or `../`, contain empty components,
-backslashes, or `.` or `..` components. `PATH`, `TITLE`, `GOAL`, `SUMMARY`, and
-numeric placeholders are faults. The renderer supplies a filled example that
-passes this same parser. Plan lines remain a bridge to native operations, not a
-second completion authority.
+```text
+<final>
+<message>Updated the requested file.</message>
+</final>
+```
 
-## Content And Messages
+Only a respond decision accepts final output. Its owner-visible form includes a
+harness-generated path/check receipt. Unsupported or future-tense claims fail
+admission. After bounded wording faults, the factual receipt is used alone.
 
-Content bodies preserve multiline UTF-8 and escaped XML entities. A content
-operation cannot return a readiness message. A report message becomes eligible
-only after required checks pass. A question message records a waiting event and
-bounded question rather than settling the matter.
+## State Grammar
 
-## Parser
+Orient and modify accept tool calls from their exact decision views. Review,
+wait, and idle make no model call. Respond accepts final only. Recovery accepts
+the intended grammar with a narrower view and one current valid example.
 
-The pure parser accepts one complete expected envelope or returns a typed fault
-with a bounded diagnosis. It never executes partial output, repairs values,
-normalizes conflicting shapes, or treats prose outside the envelope as success.
-Action parsing has no generic Explore fallback: it requires the persisted
-runtime decision that owns the decision ID, context fingerprint, and tool view.
-
-Placeholder values such as `...`, `PATH`, `TODO`, `VALUE`, `<path>`, or `[path]`
-are non-executable and fail admission before any effect.
+A tool-named root is an experiment cell, not a permanent second parser.

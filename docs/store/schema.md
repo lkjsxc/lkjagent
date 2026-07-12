@@ -2,94 +2,49 @@
 
 ## Purpose
 
-Define the fresh native SQLite schema and the fields that carry authority.
+Define the fresh active SQLite tables and authority constraints.
 
-## Matters And Operations
+## Identity And Intake
 
-`matters` stores opaque ID, run and scenario identity, objective, lifecycle,
-priority, and created and updated causal sequences.
-
-`obligations` stores opaque ID, matter ID, predicate kind and payload, required
-flag, state, current passed same-matter check reference, and invalidating event.
-
-`operations` stores opaque ID, matter ID, semantic kind, typed inputs and
-outputs, budget, admission requirement, state, current flag, and unique
-idempotency key. `operation_edges` stores unique typed acyclic edges.
+- `matters`: objective and reducer-derived lifecycle projection.
+- `owner_turns`: queue order, raw text, delivery, and matter link.
+- `conversation_messages`: logical ID, sequence, role, body, lifecycle, cause.
+- `obligations`: required predicate and reducer-derived state.
 
 ## Runtime
 
-`runs` binds source commit, executable and configuration fingerprints, clocks,
-model identity, and scenario identity.
-
-`runtime_events` stores matter, unique run causal sequence, kind, monotonic and
-wall time, typed payload, and source identity.
-
-`state_cells`, `state_cell_history`, and `state_edges` store concurrent facts,
-old and new fingerprints, source events, guards, evidence, and dependencies.
-
-`runtime_decisions` stores matter, event, optional operation, selected cells and
-edges, operation and idempotency identity, prompt state, selected time, context,
-tool, grammar, budget, recovery, and exit fingerprints, required observations
-and checks, wake time, status, and settlement event. Selection time is stored as
-`selected_monotonic_ms`. Each decision also stores `tool_count`, `prompt_tokens`,
-`prompt_token_cap`, `semantic_duplicate_count`, `harness_json_count`, and
-`unresolved_material_conflict_count`. Durable `useful` and `progressed` booleans
-are derived from outcome evidence rather than model claims.
-
-`context_frames`, `prompt_cards`, and `provider_exchanges` reference one
-decision and source fingerprints. Exchanges store redacted request and response
-refs, usage, timing, and outcome.
-
-`failure_lineages` binds operation and decisions to prompt, tool-view, budget,
-fault signature, strategy, external-condition fingerprint, next eligibility,
-and remaining budget. Its causal tuple is unique.
+- `runtime_events`: immutable causal inputs and typed payloads.
+- `state_cells`: current reduced state and source event.
+- `runtime_decisions`: immutable selection/spec, compiler attachments, status.
+- `provider_exchanges`: request intent, response outcome, usage, timing.
+- `context_items`: source identity, revision, semantic key, trust, body reference.
+- `daemon_leases`: process ownership and heartbeat.
+- `config_fingerprints`: effective nonsecret configuration identity.
 
 ## Effects And Checks
 
-`tool_admissions` stores decision, action ordinal and fingerprint, model or
-harness origin, effectful flag, accepted or rejected status, and typed reason.
+- `tool_admissions`: parsed call, exact tool spec, decision, status, reason.
+- `effect_journal`: idempotency, stage/exchange phase, fingerprints, settlement.
+- `effect_targets`: normalized path, exact bytes, mode, stage identity.
+- `observations`: one bounded result per attempted effect.
+- `checks`: obligation parameters, measured result, source revision, freshness.
+- `workspace_documents`: stable document ID, current path, current revision.
+- `workspace_revisions`: immutable SHA-256, bytes reference, parent, effect.
 
-`effect_journal` stores decision, command ordinal, unique non-null admission,
-unique idempotency key, state, and intended, prior, and outcome fingerprints.
-`effect_target_revisions` stores ordered role, normalized path, exact optional
-prior and intended bytes, fingerprints, closed part membership, and artifact-row
-intents for a journal.
-Observations reference exactly one journal row; rejected admissions have none.
+Add state edges or search tables only with their first real consumer.
 
-`observations` stores a unique effect reference, status, attempt outcome,
-bounded content reference, fingerprint, and contamination.
+## Constraints
 
-`checks` stores matter, operation, decision, stable kind and parameters, current
-and passed flags, measured result, evidence fingerprint, and artifact or
-document references.
+Foreign keys are enabled. Causal sequences, logical messages, decision/effect
+identities, idempotency keys, and document revisions are unique. Accepted effect
+admissions have one journal; rejected admissions have none. An attempted effect
+has one observation. Close requires current checks and no unsettled journal.
 
-## Conversation And Intake
+## Fresh Store
 
-`conversation_messages` stores unique logical ID and monotonic sequence, owner
-or agent role, immutable body and fingerprint, lifecycle, causal event, and
-optional replacement.
+Active setup creates no task, step, fixed template, plan, bridge snapshot, or
+synthetic idle table. Product source contains no reader for those retired rows.
+An old store is rejected without mutation.
 
-`owner_turns`, `commands`, `diagnostics`, `outbox_messages`, `config`, and
-`daemon_leases` keep intake, operator surfaces, delivery, settings, and process
-ownership separate from conversation.
-
-## Workspace
-
-`workspace_documents` stores unique document ID and normalized current path,
-state, closed-registry kind, managed flag, effective date, project, and current
-revision.
-
-`workspace_revisions` stores document, optional parent, SHA-256, immutable
-content-blob reference, provider tokenizer and count, conservative count,
-admission count, and creating operation. Document and fingerprint are unique.
-
-`content_blobs` preserves exact bytes by SHA-256. `workspace_aliases`,
-`workspace_tombstones`, `workspace_relations`, `workspace_search_rows`, and
-`workspace_index_debt` reference document IDs and revision fingerprints.
-
-## Removal
-
-A fresh store creates no task, step, template, plan-family, bridge, finish, or
-synthetic-idle tables. Production selection, prompt compilation, effects,
-recovery, and completion read none of `TaskSnapshot`, task, step, template, or
-bridge projections.
+Internal payloads and endpoint transport may use JSON. Raw payload objects are
+never rendered into model context.

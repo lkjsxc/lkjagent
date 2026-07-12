@@ -1,39 +1,39 @@
-# Faults
+# Protocol Faults
 
 ## Purpose
 
-Define parse, admission, and repair failures as durable causal data.
+Define strict parsing, bounded diagnostics, and material repair.
 
-## Parse Faults
+## Parser
 
-Stable parse faults include `wrong_envelope`, `unclosed`, `crossed_tag`,
-`attribute`, `unknown_tag`, `duplicate_field`, `empty`, `outside_prose`, and
-`json_like`. Each records decision, exchange, bounded diagnosis, invalid-output
-fingerprint, and required change.
+The pure parser accepts exactly one complete expected root. It rejects missing,
+multiple, unclosed, crossed, attributed, unknown, duplicate, oversized, and
+bad-entity tags; JSON/prose action encoding; unknown tools; missing fields;
+invalid primitives; unsafe paths; and values outside descriptor bounds.
 
-## Admission Faults
+It never repairs values, executes partial output, guesses a tool, or accepts
+readiness prose as success.
 
-Stable admission faults include `decision_required`, `stale_decision`,
-`stale_context`, `hidden_tool`, `bad_field`, `placeholder`, `path_escape`,
-`budget_exceeded`, `duplicate_effect`, and `policy_rejected`. A decision-free
-Explore action is `decision_required`. Rejection commits without an effect
-journal row.
+## Bounds
 
-## Contamination
+Envelope, scalar, field, and total output bounds come from the persisted decision
+spec. XML decoding happens after structural and byte checks. Resulting UTF-8 is
+validated again before admission.
 
-Raw failed model output stays in restricted exchange evidence and is marked
-contaminated. Normal prompts never quote it. Recovery receives only fault class,
-fingerprint, bounded diagnosis, tried strategy, and next required change.
+## Diagnosis
 
-## Repair
+A fault records stable class/signature and one bounded diagnostic without the raw
+failed body. Recovery renders the exact current descriptor and one filled valid
+example. Successful responses do not carry an `ok` diagnosis into recovery.
 
-The first repair restates the exact expected grammar and one concrete valid
-shape bound to the current decision. Recurrence must change grammar constraint,
-tool view, field set, output unit, or strategy. The same prompt, view, budget,
-and failure signature cannot be retried unchanged.
+## Premature Final
 
-## Settlement
+Final output outside respond records `premature_final`, remains invisible as an
+agent message, and returns to the phase owning the unmet obligation. Repeated
+future-tense promises cannot close or idle the matter.
 
-Every failed attempt becomes a runtime event and failure-lineage row. Parse and
-admission failures create no effect. An effect fault settles through exactly one
-observation before recovery selection.
+## Provider Anomalies
+
+Reasoning-only, empty-with-usage, missing content, malformed provider message,
+native tool-call-only JSON, and length termination are distinct outcomes. Length
+is not classified as a connection fault.
