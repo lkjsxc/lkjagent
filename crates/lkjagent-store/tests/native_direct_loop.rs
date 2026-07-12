@@ -53,7 +53,10 @@ fn direct_settlement_is_atomic_idempotent_and_reopens() -> Result<(), Box<dyn Er
     drop(store);
     let reopened = NativeStore::open(&db)?;
     let projection = reopened.restart_projection()?;
-    assert_eq!(projection.matter.expect("matter").id, "m");
+    assert_eq!(
+        projection.matter.as_ref().map(|matter| matter.id.as_str()),
+        Some("m")
+    );
     assert_eq!(projection.cells.len(), 1);
     assert!(projection.decisions.is_empty());
     let connection = Connection::open(&db)?;
@@ -133,5 +136,20 @@ fn exact_prepare_derives_open_checks_without_passing_them() -> Result<(), Box<dy
         |r| Ok((r.get(0)?, r.get(1)?)),
     )?;
     assert_eq!(rows, (3, 0));
+    let kinds: String = connection.query_row(
+        "SELECT group_concat(predicate_kind, ',') FROM (SELECT predicate_kind FROM obligations WHERE matter_id='m' ORDER BY predicate_kind)",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(
+        kinds,
+        "workspace-byte,workspace-collateral,workspace-content"
+    );
+    let invalid: i64 = connection.query_row(
+        "SELECT count(*) FROM obligations WHERE json_valid(predicate_payload)=0",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(invalid, 0);
     Ok(())
 }
