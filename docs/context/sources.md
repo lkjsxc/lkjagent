@@ -12,6 +12,8 @@ fingerprint, and information needs it can satisfy.
 
 A file observation key includes path, revision, and line range. It is never only
 `observation/read_file`, so repeated current reads do not become false conflicts.
+Every source included by the compiled plan persists as a decision-bound native
+context item before provider intent; omitted candidates do not gain rows.
 
 ## Precedence
 

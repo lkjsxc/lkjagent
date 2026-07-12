@@ -24,6 +24,7 @@ use rusqlite::Connection;
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{
+    collections::BTreeSet,
     fs,
     path::Path,
     time::{Duration, SystemTime, UNIX_EPOCH},
@@ -57,9 +58,10 @@ pub fn run_once(data:&Path,endpoint:&mut dyn Endpoint)->R<String>{
  if !p.effects.is_empty(){return Err(format!("blocked: unfinished effect {}:{}",p.effects[0].id,p.effects[0].status))}
  if !p.decisions.is_empty(){return Err(format!("blocked: unfinished decision {}:{}",p.decisions[0].id,p.decisions[0].status))}
  let snap=hydrate(&m.id,&p.cells)?; let now=crate::clock::utc_now(); let spec=match select(RuntimeState::from_snapshot(snap.clone()),RuntimePolicy::default(),CurrentTime(now.clone())){Selection::Decision(v)=>v,Selection::Idle=>return Ok("idle: no eligible decision".into()),other=>return Ok(format!("blocked: {other:?}"))};
- let seq=store.next_event_sequence(&m.id).map_err(e)?; let did=id("decision",format!("{}:{seq}:{}",m.id,spec.operation_key).as_bytes()); let devent=id("selected",did.as_bytes()); let mut decision=runtime_decision(&did,&m.id,&snap,&spec)?; let specs=specs(&decision,&spec)?; let refs:[ContextRef<'_>;0]=[];
+ let seq=store.next_event_sequence(&m.id).map_err(e)?; let did=id("decision",format!("{}:{seq}:{}",m.id,spec.operation_key).as_bytes()); let devent=id("selected",did.as_bytes()); let mut decision=runtime_decision(&did,&m.id,&snap,&spec)?; let specs=specs(&decision,&spec)?;
  store.select_decision(&Decision{id:&did,matter:&m.id,event:&devent,event_sequence:seq,event_payload:&specs[0],operation:spec.operation_key.as_bytes(),idempotency:did.as_bytes(),monotonic_ms:millis(),wall_time:&now,specs:[&specs[0],&specs[1],&specs[2],&specs[3],&specs[4],&specs[5],&specs[6],&specs[7]]}).map_err(e)?;
- let objective=context("objective","objective",String::from_utf8_lossy(&m.objective).into_owned(),TrustClass::Owner,"owner",&m.id); let sources=source_context(&p.cells); let compiled=compile_prompt(&decision,&snap,objective,&sources,&PromptBudgets::default()).map_err(|x|fault(&mut store,&did,&m.id,ModelFaultKind::Malformed,&x).unwrap_or(x))?; decision.context_frame_fingerprint=compiled.prompt.fingerprint.clone();
+ let objective=context("objective","objective",String::from_utf8_lossy(&m.objective).into_owned(),TrustClass::Owner,"owner",&m.id); let sources=source_context(&p.cells);let items=std::iter::once(objective.clone()).chain(sources.iter().cloned()).collect::<Vec<_>>();let compiled=compile_prompt(&decision,&snap,objective,&sources,&PromptBudgets::default()).map_err(|x|fault(&mut store,&did,&m.id,ModelFaultKind::Malformed,&x).unwrap_or(x))?; decision.context_frame_fingerprint=compiled.prompt.fingerprint.clone();
+ let selected=compiled.context_plan.included.iter().map(|x|x.item_id.as_str()).collect::<BTreeSet<_>>();let owned=items.into_iter().filter(|x|selected.contains(x.id.as_str())).enumerate().map(|(n,x)|(format!("context-{did}-{n}"),x.source_type,x.source_id.into_bytes(),x.source_fingerprint.into_bytes(),x.semantic_key.into_bytes(),trust(x.trust).to_string(),x.body.into_bytes())).collect::<Vec<_>>();let refs=owned.iter().map(|x|ContextRef{id:&x.0,source_kind:&x.1,source_id:&x.2,revision:&x.3,semantic_key:&x.4,trust:&x.5,body_ref:&x.6}).collect::<Vec<_>>();
  let attachments=serde_json::to_vec(&compiled.context_plan).map_err(e)?; let frame=format!("{}\n{}",compiled.prompt.system,compiled.prompt.user); let toolfp=decision.tool_view_fingerprint().map_err(e)?.into_bytes(); store.attach_compilation(&did,&attachments,frame.as_bytes(),compiled.prompt.fingerprint.as_bytes(),&toolfp,&refs).map_err(e)?;
  let xid=id("exchange",did.as_bytes()); store.provider_intent(&xid,&did,frame.as_bytes(),millis()).map_err(e)?; store.provider_phase(&xid,"intended","sent").map_err(e)?;
  let answer=match endpoint.complete(&compiled.prompt,0){Ok(v)=>v,Err(x)=>{store.provider_outcome(&xid,"failed",x.as_bytes(),(0,0),millis(),b"error",b"endpoint",b"not-parsed").map_err(e)?; return fault(&mut store,&did,&m.id,ModelFaultKind::Stale,&x)}};
@@ -126,6 +128,8 @@ fn managed_path(db:&Path)->Option<String>{Connection::open(db).ok()?.query_row("
 fn source_revision(store:&NativeStore,path:&str)->R<String>{current_source(store).filter(|(current,_)|current==path).map(|(_,revision)|revision).ok_or_else(||"no current revision-bound source for edit".into())}
 #[rustfmt::skip]
 fn context(id:&str,key:&str,body:String,trust:TrustClass,kind:&str,source:&str)->ContextItem{ContextItem{id:id.into(),semantic_key:key.into(),body,source_type:kind.into(),source_id:source.into(),source_fingerprint:stable_fingerprint(&source).unwrap_or_default(),trust,staleness:StalenessClass::Current,contamination:ContaminationClass::Clean,artifact_refs:vec![],decision_id:None,created_at:String::new()}}
+#[rustfmt::skip]
+fn trust(value:TrustClass)->&'static str{match value{TrustClass::Owner=>"owner",TrustClass::Measured=>"workspace",TrustClass::External=>"provider",_=>"tool"}}
 
 #[rustfmt::skip]
 pub fn doctor(data:&Path,json_output:bool)->R<String>{fs::create_dir_all(data).map_err(e)?;let db=data.join("lkjagent.sqlite3");let store=NativeStore::open(&db).map_err(e)?;let p=store.restart_projection().map_err(e)?;let c=Connection::open(&db).map_err(e)?;
