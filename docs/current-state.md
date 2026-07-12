@@ -7,11 +7,9 @@ name the next executable work.
 
 ## Evidence Boundary
 
-This reset is based on product source
-`5604ec89af3ba9dbfb287bd869971781fdcf2fad`. Its parent product source is
-`28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`; the only later tree change removes
-tracked files below `tmp/`. Product crates, active docs, Cargo inputs, and Docker
-inputs are otherwise identical.
+This cutover is based exactly on `ee4de81536b1baac845a346103f14420cd41f45b`.
+The focused public native-loop test passes in this checkout. No Docker or real
+configured-model endpoint campaign has run for this change.
 
 A synthetic 901-second run against the parent product source seeded
 `notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
@@ -49,31 +47,31 @@ negative fixtures and closed direct-runtime contract tables. A separate native
 opened root, the compact envelope parser rejects echoed IDs and JSON actions, and
 LLM transport preserves bounded request/outcome fields without repairing output.
 
-The direct reducer and selector now derive decisions from state cells, the five
-native tools share one descriptor projection from prompt through admission, and
-native store transactions cover intake, exchange, effect, observation, checks,
-and close. Exact edit and create effects stage expected and intended bytes,
-fsync, preserve mode, reject races, and recover every tested crash boundary.
-Unknown executable payload schemas remain inert. These pieces pass the isolated
-workspace test suite but do not yet form the production authority loop. A
-configured public probe at source `cb27f80114cc263db515242def059c91bcc2abef`
-produced one durable provider exchange; its sanitized hash-only evidence is
-tracked as connectivity evidence with `semantic_status=not-evaluated`.
+The direct reducer and selector derive decisions from native cells, the five
+native tools share one descriptor projection from prompt through admission and
+dispatch, and native transactions cover intake, exchange, effect, observation,
+checks, respond settlement, canonical message, and close. Exact edit and create
+effects stage expected and intended bytes, fsync, preserve mode, reject stale
+revisions, and retain the isolated crash-boundary coverage. Unknown executable
+payload schemas remain inert.
+
+Public `send`, `run`, `run --once`, and `status` now branch before legacy schema
+setup and open only the fresh native 18-table store. The focused public test
+demonstrates two closed exact-edit matters, restart idempotency, and stale owner
+byte preservation with a scripted endpoint.
 
 ## Active Source Gaps
 
-Production still hydrates `TaskSnapshot`, task rows, step rows, fixed templates,
-and bridge cells. Context is prepared before final decision selection. The daemon
-maps decisions back into the retired step engine and writes both authorities.
+Legacy non-public daemon, inspection, record, workspace, and TUI APIs still use
+retired schema and bridge modules for regression coverage. They are not called by
+public send, run, or status. Public scheduling currently handles one open matter
+at a time, blocks unfinished effects instead of completing every recovery phase,
+and does not yet prove fairness across simultaneous open matters.
 
-The direct five-tool descriptor catalog, parser, admission view, and effect keys
-now agree, but the production prompt renderer still reaches them through the
-retired task bridge. The direct edit transaction is safe in isolation; the public
-owner path still invokes the existing whole-file writer and does not select the direct
-edit from native state. The automatic native check reducer now consumes settled
-successful direct edit and create observations, but the app cutover must connect
-persisted native decisions, tool admissions, exact effects, that reducer, and
-final close without a second task or step authority.
+The public compiler attaches its context plan and frame fingerprints; native
+context-item rows are not yet populated for every included source. List and
+search observations remain orienting evidence until a read produces current
+source bytes. These are bounded follow-up gaps, not task/step fallback.
 
 There is no `conversation_messages` table. The TUI synthesizes owner and agent
 messages from queue and selected event rows, then merges local drafts. It has two
@@ -117,12 +115,14 @@ claims, and the close transaction owns the canonical final message.
 | reducer-selector | complete | direct state reduction and deterministic selection pass core and bridge-continuity tests |
 | store-transactions | complete | native intake through close boundaries pass restart tests |
 | exact-edits | complete | crash-safe exact edit and create pass race, mode, symlink, and crash tests |
-| automatic-checks | active | deterministic reducer passes focused tests; production direct-loop invocation is not wired |
-| context-compiler | complete | selected decisions bind escaped deduplicated sources under lane and agent-file budgets |
+| automatic-checks | complete | public exact edits immediately reduce to three current passed checks in the focused test |
+| app-public-loop | complete | public send/run/status use only the native store and direct selector in focused scripted tests |
+| context-compiler | complete | selection precedes compilation and current source revision and bytes enter the next prompt |
 | conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
-| workspace-root | complete | data and workspace roots are separate, lazy, diagnosed, and Compose-mounted |
-| public file edit | blocked | depends on context assembly and production app-loop cutover |
-| final campaigns | blocked | no frozen binary, live task proof, or PTY proof |
+| workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
+| public file edit | complete | focused exact edit, second matter, restart, and stale-revision tests pass |
+| configured-model file proof | active | no real endpoint or Docker proof ran for this cutover |
+| final campaigns | blocked | no frozen binary, live file proof, or PTY proof |
 
 ## Honesty Rules
 

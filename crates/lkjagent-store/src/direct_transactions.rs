@@ -184,7 +184,7 @@ fn hex(bytes: &[u8]) -> String {
 }
 #[rustfmt::skip]
 fn query_cells(c: &rusqlite::Connection, matter: &str) -> StoreResult<Vec<CellRow>> {
-    let mut s=c.prepare("SELECT namespace,cell_key,payload,fingerprint FROM state_cells WHERE matter_id=?1 AND status='active' ORDER BY namespace,cell_key")?;
+    let mut s=c.prepare("SELECT CAST(namespace AS BLOB),CAST(cell_key AS BLOB),payload,fingerprint FROM state_cells WHERE matter_id=?1 AND status='active' ORDER BY namespace,cell_key")?;
     let rows=s.query_map([matter],|r|Ok(CellRow{namespace:r.get(0)?,key:r.get(1)?,payload:r.get(2)?,fingerprint:r.get(3)?}))?.collect::<Result<Vec<_>,_>>()?;
     Ok(rows)
 }

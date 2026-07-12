@@ -12,24 +12,6 @@ mod support;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn status_reports_stale_lease_rows() -> TestResult<()> {
-    let data = fixture_root("lease")?;
-    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    conn.execute(
-        "INSERT INTO config (key, value) VALUES
-         ('daemon.lock.owner', 'pid:old'),
-         ('daemon.lock.heartbeat', 'unix:1')",
-        [],
-    )?;
-    drop(conn);
-
-    let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
-
-    assert!(status.contains("lease: stale owner=pid:old heartbeat=unix:1"));
-    Ok(())
-}
-
-#[test]
 fn console_line_handler_routes_owner_input_without_daemon_state() -> TestResult<()> {
     let data = fixture_root("console")?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
@@ -107,28 +89,6 @@ fn record_cli_manages_generic_records_while_daemon_is_stopped() -> TestResult<()
 #[test]
 fn cli_inspection_reads_store_rows() -> TestResult<()> {
     let data = fixture_root("cli")?;
-    let sent = cli::run([
-        "--data",
-        data.to_string_lossy().as_ref(),
-        "send",
-        "--new",
-        "What",
-        "now?",
-    ])?;
-    assert!(sent.contains("new=true"));
-    assert!(
-        cli::run(["--data", data.to_string_lossy().as_ref(), "queue", "list"])?
-            .contains("force_new=true")
-    );
-    assert!(cli::run([
-        "--data",
-        data.to_string_lossy().as_ref(),
-        "queue",
-        "show",
-        "1"
-    ])?
-    .contains("content=What now?"));
-
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     enqueue(&conn, "What is an agent?", "now")?;
     conn.execute(
@@ -142,12 +102,6 @@ fn cli_inspection_reads_store_rows() -> TestResult<()> {
         index: 0,
     };
     run_until_idle(&data, &mut endpoint, 3)?;
-    let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
-    assert!(status.contains("state: active="));
-    assert!(status.contains("decision: case-1-decision-"));
-    assert!(status.contains("context_lanes:"));
-    assert!(status.contains("lanes="));
-    assert!(status.contains("exchanges: 1"));
     let matter_list = cli::run(["--data", data.to_string_lossy().as_ref(), "matter", "list"])?;
     assert!(matter_list.contains("matter 1 closed"));
     let matter_show = cli::run([

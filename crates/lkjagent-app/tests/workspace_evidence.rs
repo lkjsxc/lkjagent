@@ -13,24 +13,6 @@ mod support;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn cli_send_writes_workspace_transcript_trace() -> TestResult<()> {
-    let data = fixture_root("workspace-send-trace")?;
-    let output = cli::run([
-        "--data",
-        data.to_string_lossy().as_ref(),
-        "send",
-        "are you ok?",
-    ])?;
-    assert!(output.contains("queue: 1"));
-    assert_contains(
-        &data,
-        "workspace/artifacts/transcripts/queue-000001.md",
-        "are you ok?",
-    )?;
-    Ok(())
-}
-
-#[test]
 fn ambiguous_save_like_turn_writes_inbox_without_endpoint() -> TestResult<()> {
     let data = fixture_root("workspace-inbox")?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;

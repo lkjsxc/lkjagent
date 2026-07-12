@@ -15,16 +15,18 @@ All file opens are relative to a retained no-follow root capability.
 
 ## Intake
 
-At cycle start, pending owner turns become durable events. Ordinary prose always
-opens or updates a matter. Questions for missing facts create a visible waiting
-state. Intake never fabricates a closed task or a canned record body.
+Public send writes directly to the native store. Ordinary prose currently opens
+a new matter with one owner turn, owner message, intake event, and active
+`matter/opened` cell. Intake never creates workspace files, a retired task, or a
+canned record body.
 
 ## Scheduling
 
-One cycle performs at most one provider call or one external effect. Stable
-priority and causal sequence select among runnable matters. A blocked matter does
-not starve another matter. New owner input is delivered between boundaries, not
-inside a provider or effect transaction.
+One public cycle selects and persists at most one direct decision, then performs
+at most one provider call and the single action admitted from that decision.
+Selection is from native cells and causal sequence. The first cutover selects one
+open matter at a time; fairness across simultaneous open matters is not yet
+proved. New owner input is delivered only at command boundaries.
 
 ## Quiescence
 
@@ -34,12 +36,15 @@ when a matter waits or blocks and continues servicing unrelated work.
 
 ## Restart
 
-Startup claims the lease, validates effective config, reconciles applying file
-effects, detects ambiguous provider sends, reduces due wakes, and then selects
-work. It never blindly repeats an external action.
+Public restart projects native cells and unfinished work before selection. A
+sent provider exchange is marked ambiguous and is never replayed. An unfinished
+file effect blocks rather than overwriting unknown bytes; settled effects and
+checks-ready state are recognized by the native projection. Full phase recovery
+for every interrupted file boundary remains narrower than the effect primitive's
+isolated recovery suite.
 
-An active store with retired task/step schema is rejected without mutation. The
-owner may retain it as historical evidence and choose a fresh data root.
+A store with retired task/step schema is rejected without mutation. The owner may
+retain it as historical evidence and choose a fresh data root.
 
 ## Workspace Creation
 

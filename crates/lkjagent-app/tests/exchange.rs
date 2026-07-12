@@ -1,7 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
 
-use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, CompletionRecord, Endpoint, ScriptedEndpoint};
 use lkjagent_core::render::Prompt;
 use lkjagent_store::plan_access::enqueue;
@@ -80,8 +79,6 @@ fn endpoint_completion_writes_exchange_and_usage_rows() -> TestResult<()> {
         (13, 3, 10, 7, "known")
     );
     assert!(usage.5.contains("cache_status"));
-    let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
-    assert!(status.contains("input_uncached=10 input_cached=3 input_total=13 output=7 cache=known"));
     Ok(())
 }
 
@@ -128,9 +125,6 @@ fn missing_endpoint_usage_gets_unknown_token_row() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert!(unknown > 0);
-    let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
-    assert!(status.contains("input_cached=unknown"));
-    assert!(status.contains("cache=unknown"));
     Ok(())
 }
 

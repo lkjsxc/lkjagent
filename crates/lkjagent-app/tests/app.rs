@@ -110,10 +110,10 @@ fn status_snapshot_contains_documented_fields() -> TestResult<()> {
         "What",
         "now?",
     ])?;
-    assert!(sent.contains("queue:"));
+    assert!(sent.contains("matter=") && sent.contains("message=owner-turn/"));
     let status = cli::run(["--data", data.to_string_lossy().as_ref(), "status"])?;
-    assert!(status.contains("daemon:"));
-    assert!(status.contains("tokens:"));
+    assert!(status.contains("roots: data="));
+    assert!(status.contains("matters: total=1"));
     Ok(())
 }
 

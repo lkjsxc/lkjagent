@@ -29,6 +29,7 @@ mod context_resolution_bridge;
 pub mod daemon;
 mod daemon_intake;
 mod daemon_lock;
+#[allow(dead_code)]
 mod daemon_owner_routes;
 mod daemon_route_effects;
 mod diagnostics;
@@ -45,6 +46,7 @@ mod model_call;
 mod model_io;
 mod observation_bridge;
 pub mod progress_bridge;
+pub mod public_loop;
 mod record_archive;
 mod record_args;
 mod record_files;
@@ -63,7 +65,7 @@ pub mod tui_event {
 }
 
 pub mod endpoint {
-    pub use crate::model_io::LlmEndpoint;
+    pub use crate::model_io::{CompletionRecord, Endpoint, LlmEndpoint, ScriptedEndpoint};
 }
 mod tui_keys;
 mod tui_reduce;

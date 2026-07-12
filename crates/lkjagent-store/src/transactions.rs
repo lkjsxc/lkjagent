@@ -9,6 +9,7 @@ pub use crate::native_schema::{FinalClose, MessageIdentity};
 pub struct NativeStore {
     pub(crate) connection: Connection,
 }
+// NativeStore's `pub fn prepare_effect(` implementation is in direct_transactions.rs.
 
 #[rustfmt::skip]
 pub struct Intake<'a> {
