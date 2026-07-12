@@ -1,8 +1,6 @@
-use serde_json::Value;
-
 use crate::model::{CheckResult, StepKind};
 use crate::runtime_decision::{OutputEnvelope, RuntimeDecision};
-use crate::runtime_tool_call::{parse_tool_call, ToolCallError};
+use crate::runtime_tool_call::{parse_model_value, ModelValue, ToolCallError};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ParsedOutput {
@@ -65,15 +63,20 @@ pub fn parse_fault_diagnosis(fault: &ParseFault) -> String {
 
 fn action_hint(error: &ToolCallError) -> &'static str {
     match error {
-        ToolCallError::NoActionFound => "Return one lkjagent_action envelope.",
-        ToolCallError::MultipleActionsFound => "Return exactly one lkjagent_action envelope.",
-        ToolCallError::Attribute(_) => "Remove attributes; use child tags only.",
-        ToolCallError::DuplicateTag(_) => "Keep one value for each scalar or argument name.",
-        ToolCallError::DecisionMismatch => "Echo the current decision_id exactly.",
-        ToolCallError::ContextMismatch => "Echo the current context_fingerprint exactly.",
-        ToolCallError::ToolUnknown => "Choose one tool from the selected tool view.",
-        ToolCallError::ArgsSchemaViolation(_) => "Match the selected tool argument schema.",
-        _ => "Use the documented action envelope with balanced child tags only.",
+        ToolCallError::MissingRoot | ToolCallError::MultipleRoots => {
+            "Return exactly one complete tool_call or final envelope."
+        }
+        ToolCallError::Attribute => "Remove attributes; use child tags only.",
+        ToolCallError::DuplicateTag => "Keep one value for each field name.",
+        ToolCallError::WrongGrammarPhase => "Use the envelope selected by the harness.",
+        ToolCallError::HiddenTool => "Choose one visible tool from this decision.",
+        ToolCallError::FieldOrder | ToolCallError::MissingField | ToolCallError::UnknownTag => {
+            "Match the ordered descriptor fields exactly."
+        }
+        ToolCallError::ValueClass | ToolCallError::UnsafePath | ToolCallError::Bounds => {
+            "Match the descriptor value class and bounds."
+        }
+        _ => "Use balanced, attribute-free child tags only.",
     }
 }
 
@@ -98,8 +101,8 @@ pub fn parse_expected_for_decision(
         OutputEnvelope::Plan => {
             crate::parse_plan::parse_plan(&block(raw, "plan")?).map(ParsedOutput::Plan)
         }
-        OutputEnvelope::Action => parse_action(raw, decision),
-        OutputEnvelope::Message => block(raw, "message").map(ParsedOutput::Message),
+        OutputEnvelope::Action => parse_model_output(raw, decision),
+        OutputEnvelope::Message => parse_model_output(raw, decision),
         OutputEnvelope::Verdict => {
             parse_verdict(&block(raw, "verdict")?).map(ParsedOutput::Verdict)
         }
@@ -128,29 +131,20 @@ pub fn block(raw: &str, tag: &str) -> Result<String, ParseFault> {
     }
 }
 
-fn parse_action(raw: &str, decision: &RuntimeDecision) -> Result<ParsedOutput, ParseFault> {
-    let parsed = parse_tool_call(raw, decision).map_err(map_action_fault)?;
-    Ok(ParsedOutput::Action(Action {
-        tool: parsed.tool_name,
-        params: parsed
-            .args
-            .into_iter()
-            .map(|(name, value)| (name, param_value(&value)))
-            .collect(),
-    }))
+fn parse_model_output(raw: &str, decision: &RuntimeDecision) -> Result<ParsedOutput, ParseFault> {
+    match parse_model_value(raw, decision).map_err(map_action_fault)? {
+        ModelValue::ToolCall(parsed) => Ok(ParsedOutput::Action(Action {
+            tool: parsed.tool_name,
+            params: parsed.args,
+        })),
+        ModelValue::Final(message) => Ok(ParsedOutput::Message(message)),
+    }
 }
 
 fn map_action_fault(error: ToolCallError) -> ParseFault {
     match error {
-        ToolCallError::ToolUnknown => ParseFault::UnknownTool,
+        ToolCallError::HiddenTool => ParseFault::UnknownTool,
         other => ParseFault::Action(other),
-    }
-}
-
-fn param_value(value: &Value) -> String {
-    match value {
-        Value::String(text) => text.clone(),
-        other => other.to_string(),
     }
 }
 

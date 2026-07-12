@@ -116,14 +116,11 @@ fn generic_explore_rejects_every_action_shape() {
     }
 }
 
-fn action(decision_id: &str, tool: &str, args: &[(&str, &str)], context: &str) -> String {
-    let mut out = format!(
-        "<lkjagent_action><decision_id>{decision_id}</decision_id><context_fingerprint>{context}</context_fingerprint><tool_name>{tool}</tool_name>"
-    );
-    out.push_str("<input>");
+fn action(_decision_id: &str, tool: &str, args: &[(&str, &str)], _context: &str) -> String {
+    let mut out = format!("<tool_call><tool>{tool}</tool><input>");
     for (name, value) in args {
         out.push_str(&format!("<{name}>{value}</{name}>"));
     }
-    out.push_str("</input></lkjagent_action>");
+    out.push_str("</input></tool_call>");
     out
 }

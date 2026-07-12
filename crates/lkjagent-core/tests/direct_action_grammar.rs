@@ -1,71 +1,94 @@
-use lkjagent_core::runtime_decision::{
-    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
-};
-use lkjagent_core::runtime_tool_call::{parse_tool_call, ToolCallError};
+use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision};
+use lkjagent_core::runtime_tool_call::{parse_model_value, ToolCallError};
+use lkjagent_core::runtime_tool_catalog::direct_tool_view;
 
 #[test]
-fn rejects_name_value_argument_wrappers() -> Result<(), String> {
-    let raw = "<lkjagent_action><decision_id>dec-1</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>fs.read</tool_name><argument><name>path</name><value>README.md</value></argument></lkjagent_action>";
-    let error = match parse_tool_call(raw, &decision()) {
-        Ok(_) => return Err("name/value wrapper accepted".to_string()),
-        Err(error) => error,
-    };
-    assert_eq!(error, ToolCallError::UnknownTag("argument".to_string()));
+fn contract_tables_reject_forbidden_xml_forms() -> Result<(), String> {
+    let cases = [
+        ("<tool_call a='1'></tool_call>", ToolCallError::Attribute),
+        ("<tool_call/>", ToolCallError::SelfClosing),
+        (
+            "<!--x--><tool_call></tool_call>",
+            ToolCallError::ForbiddenSyntax,
+        ),
+        ("<![CDATA[x]]>", ToolCallError::ForbiddenSyntax),
+        (
+            "<?xml version='1.0'?><tool_call></tool_call>",
+            ToolCallError::ForbiddenSyntax,
+        ),
+        (
+            "<tool_call><tool>x</tool></final>",
+            ToolCallError::CrossedTag,
+        ),
+        ("<tool_call><tool>x</tool>", ToolCallError::UnclosedTag),
+    ];
+    for (raw, expected) in cases {
+        assert_eq!(error(raw)?, expected, "raw={raw}");
+    }
     Ok(())
 }
 
 #[test]
-fn requires_one_input_block() -> Result<(), String> {
-    let raw = "<lkjagent_action><decision_id>dec-1</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>fs.read</tool_name></lkjagent_action>";
-    let error = match parse_tool_call(raw, &decision()) {
-        Ok(_) => return Err("missing input accepted".to_string()),
-        Err(error) => error,
-    };
-    assert!(
-        matches!(error, ToolCallError::ArgsSchemaViolation(message) if message == "missing input")
-    );
+fn contract_tables_reject_roots_prose_and_legacy_actions() -> Result<(), String> {
+    let cases = [
+        ("prose", ToolCallError::MissingRoot),
+        ("prose <tool_call></tool_call>", ToolCallError::MissingRoot),
+        (
+            "<lkjagent_action></lkjagent_action>",
+            ToolCallError::UnknownRoot,
+        ),
+        ("{\"tool\":\"read_file\"}", ToolCallError::MissingRoot),
+        (
+            "<tool_call></tool_call><tool_call></tool_call>",
+            ToolCallError::MultipleRoots,
+        ),
+        (
+            "<tool_call><decision_id>x</decision_id><input></input></tool_call>",
+            ToolCallError::UnknownTag,
+        ),
+    ];
+    for (raw, expected) in cases {
+        assert_eq!(error(raw)?, expected, "raw={raw}");
+    }
     Ok(())
 }
 
 #[test]
-fn rejects_oversized_action_bytes() -> Result<(), String> {
-    let raw = "x".repeat(16_385);
-    let error = match parse_tool_call(&raw, &decision()) {
-        Ok(_) => return Err("oversized action accepted".to_string()),
-        Err(error) => error,
-    };
-    assert!(
-        matches!(error, ToolCallError::ArgsSchemaViolation(message) if message == "action too large")
-    );
+fn contract_tables_reject_nested_duplicate_and_invalid_entities() -> Result<(), String> {
+    let cases = [
+        (
+            "<tool_call><tool><name>read_file</name></tool><input></input></tool_call>",
+            ToolCallError::NestedTag,
+        ),
+        (
+            "<tool_call><tool>read_file</tool><tool>read_file</tool></tool_call>",
+            ToolCallError::DuplicateTag,
+        ),
+        (
+            "<tool_call><tool>read_file</tool><input><path>a&bogus;</path></input></tool_call>",
+            ToolCallError::BadEntity,
+        ),
+        (
+            "<tool_call><tool>read_file</tool><input><path>a&amp;lt;b</path></input></tool_call>",
+            ToolCallError::BadEntity,
+        ),
+    ];
+    for (raw, expected) in cases {
+        assert_eq!(error(raw)?, expected, "raw={raw}");
+    }
     Ok(())
 }
 
-#[test]
-fn rejects_oversized_scalar_bytes() -> Result<(), String> {
-    let identifier = "d".repeat(4097);
-    let raw = format!(
-        "<lkjagent_action><decision_id>{identifier}</decision_id><context_fingerprint>ctx-1</context_fingerprint><tool_name>fs.read</tool_name><input><path>README.md</path></input></lkjagent_action>"
-    );
-    let error = match parse_tool_call(&raw, &decision()) {
-        Ok(_) => return Err("oversized scalar accepted".to_string()),
-        Err(error) => error,
-    };
-    assert!(
-        matches!(error, ToolCallError::ArgsSchemaViolation(message) if message == "scalar too large for decision_id")
-    );
-    Ok(())
+fn error(raw: &str) -> Result<ToolCallError, String> {
+    parse_model_value(raw, &decision()).map_or_else(Ok, |_| Err("invalid form accepted".into()))
 }
 
 fn decision() -> RuntimeDecision {
-    let mut decision = RuntimeDecision::new(
-        "dec-1",
+    RuntimeDecision::new(
+        "decision-is-not-model-data",
         "case-1",
-        OperationKey("read".to_string()),
-        ToolSetView::new(vec![
-            ToolViewEntry::new("fs.read", "read").with_params(vec!["path"], Vec::new())
-        ]),
+        OperationKey("direct.modify".into()),
+        direct_tool_view(),
         OutputEnvelope::Action,
-    );
-    decision.context_frame_fingerprint = "ctx-1".to_string();
-    decision
+    )
 }

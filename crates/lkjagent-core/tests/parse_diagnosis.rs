@@ -3,9 +3,7 @@ use lkjagent_core::runtime_tool_call::ToolCallError;
 
 #[test]
 fn action_parse_faults_have_repair_guidance() {
-    let diagnosis = parse_fault_diagnosis(&ParseFault::Action(ToolCallError::Attribute(
-        "lkjagent_action".to_string(),
-    )));
+    let diagnosis = parse_fault_diagnosis(&ParseFault::Action(ToolCallError::Attribute));
     assert!(diagnosis.contains("Repair:"));
     assert!(diagnosis.contains("Remove attributes"));
     assert!(diagnosis.contains("child tags only"));

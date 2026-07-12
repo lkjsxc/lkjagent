@@ -1,7 +1,6 @@
 use lkjagent_core::classify::instantiate;
-use lkjagent_core::parse::{parse_expected_for_decision, ParsedOutput};
+use lkjagent_core::parse::{parse_expected_for_decision, ParseFault, ParsedOutput};
 use lkjagent_core::render::render_prompt_for_decision;
-use lkjagent_core::runtime_admission::{admit_action, AdmissionStatus, ModelAction};
 use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
 use lkjagent_core::runtime_tool_catalog::explore_tool_view;
 
@@ -50,7 +49,7 @@ fn rendered_plan_example_is_parser_valid() -> Result<(), String> {
 }
 
 #[test]
-fn rendered_filled_tool_example_parses_and_admits() -> Result<(), String> {
+fn legacy_rendered_filled_tool_example_is_rejected() -> Result<(), String> {
     let snapshot = instantiate(3, "Survey workspace and report.");
     let mut decision = RuntimeDecision::new(
         "decision-1",
@@ -72,24 +71,16 @@ fn rendered_filled_tool_example_parses_and_admits() -> Result<(), String> {
         .split("Safe filled example:\n")
         .last()
         .unwrap_or("");
-    let parsed =
-        parse_expected_for_decision(&decision, example).map_err(|fault| format!("{fault:?}"))?;
-    let ParsedOutput::Action(action) = parsed else {
-        return Err("example did not parse as action".to_string());
-    };
-    let admission = admit_action(
-        &decision,
-        &ModelAction {
-            tool: action.tool,
-            params: action.params.into_iter().collect(),
-        },
-    )
-    .map_err(|error| error.message)?;
+    assert_eq!(
+        parse_expected_for_decision(&decision, example),
+        Err(ParseFault::Action(
+            lkjagent_core::runtime_tool_call::ToolCallError::UnknownRoot
+        ))
+    );
 
     assert!(prompt.user.contains("<lkjagent_action>"));
     assert!(prompt.user.contains("<input>"));
     assert!(prompt.user.contains("<path>README.md</path>"));
     assert!(prompt.user.contains("recovery_policy: correct-primitive"));
-    assert_eq!(admission.status, AdmissionStatus::Admitted);
     Ok(())
 }

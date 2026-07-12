@@ -1,10 +1,9 @@
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::model::{Attempt, AttemptOutcome, StepKind};
-use lkjagent_core::parse::{parse_expected_for_decision, ParsedOutput};
+use lkjagent_core::parse::{parse_expected_for_decision, ParseFault};
 use lkjagent_core::render::{
     max_tokens, render_prompt, render_prompt_for_decision, render_prompt_for_decision_with_attempts,
 };
-use lkjagent_core::runtime_admission::{admit_action, AdmissionStatus, ModelAction};
 use lkjagent_core::runtime_artifact::DEFAULT_UNIT_TARGET_TOKENS;
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
@@ -69,7 +68,7 @@ fn explore_decision_renders_tool_call_contract() {
 }
 
 #[test]
-fn rendered_placeholder_shape_parses_but_is_rejected() -> Result<(), String> {
+fn legacy_rendered_placeholder_shape_is_rejected() -> Result<(), String> {
     let snapshot = instantiate(3, "Survey workspace and report.");
     let decision = RuntimeDecision::new(
         "decision-1",
@@ -91,22 +90,12 @@ fn rendered_placeholder_shape_parses_but_is_rejected() -> Result<(), String> {
         .split("Schema-only shape, not copyable:\n")
         .last()
         .unwrap_or("");
-    let parsed =
-        parse_expected_for_decision(&decision, shape).map_err(|fault| format!("{fault:?}"))?;
-    let ParsedOutput::Action(action) = parsed else {
-        return Err("shape did not parse as action".to_string());
-    };
-    let admission = admit_action(
-        &decision,
-        &ModelAction {
-            tool: action.tool,
-            params: action.params.into_iter().collect(),
-        },
-    )
-    .map_err(|error| error.message)?;
-
-    assert_eq!(admission.status, AdmissionStatus::Rejected);
-    assert_eq!(admission.reason, "placeholder value for path");
+    assert_eq!(
+        parse_expected_for_decision(&decision, shape),
+        Err(ParseFault::Action(
+            lkjagent_core::runtime_tool_call::ToolCallError::UnknownRoot
+        ))
+    );
     Ok(())
 }
 
