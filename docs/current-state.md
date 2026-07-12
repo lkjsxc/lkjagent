@@ -14,11 +14,15 @@ The original planning comparison used source
 `5604ec89af3ba9dbfb287bd869971781fdcf2fad` and parent product source
 `28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`.
 
-A configured-model smoke run against the public cutover reached eight provider
-exchanges but every response ended immediately before `</tool_call>` because the
-closing root had been sent as a provider stop string. It made no edit. Current
-source omits direct-request stop strings; that correction still needs a fresh
-configured-model run.
+An initial configured-model smoke run reached eight provider exchanges but every
+response ended before `</tool_call>` because the closing root was a provider stop
+string. After source `5b643de8b10ce0ee9bd2cbe63b53c1dbed8f3798` removed that
+stop, a fresh public run closed the first matter in eight decisions with exact
+expected bytes, three current passed checks, one file, and no collateral path.
+Its second read-only turn preserved bytes but repeated reads under the old tool
+descriptor and did not close. Current source adds an explicitly admitted
+`complete=true` read path backed only by the same current passed revision; its
+configured-model behavior remains unproven.
 
 A synthetic 901-second run against the parent product source seeded
 `notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
@@ -76,7 +80,9 @@ Retired non-public daemon, inspection, record, workspace, and TUI APIs still use
 retired schema and projection modules for regression coverage. They are not called by
 public send, run, or status. Public scheduling currently handles one open matter
 at a time, blocks unfinished effects instead of completing every recovery phase,
-and does not yet prove fairness across simultaneous open matters.
+and does not yet prove fairness across simultaneous open matters. Scripted tests
+cover checked read-only continuation, but the configured model has not yet used
+that descriptor field.
 
 The public compiler attaches its context plan and frame fingerprints; native
 context-item rows are not yet populated for every included source. List and
@@ -133,8 +139,8 @@ claims, and the close transaction owns the canonical final message.
 | context-compiler | complete | selection precedes compilation and current source revision and bytes enter the next prompt |
 | conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
-| public scripted file edit | complete | focused exact edit, second matter, restart, and stale-revision tests pass |
-| configured-model file proof | active | no real endpoint or Docker proof ran for this cutover |
+| public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
+| configured-model file proof | active | real first edit passed; checked read-only second-turn close and Docker proof remain |
 | final campaigns | blocked | no frozen binary, live file proof, or PTY proof |
 
 ## Honesty Rules

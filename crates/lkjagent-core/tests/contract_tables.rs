@@ -183,7 +183,7 @@ fn contract_tables_tool_catalog_and_open_keys_preserve_authority() {
         .map(|field| field.name).collect::<Vec<_>>();
     assert_eq!(field_names(0), ["path", "offset", "count"]);
     assert_eq!(field_names(1), ["path", "query", "offset", "count"]);
-    assert_eq!(field_names(2), ["path", "offset", "count"]);
+    assert_eq!(field_names(2), ["path", "offset", "count", "complete"]);
     assert_eq!(field_names(3), ["path", "old_text", "new_text"]);
     assert_eq!(field_names(4), ["path", "content"]);
     assert!(catalog.iter().all(|tool| !tool.effect_key.is_empty()

@@ -93,6 +93,7 @@ const READ_FIELDS: &[DescriptorField] = &[
     field("path", true, PATH, (1, 1024), (None, None), Some("README.md")),
     field("offset", false, COUNT, (1, 7), (Some(0), Some(1_000_000)), None),
     field("count", false, COUNT, (1, 3), (Some(1), Some(120)), Some("20")),
+    field("complete", false, TEXT, (4, 4), (None, None), Some("true")),
 ];
 #[rustfmt::skip]
 const EDIT_FIELDS: &[DescriptorField] = &[
@@ -110,7 +111,7 @@ const CREATE_FIELDS: &[DescriptorField] = &[
 const DIRECT_CATALOG: &[ToolDescriptor] = &[
     descriptor("list_directory", "list one workspace directory", LIST_FIELDS, ORIENT, "workspace.list", 16_384, "list-denied"),
     descriptor("search_text", "search bounded workspace text", SEARCH_FIELDS, ORIENT, "workspace.search", 16_384, "search-denied"),
-    descriptor("read_file", "read a numbered page and observe its revision", READ_FIELDS, &["orient", "modify", "recovery"], "workspace.read", 32_768, "read-denied"),
+    descriptor("read_file", "read a numbered page; complete=true closes a read-only turn only when its revision still has current passed checks", READ_FIELDS, &["orient", "modify", "recovery"], "workspace.read", 32_768, "read-denied"),
     descriptor("edit_file", "replace one exact observed text span", EDIT_FIELDS, MODIFY, "workspace.edit", 8_192, "edit-denied"),
     descriptor("create_file", "create one observed-absent UTF-8 file", CREATE_FIELDS, MODIFY, "workspace.create", 8_192, "create-denied"),
 ];
