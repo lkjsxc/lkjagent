@@ -21,7 +21,9 @@ fingerprints before provider intent. It cannot change the operation.
 6. Current owner text exactly once as the user message.
 
 Previous system messages are not replayed. The objective is not copied through a
-brief, context item, and step instruction.
+brief, context item, and step instruction. The latest bounded list or search
+observation is a measured evidence card in the next orient prompt, so inspection
+can narrow toward a revision-bearing read instead of repeating blindly.
 
 ## Lanes
 

@@ -15,7 +15,9 @@ normal prompts.
 
 - Protocol faults receive the exact code and one descriptor-generated example.
 - Hidden tools regenerate only the current decision view.
-- Premature final output returns to the phase owning the unmet obligation.
+- Premature final output returns to the phase owning the unmet obligation. If a
+  current read exactly matches a still-current checked managed revision, the
+  harness materializes matter-bound continuity checks before selecting respond.
 - Missing reads activate a source-revision need.
 - Stale or ambiguous edits reread and rebase; they never overwrite.
 - Output limits reduce scope or split one semantic unit.

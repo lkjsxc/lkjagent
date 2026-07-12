@@ -35,6 +35,25 @@ alive with backoff. A fresh configured smoke closed the exact edit in seven
 cycles despite four recoverable output faults, but the correction still needs a
 fresh tracked run.
 
+A second tracked 903-second run at source
+`607465201258253de06a649c5f0d96334cc2d690` stayed alive and derived exact bytes,
+one file, 18 tables, 77 provider exchanges, 62 admissions, one effect, six
+passed checks, five owner messages, and two checked closes. It failed honestly
+because the last three read-only continuity matters did not close; the active
+matter repeated a root listing because orient observations were not recompiled.
+Current source includes bounded list/search observations in the next prompt and
+turns a rejected premature final after a current read into the same revision-
+bound continuity checks before retrying the required respond envelope. A
+configured continuation then narrowed from root to `notes` but emitted
+`exact-base.txt` without its parent because list output omitted the requested
+path, and that read error left a selected decision. Current source labels list
+and search observations with their requested path and turns dispatch errors into
+durable recovery faults instead of pending decisions. A fresh configured smoke
+using the corrected binary closed the checked first turn through the factual
+receipt fallback, then closed the second and third continuity turns in four and
+five cycles with exact bytes, one file, and nine current passed checks. This is
+not yet the tracked 903-second rerun.
+
 A synthetic 901-second run against the parent product source seeded
 `notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
 verification, and truthful report. The daemon stayed alive and owner intake

@@ -54,7 +54,10 @@ fn decision_fingerprint_is_stable_for_canonical_tool_view() {
 #[test]
 fn rendered_tool_view_and_admission_match() {
     let decision = direct_decision();
-    let read_action = action("read_file", vec![("path", "docs/current-state.md")]);
+    let read_action = action(
+        "read_file",
+        vec![("path", "docs/current-state.md"), ("complete", "false")],
+    );
     let admitted = admit(&decision, &read_action);
     let rejected = admit(&decision, &action("shell.run", vec![("command", "pwd")]));
 
@@ -95,10 +98,19 @@ fn observation_contamination_classifies_sensitive_and_external_raw() {
 #[test]
 fn workspace_policy_blocks_path_escapes() {
     let decision = direct_decision();
-    let parent = admit(&decision, &action("read_file", vec![("path", "../secret")]));
+    let parent = admit(
+        &decision,
+        &action(
+            "read_file",
+            vec![("path", "../secret"), ("complete", "false")],
+        ),
+    );
     let absolute = admit(
         &decision,
-        &action("read_file", vec![("path", "/tmp/secret")]),
+        &action(
+            "read_file",
+            vec![("path", "/tmp/secret"), ("complete", "false")],
+        ),
     );
 
     assert_eq!(parent.status, AdmissionStatus::Rejected);
@@ -119,29 +131,17 @@ fn key(namespace: &str, name: &str) -> StateKey {
     }
 }
 
-fn cell(namespace: &str, name: &str) -> StateCell {
-    StateCell::active(key(namespace, name), "source-event")
-}
+#[rustfmt::skip]
+fn cell(namespace: &str, name: &str) -> StateCell { StateCell::active(key(namespace, name), "source-event") }
 
-fn event_with_cell(id: &str, cell: StateCell) -> RuntimeEvent {
-    RuntimeEvent {
-        id: id.to_string(),
-        case_id: "case-1".to_string(),
-        kind: "state.cell.upsert".to_string(),
-        payload: RuntimeEventPayload::UpsertCell(Box::new(cell)),
-        source: "test".to_string(),
-        created_at: "now".to_string(),
-        decision_id: None,
-    }
-}
+#[rustfmt::skip]
+fn event_with_cell(id: &str, cell: StateCell) -> RuntimeEvent { RuntimeEvent { id: id.to_string(), case_id: "case-1".to_string(), kind: "state.cell.upsert".to_string(), payload: RuntimeEventPayload::UpsertCell(Box::new(cell)), source: "test".to_string(), created_at: "now".to_string(), decision_id: None } }
 
-fn read_tool() -> ToolViewEntry {
-    ToolViewEntry::new("fs.read", "read a workspace file").with_params(vec!["path"], vec!["count"])
-}
+#[rustfmt::skip]
+fn read_tool() -> ToolViewEntry { ToolViewEntry::new("fs.read", "read a workspace file").with_params(vec!["path"], vec!["count"]) }
 
-fn search_tool() -> ToolViewEntry {
-    ToolViewEntry::new("fs.search", "search workspace").with_params(vec!["query"], vec!["path"])
-}
+#[rustfmt::skip]
+fn search_tool() -> ToolViewEntry { ToolViewEntry::new("fs.search", "search workspace").with_params(vec!["query"], vec!["path"]) }
 
 fn direct_decision() -> RuntimeDecision {
     RuntimeDecision::new(

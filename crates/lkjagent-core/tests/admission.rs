@@ -12,8 +12,14 @@ use lkjagent_core::runtime_tool_view::EffectKey;
 #[test]
 fn rejects_placeholder_values_before_effects() -> Result<(), String> {
     let decision = direct_decision();
-    let result = admit_action(&decision, &action("read_file", "path", "FIELD_VALUE"))
-        .map_err(|error| error.message)?;
+    let result = admit_action(
+        &decision,
+        &action_params(
+            "read_file",
+            vec![("path", "FIELD_VALUE"), ("complete", "false")],
+        ),
+    )
+    .map_err(|error| error.message)?;
     assert_eq!(result.status, AdmissionStatus::Rejected);
     assert_eq!(result.reason, "placeholder value for path");
     Ok(())
@@ -39,8 +45,11 @@ fn incomplete_persisted_projection_is_not_admitted() -> Result<(), String> {
 
 #[test]
 fn rejects_empty_required_values_before_effects() -> Result<(), String> {
-    let result = admit_action(&direct_decision(), &action("read_file", "path", "   "))
-        .map_err(|error| error.message)?;
+    let result = admit_action(
+        &direct_decision(),
+        &action_params("read_file", vec![("path", "   "), ("complete", "false")]),
+    )
+    .map_err(|error| error.message)?;
     assert_eq!(result.status, AdmissionStatus::Rejected);
     assert_eq!(result.reason, "empty value for path");
     Ok(())
@@ -61,7 +70,14 @@ fn tool_field_specs_drive_value_class_admission() -> Result<(), String> {
     for value in ["many", "01", "0", "121"] {
         let bad = admit_action(
             &decision,
-            &action_params("read_file", vec![("path", "README.md"), ("count", value)]),
+            &action_params(
+                "read_file",
+                vec![
+                    ("path", "README.md"),
+                    ("count", value),
+                    ("complete", "false"),
+                ],
+            ),
         )
         .map_err(|error| error.message)?;
         assert_eq!(bad.status, AdmissionStatus::Rejected, "value={value}");
@@ -102,8 +118,14 @@ fn state_views_and_effect_keys_are_closed() -> Result<(), String> {
         ["edit_file"]
     );
     let decision = direct_decision();
-    let admission = admit_action(&decision, &action("read_file", "path", "README.md"))
-        .map_err(|error| error.message)?;
+    let admission = admit_action(
+        &decision,
+        &action_params(
+            "read_file",
+            vec![("path", "README.md"), ("complete", "false")],
+        ),
+    )
+    .map_err(|error| error.message)?;
     assert_eq!(
         dispatch_effect_key(&decision, &admission, &EffectKey("workspace.read".into())),
         Ok(EffectKey("workspace.read".into()))
