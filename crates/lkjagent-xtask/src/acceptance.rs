@@ -64,11 +64,20 @@ pub fn verify(root: &Path, source: &str, evidence: &Path) -> Report {
             Vec::new()
         }
     };
+    let mut evidence_derived = BTreeSet::new();
     match git::evidence_files(root, source, evidence) {
-        Ok(files) => inspect_files(&files, source, &mut report.errors),
+        Ok(files) => {
+            inspect_files(&files, source, &mut report.errors);
+            for path in files {
+                if let Ok(bytes) = fs::read(&path) {
+                    evidence_derived.extend(evidence::derivations(&path, &bytes, source));
+                }
+            }
+        }
         Err(errors) => report.errors.extend(errors),
     }
-    let derived = static_derivations(root, &mut report.errors);
+    let mut derived = static_derivations(root, &mut report.errors);
+    derived.extend(evidence_derived);
     report.missing = required
         .into_iter()
         .filter(|id| !derived.contains(id))
@@ -82,6 +91,9 @@ pub fn verify(root: &Path, source: &str, evidence: &Path) -> Report {
 
 pub fn inspect_attachment(path: &Path, bytes: &[u8], source: &str) -> Vec<String> {
     evidence::inspect(path, bytes, source)
+}
+pub fn derive_attachment(path: &Path, bytes: &[u8], source: &str) -> BTreeSet<String> {
+    evidence::derivations(path, bytes, source)
 }
 
 pub fn validate_plans(root: &Path) -> Result<Vec<String>, Vec<String>> {
