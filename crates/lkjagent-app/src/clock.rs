@@ -1,36 +1,5 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
-pub trait Clock {
-    fn now(&mut self) -> String;
-}
-
-pub struct SystemClock;
-
-impl Clock for SystemClock {
-    fn now(&mut self) -> String {
-        utc_now()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct FixedClock {
-    value: String,
-}
-
-impl FixedClock {
-    pub fn new(value: impl Into<String>) -> Self {
-        Self {
-            value: value.into(),
-        }
-    }
-}
-
-impl Clock for FixedClock {
-    fn now(&mut self) -> String {
-        self.value.clone()
-    }
-}
-
 pub fn utc_now() -> String {
     match SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -40,12 +9,6 @@ pub fn utc_now() -> String {
         Some(milliseconds) => iso_from_unix_millis(milliseconds),
         None => "1970-01-01T00:00:00Z".to_string(),
     }
-}
-
-pub(crate) fn add_milliseconds(value: &str, milliseconds: u64) -> Option<String> {
-    lkjagent_core::runtime_eligibility::utc_millis(value)?
-        .checked_add(milliseconds)
-        .map(iso_from_unix_millis)
 }
 
 fn iso_from_unix(seconds: u64) -> String {
@@ -99,10 +62,5 @@ mod tests {
         assert_eq!(iso_from_unix(86_400), "1970-01-02T00:00:00Z");
         assert_eq!(super::iso_from_unix_millis(50), "1970-01-01T00:00:00.050Z");
         assert_eq!(iso_from_unix(1_788_739_200), "2026-09-07T00:00:00Z");
-        assert_eq!(
-            super::add_milliseconds("2026-07-11T23:59:59Z", 500).as_deref(),
-            Some("2026-07-11T23:59:59.500Z")
-        );
-        assert!(super::add_milliseconds("fixed", 500).is_none());
     }
 }

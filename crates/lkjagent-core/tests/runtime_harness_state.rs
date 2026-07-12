@@ -6,16 +6,7 @@ use lkjagent_core::runtime_selector::select_runtime_decision;
 use lkjagent_core::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
 
 #[test]
-fn derives_harness_state_from_decision_authority() {
-    assert_eq!(
-        derive_harness_state(
-            Some("case:owner-intake"),
-            "owner.intake",
-            OutputEnvelope::None,
-            "commit-or-recover"
-        ),
-        RuntimeHarnessState::Intake
-    );
+fn derives_harness_state_from_direct_decision_authority() {
     assert_eq!(
         derive_harness_state(
             Some("recovery:parse/1"),
@@ -27,21 +18,12 @@ fn derives_harness_state_from_decision_authority() {
     );
     assert_eq!(
         derive_harness_state(
-            Some("todo:open/1"),
-            "todo.review/open/1",
+            Some("check:current"),
+            "check.run/current",
             OutputEnvelope::None,
             "commit-or-recover"
         ),
-        RuntimeHarnessState::Record
-    );
-    assert_eq!(
-        derive_harness_state(
-            Some("index:workspace"),
-            "index.rebuild/workspace",
-            OutputEnvelope::None,
-            "commit-or-recover"
-        ),
-        RuntimeHarnessState::Maintain
+        RuntimeHarnessState::Observe
     );
     assert_eq!(
         derive_harness_state(None, "runtime.idle", OutputEnvelope::None, "none"),

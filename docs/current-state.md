@@ -48,10 +48,11 @@ decisions, provider exchanges, admissions, effects, observations, checks,
 artifacts, or workspace records. Startup also created nine README files and one
 transcript unrelated to the requested edit.
 
-The baseline causal defect remains in the retired non-public path:
-`owner_turn.rs` treats the substring `verify` as a system operation, and
-`daemon_route_effects.rs` records an unsupported executor before any model call. Public
-`send` and `run` no longer call that path. A second 901-second run at source
+The baseline causal defect was in the retired non-public path at the recorded
+source: `owner_turn.rs` treated the substring `verify` as a system operation,
+and `daemon_route_effects.rs` recorded an unsupported executor before any model
+call. Those core owner-turn and engine files are now deleted, and public `send`
+and `run` use only the native loop. A second 901-second run at source
 `97e00698f348fc2435d47a107b5b8453c98b9d1f` reproduced the same zero-decision
 failure. Its sanitized bundle is tracked below
 `evaluation/evidence/97e00698f348fc2435d47a107b5b8453c98b9d1f/`. This summary is
@@ -91,14 +92,23 @@ the fresh native 18-table store. The focused public test demonstrates two closed
 exact-edit matters, restart idempotency, and stale owner byte preservation with
 a scripted endpoint.
 
+The compiled core no longer contains task, step, template, plan, classification,
+owner-turn, retired check, docs-tree, or plan-engine authority. Direct parsing now
+accepts only tool-call and final envelopes selected by a persisted decision, and
+the transport `Prompt` lives in `prompt.rs`. The compiled application, effects,
+and store roots now include only native public-loop dependencies. Their retired
+source files remain on disk but are not compiled; this does not claim deletion of
+every retired source file.
+
 ## Active Source Gaps
 
-Retired non-public daemon, record, workspace, inspection, and TUI modules still
-use retired schema and projections. They remain compiled but have no public CLI
-route. Public scheduling runs one matter per cycle and now prefers an unrelated
-runnable matter over one with an unfinished decision or effect. It still blocks
-instead of reconciling every effect recovery phase, and configured-model fairness
-across simultaneous matters remains unproven. The tracked schedule retained
+Retired non-public daemon, record, workspace projection, inspection, and TUI
+source files still use retired schema and projections, but crate roots no longer
+compile them. Retired store row helpers likewise remain as uncompiled source.
+Public scheduling currently handles one open matter at a time, blocks unfinished
+effects instead of completing every recovery phase, and does not yet prove
+fairness across simultaneous open matters. Scripted and configured-model runs
+cover checked read-only continuation; the tracked schedule ran fully and retained
 later active intake without claiming it closed.
 
 The public compiler attaches its context plan and frame fingerprints and stores

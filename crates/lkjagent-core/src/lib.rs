@@ -1,24 +1,7 @@
 pub mod artifact_manifest;
-pub mod checks;
-mod checks_links;
-pub mod classify;
-pub mod docs_tree;
-mod docs_tree_extract;
-pub mod engine;
-mod engine_actions;
-mod engine_checks;
-mod engine_completion;
-mod engine_extend;
-mod engine_steps;
-
-pub mod model;
-mod owner_record;
-pub mod owner_turn;
 pub mod parse;
-mod parse_plan;
-mod plan;
+pub mod prompt;
 mod prompt_policy;
-pub mod render;
 mod runtime_action_xml;
 pub mod runtime_admission;
 pub mod runtime_artifact;
@@ -67,7 +50,6 @@ pub mod runtime_tool_call;
 mod runtime_tool_cards;
 pub mod runtime_tool_catalog;
 pub mod runtime_tool_view;
-pub mod templates;
 pub mod workspace_entity {
     pub use crate::workspace_manifest::{
         preserve_identity_after_move, validate_entity, WorkspaceEntity, WorkspaceEntityIssue,

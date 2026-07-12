@@ -31,7 +31,7 @@ impl RuntimeState {
 #[rustfmt::skip]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
-pub enum RuntimeHarnessState { Intake, Clarify, Plan, Act, Observe, Recover, Record, Maintain, Idle }
+pub enum RuntimeHarnessState { Clarify, Act, Observe, Recover, Idle }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RuntimeOperation {
@@ -160,34 +160,22 @@ pub struct RuntimeBlock { pub reason: BlockReason }
 pub enum Selection { Decision(RuntimeDecisionSpec), Wait(RuntimeWait), Block(RuntimeBlock), Idle }
 
 #[rustfmt::skip]
-pub(crate) fn legacy_workspace_family(namespace: &str) -> Option<(&'static str, u8)> {
-    Some(match namespace {
-        "todo" => ("todo.review", 35), "calendar" => ("calendar.review", 36),
-        "routine" => ("routine.run", 37), "index" => ("index.rebuild", 38),
-        "proof" => ("proof.collect", 39), "dev" => ("dev.review", 40),
-        "project" => ("project.advance", 41), "finance" => ("finance.review", 42),
-        _ => return None,
-    })
-}
-
-#[rustfmt::skip]
 pub fn derive_harness_state(selected_state_key: Option<&str>, operation: &str,
     envelope: OutputEnvelope, recovery_policy: &str) -> RuntimeHarnessState {
     let namespace = selected_state_key.and_then(|label| label.split_once(':').map(|parts| parts.0));
-    let family = operation.split_once('/').map_or(operation, |parts| parts.0);
-    if namespace == Some("recovery") || operation.starts_with("recovery.") { return RuntimeHarnessState::Recover; }
-    if operation == "owner.intake" { return RuntimeHarnessState::Intake; }
-    if operation == "owner.answer" { return RuntimeHarnessState::Clarify; }
-    if matches!(family, "todo.review" | "calendar.review" | "finance.review" | "routine.run" | "dev.review" | "project.advance") {
-        return RuntimeHarnessState::Record;
+    if namespace == Some("recovery") || operation.starts_with("recovery.") {
+        return RuntimeHarnessState::Recover;
     }
-    if matches!(family, "index.rebuild" | "proof.collect" | "workspace.rebalance" | "workspace.maintain") {
-        return RuntimeHarnessState::Maintain;
+    if operation.starts_with("check.") || operation.starts_with("completion.") {
+        return RuntimeHarnessState::Observe;
     }
-    if operation.starts_with("check.") || operation.starts_with("completion.") { return RuntimeHarnessState::Observe; }
-    if operation == "runtime.idle" || envelope == OutputEnvelope::None && recovery_policy == "none" { return RuntimeHarnessState::Idle; }
+    if operation == "runtime.idle"
+        || envelope == OutputEnvelope::None && recovery_policy == "none"
+    {
+        return RuntimeHarnessState::Idle;
+    }
     match envelope {
-        OutputEnvelope::Plan => RuntimeHarnessState::Plan, OutputEnvelope::Message => RuntimeHarnessState::Clarify,
-        OutputEnvelope::Action | OutputEnvelope::Content | OutputEnvelope::Verdict | OutputEnvelope::None => RuntimeHarnessState::Act,
+        OutputEnvelope::Message => RuntimeHarnessState::Clarify,
+        OutputEnvelope::Action | OutputEnvelope::None => RuntimeHarnessState::Act,
     }
 }

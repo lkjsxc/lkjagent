@@ -2,12 +2,12 @@
 
 ## Purpose
 
-Effect adapters for workspace files, exact edits, shell commands, check fact
-gathering, and observations.
+Effect adapters for descriptor-relative workspace reads, listings, searches, and
+exact edits used by the direct runtime.
 
 Doc contract: ../../docs/tools/README.md
 
 ## Table of Contents
 
-- [src/](src/README.md): source modules.
-- [tests/](tests/README.md): integration tests.
+- [src/](src/README.md): compiled workspace effect modules.
+- [tests/](tests/README.md): workspace safety and exact edit tests.

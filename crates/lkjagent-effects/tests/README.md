@@ -1,12 +1,11 @@
-# Tests
+# Effects Tests
 
 ## Purpose
 
-Integration tests for the effects crate.
+Map integration coverage for direct workspace effects.
 
 ## Table of Contents
 
-- [effects.rs](effects.rs): workspace, shell, checks, observation, and exchange tests.
-- [workspace_edit.rs](workspace_edit.rs): exact edit preparation and phase tests.
-- [workspace_safety.rs](workspace_safety.rs): bounded content and listing tests.
-- [workspace_safety_paths.rs](workspace_safety_paths.rs): descriptor path and race tests.
+- [workspace-edit.rs](workspace_edit.rs): exact edit preparation and phases.
+- [workspace-safety.rs](workspace_safety.rs): bounded content and listings.
+- [workspace-safety-paths.rs](workspace_safety_paths.rs): path and race safety.

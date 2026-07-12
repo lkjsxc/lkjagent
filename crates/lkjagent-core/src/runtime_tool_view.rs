@@ -151,9 +151,7 @@ impl ToolSetView {
         self.entries.iter().all(|entry| {
             let direct = crate::runtime_tool_catalog::direct_catalog().iter()
                 .find(|descriptor| descriptor.name == entry.name).map(crate::runtime_tool_catalog::descriptor_entry);
-            let current = direct.or_else(|| crate::runtime_tool_cards::tool_view_for_names(&[entry.name.as_str()])
-                .entries.into_iter().next());
-            current.as_ref() == Some(entry)
+            direct.as_ref() == Some(entry)
         })
     }
 }

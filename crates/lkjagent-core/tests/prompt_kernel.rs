@@ -1,4 +1,4 @@
-use lkjagent_core::render::Prompt;
+use lkjagent_core::prompt::Prompt;
 use lkjagent_core::runtime_context::{
     default_context_pipeline, ContextFramePlan, ContextItem, ContextLanePlan, ContextPlanEntry,
     TrustClass,

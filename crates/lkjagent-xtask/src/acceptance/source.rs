@@ -30,7 +30,7 @@ const FACTS: &[Fact] = &[
     fact("P01", "crates/lkjagent-core/tests/direct_action_grammar.rs", &["contract_tables_reject_roots_prose_and_legacy_actions", "\\\"tool\\\":\\\"read_file\\\""]),
     fact("P02", "crates/lkjagent-core/tests/direct_action_grammar.rs", &["<decision_id>x</decision_id>", "ToolCallError::UnknownTag"]),
     fact("R05", "crates/lkjagent-core/src/runtime_tool_catalog.rs", &["const DIRECT_CATALOG", "direct_tool_view_for_state", "descriptor_entry"]),
-    fact("R05", "crates/lkjagent-core/src/render.rs", &["render_tool_view(&decision.tool_view)"]),
+    fact("R05", "crates/lkjagent-core/src/runtime_prompt_kernel.rs", &["fn tools_card", "decision.tool_view.entries"]),
     fact("R05", "crates/lkjagent-core/src/runtime_admission.rs", &["decision.tool_view_fingerprint()", "decision.tool_view.entry(&action.tool)"]),
     fact("R05", "crates/lkjagent-core/tests/admission.rs", &["tool_field_specs_drive_value_class_admission", "state_views_and_effect_keys_are_closed"]),
     fact("R05", "crates/lkjagent-core/tests/tool_call.rs", &["contract_tables_accept_descriptor_order_and_text", "contract_tables_reject_hidden_missing_unknown_and_order"]),

@@ -5,9 +5,8 @@ use std::path::PathBuf;
 use std::thread;
 
 use lkjagent_app::cli;
-use lkjagent_app::daemon::Endpoint;
-use lkjagent_app::endpoint::LlmEndpoint;
-use lkjagent_core::render::Prompt;
+use lkjagent_app::endpoint::{Endpoint, LlmEndpoint};
+use lkjagent_core::prompt::Prompt;
 
 mod support;
 

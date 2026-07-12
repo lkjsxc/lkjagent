@@ -31,7 +31,7 @@ fn selector_reads_model_cells_and_preserves_tool_view() {
     assert_eq!(selected.operation.0, "model.call/42");
     assert_eq!(selected.expected_envelope, OutputEnvelope::Action);
     assert_eq!(selected.model_budget_tokens, Some(512));
-    assert_eq!(selected.tool_view.tool_names(), vec!["fs.read"]);
+    assert_eq!(selected.tool_view.tool_names(), vec!["read_file"]);
     assert!(!selected.snapshot_fingerprint.is_empty());
     let mut exhausted = model_cell();
     exhausted.payload_json = exhausted
@@ -157,7 +157,7 @@ fn model_cell() -> StateCell {
         "model_budget_tokens": 512,
         "tool_budget_remaining": 1,
         "tool_view": [{
-            "name": "fs.read",
+            "name": "read_file",
             "purpose": "read a workspace file",
             "required_params": ["path"],
             "optional_params": ["count"]

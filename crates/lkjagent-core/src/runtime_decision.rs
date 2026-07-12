@@ -33,39 +33,28 @@ pub const MODEL_GRAMMARS: &[&str] = &["tool-call", "final", "none"];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OutputEnvelope {
-    Content,
-    Plan,
     Action,
     Message,
-    Verdict,
     None,
 }
 
 impl RuntimeHarnessState {
     pub fn as_str(self) -> &'static str {
         match self {
-            Self::Intake => "intake",
             Self::Clarify => "clarify",
-            Self::Plan => "plan",
             Self::Act => "act",
             Self::Observe => "observe",
             Self::Recover => "recover",
-            Self::Record => "record",
-            Self::Maintain => "maintain",
             Self::Idle => "idle",
         }
     }
 
     pub fn purpose(self) -> &'static str {
         match self {
-            Self::Intake => "classify owner turn and write transcript or inbox evidence",
-            Self::Clarify => "ask or answer one bounded missing-information question",
-            Self::Plan => "produce a bounded plan or content shape before effects",
-            Self::Act => "execute selected model action, content write, or native effect",
+            Self::Clarify => "answer one bounded owner-facing question",
+            Self::Act => "execute selected model action through direct tools",
             Self::Observe => "run checks and evaluate completion evidence",
-            Self::Recover => "repair parse, admission, endpoint, effect, or check failure",
-            Self::Record => "write owner-readable personal or work records",
-            Self::Maintain => "rebuild indexes, rebalance paths, or collect proof",
+            Self::Recover => "repair protocol, admission, endpoint, effect, or check failure",
             Self::Idle => "wait only when no executable unresolved work exists",
         }
     }
@@ -83,21 +72,17 @@ impl RuntimeHarnessState {
 
     fn context_policy(self) -> &'static str {
         match self {
-            Self::Intake | Self::Record => "recent owner turn plus workspace maps",
-            Self::Plan | Self::Act => "canonical docs plus selected workspace evidence",
-            Self::Observe => "checks, artifacts, fingerprints, and proof refs",
+            Self::Act => "owner objective plus selected workspace evidence",
+            Self::Observe => "checks, fingerprints, and proof refs",
             Self::Recover => "bounded fault diagnosis without raw failed output",
-            Self::Clarify => "missing fact and prior question only",
-            Self::Maintain => "workspace indexes, manifests, aliases, and proof refs",
+            Self::Clarify => "owner objective and measured facts",
             Self::Idle => "no model context unless new work arrives",
         }
     }
 
     fn workspace_policy(self) -> &'static str {
         match self {
-            Self::Intake => "write transcript or inbox trace",
-            Self::Record => "write record, history, fingerprint, README, and index evidence",
-            Self::Act | Self::Maintain => "path-checked workspace effects only",
+            Self::Act => "path-checked workspace effects only",
             _ => "read bounded selected workspace refs only",
         }
     }

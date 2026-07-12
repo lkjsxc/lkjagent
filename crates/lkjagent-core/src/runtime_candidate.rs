@@ -3,7 +3,7 @@ use crate::runtime_eligibility::causal_number;
 use crate::runtime_operation::RuntimeOperation;
 use crate::runtime_selector as selector;
 use crate::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
-use crate::runtime_tool_catalog::{descriptor_entry, explore_catalog};
+use crate::runtime_tool_catalog::{descriptor_entry, direct_catalog};
 use serde_json::Value;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -80,8 +80,7 @@ fn namespace_candidate(cell: &StateCell, body: &Value) -> Option<SelectorCandida
         "model" => Some(candidate(cell, RuntimeOperation::model_call(format!("model.call/{}", cell.key.name), payload_envelope(body),
             payload_tool_view(body), payload_number(body, "model_budget_tokens"), evidence(cell)), 50, "model")),
         "check" => Some(model_free(cell, &format!("check.run/{}", cell.key.name), 60, "check")),
-        namespace => crate::runtime_operation::legacy_workspace_family(namespace)
-            .map(|(operation, tier)| model_free(cell, &format!("{operation}/{}", cell.key.name), tier, namespace)),
+        _ => None,
     }
 }
 #[rustfmt::skip]
@@ -172,8 +171,8 @@ fn payload_tier(value: &Value, default: u8) -> u8 {
 }
 #[rustfmt::skip]
 fn payload_envelope(value: &Value) -> OutputEnvelope { match payload_text(value, "expected_envelope") {
-    Some("Content") => OutputEnvelope::Content, Some("Plan") => OutputEnvelope::Plan, Some("Action") => OutputEnvelope::Action,
-    Some("Message") => OutputEnvelope::Message, Some("Verdict") => OutputEnvelope::Verdict, _ => OutputEnvelope::None,
+    Some("Action") => OutputEnvelope::Action, Some("Message") => OutputEnvelope::Message,
+    _ => OutputEnvelope::None,
 } }
 #[rustfmt::skip]
 fn payload_tool_view(value: &Value) -> ToolSetView {
@@ -184,7 +183,7 @@ fn payload_tool_view(value: &Value) -> ToolSetView {
 #[rustfmt::skip]
 fn tool_entry(value: &Value) -> Option<ToolViewEntry> {
     let name = payload_text(value, "name")?;
-    explore_catalog().iter().find(|descriptor| descriptor.name == name).map(descriptor_entry)
+    direct_catalog().iter().find(|descriptor| descriptor.name == name).map(descriptor_entry)
 }
 #[rustfmt::skip]
 fn payload_evidence_requirements(value: &Value) -> Vec<String> {

@@ -2,7 +2,6 @@ use std::path::{Path, PathBuf};
 use std::time::Duration;
 
 use lkjagent_llm::client::ClientConfig;
-use rusqlite::Connection;
 use serde_json::{Map, Value};
 
 use crate::config_registry::{number, parse_document};
@@ -33,47 +32,6 @@ pub fn workspace_root(data_dir: &Path) -> Result<PathBuf, String> {
         .or_else(|| text(&values, "workspace_root"))
         .unwrap_or_else(|| crate::workspace_root::DEFAULT_WORKSPACE_ROOT.to_string());
     crate::workspace_root::resolve(data_dir, &configured)
-}
-
-#[rustfmt::skip]
-pub(crate) struct RuntimeTiming {
-    pub endpoint_retry_limit: u64, pub endpoint_backoff_milliseconds: u64,
-    pub queue_wake_milliseconds: u64, pub no_progress_window: u64,
-    pub case_budgets: [u64; 4],
-}
-
-#[rustfmt::skip]
-pub(crate) fn runtime_timing(data_dir: &Path) -> Result<RuntimeTiming, String> {
-    let values = load_flat_config(data_dir)?;
-    Ok(RuntimeTiming { endpoint_retry_limit: number(&values, "endpoint_retry_limit"),
-        endpoint_backoff_milliseconds: number(&values, "endpoint_backoff_milliseconds"),
-        queue_wake_milliseconds: number(&values, "queue_wake_milliseconds"),
-        no_progress_window: number(&values, "no_progress_window"), case_budgets: [
-            number(&values, "case_token_budget"), number(&values, "case_active_milliseconds"),
-            number(&values, "case_effect_budget"), number(&values, "case_recovery_budget")] })
-}
-
-#[rustfmt::skip]
-pub(crate) fn persist_runtime_timing(conn: &Connection, data_dir: &Path) -> Result<RuntimeTiming, String> {
-    let timing = runtime_timing(data_dir)?;
-    for (key, value) in [("runtime.endpoint_retry_limit", timing.endpoint_retry_limit),
-        ("runtime.endpoint_backoff_milliseconds", timing.endpoint_backoff_milliseconds),
-        ("runtime.no_progress_window", timing.no_progress_window),
-        ("runtime.case_token_budget", timing.case_budgets[0]),
-        ("runtime.case_active_milliseconds", timing.case_budgets[1]),
-        ("runtime.case_effect_budget", timing.case_budgets[2]),
-        ("runtime.case_recovery_budget", timing.case_budgets[3])] {
-        conn.execute("INSERT INTO config (key, value) VALUES (?1, ?2)
-            ON CONFLICT(key) DO UPDATE SET value = excluded.value", (key, value.to_string()))
-            .map_err(|error| error.to_string())?;
-    }
-    Ok(timing)
-}
-
-#[rustfmt::skip]
-pub(crate) fn workspace_scan_timing(data_dir: &Path) -> Result<(u64, u64), String> {
-    let values = load_flat_config(data_dir)?;
-    Ok((number(&values, "workspace_scan_debounce_milliseconds"), number(&values, "workspace_reconcile_seconds")))
 }
 
 #[rustfmt::skip]
@@ -151,25 +109,6 @@ pub(crate) fn endpoint_state(data_dir: &Path) -> String {
 pub(crate) fn workspace_state(data_dir: &Path) -> Result<(PathBuf, bool), String> {
     let root = workspace_root(data_dir)?;
     Ok((root.clone(), root.is_dir()))
-}
-
-pub(crate) fn file_count(path: &Path) -> usize {
-    std::fs::read_dir(path).map_or(0, |entries| entries.filter_map(Result::ok).count())
-}
-
-#[rustfmt::skip]
-pub(crate) fn join_or_none(values: &[String]) -> String { if values.is_empty() { "none".to_string() } else { values.join(",") } }
-
-#[rustfmt::skip]
-pub(crate) fn join_counts(values: &[(String, i64)]) -> String {
-    values.iter().map(|(name, count)| format!("{name}={count}"))
-        .collect::<Vec<_>>().join(",")
-}
-
-#[rustfmt::skip]
-pub(crate) fn join_bools(values: &[(&str, bool)]) -> String {
-    values.iter().map(|(name, present)| format!("{name}={present}"))
-        .collect::<Vec<_>>().join(",")
 }
 
 fn source(env: &str, section: Option<&Map<String, Value>>, key: &str) -> &'static str {

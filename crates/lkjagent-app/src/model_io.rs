@@ -1,4 +1,4 @@
-use lkjagent_core::render::Prompt;
+use lkjagent_core::prompt::Prompt;
 use lkjagent_llm::client::complete;
 use lkjagent_llm::message::Message;
 use lkjagent_llm::wire::{CallSpec, Completion};
