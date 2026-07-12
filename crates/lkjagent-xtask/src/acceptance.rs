@@ -91,9 +91,15 @@ pub fn validate_plans(root: &Path) -> Result<Vec<String>, Vec<String>> {
 pub fn scan_history(root: &Path) -> Vec<String> {
     history::secret_errors(root)
 }
+pub fn source_contracts(root: &Path) -> BTreeSet<String> {
+    source::contract_derivations(root)
+}
+pub fn source_contract_files() -> Vec<&'static str> {
+    source::contract_files()
+}
 
 fn static_derivations(root: &Path, errors: &mut Vec<String>) -> BTreeSet<String> {
-    let mut derived = BTreeSet::new();
+    let mut derived = source::contract_derivations(root);
     if crate::node_gate::check_docs_authority(root).is_ok() {
         derived.insert("D02".to_string());
     }

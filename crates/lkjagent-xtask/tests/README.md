@@ -6,7 +6,7 @@ Map focused repository checker and evaluation tests.
 
 ## Table of Contents
 
-- [acceptance_history.rs](acceptance_history.rs): reachable-history boundaries.
+- [acceptance_history.rs](acceptance_history.rs): history and source-contract boundaries.
 - [acceptance_negative.rs](acceptance_negative.rs): acceptance false positives.
 - [docs_authority_gate.rs](docs_authority_gate.rs): compact contract mutations.
 - [evaluation_harness.rs](evaluation_harness.rs): deterministic harness checks.
