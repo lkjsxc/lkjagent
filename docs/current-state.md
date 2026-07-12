@@ -107,8 +107,9 @@ of reconciling every effect recovery phase, and configured-model simultaneous-
 matter fairness remains unproven. The tracked schedule retained later active
 intake without claiming it closed.
 
-The public compiler attaches its context plan and frame fingerprints and stores
-one native context-item row for every included owner or measured source. List and
+The public compiler attaches its context plan and frame fingerprints, includes
+up to four active canonical messages from earlier matters, and stores one native
+context-item row for every included owner, history, or measured source. List and
 search observations remain orienting evidence until a read produces current
 source bytes. Final admission rejects future-tense and unsupported command or
 test claims; richer claim-to-path comparison remains a bounded follow-up. Close
