@@ -21,9 +21,9 @@ pub fn rebuild(conn: &Connection, data_dir: &Path, now: &str) -> Result<String, 
     ] {
         let _ = crate::effect_files::open_parent(&workspace, rel, true)?;
     }
-    crate::workspace_scaffold::refresh_for_path(&workspace, "records/README.md")?;
-    crate::workspace_scaffold::refresh_for_path(&workspace, "artifacts/README.md")?;
-    crate::workspace_scaffold::refresh_for_path(&workspace, "indexes/README.md")?;
+    crate::workspace_root::refresh_for_path(&workspace, "records/README.md")?;
+    crate::workspace_root::refresh_for_path(&workspace, "artifacts/README.md")?;
+    crate::workspace_root::refresh_for_path(&workspace, "indexes/README.md")?;
     let search = crate::workspace_search::rebuild(conn, &workspace)?;
     let rows = records(conn, None, false).map_err(|error| error.to_string())?;
     let specs: [(&str, Selector); 7] = [
@@ -37,7 +37,7 @@ pub fn rebuild(conn: &Connection, data_dir: &Path, now: &str) -> Result<String, 
     ];
     for (name, select) in specs {
         write_index(conn, &workspace, name, select, &rows, now)?;
-        crate::workspace_scaffold::refresh_for_path(&workspace, &format!("indexes/{name}.md"))?;
+        crate::workspace_root::refresh_for_path(&workspace, &format!("indexes/{name}.md"))?;
     }
     suppress_stale_cell(conn, now)?;
     Ok(format!(

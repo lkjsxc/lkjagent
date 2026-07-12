@@ -85,6 +85,6 @@ mod workspace_index;
 mod workspace_rebalance;
 mod workspace_rebalance_apply;
 mod workspace_rebalance_group;
-mod workspace_scaffold;
+pub mod workspace_root;
 mod workspace_scan;
 mod workspace_search;

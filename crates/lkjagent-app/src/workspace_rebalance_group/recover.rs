@@ -137,10 +137,10 @@ fn project(
         }
     }
     for item in &loaded.moves {
-        crate::workspace_scaffold::refresh_for_path(workspace, &item.old_path)?;
-        crate::workspace_scaffold::refresh_for_path(workspace, &item.new_path)?;
+        crate::workspace_root::refresh_for_path(workspace, &item.old_path)?;
+        crate::workspace_root::refresh_for_path(workspace, &item.new_path)?;
         let mut audited = item.clone();
-        let repaired = crate::workspace_scaffold::repair_record_links(
+        let repaired = crate::workspace_root::repair_record_links(
             conn,
             workspace,
             &item.entity_id,

@@ -40,14 +40,13 @@ RUN apt-get update \
         ripgrep \
     && rm -rf /var/lib/apt/lists/* \
     && useradd --uid 1000 --create-home --home-dir /home/agent --shell /usr/sbin/nologin agent \
-    && mkdir -p /data/workspace /usr/local/share/lkjagent/skills \
-    && chown agent:agent /data /data/workspace \
+    && mkdir -p /data /workspace /usr/local/share/lkjagent/skills \
+    && chown agent:agent /data /workspace \
     && printf '%s\n' \
         '#!/bin/sh' \
         'set -eu' \
-        'mkdir -p /data/workspace' \
-        'chown agent:agent /data /data/workspace' \
-        'cd /data/workspace' \
+        'chown agent:agent /data /workspace' \
+        'cd /workspace' \
         'case "${1:-}" in' \
         '  ""|run|send|status|console|workbench|doctor|workspace|log|watch|help|matter|queue|context|record|memory|today|journal|todo|calendar|finance|project|dev)' \
         '    set -- /usr/local/bin/lkjagent --data /data "$@"' \

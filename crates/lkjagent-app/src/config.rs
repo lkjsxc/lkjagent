@@ -27,17 +27,12 @@ pub fn load_client(data_dir: &Path) -> Result<ClientConfig, String> {
     Ok(config)
 }
 
-pub(crate) fn workspace_root(data_dir: &Path) -> Result<PathBuf, String> {
+pub fn workspace_root(data_dir: &Path) -> Result<PathBuf, String> {
     let values = load_flat_config(data_dir)?;
-    let root = env_text("LKJAGENT_WORKSPACE_ROOT")?
+    let configured = env_text("LKJAGENT_WORKSPACE_ROOT")?
         .or_else(|| text(&values, "workspace_root"))
-        .unwrap_or_else(|| "workspace".to_string());
-    let path = PathBuf::from(root);
-    Ok(if path.is_absolute() {
-        path
-    } else {
-        data_dir.join(path)
-    })
+        .unwrap_or_else(|| crate::workspace_root::DEFAULT_WORKSPACE_ROOT.to_string());
+    crate::workspace_root::resolve(data_dir, &configured)
 }
 
 #[rustfmt::skip]
@@ -153,11 +148,9 @@ pub(crate) fn endpoint_state(data_dir: &Path) -> String {
     format!("url={url} model={model} credential={credential}")
 }
 
-#[rustfmt::skip]
-pub(crate) fn missing_dirs(data_dir: &Path) -> Vec<String> {
-    let root = workspace_root(data_dir).unwrap_or_else(|_| data_dir.join("workspace"));
-    [".", "records", "artifacts", "indexes"].iter().filter(|rel| !root.join(rel).exists())
-        .map(|rel| format!("workspace/{rel}")).collect()
+pub(crate) fn workspace_state(data_dir: &Path) -> Result<(PathBuf, bool), String> {
+    let root = workspace_root(data_dir)?;
+    Ok((root.clone(), root.is_dir()))
 }
 
 pub(crate) fn file_count(path: &Path) -> usize {

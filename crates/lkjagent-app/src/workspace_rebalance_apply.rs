@@ -59,12 +59,12 @@ fn settle_unstarted(conn: &Connection, workspace: &Path, item: &RebalanceMove,
 #[rustfmt::skip]
 fn settle_one(conn: &Connection, workspace: &Path, item: &mut RebalanceMove, original: &RecordRow, operation_id: &str, now: &str) -> Result<(), String> {
     verify_moved(conn, workspace, item, operation_id, &original.fingerprint)?;
-    crate::workspace_scaffold::refresh_for_path(workspace, &item.old_path)?;
-    crate::workspace_scaffold::refresh_for_path(workspace, &item.new_path)?;
+    crate::workspace_root::refresh_for_path(workspace, &item.old_path)?;
+    crate::workspace_root::refresh_for_path(workspace, &item.new_path)?;
     verify_moved(conn, workspace, item, operation_id, &original.fingerprint)?;
     let current = record(conn, &item.entity_id).map_err(|error| error.to_string())?.ok_or_else(|| format!("record not found: {}", item.entity_id))?;
     if current.path != item.new_path { let mut updated = original.clone(); updated.path = item.new_path.clone(); upsert_record(conn, &updated).map_err(|error| error.to_string())?; }
-    let repaired = crate::workspace_scaffold::repair_record_links(conn, workspace, &item.entity_id, &item.old_path, &item.new_path, now)?;
+    let repaired = crate::workspace_root::repair_record_links(conn, workspace, &item.entity_id, &item.old_path, &item.new_path, now)?;
     item.validation.push(format!("links-repaired:{repaired}"));
     insert_alias_and_audit(conn, &alias(item, now), &audit_id(item), item, now).map_err(|error| error.to_string())?;
     Ok(())

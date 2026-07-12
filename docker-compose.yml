@@ -20,13 +20,15 @@ services:
       - LKJAGENT_ENDPOINT_URL
       - LKJAGENT_ENDPOINT_TIMEOUT_SECONDS
       - LKJAGENT_MODEL
+      - LKJAGENT_WORKSPACE_ROOT=/workspace
     healthcheck:
       test:
         - CMD-SHELL
         - >-
           pidof lkjagent >/dev/null &&
-          stat -c %u /data/workspace | grep -qx 1000 &&
-          test -w /data/workspace
+          test "$(stat -c %u /data)" = 1000 &&
+          test "$(stat -c %u /workspace)" = 1000 &&
+          test -w /data && test -w /workspace
       interval: 30s
       timeout: 5s
       retries: 3
@@ -43,6 +45,11 @@ services:
       - type: bind
         source: ${LKJAGENT_DATA_DIR:-./data}
         target: /data
+        bind:
+          create_host_path: true
+      - type: bind
+        source: ${LKJAGENT_WORKSPACE_DIR:-./workspace}
+        target: /workspace
         bind:
           create_host_path: true
 
