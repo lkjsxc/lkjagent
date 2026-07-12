@@ -15,17 +15,12 @@ struct EffectFact {
     intended: Vec<u8>, mode: u32, revision: Vec<u8>, targets: Vec<String>,
 }
 
-pub fn reduce_committed_edit(
-    connection: &mut Connection,
-    workspace: &OpenedWorkspace,
-    journal: &str,
-    monotonic_ms: i64,
-    wall_time: &str,
-) -> StoreResult<CheckReduction> {
+#[rustfmt::skip]
+pub fn reduce_committed_edit(connection: &mut Connection, workspace: &OpenedWorkspace,
+    journal: &str, monotonic_ms: i64, wall_time: &str) -> StoreResult<CheckReduction> {
     let tx = connection.transaction_with_behavior(TransactionBehavior::Immediate)?;
     let fact = effect_fact(&tx, journal)?;
-    let observed = workspace
-        .observe_edit_target(&fact.path)
+    let observed = workspace.observe_edit_target(&fact.path)
         .map_err(|error| StoreError::InvalidState(format!("check read failed: {error:?}")))?;
     let (bytes, mode) = match observed {
         ObservedTarget::Present(value) => (value.bytes, value.mode),
@@ -33,18 +28,9 @@ pub fn reduce_committed_edit(
     };
     let source = Sha256::digest(&bytes).to_vec();
     let pending = pending(&tx, obligations(&tx, &fact.matter)?, &source)?;
-    if pending.is_empty() {
-        tx.commit()?;
-        return Ok(CheckReduction {
-            scheduled: 0,
-            passed: 0,
-        });
-    }
-    let event_sequence: i64 = tx.query_row(
-        "SELECT coalesce(max(causal_sequence),0)+1 FROM runtime_events WHERE matter_id=?1",
-        [&fact.matter],
-        |row| row.get(0),
-    )?;
+    if pending.is_empty() { tx.commit()?; return Ok(CheckReduction { scheduled: 0, passed: 0 }); }
+    let event_sequence: i64 = tx.query_row("SELECT coalesce(max(causal_sequence),0)+1 FROM runtime_events WHERE matter_id=?1",
+        [&fact.matter], |row| row.get(0))?;
     let event = identity("check-event", journal, &source);
     tx.execute(
         "INSERT INTO runtime_events(id,matter_id,causal_sequence,kind,monotonic_ms,wall_time,payload,source_kind,source_id)
@@ -76,11 +62,12 @@ pub fn reduce_committed_edit(
         )?;
         passed += usize::from(success);
     }
+    let state = if passed == pending.len() { "current-passed" } else { "failed" };
+    tx.execute("UPDATE state_cells SET status='suppressed' WHERE matter_id=?1 AND namespace='check' AND cell_key IN ('current-passed','failed')", [&fact.matter])?;
+    tx.execute("INSERT INTO state_cells(matter_id,namespace,cell_key,payload,status,source_event_id,fingerprint) VALUES(?1,'check',?2,?3,'active',?4,?5) ON CONFLICT(matter_id,namespace,cell_key) DO UPDATE SET payload=excluded.payload,status='active',source_event_id=excluded.source_event_id,fingerprint=excluded.fingerprint",
+        params![fact.matter,state,json!({"journal":journal,"source_revision":hex(&source)}).to_string().as_bytes(),event,source])?;
     tx.commit()?;
-    Ok(CheckReduction {
-        scheduled: pending.len(),
-        passed,
-    })
+    Ok(CheckReduction { scheduled: pending.len(), passed })
 }
 
 fn effect_fact(tx: &rusqlite::Transaction<'_>, journal: &str) -> StoreResult<EffectFact> {

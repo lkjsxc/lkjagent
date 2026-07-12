@@ -29,7 +29,7 @@ pub struct ModelFault<'a> {
     pub fingerprint: &'a [u8],
 }
 #[rustfmt::skip] #[derive(Debug, PartialEq, Eq)]
-pub struct MatterRow { pub id: String, pub lifecycle: String }
+pub struct MatterRow { pub id: String, pub lifecycle: String, pub objective: Vec<u8> }
 #[rustfmt::skip] #[derive(Debug, PartialEq, Eq)]
 pub struct CellRow { pub namespace: Vec<u8>, pub key: Vec<u8>, pub payload: Vec<u8>, pub fingerprint: Vec<u8> }
 #[rustfmt::skip] #[derive(Debug, PartialEq, Eq)]
@@ -41,6 +41,20 @@ pub struct RestartProjection {
 }
 
 impl NativeStore {
+    pub fn next_queue_sequence(&self) -> StoreResult<i64> {
+        Ok(self.connection.query_row(
+            "SELECT coalesce(max(queue_sequence),0)+1 FROM owner_turns",
+            [],
+            |row| row.get(0),
+        )?)
+    }
+    pub fn next_event_sequence(&self, matter: &str) -> StoreResult<i64> {
+        Ok(self.connection.query_row(
+            "SELECT coalesce(max(causal_sequence),0)+1 FROM runtime_events WHERE matter_id=?1",
+            [matter],
+            |row| row.get(0),
+        )?)
+    }
     pub fn settle_direct(&mut self, value: &DirectSettlement<'_>) -> StoreResult<()> {
         if value.outcome.len() > 65_536 {
             return Err(StoreError::InvalidState("observation exceeds bound".into()));
@@ -101,7 +115,7 @@ impl NativeStore {
     }
 
     pub fn restart_projection(&self) -> StoreResult<RestartProjection> {
-        let matter = self.connection.query_row("SELECT id,lifecycle FROM matters WHERE lifecycle!='closed' ORDER BY priority DESC,created_sequence LIMIT 1", [], |r| Ok(MatterRow{id:r.get(0)?,lifecycle:r.get(1)?})).optional()?;
+        let matter = self.connection.query_row("SELECT id,lifecycle,objective FROM matters WHERE lifecycle!='closed' ORDER BY priority DESC,created_sequence LIMIT 1", [], |r| Ok(MatterRow{id:r.get(0)?,lifecycle:r.get(1)?,objective:r.get(2)?})).optional()?;
         let Some(ref current) = matter else {
             return Ok(RestartProjection {
                 matter: None,
