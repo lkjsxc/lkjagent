@@ -98,8 +98,8 @@ use retired schema and projections. They remain compiled but have no public CLI
 route. Public scheduling currently handles one open matter
 at a time, blocks unfinished effects instead of completing every recovery phase,
 and does not yet prove fairness across simultaneous open matters. Scripted and
-configured-model runs cover checked read-only continuation, but the full tracked
-schedule has not yet run.
+configured-model runs cover checked read-only continuation; the tracked schedule
+ran fully and retained later active intake without claiming it closed.
 
 The public compiler attaches its context plan and frame fingerprints and stores
 one native context-item row for every included owner or measured source. List and
@@ -145,14 +145,14 @@ claims, and the close transaction owns the canonical final message.
 | effects-safe-read | complete | opened-root listing, search, and revision reads pass safety tests |
 | protocol-compact | complete | strict decision-bound tool/final parser passes contract tests |
 | store-native | complete | exact 18-table schema reopens and rejects altered or retired stores |
-| llm-wiring | complete | configured public probe produced one provider exchange; semantics were not evaluated |
+| llm-wiring | complete | configured public campaign produced durable exchanges and evaluated exact-edit semantics |
 | evaluation-runner | complete | confined commands validate the tracked blocked baseline without synthetic success |
 | tool-registry | complete | one descriptor projection drives prompt, parser, admission, and effects |
 | reducer-selector | complete | direct state reduction and deterministic selection pass core and bridge-continuity tests |
 | store-transactions | complete | native intake through close boundaries pass restart tests |
 | exact-edits | complete | crash-safe exact edit and create pass race, mode, symlink, and crash tests |
 | automatic-checks | complete | public exact edits immediately reduce to three current passed checks in the focused test |
-| app-public-loop | complete | public send/run/status use only the native store and direct selector in focused scripted tests |
+| app-public-loop | complete | public send, run, status, and doctor use only native state in focused tests |
 | context-compiler | complete | selection precedes compilation and included owner or measured sources persist with the rendered frame |
 | conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
