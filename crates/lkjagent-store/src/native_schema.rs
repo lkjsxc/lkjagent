@@ -36,7 +36,7 @@ pub fn open(path: impl AsRef<Path>) -> StoreResult<Connection> {
 pub struct MessageIdentity { pub id: String, pub sequence: i64 }
 #[rustfmt::skip]
 pub struct FinalClose<'a> {
-    pub matter: &'a str, pub body: &'a [u8], pub body_fingerprint: &'a [u8],
+    pub matter: &'a str, pub decision: &'a str, pub body: &'a [u8], pub body_fingerprint: &'a [u8],
     pub event: &'a str,
     pub event_sequence: i64, pub monotonic_ms: i64, pub wall_time: &'a str, pub payload: &'a [u8],
 }
@@ -80,10 +80,13 @@ pub(crate) fn close(tx: &Transaction<'_>, value: &FinalClose<'_>) -> StoreResult
     let id = format!("completion-event/{}", value.event); let receipt = completion_receipt(tx, value.matter)?;
     let receipt_fingerprint = stable_fingerprint(&receipt).map_err(|error| StoreError::InvalidState(error.message))?.into_bytes();
     if let Some(sequence) = tx.query_row("SELECT cm.sequence FROM conversation_messages cm JOIN matters m ON m.id=cm.matter_id WHERE cm.id=?1 AND cm.body=?2 AND cm.body_fingerprint=?3 AND cm.receipt=?4 AND cm.receipt_fingerprint=?5 AND cm.cause_event_id=?6 AND m.lifecycle='closed'", params![id,value.body,value.body_fingerprint,receipt,receipt_fingerprint,value.event], |r| r.get(0)).optional()? { return Ok(MessageIdentity { id, sequence }); }
-    let blockers: i64 = tx.query_row("SELECT (SELECT count(*) FROM effect_journal j JOIN runtime_decisions d ON d.id=j.decision_id WHERE d.matter_id=?1 AND j.status NOT IN ('settled','compensated'))+(SELECT count(*) FROM runtime_decisions WHERE matter_id=?1 AND status NOT IN ('settled','failed'))+(SELECT count(*) FROM obligations o LEFT JOIN checks c ON c.id=o.current_check_id WHERE o.matter_id=?1 AND o.required=1 AND (o.status!='passed' OR c.current!=1 OR c.passed!=1))", [value.matter], |r| r.get(0))?;
+    let respond: i64 = tx.query_row("SELECT count(*) FROM runtime_decisions WHERE id=?1 AND matter_id=?2 AND compiler_status='complete' AND status IN ('selected','settled')", params![value.decision,value.matter], |r| r.get(0))?;
+    if respond != 1 { return Err(StoreError::InvalidState("respond decision cannot close matter".into())); }
+    let blockers: i64 = tx.query_row("SELECT (SELECT count(*) FROM effect_journal j JOIN runtime_decisions d ON d.id=j.decision_id WHERE d.matter_id=?1 AND j.status NOT IN ('settled','compensated'))+(SELECT count(*) FROM runtime_decisions WHERE matter_id=?1 AND id<>?2 AND status NOT IN ('settled','failed'))+(SELECT count(*) FROM obligations o LEFT JOIN checks c ON c.id=o.current_check_id WHERE o.matter_id=?1 AND o.required=1 AND (o.status!='passed' OR c.current!=1 OR c.passed!=1))", params![value.matter,value.decision], |r| r.get(0))?;
     if blockers != 0 { return Err(StoreError::InvalidState("matter has blocking operation, effect, or check".into())); }
     let sequence = tx.query_row("SELECT coalesce(max(sequence),0)+1 FROM conversation_messages", [], |r| r.get(0))?;
     tx.execute("INSERT INTO runtime_events(id,matter_id,causal_sequence,kind,monotonic_ms,wall_time,payload,source_kind,source_id) VALUES(?1,?2,?3,'matter-completed',?4,?5,?6,'harness',?7)", params![value.event,value.matter,value.event_sequence,value.monotonic_ms,value.wall_time,value.payload,id])?;
+    tx.execute("UPDATE runtime_decisions SET status='settled',settlement_event_id=?1 WHERE id=?2 AND matter_id=?3 AND status='selected'", params![value.event,value.decision,value.matter])?;
     tx.execute("INSERT INTO conversation_messages(id,sequence,role,body,body_fingerprint,receipt,receipt_fingerprint,lifecycle,matter_id,cause_event_id) VALUES(?1,?2,'agent',?3,?4,?5,?6,'active',?7,?8)", params![id,sequence,value.body,value.body_fingerprint,receipt,receipt_fingerprint,value.matter,value.event])?;
     tx.execute("UPDATE conversation_messages SET lifecycle='replaced',replacement_id=?1 WHERE matter_id=?2 AND role='agent' AND lifecycle='active' AND id<>?1", params![id,value.matter])?;
     changed(tx.execute("UPDATE matters SET lifecycle='closed',closure_event_id=?1,closure_checks_passed=1,unsettled_effects=0,updated_sequence=?2 WHERE id=?3 AND lifecycle='open'", params![value.event,value.event_sequence,value.matter])?, "matter cannot close")?;

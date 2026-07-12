@@ -6,26 +6,32 @@ Define the direct durable cycle that replaces task and step projections.
 
 ## Cycle
 
-1. Claim or refresh the daemon lease.
-2. Read owner, wake, provider, effect, and file-change events.
-3. Reduce events into current state and obligations.
-4. Select one eligible operation deterministically.
-5. Persist its immutable `RuntimeDecision` selection and exact compiler specs.
-6. Compile context and attach source refs, rendered frame, and fingerprints.
-7. Persist provider intent or prepare one native effect.
-8. Perform at most one provider call or external effect.
-9. Persist outcome events, observation, checks, message, and decision settlement.
+1. Open and restart-project the native store.
+2. Refuse replay of a sent provider exchange or unfinished effect.
+3. Hydrate a `RuntimeSnapshot` and `RuntimeState` from active native cells.
+4. Call the direct core selector and persist its immutable decision and specs.
+5. Compile the prompt after selection from the current owner objective and
+   current revision-bound source bytes; attach compiler facts and fingerprints.
+6. Persist provider intent, mark sent, call the configured endpoint, and persist
+   the bounded outcome before strict parsing.
+7. Dispatch only through the persisted tool entry and direct effect key.
+8. Settle one read/list/search observation, one exact edit/create effect, or one
+   checked final response.
+9. Reduce committed edits into three current native checks immediately.
 10. Begin the next cycle from committed rows.
 
-Context compilation cannot change the selected operation. A compile fault settles
-the decision and makes no provider call.
+Context compilation cannot change the selected operation. Parse, hidden-tool,
+and stale-revision failures settle through `reject_model_output`. A sent provider
+boundary is ambiguous on restart and never replayed.
 
 ## Decisions
 
 A decision stores selected state, operation, exact tool descriptors, grammar,
-context needs and caps, model budget, recovery policy, check requirements, exit
-policy, source refs, frame fingerprint, and settlement status. A code change that
-cannot honor a pending spec blocks it rather than reinterpreting it.
+context needs and caps, model budget, recovery policy, file check requirements,
+exit policy, frame fingerprint, and settlement status. A code change that cannot
+honor unfinished work blocks it rather than reinterpreting it. The close
+transaction excludes only its exact respond decision from blockers and settles
+that decision atomically with the canonical final message and matter closure.
 
 ## Prompt State
 

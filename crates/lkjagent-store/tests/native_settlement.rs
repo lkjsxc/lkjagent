@@ -34,7 +34,7 @@ fn intake() -> Intake<'static> {
 
 #[rustfmt::skip]
 fn close() -> FinalClose<'static> {
-    FinalClose { matter: "m", body: b"done", body_fingerprint: b"final-fp", event: "close",
+    FinalClose { matter: "m", decision: "d", body: b"done", body_fingerprint: b"final-fp", event: "close",
         event_sequence: 4, monotonic_ms: 4, wall_time: "now", payload: b"close" }
 }
 

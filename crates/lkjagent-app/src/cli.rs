@@ -3,7 +3,6 @@ use std::fs;
 use rusqlite::Connection;
 
 use crate::args::{parse, Command};
-use crate::daemon::{run_daemon, run_until_idle};
 
 pub fn run<I, S>(args: I) -> Result<String, String>
 where
@@ -13,6 +12,22 @@ where
     let invocation = parse(args)?;
     if invocation.command == Command::Help {
         return Ok(help());
+    }
+    match &invocation.command {
+        Command::Send { text, force_new } => {
+            return crate::public_loop::send(&invocation.data_dir, text, *force_new);
+        }
+        Command::Status => return crate::public_loop::status(&invocation.data_dir),
+        Command::Run { once: true } => {
+            let mut endpoint = crate::endpoint::LlmEndpoint::new(&invocation.data_dir);
+            return crate::public_loop::run_once(&invocation.data_dir, &mut endpoint);
+        }
+        Command::Run { once: false } => {
+            let mut endpoint = crate::endpoint::LlmEndpoint::new(&invocation.data_dir);
+            crate::public_loop::run(&invocation.data_dir, &mut endpoint)?;
+            return Ok(String::new());
+        }
+        _ => {}
     }
     let workspace_root = crate::config::workspace_root(&invocation.data_dir)?;
     fs::create_dir_all(&invocation.data_dir).map_err(|error| error.to_string())?;
@@ -27,32 +42,9 @@ where
         crate::daemon_lock::claim(&mut conn, &crate::clock::utc_now())?;
     }
     let result = match invocation.command {
-        Command::Run { once } if once => {
-            let mut endpoint = crate::endpoint::LlmEndpoint::new(&invocation.data_dir);
-            let snapshot = run_until_idle(&invocation.data_dir, &mut endpoint, 1)?;
-            Ok(format!(
-                "run-once: matter={} state={:?}",
-                snapshot.task.id, snapshot.task.state
-            ))
+        Command::Run { .. } | Command::Send { .. } | Command::Status => {
+            Err("public command routing failure".to_string())
         }
-        Command::Run { .. } => {
-            run_daemon(&invocation.data_dir)?;
-            Ok(String::new())
-        }
-        Command::Send { text, force_new } => {
-            let now = crate::clock::utc_now();
-            let id = lkjagent_store::plan_access::enqueue_with_force(&conn, &text, force_new, &now)
-                .map_err(|error| error.to_string())?;
-            crate::daemon_owner_routes::write_send_trace(
-                &invocation.data_dir,
-                id,
-                &text,
-                force_new,
-                &now,
-            )?;
-            Ok(format!("queue: {id} new={force_new}"))
-        }
-        Command::Status => crate::status::status_with_roots(&conn, &invocation.data_dir),
         Command::Console => crate::console::run(&conn),
         Command::Workbench => crate::workbench::run(&conn, &invocation.data_dir),
         Command::Doctor { json } => crate::diagnostics::doctor(&conn, &invocation.data_dir, json),

@@ -1,7 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
 
-use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::model::TaskState;
 use lkjagent_core::workspace_record::record_fingerprint;
@@ -66,29 +65,6 @@ fn record_like_owner_turns_write_workspace_files_without_tasks() -> TestResult<(
         &data,
         &format!("workspace/{journal_path}"),
         "記録してほしい\n",
-    )?;
-    Ok(())
-}
-
-#[test]
-fn cli_run_once_processes_record_like_turn() -> TestResult<()> {
-    let data = fixture_root("owner-turn-run-once")?;
-    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    setup(&conn)?;
-    enqueue(&conn, "todo buy tea", "queued")?;
-    drop(conn);
-
-    let output = cli::run(["--data", data.to_string_lossy().as_ref(), "run", "--once"])?;
-
-    assert!(output.contains("run-once:"));
-    let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    assert_eq!(queue_state_count(&conn, "recorded")?, 1);
-    assert_eq!(count(&conn, "workspace_records")?, 1);
-    assert!(data.join("workspace/indexes/open-todos.md").exists());
-    assert_contains(
-        &data,
-        "workspace/artifacts/transcripts/queue-000001.md",
-        "todo buy tea",
     )?;
     Ok(())
 }

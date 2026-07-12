@@ -22,25 +22,29 @@ qualified by `../current-state.md` until they use the direct effect path.
 
 ## Send
 
-`send` commits one owner turn, canonical owner message, initial event, matter,
-obligations, and state in one transaction. It returns stable owner-turn and
-message identities, not presentation text such as queue state.
+`send` creates the data directory, opens the native 18-table store, allocates a
+queue sequence, and commits one owner turn, canonical owner message, intake
+event, open matter, and active `matter/opened` cell in one transaction. This
+bounded cutover may create a new matter for every successful send. It reports the
+exact matter, turn, message, and message sequence. It creates no workspace or
+scaffold files.
 
-All ordinary prose enters the direct matter loop. Operator slash/CLI commands may
-remain deterministic. Substrings such as `verify` or `run tests` cannot divert an
-ordinary edit into a terminal route.
+All ordinary prose enters this direct matter loop. Substrings such as `verify`
+or `run tests` do not invoke owner substring routing.
 
 ## Run
 
-`run` keeps cycling while eligible work or a due wake exists. A developer
-bounded-cycle option may return control without changing matter state. One cycle
-is never described as matter completion.
+`run --once` executes at most one persisted direct decision. `run` repeats that
+same native cycle with a bounded sleep. Both open only the configured workspace
+when selected work reaches a workspace operation. They do not construct task or
+step snapshots, plans, templates, or bridge projections.
 
 ## Status Command
 
-Status reports resolved data/workspace roots, lease, active matters, waits,
-blocks, current decision, unsettled effects, and config source without secrets.
-It derives lifecycle from reduced state rather than retired task rows.
+Status opens only the native store and reports both resolved roots, matter
+lifecycle counts, the active matter, unfinished decisions, exchanges and
+effects, checks readiness, and canonical conversation identities. It does not
+synthesize task or queue events.
 
 ## Exit Codes
 

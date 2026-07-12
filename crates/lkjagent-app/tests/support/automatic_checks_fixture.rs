@@ -170,6 +170,7 @@ pub fn close(db: &Path) -> lkjagent_store::error::StoreResult<()> {
     NativeStore::open(db)?
         .close_matter(&FinalClose {
             matter: "m",
+            decision: "d",
             body: b"done",
             body_fingerprint: b"final-fp",
             event: "close",

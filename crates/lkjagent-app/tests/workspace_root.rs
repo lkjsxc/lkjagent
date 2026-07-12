@@ -29,7 +29,7 @@ fn resolves_default_relative_absolute_and_rejects_internal_roots() -> TestResult
 }
 
 #[test]
-fn help_invalid_status_and_doctor_leave_workspace_absent() -> TestResult<()> {
+fn help_invalid_and_native_status_leave_workspace_absent() -> TestResult<()> {
     let (parent, data, workspace) = fixture("lazy")?;
     let help = cli::run(["help"])?;
     assert!(help.contains("lkjagent commands"));
@@ -37,10 +37,7 @@ fn help_invalid_status_and_doctor_leave_workspace_absent() -> TestResult<()> {
     assert!(cli::run(["--data", text(&data), "unknown"]).is_err());
     assert!(!workspace.exists());
     let status = cli::run(["--data", text(&data), "status"])?;
-    assert!(status.contains("workspace_present=false"));
-    assert!(!workspace.exists());
-    let doctor = cli::run(["--data", text(&data), "doctor", "--json"])?;
-    assert!(doctor.contains("\"workspace_present\":false"));
+    assert!(status.contains(&format!("workspace={}", workspace.display())));
     assert!(!workspace.exists());
     fs::remove_dir_all(parent)?;
     Ok(())

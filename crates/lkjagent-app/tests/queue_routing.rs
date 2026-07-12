@@ -13,37 +13,6 @@ mod support;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn queue_views_show_semantic_route_evidence() -> TestResult<()> {
-    let data = fixture_root("queue-routing")?;
-    let cases = [
-        (
-            "create an artifact report from these notes",
-            "route=artifact_request durability=runtime_decision transform=true",
-        ),
-        (
-            "show the current status",
-            "route=inspection durability=read_only_report transform=false",
-        ),
-        (
-            "run cargo test and report failures",
-            "route=system_operation durability=runtime_decision transform=false",
-        ),
-        (
-            "plan a summer trip",
-            "route=new_matter durability=matter transform=true",
-        ),
-    ];
-    for (text, _) in cases {
-        cli::run(["--data", data.to_string_lossy().as_ref(), "send", text])?;
-    }
-    let list = cli::run(["--data", data.to_string_lossy().as_ref(), "queue", "list"])?;
-    for (_, expected) in cases {
-        assert!(list.contains(expected), "missing {expected} in {list}");
-    }
-    Ok(())
-}
-
-#[test]
 fn inspection_route_closes_without_endpoint_call() -> TestResult<()> {
     let data = fixture_root("queue-inspection-effect")?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
