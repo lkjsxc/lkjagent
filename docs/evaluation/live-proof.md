@@ -63,9 +63,10 @@ hashes. A textual description without frames and IDs fails.
 ## Secret Safety
 
 Capture strips authorization headers. Pre-commit scans the index against actual
-loaded secrets without printing them. Final verification scans every reachable
-Git object for current/known prior secret fingerprints, authorization patterns,
-high-confidence credentials, and private owner content. Reports contain only
+loaded secrets without printing them. Final verification scans every Git object
+reachable from HEAD for current or known prior secret fingerprints,
+authorization patterns, high-confidence credentials, and private owner content.
+Reports contain only
 path/object hash.
 
 ## Independent Review

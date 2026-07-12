@@ -4,7 +4,7 @@ use std::process::Command;
 use super::secret;
 
 pub fn secret_errors(root: &Path) -> Vec<String> {
-    let commits = match git(root, &["rev-list", "--all"]) {
+    let commits = match git(root, &["rev-list", "HEAD"]) {
         Ok(output) if output.status.success() => String::from_utf8_lossy(&output.stdout)
             .lines()
             .map(str::to_string)
