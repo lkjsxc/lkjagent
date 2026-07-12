@@ -67,7 +67,7 @@ The source contains useful low-level pieces:
 - provider intent and response logging;
 - tool admissions, effect journals, target revisions, and observations;
 - descriptor-relative no-follow file traversal and staged replacement pieces;
-- deterministic checks, workspace inventory, and TUI composer reducers;
+- deterministic checks and workspace inventory;
 - flat JSON configuration validation and Docker build separation from data.
 
 The repository now also has a source-bound acceptance incomplete mode with nine
@@ -92,24 +92,20 @@ the fresh native 18-table store. The focused public test demonstrates two closed
 exact-edit matters, restart idempotency, and stale owner byte preservation with
 a scripted endpoint.
 
-The compiled core no longer contains task, step, template, plan, classification,
-owner-turn, retired check, docs-tree, or plan-engine authority. Direct parsing now
-accepts only tool-call and final envelopes selected by a persisted decision, and
-the transport `Prompt` lives in `prompt.rs`. The compiled application, effects,
-and store roots now include only native public-loop dependencies. Their retired
-source files remain on disk but are not compiled; this does not claim deletion of
-every retired source file.
+The product crates no longer contain task, step, template, plan, classification,
+owner-turn, retired check, docs-tree, plan-engine, daemon, bridge, record,
+inspection, workbench, or old TUI authority. Direct parsing accepts only tool-call
+and final envelopes selected by a persisted decision, and transport `Prompt`
+lives in `prompt.rs`.
 
 ## Active Source Gaps
 
-Retired non-public daemon, record, workspace projection, inspection, and TUI
-source files still use retired schema and projections, but crate roots no longer
-compile them. Retired store row helpers likewise remain as uncompiled source.
-Public scheduling currently handles one open matter at a time, blocks unfinished
-effects instead of completing every recovery phase, and does not yet prove
-fairness across simultaneous open matters. Scripted and configured-model runs
-cover checked read-only continuation; the tracked schedule ran fully and retained
-later active intake without claiming it closed.
+Record, memory, activity, artifact, and TUI behavior must now be rebuilt only on
+native state. Public scheduling runs one matter per cycle and prefers an
+unrelated runnable matter over one with unfinished work. It still blocks instead
+of reconciling every effect recovery phase, and configured-model simultaneous-
+matter fairness remains unproven. The tracked schedule retained later active
+intake without claiming it closed.
 
 The public compiler attaches its context plan and frame fingerprints and stores
 one native context-item row for every included owner or measured source. List and
@@ -118,16 +114,14 @@ source bytes. Final admission rejects future-tense and unsupported command or
 test claims; richer claim-to-path comparison remains a bounded follow-up. Close
 and the owner receipt remain check-derived. These are source gaps, not fallback.
 
-The native `conversation_messages` table is canonical for public turns, but the
-TUI still synthesizes owner and agent messages from retired queue and event rows,
-then merges local drafts. It has two viewport implementations and does not
-measure wrapped display rows consistently.
+The native `conversation_messages` table is canonical for public turns. There is
+currently no public TUI; its composer, activity, and wrapped-row viewport must be
+rebuilt from native rows.
 
 Configuration and Compose now separate the runtime data root from one visible
 workspace root. The workspace is created only by an actual workspace operation,
 startup no longer writes scaffold files, and diagnostics report both roots.
-Record routing can still write canned diary text without a model, and several
-accepted configuration keys still have no production consumer.
+Several accepted configuration keys still have no production consumer.
 
 ## Direct Contract
 
@@ -168,6 +162,7 @@ claims, and the close transaction owns the canonical final message.
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
 | configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |
+| retired-source-deletion | complete | old controller, bridge, record, inspection, workbench, and TUI source is absent from product crates |
 | final campaigns | active | exact-file campaign passed; recovery, daily-life, multi-project, and PTY proof remain |
 
 ## Honesty Rules

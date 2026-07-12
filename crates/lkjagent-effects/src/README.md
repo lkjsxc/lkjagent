@@ -12,6 +12,3 @@ Map the workspace effects compiled for the direct runtime.
 - [workspace-edit.rs](workspace_edit.rs): exact edit transitions.
 - [workspace-edit-types.rs](workspace_edit_types.rs): edit evidence and phases.
 - [workspace-scan.rs](workspace_scan.rs): bounded listing and text search.
-
-Retired shell and legacy check adapter files remain in this directory but are
-excluded from `lib.rs`.

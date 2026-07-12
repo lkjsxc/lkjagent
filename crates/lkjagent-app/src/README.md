@@ -17,6 +17,3 @@ Map the modules compiled into the direct public application.
 - [model-io.rs](model_io.rs): prompt transport and endpoint adapters.
 - [public-loop.rs](public_loop.rs): native send, run, status, and doctor loop.
 - [workspace-root.rs](workspace_root.rs): lazy separate workspace capability.
-
-Retired daemon, plan bridge, record, inspection, TUI, and workbench source files
-remain in this directory but are excluded from `lib.rs` and are not product code.
