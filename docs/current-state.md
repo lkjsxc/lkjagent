@@ -98,8 +98,8 @@ and does not yet prove fairness across simultaneous open matters. Scripted and
 configured-model runs cover checked read-only continuation, but the full tracked
 schedule has not yet run.
 
-The public compiler attaches its context plan and frame fingerprints; native
-context-item rows are not yet populated for every included source. List and
+The public compiler attaches its context plan and frame fingerprints and stores
+one native context-item row for every included owner or measured source. List and
 search observations remain orienting evidence until a read produces current
 source bytes. Final model wording is not yet checked for unsupported claims,
 although close and the owner receipt remain check-derived. These are bounded
@@ -150,7 +150,7 @@ claims, and the close transaction owns the canonical final message.
 | exact-edits | complete | crash-safe exact edit and create pass race, mode, symlink, and crash tests |
 | automatic-checks | complete | public exact edits immediately reduce to three current passed checks in the focused test |
 | app-public-loop | complete | public send/run/status use only the native store and direct selector in focused scripted tests |
-| context-compiler | complete | selection precedes compilation and current source revision and bytes enter the next prompt |
+| context-compiler | complete | selection precedes compilation and included owner or measured sources persist with the rendered frame |
 | conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
