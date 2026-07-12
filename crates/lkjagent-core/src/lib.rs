@@ -67,7 +67,6 @@ pub mod runtime_tool_call;
 mod runtime_tool_cards;
 pub mod runtime_tool_catalog;
 pub mod runtime_tool_view;
-pub mod runtime_transition;
 pub mod templates;
 pub mod workspace_entity {
     pub use crate::workspace_manifest::{

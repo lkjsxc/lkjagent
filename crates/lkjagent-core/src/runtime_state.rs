@@ -17,27 +17,24 @@ pub struct StateKey {
 }
 
 impl Serialize for StateKey {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         serializer.serialize_str(&self.as_label())
     }
 }
 
 impl<'de> Deserialize<'de> for StateKey {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let label = String::deserialize(deserializer)?;
-        parse_state_key(&label).map_err(D::Error::custom)
+        Self::from_label(&label).map_err(|error| D::Error::custom(error.message))
     }
 }
 
 impl StateKey {
     pub fn from_label(label: &str) -> Result<Self, StateKeyError> {
-        parse_state_key(label).map_err(|message| StateKeyError { message })
+        let (namespace, name) = label.split_once(':').ok_or_else(|| StateKeyError {
+            message: "state key label must contain ':'".to_string(),
+        })?;
+        Self::new(namespace, name)
     }
 
     pub fn new(
@@ -50,12 +47,12 @@ impl StateKey {
         };
         if key.namespace.is_empty() || key.name.is_empty() {
             return Err(StateKeyError {
-                message: "state key namespace and name are required".to_string(),
+                message: "state key namespace and name are required".into(),
             });
         }
         if key.namespace.contains(':') || key.name.contains(':') {
             return Err(StateKeyError {
-                message: "state key parts must not contain ':'".to_string(),
+                message: "state key parts must not contain ':'".into(),
             });
         }
         Ok(key)
@@ -63,13 +60,6 @@ impl StateKey {
 
     pub fn as_label(&self) -> String {
         format!("{}:{}", self.namespace, self.name)
-    }
-}
-
-fn parse_state_key(label: &str) -> Result<StateKey, String> {
-    match label.split_once(':') {
-        Some((namespace, name)) => StateKey::new(namespace, name).map_err(|err| err.message),
-        None => Err("state key label must contain ':'".to_string()),
     }
 }
 
@@ -142,8 +132,8 @@ impl StateCell {
             status: StateStatus::Active,
             priority: 0,
             confidence: 100,
-            payload_schema: "empty".to_string(),
-            payload_json: "{}".to_string(),
+            payload_schema: "empty".into(),
+            payload_json: "{}".into(),
             evidence_refs: Vec::new(),
             source_event_id: source_event_id.into(),
             created_at: String::new(),
@@ -186,4 +176,20 @@ impl RuntimeSnapshot {
     pub fn fingerprint(&self) -> Result<String, FingerprintError> {
         stable_fingerprint(self)
     }
+}
+
+pub use crate::runtime_eligibility::CurrentTime;
+pub use crate::runtime_operation::{MatterLifecycle, RuntimePhase, RuntimeState};
+
+#[rustfmt::skip]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CompletionRequirement { pub check_name: String, pub artifact_fingerprint: String }
+#[rustfmt::skip]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct CheckEvidence { pub check_name: String, pub artifact_fingerprint: String, pub passed: bool,
+    pub decision_id: String, pub created_at: String }
+#[rustfmt::skip]
+pub fn can_close(requirements: &[CompletionRequirement], evidence: &[CheckEvidence]) -> bool {
+    !requirements.is_empty() && requirements.iter().all(|required| evidence.iter().any(|item|
+        item.passed && item.check_name == required.check_name && item.artifact_fingerprint == required.artifact_fingerprint))
 }

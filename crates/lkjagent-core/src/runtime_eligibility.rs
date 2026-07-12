@@ -3,6 +3,24 @@ use serde::{Deserialize, Serialize};
 use crate::runtime_fingerprint::{stable_fingerprint, FingerprintError};
 use crate::runtime_state::{RuntimeSnapshot, StateCell};
 
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub struct CurrentTime(pub String);
+
+impl CurrentTime {
+    pub fn new(value: impl Into<String>) -> Self {
+        Self(value.into())
+    }
+    pub fn as_str(&self) -> &str {
+        &self.0
+    }
+}
+
+pub(crate) fn causal_number(value: &str) -> Option<u64> {
+    value
+        .rsplit_once('-')
+        .and_then(|(_, suffix)| suffix.parse().ok())
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RuntimeBudget {
     pub tokens: u64,

@@ -11,8 +11,7 @@ Map lkjagent-core source modules.
   state-vector fingerprints.
 - [runtime-tool-catalog.rs](runtime_tool_catalog.rs): canonical tool
   descriptors and views.
-- [runtime-event.rs](runtime_event.rs): events, patches, reducer, and patch
-  application.
+- [runtime-event.rs](runtime_event.rs): identity- and sequence-checked direct reducer.
 - [runtime-eligibility.rs](runtime_eligibility.rs): due cells and next wakes.
 - [runtime-decision.rs](runtime_decision.rs): runtime decisions, envelopes, and
   tool-set views.
@@ -22,8 +21,8 @@ Map lkjagent-core source modules.
   plan and fingerprints.
 - [runtime-candidate.rs](runtime_candidate.rs): selector candidate generation,
   scoring, and edge blocking.
-- [runtime-selector.rs](runtime_selector.rs): pure state-vector decision
-  selection and fresh-evidence closure checks.
+- [runtime-selector.rs](runtime_selector.rs): deterministic direct selection,
+  typed waits and blocks, and guarded idle closure.
 - [runtime-admission.rs](runtime_admission.rs): action admission and workspace
   path policy.
 - [runtime-artifact.rs](runtime_artifact.rs): checked artifact units,

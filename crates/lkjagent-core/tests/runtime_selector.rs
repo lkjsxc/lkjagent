@@ -100,7 +100,7 @@ fn selector_skips_candidates_blocked_by_state_edges() {
 }
 
 #[test]
-fn payload_operation_selects_unknown_state_namespace() {
+fn unknown_state_payload_is_preserved_but_not_executed() {
     let mut custom = cell("calendar", "due/today");
     custom.payload_json = serde_json::json!({
         "operation_key": "model.call/42",
@@ -114,17 +114,9 @@ fn payload_operation_selects_unknown_state_namespace() {
 
     let selected = select(&snapshot, "decision-1", &[]);
 
-    assert_eq!(
-        selected.selected_state_key.as_deref(),
-        Some("calendar:due/today")
-    );
-    assert_eq!(selected.operation.0, "model.call/42");
-    assert_eq!(selected.expected_envelope, OutputEnvelope::Message);
-    assert!(selected.effect_command.is_none());
-    assert_eq!(
-        selected.evidence_requirements,
-        vec!["selector:payload", "record:todo-1"]
-    );
+    assert_eq!(selected.selected_state_key, None);
+    assert_eq!(selected.operation.0, "runtime.idle");
+    assert_eq!(selected.expected_envelope, OutputEnvelope::None);
 }
 
 #[test]
