@@ -94,7 +94,11 @@ impl Endpoint for LlmEndpoint {
     fn complete(&mut self, prompt: &Prompt, attempt: u32) -> Result<CompletionRecord, String> {
         let config = load_client(&self.data_dir)?;
         let max_tokens = u16::try_from(prompt.max_tokens).unwrap_or(u16::MAX);
-        let spec = CallSpec::with_stop(max_tokens, &prompt.stop);
+        let spec = if prompt.stop.is_empty() {
+            CallSpec::action(max_tokens)
+        } else {
+            CallSpec::with_stop(max_tokens, &prompt.stop)
+        };
         let messages = vec![
             Message::system(prompt.system.clone()),
             Message::user(prompt.user.clone()),

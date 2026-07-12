@@ -14,6 +14,12 @@ The original planning comparison used source
 `5604ec89af3ba9dbfb287bd869971781fdcf2fad` and parent product source
 `28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`.
 
+A configured-model smoke run against the public cutover reached eight provider
+exchanges but every response ended immediately before `</tool_call>` because the
+closing root had been sent as a provider stop string. It made no edit. Current
+source omits direct-request stop strings; that correction still needs a fresh
+configured-model run.
+
 A synthetic 901-second run against the parent product source seeded
 `notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
 verification, and truthful report. The daemon stayed alive and owner intake

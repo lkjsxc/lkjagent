@@ -14,7 +14,7 @@ mod support;
 type TestResult<T> = Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 #[test]
-fn llm_endpoint_uses_configured_chat_endpoint() -> TestResult<()> {
+fn llm_endpoint_uses_configured_chat_endpoint_without_empty_stop() -> TestResult<()> {
     let _env = EndpointEnvGuard::unset();
     let listener = TcpListener::bind("127.0.0.1:0")?;
     let url = format!("http://{}", listener.local_addr()?);
@@ -83,7 +83,7 @@ fn serve_once(listener: TcpListener) -> TestResult<()> {
     let count = stream.read(&mut request)?;
     let body = String::from_utf8_lossy(&request[..count]);
     assert!(body.contains("/v1/chat/completions"));
-    assert!(body.contains("</message></final>"));
+    assert!(!body.contains("\"stop\""));
     let response = "{\"choices\":[{\"message\":{\"content\":\"<final><message>hello</message></final>\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1,\"completion_tokens\":1,\"total_tokens\":2}}";
     stream.write_all(
         format!(
@@ -102,7 +102,7 @@ fn prompt() -> Prompt {
         user: "user".to_string(),
         fingerprint: "abc".to_string(),
         max_tokens: 700,
-        stop: "</message></final>".to_string(),
+        stop: String::new(),
     }
 }
 
