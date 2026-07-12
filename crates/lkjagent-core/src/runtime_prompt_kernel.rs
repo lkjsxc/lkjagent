@@ -109,7 +109,8 @@ fn is_agent_file(item: &ContextItem) -> bool {
 #[rustfmt::skip]
 fn selected_cell<'a>(decision: &RuntimeDecision, snapshot: &'a RuntimeSnapshot) -> Result<&'a StateCell, String> {
     let label = decision.selected_state_key.as_deref().ok_or("decision has no selected state")?;
-    snapshot.cells.values().find(|cell| cell.key.as_label() == label).ok_or("selected state is absent")
+    snapshot.cells.values().find(|cell| cell.key.as_label() == label)
+        .ok_or_else(|| "selected state is absent".to_string())
 }
 #[rustfmt::skip]
 fn kernel_card(decision: &RuntimeDecision) -> String { format!(

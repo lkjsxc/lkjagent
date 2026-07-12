@@ -34,8 +34,7 @@ fn intake() -> Intake<'static> {
 
 #[rustfmt::skip]
 fn close() -> FinalClose<'static> {
-    FinalClose { matter: "m", body: b"done", body_fingerprint: b"final-fp",
-        receipt: b"checks: passed", receipt_fingerprint: b"receipt-fp", event: "close",
+    FinalClose { matter: "m", body: b"done", body_fingerprint: b"final-fp", event: "close",
         event_sequence: 4, monotonic_ms: 4, wall_time: "now", payload: b"close" }
 }
 
@@ -152,7 +151,10 @@ fn durable_boundaries_settlement_links_revision_and_close_guards() -> Result<(),
         linked,
         ("settled".into(), "e3".into(), "j".into(), "settled".into())
     );
-    let closed: (String, i64, i64, Vec<u8>) = connection.query_row("SELECT lifecycle,(SELECT count(*) FROM conversation_message_checks WHERE message_id='completion-event/close'),(SELECT count(*) FROM runtime_events WHERE id='close'),(SELECT receipt FROM conversation_messages WHERE id='completion-event/close') FROM matters WHERE id='m'", [], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?)))?;
-    assert_eq!(closed, ("closed".into(), 1, 1, b"checks: passed".to_vec()));
+    let closed: (String, i64, Vec<u8>) = connection.query_row("SELECT lifecycle,(SELECT count(*) FROM runtime_events WHERE id='close'),(SELECT receipt FROM conversation_messages WHERE id='completion-event/close') FROM matters WHERE id='m'", [], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?;
+    assert_eq!(
+        closed,
+        ("closed".into(), 1, br#"[["passed",[2]]]"#.to_vec())
+    );
     Ok(())
 }

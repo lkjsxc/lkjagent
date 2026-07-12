@@ -10,8 +10,6 @@ Define the fresh active SQLite tables and authority constraints.
 - `owner_turns`: queue order, raw text, delivery, and matter link.
 - `conversation_messages`: logical ID, sequence, role, immutable body, exact final
   receipt, lifecycle, cause, and replacement.
-- `conversation_message_checks`: final-message binding to current passed checks
-  and their evidence fingerprints.
 - `obligations`: required predicate and reducer-derived state.
 
 ## Runtime
@@ -41,8 +39,8 @@ Add state edges or search tables only with their first real consumer.
 Foreign keys are enabled. Causal sequences, logical messages, decision/effect
 identities, idempotency keys, and document revisions are unique. Conversation
 sequence is positive and globally unique. Owner rows have no completion receipt;
-agent rows require exact receipt bytes and fingerprint. Final check bindings
-retain the evidence fingerprint named at close. Accepted effect admissions have
+agent rows require receipt bytes and a fingerprint computed from the ordered
+current passed checks at close. Accepted effect admissions have
 one journal; rejected admissions have none. An attempted effect has one
 observation. Close requires current checks and no unsettled journal.
 

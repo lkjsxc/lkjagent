@@ -1,11 +1,13 @@
 use lkjagent_core::render::Prompt;
 use lkjagent_core::runtime_context::{
-    default_context_pipeline, ContextFramePlan, ContextLanePlan, ContextPlanEntry,
+    default_context_pipeline, ContextFramePlan, ContextItem, ContextLanePlan, ContextPlanEntry,
+    TrustClass,
 };
 use lkjagent_core::runtime_decision::{
     OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
 };
-use lkjagent_core::runtime_prompt_kernel::build_prompt_card_plan;
+use lkjagent_core::runtime_prompt_kernel::{build_prompt_card_plan, compile_prompt, PromptBudgets};
+use lkjagent_core::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
 
 #[test]
 fn card_plan_has_ordered_profiles_and_fingerprints() -> Result<(), String> {
@@ -56,7 +58,7 @@ fn card_plan_has_ordered_profiles_and_fingerprints() -> Result<(), String> {
             "output"
         ]
     );
-    assert_eq!(plan.prompt_profile, "kernel-v1");
+    assert_eq!(plan.prompt_profile, "kernel-v2");
     assert!(plan.fingerprint.starts_with("fnv1a64:"));
     let state = reason(&plan, "state")?;
     assert!(state.contains("harness_state=act"));
@@ -120,6 +122,51 @@ fn card_reasons_list_context_selection_audit() -> Result<(), String> {
     let conflicts = reason(&plan, "conflicts")?;
     assert!(conflicts.contains("<id>ctx-conflict</id>"));
     assert!(conflicts.contains("<source_ref>test:source@fp</source_ref>"));
+    Ok(())
+}
+
+#[test]
+fn compiler_binds_selected_state_and_escapes_sources_once() -> Result<(), String> {
+    let key = StateKey::new("work", "edit").map_err(|error| error.message)?;
+    let mut cell = StateCell::active(key.clone(), "event-1");
+    cell.payload_schema = "state.operation.v1".into();
+    cell.payload_json = r#"{"objective":"Edit <file>","operation_key":"model.call/edit"}"#.into();
+    let mut snapshot = RuntimeSnapshot::empty("case-1");
+    snapshot.cells.insert(key, cell);
+    let fingerprint = snapshot.fingerprint().map_err(|error| error.message)?;
+    let mut decision = RuntimeDecision::new(
+        "decision-1",
+        "case-1",
+        OperationKey("model.call/edit".into()),
+        ToolSetView::empty(),
+        OutputEnvelope::Message,
+    );
+    decision.selected_state_key = Some("work:edit".into());
+    decision.snapshot_fingerprint = fingerprint.clone();
+    decision.state_vector_fingerprint = fingerprint;
+    decision.model_budget_tokens = Some(256);
+    let mut objective = ContextItem::clean_fact("owner-1", "objective", "Edit <file>");
+    objective.trust = TrustClass::Owner;
+    objective.source_type = "owner".into();
+    objective.source_fingerprint = "owner-fp".into();
+    let source = ContextItem::clean_fact("fact-1", "revision", "Observed & current");
+
+    let compiled = compile_prompt(
+        &decision,
+        &snapshot,
+        objective,
+        &[source],
+        &PromptBudgets::default(),
+    )?;
+
+    assert!(compiled
+        .prompt
+        .system
+        .contains("<value>source-linked</value>"));
+    assert!(compiled.prompt.user.contains("Edit &lt;file&gt;"));
+    assert!(compiled.prompt.user.contains("Observed &amp; current"));
+    assert_eq!(compiled.prompt.user.matches("Edit &lt;file&gt;").count(), 1);
+    assert_eq!(compiled.prompt.stop, "</final>");
     Ok(())
 }
 
