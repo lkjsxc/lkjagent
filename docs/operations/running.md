@@ -6,16 +6,18 @@ Define day-to-day operation for the daemon and owner CLI.
 
 ## Configuration
 
-Configuration lives in flat `data/lkjagent.json` plus environment overrides.
-Secrets are passed by environment variables and are not written to the config
-file.
+Runtime configuration is optional. When present, it is the flat
+`lkjagent.json` inside the selected data directory. Defaults and environment
+overrides are sufficient for a fresh data directory. Secrets are passed by
+environment variables and are not written to the config file.
 
 The exact key, type, range, default, reload, and consumer contract is in
 [../product/configuration-registry.md](../product/configuration-registry.md).
-The tracked example contains every registry key. Missing required structure,
-unknown keys, arrays, nested values, wrong scalar types, invalid ranges, and
-cross-key conflicts fail startup. Model-visible context never includes the raw
-JSON config blob or secret values.
+The tracked `config/lkjagent.example.json` contains every registry key and is
+an immutable repository example, not runtime data. In a supplied configuration,
+missing required structure, unknown keys, arrays, nested values, wrong scalar
+types, invalid ranges, and cross-key conflicts fail startup. Model-visible
+context never includes the raw JSON config blob or secret values.
 
 ## Docker Operation
 

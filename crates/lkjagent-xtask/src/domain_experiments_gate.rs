@@ -65,7 +65,7 @@ fn validate(root: &Path) -> Result<(), String> {
     {
         return Err("candidate build provenance mismatch".into());
     }
-    let baseline = io::json(&root.join("data/lkjagent.json"))?;
+    let baseline = io::json(&root.join("config/lkjagent.example.json"))?;
     let mut failures = Vec::new();
     let mut run_ids = BTreeSet::new();
     let mut stores = BTreeSet::new();

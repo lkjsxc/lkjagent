@@ -9,7 +9,7 @@ from pathlib import Path
 
 SOURCE_PATHS = (
     "Cargo.toml", "Cargo.lock", ".cargo", "rust-toolchain", "rust-toolchain.toml",
-    "crates", "docs", "evaluation", "Dockerfile", "docker-compose.yml", "data/lkjagent.json",
+    "crates", "docs", "evaluation", "Dockerfile", "docker-compose.yml", "config/lkjagent.example.json",
 )
 
 

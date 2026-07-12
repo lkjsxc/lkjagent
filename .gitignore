@@ -7,8 +7,6 @@
 /.lkjagent-models
 /.lkjagent-workspace
 /crates/**/target
-/data/*
-!/data/README.md
-!/data/lkjagent.json
+/data
 /target
 /tmp

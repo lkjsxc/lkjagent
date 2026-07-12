@@ -160,7 +160,7 @@ def main() -> int:
             ("error_type", type(error).__name__), ("error", str(error))])
         manifest(campaign, "campaign-manifest.tsv"); raise
     if build_status: return 1
-    cells = table(root / "evaluation/experiment-plan.tsv"); base = json.loads((root / "data/lkjagent.json").read_text())
+    cells = table(root / "evaluation/experiment-plan.tsv"); base = json.loads((root / "config/lkjagent.example.json").read_text())
     try: rows = run_jobs(root, campaign, campaign / "lkjagent", source, cells, base)
     except BaseException as error:
         pairs(campaign / "failure.tsv", [("status", "failed"), ("phase", "runs"),

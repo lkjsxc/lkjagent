@@ -5,7 +5,7 @@ use std::process::Command;
 
 #[rustfmt::skip]
 const SOURCE_PATHS:&[&str]=&["Cargo.toml","Cargo.lock",".cargo","rust-toolchain","rust-toolchain.toml",
-    "crates","docs","evaluation","Dockerfile","docker-compose.yml","data/lkjagent.json"];
+    "crates","docs","evaluation","Dockerfile","docker-compose.yml","config/lkjagent.example.json"];
 
 use serde_json::Value;
 

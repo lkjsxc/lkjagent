@@ -41,7 +41,7 @@ fn unknown_and_composite_configuration_fail() -> TestResult<()> {
         ),
     ] {
         let root = fixture(name)?;
-        let path = root.join("data/lkjagent.json");
+        let path = root.join("config/lkjagent.example.json");
         let mut config: serde_json::Value = serde_json::from_str(&fs::read_to_string(&path)?)?;
         let object = config
             .as_object_mut()
@@ -63,6 +63,19 @@ fn missing_docker_copy_source_fails() -> TestResult<()> {
     assert!(check_docker(&root)
         .iter()
         .any(|line| line.contains("absent-input")));
+    Ok(())
+}
+
+#[test]
+fn runtime_data_is_not_a_docker_build_input() -> TestResult<()> {
+    let root = fixture("docker-runtime-data")?;
+    let path = root.join("Dockerfile");
+    let mut dockerfile = fs::read_to_string(&path)?;
+    dockerfile.push_str("\nCOPY data /src/data\n");
+    fs::write(path, dockerfile)?;
+    assert!(check_docker(&root)
+        .iter()
+        .any(|line| line == "runtime data must not be a Docker build input"));
     Ok(())
 }
 
@@ -96,7 +109,7 @@ fn fixture(name: &str) -> TestResult<PathBuf> {
         "Dockerfile",
         "docker-compose.yml",
         ".github/workflows/verify.yml",
-        "data/lkjagent.json",
+        "config/lkjagent.example.json",
         "docs/product/configuration-registry.md",
     ] {
         let target = root.join(relative);

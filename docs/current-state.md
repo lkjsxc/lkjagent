@@ -28,9 +28,9 @@ Local Docker lint, test, and verify passed with the ignored working-copy
 because that lockfile is not tracked. Those local passes are not clean-checkout
 evidence.
 
-The configuration loader rejects unknown keys, non-scalar values, invalid
-ranges, and prompt-budget conflicts. The tracked example is complete. Runtime
-wiring remains incomplete and is an honest cleanup blocker.
+Runtime config is optional in the selected data directory; the complete tracked
+example is `config/lkjagent.example.json`. Docker builds exclude mutable `data/`.
+Runtime wiring remains incomplete and is an honest cleanup blocker.
 
 Repository build inputs include the lockfile, Cargo policy, configuration,
 Docker roots, and clean-archive workflow. The gate checks those inputs, source

@@ -3,7 +3,8 @@
 ## Purpose
 
 Define the only accepted keys, types, bounds, reload policy, and consumers for
-`data/lkjagent.json`.
+an optional runtime `lkjagent.json`. The complete tracked example is
+`config/lkjagent.example.json`; mutable data directories are not build inputs.
 
 ## Shape And Precedence
 

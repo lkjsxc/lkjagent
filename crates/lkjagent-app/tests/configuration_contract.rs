@@ -39,14 +39,28 @@ fn rejects_ranges_and_cross_key_conflicts() -> TestResult<()> {
 }
 
 #[test]
+fn missing_runtime_configuration_uses_defaults() -> TestResult<()> {
+    let data = std::env::temp_dir().join(format!(
+        "lkjagent-configuration-empty-{}",
+        std::process::id()
+    ));
+    if data.exists() {
+        fs::remove_dir_all(&data)?;
+    }
+    fs::create_dir_all(&data)?;
+    config::load_client(&data)?;
+    Ok(())
+}
+
+#[test]
 fn tracked_example_matches_the_registry() -> TestResult<()> {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
-    let example: serde_json::Value =
-        serde_json::from_str(&fs::read_to_string(root.join("data/lkjagent.json"))?)?;
+    let text = fs::read_to_string(root.join("config/lkjagent.example.json"))?;
+    let example: serde_json::Value = serde_json::from_str(&text)?;
     let object = example.as_object().ok_or("example root is not an object")?;
     assert_eq!(object.len(), 38);
     assert!(object.values().all(is_scalar));
-    config::load_client(&root.join("data"))?;
+    config::validate_document(&text)?;
     Ok(())
 }
 

@@ -40,9 +40,10 @@ docker compose run --rm replay
 `Cargo.lock`, `Dockerfile`, `docker-compose.yml`, `.dockerignore`, workflow
 files, Cargo manifests, copied source, docs, and evaluation inputs are tracked.
 The repository gate parses Docker copy sources and rejects any untracked input.
-It also rejects non-scalar or incomplete `data/lkjagent.json`, source and docs
-over 200 lines, product source over 190 files, and banned panic, unsafe,
-unfinished, mock, placeholder, retired-authority, or release-style source.
+It also rejects a non-scalar or incomplete `config/lkjagent.example.json`, a
+Docker build that reads mutable runtime `data/`, source and docs over 200 lines,
+product source over 190 files, and banned panic, unsafe, unfinished, mock,
+placeholder, retired-authority, or release-style source.
 
 The canonical isolated run is:
 

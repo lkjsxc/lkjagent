@@ -19,7 +19,7 @@ const REQUIRED: &[&str] = &[
     "Dockerfile",
     "docker-compose.yml",
     ".github/workflows/verify.yml",
-    "data/lkjagent.json",
+    "config/lkjagent.example.json",
 ];
 
 pub fn check(root: &Path) -> Result<(), Vec<String>> {
@@ -75,7 +75,7 @@ pub fn check_configuration(root: &Path) -> Vec<String> {
         .map(|(key, _)| key)
         .filter(|key| key.chars().all(|ch| ch.is_ascii_lowercase() || ch == '_'))
         .collect::<BTreeSet<_>>();
-    let text = read(root.join("data/lkjagent.json"), &mut failures);
+    let text = read(root.join("config/lkjagent.example.json"), &mut failures);
     let parsed = serde_json::from_str::<Value>(&text);
     match parsed {
         Ok(Value::Object(values)) => {
@@ -93,9 +93,9 @@ pub fn check_configuration(root: &Path) -> Vec<String> {
         Ok(_) => failures.push("tracked configuration root is not an object".to_string()),
         Err(error) => failures.push(format!("tracked configuration is invalid JSON: {error}")),
     }
-    if let Err(error) = lkjagent_app::config::load_client(&root.join("data")) {
+    if let Err(error) = lkjagent_app::config::validate_document(&text) {
         failures.push(format!(
-            "tracked configuration violates the typed registry: {error}"
+            "tracked example violates the typed registry: {error}"
         ));
     }
     failures
@@ -120,6 +120,9 @@ pub fn check_docker(root: &Path) -> Vec<String> {
                 failures.push(format!("Docker COPY source is not tracked: {source}"));
             }
         }
+    }
+    if dockerfile.lines().any(|line| line.starts_with("COPY data")) {
+        failures.push("runtime data must not be a Docker build input".to_string());
     }
     if !dockerfile.contains("cargo build --locked") {
         failures.push("Docker release build is not locked".to_string());

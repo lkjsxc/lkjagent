@@ -3,8 +3,7 @@
 .lkjagent-models
 .lkjagent-workspace
 .omx
-data/*
-!data/lkjagent.json
+data
 tmp
 target
 *.db

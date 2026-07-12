@@ -15,11 +15,11 @@ services:
     cap_drop:
       - NET_RAW
     environment:
-      HOME: /home/agent
-      LKJAGENT_API_KEY: ${LKJAGENT_API_KEY:-}
-      LKJAGENT_ENDPOINT_URL: ${LKJAGENT_ENDPOINT_URL:-}
-      LKJAGENT_ENDPOINT_TIMEOUT_SECONDS: ${LKJAGENT_ENDPOINT_TIMEOUT_SECONDS:-}
-      LKJAGENT_MODEL: ${LKJAGENT_MODEL:-}
+      - HOME=/home/agent
+      - LKJAGENT_API_KEY
+      - LKJAGENT_ENDPOINT_URL
+      - LKJAGENT_ENDPOINT_TIMEOUT_SECONDS
+      - LKJAGENT_MODEL
     healthcheck:
       test:
         - CMD-SHELL
@@ -98,9 +98,9 @@ services:
       context: .
       target: build
     environment:
-      LKJAGENT_API_KEY: ${LKJAGENT_API_KEY:-}
-      LKJAGENT_ENDPOINT_URL: ${LKJAGENT_ENDPOINT_URL:-}
-      LKJAGENT_MODEL: ${LKJAGENT_MODEL:-}
+      - LKJAGENT_API_KEY
+      - LKJAGENT_ENDPOINT_URL
+      - LKJAGENT_MODEL
     volumes:
       - type: bind
         source: ./tmp

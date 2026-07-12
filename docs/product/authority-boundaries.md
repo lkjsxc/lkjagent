@@ -32,5 +32,7 @@ admission, effects, recovery, checks, and final state.
 
 ## Configuration
 
-`data/lkjagent.json` owns flat non-secret owner settings. Secrets come from
-named environment variables and never enter prompts or evidence bodies.
+An optional `lkjagent.json` in the selected data directory owns flat
+non-secret owner settings. `config/lkjagent.example.json` documents every key
+without coupling Docker builds to mutable runtime data. Secrets come from named
+environment variables and never enter prompts or evidence bodies.

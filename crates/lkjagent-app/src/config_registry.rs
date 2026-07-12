@@ -65,6 +65,15 @@ const fn integer(min: u64, max: u64, default: u64) -> Rule {
     Rule::Integer { min, max, default }
 }
 
+pub(crate) fn parse_document(text: &str) -> Result<Map<String, Value>, String> {
+    let parsed: Value = serde_json::from_str(text).map_err(|error| error.to_string())?;
+    let Value::Object(values) = parsed else {
+        return Err("lkjagent.json must be a flat JSON object".to_string());
+    };
+    validate(&values)?;
+    Ok(values)
+}
+
 pub(crate) fn validate(values: &Map<String, Value>) -> Result<(), String> {
     for (key, value) in values {
         if value.is_object() {

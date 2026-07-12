@@ -21,7 +21,7 @@ COPY crates/lkjagent-store ./crates/lkjagent-store
 COPY crates/lkjagent-xtask ./crates/lkjagent-xtask
 COPY docs ./docs
 COPY evaluation ./evaluation
-COPY data/lkjagent.json ./data/lkjagent.json
+COPY config/lkjagent.example.json ./config/lkjagent.example.json
 COPY Dockerfile docker-compose.yml ./
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
@@ -39,14 +39,14 @@ RUN apt-get update \
         git \
         ripgrep \
     && rm -rf /var/lib/apt/lists/* \
-    && useradd --create-home --home-dir /home/agent --shell /usr/sbin/nologin agent \
+    && useradd --uid 1000 --create-home --home-dir /home/agent --shell /usr/sbin/nologin agent \
     && mkdir -p /data/workspace /usr/local/share/lkjagent/skills \
-    && chown -R agent:agent /data \
+    && chown agent:agent /data /data/workspace \
     && printf '%s\n' \
         '#!/bin/sh' \
         'set -eu' \
         'mkdir -p /data/workspace' \
-        'chown -R agent:agent /data' \
+        'chown agent:agent /data /data/workspace' \
         'cd /data/workspace' \
         'case "${1:-}" in' \
         '  ""|run|send|status|console|workbench|doctor|workspace|log|watch|help|matter|queue|context|record|memory|today|journal|todo|calendar|finance|project|dev)' \
@@ -58,6 +58,7 @@ RUN apt-get update \
     && chmod +x /usr/local/bin/lkjagent-entrypoint
 
 COPY --from=build /tmp/lkjagent /usr/local/bin/lkjagent
+COPY --from=build /src/config/lkjagent.example.json /usr/local/share/lkjagent/lkjagent.example.json
 
 WORKDIR /
 ENTRYPOINT ["/usr/local/bin/lkjagent-entrypoint"]

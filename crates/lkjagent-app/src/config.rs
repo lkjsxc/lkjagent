@@ -5,7 +5,11 @@ use lkjagent_llm::client::ClientConfig;
 use rusqlite::Connection;
 use serde_json::{Map, Value};
 
-use crate::config_registry::{number, validate};
+use crate::config_registry::{number, parse_document};
+
+pub fn validate_document(text: &str) -> Result<(), String> {
+    parse_document(text).map(|_| ())
+}
 
 pub fn load_client(data_dir: &Path) -> Result<ClientConfig, String> {
     let values = load_flat_config(data_dir)?;
@@ -97,12 +101,7 @@ pub(crate) fn load_flat_config(data_dir: &Path) -> Result<Map<String, Value>, St
         return Ok(Map::new());
     }
     let text = std::fs::read_to_string(&path).map_err(|error| error.to_string())?;
-    let parsed: Value = serde_json::from_str(&text).map_err(|error| error.to_string())?;
-    let Value::Object(values) = parsed else {
-        return Err("lkjagent.json must be a flat JSON object".to_string());
-    };
-    validate(&values)?;
-    Ok(values)
+    parse_document(&text)
 }
 
 fn text(values: &Map<String, Value>, key: &str) -> Option<String> {
