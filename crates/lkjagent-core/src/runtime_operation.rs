@@ -102,6 +102,7 @@ pub struct RuntimePolicy {
     pub prior_progress_fingerprint: Option<String>,
     pub current_progress_fingerprint: Option<String>,
     pub recovery_attempt: usize,
+    pub intended_recovery_tool: Option<String>,
 }
 
 impl Default for RuntimePolicy {
@@ -111,6 +112,7 @@ impl Default for RuntimePolicy {
             prior_progress_fingerprint: None,
             current_progress_fingerprint: None,
             recovery_attempt: 0,
+            intended_recovery_tool: None,
         }
     }
 }

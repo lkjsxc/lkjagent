@@ -30,8 +30,12 @@ cannot honor a pending spec blocks it rather than reinterpreting it.
 ## Prompt State
 
 Every model call rebuilds one system message from stable identity, active phase,
-active fault, workspace boundary, exact tool cards, and one output grammar. A
-state change therefore changes the prompt and often its visible tools.
+active fault, workspace boundary, exact tool cards, and one output grammar. The
+selector stores the canonical phase projection on the decision: orient receives
+only orient tools, modify only modify tools, and recovery only its intended tool.
+Review and respond receive none. Prompt compilation, parsing, admission, and
+dispatch consume that persisted view without reconstructing it from a catalog.
+A state change therefore changes the prompt and often its visible tools.
 
 ## Progress
 

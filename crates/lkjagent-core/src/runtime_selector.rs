@@ -9,6 +9,7 @@ use crate::runtime_operation::{
 };
 pub use crate::runtime_state::{can_close, CheckEvidence, CompletionRequirement};
 use crate::runtime_state::{CurrentTime, RuntimePhase, RuntimeSnapshot, RuntimeState, StateCell};
+use crate::runtime_tool_catalog::direct_tool_view_for_state;
 use serde_json::Value;
 use std::collections::BTreeMap;
 
@@ -27,7 +28,6 @@ pub const EXIT_GUARDS: &[&str] = &[
     "effects-settled",
     "final-message-persisted",
 ];
-
 #[rustfmt::skip]
 pub fn select(state: RuntimeState, policy: RuntimePolicy, now: CurrentTime) -> Selection {
     if crate::runtime_eligibility::utc_millis(now.as_str()).is_none() { return blocked(BlockReason::InvalidCooldown(now.0)); }
@@ -41,22 +41,22 @@ pub fn select(state: RuntimeState, policy: RuntimePolicy, now: CurrentTime) -> S
     }
     if equal_progress(&policy) { return match crate::runtime_eligibility::no_progress_strategy(policy.recovery_attempt) {
         Some(strategy) => decision(&state, RuntimePhase::Modify, &format!("recovery.{strategy}"), true,
-            OutputEnvelope::Action, policy.model_budget_tokens, strategy), None => blocked(BlockReason::Stasis), }; }
+            OutputEnvelope::Action, &policy, strategy), None => blocked(BlockReason::Stasis), }; }
     if has(&state, "response", "final-persisted") { return closure(&state); }
     if has(&state, "check", "current-passed") { return decision(&state, RuntimePhase::Respond, "respond.final", true,
-        OutputEnvelope::Message, policy.model_budget_tokens, "do-not-retry-final"); }
+        OutputEnvelope::Message, &policy, "do-not-retry-final"); }
     if has(&state, "check", "failed") || any(&state, "fault") { return decision(&state, RuntimePhase::Modify,
-        "recovery.modify", true, OutputEnvelope::Action, policy.model_budget_tokens, "change-operation"); }
+        "recovery.modify", true, OutputEnvelope::Action, &policy, "change-operation"); }
     if has(&state, "edit", "committed") { return decision(&state, RuntimePhase::Review, "check.run/current", false,
-        OutputEnvelope::None, policy.model_budget_tokens, "commit-or-recover"); }
+        OutputEnvelope::None, &policy, "commit-or-recover"); }
     if has(&state, "source", "current") { return decision(&state, RuntimePhase::Modify, "modify.source", true,
-        OutputEnvelope::Action, policy.model_budget_tokens, "change-operation"); }
+        OutputEnvelope::Action, &policy, "change-operation"); }
     if has(&state, "matter", "opened") { return decision(&state, RuntimePhase::Orient, "orient.matter", true,
-        OutputEnvelope::Plan, policy.model_budget_tokens, "change-operation"); }
+        OutputEnvelope::Action, &policy, "change-operation"); }
     let candidate = selected_candidate_at(&state.snapshot, now.as_str()); match candidate.operation.key.as_str() {
         "runtime.idle" => Selection::Idle,
         "completion.blocked" => blocked(BlockReason::MissingEvidence(candidate.operation.evidence_requirements)),
-        _ => operation_decision(&state, candidate.operation),
+        _ => operation_decision(&state, candidate.operation, &policy),
     }
 }
 #[rustfmt::skip]
@@ -77,17 +77,31 @@ fn closure(state: &RuntimeState) -> Selection {
 }
 #[rustfmt::skip]
 fn decision(state: &RuntimeState, phase: RuntimePhase, key: &str, model: bool,
-    envelope: OutputEnvelope, budget: u32, recovery: &str) -> Selection {
+    envelope: OutputEnvelope, policy: &RuntimePolicy, recovery: &str) -> Selection {
     Selection::Decision(RuntimeDecisionSpec { phase, operation_key: key.into(), causal_sequence: state.causal_sequence,
-        model_required: model, expected_envelope: envelope, tool_view: ToolSetView::empty(),
-        model_budget_tokens: model.then_some(budget), recovery_policy: recovery.into() })
+        model_required: model, expected_envelope: envelope, tool_view: exact_view(phase, key, policy),
+        model_budget_tokens: model.then_some(policy.model_budget_tokens), recovery_policy: recovery.into() })
 }
 #[rustfmt::skip]
-fn operation_decision(state: &RuntimeState, operation: RuntimeOperation) -> Selection {
-    Selection::Decision(RuntimeDecisionSpec { phase: state.phase, operation_key: operation.key,
+fn operation_decision(state: &RuntimeState, operation: RuntimeOperation, policy: &RuntimePolicy) -> Selection {
+    Selection::Decision(RuntimeDecisionSpec { phase: state.phase, operation_key: operation.key.clone(),
         causal_sequence: state.causal_sequence, model_required: operation.expected_envelope != OutputEnvelope::None,
-        expected_envelope: operation.expected_envelope, tool_view: operation.tool_view,
+        expected_envelope: operation.expected_envelope, tool_view: exact_view(state.phase, &operation.key, policy),
         model_budget_tokens: operation.model_budget_tokens, recovery_policy: operation.recovery_policy })
+}
+fn exact_view(phase: RuntimePhase, key: &str, policy: &RuntimePolicy) -> ToolSetView {
+    let state = if key.starts_with("recovery.") {
+        "recovery"
+    } else {
+        match phase {
+            RuntimePhase::Orient => "orient",
+            RuntimePhase::Modify => "modify",
+            RuntimePhase::Review => "review",
+            RuntimePhase::Respond => "respond",
+            RuntimePhase::Idle => "idle",
+        }
+    };
+    direct_tool_view_for_state(state, policy.intended_recovery_tool.as_deref())
 }
 fn blocked(reason: BlockReason) -> Selection {
     Selection::Block(RuntimeBlock { reason })

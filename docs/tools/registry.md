@@ -26,7 +26,7 @@ are absent until their complete state/effect/check path exists.
 
 ## State Views
 
-- Orient: list, search, read.
+- Orient: list, search, read, with an action envelope for the first admitted call.
 - Modify: read, edit, create.
 - Review: native checks and no model tools.
 - Respond: no tools and final grammar only.
@@ -35,7 +35,9 @@ are absent until their complete state/effect/check path exists.
 - Wait and idle: no model call.
 
 The global catalog is never rendered. Hidden names do not appear in examples or
-denial prose.
+denial prose. Review, respond, wait, and idle project an empty view. Recovery
+projects nothing unless the selector names one intended direct tool; retired
+`fs.*` explore names are never a fallback for direct decisions.
 
 ## Persisted Projection
 
