@@ -4,7 +4,9 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::atomic::{AtomicU64, Ordering};
 
-use lkjagent_xtask::acceptance::{inspect_attachment, scan_history};
+use lkjagent_xtask::acceptance::{
+    inspect_attachment, scan_history, source_contract_files, source_contracts,
+};
 
 const SOURCE: &str = "2222222222222222222222222222222222222222";
 
@@ -37,6 +39,43 @@ fn acceptance_negative_allows_only_checker_result_status_rows() {
     let claimed = inspect_attachment(Path::new("claimed.tsv"), bytes, SOURCE);
     assert!(claimed.iter().any(|error| error.contains("editable pass")));
     assert!(inspect_attachment(Path::new("result.tsv"), bytes, SOURCE).is_empty());
+}
+
+#[test]
+fn source_contracts_require_exact_implementation_and_tests() -> Result<(), Box<dyn Error>> {
+    let repository = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let expected = [
+        "F03", "F04", "P01", "P02", "P03", "P07", "R01", "R02", "R03", "R04", "R06", "X03",
+    ];
+    let actual = source_contracts(&repository);
+    assert_eq!(
+        actual.iter().map(String::as_str).collect::<Vec<_>>(),
+        expected
+    );
+
+    let root = temp()?;
+    for relative in source_contract_files() {
+        let destination = root.join(relative);
+        fs::create_dir_all(destination.parent().ok_or("contract path has no parent")?)?;
+        fs::copy(repository.join(relative), destination)?;
+    }
+    assert_eq!(source_contracts(&root), actual);
+
+    let implementation = root.join("crates/lkjagent-effects/src/workspace_capability.rs");
+    let text = fs::read_to_string(&implementation)?;
+    fs::write(
+        &implementation,
+        text.replace("OFlags::NOFOLLOW", "OFlags::empty()"),
+    )?;
+    assert!(!source_contracts(&root).contains("F03"));
+    assert!(source_contracts(&root).contains("F04"));
+
+    fs::remove_file(root.join("crates/lkjagent-llm/tests/wire_contract.rs"))?;
+    let incomplete = source_contracts(&root);
+    assert!(!incomplete.contains("P07"));
+    assert!(!incomplete.contains("X03"));
+    fs::remove_dir_all(root)?;
+    Ok(())
 }
 
 #[test]

@@ -1,5 +1,75 @@
+use std::collections::{BTreeMap, BTreeSet};
+use std::fs;
 use std::path::Path;
 use std::process::{Command, Output};
+
+struct Fact {
+    id: &'static str,
+    path: &'static str,
+    needles: &'static [&'static str],
+}
+
+#[rustfmt::skip]
+const FACTS: &[Fact] = &[
+    fact("F03", "crates/lkjagent-effects/src/workspace_capability.rs", &["pub fn read_file(", "OFlags::NOFOLLOW", "require_type(&fd, FileType::RegularFile)"]),
+    fact("F03", "crates/lkjagent-effects/tests/workspace_safety_paths.rs", &["workspace_safety_rejects_traversal_reserved_and_symlinks", "workspace_safety_special_files_return_promptly"]),
+    fact("F04", "crates/lkjagent-effects/src/workspace_edit.rs", &["pub fn prepare_exact_edit(", "old_text must match exactly once", "Revision::Absent"]),
+    fact("F04", "crates/lkjagent-effects/tests/workspace_edit.rs", &["preparation_rejects_unbound_or_unsafe_edits", "Revision::Sha256(\"stale\".into())"]),
+    fact("R01", "crates/lkjagent-store/src/transactions.rs", &["pub fn owner_intake(", "self.atomic(|tx|", "INSERT INTO conversation_messages"]),
+    fact("R01", "crates/lkjagent-store/tests/native_transactions.rs", &["durable_boundaries_intake_is_atomic_and_idempotency_is_typed", "durable_boundaries_injected_statement_failure_rolls_back_intake"]),
+    fact("R02", "crates/lkjagent-store/src/transactions.rs", &["pub fn provider_intent(", "pub fn prepare_effect(", "decision compilation is incomplete"]),
+    fact("R02", "crates/lkjagent-store/tests/native_transactions.rs", &["durable_boundaries_compiles_before_provider_and_sent_is_not_replayed", "durable_boundaries_effect_prep_is_complete_and_phases_do_not_skip"]),
+    fact("R03", "crates/lkjagent-store/src/native-schema.sql", &["CREATE TABLE runtime_decisions", "selected_state BLOB NOT NULL", "exit_spec BLOB NOT NULL"]),
+    fact("R03", "crates/lkjagent-core/tests/contract_tables.rs", &["contract_tables_decision_context_check_recovery_and_exit_are_exact", "DECISION_SPEC_FIELDS"]),
+    fact("R04", "crates/lkjagent-store/src/transactions.rs", &["pub fn attach_compilation(", "compiler_status='complete'", "pub fn provider_intent("]),
+    fact("R04", "crates/lkjagent-store/tests/native_transactions.rs", &["durable_boundaries_compiles_before_provider_and_sent_is_not_replayed"]),
+    fact("R06", "crates/lkjagent-core/src/runtime_event.rs", &["pub fn reduce(", "ReduceFault::CausalSequence"]),
+    fact("R06", "crates/lkjagent-core/src/runtime_selector.rs", &["pub fn select(", "Selection::Idle"]),
+    fact("R06", "crates/lkjagent-core/tests/runtime_reducer_selector.rs", &["reducer_preserves_unknown_and_invalidates_old_revision", "direct_transitions_do_not_add_model_review"]),
+    fact("P01", "crates/lkjagent-core/src/runtime_tool_call.rs", &["pub fn parse_model_value", "MODEL_ENVELOPES", "exact_children"]),
+    fact("P01", "crates/lkjagent-core/tests/direct_action_grammar.rs", &["contract_tables_reject_roots_prose_and_legacy_actions", "\\\"tool\\\":\\\"read_file\\\""]),
+    fact("P02", "crates/lkjagent-core/tests/direct_action_grammar.rs", &["<decision_id>x</decision_id>", "ToolCallError::UnknownTag"]),
+    fact("R05", "crates/lkjagent-core/src/runtime_tool_catalog.rs", &["const DIRECT_CATALOG", "direct_tool_view_for_state", "descriptor_entry"]),
+    fact("R05", "crates/lkjagent-core/src/render.rs", &["render_tool_view(&decision.tool_view)"]),
+    fact("R05", "crates/lkjagent-core/src/runtime_admission.rs", &["decision.tool_view_fingerprint()", "decision.tool_view.entry(&action.tool)"]),
+    fact("R05", "crates/lkjagent-core/tests/admission.rs", &["tool_field_specs_drive_value_class_admission", "state_views_and_effect_keys_are_closed"]),
+    fact("R05", "crates/lkjagent-core/tests/tool_call.rs", &["contract_tables_accept_descriptor_order_and_text", "contract_tables_reject_hidden_missing_unknown_and_order"]),
+    fact("P07", "crates/lkjagent-llm/src/wire/response.rs", &["ProviderAnomalyKind::ToolCallOnlyResponse", "fn content_and_anomaly("]),
+    fact("P07", "crates/lkjagent-llm/tests/wire_contract.rs", &["response_anomalies_remain_distinct", "ProviderAnomalyKind::ToolCallOnlyResponse"]),
+    fact("X03", "crates/lkjagent-llm/src/error.rs", &["ResponseTooLarge", "Timeout", "Connect"]),
+    fact("X03", "crates/lkjagent-llm/tests/wire_contract.rs", &["timeout_connect_and_status_are_distinct", "length_is_not_repaired_and_ambiguous_send_is_not_retried"]),
+];
+
+const fn fact(id: &'static str, path: &'static str, needles: &'static [&'static str]) -> Fact {
+    Fact { id, path, needles }
+}
+
+pub fn contract_files() -> Vec<&'static str> {
+    FACTS
+        .iter()
+        .map(|fact| fact.path)
+        .collect::<BTreeSet<_>>()
+        .into_iter()
+        .collect()
+}
+
+pub fn contract_derivations(root: &Path) -> BTreeSet<String> {
+    let mut complete = BTreeMap::<&str, bool>::new();
+    for fact in FACTS {
+        let text = fs::read_to_string(root.join(fact.path)).ok();
+        let present = text
+            .as_ref()
+            .is_some_and(|value| fact.needles.iter().all(|needle| value.contains(needle)));
+        complete
+            .entry(fact.id)
+            .and_modify(|value| *value &= present)
+            .or_insert(present);
+    }
+    complete
+        .into_iter()
+        .filter_map(|(id, ok)| ok.then(|| id.to_string()))
+        .collect()
+}
 
 pub fn validate(root: &Path, source: &str) -> Result<(), String> {
     validate_shape(source)?;

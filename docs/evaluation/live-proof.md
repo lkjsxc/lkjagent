@@ -33,12 +33,17 @@ cargo run --locked -p lkjagent-xtask -- acceptance verify \
   --source SOURCE --evidence evaluation/evidence/SOURCE
 ```
 
-The command now has a nonzero incomplete mode. It validates source binding,
-tracked plans and attachments, final workgraph ancestry, concrete experiment
-cells, secret patterns, and nine negative fixtures. It currently derives the
-compact authority, documentation shape, line limit, and reachable-secret rows.
-Every other row remains missing until its source-bound evidence exists, so the
-command cannot yet return success.
+The command has a nonzero incomplete mode. It validates source binding, tracked
+plans and attachments, final workgraph ancestry, concrete experiment cells,
+secret patterns, and nine negative fixtures. Static derivation binds exact source and
+test symbols rather than status text. It covers the compact authority,
+documentation shape, line limit, reachable-secret scan, safe descriptor-relative
+reads, exact edits, compact envelopes, hidden-tool admission, provider anomaly
+and transport classification, native decision and transaction boundaries, and
+direct reduction and selection. These are confined primitive claims only.
+Endpoint connectivity, the public application loop, workspace-root behavior,
+campaigns, records, TUI behavior, completion, and every evidence-dependent real
+behavior remain missing, so the command cannot yet return success.
 
 The checker will read plans, Git history/trailers, tracked files, command exits,
 source/binary/image hashes, SQLite, workspace manifests, prompt/tool audits,
