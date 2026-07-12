@@ -41,8 +41,8 @@ external state blocks without overwrite.
 
 One transaction verifies required current passed checks and settled runtime
 work, allocates the next conversation sequence, and commits the completion event,
-final canonical message, exact receipt bytes and fingerprint, check-evidence
-bindings, replacement projection, and matter lifecycle. The stable final logical
+final canonical message, receipt bytes and fingerprint computed from ordered
+current check evidence, replacement projection, and matter lifecycle. The stable final logical
 ID is derived from the completion event. An exact retry after commit or database
 reopen returns the existing identity and sequence; changed bytes conflict rather
 than duplicate. Message persistence failure does not repeat completed effects.

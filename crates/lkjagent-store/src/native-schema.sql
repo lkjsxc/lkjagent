@@ -87,13 +87,9 @@ CREATE TABLE checks (
  id TEXT PRIMARY KEY, matter_id TEXT NOT NULL, obligation_id TEXT NOT NULL, decision_id TEXT NOT NULL REFERENCES runtime_decisions(id),
  kind TEXT NOT NULL, parameters BLOB NOT NULL, current INTEGER NOT NULL CHECK(current IN (0,1)), passed INTEGER NOT NULL CHECK(passed IN (0,1)),
  measured BLOB NOT NULL, evidence_fingerprint BLOB NOT NULL, source_revision BLOB NOT NULL, checked_event_id TEXT NOT NULL REFERENCES runtime_events(id),
- FOREIGN KEY(obligation_id,matter_id) REFERENCES obligations(id,matter_id), UNIQUE(obligation_id,source_revision,kind),
- UNIQUE(id,obligation_id), UNIQUE(id,evidence_fingerprint));
+ FOREIGN KEY(obligation_id,matter_id) REFERENCES obligations(id,matter_id),
+ UNIQUE(obligation_id,source_revision,kind), UNIQUE(id,obligation_id));
 CREATE UNIQUE INDEX one_current_check_per_obligation ON checks(obligation_id) WHERE current=1;
-CREATE TABLE conversation_message_checks (
- message_id TEXT NOT NULL REFERENCES conversation_messages(id), check_id TEXT NOT NULL,
- evidence_fingerprint BLOB NOT NULL, PRIMARY KEY(message_id,check_id),
- FOREIGN KEY(check_id,evidence_fingerprint) REFERENCES checks(id,evidence_fingerprint));
 CREATE TABLE workspace_documents (
  id TEXT PRIMARY KEY, current_path BLOB NOT NULL UNIQUE, status TEXT NOT NULL CHECK(status IN ('active','closed','deleted')),
  managed INTEGER NOT NULL CHECK(managed IN (0,1)), current_revision_id TEXT, UNIQUE(current_revision_id,id),

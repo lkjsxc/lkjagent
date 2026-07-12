@@ -116,6 +116,8 @@ claims, and the close transaction owns the canonical final message.
 | reducer-selector | complete | direct state reduction and deterministic selection pass core and bridge-continuity tests |
 | store-transactions | complete | native intake through close boundaries pass restart tests |
 | exact-edits | complete | crash-safe exact edit and create pass race, mode, symlink, and crash tests |
+| context-compiler | complete | selected decisions bind escaped deduplicated sources under lane and agent-file budgets |
+| conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
 | workspace-root | complete | data and workspace roots are separate, lazy, diagnosed, and Compose-mounted |
 | public file edit | blocked | depends on context assembly and production app-loop cutover |
 | final campaigns | blocked | no frozen binary, live task proof, or PTY proof |

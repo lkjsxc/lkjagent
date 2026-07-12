@@ -32,8 +32,8 @@ fn prompt_frame_body_ref_replays_rendered_prompt() -> TestResult<()> {
     let json: serde_json::Value = serde_json::from_str(&body)?;
     assert_eq!(json["decision_id"], frames[0].decision_id);
     assert_eq!(json["prompt_fingerprint"], frames[0].prompt_fingerprint);
-    assert_eq!(json["prompt_profile"], "kernel-v1");
-    assert_eq!(json["context_profile"], "clean-context-v1");
+    assert_eq!(json["prompt_profile"], "kernel-v2");
+    assert_eq!(json["context_profile"], "decision-context-v1");
     assert_eq!(json["card_plan"]["cards"][0]["kind"], "kernel");
     assert!(json["card_plan"]["fingerprint"]
         .as_str()
