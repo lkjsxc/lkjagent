@@ -27,7 +27,7 @@ fn llm_endpoint_uses_configured_chat_endpoint() -> TestResult<()> {
     let mut endpoint = LlmEndpoint::new(&data);
     let text = endpoint.complete(&prompt(), 0)?.content;
     handle.join().map_err(|_| "server thread failed")??;
-    assert_eq!(text, "<message>hello</message>");
+    assert_eq!(text, "<final><message>hello</message></final>");
     Ok(())
 }
 
@@ -85,8 +85,8 @@ fn serve_once(listener: TcpListener) -> TestResult<()> {
     let count = stream.read(&mut request)?;
     let body = String::from_utf8_lossy(&request[..count]);
     assert!(body.contains("/v1/chat/completions"));
-    assert!(body.contains("</message>"));
-    let response = "{\"choices\":[{\"message\":{\"content\":\"<message>hello</message>\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1,\"completion_tokens\":1,\"total_tokens\":2}}";
+    assert!(body.contains("</message></final>"));
+    let response = "{\"choices\":[{\"message\":{\"content\":\"<final><message>hello</message></final>\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1,\"completion_tokens\":1,\"total_tokens\":2}}";
     stream.write_all(
         format!(
             "HTTP/1.1 200 OK\r\ncontent-type: application/json\r\ncontent-length: {}\r\n\r\n{}",
@@ -104,7 +104,7 @@ fn prompt() -> Prompt {
         user: "user".to_string(),
         fingerprint: "abc".to_string(),
         max_tokens: 700,
-        stop: "</message>".to_string(),
+        stop: "</message></final>".to_string(),
     }
 }
 

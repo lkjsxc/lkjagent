@@ -44,8 +44,11 @@ The source contains useful low-level pieces:
 - flat JSON configuration validation and Docker build separation from data.
 
 The repository now also has a source-bound acceptance incomplete mode with nine
-negative fixtures and closed direct-runtime contract tables. These pieces do not
-yet form the direct authority loop.
+negative fixtures and closed direct-runtime contract tables. A separate native
+18-table schema rejects incompatible stores, descriptor-relative reads hold an
+opened root, the compact envelope parser rejects echoed IDs and JSON actions, and
+LLM transport preserves bounded request/outcome fields without repairing output.
+These pieces do not yet form the direct authority loop.
 
 ## Active Source Gaps
 
@@ -53,7 +56,9 @@ Production still hydrates `TaskSnapshot`, task rows, step rows, fixed templates,
 and bridge cells. Context is prepared before final decision selection. The daemon
 maps decisions back into the retired step engine and writes both authorities.
 
-The default model tool view hides write, list, tree, shell, and any valid review
+The direct five-tool descriptor catalog is separate, but the production prompt
+renderer still emits the retired action grammar until the tool-registry node.
+The current model view hides write, list, tree, shell, and any valid review
 transition. Whole-file model writes use a direct writer that bypasses exact target
 revisions. Replacement staging changes file mode and validates captured bytes
 after exchange, so it is not yet safe for the target edit path.
@@ -89,8 +94,12 @@ claims, and the close transaction owns the canonical final message.
 | acceptance-checker | complete | source-bound incomplete mode rejects nine negative fixtures |
 | baseline-tracked | complete | tracked 901-second run has zero non-missing checker errors |
 | interfaces | complete | closed vocabularies and direct five-tool descriptors pass core tests |
-| first parallel wave | ready | effects read, protocol, native store, and LLM wiring can start |
-| public file edit | blocked | depends on native store, effects, protocol, and loop |
+| effects-safe-read | complete | opened-root listing, search, and revision reads pass safety tests |
+| protocol-compact | complete | strict decision-bound tool/final parser passes contract tests |
+| store-native | complete | exact 18-table schema reopens and rejects altered or retired stores |
+| llm-wiring | active | mechanics pass; real public endpoint probe waits for evaluation runner |
+| second parallel wave | ready | exact edits, registry, transactions, reducer, and root can start |
+| public file edit | blocked | depends on exact edits, transactions, context, and app loop |
 | final campaigns | blocked | no frozen binary, live task proof, or PTY proof |
 
 ## Honesty Rules

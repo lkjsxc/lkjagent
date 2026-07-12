@@ -36,7 +36,7 @@ fn compact_default_max_tokens_is_512() -> TestResult<()> {
 #[test]
 fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
     let response = r#"{
-        "choices":[{"message":{"content":"<lkjagent_action></lkjagent_action>"},"finish_reason":"stop"}],
+        "choices":[{"message":{"content":"<tool_call></tool_call>"},"finish_reason":"stop"}],
         "usage":{
           "prompt_tokens":11,
           "completion_tokens":7,
@@ -47,7 +47,7 @@ fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
         "timings":{"prompt_ms":4.5}
     }"#;
     let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
-    assert_eq!(completion.content, "<lkjagent_action></lkjagent_action>");
+    assert_eq!(completion.content, "<tool_call></tool_call>");
     assert_eq!(completion.finish_reason, FinishReason::Stop);
     assert_eq!(completion.closure_mode, ClosureMode::Natural);
     assert_eq!(completion.usage.prompt_tokens, Some(11));
@@ -69,7 +69,7 @@ fn response_reads_usage_finish_reason_and_cache_metrics() -> TestResult<()> {
 #[test]
 fn response_preserves_missing_usage_as_unknown() -> TestResult<()> {
     let response = r#"{
-        "choices":[{"message":{"content":"<lkjagent_action></lkjagent_action>"},"finish_reason":"stop"}]
+        "choices":[{"message":{"content":"<tool_call></tool_call>"},"finish_reason":"stop"}]
     }"#;
 
     let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
@@ -130,30 +130,25 @@ fn missing_content_field_is_provider_anomaly() -> TestResult<()> {
 #[test]
 fn stop_stripped_tool_call_close_is_not_repaired() -> TestResult<()> {
     let response = r#"{
-        "choices":[{"message":{"content":"<lkjagent_action>\n{}\n"},"finish_reason":"stop"}],
+        "choices":[{"message":{"content":"<tool_call>\n{}\n"},"finish_reason":"stop"}],
         "usage":{"prompt_tokens":11,"completion_tokens":7}
     }"#;
 
     let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
 
-    assert_eq!(completion.content, "<lkjagent_action>\n{}\n");
+    assert_eq!(completion.content, "<tool_call>\n{}\n");
     assert_eq!(completion.finish_reason, FinishReason::Stop);
     assert_eq!(completion.closure_mode, ClosureMode::Unclosed);
     Ok(())
 }
 
 #[test]
-fn stop_stripped_content_plan_and_message_closures_are_not_repaired() -> TestResult<()> {
-    for (open, close) in [
-        ("<content>body", "</content>"),
-        ("<plan>respond | done", "</plan>"),
-        ("<message>done", "</message>"),
-    ] {
+fn incomplete_compact_envelopes_are_not_repaired() -> TestResult<()> {
+    for open in ["<tool_call><tool>read_file</tool>", "<final><message>done"] {
         let response = format!(
             "{{\"choices\":[{{\"message\":{{\"content\":{open:?}}},\"finish_reason\":\"stop\"}}]}}"
         );
-        let spec = CallSpec::with_stop(MAX_TOKENS, close);
-        let completion = decode_completion(&response, &spec)?;
+        let completion = decode_completion(&response, &CallSpec::action(MAX_TOKENS))?;
         assert_eq!(completion.content, open);
         assert_eq!(completion.closure_mode, ClosureMode::Unclosed);
     }

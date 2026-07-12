@@ -26,7 +26,7 @@ fn prompt_context_suppresses_json_like_context_bodies() -> TestResult<()> {
     drop(conn);
 
     let mut endpoint = CapturingEndpoint {
-        output: "<message>done</message>".to_string(),
+        output: "<final><message>done</message></final>".to_string(),
         prompts: Vec::new(),
     };
     let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;

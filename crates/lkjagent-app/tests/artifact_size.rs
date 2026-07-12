@@ -20,7 +20,8 @@ fn long_generated_artifact_writes_manifest_and_checked_parts() -> TestResult<()>
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![
             format!("<content>{authored}</content>"),
-            "<message>artifact ready: artifacts/requests/matter-1.md</message>".to_string(),
+            "<final><message>artifact ready: artifacts/requests/matter-1.md</message></final>"
+                .to_string(),
         ],
         index: 0,
     };

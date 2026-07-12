@@ -6,7 +6,7 @@ use std::time::Duration;
 use serde::Serialize;
 use serde_json::Value;
 
-use crate::closure::{restore_stop_suffix, ClosureMode};
+use crate::closure::{classify_closure, ClosureMode};
 use crate::message::{Message, Role};
 pub use spec::CallSpec;
 
@@ -108,13 +108,12 @@ pub fn build_request(model: &str, messages: &[Message], spec: &CallSpec) -> Chat
     }
 }
 
-pub fn decode_completion(text: &str, spec: &CallSpec) -> Result<Completion, WireError> {
+pub fn decode_completion(text: &str, _spec: &CallSpec) -> Result<Completion, WireError> {
     let value: Value = serde_json::from_str(text).map_err(|_| WireError::Json)?;
     let parts = response::response_parts(value)?;
-    let (content, closure_mode) =
-        restore_stop_suffix(parts.content, &parts.finish_reason, spec.primary_stop());
+    let closure_mode = classify_closure(&parts.content);
     Ok(Completion {
-        content,
+        content: parts.content,
         finish_reason: parts.finish_reason,
         closure_mode,
         usage: parts.usage,

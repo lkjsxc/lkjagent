@@ -18,7 +18,7 @@ fn prompt_frame_body_ref_replays_rendered_prompt() -> TestResult<()> {
     enqueue(&conn, "What is an agent?", "now")?;
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>An agent follows checks.</message>".to_string()],
+        outputs: vec!["<final><message>An agent follows checks.</message></final>".to_string()],
         index: 0,
     };
     let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;
@@ -87,7 +87,7 @@ fn prompt_context_admits_workspace_record_and_index_evidence() -> TestResult<()>
     enqueue(&conn, "What should I remember?", "later")?;
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>Use the workspace evidence.</message>".to_string()],
+        outputs: vec!["<final><message>Use the workspace evidence.</message></final>".to_string()],
         index: 0,
     };
     let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;

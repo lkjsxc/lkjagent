@@ -30,7 +30,7 @@ fn unfinished_decision_with_exchange_blocks_without_provider_replay() -> TestRes
     drop(conn);
 
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>done</message>".to_string()],
+        outputs: vec!["<final><message>done</message></final>".to_string()],
         index: 0,
     };
     let blocked = run_until_idle(&data, &mut endpoint, 1)?;

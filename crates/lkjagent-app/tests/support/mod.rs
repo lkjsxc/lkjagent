@@ -25,18 +25,12 @@ pub fn action_pairs(tool: &str, params: &[(&str, &str)]) -> String {
     )
 }
 
-pub fn action_for(decision: &str, context: &str, tool: &str, params: &[(&str, &str)]) -> String {
-    let mut out = format!(
-        "<lkjagent_action><decision_id>{}</decision_id><context_fingerprint>{}</context_fingerprint><tool_name>{}</tool_name>",
-        xml(decision),
-        xml(context),
-        xml(tool)
-    );
-    out.push_str("<input>");
+pub fn action_for(_decision: &str, _context: &str, tool: &str, params: &[(&str, &str)]) -> String {
+    let mut out = format!("<tool_call><tool>{}</tool><input>", xml(tool));
     for (name, value) in params {
         out.push_str(&format!("<{}>{}</{}>", xml(name), xml(value), xml(name)));
     }
-    out.push_str("</input></lkjagent_action>");
+    out.push_str("</input></tool_call>");
     out
 }
 

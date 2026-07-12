@@ -72,7 +72,8 @@ fn artifact_request_writes_verified_artifact() -> TestResult<()> {
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![
             "<content># Artifact\n\nA verified report.</content>".to_string(),
-            "<message>artifact ready: artifacts/requests/matter-1.md</message>".to_string(),
+            "<final><message>artifact ready: artifacts/requests/matter-1.md</message></final>"
+                .to_string(),
         ],
         index: 0,
     };
@@ -101,7 +102,7 @@ fn artifact_request_requires_response_path() -> TestResult<()> {
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![
             "<content># Artifact\n\nA verified report.</content>".to_string(),
-            "<message>artifact ready</message>".to_string(),
+            "<final><message>artifact ready</message></final>".to_string(),
         ],
         index: 0,
     };
@@ -122,7 +123,7 @@ fn artifact_request_does_not_close_without_output() -> TestResult<()> {
     drop(conn);
 
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>promised</message>".to_string(); 3],
+        outputs: vec!["<final><message>promised</message></final>".to_string(); 3],
         index: 0,
     };
     let snapshot = run_until_idle(&data, &mut endpoint, 3)?;

@@ -187,13 +187,12 @@ fn timeout_connect_and_status_are_distinct() -> TestResult<()> {
 
 #[test]
 fn length_is_not_repaired_and_ambiguous_send_is_not_retried() -> TestResult<()> {
-    let body =
-        r#"{"choices":[{"message":{"content":"<lkjagent_action>{}"},"finish_reason":"length"}]}"#;
+    let body = r#"{"choices":[{"message":{"content":"<tool_call>{}"},"finish_reason":"length"}]}"#;
     let server = serve_once(200, body)?;
     let config = ClientConfig::new(&server.base_url, "m");
     let result = complete(&config, &[Message::user("x")], &CallSpec::action(8), 9)?;
     let _single_request = server.recorded()?;
-    assert_eq!(result.content, "<lkjagent_action>{}");
+    assert_eq!(result.content, "<tool_call>{}");
     assert_eq!(result.finish_reason, FinishReason::Length);
     assert!(result.transport.is_some());
     Ok(())

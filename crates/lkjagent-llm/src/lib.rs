@@ -3,7 +3,7 @@ pub mod backoff {
 }
 pub mod client;
 pub mod closure {
-    pub use crate::message::{restore_stop_suffix, ClosureMode};
+    pub use crate::message::{classify_closure, ClosureMode};
 }
 pub mod error;
 pub mod message;

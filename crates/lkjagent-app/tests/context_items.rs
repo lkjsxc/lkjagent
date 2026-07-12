@@ -29,7 +29,7 @@ fn context_prompt_excludes_contaminated_and_creates_conflict_cell() -> TestResul
     drop(conn);
 
     let mut endpoint = CapturingEndpoint {
-        output: "<message>done</message>".to_string(),
+        output: "<final><message>done</message></final>".to_string(),
         prompts: Vec::new(),
     };
     let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;
@@ -88,7 +88,7 @@ fn context_resolution_suppresses_losing_conflict_items() -> TestResult<()> {
     drop(conn);
 
     let mut endpoint = CapturingEndpoint {
-        output: "<message>done</message>".to_string(),
+        output: "<final><message>done</message></final>".to_string(),
         prompts: Vec::new(),
     };
     let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;

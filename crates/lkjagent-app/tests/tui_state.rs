@@ -187,7 +187,7 @@ fn tui_snapshot_shows_durable_agent_message_after_daemon_turn() -> TestResult<()
     drop(conn);
 
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>done</message>".to_string()],
+        outputs: vec!["<final><message>done</message></final>".to_string()],
         index: 0,
     };
     run_until_idle(&data, &mut endpoint, 3)?;

@@ -34,7 +34,7 @@ fn rejected_tool_admission_persists_refusal_evidence() -> TestResult<()> {
     drop(conn);
 
     let mut endpoint = OneShotEndpoint {
-        output: action_for("decision-view", "", "fs.read", &[("path", "../secret.txt")]),
+        output: action_for("decision-view", "", "fs.read", &[("path", "PATH")]),
     };
     let snapshot = run_until_idle(&data, &mut endpoint, 1)?;
     assert_eq!(snapshot.task.state, TaskState::Open);
@@ -48,7 +48,7 @@ fn rejected_tool_admission_persists_refusal_evidence() -> TestResult<()> {
     assert_eq!(row.0, "fs.read");
     assert_eq!(row.1, "Rejected");
     assert_eq!(row.2, expected_fp);
-    assert!(row.3.contains("path escapes workspace"));
+    assert!(row.3.contains("placeholder value for path"));
     assert_eq!(count(&conn, "observations")?, 0);
     let status: String = conn.query_row(
         "SELECT status FROM runtime_decisions WHERE id = 'decision-view'",

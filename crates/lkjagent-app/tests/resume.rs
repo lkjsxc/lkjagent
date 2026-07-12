@@ -46,7 +46,7 @@ fn rows_win_over_stale_config_snapshot() -> TestResult<()> {
     drop(conn);
 
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>Rows are authority.</message>".to_string()],
+        outputs: vec!["<final><message>Rows are authority.</message></final>".to_string()],
         index: 0,
     };
     let snapshot = run_until_idle(&data, &mut endpoint, 3)?;
@@ -77,7 +77,7 @@ fn pending_runtime_decision_is_reused_on_resume() -> TestResult<()> {
     drop(conn);
 
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>Rows are authority.</message>".to_string()],
+        outputs: vec!["<final><message>Rows are authority.</message></final>".to_string()],
         index: 0,
     };
     let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;
@@ -110,7 +110,7 @@ fn ask_step_records_answer_and_resumes_next_step() -> TestResult<()> {
     drop(conn);
 
     let mut first = ScriptedEndpoint {
-        outputs: vec!["<message>Which file?</message>".to_string()],
+        outputs: vec!["<final><message>Which file?</message></final>".to_string()],
         index: 0,
     };
     let waiting = run_until_idle(&data, &mut first, 1)?;
@@ -120,7 +120,7 @@ fn ask_step_records_answer_and_resumes_next_step() -> TestResult<()> {
     enqueue(&conn, "README.md", "now")?;
     drop(conn);
     let mut second = ScriptedEndpoint {
-        outputs: vec!["<message>README.md was selected.</message>".to_string()],
+        outputs: vec!["<final><message>README.md was selected.</message></final>".to_string()],
         index: 0,
     };
     let closed = run_until_idle(&data, &mut second, 3)?;

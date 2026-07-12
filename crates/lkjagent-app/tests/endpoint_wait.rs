@@ -148,7 +148,7 @@ impl Endpoint for CountingSuccess {
     fn complete(&mut self, _prompt: &Prompt, _attempt: u32) -> Result<CompletionRecord, String> {
         self.calls += 1;
         Ok(CompletionRecord::scripted(
-            "<message>unexpected</message>".to_string(),
+            "<final><message>unexpected</message></final>".to_string(),
         ))
     }
 }

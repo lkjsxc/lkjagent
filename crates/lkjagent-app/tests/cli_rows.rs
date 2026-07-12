@@ -136,7 +136,7 @@ fn cli_inspection_reads_store_rows() -> TestResult<()> {
     drop(conn);
 
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>done</message>".to_string()],
+        outputs: vec!["<final><message>done</message></final>".to_string()],
         index: 0,
     };
     run_until_idle(&data, &mut endpoint, 3)?;

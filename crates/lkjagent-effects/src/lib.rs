@@ -3,6 +3,8 @@ pub mod error;
 pub mod exchange;
 pub mod shell;
 pub mod workspace;
+mod workspace_capability;
+mod workspace_scan;
 
 pub mod observation {
     const OBSERVATION_CHARS: usize = 6_000;

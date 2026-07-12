@@ -18,7 +18,7 @@ fn default_explore_prompt_hides_shell_and_finish_tools() -> TestResult<()> {
     drop(conn);
 
     let mut endpoint = CapturingEndpoint {
-        output: "<message>done</message>".to_string(),
+        output: "<final><message>done</message></final>".to_string(),
         prompts: Vec::new(),
     };
     let _snapshot = run_until_idle(&data, &mut endpoint, 1)?;

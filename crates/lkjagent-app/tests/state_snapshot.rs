@@ -31,7 +31,7 @@ fn state_snapshot_cell_wins_over_older_plan_rows() -> TestResult<()> {
     assert!(status.contains("matter: 2 Open"));
 
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>State cell wins.</message>".to_string()],
+        outputs: vec!["<final><message>State cell wins.</message></final>".to_string()],
         index: 0,
     };
     let snapshot = run_until_idle(&data, &mut endpoint, 1)?;

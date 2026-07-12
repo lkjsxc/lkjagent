@@ -114,7 +114,7 @@ fn missing_endpoint_usage_gets_unknown_token_row() -> TestResult<()> {
     enqueue(&conn, "What is an agent?", "now")?;
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>done</message>".to_string()],
+        outputs: vec!["<final><message>done</message></final>".to_string()],
         index: 0,
     };
     run_until_idle(&data, &mut endpoint, 3)?;
@@ -137,7 +137,7 @@ struct UsageEndpoint;
 impl Endpoint for UsageEndpoint {
     fn complete(&mut self, _prompt: &Prompt, _attempt: u32) -> Result<CompletionRecord, String> {
         Ok(CompletionRecord {
-            content: "<message>done</message>".to_string(),
+            content: "<final><message>done</message></final>".to_string(),
             prompt_tokens: Some(13),
             completion_tokens: Some(7),
             cached_tokens: Some(3),

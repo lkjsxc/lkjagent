@@ -102,7 +102,7 @@ fn six_useful_model_decisions_continue_without_a_turn_cap() -> TestResult<()> {
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
         outputs: (1..=6)
-            .map(|index| format!("<message>useful stage {index}</message>"))
+            .map(|index| format!("<final><message>useful stage {index}</message></final>"))
             .collect(),
         index: 0,
     };

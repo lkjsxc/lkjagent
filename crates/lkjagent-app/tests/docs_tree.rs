@@ -23,7 +23,7 @@ fn docs_tree_fake_endpoint_closes_and_effect_checks_pass() -> TestResult<()> {
             "<content># Daemon Docs\n\n- [Setup](setup.md)\n- [Run](run.md)</content>".to_string(),
             "<content># Setup\n\nReturn to [index](README.md).</content>".to_string(),
             "<content># Run\n\nReturn to [index](README.md).</content>".to_string(),
-            "<message>docs tree complete</message>".to_string(),
+            "<final><message>docs tree complete</message></final>".to_string(),
         ],
     )?;
     let root = data.join("workspace");
@@ -52,7 +52,7 @@ fn docs_tree_dangling_link_materializes_revise_then_closes() -> TestResult<()> {
             "<content># Setup\n\nReturn to [index](README.md).</content>".to_string(),
             "<content># Run\n\nReturn to [index](README.md).</content>".to_string(),
             "<content># Daemon Docs\n\n- [Setup](setup.md)\n- [Run](run.md)</content>".to_string(),
-            "<message>docs tree repaired</message>".to_string(),
+            "<final><message>docs tree repaired</message></final>".to_string(),
         ],
     )?;
     let readme = fs::read_to_string(data.join("workspace/docs/daemon/README.md"))?;

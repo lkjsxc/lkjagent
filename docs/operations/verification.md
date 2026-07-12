@@ -18,10 +18,10 @@ cargo test --locked -p lkjagent-app tui_contract
 cargo test --locked -p lkjagent-xtask acceptance_negative
 ```
 
-`acceptance_negative` is implemented as four focused tests over nine rejection
-fixtures. `contract_tables` is implemented as three closed-vocabulary tests. The
-other named filters are not implemented yet. `../current-state.md` owns that gap.
-Current deterministic commands remain:
+`acceptance_negative`, `contract_tables`, `workspace_safety`,
+`durable_boundaries`, and `wire_contract` are implemented. Product-flow and TUI
+filters are not implemented yet. `../current-state.md` owns that gap. Current
+deterministic commands remain:
 
 ```sh
 cargo run --locked -p lkjagent-xtask -- check-docs

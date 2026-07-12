@@ -53,7 +53,7 @@ fn future_recovery_wait_makes_no_decision_or_model_call_until_due() -> TestResul
     drop(conn);
 
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>Agent answer.</message>".to_string()],
+        outputs: vec!["<final><message>Agent answer.</message></final>".to_string()],
         index: 0,
     };
     let mut before = FixedClock::new("2026-07-11T10:00:00Z");

@@ -61,7 +61,9 @@ fn empty_workspace_daily_turns_create_record_trace_and_indexes() -> TestResult<(
     drop(conn);
 
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>Workspace evidence is linked.</message>".to_string()],
+        outputs: vec![
+            "<final><message>Workspace evidence is linked.</message></final>".to_string(),
+        ],
         index: 0,
     };
     let snapshot = run_until_idle(&data, &mut endpoint, 2)?;

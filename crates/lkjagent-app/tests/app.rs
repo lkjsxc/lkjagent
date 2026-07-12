@@ -30,8 +30,8 @@ fn non_actions_advance_recovery_without_closing_work() -> TestResult<()> {
 
     let mut endpoint = ScriptedEndpoint {
         outputs: vec![
-            "<message>wrong</message>".to_string(),
-            "<message>done exploring</message>".to_string(),
+            "<final><message>wrong</message></final>".to_string(),
+            "<final><message>done exploring</message></final>".to_string(),
         ],
         index: 0,
     };
@@ -55,7 +55,7 @@ fn daemon_uses_injected_clock_for_durable_rows() -> TestResult<()> {
     enqueue(&conn, "What is an agent?", "queued")?;
     drop(conn);
     let mut endpoint = ScriptedEndpoint {
-        outputs: vec!["<message>An agent follows checks.</message>".to_string()],
+        outputs: vec!["<final><message>An agent follows checks.</message></final>".to_string()],
         index: 0,
     };
     let mut clock = FixedClock::new("fixed-utc");
@@ -122,7 +122,7 @@ fn typed_templates_close_with_fake_endpoint() -> TestResult<()> {
     run_scripted(
         "question",
         "What is an agent?",
-        vec!["<message>An agent follows a loop.</message>".to_string()],
+        vec!["<final><message>An agent follows a loop.</message></final>".to_string()],
         None,
     )?;
     run_scripted(
@@ -130,7 +130,7 @@ fn typed_templates_close_with_fake_endpoint() -> TestResult<()> {
         "Add a journal note about the release.",
         vec![
             "<content># Release\n\nShipped notes.</content>".to_string(),
-            "<message>journal updated</message>".to_string(),
+            "<final><message>journal updated</message></final>".to_string(),
         ],
         Some("journal/today.md"),
     )?;
@@ -140,7 +140,7 @@ fn typed_templates_close_with_fake_endpoint() -> TestResult<()> {
         vec![
             "<plan>write notes/out.md | draft | words=1</plan>".to_string(),
             "<content>setup notes</content>".to_string(),
-            "<message>wrote notes</message>".to_string(),
+            "<final><message>wrote notes</message></final>".to_string(),
         ],
         Some("notes/out.md"),
     )?;

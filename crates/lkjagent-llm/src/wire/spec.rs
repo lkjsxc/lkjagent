@@ -1,7 +1,5 @@
 use super::{TEMPERATURE, TOP_P};
 
-const ACTION_CLOSE: &str = "</lkjagent_action>";
-
 #[derive(Debug, Clone, PartialEq)]
 pub struct CallSpec {
     pub max_tokens: u16,
@@ -13,7 +11,13 @@ pub struct CallSpec {
 
 impl CallSpec {
     pub fn action(max_tokens: u16) -> Self {
-        Self::with_stop(max_tokens, ACTION_CLOSE)
+        Self {
+            max_tokens,
+            stop: Vec::new(),
+            temperature: TEMPERATURE,
+            top_p: TOP_P,
+            reasoning_effort: None,
+        }
     }
 
     pub fn with_stop(max_tokens: u16, closing_tag: &str) -> Self {
@@ -36,12 +40,5 @@ impl CallSpec {
         let effort = effort.into();
         self.reasoning_effort = (!effort.is_empty() && effort != "none").then_some(effort);
         self
-    }
-
-    pub fn primary_stop(&self) -> &str {
-        self.stop
-            .first()
-            .map(String::as_str)
-            .unwrap_or(ACTION_CLOSE)
     }
 }

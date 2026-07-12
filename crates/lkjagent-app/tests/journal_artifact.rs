@@ -20,7 +20,7 @@ fn journal_endpoint_closes_with_file_check_and_artifacts() -> TestResult<()> {
     drop(conn);
     let outputs = vec![
         "<content># Today\n\nA bounded daily note.</content>".to_string(),
-        "<message>Journal updated.</message>".to_string(),
+        "<final><message>Journal updated.</message></final>".to_string(),
     ];
     let mut endpoint = ScriptedEndpoint { outputs, index: 0 };
 
@@ -68,9 +68,9 @@ fn journal_parse_fault_recovers_before_verified_close() -> TestResult<()> {
     enqueue(&conn, objective, "now")?;
     drop(conn);
     let outputs = vec![
-        "<message>wrong envelope</message>".to_string(),
+        "<final><message>wrong envelope</message></final>".to_string(),
         "<content># Today\n\nRecovered note.</content>".to_string(),
-        "<message>Journal updated after recovery.</message>".to_string(),
+        "<final><message>Journal updated after recovery.</message></final>".to_string(),
     ];
     let mut endpoint = ScriptedEndpoint { outputs, index: 0 };
 
