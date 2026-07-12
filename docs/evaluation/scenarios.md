@@ -6,6 +6,20 @@ Define complete tasks and deterministic outcomes for the direct runtime.
 
 ## Edit Scenarios
 
+The tracked `exact-file-edit` alias starts from exact UTF-8 bytes in
+`notes/exact-base.txt`. Its first owner turn requests one exact phrase
+replacement, automatic verification of the resulting bytes, no other change,
+and a truthful report. The second scheduled turn must itself complete; three
+later turns test phrase retrieval and matter continuity without expanding the
+file scope. The five strictly increasing offsets end at 840 seconds so the same
+input supports an endpoint probe and the bounded campaign.
+
+Its declared checks bind the exact resulting SHA-256, the sole allowed changed
+path, absence of collateral and scaffold files, and durable decision, provider
+exchange, tool admission, edit effect, fresh check, truthful final message, and
+second-turn owner/final message rows. These are expected facts, not runtime
+results; no endpoint run is claimed by this scenario declaration.
+
 - S1: exact one-line edit with explicit path.
 - S2: multiline edit containing XML-sensitive and Japanese text.
 - S3: create one absent file without scaffold.

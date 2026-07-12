@@ -1,0 +1,2 @@
+Café status: amber signal.
+Owner note: keep this file focused.

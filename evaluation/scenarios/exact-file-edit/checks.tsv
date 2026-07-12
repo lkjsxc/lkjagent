@@ -1,0 +1,13 @@
+check_id	checker	expected
+exact-changed-bytes	workspace-file-sha256	notes/exact-base.txt=sha256:4c0db7b7b7f1d3587a3de74449edd345d1f89c422174bf9f5477afc071f21a3b
+only-requested-path-changed	workspace-path-diff	notes/exact-base.txt
+no-collateral-files	workspace-inventory	only-seeded-paths-present
+no-scaffold-files	workspace-inventory	no-unrequested-readme-or-transcript
+runtime-decision-durable	runtime-decision	matter-bound-row-present
+provider-exchange-durable	provider-exchange	decision-bound-row-present
+tool-admission-durable	tool-admission	exact-edit-admitted-row-present
+edit-effect-durable	effect-journal	successful-exact-edit-row-present
+fresh-byte-check-durable	check-lineage	changed-bytes-check-after-effect
+first-final-message-durable	conversation-ledger	truthful-checked-final-row-present
+second-owner-turn-complete	conversation-ledger	second-owner-and-final-rows-present
+continuity-retrieval-grounded	context-source	exact-file-revision-cited
