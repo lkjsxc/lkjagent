@@ -94,8 +94,8 @@ impl NativeStore {
             tx.execute("INSERT INTO effect_journal(id,admission_id,decision_id,command_ordinal,idempotency_key,status,intended_fingerprint,prior_fingerprint) VALUES(?1,?2,?3,?4,?5,'prepared',?6,?7)", params![value.journal,value.admission,value.decision,value.action_ordinal,value.idempotency,value.intended_fingerprint,value.prior_fingerprint])?;
             for (ordinal, target) in value.targets.iter().enumerate() {
                 tx.execute("INSERT INTO effect_targets(journal_id,ordinal,normalized_path,prior_bytes,intended_bytes,operation,prior_mode,intended_mode,stage_identity) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9)", params![value.journal,ordinal as i64,target.path,target.prior,target.intended,target.operation,target.prior_mode,target.intended_mode,target.stage_identity])?;
-                if obligations { insert_obligations(tx, value, ordinal, target.path, target.prior, target.intended)?; }
             }
+            if obligations { insert_obligations(tx, value)?; }
             Ok(())
         })
     }
@@ -133,10 +133,9 @@ fn one(count: usize, message: &str) -> StoreResult<()> {
     if count == 1 { Ok(()) } else { Err(StoreError::InvalidState(message.into())) }
 }
 fn cell_payload(revision: &[u8], body: &[u8]) -> Vec<u8> {
-    let mut out = (revision.len() as u64).to_be_bytes().to_vec();
-    out.extend(revision);
-    out.extend(body);
-    out
+    serde_json::json!({"revision":hex(revision),"body_ref":String::from_utf8_lossy(body)})
+        .to_string()
+        .into_bytes()
 }
 fn direct_retry(tx: &Transaction<'_>, v: &DirectSettlement<'_>) -> StoreResult<bool> {
     let found: Option<i64> = tx.query_row("SELECT count(*) FROM observations o JOIN runtime_decisions d ON d.id=o.decision_id JOIN tool_admissions a ON a.decision_id=d.id JOIN runtime_events e ON e.id=o.event_id JOIN state_cells s ON s.source_event_id=e.id WHERE o.id=?1 AND d.id=?2 AND d.status='settled' AND d.settlement_event_id=?3 AND a.id=?4 AND o.attempt_outcome=?5 AND o.content_ref=?6 AND o.fingerprint=?7 AND e.payload=?8 AND s.namespace=?9 AND s.cell_key=?10 AND s.payload=?11", params![v.observation,v.decision,v.event,v.admission,v.outcome,v.content_ref,v.fingerprint,v.event_payload,v.namespace,v.cell_key,cell_payload(v.source_revision,v.bytes_ref)], |r| r.get(0)).optional()?;
@@ -151,18 +150,23 @@ fn effect_retry(tx: &Transaction<'_>, e: &Effect<'_>) -> StoreResult<bool> {
     Ok(total==e.targets.len() as i64)
 }
 #[rustfmt::skip]
-fn insert_obligations(tx: &Transaction<'_>, e: &Effect<'_>, n: usize, path: &[u8], prior: Option<&[u8]>, intended: Option<&[u8]>) -> StoreResult<()> {
+fn insert_obligations(tx: &Transaction<'_>, e: &Effect<'_>) -> StoreResult<()> {
     let matter:String=tx.query_row("SELECT matter_id FROM runtime_decisions WHERE id=?1",[e.decision],|r|r.get(0))?;
-    let values=[
-        ("workspace-bytes",e.prior_fingerprint.unwrap_or_default(),prior.unwrap_or_default()),
-        ("content",e.intended_fingerprint,intended.unwrap_or_default()),
-        ("collateral",e.intended_fingerprint,path),
-    ];
-    for (kind,revision,bytes) in values {
-        let id=format!("{}/{n}/{kind}",e.journal); let payload=cell_payload(revision,bytes);
-        tx.execute("INSERT INTO obligations(id,matter_id,predicate_kind,predicate_payload,required,status) VALUES(?1,?2,?3,?4,1,'open')",params![id,matter,kind,payload])?;
-    }
+    let target=e.targets.first().ok_or_else(||StoreError::InvalidState("effect has no target".into()))?;
+    let path=std::str::from_utf8(target.path).map_err(|error|StoreError::InvalidState(error.to_string()))?;
+    let intended=target.intended.ok_or_else(||StoreError::InvalidState("effect has no intended bytes".into()))?;
+    let text=std::str::from_utf8(intended).map_err(|error|StoreError::InvalidState(error.to_string()))?;
+    let old=target.prior.and_then(|bytes|std::str::from_utf8(bytes).ok()).unwrap_or("");
+    let allowed=e.targets.iter().map(|item|String::from_utf8_lossy(item.path).into_owned()).collect::<Vec<_>>();
+    let values=[("workspace-byte",serde_json::json!({"path":path,"sha256":hex(e.intended_fingerprint)})),
+        ("workspace-content",serde_json::json!({"path":path,"old":old,"new":text,"old_count":0,"new_count":1})),
+        ("workspace-collateral",serde_json::json!({"allowed_paths":allowed}))];
+    for (kind,payload) in values { let id=format!("{}/{kind}",e.journal);
+        tx.execute("INSERT INTO obligations(id,matter_id,predicate_kind,predicate_payload,required,status) VALUES(?1,?2,?3,?4,1,'open')",params![id,matter,kind,payload.to_string().as_bytes()])?; }
     Ok(())
+}
+fn hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
 }
 #[rustfmt::skip]
 fn query_cells(c: &rusqlite::Connection, matter: &str) -> StoreResult<Vec<CellRow>> {
