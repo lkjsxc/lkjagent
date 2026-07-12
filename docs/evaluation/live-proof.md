@@ -62,8 +62,11 @@ predeclared owner schedule, and corresponding durable work. Sleeping duration is
 not progress.
 
 The exact-file evaluator requires the declared final SHA-256, one workspace file,
-five closed owner turns and five final messages, current passed checks, one edit
-effect, durable admissions and provider exchanges, and exactly 18 native tables.
+five durable owner turns, checked closes for the edit, second-turn verification,
+and retrieval continuity, current passed checks, one edit effect, durable
+admissions and provider exchanges, and exactly 18 native tables. Later scheduled
+turns exercise sustained intake but are not mislabeled as closed if still active
+at the bounded observation.
 A failed or unavailable semantic evaluator makes `campaign run` nonzero.
 
 The frozen campaigns use one no-cache clean-source binary without product changes

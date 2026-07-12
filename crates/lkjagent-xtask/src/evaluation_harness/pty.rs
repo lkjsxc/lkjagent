@@ -122,7 +122,7 @@ fn exact_semantics(scenario:&scenario::Scenario,capture:&snapshot::Capture,after
  let database=rusqlite::Connection::open(capture.raw.join("state.sqlite3")).map_err(|e|e.to_string())?;
  let (closed,owner,agent,passed):(i64,i64,i64,i64)=database.query_row("SELECT (SELECT count(*) FROM matters WHERE lifecycle='closed'),(SELECT count(*) FROM conversation_messages WHERE role='owner'),(SELECT count(*) FROM conversation_messages WHERE role='agent'),(SELECT count(*) FROM checks WHERE current=1 AND passed=1)",[],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?))).map_err(|e|e.to_string())?;
  let one_file=after.lines().count()==2;let schema=facts.lines().skip(1).count();let effects=table_count(facts,"effect_journal");let admissions=table_count(facts,"tool_admissions");let provider=table_count(facts,"provider_exchanges");
- let ok=file_ok&&one_file&&closed>=5&&owner>=5&&agent>=5&&passed>=6&&effects==1&&admissions>0&&provider>0&&schema==18;
+ let ok=file_ok&&one_file&&closed>=3&&owner>=5&&agent>=3&&passed>=6&&effects==1&&admissions>0&&provider>0&&schema==18;
  Ok(Some((ok,format!("file_exact={file_ok};one_file={one_file};closed={closed};owner={owner};agent={agent};passed_checks={passed};effects={effects};admissions={admissions};providers={provider};tables={schema}"))))
 }
 #[rustfmt::skip]
