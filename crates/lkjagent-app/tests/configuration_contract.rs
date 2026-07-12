@@ -9,8 +9,8 @@ type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 fn rejects_unknown_composite_and_wrong_type_values() -> TestResult<()> {
     for (name, extra) in [
         ("unknown", r#""surprise":true"#),
-        ("array", r#""context_retrieval_limit":[12]"#),
-        ("wrong-type", r#""context_retrieval_limit":"12""#),
+        ("array", r#""endpoint_url":["http://127.0.0.1"]"#),
+        ("wrong-type", r#""endpoint_timeout_seconds":"300""#),
     ] {
         let data = fixture(name, &format!("{{{base},{extra}}}", base = endpoint()))?;
         assert!(config::load_client(&data).is_err(), "accepted {name}");
@@ -19,18 +19,12 @@ fn rejects_unknown_composite_and_wrong_type_values() -> TestResult<()> {
 }
 
 #[test]
-fn rejects_ranges_and_cross_key_conflicts() -> TestResult<()> {
+fn rejects_ranges_and_workspace_controls() -> TestResult<()> {
     for (name, extra) in [
         ("timeout-low", r#""endpoint_timeout_seconds":0"#),
-        ("workspace-cap", r#""workspace_file_max_tokens":513"#),
-        (
-            "prompt-reserve",
-            r#""prompt_context_tokens":2048,"prompt_output_reserve_tokens":2048"#,
-        ),
-        (
-            "lane-overflow",
-            r#""prompt_context_tokens":2048,"prompt_output_reserve_tokens":256,"context_objective_tokens":512,"context_evidence_tokens":8192,"context_history_tokens":2048,"context_recovery_tokens":1024"#,
-        ),
+        ("prompt-low", r#""prompt_context_tokens":2047"#),
+        ("campaign-low", r#""live_campaign_seconds":839"#),
+        ("workspace-control", r#""workspace_root":"bad\nroot""#),
     ] {
         let data = fixture(name, &format!("{{{base},{extra}}}", base = endpoint()))?;
         assert!(config::load_client(&data).is_err(), "accepted {name}");
@@ -58,7 +52,7 @@ fn tracked_example_matches_the_registry() -> TestResult<()> {
     let text = fs::read_to_string(root.join("config/lkjagent.example.json"))?;
     let example: serde_json::Value = serde_json::from_str(&text)?;
     let object = example.as_object().ok_or("example root is not an object")?;
-    assert_eq!(object.len(), 38);
+    assert_eq!(object.len(), 7);
     assert!(object.values().all(is_scalar));
     config::validate_document(&text)?;
     Ok(())
