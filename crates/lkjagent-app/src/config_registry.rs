@@ -135,6 +135,11 @@ fn validate_cross_keys(values: &Map<String, Value>) -> Result<(), String> {
     if let Some(zone) = values.get("timezone").and_then(Value::as_str) {
         validate_timezone(zone)?;
     }
+    if let Some(root) = values.get("workspace_root").and_then(Value::as_str) {
+        if root.chars().any(char::is_control) {
+            return Err("workspace root must not contain control characters".to_string());
+        }
+    }
     Ok(())
 }
 

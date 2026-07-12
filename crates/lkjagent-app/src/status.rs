@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use lkjagent_core::model::{EventKind, StepState, TaskSnapshot, TaskState};
 use rusqlite::Connection;
 
@@ -5,16 +7,42 @@ use crate::lease_status;
 use crate::state::load_snapshot;
 
 pub fn status(conn: &Connection) -> Result<String, String> {
+    status_inner(conn, None)
+}
+
+pub fn status_with_roots(conn: &Connection, data_dir: &Path) -> Result<String, String> {
+    status_inner(conn, Some(data_dir))
+}
+
+fn status_inner(conn: &Connection, data_dir: Option<&Path>) -> Result<String, String> {
     let snapshot = load_snapshot(conn).map_err(|error| error.to_string())?;
     let pending =
         lkjagent_store::plan_hydrate::pending_count(conn).map_err(|error| error.to_string())?;
     let tokens = crate::lease_status::token_line(conn)?;
     let ledger = state_ledger_lines(conn)?;
     let lease = lease_status::line(conn)?;
+    let roots = match data_dir {
+        Some(data_dir) => {
+            let workspace = crate::config::workspace_root(data_dir)?;
+            format!(
+                "roots: data={} workspace={} workspace_present={}",
+                data_dir.display(),
+                workspace.display(),
+                workspace.is_dir()
+            )
+        }
+        None => "roots: unavailable".to_string(),
+    };
     Ok(match snapshot {
-        Some(snapshot) => format!("{}\n{}\n{}", render_status_with(&snapshot, pending, &tokens), lease, ledger),
+        Some(snapshot) => format!(
+            "{}\n{}\n{}\n{}",
+            render_status_with(&snapshot, pending, &tokens),
+            lease,
+            roots,
+            ledger
+        ),
         None => format!(
-            "daemon: idle\nmatter: none\noperation: none\nlast: none\nquestion: none\nqueue: {pending} pending\ntokens: {tokens}\n{lease}\n{ledger}"
+            "daemon: idle\nmatter: none\noperation: none\nlast: none\nquestion: none\nqueue: {pending} pending\ntokens: {tokens}\n{lease}\n{roots}\n{ledger}"
         ),
     })
 }

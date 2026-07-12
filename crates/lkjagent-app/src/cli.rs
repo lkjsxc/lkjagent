@@ -4,7 +4,6 @@ use rusqlite::Connection;
 
 use crate::args::{parse, Command};
 use crate::daemon::{run_daemon, run_until_idle};
-use crate::status::status;
 
 pub fn run<I, S>(args: I) -> Result<String, String>
 where
@@ -15,11 +14,11 @@ where
     if invocation.command == Command::Help {
         return Ok(help());
     }
+    let workspace_root = crate::config::workspace_root(&invocation.data_dir)?;
     fs::create_dir_all(&invocation.data_dir).map_err(|error| error.to_string())?;
     let db = invocation.data_dir.join("lkjagent.sqlite3");
     let mut conn = Connection::open(&db).map_err(|error| error.to_string())?;
     lkjagent_store::plan_schema::setup(&conn).map_err(|error| error.to_string())?;
-    crate::workspace_scaffold::ensure_root(&crate::config::workspace_root(&invocation.data_dir)?)?;
     let exclusive = matches!(
         &invocation.command,
         Command::RecordArchive { .. } | Command::WorkspaceApplyRebalance { .. }
@@ -53,12 +52,13 @@ where
             )?;
             Ok(format!("queue: {id} new={force_new}"))
         }
-        Command::Status => status(&conn),
+        Command::Status => crate::status::status_with_roots(&conn, &invocation.data_dir),
         Command::Console => crate::console::run(&conn),
         Command::Workbench => crate::workbench::run(&conn, &invocation.data_dir),
         Command::Doctor { json } => crate::diagnostics::doctor(&conn, &invocation.data_dir, json),
         Command::Workspace { json, rebuild } => {
             if rebuild {
+                let _opened = crate::workspace_root::open(&workspace_root)?;
                 crate::workspace_index::rebuild(
                     &conn,
                     &invocation.data_dir,
@@ -74,18 +74,21 @@ where
             project,
             date,
             mode,
-        } => crate::workspace_search::search(
-            &conn,
-            &crate::config::workspace_root(&invocation.data_dir)?,
-            &crate::workspace_search::Request {
-                query,
-                kind,
-                state,
-                project,
-                date,
-                mode,
-            },
-        ),
+        } => {
+            let _opened = crate::workspace_root::open(&workspace_root)?;
+            crate::workspace_search::search(
+                &conn,
+                &workspace_root,
+                &crate::workspace_search::Request {
+                    query,
+                    kind,
+                    state,
+                    project,
+                    date,
+                    mode,
+                },
+            )
+        }
         Command::WorkspacePlanRebalance { json } => crate::workspace_rebalance::plan(
             &conn,
             &invocation.data_dir,

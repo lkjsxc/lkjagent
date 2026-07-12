@@ -3,17 +3,14 @@ use std::path::Path;
 use rusqlite::{params, Connection};
 use serde_json::json;
 
-use crate::config::{
-    endpoint_state, file_count, join_bools, join_counts, join_or_none, missing_dirs,
-};
+use crate::config::{endpoint_state, file_count, join_bools, join_counts, join_or_none};
 
 pub fn doctor(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<String, String> {
     let missing_tables = missing_tables(conn)?;
     let counts = table_counts(conn)?;
-    let workspace_root = crate::config::workspace_root(data_dir)?;
+    let (workspace_root, workspace_present) = crate::config::workspace_state(data_dir)?;
     let prompt_cap = crate::config::prompt_max_context_tokens(data_dir)?;
     let live_seconds = crate::config::live_campaign_seconds(data_dir)?;
-    let missing_dirs = missing_dirs(data_dir);
     let endpoint = endpoint_state(data_dir);
     let unfinished = count_where(conn, "runtime_decisions", "status != 'settled'")?;
     let orphan_prompts = scalar_count(
@@ -26,8 +23,8 @@ pub fn doctor(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<Strin
     if !missing_tables.is_empty() {
         warnings.push("missing-tables".to_string());
     }
-    if !missing_dirs.is_empty() {
-        warnings.push("missing-workspace-dirs".to_string());
+    if !workspace_present {
+        warnings.push("workspace-root-absent".to_string());
     }
     if orphan_prompts > 0 {
         warnings.push("orphan-prompt-refs".to_string());
@@ -39,10 +36,11 @@ pub fn doctor(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<Strin
             "table_counts": counts,
             "lease": crate::lease_status::line(conn)?,
             "endpoint": endpoint,
+            "data_root": data_dir.display().to_string(),
             "workspace_root": workspace_root.display().to_string(),
+            "workspace_present": workspace_present,
             "prompt_max_context_tokens": prompt_cap,
             "live_campaign_seconds": live_seconds,
-            "missing_dirs": missing_dirs,
             "unfinished_decisions": unfinished,
             "orphan_prompt_refs": orphan_prompts,
             "warnings": warnings,
@@ -62,10 +60,11 @@ pub fn doctor(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<Strin
         format!("table_counts: {}", join_counts(&counts)),
         crate::lease_status::line(conn)?,
         format!("endpoint: {endpoint}"),
+        format!("data: root={}", data_dir.display()),
         format!(
-            "workspace: root={} missing={} prompt_cap={} live_seconds={}",
+            "workspace: root={} present={} prompt_cap={} live_seconds={}",
             workspace_root.display(),
-            join_or_none(&missing_dirs),
+            workspace_present,
             option_number(prompt_cap),
             option_number(live_seconds)
         ),
@@ -86,7 +85,7 @@ pub fn workspace(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<St
         ("workspace", root.join("README.md").exists()),
         ("records", root.join("records/README.md").exists()),
     ];
-    let missing = missing_dirs(data_dir);
+    let present = root.is_dir();
     if as_json {
         return Ok(json!({
             "root": root.display().to_string(),
@@ -94,7 +93,7 @@ pub fn workspace(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<St
             "artifacts": artifacts,
             "indexes": { "files": index_files },
             "readmes": readmes,
-            "missing_dirs": missing,
+            "present": present,
         })
         .to_string());
     }
@@ -104,7 +103,7 @@ pub fn workspace(conn: &Connection, data_dir: &Path, as_json: bool) -> Result<St
         format!("artifacts: total={artifacts}"),
         format!("indexes: files={index_files}"),
         format!("readmes: {}", join_bools(&readmes)),
-        format!("missing: {}", join_or_none(&missing)),
+        format!("present: {present}"),
     ]
     .join("\n"))
 }

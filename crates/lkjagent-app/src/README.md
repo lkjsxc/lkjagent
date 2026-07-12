@@ -43,7 +43,7 @@ Map lkjagent-app source modules.
 - [workspace-rebalance-apply.rs](workspace_rebalance_apply.rs): legacy single-move recovery.
 - [workspace-rebalance-group.rs](workspace_rebalance_group.rs): durable grouped rebalance apply.
 - [workspace-search.rs](workspace_search.rs): visible Markdown inventory, rebuild, and bounded retrieval.
-- [workspace-scaffold.rs](workspace_scaffold.rs): README and directory scaffold writes.
+- [workspace-root.rs](workspace_root.rs): lazy validated owner-workspace root capability.
 - [workspace-scan.rs](workspace_scan.rs): durable inventory debounce scheduling.
 - [progress-bridge.rs](progress_bridge.rs): durable progress vectors and no-progress adaptation.
 - [recovery-bridge.rs](recovery_bridge.rs): unfinished decision reuse and

@@ -162,16 +162,26 @@ fn run_scripted(
     let snapshot = run_until_idle(&data, &mut endpoint, 8)?;
     assert_eq!(snapshot.task.state, TaskState::Closed, "{name}");
     if let Some(path) = expected_file {
-        assert!(data.join("workspace").join(path).exists(), "{path}");
+        let workspace = config_workspace(&data)?;
+        assert!(workspace.join(path).exists(), "{path}");
     }
     Ok(())
 }
 
+fn config_workspace(data: &std::path::Path) -> TestResult<PathBuf> {
+    Ok(lkjagent_app::config::workspace_root(data)?)
+}
+
 fn fixture_root(name: &str) -> TestResult<PathBuf> {
-    let path = std::env::temp_dir().join(format!("lkjagent-app-{name}-{}", std::process::id()));
-    if path.exists() {
-        fs::remove_dir_all(&path)?;
+    let parent = std::env::temp_dir().join(format!("lkjagent-app-{name}-{}", std::process::id()));
+    if parent.exists() {
+        fs::remove_dir_all(&parent)?;
     }
-    fs::create_dir_all(&path)?;
-    Ok(path)
+    let data = parent.join("data");
+    fs::create_dir_all(&data)?;
+    fs::write(
+        data.join("lkjagent.json"),
+        "{\"workspace_root\":\"../workspace\"}",
+    )?;
+    Ok(data)
 }
