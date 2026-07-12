@@ -27,15 +27,39 @@ Persist provider request intent before network I/O. A finished exchange stores
 content hash/reference, usage, finish reason, anomaly, parse result, and timing.
 An ambiguous sent request is not replayed after restart.
 
+## Direct Tools And Faults
+
+After a compiled decision, admitted list, search, and read calls settle in one
+immediate transaction without filesystem mutation. The transaction inserts the
+non-effectful admission, bounded observation, causal event, settled decision,
+and active source cell containing the source revision and bytes reference. An
+exact retry, including after reopen, is a no-op; changed reuse conflicts.
+
+Malformed, hidden, or stale model output is rejected in one immediate
+transaction. It writes a typed recovery cell and causal fault event and marks
+the decision failed. Parse faults never create admission or effect rows. Exact
+fault retries are no-ops and changed retries conflict.
+
 ## Effect
 
 One transaction inserts accepted admission, prepared journal, target paths,
-exact prior/intended bytes and modes, stage identity, and idempotency key. Stage
-and each exchange/compensation phase update durably around filesystem boundaries.
+exact prior/intended bytes and modes, stage identity, and idempotency key. The
+exact create/edit API also derives required open `workspace-bytes`, `content`,
+and `collateral` obligations from the admitted target bytes and prior/intended
+revision identity. It never inserts passing checks. Exact retries are no-ops;
+changed reuse conflicts. Stage and each exchange/compensation phase update
+durably around filesystem boundaries.
 
 Settlement verifies descriptor-relative target state and commits observation,
 workspace revision, native checks, runtime events, and decision status. Unknown
 external state blocks without overwrite.
+
+## Restart Projection
+
+One native query returns the current non-closed matter, active cells, unfinished
+decisions, provider exchanges and effects, plus required-current-passed-check
+readiness. The projection reads only the 18 native authority tables and is safe
+to repeat after reopen.
 
 ## Close
 

@@ -38,7 +38,7 @@ CREATE TABLE runtime_decisions (
  budget_spec BLOB NOT NULL, recovery_spec BLOB NOT NULL, check_spec BLOB NOT NULL, exit_spec BLOB NOT NULL, compiler_status TEXT NOT NULL CHECK(compiler_status IN ('compiling','complete','rejected')),
  compiler_attachments BLOB, rendered_frame BLOB, context_fingerprint BLOB, tool_fingerprint BLOB,
  status TEXT NOT NULL CHECK(status IN ('selected','admitted','running','settled','failed')),
- settlement_event_id TEXT UNIQUE REFERENCES runtime_events(id), UNIQUE(matter_id,operation_key),
+ settlement_event_id TEXT UNIQUE REFERENCES runtime_events(id),
  CHECK((compiler_status='compiling' AND compiler_attachments IS NULL AND rendered_frame IS NULL) OR
        (compiler_status='complete' AND compiler_attachments IS NOT NULL AND rendered_frame IS NOT NULL) OR compiler_status='rejected'));
 CREATE TRIGGER immutable_decision_spec BEFORE UPDATE OF matter_id,event_id,operation_key,idempotency_key,selected_monotonic_ms,selected_state,context_spec,tool_spec,grammar_spec,budget_spec,recovery_spec,check_spec,exit_spec ON runtime_decisions BEGIN SELECT RAISE(ABORT,'immutable decision specification'); END;
@@ -79,10 +79,13 @@ CREATE TABLE effect_targets (
  CHECK((operation='delete' AND intended_bytes IS NULL) OR operation!='delete'),
  PRIMARY KEY(journal_id,ordinal), UNIQUE(journal_id,normalized_path));
 CREATE TABLE observations (
- id TEXT PRIMARY KEY, journal_id TEXT NOT NULL UNIQUE, status TEXT NOT NULL CHECK(status IN ('succeeded','failed','unknown')),
- attempt_outcome BLOB NOT NULL, content_ref BLOB NOT NULL, fingerprint BLOB NOT NULL, contamination TEXT NOT NULL CHECK(contamination IN ('clean','untrusted')),
+ id TEXT PRIMARY KEY, journal_id TEXT UNIQUE, decision_id TEXT NOT NULL REFERENCES runtime_decisions(id),
+ status TEXT NOT NULL CHECK(status IN ('succeeded','failed','unknown')),
+ attempt_outcome BLOB NOT NULL CHECK(length(attempt_outcome)<=65536), content_ref BLOB NOT NULL,
+ fingerprint BLOB NOT NULL, contamination TEXT NOT NULL CHECK(contamination IN ('clean','untrusted')),
  event_id TEXT NOT NULL UNIQUE REFERENCES runtime_events(id),
- FOREIGN KEY(journal_id,id) REFERENCES effect_journal(id,observation_id) DEFERRABLE INITIALLY DEFERRED, UNIQUE(journal_id,id));
+ FOREIGN KEY(journal_id,id) REFERENCES effect_journal(id,observation_id) DEFERRABLE INITIALLY DEFERRED,
+ UNIQUE(journal_id,id), CHECK(journal_id IS NOT NULL OR contamination='clean'));
 CREATE TABLE checks (
  id TEXT PRIMARY KEY, matter_id TEXT NOT NULL, obligation_id TEXT NOT NULL, decision_id TEXT NOT NULL REFERENCES runtime_decisions(id),
  kind TEXT NOT NULL, parameters BLOB NOT NULL, current INTEGER NOT NULL CHECK(current IN (0,1)), passed INTEGER NOT NULL CHECK(passed IN (0,1)),
