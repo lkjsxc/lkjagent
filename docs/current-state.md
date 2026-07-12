@@ -7,9 +7,12 @@ name the next executable work.
 
 ## Evidence Boundary
 
-This cutover is based exactly on `ee4de81536b1baac845a346103f14420cd41f45b`.
-The focused public native-loop test passes in this checkout. No Docker or real
-configured-model endpoint campaign has run for this change.
+The public-loop work started from `ee4de81536b1baac845a346103f14420cd41f45b`.
+The focused native-loop test passes in the current checkout, whose source is not
+yet frozen. No Docker or configured-model file campaign has run for this change.
+The original planning comparison used source
+`5604ec89af3ba9dbfb287bd869971781fdcf2fad` and parent product source
+`28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`.
 
 A synthetic 901-second run against the parent product source seeded
 `notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
@@ -21,9 +24,10 @@ decisions, provider exchanges, admissions, effects, observations, checks,
 artifacts, or workspace records. Startup also created nine README files and one
 transcript unrelated to the requested edit.
 
-The causal defect is current source: `owner_turn.rs` treats the substring
-`verify` as a system operation, and `daemon_route_effects.rs` blocks that lane as
-an unsupported executor before any model call. A second 901-second run at source
+The baseline causal defect remains in the retired non-public path:
+`owner_turn.rs` treats the substring `verify` as a system operation, and
+`daemon_route_effects.rs` records an unsupported executor before any model call. Public
+`send` and `run` no longer call that path. A second 901-second run at source
 `97e00698f348fc2435d47a107b5b8453c98b9d1f` reproduced the same zero-decision
 failure. Its sanitized bundle is tracked below
 `evaluation/evidence/97e00698f348fc2435d47a107b5b8453c98b9d1f/`. This summary is
@@ -55,15 +59,15 @@ effects stage expected and intended bytes, fsync, preserve mode, reject stale
 revisions, and retain the isolated crash-boundary coverage. Unknown executable
 payload schemas remain inert.
 
-Public `send`, `run`, `run --once`, and `status` now branch before legacy schema
+Public `send`, `run`, `run --once`, and `status` now branch before retired schema
 setup and open only the fresh native 18-table store. The focused public test
 demonstrates two closed exact-edit matters, restart idempotency, and stale owner
 byte preservation with a scripted endpoint.
 
 ## Active Source Gaps
 
-Legacy non-public daemon, inspection, record, workspace, and TUI APIs still use
-retired schema and bridge modules for regression coverage. They are not called by
+Retired non-public daemon, inspection, record, workspace, and TUI APIs still use
+retired schema and projection modules for regression coverage. They are not called by
 public send, run, or status. Public scheduling currently handles one open matter
 at a time, blocks unfinished effects instead of completing every recovery phase,
 and does not yet prove fairness across simultaneous open matters.
@@ -71,11 +75,14 @@ and does not yet prove fairness across simultaneous open matters.
 The public compiler attaches its context plan and frame fingerprints; native
 context-item rows are not yet populated for every included source. List and
 search observations remain orienting evidence until a read produces current
-source bytes. These are bounded follow-up gaps, not task/step fallback.
+source bytes. Final model wording is not yet checked for unsupported claims,
+although close and the owner receipt remain check-derived. These are bounded
+follow-up gaps, not task/step fallback.
 
-There is no `conversation_messages` table. The TUI synthesizes owner and agent
-messages from queue and selected event rows, then merges local drafts. It has two
-viewport implementations and does not measure wrapped display rows consistently.
+The native `conversation_messages` table is canonical for public turns, but the
+TUI still synthesizes owner and agent messages from retired queue and event rows,
+then merges local drafts. It has two viewport implementations and does not
+measure wrapped display rows consistently.
 
 Configuration and Compose now separate the runtime data root from one visible
 workspace root. The workspace is created only by an actual workspace operation,
@@ -120,7 +127,7 @@ claims, and the close transaction owns the canonical final message.
 | context-compiler | complete | selection precedes compilation and current source revision and bytes enter the next prompt |
 | conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
-| public file edit | complete | focused exact edit, second matter, restart, and stale-revision tests pass |
+| public scripted file edit | complete | focused exact edit, second matter, restart, and stale-revision tests pass |
 | configured-model file proof | active | no real endpoint or Docker proof ran for this cutover |
 | final campaigns | blocked | no frozen binary, live file proof, or PTY proof |
 
