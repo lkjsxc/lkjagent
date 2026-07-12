@@ -7,14 +7,18 @@ Define safe direct and Compose operation with separate roots.
 ## Direct
 
 ```sh
+cargo run --locked -p lkjagent-app -- help
 cargo run --locked -p lkjagent-app -- --data data send --new "OWNER TEXT"
 cargo run --locked -p lkjagent-app -- --data data run
+cargo run --locked -p lkjagent-app -- --data data run --once
 cargo run --locked -p lkjagent-app -- --data data status
-cargo run --locked -p lkjagent-app -- --data data workbench
+cargo run --locked -p lkjagent-app -- --data data doctor --json
 ```
 
-The current CLI accepts these commands. Its bridge limitations are recorded in
-`../current-state.md` until direct cutover.
+These are the complete public command shapes. Removed inspection, record,
+workspace, and terminal commands fail before creating a data directory, SQLite
+database, or workspace. `run --once` performs at most one persisted direct
+decision and returns its bounded outcome.
 
 ## Configuration
 

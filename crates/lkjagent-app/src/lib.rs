@@ -1,12 +1,12 @@
 mod admission_bridge;
 pub use admission_bridge::persist_tool_admissions;
-mod arg_helpers;
 pub mod args;
 mod artifact_effects;
 mod artifact_plan;
 pub mod automatic_checks;
 pub mod cli;
 pub mod clock;
+#[allow(dead_code)]
 pub mod config;
 mod config_registry;
 pub mod console;
@@ -25,13 +25,16 @@ pub mod state {
     }
 }
 mod context_bridge;
+#[allow(dead_code)]
 mod context_resolution_bridge;
 pub mod daemon;
 mod daemon_intake;
+#[allow(dead_code)]
 mod daemon_lock;
 #[allow(dead_code)]
 mod daemon_owner_routes;
 mod daemon_route_effects;
+#[allow(dead_code)]
 mod diagnostics;
 pub mod effect_dispatch;
 mod effect_files;
@@ -39,8 +42,10 @@ mod endpoint_recovery;
 mod exchange_bridge;
 mod exchange_record;
 mod explore;
+#[allow(dead_code)]
 mod inspect;
 mod lease_status;
+#[allow(dead_code)]
 mod log_view;
 mod model_call;
 mod model_io;
@@ -48,7 +53,7 @@ mod observation_bridge;
 pub mod progress_bridge;
 pub mod public_loop;
 mod record_archive;
-mod record_args;
+#[allow(dead_code)]
 mod record_files;
 mod record_identity;
 mod record_state;
@@ -59,6 +64,7 @@ mod runtime_cell;
 mod runtime_projection;
 mod snapshot_state;
 pub mod status;
+#[allow(dead_code)]
 mod task_view;
 pub mod tui_event {
     pub use crate::tui_state::TuiEvent;
@@ -85,8 +91,11 @@ mod workbench_line;
 mod workbench_render;
 pub mod workbench_state;
 mod workspace_index;
+#[allow(dead_code)]
 mod workspace_rebalance;
+#[allow(dead_code)]
 mod workspace_rebalance_apply;
+#[allow(dead_code)]
 mod workspace_rebalance_group;
 pub mod workspace_root;
 mod workspace_scan;

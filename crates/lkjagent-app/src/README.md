@@ -34,8 +34,8 @@ Map lkjagent-app source modules.
 - [model-call.rs](model_call.rs): endpoint call, exchange log, and usage handling.
 - [model-io.rs](model_io.rs): endpoint trait, live adapter, and scripted record.
 - [observation-bridge.rs](observation_bridge.rs): effect observation rows.
-- [record-args.rs](record_args.rs): record subcommand parsing.
-- [record-files.rs](record_files.rs): workspace record file commands.
+- [public-loop.rs](public_loop.rs): native public send, run, status, and doctor loop.
+- [record-files.rs](record_files.rs): inaccessible workspace record helpers.
 - [record-archive.rs](record_archive.rs): archive settlement and compensation.
 - [record-identity.rs](record_identity.rs): canonical record ids and kind aliases.
 - [workspace-index.rs](workspace_index.rs): semantic navigation page rebuild.
