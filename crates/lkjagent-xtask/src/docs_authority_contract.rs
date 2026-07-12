@@ -79,7 +79,7 @@ const REQUIREMENTS: &[(&str, &[&str])] = &[
     ("evaluation/workgraph.tsv", &["id\twave\tdepends", "acceptance-checker\t0\tdocs-reset"]),
     ("evaluation/acceptance.tsv", &["id\tcategory\tpredicate", "A01\tchecker", "D02\tdocs"]),
     ("evaluation/experiment-plan.tsv", &["cell\tstage\tenvelope", "K\tintegrated"]),
-    ("docs/evaluation/live-proof.md", &["acceptance verify", "--source SOURCE --evidence evaluation/evidence/SOURCE", "nonzero incomplete mode", "nine negative fixtures", "every required row as missing"]),
+    ("docs/evaluation/live-proof.md", &["acceptance verify", "--source SOURCE --evidence evaluation/evidence/SOURCE", "nonzero incomplete mode", "nine negative fixtures", "Every other row remains missing"]),
 ];
 
 pub(crate) fn check(files: &[RepoFile], failures: &mut Vec<String>) {

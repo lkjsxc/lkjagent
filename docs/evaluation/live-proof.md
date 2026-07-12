@@ -35,9 +35,10 @@ cargo run --locked -p lkjagent-xtask -- acceptance verify \
 
 The command now has a nonzero incomplete mode. It validates source binding,
 tracked plans and attachments, final workgraph ancestry, concrete experiment
-cells, secret patterns, and nine negative fixtures. Until predicate derivations
-and source-bound evidence exist, it reports every required row as missing and
-cannot return success.
+cells, secret patterns, and nine negative fixtures. It currently derives the
+compact authority, documentation shape, line limit, and reachable-secret rows.
+Every other row remains missing until its source-bound evidence exists, so the
+command cannot yet return success.
 
 The checker will read plans, Git history/trailers, tracked files, command exits,
 source/binary/image hashes, SQLite, workspace manifests, prompt/tool audits,

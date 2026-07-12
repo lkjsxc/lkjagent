@@ -9,6 +9,7 @@ mod source;
 mod table;
 mod workgraph;
 
+use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -67,8 +68,11 @@ pub fn verify(root: &Path, source: &str, evidence: &Path) -> Report {
         Ok(files) => inspect_files(&files, source, &mut report.errors),
         Err(errors) => report.errors.extend(errors),
     }
-    report.errors.extend(history::secret_errors(root));
-    report.missing = required;
+    let derived = static_derivations(root, &mut report.errors);
+    report.missing = required
+        .into_iter()
+        .filter(|id| !derived.contains(id))
+        .collect();
     report.errors.sort();
     report.errors.dedup();
     report.missing.sort();
@@ -86,6 +90,30 @@ pub fn validate_plans(root: &Path) -> Result<Vec<String>, Vec<String>> {
 
 pub fn scan_history(root: &Path) -> Vec<String> {
     history::secret_errors(root)
+}
+
+fn static_derivations(root: &Path, errors: &mut Vec<String>) -> BTreeSet<String> {
+    let mut derived = BTreeSet::new();
+    if crate::docs_authority_gate::check(root).is_ok() {
+        derived.insert("D02".to_string());
+    }
+    if let Ok(files) = crate::facts::collect_files(root) {
+        let docs = crate::docs::check_docs(&files);
+        if docs.is_empty() {
+            derived.insert("D04".to_string());
+        }
+        let lines = crate::lines::check_lines(&files);
+        if lines.is_empty() {
+            derived.insert("S01".to_string());
+        }
+    }
+    let secret_errors = history::secret_errors(root);
+    if secret_errors.is_empty() {
+        derived.insert("E16".to_string());
+    } else {
+        errors.extend(secret_errors);
+    }
+    derived
 }
 
 fn inspect_files(files: &[PathBuf], source: &str, errors: &mut Vec<String>) {
