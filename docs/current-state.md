@@ -95,11 +95,11 @@ a scripted endpoint.
 
 Retired non-public daemon, record, workspace, inspection, and TUI modules still
 use retired schema and projections. They remain compiled but have no public CLI
-route. Public scheduling currently handles one open matter
-at a time, blocks unfinished effects instead of completing every recovery phase,
-and does not yet prove fairness across simultaneous open matters. Scripted and
-configured-model runs cover checked read-only continuation; the tracked schedule
-ran fully and retained later active intake without claiming it closed.
+route. Public scheduling runs one matter per cycle and now prefers an unrelated
+runnable matter over one with an unfinished decision or effect. It still blocks
+instead of reconciling every effect recovery phase, and configured-model fairness
+across simultaneous matters remains unproven. The tracked schedule retained
+later active intake without claiming it closed.
 
 The public compiler attaches its context plan and frame fingerprints and stores
 one native context-item row for every included owner or measured source. List and

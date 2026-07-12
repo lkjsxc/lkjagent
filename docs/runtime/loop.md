@@ -7,8 +7,9 @@ Define the direct durable cycle that replaces task and step projections.
 ## Cycle
 
 1. Open and restart-project the native store.
-2. Refuse replay of a sent provider exchange or unfinished effect.
-3. Hydrate a `RuntimeSnapshot` and `RuntimeState` from active native cells.
+2. Mark sent provider boundaries ambiguous and leave their matters blocked.
+3. Prefer the oldest runnable matter over one with an unfinished decision or
+   effect, then hydrate a `RuntimeSnapshot` and `RuntimeState` from active native cells.
 4. Call the direct core selector and persist its immutable decision and specs.
 5. Compile the prompt after selection from the current owner objective and
    current revision-bound source bytes; attach compiler facts and fingerprints.
@@ -48,7 +49,8 @@ A state change therefore changes the prompt and often its visible tools.
 A progress fingerprint covers obligations, relevant file revisions, successful
 observations, fresh checks, recovery strategy, and candidate response. Empty
 polls and elapsed time are not progress. Repeated equal fingerprints trigger a
-material strategy change rather than an identical model call.
+material strategy change rather than an identical model call. A blocked matter
+remains durable but does not prevent selection of an unrelated runnable matter.
 
 ## Quiescence
 

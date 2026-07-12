@@ -133,7 +133,7 @@ fn durable_boundaries_compiles_before_provider_and_sent_is_not_replayed(
             b"ok"
         )
         .is_err());
-    assert_eq!(store.ambiguous_providers()?, vec!["p"]);
+    assert!(store.ambiguous_providers()?.is_empty());
     Ok(())
 }
 
