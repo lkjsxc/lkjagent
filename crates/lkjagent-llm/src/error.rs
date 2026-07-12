@@ -4,11 +4,29 @@ use crate::wire::{CacheMetric, CompletionUsage};
 
 pub type ClientResult<T> = Result<T, ClientError>;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FaultClass {
+    Timeout,
+    Dns,
+    Connect,
+    Transport,
+    HttpStatus,
+    ResponseTooLarge,
+    MalformedJson,
+    MalformedShape,
+    Length,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum EndpointFailure {
-    Connection(String),
-    Malformed(String),
-    Status { status: u16, body: String },
+    Timeout,
+    Dns,
+    Connect,
+    Transport,
+    MalformedJson,
+    MalformedShape,
+    Status { status: u16 },
+    ResponseTooLarge { limit: usize },
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -19,7 +37,6 @@ pub enum ClientError {
     },
     EndpointOverflow {
         status: u16,
-        body: String,
     },
     Oversize {
         usage: CompletionUsage,
@@ -28,10 +45,35 @@ pub enum ClientError {
     },
 }
 
+impl ClientError {
+    pub fn fault_class(&self) -> FaultClass {
+        match self {
+            Self::Endpoint { failure, .. } => failure.fault_class(),
+            Self::EndpointOverflow { .. } => FaultClass::HttpStatus,
+            Self::Oversize { .. } => FaultClass::Length,
+        }
+    }
+}
+
+impl EndpointFailure {
+    pub fn fault_class(&self) -> FaultClass {
+        match self {
+            Self::Timeout => FaultClass::Timeout,
+            Self::Dns => FaultClass::Dns,
+            Self::Connect => FaultClass::Connect,
+            Self::Transport => FaultClass::Transport,
+            Self::MalformedJson => FaultClass::MalformedJson,
+            Self::MalformedShape => FaultClass::MalformedShape,
+            Self::Status { .. } => FaultClass::HttpStatus,
+            Self::ResponseTooLarge { .. } => FaultClass::ResponseTooLarge,
+        }
+    }
+}
+
 impl std::fmt::Display for ClientError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ClientError::Endpoint {
+            Self::Endpoint {
                 failure,
                 retry_after,
             } => {
@@ -40,18 +82,8 @@ impl std::fmt::Display for ClientError {
                     "endpoint failure: {failure}; retry after {retry_after:?}"
                 )
             }
-            ClientError::EndpointOverflow { status, .. } => {
-                write!(formatter, "endpoint overflow: HTTP {status}")
-            }
-            ClientError::Oversize { preview, .. } if preview.is_empty() => {
-                formatter.write_str("endpoint completion hit max tokens")
-            }
-            ClientError::Oversize { preview, .. } => {
-                write!(
-                    formatter,
-                    "endpoint completion hit max tokens; preview={preview}"
-                )
-            }
+            Self::EndpointOverflow { status } => write!(formatter, "endpoint HTTP {status}"),
+            Self::Oversize { .. } => formatter.write_str("endpoint completion hit max tokens"),
         }
     }
 }
@@ -59,11 +91,16 @@ impl std::fmt::Display for ClientError {
 impl std::fmt::Display for EndpointFailure {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            EndpointFailure::Connection(message) => write!(formatter, "connection: {message}"),
-            EndpointFailure::Malformed(message) => {
-                write!(formatter, "malformed response: {message}")
+            Self::Timeout => formatter.write_str("timeout"),
+            Self::Dns => formatter.write_str("DNS resolution"),
+            Self::Connect => formatter.write_str("connect"),
+            Self::Transport => formatter.write_str("transport"),
+            Self::MalformedJson => formatter.write_str("malformed JSON"),
+            Self::MalformedShape => formatter.write_str("malformed response shape"),
+            Self::Status { status } => write!(formatter, "HTTP {status}"),
+            Self::ResponseTooLarge { limit } => {
+                write!(formatter, "response exceeds {limit} byte limit")
             }
-            EndpointFailure::Status { status, .. } => write!(formatter, "HTTP {status}"),
         }
     }
 }

@@ -6,6 +6,5 @@ This directory holds private helpers for the endpoint wire module.
 
 ## Table of Contents
 
-- [metrics.rs](metrics.rs): cache and timing metric extraction helpers.
-- [response.rs](response.rs): response subset parsing and provider anomaly classification.
+- [response.rs](response.rs): bounded response parsing, usage extraction, and anomaly classification.
 - [spec.rs](spec.rs): per-call generation budget and stop sequence.

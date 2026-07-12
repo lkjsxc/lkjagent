@@ -1,6 +1,7 @@
 use std::io::{Error, ErrorKind, Read, Write};
 use std::net::TcpListener;
 use std::thread::{self, JoinHandle};
+use std::time::Duration;
 
 pub type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
@@ -18,11 +19,16 @@ pub struct StubServer {
 }
 
 pub fn serve_once(status: u16, body: &'static str) -> TestResult<StubServer> {
+    serve_owned(status, body.to_string(), Duration::ZERO)
+}
+
+pub fn serve_owned(status: u16, body: String, delay: Duration) -> TestResult<StubServer> {
     let listener = TcpListener::bind("127.0.0.1:0")?;
     let address = listener.local_addr()?;
     let handle = thread::spawn(move || {
         let (mut stream, _) = listener.accept()?;
         let request = read_request(&mut stream)?;
+        thread::sleep(delay);
         let response = format!(
             "HTTP/1.1 {status} OK\r\ncontent-type: application/json\r\ncontent-length: {}\r\n\r\n{body}",
             body.len()

@@ -11,3 +11,4 @@ one-shot HTTP test double.
 - [client.rs](client.rs): local stub-server request and error mapping tests.
 - [support/](support/README.md): one-shot HTTP test double helpers.
 - [wire.rs](wire.rs): request serialization and response parsing tests.
+- [wire_contract.rs](wire_contract.rs): transport, bounded-response, and outcome contract tests.

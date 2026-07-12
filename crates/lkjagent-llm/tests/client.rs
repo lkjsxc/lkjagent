@@ -47,29 +47,25 @@ fn local_stub_server_receives_request_and_returns_completion() -> TestResult<()>
     );
     assert_eq!(
         request.body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"reasoning_effort\":\"none\",\"stop\":[\"</lkjagent_action>\"],\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system\"}],\"max_tokens\":1024,\"temperature\":0.3,\"top_p\":0.9,\"stop\":[\"</lkjagent_action>\"],\"stream\":false}"
     );
     Ok(())
 }
 
 #[test]
-fn length_finish_reason_maps_to_oversize() -> TestResult<()> {
+fn length_finish_reason_is_returned_without_repair() -> TestResult<()> {
     let body = r#"{"choices":[{"message":{"content":"partial"},"finish_reason":"length"}],"usage":{"prompt_tokens":5,"completion_tokens":2048},"prompt_cache_hit_tokens":4}"#;
     let server = serve_once(200, body)?;
     let config = ClientConfig::new(server.base_url.clone(), "local-model");
     let spec = CallSpec::action(config.max_tokens);
-    let result = complete(&config, &[Message::new(Role::System, "system")], &spec, 1);
+    let result = complete(&config, &[Message::new(Role::System, "system")], &spec, 1)?;
     let _request = server.recorded()?;
 
-    assert!(matches!(
-        result,
-        Err(ClientError::Oversize {
-            usage,
-            cache_metrics,
-            preview
-        }) if usage.completion_tokens == Some(2048) && cache_metrics.len() == 1
-            && preview == "partial"
-    ));
+    assert_eq!(result.content, "partial");
+    assert_eq!(
+        result.finish_reason,
+        lkjagent_llm::wire::FinishReason::Length
+    );
     Ok(())
 }
 
@@ -100,7 +96,7 @@ fn connection_failure_maps_to_attempt_backoff() -> TestResult<()> {
     assert!(matches!(
         result,
         Err(ClientError::Endpoint {
-            failure: EndpointFailure::Connection(_),
+            failure: EndpointFailure::Connect,
             retry_after
         }) if retry_after == Duration::from_secs(8)
     ));

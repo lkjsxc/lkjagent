@@ -17,7 +17,7 @@ fn request_serializes_exact_documented_fields() -> TestResult<()> {
     let body = serde_json::to_string(&request)?;
     assert_eq!(
         body,
-        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system prefix\"},{\"role\":\"user\",\"content\":\"<owner>hello</owner>\"}],\"max_tokens\":1400,\"temperature\":0.3,\"top_p\":0.9,\"reasoning_effort\":\"none\",\"stop\":[\"</content>\"],\"stream\":false}"
+        "{\"model\":\"local-model\",\"messages\":[{\"role\":\"system\",\"content\":\"system prefix\"},{\"role\":\"user\",\"content\":\"<owner>hello</owner>\"}],\"max_tokens\":1400,\"temperature\":0.3,\"top_p\":0.9,\"stop\":[\"</content>\"],\"stream\":false}"
     );
     Ok(())
 }
@@ -128,7 +128,7 @@ fn missing_content_field_is_provider_anomaly() -> TestResult<()> {
 }
 
 #[test]
-fn stop_stripped_tool_call_close_is_restored() -> TestResult<()> {
+fn stop_stripped_tool_call_close_is_not_repaired() -> TestResult<()> {
     let response = r#"{
         "choices":[{"message":{"content":"<lkjagent_action>\n{}\n"},"finish_reason":"stop"}],
         "usage":{"prompt_tokens":11,"completion_tokens":7}
@@ -136,14 +136,14 @@ fn stop_stripped_tool_call_close_is_restored() -> TestResult<()> {
 
     let completion = decode_completion(response, &CallSpec::action(MAX_TOKENS))?;
 
-    assert!(completion.content.ends_with("</lkjagent_action>"));
+    assert_eq!(completion.content, "<lkjagent_action>\n{}\n");
     assert_eq!(completion.finish_reason, FinishReason::Stop);
-    assert_eq!(completion.closure_mode, ClosureMode::StopSequenceClosed);
+    assert_eq!(completion.closure_mode, ClosureMode::Unclosed);
     Ok(())
 }
 
 #[test]
-fn stop_stripped_content_plan_and_message_closures_are_restored() -> TestResult<()> {
+fn stop_stripped_content_plan_and_message_closures_are_not_repaired() -> TestResult<()> {
     for (open, close) in [
         ("<content>body", "</content>"),
         ("<plan>respond | done", "</plan>"),
@@ -154,8 +154,8 @@ fn stop_stripped_content_plan_and_message_closures_are_restored() -> TestResult<
         );
         let spec = CallSpec::with_stop(MAX_TOKENS, close);
         let completion = decode_completion(&response, &spec)?;
-        assert!(completion.content.ends_with(close));
-        assert_eq!(completion.closure_mode, ClosureMode::StopSequenceClosed);
+        assert_eq!(completion.content, open);
+        assert_eq!(completion.closure_mode, ClosureMode::Unclosed);
     }
     Ok(())
 }

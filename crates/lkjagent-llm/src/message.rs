@@ -21,22 +21,13 @@ impl Message {
         }
     }
     pub fn system(content: impl Into<String>) -> Self {
-        Self {
-            role: Role::System,
-            content: content.into(),
-        }
+        Self::new(Role::System, content)
     }
     pub fn user(content: impl Into<String>) -> Self {
-        Self {
-            role: Role::User,
-            content: content.into(),
-        }
+        Self::new(Role::User, content)
     }
     pub fn assistant(content: impl Into<String>) -> Self {
-        Self {
-            role: Role::Assistant,
-            content: content.into(),
-        }
+        Self::new(Role::Assistant, content)
     }
 }
 
@@ -57,29 +48,16 @@ impl ClosureMode {
     }
 }
 
+/// Classifies content without repairing provider output.
 pub fn restore_stop_suffix(
     content: String,
-    finish_reason: &FinishReason,
+    _finish_reason: &FinishReason,
     closing_tag: &str,
 ) -> (String, ClosureMode) {
-    if content.contains(closing_tag) {
-        return (content, ClosureMode::Natural);
-    }
-    if matches!(finish_reason, FinishReason::Stop) && opening_seen(&content, closing_tag) {
-        return (
-            format!("{content}{closing_tag}"),
-            ClosureMode::StopSequenceClosed,
-        );
-    }
-    (content, ClosureMode::Unclosed)
-}
-
-fn opening_seen(content: &str, closing_tag: &str) -> bool {
-    let Some(name) = closing_tag
-        .strip_prefix("</")
-        .and_then(|value| value.strip_suffix('>'))
-    else {
-        return false;
+    let mode = if content.contains(closing_tag) {
+        ClosureMode::Natural
+    } else {
+        ClosureMode::Unclosed
     };
-    content.contains(&format!("<{name}>"))
+    (content, mode)
 }

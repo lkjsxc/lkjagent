@@ -1,13 +1,13 @@
-mod metrics;
 mod response;
 mod spec;
 
-use crate::message::{Message, Role};
+use std::time::Duration;
+
 use serde::Serialize;
 use serde_json::Value;
 
 use crate::closure::{restore_stop_suffix, ClosureMode};
-use metrics::collect_cache_metrics;
+use crate::message::{Message, Role};
 pub use spec::CallSpec;
 
 pub const MAX_TOKENS: u16 = 512;
@@ -21,7 +21,8 @@ pub struct ChatRequest {
     pub max_tokens: u16,
     pub temperature: f32,
     pub top_p: f32,
-    pub reasoning_effort: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reasoning_effort: Option<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub stop: Vec<String>,
     pub stream: bool,
@@ -41,6 +42,13 @@ pub struct Completion {
     pub usage: CompletionUsage,
     pub cache_metrics: Vec<CacheMetric>,
     pub provider_anomaly: Option<ProviderAnomaly>,
+    pub transport: Option<TransportOutcome>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TransportOutcome {
+    pub elapsed: Duration,
+    pub response_bytes: u32,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -83,8 +91,8 @@ pub enum ProviderAnomalyKind {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum WireError {
-    Json(String),
-    Missing(&'static str),
+    Json,
+    Shape(&'static str),
 }
 
 pub fn build_request(model: &str, messages: &[Message], spec: &CallSpec) -> ChatRequest {
@@ -94,17 +102,15 @@ pub fn build_request(model: &str, messages: &[Message], spec: &CallSpec) -> Chat
         max_tokens: spec.max_tokens,
         temperature: spec.temperature,
         top_p: spec.top_p,
-        reasoning_effort: "none",
+        reasoning_effort: spec.reasoning_effort.clone(),
         stop: spec.stop.clone(),
         stream: false,
     }
 }
 
 pub fn decode_completion(text: &str, spec: &CallSpec) -> Result<Completion, WireError> {
-    let value: Value =
-        serde_json::from_str(text).map_err(|error| WireError::Json(error.to_string()))?;
-    let cache_metrics = collect_cache_metrics(&value);
-    let parts = response::response_parts(value, &cache_metrics)?;
+    let value: Value = serde_json::from_str(text).map_err(|_| WireError::Json)?;
+    let parts = response::response_parts(value)?;
     let (content, closure_mode) =
         restore_stop_suffix(parts.content, &parts.finish_reason, spec.primary_stop());
     Ok(Completion {
@@ -112,8 +118,9 @@ pub fn decode_completion(text: &str, spec: &CallSpec) -> Result<Completion, Wire
         finish_reason: parts.finish_reason,
         closure_mode,
         usage: parts.usage,
-        cache_metrics,
+        cache_metrics: parts.cache_metrics,
         provider_anomaly: parts.anomaly,
+        transport: None,
     })
 }
 
@@ -129,12 +136,12 @@ impl ProviderAnomaly {
 impl ProviderAnomalyKind {
     pub fn as_str(self) -> &'static str {
         match self {
-            ProviderAnomalyKind::EmptyContentWithUsage => "empty_content_with_usage",
-            ProviderAnomalyKind::EmptyContentNoUsage => "empty_content_no_usage",
-            ProviderAnomalyKind::MissingContentField => "missing_content_field",
-            ProviderAnomalyKind::ReasoningOnlyResponse => "reasoning_only_response",
-            ProviderAnomalyKind::MalformedProviderMessage => "malformed_provider_message",
-            ProviderAnomalyKind::ToolCallOnlyResponse => "tool_call_only_response",
+            Self::EmptyContentWithUsage => "empty_content_with_usage",
+            Self::EmptyContentNoUsage => "empty_content_no_usage",
+            Self::MissingContentField => "missing_content_field",
+            Self::ReasoningOnlyResponse => "reasoning_only_response",
+            Self::MalformedProviderMessage => "malformed_provider_message",
+            Self::ToolCallOnlyResponse => "tool_call_only_response",
         }
     }
 }
@@ -149,14 +156,13 @@ impl ChatMessage {
 }
 
 impl std::fmt::Display for WireError {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            WireError::Json(message) => write!(formatter, "json: {message}"),
-            WireError::Missing(field) => write!(formatter, "missing {field}"),
+            Self::Json => f.write_str("malformed JSON"),
+            Self::Shape(field) => write!(f, "malformed response shape at {field}"),
         }
     }
 }
-
 impl std::error::Error for WireError {}
 
 fn role_name(role: Role) -> &'static str {
