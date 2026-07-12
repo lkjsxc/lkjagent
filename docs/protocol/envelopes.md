@@ -45,4 +45,7 @@ Orient and modify accept tool calls from their exact decision views. Review,
 wait, and idle make no model call. Respond accepts final only. Recovery accepts
 the intended grammar with a narrower view and one current valid example.
 
+Direct requests omit provider stop strings so the endpoint returns the closing
+root tag that strict parsing requires. The token budget remains the outer bound.
+
 A tool-named root is an experiment cell, not a permanent second parser.

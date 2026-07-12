@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::prompt_policy::{envelope_tag, protocol_for_envelope};
+use crate::prompt_policy::protocol_for_envelope;
 use crate::render::Prompt;
 use crate::runtime_context::{
     normalized_body, ContextFramePlan, ContextItem, ContextPlanEntry, TrustClass,
@@ -60,7 +60,7 @@ pub fn compile_prompt(decision: &RuntimeDecision, snapshot: &RuntimeSnapshot, ob
     if estimate_tokens(&format!("{system}\n{user}")) > budgets.total_tokens {
         return Err("compiled prompt exceeds total token budget".into());
     }
-    let stop = envelope_tag(decision.expected_envelope).map_or(String::new(), |tag| format!("</{tag}>"));
+    let stop = String::new();
     let fingerprint = stable_fingerprint(&(&system, &user, max_tokens, &stop)).map_err(|error| error.message)?;
     let prompt = Prompt { system, user, fingerprint, max_tokens, stop };
     let _ = conflicts;

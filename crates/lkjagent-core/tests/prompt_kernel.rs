@@ -166,7 +166,7 @@ fn compiler_binds_selected_state_and_escapes_sources_once() -> Result<(), String
     assert!(compiled.prompt.user.contains("Edit &lt;file&gt;"));
     assert!(compiled.prompt.user.contains("Observed &amp; current"));
     assert_eq!(compiled.prompt.user.matches("Edit &lt;file&gt;").count(), 1);
-    assert_eq!(compiled.prompt.stop, "</final>");
+    assert!(compiled.prompt.stop.is_empty());
     Ok(())
 }
 
