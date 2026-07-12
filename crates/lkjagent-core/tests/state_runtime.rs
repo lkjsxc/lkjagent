@@ -9,7 +9,7 @@ use lkjagent_core::runtime_decision::{
 };
 use lkjagent_core::runtime_event::{apply_patch, reduce_event, RuntimeEvent, RuntimeEventPayload};
 use lkjagent_core::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
-
+use lkjagent_core::runtime_tool_catalog::direct_tool_view;
 #[test]
 fn arbitrary_unknown_state_cells_round_trip_deterministically() {
     let initial = RuntimeSnapshot::empty("case-1");
@@ -53,18 +53,15 @@ fn decision_fingerprint_is_stable_for_canonical_tool_view() {
 
 #[test]
 fn rendered_tool_view_and_admission_match() {
-    let decision = decision_with_tools(vec![read_tool()]);
-    let read_action = action("fs.read", vec![("path", "docs/current-state.md")]);
+    let decision = direct_decision();
+    let read_action = action("read_file", vec![("path", "docs/current-state.md")]);
     let admitted = admit(&decision, &read_action);
     let rejected = admit(&decision, &action("shell.run", vec![("command", "pwd")]));
 
     assert_eq!(admitted.status, AdmissionStatus::Admitted);
     assert_eq!(admitted.tool_view_fingerprint, tool_fingerprint(&decision));
     assert_eq!(rejected.status, AdmissionStatus::Rejected);
-    assert_eq!(
-        rejected.reason,
-        "tool-view mismatch: shell.run absent from decision view"
-    );
+    assert_eq!(rejected.reason, "hidden-tool");
     assert!(!decision
         .tool_view
         .tool_names()
@@ -97,9 +94,12 @@ fn observation_contamination_classifies_sensitive_and_external_raw() {
 
 #[test]
 fn workspace_policy_blocks_path_escapes() {
-    let decision = decision_with_tools(vec![read_tool()]);
-    let parent = admit(&decision, &action("fs.read", vec![("path", "../secret")]));
-    let absolute = admit(&decision, &action("fs.read", vec![("path", "/tmp/secret")]));
+    let decision = direct_decision();
+    let parent = admit(&decision, &action("read_file", vec![("path", "../secret")]));
+    let absolute = admit(
+        &decision,
+        &action("read_file", vec![("path", "/tmp/secret")]),
+    );
 
     assert_eq!(parent.status, AdmissionStatus::Rejected);
     assert_eq!(absolute.status, AdmissionStatus::Rejected);
@@ -143,12 +143,12 @@ fn search_tool() -> ToolViewEntry {
     ToolViewEntry::new("fs.search", "search workspace").with_params(vec!["query"], vec!["path"])
 }
 
-fn decision_with_tools(entries: Vec<ToolViewEntry>) -> RuntimeDecision {
+fn direct_decision() -> RuntimeDecision {
     RuntimeDecision::new(
         "decision-1",
         "case-1",
-        OperationKey("model.call".to_string()),
-        ToolSetView::new(entries),
+        OperationKey("model.call".into()),
+        direct_tool_view(),
         OutputEnvelope::Action,
     )
 }

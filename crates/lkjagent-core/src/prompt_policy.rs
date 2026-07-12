@@ -18,8 +18,8 @@ pub fn protocol(kind: StepKind) -> &'static str {
     match kind {
         StepKind::Plan => "Return exactly one <plan> block with one action per physical line. The only action prefixes are write, explore, and respond; never emit plan, verify, or check actions. Harness step labels are context, not actions to copy. Use concrete values, not placeholders. Write paths are relative to the workspace root: never start them with /, ./, or ../ and never use . or .. path components. Copy the syntax of the filled example.",
         StepKind::Write | StepKind::Revise => "Return exactly <content> prose </content>. Write the requested file body only. No analysis outside the block.",
-        StepKind::Explore => "Return exactly one <lkjagent_action> block with child tags for one allowed tool. Echo decision_id and context_fingerprint exactly. Replace placeholder values before sending.",
-        StepKind::Respond | StepKind::Ask => "Return exactly <message>owner-facing answer</message>. Use gathered facts only.",
+        StepKind::Explore => "Return exactly one compact <tool_call><tool>allowed tool</tool><input>ordered fields</input></tool_call>. No prose or JSON.",
+        StepKind::Respond | StepKind::Ask => "Return exactly <final><message>owner-facing answer</message></final>. Use gathered facts only.",
         StepKind::Verify => "Return exactly <verdict>pass or fail plus measured evidence</verdict>.",
     }
 }
@@ -39,8 +39,8 @@ pub fn expected_block(kind: StepKind) -> &'static str {
     match kind {
         StepKind::Write | StepKind::Revise => "content",
         StepKind::Plan => "plan",
-        StepKind::Explore => "lkjagent_action",
-        StepKind::Respond | StepKind::Ask => "message",
+        StepKind::Explore => "tool_call",
+        StepKind::Respond | StepKind::Ask => "final",
         StepKind::Verify => "verdict",
     }
 }
@@ -49,8 +49,8 @@ pub fn envelope_tag(envelope: OutputEnvelope) -> Option<&'static str> {
     match envelope {
         OutputEnvelope::Content => Some("content"),
         OutputEnvelope::Plan => Some("plan"),
-        OutputEnvelope::Action => Some("lkjagent_action"),
-        OutputEnvelope::Message => Some("message"),
+        OutputEnvelope::Action => Some("tool_call"),
+        OutputEnvelope::Message => Some("final"),
         OutputEnvelope::Verdict => Some("verdict"),
         OutputEnvelope::None => None,
     }

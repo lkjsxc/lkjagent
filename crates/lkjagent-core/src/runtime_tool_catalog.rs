@@ -1,4 +1,11 @@
-use crate::runtime_decision::{ToolSetView, ToolViewEntry};
+use crate::runtime_decision::{
+    ToolExampleParam, ToolFieldSpec, ToolSetView, ToolValueClass, ToolViewEntry,
+};
+pub use crate::runtime_tool_cards::{
+    default_explore_tool_view, effect_for_tool, explore_catalog, explore_tool_view,
+    shell_tool_view, tool_view_for_names,
+};
+use crate::runtime_tool_view::EffectKey;
 
 #[rustfmt::skip]
 pub const TOOL_DESCRIPTOR_FIELDS: &[&str] = &["name", "purpose", "field-order", "required-flags", "value-classes", "byte-count-bounds", "safe-example", "state-affordances", "admission-rules", "effect-key", "result-bound", "denial-code"];
@@ -16,111 +23,155 @@ pub enum ToolEffect {
     PlanNote,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct DescriptorField {
+    pub name: &'static str,
+    pub required: bool,
+    pub value_class: ToolValueClass,
+    pub min_bytes: usize,
+    pub max_bytes: usize,
+    pub minimum: Option<u64>,
+    pub maximum: Option<u64>,
+    pub safe_value: Option<&'static str>,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ToolDescriptor {
     pub name: &'static str,
     pub purpose: &'static str,
-    pub effect: ToolEffect,
-    pub required_params: &'static [&'static str],
-    pub optional_params: &'static [&'static str],
-    pub example_params: &'static [(&'static str, &'static str)],
+    pub fields: &'static [DescriptorField],
+    pub state_affordances: &'static [&'static str],
+    pub admission_rules: &'static [&'static str],
+    pub effect_key: &'static str,
+    pub result_max_bytes: usize,
+    pub denial_code: &'static str,
+}
+
+const PATH: ToolValueClass = ToolValueClass::WorkspacePath;
+const TEXT: ToolValueClass = ToolValueClass::Text;
+const QUERY: ToolValueClass = ToolValueClass::Query;
+const COUNT: ToolValueClass = ToolValueClass::Count;
+const RULES: &[&str] = &["exact-fields", "workspace-relative-path", "bounded-values"];
+const ORIENT: &[&str] = &["orient", "recovery"];
+const MODIFY: &[&str] = &["modify", "recovery"];
+
+const fn field(
+    name: &'static str,
+    required: bool,
+    class: ToolValueClass,
+    bytes: (usize, usize),
+    counts: (Option<u64>, Option<u64>),
+    safe: Option<&'static str>,
+) -> DescriptorField {
+    DescriptorField {
+        name,
+        required,
+        value_class: class,
+        min_bytes: bytes.0,
+        max_bytes: bytes.1,
+        minimum: counts.0,
+        maximum: counts.1,
+        safe_value: safe,
+    }
 }
 
 #[rustfmt::skip]
-const DIRECT_CATALOG: &[ToolDescriptor] = &[
-    descriptor("list_directory", "bounded no-follow directory listing", ToolEffect::FsList, &["path"], &["offset", "count"]),
-    descriptor("search_text", "bounded UTF-8 search below one path", ToolEffect::FsSearch, &["path", "query"], &["offset", "count"]),
-    descriptor_with_examples("read_file", "numbered page with current SHA-256 revision", ToolEffect::FsRead, &["path"], &["offset", "count"], &[("path", "README.md"), ("count", "20")]),
-    descriptor("edit_file", "single exact replacement against an observed revision", ToolEffect::FsWrite, &["path", "revision", "old_text", "new_text"], &[]),
-    descriptor("create_file", "create observed-absent UTF-8 file without overwrite", ToolEffect::FsWrite, &["path", "content"], &[]),
+const LIST_FIELDS: &[DescriptorField] = &[
+    field("path", true, PATH, (1, 1024), (None, None), Some(".")),
+    field("offset", false, COUNT, (1, 7), (Some(0), Some(1_000_000)), None),
+    field("count", false, COUNT, (1, 3), (Some(1), Some(120)), Some("20")),
+];
+#[rustfmt::skip]
+const SEARCH_FIELDS: &[DescriptorField] = &[
+    field("path", true, PATH, (1, 1024), (None, None), Some(".")),
+    field("query", true, QUERY, (1, 1024), (None, None), Some("TODO")),
+    field("offset", false, COUNT, (1, 7), (Some(0), Some(1_000_000)), None),
+    field("count", false, COUNT, (1, 3), (Some(1), Some(120)), Some("20")),
+];
+#[rustfmt::skip]
+const READ_FIELDS: &[DescriptorField] = &[
+    field("path", true, PATH, (1, 1024), (None, None), Some("README.md")),
+    field("offset", false, COUNT, (1, 7), (Some(0), Some(1_000_000)), None),
+    field("count", false, COUNT, (1, 3), (Some(1), Some(120)), Some("20")),
+];
+#[rustfmt::skip]
+const EDIT_FIELDS: &[DescriptorField] = &[
+    field("path", true, PATH, (1, 1024), (None, None), Some("notes/today.md")),
+    field("old_text", true, TEXT, (1, 8192), (None, None), Some("draft")),
+    field("new_text", true, TEXT, (0, 8192), (None, None), Some("final")),
+];
+#[rustfmt::skip]
+const CREATE_FIELDS: &[DescriptorField] = &[
+    field("path", true, PATH, (1, 1024), (None, None), Some("notes/new.md")),
+    field("content", true, TEXT, (0, 8192), (None, None), Some("New note\n")),
 ];
 
 #[rustfmt::skip]
-const EXPLORE_CATALOG: &[ToolDescriptor] = &[
-    descriptor_with_examples("fs.read", "read a workspace file", ToolEffect::FsRead, &["path"], &["offset", "count"], &[("path", "README.md"), ("count", "20")]),
-    descriptor("fs.list", "list a workspace directory", ToolEffect::FsList, &[], &["path", "depth"]),
-    descriptor("fs.tree", "show a bounded workspace tree", ToolEffect::FsTree, &[], &["path", "depth"]),
-    descriptor("fs.search", "search workspace text", ToolEffect::FsSearch, &["query"], &["path"]),
-    descriptor("fs.write", "write a workspace file", ToolEffect::FsWrite, &["path", "content"], &[]),
-    descriptor("shell.run", "run a bounded shell command", ToolEffect::ShellRun, &["command"], &[]),
-    descriptor("memory.find", "search durable memory", ToolEffect::MemoryFind, &["query"], &[]),
-    descriptor("memory.save", "save durable memory", ToolEffect::MemorySave, &["topic", "content"], &[]),
-    descriptor("plan.note", "record an exploration note", ToolEffect::PlanNote, &["note"], &[]),
+const DIRECT_CATALOG: &[ToolDescriptor] = &[
+    descriptor("list_directory", "list one workspace directory", LIST_FIELDS, ORIENT, "workspace.list", 16_384, "list-denied"),
+    descriptor("search_text", "search bounded workspace text", SEARCH_FIELDS, ORIENT, "workspace.search", 16_384, "search-denied"),
+    descriptor("read_file", "read a numbered page and observe its revision", READ_FIELDS, &["orient", "modify", "recovery"], "workspace.read", 32_768, "read-denied"),
+    descriptor("edit_file", "replace one exact observed text span", EDIT_FIELDS, MODIFY, "workspace.edit", 8_192, "edit-denied"),
+    descriptor("create_file", "create one observed-absent UTF-8 file", CREATE_FIELDS, MODIFY, "workspace.create", 8_192, "create-denied"),
 ];
+
+#[rustfmt::skip]
+const fn descriptor(name: &'static str, purpose: &'static str, fields: &'static [DescriptorField],
+    states: &'static [&'static str], effect: &'static str, result: usize,
+    denial: &'static str) -> ToolDescriptor {
+    ToolDescriptor { name, purpose, fields, state_affordances: states, admission_rules: RULES,
+        effect_key: effect, result_max_bytes: result, denial_code: denial }
+}
 
 pub fn direct_catalog() -> &'static [ToolDescriptor] {
     DIRECT_CATALOG
 }
-
 pub fn direct_tool_view() -> ToolSetView {
-    ToolSetView::new(direct_catalog().iter().map(descriptor_entry).collect())
+    project(DIRECT_CATALOG.iter())
 }
 
-pub fn explore_catalog() -> &'static [ToolDescriptor] {
-    EXPLORE_CATALOG
-}
-
-pub fn explore_tool_view() -> ToolSetView {
-    ToolSetView::new(explore_catalog().iter().map(descriptor_entry).collect())
-}
-
-pub fn default_explore_tool_view() -> ToolSetView {
-    tool_view_for_names(&["fs.read", "fs.search", "memory.find", "plan.note"])
-}
-
-pub fn shell_tool_view() -> ToolSetView {
-    tool_view_for_names(&["shell.run"])
-}
-
-pub fn tool_view_for_names(names: &[&str]) -> ToolSetView {
-    let entries = explore_catalog()
+pub fn direct_tool_view_for_state(state: &str, intended_tool: Option<&str>) -> ToolSetView {
+    if matches!(state, "review" | "respond" | "wait" | "idle") {
+        return ToolSetView::empty();
+    }
+    let entries = DIRECT_CATALOG
         .iter()
-        .filter(|descriptor| names.contains(&descriptor.name))
-        .map(descriptor_entry)
-        .collect();
-    ToolSetView::new(entries)
+        .filter(|tool| tool.state_affordances.contains(&state))
+        .filter(|tool| state != "recovery" || intended_tool == Some(tool.name));
+    project(entries)
 }
 
-pub fn effect_for_tool(name: &str) -> Option<ToolEffect> {
-    explore_catalog()
-        .iter()
-        .find(|descriptor| descriptor.name == name)
-        .map(|descriptor| descriptor.effect)
+fn project<'a>(descriptors: impl Iterator<Item = &'a ToolDescriptor>) -> ToolSetView {
+    ToolSetView::new(descriptors.map(descriptor_entry).collect())
 }
 
-pub fn descriptor_entry(descriptor: &ToolDescriptor) -> ToolViewEntry {
-    ToolViewEntry::new(descriptor.name, descriptor.purpose)
-        .with_params(
-            descriptor.required_params.to_vec(),
-            descriptor.optional_params.to_vec(),
-        )
-        .with_examples(descriptor.example_params.to_vec())
+pub trait ToolProjection {
+    fn projection(&self) -> ToolViewEntry;
 }
-
-const fn descriptor(
-    name: &'static str,
-    purpose: &'static str,
-    effect: ToolEffect,
-    required_params: &'static [&'static str],
-    optional_params: &'static [&'static str],
-) -> ToolDescriptor {
-    descriptor_with_examples(name, purpose, effect, required_params, optional_params, &[])
+pub fn descriptor_entry(tool: &impl ToolProjection) -> ToolViewEntry {
+    tool.projection()
 }
-
-const fn descriptor_with_examples(
-    name: &'static str,
-    purpose: &'static str,
-    effect: ToolEffect,
-    required_params: &'static [&'static str],
-    optional_params: &'static [&'static str],
-    example_params: &'static [(&'static str, &'static str)],
-) -> ToolDescriptor {
-    ToolDescriptor {
-        name,
-        purpose,
-        effect,
-        required_params,
-        optional_params,
-        example_params,
+impl ToolProjection for ToolViewEntry {
+    fn projection(&self) -> ToolViewEntry {
+        self.clone()
+    }
+}
+#[rustfmt::skip]
+impl ToolProjection for ToolDescriptor {
+    fn projection(&self) -> ToolViewEntry {
+        let specs = self.fields.iter().map(|field| ToolFieldSpec { name: field.name.into(),
+            required: field.required, value_class: field.value_class, min_bytes: field.min_bytes,
+            max_bytes: field.max_bytes, minimum: field.minimum, maximum: field.maximum }).collect();
+        let examples = self.fields.iter().filter_map(|field| field.safe_value.map(|value|
+            ToolExampleParam { name: field.name.into(), value: value.into() })).collect();
+        ToolViewEntry { name: self.name.into(), purpose: self.purpose.into(),
+            required_params: self.fields.iter().filter(|field| field.required)
+                .map(|field| field.name.into()).collect(),
+            optional_params: self.fields.iter().filter(|field| !field.required)
+                .map(|field| field.name.into()).collect(), field_specs: specs, example_params: examples,
+            state_affordances: self.state_affordances.iter().map(|value| (*value).into()).collect(),
+            admission_rules: self.admission_rules.iter().map(|value| (*value).into()).collect(),
+            effect_key: EffectKey(self.effect_key.into()), result_max_bytes: self.result_max_bytes,
+            denial_code: self.denial_code.into() }
     }
 }

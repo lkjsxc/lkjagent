@@ -146,8 +146,7 @@ fn repair_shape(decision: &RuntimeDecision, tag: &str) -> String {
         .first()
         .map_or("TOOL", |entry| entry.name.as_str());
     format!(
-        "Corrected minimal action shape:\n<lkjagent_action>\n<decision_id>{}</decision_id>\n<context_fingerprint>{}</context_fingerprint>\n<tool_name>{}</tool_name>\n</lkjagent_action>",
-        decision.id, decision.context_frame_fingerprint, tool
+        "Corrected minimal action shape:\n<tool_call><tool>{tool}</tool><input></input></tool_call>"
     )
 }
 

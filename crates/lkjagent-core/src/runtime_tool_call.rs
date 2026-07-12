@@ -6,28 +6,24 @@ pub const MODEL_ENVELOPES: &[&str] = &["tool_call", "final"];
 pub const TOOL_CALL_FIELDS: &[&str] = &["tool", "input"];
 pub const FINAL_FIELDS: &[&str] = &["message"];
 const MAX_MODEL_BYTES: usize = 16_384;
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ToolCall {
     pub tool_name: String,
     pub args: Vec<(String, String)>,
 }
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ModelValue {
     ToolCall(ToolCall),
     Final(String),
 }
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[rustfmt::skip]
 pub enum ToolCallError {
     TooLarge, MissingRoot, MultipleRoots, EnvelopeMalformed, Attribute,
     ForbiddenSyntax, SelfClosing, UnclosedTag, CrossedTag, NestedTag,
     UnknownRoot, UnknownTag, DuplicateTag, BadEntity, WrongGrammarPhase,
-    HiddenTool, MissingField, FieldOrder, ValueClass, UnsafePath, Bounds,
+    HiddenTool, MissingField, FieldOrder, ValueClass, Placeholder, UnsafePath, Bounds,
 }
-
 pub fn parse_model_value(
     raw: &str,
     decision: &RuntimeDecision,
@@ -54,7 +50,6 @@ pub fn parse_model_value(
         _ => Err(ToolCallError::UnknownRoot),
     }
 }
-
 pub fn parse_tool_call(raw: &str, decision: &RuntimeDecision) -> Result<ToolCall, ToolCallError> {
     match parse_model_value(raw, decision)? {
         ModelValue::ToolCall(call) => Ok(call),
@@ -77,10 +72,9 @@ fn parse_tool_root(
         return Err(ToolCallError::NestedTag);
     }
     let order = entry
-        .required_params
+        .field_specs
         .iter()
-        .chain(&entry.optional_params)
-        .map(String::as_str)
+        .map(|spec| spec.name.as_str())
         .collect::<Vec<_>>();
     let mut last = None;
     let mut args = Vec::with_capacity(input.children.len());
@@ -105,9 +99,10 @@ fn parse_tool_root(
         last = Some(index);
     }
     if entry
-        .required_params
+        .field_specs
         .iter()
-        .any(|required| !args.iter().any(|(name, _)| name == required))
+        .filter(|spec| spec.required)
+        .any(|spec| !args.iter().any(|(name, _)| name == &spec.name))
     {
         return Err(ToolCallError::MissingField);
     }
@@ -168,6 +163,13 @@ fn leaf_text(element: &Element<'_>) -> Result<String, ToolCallError> {
 }
 
 fn validate_value(spec: &ToolFieldSpec, value: &str) -> Result<(), ToolCallError> {
+    let upper = value.trim().to_ascii_uppercase();
+    if matches!(
+        upper.as_str(),
+        "..." | "PATH" | "TOOL" | "TODO" | "VALUE" | "FIELD_VALUE" | "REPLACE_ME"
+    ) {
+        return Err(ToolCallError::Placeholder);
+    }
     if !spec.accepts_size(value) {
         return Err(ToolCallError::Bounds);
     }

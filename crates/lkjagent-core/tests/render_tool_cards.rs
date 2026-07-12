@@ -1,8 +1,8 @@
 use lkjagent_core::classify::instantiate;
-use lkjagent_core::parse::{parse_expected_for_decision, ParseFault, ParsedOutput};
+use lkjagent_core::parse::{parse_expected_for_decision, ParsedOutput};
 use lkjagent_core::render::render_prompt_for_decision;
 use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
-use lkjagent_core::runtime_tool_catalog::explore_tool_view;
+use lkjagent_core::runtime_tool_catalog::direct_tool_view;
 
 #[test]
 fn rendered_plan_example_is_parser_valid() -> Result<(), String> {
@@ -49,13 +49,13 @@ fn rendered_plan_example_is_parser_valid() -> Result<(), String> {
 }
 
 #[test]
-fn legacy_rendered_filled_tool_example_is_rejected() -> Result<(), String> {
+fn rendered_filled_tool_example_uses_compact_parser_contract() -> Result<(), String> {
     let snapshot = instantiate(3, "Survey workspace and report.");
     let mut decision = RuntimeDecision::new(
         "decision-1",
         "case-1",
         OperationKey("model.call/1".to_string()),
-        explore_tool_view(),
+        direct_tool_view(),
         OutputEnvelope::Action,
     );
     decision.context_frame_fingerprint = "ctx-1".to_string();
@@ -68,19 +68,22 @@ fn legacy_rendered_filled_tool_example_is_rejected() -> Result<(), String> {
     );
     let example = prompt
         .user
-        .split("Safe filled example:\n")
+        .split("Parser-valid example:\n")
         .last()
         .unwrap_or("");
-    assert_eq!(
-        parse_expected_for_decision(&decision, example),
-        Err(ParseFault::Action(
-            lkjagent_core::runtime_tool_call::ToolCallError::UnknownRoot
-        ))
-    );
-
-    assert!(prompt.user.contains("<lkjagent_action>"));
+    assert!(parse_expected_for_decision(&decision, example).is_ok());
+    assert!(prompt.user.contains("<tool_call><tool>"));
     assert!(prompt.user.contains("<input>"));
-    assert!(prompt.user.contains("<path>README.md</path>"));
-    assert!(prompt.user.contains("recovery_policy: correct-primitive"));
+    assert!(prompt.user.contains("<path>notes/new.md</path>"));
+    for forbidden in [
+        "lkjagent_action",
+        "decision_id",
+        "context_fingerprint",
+        "tool_name",
+        "fs.write",
+        "shell.run",
+    ] {
+        assert!(!prompt.user.contains(forbidden), "leaked {forbidden}");
+    }
     Ok(())
 }

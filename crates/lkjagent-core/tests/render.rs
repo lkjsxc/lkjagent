@@ -5,17 +5,14 @@ use lkjagent_core::render::{
     max_tokens, render_prompt, render_prompt_for_decision, render_prompt_for_decision_with_attempts,
 };
 use lkjagent_core::runtime_artifact::DEFAULT_UNIT_TARGET_TOKENS;
-use lkjagent_core::runtime_decision::{
-    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
-};
-
+use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView};
+use lkjagent_core::runtime_tool_catalog::direct_tool_view;
 #[test]
 fn write_steps_use_artifact_unit_budget_with_close_headroom() {
     let expected = DEFAULT_UNIT_TARGET_TOKENS + 256;
     assert_eq!(max_tokens(StepKind::Write), expected);
     assert_eq!(max_tokens(StepKind::Revise), expected);
 }
-
 #[test]
 fn decision_envelope_replaces_step_prompt_policy() {
     let snapshot = instantiate(3, "Survey workspace and report.");
@@ -32,21 +29,18 @@ fn decision_envelope_replaces_step_prompt_policy() {
         &snapshot.steps[0],
         &decision,
     );
-    assert!(prompt.system.contains("Expected: message"));
-    assert!(prompt.system.contains("Return exactly <message>"));
-    assert!(!prompt.system.contains("Return exactly <lkjagent_action>"));
+    assert!(prompt.system.contains("Expected: final"));
+    assert!(prompt.system.contains("<final><message>"));
+    assert!(!prompt.system.contains("<lkjagent_action>"));
 }
-
 #[test]
 fn explore_decision_renders_tool_call_contract() {
     let snapshot = instantiate(3, "Survey workspace and report.");
     let decision = RuntimeDecision::new(
         "decision-1",
         "case-1",
-        OperationKey("model.call/1".to_string()),
-        ToolSetView::new(vec![
-            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new())
-        ]),
+        OperationKey("model.call/1".into()),
+        direct_tool_view(),
         OutputEnvelope::Action,
     );
     let prompt = render_prompt_for_decision(
@@ -55,28 +49,31 @@ fn explore_decision_renders_tool_call_contract() {
         &snapshot.steps[0],
         &decision,
     );
-    assert!(prompt.system.contains("Expected: lkjagent_action"));
+    assert!(prompt.system.contains("Expected: tool_call"));
     assert!(prompt.system.contains("Harness state: act"));
-    assert!(prompt
-        .system
-        .contains("Return exactly one <lkjagent_action>"));
-    assert!(prompt.user.contains("<tool_name>fs.read</tool_name>"));
-    assert!(prompt.user.contains("Schema-only shape, not copyable:"));
-    assert!(prompt.user.contains("<input>"));
-    assert!(prompt.user.contains("<path>FIELD_VALUE</path>"));
-    assert_eq!(prompt.stop, "</lkjagent_action>");
+    assert!(prompt.system.contains("<tool_call><tool>"));
+    assert!(prompt.user.contains("Parser-valid example:"));
+    for forbidden in [
+        "lkjagent_action",
+        "tool_name",
+        "decision_id",
+        "context_fingerprint",
+        "fs.write",
+        "shell.run",
+        "JSON args",
+    ] {
+        assert!(!prompt.user.contains(forbidden), "leaked {forbidden}");
+    }
+    assert_eq!(prompt.stop, "</tool_call>");
 }
-
 #[test]
-fn legacy_rendered_placeholder_shape_is_rejected() -> Result<(), String> {
+fn rendered_example_parses_and_legacy_shape_is_rejected() -> Result<(), String> {
     let snapshot = instantiate(3, "Survey workspace and report.");
     let decision = RuntimeDecision::new(
         "decision-1",
         "case-1",
-        OperationKey("model.call/1".to_string()),
-        ToolSetView::new(vec![
-            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new())
-        ]),
+        OperationKey("model.call/1".into()),
+        direct_tool_view(),
         OutputEnvelope::Action,
     );
     let prompt = render_prompt_for_decision(
@@ -85,13 +82,15 @@ fn legacy_rendered_placeholder_shape_is_rejected() -> Result<(), String> {
         &snapshot.steps[0],
         &decision,
     );
-    let shape = prompt
+    let example = prompt
         .user
-        .split("Schema-only shape, not copyable:\n")
+        .split("Parser-valid example:\n")
         .last()
         .unwrap_or("");
+    assert!(parse_expected_for_decision(&decision, example).is_ok());
+    assert!(!prompt.user.contains("<lkjagent_action>"));
     assert_eq!(
-        parse_expected_for_decision(&decision, shape),
+        parse_expected_for_decision(&decision, "<lkjagent_action></lkjagent_action>"),
         Err(ParseFault::Action(
             lkjagent_core::runtime_tool_call::ToolCallError::UnknownRoot
         ))
@@ -103,7 +102,6 @@ fn legacy_rendered_placeholder_shape_is_rejected() -> Result<(), String> {
 fn generic_decision_envelopes_render_protocol_cards() {
     for (envelope, tag) in [
         (OutputEnvelope::Content, "content"),
-        (OutputEnvelope::Message, "message"),
         (OutputEnvelope::Verdict, "verdict"),
     ] {
         let snapshot = instantiate(3, "Render contract.");
@@ -123,6 +121,22 @@ fn generic_decision_envelopes_render_protocol_cards() {
         assert!(prompt.user.contains(&format!("Copy this shape:\n<{tag}>")));
         assert_eq!(prompt.stop, format!("</{tag}>"));
     }
+    let snapshot = instantiate(3, "Render final contract.");
+    let decision = RuntimeDecision::new(
+        "decision-final",
+        "case-1",
+        OperationKey("model.call/1".into()),
+        ToolSetView::empty(),
+        OutputEnvelope::Message,
+    );
+    let prompt = render_prompt_for_decision(
+        &snapshot.task,
+        &snapshot.steps,
+        &snapshot.steps[0],
+        &decision,
+    );
+    assert!(prompt.user.contains("<final><message>"));
+    assert_eq!(prompt.stop, "</final>");
 }
 
 #[test]
@@ -160,7 +174,7 @@ fn fault_linked_recovery_frame_names_next_envelope() {
     assert!(prompt.user.contains("invalid_excerpt_hash="));
     assert!(prompt
         .user
-        .contains("Next expected envelope: <message>...</message>"));
+        .contains("Next expected envelope: <final>...</final>"));
 }
 
 #[test]

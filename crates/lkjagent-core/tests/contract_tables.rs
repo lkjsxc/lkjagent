@@ -8,7 +8,6 @@ use lkjagent_core::runtime_state::{StateKey, FAULT_KINDS, MATTER_STATES, NEED_KI
 use lkjagent_core::runtime_tool_call::{FINAL_FIELDS, MODEL_ENVELOPES, TOOL_CALL_FIELDS};
 #[rustfmt::skip]
 use lkjagent_core::runtime_tool_catalog::{direct_catalog, direct_tool_view, TOOL_DESCRIPTOR_FIELDS};
-
 #[test]
 fn contract_tables_are_exact_and_closed() {
     assert_eq!(
@@ -167,7 +166,6 @@ fn contract_tables_decision_context_check_recovery_and_exit_are_exact() {
         ]
     );
 }
-
 #[test]
 fn contract_tables_tool_catalog_and_open_keys_preserve_authority() {
     assert_eq!(
@@ -180,14 +178,17 @@ fn contract_tables_tool_catalog_and_open_keys_preserve_authority() {
         names.join(","),
         "list_directory,search_text,read_file,edit_file,create_file"
     );
-    assert_eq!(catalog[0].required_params, ["path"]);
-    assert_eq!(catalog[1].required_params, ["path", "query"]);
-    assert_eq!(catalog[2].optional_params, ["offset", "count"]);
-    assert_eq!(
-        catalog[3].required_params,
-        ["path", "revision", "old_text", "new_text"]
-    );
-    assert_eq!(catalog[4].required_params, ["path", "content"]);
+    #[rustfmt::skip]
+    let field_names = |index: usize| catalog[index].fields.iter()
+        .map(|field| field.name).collect::<Vec<_>>();
+    assert_eq!(field_names(0), ["path", "offset", "count"]);
+    assert_eq!(field_names(1), ["path", "query", "offset", "count"]);
+    assert_eq!(field_names(2), ["path", "offset", "count"]);
+    assert_eq!(field_names(3), ["path", "old_text", "new_text"]);
+    assert_eq!(field_names(4), ["path", "content"]);
+    assert!(catalog.iter().all(|tool| !tool.effect_key.is_empty()
+        && tool.result_max_bytes > 0
+        && !tool.denial_code.is_empty()));
     let mut sorted_names = names;
     sorted_names.sort();
     assert_eq!(direct_tool_view().tool_names(), sorted_names);

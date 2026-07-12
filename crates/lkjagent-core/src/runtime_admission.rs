@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::runtime_decision::{OutputEnvelope, RuntimeDecision, ToolFieldSpec, ToolValueClass};
 use crate::runtime_fingerprint::FingerprintError;
-use crate::runtime_tool_catalog::effect_for_tool;
+use crate::runtime_tool_view::EffectKey;
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct ModelAction {
@@ -32,40 +32,68 @@ pub fn admit_action(
     decision: &RuntimeDecision,
     action: &ModelAction,
 ) -> Result<ToolAdmission, FingerprintError> {
-    let view_fingerprint = decision.tool_view_fingerprint()?;
+    let fingerprint = decision.tool_view_fingerprint()?;
     let rejection = rejection_reason(decision, action);
-    let (status, reason) = match rejection {
-        Some(reason) => (AdmissionStatus::Rejected, reason),
-        None => (AdmissionStatus::Admitted, "admitted".to_string()),
-    };
+    let admitted = rejection.is_none();
     Ok(ToolAdmission {
         decision_id: decision.id.clone(),
-        tool_view_fingerprint: view_fingerprint,
+        tool_view_fingerprint: fingerprint,
         action_tool: action.tool.clone(),
-        status,
-        reason,
+        status: if admitted {
+            AdmissionStatus::Admitted
+        } else {
+            AdmissionStatus::Rejected
+        },
+        reason: rejection.unwrap_or_else(|| "admitted".into()),
     })
+}
+
+pub fn admitted_effect_key(
+    decision: &RuntimeDecision,
+    admission: &ToolAdmission,
+) -> Result<EffectKey, &'static str> {
+    if admission.status != AdmissionStatus::Admitted || admission.decision_id != decision.id {
+        return Err("admission-not-current");
+    }
+    let fingerprint = decision
+        .tool_view_fingerprint()
+        .map_err(|_| "invalid-tool-view")?;
+    if admission.tool_view_fingerprint != fingerprint {
+        return Err("stale-tool-view");
+    }
+    let entry = decision
+        .tool_view
+        .entry(&admission.action_tool)
+        .ok_or("hidden-tool")?;
+    Ok(entry.effect_key.clone())
+}
+
+pub fn dispatch_effect_key(
+    decision: &RuntimeDecision,
+    admission: &ToolAdmission,
+    persisted_key: &EffectKey,
+) -> Result<EffectKey, &'static str> {
+    let projected = admitted_effect_key(decision, admission)?;
+    if &projected != persisted_key {
+        return Err("stale-effect-key");
+    }
+    Ok(projected)
 }
 
 fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<String> {
     if decision.expected_envelope != OutputEnvelope::Action {
-        return Some("decision does not admit actions".to_string());
+        return Some("decision does not admit actions".into());
     }
-    if effect_for_tool(&action.tool).is_none() {
-        return Some(format!("tool catalog excludes {}", action.tool));
-    }
-    let entry = match decision.tool_view.entry(&action.tool) {
-        Some(entry) => entry,
-        None => {
-            return Some(format!(
-                "tool-view mismatch: {} absent from decision view",
-                action.tool
-            ))
-        }
+    let Some(entry) = decision.tool_view.entry(&action.tool) else {
+        return Some("hidden-tool".into());
     };
-    for required in &entry.required_params {
-        if !action.params.contains_key(required) {
-            return Some(format!("missing required parameter {required}"));
+    if entry.effect_key.0.is_empty() || entry.result_max_bytes == 0 || entry.denial_code.is_empty()
+    {
+        return Some("incomplete persisted tool projection".into());
+    }
+    for spec in entry.field_specs.iter().filter(|spec| spec.required) {
+        if !action.params.contains_key(&spec.name) {
+            return Some(format!("missing required parameter {}", spec.name));
         }
     }
     for (name, value) in &action.params {
@@ -83,22 +111,17 @@ fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<
 }
 
 fn placeholder_value(value: &str) -> bool {
-    let trimmed = value.trim();
-    let upper = trimmed.to_ascii_uppercase();
+    let value = value.trim();
     matches!(
-        upper.as_str(),
+        value.to_ascii_uppercase().as_str(),
         "..." | "PATH" | "TOOL" | "TODO" | "VALUE" | "FIELD_VALUE" | "REPLACE_ME"
-    ) || wrapped_placeholder(trimmed, '<', '>')
-        || wrapped_placeholder(trimmed, '[', ']')
-        || wrapped_placeholder(trimmed, '{', '}')
-}
-
-fn wrapped_placeholder(value: &str, open: char, close: char) -> bool {
-    value.starts_with(open) && value.ends_with(close) && value.len() > 2
+    ) || [('<', '>'), ('[', ']'), ('{', '}')]
+        .iter()
+        .any(|(open, close)| value.starts_with(*open) && value.ends_with(*close) && value.len() > 2)
 }
 
 fn value_class_rejection(name: &str, value: &str, spec: &ToolFieldSpec) -> Option<String> {
-    if value.trim().is_empty() {
+    if value.trim().is_empty() && spec.min_bytes > 0 {
         return Some(format!("empty value for {name}"));
     }
     if !spec.accepts_size(value) {
@@ -106,7 +129,7 @@ fn value_class_rejection(name: &str, value: &str, spec: &ToolFieldSpec) -> Optio
     }
     match spec.value_class {
         ToolValueClass::WorkspacePath if !workspace_relative_path(value) => {
-            Some("path escapes workspace".to_string())
+            Some("path escapes workspace".into())
         }
         ToolValueClass::Count if spec.canonical_count(value).is_none() => {
             Some(format!("invalid count for {name}"))
@@ -120,11 +143,9 @@ pub fn workspace_relative_path(path: &str) -> bool {
         return false;
     }
     let path = Path::new(path);
-    if path.is_absolute() {
-        return false;
-    }
-    path == Path::new(".")
-        || path
-            .components()
-            .all(|component| matches!(component, Component::Normal(_)))
+    !path.is_absolute()
+        && (path == Path::new(".")
+            || path
+                .components()
+                .all(|component| matches!(component, Component::Normal(_))))
 }
