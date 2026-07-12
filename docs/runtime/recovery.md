@@ -23,6 +23,10 @@ normal prompts.
 - Check faults expose measured differences and return to modification.
 - Equal progress vectors change evidence, tools, scope, or wake.
 
+A recovery decision binds the exact active recovery cell key, not a generic
+placeholder key. Its first successful admitted observation or checked terminal
+close suppresses active recovery cells before normal selection resumes.
+
 A tuple cannot repeat without a changed fingerprinted factor or external
 condition. A successful attempt with an `ok` outcome never creates a fault card.
 

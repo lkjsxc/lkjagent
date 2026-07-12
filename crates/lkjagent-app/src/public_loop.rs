@@ -40,8 +40,12 @@ pub fn send(data:&Path,text:&str,force_new:bool)->R<String>{
 
 pub fn run(data: &Path, endpoint: &mut dyn Endpoint) -> R<()> {
     loop {
-        let _ = run_once(data, endpoint)?;
-        std::thread::sleep(Duration::from_millis(100));
+        let delay = if run_once(data, endpoint).is_ok() {
+            100
+        } else {
+            250
+        };
+        std::thread::sleep(Duration::from_millis(delay));
     }
 }
 
@@ -105,7 +109,7 @@ fn fault(store:&mut NativeStore,did:&str,matter:&str,kind:ModelFaultKind,text:&s
 #[rustfmt::skip]
 fn hydrate(matter:&str,cells:&[lkjagent_store::direct_transactions::CellRow])->R<RuntimeSnapshot>{let mut out=RuntimeSnapshot::empty(matter);for row in cells{let ns=String::from_utf8(row.namespace.clone()).map_err(e)?;let name=String::from_utf8(row.key.clone()).map_err(e)?;let key=StateKey::new(&ns,&name).map_err(e)?;out.cells.insert(key.clone(),StateCell{key,status:StateStatus::Active,priority:0,confidence:100,payload_schema:format!("state.{ns}.v1"),payload_json:String::from_utf8(row.payload.clone()).map_err(e)?,evidence_refs:vec![],source_event_id:"event-1".into(),created_at:String::new(),updated_at:String::new(),expires_at:None,cooldown_until:None,conflict_group:None,parent_key:None});}Ok(out)}
 #[rustfmt::skip]
-fn runtime_decision(id:&str,matter:&str,s:&RuntimeSnapshot,spec:&lkjagent_core::runtime_operation::RuntimeDecisionSpec)->R<RuntimeDecision>{let mut d=RuntimeDecision::new(id,matter,OperationKey(spec.operation_key.clone()),spec.tool_view.clone(),spec.expected_envelope);d.selected_state_key=Some(match spec.phase{RuntimePhase::Orient=>"matter:opened",RuntimePhase::Modify if s.cells.keys().any(|k|k.namespace=="recovery")=>"recovery:stale",RuntimePhase::Modify=>"source:current",RuntimePhase::Respond=>"check:current-passed",_=>"edit:committed"}.into());let fp=s.fingerprint().map_err(e)?;d.snapshot_fingerprint=fp.clone();d.state_vector_fingerprint=fp.clone();d.context_frame_fingerprint=fp;d.model_budget_tokens=spec.model_budget_tokens;d.recovery_policy=spec.recovery_policy.clone();d.refresh_harness_state();Ok(d)}
+fn runtime_decision(id:&str,matter:&str,s:&RuntimeSnapshot,spec:&lkjagent_core::runtime_operation::RuntimeDecisionSpec)->R<RuntimeDecision>{let mut d=RuntimeDecision::new(id,matter,OperationKey(spec.operation_key.clone()),spec.tool_view.clone(),spec.expected_envelope);let selected=match spec.phase{RuntimePhase::Orient=>"matter:opened".into(),RuntimePhase::Modify if s.cells.keys().any(|k|k.namespace=="recovery")=>s.cells.keys().find(|k|k.namespace=="recovery").map(|k|format!("{}:{}",k.namespace,k.name)).unwrap_or_else(||"recovery:stale".into()),RuntimePhase::Modify=>"source:current".into(),RuntimePhase::Respond=>"check:current-passed".into(),_=>"edit:committed".into()};d.selected_state_key=Some(selected);let fp=s.fingerprint().map_err(e)?;d.snapshot_fingerprint=fp.clone();d.state_vector_fingerprint=fp.clone();d.context_frame_fingerprint=fp;d.model_budget_tokens=spec.model_budget_tokens;d.recovery_policy=spec.recovery_policy.clone();d.refresh_harness_state();Ok(d)}
 #[rustfmt::skip]
 fn specs(d:&RuntimeDecision,s:&lkjagent_core::runtime_operation::RuntimeDecisionSpec)->R<[Vec<u8>;8]>{Ok([serde_json::to_vec(&(d.selected_state_key.clone(),&d.snapshot_fingerprint)).map_err(e)?,serde_json::to_vec(&("decision-context-v1",s.phase)).map_err(e)?,serde_json::to_vec(&d.tool_view).map_err(e)?,serde_json::to_vec(&d.expected_envelope).map_err(e)?,serde_json::to_vec(&d.model_budget_tokens).map_err(e)?,serde_json::to_vec(&d.recovery_policy).map_err(e)?,serde_json::to_vec(FILE_CHECK_KINDS).map_err(e)?,serde_json::to_vec(EXIT_GUARDS).map_err(e)?])}
 #[rustfmt::skip]

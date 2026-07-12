@@ -36,8 +36,10 @@ or `run tests` do not invoke owner substring routing.
 
 `run --once` executes at most one persisted direct decision. `run` repeats that
 same native cycle with a bounded sleep. Both open only the configured workspace
-when selected work reaches a workspace operation. They do not construct task or
-step snapshots, plans, templates, or parallel projections.
+when selected work reaches a workspace operation. The daemon form remains alive
+across a failed cycle with bounded backoff while durable status exposes the
+blocker; `--once` still reports that cycle directly. They do not construct task
+or step snapshots, plans, templates, or parallel projections.
 
 ## Status Command
 

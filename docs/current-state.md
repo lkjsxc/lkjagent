@@ -25,6 +25,16 @@ configured model then used the admitted `complete=true` read and closed that tur
 in two decisions with six current passed checks, four canonical messages, the
 same bytes, and one file. A fresh source-bound full campaign remains unproven.
 
+A tracked 903-second attempt at source
+`7f47763540e7042b3cf111997e082c72832d5c6a` exited before its observation
+boundary after a malformed first list envelope activated `recovery/malformed` while
+the next decision incorrectly named `recovery/stale`. It wrote no success
+evidence. Current source binds the actual recovery key, suppresses recovered
+cells after a successful observation or checked close, and keeps daemon mode
+alive with backoff. A fresh configured smoke closed the exact edit in seven
+cycles despite four recoverable output faults, but the correction still needs a
+fresh tracked run.
+
 A synthetic 901-second run against the parent product source seeded
 `notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
 verification, and truthful report. The daemon stayed alive and owner intake
