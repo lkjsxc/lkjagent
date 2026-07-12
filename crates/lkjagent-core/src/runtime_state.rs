@@ -82,6 +82,34 @@ pub enum StateStatus {
     Blocked,
 }
 
+pub const STATE_STATUSES: &[&str] = &["active", "inactive", "suppressed", "resolved", "blocked"];
+pub const MATTER_STATES: &[&str] = &["open", "waiting", "blocked", "closed"];
+pub const RUNTIME_PHASES: &[&str] = &["orient", "modify", "review", "respond", "idle"];
+pub const NEED_KINDS: &[&str] = &[
+    "target",
+    "source-revision",
+    "edit",
+    "check",
+    "response",
+    "owner-fact",
+];
+pub const FAULT_KINDS: &[&str] = &[
+    "protocol",
+    "admission",
+    "stale-file",
+    "effect",
+    "endpoint",
+    "check",
+    "stasis",
+];
+pub const WAKE_KINDS: &[&str] = &[
+    "immediate",
+    "time",
+    "owner-input",
+    "file-change",
+    "config-change",
+];
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EvidenceRef {
     pub source_type: String,

@@ -11,3 +11,4 @@ Doc contract: ../../docs/state/README.md and ../../docs/runtime/README.md
 ## Table of Contents
 
 - [src/](src/README.md): source modules.
+- [tests/](tests/README.md): focused integration contracts and compatibility coverage.

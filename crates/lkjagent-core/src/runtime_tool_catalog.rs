@@ -1,5 +1,8 @@
 use crate::runtime_decision::{ToolSetView, ToolViewEntry};
 
+#[rustfmt::skip]
+pub const TOOL_DESCRIPTOR_FIELDS: &[&str] = &["name", "purpose", "field-order", "required-flags", "value-classes", "byte-count-bounds", "safe-example", "state-affordances", "admission-rules", "effect-key", "result-bound", "denial-code"];
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToolEffect {
     FsRead,
@@ -23,72 +26,35 @@ pub struct ToolDescriptor {
     pub example_params: &'static [(&'static str, &'static str)],
 }
 
-const EXPLORE_CATALOG: &[ToolDescriptor] = &[
-    descriptor_with_examples(
-        "fs.read",
-        "read a workspace file",
-        ToolEffect::FsRead,
-        &["path"],
-        &["offset", "count"],
-        &[("path", "README.md"), ("count", "20")],
-    ),
-    descriptor(
-        "fs.list",
-        "list a workspace directory",
-        ToolEffect::FsList,
-        &[],
-        &["path", "depth"],
-    ),
-    descriptor(
-        "fs.tree",
-        "show a bounded workspace tree",
-        ToolEffect::FsTree,
-        &[],
-        &["path", "depth"],
-    ),
-    descriptor(
-        "fs.search",
-        "search workspace text",
-        ToolEffect::FsSearch,
-        &["query"],
-        &["path"],
-    ),
-    descriptor(
-        "fs.write",
-        "write a workspace file",
-        ToolEffect::FsWrite,
-        &["path", "content"],
-        &[],
-    ),
-    descriptor(
-        "shell.run",
-        "run a bounded shell command",
-        ToolEffect::ShellRun,
-        &["command"],
-        &[],
-    ),
-    descriptor(
-        "memory.find",
-        "search durable memory",
-        ToolEffect::MemoryFind,
-        &["query"],
-        &[],
-    ),
-    descriptor(
-        "memory.save",
-        "save durable memory",
-        ToolEffect::MemorySave,
-        &["topic", "content"],
-        &[],
-    ),
-    descriptor(
-        "plan.note",
-        "record an exploration note",
-        ToolEffect::PlanNote,
-        &["note"],
-        &[],
-    ),
+#[rustfmt::skip]
+const DIRECT_CATALOG: &[ToolDescriptor] = &[
+    descriptor("list_directory", "bounded no-follow directory listing", ToolEffect::FsList, &["path"], &["offset", "count"]),
+    descriptor("search_text", "bounded UTF-8 search below one path", ToolEffect::FsSearch, &["path", "query"], &["offset", "count"]),
+    descriptor_with_examples("read_file", "numbered page with current SHA-256 revision", ToolEffect::FsRead, &["path"], &["offset", "count"], &[("path", "README.md"), ("count", "20")]),
+    descriptor("edit_file", "single exact replacement against an observed revision", ToolEffect::FsWrite, &["path", "revision", "old_text", "new_text"], &[]),
+    descriptor("create_file", "create observed-absent UTF-8 file without overwrite", ToolEffect::FsWrite, &["path", "content"], &[]),
 ];
+
+#[rustfmt::skip]
+const EXPLORE_CATALOG: &[ToolDescriptor] = &[
+    descriptor_with_examples("fs.read", "read a workspace file", ToolEffect::FsRead, &["path"], &["offset", "count"], &[("path", "README.md"), ("count", "20")]),
+    descriptor("fs.list", "list a workspace directory", ToolEffect::FsList, &[], &["path", "depth"]),
+    descriptor("fs.tree", "show a bounded workspace tree", ToolEffect::FsTree, &[], &["path", "depth"]),
+    descriptor("fs.search", "search workspace text", ToolEffect::FsSearch, &["query"], &["path"]),
+    descriptor("fs.write", "write a workspace file", ToolEffect::FsWrite, &["path", "content"], &[]),
+    descriptor("shell.run", "run a bounded shell command", ToolEffect::ShellRun, &["command"], &[]),
+    descriptor("memory.find", "search durable memory", ToolEffect::MemoryFind, &["query"], &[]),
+    descriptor("memory.save", "save durable memory", ToolEffect::MemorySave, &["topic", "content"], &[]),
+    descriptor("plan.note", "record an exploration note", ToolEffect::PlanNote, &["note"], &[]),
+];
+
+pub fn direct_catalog() -> &'static [ToolDescriptor] {
+    DIRECT_CATALOG
+}
+
+pub fn direct_tool_view() -> ToolSetView {
+    ToolSetView::new(direct_catalog().iter().map(descriptor_entry).collect())
+}
 
 pub fn explore_catalog() -> &'static [ToolDescriptor] {
     EXPLORE_CATALOG

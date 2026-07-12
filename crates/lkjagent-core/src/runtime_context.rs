@@ -7,6 +7,11 @@ pub use crate::runtime_context_plan::{
     ContextPipelineStage, ContextPlanEntry,
 };
 
+#[rustfmt::skip]
+pub const CONTEXT_REGIONS: &[&str] = &["identity-honesty", "phase-fault", "workspace-operation", "tools-grammar-example", "evidence", "owner-message"];
+#[rustfmt::skip]
+pub const CONTEXT_LANES: &[&str] = &["objective-constraints", "file-evidence", "memory-history", "recovery-diagnosis", "output-reserve"];
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum TrustClass {
     Owner,

@@ -9,6 +9,28 @@ pub use crate::runtime_tool_view::{
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub struct OperationKey(pub String);
 
+pub const DECISION_SPEC_FIELDS: &[&str] = &[
+    "selected-state",
+    "operation",
+    "tool-descriptors",
+    "grammar",
+    "information-needs",
+    "context-caps",
+    "model-budget",
+    "recovery-policy",
+    "check-requirements",
+    "exit-policy",
+];
+pub const DECISION_SETTLEMENTS: &[&str] = &[
+    "selected",
+    "compilation-complete",
+    "provider-intent",
+    "effect-prepared",
+    "settled",
+    "blocked",
+];
+pub const MODEL_GRAMMARS: &[&str] = &["tool-call", "final", "none"];
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum OutputEnvelope {
     Content,

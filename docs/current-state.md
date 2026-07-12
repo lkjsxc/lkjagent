@@ -25,9 +25,11 @@ transcript unrelated to the requested edit.
 
 The causal defect is current source: `owner_turn.rs` treats the substring
 `verify` as a system operation, and `daemon_route_effects.rs` blocks that lane as
-an unsupported executor before any model call. The raw run remains local and
-ignored until the tracked acceptance checker can validate a sanitized bundle.
-This summary is evidence of failure, not endpoint success.
+an unsupported executor before any model call. A second 901-second run at source
+`97e00698f348fc2435d47a107b5b8453c98b9d1f` reproduced the same zero-decision
+failure. Its sanitized bundle is tracked below
+`evaluation/evidence/97e00698f348fc2435d47a107b5b8453c98b9d1f/`. This summary is
+evidence of failure, not endpoint success.
 
 ## Implemented Primitives
 
@@ -41,7 +43,9 @@ The source contains useful low-level pieces:
 - deterministic checks, workspace inventory, and TUI composer reducers;
 - flat JSON configuration validation and Docker build separation from data.
 
-These pieces do not yet form the direct authority loop.
+The repository now also has a source-bound acceptance incomplete mode with nine
+negative fixtures and closed direct-runtime contract tables. These pieces do not
+yet form the direct authority loop.
 
 ## Active Source Gaps
 
@@ -83,8 +87,9 @@ claims, and the close transaction owns the canonical final message.
 | --- | --- | --- |
 | docs-reset | complete | compact contracts, plans, and authority gate pass |
 | acceptance-checker | complete | source-bound incomplete mode rejects nine negative fixtures |
-| baseline-tracked | next | checker is ready for a sanitized current-source rerun |
-| interfaces | ready | acceptance checker dependency is satisfied |
+| baseline-tracked | complete | tracked 901-second run has zero non-missing checker errors |
+| interfaces | complete | closed vocabularies and direct five-tool descriptors pass core tests |
+| first parallel wave | ready | effects read, protocol, native store, and LLM wiring can start |
 | public file edit | blocked | depends on native store, effects, protocol, and loop |
 | final campaigns | blocked | no frozen binary, live task proof, or PTY proof |
 

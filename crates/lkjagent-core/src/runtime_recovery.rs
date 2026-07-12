@@ -2,6 +2,9 @@ use serde::{Deserialize, Serialize};
 
 use crate::runtime_fingerprint::{stable_fingerprint, FingerprintError};
 
+#[rustfmt::skip]
+pub const RECOVERY_KINDS: &[&str] = &["protocol", "hidden-tool", "premature-final", "missing-read", "stale-or-ambiguous-edit", "output-limit", "endpoint", "check", "equal-progress"];
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case")]
 #[rustfmt::skip]

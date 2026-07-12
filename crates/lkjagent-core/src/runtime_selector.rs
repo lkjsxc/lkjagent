@@ -13,6 +13,11 @@ use crate::runtime_state::{RuntimeSnapshot, StateCell};
 use crate::runtime_tool_catalog::{descriptor_entry, explore_catalog};
 
 #[rustfmt::skip]
+pub const FILE_CHECK_KINDS: &[&str] = &["regular-utf8", "intended-sha256", "occurrence-counts", "admitted-diff", "preserved-mode", "allowed-changed-paths", "effects-settled"];
+#[rustfmt::skip]
+pub const EXIT_GUARDS: &[&str] = &["required-current-checks-passed", "no-blocking-operation", "effects-settled", "final-message-persisted"];
+
+#[rustfmt::skip]
 pub fn select_runtime_decision(snapshot: &RuntimeSnapshot, decision_id: &str,
     context: &str, unfinished: &[RuntimeDecision]) -> Result<RuntimeDecision, FingerprintError> {
     if let Some(decision) = unfinished.first() { return Ok(decision.clone()); }

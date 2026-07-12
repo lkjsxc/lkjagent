@@ -6,6 +6,10 @@ use crate::runtime_action_xml::ActionXmlError;
 use crate::runtime_decision::{RuntimeDecision, ToolFieldSpec, ToolValueClass};
 use crate::runtime_tool_fields::parse_fields;
 
+pub const MODEL_ENVELOPES: &[&str] = &["tool_call", "final"];
+pub const TOOL_CALL_FIELDS: &[&str] = &["tool", "input"];
+pub const FINAL_FIELDS: &[&str] = &["message"];
+
 pub const ACTION_OPEN: &str = "<lkjagent_action>";
 pub const ACTION_CLOSE: &str = "</lkjagent_action>";
 const MAX_ACTION_BYTES: usize = 16_384;

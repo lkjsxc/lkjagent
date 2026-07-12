@@ -3,6 +3,24 @@ use serde::{Deserialize, Serialize};
 use crate::runtime_state::{RuntimeSnapshot, StateCell, StateKey, StateStatus};
 use crate::runtime_state_edge::{StateEdge, StateEdgeStatus};
 
+pub const RUNTIME_EVENT_KINDS: &[&str] = &[
+    "owner-turn",
+    "wake",
+    "provider-outcome",
+    "effect-outcome",
+    "file-change",
+];
+pub const STATE_TRANSITION_EVENTS: &[&str] = &[
+    "matter-opened",
+    "source-need-met",
+    "revision-observed",
+    "measured-difference",
+    "obligations-met",
+    "close-eligible",
+    "fault-recorded",
+    "question-persisted",
+];
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct RuntimeEvent {
     pub id: String,
