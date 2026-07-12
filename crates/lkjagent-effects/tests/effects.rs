@@ -5,7 +5,6 @@ use std::time::{Duration, Instant};
 
 use lkjagent_core::model::CheckSpec;
 use lkjagent_effects::checks::run_check;
-use lkjagent_effects::exchange::{write_exchange, ExchangeFiles};
 use lkjagent_effects::observation::observation;
 use lkjagent_effects::shell;
 use lkjagent_effects::workspace;
@@ -26,7 +25,7 @@ fn path_guard_rejects_escape_and_symlink_out() -> TestResult<()> {
 }
 
 #[test]
-fn workspace_shell_observation_and_exchange_work() -> TestResult<()> {
+fn workspace_shell_and_observation_work() -> TestResult<()> {
     let root = fixture_root("ops")?;
     workspace::write(&root, "a/readme.md", "hello\nworld\nRelease")?;
     let read = workspace::read(&root, "a/readme.md", 0, 2)?;
@@ -40,19 +39,6 @@ fn workspace_shell_observation_and_exchange_work() -> TestResult<()> {
     assert_eq!(report.output, "ok");
     assert!(observation("ok", &"x".repeat(7000)).contains("[...]"));
 
-    let paths = write_exchange(
-        &root.join("logs"),
-        1,
-        2,
-        3,
-        ExchangeFiles {
-            request: "{}",
-            response: "{}",
-            outcome: "{}",
-            timing: "{}",
-        },
-    )?;
-    assert_eq!(fs::read_to_string(paths.request)?, "{}");
     Ok(())
 }
 

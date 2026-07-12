@@ -2,8 +2,8 @@
 
 ## Purpose
 
-Effect adapters for workspace files, shell commands, check fact gathering,
-observations, and exchange logs.
+Effect adapters for workspace files, exact edits, shell commands, check fact
+gathering, and observations.
 
 Doc contract: ../../docs/tools/README.md
 

@@ -57,7 +57,7 @@ pub struct NumberedLine {
 }
 #[derive(Debug)]
 pub struct OpenedWorkspace {
-    root: OwnedFd,
+    pub(crate) root: OwnedFd,
 }
 impl OpenedWorkspace {
     pub fn open(root: &Path) -> EffectResult<Self> {
@@ -121,7 +121,7 @@ impl OpenedWorkspace {
         Ok(current)
     }
 }
-fn valid_parts(path: &str) -> EffectResult<Vec<CString>> {
+pub(crate) fn valid_parts(path: &str) -> EffectResult<Vec<CString>> {
     if path == "." {
         return Ok(Vec::new());
     }
@@ -184,6 +184,6 @@ pub(crate) fn read_regular(fd: OwnedFd, max: usize) -> EffectResult<Vec<u8>> {
     }
     Ok(bytes)
 }
-fn io_error(error: rustix::io::Errno) -> EffectError {
+pub(crate) fn io_error(error: rustix::io::Errno) -> EffectError {
     EffectError::Io(error.to_string())
 }

@@ -1,13 +1,12 @@
-use std::path::Path;
+use std::fs;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 
+use crate::model_io::CompletionRecord;
 use lkjagent_core::engine::TurnOutcome;
 use lkjagent_core::model::TaskSnapshot;
 use lkjagent_core::parse::parse_fault_diagnosis;
 use lkjagent_core::render::Prompt;
-use lkjagent_effects::exchange::{write_exchange, ExchangeFiles};
-
-use crate::model_io::CompletionRecord;
 
 pub struct ExchangeContext<'a> {
     pub logs: &'a Path,
@@ -58,20 +57,26 @@ struct Bodies {
 }
 
 fn write_files(context: &ExchangeContext<'_>, bodies: Bodies) -> Result<(), String> {
-    write_exchange(
-        context.logs,
-        context.snapshot.task.id,
-        context.step_ordinal,
-        context.attempt_ordinal,
-        ExchangeFiles {
-            request: &bodies.request,
-            response: &bodies.response,
-            outcome: &bodies.outcome,
-            timing: &bodies.timing,
-        },
-    )
-    .map(|_| ())
-    .map_err(|error| error.to_string())
+    let dir = context
+        .logs
+        .join(format!("matter-{}", context.snapshot.task.id))
+        .join(format!("operation-{}", context.step_ordinal))
+        .join(format!("attempt-{}", context.attempt_ordinal));
+    write_exchange_files(&dir, bodies)
+}
+
+fn write_exchange_files(dir: &Path, bodies: Bodies) -> Result<(), String> {
+    fs::create_dir_all(dir).map_err(|error| error.to_string())?;
+    let files: [(PathBuf, &str); 4] = [
+        (dir.join("request.json"), &bodies.request),
+        (dir.join("response.json"), &bodies.response),
+        (dir.join("outcome.json"), &bodies.outcome),
+        (dir.join("timing.json"), &bodies.timing),
+    ];
+    for (path, body) in files {
+        fs::write(path, body).map_err(|error| error.to_string())?;
+    }
+    Ok(())
 }
 
 fn request_json(context: &ExchangeContext<'_>) -> String {
