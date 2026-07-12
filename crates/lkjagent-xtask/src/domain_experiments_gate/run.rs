@@ -33,14 +33,7 @@ pub(super) fn validate(
     let run_dir = inside(campaign, field(row, "run_ref"))?;
     let local = table(&run_dir.join("matrix-row.tsv"))?;
     if local.len() != 1 || local[0] != *row { return Err(format!("{run_id} local matrix row mismatch")); }
-    let mut expected = overlay(baseline.clone(), &cell.factors)?;
-    expected.as_object_mut().ok_or("config is not an object")?.insert("workspace_root".into(), Value::String(run_dir.join("workspace").to_string_lossy().into()));
-    let bytes = serde_json::to_string(&expected).map_err(err)?;
-    if fs::read_to_string(run_dir.join("config.json")).map_err(err)? != bytes
-        || field(row, "config_sha256") != hash(bytes.as_bytes())
-    {
-        return Err(format!("{run_id} config mismatch"));
-    }
+    validate_config(root,&run_dir,row,cell,baseline,run_id)?;
     if field(row, "scenario_sha256")
         != scenario_hash(&root.join("evaluation/scenarios").join(scenario))?
         || field(row, "executable_sha256") != executable_hash
@@ -164,11 +157,19 @@ pub(super) fn validate(
     Ok(())
 }
 
-fn reported(value: Option<&Value>) -> String {
-    value
-        .and_then(Value::as_u64)
-        .map_or_else(|| "not-reported".into(), |item| item.to_string())
+#[rustfmt::skip]
+fn validate_config(root:&Path,run:&Path,row:&BTreeMap<String,String>,cell:&Cell,baseline:&Value,run_id:&str)->Result<(),String>{
+    let text=fs::read_to_string(run.join("config.json")).map_err(err)?; let mut actual:Value=serde_json::from_str(&text).map_err(err)?;
+    let workspace=actual.get("workspace_root").and_then(Value::as_str).ok_or("workspace root missing")?; let path=Path::new(workspace);
+    let suffix=Path::new(field(row,"run_ref")).join("workspace"); let local=path==run.join("workspace");
+    if !path.is_absolute() || !(if root.join(".git").exists(){local}else{path.ends_with(suffix)}) { return Err(format!("{run_id} workspace config mismatch")); }
+    actual.as_object_mut().ok_or("config is not an object")?.remove("workspace_root"); let mut expected=overlay(baseline.clone(),&cell.factors)?;
+    expected.as_object_mut().ok_or("config is not an object")?.remove("workspace_root");
+    if actual!=expected || field(row,"config_sha256")!=hash(text.as_bytes()){return Err(format!("{run_id} config mismatch"));} Ok(())
 }
+
+#[rustfmt::skip]
+fn reported(value:Option<&Value>)->String{value.and_then(Value::as_u64).map_or_else(||"not-reported".into(),|item|item.to_string())}
 
 #[rustfmt::skip]
 fn validate_config_rejected(run:&Path,row:&BTreeMap<String,String>,source:&str,run_id:&str,controls:&mut BTreeSet<String>)->Result<(),String>{

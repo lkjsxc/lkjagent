@@ -49,8 +49,9 @@ source, a strict-ancestor plan, a reproducible isolated build, production
 exchange logs, recomputed metrics, and three-or-five repeats. Attempts at
 `853c647a` and `f425d78f` exposed a no-decision close and invalid config. Runs at
 `2f0da5e1` and `891e9882` exposed source-sort drift and verifier sidecars. The
-103-row `d2dab90f` run passed locally; Docker then exposed omitted Cargo policy
-and ignored database files. No matrix is accepted; live and PTY predicates remain absent.
+`d2dab90f` exposed Docker source omissions. The 103-row `905d662a` run passed
+locally; Docker then exposed host-absolute workspace config. No matrix is
+accepted; live and PTY predicates remain absent.
 
 A fresh model-free diary run writes a journal entry containing canned
 missing-detail text after the owner asks for a diary entry. This is reproduced
@@ -192,7 +193,6 @@ machine-readable result, separate review, and hash-bound receipt.
 | final campaigns | summary-oriented xtask runners | live-acceptance |
 
 ## Honesty Rules
-
 - Target prose is not an implementation claim.
 - A historical summary is not current raw evidence.
 - Missing raw data creates a bound, not a pass.
