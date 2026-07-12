@@ -80,6 +80,7 @@ const LIST_FIELDS: &[DescriptorField] = &[
     field("path", true, PATH, (1, 1024), (None, None), Some(".")),
     field("offset", false, COUNT, (1, 7), (Some(0), Some(1_000_000)), None),
     field("count", false, COUNT, (1, 3), (Some(1), Some(120)), Some("20")),
+    field("complete", true, TEXT, (4, 5), (None, None), Some("true")),
 ];
 #[rustfmt::skip]
 const SEARCH_FIELDS: &[DescriptorField] = &[
@@ -109,7 +110,7 @@ const CREATE_FIELDS: &[DescriptorField] = &[
 
 #[rustfmt::skip]
 const DIRECT_CATALOG: &[ToolDescriptor] = &[
-    descriptor("list_directory", "list one workspace directory", LIST_FIELDS, ORIENT, "workspace.list", 16_384, "list-denied"),
+    descriptor("list_directory", "list one workspace directory; complete is required: true only for a no-change inventory report, false while locating a target", LIST_FIELDS, ORIENT, "workspace.list", 16_384, "list-denied"),
     descriptor("search_text", "search bounded workspace text", SEARCH_FIELDS, ORIENT, "workspace.search", 16_384, "search-denied"),
     descriptor("read_file", "read a numbered page; complete is required: true only when this read satisfies a no-change report objective, false when an edit may follow", READ_FIELDS, &["orient", "modify", "recovery"], "workspace.read", 32_768, "read-denied"),
     descriptor("edit_file", "replace one exact observed text span", EDIT_FIELDS, MODIFY, "workspace.edit", 8_192, "edit-denied"),

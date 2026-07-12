@@ -15,7 +15,8 @@ dispatch, generated docs, and contract tests consume the same descriptor.
 
 ## Initial Catalog
 
-- `list_directory`: bounded no-follow directory listing labeled with its request path.
+- `list_directory`: bounded no-follow directory listing labeled with its request
+  path; required `complete` is true only for a no-change inventory report.
 - `search_text`: bounded UTF-8 search labeled with its path and query.
 - `read_file`: numbered page plus current SHA-256 revision; required `complete`
   is `true` only for a no-change report objective and `false` when an edit may

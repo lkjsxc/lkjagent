@@ -54,6 +54,14 @@ receipt fallback, then closed the second and third continuity turns in four and
 five cycles with exact bytes, one file, and nine current passed checks. This is
 not yet the tracked 903-second rerun.
 
+A third tracked 903-second run at source
+`ee738f6a46ab7e40481524d0cbe0a4f6b7e73977` derived exact bytes, one file, 18
+tables, 42 provider exchanges, 36 admissions, one effect, nine checks, five
+owner messages, and three checked closes. It failed because the collateral-only
+fourth matter repeated directory listings. Current source gives listing the same
+required completion intent and reopens the managed target as measured source,
+which advances selection without reusing checks or claiming completion.
+
 A synthetic 901-second run against the parent product source seeded
 `notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
 verification, and truthful report. The daemon stayed alive and owner intake
