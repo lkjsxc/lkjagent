@@ -1,0 +1,17 @@
+table	count	interpretation
+queue	1	synthetic owner turn
+tasks	1	blocked matter
+steps	3	all blocked
+attempts	0	no step attempt
+check_results	0	no computed check
+token_usage	0	no model usage
+effect_journal	0	no effect
+runtime_decisions	0	no persisted runtime decision
+prompt_frames	0	no compiled prompt
+prompt_cards	0	no prompt card
+tool_admissions	0	no admitted tool
+observations	0	no effect observation
+provider_exchanges	0	no provider exchange
+artifacts	0	no artifact
+workspace_operations	0	no workspace operation
+workspace_operation_revisions	0	no workspace revision

@@ -1,0 +1,5 @@
+snapshot	tree_sha256	file_count	definition
+before	3792c3bbd7888610c1bd6045acd2474b89539f3782ddd8ad7147779e42818f96	1	sha256 of sorted sha256-tab-path-tab-size-newline rows
+after	f5e7774410f9e2b1f0e57b2cc900d8181814dbb775ea10fd3461392beffb352f	11	sha256 of sorted sha256-tab-path-tab-size-newline rows
+target-before	0716bafaa8b61f4b5dc4c35321d4e0959253d5b98e4aaeac13cd61b79e5ddb7c	1	notes/sample.md
+target-after	0716bafaa8b61f4b5dc4c35321d4e0959253d5b98e4aaeac13cd61b79e5ddb7c	1	notes/sample.md

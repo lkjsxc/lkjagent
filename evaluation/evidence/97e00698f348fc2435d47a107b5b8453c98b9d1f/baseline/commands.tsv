@@ -1,0 +1,8 @@
+phase	public_command	elapsed_seconds	exit_code
+build	CARGO_TARGET_DIR=/home/lkjsxc/workspace/lkjagent-direct-runtime/target cargo build --locked --release -p lkjagent-app	not-measured	0
+copy	cp /home/lkjsxc/workspace/lkjagent-direct-runtime/target/release/lkjagent PRIVATE_RUN/bin/lkjagent	not-measured	0
+send	LKJAGENT_WORKSPACE_ROOT=PRIVATE_WORKSPACE PRIVATE_RUN/bin/lkjagent --data PRIVATE_DATA send --new "Run tests and replace alpha with beta in notes/sample.md."	not-measured	0
+daemon	. /home/lkjsxc/workspace/lkjagent/.env; LKJAGENT_WORKSPACE_ROOT=PRIVATE_WORKSPACE PRIVATE_RUN/bin/lkjagent --data PRIVATE_DATA run	901	143
+status-after-2	LKJAGENT_WORKSPACE_ROOT=PRIVATE_WORKSPACE PRIVATE_RUN/bin/lkjagent --data PRIVATE_DATA status	not-measured	0
+status-after-901	LKJAGENT_WORKSPACE_ROOT=PRIVATE_WORKSPACE PRIVATE_RUN/bin/lkjagent --data PRIVATE_DATA status	not-measured	0
+note	daemon exit 143 followed the harness stop after the observation interval; it was alive immediately before that stop	not-applicable	not-applicable

@@ -1,0 +1,5 @@
+snapshot	bytes	hex
+before	28	61 6c 70 68 61 20 69 73 20 74 68 65 20 63 75 72 72 65 6e 74 20 76 61 6c 75 65 2e 0a
+after	28	61 6c 70 68 61 20 69 73 20 74 68 65 20 63 75 72 72 65 6e 74 20 76 61 6c 75 65 2e 0a
+requested-after	27	62 65 74 61 20 69 73 20 74 68 65 20 63 75 72 72 65 6e 74 20 76 61 6c 75 65 2e 0a
+exact-replacement-observed	false	unchanged target bytes

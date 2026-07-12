@@ -1,0 +1,17 @@
+observation	value
+process-after-2-seconds	alive
+process-after-901-seconds	alive
+process-stop	harness-sent-termination-after-observation
+process-stop-exit	143
+public-status-after-901-exit	0
+daemon-state-after-901	idle
+active-matter-after-901	none
+active-operation-after-901	none
+pending-queue-after-901	0
+latest-decision-after-901	none
+admissions-after-901	0
+observations-after-901	0
+provider-exchanges-after-901	0
+artifacts-after-901	0
+blocked-evidence-after-901	1
+process-identifiers	redacted-as-unnecessary

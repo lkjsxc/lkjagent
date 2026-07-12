@@ -1,0 +1,16 @@
+field	value
+source_commit	97e00698f348fc2435d47a107b5b8453c98b9d1f
+outcome	blocked
+observed_seconds	901
+requested_change	alpha-to-beta
+exact_target_change	false
+failure	unsupported_executor
+model_call_count	0
+runtime_decision_count	0
+effect_count	0
+check_count	0
+binary_sha256	d2d2feeddb3d1b24ea74a229da01b6dee1335e8acd992bf52a17197dca15d897
+binary_execution_location	private-run-copy
+endpoint_environment	sourced-from-required-file-with-values-omitted
+raw_provider_traffic	absent
+sqlite_attachment	absent

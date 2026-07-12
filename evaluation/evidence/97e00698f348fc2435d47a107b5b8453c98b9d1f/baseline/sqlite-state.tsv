@@ -1,0 +1,7 @@
+entity	identity	state	kind	attempts	actions	fact
+matter	1	blocked	filework	0	0	system_operation: blocked unsupported_executor no_command_run
+step	1	blocked	plan	0	0	action_budget=0
+step	2	blocked	verify	0	0	action_budget=0
+step	3	blocked	respond	0	0	action_budget=0
+event-count	taskblocked	1	events	not-applicable	not-applicable	exact grouped count
+runtime-event-count	case.snapshot	1	runtime_events	not-applicable	not-applicable	exact grouped count
