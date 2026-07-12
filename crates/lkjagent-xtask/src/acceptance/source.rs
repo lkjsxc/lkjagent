@@ -34,6 +34,10 @@ const FACTS: &[Fact] = &[
     fact("R05", "crates/lkjagent-core/src/runtime_admission.rs", &["decision.tool_view_fingerprint()", "decision.tool_view.entry(&action.tool)"]),
     fact("R05", "crates/lkjagent-core/tests/admission.rs", &["tool_field_specs_drive_value_class_admission", "state_views_and_effect_keys_are_closed"]),
     fact("R05", "crates/lkjagent-core/tests/tool_call.rs", &["contract_tables_accept_descriptor_order_and_text", "contract_tables_reject_hidden_missing_unknown_and_order"]),
+    fact("P03", "crates/lkjagent-core/src/runtime_tool_catalog.rs", &["const DIRECT_CATALOG", "direct_tool_view_for_state"]),
+    fact("P03", "crates/lkjagent-core/src/runtime_admission.rs", &["decision.tool_view_fingerprint()", "decision.tool_view.entry(&action.tool)"]),
+    fact("P03", "crates/lkjagent-core/tests/admission.rs", &["state_views_and_effect_keys_are_closed"]),
+    fact("P03", "crates/lkjagent-core/tests/tool_call.rs", &["contract_tables_reject_hidden_missing_unknown_and_order"]),
     fact("P07", "crates/lkjagent-llm/src/wire/response.rs", &["ProviderAnomalyKind::ToolCallOnlyResponse", "fn content_and_anomaly("]),
     fact("P07", "crates/lkjagent-llm/tests/wire_contract.rs", &["response_anomalies_remain_distinct", "ProviderAnomalyKind::ToolCallOnlyResponse"]),
     fact("X03", "crates/lkjagent-llm/src/error.rs", &["ResponseTooLarge", "Timeout", "Connect"]),
@@ -67,7 +71,8 @@ pub fn contract_derivations(root: &Path) -> BTreeSet<String> {
     }
     complete
         .into_iter()
-        .filter_map(|(id, ok)| ok.then(|| id.to_string()))
+        .filter(|(_, complete)| *complete)
+        .map(|(id, _)| id.to_string())
         .collect()
 }
 

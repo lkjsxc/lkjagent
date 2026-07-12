@@ -43,7 +43,8 @@ and transport classification, native decision and transaction boundaries, and
 direct reduction and selection. These are confined primitive claims only.
 Endpoint connectivity, the public application loop, workspace-root behavior,
 campaigns, records, TUI behavior, completion, and every evidence-dependent real
-behavior remain missing, so the command cannot yet return success.
+behavior remain missing, so the command cannot yet return success. Every other row remains missing
+until source-bound evidence derives it.
 
 The checker will read plans, Git history/trailers, tracked files, command exits,
 source/binary/image hashes, SQLite, workspace manifests, prompt/tool audits,

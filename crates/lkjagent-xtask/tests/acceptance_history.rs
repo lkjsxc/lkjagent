@@ -45,7 +45,7 @@ fn acceptance_negative_allows_only_checker_result_status_rows() {
 fn source_contracts_require_exact_implementation_and_tests() -> Result<(), Box<dyn Error>> {
     let repository = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
     let expected = [
-        "F03", "F04", "P01", "P02", "P03", "P07", "R01", "R02", "R03", "R04", "R06", "X03",
+        "F03", "F04", "P01", "P02", "P03", "P07", "R01", "R02", "R03", "R04", "R05", "R06", "X03",
     ];
     let actual = source_contracts(&repository);
     assert_eq!(
