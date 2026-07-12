@@ -32,8 +32,9 @@ without claiming completion.
 
 Use configured caps for current objective/constraints, required file evidence,
 bounded memory/history, recovery diagnosis, and output reserve. Mandatory needs
-are selected first. Optional history enters only when it satisfies a named need.
-Unused budget remains unused.
+are selected first. Up to four latest active canonical messages from earlier
+matters enter the memory lane once each; the current owner objective remains the
+higher-precedence source. Unused budget remains unused.
 
 ## Deduplication
 
