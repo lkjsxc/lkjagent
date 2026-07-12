@@ -31,11 +31,14 @@ checks prove UTF-8 content counts, exact intended SHA-256 and bytes, preserved
 mode, and admitted collateral paths. A failed replacement remains current and
 keeps its obligation open.
 
-A read-only continuation can request `read_file complete=true`. The store accepts
-it only when the opened file revision equals the current managed revision from a
-closed matter whose required checks remain current and passed. It copies those
-facts into new matter-bound obligations and checks tied to the settling read
-decision and event; it never treats an unchecked read as completion.
+Every read states `complete=false` when an edit may follow or `complete=true` for
+a no-change report objective. A final envelope
+sent one phase early is rejected, but can trigger the same checked transition
+after a successful current read. The store accepts either path only when the
+opened file revision equals the current managed revision from a closed matter
+whose required checks remain current and passed. It copies those facts into new
+matter-bound obligations and checks tied to the settling read decision and
+event; it never treats an unchecked read or premature wording as completion.
 
 Shell checks do not exist until a state-limited journaled command effect is
 adopted.

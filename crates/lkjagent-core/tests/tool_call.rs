@@ -27,20 +27,38 @@ fn contract_tables_accept_descriptor_order_and_text() -> TestResult {
 fn contract_tables_validate_counts_paths_and_bounds() -> TestResult {
     let valid = call(
         "read_file",
-        &[("path", "README.md"), ("offset", "0"), ("count", "120")],
+        &[
+            ("path", "README.md"),
+            ("offset", "0"),
+            ("count", "120"),
+            ("complete", "false"),
+        ],
     );
     assert!(parse_tool_call(&valid, &action_decision()).is_ok());
     assert_eq!(
-        parse_error(&call("read_file", &[("path", "../secret")]))?,
+        parse_error(&call(
+            "read_file",
+            &[("path", "../secret"), ("complete", "false")]
+        ))?,
         ToolCallError::UnsafePath
     );
     for value in ["01", "121"] {
-        let raw = call("read_file", &[("path", "README.md"), ("count", value)]);
+        let raw = call(
+            "read_file",
+            &[
+                ("path", "README.md"),
+                ("count", value),
+                ("complete", "false"),
+            ],
+        );
         assert_eq!(parse_error(&raw)?, ToolCallError::ValueClass);
     }
     let huge = "x".repeat(1025);
     assert_eq!(
-        parse_error(&call("read_file", &[("path", &huge)]))?,
+        parse_error(&call(
+            "read_file",
+            &[("path", &huge), ("complete", "false")]
+        ))?,
         ToolCallError::Bounds
     );
     Ok(())
