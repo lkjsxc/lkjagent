@@ -18,6 +18,7 @@ where
             return crate::public_loop::send(&invocation.data_dir, text, *force_new);
         }
         Command::Status => return crate::public_loop::status(&invocation.data_dir),
+        Command::Doctor { json } => return crate::public_loop::doctor(&invocation.data_dir, *json),
         Command::Run { once: true } => {
             let mut endpoint = crate::endpoint::LlmEndpoint::new(&invocation.data_dir);
             return crate::public_loop::run_once(&invocation.data_dir, &mut endpoint);

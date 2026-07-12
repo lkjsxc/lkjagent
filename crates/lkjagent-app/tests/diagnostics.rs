@@ -2,6 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use lkjagent_app::cli;
+use rusqlite::Connection;
 use serde_json::Value;
 
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
@@ -12,14 +13,27 @@ fn doctor_reports_separate_roots_without_creating_workspace() -> TestResult<()> 
 
     let output = cli::run(["--data", data.to_string_lossy().as_ref(), "doctor"])?;
 
-    assert!(output.contains("doctor: warn"));
-    assert!(output.contains("schema: tables=36 missing=none"));
+    assert!(output.contains("schema=native-18 tables=18 missing=0"));
     assert!(output.contains("endpoint: url="));
-    assert!(output.contains("data: root="));
-    assert!(output.contains("workspace: root="));
-    assert!(output.contains("present=false"));
-    assert!(output.contains("prompt_refs: orphan=0"));
-    assert!(output.contains("warnings: workspace-root-absent"));
+    assert!(output.contains("roots: data="));
+    assert!(output.contains("workspace="));
+    assert!(output.contains("workspace_present=false"));
+    assert!(output.contains("matters=0 unfinished_decisions=0"));
+    let connection = Connection::open(data.join("lkjagent.sqlite3"))?;
+    let tables: i64 = connection.query_row(
+        "SELECT count(*) FROM sqlite_schema WHERE type='table' AND name NOT LIKE 'sqlite_%'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(tables, 18);
+    assert_eq!(
+        connection.query_row(
+            "SELECT count(*) FROM sqlite_schema WHERE name='tasks'",
+            [],
+            |row| row.get::<_, i64>(0)
+        )?,
+        0
+    );
     Ok(())
 }
 
