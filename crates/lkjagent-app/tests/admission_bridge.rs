@@ -6,9 +6,8 @@ use std::{
 use lkjagent_app::persist_tool_admissions;
 use lkjagent_core::engine::Command;
 use lkjagent_core::parse::Action;
-use lkjagent_core::runtime_decision::{
-    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
-};
+use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision};
+use lkjagent_core::runtime_tool_catalog::tool_view_for_names;
 use lkjagent_store::plan_schema::setup;
 use rusqlite::Connection;
 
@@ -138,11 +137,11 @@ fn mismatch_reason_persists_for_hidden_tool() -> TestResult<()> {
         Ok(_) => return Err("hidden tool was admitted".into()),
     };
 
-    assert!(error.contains("tool-view mismatch"));
+    assert!(error.contains("hidden-tool"));
     let result: String = conn.query_row("SELECT result_json FROM tool_admissions", [], |row| {
         row.get(0)
     })?;
-    assert!(result.contains("tool-view mismatch"));
+    assert!(result.contains("hidden-tool"));
     Ok(())
 }
 
@@ -151,9 +150,7 @@ fn decision() -> RuntimeDecision {
         "decision-1",
         "case-1",
         OperationKey("model.call/1".to_string()),
-        ToolSetView::new(vec![
-            ToolViewEntry::new("fs.read", "read").with_params(vec!["path"], Vec::new())
-        ]),
+        tool_view_for_names(&["fs.read"]),
         OutputEnvelope::Action,
     )
 }
@@ -163,8 +160,7 @@ fn write_decision() -> RuntimeDecision {
         "write-decision",
         "case-1",
         OperationKey("model.call/1".to_string()),
-        ToolSetView::new(vec![ToolViewEntry::new("fs.write", "write")
-            .with_params(vec!["path", "content"], Vec::new())]),
+        tool_view_for_names(&["fs.write"]),
         OutputEnvelope::Action,
     )
 }

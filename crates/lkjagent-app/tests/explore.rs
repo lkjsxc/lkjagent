@@ -5,9 +5,8 @@ use lkjagent_app::daemon::{run_until_idle, CompletionRecord, Endpoint, ScriptedE
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::model::{StepKind, TaskSnapshot, TaskState};
 use lkjagent_core::render::Prompt;
-use lkjagent_core::runtime_decision::{
-    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
-};
+use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision};
+use lkjagent_core::runtime_tool_catalog::tool_view_for_names;
 use lkjagent_store::decision_rows::insert_runtime_decision;
 use lkjagent_store::plan_access::{enqueue, insert_step_tx, insert_task};
 use lkjagent_store::plan_schema::setup;
@@ -143,9 +142,7 @@ fn restricted_read_decision(snapshot: &TaskSnapshot) -> RuntimeDecision {
         "decision-view",
         "1",
         OperationKey(format!("model.call/{step_id}")),
-        ToolSetView::new(vec![
-            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new())
-        ]),
+        tool_view_for_names(&["fs.read"]),
         OutputEnvelope::Action,
     )
 }

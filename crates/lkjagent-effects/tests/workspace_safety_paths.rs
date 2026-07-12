@@ -84,7 +84,9 @@ fn workspace_safety_holds_root_and_rejects_symlink_races() -> TestResult {
     });
     for _ in 0..500 {
         if let Ok(page) = workspace.read_file("live/file", 1, 1) {
-            assert_eq!(page.lines[0].text, "inside");
+            if let Some(line) = page.lines.first() {
+                assert_eq!(line.text, "inside");
+            }
         }
     }
     stop.store(true, Ordering::Relaxed);

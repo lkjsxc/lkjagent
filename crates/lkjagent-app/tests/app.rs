@@ -160,7 +160,7 @@ fn run_scripted(
     drop(conn);
     let mut endpoint = ScriptedEndpoint { outputs, index: 0 };
     let snapshot = run_until_idle(&data, &mut endpoint, 8)?;
-    assert_eq!(snapshot.task.state, TaskState::Closed);
+    assert_eq!(snapshot.task.state, TaskState::Closed, "{name}");
     if let Some(path) = expected_file {
         assert!(data.join("workspace").join(path).exists(), "{path}");
     }

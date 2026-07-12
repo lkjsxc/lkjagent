@@ -1,9 +1,8 @@
 use lkjagent_core::runtime_context::{ContaminationClass, ContextItem, StalenessClass, TrustClass};
-use lkjagent_core::runtime_decision::{
-    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
-};
+use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision};
 use lkjagent_core::runtime_event::{RuntimeEvent, RuntimeEventPayload};
 use lkjagent_core::runtime_state::{EvidenceRef, StateCell, StateKey};
+use lkjagent_core::runtime_tool_catalog::tool_view_for_names;
 use lkjagent_store::context_rows::{context_items, insert_context_item};
 use lkjagent_store::decision_rows::{
     insert_runtime_decision, settle_decision, unfinished_decisions,
@@ -158,7 +157,7 @@ fn decision(id: &str) -> RuntimeDecision {
         id,
         "case-1",
         OperationKey("model.call".to_string()),
-        ToolSetView::new(vec![read_tool()]),
+        tool_view_for_names(&["fs.read"]),
         OutputEnvelope::Action,
     );
     decision.selected_state_key = Some("model:from-decision".to_string());
@@ -169,10 +168,6 @@ fn decision(id: &str) -> RuntimeDecision {
     decision.evidence_requirements = vec!["fresh artifact check".to_string()];
     decision.recovery_policy = "retry-same-decision".to_string();
     decision
-}
-
-fn read_tool() -> ToolViewEntry {
-    ToolViewEntry::new("fs.read", "read a workspace file").with_params(vec!["path"], Vec::new())
 }
 
 fn ids(decisions: &[RuntimeDecision]) -> Vec<&str> {

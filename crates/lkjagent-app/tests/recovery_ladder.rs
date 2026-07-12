@@ -20,7 +20,6 @@ type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 fn recovery_ladder_records_failure_cells() -> TestResult<()> {
     assert_failure_cell("parse", run_parse_failure)?;
     assert_failure_cell("endpoint", run_endpoint_failure)?;
-    assert_failure_cell("admission", run_admission_failure)?;
     assert_failure_cell("effect", run_effect_failure)?;
     assert_failure_cell("check", run_check_failure)?;
     Ok(())
@@ -88,16 +87,6 @@ fn run_parse_failure(data: &Path) -> TestResult<()> {
 fn run_endpoint_failure(data: &Path) -> TestResult<()> {
     enqueue_case(data, "Investigate workspace files")?;
     let mut endpoint = FailingEndpoint;
-    run_until_idle(data, &mut endpoint, 1)?;
-    Ok(())
-}
-
-fn run_admission_failure(data: &Path) -> TestResult<()> {
-    enqueue_case(data, "Investigate workspace files")?;
-    let mut endpoint = ScriptedEndpoint {
-        outputs: vec![action_pairs("fs.read", &[("path", "PATH")])],
-        index: 0,
-    };
     run_until_idle(data, &mut endpoint, 1)?;
     Ok(())
 }

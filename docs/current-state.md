@@ -48,7 +48,14 @@ negative fixtures and closed direct-runtime contract tables. A separate native
 18-table schema rejects incompatible stores, descriptor-relative reads hold an
 opened root, the compact envelope parser rejects echoed IDs and JSON actions, and
 LLM transport preserves bounded request/outcome fields without repairing output.
-These pieces do not yet form the direct authority loop.
+
+The direct reducer and selector now derive decisions from state cells, the five
+native tools share one descriptor projection from prompt through admission, and
+native store transactions cover intake, exchange, effect, observation, checks,
+and close. Exact edit and create effects stage expected and intended bytes,
+fsync, preserve mode, reject races, and recover every tested crash boundary.
+Unknown executable payload schemas remain inert. These pieces pass the isolated
+workspace test suite but do not yet form the production authority loop.
 
 ## Active Source Gaps
 
@@ -56,12 +63,13 @@ Production still hydrates `TaskSnapshot`, task rows, step rows, fixed templates,
 and bridge cells. Context is prepared before final decision selection. The daemon
 maps decisions back into the retired step engine and writes both authorities.
 
-The direct five-tool descriptor catalog is separate, but the production prompt
-renderer still emits the retired action grammar until the tool-registry node.
-The current model view hides write, list, tree, shell, and any valid review
-transition. Whole-file model writes use a direct writer that bypasses exact target
-revisions. Replacement staging changes file mode and validates captured bytes
-after exchange, so it is not yet safe for the target edit path.
+The direct five-tool descriptor catalog, parser, admission view, and effect keys
+now agree, but the production prompt renderer still reaches them through the
+retired task bridge. The direct edit transaction is safe in isolation; the public
+owner path still invokes the existing whole-file writer and does not select the direct
+edit from native state. The app cutover must connect persisted native decisions,
+tool admissions, exact effects, automatic checks, and final close without a
+second task or step authority.
 
 There is no `conversation_messages` table. The TUI synthesizes owner and agent
 messages from queue and selected event rows, then merges local drafts. It has two
@@ -98,8 +106,12 @@ claims, and the close transaction owns the canonical final message.
 | protocol-compact | complete | strict decision-bound tool/final parser passes contract tests |
 | store-native | complete | exact 18-table schema reopens and rejects altered or retired stores |
 | llm-wiring | active | mechanics pass; real public endpoint probe waits for evaluation runner |
-| second parallel wave | ready | exact edits, registry, transactions, reducer, and root can start |
-| public file edit | blocked | depends on exact edits, transactions, context, and app loop |
+| tool-registry | complete | one descriptor projection drives prompt, parser, admission, and effects |
+| reducer-selector | complete | direct state reduction and deterministic selection pass core and bridge-continuity tests |
+| store-transactions | complete | native intake through close boundaries pass restart tests |
+| exact-edits | complete | crash-safe exact edit and create pass race, mode, symlink, and crash tests |
+| workspace-root | active | separate-root integration is under isolated verification |
+| public file edit | blocked | depends on context assembly and production app-loop cutover |
 | final campaigns | blocked | no frozen binary, live task proof, or PTY proof |
 
 ## Honesty Rules

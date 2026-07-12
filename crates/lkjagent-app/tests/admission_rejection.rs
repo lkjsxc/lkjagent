@@ -5,10 +5,9 @@ use lkjagent_app::daemon::{run_until_idle, CompletionRecord, Endpoint};
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::model::{StepKind, TaskSnapshot, TaskState};
 use lkjagent_core::render::Prompt;
-use lkjagent_core::runtime_decision::{
-    OperationKey, OutputEnvelope, RuntimeDecision, ToolSetView, ToolViewEntry,
-};
-use lkjagent_store::decision_rows::insert_runtime_decision;
+use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision};
+use lkjagent_core::runtime_tool_catalog::tool_view_for_names;
+use lkjagent_store::decision_rows::{insert_runtime_decision, unfinished_decisions};
 use lkjagent_store::plan_access::{insert_step_tx, insert_task};
 use lkjagent_store::plan_schema::setup;
 use lkjagent_store::state_rows::insert_case;
@@ -20,7 +19,7 @@ use support::action_for;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn rejected_tool_admission_persists_refusal_evidence() -> TestResult<()> {
+fn rejected_protocol_call_persists_recovery_without_admission() -> TestResult<()> {
     let data = fixture_root("admission-rejection")?;
     let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
@@ -29,33 +28,29 @@ fn rejected_tool_admission_persists_refusal_evidence() -> TestResult<()> {
     persist(&mut conn, &snapshot)?;
     insert_case(&conn, "1", &snapshot.task.objective, "before")?;
     let decision = restricted_read_decision(&snapshot);
-    let expected_fp = decision.tool_view_fingerprint().map_err(|e| e.message)?;
+    assert!(decision.tool_view.has_current_constraints());
     insert_runtime_decision(&conn, &decision, "pending", "before")?;
+    assert_eq!(unfinished_decisions(&conn, "1")?.len(), 1);
     drop(conn);
 
     let mut endpoint = OneShotEndpoint {
         output: action_for("decision-view", "", "fs.read", &[("path", "PATH")]),
     };
-    let snapshot = run_until_idle(&data, &mut endpoint, 1)?;
+    let snapshot = run_until_idle(&data, &mut endpoint, 1)
+        .map_err(|error| format!("run until idle: {error}"))?;
     assert_eq!(snapshot.task.state, TaskState::Open);
 
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
-    let row: (String, String, String, String) = conn.query_row(
-        "SELECT action_tool, status, tool_view_fingerprint, result_json FROM tool_admissions",
-        [],
-        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
-    )?;
-    assert_eq!(row.0, "fs.read");
-    assert_eq!(row.1, "Rejected");
-    assert_eq!(row.2, expected_fp);
-    assert!(row.3.contains("placeholder value for path"));
+    assert_eq!(count(&conn, "tool_admissions")?, 0);
     assert_eq!(count(&conn, "observations")?, 0);
-    let status: String = conn.query_row(
-        "SELECT status FROM runtime_decisions WHERE id = 'decision-view'",
-        [],
-        |row| row.get(0),
-    )?;
-    assert_eq!(status, "admission_error");
+    let status: String = conn
+        .query_row(
+            "SELECT status FROM runtime_decisions WHERE id = 'decision-view'",
+            [],
+            |row| row.get(0),
+        )
+        .map_err(|error| format!("decision row: {error}"))?;
+    assert_eq!(status, "settled");
     assert_eq!(recovery_count(&conn)?, 1);
     assert_eq!(count(&conn, "attempts")?, 1);
     assert_eq!(count(&conn, "provider_exchanges")?, 1);
@@ -65,7 +60,7 @@ fn rejected_tool_admission_persists_refusal_evidence() -> TestResult<()> {
 fn recovery_count(conn: &Connection) -> rusqlite::Result<i64> {
     conn.query_row(
         "SELECT COUNT(*) FROM state_cells
-         WHERE key_label LIKE 'recovery:admission/%' AND payload_schema = 'recovery.failure'",
+         WHERE key_label LIKE 'recovery:parse/%' AND payload_schema = 'recovery.failure'",
         [],
         |row| row.get(0),
     )
@@ -87,9 +82,7 @@ fn restricted_read_decision(snapshot: &TaskSnapshot) -> RuntimeDecision {
         "decision-view",
         "1",
         OperationKey(format!("model.call/{step_id}")),
-        ToolSetView::new(vec![
-            ToolViewEntry::new("fs.read", "read file").with_params(vec!["path"], Vec::new())
-        ]),
+        tool_view_for_names(&["fs.read"]),
         OutputEnvelope::Action,
     )
 }

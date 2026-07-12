@@ -12,7 +12,7 @@ use rusqlite::Connection;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn settled_payload_decision_suppresses_selected_state_key() -> TestResult<()> {
+fn unknown_custom_done_payload_is_not_selected_or_suppressed() -> TestResult<()> {
     let data = fixture_root("selected-key")?;
     let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
@@ -36,13 +36,13 @@ fn settled_payload_decision_suppresses_selected_state_key() -> TestResult<()> {
     let _ = run_until_idle(&data, &mut endpoint, 1)?;
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
 
-    assert_eq!(cell_status(&conn, "custom:settle-me")?, "Suppressed");
-    assert_eq!(decision_selected_key(&conn)?, "custom:settle-me");
+    assert_eq!(cell_status(&conn, "custom:settle-me")?, "Active");
+    assert_ne!(decision_selected_key(&conn)?, "custom:settle-me");
     Ok(())
 }
 
 #[test]
-fn state_resolve_payload_settles_without_blocking_matter() -> TestResult<()> {
+fn unknown_state_resolve_payload_remains_inert() -> TestResult<()> {
     let data = fixture_root("state-resolve")?;
     let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
@@ -67,13 +67,13 @@ fn state_resolve_payload_settles_without_blocking_matter() -> TestResult<()> {
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
 
     assert_eq!(format!("{:?}", next.task.state), "Open");
-    assert_eq!(cell_status(&conn, "custom:settle-me")?, "Suppressed");
+    assert_eq!(cell_status(&conn, "custom:settle-me")?, "Active");
     assert_eq!(blocked_events(&conn)?, 0);
     Ok(())
 }
 
 #[test]
-fn payload_workspace_write_effect_creates_file_and_artifact() -> TestResult<()> {
+fn unknown_workspace_write_payload_cannot_create_file_or_artifact() -> TestResult<()> {
     let data = fixture_root("workspace-write")?;
     let mut conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     setup(&conn)?;
@@ -98,9 +98,14 @@ fn payload_workspace_write_effect_creates_file_and_artifact() -> TestResult<()> 
     let conn = Connection::open(data.join("lkjagent.sqlite3"))?;
     let file = data.join("workspace/native/effect.md");
 
-    assert_eq!(fs::read_to_string(file)?, "Native body");
-    assert_eq!(cell_status(&conn, "custom:settle-me")?, "Suppressed");
-    assert_eq!(count_rows(&conn, "artifacts")?, 2);
+    assert!(!file.exists());
+    assert_eq!(cell_status(&conn, "custom:settle-me")?, "Active");
+    let effect_artifacts: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM artifacts WHERE kind <> 'workspace-index'",
+        [],
+        |row| row.get(0),
+    )?;
+    assert_eq!(effect_artifacts, 0);
     Ok(())
 }
 
@@ -155,11 +160,6 @@ fn cell_status(conn: &Connection, key_label: &str) -> TestResult<String> {
         [key_label],
         |row| row.get(0),
     )?)
-}
-
-fn count_rows(conn: &Connection, table: &str) -> TestResult<i64> {
-    let sql = format!("SELECT COUNT(*) FROM {table}");
-    Ok(conn.query_row(&sql, [], |row| row.get(0))?)
 }
 
 fn blocked_events(conn: &Connection) -> TestResult<i64> {

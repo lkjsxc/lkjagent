@@ -64,11 +64,13 @@ fn cell_candidate(cell: &StateCell) -> Option<SelectorCandidate> {
     }
 }
 fn known_payload(cell: &StateCell) -> bool {
-    cell.payload_schema == "state.operation.v1"
-        || matches!(
-            cell.key.namespace.as_str(),
-            "model" | "effect" | "check" | "recovery" | "work"
-        )
+    matches!(
+        cell.payload_schema.as_str(),
+        "state.operation.v1" | "state.completion-check"
+    ) || matches!(
+        cell.key.namespace.as_str(),
+        "model" | "effect" | "check" | "recovery" | "work"
+    )
 }
 #[rustfmt::skip]
 fn namespace_candidate(cell: &StateCell, body: &Value) -> Option<SelectorCandidate> {

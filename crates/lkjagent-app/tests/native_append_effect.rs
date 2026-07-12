@@ -13,7 +13,7 @@ use rusqlite::Connection;
 type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
-fn payload_workspace_append_effect_appends_file_and_artifact() -> TestResult<()> {
+fn unknown_payload_operation_cannot_append_or_journal() -> TestResult<()> {
     let data = fixture_root("workspace-append")?;
     fs::create_dir_all(data.join("workspace/native"))?;
     fs::write(data.join("workspace/native/effect.md"), "First")?;
@@ -31,29 +31,23 @@ fn payload_workspace_append_effect_appends_file_and_artifact() -> TestResult<()>
 
     assert_eq!(
         fs::read_to_string(data.join("workspace/native/effect.md"))?,
-        "First Second"
+        "First"
     );
-    assert_eq!(cell_status(&conn)?, "Suppressed");
+    assert_eq!(cell_status(&conn)?, "Active");
     let effect_artifacts: i64 = conn.query_row(
         "SELECT COUNT(*) FROM artifacts WHERE kind <> 'workspace-index'",
         [],
         |row| row.get(0),
     )?;
-    assert_eq!(effect_artifacts, 2);
-    let journal: (String, String) = conn.query_row(
-        "SELECT effect_journal.state, observations.content FROM effect_journal
-         JOIN observations ON observations.id = effect_journal.observation_id",
-        [],
-        |row| Ok((row.get(0)?, row.get(1)?)),
-    )?;
-    assert_eq!(journal.0, "committed");
-    assert!(journal.1.contains("path=native/effect.md"));
-    assert!(journal.1.contains("fingerprint=fnv1a64:"));
+    assert_eq!(effect_artifacts, 0);
+    let journal_count: i64 =
+        conn.query_row("SELECT COUNT(*) FROM effect_journal", [], |row| row.get(0))?;
+    assert_eq!(journal_count, 0);
     Ok(())
 }
 
 #[test]
-fn multipart_append_reassembles_owned_parts_before_appending() -> TestResult<()> {
+fn unknown_payload_operation_preserves_owned_multipart_bytes() -> TestResult<()> {
     let data = fixture_root("multipart-append")?;
     let workspace = data.join("workspace/native");
     fs::create_dir_all(workspace.join("effect.parts"))?;
@@ -93,10 +87,16 @@ fn multipart_append_reassembles_owned_parts_before_appending() -> TestResult<()>
     run_until_idle(&data, &mut endpoint, 1)?;
     assert_eq!(
         fs::read_to_string(workspace.join("effect.md"))?,
-        "Alpha Beta Second"
+        "old manifest"
     );
-    assert!(!workspace.join("effect.parts/part-001.md").exists());
-    assert!(!workspace.join("effect.parts/part-002.md").exists());
+    assert_eq!(
+        fs::read_to_string(workspace.join("effect.parts/part-001.md"))?,
+        "Alpha "
+    );
+    assert_eq!(
+        fs::read_to_string(workspace.join("effect.parts/part-002.md"))?,
+        "Beta"
+    );
     Ok(())
 }
 

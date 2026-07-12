@@ -146,12 +146,14 @@ impl ToolSetView {
     pub fn fingerprint(&self) -> Result<String, FingerprintError> {
         stable_fingerprint(self)
     }
+    #[rustfmt::skip]
     pub fn has_current_constraints(&self) -> bool {
         self.entries.iter().all(|entry| {
-            !entry.field_specs.is_empty()
-                && !entry.effect_key.0.is_empty()
-                && entry.result_max_bytes > 0
-                && !entry.denial_code.is_empty()
+            let direct = crate::runtime_tool_catalog::direct_catalog().iter()
+                .find(|descriptor| descriptor.name == entry.name).map(crate::runtime_tool_catalog::descriptor_entry);
+            let current = direct.or_else(|| crate::runtime_tool_cards::tool_view_for_names(&[entry.name.as_str()])
+                .entries.into_iter().next());
+            current.as_ref() == Some(entry)
         })
     }
 }

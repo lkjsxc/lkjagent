@@ -1,8 +1,8 @@
-pub use crate::edit_types::*;
 use crate::error::EffectError;
 use crate::workspace_capability::{
     io_error, open_child, read_regular, require_type, valid_parts, OpenedWorkspace, WORKSPACE_BYTES,
 };
+pub use crate::workspace_edit_types::*;
 use rustix::fd::OwnedFd;
 use rustix::fs::{AtFlags, FileType, Mode, OFlags, RenameFlags};
 use sha2::{Digest, Sha256};
@@ -31,7 +31,9 @@ impl OpenedWorkspace {
             {
                 let text = std::str::from_utf8(&value.bytes)
                     .map_err(|error| EffectError::Utf8(error.to_string()))?;
-                if old_text.is_empty() || crate::edit_types::exact_matches(text, old_text) != 1 {
+                if old_text.is_empty()
+                    || crate::workspace_edit_types::exact_matches(text, old_text) != 1
+                {
                     return Err(EditError::Conflict("old_text must match exactly once"));
                 }
                 let output = text.replacen(old_text, new_text, 1).into();

@@ -138,7 +138,9 @@ fn run_turn<E: Endpoint, C: Clock>(
             tag_check_evidence(conn, &mut next, &mut commands, &decision.id, None)?;
             let prepared = match prepare_turn_admissions(
                 conn, workspace, &snapshot, &work, &decision, &commands, &now,
-            )? {
+            )
+            .map_err(|error| format!("prepare admissions: {error}"))?
+            {
                 AdmissionOutcome::Prepared(prepared) => prepared,
                 AdmissionOutcome::Failed(settled) => return Ok(Some(settled)),
             };
@@ -175,7 +177,9 @@ fn run_turn<E: Endpoint, C: Clock>(
     } else {
         match prepare_turn_admissions(
             conn, workspace, &snapshot, &work, &decision, &commands, &now,
-        )? {
+        )
+        .map_err(|error| format!("prepare admissions: {error}"))?
+        {
             AdmissionOutcome::Prepared(prepared) => prepared,
             AdmissionOutcome::Failed(settled) => return Ok(Some(settled)),
         }
