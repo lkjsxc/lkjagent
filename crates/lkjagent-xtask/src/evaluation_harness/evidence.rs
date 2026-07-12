@@ -145,7 +145,8 @@ fn full_commit(value: &str) -> bool { value.len() == 40 && value.bytes().all(|b|
 #[rustfmt::skip]
 fn secret(bytes: &[u8]) -> bool {
     let lower = bytes.iter().map(u8::to_ascii_lowercase).collect::<Vec<_>>();
+    let private_key = [b"-----begin ".as_slice(), b"private key-----"].concat();
     [b"sk-".as_slice(), b"ghp_", b"github_pat_"].iter().any(|p| lower.windows(p.len()).any(|w| w == *p))
-        || lower.windows(27).any(|w| w == b"-----begin private key-----")
+        || lower.windows(private_key.len()).any(|w| w == private_key)
         || lower.windows(21).any(|w| w.starts_with(b"authorization: bearer"))
 }
