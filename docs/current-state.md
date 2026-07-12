@@ -19,10 +19,11 @@ response ended before `</tool_call>` because the closing root was a provider sto
 string. After source `5b643de8b10ce0ee9bd2cbe63b53c1dbed8f3798` removed that
 stop, a fresh public run closed the first matter in eight decisions with exact
 expected bytes, three current passed checks, one file, and no collateral path.
-Its second read-only turn preserved bytes but repeated reads under the old tool
-descriptor and did not close. Current source adds an explicitly admitted
-`complete=true` read path backed only by the same current passed revision; its
-configured-model behavior remains unproven.
+Its second read-only turn first preserved bytes but repeated reads under the old
+tool descriptor. At source `1e6de0d40acec2563ff2578cb41862481a9892cf`, the
+configured model then used the admitted `complete=true` read and closed that turn
+in two decisions with six current passed checks, four canonical messages, the
+same bytes, and one file. A fresh source-bound full campaign remains unproven.
 
 A synthetic 901-second run against the parent product source seeded
 `notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
@@ -80,9 +81,9 @@ Retired non-public daemon, inspection, record, workspace, and TUI APIs still use
 retired schema and projection modules for regression coverage. They are not called by
 public send, run, or status. Public scheduling currently handles one open matter
 at a time, blocks unfinished effects instead of completing every recovery phase,
-and does not yet prove fairness across simultaneous open matters. Scripted tests
-cover checked read-only continuation, but the configured model has not yet used
-that descriptor field.
+and does not yet prove fairness across simultaneous open matters. Scripted and
+configured-model runs cover checked read-only continuation, but the full tracked
+schedule has not yet run.
 
 The public compiler attaches its context plan and frame fingerprints; native
 context-item rows are not yet populated for every included source. List and
@@ -140,7 +141,7 @@ claims, and the close transaction owns the canonical final message.
 | conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
-| configured-model file proof | active | real first edit passed; checked read-only second-turn close and Docker proof remain |
+| configured-model file proof | active | real edit and checked second-turn close passed; fresh tracked campaign and Docker proof remain |
 | final campaigns | blocked | no frozen binary, live file proof, or PTY proof |
 
 ## Honesty Rules
