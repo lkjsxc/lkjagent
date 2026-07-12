@@ -1,6 +1,17 @@
 #![allow(dead_code)]
 
+pub mod automatic_checks_fixture;
+
 use std::path::{Path, PathBuf};
+
+fn automatic_checks_root(name: &str) -> Result<PathBuf, std::io::Error> {
+    let path = std::env::temp_dir().join(format!("lkjagent-auto-{name}-{}", std::process::id()));
+    if path.exists() {
+        std::fs::remove_dir_all(&path)?;
+    }
+    std::fs::create_dir_all(&path)?;
+    Ok(path)
+}
 
 pub fn isolate_workspace(data: &Path) -> Result<PathBuf, std::io::Error> {
     let workspace = workspace(data);
