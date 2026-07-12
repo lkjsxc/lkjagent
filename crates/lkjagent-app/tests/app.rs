@@ -13,10 +13,10 @@ type TestResult<T> = Result<T, Box<dyn std::error::Error>>;
 
 #[test]
 fn help_matches_documented_command_tree() -> TestResult<()> {
-    let output = cli::run(["help"])?;
-    assert!(output.contains("send TEXT [--new]"));
-    assert!(output.contains("workbench"));
-    assert!(output.contains("matter list | matter show REF"));
+    assert_eq!(
+        cli::run(["help"])?,
+        "lkjagent commands:\n  help\n  send [--new] TEXT\n  run [--once]\n  status\n  doctor [--json]"
+    );
     Ok(())
 }
 

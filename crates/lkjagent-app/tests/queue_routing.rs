@@ -1,7 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
 
-use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::model::TaskState;
 use lkjagent_store::plan_access::{deliver_answer, enqueue};
@@ -132,17 +131,7 @@ fn delivered_answers_refresh_existing_matter_route() -> TestResult<()> {
     assert_eq!(row.route_lane.as_deref(), Some("existing_matter"));
     assert_eq!(row.route_durability.as_deref(), Some("queue_answer"));
     assert_eq!(row.route_transform_allowed, Some(false));
-    drop(conn);
-
-    let show = cli::run([
-        "--data",
-        data.to_string_lossy().as_ref(),
-        "queue",
-        "show",
-        "1",
-    ])?;
-    assert!(show.contains("route=existing_matter durability=queue_answer transform=false"));
-    assert!(show.contains("matter=7"));
+    assert_eq!(row.task_id, Some(7));
     Ok(())
 }
 

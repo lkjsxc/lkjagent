@@ -44,23 +44,6 @@ fn help_invalid_and_native_status_leave_workspace_absent() -> TestResult<()> {
 }
 
 #[test]
-fn product_flows_workspace_root_is_lazy_and_owner_safe() -> TestResult<()> {
-    let (parent, data, workspace) = fixture("access")?;
-    let _output = cli::run(["--data", text(&data), "workspace", "search", "needle"])?;
-    assert!(workspace.is_dir());
-    assert_eq!(fs::read_dir(&workspace)?.count(), 0);
-    fs::write(workspace.join("owner.txt"), "owner secret")?;
-    let _ = cli::run(["--data", text(&data), "workspace", "search", "other"])?;
-    assert_eq!(
-        fs::read_to_string(workspace.join("owner.txt"))?,
-        "owner secret"
-    );
-    assert!(!workspace.join("README.md").exists());
-    fs::remove_dir_all(parent)?;
-    Ok(())
-}
-
-#[test]
 fn environment_override_wins_in_an_isolated_process() -> TestResult<()> {
     let (parent, data, workspace) = fixture("env")?;
     let override_root = parent.join("override");
@@ -81,15 +64,12 @@ fn environment_override_wins_in_an_isolated_process() -> TestResult<()> {
 #[test]
 fn rejects_a_symlink_workspace_root() -> TestResult<()> {
     use std::os::unix::fs::symlink;
-    let (parent, data, workspace) = fixture("symlink")?;
+    let (parent, _data, workspace) = fixture("symlink")?;
     let outside = parent.join("outside");
     fs::create_dir(&outside)?;
     symlink(&outside, &workspace)?;
-    let result = cli::run(["--data", text(&data), "workspace", "search", "x"]);
+    let result = workspace_root::open(&workspace);
     assert!(result.is_err(), "symlink root was accepted");
-    assert!(result
-        .err()
-        .is_some_and(|error| error.contains("open workspace root")));
     fs::remove_dir_all(parent)?;
     Ok(())
 }

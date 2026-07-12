@@ -1,7 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
 
-use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::model::TaskState;
 use lkjagent_store::plan_access::enqueue;
@@ -49,15 +48,6 @@ fn journal_endpoint_closes_with_file_check_and_artifacts() -> TestResult<()> {
         |row| row.get(0),
     )?;
     assert!(edges >= 1);
-    let show = cli::run([
-        "--data",
-        data.to_string_lossy().as_ref(),
-        "matter",
-        "show",
-        "1",
-    ])?;
-    assert!(show.contains("artifacts:"));
-    assert!(show.contains("checks: total="));
     Ok(())
 }
 

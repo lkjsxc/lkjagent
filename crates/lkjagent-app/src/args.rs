@@ -1,9 +1,5 @@
 use std::path::PathBuf;
 
-use crate::arg_helpers::{
-    no_args, parse_context, parse_json_flag, parse_log, parse_matter, parse_memory, parse_queue,
-};
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Invocation {
     pub data_dir: PathBuf,
@@ -13,79 +9,10 @@ pub struct Invocation {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Command {
     Help,
-    Run {
-        once: bool,
-    },
-    Send {
-        text: String,
-        force_new: bool,
-    },
+    Run { once: bool },
+    Send { text: String, force_new: bool },
     Status,
-    Console,
-    Workbench,
-    Doctor {
-        json: bool,
-    },
-    Workspace {
-        json: bool,
-        rebuild: bool,
-    },
-    WorkspaceSearch {
-        query: String,
-        kind: Option<String>,
-        state: Option<String>,
-        project: Option<String>,
-        date: Option<String>,
-        mode: String,
-    },
-    WorkspacePlanRebalance {
-        json: bool,
-    },
-    WorkspaceApplyRebalance {
-        json: bool,
-    },
-    WorkspaceValidate {
-        json: bool,
-    },
-    Log {
-        limit: usize,
-        follow: bool,
-    },
-    MatterList,
-    MatterShow {
-        id: u64,
-    },
-    QueueList,
-    QueueShow {
-        id: i64,
-    },
-    ContextResolve {
-        case_id: String,
-        semantic_key: String,
-        winning_item_id: String,
-    },
-    RecordAdd {
-        kind: String,
-        title: String,
-        body: String,
-    },
-    RecordList {
-        kind: Option<String>,
-    },
-    RecordShow {
-        id: String,
-    },
-    RecordLink {
-        id: String,
-        target: String,
-    },
-    RecordArchive {
-        id: String,
-    },
-    Memory {
-        query: String,
-    },
-    Watch,
+    Doctor { json: bool },
 }
 
 pub fn parse<I, S>(args: I) -> Result<Invocation, String>
@@ -116,31 +43,14 @@ where
 }
 
 fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
-    if let Some(kind) = crate::record_args::wrapper_kind(command) {
-        return crate::record_args::parse_wrapper(kind, rest);
-    }
     match command {
-        "help" => Ok(Command::Help),
+        "help" => no_args(rest, Command::Help),
         "run" => parse_run(rest),
         "send" => parse_send(rest),
         "status" => no_args(rest, Command::Status),
-        "console" => no_args(rest, Command::Console),
-        "workbench" => parse_workbench(rest),
-        "doctor" => parse_json_flag(command, rest).map(|json| Command::Doctor { json }),
-        "workspace" => crate::arg_helpers::parse_workspace(rest),
-        "log" => parse_log(rest),
-        "matter" => parse_matter(rest),
-        "queue" => parse_queue(rest),
-        "context" => parse_context(rest),
-        "record" => crate::record_args::parse_record(rest),
-        "memory" => parse_memory(rest),
-        "watch" => no_args(rest, Command::Watch),
+        "doctor" => parse_doctor(rest),
         other => Err(format!("unknown command: {other}")),
     }
-}
-
-fn parse_workbench(rest: Vec<String>) -> Result<Command, String> {
-    no_args(rest, Command::Workbench)
 }
 
 fn parse_run(rest: Vec<String>) -> Result<Command, String> {
@@ -166,5 +76,21 @@ fn parse_send(rest: Vec<String>) -> Result<Command, String> {
         Err("send requires text".to_string())
     } else {
         Ok(Command::Send { text, force_new })
+    }
+}
+
+fn parse_doctor(rest: Vec<String>) -> Result<Command, String> {
+    match rest.as_slice() {
+        [] => Ok(Command::Doctor { json: false }),
+        [flag] if flag == "--json" => Ok(Command::Doctor { json: true }),
+        _ => Err("use doctor [--json]".to_string()),
+    }
+}
+
+fn no_args(rest: Vec<String>, command: Command) -> Result<Command, String> {
+    if rest.is_empty() {
+        Ok(command)
+    } else {
+        Err("command takes no arguments".to_string())
     }
 }

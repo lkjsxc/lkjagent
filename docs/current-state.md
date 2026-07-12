@@ -83,16 +83,19 @@ effects stage expected and intended bytes, fsync, preserve mode, reject stale
 revisions, and retain the isolated crash-boundary coverage. Unknown executable
 payload schemas remain inert.
 
-Public `send`, `run`, `run --once`, `status`, and `doctor` now branch before
-retired schema setup and open only the fresh native 18-table store. The focused public test
-demonstrates two closed exact-edit matters, restart idempotency, and stale owner
-byte preservation with a scripted endpoint.
+The public CLI now contains only `help`, `send [--new] TEXT`, `run [--once]`,
+`status`, and `doctor [--json]`. Its parser rejects retired console, workbench,
+workspace, inspection, context, record, memory, watch, alias, and category
+commands before filesystem or SQLite setup. Public stateful commands open only
+the fresh native 18-table store. The focused public test demonstrates two closed
+exact-edit matters, restart idempotency, and stale owner byte preservation with
+a scripted endpoint.
 
 ## Active Source Gaps
 
-Retired non-public daemon, record, workspace, and TUI APIs still use
-retired schema and projection modules for regression coverage. They are not called by
-public send, run, or status. Public scheduling currently handles one open matter
+Retired non-public daemon, record, workspace, inspection, and TUI modules still
+use retired schema and projections. They remain compiled but have no public CLI
+route. Public scheduling currently handles one open matter
 at a time, blocks unfinished effects instead of completing every recovery phase,
 and does not yet prove fairness across simultaneous open matters. Scripted and
 configured-model runs cover checked read-only continuation, but the full tracked

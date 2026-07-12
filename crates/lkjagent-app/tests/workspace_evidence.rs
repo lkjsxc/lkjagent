@@ -1,7 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
 
-use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::model::TaskState;
 use lkjagent_store::plan_access::enqueue;
@@ -66,13 +65,6 @@ fn empty_workspace_daily_turns_create_record_trace_and_indexes() -> TestResult<(
     assert_eq!(count(&conn, "workspace_record_history")?, 1);
     assert!(data.join("workspace/records/life/todo").exists());
     assert!(index_artifacts(&conn)? > 0);
-    let validation = cli::run([
-        "--data",
-        data.to_string_lossy().as_ref(),
-        "workspace",
-        "validate",
-    ])?;
-    assert!(validation.contains("workspace validate: ok"));
     Ok(())
 }
 

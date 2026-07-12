@@ -7,8 +7,8 @@ Integration tests for lkjagent-app.
 ## Table of Contents
 
 - [app.rs](app.rs): CLI help, scripted endpoint, and template tests.
-- [cli-rows.rs](cli_rows.rs): row-backed CLI inspection tests.
-- [context-cli.rs](context_cli.rs): owner context resolution command tests.
+- [args.rs](args.rs): bounded public argument parser tests.
+- [cli.rs](cli.rs): removed command rejection and filesystem isolation tests.
 - [context-items.rs](context_items.rs): durable context hygiene tests.
 - [contamination.rs](contamination.rs): contamination classification tests.
 - [configuration-contract.rs](configuration_contract.rs): exact scalar keys,
@@ -20,7 +20,8 @@ Integration tests for lkjagent-app.
 - [explore.rs](explore.rs): bounded explore registry behavior.
 - [journal-artifact.rs](journal_artifact.rs): journal artifact app flows.
 - [prompt-frame.rs](prompt_frame.rs): prompt-frame body replay tests.
+- [public-loop.rs](public_loop.rs): native public loop and exact-edit tests.
 - [recovery.rs](recovery.rs): unfinished decision recovery tests.
 - [resume.rs](resume.rs): row-first resume, waiting answer, and decision reuse tests.
 - [state-snapshot.rs](state_snapshot.rs): state-cell snapshot hydration tests.
-- [workspace-rebalance.rs](workspace_rebalance.rs): workspace manifest, rebalance, audit, and alias tests.
+- [workspace-root.rs](workspace_root.rs): configured workspace capability tests.

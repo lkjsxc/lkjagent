@@ -1,7 +1,6 @@
 use std::fs;
 use std::path::PathBuf;
 
-use lkjagent_app::cli;
 use lkjagent_app::daemon::{run_until_idle, ScriptedEndpoint};
 use lkjagent_core::classify::instantiate;
 use lkjagent_core::model::{StepKind, StepState, TaskState};
@@ -36,15 +35,6 @@ fn continuation_turn_attaches_to_open_matter() -> TestResult<()> {
     assert!(snapshot.task.brief.contains("owner_update="));
     assert!(snapshot.steps[0].inputs.contains("owner_update="));
 
-    let show = cli::run([
-        "--data",
-        data.to_string_lossy().as_ref(),
-        "queue",
-        "show",
-        "1",
-    ])?;
-    assert!(show.contains("route=existing_matter durability=matter_update"));
-    assert!(show.contains("matter=1"));
     Ok(())
 }
 
