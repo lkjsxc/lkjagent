@@ -7,7 +7,11 @@ pub fn kind(bytes: &[u8]) -> Option<&'static str> {
         45, 45, 45, 45, 45, 98, 101, 103, 105, 110, 32, 112, 114, 105, 118, 97, 116, 101, 32, 107,
         101, 121, 45, 45, 45, 45, 45,
     ];
-    if contains(&lower, &private_key) {
+    let private_key_end = [
+        45, 45, 45, 45, 45, 101, 110, 100, 32, 112, 114, 105, 118, 97, 116, 101, 32, 107, 101, 121,
+        45, 45, 45, 45, 45,
+    ];
+    if contains(&lower, &private_key) && contains(&lower, &private_key_end) {
         return Some("private-key");
     }
     if token_after(&lower, b"sk-", 16)

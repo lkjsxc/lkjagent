@@ -9,67 +9,34 @@ name the next executable work.
 
 The public-loop work started from `ee4de81536b1baac845a346103f14420cd41f45b`.
 The focused native-loop test passes in the current checkout, whose source is not
-yet frozen. No Docker or configured-model file campaign has run for this change.
+yet frozen. A tracked configured-model file campaign has passed as described
+below; Docker has not run after the latest loop changes.
 The original planning comparison used source
 `5604ec89af3ba9dbfb287bd869971781fdcf2fad` and parent product source
 `28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`.
 
-An initial configured-model smoke run reached eight provider exchanges but every
-response ended before `</tool_call>` because the closing root was a provider stop
-string. After source `5b643de8b10ce0ee9bd2cbe63b53c1dbed8f3798` removed that
-stop, a fresh public run closed the first matter in eight decisions with exact
-expected bytes, three current passed checks, one file, and no collateral path.
-Its second read-only turn first preserved bytes but repeated reads under the old
-tool descriptor. At source `1e6de0d40acec2563ff2578cb41862481a9892cf`, the
-configured model then used the admitted `complete=true` read and closed that turn
-in two decisions with six current passed checks, four canonical messages, the
-same bytes, and one file. A fresh source-bound full campaign remains unproven.
+Configured-model smoke runs exposed and corrected stripped closing tags,
+recovery cells bound to the wrong key, omitted orient observations, unlabeled
+listing paths, pending dispatch errors, repeated read-only calls, and unbounded
+final-wording faults. Sources `5b643de8b10ce0ee9bd2cbe63b53c1dbed8f3798`
+and `1e6de0d40acec2563ff2578cb41862481a9892cf` first proved an exact edit and
+checked read-only continuation.
 
-A tracked 903-second attempt at source
-`7f47763540e7042b3cf111997e082c72832d5c6a` exited before its observation
-boundary after a malformed first list envelope activated `recovery/malformed` while
-the next decision incorrectly named `recovery/stale`. It wrote no success
-evidence. Current source binds the actual recovery key, suppresses recovered
-cells after a successful observation or checked close, and keeps daemon mode
-alive with backoff. A fresh configured smoke closed the exact edit in seven
-cycles despite four recoverable output faults, but the correction still needs a
-fresh tracked run.
+Four 903-second tracked attempts then progressed honestly. Source
+`7f47763540e7042b3cf111997e082c72832d5c6a` exited on malformed-output recovery.
+Source `607465201258253de06a649c5f0d96334cc2d690` reached two checked closes.
+Source `ee738f6a46ab7e40481524d0cbe0a4f6b7e73977` reached three but repeated
+inventory listing. Source `f5535af5a8b2237dfbaabfb9678ccb93954707fa`
+also reached three and showed that requiring later sustained-intake matters to
+close exceeded the declared edit, second-turn, and retrieval checks. None was
+recorded as success.
 
-A second tracked 903-second run at source
-`607465201258253de06a649c5f0d96334cc2d690` stayed alive and derived exact bytes,
-one file, 18 tables, 77 provider exchanges, 62 admissions, one effect, six
-passed checks, five owner messages, and two checked closes. It failed honestly
-because the last three read-only continuity matters did not close; the active
-matter repeated a root listing because orient observations were not recompiled.
-Current source includes bounded list/search observations in the next prompt and
-turns a rejected premature final after a current read into the same revision-
-bound continuity checks before retrying the required respond envelope. A
-configured continuation then narrowed from root to `notes` but emitted
-`exact-base.txt` without its parent because list output omitted the requested
-path, and that read error left a selected decision. Current source labels list
-and search observations with their requested path and turns dispatch errors into
-durable recovery faults instead of pending decisions. A fresh configured smoke
-using the corrected binary closed the checked first turn through the factual
-receipt fallback, then closed the second and third continuity turns in four and
-five cycles with exact bytes, one file, and nine current passed checks. This is
-not yet the tracked 903-second rerun.
-
-A third tracked 903-second run at source
-`ee738f6a46ab7e40481524d0cbe0a4f6b7e73977` derived exact bytes, one file, 18
-tables, 42 provider exchanges, 36 admissions, one effect, nine checks, five
-owner messages, and three checked closes. It failed because the collateral-only
-fourth matter repeated directory listings. Current source gives listing the same
-required completion intent and reopens the managed target as measured source,
-which advances selection without reusing checks or claiming completion.
-
-A fourth tracked 903-second run at source
-`f5535af5a8b2237dfbaabfb9678ccb93954707fa` derived exact bytes, one file, 18
-tables, 23 provider exchanges, six admissions, one effect, nine checks, five
-owner messages, and three checked closes. It failed only because the evaluator
-required all five scheduled matters to close, although the declared checks bind
-the edit, second-turn verification, and retrieval continuity. Current source
-requires those three closes while retaining the two later owner turns as honest
-sustained intake.
+A fifth tracked 903-second run at source
+`689b48ec577e35315f632d5ab008f8eb9218ab18` passed its semantic evaluator with
+exact bytes, one file, 18 tables, 24 provider exchanges, ten admissions, one
+effect, 12 current passed checks, five owner messages, and four checked closes.
+The source-bound sanitized facts are tracked below
+`evaluation/evidence/689b48ec577e35315f632d5ab008f8eb9218ab18/`.
 
 A synthetic 901-second run against the parent product source seeded
 `notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
@@ -187,8 +154,8 @@ claims, and the close transaction owns the canonical final message.
 | conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
-| configured-model file proof | active | real edit and checked second-turn close passed; fresh tracked campaign and Docker proof remain |
-| final campaigns | blocked | no frozen binary, live file proof, or PTY proof |
+| configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |
+| final campaigns | active | exact-file campaign passed; recovery, daily-life, multi-project, and PTY proof remain |
 
 ## Honesty Rules
 
