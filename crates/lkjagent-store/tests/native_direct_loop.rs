@@ -167,6 +167,7 @@ fn exact_prepare_derives_open_checks_without_passing_them() -> Result<(), Box<dy
     };
     store.prepare_exact_effect(&effect)?;
     store.prepare_exact_effect(&effect)?;
+    assert_eq!(store.effects_in_budget_epoch("m")?, 1);
     let projection = store.restart_projection()?;
     assert!(!projection.checks_ready);
     assert_eq!(projection.effects[0].status, "prepared");

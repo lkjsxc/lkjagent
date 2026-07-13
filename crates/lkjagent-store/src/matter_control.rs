@@ -13,6 +13,14 @@ impl NativeStore {
         )?)
     }
 
+    pub fn effects_in_budget_epoch(&self, matter: &str) -> StoreResult<i64> {
+        Ok(self.connection.query_row(
+            "SELECT count(*) FROM effect_journal j JOIN runtime_decisions d ON d.id=j.decision_id JOIN runtime_events selected ON selected.id=d.event_id WHERE d.matter_id=?1 AND selected.causal_sequence>(SELECT coalesce(max(causal_sequence),0) FROM runtime_events WHERE matter_id=?1 AND kind IN ('owner-intake','owner-resume'))",
+            [matter],
+            |row| row.get(0),
+        )?)
+    }
+
     pub fn accounted_tokens_in_budget_epoch(&self, matter: &str) -> StoreResult<(i64, i64)> {
         Ok(self.connection.query_row(
             "SELECT coalesce(sum(coalesce(p.input_tokens,(length(p.request_ref)+3)/4)+coalesce(p.output_tokens,(length(p.response_ref)+3)/4)),0),coalesce(sum(p.input_tokens IS NULL OR p.output_tokens IS NULL),0) FROM provider_exchanges p JOIN runtime_decisions d ON d.id=p.decision_id JOIN runtime_events selected ON selected.id=d.event_id WHERE d.matter_id=?1 AND selected.causal_sequence>(SELECT coalesce(max(causal_sequence),0) FROM runtime_events WHERE matter_id=?1 AND kind IN ('owner-intake','owner-resume'))",
