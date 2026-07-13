@@ -14,14 +14,14 @@ cargo test --locked -p lkjagent-core contract_tables
 cargo test --locked -p lkjagent-effects workspace_safety
 cargo test --locked -p lkjagent-store durable_boundaries
 cargo test --locked -p lkjagent-app product_flows
-cargo test --locked -p lkjagent-app tui_contract
+cargo test --locked -p lkjagent-app --test tui_contract
 cargo test --locked -p lkjagent-xtask acceptance_negative
 ```
 
 `acceptance_negative`, `contract_tables`, `workspace_safety`,
-`durable_boundaries`, and `wire_contract` are implemented. Product-flow and TUI
-filters are not implemented yet. `../current-state.md` owns that gap. Current
-deterministic commands remain:
+`durable_boundaries`, `tui_contract`, and `wire_contract` are implemented. The
+product-flow filter is not implemented yet. `../current-state.md` owns that gap.
+The current deterministic commands remain:
 
 ```sh
 cargo run --locked -p lkjagent-xtask -- check-docs

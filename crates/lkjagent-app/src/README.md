@@ -16,4 +16,10 @@ Map the modules compiled into the direct public application.
 - [config-registry.rs](config_registry.rs): scalar configuration bounds.
 - [model-io.rs](model_io.rs): prompt transport and endpoint adapters.
 - [public-loop.rs](public_loop.rs): native send, run, status, and doctor loop.
+- [tui-model.rs](tui_model.rs): pure TUI state, input events, and intake effects.
+- [tui-composer.rs](tui_composer.rs): grapheme-aware composer reduction.
+- [tui-wrap.rs](tui_wrap.rs): grapheme and display-width wrapping.
+- [tui-viewport.rs](tui_viewport.rs): follow and durable manual anchors.
+- [tui-screen.rs](tui_screen.rs): canonical conversation and activity projection.
+- [tui-reducer.rs](tui_reducer.rs): pure screen state transitions.
 - [workspace-root.rs](workspace_root.rs): lazy separate workspace capability.

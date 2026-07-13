@@ -33,9 +33,11 @@ fields are never projected. Status reports matter lifecycle, unfinished runtime
 work, rejected or failed rows, current and passing checks, and active cell
 counts from the same transaction.
 
-This slice is store-only and read-only. It adds no public command, terminal,
-input, viewport, or rendering behavior. A later TUI may commit owner input and
-durable control events but never selects runtime work.
+The native frame projection remains store-only and read-only. The application
+now has a pure screen core over that projection: identity merge, composer
+reduction, display-width wrapping, activity separation, and viewport reduction.
+It adds no public command, terminal, threads, or database access. A later edge
+may commit owner input and durable control events but never selects runtime work.
 
 ## Input
 
@@ -49,10 +51,10 @@ restart reloads committed messages once.
 
 ## Viewport
 
-One pure layout implementation wraps grapheme clusters against actual inner pane
-width. The viewport is either Follow or a logical message plus wrapped-row
-offset. Follow shows the newest row. Manual mode preserves its anchor while
-content arrives or width changes.
+The pure layout wraps grapheme clusters against the supplied inner pane width
+using terminal display columns. The viewport is either Follow or a durable
+anchor containing message ID and wrapped-row offset. Follow shows the newest
+row. Manual mode preserves its anchor while content arrives or width changes.
 
 Scrolling to computed bottom restores Follow. Resize, search, pagination, and
 content shrink clamp the anchor. Existing matching messages never produce an
@@ -60,7 +62,9 @@ all-blank pane.
 
 ## Evidence
 
-Focused tests cover identity merge, read-transaction frames, Unicode wrapping,
-follow/manual transitions, resize, search, and composer preservation. Final proof
-uses a real PTY during a slow call with Japanese input, resize, manual append,
-bottom restoration, search clear, and post-submit restart.
+Focused store and application tests cover identity merge, read-transaction
+frames, Unicode wrapping and composer edits, submit outcomes, follow/manual
+transitions, resize, search clear, shrink, and bottom clamping. These are pure
+contract evidence only. Final proof uses a real PTY during a slow call with
+Japanese input, resize, manual append, bottom restoration, search clear, and
+post-submit restart.

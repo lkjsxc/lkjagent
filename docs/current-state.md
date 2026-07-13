@@ -108,8 +108,10 @@ continuation metadata, never unrequested whole-file bytes. The store has a
 bounded read-only TUI frame projection:
 canonical messages, whitelisted activity, and status counts share one deferred
 read transaction and expose no runtime bodies beyond bounded conversation text.
-It has no terminal, input, rendering, or public CLI integration. Public
-scheduling runs one matter per cycle and prefers an
+The application has pure identity merge, Unicode composer and wrapping, separated
+conversation and activity screen state, and anchored viewport reduction over
+that projection. It has no terminal, rendering, threads, or public CLI
+integration. Public scheduling runs one matter per cycle and prefers an
 unrelated runnable matter over one with unfinished work. It still blocks instead
 of reconciling every effect recovery phase, and configured-model simultaneous-
 matter fairness remains unproven. A 64-call model budget now creates a durable
@@ -127,8 +129,8 @@ test claims; richer claim-to-path comparison remains a bounded follow-up. Close
 and the owner receipt remain check-derived. These are source gaps, not fallback.
 
 The native `conversation_messages` table is canonical for public turns. There is
-currently no public TUI; its composer, frame polling integration, rendering, and
-wrapped-row viewport must be built over the native store projection.
+currently no public TUI; frame polling, durable intake wiring, terminal rendering,
+and PTY behavior remain outside the pure composer and wrapped-row viewport core.
 
 Configuration and Compose now separate the runtime data root from one visible
 workspace root. The workspace is created only by an actual workspace operation,
@@ -177,6 +179,7 @@ claims, and the close transaction owns the canonical final message.
 | configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |
 | retired-source-deletion | complete | old controller, bridge, record, inspection, workbench, and TUI source is absent from product crates |
 | tui-frame-projection | complete | local, workspace, and rebuilt Compose gates cover one bounded deferred read transaction |
+| tui-pure-core | complete | focused tests cover identity, Unicode composer and wrapping, screen separation, and anchored viewport behavior |
 | final campaigns | active | exact-file campaign passed; recovery, daily-life, multi-project, and PTY proof remain |
 
 ## Honesty Rules
