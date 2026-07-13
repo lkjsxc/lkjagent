@@ -1,4 +1,5 @@
 use lkjagent_store::transactions::{Decision, Intake, NativeStore};
+use rusqlite::Connection;
 use std::error::Error;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -44,5 +45,35 @@ fn owner_resume_starts_a_fresh_model_budget_epoch() -> TestResult {
     store.select_decision(&decision("d2","e5",5))?;compile(&mut store,"d2")?;
     store.provider_intent("p2","d2",b"request",5)?;
     assert_eq!(store.provider_exchanges_in_budget_epoch("m")?,1);
+    Ok(())
+}
+
+#[test]
+fn missing_provider_usage_remains_unknown() -> TestResult {
+    let db = path()?;
+    let mut store = NativeStore::open(&db)?;
+    store.owner_intake(&intake())?;
+    store.select_decision(&decision("d1", "e2", 2))?;
+    compile(&mut store, "d1")?;
+    store.provider_intent("p1", "d1", b"request", 2)?;
+    store.provider_phase("p1", "intended", "sent")?;
+    store.provider_outcome(
+        "p1",
+        "failed",
+        b"transport",
+        (None, None),
+        3,
+        b"error",
+        b"endpoint",
+        b"not-parsed",
+    )?;
+    drop(store);
+    let connection = Connection::open(db)?;
+    let usage: (Option<i64>, Option<i64>) = connection.query_row(
+        "SELECT input_tokens,output_tokens FROM provider_exchanges WHERE id='p1'",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?)),
+    )?;
+    assert_eq!(usage, (None, None));
     Ok(())
 }

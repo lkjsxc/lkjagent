@@ -119,7 +119,7 @@ impl NativeStore {
 
     #[allow(clippy::too_many_arguments)]
     #[rustfmt::skip]
-    pub fn provider_outcome(&mut self, id: &str, status: &str, response: &[u8], usage: (i64, i64), finished: i64, finish: &[u8], anomaly: &[u8], parsed: &[u8]) -> StoreResult<()> {
+    pub fn provider_outcome(&mut self, id: &str, status: &str, response: &[u8], usage: (Option<i64>, Option<i64>), finished: i64, finish: &[u8], anomaly: &[u8], parsed: &[u8]) -> StoreResult<()> {
         if !matches!(status, "succeeded" | "failed") {
             return Err(StoreError::InvalidState("provider outcome".into()));
         }

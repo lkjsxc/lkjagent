@@ -126,7 +126,7 @@ fn durable_boundaries_compiles_before_provider_and_sent_is_not_replayed(
             "p",
             "succeeded",
             b"response",
-            (1, 1),
+            (Some(1), Some(1)),
             4,
             b"stop",
             b"",
