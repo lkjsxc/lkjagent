@@ -5,7 +5,7 @@ use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecis
 use lkjagent_core::runtime_tool_catalog::{direct_tool_view, direct_tool_view_for_state};
 
 #[test]
-fn journal_descriptor_and_admission_are_exact() -> Result<(), String> {
+fn record_descriptor_and_admission_are_exact() -> Result<(), String> {
     let decision = RuntimeDecision::new(
         "decision-1",
         "matter-1",
@@ -19,9 +19,11 @@ fn journal_descriptor_and_admission_are_exact() -> Result<(), String> {
         .ok_or("missing record tool")?;
     assert_eq!(entry.required_params, ["family", "title", "body"]);
     assert_eq!(entry.optional_params, Vec::<String>::new());
-    assert_eq!(entry.effect_key.0, "workspace.record.journal");
-    let admitted = admit_action(&decision, &action("journal")).map_err(|error| error.message)?;
-    assert_eq!(admitted.status, AdmissionStatus::Admitted);
+    assert_eq!(entry.effect_key.0, "workspace.record");
+    for family in ["journal", "memory"] {
+        let admitted = admit_action(&decision, &action(family)).map_err(|error| error.message)?;
+        assert_eq!(admitted.status, AdmissionStatus::Admitted);
+    }
     let denied = admit_action(&decision, &action("calendar")).map_err(|error| error.message)?;
     assert_eq!(
         (denied.status, denied.reason.as_str()),

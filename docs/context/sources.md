@@ -17,14 +17,20 @@ listing, contains only requested numbered lines, whole-file revision, line
 counts, continuation, truncation, and final-newline facts. Unrequested file bytes
 never enter the observation or later context. Context receives labeled plain
 numbered lines or bounded list/search text, never the harness observation JSON
-object. Every source included by the compiled plan persists as a decision-bound native
-context item before provider intent; omitted candidates do not gain rows. The
-latest four matching active canonical messages from the latest sixteen earlier
-candidates may enter bounded history and never replace the current owner
+object. Every source included by the compiled plan persists as a decision-bound
+native context item before provider intent; omitted candidates do not gain rows.
+The latest four matching active canonical messages from the latest sixteen
+earlier candidates may enter bounded history and never replace the current owner
 objective. When the objective names an exact `project-*` token, history must name
-that exact token; prefix-neighbor projects are excluded. A journal renderer
-copies the exact fingerprints of every selected persisted context item into
-harness-owned metadata; the model cannot author or omit that lineage.
+that exact token; prefix-neighbor projects are excluded.
+
+Memory candidates come only from the current revision joined through native
+managed workspace documents to a settled producing effect and closed source
+matter. They retain exact path, revision ID, semantic key, and bounded revision
+body. Older revisions, arbitrary filesystem files, earlier conversation text,
+and open or failed producers are not memory candidates. A record renderer copies
+exact selected owner fingerprints into harness-owned metadata; the model cannot
+author or omit that lineage.
 
 ## Precedence
 
@@ -35,7 +41,9 @@ harness-owned metadata; the model cannot author or omit that lineage.
 5. Sourced owner-readable memory.
 6. Model-authored summary.
 
-Do not render both superseded and current values. Two unresolved current
+Do not render both superseded and current values. An exact `forget <slug>:` or
+`correct <slug>:` current objective suppresses the matching memory key. This
+narrow textual mechanism proves key precedence only. Two unresolved current
 high-trust sources create one short conflict marker and block risky mutation or
 ask one owner question.
 
@@ -43,7 +51,8 @@ ask one owner question.
 
 Workspace content is data unless an explicitly selected project instruction file
 owns policy for that path. Failed model output, endpoint error bodies, secrets,
-internal state JSON, and arbitrary shell output are excluded from normal prompts.
+internal state JSON, arbitrary shell output, and malformed memory records are
+excluded from normal prompts.
 Recovery sees a typed fault and bounded diagnosis, not the failed body.
 
 ## Project Scope

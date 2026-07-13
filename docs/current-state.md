@@ -113,14 +113,14 @@ preparation, 16 persisted rejected outputs exhaust recovery cost, and 900,000
 settled/current-cycle active milliseconds block without charging daemon downtime.
 The tracked schedule retained later active intake without claiming it closed.
 
-The public compiler attaches its context plan and frame fingerprints, includes
-up to four active canonical messages from earlier matters after exact project-token
-filtering, and stores one native
-context-item row for every included owner, history, or measured source. List and
-search observations remain orienting evidence until a read produces current
-source bytes. Final admission rejects future-tense and unsupported command or
-test claims; richer claim-to-path comparison remains a bounded follow-up. Close
-and the owner receipt remain check-derived. These are source gaps, not fallback.
+The public compiler attaches its context plan and frame fingerprints, filters
+canonical history by exact project token, and persists every selected owner,
+history, memory, or measured source. Memory candidates are bounded current
+managed `knowledge/notes/*.md` revisions with settled effects and closed source
+matters, never arbitrary files. Exact `forget <slug>:` and `correct <slug>:`
+forms suppress one matching key. List and search remain orienting evidence until
+a read provides current source bytes. Final admission rejects future-tense and
+unsupported command or test claims. Close and receipt remain check-derived.
 
 The native `conversation_messages` table is canonical for public turns. Typed
 TUI intake uses the exact returned durable message identity, and failed intake
@@ -135,15 +135,13 @@ startup no longer writes scaffold files, and diagnostics report both roots. The
 flat registry now accepts seven keys with current consumers, including strict
 `workspace_timezone` selection for journals.
 
-The first native record slice adds descriptor-derived `write_record` for journal
-only. Selection persists wall time, fixed-offset timezone, and local date before
-the provider call. The harness renders bounded Markdown at the canonical daily
-path with selected context fingerprints. Missing parents are first persisted as
-mkdir effect targets, then created with no-follow `mkdirat` and fsync. First
-write and native-revision-bound replacement produce managed revisions and four
-current checks; unmanaged and stale owner bytes block. The scripted public flow
-proves these mechanics, 18 tables, no scaffold, and path/revision receipts. It
-does not prove model-authored semantic groundedness.
+One descriptor-derived `write_record` admits journal and memory under
+`workspace.record`. Journal retains its date path and `managed-journal`; memory
+uses a bounded slug, harness frontmatter, owner lineage, and `managed-memory`.
+Both share declared parents, managed revisions, checks, and receipts. Scripted
+tests prove write, replacement, collision, stale bytes, retry, bounded current
+retrieval, exact-once prompt use, correction, and arbitrary-file exclusion.
+Semantic truth and filler remain for the unrun configured memory campaign.
 
 ## Direct Contract
 
@@ -184,7 +182,9 @@ claims, and the close transaction owns the canonical final message.
 | matter-budgets | complete | call, token, effect, recovery, and active-time epoch limits visibly block and resume from owner input |
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
 | native journal mechanics | complete | focused descriptor, timezone, parent safety, effect retry, managed revision, structural check, and public scripted tests pass |
+| native memory mechanics | complete | focused slug, lineage, managed revision, retrieval, correction, contamination, and prompt-occurrence tests pass |
 | configured-model journal proof | active | scripted mechanics cannot establish factual groundedness; the configured journal campaign has not run |
+| configured-model memory proof | active | deterministic W06/C04 portions are derived; semantic recall and filler judgment remain unrun |
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
 | configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |
 | retired-source-deletion | complete | old controller, bridge, record, inspection, workbench, and TUI source is absent from product crates |

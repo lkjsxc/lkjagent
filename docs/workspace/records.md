@@ -8,10 +8,11 @@ Define grounded records, sourced memory, activity projections, and reports.
 
 The normal descriptor registry exposes `write_record` with exact `family`,
 `title`, and `body` fields during orient, modify, and named recovery. This slice
-admits only exact `family=journal`; review and respond expose no record tool. The
-persisted descriptor, admission, and `workspace.record.journal` effect key drive
-dispatch. There is no public record command, scheduler, manifest, separate
-grammar, or direct writer.
+admits exact `family=journal` and `family=memory`; review and respond expose no
+record tool. The persisted descriptor and admission retain one honest
+`workspace.record` effect key. Family dispatch occurs only on that admitted
+path. There is no public record command, scheduler, index authority, manifest,
+separate grammar, or direct writer.
 
 ## Journal
 
@@ -29,21 +30,41 @@ lineage, effect, revision, structural check, generic byte/content/collateral
 checks, and a receipt that binds checked path and revision. Scripted tests prove
 mechanics only; configured-model campaigns own semantic groundedness.
 
+## Memory
+
+A memory write derives one nonempty lowercase kebab slug from the bounded title
+and writes `knowledge/notes/<slug>.md`. The harness owns path and frontmatter:
+`kind: memory`, semantic key, slug, and exact current owner source fingerprints.
+It rejects unsafe controls, known placeholders, a title with no safe slug,
+missing owner lineage, prohibited sensitive/raw-output forms, and a rendered
+file above 512 conservative token units before workspace mutation.
+
+The existing exact effect handles declared parents, managed replacement,
+unmanaged collision, revisions, checks, receipts, stale owner bytes, and retry
+safety. Memory adds `managed-memory`; journal retains `managed-journal` without
+weaker predicates. Deterministic checks prove lineage, shape, placeholder and
+size bounds. Whether model-authored prose is semantically true or merely filler
+remains a configured-campaign judgment and is not claimed by scripted tests.
+
+Later matters may receive only current active managed native revisions below
+`knowledge/notes/*.md` whose producing effect settled and source matter closed.
+Candidates carry exact path and current revision ID, are deduplicated by semantic
+key/current revision, and are bounded to four items, 2,048 bytes, and 512
+conservative token units, with a 1,024-byte/256-unit item cap. The filesystem is
+not scanned. Superseded revisions, open source matters, other roots, malformed
+records, and arbitrary files are absent. A row enters `context_items` only if
+compilation selects it, and its body enters the prompt at most once.
+
+A current objective line `forget <slug>:` or `correct <slug>:` suppresses the
+matching memory candidate during assembly. This proves only exact textual key
+correction; it is not a general semantic correction claim or a second control
+plane.
+
 ## Other Families
 
 Add one complete family at a time: TODO by open/done state, calendar by date,
-finance by month, ordinary note by semantic slug, then project note below one
-project root. Each uses the common effect, revision, observation, and check path.
-
-## Memory
-
-Memory begins as sourced owner-readable Markdown below `knowledge/`. Store only
-explicit owner facts/preferences, durable project facts, or verified paths needed
-later. Each entry names source identity and effective date when known.
-
-Do not store secrets, failed model claims, transient faults, or duplicated
-objective prose. A later current owner correction wins. Acceptance requires one
-fact to influence a fresh matter exactly once.
+finance by month, then project note below one project root. Each uses the common
+effect, revision, observation, and check path.
 
 ## Activity
 

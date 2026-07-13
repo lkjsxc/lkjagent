@@ -91,8 +91,11 @@ fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<
     {
         return Some("incomplete persisted tool projection".into());
     }
-    if entry.effect_key.0 == "workspace.record.journal"
-        && action.params.get("family").map(String::as_str) != Some("journal")
+    if entry.effect_key.0 == "workspace.record"
+        && !matches!(
+            action.params.get("family").map(String::as_str),
+            Some("journal" | "memory")
+        )
     {
         return Some("record family is not admitted".into());
     }

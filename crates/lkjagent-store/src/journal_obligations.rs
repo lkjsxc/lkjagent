@@ -44,8 +44,16 @@ pub(crate) fn insert(tx: &Transaction<'_>, effect: &Effect<'_>) -> StoreResult<(
     for (kind, payload) in values {
         insert_one(tx, effect.journal, &matter, kind, &payload.to_string())?;
     }
-    if effect.reason == b"workspace.record.journal" {
-        insert_managed_journal(tx, effect, &matter, path)?;
+    if effect.reason == b"workspace.record" {
+        if text.starts_with("---\nkind: journal\n") {
+            insert_managed_journal(tx, effect, &matter, path)?;
+        } else if text.starts_with("---\nkind: memory\n") {
+            insert_managed_memory(tx, effect, &matter, path)?;
+        } else {
+            return Err(StoreError::InvalidState(
+                "record kind is not admitted".into(),
+            ));
+        }
     }
     Ok(())
 }
@@ -87,6 +95,53 @@ fn insert_managed_journal(
         "managed-journal",
         &payload.to_string(),
     )
+}
+
+fn insert_managed_memory(
+    tx: &Transaction<'_>,
+    effect: &Effect<'_>,
+    matter: &str,
+    path: &str,
+) -> StoreResult<()> {
+    let slug = path
+        .strip_prefix("knowledge/notes/")
+        .and_then(|value| value.strip_suffix(".md"))
+        .filter(|value| semantic_slug(value))
+        .ok_or_else(|| StoreError::InvalidState("memory path is not canonical".into()))?;
+    let mut query = tx.prepare(
+        "SELECT CAST(source_revision AS TEXT) FROM context_items
+         WHERE decision_id=?1 AND source_kind='owner' ORDER BY source_id,source_revision",
+    )?;
+    let sources = query
+        .query_map([effect.decision], |row| row.get::<_, String>(0))?
+        .collect::<Result<Vec<_>, _>>()?;
+    if sources.is_empty() {
+        return Err(StoreError::InvalidState(
+            "memory has no current owner lineage".into(),
+        ));
+    }
+    let payload = json!({
+        "path":path,"kind":"memory","semantic_key":slug,"slug":slug,
+        "source_fingerprints":sources,"max_token_units":512
+    });
+    insert_one(
+        tx,
+        effect.journal,
+        matter,
+        "managed-memory",
+        &payload.to_string(),
+    )
+}
+
+fn semantic_slug(value: &str) -> bool {
+    !value.is_empty()
+        && value.len() <= 80
+        && !value.starts_with('-')
+        && !value.ends_with('-')
+        && value
+            .bytes()
+            .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-')
+        && !value.as_bytes().windows(2).any(|pair| pair == b"--")
 }
 
 fn journal_date(path: &str) -> Option<String> {

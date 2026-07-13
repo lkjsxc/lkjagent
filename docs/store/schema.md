@@ -22,7 +22,9 @@ Define the fresh active SQLite tables and authority constraints.
   remain unique.
 - `provider_exchanges`: request intent, response outcome, nullable reported
   usage, and timing; absent provider usage remains unknown rather than zero.
-- `context_items`: source identity, revision, semantic key, trust, body reference.
+- `context_items`: selected source identity, revision, semantic key, trust, and
+  body reference. Sourced memory uses its managed path and exact current native
+  revision ID; an omitted candidate has no row.
 - `daemon_leases`: process ownership and heartbeat.
 - `config_fingerprints`: effective nonsecret configuration identity.
 
