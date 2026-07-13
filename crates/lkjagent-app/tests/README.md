@@ -11,6 +11,7 @@ Map integration coverage for the compiled direct application surface.
 - [cli.rs](cli.rs): retired command rejection before storage creation.
 - [configuration-contract.rs](configuration_contract.rs): scalar configuration validation.
 - [endpoint.rs](endpoint.rs): configured transport and direct diagnostics.
+- [journal-flow.rs](journal_flow.rs): canonical create, replacement, lineage, collision, bounds, and stale guards.
 - [public-loop.rs](public_loop.rs): exact edit, restart, conversation, and stale guards.
 - [tui-contract.rs](tui_contract.rs): pure identity, composer, wrapping, and viewport behavior.
 - [workspace-root.rs](workspace_root.rs): lazy separate workspace capability.

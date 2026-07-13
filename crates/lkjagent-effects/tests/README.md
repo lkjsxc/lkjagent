@@ -8,4 +8,4 @@ Map integration coverage for direct workspace effects.
 
 - [workspace-edit.rs](workspace_edit.rs): exact edit preparation and phases.
 - [workspace-safety.rs](workspace_safety.rs): bounded content and listings.
-- [workspace-safety-paths.rs](workspace_safety_paths.rs): path and race safety.
+- [workspace-safety-paths.rs](workspace_safety_paths.rs): path, parent mkdir, collision, and race safety.

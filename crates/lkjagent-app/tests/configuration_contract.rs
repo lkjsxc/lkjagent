@@ -32,6 +32,41 @@ fn rejects_ranges_and_workspace_controls() -> TestResult<()> {
 }
 
 #[test]
+fn workspace_timezone_is_consumed_and_strictly_bounded() -> TestResult<()> {
+    for zone in ["UTC", "+00:00", "-00:00", "+14:00", "-14:00"] {
+        let data = fixture(
+            "timezone-valid",
+            &format!(
+                "{{{base},\"workspace_timezone\":\"{zone}\"}}",
+                base = endpoint()
+            ),
+        )?;
+        assert_eq!(config::workspace_timezone(&data)?, zone);
+    }
+    for zone in [
+        "utc",
+        "Europe/London",
+        "+1:00",
+        "+14:01",
+        "-15:00",
+        "+01:60",
+    ] {
+        let data = fixture(
+            "timezone-invalid",
+            &format!(
+                "{{{base},\"workspace_timezone\":\"{zone}\"}}",
+                base = endpoint()
+            ),
+        )?;
+        assert!(
+            config::workspace_timezone(&data).is_err(),
+            "accepted {zone}"
+        );
+    }
+    Ok(())
+}
+
+#[test]
 fn missing_runtime_configuration_uses_defaults() -> TestResult<()> {
     let data = std::env::temp_dir().join(format!(
         "lkjagent-configuration-empty-{}",
@@ -42,6 +77,7 @@ fn missing_runtime_configuration_uses_defaults() -> TestResult<()> {
     }
     fs::create_dir_all(&data)?;
     config::load_client(&data)?;
+    assert_eq!(config::workspace_timezone(&data)?, "UTC");
     Ok(())
 }
 
@@ -51,7 +87,7 @@ fn tracked_example_matches_the_registry() -> TestResult<()> {
     let text = fs::read_to_string(root.join("config/lkjagent.example.json"))?;
     let example: serde_json::Value = serde_json::from_str(&text)?;
     let object = example.as_object().ok_or("example root is not an object")?;
-    assert_eq!(object.len(), 6);
+    assert_eq!(object.len(), 7);
     assert!(object.values().all(is_scalar));
     config::validate_document(&text)?;
     Ok(())

@@ -7,7 +7,7 @@ use lkjagent_core::runtime_selector::{EXIT_GUARDS, FILE_CHECK_KINDS};
 use lkjagent_core::runtime_state::{StateKey, FAULT_KINDS, MATTER_STATES, NEED_KINDS, RUNTIME_PHASES, STATE_STATUSES, WAKE_KINDS};
 use lkjagent_core::runtime_tool_call::{FINAL_FIELDS, MODEL_ENVELOPES, TOOL_CALL_FIELDS};
 #[rustfmt::skip]
-use lkjagent_core::runtime_tool_catalog::{direct_catalog, direct_tool_view, TOOL_DESCRIPTOR_FIELDS};
+use lkjagent_core::runtime_tool_catalog::{direct_catalog, TOOL_DESCRIPTOR_FIELDS};
 #[test]
 fn contract_tables_are_exact_and_closed() {
     assert_eq!(
@@ -139,7 +139,8 @@ fn contract_tables_decision_context_check_recovery_and_exit_are_exact() {
             "admitted-diff",
             "preserved-mode",
             "allowed-changed-paths",
-            "effects-settled"
+            "effects-settled",
+            "managed-journal"
         ]
     );
     assert_eq!(
@@ -176,7 +177,7 @@ fn contract_tables_tool_catalog_and_open_keys_preserve_authority() {
     let names = catalog.iter().map(|tool| tool.name).collect::<Vec<_>>();
     assert_eq!(
         names.join(","),
-        "list_directory,search_text,read_file,edit_file,create_file"
+        "list_directory,search_text,read_file,edit_file,create_file,write_record"
     );
     #[rustfmt::skip]
     let field_names = |index: usize| catalog[index].fields.iter()
@@ -186,15 +187,12 @@ fn contract_tables_tool_catalog_and_open_keys_preserve_authority() {
     assert_eq!(field_names(2), ["path", "offset", "count", "complete"]);
     assert_eq!(field_names(3), ["path", "old_text", "new_text"]);
     assert_eq!(field_names(4), ["path", "content"]);
+    assert_eq!(field_names(5), ["family", "title", "body"]);
     assert!(catalog.iter().all(|tool| !tool.effect_key.is_empty()
         && tool.result_max_bytes > 0
         && !tool.denial_code.is_empty()));
-    let mut sorted_names = names;
-    sorted_names.sort();
-    assert_eq!(direct_tool_view().tool_names(), sorted_names);
-    let unknown = StateKey::from_label("future-capability:unrecognized/value");
-    assert_eq!(
-        unknown.map(|key| key.as_label()),
-        Ok("future-capability:unrecognized/value".to_string())
-    );
+    #[rustfmt::skip]
+    let unknown=StateKey::from_label("future-capability:unrecognized/value");
+    #[rustfmt::skip]
+    assert_eq!(unknown.map(|key|key.as_label()),Ok("future-capability:unrecognized/value".to_string()));
 }

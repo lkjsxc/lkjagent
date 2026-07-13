@@ -62,9 +62,6 @@ pub fn read(root: &Path, path: &str, offset: usize, count: usize) -> EffectResul
 
 pub fn write(root: &Path, path: &str, content: &str) -> EffectResult<String> {
     let full = resolve(root, path)?;
-    if let Some(parent) = full.parent() {
-        fs::create_dir_all(parent)?;
-    }
     fs::write(full, content)?;
     Ok(format!("path={path}\nbytes={}", content.len()))
 }

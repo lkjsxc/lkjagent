@@ -120,7 +120,7 @@ fn obligations(
     matter: &str,
 ) -> StoreResult<Vec<(String, String, Vec<u8>)>> {
     let mut query = tx.prepare("SELECT id,predicate_kind,predicate_payload FROM obligations
-        WHERE matter_id=?1 AND required=1 AND predicate_kind IN ('workspace-byte','workspace-content','workspace-collateral') ORDER BY id")?;
+        WHERE matter_id=?1 AND required=1 AND predicate_kind IN ('workspace-byte','workspace-content','workspace-collateral','managed-journal') ORDER BY id")?;
     let rows = query.query_map([matter], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))?;
     Ok(rows.collect::<Result<Vec<_>, _>>()?)
 }
@@ -171,6 +171,7 @@ fn evaluate(kind: &str, parameters: &[u8], fact: &EffectFact, bytes: &[u8], mode
         "workspace-collateral" => value["allowed_paths"].as_array().is_some_and(|allowed|
             fact.targets.iter().all(|path|
                 allowed.iter().any(|item| item.as_str() == Some(path)))),
+        "managed-journal" => crate::journal_checks::evaluate(parameters, &fact.path, bytes),
         _ => false,
     }
 }

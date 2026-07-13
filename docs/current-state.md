@@ -8,30 +8,17 @@ name the next executable work.
 ## Evidence Boundary
 
 The public-loop work started from `ee4de81536b1baac845a346103f14420cd41f45b`.
-The focused native-loop test passes in the current checkout, whose source is not
-yet frozen. A tracked configured-model file campaign has passed as described
-below. The current checkout copies `AGENTS.md` into the build image; rebuilt
-Compose test, lint, verify, agent build, and native doctor all pass. The live
-campaign remains historical evidence rather than proof of this changed source.
-The original planning comparison used source
+Focused native-loop and scripted journal tests pass in this unfrozen checkout.
+Changed-source local and rebuilt Compose test, lint, and verify pass; native
+doctor and configured-model journal campaigns have not run. The original
+comparison used source
 `5604ec89af3ba9dbfb287bd869971781fdcf2fad` and parent product source
 `28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`.
 
-Configured-model smoke runs exposed and corrected stripped closing tags,
-recovery cells bound to the wrong key, omitted orient observations, unlabeled
-listing paths, pending dispatch errors, repeated read-only calls, and unbounded
-final-wording faults. Sources `5b643de8b10ce0ee9bd2cbe63b53c1dbed8f3798`
-and `1e6de0d40acec2563ff2578cb41862481a9892cf` first proved an exact edit and
-checked read-only continuation.
-
-Four 903-second tracked attempts then progressed honestly. Source
-`7f47763540e7042b3cf111997e082c72832d5c6a` exited on malformed-output recovery.
-Source `607465201258253de06a649c5f0d96334cc2d690` reached two checked closes.
-Source `ee738f6a46ab7e40481524d0cbe0a4f6b7e73977` reached three but repeated
-inventory listing. Source `f5535af5a8b2237dfbaabfb9678ccb93954707fa`
-also reached three and showed that requiring later sustained-intake matters to
-close exceeded the declared edit, second-turn, and retrieval checks. None was
-recorded as success.
+Configured smoke runs corrected protocol, observation, dispatch, repetition, and
+final-wording faults. Four tracked 903-second attempts made partial progress but
+were not successes. Those runs remain historical diagnostics, not evidence for
+the changed journal source.
 
 A fifth tracked 903-second run at source
 `689b48ec577e35315f632d5ab008f8eb9218ab18` passed its semantic evaluator with
@@ -144,7 +131,18 @@ or the blocked-worker test.
 Configuration and Compose now separate the runtime data root from one visible
 workspace root. The workspace is created only by an actual workspace operation,
 startup no longer writes scaffold files, and diagnostics report both roots. The
-flat registry now accepts only six keys with current consumers.
+flat registry now accepts seven keys with current consumers, including strict
+`workspace_timezone` selection for journals.
+
+The first native record slice adds descriptor-derived `write_record` for journal
+only. Selection persists wall time, fixed-offset timezone, and local date before
+the provider call. The harness renders bounded Markdown at the canonical daily
+path with selected context fingerprints. Missing parents are first persisted as
+mkdir effect targets, then created with no-follow `mkdirat` and fsync. First
+write and native-revision-bound replacement produce managed revisions and four
+current checks; unmanaged and stale owner bytes block. The scripted public flow
+proves these mechanics, 18 tables, no scaffold, and path/revision receipts. It
+does not prove model-authored semantic groundedness.
 
 ## Direct Contract
 
@@ -184,6 +182,8 @@ claims, and the close transaction owns the canonical final message.
 | conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
 | matter-budgets | complete | call, token, effect, recovery, and active-time epoch limits visibly block and resume from owner input |
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
+| native journal mechanics | complete | focused descriptor, timezone, parent safety, effect retry, managed revision, structural check, and public scripted tests pass |
+| configured-model journal proof | active | scripted mechanics cannot establish factual groundedness; the configured journal campaign has not run |
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
 | configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |
 | retired-source-deletion | complete | old controller, bridge, record, inspection, workbench, and TUI source is absent from product crates |

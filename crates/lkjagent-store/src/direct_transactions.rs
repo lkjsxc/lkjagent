@@ -89,15 +89,9 @@ impl NativeStore {
         if value.targets.is_empty() {
             return Err(StoreError::InvalidState("effect has no targets".into()));
         }
-        if obligations
-            && value.targets.iter().any(|t| {
-                !matches!(t.operation, "create" | "replace")
-                    || t.intended.is_none()
-                    || (t.operation == "replace" && t.prior.is_none())
-            })
-        {
+        if obligations && !exact_targets(value) {
             return Err(StoreError::InvalidState(
-                "exact effect requires create/edit bytes".into(),
+                "exact effect requires a file first and declared mkdir targets".into(),
             ));
         }
         self.atomic(|tx| {
@@ -109,7 +103,7 @@ impl NativeStore {
             for (ordinal, target) in value.targets.iter().enumerate() {
                 tx.execute("INSERT INTO effect_targets(journal_id,ordinal,normalized_path,prior_bytes,intended_bytes,operation,prior_mode,intended_mode,stage_identity) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9)", params![value.journal,ordinal as i64,target.path,target.prior,target.intended,target.operation,target.prior_mode,target.intended_mode,target.stage_identity])?;
             }
-            if obligations { insert_obligations(tx, value)?; }
+            if obligations { crate::journal_obligations::insert(tx, value)?; }
             Ok(())
         })
     }
@@ -154,27 +148,23 @@ fn direct_retry(tx: &Transaction<'_>, v: &DirectSettlement<'_>) -> StoreResult<b
 }
 #[rustfmt::skip]
 fn effect_retry(tx: &Transaction<'_>, e: &Effect<'_>) -> StoreResult<bool> {
-    let count:i64=tx.query_row("SELECT count(*) FROM effect_journal j JOIN tool_admissions a ON a.id=j.admission_id WHERE j.id=?1 AND a.id=?2 AND j.decision_id=?3 AND j.command_ordinal=?4 AND j.idempotency_key=?5 AND j.status='prepared' AND j.intended_fingerprint=?6 AND j.prior_fingerprint IS ?7 AND a.action_fingerprint=?8 AND a.reason=?9 AND a.parsed_call=?10 AND a.tool_spec=?11",params![e.journal,e.admission,e.decision,e.action_ordinal,e.idempotency,e.intended_fingerprint,e.prior_fingerprint,e.action_fingerprint,e.reason,e.parsed_call,e.tool_spec],|r|r.get(0))?;
+    let count:i64=tx.query_row("SELECT count(*) FROM effect_journal j JOIN tool_admissions a ON a.id=j.admission_id WHERE j.id=?1 AND a.id=?2 AND j.decision_id=?3 AND j.command_ordinal=?4 AND j.idempotency_key=?5 AND j.intended_fingerprint=?6 AND j.prior_fingerprint IS ?7 AND a.action_fingerprint=?8 AND a.reason=?9 AND a.parsed_call=?10 AND a.tool_spec=?11",params![e.journal,e.admission,e.decision,e.action_ordinal,e.idempotency,e.intended_fingerprint,e.prior_fingerprint,e.action_fingerprint,e.reason,e.parsed_call,e.tool_spec],|r|r.get(0))?;
     if count!=1 { return Ok(false); }
     for (n,t) in e.targets.iter().enumerate() { let found:i64=tx.query_row("SELECT count(*) FROM effect_targets WHERE journal_id=?1 AND ordinal=?2 AND normalized_path=?3 AND prior_bytes IS ?4 AND intended_bytes IS ?5 AND operation=?6 AND prior_mode IS ?7 AND intended_mode IS ?8 AND stage_identity=?9",params![e.journal,n as i64,t.path,t.prior,t.intended,t.operation,t.prior_mode,t.intended_mode,t.stage_identity],|r|r.get(0))?; if found!=1{return Ok(false);} }
     let total:i64=tx.query_row("SELECT count(*) FROM effect_targets WHERE journal_id=?1",[e.journal],|r|r.get(0))?;
     Ok(total==e.targets.len() as i64)
 }
-#[rustfmt::skip]
-fn insert_obligations(tx: &Transaction<'_>, e: &Effect<'_>) -> StoreResult<()> {
-    let matter:String=tx.query_row("SELECT matter_id FROM runtime_decisions WHERE id=?1",[e.decision],|r|r.get(0))?;
-    let target=e.targets.first().ok_or_else(||StoreError::InvalidState("effect has no target".into()))?;
-    let path=std::str::from_utf8(target.path).map_err(|error|StoreError::InvalidState(error.to_string()))?;
-    let intended=target.intended.ok_or_else(||StoreError::InvalidState("effect has no intended bytes".into()))?;
-    let text=std::str::from_utf8(intended).map_err(|error|StoreError::InvalidState(error.to_string()))?;
-    let old=target.prior.and_then(|bytes|std::str::from_utf8(bytes).ok()).unwrap_or("");
-    let allowed=e.targets.iter().map(|item|String::from_utf8_lossy(item.path).into_owned()).collect::<Vec<_>>();
-    let values=[("workspace-byte",serde_json::json!({"path":path,"sha256":hex(e.intended_fingerprint)})),
-        ("workspace-content",serde_json::json!({"path":path,"old":old,"new":text,"old_count":0,"new_count":1})),
-        ("workspace-collateral",serde_json::json!({"allowed_paths":allowed}))];
-    for (kind,payload) in values { let id=format!("{}/{kind}",e.journal);
-        tx.execute("INSERT INTO obligations(id,matter_id,predicate_kind,predicate_payload,required,status) VALUES(?1,?2,?3,?4,1,'open')",params![id,matter,kind,payload.to_string().as_bytes()])?; }
-    Ok(())
+fn exact_targets(effect: &Effect<'_>) -> bool {
+    let Some(file) = effect.targets.first() else {
+        return false;
+    };
+    let file_ok = matches!(file.operation, "create" | "replace")
+        && file.intended.is_some()
+        && (file.operation == "create" || file.prior.is_some());
+    file_ok
+        && effect.targets.iter().skip(1).all(|target| {
+            target.operation == "mkdir" && target.prior.is_none() && target.intended.is_none()
+        })
 }
 fn hex(bytes: &[u8]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()

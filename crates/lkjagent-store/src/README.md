@@ -12,5 +12,6 @@ Map the modules compiled into the native direct store.
 - [native-schema.sql](native-schema.sql): native SQLite objects.
 - [transactions.rs](transactions.rs): native intake through close boundaries.
 - [direct-transactions.rs](direct_transactions.rs): direct tool and fault settlement.
+- [journal-obligations.rs](journal_obligations.rs): exact file, mkdir, and managed journal obligations.
 - [tui-snapshot.rs](tui_snapshot.rs): one-transaction bounded TUI frame reads.
 - [tui-snapshot-tests.rs](tui_snapshot_tests.rs): projection, pagination, and WAL consistency tests.

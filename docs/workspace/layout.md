@@ -35,9 +35,9 @@ workspace/
 ```
 
 This is a grammar, not a startup scaffold. Editing an existing file creates no
-README or projection. A record or report effect may declare the short README
-needed for its first real child. Every created path is part of the admitted
-target set.
+README or projection. The current journal slice creates only its canonical
+`entry.md` and missing parent directories; it creates no README. Every newly
+created path is part of the admitted target set.
 
 ## Path Rules
 
@@ -48,8 +48,9 @@ writes, and recovery.
 
 ## File Size
 
-Agent-owned Markdown targets at most 512 model tokens. Existing owner files may
-be larger and are read in pages. A write-derived maintenance obligation may
+Agent-owned Markdown targets at most 512 conservative token units, computed as
+the greater of UTF-8 character count and bytes divided by four rounded up.
+Existing owner files may be larger and are read in pages. A write-derived maintenance obligation may
 split an oversized agent-owned file into meaningful children and a map. It never
 creates empty parts or rewrites owner files automatically.
 

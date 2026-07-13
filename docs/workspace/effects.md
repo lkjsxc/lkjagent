@@ -25,7 +25,17 @@ The model does not echo a fingerprint; the decision and observation bind it.
 
 One SQLite transaction stores admission, idempotency, target path, exact
 prior/intended bytes, expected/intended mode, deterministic stage name, and
-prepared journal state. A create also declares every new parent directory.
+prepared journal state. A nested create validates absence from the nearest
+opened parent without opening a nonexistent directory. Its file target is first;
+every absent parent follows as an exact `mkdir` target. Existing owner
+directories are not targets.
+
+After preparation, a narrow Linux `mkdirat` edge traverses no-follow, rejects
+file, symlink, special, and case collisions, creates only declared parents, and
+fsyncs each new directory and its parent. It does not use `create_dir_all`.
+Owner bytes or a racing collision win. Declared directories left beside an
+unfinished journal remain in place, and startup exposes that unfinished effect;
+this slice does not claim fuller directory recovery.
 
 ## Replacement
 
@@ -57,10 +67,16 @@ latest owner bytes, mode, journal state, and no residue.
 
 Settlement rereads the target through the same path service, stores immutable
 revision and receipt, emits one bounded observation, and settles the decision.
-The app check reducer consumes only that committed successful observation. It
-rereads the target through the already opened descriptor capability, compares
-bytes and mode with the effect target and revision, checks required content and
-allowed target paths, then durably reduces the matching obligations. Repeating
-the reducer at the same source revision adds no rows. A failed or stale check
-returns to modification or recovery; it cannot be converted into model success
-prose.
+First journal write creates a managed document. A same-path write may replace it
+only when current filesystem bytes equal the native current revision; settlement
+creates a child revision. An unmanaged collision or stale owner bytes block.
+Exact identical journal preparation is idempotent even after settlement;
+changed reuse conflicts.
+
+The app check reducer consumes only the committed successful observation. It
+rereads the target through the opened descriptor capability, compares bytes and
+mode with the first effect target and revision, checks content and all allowed
+file or mkdir targets, then durably reduces obligations. Journals add a
+structural lineage/path/date/token/nonplaceholder check. Repeating at the same
+source revision adds no rows. A failed or stale check cannot become success
+prose, and final receipts include checked path parameters and revision.

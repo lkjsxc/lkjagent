@@ -12,7 +12,9 @@ state affordances, budgets, and workspace policy. Rejection records a typed
 reason and creates no effect row.
 
 Dispatch receives only an admitted stable effect key and typed values. A
-separate switch cannot grant a tool omitted by the registry.
+separate switch cannot grant a tool omitted by the registry. `write_record`
+rejects every family except exact `journal` before an effect row or filesystem
+mutation. The model supplies no record path, date, or metadata.
 
 ## Path And Revision Guards
 
@@ -28,8 +30,11 @@ budgets.
 ## Effect Boundary
 
 Accepted effect admission, exact target revisions, stage metadata, and journal
-row commit before filesystem mutation. Read-only operations also persist
-admission and observation when their output affects later work.
+row commit before filesystem mutation. A missing-parent journal create lists the
+file first and every absent parent as `mkdir` targets in that transaction. Only
+then may the no-follow `mkdirat` edge create and fsync those directories.
+Read-only operations also persist admission and observation when their output
+affects later work.
 
 ## Observation
 

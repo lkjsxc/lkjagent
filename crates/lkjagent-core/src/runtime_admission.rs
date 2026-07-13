@@ -91,6 +91,11 @@ fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<
     {
         return Some("incomplete persisted tool projection".into());
     }
+    if entry.effect_key.0 == "workspace.record.journal"
+        && action.params.get("family").map(String::as_str) != Some("journal")
+    {
+        return Some("record family is not admitted".into());
+    }
     for spec in entry.field_specs.iter().filter(|spec| spec.required) {
         if !action.params.contains_key(&spec.name) {
             return Some(format!("missing required parameter {}", spec.name));

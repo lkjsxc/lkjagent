@@ -19,6 +19,7 @@ lkjagent-effects = { path = "../lkjagent-effects" }
 lkjagent-llm = { path = "../lkjagent-llm" }
 lkjagent-store = { path = "../lkjagent-store" }
 rusqlite = { version = "0.40.1", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10.9"
 unicode-segmentation = "1.12.0"

@@ -567,6 +567,7 @@ dependencies = [
  "lkjagent-llm",
  "lkjagent-store",
  "rusqlite",
+ "serde",
  "serde_json",
  "sha2",
  "unicode-segmentation",

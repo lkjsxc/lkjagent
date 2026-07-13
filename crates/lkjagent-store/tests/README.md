@@ -8,6 +8,7 @@ Map integration coverage for the native direct store.
 
 - [budget-epoch.rs](budget_epoch.rs): owner-resume budget epoch accounting.
 - [durable-boundaries.rs](durable_boundaries.rs): schema and transaction boundaries.
+- [journal-effects.rs](journal_effects.rs): mkdir targets and exact settled retry identity.
 - [native-constraints.rs](native_constraints.rs): native relational constraints.
 - [native-direct-loop.rs](native_direct_loop.rs): direct projection and settlement continuity.
 - [native-reopen.rs](native_reopen.rs): reopen and incompatible schema rejection.
