@@ -34,7 +34,7 @@ fn direct() -> DirectSettlement<'static> {
         action_fingerprint:b"action", parsed_call:b"read notes/a", tool_spec:b"read-v1",
         tool:DirectTool::Read, observation:"o1", outcome:b"bytes", content_ref:b"cache/1",
         fingerprint:b"observed-fp", event:"e3", event_sequence:3, monotonic_ms:3,
-        wall_time:"now", event_payload:b"direct", namespace:b"source", cell_key:b"notes/a",
+        wall_time:"now", event_payload:b"direct", namespace:b"source", cell_key:b"current", source_path:b"notes/a",
         source_revision:b"rev-1", bytes_ref:b"cache/1" }
 }
 
