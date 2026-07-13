@@ -5,6 +5,14 @@ use crate::native_schema::MessageIdentity;
 use crate::transactions::{Intake, NativeStore};
 
 impl NativeStore {
+    pub fn checked_paths(&self, matter: &str) -> StoreResult<Vec<(String, String)>> {
+        let mut query = self.connection.prepare(
+            "SELECT DISTINCT json_extract(CAST(c.parameters AS TEXT),'$.path'),lower(hex(c.source_revision)) FROM obligations o JOIN checks c ON c.id=o.current_check_id WHERE o.matter_id=?1 AND o.required=1 AND o.status='passed' AND c.current=1 AND c.passed=1 AND json_extract(CAST(c.parameters AS TEXT),'$.path') IS NOT NULL ORDER BY 1,2 LIMIT 16",
+        )?;
+        let rows = query.query_map([matter], |row| Ok((row.get(0)?, row.get(1)?)))?;
+        Ok(rows.collect::<Result<Vec<_>, _>>()?)
+    }
+
     pub fn provider_exchanges_in_budget_epoch(&self, matter: &str) -> StoreResult<i64> {
         Ok(self.connection.query_row(
             "SELECT count(*) FROM provider_exchanges p JOIN runtime_decisions d ON d.id=p.decision_id JOIN runtime_events selected ON selected.id=d.event_id WHERE d.matter_id=?1 AND selected.causal_sequence>(SELECT coalesce(max(causal_sequence),0) FROM runtime_events WHERE matter_id=?1 AND kind IN ('owner-intake','owner-resume'))",

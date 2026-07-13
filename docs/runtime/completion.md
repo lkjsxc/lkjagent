@@ -50,8 +50,9 @@ adopted.
 Only a respond decision accepts `<final>`. Mandatory admission rejects
 future-tense readiness and command or test claims unsupported by this file-only
 runtime. Respond is unreachable until required path, effect, and verification
-checks pass. The owner-visible row always carries a harness-rendered factual
-receipt. If model wording remains invalid, factual fallback wording is persisted
+checks pass. The owner-visible body receives a bounded `Checked:` path and
+revision suffix, and the row carries the full harness-rendered factual receipt.
+If model wording remains invalid, factual fallback wording is persisted
 with that receipt.
 
 ## Close
