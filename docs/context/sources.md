@@ -19,8 +19,10 @@ never enter the observation or later context. Context receives labeled plain
 numbered lines or bounded list/search text, never the harness observation JSON
 object. Every source included by the compiled plan persists as a decision-bound native
 context item before provider intent; omitted candidates do not gain rows. The
-latest four active canonical messages from earlier matters are bounded history
-candidates and never replace the current owner objective. A journal renderer
+latest four matching active canonical messages from the latest sixteen earlier
+candidates may enter bounded history and never replace the current owner
+objective. When the objective names an exact `project-*` token, history must name
+that exact token; prefix-neighbor projects are excluded. A journal renderer
 copies the exact fingerprints of every selected persisted context item into
 harness-owned metadata; the model cannot author or omit that lineage.
 

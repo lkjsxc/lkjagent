@@ -14,6 +14,7 @@ Map the modules compiled into the direct public application.
 - [clock.rs](clock.rs): UTC timestamps and fixed-offset local dates.
 - [config.rs](config.rs): direct configuration consumers.
 - [config-registry.rs](config_registry.rs): scalar configuration bounds.
+- [history-context.rs](history_context.rs): bounded project-aware canonical history.
 - [journal-apply.rs](journal_apply.rs): journal effect preparation, application, and revision settlement.
 - [journal-checks.rs](journal_checks.rs): structural, lineage, token, and placeholder checks.
 - [journal-dispatch.rs](journal_dispatch.rs): immutable date context and bounded journal rendering.
@@ -25,4 +26,9 @@ Map the modules compiled into the direct public application.
 - [tui-viewport.rs](tui_viewport.rs): follow and durable manual anchors.
 - [tui-screen.rs](tui_screen.rs): canonical conversation and activity projection.
 - [tui-reducer.rs](tui_reducer.rs): pure screen state transitions.
+- [tui-input.rs](tui_input.rs): native key, paste, search, and resize mapping.
+- [tui-render.rs](tui_render.rs): bounded terminal frame rendering.
+- [tui-runtime.rs](tui_runtime.rs): frame polling, pagination, and durable intake.
+- [tui-terminal.rs](tui_terminal.rs): raw alternate-screen lifecycle guard.
+- [tui-worker.rs](tui_worker.rs): bounded-wake endpoint worker.
 - [workspace-root.rs](workspace_root.rs): lazy separate workspace capability.

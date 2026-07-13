@@ -4,6 +4,7 @@ pub mod cli;
 pub mod clock;
 pub mod config;
 mod config_registry;
+mod history_context;
 mod journal_apply;
 mod journal_checks;
 pub mod journal_dispatch;

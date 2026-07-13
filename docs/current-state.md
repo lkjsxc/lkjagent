@@ -114,7 +114,8 @@ settled/current-cycle active milliseconds block without charging daemon downtime
 The tracked schedule retained later active intake without claiming it closed.
 
 The public compiler attaches its context plan and frame fingerprints, includes
-up to four active canonical messages from earlier matters, and stores one native
+up to four active canonical messages from earlier matters after exact project-token
+filtering, and stores one native
 context-item row for every included owner, history, or measured source. List and
 search observations remain orienting evidence until a read produces current
 source bytes. Final admission rejects future-tense and unsupported command or
