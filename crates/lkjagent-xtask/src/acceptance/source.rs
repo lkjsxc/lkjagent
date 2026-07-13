@@ -26,7 +26,7 @@ const FACTS: &[Fact] = &[
     fact("R06", "crates/lkjagent-core/src/runtime_event.rs", &["pub fn reduce(", "ReduceFault::CausalSequence"]),
     fact("R06", "crates/lkjagent-core/src/runtime_selector.rs", &["pub fn select(", "Selection::Idle"]),
     fact("R06", "crates/lkjagent-core/tests/runtime_reducer_selector.rs", &["reducer_preserves_unknown_and_invalidates_old_revision", "direct_transitions_do_not_add_model_review"]),
-    fact("R10", "crates/lkjagent-store/src/direct_transactions.rs", &["ORDER BY CASE WHEN EXISTS", "d.status NOT IN ('settled','failed')"]),
+    fact("R10", "crates/lkjagent-store/src/direct_transactions.rs", &["ORDER BY CASE WHEN m.lifecycle='blocked'", "d.status NOT IN ('settled','failed')"]),
     fact("R10", "crates/lkjagent-store/tests/native_direct_loop.rs", &["restart_projection_skips_blocked_matter_for_runnable_owner_turn", "Some(\"m2\")"]),
     fact("S04", "crates/lkjagent-app/src/config_registry.rs", &["endpoint_api_key_env", "endpoint_timeout_seconds", "prompt_context_tokens", "workspace_root"]),
     fact("S04", "crates/lkjagent-app/src/config.rs", &["load_client", "api_key", "prompt_max_context_tokens", "workspace_root"]),
@@ -60,6 +60,9 @@ const FACTS: &[Fact] = &[
     fact("P07", "crates/lkjagent-llm/tests/wire_contract.rs", &["response_anomalies_remain_distinct", "ProviderAnomalyKind::ToolCallOnlyResponse"]),
     fact("X03", "crates/lkjagent-llm/src/error.rs", &["ResponseTooLarge", "Timeout", "Connect"]),
     fact("X03", "crates/lkjagent-llm/tests/wire_contract.rs", &["timeout_connect_and_status_are_distinct", "length_is_not_repaired_and_ambiguous_send_is_not_retried"]),
+    fact("X04", "crates/lkjagent-store/src/matter_control.rs", &["pub fn block_budget(", "'matter-blocked'", "'block','budget'", "lifecycle='blocked'"]),
+    fact("X04", "crates/lkjagent-app/src/public_loop.rs", &["MODEL_CALL_LIMIT", "exhausted model-call budget"]),
+    fact("X04", "crates/lkjagent-store/tests/native_direct_loop.rs", &["exhausted_budget_is_visible_idempotent_and_not_idle", "Some(\"blocked\")"]),
 ];
 
 const fn fact(id: &'static str, path: &'static str, needles: &'static [&'static str]) -> Fact {

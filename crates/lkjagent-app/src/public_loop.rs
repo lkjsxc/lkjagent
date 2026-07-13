@@ -31,6 +31,7 @@ use std::{
 };
 
 type R<T> = Result<T, String>;
+const MODEL_CALL_LIMIT: i64 = 64;
 
 #[rustfmt::skip]
 pub fn send(data:&Path,text:&str,force_new:bool)->R<String>{
@@ -55,6 +56,8 @@ pub fn run_once(data:&Path,endpoint:&mut dyn Endpoint)->R<String>{
  fs::create_dir_all(data).map_err(e)?; let db=data.join("lkjagent.sqlite3"); let mut store=NativeStore::open(&db).map_err(e)?;
  for exchange in store.ambiguous_providers().map_err(e)?{store.provider_phase(&exchange,"sent","ambiguous").map_err(e)?;}
  let p=store.restart_projection().map_err(e)?; let Some(m)=p.matter else{return Ok("idle: no open matter".into())};
+ if m.lifecycle=="blocked"{return Err(format!("blocked: matter {} requires owner or config change",m.id))}
+ if model_calls(&db,&m.id)>=MODEL_CALL_LIMIT{let seq=store.next_event_sequence(&m.id).map_err(e)?;let event=id("budget-block",m.id.as_bytes());let payload=json!({"kind":"model-call-budget","used":MODEL_CALL_LIMIT,"limit":MODEL_CALL_LIMIT}).to_string();store.block_budget(&m.id,&event,seq,millis(),&crate::clock::utc_now(),payload.as_bytes(),&sha(payload.as_bytes())).map_err(e)?;return Err(format!("blocked: matter {} exhausted model-call budget {MODEL_CALL_LIMIT}",m.id))}
  if !p.effects.is_empty(){return Err(format!("blocked: unfinished effect {}:{}",p.effects[0].id,p.effects[0].status))}
  if !p.decisions.is_empty(){return Err(format!("blocked: unfinished decision {}:{}",p.decisions[0].id,p.decisions[0].status))}
  let snap=hydrate(&m.id,&p.cells)?; let now=crate::clock::utc_now(); let spec=match select(RuntimeState::from_snapshot(snap.clone()),RuntimePolicy::default(),CurrentTime(now.clone())){Selection::Decision(v)=>v,Selection::Idle=>return Ok("idle: no eligible decision".into()),other=>return Ok(format!("blocked: {other:?}"))};
@@ -126,6 +129,8 @@ fn output_faults(db:&Path,matter:&str)->i64{Connection::open(db).ok().and_then(|
 fn source_decision(db:&Path,matter:&str)->Option<String>{Connection::open(db).ok()?.query_row("SELECT o.decision_id FROM state_cells s JOIN observations o ON o.event_id=s.source_event_id WHERE s.matter_id=?1 AND CAST(s.namespace AS TEXT)='source' AND CAST(s.cell_key AS TEXT)='current' AND s.status='active'",[matter],|r|r.get(0)).ok()}
 #[rustfmt::skip]
 fn managed_path(db:&Path)->Option<String>{Connection::open(db).ok()?.query_row("SELECT CAST(current_path AS TEXT) FROM workspace_documents WHERE status='active' ORDER BY id LIMIT 1",[],|r|r.get(0)).ok()}
+#[rustfmt::skip]
+fn model_calls(db:&Path,matter:&str)->i64{Connection::open(db).ok().and_then(|c|c.query_row("SELECT count(*) FROM provider_exchanges p JOIN runtime_decisions d ON d.id=p.decision_id WHERE d.matter_id=?1",[matter],|r|r.get(0)).ok()).unwrap_or(0)}
 #[rustfmt::skip]
 fn source_revision(store:&NativeStore,path:&str)->R<String>{current_source(store).filter(|(current,_)|current==path).map(|(_,revision)|revision).ok_or_else(||"no current revision-bound source for edit".into())}
 #[rustfmt::skip]

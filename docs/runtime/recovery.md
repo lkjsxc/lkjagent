@@ -44,6 +44,8 @@ Unclassified states block without overwrite.
 
 ## Budgets And Fairness
 
-Model calls, effects, recovery cost, active time, and tokens have separate durable
-limits. Exhaustion creates a visible resumable block with used and limit values.
-One blocked matter cannot starve an unrelated runnable matter.
+The current direct loop enforces a 64-call matter model budget. Exhaustion
+atomically stores a `matter-blocked` event, active `block/budget` cell with used
+and limit values, and blocked lifecycle. It is visible rather than idle, and an
+unrelated runnable matter remains eligible. Separate effect, recovery-cost,
+active-time, and token exhaustion paths remain to be implemented.
