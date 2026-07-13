@@ -50,3 +50,4 @@ pub mod error {
 mod matter_control;
 pub mod native_schema;
 pub mod transactions;
+pub mod tui_snapshot;
