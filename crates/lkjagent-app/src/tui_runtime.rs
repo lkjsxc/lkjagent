@@ -147,7 +147,7 @@ fn load_older(
     oldest_complete: &mut bool,
 ) -> Result<(), String> {
     let rows = model.screen.rows(model.width.max(1), &model.search);
-    let height = model.height.saturating_sub(4);
+    let height = model.conversation_height();
     if *oldest_complete || !tui_viewport::at_loaded_top(&model.viewport, &rows, height) {
         return Ok(());
     }

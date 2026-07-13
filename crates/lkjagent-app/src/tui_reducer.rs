@@ -36,7 +36,8 @@ pub fn reduce(mut model: TuiModel, event: TuiEvent) -> (TuiModel, Vec<TuiEffect>
         }
         TuiEvent::Scroll(delta) => {
             let rows = model.screen.rows(model.width, &model.search);
-            tui_viewport::scroll(&mut model.viewport, &rows, model.height, delta);
+            let height = model.conversation_height();
+            tui_viewport::scroll(&mut model.viewport, &rows, height, delta);
         }
         TuiEvent::ActivityExpanded(expanded) => model.screen.activity.expanded = expanded,
     }
@@ -108,5 +109,6 @@ fn refresh_draft(model: &mut TuiModel) {
 
 fn reconcile(model: &mut TuiModel) {
     let rows = model.screen.rows(model.width, "");
-    tui_viewport::reconcile(&mut model.viewport, &rows, model.height);
+    let height = model.conversation_height();
+    tui_viewport::reconcile(&mut model.viewport, &rows, height);
 }

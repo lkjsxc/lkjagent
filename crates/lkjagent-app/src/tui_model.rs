@@ -75,6 +75,16 @@ pub struct TuiModel {
 }
 
 impl TuiModel {
+    pub fn conversation_height(&self) -> usize {
+        let search = usize::from(self.search_active);
+        let activity = if self.screen.activity.expanded {
+            self.height.saturating_sub(2 + search).min(5)
+        } else {
+            0
+        };
+        self.height.saturating_sub(2 + search + activity)
+    }
+
     pub fn new(width: usize, height: usize) -> Self {
         Self {
             composer: ComposerState::default(),
