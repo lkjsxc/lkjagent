@@ -1,6 +1,6 @@
 offset_seconds	intent	text_fingerprint	owner_text
-0	inspect-orbit	sha256:3882ca8b9a1bd2f5f1da05740ba5679ef7cd808298ece747a44b5ca6a3bf0070	Inspect project-orbit and cite current source.
-180	inspect-orbital	sha256:2e15fd6e1a43715f2bdd154cd13528da113dba7305a6c30d9dd4ba7b1e68fd92	Answer about project-orbital without cross-project facts.
-420	bounded-edit	sha256:1136a76172227109f8205f3ed10f41f2bad6e6578c9907b0bff4b9058dd3796f	Edit one bounded Rust behavior and rely on automatic checks.
-660	restart-resume	sha256:86d901e43a140d6928992153bcf186ced5126be914634ab2dcbcfe4646c11b0c	Restart and resume without duplicate effects.
-840	report-evidence	sha256:3f097920855df7d9f1275d7c5225ff0cdd7a53f00317e2cc61e6eda97d0cb2af	Report the exact checked path, revision, project isolation, and risks.
+0	edit-orbit	sha256:afaebd474c34a24c9e3f55dd0f9e7ad1d0e0dfc45cb4cca5135dbfc44252473b	Read project-orbit/src/lib.rs, replace `orbit uses durable event replay` with `orbit uses checked durable event replay` exactly once, automatically verify it, and do not use project-orbital facts.
+180	edit-orbital	sha256:5be4e0ed92d59777c6ff2e50bb2f927f3207ae25583d64dc3b1f3525ca737f31	Read project-orbital/src/lib.rs, replace `orbital forbids event replay` with `orbital isolates event replay` exactly once, automatically verify it, and do not use project-orbit facts.
+420	update-orbit	sha256:4c2473684aca402b31dc3a34eedd547052880241381fa0aeac4b19858bc46500	Read project-orbit/src/lib.rs, replace `orbit uses checked durable event replay` with `orbit uses restart-safe durable event replay` exactly once, automatically verify it, and do not use project-orbital facts.
+660	restart-orbital	sha256:1d01ef6eeed46d762d64f5e2bcb5738afdc0bb42a807995529eee861367a8ae9	After restart, use read_file on project-orbital/src/lib.rs with complete true and report its checked revision without any project-orbit fact or duplicate effect.
+840	report-isolation	sha256:7edb860546d22ef4f73771de17c03576a3f5387dc6a5f0b3335e9b189b0b49c3	Use read_file on project-orbit/src/lib.rs with complete true and concisely report the exact checked path, revision, isolation, and risks.
