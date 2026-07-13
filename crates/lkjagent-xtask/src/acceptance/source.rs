@@ -65,8 +65,17 @@ const FACTS: &[Fact] = &[
     fact("X04", "crates/lkjagent-store/tests/native_direct_loop.rs", &["exhausted_budget_is_visible_idempotent_and_not_idle", "Some(\"blocked\")"]),
     fact("X04", "crates/lkjagent-app/tests/cli.rs", &["blocked_matter_resumes_on_owner_send_unless_new_is_forced", "resumed=true"]),
     fact("X04", "crates/lkjagent-store/tests/budget_epoch.rs", &["owner_resume_starts_a_fresh_model_budget_epoch", "provider_exchanges_in_budget_epoch"]),
+    fact("T01", "crates/lkjagent-app/src/tui_screen.rs", &["pub struct ConversationItem", "let mut conversation = snapshot", "sequence: Some(row.sequence)", "id: row.id.clone()"]),
+    fact("T01", "crates/lkjagent-app/tests/tui_contract.rs", &["identity_is_exact_once_and_never_body_based", "message(\"eventual\", 3"]),
     fact("T02", "crates/lkjagent-store/src/tui_snapshot.rs", &["transaction_with_behavior(TransactionBehavior::Deferred)", "let conversation = conversation(", "let activity = activity(", "let status = status("]),
     fact("T02", "crates/lkjagent-store/src/tui_snapshot_tests.rs", &["wal_writer_commit_between_queries_does_not_split_frame", "snapshot_with"]),
+    fact("T03", "crates/lkjagent-app/src/tui_screen.rs", &["pub conversation: Vec<ConversationItem>", "pub activity: ActivityPanel", "expanded: false"]),
+    fact("T03", "crates/lkjagent-store/src/tui_snapshot_tests.rs", &["canonical_order_and_conversation_activity_separation", "secret-prompt", "secret-payload"]),
+    fact("T04", "crates/lkjagent-store/src/tui_snapshot_tests.rs", &["activity_ids_are_unique_and_stable_across_polls", "first_ids.len()"]),
+    fact("T05", "crates/lkjagent-app/src/tui_viewport.rs", &["Viewport::Follow => maximum", "if target == maximum", "Viewport::Follow"]),
+    fact("T05", "crates/lkjagent-app/tests/tui_contract.rs", &["follow_and_manual_append_have_durable_anchors", "scroll(&mut viewport, &appended, 2, 99)"]),
+    fact("T06", "crates/lkjagent-app/src/tui_viewport.rs", &["pub struct Anchor", "message_id", "wrapped_row", "pub fn reconcile"]),
+    fact("T06", "crates/lkjagent-app/tests/tui_contract.rs", &["resize_search_shrink_and_overscroll_clamp_without_blank_windows", "assert!(!visible"]),
 ];
 
 const fn fact(id: &'static str, path: &'static str, needles: &'static [&'static str]) -> Fact {
