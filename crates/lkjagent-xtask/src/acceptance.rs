@@ -1,3 +1,4 @@
+mod campaign_evidence;
 mod evidence;
 mod experiments;
 mod git;
@@ -70,7 +71,7 @@ pub fn verify(root: &Path, source: &str, evidence: &Path) -> Report {
             inspect_files(&files, source, &mut report.errors);
             for path in files {
                 if let Ok(bytes) = fs::read(&path) {
-                    evidence_derived.extend(evidence::derivations(&path, &bytes, source));
+                    evidence_derived.extend(evidence::derivations_at(root, &path, &bytes, source));
                 }
             }
         }
@@ -95,6 +96,9 @@ pub fn inspect_attachment(path: &Path, bytes: &[u8], source: &str) -> Vec<String
 pub fn derive_attachment(path: &Path, bytes: &[u8], source: &str) -> BTreeSet<String> {
     evidence::derivations(path, bytes, source)
 }
+#[rustfmt::skip]
+pub fn derive_campaign_attachment(root: &Path, path: &Path, bytes: &[u8], source: &str) -> BTreeSet<String> {
+    evidence::derivations_at(root, path, bytes, source) }
 
 pub fn validate_plans(root: &Path) -> Result<Vec<String>, Vec<String>> {
     plans::validate(root)

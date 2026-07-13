@@ -6,6 +6,7 @@ Map the source-bound acceptance checker modules.
 
 ## Table of Contents
 
+- [campaign-evidence.rs](campaign_evidence.rs): strict scenario fact derivation.
 - [evidence.rs](evidence.rs): attachment content and campaign checks.
 - [experiments.rs](experiments.rs): concrete cell and scenario validation.
 - [git.rs](git.rs): source, plan, tracking, and evidence path checks.

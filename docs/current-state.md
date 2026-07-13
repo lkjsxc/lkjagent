@@ -124,10 +124,10 @@ unsupported command or test claims. Close and receipt remain check-derived.
 
 The native `conversation_messages` table is canonical for public turns. Typed
 TUI intake uses the exact returned durable message identity, and failed intake
-keeps composer bytes. Activity is intentionally limited to its newest bounded
-page. A native binary Unix PTY smoke covers entry, Ctrl-C, and terminal cleanup.
-A configured endpoint PTY campaign remains unrun and is not implied by that smoke
-or the blocked-worker test.
+keeps composer bytes. Activity is bounded. A native binary PTY smoke covers
+entry, Ctrl-C, and cleanup. Strict source-bound evaluators now measure daily-life,
+project, artifact, and slow Japanese PTY facts and reject probe-only evidence.
+The tracked PTY alias requires a bounded real cast; configured runs remain unrun.
 
 Configuration and Compose now separate the runtime data root from one visible
 workspace root. The workspace is created only by an actual workspace operation,

@@ -1,4 +1,4 @@
-use super::{clock, hash, scenario, snapshot};
+use super::{clock, hash, scenario, semantic, snapshot};
 use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -6,13 +6,7 @@ use std::process::Command;
 use std::thread;
 use std::time::{Duration, Instant};
 
-#[derive(Debug)]
-pub struct PtyFacts {
-    pub cast_fingerprint: String,
-    pub frame_count: usize,
-}
-#[rustfmt::skip]
-pub fn validate_cast(_path: &Path) -> Result<PtyFacts, String> { Err("PTY scenario is incomplete; generic PTY evidence is not supported".into()) }
+pub use super::pty_cast::validate as validate_cast;
 #[rustfmt::skip]
 pub fn reject() -> Result<(), String> { Err("PTY scenario is incomplete; canned terminal output is forbidden".into()) }
 
@@ -30,7 +24,7 @@ pub fn campaign(root: &Path, alias: &str, endpoint: &Path, probe: bool) -> Resul
     if probe {
         let run = public_output(&capture, &env, &["run", "--once"], Duration::from_secs(1900))?;
         let status = public_output(&capture, &env, &["status"], Duration::from_secs(30))?;
-        let (message, provider, _) = finish(root, &source, &scenario, &capture, &before, &[run, status], "probe")?;
+        let (message, provider, _) = finish(root, &source, &scenario, &capture, &before, &[run, status], "probe", 0)?;
         return if provider == 0 { Err(message) } else {
             Ok(format!("ok campaign probe-endpoint source={source} provider_exchange_count={provider} semantic_status=not-evaluated")) };
     }
@@ -51,7 +45,8 @@ fn run_schedule(root: &Path, source: &str, scenario: &scenario::Scenario, captur
         let status = public_output(capture, env, &["status"], Duration::from_secs(30))?;
         let daemon = daemon.join().map_err(|_| "daemon capture thread failed")??;
         if !daemon.timed_out || status.code != Some(0) { return Err("daemon was not alive through the bounded observation".into()); }
-        let (message, _, passed) = finish(root, source, scenario, capture, before, &[status], "run")?;
+        let duration = started.elapsed().as_secs();
+        let (message, _, passed) = finish(root, source, scenario, capture, before, &[status], "run", duration)?;
         if passed { Ok(()) } else { Err(message) }
     })
 }
@@ -95,9 +90,10 @@ fn public_output(capture: &snapshot::Capture, env: &BTreeMap<String,String>, arg
 }
 #[rustfmt::skip]
 fn wait_until(start: Instant, duration: Duration) { while start.elapsed() < duration { thread::sleep(Duration::from_millis(20)); } }
+#[allow(clippy::too_many_arguments)]
 #[rustfmt::skip]
 fn finish(root: &Path, source: &str, scenario: &scenario::Scenario, capture: &snapshot::Capture, before: &str,
-    outputs: &[clock::Output], mode: &str) -> Result<(String,u64,bool),String> {
+    outputs: &[clock::Output], mode: &str, duration: u64) -> Result<(String,u64,bool),String> {
     let after = snapshot::manifest(&capture.workspace)?;
     let facts = snapshot::sqlite_facts(root, &capture.data.join("lkjagent.sqlite3"), &capture.raw.join("state.sqlite3"))?;
     let provider = table_count(&facts, "provider_exchanges");
@@ -105,25 +101,27 @@ fn finish(root: &Path, source: &str, scenario: &scenario::Scenario, capture: &sn
     let binary = hash::bytes(&fs::read(&capture.binary).map_err(|e| e.to_string())?); let mut command_bytes = Vec::new();
     for output in outputs { command_bytes.extend_from_slice(&output.stdout); command_bytes.push(0); command_bytes.extend_from_slice(&output.stderr);
         command_bytes.push(0); command_bytes.extend_from_slice(format!("{:?}:{}:{}", output.code, output.elapsed.as_millis(), output.timed_out).as_bytes()); }
-    let semantic = if mode=="run" { exact_semantics(scenario,capture,&after,&facts)? } else { None };
-    let (semantic_status,outcome,detail,passed)=semantic.map_or(("not-evaluated","not-evaluated","probe-only".into(),false),|(ok,detail)|("evaluated",if ok{"passed"}else{"failed"},detail,ok));
-    let sanitized = format!("field\tvalue\nsource_commit\t{source}\nscenario\t{}\nscenario_sha256\t{}\nbinary_sha256\t{binary}\nmode\t{mode}\nsemantic_status\t{semantic_status}\noutcome\t{outcome}\nsemantic_detail\t{detail}\nprovider_exchange_count\t{provider}\nactivity_count\t{activity}\ncommand_count\t{}\ncommand_capture_sha256\t{}\nworkspace_before_sha256\t{}\nworkspace_after_sha256\t{}\nworkspace_diff_sha256\t{}\n", scenario.id, scenario.fingerprint, outputs.len(), hash::bytes(&command_bytes), hash::bytes(before.as_bytes()), hash::bytes(after.as_bytes()), hash::bytes(snapshot::diff(before, &after).as_bytes()));
+    let metrics = (mode == "run").then(|| semantic::measure(scenario, capture, before, &after, &facts)).transpose()?;
+    let passed = metrics.as_ref().is_some_and(|item| item.passed);
+    let detail = metrics.as_ref().and_then(|item| item.fields.iter().find(|(key,_)| key=="semantic_detail").map(|(_,value)|value.clone()))
+        .unwrap_or_else(|| if mode == "run" { "measured-native-facts".into() } else { "probe-only".into() });
+    let semantic_status = if mode == "run" { "evaluated" } else { "not-evaluated" };
+    let outcome = if mode != "run" { "not-evaluated" } else if passed { "passed" } else { "failed" };
+    let mut sanitized = format!("field\tvalue\nsource_commit\t{source}\nscenario\t{}\nscenario_sha256\t{}\nbinary_sha256\t{binary}\nmode\t{mode}\nsemantic_status\t{semantic_status}\noutcome\t{outcome}\nsemantic_detail\t{detail}\nduration_seconds\t{duration}\nprovider_exchange_count\t{provider}\nactivity_count\t{activity}\ncommand_count\t{}\ncommand_capture_sha256\t{}\nworkspace_before_sha256\t{}\nworkspace_after_sha256\t{}\nworkspace_diff_sha256\t{}\n", scenario.id, scenario.fingerprint, outputs.len(), hash::bytes(&command_bytes), hash::bytes(before.as_bytes()), hash::bytes(after.as_bytes()), hash::bytes(snapshot::diff(before, &after).as_bytes()));
+    if let Some(metrics)=metrics { for (key,value) in metrics.fields { if key!="semantic_detail" { append_field(&mut sanitized,&key,&value)?; } } }
     let directory = root.join("evaluation/evidence").join(source); fs::create_dir_all(&directory).map_err(|e| e.to_string())?;
     fs::write(directory.join(format!("campaign-{}-{mode}.tsv", scenario.id)), &sanitized).map_err(|e| e.to_string())?;
     Ok((format!("sanitized durable facts provider_exchange_count={provider} activity_count={activity} semantic_status={semantic_status} outcome={outcome} detail={detail}"), provider, passed))
 }
-#[rustfmt::skip]
-fn exact_semantics(scenario:&scenario::Scenario,capture:&snapshot::Capture,after:&str,facts:&str)->Result<Option<(bool,String)>,String>{
- if scenario.id!="exact-file-edit"{return Ok(None)}
- let checks=fs::read_to_string(scenario.path.join("checks.tsv")).map_err(|e|e.to_string())?;
- let expected=checks.lines().skip(1).find_map(|line|{let f=line.split('\t').collect::<Vec<_>>();(f.get(1)==Some(&"workspace-file-sha256")).then(||f.get(2).copied()).flatten()}).ok_or("exact scenario byte check missing")?;
- let (path,sha)=expected.split_once('=').ok_or("exact scenario byte check malformed")?;
- let file_ok=after.lines().skip(1).any(|line|{let f=line.split('\t').collect::<Vec<_>>();f.first()==Some(&path)&&f.get(2)==Some(&sha)});
- let database=rusqlite::Connection::open(capture.raw.join("state.sqlite3")).map_err(|e|e.to_string())?;
- let (closed,owner,agent,passed):(i64,i64,i64,i64)=database.query_row("SELECT (SELECT count(*) FROM matters WHERE lifecycle='closed'),(SELECT count(*) FROM conversation_messages WHERE role='owner'),(SELECT count(*) FROM conversation_messages WHERE role='agent'),(SELECT count(*) FROM checks WHERE current=1 AND passed=1)",[],|r|Ok((r.get(0)?,r.get(1)?,r.get(2)?,r.get(3)?))).map_err(|e|e.to_string())?;
- let one_file=after.lines().count()==2;let schema=facts.lines().skip(1).count();let effects=table_count(facts,"effect_journal");let admissions=table_count(facts,"tool_admissions");let provider=table_count(facts,"provider_exchanges");
- let ok=file_ok&&one_file&&closed>=3&&owner>=5&&agent>=3&&passed>=6&&effects==1&&admissions>0&&provider>0&&schema==18;
- Ok(Some((ok,format!("file_exact={file_ok};one_file={one_file};closed={closed};owner={owner};agent={agent};passed_checks={passed};effects={effects};admissions={admissions};providers={provider};tables={schema}"))))
+fn append_field(output: &mut String, key: &str, value: &str) -> Result<(), String> {
+    if key.is_empty() || key.contains(['\t', '\n', '\r']) || value.contains(['\t', '\n', '\r']) {
+        return Err("semantic fact is not a sanitized scalar".into());
+    }
+    output.push_str(key);
+    output.push('\t');
+    output.push_str(value);
+    output.push('\n');
+    Ok(())
 }
 #[rustfmt::skip]
 fn table_count(facts: &str, table: &str) -> u64 { facts.lines().skip(1).find_map(|line| {

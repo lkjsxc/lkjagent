@@ -14,13 +14,13 @@ source-bound evidence for lkjagent.
 
 ## Fixtures And Runners
 
-- `scenarios/`: anchored goals, schedules, checks, and seed bytes. The tracked
-  `exact-file-edit` alias serves both endpoint probes and bounded campaigns.
+- `scenarios/`: anchored goals, schedules, checks, and seed bytes. Five exact
+  aliases cover file, daily-life, project, artifact, and slow Japanese PTY runs.
 - `false-positive-fixtures/`: evidence summaries that must be rejected.
 - `corpus/`: deterministic parser and check inputs.
 - `experiment_runner/`: current experiment support pending direct-loop cutover.
 - `sqlite-online-backup.py`: quiesced SQLite Online Backup recorder.
-- `pty-recorder.py`: raw pseudo-terminal input and output recorder.
+- `pty-recorder.py`: disposable raw pseudo-terminal input and output recorder.
 - [`../crates/lkjagent-xtask/src/evaluation_harness/`](../crates/lkjagent-xtask/src/evaluation_harness/README.md): confined public production runner and evidence validator.
 
 ## Evidence

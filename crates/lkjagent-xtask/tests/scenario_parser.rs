@@ -4,8 +4,8 @@ use std::path::{Path, PathBuf};
 use lkjagent_xtask::evaluation_harness::{validate_corpus, validate_scenario};
 
 #[test]
-fn parser_covers_four_tracked_aliases() {
-    assert_eq!(validate_corpus(&repository_root()), Ok(4));
+fn parser_covers_five_tracked_aliases() {
+    assert_eq!(validate_corpus(&repository_root()), Ok(5));
 }
 
 #[test]

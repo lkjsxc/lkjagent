@@ -1,0 +1,4 @@
+scenario_key	expected_terminal
+slow-input	completed
+search-resize	completed
+restart-resume	completed
