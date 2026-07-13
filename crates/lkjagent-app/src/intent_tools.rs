@@ -38,11 +38,10 @@ pub(crate) fn narrow(
     ) else {
         return;
     };
-    let reducing = snapshot.cells.iter().any(|(key, cell)| {
-        key.namespace == "recovery"
-            && key.name == "output-limit"
-            && cell.status == StateStatus::Active
-    });
+    let reducing = snapshot
+        .cells
+        .iter()
+        .any(|(key, _)| key.namespace == "recovery" && key.name == "output-limit");
     if reducing {
         decision.model_budget_tokens = Some(4_096);
     }
@@ -64,9 +63,9 @@ pub(crate) fn narrow(
     entry.required_params = names.iter().map(|name| (*name).into()).collect();
     entry.optional_params.clear();
     let length = if reducing {
-        "between 190 and 220 words"
+        "between 130 and 150 words"
     } else {
-        "at least 190 words"
+        "at least 130 words"
     };
     entry.purpose = format!("write only report child slug={slug} unit={unit}; author a distinct source-linked body {length}; do not rewrite the map");
     entry.example_params = [
@@ -167,7 +166,7 @@ mod tests {
             ["family", "title", "body", "slug", "unit"]
         );
         assert!(entry.purpose.contains("unit=origins"));
-        assert!(entry.purpose.contains("between 190 and 220 words"));
+        assert!(entry.purpose.contains("between 130 and 150 words"));
         assert_eq!(decision.model_budget_tokens, Some(4_096));
         assert!(entry.field_spec("children").is_none());
         Ok(())

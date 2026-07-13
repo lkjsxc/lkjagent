@@ -86,7 +86,7 @@ visible blocked matter, and owner resume starts a fresh call-budget epoch while
 preserving history. Missing provider usage now remains SQL null rather than fake
 zero; known tokens and conservative unknown components now drive a durable
 post-response token block. A 16-effect epoch limit blocks before exact-edit
-preparation, 16 persisted rejected outputs exhaust recovery cost, and 900,000
+preparation, 32 persisted rejected outputs exhaust recovery cost, and 900,000
 settled/current-cycle active milliseconds block without charging daemon downtime.
 The tracked schedule retained later active intake without claiming it closed.
 
@@ -117,7 +117,7 @@ long report map or child. Short reports keep `artifacts/reports/<slug>.md`; long
 maps write `artifacts/documents/<slug>/README.md`; long children write
 `artifacts/documents/<slug>/<unit>.md`; pending resume uses native obligations and
 `report:pending`. Normal model output is capped at 1,024 tokens; limit faults
-retain no body and retry one named 190-220 word unit with a 4,096-token cap.
+retain no body and retry one named 130-150 word unit with a 4,096-token cap.
 Shared mechanics cover safe parents and revisions,
 checks, receipts, collisions, and effect-gated continuity; limits are 512/2,048.
 Memory retrieval stays current. A pre-narrowing run failed; proof remains unrun.

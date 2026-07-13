@@ -29,7 +29,7 @@ type R<T> = Result<T, String>;
 const MODEL_CALL_LIMIT: i64 = 64;
 const TOKEN_BUDGET_LIMIT: i64 = 1_048_576;
 const EFFECT_BUDGET_LIMIT: i64 = 16;
-const RECOVERY_COST_LIMIT: i64 = 16;
+const RECOVERY_COST_LIMIT: i64 = 32;
 const ACTIVE_MILLISECONDS_LIMIT: i64 = 900_000;
 
 #[derive(Clone, Debug, PartialEq, Eq)]
