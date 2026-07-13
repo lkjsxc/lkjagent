@@ -40,7 +40,10 @@ whose required checks remain current and passed. It copies those facts into new
 matter-bound obligations and checks tied to the settling read decision and
 event; it never treats an unchecked read or premature wording as completion.
 An inventory-only turn can state `list_directory complete=true`; the harness then
-reopens the current managed target and applies the same revision and check gate.
+reopens the current managed target relevant to the requested path or slug and
+applies the same revision and check gate. Effectful write, remember, correction,
+edit, replacement, creation, update, and journal objectives ignore continuity
+claims so an unrelated checked revision cannot satisfy the new work.
 
 Shell checks do not exist until a state-limited journaled command effect is
 adopted.

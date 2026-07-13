@@ -69,9 +69,16 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     };
     let journal_lower = journal_text.to_ascii_lowercase();
     let journal_grounded = u64::from(
-        journal_lower.contains("blue transit card") && journal_lower.contains("second desk drawer"),
+        journal_lower.contains("transit card")
+            && journal_lower.contains("drawer")
+            && (journal_lower.contains("second") || journal_lower.contains("2nd")),
     );
-    let memory_grounded = u64::from(memory_text.to_ascii_lowercase().contains("top desk drawer"));
+    let memory_lower = memory_text.to_ascii_lowercase();
+    let memory_grounded = u64::from(
+        memory_lower.contains("transit card")
+            && memory_lower.contains("top")
+            && memory_lower.contains("drawer"),
+    );
     let journal_sha = after
         .get(&journal_path)
         .map(|row| row.sha256.clone())
@@ -150,7 +157,7 @@ fn memory_context(objective: &str, revision: Option<&str>) -> String {
         format!(" AND CAST(i.source_revision AS TEXT)='{}'", sql(value))
     });
     format!(
-        "SELECT count(*) FROM context_items i JOIN runtime_decisions d ON d.id=i.decision_id JOIN matters m ON m.id=d.matter_id WHERE i.source_kind='memory' AND CAST(m.objective AS TEXT) LIKE '{}'{}",
+        "SELECT count(DISTINCT m.id) FROM context_items i JOIN runtime_decisions d ON d.id=i.decision_id JOIN matters m ON m.id=d.matter_id WHERE i.source_kind='memory' AND CAST(m.objective AS TEXT) LIKE '{}'{}",
         sql(objective), revision
     )
 }

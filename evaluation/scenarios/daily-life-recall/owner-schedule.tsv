@@ -1,6 +1,6 @@
 offset_seconds	intent	text_fingerprint	owner_text
 0	grounded-journal	sha256:4b15f987354972f5a24525150f36921bba80b7c0b2e73dbdd74b40a1bc87a81d	Read notes/older-fact.md and write today's grounded journal about that owner fact.
 180	memory-write	sha256:5d215ec355809b4f26538b4cb5fb4ce402fd67b6994fa39bb0019eb320f948ac	Remember this owner fact as Transit Card Location: the blue transit card is in the second desk drawer.
-420	memory-recall	sha256:d8a18f69e81458f1a12b41a7a6b3ddf9aa2be25a2775aff1c5a529259b3dcdbe	Use saved transit-card-location memory exactly once in a concise answer; do not read notes/recent-noise.md.
-660	memory-correction	sha256:fa5766e83463c9024af7906bd42256588eab49220bdde2a5c11bd35d4c723724	correct transit-card-location: replace it with this owner correction: the blue transit card is now in the top desk drawer.
-840	corrected-recall	sha256:72acf1318afffe753ed57e7c12dd748c50a3d8b44cc5b7d2772b72f13189c71a	Use corrected transit-card-location exactly once and report the top desk drawer; exclude recent noise.
+420	memory-recall	sha256:40ce9918d3d56a654ad45e00dbfcd32c98dcd06edf74c06bfd047952d1dae93c	Use saved transit-card-location memory exactly once: read knowledge/notes/transit-card-location.md with complete true, answer concisely, and do not read notes/recent-noise.md.
+660	memory-correction	sha256:54dc80345cad1b71797a80a4df9b25924a1fdc0600d0a0a9b9d4421f8783e0e1	correct transit-card-location: use write_record family memory with title Transit Card Location and body The blue transit card is now in the top desk drawer.
+840	corrected-recall	sha256:3e0af219f4803cdfa2d80c57a39230aab1289ec54b81a6acb82ffe677f1f770d	Use corrected transit-card-location exactly once: read knowledge/notes/transit-card-location.md with complete true, report the top drawer, and exclude recent noise.

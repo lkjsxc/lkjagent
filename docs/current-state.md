@@ -138,7 +138,7 @@ maps write `artifacts/documents/<slug>/README.md`; long children write
 `artifacts/documents/<slug>/<unit>.md`; pending resume uses native obligations and
 `report:pending`. Model output is capped at 1,024 tokens; limit faults retain no
 body and retry one reduced unit. Shared mechanics cover safe parents, revisions,
-checks, receipts, and collisions; short and long limits are 512 and 2,048 units.
+checks, receipts, collisions, and effect-gated continuity; limits are 512/2,048.
 Memory retrieval stays current. A pre-narrowing run failed; proof remains unrun.
 
 ## Direct Contract
