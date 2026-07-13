@@ -86,6 +86,7 @@ fn model_fault_has_no_admission_and_repeated_operation_is_allowed() -> Result<()
         fingerprint: b"fault-fp",
     })?;
     store.select_decision(&decision("d2", "e4", 4))?;
+    assert_eq!(store.recovery_cost_in_budget_epoch("m")?, 1);
     let connection = Connection::open(&db)?;
     let rows: (i64, i64, String) = connection.query_row(
         "SELECT (SELECT count(*) FROM tool_admissions),(SELECT count(*) FROM effect_journal),status FROM runtime_decisions WHERE id='d1'",
