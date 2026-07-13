@@ -20,8 +20,7 @@ Map the direct-runtime core modules.
 - [runtime-tool-call.rs](runtime_tool_call.rs): compact XML grammar.
 - [runtime-admission.rs](runtime_admission.rs): action admission.
 - [runtime-context.rs](runtime_context.rs): context selection and contamination.
-- [runtime-artifact.rs](runtime_artifact.rs): checked artifact units.
 - [runtime-recovery.rs](runtime_recovery.rs): fault and recovery ladders.
 
-Artifact and workspace record helpers remain exported separately; this slice did
-not claim their deletion.
+Retired artifact-manifest and workspace-record abstractions are absent. New
+owner-visible document behavior must derive only from native runtime rows.
