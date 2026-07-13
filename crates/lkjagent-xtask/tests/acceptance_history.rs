@@ -62,9 +62,9 @@ fn exact_campaign_derivation_requires_all_semantic_facts() {
 fn source_contracts_require_exact_implementation_and_tests() -> Result<(), Box<dyn Error>> {
     let repository = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
     let expected = [
-        "C01", "C02", "F03", "F04", "P01", "P02", "P03", "P04", "P05", "P06", "P07", "R01", "R02",
-        "R03", "R04", "R05", "R06", "R10", "S02", "S04", "T01", "T02", "T03", "T04", "T05", "T06",
-        "X03", "X04",
+        "C01", "C02", "C06", "F03", "F04", "P01", "P02", "P03", "P04", "P05", "P06", "P07", "R01",
+        "R02", "R03", "R04", "R05", "R06", "R10", "S02", "S04", "T01", "T02", "T03", "T04", "T05",
+        "T06", "X03", "X04",
     ];
     let actual = source_contracts(&repository);
     assert_eq!(

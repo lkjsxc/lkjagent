@@ -15,7 +15,7 @@ pub struct DirectSettlement<'a> {
     pub outcome: &'a [u8], pub content_ref: &'a [u8], pub fingerprint: &'a [u8],
     pub event: &'a str, pub event_sequence: i64, pub monotonic_ms: i64,
     pub wall_time: &'a str, pub event_payload: &'a [u8], pub namespace: &'a [u8],
-    pub cell_key: &'a [u8], pub source_revision: &'a [u8], pub bytes_ref: &'a [u8],
+    pub cell_key: &'a [u8], pub source_path: &'a [u8], pub source_revision: &'a [u8], pub bytes_ref: &'a [u8],
 }
 #[rustfmt::skip]
 pub enum ModelFaultKind { Malformed, Hidden, Stale }
@@ -64,7 +64,7 @@ impl NativeStore {
             tx.execute("INSERT INTO runtime_events(id,matter_id,causal_sequence,kind,monotonic_ms,wall_time,payload,source_kind,source_id) VALUES(?1,?2,?3,'direct-observed',?4,?5,?6,'tool',?7)", params![value.event,value.matter,value.event_sequence,value.monotonic_ms,value.wall_time,value.event_payload,value.admission])?;
             tx.execute("INSERT INTO tool_admissions(id,decision_id,action_ordinal,action_fingerprint,origin,effectful,status,reason,parsed_call,tool_spec) VALUES(?1,?2,?3,?4,'model',0,'accepted',?5,?6,?7)", params![value.admission,value.decision,value.action_ordinal,value.action_fingerprint,value.tool.name().as_bytes(),value.parsed_call,value.tool_spec])?;
             tx.execute("INSERT INTO observations(id,decision_id,status,attempt_outcome,content_ref,fingerprint,contamination,event_id) VALUES(?1,?2,'succeeded',?3,?4,?5,'clean',?6)", params![value.observation,value.decision,value.outcome,value.content_ref,value.fingerprint,value.event])?;
-            tx.execute("INSERT INTO state_cells(matter_id,namespace,cell_key,payload,status,source_event_id,fingerprint) VALUES(?1,?2,?3,?4,'active',?5,?6) ON CONFLICT(matter_id,namespace,cell_key) DO UPDATE SET payload=excluded.payload,status='active',source_event_id=excluded.source_event_id,fingerprint=excluded.fingerprint", params![value.matter,value.namespace,value.cell_key,cell_payload(value.source_revision,value.bytes_ref),value.event,value.fingerprint])?; tx.execute("UPDATE state_cells SET status='suppressed' WHERE matter_id=?1 AND CAST(namespace AS TEXT)='recovery' AND status='active'", [value.matter])?;
+            tx.execute("INSERT INTO state_cells(matter_id,namespace,cell_key,payload,status,source_event_id,fingerprint) VALUES(?1,?2,?3,?4,'active',?5,?6) ON CONFLICT(matter_id,namespace,cell_key) DO UPDATE SET payload=excluded.payload,status='active',source_event_id=excluded.source_event_id,fingerprint=excluded.fingerprint", params![value.matter,value.namespace,value.cell_key,cell_payload(value.source_path,value.source_revision,value.bytes_ref),value.event,value.fingerprint])?; tx.execute("UPDATE state_cells SET status='suppressed' WHERE matter_id=?1 AND CAST(namespace AS TEXT)='recovery' AND status='active'", [value.matter])?;
             one(tx.execute("UPDATE runtime_decisions SET status='settled',settlement_event_id=?1 WHERE id=?2 AND matter_id=?3 AND compiler_status='complete' AND status IN ('selected','admitted','running')", params![value.event,value.decision,value.matter])?, "decision cannot settle")
         })
     }
@@ -146,13 +146,10 @@ impl NativeStore {
 fn one(count: usize, message: &str) -> StoreResult<()> {
     if count == 1 { Ok(()) } else { Err(StoreError::InvalidState(message.into())) }
 }
-fn cell_payload(revision: &[u8], body: &[u8]) -> Vec<u8> {
-    serde_json::json!({"revision":hex(revision),"body_ref":String::from_utf8_lossy(body)})
-        .to_string()
-        .into_bytes()
-}
+#[rustfmt::skip]
+fn cell_payload(path:&[u8],revision:&[u8],body:&[u8])->Vec<u8>{let revision=std::str::from_utf8(revision).ok().filter(|value|value.len()==64&&value.bytes().all(|byte|byte.is_ascii_hexdigit())).map(str::to_owned).unwrap_or_else(||hex(revision));serde_json::json!({"path":String::from_utf8_lossy(path),"revision":revision,"body_ref":String::from_utf8_lossy(body)}).to_string().into_bytes()}
 fn direct_retry(tx: &Transaction<'_>, v: &DirectSettlement<'_>) -> StoreResult<bool> {
-    let found: Option<i64> = tx.query_row("SELECT count(*) FROM observations o JOIN runtime_decisions d ON d.id=o.decision_id JOIN tool_admissions a ON a.decision_id=d.id JOIN runtime_events e ON e.id=o.event_id JOIN state_cells s ON s.source_event_id=e.id WHERE o.id=?1 AND d.id=?2 AND d.status='settled' AND d.settlement_event_id=?3 AND a.id=?4 AND o.attempt_outcome=?5 AND o.content_ref=?6 AND o.fingerprint=?7 AND e.payload=?8 AND s.namespace=?9 AND s.cell_key=?10 AND s.payload=?11", params![v.observation,v.decision,v.event,v.admission,v.outcome,v.content_ref,v.fingerprint,v.event_payload,v.namespace,v.cell_key,cell_payload(v.source_revision,v.bytes_ref)], |r| r.get(0)).optional()?;
+    let found: Option<i64> = tx.query_row("SELECT count(*) FROM observations o JOIN runtime_decisions d ON d.id=o.decision_id JOIN tool_admissions a ON a.decision_id=d.id JOIN runtime_events e ON e.id=o.event_id JOIN state_cells s ON s.source_event_id=e.id WHERE o.id=?1 AND d.id=?2 AND d.status='settled' AND d.settlement_event_id=?3 AND a.id=?4 AND o.attempt_outcome=?5 AND o.content_ref=?6 AND o.fingerprint=?7 AND e.payload=?8 AND s.namespace=?9 AND s.cell_key=?10 AND s.payload=?11", params![v.observation,v.decision,v.event,v.admission,v.outcome,v.content_ref,v.fingerprint,v.event_payload,v.namespace,v.cell_key,cell_payload(v.source_path,v.source_revision,v.bytes_ref)], |r| r.get(0)).optional()?;
     Ok(found == Some(1))
 }
 #[rustfmt::skip]
