@@ -4,6 +4,7 @@ mod prompt_policy;
 mod runtime_action_xml;
 pub mod runtime_admission;
 pub mod runtime_candidate;
+mod runtime_record_shape;
 pub mod runtime_completion {
     pub use crate::runtime_selector::{can_close, CheckEvidence, CompletionRequirement};
 }

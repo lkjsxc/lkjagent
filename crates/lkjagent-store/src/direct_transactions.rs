@@ -18,9 +18,9 @@ pub struct DirectSettlement<'a> {
     pub cell_key: &'a [u8], pub source_path: &'a [u8], pub source_revision: &'a [u8], pub bytes_ref: &'a [u8],
 }
 #[rustfmt::skip]
-pub enum ModelFaultKind { Malformed, Hidden, Stale }
+pub enum ModelFaultKind { Malformed, Hidden, Stale, OutputLimit }
 #[rustfmt::skip]
-impl ModelFaultKind { fn key(&self) -> &'static [u8] { match self { Self::Malformed => b"malformed", Self::Hidden => b"hidden", Self::Stale => b"stale" } } }
+impl ModelFaultKind { fn key(&self) -> &'static [u8] { match self { Self::Malformed => b"malformed", Self::Hidden => b"hidden", Self::Stale => b"stale", Self::OutputLimit => b"output-limit" } } }
 #[rustfmt::skip]
 pub struct ModelFault<'a> {
     pub decision: &'a str, pub matter: &'a str, pub event: &'a str,

@@ -134,8 +134,14 @@ fn canonical(value: &str) -> Option<String> {
         && value
             .bytes()
             .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-')
-        && !value
-            .strip_prefix("part-")
-            .is_some_and(|tail| !tail.is_empty() && tail.bytes().all(|byte| byte.is_ascii_digit())))
+        && !anonymous(value))
     .then(|| value.to_string())
+}
+
+fn anonymous(value: &str) -> bool {
+    ["part-", "section-"].iter().any(|prefix| {
+        value
+            .strip_prefix(prefix)
+            .is_some_and(|tail| !tail.is_empty() && tail.bytes().all(|byte| byte.is_ascii_digit()))
+    })
 }

@@ -82,7 +82,7 @@ persisted context item. The short file requires nonempty lineage and a safe
 title and body, and it stays capped at 512 conservative token units.
 
 The same descriptor also admits a long report map and semantic children. The
-map uses owner-supplied canonical `slug`, `unit=index`, ordered unique
+map action uses canonical `slug`, `unit=index`, ordered unique
 `children`, and positive bounded `minimum_words`, then writes
 `artifacts/documents/<slug>/README.md` with owner-readable mode, exact lineage,
 and harness-generated `## Sections` links in declared order. Each child uses the
@@ -94,8 +94,9 @@ byte protection, managed replacement revisions, generic file checks, and
 receipts. `managed-report` covers the short file, `managed-report-map` and
 `managed-report-member` cover map and child structure, and one
 `managed-report-complete` obligation keeps the matter pending until every
-declared current child passes, aggregate child words meet the bound, and the
-README topology remains current. Reports never enter memory retrieval.
+declared child passes, all current managed bytes and modes reopen exactly,
+aggregate child words meet the bound, and README topology remains current.
+Reports never enter memory retrieval.
 
 ## Maintenance
 

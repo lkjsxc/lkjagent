@@ -34,6 +34,26 @@ fn record_descriptor_and_admission_are_exact() -> Result<(), String> {
         (denied.status, denied.reason.as_str()),
         (AdmissionStatus::Rejected, "record family is not admitted")
     );
+    let mut malformed = map_action();
+    malformed
+        .params
+        .insert("children".into(), "summary,summary".into());
+    assert_eq!(
+        admit_action(&decision, &malformed)
+            .map_err(|error| error.message)?
+            .status,
+        AdmissionStatus::Rejected
+    );
+    let mut optional_memory = action("memory");
+    optional_memory
+        .params
+        .insert("slug".into(), "hidden-shape".into());
+    assert_eq!(
+        admit_action(&decision, &optional_memory)
+            .map_err(|error| error.message)?
+            .status,
+        AdmissionStatus::Rejected
+    );
     for state in ["review", "respond"] {
         assert!(direct_tool_view_for_state(state, None)
             .entry("write_record")
