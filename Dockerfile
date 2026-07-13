@@ -9,7 +9,7 @@ RUN apt-get update \
         ripgrep \
     && rm -rf /var/lib/apt/lists/*
 RUN rustup component add rustfmt clippy
-COPY Cargo.toml Cargo.lock README.md ./
+COPY Cargo.toml Cargo.lock README.md AGENTS.md ./
 COPY .gitignore .dockerignore ./
 COPY .cargo ./.cargo
 COPY .github/workflows/verify.yml ./.github/workflows/verify.yml
@@ -48,7 +48,7 @@ RUN apt-get update \
         'chown agent:agent /data /workspace' \
         'cd /workspace' \
         'case "${1:-}" in' \
-        '  ""|run|send|status|console|workbench|doctor|workspace|log|watch|help|matter|queue|context|record|memory|today|journal|todo|calendar|finance|project|dev)' \
+        '  ""|run|send|status|doctor|help)' \
         '    set -- /usr/local/bin/lkjagent --data /data "$@"' \
         '    ;;' \
         'esac' \

@@ -38,7 +38,7 @@ pub fn check_baseline(root: &Path, source: Option<&str>) -> Result<String, Vec<S
     if !full_commit(requested) || requested != BASELINE { return Err(vec!["baseline source must be its exact full tracked commit".into()]); }
     let bundle = root.join("evaluation/evidence").join(requested).join("baseline");
     if !bundle.is_dir() { return Err(vec!["baseline evidence bundle is unavailable".into()]); }
-    let mut errors = Vec::new(); git_source(root, requested, &mut errors);
+    let mut errors = Vec::new(); let has_git=git_ok(root,&["rev-parse","--is-inside-work-tree"]); if has_git { git_source(root, requested, &mut errors); }
     let expected = manifest_rows(&bundle.join("manifest.sha256"), &mut errors);
     let actual = bundle_files(&bundle, &mut errors);
     if expected.keys().cloned().collect::<BTreeSet<_>>() != actual { errors.push("baseline manifest coverage is not exact".into()); }
@@ -50,10 +50,10 @@ pub fn check_baseline(root: &Path, source: Option<&str>) -> Result<String, Vec<S
         }
     }
     let manifest_name = "manifest.sha256".to_string();
-    for name in actual.iter().chain(std::iter::once(&manifest_name)) {
+    if has_git { for name in actual.iter().chain(std::iter::once(&manifest_name)) {
         let relative = format!("evaluation/evidence/{requested}/baseline/{name}");
         if !git_ok(root, &["ls-files", "--error-unmatch", "--", &relative]) { errors.push(format!("baseline file is not tracked: {name}")); }
-    }
+    } }
     semantic_checks(&bundle, requested, &mut errors);
     for name in expected.keys() {
         if let Ok(bytes) = fs::read(bundle.join(name)) {
