@@ -64,6 +64,8 @@ const FACTS: &[Fact] = &[
     fact("X04", "crates/lkjagent-app/src/public_loop.rs", &["MODEL_CALL_LIMIT", "exhausted model-call budget"]),
     fact("X04", "crates/lkjagent-store/tests/native_direct_loop.rs", &["exhausted_budget_is_visible_idempotent_and_not_idle", "Some(\"blocked\")"]),
     fact("X04", "crates/lkjagent-app/tests/cli.rs", &["blocked_matter_resumes_on_owner_send_unless_new_is_forced", "resumed=true"]),
+    fact("T02", "crates/lkjagent-store/src/tui_snapshot.rs", &["transaction_with_behavior(TransactionBehavior::Deferred)", "let conversation = conversation(", "let activity = activity(", "let status = status("]),
+    fact("T02", "crates/lkjagent-store/src/tui_snapshot_tests.rs", &["wal_writer_commit_between_queries_does_not_split_frame", "snapshot_with"]),
 ];
 
 const fn fact(id: &'static str, path: &'static str, needles: &'static [&'static str]) -> Fact {
