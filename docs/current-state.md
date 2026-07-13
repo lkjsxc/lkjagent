@@ -104,8 +104,10 @@ Record, memory, activity, artifact, and TUI behavior must now be rebuilt only on
 native state. Public scheduling runs one matter per cycle and prefers an
 unrelated runnable matter over one with unfinished work. It still blocks instead
 of reconciling every effect recovery phase, and configured-model simultaneous-
-matter fairness remains unproven. The tracked schedule retained later active
-intake without claiming it closed.
+matter fairness remains unproven. A 64-call model budget now creates a durable
+visible blocked matter; effect, recovery-cost, active-time, and token exhaustion
+remain. The tracked schedule retained later active intake without claiming it
+closed.
 
 The public compiler attaches its context plan and frame fingerprints, includes
 up to four active canonical messages from earlier matters, and stores one native
@@ -160,6 +162,7 @@ claims, and the close transaction owns the canonical final message.
 | app-public-loop | complete | public send, run, status, and doctor use only native state in focused tests |
 | context-compiler | complete | selection precedes compilation and included owner or measured sources persist with the rendered frame |
 | conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
+| model-budget | complete | 64 calls atomically block the matter with durable used and limit state |
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
 | configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |
