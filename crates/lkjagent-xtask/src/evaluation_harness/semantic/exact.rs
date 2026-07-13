@@ -1,5 +1,6 @@
 use super::{shared, Context, Measured};
 use crate::evaluation_harness::sha256;
+use rusqlite::OptionalExtension;
 use std::os::unix::fs::PermissionsExt;
 
 pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
@@ -106,6 +107,7 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     Ok(Measured::new(passed, fields))
 }
 
+#[derive(Default)]
 struct Target {
     prior_hash: String,
     intended_hash: String,
@@ -119,7 +121,7 @@ fn target(ctx: &Context<'_>, path: &str) -> Result<Target, String> {
     ctx.db.query_row("SELECT prior_bytes,intended_bytes,coalesce(prior_mode,-1),coalesce(intended_mode,-1),operation FROM effect_targets WHERE CAST(normalized_path AS TEXT)=?1", [path], |row| {
         let prior: Option<Vec<u8>> = row.get(0)?; let intended: Option<Vec<u8>> = row.get(1)?;
         Ok(Target { prior_hash: prior.as_deref().map(sha256).unwrap_or_default(), intended_hash: intended.as_deref().map(sha256).unwrap_or_default(), prior_mode: row.get::<_, i64>(2)?.max(0) as u32, intended_mode: row.get::<_, i64>(3)?.max(0) as u32, prior_absent: prior.is_none(), operation: row.get(4)?, hashes_present: intended.is_some() && (prior.is_some() || path.ends_with("created-proof.txt")) })
-    }).map_err(|error| error.to_string())
+    }).optional().map(|value| value.unwrap_or_default()).map_err(|error| error.to_string())
 }
 fn expected_files(ctx: &Context<'_>) -> Result<std::collections::BTreeMap<String, String>, String> {
     let text = std::fs::read_to_string(ctx.scenario.path.join("checks.tsv"))
