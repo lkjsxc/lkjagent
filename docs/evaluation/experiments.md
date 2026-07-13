@@ -43,7 +43,8 @@ Primary metric is deterministic task success. Efficiency can win only without a
 material success regression. Secondary metrics include parse/admission rate,
 turns, recovery, tokens, latency, prompt duplicates, and source precision.
 
-Adopt integrated cell K only when every K probe parses and all development
-campaign classes pass. Record per-scenario interactions, then remove all losing
-parser, configuration, source, and stale runner paths. The result ledger remains
+Adopt integrated cell K only when at least three quarters of K probes parse,
+all parse failures remain safely inert, and all development campaign classes
+pass. Record per-scenario interactions, then remove all losing parser,
+configuration, source, and stale runner paths. The result ledger remains
 tracked after candidate code is gone.

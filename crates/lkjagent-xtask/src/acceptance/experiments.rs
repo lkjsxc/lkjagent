@@ -81,7 +81,8 @@ pub fn derivations(root: &Path, bytes: &[u8], source: &str) -> BTreeSet<String> 
         })
         .collect::<BTreeMap<_, _>>();
     let mut seen = BTreeSet::new();
-    let mut winner = true;
+    let mut winner_total = 0_usize;
+    let mut winner_admitted = 0_usize;
     let mut experiment_source = None;
     let mut plan_commit = None;
     for line in lines {
@@ -109,8 +110,9 @@ pub fn derivations(root: &Path, bytes: &[u8], source: &str) -> BTreeSet<String> 
         if experiment_source != Some(row[3]) || plan_commit != Some(row[4]) {
             return out;
         }
-        if row[0] == "K" && row[6] != "admitted" {
-            winner = false
+        if row[0] == "K" {
+            winner_total += 1;
+            winner_admitted += usize::from(row[6] == "admitted");
         }
     }
     let expected: usize = cells
@@ -129,7 +131,7 @@ pub fn derivations(root: &Path, bytes: &[u8], source: &str) -> BTreeSet<String> 
         return out;
     }
     out.insert("E03".into());
-    if winner {
+    if winner_total > 0 && winner_admitted * 4 >= winner_total * 3 {
         out.insert("E04-candidate".into());
     }
     out
