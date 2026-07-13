@@ -130,21 +130,11 @@ fn contract_tables_decision_context_check_recovery_and_exit_are_exact() {
             "output-reserve"
         ]
     );
-    assert_eq!(
-        FILE_CHECK_KINDS,
-        [
-            "regular-utf8",
-            "intended-sha256",
-            "occurrence-counts",
-            "admitted-diff",
-            "preserved-mode",
-            "allowed-changed-paths",
-            "effects-settled",
-            "managed-journal",
-            "managed-memory",
-            "managed-report"
-        ]
-    );
+    #[rustfmt::skip]
+    assert_eq!(FILE_CHECK_KINDS,["regular-utf8","intended-sha256","occurrence-counts",
+        "admitted-diff","preserved-mode","allowed-changed-paths","effects-settled",
+        "managed-journal","managed-memory","managed-report","managed-report-map",
+        "managed-report-member","managed-report-complete"]);
     assert_eq!(
         RECOVERY_KINDS,
         [
@@ -182,14 +172,14 @@ fn contract_tables_tool_catalog_and_open_keys_preserve_authority() {
         "list_directory,search_text,read_file,edit_file,create_file,write_record"
     );
     #[rustfmt::skip]
-    let field_names = |index: usize| catalog[index].fields.iter()
-        .map(|field| field.name).collect::<Vec<_>>();
+    let field_names = |index: usize| catalog[index].fields.iter().map(|field| field.name).collect::<Vec<_>>();
     assert_eq!(field_names(0), ["path", "offset", "count", "complete"]);
     assert_eq!(field_names(1), ["path", "query", "offset", "count"]);
     assert_eq!(field_names(2), ["path", "offset", "count", "complete"]);
     assert_eq!(field_names(3), ["path", "old_text", "new_text"]);
     assert_eq!(field_names(4), ["path", "content"]);
-    assert_eq!(field_names(5), ["family", "title", "body"]);
+    #[rustfmt::skip]
+    assert_eq!(field_names(5), ["family", "title", "body", "slug", "unit", "children", "minimum_words"]);
     assert!(catalog.iter().all(|tool| !tool.effect_key.is_empty()
         && tool.result_max_bytes > 0
         && !tool.denial_code.is_empty()));

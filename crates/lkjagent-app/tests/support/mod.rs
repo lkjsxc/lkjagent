@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 pub mod automatic_checks_fixture;
+pub mod report_long;
 
 use std::path::{Path, PathBuf};
 

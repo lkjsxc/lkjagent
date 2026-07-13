@@ -74,6 +74,7 @@ fn fresh_matter_decision_uses_action_and_only_orient_tools() -> Result<(), Strin
 fn selector_decisions_use_modify_review_and_respond_projections() -> Result<(), String> {
     for (namespace, name, phase) in [
         ("source", "current", "modify"),
+        ("report", "pending", "modify"),
         ("edit", "committed", "review"),
         ("check", "current-passed", "respond"),
     ] {

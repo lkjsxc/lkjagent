@@ -15,10 +15,19 @@ pub(crate) struct JournalEdit {
     parent_revision: Option<String>,
 }
 
+pub(crate) fn prepare(
+    db: &Path,
+    workspace: &OpenedWorkspace,
+    path: &str,
+    rendered: &str,
+) -> R<JournalEdit> {
+    prepare_mode(db, workspace, path, rendered, 0o644)
+}
+
 #[rustfmt::skip]
-pub(crate) fn prepare(db:&Path,workspace:&OpenedWorkspace,path:&str,rendered:&str)->R<JournalEdit>{
+pub(crate) fn prepare_mode(db:&Path,workspace:&OpenedWorkspace,path:&str,rendered:&str,mode:u32)->R<JournalEdit>{
  let connection=Connection::open(db).map_err(err)?;let managed:Option<ManagedRow>=connection.query_row("SELECT d.managed,d.current_revision_id,r.sha256,r.content FROM workspace_documents d LEFT JOIN workspace_revisions r ON r.id=d.current_revision_id WHERE d.current_path=?1",[path.as_bytes()],|row|Ok((row.get(0)?,row.get(1)?,row.get(2)?,row.get(3)?))).optional().map_err(err)?;
- match managed{None=>{let value=workspace.prepare_absent_edit(path.into(),rendered,0o644).map_err(err)?;Ok(JournalEdit{edit:value.edit,parents:value.missing_parents,parent_revision:None})},Some((1,Some(parent),Some(hash),Some(content)))=>{let revision=hex(&hash);let observed=workspace.observe_edit_target(path).map_err(err)?;if !matches!(&observed,ObservedTarget::Present(value) if value.revision==revision&&value.bytes==content){return Err("managed record revision is stale".into())}let old=std::str::from_utf8(&content).map_err(err)?;let edit=workspace.prepare_exact_edit(path.into(),Revision::Sha256(revision),old,rendered,0o644).map_err(err)?;Ok(JournalEdit{edit,parents:vec![],parent_revision:Some(parent)})},_=>Err("unmanaged existing record collision".into())}
+ match managed{None=>{let value=workspace.prepare_absent_edit(path.into(),rendered,mode).map_err(err)?;Ok(JournalEdit{edit:value.edit,parents:value.missing_parents,parent_revision:None})},Some((1,Some(parent),Some(hash),Some(content)))=>{let revision=hex(&hash);let observed=workspace.observe_edit_target(path).map_err(err)?;if !matches!(&observed,ObservedTarget::Present(value) if value.revision==revision&&value.bytes==content){return Err("managed record revision is stale".into())}let old=std::str::from_utf8(&content).map_err(err)?;let edit=workspace.prepare_exact_edit(path.into(),Revision::Sha256(revision),old,rendered,mode).map_err(err)?;Ok(JournalEdit{edit,parents:vec![],parent_revision:Some(parent)})},_=>Err("unmanaged existing record collision".into())}
 }
 
 #[allow(clippy::too_many_arguments)]

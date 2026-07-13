@@ -96,6 +96,10 @@ const RECORD_FIELDS: &[DescriptorField] = &[
     field("family", true, TEXT, (6, 7), (None, None), Some("journal")),
     field("title", true, TEXT, (1, 256), (None, None), Some("A grounded day")),
     field("body", true, TEXT, (1, 1536), (None, None), Some("I recorded the owner-provided facts for today.")),
+    field("slug", false, TEXT, (1, 80), (None, None), Some("project-status")),
+    field("unit", false, TEXT, (1, 48), (None, None), Some("index")),
+    field("children", false, TEXT, (3, 512), (None, None), Some("summary,risks")),
+    field("minimum_words", false, COUNT, (1, 5), (Some(1), Some(20_000)), Some("200")),
 ];
 
 #[rustfmt::skip]
@@ -105,7 +109,7 @@ const DIRECT_CATALOG: &[ToolDescriptor] = &[
     descriptor("read_file", "read a numbered page; complete is required: true only when this read satisfies a no-change report objective, false when an edit may follow", READ_FIELDS, &["orient", "modify", "recovery"], "workspace.read", 32_768, "read-denied"),
     descriptor("edit_file", "replace one exact observed text span", EDIT_FIELDS, MODIFY, "workspace.edit", 8_192, "edit-denied"),
     descriptor("create_file", "create one observed-absent UTF-8 file", CREATE_FIELDS, MODIFY, "workspace.create", 8_192, "create-denied"),
-    descriptor("write_record", "write one bounded grounded owner-visible journal, memory, or short report", RECORD_FIELDS, RECORD, "workspace.record", 8_192, "record-denied"),
+    descriptor("write_record", "write one grounded journal or memory, one short report, or one long report map or child: journal and memory use family,title,body only; short report uses family=report,title,body only; long map uses family=report,title,body,slug,unit=index,children,minimum_words; long child uses family=report,title,body,slug,unit", RECORD_FIELDS, RECORD, "workspace.record", 8_192, "record-denied"),
 ];
 
 #[rustfmt::skip]
