@@ -8,6 +8,7 @@ use lkjagent_core::runtime_tool_catalog::direct_tool_view_for_state;
 
 #[test]
 fn direct_views_are_exact_for_every_phase() {
+    assert_eq!(RuntimePolicy::default().model_budget_tokens, 1_024);
     assert_eq!(
         names("orient", None),
         ["list_directory", "read_file", "search_text", "write_record"]

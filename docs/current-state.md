@@ -136,10 +136,10 @@ One descriptor-derived `write_record` admits journal, memory, short report, and
 long report map or child. Short reports keep `artifacts/reports/<slug>.md`; long
 maps write `artifacts/documents/<slug>/README.md`; long children write
 `artifacts/documents/<slug>/<unit>.md`; pending resume uses native obligations and
-`report:pending`. Output limits retain no body and retry one reduced unit. Shared
-mechanics cover safe parents, revisions, checks, receipts, and collisions;
-short and long limits are 512 and 2,048 units. Memory retrieval stays within
-current `knowledge/notes`. A no-effect pre-narrowing run failed; proof is unrun.
+`report:pending`. Model output is capped at 1,024 tokens; limit faults retain no
+body and retry one reduced unit. Shared mechanics cover safe parents, revisions,
+checks, receipts, and collisions; short and long limits are 512 and 2,048 units.
+Memory retrieval stays current. A pre-narrowing run failed; proof remains unrun.
 
 ## Direct Contract
 

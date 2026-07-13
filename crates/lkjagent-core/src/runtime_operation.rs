@@ -108,7 +108,7 @@ pub struct RuntimePolicy {
 impl Default for RuntimePolicy {
     fn default() -> Self {
         Self {
-            model_budget_tokens: 512,
+            model_budget_tokens: 1_024,
             prior_progress_fingerprint: None,
             current_progress_fingerprint: None,
             recovery_attempt: 0,
