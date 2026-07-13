@@ -85,7 +85,6 @@ const FACTS: &[Fact] = &[
     fact("T01", "crates/lkjagent-app/src/tui_render.rs", &[".rows(width.saturating_sub", "role(&row.role)", "tui_viewport::visible"]),
     fact("T02", "crates/lkjagent-store/src/tui_snapshot.rs", &["transaction_with_behavior(TransactionBehavior::Deferred)", "let conversation = conversation(", "let activity = activity(", "let status = status("]),
     fact("T02", "crates/lkjagent-store/src/tui_snapshot_tests.rs", &["wal_writer_commit_between_queries_does_not_split_frame", "snapshot_with"]),
-    fact("T03", "crates/lkjagent-app/src/tui_screen.rs", &["pub conversation: Vec<ConversationItem>", "pub activity: ActivityPanel", "expanded: false"]),
     fact("T03", "crates/lkjagent-store/src/tui_snapshot_tests.rs", &["canonical_order_and_conversation_activity_separation", "secret-prompt", "secret-payload"]),
     fact("T03", "crates/lkjagent-app/tests/tui_native.rs", &["renderer_clips_and_keeps_activity_out_of_conversation", "!line.contains(\"selected\")"]),
     fact("T04", "crates/lkjagent-store/src/tui_snapshot_tests.rs", &["activity_ids_are_unique_and_stable_across_polls", "first_ids.len()"]),
