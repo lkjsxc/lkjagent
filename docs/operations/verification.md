@@ -42,7 +42,9 @@ docker compose run --rm lint
 ```
 
 Final proof runs from a clean locked export with no source bind mount and records
-source, image, and binary hashes.
+source, image, and binary hashes. The Docker build export has no VCS metadata, so
+baseline semantic/hash validation runs there while tracked-file and reachable-
+history checks remain mandatory host gates.
 
 ## Semantic Gates
 

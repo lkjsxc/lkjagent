@@ -10,9 +10,9 @@ name the next executable work.
 The public-loop work started from `ee4de81536b1baac845a346103f14420cd41f45b`.
 The focused native-loop test passes in the current checkout, whose source is not
 yet frozen. A tracked configured-model file campaign has passed as described
-below. For the store TUI projection checkout, Compose lint passes; Compose test
-and verify stop because the build image omits the required `AGENTS.md` contract
-input. This is repository packaging failure evidence, not a projection pass.
+below. The current checkout copies `AGENTS.md` into the build image; rebuilt
+Compose test, lint, verify, agent build, and native doctor all pass. The live
+campaign remains historical evidence rather than proof of this changed source.
 The original planning comparison used source
 `5604ec89af3ba9dbfb287bd869971781fdcf2fad` and parent product source
 `28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`.
@@ -173,7 +173,7 @@ claims, and the close transaction owns the canonical final message.
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
 | configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |
 | retired-source-deletion | complete | old controller, bridge, record, inspection, workbench, and TUI source is absent from product crates |
-| tui-frame-projection | implemented | local store and workspace tests cover one bounded deferred read transaction; Compose test is blocked by its missing `AGENTS.md` input |
+| tui-frame-projection | complete | local, workspace, and rebuilt Compose gates cover one bounded deferred read transaction |
 | final campaigns | active | exact-file campaign passed; recovery, daily-life, multi-project, and PTY proof remain |
 
 ## Honesty Rules
