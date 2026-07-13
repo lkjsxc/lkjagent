@@ -93,8 +93,20 @@ fn composer(model: &TuiModel, width: usize) -> String {
         return format!("! {}", bounded(error));
     }
     let available = width.saturating_sub(2).max(1);
-    let rows = wrap(&model.composer.text, available);
-    format!("> {}", rows.last().map_or("", String::as_str))
+    let byte = model
+        .composer
+        .text
+        .grapheme_indices(true)
+        .nth(model.composer.cursor)
+        .map_or(model.composer.text.len(), |(index, _)| index);
+    let mut marked = model.composer.text.clone();
+    marked.insert(byte, '│');
+    let rows = wrap(&marked, available);
+    let current = rows
+        .iter()
+        .find(|row| row.contains('│'))
+        .map_or("│", String::as_str);
+    format!("> {current}")
 }
 
 fn bounded(value: &str) -> String {
