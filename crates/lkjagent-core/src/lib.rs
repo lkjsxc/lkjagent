@@ -1,10 +1,8 @@
-pub mod artifact_manifest;
 pub mod parse;
 pub mod prompt;
 mod prompt_policy;
 mod runtime_action_xml;
 pub mod runtime_admission;
-pub mod runtime_artifact;
 pub mod runtime_candidate;
 pub mod runtime_completion {
     pub use crate::runtime_selector::{can_close, CheckEvidence, CompletionRequirement};
@@ -50,12 +48,3 @@ pub mod runtime_tool_call;
 mod runtime_tool_cards;
 pub mod runtime_tool_catalog;
 pub mod runtime_tool_view;
-pub mod workspace_entity {
-    pub use crate::workspace_manifest::{
-        preserve_identity_after_move, validate_entity, WorkspaceEntity, WorkspaceEntityIssue,
-        WorkspaceEntityKind, WorkspaceRetention, WorkspaceVisibility,
-    };
-}
-pub mod workspace_manifest;
-pub mod workspace_record;
-mod workspace_record_paths;

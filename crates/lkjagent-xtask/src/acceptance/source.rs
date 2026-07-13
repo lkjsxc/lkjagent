@@ -106,7 +106,7 @@ pub fn contract_derivations(root: &Path) -> BTreeSet<String> {
 
 #[rustfmt::skip]
 fn retired_authority_absent(root:&Path)->bool{
- const PATHS:&[&str]=&["crates/lkjagent-core/src/owner_turn.rs","crates/lkjagent-core/src/plan.rs","crates/lkjagent-core/src/templates.rs","crates/lkjagent-app/src/daemon_route_effects.rs","crates/lkjagent-app/src/runtime_bridge.rs","crates/lkjagent-store/src/plan_schema.rs"];
+ const PATHS:&[&str]=&["crates/lkjagent-core/src/owner_turn.rs","crates/lkjagent-core/src/plan.rs","crates/lkjagent-core/src/templates.rs","crates/lkjagent-core/src/artifact_manifest.rs","crates/lkjagent-core/src/runtime_artifact.rs","crates/lkjagent-core/src/workspace_manifest.rs","crates/lkjagent-core/src/workspace_record.rs","crates/lkjagent-app/src/daemon_route_effects.rs","crates/lkjagent-app/src/runtime_bridge.rs","crates/lkjagent-app/src/workspace_search/inventory.rs","crates/lkjagent-store/src/plan_schema.rs"];
  if PATHS.iter().any(|path|root.join(path).exists()){return false}
  const TOKENS:&[&str]=&["CREATE TABLE tasks","CREATE TABLE steps","Command::Workbench","Command::Record","pub mod plan_schema","pub mod runtime_bridge"];
  ["crates/lkjagent-core/src","crates/lkjagent-app/src","crates/lkjagent-store/src"].iter().flat_map(|dir|fs::read_dir(root.join(dir)).into_iter().flatten().flatten()).filter(|row|row.path().extension().and_then(|x|x.to_str())==Some("rs")).all(|row|fs::read_to_string(row.path()).is_ok_and(|text|TOKENS.iter().all(|token|!text.contains(token))))
