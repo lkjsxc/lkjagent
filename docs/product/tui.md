@@ -19,9 +19,23 @@ Conversation contains only owner and final agent messages. Tool calls, state,
 checks, diffs, recovery, and errors use a stable-ID activity pane collapsed by
 default. Queue/status chatter does not appear as conversation.
 
-A frame loads conversation, activity, and status in one SQLite read transaction.
-The TUI commits owner input and durable control events but never selects runtime
-work.
+A frame loads conversation, activity, and status in one deferred SQLite read
+transaction on one connection. The first native frame projection caps a page at
+100 conversation rows and 200 activity rows, caps each conversation body at
+16,384 bytes with an explicit truncation flag, and supports older-page cursors.
+
+Activity exposes only stable source-qualified IDs, fixed source kinds, matter
+IDs, constrained statuses, and monotonic ordering. It reads decisions, provider
+exchanges, admissions, effects, observations, checks, and state cells. State
+cell identity material is fingerprinted. Provider request and response refs,
+prompts, parsed calls, payloads, observations, check measurements, and error
+fields are never projected. Status reports matter lifecycle, unfinished runtime
+work, rejected or failed rows, current and passing checks, and active cell
+counts from the same transaction.
+
+This slice is store-only and read-only. It adds no public command, terminal,
+input, viewport, or rendering behavior. A later TUI may commit owner input and
+durable control events but never selects runtime work.
 
 ## Input
 

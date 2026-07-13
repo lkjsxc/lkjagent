@@ -2,7 +2,8 @@
 
 ## Purpose
 
-Map the lean SQLite authority and external-effect transaction boundaries.
+Map the lean SQLite authority, external-effect transaction boundaries, and
+sanitized read projections.
 
 ## Table of Contents
 

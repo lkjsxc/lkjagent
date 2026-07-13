@@ -2,9 +2,10 @@
 
 ## Purpose
 
-SQLite persistence crate for the native 18-table direct state ledger.
+SQLite persistence and bounded read projection crate for the native 18-table
+direct state ledger.
 
-Doc contract: ../../docs/store/README.md
+Doc contracts: ../../docs/store/README.md and ../../docs/product/tui.md
 
 ## Table of Contents
 

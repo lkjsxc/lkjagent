@@ -10,7 +10,9 @@ name the next executable work.
 The public-loop work started from `ee4de81536b1baac845a346103f14420cd41f45b`.
 The focused native-loop test passes in the current checkout, whose source is not
 yet frozen. A tracked configured-model file campaign has passed as described
-below; Docker has not run after the latest loop changes.
+below. For the store TUI projection checkout, Compose lint passes; Compose test
+and verify stop because the build image omits the required `AGENTS.md` contract
+input. This is repository packaging failure evidence, not a projection pass.
 The original planning comparison used source
 `5604ec89af3ba9dbfb287bd869971781fdcf2fad` and parent product source
 `28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`.
@@ -100,8 +102,12 @@ lives in `prompt.rs`.
 
 ## Active Source Gaps
 
-Record, memory, activity, artifact, and TUI behavior must now be rebuilt only on
-native state. Public scheduling runs one matter per cycle and prefers an
+Record, memory, artifact, and owner-visible TUI behavior must now be rebuilt
+only on native state. The store has a bounded read-only TUI frame projection:
+canonical messages, whitelisted activity, and status counts share one deferred
+read transaction and expose no runtime bodies beyond bounded conversation text.
+It has no terminal, input, rendering, or public CLI integration. Public
+scheduling runs one matter per cycle and prefers an
 unrelated runnable matter over one with unfinished work. It still blocks instead
 of reconciling every effect recovery phase, and configured-model simultaneous-
 matter fairness remains unproven. A 64-call model budget now creates a durable
@@ -118,8 +124,8 @@ test claims; richer claim-to-path comparison remains a bounded follow-up. Close
 and the owner receipt remain check-derived. These are source gaps, not fallback.
 
 The native `conversation_messages` table is canonical for public turns. There is
-currently no public TUI; its composer, activity, and wrapped-row viewport must be
-rebuilt from native rows.
+currently no public TUI; its composer, frame polling integration, rendering, and
+wrapped-row viewport must be built over the native store projection.
 
 Configuration and Compose now separate the runtime data root from one visible
 workspace root. The workspace is created only by an actual workspace operation,
@@ -167,6 +173,7 @@ claims, and the close transaction owns the canonical final message.
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
 | configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |
 | retired-source-deletion | complete | old controller, bridge, record, inspection, workbench, and TUI source is absent from product crates |
+| tui-frame-projection | implemented | local store and workspace tests cover one bounded deferred read transaction; Compose test is blocked by its missing `AGENTS.md` input |
 | final campaigns | active | exact-file campaign passed; recovery, daily-life, multi-project, and PTY proof remain |
 
 ## Honesty Rules
