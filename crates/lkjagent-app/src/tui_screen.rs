@@ -50,9 +50,17 @@ impl ScreenModel {
 
     pub fn merge(&mut self, snapshot: &TuiSnapshot, pending: Option<&PendingSubmission>) {
         let expanded = self.activity.expanded;
+        for row in snapshot
+            .conversation
+            .iter()
+            .filter(|row| row.lifecycle != "active")
+        {
+            self.conversation.retain(|item| item.id != row.id);
+        }
         let mut conversation = snapshot
             .conversation
             .iter()
+            .filter(|row| row.lifecycle == "active")
             .map(|row| ConversationItem {
                 id: row.id.clone(),
                 sequence: Some(row.sequence),

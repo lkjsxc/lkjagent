@@ -76,6 +76,17 @@ fn renderer_clips_and_keeps_activity_out_of_conversation() {
 }
 
 #[test]
+#[rustfmt::skip]
+fn terminal_pane_follow_reaches_newest_and_replaced_rows_disappear() {
+    let mut model=TuiModel::new(20,6);let rows=(1..=8).map(|n|message(&format!("m{n}"),n,&format!("body {n}"))).collect();
+    let (next,_)=lkjagent_app::tui_reducer::reduce(model,TuiEvent::Snapshot(snapshot(rows)));model=next;
+    let rendered=lkjagent_app::tui_render::lines(&model);assert!(rendered.iter().any(|line|line.contains("body 8")));
+    let mut old=message("m8",8,"body 8");old.lifecycle="replaced".into();
+    let (model,_)=lkjagent_app::tui_reducer::reduce(model,TuiEvent::Snapshot(snapshot(vec![old,message("m9",9,"body 9")])));
+    assert!(model.screen.conversation.iter().all(|item|item.id!="m8"));assert!(model.screen.conversation.iter().any(|item|item.id=="m9"));
+}
+
+#[test]
 fn older_pages_merge_by_identity_in_sequence_order() {
     let mut screen = ScreenModel::project(
         &snapshot(vec![message("m3", 3, "three"), message("m4", 4, "four")]),

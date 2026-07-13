@@ -102,7 +102,8 @@ lives in `prompt.rs`.
 
 ## Active Source Gaps
 
-Record, memory, and artifact behavior must now be rebuilt only on native state. Numbered file reads persist only the requested page and
+Record, memory, and artifact behavior must now be rebuilt only on native state.
+Numbered file reads persist only the requested page and
 continuation metadata, never unrequested whole-file bytes. The store has a
 bounded read-only TUI frame projection:
 canonical messages, whitelisted activity, and status counts share one deferred
@@ -181,18 +182,12 @@ claims, and the close transaction owns the canonical final message.
 | app-public-loop | complete | public send, run, status, and doctor use only native state in focused tests |
 | context-compiler | complete | selection precedes compilation and included owner or measured sources persist with the rendered frame |
 | conversation-canonical | complete | native intake and checked close allocate stable ordered owner and final messages atomically |
-| model-budget | complete | 64 calls atomically block the matter with durable used and limit state |
-| token-budget | complete | reported or conservatively accounted epoch usage blocks before post-response admission |
-| effect-budget | complete | 16 accepted epoch journals block the next write before workspace mutation |
-| recovery-budget | complete | the sixteenth persisted epoch rejection visibly blocks the matter |
-| active-time-budget | complete | settled intervals plus current cycle block at 900,000 milliseconds |
+| matter-budgets | complete | call, token, effect, recovery, and active-time epoch limits visibly block and resume from owner input |
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
 | configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |
 | retired-source-deletion | complete | old controller, bridge, record, inspection, workbench, and TUI source is absent from product crates |
-| tui-frame-projection | complete | local, workspace, and rebuilt Compose gates cover one bounded deferred read transaction |
-| tui-pure-core | complete | focused tests cover identity, Unicode composer and wrapping, screen separation, and anchored viewport behavior |
-| tui-native-edge | complete | public command, typed intake, bounded polling worker, pagination, rendering, input, and RAII cleanup pass focused tests |
+| native-tui | complete | one-transaction frames, pure Unicode viewport, typed intake, bounded worker, rendering, PTY, and RAII tests pass |
 | final campaigns | active | exact-file campaign passed; recovery, daily-life, multi-project, and PTY proof remain |
 
 ## Honesty Rules

@@ -21,9 +21,7 @@ pub fn lines(model: &TuiModel) -> Vec<String> {
     } else {
         0
     };
-    let conversation_height = height
-        .saturating_sub(2 + search_rows)
-        .saturating_sub(activity_rows);
+    let conversation_height = model.conversation_height();
     let rows = model
         .screen
         .rows(width.saturating_sub(7).max(1), &model.search);
