@@ -27,7 +27,7 @@ pub fn reduce_committed_edit(connection: &mut Connection, workspace: &OpenedWork
         ObservedTarget::Absent => (Vec::new(), 0),
     };
     let source = Sha256::digest(&bytes).to_vec();
-    let pending = pending(&tx, obligations(&tx, &fact.matter)?, &source)?;
+    let pending = pending(&tx, obligations(&tx, &fact.matter, &fact.path)?, &source)?;
     if pending.is_empty() { tx.commit()?; return Ok(CheckReduction { scheduled: 0, passed: 0 }); }
     let event_sequence: i64 = tx.query_row("SELECT coalesce(max(causal_sequence),0)+1 FROM runtime_events WHERE matter_id=?1",
         [&fact.matter], |row| row.get(0))?;
@@ -118,10 +118,13 @@ fn effect_fact(tx: &rusqlite::Transaction<'_>, journal: &str) -> StoreResult<Eff
 fn obligations(
     tx: &rusqlite::Transaction<'_>,
     matter: &str,
+    path: &str,
 ) -> StoreResult<Vec<(String, String, Vec<u8>)>> {
     let mut query = tx.prepare("SELECT id,predicate_kind,predicate_payload FROM obligations
-        WHERE matter_id=?1 AND required=1 AND predicate_kind IN ('workspace-byte','workspace-content','workspace-collateral','managed-journal') ORDER BY id")?;
-    let rows = query.query_map([matter], |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)))?;
+        WHERE matter_id=?1 AND required=1 AND predicate_kind IN ('workspace-byte','workspace-content','workspace-collateral','managed-journal') AND (json_extract(CAST(predicate_payload AS TEXT),'$.path')=?2 OR (predicate_kind='workspace-collateral' AND EXISTS(SELECT 1 FROM json_each(CAST(predicate_payload AS TEXT),'$.allowed_paths') WHERE value=?2))) ORDER BY id")?;
+    let rows = query.query_map(params![matter, path], |row| {
+        Ok((row.get(0)?, row.get(1)?, row.get(2)?))
+    })?;
     Ok(rows.collect::<Result<Vec<_>, _>>()?)
 }
 
