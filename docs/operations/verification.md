@@ -10,33 +10,32 @@ The target program reuses these substantive suites rather than adding one shallo
 gate per workgraph row:
 
 ```sh
-cargo test --locked -p lkjagent-core contract_tables
-cargo test --locked -p lkjagent-effects workspace_safety
-cargo test --locked -p lkjagent-store durable_boundaries
-cargo test --locked -p lkjagent-app product_flows
+cargo test --locked -p lkjagent-core
+cargo test --locked -p lkjagent-effects
+cargo test --locked -p lkjagent-store
+cargo test --locked -p lkjagent-app
 cargo test --locked -p lkjagent-app --test tui_contract
 cargo test --locked -p lkjagent-app --test tui_native --test tui_responsive --test tui_terminal_guard --test tui_pty
-cargo test --locked -p lkjagent-xtask acceptance_negative
+cargo test --locked -p lkjagent-xtask --test acceptance_negative
 ```
 
-`acceptance_negative`, `contract_tables`, `workspace_safety`,
-`durable_boundaries`, `tui_contract`, and `wire_contract` are implemented. The
-product-flow filter is not implemented yet. `../current-state.md` owns that gap.
-The current deterministic commands remain:
+These suites execute substantive tests; zero-test filters are not evidence. The
+current deterministic commands are:
 
 ```sh
 cargo run --locked -p lkjagent-xtask -- check-docs
 cargo run --locked -p lkjagent-xtask -- check-lines
 cargo run --locked -p lkjagent-xtask -- check-files
 cargo run --locked -p lkjagent-xtask -- check-style
-cargo run --locked -p lkjagent-xtask -- quiet test
-cargo run --locked -p lkjagent-xtask -- quiet verify
+cargo run --locked -p lkjagent-xtask -- gate docs-authority
+cargo run --locked -p lkjagent-xtask -- gate evaluation-harness
+git diff --check SOURCE..HEAD
 ```
 
 ## Docker
 
 ```sh
-docker compose build --no-cache verify test lint
+docker compose build --no-cache verify test lint agent
 docker compose run --rm verify
 docker compose run --rm test
 docker compose run --rm lint

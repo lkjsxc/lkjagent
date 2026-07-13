@@ -74,7 +74,7 @@ const REQUIREMENTS: &[(&str, &[&str])] = &[
     ("docs/workspace/effects.md", &["exact prior/intended bytes", "expected/intended mode", "target and stage `(bytes, mode)` pairs"]),
     ("docs/product/tui.md", &["The TUI reads `conversation_messages`", "ordered by monotonic sequence and logical ID"]),
     ("docs/runtime/completion.md", &["schedules native checks automatically", "harness-rendered factual receipt", "factual fallback wording is persisted"]),
-    ("docs/current-state.md", &["`5604ec89af3ba9dbfb287bd869971781fdcf2fad`", "`28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`", "A synthetic 901-second run", "one blocked task, three blocked steps, and zero runtime", "unsupported executor before any model call", "| docs-reset | complete |", "| acceptance-checker | complete |"]),
+    ("docs/current-state.md", &["Final source is the exact acceptance `SOURCE` argument.", "Only tracked sanitized attachments below the exact source directory", "acceptance verify --source SOURCE --evidence evaluation/evidence/SOURCE", "configured 903-second daily-life run", "all six changed-source development and frozen runs remain", "| docs-reset | complete |", "| acceptance-checker | complete |"]),
     ("docs/evaluation/README.md", &["workgraph.tsv", "acceptance.tsv", "experiment-plan.tsv"]),
     ("evaluation/workgraph.tsv", &["id\twave\tdepends", "acceptance-checker\t0\tdocs-reset"]),
     ("evaluation/acceptance.tsv", &["id\tcategory\tpredicate", "A01\tchecker", "D02\tdocs"]),

@@ -42,33 +42,35 @@ fn acceptance_negative_allows_only_checker_result_status_rows() {
 }
 
 #[test]
-fn exact_campaign_derivation_requires_all_semantic_facts() {
+fn legacy_editable_campaign_summary_derives_nothing() {
     let body = format!("field\tvalue\nsource_commit\t{SOURCE}\nscenario\texact-file-edit\nmode\trun\nsemantic_status\tevaluated\noutcome\tpassed\nsemantic_detail\tfile_exact=true;one_file=true;closed=4;owner=5;agent=4;passed_checks=12;effects=1;admissions=10;providers=24;tables=18\n");
     let path = Path::new("campaign-exact-file-edit-run.tsv");
     let derived = derive_attachment(path, body.as_bytes(), SOURCE);
-    assert_eq!(
-        derived,
-        ["F01", "F07", "F08", "W02"]
-            .into_iter()
-            .map(str::to_string)
-            .collect()
-    );
+    assert!(derived.is_empty());
     let altered = body.replace("file_exact=true", "file_exact=false");
     let derived = derive_attachment(path, altered.as_bytes(), SOURCE);
-    assert_eq!(derived, ["F08"].into_iter().map(str::to_string).collect());
+    assert!(derived.is_empty());
 }
 
 #[test]
 fn source_contracts_require_exact_implementation_and_tests() -> Result<(), Box<dyn Error>> {
     let repository = Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
     let expected = [
+        "A01",
+        "A02",
+        "A03",
+        "A04",
+        "A05",
         "C01",
         "C02",
+        "C03",
         "C04-deterministic",
         "C05",
         "C06",
+        "C07",
         "F03",
         "F04",
+        "F06",
         "K01",
         "K02",
         "K03",
@@ -85,9 +87,13 @@ fn source_contracts_require_exact_implementation_and_tests() -> Result<(), Box<d
         "R04",
         "R05",
         "R06",
+        "R07",
+        "R08",
         "R10",
         "S02",
+        "S03",
         "S04",
+        "S05",
         "T01",
         "T02",
         "T03",
@@ -98,10 +104,13 @@ fn source_contracts_require_exact_implementation_and_tests() -> Result<(), Box<d
         "T08",
         "T09",
         "T10",
+        "W01",
+        "W03",
         "W04",
         "W05-deterministic",
         "W06-deterministic",
         "W08-deterministic",
+        "X01",
         "X03",
         "X04",
     ];

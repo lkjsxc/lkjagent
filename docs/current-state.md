@@ -4,45 +4,25 @@ Separate observed behavior in this checkout from the direct-runtime contract and
 name the next executable work.
 ## Evidence Boundary
 
-The public-loop work started from `ee4de81536b1baac845a346103f14420cd41f45b`.
-Focused native-loop and scripted journal tests pass in this unfrozen checkout.
-Changed-source local and rebuilt Compose test, lint, and verify pass; native
-doctor and configured-model journal campaigns have not run. The original
-comparison used source
-`5604ec89af3ba9dbfb287bd869971781fdcf2fad` and parent product source
-`28bdaacca4a6d7c779057893e3d48bfbd9f2ccea`.
+Final source is the exact acceptance `SOURCE` argument. Only tracked sanitized
+attachments below the exact source directory are evidence. Later commits may
+add files only below `evaluation/evidence/SOURCE/`; source validation rejects
+any other drift. The final command is:
 
-Configured smoke runs corrected protocol, observation, dispatch, repetition, and
-final-wording faults. Four tracked 903-second attempts made partial progress but
-were not successes. Those runs remain historical diagnostics, not evidence for
-the changed journal source.
+```sh
+cargo run --locked -p lkjagent-xtask -- acceptance verify --source SOURCE --evidence evaluation/evidence/SOURCE
+```
 
-A fifth tracked 903-second run at source
-`689b48ec577e35315f632d5ab008f8eb9218ab18` passed its semantic evaluator with
-exact bytes, one file, 18 tables, 24 provider exchanges, ten admissions, one
-effect, 12 current passed checks, five owner messages, and four checked closes.
-The source-bound sanitized facts are tracked below
-`evaluation/evidence/689b48ec577e35315f632d5ab008f8eb9218ab18/`.
+The retired baseline accepted owner intake but produced no model decision or
+requested file change. That failure and later failed configured runs remain
+tracked diagnostics, not semantic success.
 
-A synthetic 901-second run against the parent product source seeded
-`notes/sample.md` with `alpha is the current value.` and asked for an exact edit,
-verification, and truthful report. The daemon stayed alive and owner intake
-returned success, but the file remained unchanged.
-
-The fresh store had one blocked task, three blocked steps, and zero runtime
-decisions, provider exchanges, admissions, effects, observations, checks,
-artifacts, or workspace records. Startup also created nine README files and one
-transcript unrelated to the requested edit.
-
-The baseline causal defect was in the retired non-public path at the recorded
-source: `owner_turn.rs` treated the substring `verify` as a system operation,
-and `daemon_route_effects.rs` recorded an unsupported executor before any model
-call. Those core owner-turn and engine files are now deleted, and public `send`
-and `run` use only the native loop. A second 901-second run at source
-`97e00698f348fc2435d47a107b5b8453c98b9d1f` reproduced the same zero-decision
-failure. Its sanitized bundle is tracked below
-`evaluation/evidence/97e00698f348fc2435d47a107b5b8453c98b9d1f/`. This summary is
-evidence of failure, not endpoint success.
+A configured 903-second daily-life run at source
+`5c641c33573516c01276741fea0237d5d53b9339` passed strict grounded journal,
+managed-memory recall, correction, source, and contamination measurements. It
+is historical development evidence because the checker and exact-file scenario
+changed afterward. The changed source still requires development profile and six
+campaign runs, final frozen runs, Docker, native doctor, and independent review.
 
 ## Implemented Primitives
 
@@ -122,9 +102,9 @@ unsupported command or test claims. Close and receipt remain check-derived.
 The native `conversation_messages` table is canonical for public turns. Typed
 TUI intake uses the exact returned durable message identity, and failed intake
 keeps composer bytes; activity is bounded. A native PTY smoke covers entry,
-Ctrl-C, and cleanup. Strict evaluators measure daily-life, project, artifact,
-and slow Japanese PTY facts. The PTY runner drives the real TUI; project and
-artifact runs restart after settled revisions. Probe evidence fails; runs are unrun.
+Ctrl-C, and cleanup. Strict evaluators measure exact edit/create, daily-life, project, artifact, and
+slow Japanese PTY facts. PTY drives the real TUI; project and artifact runs
+restart after settled revisions. Probes cannot satisfy semantic predicates.
 
 Configuration and Compose now separate the runtime data root from one visible
 workspace root. The workspace is created only by an actual workspace operation,
@@ -182,14 +162,14 @@ claims, and the close transaction owns the canonical final message.
 | native journal mechanics | complete | focused descriptor, timezone, parent safety, effect retry, managed revision, structural check, and public scripted tests pass |
 | native memory mechanics | complete | focused slug, lineage, managed revision, retrieval, correction, contamination, and prompt-occurrence tests pass |
 | native report mechanics | complete | focused short slug, long map and child topology, pending resume, managed replacement, structural checks, collision, bound, and receipt tests pass |
-| configured-model journal proof | active | scripted mechanics cannot establish factual groundedness; the configured journal campaign has not run |
-| configured-model memory proof | active | deterministic W06/C04 portions are derived; semantic recall and filler judgment remain unrun |
-| configured-model report proof | active | deterministic W08 mechanics now cover short and linked long files, not configured semantic quality |
-| public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
-| configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |
+| configured-model journal proof | historical | one strict daily run passed before later checker changes |
+| configured-model memory proof | historical | that run proved revision-exact initial and corrected recall |
+| configured-model report proof | active | deterministic topology passes; configured semantic quality is unrun |
+| public scripted file edit | complete | exact edit/create, checked continuation, restart, and stale guards pass |
+| configured-model file proof | active | changed scenario now requires both exact edit and absent-file create |
 | retired-source-deletion | complete | old controller, bridge, record, inspection, workbench, and TUI source is absent from product crates |
 | native-tui | complete | one-transaction frames, pure Unicode viewport, typed intake, bounded worker, rendering, PTY, and RAII tests pass |
-| final campaigns | active | exact-file campaign passed; recovery, daily-life, multi-project, and PTY proof remain |
+| final campaigns | active | all six changed-source development and frozen runs remain |
 
 ## Honesty Rules
 

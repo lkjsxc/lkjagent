@@ -58,7 +58,7 @@ pub fn load(root: &Path, alias: &str) -> Result<Scenario, String> {
         }
         turns.push((offset, fields[3].to_string()));
     }
-    if turns.len() != 5 || turns.last().map(|turn| turn.0) != Some(840) {
+    if !(5..=6).contains(&turns.len()) || turns.last().map(|turn| turn.0) != Some(840) {
         return Err("owner schedule is not the bounded tracked schedule".into());
     }
     Ok(Scenario {

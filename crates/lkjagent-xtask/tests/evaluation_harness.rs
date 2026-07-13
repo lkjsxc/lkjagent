@@ -42,10 +42,10 @@ fn absent_baseline_evidence_fails_honestly() {
 }
 
 #[test]
-fn acceptance_negative_rejects_unimplemented_and_unconfined_commands() {
+fn acceptance_negative_rejects_unsupported_and_unconfined_commands() {
     let root = repository_root();
     assert_eq!(run(&words(&["benchmark", "live"]), &root), 1);
-    assert_eq!(run(&words(&["experiment", "run"]), &root), 1);
+    assert_eq!(run(&words(&["experiment", "run"]), &root), 2);
     assert_eq!(run(&words(&["proof"]), &root), 1);
     assert_eq!(run(&words(&["campaign", "run", "/bin/sh"]), &root), 2);
 }

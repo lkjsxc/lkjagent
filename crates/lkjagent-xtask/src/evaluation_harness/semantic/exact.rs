@@ -1,72 +1,142 @@
 use super::{shared, Context, Measured};
+use crate::evaluation_harness::sha256;
+use std::os::unix::fs::PermissionsExt;
 
 pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
-    let checks = std::fs::read_to_string(ctx.scenario.path.join("checks.tsv"))
-        .map_err(|error| error.to_string())?;
-    let expected = checks
-        .lines()
-        .skip(1)
-        .find_map(|line| {
-            let fields = line.split('\t').collect::<Vec<_>>();
-            (fields.get(1) == Some(&"workspace-file-sha256"))
-                .then(|| fields.get(2).copied())
-                .flatten()
-        })
-        .ok_or("exact scenario byte check missing")?;
-    let (path, sha256) = expected
-        .split_once('=')
-        .ok_or("exact scenario byte check malformed")?;
+    let expected = expected_files(ctx)?;
     let after = shared::manifest_rows(ctx.after);
     let changed = shared::changed_paths(ctx.before, ctx.after);
-    let agent_messages = shared::count(
-        ctx.db,
-        "SELECT count(*) FROM conversation_messages WHERE role='agent'",
-    )?;
-    let closed_matters = shared::count(
+    let exact = expected
+        .iter()
+        .all(|(path, hash)| after.get(path).is_some_and(|row| &row.sha256 == hash));
+    let requested = expected.keys().cloned().collect::<Vec<_>>();
+    let requested_only = changed == requested;
+    let edit = target(ctx, "notes/exact-base.txt")?;
+    let create = target(ctx, "notes/created-proof.txt")?;
+    let first = shared::text(ctx.db, "SELECT CAST(t.normalized_path AS TEXT) FROM effect_targets t JOIN effect_journal j ON j.id=t.journal_id JOIN runtime_events e ON e.id=j.prepared_event_id WHERE t.operation IN ('create','replace') ORDER BY e.causal_sequence LIMIT 1")?.unwrap_or_default();
+    let current_mode = std::fs::metadata(ctx.capture.workspace.join("notes/exact-base.txt"))
+        .map_err(|error| error.to_string())?
+        .permissions()
+        .mode()
+        & 0o777;
+    let closed = shared::count(
         ctx.db,
         "SELECT count(*) FROM matters WHERE lifecycle='closed'",
     )?;
-    let effect_count = shared::count(ctx.db, "SELECT count(*) FROM effect_journal")?;
-    let tool_admissions = shared::count(ctx.db, "SELECT count(*) FROM tool_admissions")?;
-    let expected_ok = after.get(path).is_some_and(|row| row.sha256 == sha256);
-    let one_file = after.len() == 1;
-    let requested_only = changed == [path.to_string()];
+    let agents = shared::count(
+        ctx.db,
+        "SELECT count(*) FROM conversation_messages WHERE role='agent'",
+    )?;
+    let effects = shared::count(ctx.db, "SELECT count(*) FROM effect_journal")?;
+    let admissions = shared::count(ctx.db, "SELECT count(*) FROM tool_admissions")?;
+    let receipts = shared::count(
+        ctx.db,
+        "SELECT count(*) FROM conversation_messages WHERE role='agent' AND receipt IS NOT NULL",
+    )?;
     let fields = vec![
-        ("fact_exact_path".into(), path.into()),
-        ("fact_exact_sha256".into(), sha256.into()),
+        ("fact_exact_path".into(), "notes/exact-base.txt".into()),
+        (
+            "fact_exact_sha256".into(),
+            expected["notes/exact-base.txt"].clone(),
+        ),
+        ("fact_created_path".into(), "notes/created-proof.txt".into()),
+        (
+            "fact_created_sha256".into(),
+            expected["notes/created-proof.txt"].clone(),
+        ),
         ("fact_workspace_file_count".into(), after.len().to_string()),
-        ("fact_changed_path_fingerprint".into(), shared::fingerprint(&changed)),
+        (
+            "fact_changed_path_fingerprint".into(),
+            shared::fingerprint(&changed),
+        ),
         ("fact_changed_path_count".into(), changed.len().to_string()),
-        ("fact_closed_matter_count".into(), closed_matters.to_string()),
-        ("fact_agent_message_count".into(), agent_messages.to_string()),
+        ("fact_first_effect_path".into(), first.clone()),
+        ("fact_edit_prior_sha256".into(), edit.prior_hash),
+        ("fact_edit_intended_sha256".into(), edit.intended_hash),
+        ("fact_edit_prior_mode".into(), edit.prior_mode.to_string()),
+        (
+            "fact_edit_intended_mode".into(),
+            edit.intended_mode.to_string(),
+        ),
+        ("fact_edit_current_mode".into(), current_mode.to_string()),
+        (
+            "fact_create_prior_absent_count".into(),
+            u64::from(create.prior_absent).to_string(),
+        ),
+        (
+            "fact_create_effect_count".into(),
+            u64::from(create.operation == "create").to_string(),
+        ),
+        (
+            "fact_edit_effect_count".into(),
+            u64::from(edit.operation == "replace").to_string(),
+        ),
+        ("fact_closed_matter_count".into(), closed.to_string()),
+        ("fact_agent_message_count".into(), agents.to_string()),
+        ("fact_receipt_count".into(), receipts.to_string()),
         (
             "fact_current_passed_check_count".into(),
             ctx.common.current_passed_checks.to_string(),
         ),
-        ("fact_effect_count".into(), effect_count.to_string()),
-        ("fact_tool_admission_count".into(), tool_admissions.to_string()),
-        ("fact_table_count".into(), ctx.common.table_count.to_string()),
+        ("fact_effect_count".into(), effects.to_string()),
+        ("fact_tool_admission_count".into(), admissions.to_string()),
         (
-            "semantic_detail".into(),
-            format!(
-                "file_exact={expected_ok};one_file={one_file};closed={closed_matters};owner={};agent={agent_messages};passed_checks={};effects={effect_count};admissions={tool_admissions};providers={};tables={}",
-                ctx.common.owner_turns,
-                ctx.common.current_passed_checks,
-                ctx.common.provider_exchanges,
-                ctx.common.table_count,
-            ),
+            "fact_table_count".into(),
+            ctx.common.table_count.to_string(),
         ),
     ];
-    let passed = expected_ok
-        && one_file
+    let passed = exact
+        && after.len() == 2
         && requested_only
-        && closed_matters >= 3
-        && ctx.common.owner_turns >= 5
-        && agent_messages >= 3
-        && ctx.common.current_passed_checks >= 6
-        && effect_count == 1
-        && tool_admissions > 0
+        && first == "notes/exact-base.txt"
+        && edit.hashes_present
+        && edit.prior_mode == edit.intended_mode
+        && edit.intended_mode == current_mode
+        && create.prior_absent
+        && create.operation == "create"
+        && closed >= 4
+        && ctx.common.owner_turns >= 6
+        && agents >= 4
+        && receipts >= 4
+        && ctx.common.current_passed_checks >= 9
+        && effects == 2
+        && admissions > 0
         && ctx.common.provider_exchanges > 0
         && ctx.common.table_count == 18;
     Ok(Measured::new(passed, fields))
+}
+
+struct Target {
+    prior_hash: String,
+    intended_hash: String,
+    prior_mode: u32,
+    intended_mode: u32,
+    prior_absent: bool,
+    operation: String,
+    hashes_present: bool,
+}
+fn target(ctx: &Context<'_>, path: &str) -> Result<Target, String> {
+    ctx.db.query_row("SELECT prior_bytes,intended_bytes,coalesce(prior_mode,-1),coalesce(intended_mode,-1),operation FROM effect_targets WHERE CAST(normalized_path AS TEXT)=?1", [path], |row| {
+        let prior: Option<Vec<u8>> = row.get(0)?; let intended: Option<Vec<u8>> = row.get(1)?;
+        Ok(Target { prior_hash: prior.as_deref().map(sha256).unwrap_or_default(), intended_hash: intended.as_deref().map(sha256).unwrap_or_default(), prior_mode: row.get::<_, i64>(2)?.max(0) as u32, intended_mode: row.get::<_, i64>(3)?.max(0) as u32, prior_absent: prior.is_none(), operation: row.get(4)?, hashes_present: intended.is_some() && (prior.is_some() || path.ends_with("created-proof.txt")) })
+    }).map_err(|error| error.to_string())
+}
+fn expected_files(ctx: &Context<'_>) -> Result<std::collections::BTreeMap<String, String>, String> {
+    let text = std::fs::read_to_string(ctx.scenario.path.join("checks.tsv"))
+        .map_err(|error| error.to_string())?;
+    Ok(text
+        .lines()
+        .skip(1)
+        .filter_map(|line| {
+            let fields = line.split('\t').collect::<Vec<_>>();
+            (fields.get(1) == Some(&"workspace-file-sha256"))
+                .then(|| {
+                    fields
+                        .get(2)?
+                        .split_once('=')
+                        .map(|(path, hash)| (path.into(), hash.into()))
+                })
+                .flatten()
+        })
+        .collect())
 }

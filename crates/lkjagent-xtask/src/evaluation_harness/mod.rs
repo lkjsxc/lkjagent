@@ -6,6 +6,7 @@ mod hash {
         format!("sha256:{:x}", Sha256::digest(input))
     }
 }
+mod profile_experiment;
 mod pty;
 mod pty_cast;
 mod scenario;
@@ -92,7 +93,11 @@ pub fn run_benchmark(args: &[String], root: &Path) -> i32 {
     }, _ => fail("benchmark", "live benchmark semantics are not implemented") }
 }
 #[rustfmt::skip]
-pub fn run_experiment(_args: &[String], _root: &Path) -> i32 { fail("experiment", "stale scripted semantic paths are rejected") }
+pub fn run_experiment(args: &[String], root: &Path) -> i32 {
+    let endpoint = match args { [command, flag, file] if command == "run" && flag == "--endpoint-file" => Path::new(file),
+        _ => return fail_code("experiment", "use: experiment run --endpoint-file FILE", 2) };
+    match profile_experiment::run(root, endpoint) { Ok(message) => { println!("{message}"); 0 }, Err(error) => fail("experiment", &error) }
+}
 #[rustfmt::skip]
 pub fn reject_unbound_command(name: &str) -> i32 { fail(name, "summary-only command lacks source-bound authority") }
 #[rustfmt::skip]

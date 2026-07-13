@@ -11,6 +11,7 @@ pub fn contract_files() -> Vec<&'static str> {
     FACTS
         .iter()
         .map(|fact| fact.path)
+        .chain(["Cargo.toml"])
         .collect::<BTreeSet<_>>()
         .into_iter()
         .collect()
@@ -36,6 +37,12 @@ pub fn contract_derivations(root: &Path) -> BTreeSet<String> {
     if retired_authority_absent(root) {
         derived.insert("S02".into());
     }
+    if super::source_audit::canonical_authorities_are_unique(root) {
+        derived.insert("S03".into());
+    }
+    if super::source_audit::product_surface_is_clean(root) {
+        derived.insert("S05".into());
+    }
     derived
 }
 
@@ -45,6 +52,20 @@ fn retired_authority_absent(root:&Path)->bool{
  if PATHS.iter().any(|path|root.join(path).exists()){return false}
  const TOKENS:&[&str]=&["CREATE TABLE tasks","CREATE TABLE steps","Command::Workbench","Command::Record","pub mod plan_schema","pub mod runtime_bridge"];
  ["crates/lkjagent-core/src","crates/lkjagent-app/src","crates/lkjagent-store/src"].iter().flat_map(|dir|fs::read_dir(root.join(dir)).into_iter().flatten().flatten()).filter(|row|row.path().extension().and_then(|x|x.to_str())==Some("rs")).all(|row|fs::read_to_string(row.path()).is_ok_and(|text|TOKENS.iter().all(|token|!text.contains(token))))
+}
+
+pub fn boundary_matches(root: &Path, source: &str) -> bool {
+    let spec = format!("{source}:docs/current-state.md");
+    let Ok(output) = git(root, &["show", &spec]) else {
+        return false;
+    };
+    if !output.status.success() {
+        return false;
+    }
+    let text = String::from_utf8_lossy(&output.stdout);
+    text.contains("Final source is the exact acceptance `SOURCE` argument.")
+        && text.contains("Only tracked sanitized attachments below the exact source directory")
+        && text.contains("acceptance verify --source SOURCE --evidence evaluation/evidence/SOURCE")
 }
 
 pub fn validate(root: &Path, source: &str) -> Result<(), String> {

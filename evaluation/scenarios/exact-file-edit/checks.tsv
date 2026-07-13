@@ -1,7 +1,8 @@
 check_id	checker	expected
 exact-changed-bytes	workspace-file-sha256	notes/exact-base.txt=sha256:4c0db7b7b7f1d3587a3de74449edd345d1f89c422174bf9f5477afc071f21a3b
-only-requested-path-changed	workspace-path-diff	notes/exact-base.txt
-no-collateral-files	workspace-inventory	only-seeded-paths-present
+created-exact-bytes	workspace-file-sha256	notes/created-proof.txt=sha256:8ee25a1677349a21a8cd12e23a3a6895c9425cf348809c39c04fb2e0fae8a43f
+only-requested-paths-changed	workspace-path-diff	notes/exact-base.txt,notes/created-proof.txt
+no-collateral-files	workspace-inventory	only-seeded-and-created-paths-present
 no-scaffold-files	workspace-inventory	no-unrequested-readme-or-transcript
 runtime-decision-durable	runtime-decision	matter-bound-row-present
 provider-exchange-durable	provider-exchange	decision-bound-row-present

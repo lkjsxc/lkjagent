@@ -12,6 +12,7 @@ workspace = true
 lkjagent-app = { path = "../lkjagent-app" }
 lkjagent-core = { path = "../lkjagent-core" }
 lkjagent-effects = { path = "../lkjagent-effects" }
+lkjagent-llm = { path = "../lkjagent-llm" }
 lkjagent-store = { path = "../lkjagent-store" }
 rusqlite = { version = "0.40.1", features = ["bundled"] }
 serde_json = "1"

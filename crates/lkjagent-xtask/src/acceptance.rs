@@ -1,12 +1,19 @@
+mod args;
+mod build_manifest;
 mod campaign_evidence;
+mod campaign_predicates;
+mod command_evidence;
 mod evidence;
 mod experiments;
 mod git;
 mod history;
 mod markers;
 mod plans;
+mod review;
 mod secret;
 mod source;
+mod source_audit;
+mod synthetic;
 mod table;
 mod workgraph;
 
@@ -14,14 +21,10 @@ use std::collections::BTreeSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-struct Args {
-    source: String,
-    evidence: PathBuf,
-    allow_incomplete: bool,
-}
+use args::print_errors;
 
 pub fn run(args: &[String], root: &Path) -> i32 {
-    let parsed = match parse_args(args) {
+    let parsed = match args::parse(args) {
         Ok(value) => value,
         Err(errors) => {
             print_errors(&errors);
@@ -77,8 +80,25 @@ pub fn verify(root: &Path, source: &str, evidence: &Path) -> Report {
         }
         Err(errors) => report.errors.extend(errors),
     }
-    let mut derived = static_derivations(root, &mut report.errors);
+    let mut derived = static_derivations(root, source, &mut report.errors);
     derived.extend(evidence_derived);
+    if derived.contains("E04-candidate")
+        && ["E05", "E06", "E07", "E08", "E09"]
+            .iter()
+            .all(|id| derived.contains(*id))
+        && source_audit::rejected_profiles_absent(root)
+    {
+        derived.insert("E04".into());
+        derived.insert("S06".into());
+    }
+    if derived.contains("E17-candidate")
+        && required
+            .iter()
+            .filter(|id| id.as_str() != "E17")
+            .all(|id| derived.contains(id))
+    {
+        derived.insert("E17".into());
+    }
     report.missing = required
         .into_iter()
         .filter(|id| !derived.contains(id))
@@ -114,8 +134,15 @@ pub fn source_contract_files() -> Vec<&'static str> {
     source::contract_files()
 }
 
-fn static_derivations(root: &Path, errors: &mut Vec<String>) -> BTreeSet<String> {
+fn static_derivations(root: &Path, source: &str, errors: &mut Vec<String>) -> BTreeSet<String> {
     let mut derived = source::contract_derivations(root);
+    derived.extend(history::derivations(root, source));
+    if source::boundary_matches(root, source) {
+        derived.insert("D01".into());
+    }
+    if synthetic::valid(root) {
+        derived.insert("E15".into());
+    }
     if crate::node_gate::check_docs_authority(root).is_ok() {
         derived.insert("D02".to_string());
     }
@@ -147,54 +174,5 @@ fn inspect_files(files: &[PathBuf], source: &str, errors: &mut Vec<String>) {
                 path.to_string_lossy()
             )),
         }
-    }
-}
-
-fn parse_args(args: &[String]) -> Result<Args, Vec<String>> {
-    if args.first().is_none_or(|value| value != "verify") {
-        return Err(usage("expected acceptance verify"));
-    }
-    let mut source = None;
-    let mut evidence = None;
-    let mut allow_incomplete = false;
-    let mut index = 1;
-    while index < args.len() {
-        match args[index].as_str() {
-            "--allow-incomplete" if !allow_incomplete => {
-                allow_incomplete = true;
-                index += 1;
-            }
-            "--source" if source.is_none() => {
-                source = args.get(index + 1).cloned();
-                index += 2;
-            }
-            "--evidence" if evidence.is_none() => {
-                evidence = args.get(index + 1).map(PathBuf::from);
-                index += 2;
-            }
-            flag => return Err(usage(&format!("unknown or duplicate argument: {flag}"))),
-        }
-    }
-    match (source, evidence) {
-        (Some(source), Some(evidence)) if !source.is_empty() => Ok(Args {
-            source,
-            evidence,
-            allow_incomplete,
-        }),
-        _ => Err(usage("--source and --evidence are required")),
-    }
-}
-
-fn usage(problem: &str) -> Vec<String> {
-    vec![
-        "acceptance command failed".to_string(),
-        format!("error: {problem}"),
-        "use: acceptance verify --source SOURCE --evidence PATH [--allow-incomplete]".to_string(),
-    ]
-}
-
-fn print_errors(errors: &[String]) {
-    for error in errors {
-        eprintln!("{error}");
     }
 }

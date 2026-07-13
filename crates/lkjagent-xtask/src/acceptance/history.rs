@@ -1,7 +1,93 @@
+use std::collections::BTreeSet;
 use std::path::Path;
 use std::process::Command;
 
 use super::secret;
+
+pub fn derivations(root: &Path, source: &str) -> BTreeSet<String> {
+    let mut out = BTreeSet::new();
+    let Some(boundary) = introduction(root, "crates/lkjagent-xtask/src/acceptance.rs") else {
+        return out;
+    };
+    let plans = [
+        "evaluation/workgraph.tsv",
+        "evaluation/acceptance.tsv",
+        "evaluation/experiment-plan.tsv",
+    ];
+    if plans.iter().all(|path| {
+        introduction(root, path).is_some_and(|commit| ancestor(root, &commit, &boundary))
+    }) && ancestor(root, &boundary, source)
+    {
+        out.insert("D05".into());
+    }
+    if out.contains("D05") && coherent_trailers(root, &boundary, source) {
+        out.insert("D06".into());
+    }
+    out
+}
+
+fn introduction(root: &Path, path: &str) -> Option<String> {
+    let output = git(root, &["log", "--diff-filter=A", "--format=%H", "--", path]).ok()?;
+    output
+        .status
+        .success()
+        .then(|| {
+            String::from_utf8_lossy(&output.stdout)
+                .lines()
+                .last()
+                .unwrap_or_default()
+                .to_string()
+        })
+        .filter(|value| !value.is_empty())
+}
+
+fn ancestor(root: &Path, older: &str, newer: &str) -> bool {
+    git(root, &["merge-base", "--is-ancestor", older, newer])
+        .is_ok_and(|output| output.status.success())
+}
+
+fn coherent_trailers(root: &Path, boundary: &str, source: &str) -> bool {
+    let range = format!("{boundary}..{source}");
+    let Ok(commits) = git(root, &["rev-list", "--reverse", &range]) else {
+        return false;
+    };
+    String::from_utf8_lossy(&commits.stdout)
+        .lines()
+        .all(|commit| {
+            let Ok(changes) = git(
+                root,
+                &["diff-tree", "--no-commit-id", "--name-status", "-r", commit],
+            ) else {
+                return false;
+            };
+            let rows = String::from_utf8_lossy(&changes.stdout)
+                .lines()
+                .map(str::to_string)
+                .collect::<Vec<_>>();
+            let material = rows.iter().any(|row| {
+                row.split('\t').skip(1).any(|path| {
+                    path.starts_with("crates/")
+                        || path.starts_with("docs/")
+                        || path == "Dockerfile"
+                        || path == "docker-compose.yml"
+                        || path.starts_with("config/")
+                })
+            });
+            if !material {
+                return true;
+            }
+            let deletion_count = rows.iter().filter(|row| row.starts_with('D')).count();
+            let bounded =
+                rows.len() <= 64 || (rows.len() <= 150 && deletion_count * 3 >= rows.len() * 2);
+            let message = git(root, &["show", "-s", "--format=%B", commit])
+                .ok()
+                .map(|output| String::from_utf8_lossy(&output.stdout).into_owned())
+                .unwrap_or_default();
+            bounded
+                && message.lines().any(|line| line.starts_with("Tested:"))
+                && message.lines().any(|line| line.starts_with("Not-tested:"))
+        })
+}
 
 pub fn secret_errors(root: &Path) -> Vec<String> {
     let commits = match git(root, &["rev-list", "HEAD"]) {

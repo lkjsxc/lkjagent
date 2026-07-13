@@ -616,6 +616,7 @@ dependencies = [
  "lkjagent-app",
  "lkjagent-core",
  "lkjagent-effects",
+ "lkjagent-llm",
  "lkjagent-store",
  "rusqlite",
  "serde_json",
