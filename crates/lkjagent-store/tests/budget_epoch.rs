@@ -1,3 +1,4 @@
+use lkjagent_store::direct_transactions::{ModelFault, ModelFaultKind};
 use lkjagent_store::transactions::{Decision, Intake, NativeStore};
 use rusqlite::Connection;
 use std::error::Error;
@@ -99,5 +100,23 @@ fn missing_provider_usage_remains_unknown() -> TestResult {
             Some("token-block".into())
         )
     );
+    Ok(())
+}
+
+#[test]
+#[rustfmt::skip]
+fn settled_turn_rotates_to_never_selected_owner_matter_across_reopen() -> TestResult {
+    let db=path()?;let mut store=NativeStore::open(&db)?;store.owner_intake(&intake())?;
+    let second=Intake{matter:"m2",objective:b"second",turn:"t2",queue_sequence:2,
+        raw_text:b"second",message_fingerprint:b"fp2",event:"m2-e1",event_sequence:1,
+        event_payload:b"intake",monotonic_ms:1,wall_time:"now",obligations:&[],cells:&[]};
+    store.owner_intake(&second)?;
+    assert_eq!(store.restart_projection()?.matter.map(|row|row.id),Some("m".into()));
+    store.select_decision(&decision("d1","e2",2))?;
+    store.reject_model_output(&ModelFault{decision:"d1",matter:"m",event:"e3",event_sequence:3,
+        monotonic_ms:3,wall_time:"now",event_payload:b"malformed",fault_kind:ModelFaultKind::Malformed,
+        recovery_ref:b"retry",fingerprint:b"fp"})?;drop(store);
+    let store=NativeStore::open(&db)?;
+    assert_eq!(store.restart_projection()?.matter.map(|row|row.id),Some("m2".into()));
     Ok(())
 }

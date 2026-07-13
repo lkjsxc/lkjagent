@@ -111,8 +111,9 @@ read transaction and expose no runtime bodies beyond bounded conversation text.
 The application has pure identity merge, Unicode composer and wrapping, separated
 conversation and activity screen state, and anchored viewport reduction over
 that projection. It has no terminal, rendering, threads, or public CLI
-integration. Public scheduling runs one matter per cycle and prefers an
-unrelated runnable matter over one with unfinished work. It still blocks instead
+integration. Public scheduling runs one matter per cycle, prefers an unrelated
+runnable matter over one with unfinished work, and rotates the runnable tier by
+oldest durable selection across reopen. It still blocks instead
 of reconciling every effect recovery phase, and configured-model simultaneous-
 matter fairness remains unproven. A 64-call model budget now creates a durable
 visible blocked matter, and owner resume starts a fresh call-budget epoch while
@@ -193,8 +194,7 @@ claims, and the close transaction owns the canonical final message.
 ## Honesty Rules
 
 - Target prose is not an implementation claim.
-- Process health and elapsed time are not task completion.
-- A historical summary is not current-source acceptance evidence.
+- Process health, elapsed time, and historical summaries are not current-source completion evidence.
 - A command that did not run did not pass.
 - Missing raw data creates a blocker, not a success.
 - Completion belongs to fresh checks reduced from durable facts.

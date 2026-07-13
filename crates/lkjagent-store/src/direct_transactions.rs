@@ -115,7 +115,7 @@ impl NativeStore {
     }
 
     pub fn restart_projection(&self) -> StoreResult<RestartProjection> {
-        let matter = self.connection.query_row("SELECT m.id,m.lifecycle,m.objective FROM matters m WHERE m.lifecycle!='closed' ORDER BY CASE WHEN m.lifecycle='blocked' THEN 2 WHEN EXISTS(SELECT 1 FROM runtime_decisions d WHERE d.matter_id=m.id AND d.status NOT IN ('settled','failed')) OR EXISTS(SELECT 1 FROM effect_journal j JOIN runtime_decisions d ON d.id=j.decision_id WHERE d.matter_id=m.id AND j.status NOT IN ('settled','compensated','failed','blocked')) THEN 1 ELSE 0 END, m.priority DESC,m.created_sequence LIMIT 1", [], |r| Ok(MatterRow{id:r.get(0)?,lifecycle:r.get(1)?,objective:r.get(2)?})).optional()?;
+        let matter = self.connection.query_row("SELECT m.id,m.lifecycle,m.objective FROM matters m WHERE m.lifecycle!='closed' ORDER BY CASE WHEN m.lifecycle='blocked' THEN 2 WHEN EXISTS(SELECT 1 FROM runtime_decisions d WHERE d.matter_id=m.id AND d.status NOT IN ('settled','failed')) OR EXISTS(SELECT 1 FROM effect_journal j JOIN runtime_decisions d ON d.id=j.decision_id WHERE d.matter_id=m.id AND j.status NOT IN ('settled','compensated','failed','blocked')) THEN 1 ELSE 0 END, coalesce((SELECT max(d.selected_monotonic_ms) FROM runtime_decisions d WHERE d.matter_id=m.id),-1),m.priority DESC,m.created_sequence LIMIT 1", [], |r| Ok(MatterRow{id:r.get(0)?,lifecycle:r.get(1)?,objective:r.get(2)?})).optional()?;
         let Some(ref current) = matter else {
             return Ok(RestartProjection {
                 matter: None,
