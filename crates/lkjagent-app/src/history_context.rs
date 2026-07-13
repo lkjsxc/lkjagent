@@ -16,11 +16,16 @@ pub(crate) fn load(db: &Path, matter: &str, objective: &[u8]) -> Result<Vec<Cont
         .map_err(error)?
         .collect::<Result<Vec<Row>, _>>()
         .map_err(error)?;
-    let wanted = project_ids(&String::from_utf8_lossy(objective));
+    let objective = String::from_utf8_lossy(objective);
+    let wanted = project_ids(&objective);
+    let mut corrections = crate::memory_context::correction_keys(&objective);
+    corrections.extend(current_memory_keys(&connection)?);
     Ok(rows
         .into_iter()
         .filter(|(_, _, body)| {
-            wanted.is_empty() || !wanted.is_disjoint(&project_ids(&String::from_utf8_lossy(body)))
+            let body = String::from_utf8_lossy(body);
+            (wanted.is_empty() || !wanted.is_disjoint(&project_ids(&body)))
+                && !corrected(&body, &corrections)
         })
         .take(4)
         .map(|(id, role, body)| item(id, role, body))
@@ -43,6 +48,41 @@ fn item(id: String, role: String, body: Vec<u8>) -> ContextItem {
         decision_id: None,
         created_at: String::new(),
     }
+}
+
+fn current_memory_keys(connection: &Connection) -> Result<BTreeSet<String>, String> {
+    let mut query = connection
+        .prepare(
+            "SELECT CAST(d.current_path AS TEXT) FROM workspace_documents d
+             JOIN workspace_revisions r ON r.id=d.current_revision_id
+             JOIN effect_journal e ON e.id=r.effect_id
+             JOIN runtime_decisions rd ON rd.id=e.decision_id
+             JOIN matters m ON m.id=rd.matter_id
+             WHERE d.status='active' AND d.managed=1 AND e.status='settled'
+               AND m.lifecycle='closed'
+               AND CAST(d.current_path AS TEXT) GLOB 'knowledge/notes/*.md'",
+        )
+        .map_err(error)?;
+    let paths = query
+        .query_map([], |row| row.get::<_, String>(0))
+        .map_err(error)?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(error)?;
+    Ok(paths
+        .into_iter()
+        .filter_map(|path| {
+            path.strip_prefix("knowledge/notes/")
+                .and_then(|path| path.strip_suffix(".md"))
+                .map(str::to_owned)
+        })
+        .collect())
+}
+
+fn corrected(text: &str, corrections: &BTreeSet<String>) -> bool {
+    let text = text.to_ascii_lowercase();
+    corrections
+        .iter()
+        .any(|key| text.contains(key) || text.contains(&key.replace('-', " ")))
 }
 
 fn project_ids(text: &str) -> BTreeSet<String> {
