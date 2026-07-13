@@ -50,14 +50,16 @@ and limit values, and blocked lifecycle. It is visible rather than idle, and an
 unrelated runnable matter remains eligible. The next owner `send` without
 `--new` atomically suppresses every active prior-objective control cell, records
 an owner-resume event and message, installs only the new opened control cell,
-replaces the objective, and reopens the matter. The owner-resume event
-starts a fresh model-call budget epoch without deleting prior exchanges. Separate
-A 1,048,576-unit token budget sums reported input and output tokens in the same
-epoch. Missing components remain null in provider rows and receive a conservative
-one-unit-per-four-reference-bytes accounting charge. A post-response exhaustion
-atomically fails the current decision and blocks before admission. A 16-effect
-budget counts accepted journals in the same epoch and blocks the next effectful
-decision before edit preparation or filesystem mutation. Each persisted rejected
+replaces the objective, and reopens the matter. Exact block retries are
+idempotent; changed event, payload, fingerprint, timing, or decision binding
+conflicts. The owner-resume event starts a fresh model-call budget epoch without
+deleting prior exchanges. A 1,048,576-unit token budget sums reported input and
+output tokens in the same epoch. Missing components remain null in provider rows
+and receive a conservative one-unit-per-four-reference-bytes accounting charge.
+A post-response exhaustion atomically fails the current decision and blocks
+before admission. A 16-effect budget counts accepted journals in the same epoch.
+It blocks the next effectful decision before edit preparation or filesystem
+mutation. Each persisted rejected
 model output costs one recovery point; the sixteenth failure is retained and then
 blocks the matter. Settled decision intervals plus the current process-monotonic
 cycle are capped at 900,000 active milliseconds. Daemon downtime and unrelated

@@ -132,6 +132,7 @@ fn exhausted_budget_is_visible_idempotent_and_not_idle() -> Result<(), Box<dyn E
     let db=path("budget")?;let mut store=NativeStore::open(&db)?;store.owner_intake(&intake())?;
     store.block_budget("m",None,"budget-event",2,2,"now",b"used=64 limit=64",b"budget-fp")?;
     store.block_budget("m",None,"budget-event",2,2,"now",b"used=64 limit=64",b"budget-fp")?;
+    assert!(store.block_budget("m",None,"other-event",3,3,"later",b"changed",b"other-fp").is_err());
     let projection=store.restart_projection()?;
     assert_eq!(projection.matter.as_ref().map(|row|row.lifecycle.as_str()),Some("blocked"));
     assert!(projection.cells.iter().any(|row|row.namespace==b"block"&&row.key==b"budget"));Ok(())
