@@ -32,9 +32,15 @@ pub(crate) fn semantic_part(value: &str) -> bool {
         && value
             .bytes()
             .all(|byte| byte.is_ascii_lowercase() || byte.is_ascii_digit() || byte == b'-')
-        && !value
-            .strip_prefix("part-")
+        && !anonymous(value)
+}
+
+fn anonymous(value: &str) -> bool {
+    ["part-", "section-"].iter().any(|prefix| {
+        value
+            .strip_prefix(prefix)
             .is_some_and(|tail| !tail.is_empty() && tail.bytes().all(|byte| byte.is_ascii_digit()))
+    })
 }
 
 fn short_semantic_slug(value: &str) -> bool {

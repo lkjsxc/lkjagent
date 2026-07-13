@@ -50,7 +50,7 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     )?;
     let strategy_changes = shared::count(
         ctx.db,
-        "SELECT count(DISTINCT CAST(operation_key AS TEXT)) FROM runtime_decisions WHERE CAST(operation_key AS TEXT) LIKE 'recovery.%'",
+        "SELECT count(DISTINCT CAST(operation_key AS TEXT)) FROM runtime_decisions WHERE CAST(operation_key AS TEXT) LIKE 'modify.report%'",
     )?;
     let restart_resume = shared::count(
         ctx.db,

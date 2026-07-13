@@ -1,3 +1,4 @@
+use lkjagent_effects::workspace::OpenedWorkspace;
 use lkjagent_store::error::{StoreError, StoreResult};
 use rusqlite::{params, OptionalExtension, Transaction};
 use serde_json::{json, Value};
@@ -30,6 +31,7 @@ pub(crate) fn source_revision(
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn evaluate(
     tx: &Transaction<'_>,
     matter: &str,
@@ -38,6 +40,7 @@ pub(crate) fn evaluate(
     parameters: &[u8],
     path: &str,
     bytes: &[u8],
+    workspace: &OpenedWorkspace,
 ) -> StoreResult<Option<bool>> {
     Ok(match kind {
         "managed-report-map" => Some(crate::report_topology_checks::evaluate_map(
@@ -46,7 +49,7 @@ pub(crate) fn evaluate(
         "managed-report-member" => Some(crate::report_topology_checks::evaluate_member(
             tx, decision, parameters, path, bytes,
         )),
-        "managed-report-complete" => Some(evaluate_complete(tx, matter, parameters)?),
+        "managed-report-complete" => Some(evaluate_complete(tx, matter, parameters, workspace)?),
         _ => None,
     })
 }
@@ -54,6 +57,8 @@ pub(crate) fn evaluate(
 pub(crate) fn pending_state(
     tx: &Transaction<'_>,
     matter: &str,
+    event: &str,
+    workspace: &OpenedWorkspace,
 ) -> StoreResult<Option<PendingState>> {
     let payload: Option<String> = tx.query_row(
         "SELECT CAST(predicate_payload AS TEXT) FROM obligations WHERE matter_id=?1 AND required=1 AND predicate_kind='managed-report-map' LIMIT 1",
@@ -72,12 +77,14 @@ pub(crate) fn pending_state(
         .iter()
         .filter_map(Value::as_str)
         .collect::<Vec<_>>();
+    let (map_stale, stale) =
+        crate::report_current::reopen_stale(tx, workspace, matter, event, &slug, &children)?;
     let mut remaining = Vec::new();
-    if !passed(tx, matter, &format!("report-map/{slug}"))? {
+    if map_stale || !passed(tx, matter, &format!("report-map/{slug}"))? {
         remaining.push("index".into());
     }
     for child in children {
-        if !passed(tx, matter, &format!("report-member/{slug}/{child}"))? {
+        if stale.contains(child) || !passed(tx, matter, &format!("report-member/{slug}/{child}"))? {
             remaining.push(child.to_string());
         }
     }
@@ -111,7 +118,11 @@ pub(crate) fn write_state(
     Ok(())
 }
 
-fn evaluate_complete(tx: &Transaction<'_>, matter: &str, parameters: &[u8]) -> StoreResult<bool> {
+#[rustfmt::skip]
+fn evaluate_complete(tx: &Transaction<'_>, matter: &str, parameters: &[u8], workspace: &OpenedWorkspace) -> StoreResult<bool> {
+    if !crate::report_current::all_match(tx, workspace, parameters) {
+        return Ok(false);
+    }
     let value: Value = serde_json::from_slice(parameters).map_err(invalid)?;
     let slug = value["slug"].as_str().ok_or_else(invalid_static)?;
     let minimum_words = value["minimum_words"].as_u64().ok_or_else(invalid_static)? as usize;

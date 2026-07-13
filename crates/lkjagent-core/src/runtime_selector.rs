@@ -40,8 +40,8 @@ pub fn select(state: RuntimeState, policy: RuntimePolicy, now: CurrentTime) -> S
         OutputEnvelope::Message, &policy, "do-not-retry-final"); }
     if has(&state, "check", "failed") || any(&state, "fault") { return decision(&state, RuntimePhase::Modify,
         "recovery.modify", true, OutputEnvelope::Action, &policy, "change-operation"); }
-    if has(&state, "report", "pending") { return decision(&state, RuntimePhase::Modify, "modify.report", true,
-        OutputEnvelope::Action, &policy, "change-operation"); }
+    if has(&state, "report", "pending") { let limited=has(&state,"recovery","output-limit");
+        return decision(&state,RuntimePhase::Modify,if limited{"modify.report.reduce-unit"}else{"modify.report"},true,OutputEnvelope::Action,&policy,if limited{"reduce-unit"}else{"change-operation"}); }
     if has(&state, "edit", "committed") { return decision(&state, RuntimePhase::Review, "check.run/current", false,
         OutputEnvelope::None, &policy, "commit-or-recover"); }
     if has(&state, "source", "current") { return decision(&state, RuntimePhase::Modify, "modify.source", true,

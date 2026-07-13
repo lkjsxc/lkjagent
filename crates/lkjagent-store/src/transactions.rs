@@ -1,6 +1,5 @@
-use std::path::Path;
-
 use rusqlite::{params, Connection, OptionalExtension, Transaction, TransactionBehavior};
+use std::path::Path;
 
 use crate::error::{StoreError, StoreResult};
 use crate::native_schema;
@@ -130,7 +129,7 @@ impl NativeStore {
         if !effect_transition(expected,next) { return Err(StoreError::InvalidState("effect phase transition".into())); }
         self.atomic(|tx| changed(tx.execute("UPDATE effect_journal SET status=?1 WHERE id=?2 AND status=?3", params![next,id,expected])?, "effect phase conflict"))
     }
-
+    #[rustfmt::skip]
     pub fn settle_effect(&mut self, value: &Settlement<'_>) -> StoreResult<()> {
         self.atomic(|tx| {
             tx.execute("INSERT INTO runtime_events(id,matter_id,causal_sequence,kind,monotonic_ms,wall_time,payload,source_kind,source_id) VALUES(?1,?2,?3,'effect-observed',?4,?5,?6,'effect',?7)", params![value.event,value.matter,value.event_sequence,value.monotonic_ms,value.wall_time,value.event_payload,value.journal])?;
@@ -140,10 +139,10 @@ impl NativeStore {
             tx.execute("UPDATE workspace_documents SET current_revision_id=?1,current_path=?2 WHERE id=?3", params![value.revision,value.path,value.document])?;
             tx.execute("INSERT INTO state_cells(matter_id,namespace,cell_key,payload,status,source_event_id,fingerprint) VALUES(?1,'edit','committed',?2,'active',?3,?4) ON CONFLICT(matter_id,namespace,cell_key) DO UPDATE SET payload=excluded.payload,status='active',source_event_id=excluded.source_event_id,fingerprint=excluded.fingerprint", params![value.matter,value.event_payload,value.event,value.fingerprint])?;
             changed(tx.execute("UPDATE effect_journal SET status=CASE WHEN ?1='succeeded' THEN 'settled' ELSE 'failed' END,observation_id=?2,outcome_fingerprint=?3 WHERE id=?4 AND status='observing'", params![value.status,value.observation,value.fingerprint,value.journal])?, "effect is not observing")?;
-            changed(tx.execute("UPDATE runtime_decisions SET status=CASE WHEN ?1='succeeded' THEN 'settled' ELSE 'failed' END,settlement_event_id=?2 WHERE id=(SELECT decision_id FROM effect_journal WHERE id=?3) AND status IN ('selected','admitted','running')", params![value.status,value.event,value.journal])?, "decision cannot settle")
+            changed(tx.execute("UPDATE runtime_decisions SET status=CASE WHEN ?1='succeeded' THEN 'settled' ELSE 'failed' END,settlement_event_id=?2 WHERE id=(SELECT decision_id FROM effect_journal WHERE id=?3) AND status IN ('selected','admitted','running')", params![value.status,value.event,value.journal])?, "decision cannot settle")?;
+            if value.status == "succeeded" { tx.execute("UPDATE state_cells SET status='suppressed' WHERE matter_id=?1 AND namespace='recovery' AND status='active'", [value.matter])?; } Ok(())
         })
     }
-
     #[rustfmt::skip]
     pub fn reuse_checked_revision(&mut self, matter: &str, decision: &str, path: &[u8], revision: &str) -> StoreResult<bool> {
         self.atomic(|tx| {

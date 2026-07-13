@@ -115,6 +115,11 @@ fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<
             return Some(reason);
         }
     }
+    if entry.effect_key.0 == "workspace.record"
+        && !crate::runtime_record_shape::admitted(&action.params)
+    {
+        return Some("record shape is not admitted".into());
+    }
     None
 }
 

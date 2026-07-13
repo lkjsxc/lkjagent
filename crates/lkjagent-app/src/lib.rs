@@ -15,6 +15,7 @@ mod model_io;
 pub mod public_loop;
 mod record_validation;
 mod report_checks;
+mod report_current;
 mod report_pending;
 mod report_record;
 mod report_shape;

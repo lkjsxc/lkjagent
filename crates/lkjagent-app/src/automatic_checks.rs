@@ -22,7 +22,7 @@ pub fn reduce_committed_edit(connection:&mut Connection,workspace:&OpenedWorkspa
  let (mut scheduled,mut passed,mut long,mut state_source)=(0,0,false,source.clone());
  for (obligation,kind,parameters) in rows {
   let check_source=crate::report_pending::source_revision(&tx,&kind,&parameters,&source)?; if already_current(&tx,&obligation,&check_source,&kind)?{continue}
-  let success=match crate::report_pending::evaluate(&tx,&fact.matter,&fact.decision,&kind,&parameters,&fact.path,&bytes)?{
+  let success=match crate::report_pending::evaluate(&tx,&fact.matter,&fact.decision,&kind,&parameters,&fact.path,&bytes,workspace)?{
    Some(value)=>{long|=crate::report_pending::long_kind(&kind);state_source=check_source.clone();value}
    None=>evaluate(&kind,&parameters,&fact,&bytes,mode,&source)};
   let measured=json!({"path":fact.path,"sha256":hex(&check_source),"mode":mode,"effect_targets":fact.targets,"passed":success}).to_string();let check=identity("check",&format!("{journal}:{obligation}:{kind}"),&check_source);let evidence=Sha256::digest([parameters.as_slice(),measured.as_bytes()].concat());
@@ -30,7 +30,7 @@ pub fn reduce_committed_edit(connection:&mut Connection,workspace:&OpenedWorkspa
   tx.execute("UPDATE obligations SET status=?1,current_check_id=?2,invalidating_event_id=NULL WHERE id=?3",params![if success{"passed"}else{"open"},check,obligation])?;scheduled+=1;passed+=usize::from(success);
  }
  if scheduled==0{tx.commit()?;return Ok(CheckReduction{scheduled:0,passed:0})}
- if long{let pending=crate::report_pending::pending_state(&tx,&fact.matter)?;crate::report_pending::write_state(&tx,&fact.matter,&event,json!({"journal":journal,"source_revision":hex(&state_source)}).to_string().as_bytes(),&state_source,pending.clone(),pending.is_none())?;}else{let state=if passed==scheduled{"current-passed"}else{"failed"};tx.execute("UPDATE state_cells SET status='suppressed' WHERE matter_id=?1 AND namespace='check' AND cell_key IN ('current-passed','failed')",[&fact.matter])?;tx.execute("INSERT INTO state_cells(matter_id,namespace,cell_key,payload,status,source_event_id,fingerprint) VALUES(?1,'check',?2,?3,'active',?4,?5) ON CONFLICT(matter_id,namespace,cell_key) DO UPDATE SET payload=excluded.payload,status='active',source_event_id=excluded.source_event_id,fingerprint=excluded.fingerprint",params![fact.matter,state,json!({"journal":journal,"source_revision":hex(&source)}).to_string().as_bytes(),event,source])?;}
+ if long{let pending=crate::report_pending::pending_state(&tx,&fact.matter,&event,workspace)?;crate::report_pending::write_state(&tx,&fact.matter,&event,json!({"journal":journal,"source_revision":hex(&state_source)}).to_string().as_bytes(),&state_source,pending.clone(),pending.is_none())?;}else{let state=if passed==scheduled{"current-passed"}else{"failed"};tx.execute("UPDATE state_cells SET status='suppressed' WHERE matter_id=?1 AND namespace='check' AND cell_key IN ('current-passed','failed')",[&fact.matter])?;tx.execute("INSERT INTO state_cells(matter_id,namespace,cell_key,payload,status,source_event_id,fingerprint) VALUES(?1,'check',?2,?3,'active',?4,?5) ON CONFLICT(matter_id,namespace,cell_key) DO UPDATE SET payload=excluded.payload,status='active',source_event_id=excluded.source_event_id,fingerprint=excluded.fingerprint",params![fact.matter,state,json!({"journal":journal,"source_revision":hex(&source)}).to_string().as_bytes(),event,source])?;}
  tx.commit()?;Ok(CheckReduction{scheduled,passed})
 }
 

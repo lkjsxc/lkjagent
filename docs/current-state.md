@@ -135,11 +135,11 @@ flat registry now accepts seven keys with current consumers, including strict
 One descriptor-derived `write_record` admits journal, memory, short report, and
 long report map or child. Short reports keep `artifacts/reports/<slug>.md`; long
 maps write `artifacts/documents/<slug>/README.md`; long children write
-`artifacts/documents/<slug>/<unit>.md`; and pending resume stays on native
-obligations plus one durable `report:pending` cell. All families share safe parents,
-revisions, checks, receipts, collision protection, and placeholder rejection;
-short files stay at 512 units, long files at 2,048, and memory retrieval stays
-limited to current `knowledge/notes`; configured semantic proof is unrun.
+`artifacts/documents/<slug>/<unit>.md`; pending resume uses native obligations and
+`report:pending`. Output limits retain no body and retry one reduced unit. Shared
+mechanics cover safe parents, revisions, checks, receipts, collisions, and
+placeholders. Short files stay at 512 units, long files at 2,048, and memory
+retrieval stays within current `knowledge/notes`; semantic proof remains unrun.
 
 ## Direct Contract
 

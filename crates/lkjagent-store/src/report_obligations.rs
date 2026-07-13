@@ -90,10 +90,7 @@ fn upsert(
     let id = format!("{matter}/{suffix}");
     tx.execute(
         "INSERT INTO obligations(id,matter_id,predicate_kind,predicate_payload,required,status)
-         VALUES(?1,?2,?3,?4,1,'open')
-         ON CONFLICT(id) DO UPDATE SET predicate_kind=excluded.predicate_kind,
-         predicate_payload=excluded.predicate_payload,required=1,status='open',
-         current_check_id=NULL,invalidating_event_id=NULL",
+         VALUES(?1,?2,?3,?4,1,'open') ON CONFLICT(id) DO NOTHING",
         params![id, matter, kind, payload.to_string().as_bytes()],
     )?;
     Ok(())
