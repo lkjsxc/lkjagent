@@ -116,9 +116,9 @@ unrelated runnable matter over one with unfinished work. It still blocks instead
 of reconciling every effect recovery phase, and configured-model simultaneous-
 matter fairness remains unproven. A 64-call model budget now creates a durable
 visible blocked matter, and owner resume starts a fresh call-budget epoch while
-preserving history; effect, recovery-cost, active-time, and token exhaustion
-remain. The tracked schedule retained later active intake without claiming it
-closed.
+preserving history. Missing provider usage now remains SQL null rather than fake
+zero; effect, recovery-cost, active-time, and token exhaustion remain. The
+tracked schedule retained later active intake without claiming it closed.
 
 The public compiler attaches its context plan and frame fingerprints, includes
 up to four active canonical messages from earlier matters, and stores one native

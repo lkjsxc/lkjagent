@@ -20,7 +20,8 @@ Define the fresh active SQLite tables and authority constraints.
 - `runtime_decisions`: immutable selection/spec, compiler attachments, status.
   Operation keys may recur within a matter; decision and idempotency identities
   remain unique.
-- `provider_exchanges`: request intent, response outcome, usage, timing.
+- `provider_exchanges`: request intent, response outcome, nullable reported
+  usage, and timing; absent provider usage remains unknown rather than zero.
 - `context_items`: source identity, revision, semantic key, trust, body reference.
 - `daemon_leases`: process ownership and heartbeat.
 - `config_fingerprints`: effective nonsecret configuration identity.
