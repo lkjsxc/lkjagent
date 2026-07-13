@@ -1,10 +1,7 @@
 # Current State
-
 ## Purpose
-
 Separate observed behavior in this checkout from the direct-runtime contract and
 name the next executable work.
-
 ## Evidence Boundary
 
 The public-loop work started from `ee4de81536b1baac845a346103f14420cd41f45b`.
@@ -135,11 +132,14 @@ startup no longer writes scaffold files, and diagnostics report both roots. The
 flat registry now accepts seven keys with current consumers, including strict
 `workspace_timezone` selection for journals.
 
-One descriptor-derived `write_record` admits journal, memory, and short report.
-Reports use `artifacts/reports/<slug>.md`, ordered selected-context lineage, and
-`managed-report`. All families share safe parents, revisions, checks, receipts,
-collision protection, placeholder rejection, and a 512-unit cap. Memory retrieval
-stays limited to current `knowledge/notes`; configured semantic proof is unrun.
+One descriptor-derived `write_record` admits journal, memory, short report, and
+long report map or child. Short reports keep `artifacts/reports/<slug>.md`; long
+maps write `artifacts/documents/<slug>/README.md`; long children write
+`artifacts/documents/<slug>/<unit>.md`; and pending resume stays on native
+obligations plus one durable `report:pending` cell. All families share safe parents,
+revisions, checks, receipts, collision protection, and placeholder rejection;
+short files stay at 512 units, long files at 2,048, and memory retrieval stays
+limited to current `knowledge/notes`; configured semantic proof is unrun.
 
 ## Direct Contract
 
@@ -181,10 +181,10 @@ claims, and the close transaction owns the canonical final message.
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
 | native journal mechanics | complete | focused descriptor, timezone, parent safety, effect retry, managed revision, structural check, and public scripted tests pass |
 | native memory mechanics | complete | focused slug, lineage, managed revision, retrieval, correction, contamination, and prompt-occurrence tests pass |
-| native short-report mechanics | complete | focused slug, all-source lineage, managed replacement, structural checks, collision, bound, and receipt tests pass |
+| native report mechanics | complete | focused short slug, long map and child topology, pending resume, managed replacement, structural checks, collision, bound, and receipt tests pass |
 | configured-model journal proof | active | scripted mechanics cannot establish factual groundedness; the configured journal campaign has not run |
 | configured-model memory proof | active | deterministic W06/C04 portions are derived; semantic recall and filler judgment remain unrun |
-| configured-model report proof | active | deterministic short-file mechanics do not prove semantic quality or long linked output |
+| configured-model report proof | active | deterministic W08 mechanics now cover short and linked long files, not configured semantic quality |
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
 | configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |
 | retired-source-deletion | complete | old controller, bridge, record, inspection, workbench, and TUI source is absent from product crates |

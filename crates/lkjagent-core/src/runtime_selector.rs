@@ -14,7 +14,7 @@ use serde_json::Value;
 use std::collections::BTreeMap;
 #[rustfmt::skip]
 pub const FILE_CHECK_KINDS: &[&str] = &["regular-utf8", "intended-sha256", "occurrence-counts",
-    "admitted-diff", "preserved-mode", "allowed-changed-paths", "effects-settled", "managed-journal", "managed-memory", "managed-report"];
+    "admitted-diff", "preserved-mode", "allowed-changed-paths", "effects-settled", "managed-journal", "managed-memory", "managed-report", "managed-report-map", "managed-report-member", "managed-report-complete"];
 pub const EXIT_GUARDS: &[&str] = &[
     "required-current-checks-passed",
     "no-blocking-operation",
@@ -40,6 +40,8 @@ pub fn select(state: RuntimeState, policy: RuntimePolicy, now: CurrentTime) -> S
         OutputEnvelope::Message, &policy, "do-not-retry-final"); }
     if has(&state, "check", "failed") || any(&state, "fault") { return decision(&state, RuntimePhase::Modify,
         "recovery.modify", true, OutputEnvelope::Action, &policy, "change-operation"); }
+    if has(&state, "report", "pending") { return decision(&state, RuntimePhase::Modify, "modify.report", true,
+        OutputEnvelope::Action, &policy, "change-operation"); }
     if has(&state, "edit", "committed") { return decision(&state, RuntimePhase::Review, "check.run/current", false,
         OutputEnvelope::None, &policy, "commit-or-recover"); }
     if has(&state, "source", "current") { return decision(&state, RuntimePhase::Modify, "modify.source", true,
@@ -96,9 +98,8 @@ fn exact_view(phase: RuntimePhase, key: &str, policy: &RuntimePolicy) -> ToolSet
     };
     direct_tool_view_for_state(state, policy.intended_recovery_tool.as_deref())
 }
-fn blocked(reason: BlockReason) -> Selection {
-    Selection::Block(RuntimeBlock { reason })
-}
+#[rustfmt::skip]
+fn blocked(reason: BlockReason) -> Selection { Selection::Block(RuntimeBlock { reason }) }
 fn has(state: &RuntimeState, ns: &str, name: &str) -> bool {
     state
         .snapshot
@@ -125,7 +126,15 @@ fn active_names(state: &RuntimeState, ns: &str) -> Vec<String> {
 fn executable(cell: &StateCell) -> bool {
     matches!(
         cell.key.namespace.as_str(),
-        "matter" | "source" | "edit" | "check" | "fault" | "model" | "effect" | "recovery"
+        "matter"
+            | "source"
+            | "edit"
+            | "check"
+            | "fault"
+            | "model"
+            | "effect"
+            | "recovery"
+            | "report"
     )
 }
 fn equal_progress(policy: &RuntimePolicy) -> bool {
@@ -179,12 +188,10 @@ fn tool_exhausted(cell: &StateCell) -> bool {
         .and_then(|value| value.get("tool_budget_remaining").and_then(Value::as_u64))
         == Some(0)
 }
-pub fn select_operation(snapshot: &RuntimeSnapshot) -> RuntimeOperation {
-    selected_candidate(snapshot).operation
-}
-pub fn candidates(snapshot: &RuntimeSnapshot) -> Vec<SelectorCandidate> {
-    selector_candidates(snapshot)
-}
+#[rustfmt::skip]
+pub fn select_operation(snapshot: &RuntimeSnapshot) -> RuntimeOperation { selected_candidate(snapshot).operation }
+#[rustfmt::skip]
+pub fn candidates(snapshot: &RuntimeSnapshot) -> Vec<SelectorCandidate> { selector_candidates(snapshot) }
 #[rustfmt::skip]
 pub(crate) fn apply_edge_blocks(snapshot: &RuntimeSnapshot, mut item: SelectorCandidate) -> SelectorCandidate {
     let Some(key) = &item.state_key else { return item }; let label = key.as_label();

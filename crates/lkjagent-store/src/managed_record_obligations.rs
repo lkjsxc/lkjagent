@@ -16,7 +16,7 @@ pub(crate) fn insert(
     } else if text.starts_with("---\nkind: memory\n") {
         insert_memory(tx, effect, matter, path)
     } else if text.starts_with("---\nkind: report\n") {
-        insert_report(tx, effect, matter, path)
+        crate::report_obligations::insert(tx, effect, matter, path, text)
     } else {
         Err(StoreError::InvalidState(
             "record kind is not admitted".into(),
@@ -38,12 +38,9 @@ fn insert_journal(
             "journal has no current owner lineage".into(),
         ));
     }
-    let sources = rows
-        .into_iter()
-        .map(|(_, revision)| revision)
-        .collect::<Vec<_>>();
     let payload = json!({
-        "path":path,"kind":"journal","date":date,"source_fingerprints":sources,
+        "path":path,"kind":"journal","date":date,
+        "source_fingerprints":rows.into_iter().map(|(_, revision)| revision).collect::<Vec<_>>(),
         "max_token_units":512
     });
     insert_one(tx, effect, matter, "managed-journal", payload)
@@ -73,25 +70,6 @@ fn insert_memory(
     insert_one(tx, effect, matter, "managed-memory", payload)
 }
 
-fn insert_report(
-    tx: &Transaction<'_>,
-    effect: &Effect<'_>,
-    matter: &str,
-    path: &str,
-) -> StoreResult<()> {
-    let slug = record_slug(path, "artifacts/reports/")
-        .ok_or_else(|| StoreError::InvalidState("report path is not canonical".into()))?;
-    let sources = lineage_rows(tx, effect)?
-        .into_iter()
-        .map(|(kind, revision)| format!("{kind}:{revision}"))
-        .collect::<Vec<_>>();
-    let payload = json!({
-        "path":path,"kind":"report","semantic_key":slug,"slug":slug,
-        "source_lineage":sources,"max_token_units":512
-    });
-    insert_one(tx, effect, matter, "managed-report", payload)
-}
-
 fn insert_one(
     tx: &Transaction<'_>,
     effect: &Effect<'_>,
@@ -99,7 +77,13 @@ fn insert_one(
     kind: &str,
     payload: serde_json::Value,
 ) -> StoreResult<()> {
-    crate::journal_obligations::insert_one(tx, effect.journal, matter, kind, &payload.to_string())
+    crate::journal_obligations::insert_one(
+        tx,
+        &format!("{}/{}", effect.journal, kind),
+        matter,
+        kind,
+        &payload.to_string(),
+    )
 }
 
 fn lineage_rows(tx: &Transaction<'_>, effect: &Effect<'_>) -> StoreResult<Vec<(String, String)>> {

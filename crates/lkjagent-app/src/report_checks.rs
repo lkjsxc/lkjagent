@@ -15,10 +15,6 @@ pub(crate) fn evaluate(parameters: &[u8], path: &str, bytes: &[u8]) -> bool {
     {
         return false;
     }
-    structure(&value, text)
-}
-
-fn structure(value: &Value, text: &str) -> bool {
     let lines = text.lines().collect::<Vec<_>>();
     let Some(slug) = value["slug"].as_str() else {
         return false;
@@ -48,12 +44,16 @@ fn structure(value: &Value, text: &str) -> bool {
         .as_array()
         .map(|items| items.iter().filter_map(Value::as_str).collect::<Vec<_>>())
         .unwrap_or_default();
-    let title = lines.get(end + 1).and_then(|line| line.strip_prefix("# "));
-    let body = lines.get(end + 3..).unwrap_or_default().join("\n");
-    !expected.is_empty()
-        && actual.len() == end.saturating_sub(5)
-        && actual == expected
-        && title.is_some_and(|title| !title.trim().is_empty())
+    actual == expected
+        && !expected.is_empty()
+        && lines
+            .get(end + 1)
+            .is_some_and(|line| line.starts_with("# "))
         && lines.get(end + 2) == Some(&"")
-        && !body.trim().is_empty()
+        && !lines
+            .get(end + 3..)
+            .unwrap_or_default()
+            .join("\n")
+            .trim()
+            .is_empty()
 }

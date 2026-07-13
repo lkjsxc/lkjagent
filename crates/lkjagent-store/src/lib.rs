@@ -51,5 +51,7 @@ pub(crate) mod journal_obligations;
 pub(crate) mod managed_record_obligations;
 mod matter_control;
 pub mod native_schema;
+pub(crate) mod report_obligations;
+pub(crate) mod report_paths;
 pub mod transactions;
 pub mod tui_snapshot;

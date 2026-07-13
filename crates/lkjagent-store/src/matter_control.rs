@@ -7,7 +7,7 @@ use crate::transactions::{Intake, NativeStore};
 impl NativeStore {
     pub fn checked_paths(&self, matter: &str) -> StoreResult<Vec<(String, String)>> {
         let mut query = self.connection.prepare(
-            "SELECT DISTINCT json_extract(CAST(c.parameters AS TEXT),'$.path'),lower(hex(c.source_revision)) FROM obligations o JOIN checks c ON c.id=o.current_check_id WHERE o.matter_id=?1 AND o.required=1 AND o.status='passed' AND c.current=1 AND c.passed=1 AND json_extract(CAST(c.parameters AS TEXT),'$.path') IS NOT NULL ORDER BY 1,2 LIMIT 16",
+            "SELECT DISTINCT json_extract(CAST(c.parameters AS TEXT),'$.path'),lower(hex(c.source_revision)) FROM obligations o JOIN checks c ON c.id=o.current_check_id WHERE o.matter_id=?1 AND o.required=1 AND o.status='passed' AND c.current=1 AND c.passed=1 AND c.kind IN ('workspace-byte','managed-journal','managed-memory','managed-report','managed-report-map','managed-report-member') AND json_extract(CAST(c.parameters AS TEXT),'$.path') IS NOT NULL ORDER BY 1,2 LIMIT 16",
         )?;
         let rows = query.query_map([matter], |row| Ok((row.get(0)?, row.get(1)?)))?;
         Ok(rows.collect::<Result<Vec<_>, _>>()?)
