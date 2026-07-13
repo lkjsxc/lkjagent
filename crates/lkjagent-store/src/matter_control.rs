@@ -113,7 +113,17 @@ impl NativeStore {
                 )
                 .optional()?;
             match lifecycle.as_deref() {
-                Some("blocked") => return Ok(()),
+                Some("blocked") => {
+                    let exact: i64 = tx.query_row(
+                        "SELECT count(*) FROM state_cells s JOIN runtime_events e ON e.id=s.source_event_id WHERE s.matter_id=?1 AND s.namespace='block' AND s.cell_key='budget' AND s.status='active' AND s.source_event_id=?2 AND s.payload=?3 AND s.fingerprint=?4 AND e.causal_sequence=?5 AND e.monotonic_ms=?6 AND e.wall_time=?7 AND e.payload=?3",
+                        params![matter,event,payload,fingerprint,sequence,monotonic_ms,wall_time],
+                        |row| row.get(0),
+                    )?;
+                    let settled = if let Some(decision) = decision {
+                        tx.query_row("SELECT count(*) FROM runtime_decisions WHERE id=?1 AND matter_id=?2 AND status='failed' AND settlement_event_id=?3",params![decision,matter,event],|row|row.get::<_,i64>(0))? == 1
+                    } else { true };
+                    return if exact == 1 && settled { Ok(()) } else { Err(StoreError::InvalidState("budget block retry conflict".into())) };
+                }
                 Some("open") => {}
                 Some(_) => {
                     return Err(StoreError::InvalidState(
