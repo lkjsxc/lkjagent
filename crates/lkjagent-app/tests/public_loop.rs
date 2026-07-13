@@ -30,6 +30,14 @@ fn public_native_loop_exact_edit_second_matter_restart_and_stale_guard()->TestRe
  let c=Connection::open(&db)?; assert_eq!(scalar(&c,"SELECT count(*) FROM effect_journal")?,1); assert_eq!(scalar(&c,"SELECT count(*) FROM state_cells WHERE CAST(namespace AS TEXT)='recovery' AND CAST(cell_key AS TEXT)='stale' AND status='active'")?,1); assert_eq!(scalar(&c,"SELECT count(*) FROM state_cells WHERE CAST(namespace AS TEXT)='recovery' AND CAST(cell_key AS TEXT)='stale' AND status='suppressed'")?,1); assert_eq!(scalar(&c,"SELECT count(*) FROM state_cells WHERE CAST(namespace AS TEXT)='recovery' AND CAST(cell_key AS TEXT)='malformed' AND status='suppressed'")?,2); let status=cli::run(["--data",data_arg.as_ref(),"status"])?; assert!(status.contains("roots: data=")&&status.contains("workspace=")&&status.contains("unfinished:")&&status.contains("checks-ready=")); assert!(!status.contains("task:")); Ok(())
 }
 
+#[test]
+#[rustfmt::skip]
+fn read_observation_contains_only_requested_page()->TestResult {
+ let root=fixture()?;let data=root.join("data");let workspace=root.join("workspace");fs::create_dir_all(workspace.join("notes"))?;fs::create_dir_all(&data)?;fs::write(workspace.join("notes/long.txt"),"visible line\nhidden outside page\n")?;fs::write(data.join("lkjagent.json"),"{\"workspace_root\":\"../workspace\"}")?;
+ let data_arg=data.to_string_lossy();cli::run(["--data",data_arg.as_ref(),"send","Read only the first line, then continue."])?;let mut endpoint=ScriptedEndpoint{outputs:vec!["<tool_call><tool>read_file</tool><input><path>notes/long.txt</path><offset>1</offset><count>1</count><complete>false</complete></input></tool_call>".into()],index:0};public_loop::run_once(&data,&mut endpoint)?;
+ let c=Connection::open(data.join("lkjagent.sqlite3"))?;let body=String::from_utf8(c.query_row("SELECT attempt_outcome FROM observations",[],|r|r.get::<_,Vec<u8>>(0))?)?;assert!(body.contains("visible line")&&body.contains("\"total_lines\":2")&&body.contains("\"next_line\":2"));assert!(!body.contains("hidden outside page")&&!body.contains("\"bytes\""));Ok(())
+}
+
 fn read(path: &str) -> String {
     format!("<tool_call><tool>read_file</tool><input><path>{path}</path><complete>false</complete></input></tool_call>")
 }

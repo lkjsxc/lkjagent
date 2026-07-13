@@ -103,7 +103,9 @@ lives in `prompt.rs`.
 ## Active Source Gaps
 
 Record, memory, artifact, and owner-visible TUI behavior must now be rebuilt
-only on native state. The store has a bounded read-only TUI frame projection:
+only on native state. Numbered file reads persist only the requested page and
+continuation metadata, never unrequested whole-file bytes. The store has a
+bounded read-only TUI frame projection:
 canonical messages, whitelisted activity, and status counts share one deferred
 read transaction and expose no runtime bodies beyond bounded conversation text.
 It has no terminal, input, rendering, or public CLI integration. Public
