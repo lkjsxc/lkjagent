@@ -50,15 +50,24 @@ pub(crate) fn dispatch(
             .find(|item| item.0 == name)
             .map(|item| item.1.as_str())
     };
-    if get("family") != Some("journal") {
+    let family = get("family").ok_or("record family missing")?;
+    let title = get("title").ok_or("record title missing")?;
+    let body = get("body").ok_or("record body missing")?;
+    if family == "memory" {
+        return crate::memory_record::dispatch(
+            data, db, store, matter, decision, entry, raw, title, body,
+        );
+    }
+    if family != "journal" {
         return Err("record family is not admitted".into());
     }
-    let title = get("title").ok_or("journal title missing")?;
-    let body = get("body").ok_or("journal body missing")?;
-    validate_authored(title, body)?;
+    crate::record_validation::authored("journal", title, body)?;
     let context = load_context(db, decision)?;
     let path = canonical_path(&context.local_date)?;
-    let sources = source_fingerprints(db, decision)?;
+    let sources = source_rows(db, decision)?
+        .into_iter()
+        .map(|(_, fingerprint)| fingerprint)
+        .collect::<Vec<_>>();
     let rendered = render(&context.local_date, &sources, title, body);
     if crate::journal_checks::token_units(&rendered) > TOKEN_LIMIT {
         return Err("journal document exceeds 512 conservative token units".into());
@@ -70,27 +79,6 @@ pub(crate) fn dispatch(
     crate::journal_apply::apply(
         db, store, &workspace, matter, decision, entry, raw, &path, prepared,
     )
-}
-
-fn validate_authored(title: &str, body: &str) -> R<()> {
-    if title.trim().is_empty() || body.trim().is_empty() {
-        return Err("journal title and body must be nonempty".into());
-    }
-    if title
-        .chars()
-        .any(|value| matches!(value, '\r' | '\n') || value.is_control())
-    {
-        return Err("journal title must be one safe line".into());
-    }
-    if body.chars().any(|value| value == '\0' || value == '\r') {
-        return Err("journal body contains unsafe controls".into());
-    }
-    if crate::journal_checks::known_placeholder(title)
-        || crate::journal_checks::known_placeholder(body)
-    {
-        return Err("journal contains a known placeholder".into());
-    }
-    Ok(())
 }
 
 fn load_context(db: &Path, decision: &str) -> R<BoundDecisionContext> {
@@ -109,7 +97,7 @@ fn load_context(db: &Path, decision: &str) -> R<BoundDecisionContext> {
     Ok(context)
 }
 
-fn source_fingerprints(db: &Path, decision: &str) -> R<Vec<String>> {
+pub(crate) fn source_rows(db: &Path, decision: &str) -> R<Vec<(String, String)>> {
     let connection = Connection::open(db).map_err(err)?;
     let mut query = connection
         .prepare("SELECT source_kind,CAST(source_revision AS TEXT) FROM context_items WHERE decision_id=?1 ORDER BY source_kind,source_id,source_revision")
@@ -124,12 +112,9 @@ fn source_fingerprints(db: &Path, decision: &str) -> R<Vec<String>> {
     if !rows.iter().any(|(kind, _)| kind == "owner")
         || rows.iter().any(|(_, fp)| !lineage_value(fp))
     {
-        return Err("journal source lineage is missing or unsafe".into());
+        return Err("record source lineage is missing or unsafe".into());
     }
-    Ok(rows
-        .into_iter()
-        .map(|(_, fingerprint)| fingerprint)
-        .collect())
+    Ok(rows)
 }
 
 fn lineage_value(value: &str) -> bool {

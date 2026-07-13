@@ -15,7 +15,7 @@ use std::collections::BTreeMap;
 
 #[rustfmt::skip]
 pub const FILE_CHECK_KINDS: &[&str] = &["regular-utf8", "intended-sha256", "occurrence-counts",
-    "admitted-diff", "preserved-mode", "allowed-changed-paths", "effects-settled", "managed-journal"];
+    "admitted-diff", "preserved-mode", "allowed-changed-paths", "effects-settled", "managed-journal", "managed-memory"];
 pub const EXIT_GUARDS: &[&str] = &[
     "required-current-checks-passed",
     "no-blocking-operation",

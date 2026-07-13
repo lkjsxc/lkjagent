@@ -93,7 +93,7 @@ const CREATE_FIELDS: &[DescriptorField] = &[
 ];
 #[rustfmt::skip]
 const RECORD_FIELDS: &[DescriptorField] = &[
-    field("family", true, TEXT, (7, 7), (None, None), Some("journal")),
+    field("family", true, TEXT, (6, 7), (None, None), Some("journal")),
     field("title", true, TEXT, (1, 256), (None, None), Some("A grounded day")),
     field("body", true, TEXT, (1, 1536), (None, None), Some("I recorded the owner-provided facts for today.")),
 ];
@@ -105,7 +105,7 @@ const DIRECT_CATALOG: &[ToolDescriptor] = &[
     descriptor("read_file", "read a numbered page; complete is required: true only when this read satisfies a no-change report objective, false when an edit may follow", READ_FIELDS, &["orient", "modify", "recovery"], "workspace.read", 32_768, "read-denied"),
     descriptor("edit_file", "replace one exact observed text span", EDIT_FIELDS, MODIFY, "workspace.edit", 8_192, "edit-denied"),
     descriptor("create_file", "create one observed-absent UTF-8 file", CREATE_FIELDS, MODIFY, "workspace.create", 8_192, "create-denied"),
-    descriptor("write_record", "write one bounded grounded owner-visible record; only family journal is currently admitted", RECORD_FIELDS, RECORD, "workspace.record.journal", 8_192, "record-denied"),
+    descriptor("write_record", "write one bounded grounded owner-visible journal or memory record", RECORD_FIELDS, RECORD, "workspace.record", 8_192, "record-denied"),
 ];
 
 #[rustfmt::skip]

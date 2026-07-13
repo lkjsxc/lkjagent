@@ -64,6 +64,7 @@ fn source_contracts_require_exact_implementation_and_tests() -> Result<(), Box<d
     let expected = [
         "C01",
         "C02",
+        "C04-deterministic",
         "C05",
         "C06",
         "F03",
@@ -99,6 +100,7 @@ fn source_contracts_require_exact_implementation_and_tests() -> Result<(), Box<d
         "T10",
         "W04",
         "W05-deterministic",
+        "W06-deterministic",
         "X03",
         "X04",
     ];

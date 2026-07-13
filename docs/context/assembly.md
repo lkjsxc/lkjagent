@@ -33,9 +33,10 @@ without claiming completion.
 ## Lanes
 
 Use configured caps for current objective/constraints, required file evidence,
-bounded memory/history, recovery diagnosis, and output reserve. Mandatory needs
-are selected first. Up to four latest active canonical messages from earlier
-matters enter the memory lane once each; the current owner objective remains the
+bounded sourced memory, recovery diagnosis, and output reserve. Mandatory needs
+are selected first. Up to four eligible current native memory revisions enter
+the memory lane once each; arbitrary earlier conversation messages and
+filesystem files do not. The current owner objective remains the
 higher-precedence source. Unused budget remains unused.
 
 ## Deduplication
@@ -47,7 +48,9 @@ beat summaries.
 
 A prompt check rejects duplicate bodies, repeated revisions, hidden tool names,
 raw harness JSON objects, unescaped dynamic text, and budget overflow. Escaped
-JSON file content remains valid workspace data.
+JSON file content remains valid workspace data. Exact current objective forms
+`forget <slug>:` and `correct <slug>:` suppress the matching memory key before
+selection; no broader semantic inference is claimed.
 
 ## Paging And Stability
 
