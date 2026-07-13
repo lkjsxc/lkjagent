@@ -2,6 +2,20 @@ use lkjagent_core::runtime_decision::{RuntimeDecision, ToolExampleParam};
 use lkjagent_core::runtime_operation::RuntimePhase;
 use lkjagent_core::runtime_state::{RuntimeSnapshot, StateStatus};
 
+pub(crate) fn report_objective(snapshot: &RuntimeSnapshot) -> Option<String> {
+    let cell = snapshot
+        .cells
+        .iter()
+        .find(|(key, cell)| {
+            key.namespace == "report" && key.name == "pending" && cell.status == StateStatus::Active
+        })?
+        .1;
+    let value = serde_json::from_str::<serde_json::Value>(&cell.payload_json).ok()?;
+    let slug = value["slug"].as_str()?;
+    let unit = value["remaining_units"].as_array()?.first()?.as_str()?;
+    Some(format!("Write only the report child slug={slug} unit={unit}. Author a distinct source-linked body of 130-150 words. Do not write the map or any other unit."))
+}
+
 pub(crate) fn narrow(
     decision: &mut RuntimeDecision,
     objective: &[u8],
@@ -88,7 +102,7 @@ pub(crate) fn narrow(
 
 #[cfg(test)]
 mod tests {
-    use super::narrow;
+    use super::{narrow, report_objective};
     use lkjagent_core::runtime_decision::{OperationKey, OutputEnvelope, RuntimeDecision};
     use lkjagent_core::runtime_operation::RuntimePhase;
     use lkjagent_core::runtime_state::{RuntimeSnapshot, StateCell, StateKey};
@@ -144,9 +158,9 @@ mod tests {
         let mut snapshot = RuntimeSnapshot::empty("m");
         snapshot.cells.insert(key, cell);
         let recovery = StateKey::new("recovery", "output-limit").map_err(|error| error.message)?;
-        snapshot
-            .cells
-            .insert(recovery.clone(), StateCell::active(recovery, "fault"));
+        let mut recovery_cell = StateCell::active(recovery.clone(), "fault");
+        recovery_cell.status = lkjagent_core::runtime_state::StateStatus::Suppressed;
+        snapshot.cells.insert(recovery, recovery_cell);
         let mut decision = RuntimeDecision::new(
             "d",
             "m",
@@ -169,6 +183,7 @@ mod tests {
         assert!(entry.purpose.contains("between 130 and 150 words"));
         assert_eq!(decision.model_budget_tokens, Some(4_096));
         assert!(entry.field_spec("children").is_none());
+        assert_eq!(report_objective(&snapshot).as_deref(), Some("Write only the report child slug=world-history unit=origins. Author a distinct source-linked body of 130-150 words. Do not write the map or any other unit."));
         Ok(())
     }
 }

@@ -64,7 +64,9 @@ It blocks the next effectful decision before edit preparation or filesystem
 mutation. Each persisted rejected
 model output costs one recovery point; the thirty-second failure is retained and
 then blocks the matter. Settled decision intervals plus the current process-monotonic
-cycle are capped at 900,000 active milliseconds. Daemon downtime and unrelated
-matter time are not charged; clock rollback contributes zero persisted duration.
+cycle are capped at 900,000 active milliseconds. While a persisted long report
+remains pending, only this ceiling is 3,600,000 milliseconds so bounded semantic
+units can settle; the other epoch limits remain unchanged. Daemon downtime and
+unrelated matter time are not charged; clock rollback contributes zero persisted duration.
 Within the runnable tier, the matter with the oldest last durable selection runs
 first, so a never-selected owner matter receives a turn across process reopen.

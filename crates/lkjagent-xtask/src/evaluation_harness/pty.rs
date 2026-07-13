@@ -72,13 +72,14 @@ fn run_schedule(root: &Path, source: &str, scenario: &scenario::Scenario, captur
 }
 #[rustfmt::skip]
 fn restart_schedule(root:&Path,source:&str,scenario:&scenario::Scenario,capture:&snapshot::Capture,before:&str,env:&BTreeMap<String,String>)->Result<(),String>{
+ let (restart,total)=if scenario.id=="long-artifact-recovery"{(2_400,3_601)}else{(620,901)};
  let started=Instant::now();thread::scope(|scope|->Result<(),String>{
-  let binary=capture.binary.clone();let cwd=capture.root.clone();let first_env=env.clone();let first=scope.spawn(move||clock::command(&binary,&["--data".into(),cwd.join("data").display().to_string(),"run".into()],&cwd,&first_env,Duration::from_secs(620)));
-  for (offset,text) in scenario.turns.iter().skip(1).take_while(|turn|turn.0<620){wait_until(started,Duration::from_secs(*offset));public(capture,env,&["send",text],Duration::from_secs(30))?}
-  wait_until(started,Duration::from_secs(620));let first=first.join().map_err(|_|"first daemon thread failed")??;if !first.timed_out{return Err("first daemon did not reach restart boundary".into())}record_restart(capture)?;
-  let binary=capture.binary.clone();let cwd=capture.root.clone();let second_env=env.clone();let second=scope.spawn(move||clock::command(&binary,&["--data".into(),cwd.join("data").display().to_string(),"run".into()],&cwd,&second_env,Duration::from_secs(283)));
-  for (offset,text) in scenario.turns.iter().skip(1).filter(|turn|turn.0>=620){wait_until(started,Duration::from_secs(*offset));public(capture,env,&["send",text],Duration::from_secs(30))?}
-  wait_until(started,Duration::from_secs(901));let status=public_output(capture,env,&["status"],Duration::from_secs(30))?;let second=second.join().map_err(|_|"second daemon thread failed")??;if !second.timed_out||status.code!=Some(0){return Err("restarted daemon did not reach observation boundary".into())}let duration=started.elapsed().as_secs();let(message,_,passed)=finish(root,source,scenario,capture,before,&[status],"run",duration)?;if passed{Ok(())}else{Err(message)}
+  let binary=capture.binary.clone();let cwd=capture.root.clone();let first_env=env.clone();let first=scope.spawn(move||clock::command(&binary,&["--data".into(),cwd.join("data").display().to_string(),"run".into()],&cwd,&first_env,Duration::from_secs(restart)));
+  for (offset,text) in scenario.turns.iter().skip(1).take_while(|turn|turn.0<restart){wait_until(started,Duration::from_secs(*offset));public(capture,env,&["send",text],Duration::from_secs(30))?}
+  wait_until(started,Duration::from_secs(restart));let first=first.join().map_err(|_|"first daemon thread failed")??;if !first.timed_out{return Err("first daemon did not reach restart boundary".into())}record_restart(capture)?;
+  let binary=capture.binary.clone();let cwd=capture.root.clone();let second_env=env.clone();let second=scope.spawn(move||clock::command(&binary,&["--data".into(),cwd.join("data").display().to_string(),"run".into()],&cwd,&second_env,Duration::from_secs(total-restart+2)));
+  for (offset,text) in scenario.turns.iter().skip(1).filter(|turn|turn.0>=restart){wait_until(started,Duration::from_secs(*offset));public(capture,env,&["send",text],Duration::from_secs(30))?}
+  wait_until(started,Duration::from_secs(total));let status=public_output(capture,env,&["status"],Duration::from_secs(30))?;let second=second.join().map_err(|_|"second daemon thread failed")??;if !second.timed_out||status.code!=Some(0){return Err("restarted daemon did not reach observation boundary".into())}let duration=started.elapsed().as_secs();let(message,_,passed)=finish(root,source,scenario,capture,before,&[status],"run",duration)?;if passed{Ok(())}else{Err(message)}
  })
 }
 fn record_restart(capture: &snapshot::Capture) -> Result<(), String> {

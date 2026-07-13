@@ -88,6 +88,8 @@ zero; known tokens and conservative unknown components now drive a durable
 post-response token block. A 16-effect epoch limit blocks before exact-edit
 preparation, 32 persisted rejected outputs exhaust recovery cost, and 900,000
 settled/current-cycle active milliseconds block without charging daemon downtime.
+A persisted pending long report raises only that active-time ceiling to 3,600,000
+milliseconds; calls, tokens, effects, and recovery remain separately bounded.
 The tracked schedule retained later active intake without claiming it closed.
 
 The public compiler attaches its context plan and frame fingerprints, filters
@@ -118,6 +120,7 @@ maps write `artifacts/documents/<slug>/README.md`; long children write
 `artifacts/documents/<slug>/<unit>.md`; pending resume uses native obligations and
 `report:pending`. Normal model output is capped at 1,024 tokens; limit faults
 retain no body and retry one named 130-150 word unit with a 4,096-token cap.
+Configured calls request minimal reasoning effort while preserving tool admission.
 Shared mechanics cover safe parents and revisions,
 checks, receipts, collisions, and effect-gated continuity; limits are 512/2,048.
 Memory retrieval stays current. A pre-narrowing run failed; proof remains unrun.
