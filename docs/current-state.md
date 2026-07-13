@@ -113,7 +113,8 @@ scheduling runs one matter per cycle and prefers an
 unrelated runnable matter over one with unfinished work. It still blocks instead
 of reconciling every effect recovery phase, and configured-model simultaneous-
 matter fairness remains unproven. A 64-call model budget now creates a durable
-visible blocked matter; effect, recovery-cost, active-time, and token exhaustion
+visible blocked matter, and owner resume starts a fresh call-budget epoch while
+preserving history; effect, recovery-cost, active-time, and token exhaustion
 remain. The tracked schedule retained later active intake without claiming it
 closed.
 
