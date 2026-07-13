@@ -12,7 +12,10 @@ Define revision-safe file operations and recoverable settlement.
 - Create one absent UTF-8 file without overwrite.
 - Replace one exact old-text occurrence in an observed revision.
 
-Delete, move, whole-file overwrite, and shell are not initial model tools.
+Delete, move, whole-file overwrite, and shell are not initial model tools. A
+safe read of an absent regular-file target settles a bounded `absent` source
+observation so the next state can expose `create_file`; unsafe and present-path
+read failures do not become absence.
 
 ## Edit Admission
 

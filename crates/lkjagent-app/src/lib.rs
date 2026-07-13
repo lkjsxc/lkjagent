@@ -1,3 +1,4 @@
+mod absent_read;
 pub mod args;
 pub mod automatic_checks;
 pub mod cli;

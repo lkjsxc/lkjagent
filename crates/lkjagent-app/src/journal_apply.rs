@@ -30,6 +30,11 @@ pub(crate) fn prepare_mode(db:&Path,workspace:&OpenedWorkspace,path:&str,rendere
  match managed{None=>{let value=workspace.prepare_absent_edit(path.into(),rendered,mode).map_err(err)?;Ok(JournalEdit{edit:value.edit,parents:value.missing_parents,parent_revision:None})},Some((1,Some(parent),Some(hash),Some(content)))=>{let revision=hex(&hash);let observed=workspace.observe_edit_target(path).map_err(err)?;if !matches!(&observed,ObservedTarget::Present(value) if value.revision==revision&&value.bytes==content){return Err("managed record revision is stale".into())}let old=std::str::from_utf8(&content).map_err(err)?;let edit=workspace.prepare_exact_edit(path.into(),Revision::Sha256(revision),old,rendered,mode).map_err(err)?;Ok(JournalEdit{edit,parents:vec![],parent_revision:Some(parent)})},_=>Err("unmanaged existing record collision".into())}
 }
 
+#[rustfmt::skip]
+pub(crate) fn prepare_direct(workspace:&OpenedWorkspace,path:&str,revision:Revision,old:&str,new:&str)->R<JournalEdit>{
+ match revision{Revision::Absent=>workspace.prepare_absent_edit(path.into(),new,0o644).map(|value|JournalEdit{edit:value.edit,parents:value.missing_parents,parent_revision:None}).map_err(err),Revision::Sha256(value)=>workspace.prepare_exact_edit(path.into(),Revision::Sha256(value),old,new,0o644).map(|edit|JournalEdit{edit,parents:vec![],parent_revision:None}).map_err(err)}
+}
+
 #[allow(clippy::too_many_arguments)]
 #[rustfmt::skip]
 pub(crate) fn apply(db:&Path,store:&mut NativeStore,workspace:&OpenedWorkspace,matter:&str,decision:&str,entry:&lkjagent_core::runtime_decision::ToolViewEntry,raw:&str,path:&str,prepared:JournalEdit)->R<String>{
