@@ -21,7 +21,8 @@ normal prompts.
 - Missing reads activate a source-revision need.
 - Stale or ambiguous edits reread and rebase; they never overwrite.
 - Provider length or oversize normalizes to `output-limit` without body bytes;
-  a pending report retries as `modify.report.reduce-unit` for one named unit.
+  a pending report retries as `modify.report.reduce-unit` for one named 190-220
+  word unit under a persisted 4,096-token output cap.
 - Endpoint faults use typed retry/wait policy and config-change wakes.
 - Check faults expose measured differences and return to modification.
 - Equal progress vectors change evidence, tools, scope, or wake.

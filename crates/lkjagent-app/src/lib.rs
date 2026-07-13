@@ -7,6 +7,7 @@ pub mod config;
 mod config_registry;
 mod continuity;
 mod history_context;
+mod intent_tools;
 mod journal_apply;
 mod journal_checks;
 pub mod journal_dispatch;
