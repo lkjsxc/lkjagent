@@ -53,18 +53,25 @@ pub(crate) fn dispatch(
     let family = get("family").ok_or("record family missing")?;
     let title = get("title").ok_or("record title missing")?;
     let body = get("body").ok_or("record body missing")?;
+    let has_report_fields = ["slug", "unit", "children", "minimum_words"]
+        .iter()
+        .any(|name| get(name).is_some());
     if family == "memory" {
+        if has_report_fields {
+            return Err("memory does not admit report option fields".into());
+        }
         return crate::memory_record::dispatch(
             data, db, store, matter, decision, entry, raw, title, body,
         );
     }
     if family == "report" {
-        return crate::report_record::dispatch(
-            data, db, store, matter, decision, entry, raw, title, body,
-        );
+        return crate::report_record::dispatch(data, db, store, matter, decision, entry, raw, args);
     }
     if family != "journal" {
         return Err("record family is not admitted".into());
+    }
+    if has_report_fields {
+        return Err("journal does not admit report option fields".into());
     }
     crate::record_validation::authored("journal", title, body)?;
     let context = load_context(db, decision)?;

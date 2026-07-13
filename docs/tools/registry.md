@@ -24,10 +24,12 @@ dispatch, generated docs, and contract tests consume the same descriptor.
   checks from a closed matter.
 - `edit_file`: exact single-match replacement against an observed revision.
 - `create_file`: create one observed-absent UTF-8 file without overwrite.
-- `write_record`: exact fields `family`, `title`, and `body`; exact
-  `family=journal`, `family=memory`, and bounded short `family=report` are
-  admitted. Its single persisted effect key is `workspace.record`; the family
-  does not invent a second effect key.
+- `write_record`: exact required fields `family`, `title`, and `body`, plus
+  optional `slug`, `unit`, `children`, and `minimum_words`. Journal and memory
+  forbid the optionals. Short report uses `family=report` with no optionals.
+  Long map uses `family=report,slug,unit=index,children,minimum_words`, and long
+  child uses `family=report,slug,unit`. Its single persisted effect key is
+  `workspace.record`; the family does not invent a second effect key.
 
 Shell, file delete/move, whole-file overwrite, and other record families are
 absent until their complete state/effect/check path exists.

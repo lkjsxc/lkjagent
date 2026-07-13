@@ -70,6 +70,11 @@ fn direct_transitions_do_not_add_model_review() -> TestResult {
         "recovery.modify",
         true,
     );
+    assert_decision(
+        state_with(cell("report", "pending", "event-1")?),
+        "modify.report",
+        true,
+    );
     Ok(())
 }
 

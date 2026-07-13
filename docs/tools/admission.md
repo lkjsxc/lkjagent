@@ -13,10 +13,13 @@ reason and creates no effect row.
 
 Dispatch receives only an admitted stable effect key and typed values. A
 separate switch cannot grant a tool omitted by the registry. `write_record`
-accepts only exact `journal` or `memory`, persists the common
-`workspace.record` effect path, then dispatches the admitted family. Every other
-family is rejected before an effect row or filesystem mutation. The model
-supplies no record path, date, slug, or metadata.
+persists the common `workspace.record` effect path, then dispatches one exact
+shape: journal or memory with no report optionals, short report with no
+optionals, long report map with canonical `slug`, `unit=index`, ordered unique
+`children`, and positive bounded `minimum_words`, or long child with the same
+slug plus one semantic non-index `unit`. Every other family or mixed shape is
+rejected before an effect row or filesystem mutation. The model supplies no
+record path, date, frontmatter, or section links.
 
 ## Path And Revision Guards
 
