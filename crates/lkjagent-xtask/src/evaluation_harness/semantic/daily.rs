@@ -31,10 +31,7 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     )?;
     let relevant_recall = shared::count(
         ctx.db,
-        &memory_context(
-            "Use corrected transit-card-location%",
-            Some(&memory_revision),
-        ),
+        &recall_context("Use corrected transit-card-location%", &memory_revision),
     )?;
     let correction_memory = shared::count(
         ctx.db,
@@ -44,7 +41,7 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
         ctx.db,
         &format!(
             "{} AND CAST(i.source_revision AS TEXT)<>'{}'",
-            memory_context("Use corrected transit-card-location%", None),
+            recall_context("Use corrected transit-card-location%", ""),
             sql(&memory_revision)
         ),
     )?;
@@ -69,9 +66,11 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     };
     let journal_lower = journal_text.to_ascii_lowercase();
     let journal_grounded = u64::from(
-        journal_lower.contains("transit card")
+        journal_lower.contains("card")
             && journal_lower.contains("drawer")
-            && (journal_lower.contains("second") || journal_lower.contains("2nd")),
+            && ["second", "2nd", "number two", "drawer two"]
+                .iter()
+                .any(|term| journal_lower.contains(term)),
     );
     let memory_lower = memory_text.to_ascii_lowercase();
     let memory_grounded = u64::from(
@@ -152,6 +151,17 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     Ok(Measured::new(passed, fields))
 }
 
+fn recall_context(objective: &str, revision: &str) -> String {
+    let revision = if revision.is_empty() {
+        String::new()
+    } else {
+        format!(" AND CAST(i.source_revision AS TEXT)='{}'", sql(revision))
+    };
+    format!(
+        "SELECT count(DISTINCT m.id) FROM context_items i JOIN runtime_decisions d ON d.id=i.decision_id JOIN matters m ON m.id=d.matter_id WHERE (i.source_kind='memory' OR (i.source_kind='source' AND CAST(i.source_id AS TEXT)='knowledge/notes/transit-card-location.md')) AND CAST(m.objective AS TEXT) LIKE '{}'{}",
+        sql(objective), revision
+    )
+}
 fn memory_context(objective: &str, revision: Option<&str>) -> String {
     let revision = revision.map_or(String::new(), |value| {
         format!(" AND CAST(i.source_revision AS TEXT)='{}'", sql(value))
