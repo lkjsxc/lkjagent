@@ -74,9 +74,11 @@ between runs.
 
 ## PTY
 
-PTY evidence stores raw input/output frames, dimensions, timestamps, composer
-events, canonical message IDs/sequences, viewport mode/anchor/max-top, and screen
-hashes. A textual description without frames and IDs fails.
+The confined capture may hold bounded timestamped input, output, resize, and
+marker frames while evaluation runs. Tracked evidence stores only the cast hash,
+measured event counts, slow interval, terminal cleanup counts, durable identity
+counts, and source/scenario bindings. A textual claim without the measured cast
+facts fails, and raw terminal content is never copied into tracked evidence.
 
 ## Secret Safety
 

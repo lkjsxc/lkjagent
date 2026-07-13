@@ -1,0 +1,8 @@
+check_id	checker
+japanese-input	pty-input
+slow-call-responsive	pty-frame-time
+search-resize-anchor	pty-screen
+canonical-message-identity	conversation-ledger
+activity-responsive	pty-screen
+terminal-cleanup	pty-terminal
+restart-resume	conversation-ledger

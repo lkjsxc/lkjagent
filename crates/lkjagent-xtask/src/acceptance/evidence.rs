@@ -14,6 +14,14 @@ pub fn derivations(path:&Path,bytes:&[u8],source:&str)->BTreeSet<String>{
  out
 }
 
+pub fn derivations_at(root: &Path, path: &Path, bytes: &[u8], source: &str) -> BTreeSet<String> {
+    let mut out = derivations(path, bytes, source);
+    out.extend(super::campaign_evidence::derivations(
+        root, path, bytes, source,
+    ));
+    out
+}
+
 pub fn inspect(path: &Path, bytes: &[u8], source: &str) -> Vec<String> {
     let label = path.to_string_lossy();
     if secret::kind(bytes).is_some() || secret::contains_loaded(bytes) {
@@ -151,17 +159,20 @@ fn campaign_errors(fields: &HashMap<String, String>, label: &str) -> Vec<String>
             "{label}: campaign duration is shorter than 900 seconds"
         ));
     }
-    for key in [
-        "decision_count",
-        "useful_decision_count",
-        "progress_decision_count",
-        "owner_turn_count",
+    for (key, measured) in [
+        ("decision_count", "measured_runtime_decision_count"),
+        ("useful_decision_count", "measured_useful_decision_count"),
+        (
+            "progress_decision_count",
+            "measured_progress_decision_count",
+        ),
+        ("owner_turn_count", "measured_owner_turn_count"),
     ] {
-        if fields
+        let count = fields
             .get(key)
-            .and_then(|value| value.parse::<u64>().ok())
-            .is_none_or(|value| value == 0)
-        {
+            .or_else(|| fields.get(measured))
+            .and_then(|value| value.parse::<u64>().ok());
+        if count.is_none_or(|value| value == 0) {
             errors.push(format!("{label}: campaign is quiet or missing {key}"));
         }
     }
