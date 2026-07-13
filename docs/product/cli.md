@@ -11,6 +11,7 @@ lkjagent help
 lkjagent --data DATA send [--new] TEXT
 lkjagent --data DATA run [--once]
 lkjagent --data DATA status
+lkjagent --data DATA tui
 lkjagent --data DATA doctor [--json]
 ```
 
@@ -47,6 +48,14 @@ lifecycle counts, the active matter, unfinished decisions, exchanges and
 effects, checks readiness, and canonical conversation identities. It does not
 synthesize task or queue events.
 
+## TUI Command
+
+`tui` opens the native terminal interface on a TTY. It reads the bounded native
+frame projection and commits owner text through the same typed intake operation
+as `send`; it does not call retired commands or own runtime selection. Endpoint
+work runs on a background thread while terminal input and SQLite frame reads stay
+on the UI thread.
+
 ## Doctor Command
 
 Doctor opens only the native 18-table store, validates it, and reports resolved
@@ -56,7 +65,7 @@ prints credential values.
 
 ## Help Command
 
-Help prints only the five public command shapes. It creates no data directory,
+Help prints only the six public command shapes. It creates no data directory,
 database, or workspace.
 
 ## Exit Codes

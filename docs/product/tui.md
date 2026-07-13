@@ -33,18 +33,22 @@ fields are never projected. Status reports matter lifecycle, unfinished runtime
 work, rejected or failed rows, current and passing checks, and active cell
 counts from the same transaction.
 
-The native frame projection remains store-only and read-only. The application
-now has a pure screen core over that projection: identity merge, composer
-reduction, display-width wrapping, activity separation, and viewport reduction.
-It adds no public command, terminal, threads, or database access. A later edge
-may commit owner input and durable control events but never selects runtime work.
+The native frame projection remains store-only and read-only. The public `tui`
+command polls it in one deferred transaction on the UI thread at bounded cadence.
+The application merges older pages by exact message ID and sequence without
+duplicates. Activity remains the newest bounded page and is not paginated yet.
+The terminal edge commits owner input but never selects or dispatches runtime
+work.
 
 ## Input
 
-Endpoint and filesystem work run outside the terminal reducer. Japanese text,
-emoji, cursor position, and unsubmitted bytes survive refresh, activity, resize,
-search, scrolling, and slow model calls. Submit clears the composer only after
-durable intake succeeds.
+Endpoint and filesystem work run on a background worker constructed inside its
+thread. The worker waits for bounded wake signals and never holds a frame read
+transaction during endpoint I/O. Japanese text, paste, emoji, grapheme cursor
+position, and unsubmitted bytes survive refresh, activity, resize, search,
+scrolling, and slow model calls. Submit retains bytes until typed durable intake
+returns the exact canonical message ID, then clears only the submitted revision.
+Intake failure retains text and displays a bounded error.
 
 Initial behavior does not persist an unsubmitted draft across process exit. A
 restart reloads committed messages once.
@@ -56,15 +60,23 @@ using terminal display columns. The viewport is either Follow or a durable
 anchor containing message ID and wrapped-row offset. Follow shows the newest
 row. Manual mode preserves its anchor while content arrives or width changes.
 
-Scrolling to computed bottom restores Follow. Resize, search, pagination, and
-content shrink clamp the anchor. Existing matching messages never produce an
-all-blank pane.
+Scrolling to computed bottom restores Follow. Scrolling above the loaded top
+loads the next older conversation page and preserves the logical message and
+wrapped-row anchor. Resize, search, pagination, and content shrink clamp the
+anchor. Existing matching messages never produce an all-blank pane.
+
+Ctrl-F enters search and Escape clears it without changing the composer. F2
+toggles activity. Arrow and page keys scroll, End restores Follow, and Ctrl-C
+exits. Character, paste, backspace, delete, cursor, Home, and End input are
+grapheme safe. Raw mode, alternate screen, and cursor state use an unwind-safe
+terminal guard.
 
 ## Evidence
 
 Focused store and application tests cover identity merge, read-transaction
-frames, Unicode wrapping and composer edits, submit outcomes, follow/manual
-transitions, resize, search clear, shrink, and bottom clamping. These are pure
-contract evidence only. Final proof uses a real PTY during a slow call with
+frames, Unicode wrapping and composer edits, durable submit outcomes, renderer
+clipping and separation, terminal cleanup, pagination merge, input while a test
+endpoint is blocked, and native binary entry/cleanup in a Unix PTY. Final proof
+still uses a configured endpoint PTY during a slow call with
 Japanese input, resize, manual append, bottom restoration, search clear, and
 post-submit restart.

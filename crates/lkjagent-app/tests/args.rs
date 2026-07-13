@@ -12,6 +12,7 @@ fn parser_accepts_only_public_commands() -> TestResult<()> {
         Command::Run { once: true }
     );
     assert_eq!(parse(["status"])?.command, Command::Status);
+    assert_eq!(parse(["tui"])?.command, Command::Tui);
     assert_eq!(parse(["doctor"])?.command, Command::Doctor { json: false });
     assert_eq!(
         parse(["doctor", "--json"])?.command,
@@ -64,6 +65,7 @@ fn parser_rejects_arguments_outside_the_public_shapes() {
     for args in [
         &["help", "extra"][..],
         &["status", "--json"][..],
+        &["tui", "extra"][..],
         &["doctor", "--once"][..],
         &["run", "--json"][..],
         &["send", "--new"][..],

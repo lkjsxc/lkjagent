@@ -3,6 +3,9 @@ use unicode_width::UnicodeWidthStr;
 
 use crate::tui_model::{ComposerEvent, ComposerState, PendingSubmission, TuiEffect};
 
+const MAX_COMPOSER_BYTES: usize = 16_384;
+const LIMIT_ERROR: &str = "composer limit reached";
+
 pub fn reduce(mut state: ComposerState, event: ComposerEvent) -> (ComposerState, Vec<TuiEffect>) {
     let mut effects = Vec::new();
     match event {
@@ -17,6 +20,10 @@ pub fn reduce(mut state: ComposerState, event: ComposerEvent) -> (ComposerState,
         ComposerEvent::Home => state.cursor = 0,
         ComposerEvent::End => state.cursor = count(&state.text),
         ComposerEvent::Submit { message_id } => submit(&mut state, message_id, &mut effects),
+        ComposerEvent::SubmitCommitted {
+            request_id,
+            message_id,
+        } => commit(&mut state, &request_id, message_id),
         ComposerEvent::SubmitSucceeded { message_id } => succeed(&mut state, &message_id),
         ComposerEvent::SubmitFailed { message_id, error } => {
             fail(&mut state, &message_id, error);
@@ -32,12 +39,20 @@ pub fn cursor_display_column(state: &ComposerState) -> usize {
 }
 
 fn replace(state: &mut ComposerState, text: String) {
+    if text.len() > MAX_COMPOSER_BYTES {
+        state.last_error = Some(LIMIT_ERROR.to_string());
+        return;
+    }
     state.text = text;
     state.cursor = count(&state.text);
     changed(state);
 }
 
 fn insert(state: &mut ComposerState, text: &str) {
+    if state.text.len().saturating_add(text.len()) > MAX_COMPOSER_BYTES {
+        state.last_error = Some(LIMIT_ERROR.to_string());
+        return;
+    }
     clamp(state);
     let byte = byte_index(&state.text, state.cursor);
     state.text.insert_str(byte, text);
@@ -83,6 +98,19 @@ fn submit(state: &mut ComposerState, message_id: String, effects: &mut Vec<TuiEf
     effects.push(TuiEffect::CommitOwnerMessage { message_id, body });
 }
 
+fn commit(state: &mut ComposerState, request_id: &str, message_id: String) {
+    let Some(pending) = state.pending.as_mut() else {
+        return;
+    };
+    if pending.message_id != request_id {
+        return;
+    }
+    pending.message_id = message_id;
+    pending.durable = true;
+    state.last_error = None;
+    clear_submitted_revision(state);
+}
+
 fn succeed(state: &mut ComposerState, message_id: &str) {
     let Some(pending) = state.pending.as_mut() else {
         return;
@@ -92,7 +120,12 @@ fn succeed(state: &mut ComposerState, message_id: &str) {
     }
     pending.durable = true;
     state.last_error = None;
-    if state.revision == pending.revision {
+    clear_submitted_revision(state);
+}
+
+fn clear_submitted_revision(state: &mut ComposerState) {
+    let revision = state.pending.as_ref().map(|item| item.revision);
+    if revision == Some(state.revision) {
         state.text.clear();
         state.cursor = 0;
         state.revision = state.revision.saturating_add(1);

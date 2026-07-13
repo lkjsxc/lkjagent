@@ -102,18 +102,19 @@ lives in `prompt.rs`.
 
 ## Active Source Gaps
 
-Record, memory, artifact, and owner-visible TUI behavior must now be rebuilt
-only on native state. Numbered file reads persist only the requested page and
+Record, memory, and artifact behavior must now be rebuilt only on native state. Numbered file reads persist only the requested page and
 continuation metadata, never unrequested whole-file bytes. The store has a
 bounded read-only TUI frame projection:
 canonical messages, whitelisted activity, and status counts share one deferred
 read transaction and expose no runtime bodies beyond bounded conversation text.
-The application has pure identity merge, Unicode composer and wrapping, separated
-conversation and activity screen state, and anchored viewport reduction over
-that projection. It has no terminal, rendering, threads, or public CLI
-integration. Public scheduling runs one matter per cycle, prefers an unrelated
-runnable matter over one with unfinished work, and rotates the runnable tier by
-oldest durable selection across reopen. It still blocks instead
+The application has identity merge, Unicode composer and wrapping, separated
+conversation and activity rendering, anchored pagination, a public native
+terminal command, and unwind-safe terminal cleanup over that projection. Frame
+reads and input stay on one UI thread while configured endpoint cycles run on a
+bounded-wake background worker. Public scheduling runs one matter per cycle,
+prefers an unrelated runnable matter over one with unfinished work, and rotates
+the runnable tier by oldest durable selection across reopen. It still blocks
+instead
 of reconciling every effect recovery phase, and configured-model simultaneous-
 matter fairness remains unproven. A 64-call model budget now creates a durable
 visible blocked matter, and owner resume starts a fresh call-budget epoch while
@@ -122,8 +123,7 @@ zero; known tokens and conservative unknown components now drive a durable
 post-response token block. A 16-effect epoch limit blocks before exact-edit
 preparation, 16 persisted rejected outputs exhaust recovery cost, and 900,000
 settled/current-cycle active milliseconds block without charging daemon downtime.
-The
-tracked schedule retained later active intake without claiming it closed.
+The tracked schedule retained later active intake without claiming it closed.
 
 The public compiler attaches its context plan and frame fingerprints, includes
 up to four active canonical messages from earlier matters, and stores one native
@@ -133,9 +133,12 @@ source bytes. Final admission rejects future-tense and unsupported command or
 test claims; richer claim-to-path comparison remains a bounded follow-up. Close
 and the owner receipt remain check-derived. These are source gaps, not fallback.
 
-The native `conversation_messages` table is canonical for public turns. There is
-currently no public TUI; frame polling, durable intake wiring, terminal rendering,
-and PTY behavior remain outside the pure composer and wrapped-row viewport core.
+The native `conversation_messages` table is canonical for public turns. Typed
+TUI intake uses the exact returned durable message identity, and failed intake
+keeps composer bytes. Activity is intentionally limited to its newest bounded
+page. A native binary Unix PTY smoke covers entry, Ctrl-C, and terminal cleanup.
+A configured endpoint PTY campaign remains unrun and is not implied by that smoke
+or the blocked-worker test.
 
 Configuration and Compose now separate the runtime data root from one visible
 workspace root. The workspace is created only by an actual workspace operation,
@@ -189,6 +192,7 @@ claims, and the close transaction owns the canonical final message.
 | retired-source-deletion | complete | old controller, bridge, record, inspection, workbench, and TUI source is absent from product crates |
 | tui-frame-projection | complete | local, workspace, and rebuilt Compose gates cover one bounded deferred read transaction |
 | tui-pure-core | complete | focused tests cover identity, Unicode composer and wrapping, screen separation, and anchored viewport behavior |
+| tui-native-edge | complete | public command, typed intake, bounded polling worker, pagination, rendering, input, and RAII cleanup pass focused tests |
 | final campaigns | active | exact-file campaign passed; recovery, daily-life, multi-project, and PTY proof remain |
 
 ## Honesty Rules

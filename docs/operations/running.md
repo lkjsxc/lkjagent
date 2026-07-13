@@ -12,13 +12,15 @@ cargo run --locked -p lkjagent-app -- --data data send --new "OWNER TEXT"
 cargo run --locked -p lkjagent-app -- --data data run
 cargo run --locked -p lkjagent-app -- --data data run --once
 cargo run --locked -p lkjagent-app -- --data data status
+cargo run --locked -p lkjagent-app -- --data data tui
 cargo run --locked -p lkjagent-app -- --data data doctor --json
 ```
 
-These are the complete public command shapes. Removed inspection, record,
-workspace, and terminal commands fail before creating a data directory, SQLite
-database, or workspace. `run --once` performs at most one persisted direct
-decision and returns its bounded outcome.
+These are the complete public command shapes. Removed inspection, record, and
+workspace commands fail before creating a data directory, SQLite database, or
+workspace. `run --once` performs at most one persisted direct decision and
+returns its bounded outcome. `tui` requires TTY stdin and stdout; Ctrl-C exits
+through the terminal guard.
 
 ## Configuration
 
@@ -29,10 +31,10 @@ retired authority rows.
 
 ## Compose
 
-The target Compose contract mounts host data through `LKJAGENT_DATA_DIR` and host
-workspace through `LKJAGENT_WORKSPACE_DIR`. Data appears at `/data`; owner files
-appear at `/workspace`. The current Compose file still mounts only `/data` and is
-an open cutover item.
+Compose mounts host data through `LKJAGENT_DATA_DIR` and host workspace through
+`LKJAGENT_WORKSPACE_DIR`. Data appears at `/data`; owner files appear at
+`/workspace`. The image entrypoint recognizes `tui`; run it with an allocated
+TTY, for example `docker compose run --rm agent tui` from an interactive shell.
 
 ## Lifecycle
 

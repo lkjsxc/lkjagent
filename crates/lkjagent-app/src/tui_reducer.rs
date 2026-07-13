@@ -1,6 +1,5 @@
 use crate::tui_composer;
 use crate::tui_model::{ComposerEvent, TuiEffect, TuiEvent, TuiModel};
-use crate::tui_screen::ScreenModel;
 use crate::tui_viewport;
 
 pub fn reduce(mut model: TuiModel, event: TuiEvent) -> (TuiModel, Vec<TuiEffect>) {
@@ -14,17 +13,27 @@ pub fn reduce(mut model: TuiModel, event: TuiEvent) -> (TuiModel, Vec<TuiEffect>
         }
         TuiEvent::Snapshot(snapshot) => {
             acknowledge_snapshot(&mut model, &snapshot);
-            let expanded = model.screen.activity.expanded;
-            model.screen = ScreenModel::project(&snapshot, model.composer.pending.as_ref());
-            model.screen.activity.expanded = expanded;
+            model
+                .screen
+                .merge(&snapshot, model.composer.pending.as_ref());
             reconcile(&mut model);
         }
         TuiEvent::Resize { width, height } => {
-            model.width = width.max(1);
-            model.height = height.max(1);
+            model.width = width;
+            model.height = height;
             reconcile(&mut model);
         }
-        TuiEvent::Search(search) => model.search = search,
+        TuiEvent::Search(search) => {
+            model.search = search;
+            reconcile(&mut model);
+        }
+        TuiEvent::SearchMode(active) => {
+            model.search_active = active;
+            if !active {
+                model.search.clear();
+            }
+            reconcile(&mut model);
+        }
         TuiEvent::Scroll(delta) => {
             let rows = model.screen.rows(model.width, &model.search);
             tui_viewport::scroll(&mut model.viewport, &rows, model.height, delta);
@@ -60,6 +69,10 @@ fn acknowledge_snapshot(
 
 fn refresh_draft(model: &mut TuiModel) {
     if let Some(draft) = model.composer.pending.as_ref() {
+        model
+            .screen
+            .conversation
+            .retain(|item| item.durable || item.id == draft.message_id);
         if let Some(item) = model
             .screen
             .conversation
