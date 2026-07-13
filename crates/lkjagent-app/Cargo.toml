@@ -20,3 +20,5 @@ lkjagent-store = { path = "../lkjagent-store" }
 rusqlite = { version = "0.40.1", features = ["bundled"] }
 serde_json = "1"
 sha2 = "0.10.9"
+unicode-segmentation = "1.12.0"
+unicode-width = "0.1.14"
