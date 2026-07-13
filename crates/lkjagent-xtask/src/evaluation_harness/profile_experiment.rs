@@ -72,13 +72,10 @@ pub fn run(root: &Path, endpoint: &Path) -> Result<String, String> {
                         0,
                     )
                 } else {
-                    let prompt = prompt(&row, scenario);
+                    let (system, user) = super::profile_prompt::build(&row, scenario)?;
                     let completion = complete(
                         &client,
-                        &[
-                            Message::system(prompt),
-                            Message::user("Return the action now."),
-                        ],
+                        &[Message::system(system), Message::user(user)],
                         &CallSpec::action(256),
                         0,
                     )
@@ -115,19 +112,6 @@ fn hard_rejected(row: &std::collections::BTreeMap<&str, &str>) -> bool {
     row["envelope"] == "tool-named"
         || row["tool_view"] == "broad-workspace"
         || row["edit_form"] != "exact-text"
-}
-fn prompt(row: &std::collections::BTreeMap<&str, &str>, scenario: &str) -> String {
-    let example = if row["example"] == "none" {
-        String::new()
-    } else {
-        " Example: <tool_call><tool>read_file</tool><path>notes/exact-base.txt</path><offset>1</offset><count>20</count><complete>false</complete></tool_call>.".into()
-    };
-    let context = if row["context"] == "recent-plus-required" {
-        " A recent unrelated note is noise."
-    } else {
-        ""
-    };
-    format!("<system>You are the action selector for profile {} scenario {scenario}. Return exactly one action and no prose.</system><protocol><action-envelope>&lt;tool_call&gt;&lt;tool&gt;TOOL&lt;/tool&gt;&lt;field&gt;VALUE&lt;/field&gt;&lt;/tool_call&gt;</action-envelope><rules>Strict attribute-free XML-like tags. No JSON, markdown, attributes, self-closing tags, or extra fields. Preserve descriptor field order.</rules></protocol><tools><tool><name>read_file</name><purpose>read one numbered page</purpose><fields>path, offset, count, complete</fields></tool></tools><objective>Select read_file for notes/exact-base.txt at offset 1 count 20 with complete false.{context}{example}</objective>", row["cell"])
 }
 fn required<'a>(
     values: &'a std::collections::BTreeMap<String, String>,

@@ -13,6 +13,7 @@ validator, bounded captures, and mechanical false-positive checks.
 - [pty.rs](pty.rs): bounded campaign execution and sanitized evidence writing.
 - [pty-cast.rs](pty_cast.rs): bounded temporary cast parsing into measured counts.
 - [profile-experiment.rs](profile_experiment.rs): configured hashed grammar probes.
+- [profile-prompt.rs](profile_prompt.rs): production-kernel profile prompt variants.
 - [semantic/mod.rs](semantic/mod.rs): scenario-specific native fact evaluators.
 - [scenario.rs](scenario.rs): five tracked aliases, hashed five- or six-turn
   schedules, seed bytes, and shell-free endpoint files. Tests reject changed

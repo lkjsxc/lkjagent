@@ -7,6 +7,7 @@ mod hash {
     }
 }
 mod profile_experiment;
+mod profile_prompt;
 mod pty;
 mod pty_cast;
 mod scenario;
