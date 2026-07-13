@@ -37,7 +37,8 @@ absent until their complete state/effect/check path exists.
 ## State Views
 
 - Orient: list, search, read, and grounded journal, memory, or report write.
-- Modify: read, edit, create, and grounded journal, memory, or report write.
+- Modify: edit, create, or grounded journal, memory, or report write after a
+  current source read; repeated unchanged reads are absent.
 - Review: native checks and no model tools, including no record write.
 - Respond: no tools and final grammar only, including no record write.
 - Protocol recovery: smallest useful subset of the intended state.

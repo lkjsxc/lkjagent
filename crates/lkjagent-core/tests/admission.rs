@@ -108,7 +108,7 @@ fn state_views_and_effect_keys_are_closed() -> Result<(), String> {
     );
     assert_eq!(
         direct_tool_view_for_state("modify", None).tool_names(),
-        ["create_file", "edit_file", "read_file", "write_record"]
+        ["create_file", "edit_file", "write_record"]
     );
     for state in ["review", "respond", "wait", "idle"] {
         assert!(direct_tool_view_for_state(state, None).entries.is_empty());

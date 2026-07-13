@@ -14,7 +14,7 @@ fn direct_views_are_exact_for_every_phase() {
     );
     assert_eq!(
         names("modify", None),
-        ["create_file", "edit_file", "read_file", "write_record"]
+        ["create_file", "edit_file", "write_record"]
     );
     assert_eq!(names("recovery", Some("edit_file")), ["edit_file"]);
     for state in ["review", "respond", "wait", "idle"] {
