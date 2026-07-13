@@ -105,7 +105,7 @@ const DIRECT_CATALOG: &[ToolDescriptor] = &[
     descriptor("read_file", "read a numbered page; complete is required: true only when this read satisfies a no-change report objective, false when an edit may follow", READ_FIELDS, &["orient", "modify", "recovery"], "workspace.read", 32_768, "read-denied"),
     descriptor("edit_file", "replace one exact observed text span", EDIT_FIELDS, MODIFY, "workspace.edit", 8_192, "edit-denied"),
     descriptor("create_file", "create one observed-absent UTF-8 file", CREATE_FIELDS, MODIFY, "workspace.create", 8_192, "create-denied"),
-    descriptor("write_record", "write one bounded grounded owner-visible journal or memory record", RECORD_FIELDS, RECORD, "workspace.record", 8_192, "record-denied"),
+    descriptor("write_record", "write one bounded grounded owner-visible journal, memory, or short report", RECORD_FIELDS, RECORD, "workspace.record", 8_192, "record-denied"),
 ];
 
 #[rustfmt::skip]

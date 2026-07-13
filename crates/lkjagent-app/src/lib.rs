@@ -14,6 +14,8 @@ pub mod memory_record;
 mod model_io;
 pub mod public_loop;
 mod record_validation;
+mod report_checks;
+mod report_record;
 pub mod tui_composer;
 pub mod tui_input;
 mod tui_io;

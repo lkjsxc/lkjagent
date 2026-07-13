@@ -58,13 +58,22 @@ pub(crate) fn dispatch(
             data, db, store, matter, decision, entry, raw, title, body,
         );
     }
+    if family == "report" {
+        return crate::report_record::dispatch(
+            data, db, store, matter, decision, entry, raw, title, body,
+        );
+    }
     if family != "journal" {
         return Err("record family is not admitted".into());
     }
     crate::record_validation::authored("journal", title, body)?;
     let context = load_context(db, decision)?;
     let path = canonical_path(&context.local_date)?;
-    let sources = source_rows(db, decision)?
+    let rows = source_rows(db, decision)?;
+    if !rows.iter().any(|(kind, _)| kind == "owner") {
+        return Err("journal source lineage has no current owner context".into());
+    }
+    let sources = rows
         .into_iter()
         .map(|(_, fingerprint)| fingerprint)
         .collect::<Vec<_>>();
@@ -100,7 +109,9 @@ fn load_context(db: &Path, decision: &str) -> R<BoundDecisionContext> {
 pub(crate) fn source_rows(db: &Path, decision: &str) -> R<Vec<(String, String)>> {
     let connection = Connection::open(db).map_err(err)?;
     let mut query = connection
-        .prepare("SELECT source_kind,CAST(source_revision AS TEXT) FROM context_items WHERE decision_id=?1 ORDER BY source_kind,source_id,source_revision")
+        .prepare(
+            "SELECT source_kind,CAST(source_revision AS TEXT) FROM context_items WHERE decision_id=?1 ORDER BY rowid",
+        )
         .map_err(err)?;
     let rows = query
         .query_map([decision], |row| {
@@ -109,8 +120,10 @@ pub(crate) fn source_rows(db: &Path, decision: &str) -> R<Vec<(String, String)>>
         .map_err(err)?
         .collect::<Result<Vec<_>, _>>()
         .map_err(err)?;
-    if !rows.iter().any(|(kind, _)| kind == "owner")
-        || rows.iter().any(|(_, fp)| !lineage_value(fp))
+    if rows.is_empty()
+        || rows
+            .iter()
+            .any(|(kind, fp)| !lineage_value(kind) || !lineage_value(fp))
     {
         return Err("record source lineage is missing or unsafe".into());
     }
