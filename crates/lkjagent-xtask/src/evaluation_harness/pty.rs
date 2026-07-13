@@ -19,7 +19,11 @@ pub fn campaign(root: &Path, alias: &str, endpoint: &Path, probe: bool) -> Resul
     fs::copy(binary_source, &capture.binary).map_err(|error| error.to_string())?;
     snapshot::copy_seed(&scenario.path.join("seed"), &capture.workspace)?;
     let before = snapshot::manifest(&capture.workspace)?;
-    let env = runtime_env(&capture, &endpoint); let first = &scenario.turns[0].1;
+    let env = runtime_env(&capture, &endpoint);
+    if !probe && scenario.id == "slow-japanese-pty" {
+        return terminal_schedule(root, &source, &scenario, &capture, &before, &env);
+    }
+    let first = &scenario.turns[0].1;
     public(&capture, &env, &["send", "--new", first], Duration::from_secs(30))?;
     if probe {
         let run = public_output(&capture, &env, &["run", "--once"], Duration::from_secs(1900))?;
@@ -30,6 +34,19 @@ pub fn campaign(root: &Path, alias: &str, endpoint: &Path, probe: bool) -> Resul
     }
     run_schedule(root, &source, &scenario, &capture, &before, &env)?;
     Ok(format!("ok campaign source={source} scenario={alias} semantic_status=evaluated outcome=passed"))
+}
+#[rustfmt::skip]
+fn terminal_schedule(root: &Path, source: &str, scenario: &scenario::Scenario,
+    capture: &snapshot::Capture, before: &str, env: &BTreeMap<String,String>) -> Result<String,String> {
+    let args = [root.join("evaluation/pty-recorder.py").display().to_string(),
+        capture.raw.join("terminal.cast").display().to_string(), capture.binary.display().to_string(),
+        capture.data.display().to_string(), scenario.path.join("owner-schedule.tsv").display().to_string()];
+    let output = clock::command(Path::new("/usr/bin/python3"), &args, &capture.root, env, Duration::from_secs(930))?;
+    if output.code != Some(0) || output.timed_out { return Err("real PTY campaign capture failed".into()); }
+    let duration = output.elapsed.as_secs();
+    let (message, _, passed) = finish(root, source, scenario, capture, before, &[output], "run", duration)?;
+    if passed { Ok(format!("ok campaign source={source} scenario={} semantic_status=evaluated outcome=passed",scenario.id)) }
+    else { Err(message) }
 }
 #[rustfmt::skip]
 fn run_schedule(root: &Path, source: &str, scenario: &scenario::Scenario, capture: &snapshot::Capture,
@@ -76,7 +93,8 @@ fn build(root: &Path) -> Result<PathBuf, String> {
 #[rustfmt::skip]
 fn runtime_env(capture: &snapshot::Capture, endpoint: &BTreeMap<String,String>) -> BTreeMap<String,String> {
     let mut env = endpoint.clone(); env.insert("LKJAGENT_WORKSPACE_ROOT".into(), capture.workspace.display().to_string());
-    env.insert("HOME".into(), capture.root.display().to_string()); env
+    env.insert("HOME".into(), capture.root.display().to_string());
+    env.insert("TERM".into(), "xterm-256color".into()); env.insert("LANG".into(), "C.UTF-8".into()); env
 }
 #[rustfmt::skip]
 fn public(capture: &snapshot::Capture, env: &BTreeMap<String,String>, args: &[&str], timeout: Duration) -> Result<(), String> {
