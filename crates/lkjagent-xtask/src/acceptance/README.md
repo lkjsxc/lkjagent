@@ -13,6 +13,7 @@ Map the source-bound acceptance checker modules.
 - [markers.rs](markers.rs): evidence marker extraction.
 - [plans.rs](plans.rs): tracked plan orchestration.
 - [secret.rs](secret.rs): high-confidence secret pattern checks.
-- [source.rs](source.rs): frozen-source checks and exact primitive contracts.
+- [source.rs](source.rs): frozen-source validation and contract derivation.
+- [source-facts.rs](source_facts.rs): exact implementation and test predicates.
 - [table.rs](table.rs): bounded TSV parsing.
 - [workgraph.rs](workgraph.rs): dependency and final-ancestry validation.
