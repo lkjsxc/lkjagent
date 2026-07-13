@@ -22,10 +22,11 @@ workspace is created.
 
 `send` creates the data directory, opens the native 18-table store, allocates a
 queue sequence, and commits one owner turn, canonical owner message, intake
-event, open matter, and active `matter/opened` cell in one transaction. This
-bounded cutover may create a new matter for every successful send. It reports the
-exact matter, turn, message, and message sequence. It creates no workspace or
-scaffold files.
+event, open matter, and active `matter/opened` cell in one transaction. Without
+`--new`, an owner message resumes the oldest budget-blocked matter atomically,
+suppresses its block cell, and updates its objective. `--new` always creates a
+separate matter. Send reports exact matter, turn, message, sequence, and resume
+status. It creates no workspace or scaffold files.
 
 All ordinary prose enters this direct matter loop. Substrings such as `verify`
 or `run tests` do not invoke owner substring routing.
