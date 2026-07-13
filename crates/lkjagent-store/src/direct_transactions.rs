@@ -154,17 +154,14 @@ fn effect_retry(tx: &Transaction<'_>, e: &Effect<'_>) -> StoreResult<bool> {
     let total:i64=tx.query_row("SELECT count(*) FROM effect_targets WHERE journal_id=?1",[e.journal],|r|r.get(0))?;
     Ok(total==e.targets.len() as i64)
 }
-fn exact_targets(effect: &Effect<'_>) -> bool {
-    let Some(file) = effect.targets.first() else {
-        return false;
-    };
-    let file_ok = matches!(file.operation, "create" | "replace")
-        && file.intended.is_some()
-        && (file.operation == "create" || file.prior.is_some());
-    file_ok
-        && effect.targets.iter().skip(1).all(|target| {
-            target.operation == "mkdir" && target.prior.is_none() && target.intended.is_none()
-        })
+#[rustfmt::skip]
+fn exact_targets(effect:&Effect<'_>)->bool{
+ let Some(file)=effect.targets.first() else{return false};
+ let Ok(file_path)=std::str::from_utf8(file.path) else{return false};
+ let file_ok=matches!(file.operation,"create"|"replace")&&file.intended.is_some()&&(file.operation=="create"||file.prior.is_some());
+ let directories=effect.targets.iter().skip(1).collect::<Vec<_>>();
+ let directory_ok=directories.iter().all(|target|target.operation=="mkdir"&&target.prior.is_none()&&target.intended.is_none())&&directories.iter().all(|target|std::str::from_utf8(target.path).is_ok_and(|path|file_path.starts_with(&format!("{path}/"))))&&directories.windows(2).all(|rows|std::str::from_utf8(rows[0].path).ok().zip(std::str::from_utf8(rows[1].path).ok()).is_some_and(|(parent,child)|child.starts_with(&format!("{parent}/"))));
+ file_ok&&directory_ok
 }
 fn hex(bytes: &[u8]) -> String {
     bytes.iter().map(|byte| format!("{byte:02x}")).collect()
