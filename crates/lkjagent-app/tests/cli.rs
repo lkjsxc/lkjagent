@@ -28,6 +28,7 @@ fn blocked_matter_resumes_on_owner_send_unless_new_is_forced() -> TestResult<()>
     let sequence = store.next_event_sequence(&matter)?;
     store.block_budget(
         &matter,
+        None,
         "blocked",
         sequence,
         2,

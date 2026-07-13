@@ -36,7 +36,7 @@ fn owner_resume_starts_a_fresh_model_budget_epoch() -> TestResult {
     store.select_decision(&decision("d1","e2",2))?;compile(&mut store,"d1")?;
     store.provider_intent("p1","d1",b"request",2)?;
     assert_eq!(store.provider_exchanges_in_budget_epoch("m")?,1);
-    store.block_budget("m","blocked",3,3,"now",b"used=1 limit=1",b"block")?;
+    store.block_budget("m",None,"blocked",3,3,"now",b"used=1 limit=1",b"block")?;
     let resumed=Intake{matter:"m",objective:b"corrected",turn:"t2",queue_sequence:2,
         raw_text:b"resume",message_fingerprint:b"resume-fp",event:"e4",event_sequence:4,
         event_payload:b"resume",monotonic_ms:4,wall_time:"now",obligations:&[],cells:&[]};
@@ -67,6 +67,17 @@ fn missing_provider_usage_remains_unknown() -> TestResult {
         b"endpoint",
         b"not-parsed",
     )?;
+    assert_eq!(store.accounted_tokens_in_budget_epoch("m")?, (5, 1));
+    store.block_budget(
+        "m",
+        Some("d1"),
+        "token-block",
+        3,
+        3,
+        "now",
+        b"dimension=tokens",
+        b"token-block-fp",
+    )?;
     drop(store);
     let connection = Connection::open(db)?;
     let usage: (Option<i64>, Option<i64>) = connection.query_row(
@@ -75,5 +86,18 @@ fn missing_provider_usage_remains_unknown() -> TestResult {
         |row| Ok((row.get(0)?, row.get(1)?)),
     )?;
     assert_eq!(usage, (None, None));
+    let state: (String, String, Option<String>) = connection.query_row(
+        "SELECT m.lifecycle,d.status,d.settlement_event_id FROM matters m JOIN runtime_decisions d ON d.matter_id=m.id WHERE d.id='d1'",
+        [],
+        |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+    )?;
+    assert_eq!(
+        state,
+        (
+            "blocked".into(),
+            "failed".into(),
+            Some("token-block".into())
+        )
+    );
     Ok(())
 }

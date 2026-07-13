@@ -13,6 +13,14 @@ impl NativeStore {
         )?)
     }
 
+    pub fn accounted_tokens_in_budget_epoch(&self, matter: &str) -> StoreResult<(i64, i64)> {
+        Ok(self.connection.query_row(
+            "SELECT coalesce(sum(coalesce(p.input_tokens,(length(p.request_ref)+3)/4)+coalesce(p.output_tokens,(length(p.response_ref)+3)/4)),0),coalesce(sum(p.input_tokens IS NULL OR p.output_tokens IS NULL),0) FROM provider_exchanges p JOIN runtime_decisions d ON d.id=p.decision_id JOIN runtime_events selected ON selected.id=d.event_id WHERE d.matter_id=?1 AND selected.causal_sequence>(SELECT coalesce(max(causal_sequence),0) FROM runtime_events WHERE matter_id=?1 AND kind IN ('owner-intake','owner-resume'))",
+            [matter],
+            |row| Ok((row.get(0)?, row.get(1)?)),
+        )?)
+    }
+
     pub fn latest_blocked_matter(&self) -> StoreResult<Option<String>> {
         Ok(self
             .connection
@@ -64,6 +72,7 @@ impl NativeStore {
     pub fn block_budget(
         &mut self,
         matter: &str,
+        decision: Option<&str>,
         event: &str,
         sequence: i64,
         monotonic_ms: i64,
@@ -93,6 +102,15 @@ impl NativeStore {
                 "INSERT INTO runtime_events(id,matter_id,causal_sequence,kind,monotonic_ms,wall_time,payload,source_kind,source_id) VALUES(?1,?2,?3,'matter-blocked',?4,?5,?6,'harness',?7)",
                 params![event, matter, sequence, monotonic_ms, wall_time, payload, matter],
             )?;
+            if let Some(decision) = decision {
+                let settled = tx.execute(
+                    "UPDATE runtime_decisions SET status='failed',settlement_event_id=?1 WHERE id=?2 AND matter_id=?3 AND status IN ('selected','admitted','running')",
+                    params![event, decision, matter],
+                )?;
+                if settled != 1 {
+                    return Err(StoreError::InvalidState("budget decision conflict".into()));
+                }
+            }
             tx.execute(
                 "INSERT INTO state_cells(matter_id,namespace,cell_key,payload,status,source_event_id,fingerprint) VALUES(?1,'block','budget',?2,'active',?3,?4) ON CONFLICT(matter_id,namespace,cell_key) DO UPDATE SET payload=excluded.payload,status='active',source_event_id=excluded.source_event_id,fingerprint=excluded.fingerprint",
                 params![matter, payload, event, fingerprint],

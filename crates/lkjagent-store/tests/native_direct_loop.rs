@@ -128,8 +128,8 @@ fn restart_projection_skips_blocked_matter_for_runnable_owner_turn() -> Result<(
 #[rustfmt::skip]
 fn exhausted_budget_is_visible_idempotent_and_not_idle() -> Result<(), Box<dyn Error>> {
     let db=path("budget")?;let mut store=NativeStore::open(&db)?;store.owner_intake(&intake())?;
-    store.block_budget("m","budget-event",2,2,"now",b"used=64 limit=64",b"budget-fp")?;
-    store.block_budget("m","budget-event",2,2,"now",b"used=64 limit=64",b"budget-fp")?;
+    store.block_budget("m",None,"budget-event",2,2,"now",b"used=64 limit=64",b"budget-fp")?;
+    store.block_budget("m",None,"budget-event",2,2,"now",b"used=64 limit=64",b"budget-fp")?;
     let projection=store.restart_projection()?;
     assert_eq!(projection.matter.as_ref().map(|row|row.lifecycle.as_str()),Some("blocked"));
     assert!(projection.cells.iter().any(|row|row.namespace==b"block"&&row.key==b"budget"));Ok(())
