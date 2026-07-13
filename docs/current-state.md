@@ -119,8 +119,9 @@ visible blocked matter, and owner resume starts a fresh call-budget epoch while
 preserving history. Missing provider usage now remains SQL null rather than fake
 zero; known tokens and conservative unknown components now drive a durable
 post-response token block. A 16-effect epoch limit blocks before exact-edit
-preparation, and 16 persisted rejected outputs exhaust recovery cost. Active-time
-exhaustion remains. The
+preparation, 16 persisted rejected outputs exhaust recovery cost, and 900,000
+settled/current-cycle active milliseconds block without charging daemon downtime.
+The
 tracked schedule retained later active intake without claiming it closed.
 
 The public compiler attaches its context plan and frame fingerprints, includes
@@ -180,6 +181,7 @@ claims, and the close transaction owns the canonical final message.
 | token-budget | complete | reported or conservatively accounted epoch usage blocks before post-response admission |
 | effect-budget | complete | 16 accepted epoch journals block the next write before workspace mutation |
 | recovery-budget | complete | the sixteenth persisted epoch rejection visibly blocks the matter |
+| active-time-budget | complete | settled intervals plus current cycle block at 900,000 milliseconds |
 | workspace-root | complete | public send is workspace-free and direct work opens the separate configured root lazily |
 | public scripted file edit | complete | focused exact edit, checked read-only second matter, restart, and stale-revision tests pass |
 | configured-model file proof | complete | tracked 903-second exact-file campaign passed with edit, second-turn, and retrieval continuity |

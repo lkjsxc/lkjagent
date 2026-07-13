@@ -59,4 +59,6 @@ atomically fails the current decision and blocks before admission. A 16-effect
 budget counts accepted journals in the same epoch and blocks the next effectful
 decision before edit preparation or filesystem mutation. Each persisted rejected
 model output costs one recovery point; the sixteenth failure is retained and then
-blocks the matter. Active-time exhaustion remains to be implemented.
+blocks the matter. Settled decision intervals plus the current process-monotonic
+cycle are capped at 900,000 active milliseconds. Daemon downtime and unrelated
+matter time are not charged; clock rollback contributes zero persisted duration.

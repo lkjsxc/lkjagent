@@ -13,6 +13,14 @@ impl NativeStore {
         )?)
     }
 
+    pub fn active_milliseconds_in_budget_epoch(&self, matter: &str) -> StoreResult<i64> {
+        Ok(self.connection.query_row(
+            "SELECT coalesce(sum(CASE WHEN settled.monotonic_ms>=d.selected_monotonic_ms THEN settled.monotonic_ms-d.selected_monotonic_ms ELSE 0 END),0) FROM runtime_decisions d JOIN runtime_events selected ON selected.id=d.event_id JOIN runtime_events settled ON settled.id=d.settlement_event_id WHERE d.matter_id=?1 AND selected.causal_sequence>(SELECT coalesce(max(causal_sequence),0) FROM runtime_events WHERE matter_id=?1 AND kind IN ('owner-intake','owner-resume'))",
+            [matter],
+            |row| row.get(0),
+        )?)
+    }
+
     pub fn recovery_cost_in_budget_epoch(&self, matter: &str) -> StoreResult<i64> {
         Ok(self.connection.query_row(
             "SELECT count(*) FROM runtime_events rejected WHERE rejected.matter_id=?1 AND rejected.kind='model-output-rejected' AND rejected.causal_sequence>(SELECT coalesce(max(causal_sequence),0) FROM runtime_events WHERE matter_id=?1 AND kind IN ('owner-intake','owner-resume'))",
