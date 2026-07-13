@@ -25,16 +25,17 @@ dispatch, generated docs, and contract tests consume the same descriptor.
 - `edit_file`: exact single-match replacement against an observed revision.
 - `create_file`: create one observed-absent UTF-8 file without overwrite.
 - `write_record`: exact fields `family`, `title`, and `body`; exact
-  `family=journal` and `family=memory` are admitted. Its single persisted effect
-  key is `workspace.record`; the family does not invent a second effect key.
+  `family=journal`, `family=memory`, and bounded short `family=report` are
+  admitted. Its single persisted effect key is `workspace.record`; the family
+  does not invent a second effect key.
 
 Shell, file delete/move, whole-file overwrite, and other record families are
 absent until their complete state/effect/check path exists.
 
 ## State Views
 
-- Orient: list, search, read, and grounded journal or memory write.
-- Modify: read, edit, create, and grounded journal or memory write.
+- Orient: list, search, read, and grounded journal, memory, or report write.
+- Modify: read, edit, create, and grounded journal, memory, or report write.
 - Review: native checks and no model tools, including no record write.
 - Respond: no tools and final grammar only, including no record write.
 - Protocol recovery: smallest useful subset of the intended state.

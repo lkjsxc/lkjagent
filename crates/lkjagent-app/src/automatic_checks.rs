@@ -121,7 +121,7 @@ fn obligations(
     path: &str,
 ) -> StoreResult<Vec<(String, String, Vec<u8>)>> {
     let mut query = tx.prepare("SELECT id,predicate_kind,predicate_payload FROM obligations
-        WHERE matter_id=?1 AND required=1 AND predicate_kind IN ('workspace-byte','workspace-content','workspace-collateral','managed-journal','managed-memory') AND (json_extract(CAST(predicate_payload AS TEXT),'$.path')=?2 OR (predicate_kind='workspace-collateral' AND EXISTS(SELECT 1 FROM json_each(CAST(predicate_payload AS TEXT),'$.allowed_paths') WHERE value=?2))) ORDER BY id")?;
+        WHERE matter_id=?1 AND required=1 AND predicate_kind IN ('workspace-byte','workspace-content','workspace-collateral','managed-journal','managed-memory','managed-report') AND (json_extract(CAST(predicate_payload AS TEXT),'$.path')=?2 OR (predicate_kind='workspace-collateral' AND EXISTS(SELECT 1 FROM json_each(CAST(predicate_payload AS TEXT),'$.allowed_paths') WHERE value=?2))) ORDER BY id")?;
     let rows = query.query_map(params![matter, path], |row| {
         Ok((row.get(0)?, row.get(1)?, row.get(2)?))
     })?;
@@ -134,18 +134,17 @@ fn query_bytes(
     value: &str,
 ) -> StoreResult<Vec<Vec<u8>>> {
     let mut query = tx.prepare(sql)?;
-    let rows = query.query_map([value], |row| row.get(0))?;
-    Ok(rows.collect::<Result<Vec<_>, _>>()?)
+    let rows = query
+        .query_map([value], |row| row.get(0))?
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok(rows)
 }
 
 #[rustfmt::skip]
-fn pending(tx: &rusqlite::Transaction<'_>, rows: Vec<(String, String, Vec<u8>)>, source: &[u8])
-    -> StoreResult<Vec<(String, String, Vec<u8>)>> {
-    let mut pending = Vec::new();
-    for row in rows {
+fn pending(tx: &rusqlite::Transaction<'_>, rows: Vec<(String, String, Vec<u8>)>, source: &[u8]) -> StoreResult<Vec<(String, String, Vec<u8>)>> {
+    let mut pending = Vec::new(); for row in rows {
         if !already_current(tx, &row.0, source, &row.1)? { pending.push(row); }
-    }
-    Ok(pending)
+    } Ok(pending)
 }
 
 fn already_current(
@@ -176,14 +175,13 @@ fn evaluate(kind: &str, parameters: &[u8], fact: &EffectFact, bytes: &[u8], mode
                 allowed.iter().any(|item| item.as_str() == Some(path)))),
         "managed-journal" => crate::journal_checks::evaluate(parameters, &fact.path, bytes),
         "managed-memory" => crate::memory_checks::evaluate(parameters, &fact.path, bytes),
+        "managed-report" => crate::report_checks::evaluate(parameters, &fact.path, bytes),
         _ => false,
     }
 }
 
 #[rustfmt::skip]
-fn count(text: &str, needle: &str) -> usize {
-    if needle.is_empty() { 0 } else { text.match_indices(needle).count() }
-}
+fn count(text: &str, needle: &str) -> usize { if needle.is_empty() { 0 } else { text.match_indices(needle).count() } }
 fn identity(prefix: &str, seed: &str, source: &[u8]) -> String {
     let digest = Sha256::digest([seed.as_bytes(), source].concat());
     format!("{prefix}-{}", &hex(&digest)[..24])

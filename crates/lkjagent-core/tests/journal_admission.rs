@@ -20,7 +20,7 @@ fn record_descriptor_and_admission_are_exact() -> Result<(), String> {
     assert_eq!(entry.required_params, ["family", "title", "body"]);
     assert_eq!(entry.optional_params, Vec::<String>::new());
     assert_eq!(entry.effect_key.0, "workspace.record");
-    for family in ["journal", "memory"] {
+    for family in ["journal", "memory", "report"] {
         let admitted = admit_action(&decision, &action(family)).map_err(|error| error.message)?;
         assert_eq!(admitted.status, AdmissionStatus::Admitted);
     }

@@ -21,13 +21,15 @@ pub(crate) fn authored(family: &str, title: &str, body: &str) -> R<()> {
     {
         return Err(format!("{family} contains a known placeholder"));
     }
-    if family == "memory" && unsafe_memory_text(title, body) {
-        return Err("memory contains prohibited sensitive or raw output content".into());
+    if unsafe_record_text(title, body) {
+        return Err(format!(
+            "{family} contains prohibited sensitive or raw output content"
+        ));
     }
     Ok(())
 }
 
-fn unsafe_memory_text(title: &str, body: &str) -> bool {
+fn unsafe_record_text(title: &str, body: &str) -> bool {
     let text = format!("{title}\n{body}").to_ascii_lowercase();
     let sensitive = [
         "password:",

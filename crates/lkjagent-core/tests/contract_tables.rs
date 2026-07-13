@@ -141,7 +141,8 @@ fn contract_tables_decision_context_check_recovery_and_exit_are_exact() {
             "allowed-changed-paths",
             "effects-settled",
             "managed-journal",
-            "managed-memory"
+            "managed-memory",
+            "managed-report"
         ]
     );
     assert_eq!(

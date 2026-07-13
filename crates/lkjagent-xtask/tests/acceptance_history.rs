@@ -101,6 +101,7 @@ fn source_contracts_require_exact_implementation_and_tests() -> Result<(), Box<d
         "W04",
         "W05-deterministic",
         "W06-deterministic",
+        "W08-deterministic",
         "X03",
         "X04",
     ];
