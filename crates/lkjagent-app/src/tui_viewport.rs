@@ -48,12 +48,21 @@ pub fn scroll(viewport: &mut Viewport, rows: &[ViewRow], height: usize, delta: i
     }
 }
 
+pub fn at_loaded_top(viewport: &Viewport, rows: &[ViewRow], height: usize) -> bool {
+    !matches!(viewport, Viewport::Follow) && !rows.is_empty() && start(viewport, rows, height) == 0
+}
+
 pub fn reconcile(viewport: &mut Viewport, rows: &[ViewRow], height: usize) {
-    let Viewport::Manual(_) = viewport else {
+    let Viewport::Manual(current_anchor) = viewport else {
         return;
     };
     if rows.is_empty() {
         *viewport = Viewport::Follow;
+        return;
+    }
+    if rows.iter().any(|row| {
+        row.message_id == current_anchor.message_id && row.wrapped_row == current_anchor.wrapped_row
+    }) {
         return;
     }
     let index = start(viewport, rows, height.max(1));

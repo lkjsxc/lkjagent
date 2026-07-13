@@ -24,7 +24,7 @@ a corrected TUI build on that same loop only after ordinary editing works.
 cargo run --locked -p lkjagent-app -- send --new "OWNER TEXT"
 cargo run --locked -p lkjagent-app -- run
 cargo run --locked -p lkjagent-app -- status
-cargo run --locked -p lkjagent-app -- workbench
+cargo run --locked -p lkjagent-app -- tui
 docker compose run --rm verify
 ```
 

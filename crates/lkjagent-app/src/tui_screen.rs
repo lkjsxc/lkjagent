@@ -37,6 +37,19 @@ pub struct ScreenModel {
 
 impl ScreenModel {
     pub fn project(snapshot: &TuiSnapshot, pending: Option<&PendingSubmission>) -> Self {
+        let mut screen = Self {
+            activity: ActivityPanel {
+                expanded: false,
+                items: Vec::new(),
+            },
+            ..Self::default()
+        };
+        screen.merge(snapshot, pending);
+        screen
+    }
+
+    pub fn merge(&mut self, snapshot: &TuiSnapshot, pending: Option<&PendingSubmission>) {
+        let expanded = self.activity.expanded;
         let mut conversation = snapshot
             .conversation
             .iter()
@@ -49,9 +62,26 @@ impl ScreenModel {
                 durable: true,
             })
             .collect::<Vec<_>>();
+        for item in conversation.drain(..) {
+            if let Some(old) = self.conversation.iter_mut().find(|old| old.id == item.id) {
+                *old = item;
+            } else {
+                self.conversation.push(item);
+            }
+        }
+        self.conversation.sort_by(|left, right| {
+            left.sequence
+                .unwrap_or(i64::MAX)
+                .cmp(&right.sequence.unwrap_or(i64::MAX))
+                .then_with(|| left.id.cmp(&right.id))
+        });
         if let Some(draft) = pending {
-            if !conversation.iter().any(|item| item.id == draft.message_id) {
-                conversation.push(ConversationItem {
+            if !self
+                .conversation
+                .iter()
+                .any(|item| item.id == draft.message_id)
+            {
+                self.conversation.push(ConversationItem {
                     id: draft.message_id.clone(),
                     sequence: None,
                     role: "owner".to_string(),
@@ -61,25 +91,11 @@ impl ScreenModel {
                 });
             }
         }
-        let activity = snapshot
-            .activity
-            .iter()
-            .map(|row| ActivityItem {
-                id: row.id.clone(),
-                kind: row.kind.clone(),
-                matter_id: row.matter_id.clone(),
-                status: row.status.clone(),
-                monotonic_ms: row.monotonic_ms,
-            })
-            .collect();
-        Self {
-            conversation,
-            activity: ActivityPanel {
-                expanded: false,
-                items: activity,
-            },
-            status: snapshot.status.clone(),
-        }
+        self.activity = ActivityPanel {
+            expanded,
+            items: snapshot.activity.iter().map(activity_item).collect(),
+        };
+        self.status = snapshot.status.clone();
     }
 
     pub fn rows(&self, width: usize, search: &str) -> Vec<ViewRow> {
@@ -100,6 +116,16 @@ impl ScreenModel {
                     .collect::<Vec<_>>()
             })
             .collect()
+    }
+}
+
+fn activity_item(row: &lkjagent_store::tui_snapshot::ActivityRow) -> ActivityItem {
+    ActivityItem {
+        id: row.id.clone(),
+        kind: row.kind.clone(),
+        matter_id: row.matter_id.clone(),
+        status: row.status.clone(),
+        monotonic_ms: row.monotonic_ms,
     }
 }
 

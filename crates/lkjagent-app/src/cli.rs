@@ -12,6 +12,10 @@ where
             crate::public_loop::send(&invocation.data_dir, &text, force_new)
         }
         Command::Status => crate::public_loop::status(&invocation.data_dir),
+        Command::Tui => {
+            crate::tui_terminal::run(&invocation.data_dir)?;
+            Ok(String::new())
+        }
         Command::Doctor { json } => crate::public_loop::doctor(&invocation.data_dir, json),
         Command::Run { once: true } => {
             let mut endpoint = crate::endpoint::LlmEndpoint::new(&invocation.data_dir);
@@ -32,6 +36,7 @@ pub fn help() -> String {
         "  send [--new] TEXT",
         "  run [--once]",
         "  status",
+        "  tui",
         "  doctor [--json]",
     ]
     .join("\n")

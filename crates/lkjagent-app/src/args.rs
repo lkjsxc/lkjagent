@@ -12,6 +12,7 @@ pub enum Command {
     Run { once: bool },
     Send { text: String, force_new: bool },
     Status,
+    Tui,
     Doctor { json: bool },
 }
 
@@ -48,6 +49,7 @@ fn parse_command(command: &str, rest: Vec<String>) -> Result<Command, String> {
         "run" => parse_run(rest),
         "send" => parse_send(rest),
         "status" => no_args(rest, Command::Status),
+        "tui" => no_args(rest, Command::Tui),
         "doctor" => parse_doctor(rest),
         other => Err(format!("unknown command: {other}")),
     }

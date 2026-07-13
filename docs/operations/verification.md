@@ -15,6 +15,7 @@ cargo test --locked -p lkjagent-effects workspace_safety
 cargo test --locked -p lkjagent-store durable_boundaries
 cargo test --locked -p lkjagent-app product_flows
 cargo test --locked -p lkjagent-app --test tui_contract
+cargo test --locked -p lkjagent-app --test tui_native --test tui_responsive --test tui_terminal_guard --test tui_pty
 cargo test --locked -p lkjagent-xtask acceptance_negative
 ```
 
@@ -45,6 +46,12 @@ Final proof runs from a clean locked export with no source bind mount and record
 source, image, and binary hashes. The Docker build export has no VCS metadata, so
 baseline semantic/hash validation runs there while tracked-file and reachable-
 history checks remain mandatory host gates.
+
+## Native TUI
+
+Tests use real SQLite intake and frame projection, a test-only blocking endpoint
+to prove input independence, and a native binary Unix PTY cleanup smoke. They are
+not a configured endpoint or final PTY campaign.
 
 ## Semantic Gates
 

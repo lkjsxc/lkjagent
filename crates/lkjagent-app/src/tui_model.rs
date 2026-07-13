@@ -31,9 +31,20 @@ pub enum ComposerEvent {
     MoveRight,
     Home,
     End,
-    Submit { message_id: String },
-    SubmitSucceeded { message_id: String },
-    SubmitFailed { message_id: String, error: String },
+    Submit {
+        message_id: String,
+    },
+    SubmitCommitted {
+        request_id: String,
+        message_id: String,
+    },
+    SubmitSucceeded {
+        message_id: String,
+    },
+    SubmitFailed {
+        message_id: String,
+        error: String,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -47,6 +58,7 @@ pub enum TuiEvent {
     Snapshot(TuiSnapshot),
     Resize { width: usize, height: usize },
     Search(String),
+    SearchMode(bool),
     Scroll(isize),
     ActivityExpanded(bool),
 }
@@ -57,6 +69,7 @@ pub struct TuiModel {
     pub screen: ScreenModel,
     pub viewport: Viewport,
     pub search: String,
+    pub search_active: bool,
     pub width: usize,
     pub height: usize,
 }
@@ -68,8 +81,10 @@ impl TuiModel {
             screen: ScreenModel::default(),
             viewport: Viewport::default(),
             search: String::new(),
-            width: width.max(1),
-            height: height.max(1),
+            search_active: false,
+            width,
+
+            height,
         }
     }
 }
