@@ -120,6 +120,7 @@ fn native_key_mapping_covers_edit_submit_scroll_and_quit() {
         Event::Key(KeyEvent::new(KeyCode::End, KeyModifiers::NONE)),
     );
     assert_eq!(model.composer.text, "かな");
+    assert!(lkjagent_app::tui_render::render(&model).contains("かな│"));
     let enter = tui_input::map(
         Event::Key(KeyEvent::new(KeyCode::Enter, KeyModifiers::NONE)),
         &model,
