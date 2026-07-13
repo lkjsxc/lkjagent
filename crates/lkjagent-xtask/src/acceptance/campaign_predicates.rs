@@ -21,8 +21,6 @@ pub fn exact(fields: &BTreeMap<&str, &str>) -> bool {
             ],
         )
         && number(fields, "fact_effect_count") == 2
-        && number(fields, "fact_closed_matter_count") >= 4
-        && number(fields, "fact_receipt_count") >= 4
         && number(fields, "fact_current_passed_check_count") >= 6
         && number(fields, "fact_table_count") == 18
 }

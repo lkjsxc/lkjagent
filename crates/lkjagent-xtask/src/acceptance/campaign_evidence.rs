@@ -11,7 +11,7 @@ pub fn derivations(root: &Path, path: &Path, bytes: &[u8], source: &str) -> BTre
         return BTreeSet::new();
     };
     let mut out = match scenario {
-        "exact-file-edit" if exact(&fields) => ids(&["F01", "F02", "F05", "F07", "F08", "W02"]),
+        "exact-file-edit" if exact(&fields) => ids(&["F01", "F02", "F07", "W02"]),
         "daily-life-recall" if daily(&fields) => ids(&["C04", "W05", "W06"]),
         "multi-project-development" if projects(&fields) => ids(&["C05"]),
         "long-artifact-recovery" if artifact(&fields) => ids(&["R09", "R11", "W08", "X02"]),

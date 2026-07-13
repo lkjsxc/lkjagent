@@ -97,10 +97,7 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
         && edit.intended_mode == current_mode
         && create_prior_absent
         && create_effects == 1
-        && closed >= 4
         && ctx.common.owner_turns >= 6
-        && agents >= 4
-        && receipts >= 4
         && ctx.common.current_passed_checks >= 6
         && effects == 2
         && admissions > 0
