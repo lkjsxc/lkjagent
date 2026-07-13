@@ -12,7 +12,10 @@ fingerprint, and information needs it can satisfy.
 
 A file observation key includes path, revision, and line range. It is never only
 `observation/read_file`, so repeated current reads do not become false conflicts.
-Every source included by the compiled plan persists as a decision-bound native
+A read observation contains only requested numbered lines, whole-file revision,
+line counts, continuation, truncation, and final-newline facts. Unrequested file
+bytes never enter the observation or later context. Every source included by the
+compiled plan persists as a decision-bound native
 context item before provider intent; omitted candidates do not gain rows. The
 latest four active canonical messages from earlier matters are bounded history
 candidates and never replace the current owner objective.
