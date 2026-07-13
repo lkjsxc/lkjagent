@@ -57,7 +57,6 @@ fn bound<'a>(
     if !source_ok
         || fields.get("mode") != Some(&"run")
         || fields.get("semantic_status") != Some(&"evaluated")
-        || fields.get("outcome") != Some(&"passed")
         || fields.get("scenario_sha256") != Some(&scenario_fingerprint.as_str())
         || fields.get("binary_sha256") != Some(&expected_binary.as_str())
         || !hash(fields.get("command_capture_sha256")?)

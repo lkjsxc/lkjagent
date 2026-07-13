@@ -15,9 +15,21 @@ fn daily_campaign_derives_only_from_source_bound_measured_rows() -> Result<(), S
     let path = directory.join("campaign-daily-life-recall-run.tsv");
     let valid = daily(&root, &source)?;
     manifest(&root, &directory, &source, 'a')?;
+    let expected = ids(&["C04", "E12", "W05", "W06"]);
     assert_eq!(
         derive_campaign_attachment(&root, &path, valid.as_bytes(), &source),
-        ids(&["C04", "E12", "W05", "W06"])
+        expected
+    );
+    assert_eq!(
+        derive_campaign_attachment(
+            &root,
+            &path,
+            valid
+                .replace("outcome\tpassed", "outcome\tfailed")
+                .as_bytes(),
+            &source,
+        ),
+        expected
     );
     for invalid in [
         valid.replace("mode\trun", "mode\tprobe"),
