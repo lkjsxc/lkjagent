@@ -13,6 +13,14 @@ impl NativeStore {
         )?)
     }
 
+    pub fn recovery_cost_in_budget_epoch(&self, matter: &str) -> StoreResult<i64> {
+        Ok(self.connection.query_row(
+            "SELECT count(*) FROM runtime_events rejected WHERE rejected.matter_id=?1 AND rejected.kind='model-output-rejected' AND rejected.causal_sequence>(SELECT coalesce(max(causal_sequence),0) FROM runtime_events WHERE matter_id=?1 AND kind IN ('owner-intake','owner-resume'))",
+            [matter],
+            |row| row.get(0),
+        )?)
+    }
+
     pub fn effects_in_budget_epoch(&self, matter: &str) -> StoreResult<i64> {
         Ok(self.connection.query_row(
             "SELECT count(*) FROM effect_journal j JOIN runtime_decisions d ON d.id=j.decision_id JOIN runtime_events selected ON selected.id=d.event_id WHERE d.matter_id=?1 AND selected.causal_sequence>(SELECT coalesce(max(causal_sequence),0) FROM runtime_events WHERE matter_id=?1 AND kind IN ('owner-intake','owner-resume'))",

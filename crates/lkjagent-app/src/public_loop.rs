@@ -34,6 +34,7 @@ type R<T> = Result<T, String>;
 const MODEL_CALL_LIMIT: i64 = 64;
 const TOKEN_BUDGET_LIMIT: i64 = 1_048_576;
 const EFFECT_BUDGET_LIMIT: i64 = 16;
+const RECOVERY_COST_LIMIT: i64 = 16;
 
 #[rustfmt::skip]
 pub fn send(data:&Path,text:&str,force_new:bool)->R<String>{
@@ -59,6 +60,7 @@ pub fn run_once(data:&Path,endpoint:&mut dyn Endpoint)->R<String>{
  if m.lifecycle=="blocked"{return Err(format!("blocked: matter {} requires owner or config change",m.id))}
  let calls=store.provider_exchanges_in_budget_epoch(&m.id).map_err(e)?;if calls>=MODEL_CALL_LIMIT{return exhaust(&mut store,&m.id,None,"model-calls",calls,MODEL_CALL_LIMIT,0)}
  let (tokens,unknown)=store.accounted_tokens_in_budget_epoch(&m.id).map_err(e)?;if tokens>=TOKEN_BUDGET_LIMIT{return exhaust(&mut store,&m.id,None,"tokens",tokens,TOKEN_BUDGET_LIMIT,unknown)}
+ let recovery=store.recovery_cost_in_budget_epoch(&m.id).map_err(e)?;if recovery>=RECOVERY_COST_LIMIT{return exhaust(&mut store,&m.id,None,"recovery-cost",recovery,RECOVERY_COST_LIMIT,0)}
  if !p.effects.is_empty(){return Err(format!("blocked: unfinished effect {}:{}",p.effects[0].id,p.effects[0].status))}
  if !p.decisions.is_empty(){return Err(format!("blocked: unfinished decision {}:{}",p.decisions[0].id,p.decisions[0].status))}
  let snap=hydrate(&m.id,&p.cells)?; let now=crate::clock::utc_now(); let spec=match select(RuntimeState::from_snapshot(snap.clone()),RuntimePolicy::default(),CurrentTime(now.clone())){Selection::Decision(v)=>v,Selection::Idle=>return Ok("idle: no eligible decision".into()),other=>return Ok(format!("blocked: {other:?}"))};
@@ -116,7 +118,7 @@ fn modify(db:&Path,store:&mut NativeStore,ws:&OpenedWorkspace,matter:&str,did:&s
 #[rustfmt::skip]
 fn close(store:&mut NativeStore,matter:&str,did:&str,body:&str)->R<String>{let seq=store.next_event_sequence(matter).map_err(e)?;let event=id("close",did.as_bytes());let fp=sha(body.as_bytes());let msg=store.close_matter(&FinalClose{matter,decision:did,body:body.as_bytes(),body_fingerprint:&fp,event:&event,event_sequence:seq,monotonic_ms:millis(),wall_time:&crate::clock::utc_now(),payload:b"harness checked close"}).map_err(e)?;Ok(format!("closed: matter={matter} decision={did} message={} sequence={}",msg.id,msg.sequence))}
 #[rustfmt::skip]
-fn fault(store:&mut NativeStore,did:&str,matter:&str,kind:ModelFaultKind,text:&str)->R<String>{let seq=store.next_event_sequence(matter).map_err(e)?;let event=id("fault",format!("{did}:{text}").as_bytes());let fp=sha(text.as_bytes());store.reject_model_output(&ModelFault{decision:did,matter,event:&event,event_sequence:seq,monotonic_ms:millis(),wall_time:&crate::clock::utc_now(),event_payload:text.as_bytes(),fault_kind:kind,recovery_ref:bounded(text.as_bytes(),1024),fingerprint:&fp}).map_err(e)?;Ok(format!("fault: decision={did} event={event}"))}
+fn fault(store:&mut NativeStore,did:&str,matter:&str,kind:ModelFaultKind,text:&str)->R<String>{let seq=store.next_event_sequence(matter).map_err(e)?;let event=id("fault",format!("{did}:{text}").as_bytes());let fp=sha(text.as_bytes());store.reject_model_output(&ModelFault{decision:did,matter,event:&event,event_sequence:seq,monotonic_ms:millis(),wall_time:&crate::clock::utc_now(),event_payload:text.as_bytes(),fault_kind:kind,recovery_ref:bounded(text.as_bytes(),1024),fingerprint:&fp}).map_err(e)?;let used=store.recovery_cost_in_budget_epoch(matter).map_err(e)?;if used>=RECOVERY_COST_LIMIT{return exhaust(store,matter,None,"recovery-cost",used,RECOVERY_COST_LIMIT,0)}Ok(format!("fault: decision={did} event={event}"))}
 
 #[rustfmt::skip]
 fn hydrate(matter:&str,cells:&[lkjagent_store::direct_transactions::CellRow])->R<RuntimeSnapshot>{let mut out=RuntimeSnapshot::empty(matter);for row in cells{let ns=String::from_utf8(row.namespace.clone()).map_err(e)?;let name=String::from_utf8(row.key.clone()).map_err(e)?;let key=StateKey::new(&ns,&name).map_err(e)?;out.cells.insert(key.clone(),StateCell{key,status:StateStatus::Active,priority:0,confidence:100,payload_schema:format!("state.{ns}.v1"),payload_json:String::from_utf8(row.payload.clone()).map_err(e)?,evidence_refs:vec![],source_event_id:"event-1".into(),created_at:String::new(),updated_at:String::new(),expires_at:None,cooldown_until:None,conflict_group:None,parent_key:None});}Ok(out)}

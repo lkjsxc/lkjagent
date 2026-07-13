@@ -57,5 +57,6 @@ epoch. Missing components remain null in provider rows and receive a conservativ
 one-unit-per-four-reference-bytes accounting charge. A post-response exhaustion
 atomically fails the current decision and blocks before admission. A 16-effect
 budget counts accepted journals in the same epoch and blocks the next effectful
-decision before edit preparation or filesystem mutation. Separate recovery-cost
-and active-time exhaustion paths remain to be implemented.
+decision before edit preparation or filesystem mutation. Each persisted rejected
+model output costs one recovery point; the sixteenth failure is retained and then
+blocks the matter. Active-time exhaustion remains to be implemented.
