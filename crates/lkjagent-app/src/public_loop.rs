@@ -33,6 +33,7 @@ use std::{
 type R<T> = Result<T, String>;
 const MODEL_CALL_LIMIT: i64 = 64;
 const TOKEN_BUDGET_LIMIT: i64 = 1_048_576;
+const EFFECT_BUDGET_LIMIT: i64 = 16;
 
 #[rustfmt::skip]
 pub fn send(data:&Path,text:&str,force_new:bool)->R<String>{
@@ -103,6 +104,7 @@ fn direct(store:&mut NativeStore,matter:&str,did:&str,raw:&str,entry:&lkjagent_c
 #[allow(clippy::too_many_arguments)]
 #[rustfmt::skip]
 fn modify(db:&Path,store:&mut NativeStore,ws:&OpenedWorkspace,matter:&str,did:&str,entry:&lkjagent_core::runtime_decision::ToolViewEntry,path:&str,old:&str,new:&str,raw:&str)->R<String>{
+ let effects=store.effects_in_budget_epoch(matter).map_err(e)?;if effects>=EFFECT_BUDGET_LIMIT{return exhaust(store,matter,Some(did),"effects",effects,EFFECT_BUDGET_LIMIT,0)}
  let revision=if entry.effect_key.0=="workspace.create"{Revision::Absent}else{Revision::Sha256(source_revision(store,path)?)}; let edit=match ws.prepare_exact_edit(path.into(),revision,old,new,0o644){Ok(v)=>v,Err(x)=>return fault(store,did,matter,ModelFaultKind::Stale,&format!("{x:?}"))};
  let intended=sha(&edit.intended_bytes); let prior=edit.prior_bytes.as_deref().map(sha); let admission=id("admission",did.as_bytes()); let journal=id("journal",did.as_bytes()); let target=Target{path:path.as_bytes(),prior:edit.prior_bytes.as_deref(),intended:Some(&edit.intended_bytes),operation:if edit.prior_bytes.is_some(){"replace"}else{"create"},prior_mode:edit.expected_mode.map(i64::from),intended_mode:Some(i64::from(edit.intended_mode)),stage_identity:edit.stage_identity.as_bytes()}; let spec=serde_json::to_vec(entry).map_err(e)?;
  store.prepare_exact_effect(&Effect{admission:&admission,journal:&journal,decision:did,action_ordinal:0,action_fingerprint:&sha(raw.as_bytes()),reason:entry.effect_key.0.as_bytes(),parsed_call:raw.as_bytes(),tool_spec:&spec,idempotency:journal.as_bytes(),intended_fingerprint:&intended,prior_fingerprint:prior.as_deref(),targets:&[target]}).map_err(e)?;
