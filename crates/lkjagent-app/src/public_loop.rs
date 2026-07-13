@@ -35,10 +35,8 @@ const MODEL_CALL_LIMIT: i64 = 64;
 
 #[rustfmt::skip]
 pub fn send(data:&Path,text:&str,force_new:bool)->R<String>{
- fs::create_dir_all(data).map_err(e)?; let db=data.join("lkjagent.sqlite3"); let mut s=NativeStore::open(&db).map_err(e)?; let q=s.next_queue_sequence().map_err(e)?;
- let seed=format!("{q}:{text}"); let matter=id("matter",seed.as_bytes()); let turn=id("turn",seed.as_bytes()); let event=id("intake",turn.as_bytes()); let payload=json!({"kind":"matter/opened","objective":text}).to_string(); let fp=sha(text.as_bytes()); let cfp=sha(payload.as_bytes());
- let cell=Cell(b"matter",b"opened",payload.as_bytes(),&cfp); let msg=s.owner_intake(&Intake{matter:&matter,objective:text.as_bytes(),turn:&turn,queue_sequence:q,raw_text:text.as_bytes(),message_fingerprint:&fp,event:&event,event_sequence:1,event_payload:payload.as_bytes(),monotonic_ms:millis(),wall_time:&crate::clock::utc_now(),obligations:&[],cells:&[cell]}).map_err(e)?;
- Ok(format!("send: matter={matter} turn={turn} message={} sequence={} new={force_new}",msg.id,msg.sequence)) }
+ fs::create_dir_all(data).map_err(e)?;let db=data.join("lkjagent.sqlite3");let mut s=NativeStore::open(&db).map_err(e)?;let q=s.next_queue_sequence().map_err(e)?;let seed=format!("{q}:{text}");let blocked=if force_new{None}else{s.latest_blocked_matter().map_err(e)?};let resumed=blocked.is_some();let matter=blocked.unwrap_or_else(||id("matter",seed.as_bytes()));let turn=id("turn",seed.as_bytes());let event=id(if resumed{"resume"}else{"intake"},turn.as_bytes());let payload=json!({"kind":if resumed{"matter/resumed"}else{"matter/opened"},"objective":text}).to_string();let fp=sha(text.as_bytes());let cfp=sha(payload.as_bytes());let cell=Cell(b"matter",b"opened",payload.as_bytes(),&cfp);let sequence=if resumed{s.next_event_sequence(&matter).map_err(e)?}else{1};let value=Intake{matter:&matter,objective:text.as_bytes(),turn:&turn,queue_sequence:q,raw_text:text.as_bytes(),message_fingerprint:&fp,event:&event,event_sequence:sequence,event_payload:payload.as_bytes(),monotonic_ms:millis(),wall_time:&crate::clock::utc_now(),obligations:&[],cells:&[cell]};let msg=if resumed{s.resume_blocked(&value)}else{s.owner_intake(&value)}.map_err(e)?;
+ Ok(format!("send: matter={matter} turn={turn} message={} sequence={} new={} resumed={resumed}",msg.id,msg.sequence,force_new||!resumed)) }
 
 pub fn run(data: &Path, endpoint: &mut dyn Endpoint) -> R<()> {
     loop {

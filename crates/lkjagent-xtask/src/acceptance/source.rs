@@ -60,9 +60,10 @@ const FACTS: &[Fact] = &[
     fact("P07", "crates/lkjagent-llm/tests/wire_contract.rs", &["response_anomalies_remain_distinct", "ProviderAnomalyKind::ToolCallOnlyResponse"]),
     fact("X03", "crates/lkjagent-llm/src/error.rs", &["ResponseTooLarge", "Timeout", "Connect"]),
     fact("X03", "crates/lkjagent-llm/tests/wire_contract.rs", &["timeout_connect_and_status_are_distinct", "length_is_not_repaired_and_ambiguous_send_is_not_retried"]),
-    fact("X04", "crates/lkjagent-store/src/matter_control.rs", &["pub fn block_budget(", "'matter-blocked'", "'block','budget'", "lifecycle='blocked'"]),
+    fact("X04", "crates/lkjagent-store/src/matter_control.rs", &["pub fn block_budget(", "'matter-blocked'", "'block','budget'", "lifecycle='blocked'", "pub fn resume_blocked(", "'owner-resume'"]),
     fact("X04", "crates/lkjagent-app/src/public_loop.rs", &["MODEL_CALL_LIMIT", "exhausted model-call budget"]),
     fact("X04", "crates/lkjagent-store/tests/native_direct_loop.rs", &["exhausted_budget_is_visible_idempotent_and_not_idle", "Some(\"blocked\")"]),
+    fact("X04", "crates/lkjagent-app/tests/cli.rs", &["blocked_matter_resumes_on_owner_send_unless_new_is_forced", "resumed=true"]),
 ];
 
 const fn fact(id: &'static str, path: &'static str, needles: &'static [&'static str]) -> Fact {

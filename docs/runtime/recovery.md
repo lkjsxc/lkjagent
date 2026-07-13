@@ -47,5 +47,7 @@ Unclassified states block without overwrite.
 The current direct loop enforces a 64-call matter model budget. Exhaustion
 atomically stores a `matter-blocked` event, active `block/budget` cell with used
 and limit values, and blocked lifecycle. It is visible rather than idle, and an
-unrelated runnable matter remains eligible. Separate effect, recovery-cost,
+unrelated runnable matter remains eligible. The next owner `send` without
+`--new` atomically suppresses that block, records an owner-resume event and
+message, replaces the objective, and reopens the matter. Separate effect, recovery-cost,
 active-time, and token exhaustion paths remain to be implemented.
