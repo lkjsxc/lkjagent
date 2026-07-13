@@ -1,4 +1,6 @@
 scenario_key	expected_terminal
-daily-journal	completed
-mixed-record-update	completed
-older-fact-recall	completed
+grounded-journal	completed
+memory-write	completed
+memory-recall	completed
+memory-correction	completed
+corrected-recall	completed

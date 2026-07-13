@@ -59,6 +59,7 @@ def main() -> int:
                 send(master, "\x1bOQ", frames, started)
                 activity_sent = True
             if elapsed >= 650.0 and not restarted:
+                write_restart_marker(data / "lkjagent.sqlite3", cast.parent / "restart.marker")
                 stop(process, master, frames, started)
                 process, master = spawn(binary, data, frames, started)
                 restarted = True
@@ -146,6 +147,17 @@ def provider_status(database: Path) -> tuple[str, int] | None:
         return row[0], duration
     except sqlite3.Error:
         return None
+
+
+def write_restart_marker(database: Path, marker: Path) -> None:
+    connection = sqlite3.connect(f"file:{database}?mode=ro", uri=True, timeout=1.0)
+    rows = connection.execute(
+        "SELECT id FROM conversation_messages ORDER BY sequence"
+    ).fetchall()
+    connection.close()
+    if not rows:
+        raise RuntimeError("restart marker has no durable messages")
+    marker.write_text("".join(f"message\t{row[0]}\n" for row in rows), encoding="utf-8")
 
 
 def stop(process, master: int, frames: list, started: float) -> None:

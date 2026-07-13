@@ -35,13 +35,11 @@ required durable lineage.
 
 ## Daily Scenarios
 
-Journal verifies configured `YYYY/MM/DD`, grounded model-authored body, no copied
-command/canned filler/invented fact, token cap, revision, check, and receipt.
-Record scenarios add TODO, calendar, finance, note, and project paths one family
-at a time.
-
-Recall records a sourced fact in one run, uses it once in a fresh matter, then
-proves a newer owner correction wins.
+Journal verifies configured `YYYY/MM/DD`, grounded model-authored body, no
+canned filler or invented fact, token cap, revision, lineage, check, and receipt.
+The tracked recall schedule writes one managed transit-card memory, uses it once
+in a fresh matter, replaces it from an explicit owner correction, then requires
+the corrected current revision once while recent noise and rogue files stay out.
 
 ## Report And Activity Scenarios
 

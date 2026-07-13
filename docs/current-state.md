@@ -122,9 +122,9 @@ unsupported command or test claims. Close and receipt remain check-derived.
 The native `conversation_messages` table is canonical for public turns. Typed
 TUI intake uses the exact returned durable message identity, and failed intake
 keeps composer bytes; activity is bounded. A native PTY smoke covers entry,
-Ctrl-C, and cleanup. Strict source-bound evaluators measure daily-life,
-project, artifact, and slow Japanese PTY facts. The tracked runner drives the
-real native TUI into a bounded cast; probe-only evidence fails and runs are unrun.
+Ctrl-C, and cleanup. Strict evaluators measure daily-life, project, artifact,
+and slow Japanese PTY facts. The PTY runner drives the real TUI; project and
+artifact runs restart after settled revisions. Probe evidence fails; runs are unrun.
 
 Configuration and Compose now separate the runtime data root from one visible
 workspace root. The workspace is created only by an actual workspace operation,

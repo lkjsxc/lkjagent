@@ -1,6 +1,6 @@
 offset_seconds	intent	text_fingerprint	owner_text
 0	inspect-orbit	sha256:3882ca8b9a1bd2f5f1da05740ba5679ef7cd808298ece747a44b5ca6a3bf0070	Inspect project-orbit and cite current source.
 180	inspect-orbital	sha256:2e15fd6e1a43715f2bdd154cd13528da113dba7305a6c30d9dd4ba7b1e68fd92	Answer about project-orbital without cross-project facts.
-420	bounded-edit	sha256:29660179e2367d0785ca0e04ce524fec499dc24b0ec46c543ecb7e3627599d9d	Edit one bounded Rust behavior and run focused checks.
+420	bounded-edit	sha256:1136a76172227109f8205f3ed10f41f2bad6e6578c9907b0bff4b9058dd3796f	Edit one bounded Rust behavior and rely on automatic checks.
 660	restart-resume	sha256:86d901e43a140d6928992153bcf186ced5126be914634ab2dcbcfe4646c11b0c	Restart and resume without duplicate effects.
-840	report-evidence	sha256:ea543fda43ce7ab89d6eb3b7bf38ffdd538711eace765307f93f8cda5fe48c0f	Report the exact diff, checks, project note, and risks.
+840	report-evidence	sha256:3f097920855df7d9f1275d7c5225ff0cdd7a53f00317e2cc61e6eda97d0cb2af	Report the exact checked path, revision, project isolation, and risks.

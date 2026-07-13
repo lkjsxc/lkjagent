@@ -9,10 +9,7 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
         ctx.db,
         "SELECT count(DISTINCT id) FROM conversation_messages",
     )?;
-    let restart_resume = shared::count(
-        ctx.db,
-        "SELECT count(*) FROM runtime_events WHERE kind='owner-resume'",
-    )?;
+    let restart_resume = shared::restart_survivors(&ctx.capture.raw, ctx.db, "message")?;
     let fields = vec![
         (
             "fact_cast_sha256".into(),

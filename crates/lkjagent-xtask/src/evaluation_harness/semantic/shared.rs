@@ -79,14 +79,6 @@ pub fn revision_for_path(connection: &Connection, path: &str) -> Result<Option<S
     )
 }
 
-pub fn parent_revision(connection: &Connection, revision: &str) -> Result<Option<String>, String> {
-    text_with(
-        connection,
-        "SELECT CAST(parent_id AS TEXT) FROM workspace_revisions WHERE id=?1",
-        revision,
-    )
-}
-
 pub fn token_units(text: &str) -> u64 {
     text.len().div_ceil(4).max(text.chars().count()) as u64
 }
@@ -113,6 +105,26 @@ pub fn placeholder_count(text: &str) -> u64 {
 
 pub fn fingerprint(paths: &[String]) -> String {
     sha256(paths.join("\n").as_bytes())
+}
+
+pub fn restart_survivors(raw: &Path, connection: &Connection, kind: &str) -> Result<u64, String> {
+    let text = fs::read_to_string(raw.join("restart.marker")).map_err(|error| error.to_string())?;
+    let mut count = 0;
+    for line in text.lines() {
+        let Some((row_kind, id)) = line.split_once('\t') else {
+            return Err("restart marker is malformed".into());
+        };
+        if row_kind != kind || id.is_empty() {
+            continue;
+        }
+        let sql = if kind == "revision" {
+            "SELECT count(*) FROM workspace_documents WHERE current_revision_id=?1"
+        } else {
+            "SELECT count(*) FROM conversation_messages WHERE id=?1"
+        };
+        count += scalar_with(connection, sql, id)?;
+    }
+    Ok(count)
 }
 
 pub fn cast_path(raw: &Path) -> PathBuf {

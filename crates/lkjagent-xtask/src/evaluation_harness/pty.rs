@@ -51,6 +51,9 @@ fn terminal_schedule(root: &Path, source: &str, scenario: &scenario::Scenario,
 #[rustfmt::skip]
 fn run_schedule(root: &Path, source: &str, scenario: &scenario::Scenario, capture: &snapshot::Capture,
     before: &str, env: &BTreeMap<String,String>) -> Result<(), String> {
+    if matches!(scenario.id.as_str(),"long-artifact-recovery"|"multi-project-development") {
+        return restart_schedule(root,source,scenario,capture,before,env);
+    }
     let started = Instant::now(); let binary = capture.binary.clone(); let cwd = capture.root.clone(); let daemon_env = env.clone();
     thread::scope(|scope| -> Result<(), String> {
         let daemon = scope.spawn(move || clock::command(&binary, &["--data".into(), cwd.join("data").display().to_string(), "run".into()],
@@ -66,6 +69,35 @@ fn run_schedule(root: &Path, source: &str, scenario: &scenario::Scenario, captur
         let (message, _, passed) = finish(root, source, scenario, capture, before, &[status], "run", duration)?;
         if passed { Ok(()) } else { Err(message) }
     })
+}
+#[rustfmt::skip]
+fn restart_schedule(root:&Path,source:&str,scenario:&scenario::Scenario,capture:&snapshot::Capture,before:&str,env:&BTreeMap<String,String>)->Result<(),String>{
+ let started=Instant::now();thread::scope(|scope|->Result<(),String>{
+  let binary=capture.binary.clone();let cwd=capture.root.clone();let first_env=env.clone();let first=scope.spawn(move||clock::command(&binary,&["--data".into(),cwd.join("data").display().to_string(),"run".into()],&cwd,&first_env,Duration::from_secs(620)));
+  for (offset,text) in scenario.turns.iter().skip(1).take_while(|turn|turn.0<620){wait_until(started,Duration::from_secs(*offset));public(capture,env,&["send",text],Duration::from_secs(30))?}
+  wait_until(started,Duration::from_secs(620));let first=first.join().map_err(|_|"first daemon thread failed")??;if !first.timed_out{return Err("first daemon did not reach restart boundary".into())}record_restart(capture)?;
+  let binary=capture.binary.clone();let cwd=capture.root.clone();let second_env=env.clone();let second=scope.spawn(move||clock::command(&binary,&["--data".into(),cwd.join("data").display().to_string(),"run".into()],&cwd,&second_env,Duration::from_secs(283)));
+  for (offset,text) in scenario.turns.iter().skip(1).filter(|turn|turn.0>=620){wait_until(started,Duration::from_secs(*offset));public(capture,env,&["send",text],Duration::from_secs(30))?}
+  wait_until(started,Duration::from_secs(901));let status=public_output(capture,env,&["status"],Duration::from_secs(30))?;let second=second.join().map_err(|_|"second daemon thread failed")??;if !second.timed_out||status.code!=Some(0){return Err("restarted daemon did not reach observation boundary".into())}let duration=started.elapsed().as_secs();let(message,_,passed)=finish(root,source,scenario,capture,before,&[status],"run",duration)?;if passed{Ok(())}else{Err(message)}
+ })
+}
+fn record_restart(capture: &snapshot::Capture) -> Result<(), String> {
+    let db = rusqlite::Connection::open(capture.data.join("lkjagent.sqlite3"))
+        .map_err(|error| error.to_string())?;
+    let mut query=db.prepare("SELECT current_revision_id FROM workspace_documents WHERE current_revision_id IS NOT NULL ORDER BY current_path").map_err(|error|error.to_string())?;
+    let rows = query
+        .query_map([], |row| row.get::<_, String>(0))
+        .map_err(|error| error.to_string())?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|error| error.to_string())?;
+    if rows.is_empty() {
+        return Err("restart boundary has no settled workspace revision".into());
+    }
+    let body = rows
+        .into_iter()
+        .map(|id| format!("revision\t{id}\n"))
+        .collect::<String>();
+    fs::write(capture.raw.join("restart.marker"), body).map_err(|error| error.to_string())
 }
 #[rustfmt::skip]
 fn exact_clean_head(root: &Path) -> Result<String, String> {

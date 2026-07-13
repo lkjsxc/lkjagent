@@ -17,32 +17,41 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     } else {
         shared::revision_for_path(ctx.db, &journal_path)?
     };
-    let journal_parent = match journal_revision.as_deref() {
-        Some(revision) => shared::parent_revision(ctx.db, revision)?,
-        None => None,
-    };
     let memory_revision = shared::text(
         ctx.db,
-        "SELECT CAST(current_revision_id AS TEXT) FROM workspace_documents WHERE managed=1 AND CAST(current_path AS TEXT) LIKE 'knowledge/notes/%' ORDER BY CAST(current_path AS TEXT) LIMIT 1",
-    )?
-    .unwrap_or_default();
+        "SELECT CAST(current_revision_id AS TEXT) FROM workspace_documents WHERE managed=1 AND CAST(current_path AS TEXT)='knowledge/notes/transit-card-location.md' AND status='active'",
+    )?.unwrap_or_default();
+    let memory_text = shared::text(
+        ctx.db,
+        "SELECT CAST(r.content AS TEXT) FROM workspace_documents d JOIN workspace_revisions r ON r.id=d.current_revision_id WHERE CAST(d.current_path AS TEXT)='knowledge/notes/transit-card-location.md' AND d.status='active'",
+    )?.unwrap_or_default();
+    let initial_recall = shared::count(
+        ctx.db,
+        &memory_context("Use saved transit-card-location%", None),
+    )?;
     let relevant_recall = shared::count(
         ctx.db,
-        "SELECT count(*) FROM context_items WHERE instr(CAST(source_id AS TEXT),'older-fact.md')>0",
+        &memory_context(
+            "Use corrected transit-card-location%",
+            Some(&memory_revision),
+        ),
+    )?;
+    let correction_memory = shared::count(
+        ctx.db,
+        &memory_context("correct transit-card-location:%", None),
+    )?;
+    let stale_memory = shared::count(
+        ctx.db,
+        &format!(
+            "{} AND CAST(i.source_revision AS TEXT)<>'{}'",
+            memory_context("Use corrected transit-card-location%", None),
+            sql(&memory_revision)
+        ),
     )?;
     let noise_recall = shared::count(
         ctx.db,
         "SELECT count(*) FROM context_items WHERE instr(CAST(source_id AS TEXT),'recent-noise.md')>0",
     )?;
-    let stale_memory = if memory_revision.is_empty() {
-        0
-    } else {
-        shared::scalar_with(
-            ctx.db,
-            "SELECT count(*) FROM context_items WHERE source_kind='memory' AND CAST(source_revision AS TEXT)<>?1",
-            &memory_revision,
-        )?
-    };
     let rogue_memory = shared::count(
         ctx.db,
         "SELECT count(*) FROM context_items WHERE source_kind='memory' AND CAST(source_revision AS TEXT) NOT IN (SELECT CAST(current_revision_id AS TEXT) FROM workspace_documents WHERE managed=1 AND status='active')",
@@ -58,6 +67,11 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
         &journal_path,
     )?
     };
+    let journal_lower = journal_text.to_ascii_lowercase();
+    let journal_grounded = u64::from(
+        journal_lower.contains("blue transit card") && journal_lower.contains("second desk drawer"),
+    );
+    let memory_grounded = u64::from(memory_text.to_ascii_lowercase().contains("top desk drawer"));
     let journal_sha = after
         .get(&journal_path)
         .map(|row| row.sha256.clone())
@@ -67,10 +81,6 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
         (
             "fact_journal_revision_id".into(),
             journal_revision.unwrap_or_default(),
-        ),
-        (
-            "fact_journal_parent_revision_id".into(),
-            journal_parent.unwrap_or_default(),
         ),
         ("fact_journal_sha256".into(), journal_sha),
         ("fact_journal_token_units".into(), token_units.to_string()),
@@ -83,12 +93,28 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
             journal_lineage.to_string(),
         ),
         (
+            "fact_journal_grounded_owner_fact_count".into(),
+            journal_grounded.to_string(),
+        ),
+        (
             "fact_memory_current_revision_id".into(),
             memory_revision.clone(),
         ),
         (
+            "fact_memory_grounded_correction_count".into(),
+            memory_grounded.to_string(),
+        ),
+        (
+            "fact_initial_recall_context_count".into(),
+            initial_recall.to_string(),
+        ),
+        (
             "fact_relevant_recall_context_count".into(),
             relevant_recall.to_string(),
+        ),
+        (
+            "fact_correction_memory_context_count".into(),
+            correction_memory.to_string(),
         ),
         (
             "fact_noise_recall_context_count".into(),
@@ -105,13 +131,29 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     ];
     let passed = !journal_path.is_empty()
         && !memory_revision.is_empty()
-        && token_units > 0
-        && token_units <= 512
+        && (1..=512).contains(&token_units)
         && placeholder_count == 0
         && journal_lineage > 0
+        && journal_grounded == 1
+        && memory_grounded == 1
+        && initial_recall == 1
         && relevant_recall == 1
+        && correction_memory == 0
         && noise_recall == 0
         && stale_memory == 0
         && rogue_memory == 0;
     Ok(Measured::new(passed, fields))
+}
+
+fn memory_context(objective: &str, revision: Option<&str>) -> String {
+    let revision = revision.map_or(String::new(), |value| {
+        format!(" AND CAST(i.source_revision AS TEXT)='{}'", sql(value))
+    });
+    format!(
+        "SELECT count(*) FROM context_items i JOIN runtime_decisions d ON d.id=i.decision_id JOIN matters m ON m.id=d.matter_id WHERE i.source_kind='memory' AND CAST(m.objective AS TEXT) LIKE '{}'{}",
+        sql(objective), revision
+    )
+}
+fn sql(value: &str) -> String {
+    value.replace('\'', "''")
 }

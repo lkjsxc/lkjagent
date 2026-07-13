@@ -8,10 +8,7 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     let orbit_in_orbital = contamination(ctx, &orbit_revision, "project-orbital")?;
     let orbital_in_orbit = contamination(ctx, &orbital_revision, "project-orbit")?;
     let changed = shared::changed_paths(ctx.before, ctx.after);
-    let restart_resume = shared::count(
-        ctx.db,
-        "SELECT count(*) FROM runtime_events WHERE kind='owner-resume'",
-    )?;
+    let restart_resume = shared::restart_survivors(&ctx.capture.raw, ctx.db, "revision")?;
     let duplicate_effects = shared::count(ctx.db, "SELECT count(*) FROM effect_journal")?
         .saturating_sub(shared::count(
             ctx.db,

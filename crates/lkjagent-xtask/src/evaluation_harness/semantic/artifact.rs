@@ -52,13 +52,10 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
         ctx.db,
         "SELECT count(DISTINCT CAST(operation_key AS TEXT)) FROM runtime_decisions WHERE CAST(operation_key AS TEXT) LIKE 'modify.report%'",
     )?;
-    let restart_resume = shared::count(
-        ctx.db,
-        "SELECT count(*) FROM runtime_events WHERE kind='owner-resume'",
-    )?;
+    let restart_resume = shared::restart_survivors(&ctx.capture.raw, ctx.db, "revision")?;
     let early_completion = shared::count(
         ctx.db,
-        "SELECT count(*) FROM conversation_messages WHERE role='agent' AND receipt IS NOT NULL AND sequence < (SELECT coalesce(max(sequence),0) FROM conversation_messages WHERE role='owner')",
+        "SELECT count(*) FROM conversation_messages a JOIN runtime_events close_event ON close_event.id=a.cause_event_id JOIN obligations o ON o.matter_id=a.matter_id AND o.predicate_kind='managed-report-complete' LEFT JOIN checks c ON c.id=o.current_check_id AND c.current=1 AND c.passed=1 LEFT JOIN runtime_events check_event ON check_event.id=c.checked_event_id WHERE a.role='agent' AND (check_event.id IS NULL OR close_event.causal_sequence<=check_event.causal_sequence)",
     )?;
     let source_lineage = shared::count(
         ctx.db,

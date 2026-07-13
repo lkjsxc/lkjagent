@@ -65,11 +65,15 @@ fn daily(fields: &BTreeMap<&str, &str>) -> bool {
         && (1..=512).contains(&number(fields, "fact_journal_token_units"))
         && number(fields, "fact_journal_placeholder_count") == 0
         && number(fields, "fact_journal_lineage_count") > 0
+        && number(fields, "fact_journal_grounded_owner_fact_count") == 1
         && present(fields, "fact_memory_current_revision_id")
+        && number(fields, "fact_memory_grounded_correction_count") == 1
+        && number(fields, "fact_initial_recall_context_count") == 1
         && number(fields, "fact_relevant_recall_context_count") == 1
         && zero(
             fields,
             &[
+                "fact_correction_memory_context_count",
                 "fact_noise_recall_context_count",
                 "fact_stale_memory_context_count",
                 "fact_rogue_memory_context_count",

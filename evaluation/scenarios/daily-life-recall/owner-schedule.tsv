@@ -1,6 +1,6 @@
 offset_seconds	intent	text_fingerprint	owner_text
-0	journal	sha256:63b16af556824628a94a013f19d965c1852aea4afb4345417ce16ecbb4ff6c2f	今日の日記を同日の確認済み記録から作成する
-180	mixed-records	sha256:ec07054df12a26799b17020ba6df1321c9d5a6145d4efe76d8ae4a6fd624c648	TODOと予定と支出を別々に更新する
-420	external-correction	sha256:2a18fc92061002579b0dba3f6bd13418dc78f8dd0db823be2235cdc4b17bf4d1	外部修正を読み直して索引を更新する
-660	older-recall	sha256:4b579d4e56adb9c89e47f45df43959b01ce71213892cc1441c85a54478865702	古い事実を無関係な最近のメモより優先する
-840	current-summary	sha256:9ab5581904c163a7363c56d144155f0920240155ca58a390317eb9eb2cfb40c2	現在のTODOだけを要約する
+0	grounded-journal	sha256:4b15f987354972f5a24525150f36921bba80b7c0b2e73dbdd74b40a1bc87a81d	Read notes/older-fact.md and write today's grounded journal about that owner fact.
+180	memory-write	sha256:5d215ec355809b4f26538b4cb5fb4ce402fd67b6994fa39bb0019eb320f948ac	Remember this owner fact as Transit Card Location: the blue transit card is in the second desk drawer.
+420	memory-recall	sha256:d8a18f69e81458f1a12b41a7a6b3ddf9aa2be25a2775aff1c5a529259b3dcdbe	Use saved transit-card-location memory exactly once in a concise answer; do not read notes/recent-noise.md.
+660	memory-correction	sha256:fa5766e83463c9024af7906bd42256588eab49220bdde2a5c11bd35d4c723724	correct transit-card-location: replace it with this owner correction: the blue transit card is now in the top desk drawer.
+840	corrected-recall	sha256:72acf1318afffe753ed57e7c12dd748c50a3d8b44cc5b7d2772b72f13189c71a	Use corrected transit-card-location exactly once and report the top desk drawer; exclude recent noise.
