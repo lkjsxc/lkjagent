@@ -10,9 +10,10 @@ validator, bounded captures, and mechanical false-positive checks.
 - [mod.rs](mod.rs): campaign CLI, copied-binary runner, and derived output.
 - [clock.rs](clock.rs): monotonic deadlines, bounded capture, and process groups.
 - [evidence.rs](evidence.rs): versioned baseline and negative-fixture validation.
-- [pty.rs](pty.rs): explicit rejection of incomplete PTY scenarios.
-- [scenario.rs](scenario.rs): four tracked aliases, hashed five-turn schedules,
+- [pty.rs](pty.rs): bounded campaign execution and sanitized evidence writing.
+- [pty-cast.rs](pty_cast.rs): bounded temporary cast parsing into measured counts.
+- [semantic/mod.rs](semantic/mod.rs): scenario-specific native fact evaluators.
+- [scenario.rs](scenario.rs): five tracked aliases, hashed five-turn schedules,
   hashed seed bytes, and shell-free endpoint files. Parser tests reject changed
-  owner-text and seed hashes; `exact-file-edit` is accepted by both campaign
-  modes without accepting arbitrary paths or owner text.
+  owner text and seed hashes; aliases never accept arbitrary paths or owner text.
 - [snapshot.rs](snapshot.rs): confined roots, manifests, diffs, and stable SQLite facts.

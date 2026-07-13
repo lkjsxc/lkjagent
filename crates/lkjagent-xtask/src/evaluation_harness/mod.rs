@@ -7,7 +7,9 @@ mod hash {
     }
 }
 mod pty;
+mod pty_cast;
 mod scenario;
+mod semantic;
 mod snapshot;
 
 pub use clock::{FakeClock, FaultInjector};
@@ -16,6 +18,10 @@ pub use hash::bytes as sha256;
 pub use pty::validate_cast;
 pub use scenario::{endpoint_file, validate as validate_scenario};
 use std::path::Path;
+
+pub fn scenario_fingerprint(root: &Path, alias: &str) -> Result<String, String> {
+    scenario::load(root, alias).map(|value| value.fingerprint)
+}
 
 #[rustfmt::skip]
 pub fn check(root: &Path) -> Result<(), Vec<String>> {

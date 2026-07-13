@@ -5,11 +5,12 @@ use std::path::{Path, PathBuf};
 
 use super::hash;
 
-pub const ALIASES: [&str; 4] = [
+pub const ALIASES: [&str; 5] = [
     "daily-life-recall",
     "exact-file-edit",
     "multi-project-development",
     "long-artifact-recovery",
+    "slow-japanese-pty",
 ];
 
 pub struct Scenario {

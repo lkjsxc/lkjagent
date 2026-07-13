@@ -1,0 +1,1 @@
+Slow terminal campaign seed.
