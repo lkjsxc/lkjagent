@@ -13,6 +13,7 @@ const RULES: &[(&str, Rule)] = &[
     ("endpoint_timeout_seconds", integer(1, 1800, 300)),
     ("prompt_context_tokens", integer(2048, 262144, 16384)),
     ("workspace_root", Rule::Text),
+    ("workspace_timezone", Rule::Text),
 ];
 
 const fn integer(min: u64, max: u64, default: u64) -> Rule {
@@ -58,6 +59,30 @@ pub(crate) fn validate(values: &Map<String, Value>) -> Result<(), String> {
         .is_some_and(|root| root.chars().any(char::is_control))
     {
         return Err("workspace root must not contain control characters".to_string());
+    }
+    if let Some(zone) = values.get("workspace_timezone").and_then(Value::as_str) {
+        validate_workspace_timezone(zone)?;
+    }
+    Ok(())
+}
+
+pub(crate) fn validate_workspace_timezone(zone: &str) -> Result<(), String> {
+    if zone == "UTC" {
+        return Ok(());
+    }
+    let bytes = zone.as_bytes();
+    let canonical = bytes.len() == 6
+        && matches!(bytes[0], b'+' | b'-')
+        && bytes[1..3].iter().all(u8::is_ascii_digit)
+        && bytes[3] == b':'
+        && bytes[4..6].iter().all(u8::is_ascii_digit);
+    if !canonical {
+        return Err("workspace_timezone must be UTC or a canonical fixed offset".to_string());
+    }
+    let hour = u16::from(bytes[1] - b'0') * 10 + u16::from(bytes[2] - b'0');
+    let minute = u16::from(bytes[4] - b'0') * 10 + u16::from(bytes[5] - b'0');
+    if minute >= 60 || hour > 14 || hour == 14 && minute != 0 {
+        return Err("workspace_timezone offset is outside -14:00..+14:00".to_string());
     }
     Ok(())
 }

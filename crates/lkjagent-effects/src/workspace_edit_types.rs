@@ -29,6 +29,12 @@ pub struct PreparedEdit {
     pub stage_identity: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PreparedPathCreate {
+    pub edit: PreparedEdit,
+    pub missing_parents: Vec<String>,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DurablePhase {
     Staged,
@@ -61,6 +67,18 @@ pub enum EditError {
 }
 
 pub type EditResult<T> = Result<T, EditError>;
+
+impl std::fmt::Display for EditError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Effect(error) => write!(formatter, "{error}"),
+            Self::Conflict(message) => write!(formatter, "conflict: {message}"),
+            Self::Unsupported => write!(formatter, "unsupported atomic edit"),
+        }
+    }
+}
+
+impl std::error::Error for EditError {}
 
 impl From<EffectError> for EditError {
     fn from(value: EffectError) -> Self {

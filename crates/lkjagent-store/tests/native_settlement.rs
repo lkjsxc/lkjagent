@@ -152,9 +152,11 @@ fn durable_boundaries_settlement_links_revision_and_close_guards() -> Result<(),
         ("settled".into(), "e3".into(), "j".into(), "settled".into())
     );
     let closed: (String, i64, Vec<u8>) = connection.query_row("SELECT lifecycle,(SELECT count(*) FROM runtime_events WHERE id='close'),(SELECT receipt FROM conversation_messages WHERE id='completion-event/close') FROM matters WHERE id='m'", [], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?)))?;
-    assert_eq!(
-        closed,
-        ("closed".into(), 1, br#"[["passed",[2]]]"#.to_vec())
-    );
+    assert_eq!((closed.0.as_str(), closed.1), ("closed", 1));
+    let receipt: serde_json::Value = serde_json::from_slice(&closed.2)?;
+    assert_eq!(receipt[0]["check"], "passed");
+    assert_eq!(receipt[0]["evidence"], "02");
+    assert_eq!(receipt[0]["revision"], "02");
+    assert_eq!(receipt[0]["parameters"], "\u{1}");
     Ok(())
 }

@@ -8,8 +8,10 @@ Build the smallest sufficient prompt after operation selection is durable.
 
 The selector first persists immutable operation, information needs, lane caps,
 state fragments, exact tool view, grammar, checks, recovery, and output reserve.
-Compilation then selects sources and atomically attaches rendered cards and
-fingerprints before provider intent. It cannot change the operation.
+It also persists selected wall time, effective workspace timezone, and local date
+in the decision context. Compilation then selects sources and atomically
+attaches rendered cards and fingerprints before provider intent. It cannot
+change the operation or journal date.
 
 ## Regions
 

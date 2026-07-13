@@ -20,7 +20,9 @@ numbered lines or bounded list/search text, never the harness observation JSON
 object. Every source included by the compiled plan persists as a decision-bound native
 context item before provider intent; omitted candidates do not gain rows. The
 latest four active canonical messages from earlier matters are bounded history
-candidates and never replace the current owner objective.
+candidates and never replace the current owner objective. A journal renderer
+copies the exact fingerprints of every selected persisted context item into
+harness-owned metadata; the model cannot author or omit that lineage.
 
 ## Precedence
 

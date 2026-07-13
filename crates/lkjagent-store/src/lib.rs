@@ -47,6 +47,7 @@ pub mod error {
     }
 }
 
+pub(crate) mod journal_obligations;
 mod matter_control;
 pub mod native_schema;
 pub mod transactions;

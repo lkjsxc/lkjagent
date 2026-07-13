@@ -92,27 +92,22 @@ pub(crate) fn close(tx: &Transaction<'_>, value: &FinalClose<'_>) -> StoreResult
 }
 #[rustfmt::skip]
 fn completion_receipt(tx: &Transaction<'_>, matter: &str) -> StoreResult<Vec<u8>> {
-    let mut statement = tx.prepare("SELECT c.id,c.evidence_fingerprint FROM obligations o JOIN checks c ON c.id=o.current_check_id WHERE o.matter_id=?1 AND o.required=1 AND o.status='passed' AND c.current=1 AND c.passed=1 ORDER BY o.id,c.id")?;
-    let rows = statement.query_map([matter], |row| Ok((row.get::<_,String>(0)?, row.get::<_,Vec<u8>>(1)?)))?.collect::<Result<Vec<_>,_>>()?;
+    let mut statement = tx.prepare("SELECT c.id,c.evidence_fingerprint,c.source_revision,c.parameters FROM obligations o JOIN checks c ON c.id=o.current_check_id WHERE o.matter_id=?1 AND o.required=1 AND o.status='passed' AND c.current=1 AND c.passed=1 ORDER BY o.id,c.id")?;
+    let rows = statement.query_map([matter], |row| Ok((row.get::<_,String>(0)?, row.get::<_,Vec<u8>>(1)?, row.get::<_,Vec<u8>>(2)?, row.get::<_,Vec<u8>>(3)?)))?.collect::<Result<Vec<_>,_>>()?;
     if rows.is_empty() { return Err(StoreError::InvalidState("matter has no required passing checks".into())); }
-    serde_json::to_vec(&rows).map_err(|error| StoreError::InvalidState(error.to_string()))
+    let receipt=rows.into_iter().map(|(check,evidence,revision,parameters)|serde_json::json!({"check":check,"evidence":hex(&evidence),"revision":hex(&revision),"parameters":String::from_utf8_lossy(&parameters)})).collect::<Vec<_>>();
+    serde_json::to_vec(&receipt).map_err(|error| StoreError::InvalidState(error.to_string()))
 }
+#[rustfmt::skip]
+fn hex(bytes:&[u8])->String{bytes.iter().map(|byte|format!("{byte:02x}")).collect()}
 #[rustfmt::skip]
 fn changed(count: usize, message: &str) -> StoreResult<()> {
     if count == 1 { Ok(()) } else { Err(StoreError::InvalidState(message.into())) }
 }
-pub fn setup(connection: &Connection) -> StoreResult<()> {
-    match schema_state(connection)? {
-        SchemaState::Empty => create_fresh(connection),
-        SchemaState::Native => {
-            validate_native(connection)?;
-            configure(connection)
-        }
-        SchemaState::Incompatible { version, objects } => {
-            Err(StoreError::IncompatibleSchema { version, objects })
-        }
-    }
-}
+#[rustfmt::skip]
+pub fn setup(connection:&Connection)->StoreResult<()>{match schema_state(connection)?{
+    SchemaState::Empty=>create_fresh(connection),SchemaState::Native=>{validate_native(connection)?;configure(connection)}
+    SchemaState::Incompatible{version,objects}=>Err(StoreError::IncompatibleSchema{version,objects})}}
 
 fn create_fresh(connection: &Connection) -> StoreResult<()> {
     configure(connection)?;

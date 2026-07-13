@@ -95,6 +95,56 @@ fn workspace_safety_holds_root_and_rejects_symlink_races() -> TestResult {
 }
 
 #[test]
+fn lazy_parent_creation_is_declared_no_follow_and_collision_safe() -> TestResult {
+    let root = fixture("parents")?;
+    fs::create_dir(root.join("life"))?;
+    let workspace = OpenedWorkspace::open(&root)?;
+    let prepared = workspace.prepare_absent_edit(
+        "life/journal/2026/07/13/entry.md".into(),
+        "bounded journal\n",
+        0o644,
+    )?;
+    assert_eq!(
+        prepared.missing_parents,
+        [
+            "life/journal",
+            "life/journal/2026",
+            "life/journal/2026/07",
+            "life/journal/2026/07/13",
+        ]
+    );
+    assert!(
+        !root.join("life/journal").exists(),
+        "prepare mutated workspace"
+    );
+    workspace.create_declared_directories(&prepared.missing_parents[..1])?;
+    assert!(root.join("life/journal").is_dir());
+    assert!(
+        !root.join("life/journal/2026").exists(),
+        "undeclared parent appeared"
+    );
+
+    let unsafe_root = fixture("parent-collisions")?;
+    fs::create_dir(unsafe_root.join("life"))?;
+    fs::write(unsafe_root.join("life/journal"), "owner file")?;
+    let unsafe_workspace = OpenedWorkspace::open(&unsafe_root)?;
+    assert!(unsafe_workspace
+        .prepare_absent_edit("life/journal/a.md".into(), "x", 0o644)
+        .is_err());
+    fs::remove_file(unsafe_root.join("life/journal"))?;
+    symlink("/tmp", unsafe_root.join("life/journal"))?;
+    assert!(unsafe_workspace
+        .prepare_absent_edit("life/journal/a.md".into(), "x", 0o644)
+        .is_err());
+    fs::remove_file(unsafe_root.join("life/journal"))?;
+    fs::create_dir(unsafe_root.join("life/Journal"))?;
+    assert!(unsafe_workspace
+        .prepare_absent_edit("life/journal/a.md".into(), "x", 0o644)
+        .is_err());
+    Ok(())
+}
+
+#[test]
 fn workspace_safety_special_files_return_promptly() -> TestResult {
     let root = fixture("special")?;
     assert!(Command::new("mkfifo")
@@ -105,6 +155,9 @@ fn workspace_safety_special_files_return_promptly() -> TestResult {
     let workspace = OpenedWorkspace::open(&root)?;
     let start = Instant::now();
     assert!(workspace.read_file("pipe", 1, 1).is_err());
+    assert!(workspace
+        .prepare_absent_edit("pipe/entry.md".into(), "x", 0o644)
+        .is_err());
     assert!(workspace.read_file("socket", 1, 1).is_err());
     assert!(start.elapsed() < Duration::from_secs(1));
     let devices = OpenedWorkspace::open(std::path::Path::new("/dev"))?;

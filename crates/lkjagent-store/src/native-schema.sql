@@ -73,10 +73,11 @@ CREATE TABLE effect_journal (
  UNIQUE(admission_id,id), UNIQUE(id,observation_id));
 CREATE TABLE effect_targets (
  journal_id TEXT NOT NULL REFERENCES effect_journal(id), ordinal INTEGER NOT NULL CHECK(ordinal>=0), normalized_path BLOB NOT NULL,
- prior_bytes BLOB, intended_bytes BLOB, operation TEXT NOT NULL CHECK(operation IN ('create','replace','delete')),
+ prior_bytes BLOB, intended_bytes BLOB, operation TEXT NOT NULL CHECK(operation IN ('create','replace','delete','mkdir')),
  prior_mode INTEGER, intended_mode INTEGER, stage_identity BLOB NOT NULL,
  CHECK((operation='create' AND prior_bytes IS NULL) OR operation!='create'),
  CHECK((operation='delete' AND intended_bytes IS NULL) OR operation!='delete'),
+ CHECK((operation='mkdir' AND prior_bytes IS NULL AND intended_bytes IS NULL) OR operation!='mkdir'),
  PRIMARY KEY(journal_id,ordinal), UNIQUE(journal_id,normalized_path));
 CREATE TABLE observations (
  id TEXT PRIMARY KEY, journal_id TEXT UNIQUE, decision_id TEXT NOT NULL REFERENCES runtime_decisions(id),

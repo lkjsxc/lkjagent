@@ -34,6 +34,11 @@ pub fn workspace_root(data_dir: &Path) -> Result<PathBuf, String> {
     crate::workspace_root::resolve(data_dir, &configured)
 }
 
+pub fn workspace_timezone(data_dir: &Path) -> Result<String, String> {
+    let values = load_flat_config(data_dir)?;
+    Ok(text(&values, "workspace_timezone").unwrap_or_else(|| "UTC".to_string()))
+}
+
 #[rustfmt::skip]
 pub(crate) fn prompt_max_context_tokens(data_dir: &Path) -> Result<Option<u64>, String> {
     let values = load_flat_config(data_dir)?;

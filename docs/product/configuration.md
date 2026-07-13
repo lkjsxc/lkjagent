@@ -22,13 +22,17 @@ the file, SQLite, prompts, status, logs, or evidence.
   "endpoint_timeout_seconds": 300,
   "endpoint_url": "http://127.0.0.1:8080",
   "prompt_context_tokens": 16384,
-  "workspace_root": "../workspace"
+  "workspace_root": "../workspace",
+  "workspace_timezone": "UTC"
 }
 ```
 
 This is the current registry. Endpoint transport consumes the endpoint keys,
-the prompt compiler and doctor consume the context bound, and workspace
-operations consume the root. Unknown future keys fail closed.
+the prompt compiler and doctor consume the context bound, workspace operations
+consume the root, and journal decision selection consumes `workspace_timezone`.
+The timezone defaults to `UTC` and accepts only `UTC` or canonical fixed offsets
+from `-14:00` through `+14:00`; malformed forms and offsets past 14:00 fail.
+Unknown future keys fail closed.
 
 ## Precedence
 

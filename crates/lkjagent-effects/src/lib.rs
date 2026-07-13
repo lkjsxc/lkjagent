@@ -40,4 +40,5 @@ pub mod workspace;
 mod workspace_capability;
 pub mod workspace_edit;
 mod workspace_edit_types;
+mod workspace_parents;
 mod workspace_scan;

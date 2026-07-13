@@ -17,7 +17,7 @@ pub fn resolve(data_root: &Path, configured: &str) -> Result<PathBuf, String> {
 
 pub fn open(root: &Path) -> Result<PathBuf, String> {
     if !root.exists() {
-        fs::create_dir_all(root).map_err(|error| format!("create workspace root: {error}"))?;
+        fs::create_dir(root).map_err(|error| format!("create workspace root: {error}"))?;
     }
     let metadata =
         fs::symlink_metadata(root).map_err(|error| format!("open workspace root: {error}"))?;

@@ -6,20 +6,28 @@ Define grounded records, sourced memory, activity projections, and reports.
 
 ## Record Tool
 
-After ordinary editing works, the record phase exposes the normal descriptor-
-derived `write_record` tool with family, title, and body fields. The harness
-chooses canonical family, date/state path, token cap, and checks. There is no
-separate record grammar or direct writer.
+The normal descriptor registry exposes `write_record` with exact `family`,
+`title`, and `body` fields during orient, modify, and named recovery. This slice
+admits only exact `family=journal`; review and respond expose no record tool. The
+persisted descriptor, admission, and `workspace.record.journal` effect key drive
+dispatch. There is no public record command, scheduler, manifest, separate
+grammar, or direct writer.
 
 ## Journal
 
-A diary request writes `life/journal/YYYY/MM/DD/entry.md` using configured
-timezone. The model authors bounded reflection from selected same-day owner and
-workspace facts. It cannot copy the command as the entry, invent events, use a
-Unix-time path, or substitute canned missing-detail text.
+A diary request writes `life/journal/YYYY/MM/DD/entry.md`. Selection binds the
+effective fixed-offset workspace timezone, wall time, and local date in the
+immutable decision context before provider intent. A later config edit or slow
+call cannot move that path.
 
-Sparse evidence may produce a short honest reflection that states uncertainty.
-Success requires provider lineage, revision, fresh check, and factual path receipt.
+The harness renders UTF-8 Markdown with kind, date, and exact selected source
+fingerprints, then adds model-authored title and body. The whole document must be
+nonempty, free of known placeholders, and at most 512 conservative token units.
+The model cannot choose path, date, or frontmatter. Sparse evidence may produce
+a short honest reflection that states uncertainty. Success requires native
+lineage, effect, revision, structural check, generic byte/content/collateral
+checks, and a receipt that binds checked path and revision. Scripted tests prove
+mechanics only; configured-model campaigns own semantic groundedness.
 
 ## Other Families
 
