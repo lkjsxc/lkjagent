@@ -14,7 +14,7 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     let requested_only = changed == requested;
     let edit = target(ctx, "notes/exact-base.txt")?;
     let create = target(ctx, "notes/created-proof.txt")?;
-    let first = shared::text(ctx.db, "SELECT CAST(t.normalized_path AS TEXT) FROM effect_targets t JOIN effect_journal j ON j.id=t.journal_id JOIN runtime_events e ON e.id=j.prepared_event_id WHERE t.operation IN ('create','replace') ORDER BY e.causal_sequence LIMIT 1")?.unwrap_or_default();
+    let first = shared::text(ctx.db, "SELECT CAST(t.normalized_path AS TEXT) FROM effect_targets t JOIN effect_journal j ON j.id=t.journal_id JOIN runtime_decisions d ON d.id=j.decision_id WHERE t.operation IN ('create','replace') ORDER BY d.selected_monotonic_ms,d.id LIMIT 1")?.unwrap_or_default();
     let current_mode = std::fs::metadata(ctx.capture.workspace.join("notes/exact-base.txt"))
         .map_err(|error| error.to_string())?
         .permissions()
