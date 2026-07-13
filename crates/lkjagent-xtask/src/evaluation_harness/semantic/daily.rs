@@ -51,7 +51,7 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     )?;
     let rogue_memory = shared::count(
         ctx.db,
-        "SELECT count(*) FROM context_items WHERE source_kind='memory' AND CAST(source_revision AS TEXT) NOT IN (SELECT CAST(current_revision_id AS TEXT) FROM workspace_documents WHERE managed=1 AND status='active')",
+        "SELECT count(*) FROM context_items WHERE source_kind='memory' AND CAST(source_revision AS TEXT) NOT IN (SELECT CAST(r.id AS TEXT) FROM workspace_revisions r JOIN workspace_documents d ON d.id=r.document_id WHERE d.managed=1)",
     )?;
     let token_units = shared::token_units(&journal_text);
     let placeholder_count = shared::placeholder_count(&journal_text);
