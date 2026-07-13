@@ -27,7 +27,7 @@ use std::{
     collections::BTreeSet,
     fs,
     path::Path,
-    time::{Duration, SystemTime, UNIX_EPOCH},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
 type R<T> = Result<T, String>;
@@ -35,6 +35,7 @@ const MODEL_CALL_LIMIT: i64 = 64;
 const TOKEN_BUDGET_LIMIT: i64 = 1_048_576;
 const EFFECT_BUDGET_LIMIT: i64 = 16;
 const RECOVERY_COST_LIMIT: i64 = 16;
+const ACTIVE_MILLISECONDS_LIMIT: i64 = 900_000;
 
 #[rustfmt::skip]
 pub fn send(data:&Path,text:&str,force_new:bool)->R<String>{
@@ -54,13 +55,14 @@ pub fn run(data: &Path, endpoint: &mut dyn Endpoint) -> R<()> {
 
 #[rustfmt::skip]
 pub fn run_once(data:&Path,endpoint:&mut dyn Endpoint)->R<String>{
- fs::create_dir_all(data).map_err(e)?; let db=data.join("lkjagent.sqlite3"); let mut store=NativeStore::open(&db).map_err(e)?;
+ let cycle=Instant::now();fs::create_dir_all(data).map_err(e)?; let db=data.join("lkjagent.sqlite3"); let mut store=NativeStore::open(&db).map_err(e)?;
  for exchange in store.ambiguous_providers().map_err(e)?{store.provider_phase(&exchange,"sent","ambiguous").map_err(e)?;}
  let p=store.restart_projection().map_err(e)?; let Some(m)=p.matter else{return Ok("idle: no open matter".into())};
  if m.lifecycle=="blocked"{return Err(format!("blocked: matter {} requires owner or config change",m.id))}
  let calls=store.provider_exchanges_in_budget_epoch(&m.id).map_err(e)?;if calls>=MODEL_CALL_LIMIT{return exhaust(&mut store,&m.id,None,"model-calls",calls,MODEL_CALL_LIMIT,0)}
  let (tokens,unknown)=store.accounted_tokens_in_budget_epoch(&m.id).map_err(e)?;if tokens>=TOKEN_BUDGET_LIMIT{return exhaust(&mut store,&m.id,None,"tokens",tokens,TOKEN_BUDGET_LIMIT,unknown)}
  let recovery=store.recovery_cost_in_budget_epoch(&m.id).map_err(e)?;if recovery>=RECOVERY_COST_LIMIT{return exhaust(&mut store,&m.id,None,"recovery-cost",recovery,RECOVERY_COST_LIMIT,0)}
+ let active=store.active_milliseconds_in_budget_epoch(&m.id).map_err(e)?;if active>=ACTIVE_MILLISECONDS_LIMIT{return exhaust(&mut store,&m.id,None,"active-milliseconds",active,ACTIVE_MILLISECONDS_LIMIT,0)}
  if !p.effects.is_empty(){return Err(format!("blocked: unfinished effect {}:{}",p.effects[0].id,p.effects[0].status))}
  if !p.decisions.is_empty(){return Err(format!("blocked: unfinished decision {}:{}",p.decisions[0].id,p.decisions[0].status))}
  let snap=hydrate(&m.id,&p.cells)?; let now=crate::clock::utc_now(); let spec=match select(RuntimeState::from_snapshot(snap.clone()),RuntimePolicy::default(),CurrentTime(now.clone())){Selection::Decision(v)=>v,Selection::Idle=>return Ok("idle: no eligible decision".into()),other=>return Ok(format!("blocked: {other:?}"))};
@@ -73,6 +75,7 @@ pub fn run_once(data:&Path,endpoint:&mut dyn Endpoint)->R<String>{
  let answer=match endpoint.complete(&compiled.prompt,0){Ok(v)=>v,Err(x)=>{store.provider_outcome(&xid,"failed",x.as_bytes(),(None,None),millis(),b"error",b"endpoint",b"not-parsed").map_err(e)?; return fault(&mut store,&did,&m.id,ModelFaultKind::Stale,&x)}};
  let raw=bounded(answer.content.as_bytes(),16_384); store.provider_outcome(&xid,"succeeded",raw,(answer.prompt_tokens.map(i64::from),answer.completion_tokens.map(i64::from)),millis(),answer.finish_reason.as_bytes(),answer.anomaly.as_deref().unwrap_or("").as_bytes(),b"strict-parse-follows").map_err(e)?;
  let (tokens,unknown)=store.accounted_tokens_in_budget_epoch(&m.id).map_err(e)?;if tokens>=TOKEN_BUDGET_LIMIT{return exhaust(&mut store,&m.id,Some(&did),"tokens",tokens,TOKEN_BUDGET_LIMIT,unknown)}
+ let active=store.active_milliseconds_in_budget_epoch(&m.id).map_err(e)?.saturating_add(i64::try_from(cycle.elapsed().as_millis()).unwrap_or(i64::MAX));if active>=ACTIVE_MILLISECONDS_LIMIT{return exhaust(&mut store,&m.id,Some(&did),"active-milliseconds",active,ACTIVE_MILLISECONDS_LIMIT,0)}
  let parsed=match lkjagent_core::parse::parse_expected_for_decision(&decision,&answer.content){Ok(v)=>v,Err(x)=>{let text=format!("{x:?}");if decision.expected_envelope==lkjagent_core::runtime_decision::OutputEnvelope::Message&&output_faults(&db,&m.id)>0{return close(&mut store,&m.id,&did,"Completed with current harness checks.")}let outcome=fault(&mut store,&did,&m.id,if text.contains("UnknownTool"){ModelFaultKind::Hidden}else{ModelFaultKind::Malformed},&text)?;if answer.content.trim_start().starts_with("<final>"){if let Some((path,revision))=current_source(&store){let _=store.reuse_checked_revision(&m.id,&source_decision(&db,&m.id).unwrap_or_else(||did.to_string()),path.as_bytes(),&revision).map_err(e)?;}}return Ok(outcome)}};
  match parsed { ParsedOutput::Action(a)=>match dispatch(data,&db,&mut store,&m.id,&did,&decision,&a.tool,&a.params,&answer.content){Ok(v)=>Ok(v),Err(x)=>fault(&mut store,&did,&m.id,ModelFaultKind::Stale,&x)}, ParsedOutput::Message(body) if final_claims_allowed(&body)=>close(&mut store,&m.id,&did,&body), ParsedOutput::Message(_)=>fault(&mut store,&did,&m.id,ModelFaultKind::Malformed,"unsupported future or command claim in final wording") }
 }
