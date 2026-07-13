@@ -91,13 +91,12 @@ pub fn run(root: &Path, endpoint: &Path) -> Result<String, String> {
                         direct_tool_view_for_state("orient", None),
                         OutputEnvelope::Action,
                     );
-                    let outcome = if parse_model_value(&completion.content, &decision).is_ok() {
-                        "admitted"
-                    } else {
-                        "parse-fault"
+                    let outcome = match parse_model_value(&completion.content, &decision) {
+                        Ok(_) => "admitted".to_string(),
+                        Err(error) => format!("parse-fault-{error:?}"),
                     };
                     call_count += 1;
-                    (outcome.to_string(), response_hash, 1)
+                    (outcome, response_hash, 1)
                 };
                 output.push_str(&format!("{cell}\t{scenario}\t{repeat}\t{source}\t{plan_commit}\t{profile}\t{outcome}\t{response_hash}\t{calls}\n"));
             }
@@ -128,7 +127,7 @@ fn prompt(row: &std::collections::BTreeMap<&str, &str>, scenario: &str) -> Strin
     } else {
         ""
     };
-    format!("Profile {} scenario {scenario}. Use only the strict attribute-free tool_call grammar. Select read_file for notes/exact-base.txt at offset 1 count 20 with complete false.{context}{example} Output only one action.", row["cell"])
+    format!("<system>You are the action selector for profile {} scenario {scenario}. Return exactly one action and no prose.</system><protocol><action-envelope>&lt;tool_call&gt;&lt;tool&gt;TOOL&lt;/tool&gt;&lt;field&gt;VALUE&lt;/field&gt;&lt;/tool_call&gt;</action-envelope><rules>Strict attribute-free XML-like tags. No JSON, markdown, attributes, self-closing tags, or extra fields. Preserve descriptor field order.</rules></protocol><tools><tool><name>read_file</name><purpose>read one numbered page</purpose><fields>path, offset, count, complete</fields></tool></tools><objective>Select read_file for notes/exact-base.txt at offset 1 count 20 with complete false.{context}{example}</objective>", row["cell"])
 }
 fn required<'a>(
     values: &'a std::collections::BTreeMap<String, String>,

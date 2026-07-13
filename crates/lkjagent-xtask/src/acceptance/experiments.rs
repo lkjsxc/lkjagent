@@ -92,7 +92,8 @@ pub fn derivations(root: &Path, bytes: &[u8], source: &str) -> BTreeSet<String> 
             || !matches!(row[2], "1" | "2" | "3")
             || !hash(row[5])
             || !hash(row[7])
-            || !matches!(row[6], "admitted" | "parse-fault" | "static-rejected")
+            || !(matches!(row[6], "admitted" | "static-rejected")
+                || row[6].starts_with("parse-fault-"))
             || !seen.insert((row[0], row[1], row[2]))
         {
             return out;
