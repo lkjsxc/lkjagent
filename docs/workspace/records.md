@@ -8,8 +8,8 @@ Define grounded records, sourced memory, activity projections, and reports.
 
 The normal descriptor registry exposes `write_record` with exact `family`,
 `title`, and `body` fields during orient, modify, and named recovery. This slice
-admits exact `family=journal` and `family=memory`; review and respond expose no
-record tool. The persisted descriptor and admission retain one honest
+admits exact `family=journal`, `family=memory`, and `family=report`; review and
+respond expose no record tool. The persisted descriptor and admission retain one honest
 `workspace.record` effect key. Family dispatch occurs only on that admitted
 path. There is no public record command, scheduler, index authority, manifest,
 separate grammar, or direct writer.
@@ -75,10 +75,17 @@ body, secret, or state JSON. They are evidence, not control authority.
 
 ## Reports
 
-A short report uses one real file below `artifacts/documents` or
-`artifacts/reports`. Longer output uses meaningful semantic children plus a
-README map, each below the token cap. No empty or placeholder part exists.
-Checks cover paths, links, order, fingerprints, sources, and final receipt.
+A short report derives a bounded slug from its title and writes one real file at
+`artifacts/reports/<slug>.md`. Harness-owned frontmatter records kind, semantic
+key, slug, and the ordered kind/fingerprint pair for every selected persisted
+context item. The report requires nonempty lineage and a safe title and body;
+the whole file is capped at 512 conservative token units.
+
+The shared exact effect provides declared parents, collision and stale-byte
+protection, managed replacement revisions, generic file checks, and receipts.
+`managed-report` additionally checks canonical structure, exact lineage,
+nonempty prose, placeholders, and size. Reports never enter memory retrieval.
+Longer README maps and semantic children are not implemented yet.
 
 ## Maintenance
 

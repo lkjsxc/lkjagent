@@ -28,9 +28,10 @@ Memory candidates come only from the current revision joined through native
 managed workspace documents to a settled producing effect and closed source
 matter. They retain exact path, revision ID, semantic key, and bounded revision
 body. Older revisions, arbitrary filesystem files, earlier conversation text,
-and open or failed producers are not memory candidates. A record renderer copies
-exact selected owner fingerprints into harness-owned metadata; the model cannot
-author or omit that lineage.
+and open or failed producers are not memory candidates. Memory metadata copies
+exact selected owner fingerprints. Short-report metadata copies the ordered kind
+and fingerprint of every selected persisted context item. The model cannot author
+or omit either lineage.
 
 ## Precedence
 

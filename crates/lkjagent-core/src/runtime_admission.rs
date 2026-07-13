@@ -94,7 +94,7 @@ fn rejection_reason(decision: &RuntimeDecision, action: &ModelAction) -> Option<
     if entry.effect_key.0 == "workspace.record"
         && !matches!(
             action.params.get("family").map(String::as_str),
-            Some("journal" | "memory")
+            Some("journal" | "memory" | "report")
         )
     {
         return Some("record family is not admitted".into());
