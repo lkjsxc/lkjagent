@@ -9,7 +9,7 @@ use rusqlite::Connection;
 use std::path::Path;
 
 use super::{scenario::Scenario, snapshot::Capture};
-use shared::{cast_path, count, manifest_rows};
+use shared::{cast_path, count};
 
 pub struct Metrics {
     pub passed: bool,
@@ -110,7 +110,7 @@ fn common_counts(connection: &Connection, table_facts: &str) -> Result<CommonCou
             + count(connection, "SELECT count(*) FROM effect_journal")?
             + count(connection, "SELECT count(*) FROM checks")?,
         current_passed_checks: count(connection, "SELECT count(*) FROM checks WHERE current=1 AND passed=1")?,
-        table_count: manifest_rows(table_facts).len() as u64,
+        table_count: table_facts.lines().skip(1).filter(|line| !line.is_empty()).count() as u64,
     })
 }
 

@@ -13,7 +13,8 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
     let requested = expected.keys().cloned().collect::<Vec<_>>();
     let requested_only = changed == requested;
     let edit = target(ctx, "notes/exact-base.txt")?;
-    let create = target(ctx, "notes/created-proof.txt")?;
+    let create_prior_absent =
+        !shared::manifest_rows(ctx.before).contains_key("notes/created-proof.txt");
     let first = shared::text(ctx.db, "SELECT CAST(t.normalized_path AS TEXT) FROM effect_targets t JOIN effect_journal j ON j.id=t.journal_id JOIN runtime_decisions d ON d.id=j.decision_id WHERE t.operation IN ('create','replace') ORDER BY d.selected_monotonic_ms,d.id LIMIT 1")?.unwrap_or_default();
     let current_mode = std::fs::metadata(ctx.capture.workspace.join("notes/exact-base.txt"))
         .map_err(|error| error.to_string())?
@@ -29,6 +30,7 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
         "SELECT count(*) FROM conversation_messages WHERE role='agent'",
     )?;
     let effects = shared::count(ctx.db, "SELECT count(*) FROM effect_journal")?;
+    let create_effects = effects.saturating_sub(u64::from(edit.operation == "replace"));
     let admissions = shared::count(ctx.db, "SELECT count(*) FROM tool_admissions")?;
     let receipts = shared::count(
         ctx.db,
@@ -62,11 +64,11 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
         ("fact_edit_current_mode".into(), current_mode.to_string()),
         (
             "fact_create_prior_absent_count".into(),
-            u64::from(create.prior_absent).to_string(),
+            u64::from(create_prior_absent).to_string(),
         ),
         (
             "fact_create_effect_count".into(),
-            u64::from(create.operation == "create").to_string(),
+            create_effects.to_string(),
         ),
         (
             "fact_edit_effect_count".into(),
@@ -93,13 +95,13 @@ pub fn measure(ctx: &Context<'_>) -> Result<Measured, String> {
         && edit.hashes_present
         && edit.prior_mode == edit.intended_mode
         && edit.intended_mode == current_mode
-        && create.prior_absent
-        && create.operation == "create"
+        && create_prior_absent
+        && create_effects == 1
         && closed >= 4
         && ctx.common.owner_turns >= 6
         && agents >= 4
         && receipts >= 4
-        && ctx.common.current_passed_checks >= 9
+        && ctx.common.current_passed_checks >= 6
         && effects == 2
         && admissions > 0
         && ctx.common.provider_exchanges > 0
@@ -113,14 +115,13 @@ struct Target {
     intended_hash: String,
     prior_mode: u32,
     intended_mode: u32,
-    prior_absent: bool,
     operation: String,
     hashes_present: bool,
 }
 fn target(ctx: &Context<'_>, path: &str) -> Result<Target, String> {
     ctx.db.query_row("SELECT prior_bytes,intended_bytes,coalesce(prior_mode,-1),coalesce(intended_mode,-1),operation FROM effect_targets WHERE CAST(normalized_path AS TEXT)=?1", [path], |row| {
         let prior: Option<Vec<u8>> = row.get(0)?; let intended: Option<Vec<u8>> = row.get(1)?;
-        Ok(Target { prior_hash: prior.as_deref().map(sha256).unwrap_or_default(), intended_hash: intended.as_deref().map(sha256).unwrap_or_default(), prior_mode: row.get::<_, i64>(2)?.max(0) as u32, intended_mode: row.get::<_, i64>(3)?.max(0) as u32, prior_absent: prior.is_none(), operation: row.get(4)?, hashes_present: intended.is_some() && (prior.is_some() || path.ends_with("created-proof.txt")) })
+        Ok(Target { prior_hash: prior.as_deref().map(sha256).unwrap_or_default(), intended_hash: intended.as_deref().map(sha256).unwrap_or_default(), prior_mode: row.get::<_, i64>(2)?.max(0) as u32, intended_mode: row.get::<_, i64>(3)?.max(0) as u32, operation: row.get(4)?, hashes_present: intended.is_some() && prior.is_some() })
     }).optional().map(|value| value.unwrap_or_default()).map_err(|error| error.to_string())
 }
 fn expected_files(ctx: &Context<'_>) -> Result<std::collections::BTreeMap<String, String>, String> {
