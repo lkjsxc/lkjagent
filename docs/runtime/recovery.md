@@ -52,5 +52,8 @@ unrelated runnable matter remains eligible. The next owner `send` without
 an owner-resume event and message, installs only the new opened control cell,
 replaces the objective, and reopens the matter. The owner-resume event
 starts a fresh model-call budget epoch without deleting prior exchanges. Separate
-effect, recovery-cost, active-time, and token exhaustion paths remain to be
-implemented.
+A 1,048,576-unit token budget sums reported input and output tokens in the same
+epoch. Missing components remain null in provider rows and receive a conservative
+one-unit-per-four-reference-bytes accounting charge. A post-response exhaustion
+atomically fails the current decision and blocks before admission. Separate
+effect, recovery-cost, and active-time exhaustion paths remain to be implemented.
