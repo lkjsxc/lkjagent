@@ -89,7 +89,7 @@ fn focused_runtime_and_effect_facts_are_required() {
 fn current_state_evidence_boundary_and_work_state_are_required() {
     for token in [
         "Final source is the exact acceptance `SOURCE` argument.",
-        "configured 903-second daily-life run",
+        "all five configured campaigns ran for at least 903 seconds",
         "| acceptance-checker | complete |",
     ] {
         let mut files = repo_files();

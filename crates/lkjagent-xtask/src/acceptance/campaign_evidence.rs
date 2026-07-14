@@ -53,7 +53,11 @@ fn bound<'a>(
         development.then(|| *fields.get("development_source_commit").unwrap_or(&""));
     let expected_binary =
         super::build_manifest::binary(root, path.parent()?, source, development, campaign_source)?;
-    let progress_floor = if scenario == "exact-file-edit" { 2 } else { 3 };
+    let progress_floor = match scenario {
+        "exact-file-edit" => 2,
+        "slow-japanese-pty" => 0,
+        _ => 3,
+    };
     if !source_ok
         || fields.get("mode") != Some(&"run")
         || fields.get("semantic_status") != Some(&"evaluated")

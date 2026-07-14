@@ -17,12 +17,11 @@ The retired baseline accepted owner intake but produced no model decision or
 requested file change. That failure and later failed configured runs remain
 tracked diagnostics, not semantic success.
 
-A configured 903-second daily-life run at source
-`5c641c33573516c01276741fea0237d5d53b9339` passed strict grounded journal,
-managed-memory recall, correction, source, and contamination measurements. It
-is historical development evidence because the checker and exact-file scenario
-changed afterward. The changed source still requires development profile and six
-campaign runs, final frozen runs, Docker, native doctor, and independent review.
+At development source `b6b391331700412e7888737ecc77349b3f6121e8`,
+all five configured campaigns ran for at least 903 seconds and passed strict
+exact-file, long-artifact recovery, daily recall, multi-project, and native PTY
+measurements with one shared binary hash. Frozen-source campaigns, Docker,
+native doctor, source-bound receipts, and independent review remain.
 
 ## Implemented Primitives
 
@@ -122,7 +121,8 @@ The first pending-child attempt uses 128 tokens to exercise that durable recover
 Configured calls request no reasoning effort while preserving tool admission.
 Shared mechanics cover safe parents and revisions,
 checks, receipts, collisions, and effect-gated continuity; limits are 512/2,048.
-Memory retrieval stays current. A pre-narrowing run failed; proof remains unrun.
+Memory retrieval stays current. The tracked development campaign settled all
+12 semantic children, 1,686 aggregate words, output-limit recovery, and restart.
 
 ## Direct Contract
 
@@ -165,14 +165,14 @@ claims, and the close transaction owns the canonical final message.
 | native journal mechanics | complete | focused descriptor, timezone, parent safety, effect retry, managed revision, structural check, and public scripted tests pass |
 | native memory mechanics | complete | focused slug, lineage, managed revision, retrieval, correction, contamination, and prompt-occurrence tests pass |
 | native report mechanics | complete | focused short slug, long map and child topology, pending resume, managed replacement, structural checks, collision, bound, and receipt tests pass |
-| configured-model journal proof | historical | one strict daily run passed before later checker changes |
-| configured-model memory proof | historical | that run proved revision-exact initial and corrected recall |
-| configured-model report proof | active | deterministic topology passes; configured semantic quality is unrun |
+| configured-model journal proof | development | same-source strict daily campaign passed grounded journal facts |
+| configured-model memory proof | development | same run passed initial and corrected revision-exact recall |
+| configured-model report proof | development | same-source campaign passed 12 children, 1,686 words, recovery, and restart |
 | public scripted file edit | complete | exact edit/create, checked continuation, restart, and stale guards pass |
-| configured-model file proof | active | changed scenario now requires both exact edit and absent-file create |
+| configured-model file proof | development | same-source campaign passed exact edit, absent create, and six checks |
 | retired-source-deletion | complete | old controller, bridge, record, inspection, workbench, and TUI source is absent from product crates |
 | native-tui | complete | one-transaction frames, pure Unicode viewport, typed intake, bounded worker, rendering, PTY, and RAII tests pass |
-| final campaigns | active | all six changed-source development and frozen runs remain |
+| final campaigns | active | five development runs pass; five frozen-source runs remain |
 
 ## Honesty Rules
 

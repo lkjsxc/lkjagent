@@ -59,9 +59,11 @@ Five meaningful development campaigns and five frozen-source campaigns each run
 at least 900 seconds: file, recovery, daily life/recall, multiple projects/report,
 and PTY. Each uses fresh roots, real endpoint, production public commands,
 predeclared owner schedule, and corresponding durable work. Sleeping duration is
-not progress.
+not progress. The PTY scenario derives its progress from measured input, output,
+resize, activity, search, identity, slow-call, and restart facts rather than
+workspace-effect progress decisions.
 
-The exact-file evaluator requires the declared final SHA-256, one workspace file,
+The exact-file evaluator requires the declared final SHA-256, two workspace files,
 five durable owner turns, checked closes for the edit, second-turn verification,
 and retrieval continuity, current passed checks, one edit effect, durable
 admissions and provider exchanges, and exactly 18 native tables. Later scheduled
