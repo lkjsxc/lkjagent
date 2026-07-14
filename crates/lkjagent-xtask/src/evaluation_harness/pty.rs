@@ -42,7 +42,10 @@ fn terminal_schedule(root: &Path, source: &str, scenario: &scenario::Scenario,
         capture.raw.join("terminal.cast").display().to_string(), capture.binary.display().to_string(),
         capture.data.display().to_string(), scenario.path.join("owner-schedule.tsv").display().to_string()];
     let output = clock::command(Path::new("/usr/bin/python3"), &args, &capture.root, env, Duration::from_secs(970))?;
-    if output.code != Some(0) || output.timed_out { return Err(format!("real PTY campaign capture failed code={:?} timed_out={}", output.code, output.timed_out)); }
+    if output.code != Some(0) || output.timed_out {
+        let stderr=String::from_utf8_lossy(&output.stderr);let cause=if stderr.contains("can't open file"){"script-missing"}else if stderr.contains("usage: pty-recorder.py"){"argument-count"}else if stderr.contains("TUI exited early"){"tui-exited"}else if stderr.contains("restart marker"){"restart-marker"}else{"recorder-error"};
+        return Err(format!("real PTY campaign capture failed cause={cause} code={:?} timed_out={}", output.code, output.timed_out));
+    }
     let duration = output.elapsed.as_secs();
     let (message, _, passed) = finish(root, source, scenario, capture, before, &[output], "run", duration)?;
     if passed { Ok(format!("ok campaign source={source} scenario={} semantic_status=evaluated outcome=passed",scenario.id)) }
