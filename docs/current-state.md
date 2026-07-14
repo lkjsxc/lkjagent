@@ -21,8 +21,9 @@ tracked diagnostics, not semantic success.
 At development source `b6b391331700412e7888737ecc77349b3f6121e8`,
 all five configured campaigns ran for at least 903 seconds and passed strict
 exact-file, long-artifact recovery, daily recall, multi-project, and native PTY
-measurements with one shared binary hash. Frozen-source campaigns, Docker,
-native doctor, source-bound receipts, and independent review remain.
+measurements with one shared binary hash. Docker Compose build, test, lint, and
+verify pass for this tree. Frozen-source campaigns, native doctor, source-bound
+receipts, and independent review remain.
 
 ## Implemented Primitives
 

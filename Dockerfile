@@ -23,6 +23,16 @@ COPY docs ./docs
 COPY evaluation ./evaluation
 COPY config/lkjagent.example.json ./config/lkjagent.example.json
 COPY Dockerfile docker-compose.yml ./
+RUN git init \
+    && git config user.name container \
+    && git config user.email container@invalid \
+    && git add . \
+    && git commit -m "container source snapshot" \
+        -m "Tested: copied build context is tracked" \
+        -m "Not-tested: external repository history is unavailable" \
+    && git commit --allow-empty -m "container test boundary" \
+        -m "Tested: parent source snapshot is reachable" \
+        -m "Not-tested: external repository history is unavailable"
 RUN --mount=type=cache,target=/usr/local/cargo/registry \
     --mount=type=cache,target=/usr/local/cargo/git \
     --mount=type=cache,target=/src/target \

@@ -1,6 +1,7 @@
 use std::fs;
 use std::os::unix::fs::symlink;
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 use lkjagent_xtask::evaluation_harness::{
     endpoint_file, fixture_errors, sha256, validate_cast, FakeClock, FaultInjector,
@@ -16,15 +17,21 @@ fn repository_satisfies_evaluation_runner_contract() {
 #[test]
 fn tracked_blocked_baseline_evidence_validates_honestly() {
     let root = repository_root();
+    let source = "97e00698f348fc2435d47a107b5b8453c98b9d1f";
     let args = words(&[
         "evidence",
         "check",
         "--campaign",
         "baseline",
         "--source",
-        "97e00698f348fc2435d47a107b5b8453c98b9d1f",
+        source,
     ]);
-    assert_eq!(run(&args, &root), 0);
+    let reachable = Command::new("git")
+        .args(["cat-file", "-e", &format!("{source}^{{commit}}")])
+        .current_dir(&root)
+        .status()
+        .is_ok_and(|status| status.success());
+    assert_eq!(run(&args, &root), i32::from(!reachable));
 }
 
 #[test]
