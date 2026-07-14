@@ -20,9 +20,10 @@ normal prompts.
   harness materializes matter-bound continuity checks before selecting respond.
 - Missing reads activate a source-revision need.
 - Stale or ambiguous edits reread and rebase; they never overwrite.
-- Provider length or oversize normalizes to `output-limit` without body bytes;
-  a pending report retries as `modify.report.reduce-unit` for one named 130-150
-  word unit under a persisted 4,096-token output cap.
+- A pending report's first child attempt uses 128 tokens to establish a real
+  `output-limit` fault without retaining body bytes. It retries as
+  `modify.report.reduce-unit` for one named 130-150 word unit under a persisted
+  4,096-token output cap.
 - Endpoint faults use typed retry/wait policy and config-change wakes.
 - Check faults expose measured differences and return to modification.
 - Equal progress vectors change evidence, tools, scope, or wake.
@@ -64,9 +65,7 @@ It blocks the next effectful decision before edit preparation or filesystem
 mutation. Each persisted rejected
 model output costs one recovery point; the thirty-second failure is retained and
 then blocks the matter. Settled decision intervals plus the current process-monotonic
-cycle are capped at 900,000 active milliseconds. While a persisted long report
-remains pending, only this ceiling is 3,600,000 milliseconds so bounded semantic
-units can settle; the other epoch limits remain unchanged. Daemon downtime and
-unrelated matter time are not charged; clock rollback contributes zero persisted duration.
+cycle are capped at 900,000 active milliseconds. Daemon downtime and unrelated
+matter time are not charged; clock rollback contributes zero persisted duration.
 Within the runnable tier, the matter with the oldest last durable selection runs
 first, so a never-selected owner matter receives a turn across process reopen.

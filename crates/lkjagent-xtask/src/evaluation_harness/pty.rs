@@ -72,7 +72,7 @@ fn run_schedule(root: &Path, source: &str, scenario: &scenario::Scenario, captur
 }
 #[rustfmt::skip]
 fn restart_schedule(root:&Path,source:&str,scenario:&scenario::Scenario,capture:&snapshot::Capture,before:&str,env:&BTreeMap<String,String>)->Result<(),String>{
- let (restart,total)=if scenario.id=="long-artifact-recovery"{(2_400,3_601)}else{(620,901)};
+ let restart=620;let total=901;
  let started=Instant::now();thread::scope(|scope|->Result<(),String>{
   let binary=capture.binary.clone();let cwd=capture.root.clone();let first_env=env.clone();let first=scope.spawn(move||clock::command(&binary,&["--data".into(),cwd.join("data").display().to_string(),"run".into()],&cwd,&first_env,Duration::from_secs(restart)));
   for (offset,text) in scenario.turns.iter().skip(1).take_while(|turn|turn.0<restart){wait_until(started,Duration::from_secs(*offset));public(capture,env,&["send",text],Duration::from_secs(30))?}

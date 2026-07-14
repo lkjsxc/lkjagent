@@ -99,7 +99,7 @@ impl Endpoint for LlmEndpoint {
         } else {
             CallSpec::with_stop(max_tokens, &prompt.stop)
         }
-        .with_reasoning_effort("minimal");
+        .with_reasoning_effort("none");
         let messages = vec![
             Message::system(prompt.system.clone()),
             Message::user(prompt.user.clone()),

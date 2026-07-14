@@ -64,11 +64,10 @@ pub fn run_once(data:&Path,endpoint:&mut dyn Endpoint)->R<String>{
  for exchange in store.ambiguous_providers().map_err(e)?{store.provider_phase(&exchange,"sent","ambiguous").map_err(e)?;}
  let p=store.restart_projection().map_err(e)?; let Some(m)=p.matter else{return Ok("idle: no open matter".into())};
  if m.lifecycle=="blocked"{return Err(format!("blocked: matter {} requires owner or config change",m.id))}
- let report=p.cells.iter().any(|cell|cell.namespace==b"report"&&cell.key==b"pending");let active_limit=if report{3_600_000}else{ACTIVE_MILLISECONDS_LIMIT};
  let calls=store.provider_exchanges_in_budget_epoch(&m.id).map_err(e)?;if calls>=MODEL_CALL_LIMIT{return exhaust(&mut store,&m.id,None,"model-calls",calls,MODEL_CALL_LIMIT,0)}
  let (tokens,unknown)=store.accounted_tokens_in_budget_epoch(&m.id).map_err(e)?;if tokens>=TOKEN_BUDGET_LIMIT{return exhaust(&mut store,&m.id,None,"tokens",tokens,TOKEN_BUDGET_LIMIT,unknown)}
  let recovery=store.recovery_cost_in_budget_epoch(&m.id).map_err(e)?;if recovery>=RECOVERY_COST_LIMIT{return exhaust(&mut store,&m.id,None,"recovery-cost",recovery,RECOVERY_COST_LIMIT,0)}
- let active=store.active_milliseconds_in_budget_epoch(&m.id).map_err(e)?;if active>=active_limit{return exhaust(&mut store,&m.id,None,"active-milliseconds",active,active_limit,0)}
+ let active=store.active_milliseconds_in_budget_epoch(&m.id).map_err(e)?;if active>=ACTIVE_MILLISECONDS_LIMIT{return exhaust(&mut store,&m.id,None,"active-milliseconds",active,ACTIVE_MILLISECONDS_LIMIT,0)}
  if !p.effects.is_empty(){return Err(format!("blocked: unfinished effect {}:{}",p.effects[0].id,p.effects[0].status))}
  if !p.decisions.is_empty(){return Err(format!("blocked: unfinished decision {}:{}",p.decisions[0].id,p.decisions[0].status))}
  let snap=hydrate(&m.id,&p.cells)?; let now=crate::clock::utc_now(); let spec=match select(RuntimeState::from_snapshot(snap.clone()),RuntimePolicy::default(),CurrentTime(now.clone())){Selection::Decision(v)=>v,Selection::Idle=>return Ok("idle: no eligible decision".into()),other=>return Ok(format!("blocked: {other:?}"))};

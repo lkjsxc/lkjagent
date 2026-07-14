@@ -56,9 +56,7 @@ pub(crate) fn narrow(
         .cells
         .iter()
         .any(|(key, _)| key.namespace == "recovery" && key.name == "output-limit");
-    if reducing {
-        decision.model_budget_tokens = Some(4_096);
-    }
+    decision.model_budget_tokens = Some(if reducing { 4_096 } else { 128 });
     let Some(entry) = decision
         .tool_view
         .entries
@@ -183,6 +181,16 @@ mod tests {
         assert!(entry.purpose.contains("between 130 and 150 words"));
         assert_eq!(decision.model_budget_tokens, Some(4_096));
         assert!(entry.field_spec("children").is_none());
+        snapshot
+            .cells
+            .remove(&StateKey::new("recovery", "output-limit").map_err(|error| error.message)?);
+        narrow(
+            &mut decision,
+            b"use write_record family report",
+            RuntimePhase::Modify,
+            &snapshot,
+        );
+        assert_eq!(decision.model_budget_tokens, Some(128));
         assert_eq!(report_objective(&snapshot).as_deref(), Some("Write only the report child slug=world-history unit=origins. Author a distinct source-linked body of 130-150 words. Do not write the map or any other unit."));
         Ok(())
     }

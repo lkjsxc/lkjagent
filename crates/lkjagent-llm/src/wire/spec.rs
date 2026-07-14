@@ -38,7 +38,7 @@ impl CallSpec {
 
     pub fn with_reasoning_effort(mut self, effort: impl Into<String>) -> Self {
         let effort = effort.into();
-        self.reasoning_effort = (!effort.is_empty() && effort != "none").then_some(effort);
+        self.reasoning_effort = (!effort.is_empty()).then_some(effort);
         self
     }
 }

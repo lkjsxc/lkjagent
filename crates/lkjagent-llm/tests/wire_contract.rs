@@ -5,7 +5,7 @@ use lkjagent_llm::client::{complete, ClientConfig, MAX_RESPONSE_BYTES};
 use lkjagent_llm::error::{ClientError, EndpointFailure, FaultClass};
 use lkjagent_llm::message::Message;
 use lkjagent_llm::wire::{
-    decode_completion, CallSpec, FinishReason, ProviderAnomalyKind, WireError,
+    build_request, decode_completion, CallSpec, FinishReason, ProviderAnomalyKind, WireError,
 };
 use support::{serve_once, serve_owned, TestResult};
 const OK: &str = r#"{"choices":[{"message":{"content":"done"},"finish_reason":"stop"}]}"#;
@@ -38,15 +38,16 @@ fn nondefault_fields_reasoning_and_auth_are_confined() -> TestResult<()> {
 }
 
 #[test]
-fn absent_and_none_reasoning_are_omitted() -> TestResult<()> {
-    for spec in [
-        CallSpec::action(33),
-        CallSpec::action(33).with_reasoning_effort("none"),
-    ] {
-        let request = lkjagent_llm::wire::build_request("m", &[Message::user("x")], &spec);
-        let value = serde_json::to_value(request)?;
-        assert!(value.get("reasoning_effort").is_none());
-    }
+fn absent_reasoning_is_omitted_and_explicit_none_is_retained() -> TestResult<()> {
+    let absent = build_request("m", &[Message::user("x")], &CallSpec::action(33));
+    let absent = serde_json::to_value(absent)?;
+    assert!(absent.get("reasoning_effort").is_none());
+    let none = build_request(
+        "m",
+        &[Message::user("x")],
+        &CallSpec::action(33).with_reasoning_effort("none"),
+    );
+    assert_eq!(serde_json::to_value(none)?["reasoning_effort"], "none");
     Ok(())
 }
 

@@ -44,9 +44,7 @@ the corrected current revision once while recent noise and rogue files stay out.
 ## Report And Activity Scenarios
 
 A short report is one checked file. A longer report has meaningful bounded
-children, complete links, no empty part, and restart continuity. The long-report
-schedule alone ends at 3,480 seconds, with a 2,400-second restart boundary, so
-bounded model-authored units can satisfy the 1,500-word aggregate. Activity
+children, complete links, no empty part, and restart continuity. Activity
 projections bind canonical messages and decision/effect/check receipts without
 becoming runtime authority.
 
