@@ -170,6 +170,15 @@ fn generic_pty_fixture_is_rejected() -> Result<(), String> {
     fs::remove_file(path).map_err(|error| error.to_string())
 }
 
+#[test]
+fn ctrl_f_is_measured_as_search_input() -> Result<(), String> {
+    let path = temporary("search.cast");
+    let cast = "{\"version\":2}\n[0.0,\"m\",\"slow-start\"]\n[0.1,\"i\",\"\\u0006日本語\"]\n[1.2,\"m\",\"slow-end\"]\n";
+    fs::write(&path, cast).map_err(|error| error.to_string())?;
+    assert_eq!(validate_cast(&path)?.search_inputs, 1);
+    fs::remove_file(path).map_err(|error| error.to_string())
+}
+
 fn repository_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
 }

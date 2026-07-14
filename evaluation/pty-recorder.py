@@ -35,7 +35,10 @@ def main() -> int:
     try:
         while time.monotonic() - started < 901.0:
             elapsed = time.monotonic() - started
-            while sent < len(turns) and elapsed >= turns[sent][0]:
+            while sent < len(turns):
+                due = max(turns[sent][0], 1.0 if sent == 0 else 0.0)
+                if elapsed < due:
+                    break
                 send(master, turns[sent][1] + "\r", frames, started)
                 sent += 1
             read_available(master, frames, started)
@@ -173,8 +176,14 @@ def stop(process, master: int, frames: list, started: float) -> None:
 
 def write_cast(path: Path, frames: list) -> None:
     header = {"version": 2, "width": 80, "height": 24, "timestamp": 0}
+    outputs = [i for i, frame in enumerate(frames) if frame[1] == "o"]
+    keep = set(outputs[:64] + outputs[-64:])
+    selected = [frame for i, frame in enumerate(frames) if frame[1] != "o" or i in keep]
+    for frame in selected:
+        if frame[1] == "o" and len(frame[2].encode("utf-8")) > 4096:
+            frame[2] = frame[2].encode("utf-8")[:4096].decode("utf-8", "ignore")
     lines = [json.dumps(header, sort_keys=True)]
-    lines.extend(json.dumps(frame, ensure_ascii=False) for frame in frames)
+    lines.extend(json.dumps(frame, ensure_ascii=False) for frame in selected)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

@@ -66,7 +66,7 @@ pub fn validate(path: &Path) -> Result<PtyFacts, String> {
 fn input(facts: &mut PtyFacts, body: &str) {
     facts.input_frames += 1;
     facts.japanese_inputs += usize::from(!body.is_ascii());
-    facts.search_inputs += usize::from(body.contains('/'));
+    facts.search_inputs += usize::from(body.contains('/') || body.contains('\u{6}'));
 }
 fn output(facts: &mut PtyFacts, body: &str) {
     facts.output_frames += 1;
