@@ -38,9 +38,10 @@ pub fn campaign(root: &Path, alias: &str, endpoint: &Path, probe: bool) -> Resul
 #[rustfmt::skip]
 fn terminal_schedule(root: &Path, source: &str, scenario: &scenario::Scenario,
     capture: &snapshot::Capture, before: &str, env: &BTreeMap<String,String>) -> Result<String,String> {
-    let args = [root.join("evaluation/pty-recorder.py").display().to_string(),
-        capture.raw.join("terminal.cast").display().to_string(), capture.binary.display().to_string(),
-        capture.data.display().to_string(), scenario.path.join("owner-schedule.tsv").display().to_string()];
+    let recorder=fs::canonicalize(root.join("evaluation/pty-recorder.py")).map_err(|error|error.to_string())?;
+    let schedule=fs::canonicalize(scenario.path.join("owner-schedule.tsv")).map_err(|error|error.to_string())?;
+    let args = [recorder.display().to_string(), capture.raw.join("terminal.cast").display().to_string(),
+        capture.binary.display().to_string(), capture.data.display().to_string(), schedule.display().to_string()];
     let output = clock::command(Path::new("/usr/bin/python3"), &args, &capture.root, env, Duration::from_secs(970))?;
     if output.code != Some(0) || output.timed_out {
         let stderr=String::from_utf8_lossy(&output.stderr);let cause=if stderr.contains("can't open file"){"script-missing"}else if stderr.contains("usage: pty-recorder.py"){"argument-count"}else if stderr.contains("TUI exited early"){"tui-exited"}else if stderr.contains("restart marker"){"restart-marker"}else{"recorder-error"};
