@@ -4,8 +4,9 @@ Separate observed behavior in this checkout from the direct-runtime contract and
 name the next executable work.
 ## Evidence Boundary
 
-Final source is the exact acceptance `SOURCE` argument. Only tracked sanitized
-attachments below the exact source directory are evidence. Later commits may
+Final source is the exact acceptance `SOURCE` argument.
+Only tracked sanitized attachments below the exact source directory are evidence.
+Later commits may
 add files only below `evaluation/evidence/SOURCE/`; source validation rejects
 any other drift. The final command is:
 

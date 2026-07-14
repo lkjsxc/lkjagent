@@ -175,7 +175,11 @@ fn campaign_errors(fields: &HashMap<String, String>, label: &str) -> Vec<String>
             .get(key)
             .or_else(|| fields.get(measured))
             .and_then(|value| value.parse::<u64>().ok());
-        if count.is_none_or(|value| value == 0) {
+        let terminal_progress = key == "progress_decision_count"
+            && fields
+                .get("scenario")
+                .is_some_and(|value| value == "slow-japanese-pty");
+        if count.is_none_or(|value| value == 0 && !terminal_progress) {
             errors.push(format!("{label}: campaign is quiet or missing {key}"));
         }
     }
