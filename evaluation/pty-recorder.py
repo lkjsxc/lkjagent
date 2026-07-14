@@ -178,6 +178,10 @@ def write_cast(path: Path, frames: list) -> None:
     header = {"version": 2, "width": 80, "height": 24, "timestamp": 0}
     outputs = [i for i, frame in enumerate(frames) if frame[1] == "o"]
     keep = set(outputs[:64] + outputs[-64:])
+    for marker in ("activity", "\x1b[?1049h", "\x1b[?1049l"):
+        match = next((i for i in outputs if marker in frames[i][2].lower()), None)
+        if match is not None:
+            keep.add(match)
     selected = [frame for i, frame in enumerate(frames) if frame[1] != "o" or i in keep]
     for frame in selected:
         if frame[1] == "o" and len(frame[2].encode("utf-8")) > 4096:
